@@ -8,25 +8,33 @@ buildscript {
     }
 }
 
+apply plugin: org.flywaydb.gradle.FlywayPlugin
+// TODO: flyway has bug to use flyway.placeholderReplacement = false, I submitted bug https://github.com/flyway/flyway/issues/1001
+// for now disable it with custom prefix/suffix
+flyway.placeholderPrefix = '#DISABLED_FLYWAY_PLACEHOLDER_PREFIX'
+flyway.placeholderSuffix = '#DISABLED_FLYWAY_PLACEHOLDER_SUFFIX'
+
 // use gradlew -Penv=${env} to pass
 def environment = hasProperty('env') ? env : null
-def flywayProperties = "src/main/resources/flyway.properties"
 
-if (environment != null) {
-    flywayProperties = "conf/${environment}/resources/flyway.properties"
-    assert project.file(flywayProperties).exists()
-}
+tasks.findAll { task -> task.name.startsWith('flyway') }.forEach { flywayTask ->
+    flywayTask.dependsOn {
+        def flywayProperties = "src/main/resources/flyway.properties"
 
-if (project.file(flywayProperties).exists()) {
-    def Properties properties = new Properties()
-    project.file(flywayProperties).withInputStream {
-        properties.load(it)
+        if (environment != null) {
+            flywayProperties = "conf/${environment}/resources/flyway.properties"
+        }
+
+        assert project.file(flywayProperties).exists()
+
+        def Properties properties = new Properties()
+        project.file(flywayProperties).withInputStream {
+            properties.load(it)
+        }
+        properties.each { key, value ->
+            project.ext[key] = value
+        }
+
+        logger.info("loading flyway properties, file=${project.file(flywayProperties)}")
     }
-    properties.each { key, value ->
-        project.ext[key] = value
-    }
-
-    logger.info("loading flyway properties, file=${project.file(flywayProperties)}")
 }
-
-apply plugin: org.flywaydb.gradle.FlywayPlugin
