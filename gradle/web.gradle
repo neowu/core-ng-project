@@ -1,0 +1,51 @@
+import org.apache.tools.ant.filters.ExpandProperties
+
+// use gradlew -Penv=${env} to pass
+def environment = hasProperty('env') ? env : null
+
+apply plugin: 'war'
+
+dependencies {
+    providedCompile(
+            'javax.servlet:javax.servlet-api:3.1.0'
+    )
+}
+
+processResources {
+    // war ant.properties require baseDir of project
+    projectDir.mkdirs()
+
+    project.ext.properties.each { key, value ->
+        ant.properties[key] = value
+    }
+
+    filesMatching('**/*.properties') {
+        filter ExpandProperties, project: project.ant.project
+    }
+    filesMatching('**/*.xml') {
+        filter ExpandProperties, project: project.ant.project
+    }
+}
+
+war {
+    duplicatesStrategy = 'EXCLUDE'
+
+    if (environment != null) {
+        def envResources = "conf/${environment}/resources"
+        assert project.file(envResources).exists()
+        sourceSets.main.resources.srcDirs envResources
+
+        webAppDirName = "conf/${environment}/webapp"    // copy env specific webapp first, then include src/main/webapp
+        from "src/main/webapp"
+    }
+
+    archiveName = "${baseName}.war"
+
+    filesMatching('**/*.css') {
+        filter ExpandProperties, project: project.ant.project
+    }
+}
+
+mkdirs << {
+    webAppDir.mkdirs()
+}

@@ -1,0 +1,116 @@
+apply from: file("${rootDir}/gradle/project.gradle")
+
+subprojects {
+    apply from: file("${rootDir}/gradle/quality.gradle")
+
+    group = 'core.framework'
+    version = '3.1.8'
+}
+
+def awsVersion = '1.10.2'
+def jacksonVersion = '2.5.4'
+
+project(':core-ng-api') {
+    apply from: file("${rootDir}/gradle/lib.gradle")
+}
+
+project(':core-ng') {
+    apply from: file("${rootDir}/gradle/lib.gradle")
+    dependencies {
+        provided(
+                'redis.clients:jedis:2.7.2',
+                'org.elasticsearch:elasticsearch:1.6.0',
+                'com.mchange:c3p0:0.9.5',
+                'org.mongodb:mongo-java-driver:3.0.1',
+                'com.rabbitmq:amqp-client:3.5.3',
+                "com.amazonaws:aws-java-sdk-core:${awsVersion}@jar",
+                "com.amazonaws:aws-java-sdk-sqs:${awsVersion}@jar",
+                "com.amazonaws:aws-java-sdk-sns:${awsVersion}@jar"
+        )
+        compile(
+                project(":core-ng-api"),
+                'javax.inject:javax.inject:1',
+                'org.javassist:javassist:3.19.0-GA',
+                'org.slf4j:slf4j-api:1.7.12',
+                "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}",
+                'org.apache.httpcomponents:httpclient:4.4.1',
+                'io.undertow:undertow-core:1.2.8.Final',
+                'org.thymeleaf:thymeleaf:2.1.4.RELEASE',
+                'net.sourceforge.nekohtml:nekohtml:1.9.22'  // used by thymeleaf legacyHTML5
+        )
+        testCompile(
+                'junit:junit:4.12',
+                'org.mockito:mockito-core:1.10.19',
+                'org.hsqldb:hsqldb:2.3.2'
+        )
+    }
+}
+
+project(':core-ng-test') {
+    apply from: file("${rootDir}/gradle/lib.gradle")
+    dependencies {
+        compile(
+                project(":core-ng"),
+                'junit:junit:4.12',
+                'org.mockito:mockito-core:1.10.19',
+                'org.hsqldb:hsqldb:2.3.2'
+        )
+    }
+}
+
+configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
+    apply plugin: 'maven-publish'
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+
+                artifact sourcesJar {
+                    classifier 'sources'
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                url mavenRepo
+            }
+        }
+    }
+}
+
+project(':demo-service') {
+    apply from: file("${rootDir}/gradle/app.gradle")
+
+    dependencies {
+        compile(
+                project(':core-ng'),
+                'org.mongodb:mongo-java-driver:3.0.1'
+        )
+        runtime(
+                'com.mchange:c3p0:0.9.5',
+                'com.rabbitmq:amqp-client:3.5.3',
+                'redis.clients:jedis:2.7.2'
+        )
+        testCompile(
+                project(':core-ng-test')
+        )
+    }
+}
+
+project(':search-service') {
+    apply from: file("${rootDir}/gradle/app.gradle")
+
+    dependencies {
+        compile(
+                project(':core-ng'),
+                'org.elasticsearch:elasticsearch:1.6.0'
+        )
+        testCompile(
+                project(':core-ng-test')
+        )
+    }
+}

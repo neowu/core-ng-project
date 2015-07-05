@@ -1,0 +1,37 @@
+configurations {
+    provided
+}
+
+sourceSets {
+    main.compileClasspath += configurations.provided
+    test.compileClasspath += configurations.provided
+    test.runtimeClasspath += configurations.provided
+}
+
+apply plugin: 'idea'
+idea.module.scopes.PROVIDED.plus += [configurations.provided]
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    from sourceSets.main.allSource
+    classifier 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+afterEvaluate {
+    // configurations.runtime requires to be after dependency definition
+    task standaloneJar(type: Jar, dependsOn: jar) {
+        classifier = 'standalone'
+
+        from files(sourceSets.main.output.classesDir)
+        from files(sourceSets.main.output.resourcesDir)
+        from configurations.runtime.asFileTree.files.collect { zipTree(it) }
+
+        manifest {
+            attributes 'Main-Class': 'Main'
+            from project.jar.manifest
+        }
+    }
+}

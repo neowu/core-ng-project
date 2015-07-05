@@ -1,0 +1,21 @@
+// use gradlew -Penv=${env} to pass
+def environment = hasProperty('env') ? env : null
+
+apply plugin: 'application'
+mainClassName = 'Main'
+
+afterEvaluate {
+    distTar {
+        archiveName "${baseName}.${extension}"
+    }
+}
+
+distributions {
+    main {
+        if (environment != null) {
+            def envProperties = "conf/${environment}/resources"
+            assert project.file(envProperties).exists()
+            sourceSets.main.resources.srcDirs envProperties
+        }
+    }
+}

@@ -1,0 +1,39 @@
+apply plugin: 'checkstyle'
+apply plugin: 'pmd'
+apply plugin: 'findbugs'
+
+tasks.withType(Checkstyle) {
+    configurations {
+        checkstyle
+    }
+
+    dependencies {
+        checkstyle 'com.puppycrawl.tools:checkstyle:6.7'
+        checkstyle files("${rootDir}/gradle/checkstyle/sevntu-checks-1.13.0.jar")
+    }
+
+    configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
+    configProperties['configDir'] = configFile.parentFile
+    checkstyleClasspath = configurations.checkstyle
+}
+
+pmd {
+    ruleSets = []
+    ruleSetFiles = rootProject.files('gradle/pmd/rule-set.xml')
+    toolVersion = '5.3.2'
+    consoleOutput = true
+}
+
+findbugs {
+    effort = 'max'
+    reportLevel = 'low'
+    excludeFilter = rootProject.file('gradle/findbugs/exclude-filter.xml')
+    toolVersion = '3.0.1'
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}

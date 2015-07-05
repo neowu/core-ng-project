@@ -1,0 +1,102 @@
+package core.framework.impl.db;
+
+import core.framework.api.db.Query;
+import core.framework.api.db.Transaction;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * @author neo
+ */
+public class DatabaseImplTest {
+    static DatabaseImpl database;
+
+    @BeforeClass
+    public static void createDatabase() {
+        database = new DatabaseImpl()
+            .url("jdbc:hsqldb:mem:.;sql.syntax_mys=true")
+            .view(EntityView.class);
+
+        database.execute("CREATE TABLE database_test (id INT PRIMARY KEY, string_field VARCHAR(20), enum_field VARCHAR(10))");
+    }
+
+    @AfterClass
+    public static void cleanupDatabase() {
+        database.execute("DROP TABLE database_test");
+    }
+
+    @Before
+    public void truncateTables() {
+        database.execute("TRUNCATE TABLE database_test");
+    }
+
+    @Test
+    public void selectOneWithView() {
+        database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
+            .addParam(1)
+            .addParam("string")
+            .addParam(TestEnum.V1));
+
+        Query query = new Query("SELECT string_field, enum_field FROM database_test where id = ?").addParam(1);
+        EntityView view = database.selectOne(query, EntityView.class).get();
+
+        Assert.assertEquals("string", view.stringField);
+        Assert.assertEquals(TestEnum.V1, view.enumField);
+    }
+
+    @Test
+    public void selectWithView() {
+        database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
+            .addParam(1)
+            .addParam("string")
+            .addParam(TestEnum.V1));
+
+        database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
+            .addParam(2)
+            .addParam("string")
+            .addParam(TestEnum.V2));
+
+        Query query = new Query("SELECT string_field, enum_field FROM database_test");
+        List<EntityView> views = database.select(query, EntityView.class);
+
+        Assert.assertEquals(2, views.size());
+        Assert.assertEquals(TestEnum.V1, views.get(0).enumField);
+        Assert.assertEquals(TestEnum.V2, views.get(1).enumField);
+    }
+
+    @Test
+    public void commitTransaction() {
+        try (Transaction transaction = database.beginTransaction()) {
+            database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
+                .addParam(1)
+                .addParam("string")
+                .addParam(TestEnum.V1));
+            transaction.commit();
+        }
+
+        Query query = new Query("SELECT string_field, enum_field FROM database_test where id = ?").addParam(1);
+        Optional<EntityView> result = database.selectOne(query, EntityView.class);
+        Assert.assertTrue(result.isPresent());
+    }
+
+    @Test
+    public void rollbackTransaction() {
+        try (Transaction transaction = database.beginTransaction()) {
+            database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
+                .addParam(1)
+                .addParam("string")
+                .addParam(TestEnum.V1));
+            transaction.rollback();
+        }
+
+        Query query = new Query("SELECT string_field, enum_field FROM database_test where id = ?").addParam(1);
+        Optional<EntityView> result = database.selectOne(query, EntityView.class);
+        Assert.assertFalse(result.isPresent());
+    }
+}

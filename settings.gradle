@@ -1,0 +1,5 @@
+include 'core-ng-api',
+        'core-ng',
+        'core-ng-test',
+        'demo-service',
+        'search-service'

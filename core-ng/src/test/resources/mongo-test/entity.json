@@ -1,0 +1,23 @@
+{
+  "int_field": null,
+  "double_field": null,
+  "date_field": null,
+  "string_field": "string",
+  "list_field": [
+    "V1",
+    "V2"
+  ],
+  "map_field": {
+    "K1": "V1",
+    "K2": "V2"
+  },
+  "child": {
+    "boolean_field": null,
+    "enum_field": "ITEM1",
+    "enum_list_field": null,
+    "ref_id_field": null
+  },
+  "children": null,
+  "children_map": null,
+  "null_child": null
+}

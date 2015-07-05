@@ -1,0 +1,27 @@
+- sku: NIKE-002
+  productId: 1
+  name: Nike T-Shirt Green M
+  price: 9.9
+  color: green
+  size: M
+
+- sku: NIKE-003
+  productId: 1
+  name: Nike T-Shirt Green XL
+  price: 9.9
+  color: green
+  size: XL
+
+- sku: NIKE-004
+  productId: 1
+  name: Nike T-Shirt Red S
+  price: 8.5
+  color: red
+  size: S
+
+- sku: LEVIS-001
+  productId: 2
+  name: Levis jeans loose
+  price: 39.9
+  color: blue
+  size: 30

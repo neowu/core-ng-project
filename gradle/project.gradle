@@ -1,0 +1,50 @@
+apply plugin: 'build-dashboard'
+
+defaultTasks 'clean', 'build'
+
+def buildTime = new Date();
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    project.ext['project.build.time'] = buildTime.format('yyyyMMdd-HHmmss')
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    buildDir = "${rootDir}/build/${name}"
+
+    afterEvaluate {
+        tasks.withType(Jar) {
+            manifest {
+                attributes 'Implementation-Title': project.name,
+                        'Implementation-Version': project.version,
+                        'Created-By': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
+                        'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}",
+                        'Built-By': System.getProperty('user.name'),
+                        'Built-On': "${InetAddress.localHost.hostName}/${InetAddress.localHost.hostAddress}",
+                        'Build-Time': buildTime.format('yyyy/MM/dd HH:mm:ss')
+            }
+        }
+    }
+
+    task mkdirs << {
+        description = 'create project folder skeleton.'
+        sourceSets*.java.srcDirs*.each { it.mkdirs() }
+        sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
