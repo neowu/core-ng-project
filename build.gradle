@@ -76,7 +76,7 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
 
         repositories {
             maven {
-                url mavenRepo
+                url System.properties['core-ng.maven.repo']
             }
         }
     }
