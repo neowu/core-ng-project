@@ -23,7 +23,9 @@ public class WebModule extends Module {
         http().intercept(bind(TestInterceptor.class));
 
         route().get("/hello", request -> Response.text("hello", HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
-        route().get("/hello/", request -> Response.text("hello1", HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
+        route().get("/hello/", request -> Response.text("hello with ending slash", HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
+        route().get("/hello/:name", request -> Response.text("hello " + request.pathParam("name"), HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
+
         route().get("/index", bind(IndexController.class)::index);
 
         SiteController siteController = bind(SiteController.class);
@@ -32,8 +34,7 @@ public class WebModule extends Module {
 
         route().get("/static/:asset(*)", new AssetController("static"));
 
-        ProductController productController = bind(ProductController.class);
-        api().service(ProductWebService.class, productController);
+        api().service(ProductWebService.class, bind(ProductController.class));
 
         api().client(ProductWebService.class, "http://localhost:8080");
 

@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.1.9 (7/8/2015)
+* fix api webservice client encode path param
+
 ### 3.1.8 (6/30/2015)
 * fix requestURL(), parse x-forwarded-port to get requested port  
   

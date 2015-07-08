@@ -43,6 +43,6 @@ public class DemoApp extends AbstractApplication {
 
 //        load(new MongoTest());
 
-        load(new QueueModule());
+//        load(new QueueModule());
     }
 }
