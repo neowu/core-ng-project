@@ -37,7 +37,7 @@ public class SystemModule extends Module {
         property("sys.log.traceLogPath").ifPresent(path -> log().traceLogPath(Paths.get(path)));
         property("sys.log.actionLogPath").ifPresent(path -> log().actionLogPath(Paths.get(path)));
 
-        property("sys.rabbitMQ.host").ifPresent(hosts -> queue().rabbitMQ().hosts(hosts));
+        property("sys.rabbitMQ.host").ifPresent(hosts -> queue().rabbitMQ().hosts(hosts.split(",")));
         property("sys.rabbitMQ.user").ifPresent(user -> queue().rabbitMQ().user(user));
         property("sys.rabbitMQ.password").ifPresent(password -> queue().rabbitMQ().password(password));
 
