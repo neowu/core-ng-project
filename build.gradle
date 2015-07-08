@@ -38,7 +38,8 @@ project(':core-ng') {
                 'org.apache.httpcomponents:httpclient:4.4.1',
                 'io.undertow:undertow-core:1.2.8.Final',
                 'org.thymeleaf:thymeleaf:2.1.4.RELEASE',
-                'net.sourceforge.nekohtml:nekohtml:1.9.22'  // used by thymeleaf legacyHTML5
+                'net.sourceforge.nekohtml:nekohtml:1.9.22',  // used by thymeleaf legacyHTML5
+                'org.jsoup:jsoup:1.8.2'
         )
         testCompile(
                 'junit:junit:4.12',
