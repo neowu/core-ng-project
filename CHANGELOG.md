@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.2.0 (7/9/2015)
+* update gradle to 2.5
+* update build gradle to publish to s3 directly
+
 ### 3.1.9 (7/8/2015)
 * fix api webservice client encode path param
 * renamed StandardAppModule to SystemModule, and added jdbc pool properties

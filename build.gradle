@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '3.1.9'
+    version = '3.2.0'
 }
 
 def awsVersion = '1.10.2'
@@ -76,7 +76,12 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
 
         repositories {
             maven {
-                url System.properties['core-ng.maven.repo']
+                // put following values in gradle.properties, e.g. systemProp.core-ng.repo.s3.url = s3://xxx
+                url System.properties['core-ng.repo.s3.url']
+                credentials(AwsCredentials) {
+                    accessKey System.properties['core-ng.repo.s3.accessKey']
+                    secretKey System.properties['core-ng.repo.s3.secretKey']
+                }
             }
         }
     }
