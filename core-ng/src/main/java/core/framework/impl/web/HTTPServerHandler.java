@@ -4,7 +4,6 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Charsets;
 import core.framework.api.util.InputStreams;
-import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.web.Interceptor;
 import core.framework.api.web.Response;
@@ -34,22 +33,23 @@ public class HTTPServerHandler implements HttpHandler {
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
 
-    private final FormParserFactory formParserFactory = FormParserFactory.builder().build();
-    private final BeanValidator validator;
-    private final Route route;
-    private final SessionManager sessionManager;
-    private final ActionLogger actionLogger;
     private final ResponseHandler responseHandler = new ResponseHandler();
+    private final FormParserFactory formParserFactory = FormParserFactory.builder().build();
     final HTTPServerErrorHandler errorHandler = new HTTPServerErrorHandler(responseHandler);
-    final List<Interceptor> interceptors = Lists.newArrayList();
+    private final ActionLogger actionLogger;
+    private final Route route;
+    private final List<Interceptor> interceptors;
+    private final SessionManager sessionManager;
     private final WebContextImpl webContext;
+    private final BeanValidator validator;
 
-    public HTTPServerHandler(Route route, SessionManager sessionManager, ActionLogger actionLogger, BeanValidator validator, WebContextImpl webContext) {
-        this.route = route;
-        this.sessionManager = sessionManager;
+    public HTTPServerHandler(ActionLogger actionLogger, Route route, List<Interceptor> interceptors, SessionManager sessionManager, WebContextImpl webContext, BeanValidator validator) {
         this.actionLogger = actionLogger;
-        this.validator = validator;
+        this.route = route;
+        this.interceptors = interceptors;
+        this.sessionManager = sessionManager;
         this.webContext = webContext;
+        this.validator = validator;
     }
 
     @Override

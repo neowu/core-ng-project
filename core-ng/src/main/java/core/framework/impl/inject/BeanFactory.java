@@ -1,6 +1,7 @@
 package core.framework.impl.inject;
 
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Maps;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -15,7 +16,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,7 +23,7 @@ import java.util.Set;
  * @author neo
  */
 public class BeanFactory {
-    final Map<Key, Object> beans = new HashMap<>();
+    final Map<Key, Object> beans = Maps.newHashMap();
 
     public void bind(Type type, String name, Object instance) {
         if (instance == null) throw new Error("instance is null");

@@ -29,7 +29,7 @@ public class APIConfig {
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {
-        logger.info("register service interface, interface={}", serviceInterface.getCanonicalName());
+        logger.info("create api service, interface={}", serviceInterface.getCanonicalName());
         BeanValidator validator = context.httpServer.validator;
         new ServiceInterfaceValidator(serviceInterface, validator).validate();
 
@@ -43,16 +43,13 @@ public class APIConfig {
     }
 
     public <T> WebServiceClientConfig client(Class<T> serviceInterface, String serviceURL) {
-        logger.info("register service client, interface={}", serviceInterface.getCanonicalName());
+        logger.info("create api service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         HTTPClient httpClient = httpClient();
         BeanValidator validator = new BeanValidator();
         new ServiceInterfaceValidator(serviceInterface, validator).validate();
-
         WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator);
-
         T client = new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
         context.beanFactory.bind(serviceInterface, null, client);
-
         return webServiceClient;
     }
 

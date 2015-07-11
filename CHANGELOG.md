@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.2.1 (7/11/2015 - )
+* measure startup time
+
 ### 3.2.0 (7/9/2015)
 * update gradle to 2.5
 * update build gradle to publish to s3 directly

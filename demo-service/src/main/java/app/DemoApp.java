@@ -4,8 +4,6 @@ import app.domain.Product;
 import app.service.ProductService;
 import core.framework.api.AbstractApplication;
 import core.framework.api.module.SystemModule;
-import core.framework.api.util.ClasspathResources;
-import core.framework.api.util.YAML;
 
 import java.time.Duration;
 
@@ -20,7 +18,7 @@ public class DemoApp extends AbstractApplication {
         cache().add(Product.class, Duration.ofSeconds(60));
         cache().add("product-name-id", Integer.class, Duration.ofSeconds(60));
 
-        bind(YAML.load(BusinessConfig.class, ClasspathResources.text("config.yml")));
+//        bind(YAML.load(BusinessConfig.class, ClasspathResources.text("config.yml")));
 
         db().repository(Product.class);
         bind(ProductService.class);

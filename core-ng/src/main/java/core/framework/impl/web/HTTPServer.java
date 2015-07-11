@@ -4,6 +4,8 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.module.HTTPConfig;
 import core.framework.api.module.RouteConfig;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Lists;
+import core.framework.api.util.StopWatch;
 import core.framework.api.web.Controller;
 import core.framework.api.web.ErrorHandler;
 import core.framework.api.web.Interceptor;
@@ -13,6 +15,8 @@ import core.framework.impl.web.session.SessionManager;
 import io.undertow.Undertow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author neo
@@ -29,22 +33,27 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
     public final BeanValidator validator = new BeanValidator();
     public final WebContextImpl webContext = new WebContextImpl();
     private final Route route = new Route();
+    private final List<Interceptor> interceptors = Lists.newArrayList();
     private final HTTPServerHandler httpServerHandler;
     private int port = 8080;
 
     public HTTPServer(ActionLogger actionLogger) {
-        httpServerHandler = new HTTPServerHandler(route, sessionManager, actionLogger, validator, webContext);
+        httpServerHandler = new HTTPServerHandler(actionLogger, route, interceptors, sessionManager, webContext, validator);
     }
 
     public void start() {
-        Undertow server = Undertow.builder()
-            .addHttpListener(port, "0.0.0.0")
-            .setHandler(httpServerHandler)
-//            .setWorkerThreads(200)
-            .build();
+        StopWatch watch = new StopWatch();
+        try {
+            Undertow server = Undertow.builder()
+                .addHttpListener(port, "0.0.0.0")
+                .setHandler(httpServerHandler)
+                    //            .setWorkerThreads(200)
+                .build();
 
-        server.start();
-        logger.info("http server started");
+            server.start();
+        } finally {
+            logger.info("http server started, elapsedTime={}", watch.elapsedTime());
+        }
     }
 
     @Override
@@ -52,7 +61,7 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
         if (interceptor.getClass().isSynthetic())
             throw Exceptions.error("interceptor class must not be anonymous class or lambda, please create static class, interceptorClass={}", interceptor.getClass().getCanonicalName());
 
-        httpServerHandler.interceptors.add(interceptor);
+        interceptors.add(interceptor);
     }
 
     @Override

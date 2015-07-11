@@ -45,10 +45,15 @@ public final class DatabaseImpl implements Database {
     private final Map<Class, RowMapper> viewRowMappers = Maps.newHashMap();
 
     public DatabaseImpl() {
-        dataSource = new ComboPooledDataSource();
-        dataSource.setTestConnectionOnCheckout(true);
-        dataSource.setCheckoutTimeout(timeoutInSeconds * 1000);
-        transactionManager = new TransactionManager(dataSource);
+        StopWatch watch = new StopWatch();
+        try {
+            dataSource = new ComboPooledDataSource();
+            dataSource.setTestConnectionOnCheckout(true);
+            dataSource.setCheckoutTimeout(timeoutInSeconds * 1000);
+            transactionManager = new TransactionManager(dataSource);
+        } finally {
+            logger.info("create database connection pool, elapsedTime={}", watch.elapsedTime());
+        }
     }
 
     public void shutdown() {
@@ -59,7 +64,7 @@ public final class DatabaseImpl implements Database {
     public DatabaseImpl url(String url) {
         if (!url.startsWith("jdbc:")) throw Exceptions.error("jdbc url must start with \"jdbc:\", url={}", url);
 
-        logger.info("set database connection pool url, url={}", url);
+        logger.info("set database connection url, url={}", url);
         dataSource.setJdbcUrl(url);
         try {
             if (url.startsWith("jdbc:mysql:")) {
@@ -86,10 +91,14 @@ public final class DatabaseImpl implements Database {
     }
 
     public <T> Repository<T> repository(Class<T> entityClass) {
-        logger.info("create db repository, entityClass={}", entityClass.getCanonicalName());
-        RepositoryEntityValidator<T> validator = new RepositoryEntityValidator<>(entityClass);
-        RowMapper<T> mapper = registerViewClass(entityClass);
-        return new RepositoryImpl<>(this, validator, entityClass, mapper);
+        StopWatch watch = new StopWatch();
+        try {
+            RepositoryEntityValidator<T> validator = new RepositoryEntityValidator<>(entityClass);
+            RowMapper<T> mapper = registerViewClass(entityClass);
+            return new RepositoryImpl<>(this, validator, entityClass, mapper);
+        } finally {
+            logger.info("create db repository, entityClass={}, elapsedTime={}", entityClass.getCanonicalName(), watch.elapsedTime());
+        }
     }
 
     public void timeout(Duration timeout) {
