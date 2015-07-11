@@ -48,7 +48,7 @@ public final class Encodings {
         try {
             return URLEncoder.encode(text, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
+            throw new Error(e);
         }
     }
 
@@ -56,7 +56,7 @@ public final class Encodings {
         try {
             return URLDecoder.decode(text, Charsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
+            throw new Error(e);
         }
     }
 }
