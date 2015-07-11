@@ -1,5 +1,6 @@
 package core.framework.api.template;
 
+import core.framework.api.util.StopWatch;
 import core.framework.impl.template.StringTemplateResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,17 +17,23 @@ import java.util.Map;
  */
 public final class HTMLTemplate {
     private final Logger logger = LoggerFactory.getLogger(HTMLTemplate.class);
-
-    private final TemplateEngine templateEngine = new TemplateEngine();
-    private final StringTemplateResolver stringTemplateResolver = new StringTemplateResolver();
+    private final TemplateEngine templateEngine;
+    private final StringTemplateResolver stringTemplateResolver;
 
     public HTMLTemplate() {
-        ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setTemplateMode(StandardTemplateModeHandlers.LEGACYHTML5.getTemplateModeName());
-        templateEngine.addTemplateResolver(templateResolver);
+        StopWatch watch = new StopWatch();
+        try {
+            templateEngine = new TemplateEngine();
+            stringTemplateResolver = new StringTemplateResolver();
+            ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
+            templateResolver.setTemplateMode(StandardTemplateModeHandlers.LEGACYHTML5.getTemplateModeName());
+            templateEngine.addTemplateResolver(templateResolver);
 
-        stringTemplateResolver.setTemplateMode(StandardTemplateModeHandlers.LEGACYHTML5.getTemplateModeName());
-        templateEngine.addTemplateResolver(stringTemplateResolver);
+            stringTemplateResolver.setTemplateMode(StandardTemplateModeHandlers.LEGACYHTML5.getTemplateModeName());
+            templateEngine.addTemplateResolver(stringTemplateResolver);
+        } finally {
+            logger.info("create html template, elapsedTime={}", watch.elapsedTime());
+        }
     }
 
     public void putTemplate(String templateName, String template) {

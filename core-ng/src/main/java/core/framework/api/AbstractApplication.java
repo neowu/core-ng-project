@@ -15,6 +15,7 @@ public abstract class AbstractApplication extends Module {
         try {
             configure();
 
+            logger.info("execute startup methods");
             context.startupHook.forEach(java.lang.Runnable::run);
         } catch (Throwable e) {
             logger.error("application failed to start, error={}", e.getMessage(), e);

@@ -1,5 +1,6 @@
 package core.framework.api.http;
 
+import core.framework.api.util.StopWatch;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -28,7 +29,7 @@ public final class HTTPClientBuilder {
     private Duration slowTransactionThreshold = Duration.ofSeconds(30);
 
     public HTTPClient build() {
-        logger.info("create http client");
+        StopWatch watch = new StopWatch();
         try {
             HttpClientBuilder builder = HttpClients.custom();
             builder.setKeepAliveStrategy((response, context) -> keepAliveTimeout.toMillis());
@@ -50,6 +51,8 @@ public final class HTTPClientBuilder {
             return new HTTPClient(httpClient, slowTransactionThreshold.toMillis());
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
+        } finally {
+            logger.info("create http client, elapsedTime={}", watch.elapsedTime());
         }
     }
 

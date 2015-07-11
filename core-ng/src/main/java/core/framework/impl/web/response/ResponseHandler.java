@@ -19,10 +19,8 @@ import java.util.Map;
  */
 public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
-
-    final Map<Class, BodyHandler> handlers = Maps.newHashMap();
-
-    final HTTPHeaderMappings headerMappings = new HTTPHeaderMappings();
+    private final Map<Class, BodyHandler> handlers = Maps.newHashMap();
+    private final HTTPHeaderMappings headerMappings = new HTTPHeaderMappings();
 
     public ResponseHandler() {
         handlers.put(BeanBody.class, new BeanBodyResponseHandler());

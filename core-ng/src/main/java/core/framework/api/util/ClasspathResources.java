@@ -15,7 +15,7 @@ public final class ClasspathResources {
     public static byte[] bytes(String path) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try (InputStream stream = loader.getResourceAsStream(path)) {
-            if (stream == null) throw new Error("can not load resource, path=" + path);
+            if (stream == null) throw Exceptions.error("can not load resource, path={}", path);
             return InputStreams.bytes(stream);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

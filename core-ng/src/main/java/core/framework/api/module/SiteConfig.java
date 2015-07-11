@@ -13,10 +13,6 @@ public class SiteConfig {
     }
 
     public SessionConfig session() {
-        return createSessionConfig(context);
-    }
-
-    protected SessionConfig createSessionConfig(ModuleContext context) {
         return new SessionConfig(context);
     }
 }
