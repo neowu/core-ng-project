@@ -1,7 +1,8 @@
 ## Change log
 
-### 3.2.1 (7/11/2015 - )
+### 3.2.1 (7/11/2015 - 7/13/2015)
 * measure startup time
+* measure time on test db schema creation
 
 ### 3.2.0 (7/9/2015)
 * update gradle to 2.5

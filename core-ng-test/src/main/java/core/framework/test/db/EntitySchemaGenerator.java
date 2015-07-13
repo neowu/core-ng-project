@@ -7,6 +7,7 @@ import core.framework.api.db.Query;
 import core.framework.api.db.Table;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
+import core.framework.api.util.StopWatch;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
 import org.slf4j.Logger;
@@ -32,9 +33,14 @@ public class EntitySchemaGenerator {
     }
 
     public void generate() {
-        String sql = buildSchemaSQL();
-        logger.info("create schema, entityClass={}, sql={}", entityClass.getCanonicalName(), sql);
-        database.execute(Query.query(sql));
+        StopWatch watch = new StopWatch();
+        String sql = null;
+        try {
+            sql = buildSchemaSQL();
+            database.execute(Query.query(sql));
+        } finally {
+            logger.info("create schema, entityClass={}, sql={}, elapsedTime={}", entityClass.getCanonicalName(), sql, watch.elapsedTime());
+        }
     }
 
     private String buildSchemaSQL() {
