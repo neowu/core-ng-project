@@ -2,13 +2,14 @@ package core.framework.impl.web.client;
 
 import core.framework.api.http.ContentTypes;
 import core.framework.api.http.HTTPClient;
+import core.framework.api.http.HTTPHeaders;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.http.HTTPResponse;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.module.WebServiceClientConfig;
-import core.framework.api.util.Charsets;
+import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Types;
@@ -23,9 +24,7 @@ import core.framework.impl.web.route.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
-import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -51,6 +50,7 @@ public class WebServiceClient implements WebServiceClientConfig {
 
         String serviceURL = serviceURL(path, pathParams);
         HTTPRequest httpRequest = new HTTPRequest(method, serviceURL);
+        httpRequest.header(HTTPHeaders.ACCEPT, ContentTypes.APPLICATION_JSON);
 
         linkContext(httpRequest);
 
@@ -117,7 +117,7 @@ public class WebServiceClient implements WebServiceClientConfig {
                 throw new RemoteServiceException("failed to validate, message=" + validationErrorResponse.message + ", fieldErrors=" + validationErrorResponse.fieldErrors);
             } else {
                 ErrorResponse errorResponse = JSON.fromJSON(ErrorResponse.class, response.text());
-                throw new RemoteServiceException(errorResponse.message);
+                throw new RemoteServiceException("failed to call remote web service, remoteError=" + errorResponse.message + ", remoteStackTrace=" + errorResponse.stackTrace);
             }
         } catch (RemoteServiceException e) {
             throw e;
@@ -137,28 +137,12 @@ public class WebServiceClient implements WebServiceClientConfig {
                 int paramIndex = value.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : value.length();
                 String variable = value.substring(1, endIndex);
-                builder.append('/').append(encodePathParam(pathParams.get(variable)));
+                builder.append('/').append(Encodings.urlPath(pathParams.get(variable)));
             } else {
                 builder.append('/').append(value);
             }
             path = path.next;
         }
         return builder.toString();
-    }
-
-    String encodePathParam(String pathParam) {
-        try {
-            String encodedPathParam = URLEncoder.encode(pathParam, Charsets.UTF_8.name());
-            if (encodedPathParam.indexOf('+') < 0) return encodedPathParam;
-            StringBuilder builder = new StringBuilder(encodedPathParam.length() + 10);
-            for (int i = 0; i < encodedPathParam.length(); i++) {
-                char ch = encodedPathParam.charAt(i);
-                if (ch == '+') builder.append("%20");
-                else builder.append(ch);
-            }
-            return builder.toString();
-        } catch (UnsupportedEncodingException e) {
-            throw new Error(e);
-        }
     }
 }

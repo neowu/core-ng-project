@@ -1,5 +1,10 @@
 ## Change log
 
+### 3.2.2 (7/13/2015)
+* fix api() client to pass "Accept: application/json" 
+* replace URL/URLPath encoding with apache common codec
+* tuned async task begin/end log message
+
 ### 3.2.1 (7/11/2015 - 7/13/2015)
 * measure startup time
 * measure time on test db schema creation

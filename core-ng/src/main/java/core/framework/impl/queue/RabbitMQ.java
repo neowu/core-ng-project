@@ -20,7 +20,7 @@ public class RabbitMQ {
     private final Logger logger = LoggerFactory.getLogger(RabbitMQ.class);
     public final ConnectionFactory connectionFactory = new ConnectionFactory();
     private Address[] addresses;
-    Connection connection;
+    private Connection connection;
 
     public RabbitMQ() {
         connectionFactory.setAutomaticRecoveryEnabled(true);

@@ -35,6 +35,7 @@ public class Executor {
     private <T> T execute(Callable<T> task) {
         actionLogger.start();
         try {
+            logger.debug("=== task execution begin ===");
             return task.call();
         } catch (Throwable e) {
             ActionLogContext.put(ActionLogContext.ERROR_MESSAGE, e.getMessage());
@@ -48,6 +49,7 @@ public class Executor {
 
             return null;
         } finally {
+            logger.debug("=== task execution end ===");
             actionLogger.end();
         }
     }

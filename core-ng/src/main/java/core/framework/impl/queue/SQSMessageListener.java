@@ -111,6 +111,8 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
                         process(message);
                         return null;
                     } finally {
+                        logger.debug("delete message, handle={}", message.getReceiptHandle());
+                        sqs.deleteMessage(queueURL, message.getReceiptHandle());
                         counter.decrease();
                     }
                 });
@@ -119,60 +121,55 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
     }
 
     private <T> void process(Message sqsMessage) throws Exception {
-        try {
-            logger.debug("=== message handling begin ===");
-            logger.debug("message={}", sqsMessage);
-            String messageType;
-            String messageBody;
-            String messageId;
-            Map<String, MessageAttributeValue> attributes = sqsMessage.getMessageAttributes();
-            MessageAttributeValue publisher = attributes.get(MESSAGE_ATTR_PUBLISHER);
-            if (publisher != null && "sqs".equals(publisher.getStringValue())) {
-                messageType = attributes.get(MESSAGE_ATTR_TYPE).getStringValue();
-                messageBody = sqsMessage.getBody();
-                messageId = sqsMessage.getMessageId();
+        logger.debug("queueURL={}", queueURL);
+        logger.debug("message={}", sqsMessage);
+        String messageType;
+        String messageBody;
+        String messageId;
+        Map<String, MessageAttributeValue> attributes = sqsMessage.getMessageAttributes();
+        MessageAttributeValue publisher = attributes.get(MESSAGE_ATTR_PUBLISHER);
+        if (publisher != null && "sqs".equals(publisher.getStringValue())) {
+            messageType = attributes.get(MESSAGE_ATTR_TYPE).getStringValue();
+            messageBody = sqsMessage.getBody();
+            messageId = sqsMessage.getMessageId();
 
-                linkSQSContext(attributes, messageId);
+            linkSQSContext(attributes, messageId);
 
-                MessageAttributeValue sender = attributes.get(MESSAGE_ATTR_SENDER);
-                if (sender != null) {
-                    ActionLogContext.put("sender", sender.getStringValue());
-                }
-            } else {
-                // assume to be SNS
-                SNSMessage snsMessage = JSON.fromJSON(SNSMessage.class, sqsMessage.getBody());
-                messageType = snsMessage.subject;
-                messageBody = snsMessage.message;
-                messageId = snsMessage.messageId;
-
-                linkSNSContext(snsMessage, messageId);
-
-                if (snsMessage.attributes.eventSender != null) {
-                    ActionLogContext.put("sender", snsMessage.attributes.eventSender.value);
-                }
+            MessageAttributeValue sender = attributes.get(MESSAGE_ATTR_SENDER);
+            if (sender != null) {
+                ActionLogContext.put("sender", sender.getStringValue());
             }
-            ActionLogContext.put("messageId", messageId);
+        } else {
+            // assume to be SNS
+            SNSMessage snsMessage = JSON.fromJSON(SNSMessage.class, sqsMessage.getBody());
+            messageType = snsMessage.subject;
+            messageBody = snsMessage.message;
+            messageId = snsMessage.messageId;
 
-            if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
-            ActionLogContext.put(ActionLogContext.ACTION, "queue/" + messageType);
+            linkSNSContext(snsMessage, messageId);
 
-            ActionLogContext.get(ActionLogContext.TRACE).ifPresent(trace -> {
-                if ("true".equals(trace))
-                    logger.warn("trace log is triggered for current message, messageId={}", messageId);
-            });
-
-            Class<T> messageClass = messageClass(messageType);
-            T message = JSON.fromJSON(messageClass, messageBody);
-            validator.validate(message);
-
-            @SuppressWarnings("unchecked")
-            MessageHandler<T> handler = handlers.get(messageType);
-            ActionLogContext.put("handler", handler.getClass().getCanonicalName());
-            handler.handle(message);
-        } finally {
-            sqs.deleteMessage(queueURL, sqsMessage.getReceiptHandle());
-            logger.debug("=== message handling end ===");
+            if (snsMessage.attributes.eventSender != null) {
+                ActionLogContext.put("sender", snsMessage.attributes.eventSender.value);
+            }
         }
+        ActionLogContext.put("messageId", messageId);
+
+        if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
+        ActionLogContext.put(ActionLogContext.ACTION, "queue/" + messageType);
+
+        ActionLogContext.get(ActionLogContext.TRACE).ifPresent(trace -> {
+            if ("true".equals(trace))
+                logger.warn("trace log is triggered for current message, messageId={}", messageId);
+        });
+
+        Class<T> messageClass = messageClass(messageType);
+        T message = JSON.fromJSON(messageClass, messageBody);
+        validator.validate(message);
+
+        @SuppressWarnings("unchecked")
+        MessageHandler<T> handler = handlers.get(messageType);
+        ActionLogContext.put("handler", handler.getClass().getCanonicalName());
+        handler.handle(message);
     }
 
     private <T> Class<T> messageClass(String messageType) {
@@ -214,7 +211,7 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
                 MESSAGE_ATTR_TRACE));
 
         List<Message> messages = result.getMessages();
-        logger.info("long poll from SQS, queueURL={}, receivedMessages={}", queueURL, messages.size());
+        logger.info("long poll from sqs, queueURL={}, receivedMessages={}", queueURL, messages.size());
         return messages;
     }
 }

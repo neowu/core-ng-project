@@ -1,5 +1,6 @@
 package core.framework.api.util;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,7 +11,12 @@ import static org.junit.Assert.assertEquals;
 public class EncodingsTest {
     @Test
     public void encodeHex() {
-        assertEquals("74657374206d657373616765", Encodings.hex("test message".getBytes()));
+        assertEquals("74657374206d657373616765", Encodings.hex(Strings.bytes("test message")));
+    }
+
+    @Test
+    public void decodeHex() {
+        assertEquals("test message", new String(Encodings.decodeHex("74657374206d657373616765"), Charsets.UTF_8));
     }
 
     @Test
@@ -27,14 +33,14 @@ public class EncodingsTest {
     @Test
     public void decodeBase64() {
         // from http://en.wikipedia.org/wiki/Base64
-        assertEquals("leasure.", new String(Encodings.decodeBase64("bGVhc3VyZS4=")));
+        assertEquals("leasure.", new String(Encodings.decodeBase64("bGVhc3VyZS4="), Charsets.UTF_8));
     }
 
     @Test
     public void decodeBase64URLSafe() {
         String message = "leasure.";
-        String encodedMessage = Encodings.base64URLSafe(message.getBytes());
-        assertEquals(message, new String(Encodings.decodeBase64(encodedMessage)));
+        String encodedMessage = Encodings.base64URLSafe(Strings.bytes(message));
+        assertEquals(message, new String(Encodings.decodeBase64(encodedMessage), Charsets.UTF_8));
     }
 
     @Test
@@ -47,5 +53,11 @@ public class EncodingsTest {
     @Test
     public void decodeURL() {
         assertEquals("key=value?", Encodings.decodeURL("key%3Dvalue%3F"));
+    }
+
+    @Test
+    public void encodeURLPath() {
+        Assert.assertEquals("v1", Encodings.urlPath("v1"));
+        Assert.assertEquals("the path should use %20 for space, where queryString uses + for space", "v1%20v2", Encodings.urlPath("v1 v2"));
     }
 }

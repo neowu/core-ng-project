@@ -70,8 +70,8 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
 
     @Override
     public void run() {
-        Thread.currentThread().setName("rabbitmq-listener-" + Thread.currentThread().getId());
-        logger.info("rabbitmq message listener started, queue={}", queue);
+        Thread.currentThread().setName("rabbitMQ-listener-" + Thread.currentThread().getId());
+        logger.info("rabbitMQ message listener started, queue={}", queue);
 
         while (!shutdown) {
             try {
@@ -117,48 +117,43 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
     }
 
     public void shutdown() {
-        logger.info("shutdown rabbitmq message listener, queue={}", queue);
+        logger.info("shutdown rabbitMQ message listener, queue={}", queue);
         shutdown = true;
         listenerExecutor.shutdown();
     }
 
     private <T> void process(QueueingConsumer.Delivery delivery) throws Exception {
-        try {
-            logger.debug("=== message handling begin ===");
-            String messageBody = new String(delivery.getBody(), Charsets.UTF_8);
-            String messageType = delivery.getProperties().getType();
-            logger.debug("messageType={}", messageType);
-            logger.debug("message={}", messageBody);
+        String messageBody = new String(delivery.getBody(), Charsets.UTF_8);
+        String messageType = delivery.getProperties().getType();
+        logger.debug("messageType={}", messageType);
+        logger.debug("message={}", messageBody);
 
-            if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
-            ActionLogContext.put(ActionLogContext.ACTION, "queue/" + queue);
+        if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
+        ActionLogContext.put(ActionLogContext.ACTION, "queue/" + queue);
 
-            String messageId = delivery.getProperties().getMessageId();
-            ActionLogContext.put("messageId", messageId);
+        String messageId = delivery.getProperties().getMessageId();
+        ActionLogContext.put("messageId", messageId);
 
-            Map<String, Object> headers = delivery.getProperties().getHeaders();
-            linkContext(headers, messageId);
+        Map<String, Object> headers = delivery.getProperties().getHeaders();
+        linkContext(headers, messageId);
 
-            Object sender = headers.get("sender");
-            if (sender != null) {
-                ActionLogContext.put("sender", sender);
-            }
-
-            @SuppressWarnings("unchecked")
-            Class<T> messageClass = messageClasses.get(messageType);
-            if (messageClass == null) {
-                throw Exceptions.error("can not find message class, messageType={}", messageType);
-            }
-            T message = JSON.fromJSON(messageClass, messageBody);
-            validator.validate(message);
-
-            @SuppressWarnings("unchecked")
-            MessageHandler<T> handler = handlers.get(messageType);
-            ActionLogContext.put("handler", handler.getClass().getCanonicalName());
-            handler.handle(message);
-        } finally {
-            logger.debug("=== message handling end ===");
+        Object sender = headers.get("sender");
+        if (sender != null) {
+            ActionLogContext.put("sender", sender);
         }
+
+        @SuppressWarnings("unchecked")
+        Class<T> messageClass = messageClasses.get(messageType);
+        if (messageClass == null) {
+            throw Exceptions.error("can not find message class, messageType={}", messageType);
+        }
+        T message = JSON.fromJSON(messageClass, messageBody);
+        validator.validate(message);
+
+        @SuppressWarnings("unchecked")
+        MessageHandler<T> handler = handlers.get(messageType);
+        ActionLogContext.put("handler", handler.getClass().getCanonicalName());
+        handler.handle(message);
     }
 
     private void linkContext(Map<String, Object> headers, String messageId) {

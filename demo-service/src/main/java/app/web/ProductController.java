@@ -3,6 +3,7 @@ package app.web;
 import app.domain.Product;
 import app.service.ProductService;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.web.exception.NotFoundException;
 
 import javax.inject.Inject;
 import java.time.Instant;
@@ -29,6 +30,7 @@ public class ProductController implements ProductWebService {
     @Override
     public ProductView get(Integer id) {
         ActionLogContext.put("pid", id);
+        if (id == 404) throw new NotFoundException("product not found, id=" + id);
         Product product = productService.get(id);
         return view(product);
     }
