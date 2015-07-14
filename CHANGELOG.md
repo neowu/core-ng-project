@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.2.3 (7/14/2015)
+* tune http client log info
+* enhanced Files, create temp file, logging 
+
 ### 3.2.2 (7/13/2015)
 * fix api() client to pass "Accept: application/json" 
 * replace URL/URLPath encoding with apache common codec

@@ -40,7 +40,6 @@ public final class HTTPClient {
 
     public HTTPResponse execute(HTTPRequest request) {
         StopWatch watch = new StopWatch();
-        logger.debug("send http request, uri={}", request.uri());
         HttpUriRequest httpRequest = request.builder.build();
         try (CloseableHttpResponse response = client.execute(httpRequest)) {
             int statusCode = response.getStatusLine().getStatusCode();
