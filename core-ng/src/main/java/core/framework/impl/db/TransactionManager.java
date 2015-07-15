@@ -4,6 +4,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 import core.framework.api.db.IsolationLevel;
 import core.framework.api.db.Transaction;
 import core.framework.api.db.UncheckedSQLException;
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class TransactionManager {
         if (connection != null) {
             TransactionState state = currentTransactionState.get();
             if (state != TransactionState.START)
-                throw new Error("sql is not allowed after transaction ends, currentState=" + state);
+                throw Exceptions.error("sql is not allowed after transaction ends, currentState={}", state);
             return connection;
         }
 
@@ -47,17 +48,20 @@ public class TransactionManager {
     private Connection getConnectionFromPool() {
         Connection connection;
         StopWatch watch = new StopWatch();
-        int totalConnections = -1;
+        int available = -1;
+        int total = -1;
         try {
-            totalConnections = dataSource.getNumConnections();
+            available = dataSource.getNumIdleConnections();
+            total = dataSource.getNumConnections();
             connection = dataSource.getConnection();
             if (defaultIsolationLevel != null) connection.setTransactionIsolation(defaultIsolationLevel.level);
             return connection;
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);
         } finally {
-            logger.debug("get connection from connection pool, currentPoolSize={}, elapsedTime={}",
-                totalConnections,
+            logger.debug("get connection from pool, available={}, total={}, elapsedTime={}",
+                available,
+                total,
                 watch.elapsedTime());
         }
     }

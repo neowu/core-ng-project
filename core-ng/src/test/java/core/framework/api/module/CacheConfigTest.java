@@ -12,8 +12,10 @@ public class CacheConfigTest {
 
     @Test
     public void cacheName() {
-        String name = cacheConfig.cacheName(null, Types.list(String.class));
+        Assert.assertEquals("list-string", cacheConfig.cacheName(null, Types.list(String.class)));
 
-        Assert.assertEquals("list-string", name);
+        Assert.assertEquals("string", cacheConfig.cacheName(null, String.class));
+
+        Assert.assertEquals("name", cacheConfig.cacheName("name", String.class));
     }
 }

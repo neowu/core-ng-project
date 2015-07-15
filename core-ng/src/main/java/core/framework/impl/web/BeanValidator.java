@@ -32,8 +32,7 @@ public class BeanValidator {
             if (((List) bean).isEmpty()) return bean;
             Object item = ((List) bean).get(0);
             if (item == null) throw new ValidationException("list element must not be null", null);
-            Class<?> valueClass = item.getClass();
-            beanType = Types.list(valueClass);
+            beanType = Types.list(item.getClass());
         } else {
             beanType = bean.getClass();
         }

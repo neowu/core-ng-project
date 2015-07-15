@@ -1,11 +1,16 @@
 ## Change log
 
+### 3.2.4 (7/15/2015)
+* fix: http response body validation pass empty list 
+* databaseImpl, track available/total connections when getting conn from pool
+* httpClient, allow server ssl cert change during renegotiation 
+
 ### 3.2.3 (7/14/2015)
 * tune http client log info
 * enhanced Files, create temp file, logging 
 
 ### 3.2.2 (7/13/2015)
-* fix api() client to pass "Accept: application/json" 
+* fix: api() client to pass "Accept: application/json" 
 * replace URL/URLPath encoding with apache common codec
 * tuned async task begin/end log message
 
@@ -18,14 +23,14 @@
 * update build gradle to publish to s3 directly
 
 ### 3.1.9 (7/8/2015)
-* fix api webservice client encode path param
+* fix: api webservice client encode path param
 * renamed StandardAppModule to SystemModule, and added jdbc pool properties
 
 ### 3.1.8 (6/30/2015)
-* fix requestURL(), parse x-forwarded-port to get requested port  
+* fix: requestURL(), parse x-forwarded-port to get requested port  
   
 ### 3.1.7.1 (6/30/2015)
-* fix test hsql db map BigDecimal to DECIMAL(10,2)
+* fix: test hsql db map BigDecimal to DECIMAL(10,2)
 
 ### 3.1.7 (6/26/2015 - 6/29/2015)
 * refactory config structure to simplify test context
@@ -49,7 +54,7 @@
 * move repository() into db() and register db entity class to view. 
 
 ### 3.1.2 (6/22/2015)
-* fix webservice interface validator should allow String as @PathParam
+* fix: webservice interface validator should allow String as @PathParam
 
 ### 3.1.1 (6/18/2015 - 6/22/2015)
 * db added timeout for checkout conn and query, default is 60s
