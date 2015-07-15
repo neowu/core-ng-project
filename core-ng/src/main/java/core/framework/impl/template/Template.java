@@ -1,20 +1,23 @@
 package core.framework.impl.template;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author neo
  */
 public class Template {
-    private final TagHandler handler;
+    private final List<FragmentHandler> handlers;
 
-    public Template(TagHandler handler) {
-        this.handler = handler;
+    public Template(List<FragmentHandler> handlers) {
+        this.handlers = handlers;
     }
 
-    public String process(Map<String, Object> context) {
+    public String process(Object value) {
+        TemplateContext context = new TemplateContext(value);
         StringBuilder builder = new StringBuilder();
-        handler.process(builder, context);
+        for (FragmentHandler handler : handlers) {
+            handler.process(builder, context);
+        }
         return builder.toString();
     }
 }
