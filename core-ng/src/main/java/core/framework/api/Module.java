@@ -72,6 +72,7 @@ public abstract class Module {
     }
 
     public void loadProperties(String path) {
+        logger.info("load properties, path={}", path);
         context.properties.load(path);
     }
 

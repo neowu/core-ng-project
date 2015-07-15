@@ -22,26 +22,23 @@ public class AsyncExecutor {
     }
 
     public <T> Future<T> submit(String name, Callable<T> task) {
+        logger.debug("submit async task, name={}", name);
+
         String requestId = ActionLogContext.get(ActionLogContext.REQUEST_ID).orElseGet(() -> UUID.randomUUID().toString());
         Optional<String> actionOptional = ActionLogContext.get(ActionLogContext.ACTION);
         String action = actionOptional.isPresent() ? actionOptional.get() + "/" + name : name;
         boolean trace = "true".equals(ActionLogContext.get(ActionLogContext.TRACE).orElse(null));
 
         return executor.submit(() -> {
-            try {
-                logger.debug("=== execution begin ===");
-                String executionId = UUID.randomUUID().toString();
-                ActionLogContext.put("executionId", executionId);
-                ActionLogContext.put(ActionLogContext.REQUEST_ID, requestId);
-                ActionLogContext.put(ActionLogContext.ACTION, action);
-                if (trace) {
-                    logger.warn("trace log is triggered for current execution, executionId={}", executionId);
-                    ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
-                }
-                return task.call();
-            } finally {
-                logger.debug("=== execution end ===");
+            String executionId = UUID.randomUUID().toString();
+            ActionLogContext.put("executionId", executionId);
+            ActionLogContext.put(ActionLogContext.REQUEST_ID, requestId);
+            ActionLogContext.put(ActionLogContext.ACTION, action);
+            if (trace) {
+                logger.warn("trace log is triggered for current execution, executionId={}", executionId);
+                ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
             }
+            return task.call();
         });
     }
 }

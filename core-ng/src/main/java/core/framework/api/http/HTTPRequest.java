@@ -24,7 +24,7 @@ public final class HTTPRequest {
     private String body;
 
     public HTTPRequest(HTTPMethod method, String uri) {
-        logger.debug("method={}, uri={}", method, uri);
+        logger.debug("[request] method={}, uri={}", method, uri);
         this.uri = uri;
         builder = RequestBuilder.create(method.name()).setUri(uri);
     }
@@ -34,21 +34,21 @@ public final class HTTPRequest {
     }
 
     public HTTPRequest header(String name, String value) {
-        logger.debug("[header] {}={}", name, value);
+        logger.debug("[request:header] {}={}", name, value);
         builder.setHeader(name, value);
         return this;
     }
 
     public HTTPRequest addParam(String name, String value) {
-        logger.debug("[param] {}={}", name, value);
+        logger.debug("[request:param] {}={}", name, value);
         builder.addParameter(name, value);
         return this;
     }
 
-    public HTTPRequest text(String value, String contentType) {
-        logger.debug("[entity] value={}, contentType={}", value, contentType);
-        this.body = value;
-        builder.setEntity(new StringEntity(value, ContentType.create(contentType)));
+    public HTTPRequest text(String body, String contentType) {
+        logger.debug("[request] body={}, contentType={}", body, contentType);
+        this.body = body;
+        builder.setEntity(new StringEntity(body, ContentType.create(contentType)));
         return this;
     }
 

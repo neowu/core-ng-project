@@ -3,6 +3,7 @@ package core.framework.test.db;
 import core.framework.api.db.Database;
 import core.framework.api.db.Query;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,16 +50,23 @@ public class SQLScriptRunner {
                     delimiter = delimiterMatcher.group(1);
                 } else if (!commentMatcher.find()) {
                     query.appendStatement(trimmedLine);
-                    query.appendStatement(" ");
                     if (trimmedLine.endsWith(delimiter)) {
-                        logger.info("execute, sql={}", query.statement());
-                        database.execute(query);
+                        executeSQL(query);
                         query = null;
                     }
                 }
             }
         } catch (RuntimeException | IOException e) {
             throw Exceptions.error("failed to run script, error={}, lineNumber={}", e.getMessage(), lineNumber, e);
+        }
+    }
+
+    private void executeSQL(Query query) {
+        StopWatch watch = new StopWatch();
+        try {
+            database.execute(query);
+        } finally {
+            logger.info("execute, sql={}, elapsedTime={}", query.statement(), watch.elapsedTime());
         }
     }
 }

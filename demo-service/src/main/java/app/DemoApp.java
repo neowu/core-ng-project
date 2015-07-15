@@ -18,8 +18,6 @@ public class DemoApp extends AbstractApplication {
         cache().add(Product.class, Duration.ofSeconds(60));
         cache().add("product-name-id", Integer.class, Duration.ofSeconds(60));
 
-//        bind(YAML.load(BusinessConfig.class, ClasspathResources.text("config.yml")));
-
         db().repository(Product.class);
         bind(ProductService.class);
 

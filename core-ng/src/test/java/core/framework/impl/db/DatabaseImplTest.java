@@ -71,6 +71,14 @@ public class DatabaseImplTest {
     }
 
     @Test
+    public void selectEmptyWithView() {
+        Query query = new Query("SELECT string_field, enum_field FROM database_test where id = -1");
+        List<EntityView> views = database.select(query, EntityView.class);
+
+        Assert.assertTrue(views.isEmpty());
+    }
+
+    @Test
     public void commitTransaction() {
         try (Transaction transaction = database.beginTransaction()) {
             database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")

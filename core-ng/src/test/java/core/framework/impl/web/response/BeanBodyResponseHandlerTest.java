@@ -13,9 +13,15 @@ public class BeanBodyResponseHandlerTest {
     BeanBodyResponseHandler handler = new BeanBodyResponseHandler();
 
     @Test
-    public void validateListBean() {
-        List<TestBean> bean = Lists.newArrayList(new TestBean());
-        handler.validateBeanClass(bean);
+    public void validateList() {
+        List<TestBean> list = Lists.newArrayList(new TestBean());
+        handler.validateBeanClass(list);
+    }
+
+    @Test
+    public void validateEmptyList() {
+        List<TestBean> list = Lists.newArrayList();
+        handler.validateBeanClass(list);
     }
 
     @Test

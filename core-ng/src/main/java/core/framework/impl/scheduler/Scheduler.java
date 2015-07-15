@@ -64,21 +64,16 @@ public class Scheduler {
 
     private Callable<Void> task(String name, Job job, boolean trace) {
         return () -> {
-            logger.debug("=== scheduled job begin ===");
-            try {
-                ActionLogContext.put(ActionLogContext.ACTION, "job/" + name);
-                ActionLogContext.put(ActionLogContext.REQUEST_ID, UUID.randomUUID().toString());
-                ActionLogContext.put("job", job.getClass().getCanonicalName());
-                logger.info("execute job, name={}", name);
-                if (trace) {
-                    logger.warn("trace log is triggered for current job execution, job={}", name);
-                    ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
-                }
-                job.execute();
-                return null;
-            } finally {
-                logger.debug("=== scheduled job end ===");
+            logger.info("execute scheduled job, name={}", name);
+            ActionLogContext.put(ActionLogContext.ACTION, "job/" + name);
+            ActionLogContext.put(ActionLogContext.REQUEST_ID, UUID.randomUUID().toString());
+            ActionLogContext.put("job", job.getClass().getCanonicalName());
+            if (trace) {
+                logger.warn("trace log is triggered for current job execution, job={}", name);
+                ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
             }
+            job.execute();
+            return null;
         };
     }
 

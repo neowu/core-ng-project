@@ -4,6 +4,7 @@ import core.framework.api.db.Column;
 import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Query;
 import core.framework.api.db.Table;
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 
 import java.lang.reflect.Field;
@@ -42,7 +43,7 @@ public class UpdateQueryBuilder {
                 if (value != null) {
                     Column column = field.getDeclaredAnnotation(Column.class);
                     if (index > 0) query.appendStatement(", ");
-                    query.appendStatement(column.name()).appendStatement("=?");
+                    query.appendStatement(column.name()).appendStatement(" = ?");
                     query.addParam(value);
                     index++;
                 }
@@ -54,10 +55,10 @@ public class UpdateQueryBuilder {
             index = 0;
             for (Field field : primaryKeyFields) {
                 Object value = field.get(entity);
-                if (value == null) throw new Error("primary key can not be null, field=" + field);
+                if (value == null) throw Exceptions.error("primary key can not be null, field={}", field);
                 Column column = field.getDeclaredAnnotation(Column.class);
                 if (index > 0) query.appendStatement(" AND ");
-                query.appendStatement(column.name()).appendStatement("=?");
+                query.appendStatement(column.name()).appendStatement(" = ?");
                 query.addParam(value);
                 index++;
             }

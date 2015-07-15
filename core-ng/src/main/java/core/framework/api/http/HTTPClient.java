@@ -19,6 +19,12 @@ import java.util.Map;
  * @author neo
  */
 public final class HTTPClient {
+    static {
+        // allow server ssl cert change during renegotiation
+        // http client uses pooled connection, multiple requests to same host may hit different server behind LB
+        System.setProperty("jdk.tls.allowUnsafeServerCertChange", "false");
+    }
+
     private final Logger logger = LoggerFactory.getLogger(HTTPClient.class);
 
     private final CloseableHttpClient client;
@@ -40,15 +46,14 @@ public final class HTTPClient {
 
     public HTTPResponse execute(HTTPRequest request) {
         StopWatch watch = new StopWatch();
-        logger.debug("send http request, uri={}", request.uri());
         HttpUriRequest httpRequest = request.builder.build();
         try (CloseableHttpResponse response = client.execute(httpRequest)) {
             int statusCode = response.getStatusLine().getStatusCode();
-            logger.debug("responseStatus={}", statusCode);
+            logger.debug("[response] status={}", statusCode);
 
             Map<String, String> headers = Maps.newHashMap();
             for (Header header : response.getAllHeaders()) {
-                logger.debug("[responseHeader] {}={}", header.getName(), header.getValue());
+                logger.debug("[response:header] {}={}", header.getName(), header.getValue());
                 headers.putIfAbsent(header.getName(), header.getValue());
             }
 
@@ -71,6 +76,6 @@ public final class HTTPClient {
     private void logResponseText(HTTPResponse httpResponse) {
         String contentType = httpResponse.contentType();
         if (contentType != null && (contentType.contains("text") || contentType.contains("json")))
-            logger.debug("responseText={}", httpResponse.text());
+            logger.debug("[response] body={}", httpResponse.text());
     }
 }
