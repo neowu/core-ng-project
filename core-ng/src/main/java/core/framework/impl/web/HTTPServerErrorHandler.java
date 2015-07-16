@@ -1,10 +1,11 @@
 package core.framework.impl.web;
 
-import core.framework.api.exception.Warning;
 import core.framework.api.http.ContentTypes;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Warning;
 import core.framework.api.util.Exceptions;
+import core.framework.api.validate.ValidationException;
 import core.framework.api.web.ErrorHandler;
 import core.framework.api.web.Response;
 import core.framework.api.web.ResponseImpl;
@@ -13,7 +14,6 @@ import core.framework.api.web.exception.ForbiddenException;
 import core.framework.api.web.exception.MethodNotAllowedException;
 import core.framework.api.web.exception.NotFoundException;
 import core.framework.api.web.exception.UnauthorizedException;
-import core.framework.api.web.exception.ValidationException;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.exception.ValidationErrorResponse;
 import core.framework.impl.web.response.ResponseHandler;
@@ -92,9 +92,9 @@ public class HTTPServerErrorHandler {
         if (accept != null && accept.contains("application/json")) {
             Object bean;
             if (e instanceof ValidationException) {
-                bean = validationErrorBody((ValidationException) e);
+                bean = validationErrorResponse((ValidationException) e);
             } else {
-                bean = errorBody(e);
+                bean = errorResponse(e);
             }
             return Response.bean(bean, status);
         } else {
@@ -113,17 +113,16 @@ public class HTTPServerErrorHandler {
         exchange.getResponseSender().send(errorHTML(e));
     }
 
-    private ErrorResponse errorBody(Throwable e) {
+    private ErrorResponse errorResponse(Throwable e) {
         ErrorResponse response = new ErrorResponse();
         response.message = e.getMessage();
         response.stackTrace = Exceptions.stackTrace(e);
         return response;
     }
 
-    private ValidationErrorResponse validationErrorBody(ValidationException e) {
+    private ValidationErrorResponse validationErrorResponse(ValidationException e) {
         ValidationErrorResponse response = new ValidationErrorResponse();
-        response.message = e.getMessage();
-        response.fieldErrors = e.fieldErrors;
+        response.errors = e.errors;
         return response;
     }
 }

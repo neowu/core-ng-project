@@ -15,7 +15,7 @@ public class ValidatorBuilderTest {
     }
 
     @Test
-    public void createEmptyValidator() {
+    public void withoutValidationAnnotation() {
         Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
         Assert.assertNull(validator.validator);
 

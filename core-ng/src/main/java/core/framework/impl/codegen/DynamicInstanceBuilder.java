@@ -12,11 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author neo
  */
 public class DynamicInstanceBuilder<T> {
+    private static final AtomicInteger INDEX = new AtomicInteger();
     private final Logger logger = LoggerFactory.getLogger(DynamicInstanceBuilder.class);
     private final CtClass classBuilder;
     private final ClassPool classPool;
@@ -29,7 +31,7 @@ public class DynamicInstanceBuilder<T> {
         String interfaceClassName = interfaceClass.getCanonicalName();
 
         classPool = ClassPool.getDefault();
-        classBuilder = classPool.makeClass(className);
+        classBuilder = classPool.makeClass(className + "$" + (INDEX.getAndIncrement()));
 
         try {
             classBuilder.addInterface(classPool.get(interfaceClassName));

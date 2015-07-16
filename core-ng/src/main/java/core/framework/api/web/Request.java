@@ -1,7 +1,6 @@
 package core.framework.api.web;
 
 import core.framework.api.http.HTTPMethod;
-import core.framework.api.web.exception.ValidationException;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -28,7 +27,7 @@ public interface Request {
 
     Optional<String> formParam(String name);
 
-    <T> T bean(Type instanceType) throws ValidationException;
+    <T> T bean(Type instanceType);
 
     String clientIP();
 

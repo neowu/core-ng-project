@@ -48,11 +48,12 @@ public class ValidatorTest {
         instance.children = Lists.newArrayList();
         instance.children.add(instance.child);
 
-        ValidationResult result = validator.validate(instance);
+        ValidationErrors validationErrors = new ValidationErrors();
+        validator.validate(instance, validationErrors);
 
-        Assert.assertFalse(result.isValid());
+        Assert.assertTrue(validationErrors.hasError());
 
-        Map<String, String> errors = result.errors;
+        Map<String, String> errors = validationErrors.errors;
 
         assertEquals(4, errors.size());
         assertThat(errors.get("stringField"), containsString("stringField"));
@@ -71,11 +72,12 @@ public class ValidatorTest {
         instance.children = Lists.newArrayList();
         instance.children.add(instance.child);
 
-        ValidationResult result = validator.validate(Lists.newArrayList(instance));
+        ValidationErrors validationErrors = new ValidationErrors();
+        validator.validate(Lists.newArrayList(instance), validationErrors);
 
-        Assert.assertFalse(result.isValid());
+        Assert.assertTrue(validationErrors.hasError());
 
-        Map<String, String> errors = result.errors;
+        Map<String, String> errors = validationErrors.errors;
 
         assertEquals(4, errors.size());
         assertThat(errors.get("stringField"), containsString("stringField"));

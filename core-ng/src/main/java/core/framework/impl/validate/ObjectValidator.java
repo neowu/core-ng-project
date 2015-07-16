@@ -23,12 +23,12 @@ public class ObjectValidator implements FieldValidator {
     }
 
     @Override
-    public void validate(Object instance, ValidationResult result) {
+    public void validate(Object instance, ValidationErrors errors) {
         if (instance != null) {
             validators.forEach((field, validators) -> {
                 try {
                     Object fieldValue = field.get(instance);
-                    validators.forEach(validator -> validator.validate(fieldValue, result));
+                    validators.forEach(validator -> validator.validate(fieldValue, errors));
                 } catch (IllegalAccessException e) {
                     throw new Error(e);
                 }

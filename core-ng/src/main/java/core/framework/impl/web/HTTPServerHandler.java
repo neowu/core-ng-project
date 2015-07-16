@@ -33,15 +33,15 @@ public class HTTPServerHandler implements HttpHandler {
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
 
-    private final ResponseHandler responseHandler = new ResponseHandler();
     private final FormParserFactory formParserFactory = FormParserFactory.builder().build();
-    final HTTPServerErrorHandler errorHandler = new HTTPServerErrorHandler(responseHandler);
     private final ActionLogger actionLogger;
     private final Route route;
     private final List<Interceptor> interceptors;
     private final SessionManager sessionManager;
     private final WebContextImpl webContext;
     private final BeanValidator validator;
+    private final ResponseHandler responseHandler;
+    final HTTPServerErrorHandler errorHandler;
 
     public HTTPServerHandler(ActionLogger actionLogger, Route route, List<Interceptor> interceptors, SessionManager sessionManager, WebContextImpl webContext, BeanValidator validator) {
         this.actionLogger = actionLogger;
@@ -50,6 +50,8 @@ public class HTTPServerHandler implements HttpHandler {
         this.sessionManager = sessionManager;
         this.webContext = webContext;
         this.validator = validator;
+        responseHandler = new ResponseHandler(validator);
+        errorHandler = new HTTPServerErrorHandler(responseHandler);
     }
 
     @Override

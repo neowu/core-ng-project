@@ -19,7 +19,7 @@ public class LengthValidator implements FieldValidator {
     }
 
     @Override
-    public void validate(Object value, ValidationResult result) {
+    public void validate(Object value, ValidationErrors errors) {
         if (value == null) return;
         int length;
         if (value instanceof String) {
@@ -33,9 +33,9 @@ public class LengthValidator implements FieldValidator {
         }
 
         if (this.length.min() > -1 && length < this.length.min())
-            result.addError(fieldPath, this.length.message());
+            errors.add(fieldPath, this.length.message());
 
         if (this.length.max() > -1 && length > this.length.max())
-            result.addError(fieldPath, this.length.message());
+            errors.add(fieldPath, this.length.message());
     }
 }

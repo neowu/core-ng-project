@@ -36,9 +36,7 @@ public class ServiceControllerBuilder<T> {
     }
 
     public Controller build() {
-        int index = methodIndex();
-        String className = service.getClass().getCanonicalName() + "$" + method.getName() + "$" + index;
-        DynamicInstanceBuilder<Controller> builder = new DynamicInstanceBuilder<>(Controller.class, className);
+        DynamicInstanceBuilder<Controller> builder = new DynamicInstanceBuilder<>(Controller.class, service.getClass().getCanonicalName() + "$" + method.getName());
 
         builder.addField(new CodeBuilder().append("final {} delegate;", serviceInterface.getCanonicalName()).toString());
         builder.constructor(new Class[]{serviceInterface}, "this.delegate = $1;");
@@ -88,14 +86,6 @@ public class ServiceControllerBuilder<T> {
 
         builder.append("}");
         return builder.toString();
-    }
-
-    private int methodIndex() {
-        Method[] methods = serviceInterface.getMethods();
-        for (int i = 0; i < methods.length; i++) {
-            if (methods[i].equals(method)) return i;
-        }
-        throw new Error("method must be method of service interface");
     }
 
     private PathParam pathParam(Annotation[] annotations) {

@@ -8,7 +8,6 @@ import core.framework.api.web.CookieSpec;
 import core.framework.api.web.Request;
 import core.framework.api.web.Session;
 import core.framework.api.web.exception.BadRequestException;
-import core.framework.api.web.exception.ValidationException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.form.FormData;
@@ -146,11 +145,10 @@ public final class RequestImpl implements Request {
     }
 
     @Override
-    public <T> T bean(Type instanceType) throws ValidationException {
-        validator.register(instanceType);
+    public <T> T bean(Type instanceType) {
         try {
             T bean = parseBean(instanceType);
-            return validator.validate(bean);
+            return validator.validate(instanceType, bean);
         } catch (UncheckedIOException e) {
             throw new BadRequestException(e);
         }

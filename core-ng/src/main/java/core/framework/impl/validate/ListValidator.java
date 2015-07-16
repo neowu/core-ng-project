@@ -15,9 +15,9 @@ public class ListValidator implements FieldValidator {
     }
 
     @Override
-    public void validate(Object list, ValidationResult result) {
+    public void validate(Object list, ValidationErrors errors) {
         if (list instanceof List) {
-            ((List<?>) list).forEach(value -> valueValidator.validate(value, result));
+            ((List<?>) list).forEach(value -> valueValidator.validate(value, errors));
         } else if (list != null) {
             throw Exceptions.error("expected list, actualClass={}", list.getClass().getCanonicalName());
         }
