@@ -1,6 +1,7 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.util.Lists;
+import core.framework.impl.web.BeanValidator;
 import core.framework.impl.web.TestBean;
 import org.junit.Test;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * @author neo
  */
 public class BeanBodyResponseHandlerTest {
-    BeanBodyResponseHandler handler = new BeanBodyResponseHandler();
+    BeanBodyResponseHandler handler = new BeanBodyResponseHandler(new BeanValidator());
 
     @Test
     public void validateList() {

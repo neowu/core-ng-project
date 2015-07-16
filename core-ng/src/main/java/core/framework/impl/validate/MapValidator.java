@@ -15,9 +15,9 @@ public class MapValidator implements FieldValidator {
     }
 
     @Override
-    public void validate(Object map, ValidationResult result) {
+    public void validate(Object map, ValidationErrors errors) {
         if (map instanceof Map) {
-            ((Map<?, ?>) map).forEach((key, value) -> valueValidator.validate(value, result));
+            ((Map<?, ?>) map).forEach((key, value) -> valueValidator.validate(value, errors));
         } else if (map != null) {
             throw Exceptions.error("expected map, actualClass={}", map.getClass().getCanonicalName());
         }

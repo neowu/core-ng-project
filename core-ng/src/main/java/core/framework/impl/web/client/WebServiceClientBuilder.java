@@ -11,6 +11,7 @@ import core.framework.impl.web.service.HTTPMethodHelper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -26,8 +27,7 @@ public class WebServiceClientBuilder<T> {
     }
 
     public T build() {
-        String className = serviceInterface.getCanonicalName() + "$Client";
-        DynamicInstanceBuilder<T> builder = new DynamicInstanceBuilder<>(serviceInterface, className);
+        DynamicInstanceBuilder<T> builder = new DynamicInstanceBuilder<>(serviceInterface, serviceInterface.getCanonicalName() + "$Client");
 
         builder.addField(new CodeBuilder().append("final {} client;", WebServiceClient.class.getCanonicalName()).toString());
         builder.constructor(new Class[]{WebServiceClient.class}, "this.client = $1;");
@@ -47,6 +47,7 @@ public class WebServiceClientBuilder<T> {
 
         TypeHelper returnType = new TypeHelper(method.getGenericReturnType());
         Map<String, Integer> pathParamIndexes = Maps.newHashMap();
+        Type requestBeanType = null;
         Integer requestBeanIndex = null;
         builder.append("public {} {}(", returnType.canonicalName(), method.getName());
         Annotation[][] annotations = method.getParameterAnnotations();
@@ -61,17 +62,19 @@ public class WebServiceClientBuilder<T> {
                 pathParamIndexes.put(pathParam.value(), i);
             } else {
                 requestBeanIndex = i;
+                requestBeanType = method.getGenericParameterTypes()[i];
             }
         }
         builder.append(") {\n");
 
+        builder.indent(1).append("java.lang.reflect.Type requestBeanType = {};\n", requestBeanType == null ? "null" : new TypeHelper(requestBeanType).variableValue());
         builder.indent(1).append("Object requestBean = {};\n", requestBeanIndex == null ? "null" : "param" + requestBeanIndex);
 
         builder.indent(1).append("java.util.Map pathParams = new java.util.HashMap();\n");
         pathParamIndexes.forEach((name, index) ->
             builder.indent(1).append("pathParams.put(\"{}\", String.valueOf(param{}));\n", name, index));
 
-        builder.indent(1).append("{} response = ({}) client.execute({}.{},\"{}\",pathParams,requestBean,{});\n",
+        builder.indent(1).append("{} response = ({}) client.execute({}.{},\"{}\",pathParams,requestBeanType,requestBean,{});\n",
             returnType.variableType(),
             returnType.variableType(),
             HTTPMethod.class.getCanonicalName(),

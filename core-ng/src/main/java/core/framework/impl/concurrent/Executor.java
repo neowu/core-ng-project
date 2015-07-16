@@ -1,7 +1,7 @@
 package core.framework.impl.concurrent;
 
-import core.framework.api.exception.Warning;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Warning;
 import core.framework.impl.log.ActionLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

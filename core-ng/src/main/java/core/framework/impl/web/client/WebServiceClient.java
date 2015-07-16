@@ -12,10 +12,10 @@ import core.framework.api.module.WebServiceClientConfig;
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
+import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
 import core.framework.api.web.client.WebServiceRequestSigner;
 import core.framework.api.web.exception.RemoteServiceException;
-import core.framework.api.web.exception.ValidationException;
 import core.framework.impl.web.BeanValidator;
 import core.framework.impl.web.HTTPServerHandler;
 import core.framework.impl.web.exception.ErrorResponse;
@@ -35,7 +35,7 @@ public class WebServiceClient implements WebServiceClientConfig {
 
     private final String serviceURL;
     private final HTTPClient httpClient;
-    final BeanValidator validator;
+    private final BeanValidator validator;
     private WebServiceRequestSigner signer;
 
     public WebServiceClient(String serviceURL, HTTPClient httpClient, BeanValidator validator) {
@@ -44,9 +44,12 @@ public class WebServiceClient implements WebServiceClientConfig {
         this.validator = validator;
     }
 
-    public <T> T execute(HTTPMethod method, String path, Map<String, String> pathParams, Object requestBean, Type responseType) {
+    public <T> T execute(HTTPMethod method, String path, Map<String, String> pathParams, Type requestType, Object requestBean, Type responseType) {
         logger.debug("call web service, serviceURL={}, method={}, path={}, pathParams={}", serviceURL, method, path, pathParams);
-        validateRequestBean(requestBean);
+
+        if (requestType != null) {
+            validator.validate(requestType, requestBean);
+        }
 
         String serviceURL = serviceURL(path, pathParams);
         HTTPRequest httpRequest = new HTTPRequest(method, serviceURL);
@@ -98,32 +101,23 @@ public class WebServiceClient implements WebServiceClientConfig {
         this.signer = signer;
     }
 
-    private void validateRequestBean(Object requestBean) {
-        if (requestBean != null) {
-            try {
-                validator.validate(requestBean);
-            } catch (ValidationException e) {
-                throw new Error(e);
-            }
-        }
-    }
-
     private void validateResponse(HTTPResponse response) {
         HTTPStatus status = response.status();
         if (status.code >= HTTPStatus.OK.code && status.code <= 300) return;
+        String responseText = response.text();
         try {
             if (status == HTTPStatus.BAD_REQUEST) {
-                ValidationErrorResponse validationErrorResponse = JSON.fromJSON(ValidationErrorResponse.class, response.text());
-                throw new RemoteServiceException("failed to validate, message=" + validationErrorResponse.message + ", fieldErrors=" + validationErrorResponse.fieldErrors);
+                ValidationErrorResponse validationErrorResponse = JSON.fromJSON(ValidationErrorResponse.class, responseText);
+                throw new RemoteServiceException(Strings.format("failed to validate, errors={}", validationErrorResponse.errors));
             } else {
-                ErrorResponse errorResponse = JSON.fromJSON(ErrorResponse.class, response.text());
-                throw new RemoteServiceException("failed to call remote web service, remoteError=" + errorResponse.message + ", remoteStackTrace=" + errorResponse.stackTrace);
+                ErrorResponse errorResponse = JSON.fromJSON(ErrorResponse.class, responseText);
+                throw new RemoteServiceException(Strings.format("failed to call remote web service, error={}, remoteStackTrace={}", errorResponse.message, errorResponse.stackTrace));
             }
         } catch (RemoteServiceException e) {
             throw e;
         } catch (Exception e) {
-            logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, response.text(), e);
-            throw new RemoteServiceException("received non 2xx status code, status=" + status.code + ", remoteMessage=" + response.text(), e);
+            logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, responseText, e);
+            throw new RemoteServiceException(Strings.format("received non 2xx status code, status={}, responseText={}", status.code, responseText), e);
         }
     }
 

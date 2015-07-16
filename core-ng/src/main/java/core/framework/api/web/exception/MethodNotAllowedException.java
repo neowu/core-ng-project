@@ -1,7 +1,7 @@
 package core.framework.api.web.exception;
 
-import core.framework.api.exception.Warning;
 import core.framework.api.http.HTTPMethod;
+import core.framework.api.log.Warning;
 
 /**
  * @author neo

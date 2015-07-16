@@ -1,4 +1,4 @@
-package core.framework.api.exception;
+package core.framework.api.log;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

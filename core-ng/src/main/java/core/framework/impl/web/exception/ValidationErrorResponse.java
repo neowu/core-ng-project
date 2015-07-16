@@ -10,9 +10,6 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ValidationErrorResponse {
-    @XmlElement(name = "message")
-    public String message;
-
-    @XmlElement(name = "field_errors")
-    public Map<String, String> fieldErrors;
+    @XmlElement(name = "errors")
+    public Map<String, String> errors;
 }

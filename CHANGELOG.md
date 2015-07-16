@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.2.5 (7/16/2015)
+* standardized validation exception and make validator throw validationException, refactory validator
+
 ### 3.2.4 (7/15/2015)
 * fix: http response body validation pass empty list 
 * databaseImpl, track available/total connections when getting conn from pool

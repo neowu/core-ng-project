@@ -2,7 +2,6 @@ package core.framework.impl.queue;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
-import core.framework.impl.validate.ValidationResult;
 import core.framework.impl.validate.Validator;
 import core.framework.impl.validate.ValidatorBuilder;
 
@@ -16,10 +15,10 @@ public class MessageValidator {
     private final Map<Class<?>, Validator> validators = Maps.newHashMap();
 
     public void register(Class<?> messageClass) {
-        new MessageClassValidator(messageClass).validate();
-
-        validators.computeIfAbsent(messageClass,
-            key -> new ValidatorBuilder(key, field -> field.getDeclaredAnnotation(XmlElement.class).name()).build());
+        validators.computeIfAbsent(messageClass, key -> {
+            new MessageClassValidator(messageClass).validate();
+            return new ValidatorBuilder(key, field -> field.getDeclaredAnnotation(XmlElement.class).name()).build();
+        });
     }
 
     public <T> void validate(T message) {
@@ -29,8 +28,6 @@ public class MessageValidator {
         if (validator == null)
             throw Exceptions.error("message class is not registered, class={}", message.getClass().getCanonicalName());
 
-        ValidationResult result = validator.validate(message);
-        if (!result.isValid())
-            throw Exceptions.error("failed to validate, errors={}", result.errors);
+        validator.validate(message);
     }
 }

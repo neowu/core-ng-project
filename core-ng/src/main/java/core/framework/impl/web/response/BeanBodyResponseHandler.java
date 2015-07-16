@@ -3,10 +3,9 @@ package core.framework.impl.web.response;
 import core.framework.api.http.ContentTypes;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
-import core.framework.api.util.Maps;
 import core.framework.api.util.Types;
 import core.framework.api.web.ResponseImpl;
-import core.framework.impl.web.BeanTypeValidator;
+import core.framework.impl.web.BeanValidator;
 import io.undertow.io.Sender;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author neo
@@ -23,7 +21,11 @@ import java.util.Map;
 public class BeanBodyResponseHandler implements BodyHandler {
     private final Logger logger = LoggerFactory.getLogger(BeanBodyResponseHandler.class);
 
-    private final Map<Type, Boolean> validations = Maps.newConcurrentHashMap();
+    private final BeanValidator validator;
+
+    public BeanBodyResponseHandler(BeanValidator validator) {
+        this.validator = validator;
+    }
 
     @Override
     public void handle(ResponseImpl response, HttpServerExchange exchange) {
@@ -53,9 +55,6 @@ public class BeanBodyResponseHandler implements BodyHandler {
             instanceType = bean.getClass();
         }
 
-        if (!validations.containsKey(instanceType)) {
-            new BeanTypeValidator(instanceType).validate();
-            validations.putIfAbsent(instanceType, true);
-        }
+        validator.register(instanceType);
     }
 }

@@ -4,7 +4,6 @@ import core.framework.api.mongo.Field;
 import core.framework.api.mongo.Id;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
-import core.framework.impl.validate.ValidationResult;
 import core.framework.impl.validate.Validator;
 import core.framework.impl.validate.ValidatorBuilder;
 
@@ -33,8 +32,6 @@ public class MongoEntityValidator {
         if (validator == null)
             throw Exceptions.error("entity class is not registered, entityClass={}", entity.getClass().getCanonicalName());
 
-        ValidationResult result = validator.validate(entity);
-        if (!result.isValid())
-            throw Exceptions.error("failed to validate, errors={}", result.errors);
+        validator.validate(entity);
     }
 }
