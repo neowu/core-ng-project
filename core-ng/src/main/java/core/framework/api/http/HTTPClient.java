@@ -22,7 +22,7 @@ public final class HTTPClient {
     static {
         // allow server ssl cert change during renegotiation
         // http client uses pooled connection, multiple requests to same host may hit different server behind LB
-        System.setProperty("jdk.tls.allowUnsafeServerCertChange", "false");
+        System.setProperty("jdk.tls.allowUnsafeServerCertChange", "true");
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClient.class);
