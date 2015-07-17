@@ -1,5 +1,7 @@
 package core.framework.impl.template;
 
+import core.framework.impl.template.function.HTMLFunction;
+
 import java.util.List;
 
 /**
@@ -13,10 +15,12 @@ public class Template {
     }
 
     public String process(Object value) {
-        TemplateContext context = new TemplateContext(value);
+        CallStack stack = new CallStack(value);
+        stack.functions.put("html", new HTMLFunction());
+
         StringBuilder builder = new StringBuilder();
         for (FragmentHandler handler : handlers) {
-            handler.process(builder, context);
+            handler.process(builder, stack);
         }
         return builder.toString();
     }

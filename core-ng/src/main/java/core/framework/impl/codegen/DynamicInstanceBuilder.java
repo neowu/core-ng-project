@@ -39,7 +39,7 @@ public class DynamicInstanceBuilder<T> {
             constructor.setBody(";");
             classBuilder.addConstructor(constructor);
         } catch (NotFoundException | CannotCompileException e) {
-            throw new Error(e);
+            throw new CodeCompileException(e);
         }
     }
 
@@ -59,7 +59,7 @@ public class DynamicInstanceBuilder<T> {
             classBuilder.addConstructor(constructor);
             return this;
         } catch (CannotCompileException | NotFoundException e) {
-            throw new Error(e);
+            throw new CodeCompileException(e);
         }
     }
 
@@ -68,8 +68,8 @@ public class DynamicInstanceBuilder<T> {
             classBuilder.addMethod(CtMethod.make(method, classBuilder));
             return this;
         } catch (CannotCompileException e) {
-            logger.info("method:\n{}", method);
-            throw new Error(e);
+            logger.error("failed method:\n{}", method);
+            throw new CodeCompileException(e);
         }
     }
 
@@ -78,8 +78,8 @@ public class DynamicInstanceBuilder<T> {
             classBuilder.addField(CtField.make(field, classBuilder));
             return this;
         } catch (CannotCompileException e) {
-            logger.info("field:\n{}", field);
-            throw new Error(e);
+            logger.error("failed field:\n{}", field);
+            throw new CodeCompileException(e);
         }
     }
 
@@ -90,7 +90,7 @@ public class DynamicInstanceBuilder<T> {
             classBuilder.detach();
             return targetClass.getDeclaredConstructor(constructorParamClasses).newInstance(constructorParams);
         } catch (CannotCompileException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new Error(e);
+            throw new CodeCompileException(e);
         }
     }
 }

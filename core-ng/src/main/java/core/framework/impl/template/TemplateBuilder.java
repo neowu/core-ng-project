@@ -2,6 +2,7 @@ package core.framework.impl.template;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
+import core.framework.impl.template.expression.CallTypeStack;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,13 +17,15 @@ import java.util.List;
  */
 public class TemplateBuilder {
     private final String template;
+    private final CallTypeStack stack;
     private final List<FragmentHandler> handlers = Lists.newArrayList();
     private StringBuilder currentContent = new StringBuilder();
-    private Deque<BlockHandler> blockHandlers = new ArrayDeque<>();
+    private Deque<CompositeHandler> blockHandlers = new ArrayDeque<>();
     private int currentLineNumber;
 
-    public TemplateBuilder(String template) {
+    public TemplateBuilder(String template, Class<?> modelClass) {
         this.template = template;
+        this.stack = new CallTypeStack(modelClass);
     }
 
     public Template build() {
@@ -44,7 +47,7 @@ public class TemplateBuilder {
         }
 
         if (!blockHandlers.isEmpty()) {
-            throw Exceptions.error("block is not closed, expression={}", blockHandlers.peek().expression);
+            throw Exceptions.error("block is not closed, expression={}", blockHandlers.peek());
         }
 
         addStaticContentFragmentHandler();
@@ -54,21 +57,29 @@ public class TemplateBuilder {
 
     private void processDirective(String line) {
         addStaticContentFragmentHandler();
-        int index = line.indexOf("<!--[");
-        int endIndex = line.indexOf("]-->");
-        String expression = line.substring(index + 5, endIndex);
-        if (expression.startsWith("/")) {
-            BlockHandler handler = blockHandlers.pop();
-            expression = expression.substring(1);
-            if (!handler.expression.equals(expression))
-                throw Exceptions.error("expression block does not match, lineNumber={}, expectedExpression={}", currentLineNumber, handler.expression);
+        int index = line.indexOf("<!--%");
+        int endIndex = line.indexOf("%-->");
+        String expression = line.substring(index + 5, endIndex).trim();
+        if (expression.equals("end")) {
+            CompositeHandler handler = blockHandlers.pop();
             if (blockHandlers.isEmpty()) {
                 handlers.add(handler);
             } else {
-                blockHandlers.peek().handlers.add(handler);
+                blockHandlers.peek().add(handler);
+            }
+            if (handler instanceof ForHandler) {
+                stack.paramClasses.remove(((ForHandler) handler).variable);
             }
         } else {
-            blockHandlers.push(new BlockHandler(expression));
+            if (expression.startsWith("if")) {
+                blockHandlers.push(new IfHandler(expression, stack, line + ", line=" + currentLineNumber));
+            } else if (expression.startsWith("for")) {
+                ForHandler forHandler = new ForHandler(expression, stack, line + ", line=" + currentLineNumber);
+                blockHandlers.push(forHandler);
+                stack.paramClasses.put(forHandler.variable, forHandler.valueClass);
+            } else {
+                throw new Error("unsupported directive, line=" + line);
+            }
         }
     }
 
@@ -83,9 +94,9 @@ public class TemplateBuilder {
                 i++;
             } else if (ch == '}') {
                 if (blockHandlers.isEmpty()) {
-                    handlers.add(new ExpressionHandler(expression.toString()));
+                    handlers.add(new ExpressionHandler(expression.toString(), stack, line + ", line=" + currentLineNumber));
                 } else {
-                    blockHandlers.peek().handlers.add(new ExpressionHandler(expression.toString()));
+                    blockHandlers.peek().add(new ExpressionHandler(expression.toString(), stack, line + ", line=" + currentLineNumber));
                 }
                 expression = new StringBuilder();
                 inExpression = false;
@@ -106,14 +117,14 @@ public class TemplateBuilder {
             if (blockHandlers.isEmpty()) {
                 handlers.add(new StaticContentHandler(currentContent.toString()));
             } else {
-                blockHandlers.peek().handlers.add(new StaticContentHandler(currentContent.toString()));
+                blockHandlers.peek().add(new StaticContentHandler(currentContent.toString()));
             }
             currentContent = new StringBuilder();
         }
     }
 
     private boolean isDirective(String line) {
-        return line.trim().startsWith("<!--[");
+        return line.trim().startsWith("<!--%");
     }
 
     private boolean containsExpression(String line) {

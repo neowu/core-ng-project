@@ -11,7 +11,7 @@ public class StaticContentHandler implements FragmentHandler {
     }
 
     @Override
-    public void process(StringBuilder builder, TemplateContext context) {
+    public void process(StringBuilder builder, CallStack stack) {
         builder.append(content);
     }
 }
