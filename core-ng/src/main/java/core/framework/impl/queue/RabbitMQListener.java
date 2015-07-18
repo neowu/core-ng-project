@@ -88,6 +88,7 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
         try {
             channel = rabbitMQ.channel();
             QueueingConsumer consumer = new QueueingConsumer(channel);
+            channel.basicQos(counter.maxConcurrentHandlers);
             channel.basicConsume(queue, false, consumer);
             consumeMessage(consumer, channel);
         } finally {
@@ -105,7 +106,9 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
                     process(delivery);
                     return null;
                 } finally {
+                    //TODO: handle connection failure, reopen conn?
                     channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                    //TODO: make sure counter decrease, make above line never throw exception
                     counter.decrease();
                 }
             });
