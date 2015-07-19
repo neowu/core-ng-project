@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '3.2.5'
+    version = '3.2.6'
 }
 
 def awsVersion = '1.10.2'
@@ -19,7 +19,7 @@ project(':core-ng') {
     dependencies {
         provided(
                 'redis.clients:jedis:2.7.2',
-                'org.elasticsearch:elasticsearch:1.6.0',
+                'org.elasticsearch:elasticsearch:1.7.0',
                 'com.mchange:c3p0:0.9.5',
                 'org.mongodb:mongo-java-driver:3.0.1',
                 'com.rabbitmq:amqp-client:3.5.3',
@@ -112,7 +112,7 @@ project(':search-service') {
     dependencies {
         compile(
                 project(':core-ng'),
-                'org.elasticsearch:elasticsearch:1.6.0'
+                'org.elasticsearch:elasticsearch:1.7.0'
         )
         testCompile(
                 project(':core-ng-test')
