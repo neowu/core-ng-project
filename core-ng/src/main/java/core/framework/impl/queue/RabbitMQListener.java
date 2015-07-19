@@ -90,13 +90,13 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
             QueueingConsumer consumer = new QueueingConsumer(channel);
             channel.basicQos(counter.maxConcurrentHandlers);
             channel.basicConsume(queue, false, consumer);
-            consumeMessage(consumer, channel);
+            consumeMessage(consumer);
         } finally {
             rabbitMQ.closeChannel(channel);
         }
     }
 
-    private void consumeMessage(QueueingConsumer consumer, Channel channel) throws InterruptedException {
+    private void consumeMessage(QueueingConsumer consumer) throws InterruptedException {
         while (!shutdown) {
             counter.waitUntilAvailable();
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
@@ -106,10 +106,9 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
                     process(delivery);
                     return null;
                 } finally {
+                    counter.decrease(); // release counter first, not let exception from basic ack bypass it.
                     //TODO: handle connection failure, reopen conn?
-                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-                    //TODO: make sure counter decrease, make above line never throw exception
-                    counter.decrease();
+                    consumer.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                 }
             });
         }
