@@ -46,8 +46,6 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
     private final MessageHandlerCounter counter = new MessageHandlerCounter();
     private final MessageValidator validator;
 
-    volatile boolean shutdown;
-
     public SQSMessageListener(Executor executor, AmazonSQS sqs, String queueURL, MessageValidator validator) {
         this.executor = executor;
         this.sqs = sqs;
@@ -78,7 +76,7 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
         Thread.currentThread().setName("sqs-listener-" + Thread.currentThread().getId());
         logger.info("sqs message listener started, queueURL={}", queueURL);
 
-        while (!shutdown) {
+        while (!listenerExecutor.isShutdown()) {
             try {
                 execute();
             } catch (Throwable e) {
@@ -94,7 +92,6 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
 
     public void shutdown() {
         logger.info("shutdown sqs message listener, queueURL={}", queueURL);
-        shutdown = true;
         listenerExecutor.shutdown();
     }
 

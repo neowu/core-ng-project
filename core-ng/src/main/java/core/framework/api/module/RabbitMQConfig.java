@@ -36,7 +36,7 @@ public class RabbitMQConfig {
     }
 
     public RabbitMQConfig connectionTimeout(Duration timeout) {
-        context.queueManager.rabbitMQ.connectionTimeout(timeout);
+        context.queueManager.rabbitMQ.connectionFactory.setConnectionTimeout((int) timeout.toMillis());
         return this;
     }
 }

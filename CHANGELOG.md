@@ -1,7 +1,7 @@
 ## Change log
 
-### 3.2.6 (7/17/2015 ongoing)
-* improve rabbitmq message listener fault tolerant
+### 3.2.6 (7/17/2015 - 7/20/2015)
+* refactory rabbitmq support
 * update elasticsearch to 1.7
 
 ### 3.2.5 (7/16/2015)
