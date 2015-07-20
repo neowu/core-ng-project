@@ -1,5 +1,36 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html>
+<head>
+    <title>template test</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
 <body>
-<p th:text="${name}">to be replaced</p>
+<div>
+    <p>field access</p>
+
+    <p>${stringField}</p>
+
+    <p>${numberField}</p>
+
+    <p>${addToNumberField()}</p>
+
+    <p>${appendToStringField("_postfix")}</p>
+</div>
+
+<div>
+    <p>loop test</p>
+    <ul>
+        <!--% for x in items %-->
+        <li>${x}</li>
+        <!--% end %-->
+    </ul>
+    <ul>
+        <!--% for child in children %-->
+        <!--% if child.boolField %-->
+        <li>${child.stringField} ${child.doubleField}</li>
+        <!--% end %-->
+        <!--% end %-->
+    </ul>
+</div>
 </body>
 </html>

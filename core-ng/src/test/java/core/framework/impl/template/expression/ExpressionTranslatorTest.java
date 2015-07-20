@@ -23,6 +23,12 @@ public class ExpressionTranslatorTest {
     }
 
     @Test
+    public void method() {
+        String expression = translator.translate(parser.parse("method()"), new CallTypeStack(Object.class));
+        Assert.assertEquals("$root.method()", expression);
+    }
+
+    @Test
     public void builtinMethod() {
         String expression = translator.translate(parser.parse("#html(field)"), new CallTypeStack(Object.class));
         Assert.assertEquals("stack.function(\"html\").apply(new Object[]{$root.field})", expression);

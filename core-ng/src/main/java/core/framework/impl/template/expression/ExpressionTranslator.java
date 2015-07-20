@@ -29,7 +29,7 @@ public class ExpressionTranslator {
                 builder.append("stack.function(\"").append(method.name.substring(1)).append("\").apply(");
             } else {
                 if (root && !stack.paramClasses.containsKey(method.name)) {
-                    builder.append("$root");
+                    builder.append("$root.");
                 }
                 builder.append(method.name).append('(');
             }

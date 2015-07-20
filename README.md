@@ -15,6 +15,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * nested db transaction? 
 * validate ES index object
 * provide ws interface to send queue message for dev and prod troubleshoot?
+* review/refactory/unit-test all packages
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)

@@ -1,10 +1,11 @@
 package core.framework.impl.template;
 
-import core.framework.api.util.Lists;
+import core.framework.api.util.Exceptions;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionParser;
+import core.framework.impl.template.expression.ExpressionTypeInspector;
 import core.framework.impl.template.expression.Token;
 
 import java.util.List;
@@ -14,26 +15,25 @@ import java.util.regex.Pattern;
 /**
  * @author neo
  */
-public class ForHandler implements FragmentHandler, CompositeHandler {
+public class ForHandler extends CompositeHandler implements FragmentHandler {
+    private static final Pattern STATEMENT_PATTERN = Pattern.compile("for ([a-zA-Z1-9]+) in ([#a-zA-Z1-9\\.\\(\\)]+)");
+
     Expression expression;
-    final List<FragmentHandler> handlers = Lists.newArrayList();
     String variable;
     Class<?> valueClass;
 
-    public ForHandler(String statement, CallTypeStack stack, String reference) {
-        Pattern pattern = Pattern.compile("for (\\w+) in (.+)");
-        Matcher matcher = pattern.matcher(statement);
-        if (!matcher.matches()) throw new Error("not match, exp=" + statement);
-        variable = matcher.group(1);
-        valueClass = Object.class; //todo: impl this
-        String list = matcher.group(2);
-        Token expression = new ExpressionParser().parse(list);
-        this.expression = new ExpressionBuilder().build(expression, stack, List.class);
-    }
+    public ForHandler(String statement, CallTypeStack stack, String location) {
+        Matcher matcher = STATEMENT_PATTERN.matcher(statement);
+        if (!matcher.matches())
+            throw Exceptions.error("statement must match \"for var in list\", location={}", location);
 
-    @Override
-    public void add(FragmentHandler handler) {
-        handlers.add(handler);
+        variable = matcher.group(1);
+        String list = matcher.group(2);
+
+        Token expression = new ExpressionParser().parse(list);
+        valueClass = new ExpressionTypeInspector().listValueClass(expression, stack.rootClass, list);
+
+        this.expression = new ExpressionBuilder().build(expression, stack, List.class);
     }
 
     @Override
