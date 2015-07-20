@@ -16,6 +16,7 @@ public class TemplateTest {
         public Integer numberField;
         public List<String> items = Lists.newArrayList();
         public List<Child> children = Lists.newArrayList();
+        public String htmlField;
 
         public Integer addToNumberField() {
             return numberField + 100;
@@ -43,11 +44,12 @@ public class TemplateTest {
         Template template = new TemplateBuilder(ClasspathResources.text("template-test/template.html"), TestModel.class).build();
 
         TestModel model = new TestModel();
-        model.stringField = "string";
+        model.stringField = "string<";
         model.numberField = 100;
         model.items.addAll(Lists.newArrayList("a", "b", "c"));
         model.children.add(new Child("child1", 1.0, true));
         model.children.add(new Child("child2", 2.0, false));
+        model.htmlField = "<pre>html</pre>";
 
         String result = template.process(model);
 

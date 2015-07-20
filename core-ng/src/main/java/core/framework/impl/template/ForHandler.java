@@ -1,6 +1,7 @@
 package core.framework.impl.template;
 
 import core.framework.api.util.Exceptions;
+import core.framework.impl.codegen.CodeCompileException;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
@@ -30,10 +31,13 @@ public class ForHandler extends CompositeHandler implements FragmentHandler {
         variable = matcher.group(1);
         String list = matcher.group(2);
 
-        Token expression = new ExpressionParser().parse(list);
-        valueClass = new ExpressionTypeInspector().listValueClass(expression, stack.rootClass, list);
-
-        this.expression = new ExpressionBuilder().build(expression, stack, List.class);
+        try {
+            Token expression = new ExpressionParser().parse(list);
+            valueClass = new ExpressionTypeInspector().listValueClass(expression, stack.rootClass, list);
+            this.expression = new ExpressionBuilder().build(expression, stack, List.class);
+        } catch (CodeCompileException e) {
+            throw new Error("failed to compile expression, location=" + location, e);
+        }
     }
 
     @Override

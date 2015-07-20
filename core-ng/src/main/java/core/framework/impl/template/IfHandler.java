@@ -1,6 +1,7 @@
 package core.framework.impl.template;
 
 import core.framework.api.util.Exceptions;
+import core.framework.impl.codegen.CodeCompileException;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
@@ -26,8 +27,12 @@ public class IfHandler extends CompositeHandler implements FragmentHandler {
         reverse = "not ".equals(matcher.group(2));
         String condition = matcher.group(3);
 
-        Token expression = new ExpressionParser().parse(condition);
-        this.expression = new ExpressionBuilder().build(expression, stack, Boolean.class);
+        try {
+            Token expression = new ExpressionParser().parse(condition);
+            this.expression = new ExpressionBuilder().build(expression, stack, Boolean.class);
+        } catch (CodeCompileException e) {
+            throw new Error("failed to compile expression, location=" + location, e);
+        }
     }
 
     @Override
