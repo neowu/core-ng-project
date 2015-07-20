@@ -20,7 +20,7 @@ public class TemplateBuilder {
     private final CallTypeStack stack;
     private final List<FragmentHandler> handlers = Lists.newArrayList();
     private StringBuilder currentContent = new StringBuilder();
-    private Deque<CompositeHandler> blockHandlers = new ArrayDeque<>();
+    private final Deque<CompositeHandler> blockHandlers = new ArrayDeque<>();
     private int currentLineNumber;
 
     public TemplateBuilder(String template, Class<?> modelClass) {
@@ -60,7 +60,7 @@ public class TemplateBuilder {
         int index = line.indexOf("<!--%");
         int endIndex = line.indexOf("%-->");
         String expression = line.substring(index + 5, endIndex).trim();
-        if (expression.equals("end")) {
+        if ("end".equals(expression)) {
             CompositeHandler handler = blockHandlers.pop();
             if (blockHandlers.isEmpty()) {
                 handlers.add(handler);

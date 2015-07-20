@@ -2,7 +2,10 @@ package core.framework.impl.template;
 
 import core.framework.api.util.Lists;
 import core.framework.impl.template.expression.CallTypeStack;
-import core.framework.impl.template.expression.ExpressionImpl;
+import core.framework.impl.template.expression.Expression;
+import core.framework.impl.template.expression.ExpressionBuilder;
+import core.framework.impl.template.expression.ExpressionParser;
+import core.framework.impl.template.expression.Token;
 
 import java.util.List;
 
@@ -10,13 +13,15 @@ import java.util.List;
  * @author neo
  */
 public class IfHandler implements FragmentHandler, CompositeHandler {
-    ExpressionImpl expression;
+    final Expression expression;
     final List<FragmentHandler> handlers = Lists.newArrayList();
 
-    public IfHandler(String expression, CallTypeStack stack, String reference) {
-        int index = expression.indexOf("if ");
-        String condition = expression.substring(index + 3);
-        this.expression = new ExpressionImpl(condition, stack, reference);
+    public IfHandler(String statement, CallTypeStack stack, String reference) {
+        int index = statement.indexOf("if ");
+        String condition = statement.substring(index + 3);
+
+        Token expression = new ExpressionParser().parse(condition);
+        this.expression = new ExpressionBuilder().build(expression, stack, Boolean.class);
     }
 
     @Override
@@ -26,9 +31,7 @@ public class IfHandler implements FragmentHandler, CompositeHandler {
 
     @Override
     public void process(StringBuilder builder, CallStack stack) {
-        Object result = expression.eval(stack);
-        if (!(result instanceof Boolean))
-            throw new Error("condition must be boolean expression, expression=" + expression.expression + ", ref=" + expression.reference);
+        Boolean result = (Boolean) expression.eval(stack);
         if (Boolean.TRUE.equals(result)) {
             for (FragmentHandler handler : handlers) {
                 handler.process(builder, stack);
