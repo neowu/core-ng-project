@@ -22,7 +22,11 @@ tasks.findAll { task -> task.name.startsWith('flyway') }.forEach { flywayTask ->
         def flywayProperties = "src/main/resources/flyway.properties"
 
         if (environment != null) {
-            flywayProperties = "conf/${environment}/resources/flyway.properties"
+            def envResources = "conf/${environment}/resources"
+            assert project.file(envResources).exists()
+            sourceSets.main.resources.srcDirs envResources
+
+            flywayProperties = "${envResources}/flyway.properties"
         }
 
         assert project.file(flywayProperties).exists()

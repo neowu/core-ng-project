@@ -1,6 +1,5 @@
 package core.framework.impl.queue;
 
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.module.MessageHandlerConfig;
@@ -16,11 +15,11 @@ import core.framework.impl.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 
 /**
  * @author neo
@@ -28,6 +27,7 @@ import java.util.concurrent.Executors;
 public class RabbitMQListener implements Runnable, MessageHandlerConfig {
     static final String HEADER_REQUEST_ID = "requestId";
     static final String HEADER_TRACE = "trace";
+    static final String HEADER_SENDER = "sender";
 
     private final Logger logger = LoggerFactory.getLogger(RabbitMQListener.class);
 
@@ -36,12 +36,11 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
     final RabbitMQ rabbitMQ;
     final String queue;
 
-    private final MessageHandlerCounter counter = new MessageHandlerCounter();
+    private int maxConcurrentHandlers = 10;
+    private Semaphore semaphore;
     private final MessageValidator validator;
     private final Map<String, MessageHandler> handlers = Maps.newHashMap();
     private final Map<String, Class> messageClasses = Maps.newHashMap();
-
-    volatile boolean shutdown;
 
     public RabbitMQListener(RabbitMQ rabbitMQ, String queue, Executor executor, MessageValidator validator) {
         this.executor = executor;
@@ -52,7 +51,7 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
 
     @Override
     public MessageHandlerConfig maxConcurrentHandlers(int maxConcurrentHandlers) {
-        counter.maxConcurrentHandlers = maxConcurrentHandlers;
+        this.maxConcurrentHandlers = maxConcurrentHandlers;
         return this;
     }
 
@@ -72,10 +71,10 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
     public void run() {
         Thread.currentThread().setName("rabbitMQ-listener-" + Thread.currentThread().getId());
         logger.info("rabbitMQ message listener started, queue={}", queue);
-
-        while (!shutdown) {
-            try {
-                execute();
+        semaphore = new Semaphore(maxConcurrentHandlers, false);
+        while (!listenerExecutor.isShutdown()) {
+            try (RabbitMQConsumer consumer = rabbitMQ.consumer(queue, maxConcurrentHandlers)) {
+                pullMessage(consumer);
             } catch (Throwable e) {
                 logger.error("failed to pull message, retry in 30 seconds", e);
                 Threads.sleepRoughly(Duration.ofSeconds(30));
@@ -83,32 +82,17 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
         }
     }
 
-    private void execute() throws InterruptedException, IOException {
-        Channel channel = null;
-        try {
-            channel = rabbitMQ.channel();
-            QueueingConsumer consumer = new QueueingConsumer(channel);
-            channel.basicQos(counter.maxConcurrentHandlers);
-            channel.basicConsume(queue, false, consumer);
-            consumeMessage(consumer);
-        } finally {
-            rabbitMQ.closeChannel(channel);
-        }
-    }
-
-    private void consumeMessage(QueueingConsumer consumer) throws InterruptedException {
-        while (!shutdown) {
-            counter.waitUntilAvailable();
+    private void pullMessage(RabbitMQConsumer consumer) {
+        while (!listenerExecutor.isShutdown()) {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-            counter.increase();
+            semaphore.acquireUninterruptibly(); // acquire permit right before submit, to avoid permit failing to release back due to exception in between
             executor.submit(() -> {
                 try {
                     process(delivery);
                     return null;
                 } finally {
-                    counter.decrease(); // release counter first, not let exception from basic ack bypass it.
-                    //TODO: handle connection failure, reopen conn?
-                    consumer.getChannel().basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                    semaphore.release(); // release permit first, not let exception from basic ack bypass it.
+                    consumer.acknowledge(delivery.getEnvelope().getDeliveryTag());
                 }
             });
         }
@@ -120,7 +104,6 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
 
     public void shutdown() {
         logger.info("shutdown rabbitMQ message listener, queue={}", queue);
-        shutdown = true;
         listenerExecutor.shutdown();
     }
 
@@ -139,7 +122,7 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
         Map<String, Object> headers = delivery.getProperties().getHeaders();
         linkContext(headers, messageId);
 
-        Object sender = headers.get("sender");
+        Object sender = headers.get(HEADER_SENDER);
         if (sender != null) {
             ActionLogContext.put("sender", sender);
         }
