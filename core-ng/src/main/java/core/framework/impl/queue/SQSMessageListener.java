@@ -108,9 +108,9 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
                         process(message);
                         return null;
                     } finally {
+                        counter.decrease();
                         logger.debug("delete message, handle={}", message.getReceiptHandle());
                         sqs.deleteMessage(queueURL, message.getReceiptHandle());
-                        counter.decrease();
                     }
                 });
             }
