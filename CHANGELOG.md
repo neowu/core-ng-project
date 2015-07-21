@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.2.7 (7/21/2015)
+* db repository, added selectAll()
+
 ### 3.2.6 (7/17/2015 - 7/20/2015)
 * refactory rabbitmq support
 * update elasticsearch to 1.7
