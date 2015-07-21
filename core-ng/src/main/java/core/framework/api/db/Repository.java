@@ -7,6 +7,8 @@ import java.util.Optional;
  * @author neo
  */
 public interface Repository<T> {
+    List<T> selectAll();
+
     List<T> select(String whereClause, Object... params);
 
     Optional<T> selectOne(String whereClause, Object... params);

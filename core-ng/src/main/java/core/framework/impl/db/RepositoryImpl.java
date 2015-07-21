@@ -38,6 +38,25 @@ public class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
+    public List<T> selectAll() {
+        StopWatch watch = new StopWatch();
+        Query query = selectQuery.all();
+        String sql = query.statement();
+        List<T> results = null;
+        try {
+            results = database.executeQuery(sql, query.params, rowMapper);
+            return results;
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            logger.debug("selectAll, sql={}, params={}, elapsedTime={}", sql, query.params, elapsedTime);
+            if (elapsedTime > database.slowQueryThresholdInMs)
+                logger.warn("slow query detected");
+            if (results != null && results.size() > database.tooManyRowsReturnedThreshold)
+                logger.warn("too many rows returned, returnedRows={}", results.size());
+        }
+    }
+
+    @Override
     public List<T> select(String whereClause, Object... params) {
         StopWatch watch = new StopWatch();
         Query query = selectQuery.where(whereClause, params);
