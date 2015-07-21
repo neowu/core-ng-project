@@ -6,6 +6,7 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.ResponseImpl;
 import core.framework.impl.web.BeanValidator;
+import core.framework.impl.web.HTMLTemplateManager;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
@@ -23,10 +24,10 @@ public class ResponseHandler {
     private final Map<Class, BodyHandler> handlers = Maps.newHashMap();
     private final HTTPHeaderMappings headerMappings = new HTTPHeaderMappings();
 
-    public ResponseHandler(BeanValidator validator) {
+    public ResponseHandler(BeanValidator validator, HTMLTemplateManager templateManager) {
         handlers.put(BeanBody.class, new BeanBodyResponseHandler(validator));
         handlers.put(TextBody.class, new TextBodyResponseHandler());
-        handlers.put(HTMLBody.class, new HTMLBodyResponseHandler());
+        handlers.put(HTMLBody.class, new HTMLBodyResponseHandler(templateManager));
         handlers.put(ByteArrayBody.class, new ByteArrayBodyResponseHandler());
     }
 

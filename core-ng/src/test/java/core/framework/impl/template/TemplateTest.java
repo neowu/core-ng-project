@@ -51,7 +51,7 @@ public class TemplateTest {
         model.children.add(new Child("child2", 2.0, false));
         model.htmlField = "<pre>html</pre>";
 
-        String result = template.process(model);
+        String result = template.process(model, null);
 
         Assert.assertEquals(ClasspathResources.text("template-test/template-result.html"), result);
     }

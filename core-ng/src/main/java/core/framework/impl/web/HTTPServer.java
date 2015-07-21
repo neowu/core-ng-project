@@ -10,6 +10,7 @@ import core.framework.api.web.Controller;
 import core.framework.api.web.ErrorHandler;
 import core.framework.api.web.Interceptor;
 import core.framework.impl.log.ActionLogger;
+import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
 import io.undertow.Undertow;
@@ -30,15 +31,28 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
 
     public final SessionManager sessionManager = new SessionManager();
+    public final HTMLTemplateManager templateManager = new HTMLTemplateManager();
     public final BeanValidator validator = new BeanValidator();
     public final WebContextImpl webContext = new WebContextImpl();
     private final Route route = new Route();
     private final List<Interceptor> interceptors = Lists.newArrayList();
     private final HTTPServerHandler httpServerHandler;
+    private final HTTPServerErrorHandler errorHandler;
     private int port = 8080;
 
     public HTTPServer(ActionLogger actionLogger) {
-        httpServerHandler = new HTTPServerHandler(actionLogger, route, interceptors, sessionManager, webContext, validator);
+        ResponseHandler responseHandler = new ResponseHandler(validator, templateManager);
+        errorHandler = new HTTPServerErrorHandler(responseHandler);
+
+        httpServerHandler = new HTTPServerHandler();
+        httpServerHandler.actionLogger = actionLogger;
+        httpServerHandler.route = route;
+        httpServerHandler.interceptors = interceptors;
+        httpServerHandler.sessionManager = sessionManager;
+        httpServerHandler.webContext = webContext;
+        httpServerHandler.validator = validator;
+        httpServerHandler.responseHandler = responseHandler;
+        httpServerHandler.errorHandler = errorHandler;
     }
 
     public void start() {
@@ -47,9 +61,7 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
             Undertow server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
                 .setHandler(httpServerHandler)
-                    //            .setWorkerThreads(200)
                 .build();
-
             server.start();
         } finally {
             logger.info("http server started, elapsedTime={}", watch.elapsedTime());
@@ -66,7 +78,7 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
 
     @Override
     public void errorHandler(ErrorHandler handler) {
-        httpServerHandler.errorHandler.customErrorHandler = handler;
+        errorHandler.customErrorHandler = handler;
     }
 
     @Override

@@ -22,6 +22,7 @@ public class TemplateBuilder {
     private int currentLineNumber;
 
     public TemplateBuilder(String template, Class<?> modelClass) {
+        //TODO: validate
         this.template = template;
         this.stack = new CallTypeStack(modelClass);
         handlerStack.add(new CompositeHandler());

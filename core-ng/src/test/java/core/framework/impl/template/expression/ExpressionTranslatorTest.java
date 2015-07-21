@@ -8,29 +8,28 @@ import org.junit.Test;
  */
 public class ExpressionTranslatorTest {
     ExpressionParser parser = new ExpressionParser();
-    ExpressionTranslator translator = new ExpressionTranslator();
 
     @Test
     public void text() {
-        String expression = translator.translate(parser.parse("\"text\""), new CallTypeStack(Object.class));
+        String expression = new ExpressionTranslator(parser.parse("\"text\""), new CallTypeStack(Object.class)).translate();
         Assert.assertEquals("\"text\"", expression);
     }
 
     @Test
     public void field() {
-        String expression = translator.translate(parser.parse("field"), new CallTypeStack(Object.class));
+        String expression = new ExpressionTranslator(parser.parse("field"), new CallTypeStack(Object.class)).translate();
         Assert.assertEquals("$root.field", expression);
     }
 
     @Test
     public void method() {
-        String expression = translator.translate(parser.parse("method()"), new CallTypeStack(Object.class));
+        String expression = new ExpressionTranslator(parser.parse("method()"), new CallTypeStack(Object.class)).translate();
         Assert.assertEquals("$root.method()", expression);
     }
 
     @Test
     public void builtinMethod() {
-        String expression = translator.translate(parser.parse("#html(field)"), new CallTypeStack(Object.class));
+        String expression = new ExpressionTranslator(parser.parse("#html(field)"), new CallTypeStack(Object.class)).translate();
         Assert.assertEquals("stack.function(\"html\").apply(new Object[]{$root.field})", expression);
     }
 
@@ -38,7 +37,7 @@ public class ExpressionTranslatorTest {
     public void contextVariable() {
         CallTypeStack stack = new CallTypeStack(Object.class);
         stack.paramClasses.put("item", Object.class);
-        String expression = translator.translate(parser.parse("item"), stack);
+        String expression = new ExpressionTranslator(parser.parse("item"), stack).translate();
         Assert.assertEquals("item", expression);
     }
 
@@ -47,12 +46,12 @@ public class ExpressionTranslatorTest {
         CallTypeStack stack = new CallTypeStack(Object.class);
         stack.paramClasses.put("item", Object.class);
         Token expression = parser.parse("#html(field.method(), item.field, \"text\")");
-        Assert.assertEquals("stack.function(\"html\").apply(new Object[]{$root.field.method(),item.field,\"text\"})", translator.translate(expression, stack));
+        Assert.assertEquals("stack.function(\"html\").apply(new Object[]{$root.field.method(),item.field,\"text\"})", new ExpressionTranslator(expression, stack).translate());
     }
 
     @Test
     public void methodWithNumberParam() {
-        String expression = translator.translate(parser.parse("field.method(1)"), new CallTypeStack(Object.class));
+        String expression = new ExpressionTranslator(parser.parse("field.method(1)"), new CallTypeStack(Object.class)).translate();
         Assert.assertEquals("$root.field.method(1)", expression);
     }
 }

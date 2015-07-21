@@ -15,4 +15,8 @@ public class SiteConfig {
     public SessionConfig session() {
         return new SessionConfig(context);
     }
+
+    public void template(String path, Class<?> modelClass) {
+        context.httpServer.templateManager.addTemplate(path, modelClass);
+    }
 }

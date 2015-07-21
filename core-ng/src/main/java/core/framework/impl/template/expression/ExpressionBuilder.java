@@ -8,8 +8,6 @@ import core.framework.impl.template.CallStack;
  * @author neo
  */
 public class ExpressionBuilder {
-    private final ExpressionTranslator translator = new ExpressionTranslator();
-
     public Expression build(Token expression, CallTypeStack stack, Class returnType) {
         DynamicInstanceBuilder<Expression> builder = new DynamicInstanceBuilder<>(Expression.class, Expression.class.getCanonicalName());
         builder.addMethod(buildEval(expression, stack, returnType));
@@ -24,7 +22,7 @@ public class ExpressionBuilder {
             .forEach((name, paramClass) -> builder.indent(1).append("{} {} = ({})stack.context(\"{}\");\n",
                 paramClass.getCanonicalName(), name, paramClass.getCanonicalName(), name));
 
-        String translatedExpression = translator.translate(expression, stack);
+        String translatedExpression = new ExpressionTranslator(expression, stack).translate();
 
         if (Boolean.class.equals(returnType)) {
             builder.indent(1).append("return Boolean.valueOf(Boolean.TRUE.equals({}));\n", translatedExpression);

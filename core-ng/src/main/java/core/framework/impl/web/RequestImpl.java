@@ -11,6 +11,7 @@ import core.framework.api.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.form.FormData;
+import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 
 import java.io.UncheckedIOException;
@@ -40,15 +41,17 @@ public final class RequestImpl implements Request {
         this.validator = validator;
 
         method = HTTPMethod.valueOf(exchange.getRequestMethod().toString());
-        String xForwardedFor = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_FOR);
+        HeaderMap headers = exchange.getRequestHeaders();
+
+        String xForwardedFor = headers.getFirst(Headers.X_FORWARDED_FOR);
         remoteAddress = new RemoteAddress(exchange.getSourceAddress().getAddress().getHostAddress(), xForwardedFor);
 
-        String xForwardedProto = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_PROTO);
-        String xForwardedPort = exchange.getRequestHeaders().getFirst(Headers.X_FORWARDED_PORT);
+        String xForwardedProto = headers.getFirst(Headers.X_FORWARDED_PROTO);
+        String xForwardedPort = headers.getFirst(Headers.X_FORWARDED_PORT);
         protocol = new RequestProtocol(exchange.getRequestScheme(), xForwardedProto, exchange.getHostPort(), xForwardedPort);
 
         if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
-            contentType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
+            contentType = headers.getFirst(Headers.CONTENT_TYPE);
         } else {
             contentType = null;
         }
@@ -110,7 +113,7 @@ public final class RequestImpl implements Request {
     @Override
     public Session session() {
         if (session == null)
-            throw new Error("session impl is not configured, please use site() to configure in module");
+            throw new Error("session store is not configured, please use site() to configure in module");
         return session;
     }
 

@@ -34,25 +34,15 @@ public class HTTPServerHandler implements HttpHandler {
     private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
 
     private final FormParserFactory formParserFactory = FormParserFactory.builder().build();
-    private final ActionLogger actionLogger;
-    private final Route route;
-    private final List<Interceptor> interceptors;
-    private final SessionManager sessionManager;
-    private final WebContextImpl webContext;
-    private final BeanValidator validator;
-    private final ResponseHandler responseHandler;
-    final HTTPServerErrorHandler errorHandler;
 
-    public HTTPServerHandler(ActionLogger actionLogger, Route route, List<Interceptor> interceptors, SessionManager sessionManager, WebContextImpl webContext, BeanValidator validator) {
-        this.actionLogger = actionLogger;
-        this.route = route;
-        this.interceptors = interceptors;
-        this.sessionManager = sessionManager;
-        this.webContext = webContext;
-        this.validator = validator;
-        responseHandler = new ResponseHandler(validator);
-        errorHandler = new HTTPServerErrorHandler(responseHandler);
-    }
+    ActionLogger actionLogger;
+    Route route;
+    List<Interceptor> interceptors;
+    SessionManager sessionManager;
+    WebContextImpl webContext;
+    BeanValidator validator;
+    ResponseHandler responseHandler;
+    HTTPServerErrorHandler errorHandler;
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
@@ -61,10 +51,9 @@ public class HTTPServerHandler implements HttpHandler {
             return;
         }
 
+        actionLogger.start();
         RequestImpl request = new RequestImpl(exchange, validator);
-
         try {
-            actionLogger.start();
             logger.debug("=== http transaction begin ===");
 
             parseRequest(request, exchange);

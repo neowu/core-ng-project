@@ -8,8 +8,6 @@ import core.framework.impl.web.response.ByteArrayBody;
 import core.framework.impl.web.response.HTMLBody;
 import core.framework.impl.web.response.TextBody;
 
-import java.util.Map;
-
 /**
  * @author neo
  */
@@ -33,8 +31,8 @@ public interface Response {
             .status(status);
     }
 
-    static Response html(String templateName, Map<String, Object> context) {
-        return new ResponseImpl(new HTMLBody(templateName, context))
+    static Response html(String templateName, Object model) {
+        return new ResponseImpl(new HTMLBody(templateName, model))
             .status(HTTPStatus.OK);
     }
 

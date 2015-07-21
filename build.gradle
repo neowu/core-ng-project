@@ -30,15 +30,13 @@ project(':core-ng') {
         compile(
                 project(":core-ng-api"),
                 'javax.inject:javax.inject:1',
-                'org.javassist:javassist:3.19.0-GA',
+                'org.javassist:javassist:3.20.0-GA',
                 'org.slf4j:slf4j-api:1.7.12',
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
                 "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}",
                 'org.apache.httpcomponents:httpclient:4.4.1',
-                'io.undertow:undertow-core:1.2.8.Final',
-                'org.thymeleaf:thymeleaf:2.1.4.RELEASE',
-                'net.sourceforge.nekohtml:nekohtml:1.9.22' // used by thymeleaf legacyHTML5
+                'io.undertow:undertow-core:1.2.8.Final'
         )
         testCompile(
                 'junit:junit:4.12',
