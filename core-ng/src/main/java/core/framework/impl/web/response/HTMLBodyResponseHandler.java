@@ -2,7 +2,7 @@ package core.framework.impl.web.response;
 
 import core.framework.api.http.ContentTypes;
 import core.framework.api.web.ResponseImpl;
-import core.framework.impl.web.HTMLTemplateManager;
+import core.framework.impl.web.TemplateManager;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
@@ -10,9 +10,9 @@ import io.undertow.util.Headers;
  * @author neo
  */
 public class HTMLBodyResponseHandler implements BodyHandler {
-    private final HTMLTemplateManager templateManager;
+    private final TemplateManager templateManager;
 
-    public HTMLBodyResponseHandler(HTMLTemplateManager templateManager) {
+    public HTMLBodyResponseHandler(TemplateManager templateManager) {
         this.templateManager = templateManager;
     }
 

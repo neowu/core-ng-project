@@ -17,13 +17,13 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class HTMLTemplateManager {
-    private final Logger logger = LoggerFactory.getLogger(HTMLTemplateManager.class);
+public class TemplateManager {
+    private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
     private final Map<String, Template> templates = Maps.newConcurrentHashMap();
     private final Path webPath;
     private boolean refreshTemplateIfModified;
 
-    public HTMLTemplateManager() {
+    public TemplateManager() {
         webPath = locateWebPath();
     }
 

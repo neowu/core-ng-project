@@ -3,10 +3,10 @@ package core.framework.impl.template;
 /**
  * @author neo
  */
-public class StaticContentHandler implements FragmentHandler {
+public class StaticHandler implements FragmentHandler {
     private final String content;
 
-    public StaticContentHandler(String content) {
+    public StaticHandler(String content) {
         this.content = content;
     }
 

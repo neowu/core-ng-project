@@ -6,7 +6,7 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.ResponseImpl;
 import core.framework.impl.web.BeanValidator;
-import core.framework.impl.web.HTMLTemplateManager;
+import core.framework.impl.web.TemplateManager;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
@@ -24,7 +24,7 @@ public class ResponseHandler {
     private final Map<Class, BodyHandler> handlers = Maps.newHashMap();
     private final HTTPHeaderMappings headerMappings = new HTTPHeaderMappings();
 
-    public ResponseHandler(BeanValidator validator, HTMLTemplateManager templateManager) {
+    public ResponseHandler(BeanValidator validator, TemplateManager templateManager) {
         handlers.put(BeanBody.class, new BeanBodyResponseHandler(validator));
         handlers.put(TextBody.class, new TextBodyResponseHandler());
         handlers.put(HTMLBody.class, new HTMLBodyResponseHandler(templateManager));
@@ -39,7 +39,7 @@ public class ResponseHandler {
         HeaderMap headers = exchange.getResponseHeaders();
         response.headers.forEach((name, value) -> {
             String headerValue = String.valueOf(value);
-            logger.debug("[responseHeader] {}={}", name, headerValue);
+            logger.debug("[response:header] {}={}", name, headerValue);
             headers.put(headerMappings.undertowHeader(name), headerValue);
         });
 
@@ -58,7 +58,7 @@ public class ResponseHandler {
                 cookie.setPath(spec.path);
                 cookie.setSecure(spec.secure);
                 cookie.setHttpOnly(spec.httpOnly);
-                logger.debug("[responseCookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
+                logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
                     cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
                 responseCookies.put(spec.name, cookie);
             });

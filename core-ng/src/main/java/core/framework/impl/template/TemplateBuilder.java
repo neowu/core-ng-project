@@ -110,7 +110,7 @@ public class TemplateBuilder {
 
     private void addStaticContentFragmentHandler() {
         if (currentContent.length() > 0) {
-            handlerStack.peek().handlers.add(new StaticContentHandler(currentContent.toString()));
+            handlerStack.peek().handlers.add(new StaticHandler(currentContent.toString()));
             currentContent = new StringBuilder();
         }
     }

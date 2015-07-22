@@ -31,7 +31,7 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
 
     public final SessionManager sessionManager = new SessionManager();
-    public final HTMLTemplateManager templateManager = new HTMLTemplateManager();
+    public final TemplateManager templateManager = new TemplateManager();
     public final BeanValidator validator = new BeanValidator();
     public final WebContextImpl webContext = new WebContextImpl();
     private final Route route = new Route();
