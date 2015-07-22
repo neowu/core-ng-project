@@ -51,6 +51,7 @@ public class HTMLTemplateManager {
         StopWatch watch = new StopWatch();
         try {
             Template template = templates.computeIfAbsent(templateKey(templateName), (key) -> loadTemplate(templateName, model.getClass()));
+            //TODO: manage custom function
             return template.process(model, null);
         } finally {
             logger.debug("process, templateName={}, elapsedTime={}", templateName, watch.elapsedTime());
