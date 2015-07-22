@@ -4,11 +4,11 @@ package core.framework.impl.web.response;
  * @author neo
  */
 public class HTMLBody implements Body {
-    final String templateName;
+    final String templatePath;
     final Object model;
 
-    public HTMLBody(String templateName, Object model) {
-        this.templateName = templateName;
+    public HTMLBody(String templatePath, Object model) {
+        this.templatePath = templatePath;
         this.model = model;
     }
 }

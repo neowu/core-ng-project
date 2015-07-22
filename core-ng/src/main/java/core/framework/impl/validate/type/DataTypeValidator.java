@@ -39,7 +39,6 @@ public class DataTypeValidator {
             visitList(inspector, null);
         } else {
             if (allowTopLevelValue && allowedValueClass.apply(inspector.rawClass)) return;
-
             visitObjectType(inspector, true);
         }
     }
@@ -61,10 +60,10 @@ public class DataTypeValidator {
             throw Exceptions.error("class must contain only one public default constructor, constructors={}", Arrays.toString(constructors));
         }
 
-        visitor.visitClass(objectType.rawClass, topLevel);
+        if (visitor != null) visitor.visitClass(objectType.rawClass, topLevel);
         Field[] fields = objectType.rawClass.getDeclaredFields();
         for (Field field : fields) {
-            visitor.visitField(field, topLevel);
+            if (visitor != null) visitor.visitField(field, topLevel);
             TypeInspector fieldType = new TypeInspector(field.getGenericType());
             if (fieldType.isList()) {
                 if (!allowChildListAndMap)

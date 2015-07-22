@@ -1,5 +1,10 @@
 ## Change log
 
+### 3.2.8 (7/22/2015)
+* template: validate model class
+* add TemplateEngine for general purpose
+* module: renamed bind(supplier) to bindSupplier()
+
 ### 3.2.7 (7/21/2015 - 7/22/2015)
 * db repository, added selectAll()
 * template engine first draft impl, removed thymeleaf

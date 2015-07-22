@@ -31,6 +31,9 @@ public class DatabaseClassValidator implements TypeVisitor {
 
     public void validateEntityClass() {
         validator.validate();
+
+        if (!foundPK)
+            throw Exceptions.error("entity class must have @PrimaryKey, class={}", validator.type.getTypeName());
     }
 
     public void validateViewClass() {
@@ -84,11 +87,5 @@ public class DatabaseClassValidator implements TypeVisitor {
                 throw Exceptions.error("auto increment primary key must be Integer or Long, field={}", field);
             }
         }
-    }
-
-    @Override
-    public void onComplete() {
-        if (!validateView && !foundPK)
-            throw Exceptions.error("entity class must have @PrimaryKey, class={}", validator.type.getTypeName());
     }
 }

@@ -31,11 +31,13 @@ public interface Response {
 
     static Response bean(Object bean, HTTPStatus status) {
         return new ResponseImpl(new BeanBody(bean))
+            .contentType(ContentTypes.APPLICATION_JSON)
             .status(status);
     }
 
-    static Response html(String templateName, Object model) {
-        return new ResponseImpl(new HTMLBody(templateName, model))
+    static Response html(String templatePath, Object model) {
+        return new ResponseImpl(new HTMLBody(templatePath, model))
+            .contentType(ContentTypes.TEXT_HTML)
             .status(HTTPStatus.OK);
     }
 

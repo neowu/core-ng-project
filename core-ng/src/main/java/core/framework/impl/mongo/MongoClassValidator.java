@@ -33,6 +33,10 @@ public class MongoClassValidator implements TypeVisitor {
 
     public void validateEntityClass() {
         validator.validate();
+
+        if (id == null) {
+            throw Exceptions.error("entity class must have @Id field, class={}", validator.type.getTypeName());
+        }
     }
 
     public void validateViewClass() {
@@ -83,13 +87,6 @@ public class MongoClassValidator implements TypeVisitor {
             id = field;
         } else {
             throw Exceptions.error("child class must not have @Id field, field={}", field);
-        }
-    }
-
-    @Override
-    public void onComplete() {
-        if (!validateView && id == null) {
-            throw Exceptions.error("entity class must have @Id field, class={}", validator.type.getTypeName());
         }
     }
 }

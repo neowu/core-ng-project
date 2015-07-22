@@ -1,14 +1,11 @@
 package core.framework.impl.web.response;
 
-import core.framework.api.http.ContentTypes;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Types;
 import core.framework.api.web.ResponseImpl;
 import core.framework.impl.web.BeanValidator;
-import io.undertow.io.Sender;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,15 +27,10 @@ public class BeanBodyResponseHandler implements BodyHandler {
     @Override
     public void handle(ResponseImpl response, HttpServerExchange exchange) {
         Object bean = ((BeanBody) response.body).bean;
-
         validateBeanClass(bean);
-
-        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
-
-        Sender sender = exchange.getResponseSender();
         String responseText = JSON.toJSON(bean);
         logger.debug("[response] body={}", responseText);
-        sender.send(responseText);
+        exchange.getResponseSender().send(responseText);
     }
 
     // to validate response bean, since it can not get declaration type from instance, try to construct original type as much as it can.

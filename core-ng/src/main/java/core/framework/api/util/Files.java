@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
 import java.util.UUID;
 
 import static java.nio.file.Files.copy;
@@ -106,5 +107,13 @@ public final class Files {
         }
         LOGGER.debug("create temp directory, path={}", path);
         return path;
+    }
+
+    public static Instant lastModified(Path path) {
+        try {
+            return java.nio.file.Files.getLastModifiedTime(path).toInstant();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }

@@ -82,9 +82,4 @@ public class BeanTypeValidator implements TypeVisitor {
         }
         elements.add(name);
     }
-
-    @Override
-    public void onComplete() {
-
-    }
 }

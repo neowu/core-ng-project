@@ -54,11 +54,11 @@ public abstract class Module {
     }
 
     public <T> T bind(Type type, String name, T instance) {
-        return bind(type, name, () -> instance);
+        return bindSupplier(type, name, () -> instance);
     }
 
-    public <T> T bind(Type type, String name, Supplier<T> supplier) {
-        return context.beanFactory.bind(type, name, supplier);
+    public <T> T bindSupplier(Type type, String name, Supplier<T> supplier) {
+        return context.beanFactory.bindSupplier(type, name, supplier);
     }
 
     public <T> T bean(Type instanceType, String name) {

@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 public class BeanFactory {
     final Map<Key, Object> beans = Maps.newHashMap();
 
-    public <T> T bind(Type type, String name, Supplier<T> supplier) {
+    public <T> T bindSupplier(Type type, String name, Supplier<T> supplier) {
         T instance = supplier.get();
         bind(type, name, supplier.get());
         return instance;

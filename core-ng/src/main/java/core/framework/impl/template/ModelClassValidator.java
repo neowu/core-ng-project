@@ -1,8 +1,7 @@
-package core.framework.impl.cache;
+package core.framework.impl.template;
 
 import core.framework.impl.validate.type.DataTypeValidator;
 
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -11,16 +10,15 @@ import java.time.LocalDateTime;
 /**
  * @author neo
  */
-public class CacheTypeValidator {
+public class ModelClassValidator {
     private final DataTypeValidator validator;
 
-    public CacheTypeValidator(Type instanceType) {
-        validator = new DataTypeValidator(instanceType);
+    public ModelClassValidator(Class<?> modelClass) {
+        validator = new DataTypeValidator(modelClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;
-        validator.allowTopLevelList = true;
-        validator.allowTopLevelValue = true;
+        validator.allowTopLevelList = false;
     }
 
     public void validate() {

@@ -1,5 +1,6 @@
 package core.framework.impl.web;
 
+import core.framework.api.util.Files;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.template.Template;
@@ -7,6 +8,7 @@ import core.framework.impl.template.TemplateBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -21,37 +23,38 @@ public class TemplateManager {
         this.webDirectory = webDirectory;
     }
 
-    public String process(String templateName, Object model) {
+    public String process(String templatePath, Object model) {
         StopWatch watch = new StopWatch();
         try {
-            Template template = templates.computeIfAbsent(templateKey(templateName), (key) -> loadTemplate(templateName, model.getClass()));
+            Template template = templates.computeIfAbsent(templateKey(templatePath), (key) -> load(templatePath, model.getClass()));
             //TODO: manage custom function
             return template.process(model, null);
         } finally {
-            logger.debug("process, templateName={}, elapsedTime={}", templateName, watch.elapsedTime());
+            logger.debug("process, templatePath={}, elapsedTime={}", templatePath, watch.elapsedTime());
         }
     }
 
-    public void addTemplate(String templateName, Class<?> modelClass) {
+    public void add(String templatePath, Class<?> modelClass) {
         StopWatch watch = new StopWatch();
         try {
-            templates.put(templateKey(templateName), loadTemplate(templateName, modelClass));
+            templates.put(templateKey(templatePath), load(templatePath, modelClass));
         } finally {
-            logger.info("add template, templateName={}, modelClass={}, elapsedTime={}", templateName, modelClass.getCanonicalName(), watch.elapsedTime());
+            logger.info("add, templatePath={}, modelClass={}, elapsedTime={}", templatePath, modelClass.getCanonicalName(), watch.elapsedTime());
         }
     }
 
-    private Template loadTemplate(String templateName, Class<?> modelClass) {
-        logger.debug("load template, path={}", templateName);
-        String template = webDirectory.text(templateName);
+    private Template load(String templatePath, Class<?> modelClass) {
+        logger.debug("load template, path={}", templatePath);
+        String template = Files.text(webDirectory.path(templatePath));
         return new TemplateBuilder(template, modelClass).build();
     }
 
-    private String templateKey(String templateName) {
+    private String templateKey(String templatePath) {
         if (webDirectory.localEnv) {
-            return templateName + ":" + webDirectory.lastModified(templateName).toMillis();
+            Path path = webDirectory.path(templatePath);
+            return templatePath + ":" + Files.lastModified(path).getEpochSecond();
         } else {
-            return templateName;
+            return templatePath;
         }
     }
 }

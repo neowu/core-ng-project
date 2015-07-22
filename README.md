@@ -4,14 +4,12 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* template: validate model class
 * template: "include" support
-* website: template/tag, move template to FS
 * website: i18n
 * website: cms components
+* push action log to rabbitmq directly, index thru ES/Kibana
 * resilient retry and throttling
 * Cache pre warm, static or provide structure
-* push action log to rabbitmq directly, index thru ES/Kibana
 * webservice client retry on network issue
 * nested db transaction?
 * validate ES index object

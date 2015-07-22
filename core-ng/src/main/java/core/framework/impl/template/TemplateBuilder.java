@@ -22,7 +22,7 @@ public class TemplateBuilder {
     private int currentLineNumber;
 
     public TemplateBuilder(String template, Class<?> modelClass) {
-        //TODO: validate
+        new ModelClassValidator(modelClass).validate();
         this.template = template;
         this.stack = new CallTypeStack(modelClass);
         handlerStack.add(new Template(modelClass));

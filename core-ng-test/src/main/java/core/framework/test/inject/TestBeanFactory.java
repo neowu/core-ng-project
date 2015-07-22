@@ -18,17 +18,17 @@ public class TestBeanFactory extends BeanFactory {
     private final Set<Key> overrideBindings = Sets.newHashSet();
 
     @Override
-    public <T> T bind(Type type, String name, Supplier<T> supplier) {
+    public <T> T bindSupplier(Type type, String name, Supplier<T> supplier) {
         if (overrideBindings.contains(new Key(type, name))) {
             logger.info("skip bean binding, bean is overridden in test context, type={}, name={}", type.getTypeName(), name);
             return bean(type, name);
         } else {
-            return super.bind(type, name, supplier);
+            return super.bindSupplier(type, name, supplier);
         }
     }
 
     public <T> T overrideBinding(Type type, String name, T instance) {
-        bind(type, name, () -> instance);
+        bind(type, name, instance);
         overrideBindings.add(new Key(type, name));
         return instance;
     }

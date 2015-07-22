@@ -22,7 +22,7 @@ public class SiteConfig {
     }
 
     public void template(String path, Class<?> modelClass) {
-        context.httpServer.templateManager.addTemplate(path, modelClass);
+        context.httpServer.templateManager.add(path, modelClass);
     }
 
     public void staticContent(String root) {

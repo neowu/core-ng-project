@@ -84,9 +84,4 @@ class MessageClassValidator implements TypeVisitor {
         }
         elements.add(name);
     }
-
-    @Override
-    public void onComplete() {
-
-    }
 }
