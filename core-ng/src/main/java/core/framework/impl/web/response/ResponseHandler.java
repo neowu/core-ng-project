@@ -29,6 +29,7 @@ public class ResponseHandler {
         handlers.put(TextBody.class, new TextBodyResponseHandler());
         handlers.put(HTMLBody.class, new HTMLBodyResponseHandler(templateManager));
         handlers.put(ByteArrayBody.class, new ByteArrayBodyResponseHandler());
+        handlers.put(FileBody.class, new FileBodyResponseHandler());
     }
 
     public void handle(ResponseImpl response, HttpServerExchange exchange) {
@@ -65,8 +66,9 @@ public class ResponseHandler {
         }
 
         BodyHandler handler = handlers.get(response.body.getClass());
-        if (handler == null) throw Exceptions.error("unexpected body class, body={}", response.body.getClass());
-        logger.debug("responseHandlerClass={}", handler.getClass().getName());
+        if (handler == null)
+            throw Exceptions.error("unexpected body class, body={}", response.body.getClass().getCanonicalName());
+        logger.debug("responseHandlerClass={}", handler.getClass().getCanonicalName());
         handler.handle(response, exchange);
     }
 }

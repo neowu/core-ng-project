@@ -1,7 +1,6 @@
 package app;
 
 import app.web.APITestController;
-import app.web.AssetController;
 import app.web.AsyncTestController;
 import app.web.ProductController;
 import app.web.ProductWebService;
@@ -27,21 +26,18 @@ public class WebModule extends Module {
         route().get("/hello/", request -> Response.text("hello with ending slash", HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
         route().get("/hello/:name", request -> Response.text("hello " + request.pathParam("name"), HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
 
-        site().template("template/index.html", IndexPage.class);
+        site().template("/template/index.html", IndexPage.class);
+        site().staticContent("/static");
         route().get("/index", bind(IndexController.class)::index);
 
         SiteController siteController = bind(SiteController.class);
         route().post("/form", siteController::post);
         route().get("/:all(*)", siteController::wildcard);
 
-        route().get("/static/:asset(*)", new AssetController("static"));
-
         api().service(ProductWebService.class, bind(ProductController.class));
-
         api().client(ProductWebService.class, "http://localhost:8080");
 
         route().get("/api-test", bind(APITestController.class)::get);
-
         route().get("/async-test", bind(AsyncTestController.class));
     }
 }

@@ -58,9 +58,7 @@ public abstract class Module {
     }
 
     public <T> T bind(Type type, String name, Supplier<T> supplier) {
-        T instance = supplier.get();
-        context.beanFactory.bind(type, name, instance);
-        return instance;
+        return context.beanFactory.bind(type, name, supplier);
     }
 
     public <T> T bean(Type instanceType, String name) {

@@ -5,8 +5,11 @@ import core.framework.api.http.HTTPHeaders;
 import core.framework.api.http.HTTPStatus;
 import core.framework.impl.web.response.BeanBody;
 import core.framework.impl.web.response.ByteArrayBody;
+import core.framework.impl.web.response.FileBody;
 import core.framework.impl.web.response.HTMLBody;
 import core.framework.impl.web.response.TextBody;
+
+import java.io.File;
 
 /**
  * @author neo
@@ -49,6 +52,11 @@ public interface Response {
         return new ResponseImpl(new ByteArrayBody(bytes))
             .status(HTTPStatus.OK)
             .contentType(contentType);
+    }
+
+    static Response file(File file) {
+        return new ResponseImpl(new FileBody(file))
+            .status(HTTPStatus.OK);
     }
 
     static Response redirect(String url) {

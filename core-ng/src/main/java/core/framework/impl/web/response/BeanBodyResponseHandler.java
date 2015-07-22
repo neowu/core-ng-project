@@ -37,7 +37,7 @@ public class BeanBodyResponseHandler implements BodyHandler {
 
         Sender sender = exchange.getResponseSender();
         String responseText = JSON.toJSON(bean);
-        logger.debug("responseText={}", responseText);
+        logger.debug("[response] body={}", responseText);
         sender.send(responseText);
     }
 

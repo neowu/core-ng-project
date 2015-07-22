@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * @author neo
@@ -17,16 +18,17 @@ public class TestBeanFactory extends BeanFactory {
     private final Set<Key> overrideBindings = Sets.newHashSet();
 
     @Override
-    public void bind(Type type, String name, Object instance) {
+    public <T> T bind(Type type, String name, Supplier<T> supplier) {
         if (overrideBindings.contains(new Key(type, name))) {
             logger.info("skip bean binding, bean is overridden in test context, type={}, name={}", type.getTypeName(), name);
+            return bean(type, name);
         } else {
-            super.bind(type, name, instance);
+            return super.bind(type, name, supplier);
         }
     }
 
     public <T> T overrideBinding(Type type, String name, T instance) {
-        bind(type, name, instance);
+        bind(type, name, () -> instance);
         overrideBindings.add(new Key(type, name));
         return instance;
     }

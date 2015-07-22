@@ -15,6 +15,7 @@ class HTTPHeaderMappings {
 
     HTTPHeaderMappings() {
         undertowHeaderMappings.put(HTTPHeaders.CONTENT_TYPE, Headers.CONTENT_TYPE);
+        undertowHeaderMappings.put(HTTPHeaders.IF_MODIFIED_SINCE, Headers.IF_MODIFIED_SINCE);
         undertowHeaderMappings.put(HTTPHeaders.LOCATION, Headers.LOCATION);
     }
 

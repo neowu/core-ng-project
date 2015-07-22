@@ -19,6 +19,6 @@ public class IndexController {
 //        response.cookie(CookieConstraints.TEST, null);
 //        response.cookie(CookieConstraints.TEST1, null);
 
-        return Response.html("template/index.html", model);
+        return Response.html("/template/index.html", model);
     }
 }

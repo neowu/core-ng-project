@@ -89,7 +89,7 @@ public class HTTPServerHandler implements HttpHandler {
         logger.debug("requestURL={}", request.requestURL());
         logger.debug("queryString={}", exchange.getQueryString());
         for (HeaderValues header : exchange.getRequestHeaders()) {
-            logger.debug("[header] {}={}", header.getHeaderName(), header.toArray());
+            logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
         }
         String path = exchange.getRequestPath();
         ActionLogContext.put("path", path);
@@ -108,13 +108,13 @@ public class HTTPServerHandler implements HttpHandler {
             exchange.startBlocking();
             byte[] bytes = InputStreams.bytes(exchange.getInputStream());
             request.body = new String(bytes, Charsets.UTF_8);
-            logger.debug("body={}", request.body);
+            logger.debug("[request] body={}", request.body);
         } else if (request.method == HTTPMethod.POST) {
             FormDataParser parser = formParserFactory.createParser(exchange);
             if (parser != null) {
                 request.formData = parser.parseBlocking();
                 for (String name : request.formData) {
-                    logger.debug("[form] {}={}", name, request.formData.get(name));
+                    logger.debug("[request:form] {}={}", name, request.formData.get(name));
                 }
             }
         }

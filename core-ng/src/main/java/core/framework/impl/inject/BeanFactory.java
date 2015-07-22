@@ -18,6 +18,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * @author neo
@@ -25,8 +26,15 @@ import java.util.Set;
 public class BeanFactory {
     final Map<Key, Object> beans = Maps.newHashMap();
 
+    public <T> T bind(Type type, String name, Supplier<T> supplier) {
+        T instance = supplier.get();
+        bind(type, name, supplier.get());
+        return instance;
+    }
+
     public void bind(Type type, String name, Object instance) {
         if (instance == null) throw new Error("instance is null");
+
         if (!isTypeOf(instance, type))
             throw Exceptions.error("instance type doesn't match, type={}, instanceType={}", type, instance.getClass());
 
@@ -150,6 +158,6 @@ public class BeanFactory {
     boolean isTypeOf(Object instance, Type type) {
         if (type instanceof Class) return ((Class) type).isInstance(instance);
         if (type instanceof ParameterizedType) return isTypeOf(instance, ((ParameterizedType) type).getRawType());
-        throw new Error("not supported type, type=" + type);
+        throw Exceptions.error("not supported type, type={}", type);
     }
 }
