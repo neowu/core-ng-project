@@ -25,7 +25,7 @@ public class TemplateBuilder {
         //TODO: validate
         this.template = template;
         this.stack = new CallTypeStack(modelClass);
-        handlerStack.add(new CompositeHandler());
+        handlerStack.add(new Template(modelClass));
     }
 
     public Template build() {
@@ -53,7 +53,7 @@ public class TemplateBuilder {
 
         addStaticContentFragmentHandler();
 
-        return new Template(stack.rootClass, handlerStack.peek());
+        return (Template) handlerStack.peek();
     }
 
     private void processDirective(String line) {

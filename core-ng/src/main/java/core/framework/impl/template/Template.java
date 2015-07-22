@@ -9,13 +9,11 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class Template {
+public class Template extends CompositeHandler {
     private final Class<?> modelClass;
-    private final CompositeHandler handler;
 
-    public Template(Class<?> modelClass, CompositeHandler handler) {
+    public Template(Class<?> modelClass) {
         this.modelClass = modelClass;
-        this.handler = handler;
     }
 
     public String process(Object model, Map<String, Function> customFunctions) {
@@ -31,9 +29,14 @@ public class Template {
             stack.functions.putAll(customFunctions);
 
         StringBuilder builder = new StringBuilder();
-        for (FragmentHandler handler : this.handler.handlers) {
+        process(builder, stack);
+        return builder.toString();
+    }
+
+    @Override
+    public void process(StringBuilder builder, CallStack stack) {
+        for (FragmentHandler handler : this.handlers) {
             handler.process(builder, stack);
         }
-        return builder.toString();
     }
 }

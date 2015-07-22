@@ -7,13 +7,6 @@ import java.util.List;
 /**
  * @author neo
  */
-public class CompositeHandler implements FragmentHandler {
+public abstract class CompositeHandler implements FragmentHandler {
     public final List<FragmentHandler> handlers = Lists.newArrayList();
-
-    @Override
-    public void process(StringBuilder builder, CallStack stack) {
-        for (FragmentHandler handler : handlers) {
-            handler.process(builder, stack);
-        }
-    }
 }

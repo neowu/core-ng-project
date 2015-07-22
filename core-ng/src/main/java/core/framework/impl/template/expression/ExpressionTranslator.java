@@ -50,11 +50,11 @@ public class ExpressionTranslator {
         if (!method.params.isEmpty() && method.builtinMethod) builder.append("new Object[]{");
         int index = 0;
         for (Token param : method.params) {
-            if (index > 0) builder.append(",");
+            if (index > 0) builder.append(',');
             append(builder, param, true);
             index++;
         }
-        if (!method.params.isEmpty() && method.builtinMethod) builder.append("}");
+        if (!method.params.isEmpty() && method.builtinMethod) builder.append('}');
         builder.append(')');
         if (method.next != null) {
             builder.append('.');

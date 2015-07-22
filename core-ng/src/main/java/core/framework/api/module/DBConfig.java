@@ -19,7 +19,7 @@ import java.time.Duration;
 public class DBConfig {
     private final Logger logger = LoggerFactory.getLogger(DBConfig.class);
     private final ModuleContext context;
-    protected final String name;
+    private final String name;
     private final DatabaseImpl database;
 
     public DBConfig(ModuleContext context, String name) {

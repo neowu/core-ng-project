@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 /**
  * @author neo
  */
-public class IfHandler extends CompositeHandler implements FragmentHandler {
+public class IfHandler extends CompositeHandler {
     private static final Pattern STATEMENT_PATTERN = Pattern.compile("if ((not )?)([#a-zA-Z1-9\\.\\(\\)]+)");
     final Expression expression;
     final boolean reverse;

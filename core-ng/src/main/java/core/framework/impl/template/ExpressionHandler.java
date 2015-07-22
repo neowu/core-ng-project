@@ -57,6 +57,7 @@ public class ExpressionHandler implements FragmentHandler {
                     break;
                 default:
                     builder.append(ch);
+                    break;
             }
         }
         return builder.toString();

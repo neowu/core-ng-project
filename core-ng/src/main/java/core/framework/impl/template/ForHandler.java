@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 /**
  * @author neo
  */
-public class ForHandler extends CompositeHandler implements FragmentHandler {
+public class ForHandler extends CompositeHandler {
     private static final Pattern STATEMENT_PATTERN = Pattern.compile("for ([a-zA-Z1-9]+) in ([#a-zA-Z1-9\\.\\(\\)]+)");
 
     Expression expression;
