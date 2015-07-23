@@ -5,11 +5,12 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Types;
 import core.framework.impl.module.AWSQueueBuilder;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.module.RabbitMQQueueBuilder;
 import core.framework.impl.queue.MessageValidator;
 import core.framework.impl.queue.MockMessagePublisher;
 import core.framework.impl.queue.RabbitMQ;
 import core.framework.impl.queue.RabbitMQEndpoint;
+import core.framework.impl.queue.RabbitMQListener;
+import core.framework.impl.queue.RabbitMQPublisher;
 
 /**
  * @author neo
@@ -52,7 +53,12 @@ public class QueueConfig {
         if (queueURI.startsWith("https://sqs.")) {
             return new AWSQueueBuilder(context).listener(queueURI);
         } else if (queueURI.startsWith("rabbitmq://queue/")) {
-            return new RabbitMQQueueBuilder(context).listener(new RabbitMQEndpoint(queueURI).routingKey);
+            RabbitMQListener listener = new RabbitMQListener(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(queueURI).routingKey, context.executor, context.queueManager.validator());
+            if (!context.test) {
+                context.startupHook.add(listener::start);
+                context.shutdownHook.add(listener::shutdown);
+            }
+            return listener;
         } else {
             throw Exceptions.error("unsupported protocol, queueURI={}", queueURI);
         }
@@ -66,7 +72,7 @@ public class QueueConfig {
         } else if (uri.startsWith("https://sqs.")) {
             return new AWSQueueBuilder(context).sqsPublisher(uri, messageClass);
         } else if (uri.startsWith("rabbitmq://")) {
-            return new RabbitMQQueueBuilder(context).publisher(new RabbitMQEndpoint(uri), messageClass, context.queueManager.validator());
+            return new RabbitMQPublisher<>(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(uri), messageClass, context.queueManager.validator());
         } else {
             throw Exceptions.error("unsupported protocol, uri={}", uri);
         }

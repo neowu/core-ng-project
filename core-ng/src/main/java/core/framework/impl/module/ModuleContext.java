@@ -9,7 +9,6 @@ import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.Properties;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
-import core.framework.impl.queue.QueueManager;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.web.HTTPServer;
 import core.framework.impl.web.management.HealthCheckController;

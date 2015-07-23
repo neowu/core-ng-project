@@ -17,7 +17,7 @@ public class RabbitMQEndpoint {
             exchange = "";
             routingKey = destinationURI.substring(17);
         } else {
-            throw Exceptions.error("unsupported rabbitmq uri, uri={}", destinationURI);
+            throw Exceptions.error("unsupported rabbitMQ uri, uri={}", destinationURI);
         }
     }
 }

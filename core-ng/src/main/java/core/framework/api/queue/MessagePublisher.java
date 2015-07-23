@@ -6,6 +6,6 @@ package core.framework.api.queue;
 public interface MessagePublisher<T> {
     void publish(T message);
 
-    // with rabbitmq, the queue is queueName, with SQS, it is full sqs url
-    void reply(String queue, T message);
+    // with rabbitMQ, the queue is queueName, with SQS, it is full sqs url
+    void publish(String queue, T message);
 }

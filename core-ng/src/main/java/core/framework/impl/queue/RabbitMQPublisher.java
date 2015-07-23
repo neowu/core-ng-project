@@ -32,7 +32,7 @@ public class RabbitMQPublisher<T> implements MessagePublisher<T> {
     }
 
     @Override
-    public void reply(String queue, T message) {
+    public void publish(String queue, T message) {
         publish("", queue, message);
     }
 

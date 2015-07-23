@@ -31,11 +31,11 @@ public class SQSMessagePublisher<T> implements MessagePublisher<T> {
 
     @Override
     public void publish(T message) {
-        reply(defaultQueueURL, message);
+        publish(defaultQueueURL, message);
     }
 
     @Override
-    public void reply(String queueURL, T message) {
+    public void publish(String queueURL, T message) {
         StopWatch watch = new StopWatch();
         try {
             validator.validate(message);

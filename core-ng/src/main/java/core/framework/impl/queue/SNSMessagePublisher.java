@@ -30,11 +30,11 @@ public class SNSMessagePublisher<T> implements MessagePublisher<T> {
 
     @Override
     public void publish(T message) {
-        reply(defaultTopicARN, message);
+        publish(defaultTopicARN, message);
     }
 
     @Override
-    public void reply(String topicARN, T message) {
+    public void publish(String topicARN, T message) {
         StopWatch watch = new StopWatch();
         try {
             validator.validate(message);
