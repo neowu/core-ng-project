@@ -5,4 +5,5 @@ package app.web.site;
  */
 public class IndexPage {
     public String name;
+    public String backgroundColor;
 }

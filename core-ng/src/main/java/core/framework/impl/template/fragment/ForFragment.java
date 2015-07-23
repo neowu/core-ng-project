@@ -1,7 +1,9 @@
-package core.framework.impl.template;
+package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Strings;
 import core.framework.impl.codegen.CodeCompileException;
+import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
@@ -16,17 +18,17 @@ import java.util.regex.Pattern;
 /**
  * @author neo
  */
-public class ForHandler extends CompositeHandler {
+public class ForFragment extends CompositeFragment {
     private static final Pattern STATEMENT_PATTERN = Pattern.compile("for ([a-zA-Z1-9]+) in ([#a-zA-Z1-9\\.\\(\\)]+)");
 
-    Expression expression;
-    String variable;
-    Class<?> valueClass;
+    private final Expression expression;
+    public final String variable;
+    public final Class<?> valueClass;
 
-    public ForHandler(String statement, CallTypeStack stack, String location) {
+    public ForFragment(String statement, CallTypeStack stack, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);
         if (!matcher.matches())
-            throw Exceptions.error("statement must match \"for var in list\", location={}", location);
+            throw Exceptions.error("statement must match \"for var in list\", statement={}, location={}", statement, location);
 
         variable = matcher.group(1);
         String list = matcher.group(2);
@@ -36,7 +38,7 @@ public class ForHandler extends CompositeHandler {
             valueClass = new ExpressionTypeInspector().listValueClass(expression, stack.rootClass, list);
             this.expression = new ExpressionBuilder().build(expression, stack, List.class);
         } catch (CodeCompileException e) {
-            throw new Error("failed to compile expression, location=" + location, e);
+            throw new Error(Strings.format("failed to compile expression, statement={}, location={}", statement, location), e);
         }
     }
 
@@ -45,7 +47,7 @@ public class ForHandler extends CompositeHandler {
         List<?> list = (List<?>) expression.eval(stack);
         for (Object item : list) {
             stack.contextObjects.put(variable, item);
-            for (FragmentHandler handler : handlers) {
+            for (Fragment handler : handlers) {
                 handler.process(builder, stack);
             }
         }

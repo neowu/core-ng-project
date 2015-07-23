@@ -2,6 +2,7 @@ package core.framework.impl.template;
 
 import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.Lists;
+import core.framework.impl.template.location.ClasspathTemplateLocation;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ import org.junit.Test;
 public class TemplateTest {
     @Test
     public void process() {
-        Template template = new TemplateBuilder(ClasspathResources.text("template-test/template.html"), TestModel.class).build();
+        Template template = new TemplateBuilder(new ClasspathTemplateLocation("template-test/template.html"), TestModel.class).build();
 
         TestModel model = new TestModel();
         model.stringField = "string<";

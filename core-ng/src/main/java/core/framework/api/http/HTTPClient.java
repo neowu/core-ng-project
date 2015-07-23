@@ -5,6 +5,7 @@ import core.framework.api.util.InputStreams;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -57,7 +58,8 @@ public final class HTTPClient {
                 headers.putIfAbsent(header.getName(), header.getValue());
             }
 
-            byte[] bytes = InputStreams.bytes(response.getEntity().getContent());
+            HttpEntity entity = response.getEntity();
+            byte[] bytes = InputStreams.bytes(entity.getContent(), (int) entity.getContentLength());
             HTTPResponse httpResponse = new HTTPResponse(HTTPStatus.parse(statusCode), headers, bytes);
 
             logResponseText(httpResponse);

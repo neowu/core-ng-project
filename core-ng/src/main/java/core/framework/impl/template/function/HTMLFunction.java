@@ -1,7 +1,5 @@
 package core.framework.impl.template.function;
 
-import core.framework.impl.template.expression.HTMLText;
-
 /**
  * @author neo
  */

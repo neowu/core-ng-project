@@ -1,12 +1,14 @@
-package core.framework.impl.template;
+package core.framework.impl.template.fragment;
+
+import core.framework.impl.template.CallStack;
 
 /**
  * @author neo
  */
-public class StaticHandler implements FragmentHandler {
+public class StaticFragment implements Fragment {
     private final String content;
 
-    public StaticHandler(String content) {
+    public StaticFragment(String content) {
         this.content = content;
     }
 

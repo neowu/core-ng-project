@@ -4,7 +4,7 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* template: "include" support
+* provide ws interface to send queue message for dev and prod troubleshoot?
 * website: i18n
 * website: cms components
 * push action log to rabbitmq directly, index thru ES/Kibana
@@ -13,11 +13,11 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * webservice client retry on network issue
 * nested db transaction?
 * validate ES index object
-* provide ws interface to send queue message for dev and prod troubleshoot?
 * template: "map" support?
 * review/refactory/unit-test all packages
-* website static content security check, (in prod, this is not part of java, but nginx)
+* website static content security check, (in server env, this is handled by nginx directly)
 * template security check, escaping and etc
+* template support load from string?
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)

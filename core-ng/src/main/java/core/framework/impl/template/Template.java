@@ -1,6 +1,8 @@
 package core.framework.impl.template;
 
 import core.framework.api.util.Exceptions;
+import core.framework.impl.template.fragment.CompositeFragment;
+import core.framework.impl.template.fragment.Fragment;
 import core.framework.impl.template.function.Function;
 import core.framework.impl.template.function.HTMLFunction;
 
@@ -9,7 +11,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class Template extends CompositeHandler {
+public class Template extends CompositeFragment {
     private final Class<?> modelClass;
 
     public Template(Class<?> modelClass) {
@@ -35,7 +37,7 @@ public class Template extends CompositeHandler {
 
     @Override
     public void process(StringBuilder builder, CallStack stack) {
-        for (FragmentHandler handler : this.handlers) {
+        for (Fragment handler : this.handlers) {
             handler.process(builder, stack);
         }
     }

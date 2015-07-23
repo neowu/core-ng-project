@@ -1,7 +1,9 @@
-package core.framework.impl.template;
+package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Strings;
 import core.framework.impl.codegen.CodeCompileException;
+import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
@@ -14,15 +16,15 @@ import java.util.regex.Pattern;
 /**
  * @author neo
  */
-public class IfHandler extends CompositeHandler {
+public class IfFragment extends CompositeFragment {
     private static final Pattern STATEMENT_PATTERN = Pattern.compile("if ((not )?)([#a-zA-Z1-9\\.\\(\\)]+)");
     final Expression expression;
     final boolean reverse;
 
-    public IfHandler(String statement, CallTypeStack stack, String location) {
+    public IfFragment(String statement, CallTypeStack stack, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);
         if (!matcher.matches())
-            throw Exceptions.error("statement must match \"if (not) condition\", location={}", location);
+            throw Exceptions.error("statement must match \"if (not) condition\", statement={}, location={}", statement, location);
 
         reverse = "not ".equals(matcher.group(2));
         String condition = matcher.group(3);
@@ -31,7 +33,7 @@ public class IfHandler extends CompositeHandler {
             Token expression = new ExpressionParser().parse(condition);
             this.expression = new ExpressionBuilder().build(expression, stack, Boolean.class);
         } catch (CodeCompileException e) {
-            throw new Error("failed to compile expression, location=" + location, e);
+            throw new Error(Strings.format("failed to compile expression, statement={}, location={}", statement, location), e);
         }
     }
 
@@ -40,7 +42,7 @@ public class IfHandler extends CompositeHandler {
         Boolean result = (Boolean) expression.eval(stack);
         Boolean expected = reverse ? Boolean.FALSE : Boolean.TRUE;
         if (expected.equals(result)) {
-            for (FragmentHandler handler : handlers) {
+            for (Fragment handler : handlers) {
                 handler.process(builder, stack);
             }
         }

@@ -19,6 +19,7 @@ import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createDirectory;
 import static java.nio.file.Files.delete;
 import static java.nio.file.Files.exists;
+import static java.nio.file.Files.getLastModifiedTime;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Files.walkFileTree;
 
@@ -111,7 +112,7 @@ public final class Files {
 
     public static Instant lastModified(Path path) {
         try {
-            return java.nio.file.Files.getLastModifiedTime(path).toInstant();
+            return getLastModifiedTime(path).toInstant();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

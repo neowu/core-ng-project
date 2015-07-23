@@ -39,7 +39,8 @@ public class BeanFactory {
             throw Exceptions.error("instance type doesn't match, type={}, instanceType={}", type, instance.getClass());
 
         Object previous = beans.put(new Key(type, name), instance);
-        if (previous != null) throw new Error("duplicated bean found, previous=" + previous);
+        if (previous != null)
+            throw Exceptions.error("duplicated bean found, type={}, name={}, previous={}", type.getTypeName(), name, previous);
     }
 
     public Set<Key> keys() {

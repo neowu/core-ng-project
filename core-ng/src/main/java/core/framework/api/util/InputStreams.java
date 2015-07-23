@@ -9,10 +9,10 @@ import java.io.UncheckedIOException;
  * @author neo
  */
 public final class InputStreams {
-    public static byte[] bytes(InputStream stream) {
-        final int bufferSize = 0x1000; // 4K
+    public static byte[] bytes(InputStream stream, int initialCapacity) {
+        int bufferSize = 0x1000; // 4K
 
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ByteArrayOutputStream output = new ByteArrayOutputStream(Math.max(initialCapacity, 256));
         byte[] buf = new byte[bufferSize];
         int len;
         try {
@@ -26,5 +26,9 @@ public final class InputStreams {
         }
 
         return output.toByteArray();
+    }
+
+    public static byte[] bytes(InputStream stream) {
+        return bytes(stream, 256);
     }
 }

@@ -28,7 +28,9 @@ public class WebModule extends Module {
 
         site().template("/template/index.html", IndexPage.class);
         site().staticContent("/static");
-        route().get("/index", bind(IndexController.class)::index);
+        IndexController controller = bind(IndexController.class);
+        route().get("/index", controller::index);
+        route().get("/css/main.css", controller::css);
 
         SiteController siteController = bind(SiteController.class);
         route().post("/form", siteController::post);

@@ -14,27 +14,27 @@ import java.nio.file.Paths;
 public class WebDirectory {
     private final Logger logger = LoggerFactory.getLogger(WebDirectory.class);
 
-    private final Path webPath;
+    private final Path root;
     public boolean localEnv;
 
     public WebDirectory() {
-        this.webPath = locateWebPath();
+        this.root = locateRootDirectory();
     }
 
-    private Path locateWebPath() {
-        String webPathValue = System.getProperty("core.web");
-        if (webPathValue != null) {
-            Path webPath = Paths.get(webPathValue).toAbsolutePath();
-            if (Files.exists(webPath) && Files.isDirectory(webPath)) {
-                logger.info("found -Dcore.web, use it as web directory, path={}", webPath);
-                return webPath;
+    private Path locateRootDirectory() {
+        String value = System.getProperty("core.web");
+        if (value != null) {
+            Path path = Paths.get(value).toAbsolutePath();
+            if (Files.exists(path) && Files.isDirectory(path)) {
+                logger.info("found -Dcore.web, use it as web directory, path={}", path);
+                return path;
             }
         } else {
-            Path webPath = Paths.get("./src/main/dist/web").toAbsolutePath();
-            if (Files.exists(webPath) && Files.isDirectory(webPath)) {
-                logger.warn("found local web directory, this should only happen in local dev env or test, path={}", webPath);
+            Path path = Paths.get("./src/main/dist/web").toAbsolutePath();
+            if (Files.exists(path) && Files.isDirectory(path)) {
+                logger.warn("found local web directory, this should only happen in local dev env or test, path={}", path);
                 localEnv = true;
-                return webPath;
+                return path;
             }
         }
         logger.info("can not locate web directory");
@@ -42,9 +42,13 @@ public class WebDirectory {
     }
 
     public Path path(String path) {
-        if (webPath == null)
-            throw new Error("web path does not exist, check -Dcore.web or set working dir to be module path for local dev env.");
         if (path.charAt(0) != '/') throw Exceptions.error("path must start with '/', path={}", path);
-        return webPath.resolve(path.substring(1)).toAbsolutePath();
+        return root().resolve(path.substring(1)).toAbsolutePath();
+    }
+
+    public Path root() {
+        if (root == null)
+            throw new Error("can not find web path, check -Dcore.web or set working dir to be module path for local dev env.");
+        return root;
     }
 }

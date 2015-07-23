@@ -6,7 +6,7 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.impl.web.response.BeanBody;
 import core.framework.impl.web.response.ByteArrayBody;
 import core.framework.impl.web.response.FileBody;
-import core.framework.impl.web.response.HTMLBody;
+import core.framework.impl.web.response.TemplateBody;
 import core.framework.impl.web.response.TextBody;
 
 import java.io.File;
@@ -35,10 +35,14 @@ public interface Response {
             .status(status);
     }
 
-    static Response html(String templatePath, Object model) {
-        return new ResponseImpl(new HTMLBody(templatePath, model))
-            .contentType(ContentTypes.TEXT_HTML)
+    static Response template(String templatePath, Object model) {
+        return new ResponseImpl(new TemplateBody(templatePath, model))
             .status(HTTPStatus.OK);
+    }
+
+    static Response html(String templatePath, Object model) {
+        return template(templatePath, model)
+            .contentType(ContentTypes.TEXT_HTML);
     }
 
     static Response empty() {

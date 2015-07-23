@@ -1,25 +1,27 @@
-package core.framework.impl.template;
+package core.framework.impl.template.fragment;
 
+import core.framework.api.util.Strings;
 import core.framework.impl.codegen.CodeCompileException;
+import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionParser;
-import core.framework.impl.template.expression.HTMLText;
 import core.framework.impl.template.expression.Token;
+import core.framework.impl.template.function.HTMLText;
 
 /**
  * @author neo
  */
-public class ExpressionHandler implements FragmentHandler {
+public class ExpressionFragment implements Fragment {
     final Expression expression;
 
-    public ExpressionHandler(String expression, CallTypeStack stack, String location) {
+    public ExpressionFragment(String expression, CallTypeStack stack, String location) {
         try {
             Token token = new ExpressionParser().parse(expression);
             this.expression = new ExpressionBuilder().build(token, stack, Object.class);
         } catch (CodeCompileException e) {
-            throw new Error("failed to compile expression, location=" + location, e);
+            throw new Error(Strings.format("failed to compile expression, expression={}, location={}", expression, location), e);
         }
     }
 

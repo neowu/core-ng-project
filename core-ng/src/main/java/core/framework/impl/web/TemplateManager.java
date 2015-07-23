@@ -5,6 +5,7 @@ import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.template.Template;
 import core.framework.impl.template.TemplateBuilder;
+import core.framework.impl.template.location.FileTemplateLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +46,7 @@ public class TemplateManager {
 
     private Template load(String templatePath, Class<?> modelClass) {
         logger.debug("load template, path={}", templatePath);
-        String template = Files.text(webDirectory.path(templatePath));
-        return new TemplateBuilder(template, modelClass).build();
+        return new TemplateBuilder(new FileTemplateLocation(webDirectory.root(), templatePath), modelClass).build();
     }
 
     private String templateKey(String templatePath) {

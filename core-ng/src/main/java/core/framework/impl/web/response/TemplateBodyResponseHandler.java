@@ -7,16 +7,16 @@ import io.undertow.server.HttpServerExchange;
 /**
  * @author neo
  */
-public class HTMLBodyResponseHandler implements BodyHandler {
+public class TemplateBodyResponseHandler implements BodyHandler {
     private final TemplateManager templateManager;
 
-    public HTMLBodyResponseHandler(TemplateManager templateManager) {
+    public TemplateBodyResponseHandler(TemplateManager templateManager) {
         this.templateManager = templateManager;
     }
 
     @Override
     public void handle(ResponseImpl response, HttpServerExchange exchange) {
-        HTMLBody body = (HTMLBody) response.body;
+        TemplateBody body = (TemplateBody) response.body;
         String html = templateManager.process(body.templatePath, body.model);
         exchange.getResponseSender().send(html);
     }
