@@ -6,7 +6,8 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.ResponseImpl;
 import core.framework.impl.web.BeanValidator;
-import core.framework.impl.web.TemplateManager;
+import core.framework.impl.web.RequestImpl;
+import core.framework.impl.web.template.TemplateManager;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
@@ -32,7 +33,7 @@ public class ResponseHandler {
         handlers.put(FileBody.class, new FileBodyResponseHandler());
     }
 
-    public void handle(ResponseImpl response, HttpServerExchange exchange) {
+    public void handle(ResponseImpl response, HttpServerExchange exchange, RequestImpl request) {
         HTTPStatus status = response.status();
         exchange.setResponseCode(status.code);
         ActionLogContext.put("responseCode", status.code);
@@ -69,6 +70,6 @@ public class ResponseHandler {
         if (handler == null)
             throw Exceptions.error("unexpected body class, body={}", response.body.getClass().getCanonicalName());
         logger.debug("responseHandlerClass={}", handler.getClass().getCanonicalName());
-        handler.handle(response, exchange);
+        handler.handle(response, exchange.getResponseSender(), request);
     }
 }

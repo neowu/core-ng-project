@@ -63,7 +63,7 @@ public class HTTPServerErrorHandler {
             }
             String accept = exchange.getRequestHeaders().getFirst(Headers.ACCEPT);
             if (errorResponse == null) errorResponse = defaultErrorResponse(e, accept);
-            responseHandler.handle((ResponseImpl) errorResponse, exchange);
+            responseHandler.handle((ResponseImpl) errorResponse, exchange, request);
         } catch (Throwable error) {
             if (exchange.isResponseStarted()) {
                 logger.error("response was sent, discard the current http transaction", error);

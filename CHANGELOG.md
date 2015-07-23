@@ -6,6 +6,8 @@
 * module: renamed bind(supplier) to bindSupplier()
 * template: "include" support
 * queue: renamed MessagePublisher.reply to publish
+* template: custom function support, prepare for #msg, #js, #css
+* template: load from string
 
 ### 3.2.7 (7/21/2015 - 7/22/2015)
 * db repository, added selectAll()

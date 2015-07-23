@@ -1,6 +1,7 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.web.ResponseImpl;
+import core.framework.impl.web.RequestImpl;
 import io.undertow.io.IoCallback;
 import io.undertow.io.Sender;
 import io.undertow.server.HttpServerExchange;
@@ -17,12 +18,12 @@ import java.nio.channels.FileChannel;
  */
 public class FileBodyResponseHandler implements BodyHandler {
     @Override
-    public void handle(ResponseImpl response, HttpServerExchange exchange) {
+    public void handle(ResponseImpl response, Sender sender, RequestImpl request) {
         File file = ((FileBody) response.body).file;
 
         try {
             FileChannel channel = new FileInputStream(file).getChannel();
-            exchange.getResponseSender().transferFrom(channel, new IoCallback() {
+            sender.transferFrom(channel, new IoCallback() {
                 @Override
                 public void onComplete(HttpServerExchange exchange, Sender sender) {
                     IoUtils.safeClose(channel);

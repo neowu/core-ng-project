@@ -1,11 +1,12 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.web.ResponseImpl;
-import io.undertow.server.HttpServerExchange;
+import core.framework.impl.web.RequestImpl;
+import io.undertow.io.Sender;
 
 /**
  * @author neo
  */
 public interface BodyHandler {
-    void handle(ResponseImpl response, HttpServerExchange exchange);
+    void handle(ResponseImpl response, Sender sender, RequestImpl request);
 }

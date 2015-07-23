@@ -1,7 +1,8 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.web.ResponseImpl;
-import io.undertow.server.HttpServerExchange;
+import core.framework.impl.web.RequestImpl;
+import io.undertow.io.Sender;
 
 import java.nio.ByteBuffer;
 
@@ -10,8 +11,8 @@ import java.nio.ByteBuffer;
  */
 public class ByteArrayBodyResponseHandler implements BodyHandler {
     @Override
-    public void handle(ResponseImpl response, HttpServerExchange exchange) {
+    public void handle(ResponseImpl response, Sender sender, RequestImpl request) {
         ByteArrayBody body = (ByteArrayBody) response.body;
-        exchange.getResponseSender().send(ByteBuffer.wrap(body.bytes));
+        sender.send(ByteBuffer.wrap(body.bytes));
     }
 }

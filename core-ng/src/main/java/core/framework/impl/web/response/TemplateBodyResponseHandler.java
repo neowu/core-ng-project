@@ -1,8 +1,9 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.web.ResponseImpl;
-import core.framework.impl.web.TemplateManager;
-import io.undertow.server.HttpServerExchange;
+import core.framework.impl.web.RequestImpl;
+import core.framework.impl.web.template.TemplateManager;
+import io.undertow.io.Sender;
 
 /**
  * @author neo
@@ -15,9 +16,9 @@ public class TemplateBodyResponseHandler implements BodyHandler {
     }
 
     @Override
-    public void handle(ResponseImpl response, HttpServerExchange exchange) {
+    public void handle(ResponseImpl response, Sender sender, RequestImpl request) {
         TemplateBody body = (TemplateBody) response.body;
-        String html = templateManager.process(body.templatePath, body.model);
-        exchange.getResponseSender().send(html);
+        String html = templateManager.process(body.templatePath, body.model, request);
+        sender.send(html);
     }
 }

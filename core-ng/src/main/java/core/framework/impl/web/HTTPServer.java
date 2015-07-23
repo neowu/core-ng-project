@@ -13,6 +13,7 @@ import core.framework.impl.log.ActionLogger;
 import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
+import core.framework.impl.web.template.TemplateManager;
 import io.undertow.Undertow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

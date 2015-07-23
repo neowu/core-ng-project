@@ -4,9 +4,8 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* provide ws interface to send queue message for dev and prod troubleshoot?
 * website: i18n
-* website: cms components
+* provide ws interface to send queue message for dev and prod troubleshoot?
 * push action log to rabbitmq directly, index thru ES/Kibana
 * resilient retry and throttling
 * Cache pre warm, static or provide structure
@@ -17,7 +16,6 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * review/refactory/unit-test all packages
 * website static content security check, (in server env, this is handled by nginx directly)
 * template security check, escaping and etc
-* template support load from string?
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)

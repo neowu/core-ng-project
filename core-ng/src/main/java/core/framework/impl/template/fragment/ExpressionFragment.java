@@ -57,6 +57,9 @@ public class ExpressionFragment implements Fragment {
                 case '\'':
                     builder.append("&#39;");
                     break;
+                case '/':
+                    builder.append("&#47;");
+                    break;
                 default:
                     builder.append(ch);
                     break;

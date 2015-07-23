@@ -104,6 +104,7 @@ public final class RequestImpl implements Request {
         return cookie(spec.name);
     }
 
+    //TODO: remove this, let session manager handle SessionId/SecureSessionId
     public Optional<String> cookie(String name) {
         Cookie cookie = exchange.getRequestCookies().get(name);
         if (cookie == null) return Optional.empty();

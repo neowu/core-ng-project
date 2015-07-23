@@ -18,9 +18,8 @@ public class ExpressionBuilder {
         CodeBuilder builder = new CodeBuilder();
         builder.append("public Object eval({} stack) {\n", CallStack.class.getCanonicalName());
         builder.indent(1).append("{} $root = ({})stack.root;\n", stack.rootClass.getCanonicalName(), stack.rootClass.getCanonicalName());
-        stack.paramClasses
-            .forEach((name, paramClass) -> builder.indent(1).append("{} {} = ({})stack.context(\"{}\");\n",
-                paramClass.getCanonicalName(), name, paramClass.getCanonicalName(), name));
+        stack.paramClasses.forEach((name, paramClass) -> builder.indent(1).append("{} {} = ({})stack.context(\"{}\");\n",
+            paramClass.getCanonicalName(), name, paramClass.getCanonicalName(), name));
 
         String translatedExpression = new ExpressionTranslator(expression, stack).translate();
 

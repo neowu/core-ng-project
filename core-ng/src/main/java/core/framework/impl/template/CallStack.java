@@ -17,10 +17,12 @@ public class CallStack {
         this.root = root;
     }
 
+    // used by generated code
     public Object context(String name) {
         return contextObjects.get(name);
     }
 
+    // used by generated code
     public Function function(String name) {
         return functions.get(name);
     }

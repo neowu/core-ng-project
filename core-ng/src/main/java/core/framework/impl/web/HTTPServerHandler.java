@@ -75,7 +75,7 @@ public class HTTPServerHandler implements HttpHandler {
             webContext.context.set(Maps.newHashMap());
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
             sessionManager.save(request, exchange);
-            responseHandler.handle((ResponseImpl) response, exchange);
+            responseHandler.handle((ResponseImpl) response, exchange, request);
         } catch (Throwable e) {
             errorHandler.handleError(e, exchange, request);
         } finally {

@@ -1,11 +1,14 @@
-package core.framework.impl.web;
+package core.framework.impl.web.template;
 
 import core.framework.api.util.Files;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.template.Template;
 import core.framework.impl.template.TemplateBuilder;
+import core.framework.impl.template.function.Function;
 import core.framework.impl.template.location.FileTemplateLocation;
+import core.framework.impl.web.RequestImpl;
+import core.framework.impl.web.WebDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,15 +27,21 @@ public class TemplateManager {
         this.webDirectory = webDirectory;
     }
 
-    public String process(String templatePath, Object model) {
+    public String process(String templatePath, Object model, RequestImpl request) {
         StopWatch watch = new StopWatch();
         try {
             Template template = templates.computeIfAbsent(templateKey(templatePath), (key) -> load(templatePath, model.getClass()));
-            //TODO: manage custom function
-            return template.process(model, null);
+            Map<String, Function> functions = functions(request);
+            return template.process(model, functions);
         } finally {
             logger.debug("process, templatePath={}, elapsedTime={}", templatePath, watch.elapsedTime());
         }
+    }
+
+    private Map<String, Function> functions(RequestImpl request) {
+        Map<String, Function> functions = Maps.newHashMap();
+        functions.put("msg", new MessageFunction(request));
+        return functions;
     }
 
     public void add(String templatePath, Class<?> modelClass) {
