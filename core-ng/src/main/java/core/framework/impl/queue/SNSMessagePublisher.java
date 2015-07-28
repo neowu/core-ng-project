@@ -17,24 +17,19 @@ import org.slf4j.LoggerFactory;
 public class SNSMessagePublisher<T> implements MessagePublisher<T> {
     private final Logger logger = LoggerFactory.getLogger(SNSMessagePublisher.class);
     private final AmazonSNS sns;
-    private final String defaultTopicARN;
+    private final String topicARN;
     private final String messageType;
     private final MessageValidator validator;
 
-    public SNSMessagePublisher(AmazonSNS sns, String defaultTopicARN, Class<?> messageClass, MessageValidator validator) {
+    public SNSMessagePublisher(AmazonSNS sns, String topicARN, Class<?> messageClass, MessageValidator validator) {
         this.sns = sns;
-        this.defaultTopicARN = defaultTopicARN;
+        this.topicARN = topicARN;
         this.messageType = messageClass.getDeclaredAnnotation(Message.class).name();
         this.validator = validator;
     }
 
     @Override
     public void publish(T message) {
-        publish(defaultTopicARN, message);
-    }
-
-    @Override
-    public void publish(String topicARN, T message) {
         StopWatch watch = new StopWatch();
         try {
             validator.validate(message);
@@ -54,6 +49,11 @@ public class SNSMessagePublisher<T> implements MessagePublisher<T> {
             ActionLogContext.track("sns", elapsedTime);
             logger.debug("publish message, topicARN={}, type={}, elapsedTime={}", topicARN, messageType, elapsedTime);
         }
+    }
+
+    @Override
+    public void publish(String routingKey, T message) {
+        throw new Error("sns message publisher does not support publishing with routingKey");
     }
 
     private void linkContext(PublishRequest request) {

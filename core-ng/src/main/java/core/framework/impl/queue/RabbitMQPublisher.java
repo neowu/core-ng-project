@@ -32,8 +32,8 @@ public class RabbitMQPublisher<T> implements MessagePublisher<T> {
     }
 
     @Override
-    public void publish(String queue, T message) {
-        publish("", queue, message);
+    public void publish(String routingKey, T message) {
+        publish(endpoint.exchange, routingKey, message);
     }
 
     private void publish(String exchange, String routingKey, T message) {

@@ -2,15 +2,19 @@ package core.framework.api.module;
 
 import core.framework.api.queue.MessagePublisher;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Lists;
 import core.framework.api.util.Types;
 import core.framework.impl.module.AWSQueueBuilder;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.queue.CompositePublisher;
 import core.framework.impl.queue.MessageValidator;
 import core.framework.impl.queue.MockMessagePublisher;
 import core.framework.impl.queue.RabbitMQ;
 import core.framework.impl.queue.RabbitMQEndpoint;
 import core.framework.impl.queue.RabbitMQListener;
 import core.framework.impl.queue.RabbitMQPublisher;
+
+import java.util.List;
 
 /**
  * @author neo
@@ -47,6 +51,17 @@ public class QueueConfig {
         validator.register(messageClass);
         MessagePublisher<T> publisher = publisher(destination, messageClass);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), null, publisher);
+    }
+
+    // this is to support publish to SNS and RabbitMQ same time, as interim step to deprecate SNS/SQS
+    public <T> void publish(String[] destinations, Class<T> messageClass) {
+        MessageValidator validator = context.queueManager.validator();
+        validator.register(messageClass);
+        List<MessagePublisher<T>> publishers = Lists.newArrayList();
+        for (String destination : destinations) {
+            publishers.add(publisher(destination, messageClass));
+        }
+        context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), null, new CompositePublisher<>(publishers));
     }
 
     private MessageHandlerConfig listener(String queueURI) {

@@ -18,24 +18,19 @@ import org.slf4j.LoggerFactory;
 public class SQSMessagePublisher<T> implements MessagePublisher<T> {
     private final Logger logger = LoggerFactory.getLogger(SQSMessagePublisher.class);
     private final AmazonSQS sqs;
-    private final String defaultQueueURL;
+    private final String queueURL;
     private final String messageType;
     private final MessageValidator validator;
 
-    public SQSMessagePublisher(AmazonSQS sqs, String defaultQueueURL, Class<?> messageClass, MessageValidator validator) {
+    public SQSMessagePublisher(AmazonSQS sqs, String queueURL, Class<?> messageClass, MessageValidator validator) {
         this.sqs = sqs;
-        this.defaultQueueURL = defaultQueueURL;
+        this.queueURL = queueURL;
         this.messageType = messageClass.getDeclaredAnnotation(Message.class).name();
         this.validator = validator;
     }
 
     @Override
     public void publish(T message) {
-        publish(defaultQueueURL, message);
-    }
-
-    @Override
-    public void publish(String queueURL, T message) {
         StopWatch watch = new StopWatch();
         try {
             validator.validate(message);
@@ -57,6 +52,11 @@ public class SQSMessagePublisher<T> implements MessagePublisher<T> {
             ActionLogContext.track("sqs", elapsedTime);
             logger.debug("publish message, queueURL={}, type={}, elapsedTime={}", queueURL, messageType, elapsedTime);
         }
+    }
+
+    @Override
+    public void publish(String routingKey, T message) {
+        throw new Error("sqs message publisher does not support publishing with routingKey");
     }
 
     private void linkContext(SendMessageRequest request) {

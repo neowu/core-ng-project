@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.2.9 (7/28/2015)
+* queue: composite queue publisher
+* queue: MessagePublisher.publish with routingKey, only support for RabbitMQ
+
 ### 3.2.8 (7/22/2015 － 7/23/2015)
 * template: validate model class
 * add TemplateEngine for general purpose

@@ -6,6 +6,6 @@ package core.framework.api.queue;
 public interface MessagePublisher<T> {
     void publish(T message);
 
-    // with rabbitMQ, the queue is queueName, with SQS, it is full sqs url
-    void publish(String queue, T message);
+    // RabbitMQ uses routingKey as queueName with default exchange, SNS/SQS don't support routingKey
+    void publish(String routingKey, T message);
 }

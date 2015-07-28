@@ -19,12 +19,16 @@ public class MockMessagePublisher<T> implements MessagePublisher<T> {
 
     @Override
     public void publish(T message) {
-        publish(uri, message);
+        publish(uri, null, message);
     }
 
     @Override
-    public void publish(String uri, T message) {
-        logger.info("publish message, uri={}, messageClass={}", uri, message.getClass().getCanonicalName());
+    public void publish(String routingKey, T message) {
+        publish(uri, routingKey, message);
+    }
+
+    private void publish(String uri, String routingKey, T message) {
+        logger.info("publish message, uri={}, routingKey={}, messageClass={}", uri, routingKey, message.getClass().getCanonicalName());
         validator.validate(message);
     }
 }
