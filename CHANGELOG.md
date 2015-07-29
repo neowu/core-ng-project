@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.3.0
+* mongo: refactory, support fongo, minor API changes
+
 ### 3.2.9 (7/28/2015)
 * queue: composite queue publisher
 * queue: MessagePublisher.publish with routingKey, only support for RabbitMQ

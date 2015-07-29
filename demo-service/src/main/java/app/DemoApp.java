@@ -21,21 +21,12 @@ public class DemoApp extends AbstractApplication {
         db().repository(Product.class);
         bind(ProductService.class);
 
-//        Mongo mongo = bind(new MongoBuilder()
-//            .uri("mongodb://192.168.2.2:27017")
-//            .databaseName("main")
-//            .entityClass(User.class)
-//            .viewClass(MongoUserAggregateView.class)
-//            .get());
-//        onShutdown(mongo::shutdown);
+        load(new MongoModule());
 
         // web part
         load(new WebModule());
 
 //        load(new JobModule());
-
-//        load(new MongoTest());
-
 //        load(new QueueModule());
     }
 }

@@ -32,27 +32,22 @@ public final class Mongo {
     private final MongoClient mongoClient;
 
     private final MongoDatabase database;
-    private final Map<Class, EntityIdHandler> idHandlers;
-    private final long slowQueryThresholdInMs;
-    private final int tooManyRowsReturnedThreshold;
 
-    private final MongoEntityValidator validator;
+    Map<Class, EntityIdHandler> idHandlers;
+    long slowQueryThresholdInMs;
+    int tooManyRowsReturnedThreshold;
+    MongoEntityValidator validator;
 
-    Mongo(MongoClient mongoClient,
-          String databaseName,
-          Map<Class, EntityIdHandler> idHandlers,
-          MongoEntityValidator validator, int tooManyRowsReturnedThreshold, long slowQueryThresholdInMs) {
+    Mongo(MongoClient mongoClient, MongoDatabase database) {
         this.mongoClient = mongoClient;
-        database = mongoClient.getDatabase(databaseName);
-        this.idHandlers = idHandlers;
-        this.slowQueryThresholdInMs = slowQueryThresholdInMs;
-        this.tooManyRowsReturnedThreshold = tooManyRowsReturnedThreshold;
-        this.validator = validator;
+        this.database = database;
     }
 
     public void shutdown() {
-        logger.info("shutdown mongodb client, database={}", database.getName());
-        mongoClient.close();
+        if (mongoClient != null) {  // for test env, the client will be null
+            logger.info("shutdown mongodb client, database={}", database.getName());
+            mongoClient.close();
+        }
     }
 
     public <T> void insert(T entity) {
@@ -71,14 +66,14 @@ public final class Mongo {
         }
     }
 
-    public <T> Optional<T> findOne(Class<T> entityClass, String id) {
-        return findOne(entityClass, Filters.eq("_id", new ObjectId(id)));
+    public <T> Optional<T> findOne(Class<T> entityClass, ObjectId id) {
+        return findOne(entityClass, Filters.eq("_id", id));
     }
 
     public <T> Optional<T> findOne(Class<T> entityClass, Bson filter) {
         StopWatch watch = new StopWatch();
         try {
-            List<T> results = executeFind(Lists.newArrayList(), entityClass, filter);
+            List<T> results = executeFind(entityClass, filter);
             if (results.isEmpty()) return Optional.empty();
             if (results.size() > 1) throw new Error("more than one row returned, size=" + results.size());
             return Optional.of(results.get(0));
@@ -93,16 +88,17 @@ public final class Mongo {
 
     public <T> List<T> find(Class<T> entityClass, Bson filter) {
         StopWatch watch = new StopWatch();
-        List<T> results = Lists.newArrayList();
+        List<T> results = null;
         try {
-            return executeFind(results, entityClass, filter);
+            results = executeFind(entityClass, filter);
+            return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
             logger.debug("find, entityClass={}, filter={}, elapsedTime={}", entityClass.getName(), filter, elapsedTime);
             if (elapsedTime > slowQueryThresholdInMs)
                 logger.warn("slow query detected");
-            if (results.size() > tooManyRowsReturnedThreshold)
+            if (results != null && results.size() > tooManyRowsReturnedThreshold)
                 logger.warn("too many rows returned, returnedRows={}", results.size());
         }
     }
@@ -186,7 +182,8 @@ public final class Mongo {
         }
     }
 
-    private <T> List<T> executeFind(List<T> results, Class<T> entityClass, Bson filter) {
+    private <T> List<T> executeFind(Class<T> entityClass, Bson filter) {
+        List<T> results = Lists.newArrayList();
         FindIterable<T> documents = collection(entityClass).find(filter == null ? new BsonDocument() : filter);
         for (T document : documents) {
             results.add(document);
