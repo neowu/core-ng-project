@@ -1,4 +1,4 @@
-package core.framework.impl.web;
+package core.framework.impl.web.site;
 
 import core.framework.api.http.HTTPHeaders;
 import core.framework.api.http.HTTPStatus;
@@ -31,7 +31,7 @@ public class StaticContentController implements Controller {
     private final Logger logger = LoggerFactory.getLogger(StaticContentController.class);
     private final Path contentDirectory;
 
-    public StaticContentController(WebDirectory webDirectory, String root) {
+    StaticContentController(WebDirectory webDirectory, String root) {
         contentDirectory = webDirectory.path(root);
         if (!Files.isDirectory(contentDirectory))
             throw Exceptions.error("content root must be directory, root={}", contentDirectory);

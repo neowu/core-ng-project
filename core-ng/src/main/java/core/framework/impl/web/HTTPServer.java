@@ -12,8 +12,7 @@ import core.framework.api.web.Interceptor;
 import core.framework.impl.log.ActionLogger;
 import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.route.Route;
-import core.framework.impl.web.session.SessionManager;
-import core.framework.impl.web.template.TemplateManager;
+import core.framework.impl.web.site.SiteManager;
 import io.undertow.Undertow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +30,7 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
 
-    public final WebDirectory webDirectory = new WebDirectory();
-    public final SessionManager sessionManager = new SessionManager();
-    public final TemplateManager templateManager = new TemplateManager(webDirectory);
+    public final SiteManager siteManager = new SiteManager();
     public final BeanValidator validator = new BeanValidator();
     public final WebContextImpl webContext = new WebContextImpl();
     private final Route route = new Route();
@@ -43,14 +40,14 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
     private int port = 8080;
 
     public HTTPServer(ActionLogger actionLogger) {
-        ResponseHandler responseHandler = new ResponseHandler(validator, templateManager);
+        ResponseHandler responseHandler = new ResponseHandler(validator, siteManager.templateManager);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
 
         httpServerHandler = new HTTPServerHandler();
         httpServerHandler.actionLogger = actionLogger;
         httpServerHandler.route = route;
         httpServerHandler.interceptors = interceptors;
-        httpServerHandler.sessionManager = sessionManager;
+        httpServerHandler.sessionManager = siteManager.sessionManager;
         httpServerHandler.webContext = webContext;
         httpServerHandler.validator = validator;
         httpServerHandler.responseHandler = responseHandler;

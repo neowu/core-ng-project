@@ -1,4 +1,4 @@
-package core.framework.impl.web;
+package core.framework.impl.web.site;
 
 import core.framework.api.util.Exceptions;
 import org.slf4j.Logger;

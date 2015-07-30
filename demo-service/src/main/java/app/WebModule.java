@@ -28,6 +28,8 @@ public class WebModule extends Module {
 
         site().template("/template/index.html", IndexPage.class);
         site().staticContent("/static");
+        site().message().loadProperties("messages/main.properties");
+
         IndexController controller = bind(IndexController.class);
         route().get("/index", controller::index);
         route().get("/css/main.css", controller::css);

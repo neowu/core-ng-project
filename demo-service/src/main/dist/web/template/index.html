@@ -6,7 +6,9 @@
 <body>
 <p>hello ${name}!</p>
 
-<p>this is msg: ${#msg("key")}</p>
+<p>this is msg: ${#msg("key.hello")}</p>
+
+<p>msg will return key if not found: ${#msg("key.world")}</p>
 </body>
 <!--% include /template/footer.html %-->
 </html>

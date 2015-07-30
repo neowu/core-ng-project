@@ -22,7 +22,7 @@ public class SessionConfig {
     }
 
     public SessionConfig timeout(Duration timeout) {
-        context.httpServer.sessionManager.sessionTimeout(timeout);
+        context.httpServer.siteManager.sessionManager.sessionTimeout(timeout);
         return this;
     }
 
@@ -33,7 +33,7 @@ public class SessionConfig {
             context.startupHook.add(provider::start);
             context.shutdownHook.add(provider::shutdown);
         }
-        context.httpServer.sessionManager.sessionProvider(provider);
+        context.httpServer.siteManager.sessionManager.sessionProvider(provider);
         return this;
     }
 
@@ -46,7 +46,7 @@ public class SessionConfig {
         logger.info("create redis session provider, host={}", host);
         Redis redis = new RedisBuilder().host(host).get();
         context.shutdownHook.add(redis::shutdown);
-        context.httpServer.sessionManager.sessionProvider(new RedisSessionStore(redis));
+        context.httpServer.siteManager.sessionManager.sessionProvider(new RedisSessionStore(redis));
         return this;
     }
 }

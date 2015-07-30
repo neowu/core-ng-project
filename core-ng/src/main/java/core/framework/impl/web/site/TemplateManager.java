@@ -1,4 +1,4 @@
-package core.framework.impl.web.template;
+package core.framework.impl.web.site;
 
 import core.framework.api.util.Files;
 import core.framework.api.util.Maps;
@@ -8,7 +8,6 @@ import core.framework.impl.template.TemplateBuilder;
 import core.framework.impl.template.function.Function;
 import core.framework.impl.template.location.FileTemplateLocation;
 import core.framework.impl.web.RequestImpl;
-import core.framework.impl.web.WebDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +21,11 @@ public class TemplateManager {
     private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
     private final Map<String, Template> templates = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
+    private final MessageManager messageManager;
 
-    public TemplateManager(WebDirectory webDirectory) {
+    public TemplateManager(WebDirectory webDirectory, MessageManager messageManager) {
         this.webDirectory = webDirectory;
+        this.messageManager = messageManager;
     }
 
     public String process(String templatePath, Object model, RequestImpl request) {
@@ -40,7 +41,7 @@ public class TemplateManager {
 
     private Map<String, Function> functions(RequestImpl request) {
         Map<String, Function> functions = Maps.newHashMap();
-        functions.put("msg", new MessageFunction(request));
+        functions.put("msg", new MessageFunction(messageManager, request));
         return functions;
     }
 

@@ -1,7 +1,6 @@
 package core.framework.api.module;
 
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.StaticContentController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +20,16 @@ public class SiteConfig {
         return new SessionConfig(context);
     }
 
+    public MessageConfig message() {
+        return new MessageConfig(context);
+    }
+
     public void template(String path, Class<?> modelClass) {
-        context.httpServer.templateManager.add(path, modelClass);
+        context.httpServer.siteManager.templateManager.add(path, modelClass);
     }
 
     public void staticContent(String root) {
         logger.info("add static content root, root={}", root);
-        context.httpServer.get(root + "/:path(*)", new StaticContentController(context.httpServer.webDirectory, root));
+        context.httpServer.get(root + "/:path(*)", context.httpServer.siteManager.staticContentController(root));
     }
 }

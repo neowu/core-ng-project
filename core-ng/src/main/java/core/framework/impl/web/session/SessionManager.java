@@ -21,7 +21,7 @@ public class SessionManager {
     private Duration sessionTimeout = Duration.ofMinutes(20);
 
     public Session load(RequestImpl request) {
-        if (sessionStore == null) return null;
+        if (sessionStore == null) return null;  // session store is not initialized
 
         logger.debug("load http session");
         SessionImpl session = new SessionImpl();

@@ -1,9 +1,4 @@
-package core.framework.impl.inject;
-
-import core.framework.api.util.ClasspathResources;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Strings;
+package core.framework.api.util;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -33,7 +28,6 @@ public class Properties {
 
     public Optional<String> get(String key) {
         String value = properties.get(key);
-
         if (!Strings.empty(value)) {
             return Optional.of(value);
         }

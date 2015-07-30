@@ -1,4 +1,4 @@
-package core.framework.impl.inject;
+package core.framework.api.util;
 
 import org.junit.Assert;
 import org.junit.Before;

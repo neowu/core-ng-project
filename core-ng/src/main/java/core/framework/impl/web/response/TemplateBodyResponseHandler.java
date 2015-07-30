@@ -2,7 +2,7 @@ package core.framework.impl.web.response;
 
 import core.framework.api.web.ResponseImpl;
 import core.framework.impl.web.RequestImpl;
-import core.framework.impl.web.template.TemplateManager;
+import core.framework.impl.web.site.TemplateManager;
 import io.undertow.io.Sender;
 
 /**

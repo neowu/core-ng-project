@@ -1,6 +1,9 @@
 ## Change log
 
-### 3.3.0
+### 3.3.1 (7/30/2015)
+* website: message support, site().message().messageProvider() is for custom message service
+
+### 3.3.0 (7/29/2015)
 * mongo: refactory, support fongo, minor API changes
 
 ### 3.2.9 (7/28/2015)

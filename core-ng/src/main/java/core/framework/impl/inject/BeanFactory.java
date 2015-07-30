@@ -28,7 +28,7 @@ public class BeanFactory {
 
     public <T> T bindSupplier(Type type, String name, Supplier<T> supplier) {
         T instance = supplier.get();
-        bind(type, name, supplier.get());
+        bind(type, name, instance);
         return instance;
     }
 
