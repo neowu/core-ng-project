@@ -1,5 +1,14 @@
 ## Change log
 
+### 3.3.2 (7/31/2015)
+* updated c3p0 to 0.9.5.1 (all client must update c3p0 lib to use latest core-ng)
+
+  not use thread pool for checkin, because we don't do test on checkin or custom checkin logic, this improves performance on high load
+
+  dataSource.setForceSynchronousCheckins(true);
+
+* updated mysql driver to 5.1.36 for db-migration
+
 ### 3.3.1 (7/30/2015)
 * website: message support, site().message().messageProvider() is for custom message service
 

@@ -11,6 +11,8 @@ def awsVersion = '1.10.8'
 def jacksonVersion = '2.5.4'
 def mongoVersion = '3.0.3'
 def elasticVersion = '1.7.1'
+def rabbitVersion = '3.5.3'
+def c3p0Version = '0.9.5.1'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -22,9 +24,9 @@ project(':core-ng') {
         provided(
                 'redis.clients:jedis:2.7.2',
                 "org.elasticsearch:elasticsearch:${elasticVersion}",
-                'com.mchange:c3p0:0.9.5',
+                "com.mchange:c3p0:${c3p0Version}",
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                'com.rabbitmq:amqp-client:3.5.3',
+                "com.rabbitmq:amqp-client:${rabbitVersion}",
                 "com.amazonaws:aws-java-sdk-core:${awsVersion}@jar",
                 "com.amazonaws:aws-java-sdk-sqs:${awsVersion}@jar",
                 "com.amazonaws:aws-java-sdk-sns:${awsVersion}@jar"
@@ -100,8 +102,8 @@ project(':demo-service') {
                 "org.mongodb:mongo-java-driver:${mongoVersion}"
         )
         runtime(
-                'com.mchange:c3p0:0.9.5',
-                'com.rabbitmq:amqp-client:3.5.3',
+                "com.mchange:c3p0:${c3p0Version}",
+                "com.rabbitmq:amqp-client:${rabbitVersion}",
                 'redis.clients:jedis:2.7.2'
         )
         testCompile(

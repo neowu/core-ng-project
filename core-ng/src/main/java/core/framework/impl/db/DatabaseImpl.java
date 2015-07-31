@@ -48,6 +48,7 @@ public final class DatabaseImpl implements Database {
         StopWatch watch = new StopWatch();
         try {
             dataSource = new ComboPooledDataSource();
+            dataSource.setForceSynchronousCheckins(true);   // make c3p0 not use thread pool for checkin, we don't do test on checkin, this improves performance under high load
             dataSource.setTestConnectionOnCheckout(true);
             dataSource.setCheckoutTimeout(timeoutInSeconds * 1000);
             transactionManager = new TransactionManager(dataSource);
