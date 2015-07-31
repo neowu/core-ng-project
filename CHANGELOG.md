@@ -1,9 +1,9 @@
 ## Change log
 
 ### 3.3.2 (7/31/2015)
-* updated c3p0 to 0.9.5.1 (all client must update c3p0 lib to use latest core-ng)
+* updated c3p0 to 0.9.5.1 (all client must update c3p0 lib to use this version of core-ng)
 
-  not use thread pool for checkin, because we don't do test on checkin or custom checkin logic, this improves performance on high load
+  make c3p0 not use thread pool for checkin, we don't do test on checkin, this improves performance under high load
 
   dataSource.setForceSynchronousCheckins(true);
 
