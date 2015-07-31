@@ -7,8 +7,10 @@ subprojects {
     version = '3.3.1'
 }
 
-def awsVersion = '1.10.2'
+def awsVersion = '1.10.8'
 def jacksonVersion = '2.5.4'
+def mongoVersion = '3.0.3'
+def elasticVersion = '1.7.1'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -19,9 +21,9 @@ project(':core-ng') {
     dependencies {
         provided(
                 'redis.clients:jedis:2.7.2',
-                'org.elasticsearch:elasticsearch:1.7.0',
+                "org.elasticsearch:elasticsearch:${elasticVersion}",
                 'com.mchange:c3p0:0.9.5',
-                'org.mongodb:mongo-java-driver:3.0.1',
+                "org.mongodb:mongo-java-driver:${mongoVersion}",
                 'com.rabbitmq:amqp-client:3.5.3',
                 "com.amazonaws:aws-java-sdk-core:${awsVersion}@jar",
                 "com.amazonaws:aws-java-sdk-sqs:${awsVersion}@jar",
@@ -50,7 +52,7 @@ project(':core-ng-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         provided(
-                'org.mongodb:mongo-java-driver:3.0.1',
+                "org.mongodb:mongo-java-driver:${mongoVersion}",
                 'com.github.fakemongo:fongo:2.0.1'
         )
         compile(
@@ -95,7 +97,7 @@ project(':demo-service') {
     dependencies {
         compile(
                 project(':core-ng'),
-                'org.mongodb:mongo-java-driver:3.0.1'
+                "org.mongodb:mongo-java-driver:${mongoVersion}"
         )
         runtime(
                 'com.mchange:c3p0:0.9.5',
@@ -106,7 +108,6 @@ project(':demo-service') {
                 project(':core-ng-test')
         )
         testRuntime(
-                'org.mongodb:mongo-java-driver:3.0.1',
                 'com.github.fakemongo:fongo:2.0.1'
         )
     }
@@ -118,7 +119,7 @@ project(':search-service') {
     dependencies {
         compile(
                 project(':core-ng'),
-                'org.elasticsearch:elasticsearch:1.7.0'
+                "org.elasticsearch:elasticsearch:${elasticVersion}"
         )
         testCompile(
                 project(':core-ng-test')
