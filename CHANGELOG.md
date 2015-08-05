@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.3.3 (8/4/2015)
+* cache/session: update default redis pool size, (min=8,max=32) optimized to AWS medium/large instances.
+* redis: print pool size info for slow query
+
 ### 3.3.2 (7/31/2015)
 * updated c3p0 to 0.9.5.1 (all client must update c3p0 lib to use this version of core-ng)
 

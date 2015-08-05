@@ -39,9 +39,7 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("get, key={}, elapsedTime={}", key, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -53,9 +51,7 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("set, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -67,9 +63,7 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("expire, key={}, duration={}, elapsedTime={}", key, duration, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -81,9 +75,7 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("setExpire, key={}, value={}, duration={}, elapsedTime={}", key, value, duration, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -95,8 +87,7 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("del, keys={}, elapsedTime={}", keys, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -108,9 +99,7 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("hgetAll, key={}, elapsedTime={}", key, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -122,9 +111,7 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("hmset, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -136,9 +123,7 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("keys, pattern={}, elapsedTime={}", pattern, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -152,9 +137,16 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("pipeline, elapsedTime={}", elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
+        }
+    }
 
+    private void checkSlowQuery(long elapsedTime) {
+        if (elapsedTime > slowQueryThresholdInMs) {
+            int activeNum = redisPool.getNumActive();
+            int idleNum = redisPool.getNumIdle();
+            logger.debug("redis pool, active={}, idle={}", activeNum, idleNum);
+            logger.warn("slow query detected");
         }
     }
 }

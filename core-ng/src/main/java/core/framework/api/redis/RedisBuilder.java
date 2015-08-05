@@ -44,6 +44,7 @@ public final class RedisBuilder implements Supplier<Redis> {
     @Override
     public Redis get() {
         logger.info("create redis client, host={}", host);
+        config.setJmxEnabled(false);
         JedisPool pool = new JedisPool(config, host, Protocol.DEFAULT_PORT, (int) timeout.toMillis(), null, Protocol.DEFAULT_DATABASE, null);
         return new Redis(pool, slowQueryThreshold.toMillis());
     }

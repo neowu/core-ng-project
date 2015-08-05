@@ -22,7 +22,6 @@ import java.time.Duration;
  * @author neo
  */
 public class CacheConfig {
-    private static final Duration REDIS_CACHE_TIMEOUT = Duration.ofMillis(500);  // cache redis use shorter 500ms as timeout
     private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
     private final ModuleContext context;
 
@@ -55,8 +54,10 @@ public class CacheConfig {
             local();
         } else {
             logger.info("create redis cache manager, host={}", host);
-            Redis redis = new RedisBuilder().host(host)
-                .timeout(REDIS_CACHE_TIMEOUT)
+            Redis redis = new RedisBuilder()
+                .host(host)
+                .poolSize(8, 32)      // reasonable value for AWS medium/large instances
+                .timeout(Duration.ofMillis(500))    // for cache, it should not be longer than 500ms to get value
                 .get();
             context.shutdownHook.add(redis::shutdown);
 
