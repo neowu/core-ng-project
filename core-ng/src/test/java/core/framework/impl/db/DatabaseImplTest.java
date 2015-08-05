@@ -19,9 +19,9 @@ public class DatabaseImplTest {
 
     @BeforeClass
     public static void createDatabase() {
-        database = new DatabaseImpl()
-            .url("jdbc:hsqldb:mem:.;sql.syntax_mys=true")
-            .view(EntityView.class);
+        database = new DatabaseImpl();
+        database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
+        database.view(EntityView.class);
 
         database.execute("CREATE TABLE database_test (id INT PRIMARY KEY, string_field VARCHAR(20), enum_field VARCHAR(10))");
     }

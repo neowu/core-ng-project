@@ -51,6 +51,8 @@ public final class DatabaseImpl implements Database {
             dataSource.setForceSynchronousCheckins(true);   // make c3p0 not use thread pool for checkin, we don't do test on checkin, this improves performance under high load
             dataSource.setTestConnectionOnCheckout(true);
             dataSource.setCheckoutTimeout(timeoutInSeconds * 1000);
+            poolSize(5, 50);    // default optimization for AWS medium/large instances
+            dataSource.setMaxIdleTime((int) Duration.ofHours(2).getSeconds());  // close connection if be idle for more than 2 hours.
             transactionManager = new TransactionManager(dataSource);
         } finally {
             logger.info("create database connection pool, elapsedTime={}", watch.elapsedTime());
@@ -62,7 +64,7 @@ public final class DatabaseImpl implements Database {
         dataSource.close();
     }
 
-    public DatabaseImpl url(String url) {
+    public void url(String url) {
         if (!url.startsWith("jdbc:")) throw Exceptions.error("jdbc url must start with \"jdbc:\", url={}", url);
 
         logger.info("set database connection url, url={}", url);
@@ -82,13 +84,11 @@ public final class DatabaseImpl implements Database {
         } catch (PropertyVetoException e) {
             throw new Error(e);
         }
-        return this;
     }
 
-    public <T> DatabaseImpl view(Class<T> viewClass) {
+    public <T> void view(Class<T> viewClass) {
         new DatabaseClassValidator(viewClass).validateViewClass();
         registerViewClass(viewClass);
-        return this;
     }
 
     public <T> Repository<T> repository(Class<T> entityClass) {
@@ -105,6 +105,12 @@ public final class DatabaseImpl implements Database {
     public void timeout(Duration timeout) {
         this.timeoutInSeconds = (int) timeout.getSeconds();
         dataSource.setCheckoutTimeout((int) timeout.toMillis());
+    }
+
+    public void poolSize(int minSize, int maxSize) {
+        dataSource.setMinPoolSize(minSize);
+        dataSource.setInitialPoolSize(minSize);
+        dataSource.setMaxPoolSize(maxSize);
     }
 
     @Override

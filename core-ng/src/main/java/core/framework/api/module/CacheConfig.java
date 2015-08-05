@@ -56,7 +56,6 @@ public class CacheConfig {
             logger.info("create redis cache manager, host={}", host);
             Redis redis = new RedisBuilder()
                 .host(host)
-                .poolSize(8, 32)      // reasonable value for AWS medium/large instances
                 .timeout(Duration.ofMillis(500))    // for cache, it should not be longer than 500ms to get value
                 .get();
             context.shutdownHook.add(redis::shutdown);

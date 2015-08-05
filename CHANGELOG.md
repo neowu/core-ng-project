@@ -1,5 +1,11 @@
 ## Change log
 
+### 3.3.4 (8/5/2015)
+* make default values to fit AWS medium/large instance, simplify env properties
+* rabbitmq: make default user/password to rabbitmq/rabbitmq
+* redis: make default pool size to (5,50)
+* db: make default pool size to (5,50)
+
 ### 3.3.3 (8/4/2015)
 * cache/session: update default redis pool size, (min=8,max=32) optimized to AWS medium/large instances.
 * redis: print pool size info for slow query

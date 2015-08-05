@@ -20,6 +20,12 @@ public final class RedisBuilder implements Supplier<Redis> {
     private Duration slowQueryThreshold = Duration.ofMillis(100);
     private final JedisPoolConfig config = new JedisPoolConfig();
 
+    public RedisBuilder() {
+        config.setJmxEnabled(false);
+        poolSize(5, 50);    // default optimization for AWS medium/large instances
+        config.setMinEvictableIdleTimeMillis(Duration.ofMinutes(30).toMillis());    // close if connection idles for more than 30 min
+    }
+
     public RedisBuilder host(String host) {
         this.host = host;
         return this;
@@ -27,6 +33,7 @@ public final class RedisBuilder implements Supplier<Redis> {
 
     public RedisBuilder poolSize(int minSize, int maxSize) {
         config.setMinIdle(minSize);
+        config.setMaxIdle(maxSize);
         config.setMaxTotal(maxSize);
         return this;
     }
@@ -44,7 +51,6 @@ public final class RedisBuilder implements Supplier<Redis> {
     @Override
     public Redis get() {
         logger.info("create redis client, host={}", host);
-        config.setJmxEnabled(false);
         JedisPool pool = new JedisPool(config, host, Protocol.DEFAULT_PORT, (int) timeout.toMillis(), null, Protocol.DEFAULT_DATABASE, null);
         return new Redis(pool, slowQueryThreshold.toMillis());
     }

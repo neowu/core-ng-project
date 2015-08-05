@@ -28,17 +28,22 @@ public class RabbitMQ {
 
     public RabbitMQ() {
         connectionFactory.setAutomaticRecoveryEnabled(true);
-        connectionFactory.setConnectionTimeout((int) Duration.ofSeconds(5).toMillis());
+        timeout(Duration.ofSeconds(5));
+        connectionFactory.setUsername("rabbitmq");  // default user/password
+        connectionFactory.setPassword("rabbitmq");
     }
 
-    public RabbitMQ hosts(String... hosts) {
+    public void hosts(String... hosts) {
         logger.info("set rabbitMQ hosts, hosts={}", Arrays.toString(hosts));
         addresses = new Address[hosts.length];
         for (int i = 0; i < hosts.length; i++) {
             String host = hosts[i];
             addresses[i] = new Address(host);
         }
-        return this;
+    }
+
+    public void timeout(Duration timeout) {
+        connectionFactory.setConnectionTimeout((int) timeout.toMillis());
     }
 
     public void shutdown() {

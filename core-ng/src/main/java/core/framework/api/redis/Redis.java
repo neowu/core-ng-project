@@ -145,7 +145,8 @@ public final class Redis {
         if (elapsedTime > slowQueryThresholdInMs) {
             int activeNum = redisPool.getNumActive();
             int idleNum = redisPool.getNumIdle();
-            logger.debug("redis pool, active={}, idle={}", activeNum, idleNum);
+            int waitingNum = redisPool.getNumWaiters();
+            logger.debug("redis pool stats, active={}, idle={}, waiting={}", activeNum, idleNum, waitingNum);
             logger.warn("slow query detected");
         }
     }

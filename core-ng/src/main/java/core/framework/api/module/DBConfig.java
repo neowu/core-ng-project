@@ -65,9 +65,7 @@ public class DBConfig {
     }
 
     public DBConfig poolSize(int minSize, int maxSize) {
-        database.dataSource.setMinPoolSize(minSize);
-        database.dataSource.setInitialPoolSize(minSize);
-        database.dataSource.setMaxPoolSize(maxSize);
+        database.poolSize(minSize, maxSize);
         return this;
     }
 

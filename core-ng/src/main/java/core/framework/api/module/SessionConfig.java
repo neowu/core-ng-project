@@ -44,10 +44,7 @@ public class SessionConfig {
         }
 
         logger.info("create redis session provider, host={}", host);
-        Redis redis = new RedisBuilder()
-            .host(host)
-            .poolSize(8, 32)      // reasonable value for AWS medium/large instances
-            .get();
+        Redis redis = new RedisBuilder().host(host).get();
         context.shutdownHook.add(redis::shutdown);
         context.httpServer.siteManager.sessionManager.sessionProvider(new RedisSessionStore(redis));
         return this;
