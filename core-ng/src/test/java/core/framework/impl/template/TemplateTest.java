@@ -14,10 +14,10 @@ import java.io.StringReader;
  * @author neo
  */
 public class TemplateTest {
-    private static class TestTemplateSource implements TemplateSource {
+    static class TestTemplateSource implements TemplateSource {
         private final String path;
 
-        private TestTemplateSource(String path) {
+        TestTemplateSource(String path) {
             this.path = path;
         }
 
