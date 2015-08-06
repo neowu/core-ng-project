@@ -129,13 +129,14 @@ project(':search-service') {
     }
 }
 
-project(':log-aggregator') {
+project(':log-processor') {
     apply from: file("${rootDir}/gradle/app.gradle")
 
     dependencies {
         compile(
                 project(':core-ng'),
-                "org.elasticsearch:elasticsearch:${elasticVersion}"
+                "org.elasticsearch:elasticsearch:${elasticVersion}",
+                "com.rabbitmq:amqp-client:${rabbitVersion}"
         )
         testCompile(
                 project(':core-ng-test')

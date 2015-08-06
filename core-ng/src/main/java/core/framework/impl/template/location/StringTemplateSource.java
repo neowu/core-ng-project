@@ -7,10 +7,10 @@ import java.io.StringReader;
 /**
  * @author neo
  */
-public final class StringTemplateLocation implements TemplateLocation {
+public final class StringTemplateSource implements TemplateSource {
     public final String template;
 
-    public StringTemplateLocation(String template) {
+    public StringTemplateSource(String template) {
         this.template = template;
     }
 
@@ -20,7 +20,7 @@ public final class StringTemplateLocation implements TemplateLocation {
     }
 
     @Override
-    public TemplateLocation location(String path) {
+    public TemplateSource resolve(String path) {
         throw new Error("string template does not support include");
     }
 }

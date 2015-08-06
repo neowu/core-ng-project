@@ -6,8 +6,8 @@ import java.io.IOException;
 /**
  * @author neo
  */
-public interface TemplateLocation {
+public interface TemplateSource {
     BufferedReader reader() throws IOException;
 
-    TemplateLocation location(String path);
+    TemplateSource resolve(String path);
 }

@@ -33,6 +33,17 @@ public class RabbitMQ {
         connectionFactory.setPassword("rabbitmq");
     }
 
+    public void shutdown() {
+        if (connection != null) {
+            logger.info("close rabbitMQ connection, hosts={}", Arrays.toString(addresses));
+            try {
+                connection.close();
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+    }
+
     public void hosts(String... hosts) {
         logger.info("set rabbitMQ hosts, hosts={}", Arrays.toString(hosts));
         addresses = new Address[hosts.length];
@@ -44,17 +55,6 @@ public class RabbitMQ {
 
     public void timeout(Duration timeout) {
         connectionFactory.setConnectionTimeout((int) timeout.toMillis());
-    }
-
-    public void shutdown() {
-        if (connection != null) {
-            logger.info("close rabbitMQ connection, hosts={}", Arrays.toString(addresses));
-            try {
-                connection.close();
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }
     }
 
     public RabbitMQConsumer consumer(String queue, int prefetchCount) {

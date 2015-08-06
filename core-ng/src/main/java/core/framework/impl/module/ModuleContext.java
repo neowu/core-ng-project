@@ -4,6 +4,7 @@ import core.framework.api.concurrent.AsyncExecutor;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Properties;
 import core.framework.api.web.WebContext;
+import core.framework.api.web.site.TemplateManager;
 import core.framework.impl.cache.CacheManager;
 import core.framework.impl.concurrent.Executor;
 import core.framework.impl.inject.BeanFactory;
@@ -45,6 +46,7 @@ public class ModuleContext {
         }
         httpServer = new HTTPServer(loggerFactory.actionLogger);
         beanFactory.bind(WebContext.class, null, httpServer.webContext);
+        beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);
         if (!test) {
             startupHook.add(httpServer::start);
         }

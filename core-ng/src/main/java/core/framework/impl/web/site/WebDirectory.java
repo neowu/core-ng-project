@@ -22,11 +22,11 @@ public class WebDirectory {
     }
 
     private Path locateRootDirectory() {
-        String value = System.getProperty("core.web");
+        String value = System.getProperty("core.webPath");
         if (value != null) {
             Path path = Paths.get(value).toAbsolutePath();
             if (Files.exists(path) && Files.isDirectory(path)) {
-                logger.info("found -Dcore.web, use it as web directory, path={}", path);
+                logger.info("found -Dcore.webPath, use it as web directory, path={}", path);
                 return path;
             }
         } else {
@@ -48,7 +48,7 @@ public class WebDirectory {
 
     public Path root() {
         if (root == null)
-            throw new Error("can not find web path, check -Dcore.web or set working dir to be module path for local dev env.");
+            throw new Error("can not find web path, check -Dcore.webPath or set working dir to be module path for local dev env.");
         return root;
     }
 }

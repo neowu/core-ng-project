@@ -3,11 +3,12 @@ package core.framework.impl.web.site;
 import core.framework.api.util.Files;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
+import core.framework.api.web.Request;
+import core.framework.api.web.site.TemplateManager;
 import core.framework.impl.template.Template;
 import core.framework.impl.template.TemplateBuilder;
 import core.framework.impl.template.function.Function;
-import core.framework.impl.template.location.FileTemplateLocation;
-import core.framework.impl.web.RequestImpl;
+import core.framework.impl.template.location.FileTemplateSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,18 +18,19 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class TemplateManager {
-    private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
+public class TemplateManagerImpl implements TemplateManager {
+    private final Logger logger = LoggerFactory.getLogger(TemplateManagerImpl.class);
     private final Map<String, Template> templates = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
     private final MessageManager messageManager;
 
-    public TemplateManager(WebDirectory webDirectory, MessageManager messageManager) {
+    public TemplateManagerImpl(WebDirectory webDirectory, MessageManager messageManager) {
         this.webDirectory = webDirectory;
         this.messageManager = messageManager;
     }
 
-    public String process(String templatePath, Object model, RequestImpl request) {
+    @Override
+    public String process(String templatePath, Object model, Request request) {
         StopWatch watch = new StopWatch();
         try {
             Template template = templates.computeIfAbsent(templateKey(templatePath), (key) -> load(templatePath, model.getClass()));
@@ -39,7 +41,7 @@ public class TemplateManager {
         }
     }
 
-    private Map<String, Function> functions(RequestImpl request) {
+    private Map<String, Function> functions(Request request) {
         Map<String, Function> functions = Maps.newHashMap();
         functions.put("msg", new MessageFunction(messageManager, request));
         return functions;
@@ -56,7 +58,7 @@ public class TemplateManager {
 
     private Template load(String templatePath, Class<?> modelClass) {
         logger.debug("load template, path={}", templatePath);
-        return new TemplateBuilder(new FileTemplateLocation(webDirectory.root(), templatePath), modelClass).build();
+        return new TemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass).build();
     }
 
     private String templateKey(String templatePath) {

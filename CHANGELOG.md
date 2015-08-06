@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.3.5 (8/6/2015)
+* internal: expose web template manager for cms widget impl
+* internal: renamed -Dcore.web to -Dcore.webPath, added -Dcore.appName, prepare for log aggregating
+
 ### 3.3.4 (8/5/2015)
 * make default values to fit AWS medium/large instance, simplify env properties
 * rabbitmq: make default user/password to rabbitmq/rabbitmq

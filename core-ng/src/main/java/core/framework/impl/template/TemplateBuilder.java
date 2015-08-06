@@ -7,7 +7,7 @@ import core.framework.impl.template.fragment.ExpressionFragment;
 import core.framework.impl.template.fragment.ForFragment;
 import core.framework.impl.template.fragment.IfFragment;
 import core.framework.impl.template.fragment.StaticFragment;
-import core.framework.impl.template.location.TemplateLocation;
+import core.framework.impl.template.location.TemplateSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,40 +23,40 @@ import java.util.regex.Pattern;
 public class TemplateBuilder {
     private static final Pattern INCLUDE_STATEMENT_PATTERN = Pattern.compile("include ([/a-zA-Z1-9\\-_\\.]+)");
 
-    private final TemplateLocation location;
+    private final TemplateSource source;
     private final CallTypeStack stack;
     private final Deque<CompositeFragment> fragmentStack = new ArrayDeque<>();
     private StringBuilder currentContent = new StringBuilder();
 
-    public TemplateBuilder(TemplateLocation location, Class<?> modelClass) {
+    public TemplateBuilder(TemplateSource source, Class<?> modelClass) {
         new ModelClassValidator(modelClass).validate();
-        this.location = location;
+        this.source = source;
         this.stack = new CallTypeStack(modelClass);
     }
 
     public Template build() {
         fragmentStack.add(new Template(stack.rootClass));
-        parse(location);
+        parse(source);
 
         if (fragmentStack.size() != 1) {
-            throw Exceptions.error("directive is not closed, handlers={}, location={}", fragmentStack.peek(), location);
+            throw Exceptions.error("directive is not closed, handlers={}, location={}", fragmentStack.peek(), source);
         }
 
         return (Template) fragmentStack.remove();
     }
 
-    public void parse(TemplateLocation location) {
+    public void parse(TemplateSource source) {
         int lineNumber = 0;
-        try (BufferedReader reader = location.reader()) {
+        try (BufferedReader reader = source.reader()) {
             while (true) {
                 String line = reader.readLine();
                 if (line == null) break;
 
                 lineNumber++;
-                String locationInfo = location + ":" + lineNumber;
+                String locationInfo = source + ":" + lineNumber;
 
                 if (isDirective(line, locationInfo)) {
-                    processDirective(line, location, locationInfo);
+                    processDirective(line, source, locationInfo);
                 } else if (containsExpression(line)) {
                     processExpression(line, locationInfo);
                 } else {
@@ -70,7 +70,7 @@ public class TemplateBuilder {
         addStaticContent();
     }
 
-    private void processDirective(String line, TemplateLocation location, String locationInfo) {
+    private void processDirective(String line, TemplateSource source, String locationInfo) {
         addStaticContent();
         int index = line.indexOf("<!--%");
         int endIndex = line.indexOf("%-->");
@@ -91,13 +91,13 @@ public class TemplateBuilder {
             fragmentStack.push(fragment);
             stack.paramClasses.put(fragment.variable, fragment.valueClass);
         } else if (statement.startsWith("include")) {
-            processInclude(statement, location, locationInfo);
+            processInclude(statement, source, locationInfo);
         } else {
-            throw Exceptions.error("unsupported directive, line={}, location={}", line, this.location);
+            throw Exceptions.error("unsupported directive, line={}, location={}", line, this.source);
         }
     }
 
-    private void processInclude(String statement, TemplateLocation location, String locationInfo) {
+    private void processInclude(String statement, TemplateSource source, String locationInfo) {
         Matcher matcher = INCLUDE_STATEMENT_PATTERN.matcher(statement);
         if (!matcher.matches())
             throw Exceptions.error("include must match \"include path\", statement={}, location={}", statement, locationInfo);
@@ -106,11 +106,11 @@ public class TemplateBuilder {
 
         int fragmentCountBeforeInclude = fragmentStack.size();
 
-        TemplateLocation includeLocation = location.location(includePath);
-        parse(includeLocation);
+        TemplateSource includeSource = source.resolve(includePath);
+        parse(includeSource);
 
         if (fragmentStack.size() != fragmentCountBeforeInclude) {
-            throw Exceptions.error("directives in include do not matches, location={}", statement, includeLocation);
+            throw Exceptions.error("directives in include do not matches, location={}", statement, includeSource);
         }
     }
 

@@ -2,17 +2,41 @@ package core.framework.impl.template;
 
 import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.Lists;
-import core.framework.impl.template.location.ClasspathTemplateLocation;
+import core.framework.impl.template.location.TemplateSource;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * @author neo
  */
 public class TemplateTest {
+    private static class TestTemplateSource implements TemplateSource {
+        private final String path;
+
+        private TestTemplateSource(String path) {
+            this.path = path;
+        }
+
+        @Override
+        public BufferedReader reader() throws IOException {
+            return new BufferedReader(new StringReader(ClasspathResources.text(path)));
+        }
+
+        @Override
+        public TemplateSource resolve(String path) {
+            if ("footer.html".equals(path)) return new TestTemplateSource("template-test/footer.html");
+            Assert.fail("unknown path, path=" + path);
+            return null;
+        }
+    }
+
     @Test
     public void process() {
-        Template template = new TemplateBuilder(new ClasspathTemplateLocation("template-test/template.html"), TestModel.class).build();
+        Template template = new TemplateBuilder(new TestTemplateSource("template-test/template.html"), TestModel.class).build();
 
         TestModel model = new TestModel();
         model.stringField = "string<";

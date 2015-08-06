@@ -1,16 +1,16 @@
 package core.framework.impl.web.site;
 
+import core.framework.api.web.Request;
 import core.framework.impl.template.function.Function;
-import core.framework.impl.web.RequestImpl;
 
 /**
  * @author neo
  */
 public class MessageFunction implements Function {
     private final MessageManager messageManager;
-    private final RequestImpl request;
+    private final Request request;
 
-    public MessageFunction(MessageManager messageManager, RequestImpl request) {
+    public MessageFunction(MessageManager messageManager, Request request) {
         this.messageManager = messageManager;
         this.request = request;
     }

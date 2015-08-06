@@ -1,8 +1,8 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.web.ResponseImpl;
+import core.framework.api.web.site.TemplateManager;
 import core.framework.impl.web.RequestImpl;
-import core.framework.impl.web.site.TemplateManager;
 import io.undertow.io.Sender;
 
 /**
@@ -18,7 +18,7 @@ public class TemplateBodyResponseHandler implements BodyHandler {
     @Override
     public void handle(ResponseImpl response, Sender sender, RequestImpl request) {
         TemplateBody body = (TemplateBody) response.body;
-        String html = templateManager.process(body.templatePath, body.model, request);
-        sender.send(html);
+        String content = templateManager.process(body.templatePath, body.model, request);
+        sender.send(content);
     }
 }

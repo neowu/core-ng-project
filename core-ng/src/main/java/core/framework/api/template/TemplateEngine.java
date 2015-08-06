@@ -5,9 +5,7 @@ import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.template.Template;
 import core.framework.impl.template.TemplateBuilder;
-import core.framework.impl.template.location.ClasspathTemplateLocation;
-import core.framework.impl.template.location.StringTemplateLocation;
-import core.framework.impl.template.location.TemplateLocation;
+import core.framework.impl.template.location.StringTemplateSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,18 +29,10 @@ public final class TemplateEngine {
         }
     }
 
-    public void addClasspathTemplate(String name, String templateClasspath, Class<?> modelClass) {
-        add(name, new ClasspathTemplateLocation(templateClasspath), modelClass);
-    }
-
-    public void addStringTemplate(String name, String template, Class<?> modelClass) {
-        add(name, new StringTemplateLocation(template), modelClass);
-    }
-
-    private void add(String name, TemplateLocation location, Class<?> modelClass) {
+    public void addTemplate(String name, String templateContent, Class<?> modelClass) {
         StopWatch watch = new StopWatch();
         try {
-            templates.put(name, new TemplateBuilder(location, modelClass).build());
+            templates.put(name, new TemplateBuilder(new StringTemplateSource(templateContent), modelClass).build());
         } finally {
             logger.info("add template, name={}, modelClass={}, elapsedTime={}", name, modelClass.getCanonicalName(), watch.elapsedTime());
         }

@@ -11,8 +11,8 @@ afterEvaluate {
 
     startScripts {
         doLast {
-            windowsScript.text = windowsScript.text.replaceFirst('set DEFAULT_JVM_OPTS=', 'set DEFAULT_JVM_OPTS="-Dcore.web=%~dp0../web"')
-            unixScript.text = unixScript.text.replaceFirst('DEFAULT_JVM_OPTS=""', 'DEFAULT_JVM_OPTS=\'-Dcore.web=\\$APP_HOME/web\'')
+            windowsScript.text = windowsScript.text.replaceFirst('set DEFAULT_JVM_OPTS=', "set DEFAULT_JVM_OPTS=\"-Dcore.webPath=%~dp0../web -Dcore.appName=${project.name}\"")
+            unixScript.text = unixScript.text.replaceFirst('DEFAULT_JVM_OPTS=""', "DEFAULT_JVM_OPTS='-Dcore.webPath=\\\$APP_HOME/web -Dcore.appName=${project.name}'")
         }
     }
 }

@@ -11,11 +11,11 @@ import static java.nio.file.Files.newBufferedReader;
 /**
  * @author neo
  */
-public final class FileTemplateLocation implements TemplateLocation {
+public final class FileTemplateSource implements TemplateSource {
     private final Path root;
     public final Path path;
 
-    public FileTemplateLocation(Path root, String path) {
+    public FileTemplateSource(Path root, String path) {
         this.root = root;
         if (!path.startsWith("/")) throw Exceptions.error("path must start with '/', path={}", path);
         this.path = root.resolve(path.substring(1));
@@ -27,8 +27,8 @@ public final class FileTemplateLocation implements TemplateLocation {
     }
 
     @Override
-    public TemplateLocation location(String path) {
-        return new FileTemplateLocation(root, path);
+    public TemplateSource resolve(String path) {
+        return new FileTemplateSource(root, path);
     }
 
     @Override

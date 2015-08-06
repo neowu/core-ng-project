@@ -9,6 +9,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -124,6 +125,31 @@ public final class Redis {
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("keys, pattern={}, elapsedTime={}", pattern, elapsedTime);
             checkSlowQuery(elapsedTime);
+        }
+    }
+
+    public void lpush(String key, String value) {
+        StopWatch watch = new StopWatch();
+        try (Jedis redis = redisPool.getResource()) {
+            redis.lpush(key, value);
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("lpush, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
+            checkSlowQuery(elapsedTime);
+        }
+    }
+
+    // blocking right pop
+    public String brpop(String key) {
+        StopWatch watch = new StopWatch();
+        try (Jedis redis = redisPool.getResource()) {
+            List<String> result = redis.brpop(key, "0");
+            return result.get(1);   // result[0] is key, result[1] is popped value
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("brpop, key={}, elapsedTime={}", key, elapsedTime);
         }
     }
 
