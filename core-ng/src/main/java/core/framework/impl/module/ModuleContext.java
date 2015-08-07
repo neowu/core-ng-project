@@ -44,13 +44,13 @@ public class ModuleContext {
         if (!test) {
             shutdownHook.add(loggerFactory::shutdown);
         }
-        httpServer = new HTTPServer(loggerFactory.actionLogger);
+        httpServer = new HTTPServer(loggerFactory.logManager);
         beanFactory.bind(WebContext.class, null, httpServer.webContext);
         beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);
         if (!test) {
             startupHook.add(httpServer::start);
         }
-        executor = new Executor(loggerFactory.actionLogger);
+        executor = new Executor(loggerFactory.logManager);
         shutdownHook.add(executor::shutdown);
 
         beanFactory.bind(AsyncExecutor.class, null, new AsyncExecutor(executor));

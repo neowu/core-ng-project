@@ -7,11 +7,13 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.script.ScriptService;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.Map;
 
 /**
  * @author neo
@@ -80,7 +82,22 @@ public final class ElasticSearch {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("index, type={}, id={}, elapsedTime={}", type, id, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs) logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
+        }
+    }
+
+    public void updateByScript(String type, String id, String script, Map<String, Object> params) {
+        StopWatch watch = new StopWatch();
+        try {
+            client.prepareUpdate(index, type, id)
+                .setScript(script, ScriptService.ScriptType.INLINE)
+                .setScriptParams(params)
+                .get();
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("elasticsearch", elapsedTime);
+            logger.debug("update by script, type={}, id={}, script={}, elapsedTime={}", type, id, script, elapsedTime);
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -98,7 +115,11 @@ public final class ElasticSearch {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("search, type={}, query={}, searchTime={}, elapsedTime={}", type, source, searchTimeTook, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs) logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
+    }
+
+    private void checkSlowQuery(long elapsedTime) {
+        if (elapsedTime > slowQueryThresholdInMs) logger.warn("slow query detected");
     }
 }

@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.3.6 (8/7/2015 - to be continued)
+* log: push action log to rabbitmq, index by ES/Kibana
+* log: renamed action log requestId to id, and use refId for reference
+
 ### 3.3.5 (8/6/2015)
 * internal: expose web template manager for cms widget impl
 * internal: renamed -Dcore.web to -Dcore.webPath, added -Dcore.appName, prepare for log aggregating

@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * @author neo
  */
-public class ActionLogger {
+public class LogManager {
     private final ThreadLocal<ActionLog> logs = new ThreadLocal<>();
     private Writer actionLogWriter = new BufferedWriter(new OutputStreamWriter(System.out, Charsets.UTF_8));
     private Path traceLogPath;

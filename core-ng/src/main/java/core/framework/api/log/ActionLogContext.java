@@ -1,7 +1,7 @@
 package core.framework.api.log;
 
-import core.framework.impl.log.ActionLogger;
 import core.framework.impl.log.DefaultLoggerFactory;
+import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.StaticLoggerBinder;
@@ -21,22 +21,22 @@ public final class ActionLogContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(ActionLogContext.class);
 
     public static Optional<String> get(String key) {
-        ActionLogger actionLogger = actionLogger();
-        return actionLogger.get(key);
+        LogManager logManager = logManager();
+        return logManager.get(key);
     }
 
     public static void put(String key, Object value) {
-        ActionLogger actionLogger = actionLogger();
+        LogManager logManager = logManager();
         LOGGER.debug("[context] {}={}", key, value);
-        actionLogger.put(key, value);
+        logManager.put(key, value);
     }
 
     public static void track(String action, long elapsedTime) {
-        ActionLogger actionLogger = actionLogger();
-        actionLogger.track(action, elapsedTime);
+        LogManager logManager = logManager();
+        logManager.track(action, elapsedTime);
     }
 
-    private static ActionLogger actionLogger() {
-        return ((DefaultLoggerFactory) StaticLoggerBinder.getSingleton().getLoggerFactory()).actionLogger;
+    private static LogManager logManager() {
+        return ((DefaultLoggerFactory) StaticLoggerBinder.getSingleton().getLoggerFactory()).logManager;
     }
 }

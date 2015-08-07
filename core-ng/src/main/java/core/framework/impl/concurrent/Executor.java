@@ -2,7 +2,7 @@ package core.framework.impl.concurrent;
 
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Warning;
-import core.framework.impl.log.ActionLogger;
+import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +17,10 @@ import java.util.concurrent.Future;
 public class Executor {
     private final Logger logger = LoggerFactory.getLogger(Executor.class);
     private final ExecutorService executorService = Executors.newCachedThreadPool();
-    private final ActionLogger actionLogger;
+    private final LogManager logManager;
 
-    public Executor(ActionLogger actionLogger) {
-        this.actionLogger = actionLogger;
+    public Executor(LogManager logManager) {
+        this.logManager = logManager;
     }
 
     public void shutdown() {
@@ -33,7 +33,7 @@ public class Executor {
     }
 
     private <T> T execute(Callable<T> task) {
-        actionLogger.start();
+        logManager.start();
         try {
             logger.debug("=== task execution begin ===");
             return task.call();
@@ -50,7 +50,7 @@ public class Executor {
             return null;
         } finally {
             logger.debug("=== task execution end ===");
-            actionLogger.end();
+            logManager.end();
         }
     }
 }

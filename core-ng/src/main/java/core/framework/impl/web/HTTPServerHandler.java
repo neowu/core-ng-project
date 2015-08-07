@@ -8,7 +8,7 @@ import core.framework.api.util.Maps;
 import core.framework.api.web.Interceptor;
 import core.framework.api.web.Response;
 import core.framework.api.web.ResponseImpl;
-import core.framework.impl.log.ActionLogger;
+import core.framework.impl.log.LogManager;
 import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
@@ -35,7 +35,7 @@ public class HTTPServerHandler implements HttpHandler {
 
     private final FormParserFactory formParserFactory = FormParserFactory.builder().build();
 
-    ActionLogger actionLogger;
+    LogManager logManager;
     Route route;
     List<Interceptor> interceptors;
     SessionManager sessionManager;
@@ -51,7 +51,7 @@ public class HTTPServerHandler implements HttpHandler {
             return;
         }
 
-        actionLogger.start();
+        logManager.start();
         RequestImpl request = new RequestImpl(exchange, validator);
         try {
             logger.debug("=== http transaction begin ===");
@@ -81,7 +81,7 @@ public class HTTPServerHandler implements HttpHandler {
         } finally {
             webContext.context.remove();
             logger.debug("=== http transaction end ===");
-            actionLogger.end();
+            logManager.end();
         }
     }
 

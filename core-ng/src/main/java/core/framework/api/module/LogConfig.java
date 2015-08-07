@@ -24,7 +24,7 @@ public class LogConfig {
             logger.info("use console output for action log during test");
         } else {
             DefaultLoggerFactory loggerFactory = (DefaultLoggerFactory) LoggerFactory.getILoggerFactory();
-            loggerFactory.actionLogger.actionLogPath(actionLogPath);
+            loggerFactory.logManager.actionLogPath(actionLogPath);
         }
     }
 
@@ -33,7 +33,7 @@ public class LogConfig {
             logger.info("use console output for trace log during test");
         } else {
             DefaultLoggerFactory loggerFactory = (DefaultLoggerFactory) LoggerFactory.getILoggerFactory();
-            loggerFactory.actionLogger.traceLogPath(traceLogPath);
+            loggerFactory.logManager.traceLogPath(traceLogPath);
         }
     }
 }

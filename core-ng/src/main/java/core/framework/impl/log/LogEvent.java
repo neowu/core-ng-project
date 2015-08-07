@@ -43,7 +43,8 @@ class LogEvent {
             StringBuilder builder = new StringBuilder();
             builder.append(DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(time)))
                 .append(" [")
-                .append(Thread.currentThread().getName()).append("] ")
+                .append(Thread.currentThread().getName())
+                .append("] ")
                 .append(level.name())
                 .append(' ')
                 .append(logger)

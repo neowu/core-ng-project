@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class DefaultLoggerFactory implements ILoggerFactory {
     private final Map<String, Logger> loggers = Maps.newConcurrentHashMap();
-    public final ActionLogger actionLogger = new ActionLogger();
+    public final LogManager logManager = new LogManager();
 
     @Override
     public Logger getLogger(String name) {
@@ -20,7 +20,7 @@ public class DefaultLoggerFactory implements ILoggerFactory {
             return logger;
         } else {
             LogLevel[] levels = logLevel(name);
-            logger = new LoggerImpl(name, actionLogger, levels[0], levels[1]);
+            logger = new LoggerImpl(name, logManager, levels[0], levels[1]);
             Logger existingLogger = loggers.putIfAbsent(name, logger);
             return existingLogger == null ? logger : existingLogger;
         }
@@ -28,7 +28,6 @@ public class DefaultLoggerFactory implements ILoggerFactory {
 
     private LogLevel[] logLevel(String name) {
         if (name.startsWith("com.mchange")
-            || name.startsWith("org.thymeleaf")
             || name.startsWith("org.elasticsearch")
             || name.startsWith("org.mongodb")
             || name.startsWith("org.xnio")
@@ -41,6 +40,6 @@ public class DefaultLoggerFactory implements ILoggerFactory {
     public void shutdown() {
         Logger logger = getLogger(DefaultLoggerFactory.class.getName());
         logger.info("showdown log factory");
-        actionLogger.close();
+        logManager.close();
     }
 }

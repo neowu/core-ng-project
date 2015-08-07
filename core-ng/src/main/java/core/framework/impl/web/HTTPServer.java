@@ -9,7 +9,7 @@ import core.framework.api.util.StopWatch;
 import core.framework.api.web.Controller;
 import core.framework.api.web.ErrorHandler;
 import core.framework.api.web.Interceptor;
-import core.framework.impl.log.ActionLogger;
+import core.framework.impl.log.LogManager;
 import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.site.SiteManager;
@@ -39,12 +39,12 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
     private final HTTPServerErrorHandler errorHandler;
     private int port = 8080;
 
-    public HTTPServer(ActionLogger actionLogger) {
+    public HTTPServer(LogManager logManager) {
         ResponseHandler responseHandler = new ResponseHandler(validator, siteManager.templateManager);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
 
         httpServerHandler = new HTTPServerHandler();
-        httpServerHandler.actionLogger = actionLogger;
+        httpServerHandler.logManager = logManager;
         httpServerHandler.route = route;
         httpServerHandler.interceptors = interceptors;
         httpServerHandler.sessionManager = siteManager.sessionManager;
