@@ -5,4 +5,6 @@ package core.framework.api.web;
  */
 public interface WebContext {
     <T> T get(String key);
+
+    Request request();
 }

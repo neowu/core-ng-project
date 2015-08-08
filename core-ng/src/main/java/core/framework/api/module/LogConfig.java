@@ -1,6 +1,5 @@
 package core.framework.api.module;
 
-import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.module.ModuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +22,7 @@ public class LogConfig {
         if (context.test) {
             logger.info("use console output for action log during test");
         } else {
-            DefaultLoggerFactory loggerFactory = (DefaultLoggerFactory) LoggerFactory.getILoggerFactory();
-            loggerFactory.logManager.logWriter.actionLogPath(actionLogPath);
+            context.logManager.logWriter.actionLogPath(actionLogPath);
         }
     }
 
@@ -32,8 +30,7 @@ public class LogConfig {
         if (context.test) {
             logger.info("use console output for trace log during test");
         } else {
-            DefaultLoggerFactory loggerFactory = (DefaultLoggerFactory) LoggerFactory.getILoggerFactory();
-            loggerFactory.logManager.logWriter.traceLogPath(traceLogPath);
+            context.logManager.logWriter.traceLogPath(traceLogPath);
         }
     }
 }

@@ -3,7 +3,6 @@ package core.framework.impl.web;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Charsets;
 import core.framework.api.util.InputStreams;
-import core.framework.api.util.Maps;
 import core.framework.api.web.Interceptor;
 import core.framework.api.web.Response;
 import core.framework.api.web.ResponseImpl;
@@ -71,14 +70,14 @@ public class HTTPServerHandler implements HttpHandler {
                 actionLog.trace = true;
             }
 
-            webContext.context.set(Maps.newHashMap());
+            webContext.initialize(request);
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
             sessionManager.save(request, exchange);
             responseHandler.handle((ResponseImpl) response, exchange, request);
         } catch (Throwable e) {
             errorHandler.handleError(e, exchange, request);
         } finally {
-            webContext.context.remove();
+            webContext.cleanup();
             logger.debug("=== http transaction end ===");
             logManager.end();
         }

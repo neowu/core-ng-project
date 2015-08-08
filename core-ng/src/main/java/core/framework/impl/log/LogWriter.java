@@ -101,7 +101,7 @@ public class LogWriter {
 
         return Strings.format("{}/{}/{}.{}.{}.log",
             logPath,
-            action == null ? "unassigned" : action,
+            action,
             TRACE_LOG_DATE_FORMAT.format(date),
             id,
             sequence);

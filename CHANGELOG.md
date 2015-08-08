@@ -3,6 +3,7 @@
 ### 3.3.6 (8/7/2015 - to be continued)
 * log: push action log to rabbitmq, index by ES/Kibana
 * log: renamed action log requestId to id, and use refId for reference
+* webService: WebContext can retrive request() to support web service
 
 ### 3.3.5 (8/6/2015)
 * internal: expose web template manager for cms widget impl

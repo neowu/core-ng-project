@@ -42,13 +42,12 @@ public class ModuleContext {
         this.beanFactory = beanFactory;
         this.test = test;
 
-        DefaultLoggerFactory loggerFactory = (DefaultLoggerFactory) LoggerFactory.getILoggerFactory();
-        this.logManager = loggerFactory.logManager;
+        this.logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
         if (!test) {
             shutdownHook.add(logManager::shutdown);
         }
 
-        httpServer = new HTTPServer(loggerFactory.logManager);
+        httpServer = new HTTPServer(logManager);
         beanFactory.bind(WebContext.class, null, httpServer.webContext);
         beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);
         if (!test) {

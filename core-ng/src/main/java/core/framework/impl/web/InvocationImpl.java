@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author neo
@@ -47,8 +46,7 @@ public class InvocationImpl implements Invocation {
 
     @Override
     public void putContext(String key, Object value) {
-        Map<String, Object> context = webContext.context.get();
-        context.put(key, value);
+        webContext.put(key, value);
     }
 
     @Override
