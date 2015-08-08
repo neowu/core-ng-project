@@ -1,18 +1,18 @@
 package core.framework.impl.scheduler;
 
-import core.framework.api.log.ActionLogContext;
 import core.framework.api.scheduler.Job;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.NotFoundException;
 import core.framework.impl.concurrent.Executor;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
 import core.framework.impl.scheduler.trigger.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,10 +26,12 @@ public class Scheduler {
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Executor executor;
+    private final LogManager logManager;
     private final Map<String, JobTrigger> triggers = Maps.newHashMap();
 
-    public Scheduler(Executor executor) {
+    public Scheduler(Executor executor, LogManager logManager) {
         this.executor = executor;
+        this.logManager = logManager;
     }
 
     public void start() {
@@ -65,12 +67,12 @@ public class Scheduler {
     private Callable<Void> task(String name, Job job, boolean trace) {
         return () -> {
             logger.info("execute scheduled job, name={}", name);
-            ActionLogContext.put(ActionLogContext.ACTION, "job/" + name);
-            ActionLogContext.put(ActionLogContext.REQUEST_ID, UUID.randomUUID().toString());
-            ActionLogContext.put("job", job.getClass().getCanonicalName());
+            ActionLog actionLog = logManager.currentActionLog();
+            actionLog.action = "job/" + name;
+            actionLog.putContext("job", job.getClass().getCanonicalName());
             if (trace) {
                 logger.warn("trace log is triggered for current job execution, job={}", name);
-                ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
+                actionLog.trace = true;
             }
             job.execute();
             return null;

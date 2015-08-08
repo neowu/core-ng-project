@@ -41,7 +41,7 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
 
     public HTTPServer(LogManager logManager) {
         ResponseHandler responseHandler = new ResponseHandler(validator, siteManager.templateManager);
-        errorHandler = new HTTPServerErrorHandler(responseHandler);
+        errorHandler = new HTTPServerErrorHandler(responseHandler, logManager);
 
         httpServerHandler = new HTTPServerHandler();
         httpServerHandler.logManager = logManager;

@@ -36,10 +36,4 @@ public class DefaultLoggerFactory implements ILoggerFactory {
         }
         return new LogLevel[]{LogLevel.INFO, LogLevel.DEBUG};
     }
-
-    public void shutdown() {
-        Logger logger = getLogger(DefaultLoggerFactory.class.getName());
-        logger.info("showdown log factory");
-        logManager.close();
-    }
 }

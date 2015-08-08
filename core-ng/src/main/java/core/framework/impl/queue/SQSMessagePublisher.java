@@ -8,6 +8,8 @@ import core.framework.api.queue.Message;
 import core.framework.api.queue.MessagePublisher;
 import core.framework.api.util.JSON;
 import core.framework.api.util.StopWatch;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,12 +23,14 @@ public class SQSMessagePublisher<T> implements MessagePublisher<T> {
     private final String queueURL;
     private final String messageType;
     private final MessageValidator validator;
+    private final LogManager logManager;
 
-    public SQSMessagePublisher(AmazonSQS sqs, String queueURL, Class<?> messageClass, MessageValidator validator) {
+    public SQSMessagePublisher(AmazonSQS sqs, String queueURL, Class<?> messageClass, MessageValidator validator, LogManager logManager) {
         this.sqs = sqs;
         this.queueURL = queueURL;
         this.messageType = messageClass.getDeclaredAnnotation(Message.class).name();
         this.validator = validator;
+        this.logManager = logManager;
     }
 
     @Override
@@ -60,14 +64,15 @@ public class SQSMessagePublisher<T> implements MessagePublisher<T> {
     }
 
     private void linkContext(SendMessageRequest request) {
-        ActionLogContext.get(ActionLogContext.REQUEST_ID).ifPresent(requestId ->
-            request.addMessageAttributesEntry(SQSMessageListener.MESSAGE_ATTR_REQUEST_ID,
-                new MessageAttributeValue().withDataType("String").withStringValue(requestId)));
+        ActionLog actionLog = logManager.currentActionLog();
+        if (actionLog == null) return;
 
-        ActionLogContext.get(ActionLogContext.TRACE).ifPresent(trace -> {
-            if ("true".equals(trace))
-                request.addMessageAttributesEntry(SQSMessageListener.MESSAGE_ATTR_TRACE,
-                    new MessageAttributeValue().withDataType("String").withStringValue("true"));
-        });
+        request.addMessageAttributesEntry(SQSMessageListener.MESSAGE_ATTR_REQUEST_ID,
+            new MessageAttributeValue().withDataType("String").withStringValue(actionLog.refId()));
+
+        if (actionLog.trace) {
+            request.addMessageAttributesEntry(SQSMessageListener.MESSAGE_ATTR_TRACE,
+                new MessageAttributeValue().withDataType("String").withStringValue("true"));
+        }
     }
 }

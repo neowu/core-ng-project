@@ -1,7 +1,7 @@
 package core.framework.impl.concurrent;
 
-import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Warning;
+import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +38,15 @@ public class Executor {
             logger.debug("=== task execution begin ===");
             return task.call();
         } catch (Throwable e) {
-            ActionLogContext.put(ActionLogContext.ERROR_MESSAGE, e.getMessage());
-            ActionLogContext.put(ActionLogContext.EXCEPTION_CLASS, e.getClass().getCanonicalName());
+            ActionLog actionLog = logManager.currentActionLog();
+            actionLog.errorMessage = e.getMessage();
+            actionLog.exceptionClass = e.getClass();
 
             if (e.getClass().isAnnotationPresent(Warning.class)) {
                 logger.warn(e.getMessage(), e);
             } else {
                 logger.error(e.getMessage(), e);
             }
-
             return null;
         } finally {
             logger.debug("=== task execution end ===");

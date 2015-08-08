@@ -68,7 +68,7 @@ public class QueueConfig {
         if (queueURI.startsWith("https://sqs.")) {
             return new AWSQueueBuilder(context).listener(queueURI);
         } else if (queueURI.startsWith("rabbitmq://queue/")) {
-            RabbitMQListener listener = new RabbitMQListener(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(queueURI).routingKey, context.executor, context.queueManager.validator());
+            RabbitMQListener listener = new RabbitMQListener(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(queueURI).routingKey, context.executor, context.queueManager.validator(), context.logManager);
             if (!context.test) {
                 context.startupHook.add(listener::start);
                 context.shutdownHook.add(listener::shutdown);
@@ -87,7 +87,7 @@ public class QueueConfig {
         } else if (uri.startsWith("https://sqs.")) {
             return new AWSQueueBuilder(context).sqsPublisher(uri, messageClass);
         } else if (uri.startsWith("rabbitmq://")) {
-            return new RabbitMQPublisher<>(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(uri), messageClass, context.queueManager.validator());
+            return new RabbitMQPublisher<>(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(uri), messageClass, context.queueManager.validator(), context.logManager);
         } else {
             throw Exceptions.error("unsupported protocol, uri={}", uri);
         }

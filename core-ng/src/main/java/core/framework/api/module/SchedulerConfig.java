@@ -24,7 +24,7 @@ public class SchedulerConfig {
         if (context.scheduler != null) {
             return context.scheduler;
         } else {
-            Scheduler scheduler = new Scheduler(context.executor);
+            Scheduler scheduler = new Scheduler(context.executor, context.logManager);
             if (!context.test) {
                 context.startupHook.add(scheduler::start);
                 context.shutdownHook.add(scheduler::shutdown);

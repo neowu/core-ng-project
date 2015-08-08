@@ -5,7 +5,6 @@ import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.MessageAttributeValue;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import com.amazonaws.services.sqs.model.ReceiveMessageResult;
-import core.framework.api.log.ActionLogContext;
 import core.framework.api.module.MessageHandlerConfig;
 import core.framework.api.queue.MessageHandler;
 import core.framework.api.util.Exceptions;
@@ -14,6 +13,8 @@ import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
 import core.framework.impl.concurrent.Executor;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author neo
  */
 public class SQSMessageListener implements Runnable, MessageHandlerConfig {
+    private static final Pattern QUEUE_URL_PATTERN = Pattern.compile("https\\://sqs\\.([\\w-]+)\\.amazonaws\\.com(\\.cn){0,1}/(\\d+)/([\\w-]+)");
     private final Logger logger = LoggerFactory.getLogger(SQSMessageListener.class);
 
     // to keep backward compatible with core 2.x, SQS/SNS message will be replaced by RabbitMQ
@@ -36,21 +40,27 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
     static final String MESSAGE_ATTR_REQUEST_ID = "request_id";
     static final String MESSAGE_ATTR_TRACE = "trace";
 
-    final ExecutorService listenerExecutor = Executors.newSingleThreadExecutor();
-    final Executor executor;
-    final AmazonSQS sqs;
-    final String queueURL;
+    private final ExecutorService listenerExecutor = Executors.newSingleThreadExecutor();
+    private final Executor executor;
+    private final AmazonSQS sqs;
+    private final String queueURL;
+    private final LogManager logManager;
+    private final String queueName;
 
     private final Map<String, MessageHandler> handlers = Maps.newHashMap();
     private final Map<String, Class> messageClasses = Maps.newHashMap();
     private final MessageHandlerCounter counter = new MessageHandlerCounter();
     private final MessageValidator validator;
 
-    public SQSMessageListener(Executor executor, AmazonSQS sqs, String queueURL, MessageValidator validator) {
+    public SQSMessageListener(Executor executor, AmazonSQS sqs, String queueURL, MessageValidator validator, LogManager logManager) {
         this.executor = executor;
         this.sqs = sqs;
         this.queueURL = queueURL;
         this.validator = validator;
+        this.logManager = logManager;
+        Matcher matcher = QUEUE_URL_PATTERN.matcher(queueURL);
+        if (!matcher.matches()) throw Exceptions.error("queue url does not match the pattern, queueURL={}", queueURL);
+        queueName = matcher.group(4);
     }
 
     @Override
@@ -118,46 +128,31 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
     }
 
     private <T> void process(Message sqsMessage) throws Exception {
+        ActionLog actionLog = logManager.currentActionLog();
+        actionLog.action = "queue/" + queueName;
+
         logger.debug("queueURL={}", queueURL);
         logger.debug("message={}", sqsMessage);
         String messageType;
         String messageBody;
-        String messageId;
         Map<String, MessageAttributeValue> attributes = sqsMessage.getMessageAttributes();
         MessageAttributeValue publisher = attributes.get(MESSAGE_ATTR_PUBLISHER);
         if (publisher != null && "sqs".equals(publisher.getStringValue())) {
             messageType = attributes.get(MESSAGE_ATTR_TYPE).getStringValue();
             messageBody = sqsMessage.getBody();
-            messageId = sqsMessage.getMessageId();
+            linkSQSContext(actionLog, attributes);
 
-            linkSQSContext(attributes, messageId);
-
-            MessageAttributeValue sender = attributes.get(MESSAGE_ATTR_SENDER);
-            if (sender != null) {
-                ActionLogContext.put("sender", sender.getStringValue());
-            }
         } else {
             // assume to be SNS
             SNSMessage snsMessage = JSON.fromJSON(SNSMessage.class, sqsMessage.getBody());
             messageType = snsMessage.subject;
             messageBody = snsMessage.message;
-            messageId = snsMessage.messageId;
 
-            linkSNSContext(snsMessage, messageId);
+            linkSNSContext(actionLog, snsMessage);
 
-            if (snsMessage.attributes.eventSender != null) {
-                ActionLogContext.put("sender", snsMessage.attributes.eventSender.value);
-            }
         }
-        ActionLogContext.put("messageId", messageId);
-
+        actionLog.putContext("messageType", messageType);
         if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
-        ActionLogContext.put(ActionLogContext.ACTION, "queue/" + messageType);
-
-        ActionLogContext.get(ActionLogContext.TRACE).ifPresent(trace -> {
-            if ("true".equals(trace))
-                logger.warn("trace log is triggered for current message, messageId={}", messageId);
-        });
 
         Class<T> messageClass = messageClass(messageType);
         T message = JSON.fromJSON(messageClass, messageBody);
@@ -165,7 +160,7 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
 
         @SuppressWarnings("unchecked")
         MessageHandler<T> handler = handlers.get(messageType);
-        ActionLogContext.put("handler", handler.getClass().getCanonicalName());
+        actionLog.putContext("handler", handler.getClass().getCanonicalName());
         handler.handle(message);
     }
 
@@ -178,22 +173,31 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
         return messageClass;
     }
 
-    private void linkSNSContext(SNSMessage snsMessage, String messageId) {
-        String requestId = snsMessage.attributes.requestId != null ? snsMessage.attributes.requestId.value : messageId;
-        ActionLogContext.put(ActionLogContext.REQUEST_ID, requestId);
-
+    private void linkSNSContext(ActionLog actionLog, SNSMessage snsMessage) {
+        if (snsMessage.attributes.requestId != null) {
+            actionLog.refId(snsMessage.attributes.requestId.value);
+        }
         if (snsMessage.attributes.trace != null && "true".equals(snsMessage.attributes.trace.value)) {
-            ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
+            logger.warn("trace log is triggered for current sqs message, logId={}", actionLog.id);
+            actionLog.trace = true;
+        }
+        if (snsMessage.attributes.eventSender != null) {
+            actionLog.putContext("sender", snsMessage.attributes.eventSender.value);
         }
     }
 
-    private void linkSQSContext(Map<String, MessageAttributeValue> attributes, String messageId) {
+    private void linkSQSContext(ActionLog actionLog, Map<String, MessageAttributeValue> attributes) {
         MessageAttributeValue requestId = attributes.get(MESSAGE_ATTR_REQUEST_ID);
-        ActionLogContext.put(ActionLogContext.REQUEST_ID, requestId != null ? requestId.getStringValue() : messageId);
+        if (requestId != null) actionLog.refId(requestId.getStringValue());
 
         MessageAttributeValue trace = attributes.get(MESSAGE_ATTR_TRACE);
         if (trace != null && "true".equals(trace.getStringValue())) {
-            ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
+            logger.warn("trace log is triggered for current sqs message, logId={}", actionLog.id);
+            actionLog.trace = true;
+        }
+        MessageAttributeValue sender = attributes.get(MESSAGE_ATTR_SENDER);
+        if (sender != null) {
+            actionLog.putContext("sender", sender.getStringValue());
         }
     }
 

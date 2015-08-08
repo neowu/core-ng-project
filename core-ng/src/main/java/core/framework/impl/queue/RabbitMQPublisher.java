@@ -1,14 +1,14 @@
 package core.framework.impl.queue;
 
 import com.rabbitmq.client.AMQP;
-import core.framework.api.log.ActionLogContext;
 import core.framework.api.queue.Message;
 import core.framework.api.queue.MessagePublisher;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author neo
@@ -18,12 +18,14 @@ public class RabbitMQPublisher<T> implements MessagePublisher<T> {
     private final RabbitMQEndpoint endpoint;
     private final String messageType;
     private final MessageValidator validator;
+    private final LogManager logManager;
 
-    public RabbitMQPublisher(RabbitMQ rabbitMQ, RabbitMQEndpoint endpoint, Class<T> messageClass, MessageValidator validator) {
+    public RabbitMQPublisher(RabbitMQ rabbitMQ, RabbitMQEndpoint endpoint, Class<T> messageClass, MessageValidator validator, LogManager logManager) {
         this.rabbitMQ = rabbitMQ;
         this.endpoint = endpoint;
         this.messageType = messageClass.getDeclaredAnnotation(Message.class).name();
         this.validator = validator;
+        this.logManager = logManager;
     }
 
     @Override
@@ -39,27 +41,24 @@ public class RabbitMQPublisher<T> implements MessagePublisher<T> {
     private void publish(String exchange, String routingKey, T message) {
         validator.validate(message);
 
-        AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder()
-            .messageId(UUID.randomUUID().toString())
-            .type(messageType)
-            .deliveryMode(2);   // persistent mode
-
         Map<String, Object> headers = Maps.newHashMap();
         headers.put(RabbitMQListener.HEADER_SENDER, Network.localHostName());
-        linkContext(headers);
-        builder.headers(headers);
+
+        AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder()
+            .type(messageType)
+            .deliveryMode(2)   // persistent mode
+            .headers(headers);
+
+        linkContext(builder, headers);
 
         rabbitMQ.publish(exchange, routingKey, JSON.toJSON(message), builder.build());
     }
 
-    private void linkContext(Map<String, Object> headers) {
-        ActionLogContext.get(ActionLogContext.REQUEST_ID)
-            .ifPresent(requestId -> headers.put(RabbitMQListener.HEADER_REQUEST_ID, requestId));
+    private void linkContext(AMQP.BasicProperties.Builder builder, Map<String, Object> headers) {
+        ActionLog actionLog = logManager.currentActionLog();
+        if (actionLog == null) return;
 
-        ActionLogContext.get(ActionLogContext.TRACE)
-            .ifPresent(trace -> {
-                if ("true".equals(trace))
-                    headers.put(RabbitMQListener.HEADER_TRACE, "true");
-            });
+        builder.correlationId(actionLog.refId());
+        if (actionLog.trace) headers.put(RabbitMQListener.HEADER_TRACE, "true");
     }
 }

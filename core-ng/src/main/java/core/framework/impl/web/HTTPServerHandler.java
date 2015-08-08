@@ -1,13 +1,13 @@
 package core.framework.impl.web;
 
 import core.framework.api.http.HTTPMethod;
-import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Charsets;
 import core.framework.api.util.InputStreams;
 import core.framework.api.util.Maps;
 import core.framework.api.web.Interceptor;
 import core.framework.api.web.Response;
 import core.framework.api.web.ResponseImpl;
+import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.route.Route;
@@ -22,13 +22,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author neo
  */
 public class HTTPServerHandler implements HttpHandler {
-    public static final String HEADER_REQUEST_ID = "request-id";
+    public static final String HEADER_REF_ID = "ref-id";
     public static final String HEADER_TRACE = "trace";
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
@@ -55,21 +54,21 @@ public class HTTPServerHandler implements HttpHandler {
         RequestImpl request = new RequestImpl(exchange, validator);
         try {
             logger.debug("=== http transaction begin ===");
+            ActionLog actionLog = logManager.currentActionLog();
 
-            parseRequest(request, exchange);
+            parseRequest(request, exchange, actionLog);
 
-            String requestId = request.header(HEADER_REQUEST_ID).orElseGet(() -> UUID.randomUUID().toString());
-            ActionLogContext.put(ActionLogContext.REQUEST_ID, requestId);
+            request.header(HEADER_REF_ID).ifPresent(actionLog::refId);
 
             ControllerProxy controller = route.get(request.path(), request.method, request.pathParams);
-            ActionLogContext.put(ActionLogContext.ACTION, controller.action);
-            ActionLogContext.put("controller", controller.targetClassName + "." + controller.targetMethodName);
+            actionLog.action = controller.action;
+            actionLog.putContext("controller", controller.targetClassName + "." + controller.targetMethodName);
             logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());
 
             // trigger trace after action/requestId are determined due to trace log use action as part of path, is there better way?
-            if ("true".equals(exchange.getRequestHeaders().getFirst(HEADER_TRACE))) {
-                logger.warn("trace log is triggered for current request, requestId={}, clientIP={}", requestId, request.clientIP());
-                ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
+            if ("true".equals(request.header(HEADER_TRACE).orElse(null))) {
+                logger.warn("trace log is triggered for current request, logId={}, clientIP={}", actionLog.id, request.clientIP());
+                actionLog.trace = true;
             }
 
             webContext.context.set(Maps.newHashMap());
@@ -85,15 +84,15 @@ public class HTTPServerHandler implements HttpHandler {
         }
     }
 
-    private void parseRequest(RequestImpl request, HttpServerExchange exchange) throws IOException {
+    private void parseRequest(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws IOException {
         logger.debug("requestURL={}", request.requestURL());
         logger.debug("queryString={}", exchange.getQueryString());
         for (HeaderValues header : exchange.getRequestHeaders()) {
             logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
         }
         String path = exchange.getRequestPath();
-        ActionLogContext.put("path", path);
-        ActionLogContext.put("method", String.valueOf(request.method));
+        actionLog.putContext("path", path);
+        actionLog.putContext("method", request.method);
         logger.debug("clientIP={}", request.remoteAddress);
 
         if (request.contentType != null) {

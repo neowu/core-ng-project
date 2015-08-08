@@ -21,15 +21,15 @@ public class AWSQueueBuilder {
     }
 
     public <T> SQSMessagePublisher<T> sqsPublisher(String queueURL, Class<T> messageClass) {
-        return new SQSMessagePublisher<>(amazonSQS(), queueURL, messageClass, context.queueManager.validator());
+        return new SQSMessagePublisher<>(amazonSQS(), queueURL, messageClass, context.queueManager.validator(), context.logManager);
     }
 
     public <T> SNSMessagePublisher<T> snsPublisher(String topicARN, Class<T> messageClass) {
-        return new SNSMessagePublisher<>(amazonSNS(), topicARN, messageClass, context.queueManager.validator());
+        return new SNSMessagePublisher<>(amazonSNS(), topicARN, messageClass, context.queueManager.validator(), context.logManager);
     }
 
     public SQSMessageListener listener(String queueURL) {
-        SQSMessageListener listener = new SQSMessageListener(context.executor, amazonSQS(), queueURL, context.queueManager.validator());
+        SQSMessageListener listener = new SQSMessageListener(context.executor, amazonSQS(), queueURL, context.queueManager.validator(), context.logManager);
         if (!context.test) {
             context.startupHook.add(listener::start);
             context.shutdownHook.add(listener::shutdown);

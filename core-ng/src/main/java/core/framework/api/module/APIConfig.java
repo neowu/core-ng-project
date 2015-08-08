@@ -48,7 +48,7 @@ public class APIConfig {
         BeanValidator validator = context.httpServer.validator;
         new ServiceInterfaceValidator(serviceInterface, validator).validate();
 
-        WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator);
+        WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator, context.logManager);
         T client = new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
         context.beanFactory.bind(serviceInterface, null, client);
         return webServiceClient;

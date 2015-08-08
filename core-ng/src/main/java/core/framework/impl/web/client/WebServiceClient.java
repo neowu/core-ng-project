@@ -7,7 +7,6 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.http.HTTPResponse;
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.log.ActionLogContext;
 import core.framework.api.module.WebServiceClientConfig;
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
@@ -16,6 +15,8 @@ import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
 import core.framework.api.web.client.WebServiceRequestSigner;
 import core.framework.api.web.exception.RemoteServiceException;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
 import core.framework.impl.web.BeanValidator;
 import core.framework.impl.web.HTTPServerHandler;
 import core.framework.impl.web.exception.ErrorResponse;
@@ -36,12 +37,14 @@ public class WebServiceClient implements WebServiceClientConfig {
     private final String serviceURL;
     private final HTTPClient httpClient;
     private final BeanValidator validator;
+    private final LogManager logManager;
     private WebServiceRequestSigner signer;
 
-    public WebServiceClient(String serviceURL, HTTPClient httpClient, BeanValidator validator) {
+    public WebServiceClient(String serviceURL, HTTPClient httpClient, BeanValidator validator, LogManager logManager) {
         this.serviceURL = serviceURL;
         this.httpClient = httpClient;
         this.validator = validator;
+        this.logManager = logManager;
     }
 
     public <T> T execute(HTTPMethod method, String path, Map<String, String> pathParams, Type requestType, Object requestBean, Type responseType) {
@@ -85,15 +88,14 @@ public class WebServiceClient implements WebServiceClientConfig {
     }
 
     private void linkContext(HTTPRequest httpRequest) {
-        ActionLogContext.get(ActionLogContext.REQUEST_ID)
-            .ifPresent(requestId -> httpRequest.header(HTTPServerHandler.HEADER_REQUEST_ID, requestId));
+        ActionLog actionLog = logManager.currentActionLog();
+        if (actionLog == null) return;  // web service client may be used without action log context
 
-        ActionLogContext.get(ActionLogContext.TRACE)
-            .ifPresent(trace -> {
-                if ("true".equals(trace)) {
-                    httpRequest.header(HTTPServerHandler.HEADER_TRACE, "true");
-                }
-            });
+        httpRequest.header(HTTPServerHandler.HEADER_REF_ID, actionLog.refId());
+
+        if (actionLog.trace) {
+            httpRequest.header(HTTPServerHandler.HEADER_TRACE, "true");
+        }
     }
 
     @Override

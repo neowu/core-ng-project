@@ -1,12 +1,11 @@
 package core.framework.api.concurrent;
 
-import core.framework.api.log.ActionLogContext;
 import core.framework.impl.concurrent.Executor;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -16,27 +15,28 @@ import java.util.concurrent.Future;
 public class AsyncExecutor {
     private final Logger logger = LoggerFactory.getLogger(AsyncExecutor.class);
     private final Executor executor;
+    private final LogManager logManager;
 
-    public AsyncExecutor(Executor executor) {
+    public AsyncExecutor(Executor executor, LogManager logManager) {
         this.executor = executor;
+        this.logManager = logManager;
     }
 
     public <T> Future<T> submit(String name, Callable<T> task) {
         logger.debug("submit async task, name={}", name);
 
-        String requestId = ActionLogContext.get(ActionLogContext.REQUEST_ID).orElseGet(() -> UUID.randomUUID().toString());
-        Optional<String> actionOptional = ActionLogContext.get(ActionLogContext.ACTION);
-        String action = actionOptional.isPresent() ? actionOptional.get() + "/" + name : name;
-        boolean trace = "true".equals(ActionLogContext.get(ActionLogContext.TRACE).orElse(null));
+        ActionLog parentActionLog = logManager.currentActionLog();
+        String refId = parentActionLog != null ? parentActionLog.refId() : null;
+        String action = parentActionLog != null ? parentActionLog.action + "/" + name : name;
+        boolean trace = parentActionLog != null && parentActionLog.trace;
 
         return executor.submit(() -> {
-            String executionId = UUID.randomUUID().toString();
-            ActionLogContext.put("executionId", executionId);
-            ActionLogContext.put(ActionLogContext.REQUEST_ID, requestId);
-            ActionLogContext.put(ActionLogContext.ACTION, action);
+            ActionLog currentActionLog = logManager.currentActionLog();
+            currentActionLog.refId(refId);
+            currentActionLog.action = action;
             if (trace) {
-                logger.warn("trace log is triggered for current execution, executionId={}", executionId);
-                ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
+                logger.warn("trace log is triggered for current execution, logId={}", currentActionLog.id);
+                currentActionLog.trace = true;
             }
             return task.call();
         });

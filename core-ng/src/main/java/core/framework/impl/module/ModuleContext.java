@@ -10,6 +10,7 @@ import core.framework.impl.concurrent.Executor;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
+import core.framework.impl.log.LogManager;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.web.HTTPServer;
 import core.framework.impl.web.management.HealthCheckController;
@@ -35,25 +36,28 @@ public class ModuleContext {
     public Scheduler scheduler;
     public CacheManager cacheManager;
     public final QueueManager queueManager = new QueueManager();
+    public final LogManager logManager;
 
     public ModuleContext(BeanFactory beanFactory, boolean test) {
         this.beanFactory = beanFactory;
         this.test = test;
 
         DefaultLoggerFactory loggerFactory = (DefaultLoggerFactory) LoggerFactory.getILoggerFactory();
+        this.logManager = loggerFactory.logManager;
         if (!test) {
-            shutdownHook.add(loggerFactory::shutdown);
+            shutdownHook.add(logManager::shutdown);
         }
+
         httpServer = new HTTPServer(loggerFactory.logManager);
         beanFactory.bind(WebContext.class, null, httpServer.webContext);
         beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);
         if (!test) {
             startupHook.add(httpServer::start);
         }
-        executor = new Executor(loggerFactory.logManager);
+        executor = new Executor(logManager);
         shutdownHook.add(executor::shutdown);
 
-        beanFactory.bind(AsyncExecutor.class, null, new AsyncExecutor(executor));
+        beanFactory.bind(AsyncExecutor.class, null, new AsyncExecutor(executor, logManager));
 
         if (!test) {
             httpServer.get("/health-check", new HealthCheckController());

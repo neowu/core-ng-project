@@ -1,7 +1,6 @@
 package core.framework.impl.queue;
 
 import com.rabbitmq.client.QueueingConsumer;
-import core.framework.api.log.ActionLogContext;
 import core.framework.api.module.MessageHandlerConfig;
 import core.framework.api.queue.Message;
 import core.framework.api.queue.MessageHandler;
@@ -12,6 +11,8 @@ import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
 import core.framework.impl.concurrent.Executor;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,16 +26,16 @@ import java.util.concurrent.Semaphore;
  * @author neo
  */
 public class RabbitMQListener implements Runnable, MessageHandlerConfig {
-    static final String HEADER_REQUEST_ID = "requestId";
     static final String HEADER_TRACE = "trace";
     static final String HEADER_SENDER = "sender";
 
     private final Logger logger = LoggerFactory.getLogger(RabbitMQListener.class);
 
-    final ExecutorService listenerExecutor = Executors.newSingleThreadExecutor();
-    final Executor executor;
-    final RabbitMQ rabbitMQ;
-    final String queue;
+    private final ExecutorService listenerExecutor = Executors.newSingleThreadExecutor();
+    private final Executor executor;
+    private final RabbitMQ rabbitMQ;
+    private final LogManager logManager;
+    private final String queue;
 
     private int maxConcurrentHandlers = 10;
     private Semaphore semaphore;
@@ -42,11 +43,12 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
     private final Map<String, MessageHandler> handlers = Maps.newHashMap();
     private final Map<String, Class> messageClasses = Maps.newHashMap();
 
-    public RabbitMQListener(RabbitMQ rabbitMQ, String queue, Executor executor, MessageValidator validator) {
+    public RabbitMQListener(RabbitMQ rabbitMQ, String queue, Executor executor, MessageValidator validator, LogManager logManager) {
         this.executor = executor;
         this.rabbitMQ = rabbitMQ;
         this.queue = queue;
         this.validator = validator;
+        this.logManager = logManager;
     }
 
     @Override
@@ -108,23 +110,28 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
     }
 
     private <T> void process(QueueingConsumer.Delivery delivery) throws Exception {
+        ActionLog actionLog = logManager.currentActionLog();
+        actionLog.action = "queue/" + queue;
+
         String messageBody = new String(delivery.getBody(), Charsets.UTF_8);
         String messageType = delivery.getProperties().getType();
-        logger.debug("messageType={}", messageType);
+        actionLog.putContext("messageType", messageType);
+
         logger.debug("message={}", messageBody);
 
         if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
-        ActionLogContext.put(ActionLogContext.ACTION, "queue/" + queue);
 
-        String messageId = delivery.getProperties().getMessageId();
-        ActionLogContext.put("messageId", messageId);
-
+        actionLog.refId(delivery.getProperties().getCorrelationId());
         Map<String, Object> headers = delivery.getProperties().getHeaders();
-        linkContext(headers, messageId);
+        Object trace = headers.get(HEADER_TRACE);
+        if ("true".equals(String.valueOf(trace))) {
+            logger.warn("trace log is triggered for current message, logId={}", actionLog.id);
+            actionLog.trace = true;
+        }
 
         Object sender = headers.get(HEADER_SENDER);
         if (sender != null) {
-            ActionLogContext.put("sender", sender);
+            actionLog.putContext("sender", sender);
         }
 
         @SuppressWarnings("unchecked")
@@ -137,18 +144,7 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
 
         @SuppressWarnings("unchecked")
         MessageHandler<T> handler = handlers.get(messageType);
-        ActionLogContext.put("handler", handler.getClass().getCanonicalName());
+        actionLog.putContext("handler", handler.getClass().getCanonicalName());
         handler.handle(message);
-    }
-
-    private void linkContext(Map<String, Object> headers, String messageId) {
-        Object requestId = headers.get(HEADER_REQUEST_ID);
-        ActionLogContext.put(ActionLogContext.REQUEST_ID, requestId != null ? requestId : messageId);
-
-        Object trace = headers.get(HEADER_TRACE);
-        if ("true".equals(String.valueOf(trace))) {
-            logger.warn("trace log is triggered for current message, messageId={}", messageId);
-            ActionLogContext.put(ActionLogContext.TRACE, Boolean.TRUE);
-        }
     }
 }
