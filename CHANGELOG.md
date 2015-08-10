@@ -1,9 +1,11 @@
 ## Change log
 
-### 3.3.6 (8/7/2015 - to be continued)
+### 3.3.6 (8/7/2015 - 8/10/2015)
 * log: push action log to rabbitmq, index by ES/Kibana
 * log: renamed action log requestId to id, and use refId for reference
 * webService: WebContext can retrive request() to support web service
+* rabbitmq: publish message with appId = -Dcore.appName
+* webservice client: pass -Dcore.appName via "client" header
 
 ### 3.3.5 (8/6/2015)
 * internal: expose web template manager for cms widget impl

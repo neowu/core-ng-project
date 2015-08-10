@@ -62,7 +62,7 @@ public class LogWriter {
     Writer createTraceWriter(ActionLog log) {
         if (traceLogPath != null) {
             try {
-                String traceLogPath = traceLogFilePath(this.traceLogPath.toString(), LocalDateTime.ofInstant(log.startTime, ZoneId.systemDefault()), log.action, log.id);
+                String traceLogPath = traceLogFilePath(this.traceLogPath.toString(), LocalDateTime.ofInstant(log.startTime, ZoneId.systemDefault()), log.action(), log.id);
                 log.putContext("logPath", traceLogPath);
                 Path path = Paths.get(traceLogPath).toAbsolutePath();
                 Files.createDirectories(path.getParent());
@@ -130,7 +130,7 @@ public class LogWriter {
             .append(log.id)
             .append(LOG_SPLITTER)
             .append("action=")
-            .append(log.action);
+            .append(log.action());
 
         if (log.refId != null) {
             builder.append(LOG_SPLITTER)
@@ -154,9 +154,9 @@ public class LogWriter {
                 .append(filterLineSeparator(entry.getValue()));
         }
 
-        for (Map.Entry<String, TimeTracking> entry : log.tracking.entrySet()) {
+        for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
             String action = entry.getKey();
-            TimeTracking tracking = entry.getValue();
+            PerformanceStat tracking = entry.getValue();
             builder.append(LOG_SPLITTER)
                 .append(action).append("Count=").append(tracking.count)
                 .append(LOG_SPLITTER)

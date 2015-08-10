@@ -45,8 +45,8 @@ public class SQSMessagePublisher<T> implements MessagePublisher<T> {
                     new MessageAttributeValue().withDataType("String").withStringValue("sqs"))
                 .addMessageAttributesEntry(SQSMessageListener.MESSAGE_ATTR_TYPE,
                     new MessageAttributeValue().withDataType("String").withStringValue(messageType))
-                .addMessageAttributesEntry(SQSMessageListener.MESSAGE_ATTR_SENDER,
-                    new MessageAttributeValue().withDataType("String").withStringValue(Network.localHostName()));
+                .addMessageAttributesEntry(SQSMessageListener.MESSAGE_ATTR_CLIENT_IP,
+                    new MessageAttributeValue().withDataType("String").withStringValue(Network.localHostAddress()));
 
             linkContext(request);
 
@@ -67,7 +67,7 @@ public class SQSMessagePublisher<T> implements MessagePublisher<T> {
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog == null) return;
 
-        request.addMessageAttributesEntry(SQSMessageListener.MESSAGE_ATTR_REQUEST_ID,
+        request.addMessageAttributesEntry(SQSMessageListener.MESSAGE_ATTR_REF_ID,
             new MessageAttributeValue().withDataType("String").withStringValue(actionLog.refId()));
 
         if (actionLog.trace) {

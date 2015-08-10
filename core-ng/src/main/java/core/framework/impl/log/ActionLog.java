@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.api.log.Warning;
 import core.framework.api.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,17 +17,22 @@ import java.util.UUID;
  */
 public class ActionLog {
     private final Logger logger = LoggerFactory.getLogger(ActionLog.class);
-    public final Instant startTime = Instant.now();
+
+    final Instant startTime = Instant.now();
     private LogLevel result = LogLevel.INFO;
-    public String id = UUID.randomUUID().toString();
-    public String action = "unassigned";
+    String id = UUID.randomUUID().toString();
+    private String action = "unassigned";
     String refId;
     public boolean trace;  // whether always write trace log for all subsequent actions
-    public String errorMessage;
-    public Class<?> exceptionClass;
+    String errorMessage;
+    Class<?> exceptionClass;
     long elapsed;
     final Map<String, String> context = new LinkedHashMap<>();
-    final Map<String, TimeTracking> tracking = Maps.newHashMap();
+    final Map<String, PerformanceStat> performanceStats = Maps.newHashMap();
+
+    public ActionLog() {
+        logger.debug("[context] id={}", id);
+    }
 
     void updateResult(LogLevel level) {
         if (level.value > result.value) result = level;
@@ -50,7 +56,7 @@ public class ActionLog {
     }
 
     public void track(String action, long elapsedTime) {
-        TimeTracking tracking = this.tracking.computeIfAbsent(action, key -> new TimeTracking());
+        PerformanceStat tracking = this.performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
         tracking.count++;
         tracking.totalElapsedTime += elapsedTime;
     }
@@ -61,6 +67,34 @@ public class ActionLog {
     }
 
     public void refId(String refId) {
-        this.refId = refId;
+        if (refId != null) {
+            logger.debug("[context] refId={}", refId);
+            this.refId = refId;
+        }
+    }
+
+    public String action() {
+        return action;
+    }
+
+    public void action(String action) {
+        logger.debug("[context] action={}", action);
+        this.action = action;
+    }
+
+    public void triggerTraceLog() {
+        logger.warn("trigger trace log, id={}, action={}", id, action);
+        trace = true;
+    }
+
+    public void error(Throwable e) {
+        errorMessage = e.getMessage();
+        exceptionClass = e.getClass();
+
+        if (e.getClass().isAnnotationPresent(Warning.class)) {
+            logger.warn(errorMessage, e);
+        } else {
+            logger.error(errorMessage, e);
+        }
     }
 }

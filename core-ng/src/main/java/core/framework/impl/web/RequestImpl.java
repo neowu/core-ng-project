@@ -11,8 +11,6 @@ import core.framework.api.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.form.FormData;
-import io.undertow.util.HeaderMap;
-import io.undertow.util.Headers;
 
 import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
@@ -26,11 +24,12 @@ import java.util.Optional;
 public final class RequestImpl implements Request {
     private final HttpServerExchange exchange;
     private final BeanValidator validator;
-
-    private final RequestProtocol protocol;
-    final RemoteAddress remoteAddress;
-    final HTTPMethod method;
-    final String contentType;
+    HTTPMethod method;
+    String clientIP;
+    String scheme;
+    int port;
+    String requestURL;
+    String contentType;
     final PathParams pathParams = new PathParams();
     FormData formData;
     String body;
@@ -39,49 +38,16 @@ public final class RequestImpl implements Request {
     RequestImpl(HttpServerExchange exchange, BeanValidator validator) {
         this.exchange = exchange;
         this.validator = validator;
-
-        method = HTTPMethod.valueOf(exchange.getRequestMethod().toString());
-        HeaderMap headers = exchange.getRequestHeaders();
-
-        String xForwardedFor = headers.getFirst(Headers.X_FORWARDED_FOR);
-        remoteAddress = new RemoteAddress(exchange.getSourceAddress().getAddress().getHostAddress(), xForwardedFor);
-
-        String xForwardedProto = headers.getFirst(Headers.X_FORWARDED_PROTO);
-        String xForwardedPort = headers.getFirst(Headers.X_FORWARDED_PORT);
-        protocol = new RequestProtocol(exchange.getRequestScheme(), xForwardedProto, exchange.getHostPort(), xForwardedPort);
-
-        if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
-            contentType = headers.getFirst(Headers.CONTENT_TYPE);
-        } else {
-            contentType = null;
-        }
     }
 
     @Override
     public String requestURL() {
-        if (exchange.isHostIncludedInRequestURI()) {    // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
-            return exchange.getRequestURI();
-        } else {
-            String scheme = protocol.scheme();
-            int port = protocol.port();
-
-            StringBuilder builder = new StringBuilder(scheme)
-                .append("://")
-                .append(exchange.getHostName());
-
-            if (!(("http".equals(scheme) && port == 80)
-                || ("https".equals(scheme) && port == 443))) {
-                builder.append(':').append(port);
-            }
-
-            builder.append(exchange.getRequestURI());
-            return builder.toString();
-        }
+        return requestURL;
     }
 
     @Override
     public String scheme() {
-        return protocol.scheme();
+        return scheme;
     }
 
     @Override
@@ -96,7 +62,7 @@ public final class RequestImpl implements Request {
 
     @Override
     public String clientIP() {
-        return remoteAddress.clientIP();
+        return clientIP;
     }
 
     @Override
@@ -104,7 +70,7 @@ public final class RequestImpl implements Request {
         return cookie(spec.name);
     }
 
-    //TODO: remove this, let session manager handle SessionId/SecureSessionId
+    //TODO: inline this, let session manager handle SessionId/SecureSessionId, use CookieSpec
     public Optional<String> cookie(String name) {
         Cookie cookie = exchange.getRequestCookies().get(name);
         if (cookie == null) return Optional.empty();

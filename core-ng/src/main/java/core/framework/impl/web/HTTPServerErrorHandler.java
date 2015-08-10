@@ -2,7 +2,6 @@ package core.framework.impl.web;
 
 import core.framework.api.http.ContentTypes;
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.log.Warning;
 import core.framework.api.util.Exceptions;
 import core.framework.api.validate.ValidationException;
 import core.framework.api.web.ErrorHandler;
@@ -41,14 +40,7 @@ public class HTTPServerErrorHandler {
 
     public void handleError(Throwable e, HttpServerExchange exchange, RequestImpl request) {
         ActionLog actionLog = logManager.currentActionLog();
-        actionLog.errorMessage = e.getMessage();
-        actionLog.exceptionClass = e.getClass();
-
-        if (e.getClass().isAnnotationPresent(Warning.class)) {
-            logger.warn(e.getMessage(), e);
-        } else {
-            logger.error(e.getMessage(), e);
-        }
+        actionLog.error(e);
 
         if (exchange.isResponseStarted()) {
             logger.error("response was sent, discard the current http transaction");

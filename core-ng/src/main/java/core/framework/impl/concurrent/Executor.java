@@ -1,6 +1,5 @@
 package core.framework.impl.concurrent;
 
-import core.framework.api.log.Warning;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
@@ -39,14 +38,7 @@ public class Executor {
             return task.call();
         } catch (Throwable e) {
             ActionLog actionLog = logManager.currentActionLog();
-            actionLog.errorMessage = e.getMessage();
-            actionLog.exceptionClass = e.getClass();
-
-            if (e.getClass().isAnnotationPresent(Warning.class)) {
-                logger.warn(e.getMessage(), e);
-            } else {
-                logger.error(e.getMessage(), e);
-            }
+            actionLog.error(e);
             return null;
         } finally {
             logger.debug("=== task execution end ===");

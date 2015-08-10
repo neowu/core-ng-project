@@ -25,8 +25,8 @@ public class SNSMessage {
     public SNSMessageAttributes attributes = new SNSMessageAttributes();
 
     public static class SNSMessageAttributes {
-        @XmlElement(name = SQSMessageListener.MESSAGE_ATTR_SENDER)
-        public SNSMessageAttributeValue eventSender;
+        @XmlElement(name = SQSMessageListener.MESSAGE_ATTR_CLIENT_IP)
+        public SNSMessageAttributeValue clientIP;
 
         @XmlElement(name = SQSMessageListener.MESSAGE_ATTR_TYPE)
         public SNSMessageAttributeValue eventType;
@@ -34,8 +34,8 @@ public class SNSMessage {
         @XmlElement(name = SQSMessageListener.MESSAGE_ATTR_PUBLISHER)
         public SNSMessageAttributeValue eventPublisher;
 
-        @XmlElement(name = SQSMessageListener.MESSAGE_ATTR_REQUEST_ID)
-        public SNSMessageAttributeValue requestId;
+        @XmlElement(name = SQSMessageListener.MESSAGE_ATTR_REF_ID)
+        public SNSMessageAttributeValue refId;
 
         @XmlElement(name = SQSMessageListener.MESSAGE_ATTR_TRACE)
         public SNSMessageAttributeValue trace;

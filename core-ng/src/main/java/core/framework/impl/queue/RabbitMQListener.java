@@ -27,7 +27,7 @@ import java.util.concurrent.Semaphore;
  */
 public class RabbitMQListener implements Runnable, MessageHandlerConfig {
     static final String HEADER_TRACE = "trace";
-    static final String HEADER_SENDER = "sender";
+    static final String HEADER_CLIENT_IP = "clientIP";
 
     private final Logger logger = LoggerFactory.getLogger(RabbitMQListener.class);
 
@@ -111,7 +111,7 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
 
     private <T> void process(QueueingConsumer.Delivery delivery) throws Exception {
         ActionLog actionLog = logManager.currentActionLog();
-        actionLog.action = "queue/" + queue;
+        actionLog.action("queue/" + queue);
 
         String messageBody = new String(delivery.getBody(), Charsets.UTF_8);
         String messageType = delivery.getProperties().getType();
@@ -122,16 +122,20 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
         if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
 
         actionLog.refId(delivery.getProperties().getCorrelationId());
+
         Map<String, Object> headers = delivery.getProperties().getHeaders();
-        Object trace = headers.get(HEADER_TRACE);
-        if ("true".equals(String.valueOf(trace))) {
-            logger.warn("trace log is triggered for current message, logId={}", actionLog.id);
-            actionLog.trace = true;
+        if ("true".equals(String.valueOf(headers.get(HEADER_TRACE)))) {
+            actionLog.triggerTraceLog();
         }
 
-        Object sender = headers.get(HEADER_SENDER);
-        if (sender != null) {
-            actionLog.putContext("sender", sender);
+        String appId = delivery.getProperties().getAppId();
+        if (appId != null) {
+            actionLog.putContext("client", appId);
+        }
+
+        Object clientIP = headers.get(HEADER_CLIENT_IP);
+        if (clientIP != null) {
+            actionLog.putContext("clientIP", clientIP);
         }
 
         @SuppressWarnings("unchecked")

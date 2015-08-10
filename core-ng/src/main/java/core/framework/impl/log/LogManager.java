@@ -9,6 +9,11 @@ import org.slf4j.LoggerFactory;
 public class LogManager {
     private final ThreadLocal<ActionLogger> loggers = new ThreadLocal<>();
     public final LogWriter logWriter = new LogWriter();
+    public final String appName;
+
+    public LogManager() {
+        this.appName = System.getProperty("core.appName");
+    }
 
     public void start() {
         loggers.set(new ActionLogger(logWriter));

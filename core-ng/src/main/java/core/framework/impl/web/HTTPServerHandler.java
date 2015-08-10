@@ -1,8 +1,5 @@
 package core.framework.impl.web;
 
-import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.Charsets;
-import core.framework.api.util.InputStreams;
 import core.framework.api.web.Interceptor;
 import core.framework.api.web.Response;
 import core.framework.api.web.ResponseImpl;
@@ -13,13 +10,10 @@ import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.form.FormDataParser;
-import io.undertow.server.handlers.form.FormParserFactory;
-import io.undertow.util.HeaderValues;
+import io.undertow.util.HeaderMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -28,10 +22,10 @@ import java.util.List;
 public class HTTPServerHandler implements HttpHandler {
     public static final String HEADER_REF_ID = "ref-id";
     public static final String HEADER_TRACE = "trace";
+    public static final String HEADER_CLIENT = "client";
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
-
-    private final FormParserFactory formParserFactory = FormParserFactory.builder().build();
+    private final RequestParser requestParser = new RequestParser();
 
     LogManager logManager;
     Route route;
@@ -54,20 +48,25 @@ public class HTTPServerHandler implements HttpHandler {
         try {
             logger.debug("=== http transaction begin ===");
             ActionLog actionLog = logManager.currentActionLog();
+            requestParser.parse(request, exchange, actionLog);
+            request.session = sessionManager.load(request);
 
-            parseRequest(request, exchange, actionLog);
+            HeaderMap headers = exchange.getRequestHeaders();
 
-            request.header(HEADER_REF_ID).ifPresent(actionLog::refId);
+            String client = headers.getFirst(HTTPServerHandler.HEADER_CLIENT);
+            if (client != null) actionLog.putContext("client", client);
 
-            ControllerProxy controller = route.get(request.path(), request.method, request.pathParams);
-            actionLog.action = controller.action;
+            String refId = headers.getFirst(HTTPServerHandler.HEADER_REF_ID);
+            if (refId != null) actionLog.refId(refId);
+
+            ControllerProxy controller = route.get(request.path(), request.method(), request.pathParams);
+            actionLog.action(controller.action);
             actionLog.putContext("controller", controller.targetClassName + "." + controller.targetMethodName);
             logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());
 
-            // trigger trace after action/requestId are determined due to trace log use action as part of path, is there better way?
-            if ("true".equals(request.header(HEADER_TRACE).orElse(null))) {
-                logger.warn("trace log is triggered for current request, logId={}, clientIP={}", actionLog.id, request.clientIP());
-                actionLog.trace = true;
+            // trigger trace after action is determined due to trace log use action as part of path, is there better way?
+            if ("true".equals(headers.getFirst(HEADER_TRACE))) {
+                actionLog.triggerTraceLog();
             }
 
             webContext.initialize(request);
@@ -80,41 +79,6 @@ public class HTTPServerHandler implements HttpHandler {
             webContext.cleanup();
             logger.debug("=== http transaction end ===");
             logManager.end();
-        }
-    }
-
-    private void parseRequest(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws IOException {
-        logger.debug("requestURL={}", request.requestURL());
-        logger.debug("queryString={}", exchange.getQueryString());
-        for (HeaderValues header : exchange.getRequestHeaders()) {
-            logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
-        }
-        String path = exchange.getRequestPath();
-        actionLog.putContext("path", path);
-        actionLog.putContext("method", request.method);
-        logger.debug("clientIP={}", request.remoteAddress);
-
-        if (request.contentType != null) {
-            parseRequestBody(exchange, request);
-        }
-
-        request.session = sessionManager.load(request);
-    }
-
-    private void parseRequestBody(HttpServerExchange exchange, RequestImpl request) throws IOException {
-        if (request.contentType.startsWith("application/json")) {
-            exchange.startBlocking();
-            byte[] bytes = InputStreams.bytes(exchange.getInputStream());
-            request.body = new String(bytes, Charsets.UTF_8);
-            logger.debug("[request] body={}", request.body);
-        } else if (request.method == HTTPMethod.POST) {
-            FormDataParser parser = formParserFactory.createParser(exchange);
-            if (parser != null) {
-                request.formData = parser.parseBlocking();
-                for (String name : request.formData) {
-                    logger.debug("[request:form] {}={}", name, request.formData.get(name));
-                }
-            }
         }
     }
 }

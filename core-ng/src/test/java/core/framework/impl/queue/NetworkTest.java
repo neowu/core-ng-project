@@ -8,8 +8,8 @@ import org.junit.Test;
  */
 public class NetworkTest {
     @Test
-    public void localHostName() {
-        String hostName = Network.localHostName();
-        Assert.assertNotNull(hostName);
+    public void localHostAddress() {
+        String hostAddress = Network.localHostAddress();
+        Assert.assertNotNull(hostAddress);
     }
 }

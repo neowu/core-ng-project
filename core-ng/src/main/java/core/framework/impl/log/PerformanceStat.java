@@ -3,7 +3,7 @@ package core.framework.impl.log;
 /**
  * @author neo
  */
-class TimeTracking {
+class PerformanceStat {
     public long totalElapsedTime;
     public int count;
 }

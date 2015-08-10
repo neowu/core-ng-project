@@ -27,16 +27,15 @@ public class AsyncExecutor {
 
         ActionLog parentActionLog = logManager.currentActionLog();
         String refId = parentActionLog != null ? parentActionLog.refId() : null;
-        String action = parentActionLog != null ? parentActionLog.action + "/" + name : name;
+        String action = parentActionLog != null ? parentActionLog.action() + "/" + name : name;
         boolean trace = parentActionLog != null && parentActionLog.trace;
 
         return executor.submit(() -> {
             ActionLog currentActionLog = logManager.currentActionLog();
             currentActionLog.refId(refId);
-            currentActionLog.action = action;
+            currentActionLog.action(action);
             if (trace) {
-                logger.warn("trace log is triggered for current execution, logId={}", currentActionLog.id);
-                currentActionLog.trace = true;
+                currentActionLog.triggerTraceLog();
             }
             return task.call();
         });

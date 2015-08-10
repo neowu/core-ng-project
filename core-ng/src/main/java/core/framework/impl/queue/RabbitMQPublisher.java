@@ -42,11 +42,12 @@ public class RabbitMQPublisher<T> implements MessagePublisher<T> {
         validator.validate(message);
 
         Map<String, Object> headers = Maps.newHashMap();
-        headers.put(RabbitMQListener.HEADER_SENDER, Network.localHostName());
+        headers.put(RabbitMQListener.HEADER_CLIENT_IP, Network.localHostAddress());
 
         AMQP.BasicProperties.Builder builder = new AMQP.BasicProperties.Builder()
             .type(messageType)
             .deliveryMode(2)   // persistent mode
+            .appId(logManager.appName)
             .headers(headers);
 
         linkContext(builder, headers);

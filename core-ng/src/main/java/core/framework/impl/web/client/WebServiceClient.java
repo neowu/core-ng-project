@@ -58,6 +58,10 @@ public class WebServiceClient implements WebServiceClientConfig {
         HTTPRequest httpRequest = new HTTPRequest(method, serviceURL);
         httpRequest.header(HTTPHeaders.ACCEPT, ContentTypes.APPLICATION_JSON);
 
+        if (logManager.appName != null) {
+            httpRequest.header(HTTPServerHandler.HEADER_CLIENT, logManager.appName);
+        }
+
         linkContext(httpRequest);
 
         if (requestBean != null) {

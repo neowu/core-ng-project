@@ -68,11 +68,10 @@ public class Scheduler {
         return () -> {
             logger.info("execute scheduled job, name={}", name);
             ActionLog actionLog = logManager.currentActionLog();
-            actionLog.action = "job/" + name;
+            actionLog.action("job/" + name);
             actionLog.putContext("job", job.getClass().getCanonicalName());
             if (trace) {
-                logger.warn("trace log is triggered for current job execution, logId={}, job={}", actionLog.id, name);
-                actionLog.trace = true;
+                actionLog.triggerTraceLog();
             }
             job.execute();
             return null;

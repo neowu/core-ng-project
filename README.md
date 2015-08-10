@@ -5,7 +5,6 @@ It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
 * provide ws interface to send queue message for dev and prod troubleshoot?
-* rabbitmq, publish message with appId = -Dcore.appName?
 * resilient retry and throttling
 * Cache pre warm, static or provide structure
 * webservice client retry on network issue

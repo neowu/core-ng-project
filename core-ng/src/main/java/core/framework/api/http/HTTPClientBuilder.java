@@ -32,6 +32,8 @@ public final class HTTPClientBuilder {
         StopWatch watch = new StopWatch();
         try {
             HttpClientBuilder builder = HttpClients.custom();
+            builder.setUserAgent("httpClient");
+
             builder.setKeepAliveStrategy((response, context) -> keepAliveTimeout.toMillis());
 
             builder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)

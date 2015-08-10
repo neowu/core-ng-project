@@ -7,17 +7,17 @@ import java.net.UnknownHostException;
  * @author neo
  */
 public class Network {
-    private static String localHostName;
+    private static String localHostAddress;
 
-    static String localHostName() {
-        if (localHostName == null)
+    static String localHostAddress() {
+        if (localHostAddress == null)
             try {
-                String localHostName = InetAddress.getLocalHost().getCanonicalHostName();
-                Network.localHostName = localHostName;
+                String localHostName = InetAddress.getLocalHost().getHostAddress();
+                Network.localHostAddress = localHostName;
                 return localHostName;   // return temporary variable for lock free
             } catch (UnknownHostException e) {
                 throw new Error(e);
             }
-        return localHostName;
+        return localHostAddress;
     }
 }
