@@ -1,7 +1,10 @@
 package app.service;
 
 import app.domain.MongoUserAggregateView;
+import app.domain.Status;
 import app.domain.User;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 import core.framework.api.mongo.Mongo;
 import org.bson.BsonDocument;
 import org.bson.types.ObjectId;
@@ -22,6 +25,10 @@ public class UserService {
 
     public User find(String id) {
         return mongo.findOne(User.class, new ObjectId(id)).get();
+    }
+
+    public List<User> findByStatus(Status status) {
+        return mongo.find(User.class, Filters.eq("status", status.toString()), Sorts.ascending("name"), null, null);
     }
 
     public List<MongoUserAggregateView> aggregate() {

@@ -9,6 +9,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.mongo.EntityIdHandler;
@@ -61,8 +62,7 @@ public final class Mongo {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
             logger.debug("insert, entityClass={}, elapsedTime={}", entity.getClass().getName(), elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -73,34 +73,51 @@ public final class Mongo {
     public <T> Optional<T> findOne(Class<T> entityClass, Bson filter) {
         StopWatch watch = new StopWatch();
         try {
-            List<T> results = executeFind(entityClass, filter);
+            FindIterable<T> query = collection(entityClass)
+                .find(filter == null ? new BsonDocument() : filter)
+                .limit(2);
+            List<T> results = Lists.newArrayList();
+            for (T document : query) {
+                results.add(document);
+            }
             if (results.isEmpty()) return Optional.empty();
-            if (results.size() > 1) throw new Error("more than one row returned, size=" + results.size());
+            if (results.size() > 1) throw Exceptions.error("more than one row returned, size={}", results.size());
             return Optional.of(results.get(0));
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
             logger.debug("findOne, entityClass={}, filter={}, elapsedTime={}", entityClass.getName(), filter, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
-    public <T> List<T> find(Class<T> entityClass, Bson filter) {
+    public <T> List<T> find(Class<T> entityClass, Bson filter, Bson sort, Integer skip, Integer limit) {
         StopWatch watch = new StopWatch();
-        List<T> results = null;
+        List<T> results = Lists.newArrayList();
         try {
-            results = executeFind(entityClass, filter);
+            FindIterable<T> query = collection(entityClass)
+                .find(filter == null ? new BsonDocument() : filter);
+
+            if (sort != null) query.sort(sort);
+            if (skip != null) query.skip(skip);
+            if (limit != null) query.limit(limit);
+
+            for (T document : query) {
+                results.add(document);
+            }
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
-            logger.debug("find, entityClass={}, filter={}, elapsedTime={}", entityClass.getName(), filter, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-            if (results != null && results.size() > tooManyRowsReturnedThreshold)
+            logger.debug("find, entityClass={}, filter={}, sort={}, skip={}, limit={}, elapsedTime={}", entityClass.getName(), filter, sort, skip, limit, elapsedTime);
+            checkSlowQuery(elapsedTime);
+            if (results.size() > tooManyRowsReturnedThreshold)
                 logger.warn("too many rows returned, returnedRows={}", results.size());
         }
+    }
+
+    public <T> List<T> find(Class<T> entityClass, Bson filter) {
+        return find(entityClass, filter, null, null, null);
     }
 
     public <T, V> List<V> aggregate(Class<T> entityClass, Class<V> resultClass, Bson... pipeline) {
@@ -117,8 +134,7 @@ public final class Mongo {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
             logger.debug("aggregate, entityClass={}, pipeline={}, elapsedTime={}", entityClass.getName(), pipeline, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
             if (results.size() > tooManyRowsReturnedThreshold)
                 logger.warn("too many rows returned, returnedRows={}", results.size());
         }
@@ -136,8 +152,7 @@ public final class Mongo {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
             logger.debug("update, entityClass={}, elapsedTime={}", entity.getClass().getName(), elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -150,8 +165,7 @@ public final class Mongo {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
             logger.debug("update, entityClass={}, filter={}, update={}, elapsedTime={}", entityClass, filter, update, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -163,8 +177,7 @@ public final class Mongo {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
             logger.debug("delete, entityClass={}, id={}, elapsedTime={}", entityClass.getName(), id, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -177,24 +190,19 @@ public final class Mongo {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
             logger.debug("delete, entityClass={}, filter={}, elapsedTime={}", entityClass, filter, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
-    }
-
-    private <T> List<T> executeFind(Class<T> entityClass, Bson filter) {
-        List<T> results = Lists.newArrayList();
-        FindIterable<T> documents = collection(entityClass).find(filter == null ? new BsonDocument() : filter);
-        for (T document : documents) {
-            results.add(document);
-        }
-        return results;
     }
 
     private <T> Bson idEqualsFilter(T entity) {
         @SuppressWarnings("unchecked")
         EntityIdHandler<T> idHandler = idHandlers.get(entity.getClass());
         return Filters.eq("_id", idHandler.get(entity));
+    }
+
+    private void checkSlowQuery(long elapsedTime) {
+        if (elapsedTime > slowQueryThresholdInMs)
+            logger.warn("slow query detected");
     }
 
     private <T> MongoCollection<T> collection(Class<T> entityClass) {

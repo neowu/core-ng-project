@@ -43,6 +43,24 @@ public class UserServiceTest extends IntegrationTest {
     }
 
     @Test
+    public void findByStatus() {
+        createUser("test3", Status.INACTIVE);
+        createUser("test2", Status.ACTIVE);
+        createUser("test1", Status.ACTIVE);
+
+        List<User> users = userService.findByStatus(Status.ACTIVE);
+        Assert.assertEquals(2, users.size());
+        Assert.assertEquals("test1", users.get(0).name);
+    }
+
+    private void createUser(String name, Status status) {
+        User user = new User();
+        user.name = name;
+        user.status = status;
+        userService.save(user);
+    }
+
+    @Test
     public void aggregate() {
         User user = new User();
         user.name = "test1";
