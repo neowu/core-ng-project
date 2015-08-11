@@ -8,18 +8,17 @@ import java.lang.reflect.Method;
  * @author neo
  */
 public class ControllerProxy {
-    public final String action;
     public final Controller controller;
+    public final String action;
     public final Method targetMethod;
     public final String targetClassName;
     public final String targetMethodName;
 
-    public ControllerProxy(String action, Controller controller) {
-        this.action = action;
+    public ControllerProxy(Controller controller, String action, Method targetMethod, String targetClassName, String targetMethodName) {
         this.controller = controller;
-        ControllerInspector inspector = new ControllerInspector(controller);
-        targetMethod = inspector.targetMethod;
-        targetClassName = inspector.targetClassName;
-        targetMethodName = inspector.targetMethodName;
+        this.action = action;
+        this.targetMethod = targetMethod;
+        this.targetClassName = targetClassName;
+        this.targetMethodName = targetMethodName;
     }
 }

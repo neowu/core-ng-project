@@ -24,7 +24,8 @@ public class WebContextImpl implements WebContext {
         return request.get();
     }
 
-    void put(String key, Object value) {
+    @Override
+    public <T> void put(String key, T value) {
         context.get().put(key, value);
     }
 

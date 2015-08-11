@@ -14,7 +14,7 @@ public class TestInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Invocation invocation) throws Exception {
-        Protected annotation = invocation.controllerAnnotation(Protected.class);
+        Protected annotation = invocation.annotation(Protected.class);
         if (annotation != null) {
             logger.debug("detected @Protected");
         }

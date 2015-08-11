@@ -3,7 +3,6 @@ package core.framework.impl.web.route;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Maps;
-import core.framework.api.web.Controller;
 import core.framework.api.web.exception.NotFoundException;
 import core.framework.impl.web.ControllerProxy;
 import core.framework.impl.web.PathParams;
@@ -22,7 +21,7 @@ public final class Route {
     private final Map<String, URLHandler> staticHandlers = Maps.newHashMap();
     private final PathNode dynamicRoot = new PathNode();
 
-    public void add(HTTPMethod method, String path, Controller controller) {
+    public void add(HTTPMethod method, String path, ControllerProxy proxy) {
         logger.info("route, {} {}", method, path);
         validator.validate(path);
 
@@ -36,7 +35,7 @@ public final class Route {
                 staticHandlers.put(path, handler);
             }
         }
-        handler.put(method, controller);
+        handler.put(method, proxy);
     }
 
     public ControllerProxy get(String path, HTTPMethod method, PathParams pathParams) {

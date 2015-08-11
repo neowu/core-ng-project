@@ -2,6 +2,7 @@ package app.web;
 
 import app.domain.Product;
 import app.service.ProductService;
+import app.web.interceptor.Protected;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.web.exception.NotFoundException;
 
@@ -28,6 +29,7 @@ public class ProductController implements ProductWebService {
     }
 
     @Override
+    @Protected(operation = "get-product")
     public ProductView get(Integer id) {
         ActionLogContext.put("pid", id);
         if (id == 404) throw new NotFoundException("product not found, id=" + id);

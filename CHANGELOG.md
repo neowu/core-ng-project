@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.3.7
+* web: fix webservice controller inspection (getAnnotation/methodInfo)
+
 ### 3.3.6 (8/7/2015 - 8/10/2015)
 * log: push action log to rabbitmq, index by ES/Kibana
 * log: renamed action log requestId to id, and use refId for reference

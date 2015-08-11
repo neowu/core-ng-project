@@ -33,7 +33,7 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
     public final SiteManager siteManager = new SiteManager();
     public final BeanValidator validator = new BeanValidator();
     public final WebContextImpl webContext = new WebContextImpl();
-    private final Route route = new Route();
+    public final Route route = new Route();
     private final List<Interceptor> interceptors = Lists.newArrayList();
     private final HTTPServerHandler httpServerHandler;
     private final HTTPServerErrorHandler errorHandler;
@@ -82,7 +82,8 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
 
     @Override
     public void add(HTTPMethod method, String path, Controller controller) {
-        route.add(method, path, controller);
+        ControllerProxy proxy = new ControllerProxyBuilder(method, path, controller).build();
+        route.add(method, path, proxy);
     }
 
     @Override

@@ -4,6 +4,7 @@ import core.framework.api.web.Interceptor;
 import core.framework.api.web.Invocation;
 import core.framework.api.web.Request;
 import core.framework.api.web.Response;
+import core.framework.api.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,18 +21,18 @@ public class InvocationImpl implements Invocation {
     private final ControllerProxy controller;
     private final List<Interceptor> interceptors;
     private final Request request;
-    private final WebContextImpl webContext;
+    private final WebContextImpl context;
     private int currentStack;
 
-    public InvocationImpl(ControllerProxy controller, List<Interceptor> interceptors, Request request, WebContextImpl webContext) {
+    public InvocationImpl(ControllerProxy controller, List<Interceptor> interceptors, Request request, WebContextImpl context) {
         this.controller = controller;
         this.interceptors = interceptors;
         this.request = request;
-        this.webContext = webContext;
+        this.context = context;
     }
 
     @Override
-    public <T extends Annotation> T controllerAnnotation(Class<T> annotationClass) {
+    public <T extends Annotation> T annotation(Class<T> annotationClass) {
         Method controllerMethod = controller.targetMethod;
         T annotation = controllerMethod.getDeclaredAnnotation(annotationClass);
         if (annotation == null)
@@ -40,13 +41,8 @@ public class InvocationImpl implements Invocation {
     }
 
     @Override
-    public Request request() {
-        return request;
-    }
-
-    @Override
-    public void putContext(String key, Object value) {
-        webContext.put(key, value);
+    public WebContext context() {
+        return context;
     }
 
     @Override

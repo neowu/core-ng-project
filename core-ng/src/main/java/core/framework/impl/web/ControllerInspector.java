@@ -52,11 +52,10 @@ class ControllerInspector {
                 Class<?> targetClass = Class.forName(methodRefInfo[0].replaceAll("/", "."));
                 targetClassName = targetClass.getCanonicalName();
                 targetMethodName = methodRefInfo[1];
-                String methodName = methodRefInfo[1];
-                if (methodName.contains("$")) {
+                if (targetMethodName.contains("$")) {
                     targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
                 } else {
-                    targetMethod = targetClass.getMethod(methodName, CONTROLLER_METHOD.getParameterTypes());
+                    targetMethod = targetClass.getMethod(targetMethodName, CONTROLLER_METHOD.getParameterTypes());
                 }
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {

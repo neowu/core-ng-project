@@ -6,11 +6,9 @@ import java.lang.annotation.Annotation;
  * @author neo
  */
 public interface Invocation {
-    <T extends Annotation> T controllerAnnotation(Class<T> annotationClass);
+    <T extends Annotation> T annotation(Class<T> annotationClass);
 
-    Request request();
-
-    void putContext(String key, Object value);
+    WebContext context();
 
     Response proceed() throws Exception;
 }
