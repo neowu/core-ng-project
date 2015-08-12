@@ -25,12 +25,9 @@ public class RequestParser {
 
     void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws IOException {
         request.method = HTTPMethod.valueOf(exchange.getRequestMethod().toString());
-        actionLog.putContext("method", request.method());
+        actionLog.context("method", request.method());
 
         HeaderMap headers = exchange.getRequestHeaders();
-        for (HeaderValues header : headers) {
-            logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
-        }
 
         String xForwardedFor = headers.getFirst(Headers.X_FORWARDED_FOR);
         String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
@@ -38,7 +35,7 @@ public class RequestParser {
 
         String clientIP = clientIP(remoteAddress, xForwardedFor);
         request.clientIP = clientIP;
-        actionLog.putContext("clientIP", clientIP);
+        actionLog.context("clientIP", clientIP);
 
         String xForwardedProto = headers.getFirst(Headers.X_FORWARDED_PROTO);
         String requestScheme = exchange.getRequestScheme();
@@ -50,15 +47,19 @@ public class RequestParser {
         logger.debug("[request] hostPort={}", hostPort);
         request.port = port(hostPort, xForwardedPort);
 
-        actionLog.putContext("path", request.path());
+        actionLog.context("path", request.path());
 
         String requestURL = requestURL(request, exchange);
         request.requestURL = requestURL;
         logger.debug("[request] requestURL={}", requestURL);
         logger.debug("[request] queryString={}", exchange.getQueryString());
 
+        for (HeaderValues header : headers) {
+            logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
+        }
+
         String userAgent = headers.getFirst(Headers.USER_AGENT);
-        if (userAgent != null) actionLog.putContext("userAgent", userAgent);
+        if (userAgent != null) actionLog.context("userAgent", userAgent);
 
         if (request.method == HTTPMethod.POST || request.method == HTTPMethod.PUT) {
             request.contentType = headers.getFirst(Headers.CONTENT_TYPE);

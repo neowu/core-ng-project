@@ -9,6 +9,9 @@ import javax.xml.bind.annotation.XmlElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ErrorResponse {
+    @XmlElement(name = "id")
+    public String id;
+
     @XmlElement(name = "message")
     public String message;
 

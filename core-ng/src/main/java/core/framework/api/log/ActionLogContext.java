@@ -15,14 +15,14 @@ public final class ActionLogContext {
         LogManager logManager = logManager();
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog == null) return Optional.empty();
-        return actionLog.getContext(key);
+        return actionLog.context(key);
     }
 
     public static void put(String key, Object value) {
         LogManager logManager = logManager();
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog != null) {
-            actionLog.putContext(key, value);
+            actionLog.context(key, value);
         }
     }
 

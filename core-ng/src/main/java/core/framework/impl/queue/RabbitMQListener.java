@@ -115,7 +115,7 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
 
         String messageBody = new String(delivery.getBody(), Charsets.UTF_8);
         String messageType = delivery.getProperties().getType();
-        actionLog.putContext("messageType", messageType);
+        actionLog.context("messageType", messageType);
 
         logger.debug("message={}", messageBody);
 
@@ -130,12 +130,12 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
 
         String appId = delivery.getProperties().getAppId();
         if (appId != null) {
-            actionLog.putContext("client", appId);
+            actionLog.context("client", appId);
         }
 
         Object clientIP = headers.get(HEADER_CLIENT_IP);
         if (clientIP != null) {
-            actionLog.putContext("clientIP", clientIP);
+            actionLog.context("clientIP", clientIP);
         }
 
         @SuppressWarnings("unchecked")
@@ -148,7 +148,7 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
 
         @SuppressWarnings("unchecked")
         MessageHandler<T> handler = handlers.get(messageType);
-        actionLog.putContext("handler", handler.getClass().getCanonicalName());
+        actionLog.context("handler", handler.getClass().getCanonicalName());
         handler.handle(message);
     }
 }

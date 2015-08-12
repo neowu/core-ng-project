@@ -39,8 +39,7 @@ public class HTTPServerErrorHandler {
     }
 
     public void handleError(Throwable e, HttpServerExchange exchange, RequestImpl request) {
-        ActionLog actionLog = logManager.currentActionLog();
-        actionLog.error(e);
+        logManager.logError(logger, e);
 
         if (exchange.isResponseStarted()) {
             logger.error("response was sent, discard the current http transaction");
@@ -106,12 +105,13 @@ public class HTTPServerErrorHandler {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ContentTypes.TEXT_HTML);
         exchange.setResponseCode(HTTPStatus.INTERNAL_SERVER_ERROR.code);
         ActionLog actionLog = logManager.currentActionLog();
-        actionLog.putContext("responseCode", exchange.getResponseCode());
+        actionLog.context("responseCode", exchange.getResponseCode());
         exchange.getResponseSender().send(errorHTML(e));
     }
 
     private ErrorResponse errorResponse(Throwable e) {
         ErrorResponse response = new ErrorResponse();
+        response.id = logManager.currentActionLog().id;
         response.message = e.getMessage();
         response.stackTrace = Exceptions.stackTrace(e);
         return response;

@@ -1,6 +1,5 @@
 package core.framework.impl.concurrent;
 
-import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,17 +31,14 @@ public class Executor {
     }
 
     private <T> T execute(Callable<T> task) {
-        logManager.start();
+        logManager.start(logger, "=== task execution begin ===");
         try {
-            logger.debug("=== task execution begin ===");
             return task.call();
         } catch (Throwable e) {
-            ActionLog actionLog = logManager.currentActionLog();
-            actionLog.error(e);
+            logManager.logError(logger, e);
             return null;
         } finally {
-            logger.debug("=== task execution end ===");
-            logManager.end();
+            logManager.end(logger, "=== task execution end ===");
         }
     }
 }

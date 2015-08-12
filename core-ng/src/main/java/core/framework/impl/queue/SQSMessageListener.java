@@ -152,7 +152,7 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
             linkSNSContext(actionLog, snsMessage);
 
         }
-        actionLog.putContext("messageType", messageType);
+        actionLog.context("messageType", messageType);
         if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
 
         Class<T> messageClass = messageClass(messageType);
@@ -161,7 +161,7 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
 
         @SuppressWarnings("unchecked")
         MessageHandler<T> handler = handlers.get(messageType);
-        actionLog.putContext("handler", handler.getClass().getCanonicalName());
+        actionLog.context("handler", handler.getClass().getCanonicalName());
         handler.handle(message);
     }
 
@@ -182,7 +182,7 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
             actionLog.triggerTraceLog();
         }
         if (snsMessage.attributes.clientIP != null) {
-            actionLog.putContext("clientIP", snsMessage.attributes.clientIP.value);
+            actionLog.context("clientIP", snsMessage.attributes.clientIP.value);
         }
     }
 
@@ -196,7 +196,7 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
         }
         MessageAttributeValue clientIP = attributes.get(MESSAGE_ATTR_CLIENT_IP);
         if (clientIP != null) {
-            actionLog.putContext("clientIP", clientIP.getStringValue());
+            actionLog.context("clientIP", clientIP.getStringValue());
         }
     }
 

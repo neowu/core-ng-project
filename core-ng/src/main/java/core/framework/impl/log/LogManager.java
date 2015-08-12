@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.api.log.Warning;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +16,16 @@ public class LogManager {
         this.appName = System.getProperty("core.appName");
     }
 
-    public void start() {
-        loggers.set(new ActionLogger(logWriter));
+    public void start(Logger logger, String message) {
+        ActionLogger actionLogger = new ActionLogger(logWriter);
+        loggers.set(actionLogger);
+        logger.debug(message);
+        actionLogger.log.logId();
     }
 
-    public void end() {
-        ActionLogger logger = loggers.get();
-        logger.end();
+    public void end(Logger logger, String message) {
+        logger.debug(message);
+        loggers.get().end();
         loggers.remove();
     }
 
@@ -40,5 +44,17 @@ public class LogManager {
         Logger logger = LoggerFactory.getLogger(LogManager.class.getName());
         logger.info("showdown log manager");
         logWriter.close();
+    }
+
+    public void logError(Logger logger, Throwable e) {  // pass logger where the exception is caught
+        ActionLog actionLog = currentActionLog();
+        actionLog.error(e);
+
+        String errorMessage = e.getMessage();
+        if (e.getClass().isAnnotationPresent(Warning.class)) {
+            logger.warn(errorMessage, e);
+        } else {
+            logger.error(errorMessage, e);
+        }
     }
 }

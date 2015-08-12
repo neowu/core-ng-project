@@ -49,10 +49,9 @@ public class HTTPServerHandler implements HttpHandler {
             return;
         }
 
-        logManager.start();
+        logManager.start(logger, "=== http transaction begin ===");
         RequestImpl request = new RequestImpl(exchange, validator);
         try {
-            logger.debug("=== http transaction begin ===");
             ActionLog actionLog = logManager.currentActionLog();
             requestParser.parse(request, exchange, actionLog);
             request.session = sessionManager.load(request);
@@ -60,14 +59,14 @@ public class HTTPServerHandler implements HttpHandler {
             HeaderMap headers = exchange.getRequestHeaders();
 
             String client = headers.getFirst(HTTPServerHandler.HEADER_CLIENT);
-            if (client != null) actionLog.putContext("client", client);
+            if (client != null) actionLog.context("client", client);
 
             String refId = headers.getFirst(HTTPServerHandler.HEADER_REF_ID);
             if (refId != null) actionLog.refId(refId);
 
             ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams);
             actionLog.action(controller.action);
-            actionLog.putContext("controller", controller.controllerInfo);
+            actionLog.context("controller", controller.controllerInfo);
             logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());
 
             // trigger trace after action is determined due to trace log use action as part of path, is there better way?
@@ -83,8 +82,7 @@ public class HTTPServerHandler implements HttpHandler {
             errorHandler.handleError(e, exchange, request);
         } finally {
             webContext.cleanup();
-            logger.debug("=== http transaction end ===");
-            logManager.end();
+            logManager.end(logger, "=== http transaction end ===");
         }
     }
 }

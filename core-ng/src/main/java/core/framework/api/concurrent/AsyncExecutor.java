@@ -27,7 +27,7 @@ public class AsyncExecutor {
 
         ActionLog parentActionLog = logManager.currentActionLog();
         String refId = parentActionLog != null ? parentActionLog.refId() : null;
-        String action = parentActionLog != null ? parentActionLog.action() + "/" + name : name;
+        String action = parentActionLog != null ? parentActionLog.action + "/" + name : name;
         boolean trace = parentActionLog != null && parentActionLog.trace;
 
         return executor.submit(() -> {

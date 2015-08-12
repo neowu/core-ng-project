@@ -33,6 +33,7 @@ public class ProductController implements ProductWebService {
     public ProductView get(Integer id) {
         ActionLogContext.put("pid", id);
         if (id == 404) throw new NotFoundException("product not found, id=" + id);
+        if (id == 500) throw new Error("get product error, id=" + id);
         Product product = productService.get(id);
         return view(product);
     }
