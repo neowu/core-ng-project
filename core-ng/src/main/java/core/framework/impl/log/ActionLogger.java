@@ -11,12 +11,15 @@ class ActionLogger {
     private static final int MAX_HOLD_SIZE = 5000;
 
     private final LogWriter logWriter;
+    private final LogForwarder logForwarder;
+
     final ActionLog log = new ActionLog();
     private List<LogEvent> events = new LinkedList<>();
     private Writer traceWriter;
 
-    public ActionLogger(LogWriter logWriter) {
+    public ActionLogger(LogWriter logWriter, LogForwarder logForwarder) {
         this.logWriter = logWriter;
+        this.logForwarder = logForwarder;
     }
 
     public void process(LogEvent event) {
@@ -35,6 +38,10 @@ class ActionLogger {
 
     public void end() {
         log.end();
+
+        if (logForwarder != null) {
+            logForwarder.sendActionLog(log);
+        }
 
         logWriter.writeActionLog(log);
 

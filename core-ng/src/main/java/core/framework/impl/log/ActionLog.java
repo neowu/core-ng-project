@@ -40,7 +40,7 @@ public class ActionLog {
         if (level.value > result.value) result = level;
     }
 
-    String result() {
+    public String result() {
         return result == LogLevel.INFO ? "OK" : String.valueOf(result);
     }
 
@@ -56,7 +56,7 @@ public class ActionLog {
     public void track(String action, long elapsedTime) {
         PerformanceStat tracking = this.performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
         tracking.count++;
-        tracking.totalElapsedTime += elapsedTime;
+        tracking.totalElapsed += elapsedTime;
     }
 
     public String refId() {

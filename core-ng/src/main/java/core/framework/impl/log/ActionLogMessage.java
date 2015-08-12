@@ -1,0 +1,39 @@
+package core.framework.impl.log;
+
+import core.framework.api.queue.Message;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import java.time.Instant;
+import java.util.Map;
+
+/**
+ * @author neo
+ */
+@Message(name = "action_log")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class ActionLogMessage {
+    @XmlElement(name = "app")
+    public String app;
+    @XmlElement(name = "date")
+    public Instant date;
+    @XmlElement(name = "id")
+    public String id;
+    @XmlElement(name = "result")
+    public String result;
+    @XmlElement(name = "ref_id")
+    public String refId;
+    @XmlElement(name = "action")
+    public String action;
+    @XmlElement(name = "error_message")
+    public String errorMessage;
+    @XmlElement(name = "exception_class")
+    public String exceptionClass;
+    @XmlElement(name = "elapsed")
+    public Long elapsed;
+    @XmlElement(name = "context")
+    public Map<String, String> context;
+    @XmlElement(name = "perf_stats")
+    public Map<String, PerformanceStatMessage> performanceStats;
+}

@@ -30,7 +30,7 @@ private java.util.Map decode_java_util_Map_java_lang_String(org.bson.BsonReader 
         reader.skipValue();
         return null;
     }
-    java.util.Map map = new java.util.HashMap();
+    java.util.Map map = new java.util.LinkedHashMap();
     reader.readStartDocument();
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
         String fieldName = reader.readName();
@@ -135,7 +135,7 @@ private java.util.Map decode_java_util_Map_core_framework_impl_mongo_TestEntityC
         reader.skipValue();
         return null;
     }
-    java.util.Map map = new java.util.HashMap();
+    java.util.Map map = new java.util.LinkedHashMap();
     reader.readStartDocument();
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
         String fieldName = reader.readName();

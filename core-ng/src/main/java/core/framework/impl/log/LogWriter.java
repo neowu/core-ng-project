@@ -160,7 +160,7 @@ public class LogWriter {
             builder.append(LOG_SPLITTER)
                 .append(action).append("Count=").append(tracking.count)
                 .append(LOG_SPLITTER)
-                .append(action).append("ElapsedTime=").append(tracking.totalElapsedTime);
+                .append(action).append("ElapsedTime=").append(tracking.totalElapsed);
         }
 
         builder.append(LogEvent.LINE_SEPARATOR);

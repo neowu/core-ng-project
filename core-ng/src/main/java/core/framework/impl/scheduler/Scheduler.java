@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author neo
  */
-public class Scheduler {
+public final class Scheduler {
     private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -69,22 +69,12 @@ public class Scheduler {
             logger.info("execute scheduled job, name={}", name);
             ActionLog actionLog = logManager.currentActionLog();
             actionLog.action("job/" + name);
-            actionLog.context("job", job.getClass().getCanonicalName());
+            actionLog.context("jobClass", job.getClass().getCanonicalName());
             if (trace) {
                 actionLog.triggerTraceLog();
             }
             job.execute();
             return null;
         };
-    }
-
-    static class JobTrigger {
-        final Job job;
-        final Trigger trigger;
-
-        JobTrigger(Job job, Trigger trigger) {
-            this.job = job;
-            this.trigger = trigger;
-        }
     }
 }

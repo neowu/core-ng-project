@@ -124,18 +124,20 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
         actionLog.refId(delivery.getProperties().getCorrelationId());
 
         Map<String, Object> headers = delivery.getProperties().getHeaders();
-        if ("true".equals(String.valueOf(headers.get(HEADER_TRACE)))) {
-            actionLog.triggerTraceLog();
+        if (headers != null) {
+            if ("true".equals(String.valueOf(headers.get(HEADER_TRACE)))) {
+                actionLog.triggerTraceLog();
+            }
+
+            Object clientIP = headers.get(HEADER_CLIENT_IP);
+            if (clientIP != null) {
+                actionLog.context("clientIP", clientIP);
+            }
         }
 
         String appId = delivery.getProperties().getAppId();
         if (appId != null) {
             actionLog.context("client", appId);
-        }
-
-        Object clientIP = headers.get(HEADER_CLIENT_IP);
-        if (clientIP != null) {
-            actionLog.context("clientIP", clientIP);
         }
 
         @SuppressWarnings("unchecked")

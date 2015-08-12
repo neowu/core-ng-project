@@ -4,6 +4,6 @@ package core.framework.impl.log;
  * @author neo
  */
 class PerformanceStat {
-    public long totalElapsedTime;
-    public int count;
+    public long totalElapsed;
+    public int count = 0;
 }

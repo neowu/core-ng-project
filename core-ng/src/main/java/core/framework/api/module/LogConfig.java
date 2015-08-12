@@ -1,5 +1,6 @@
 package core.framework.api.module;
 
+import core.framework.impl.log.LogForwarder;
 import core.framework.impl.module.ModuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,15 @@ public final class LogConfig {
             logger.info("use console output for trace log during test");
         } else {
             context.logManager.logWriter.traceLogPath(traceLogPath);
+        }
+    }
+
+    public void remoteLogHost(String host) {
+        if (context.test) {
+            logger.info("disable forwarding log to remote during test");
+        } else {
+            context.logManager.logForwarder = new LogForwarder(host, context.logManager.appName);
+            context.startupHook.add(context.logManager.logForwarder::initialize);
         }
     }
 }

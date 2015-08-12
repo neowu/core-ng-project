@@ -1,8 +1,9 @@
 ## Change log
 
-### 3.3.8 (8/11/2015 - )
+### 3.3.8 (8/11/2015 - 8/12/2015)
 * http server: interceptor ignore built-in controllers
 * mongo: use LinkedHashMap to keep same order as in mongo
+* log: draft of log forwarding
 
 ### 3.3.7 (8/11/2015)
 * web: fix webservice controller inspection (getAnnotation/methodInfo)

@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author neo
@@ -32,6 +33,9 @@ public class ProductController implements ProductWebService {
     @Protected(operation = "get-product")
     public ProductView get(Integer id) {
         ActionLogContext.put("pid", id);
+        double times = 1 + new Random().nextDouble() / 10 * 4 - 0.2; // +/-20% random
+        long time = (long) (100 * times);
+        ActionLogContext.track("testDB", time);
         if (id == 404) throw new NotFoundException("product not found, id=" + id);
         if (id == 500) throw new Error("get product error, id=" + id);
         Product product = productService.get(id);

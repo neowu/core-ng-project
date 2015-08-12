@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 public class LogManager {
     private final ThreadLocal<ActionLogger> loggers = new ThreadLocal<>();
     public final LogWriter logWriter = new LogWriter();
+    public LogForwarder logForwarder;
     public final String appName;
 
     public LogManager() {
@@ -17,7 +18,7 @@ public class LogManager {
     }
 
     public void start(Logger logger, String message) {
-        ActionLogger actionLogger = new ActionLogger(logWriter);
+        ActionLogger actionLogger = new ActionLogger(logWriter, logForwarder);
         loggers.set(actionLogger);
         logger.debug(message);
         actionLogger.log.logId();
@@ -44,6 +45,7 @@ public class LogManager {
         Logger logger = LoggerFactory.getLogger(LogManager.class.getName());
         logger.info("showdown log manager");
         logWriter.close();
+        if (logForwarder != null) logForwarder.shutdown();
     }
 
     public void logError(Logger logger, Throwable e) {  // pass logger where the exception is caught

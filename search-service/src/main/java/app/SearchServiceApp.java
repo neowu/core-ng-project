@@ -12,7 +12,9 @@ import core.framework.api.search.ElasticSearchBuilder;
 public class SearchServiceApp extends AbstractApplication {
     @Override
     protected void initialize() {
-        ElasticSearch search = bindSupplier(ElasticSearch.class, null, new ElasticSearchBuilder().remote("192.168.2.2"));
+        ElasticSearch search = bindSupplier(ElasticSearch.class, null, new ElasticSearchBuilder()
+            .remote("192.168.2.2")
+            .index("action"));
         onShutdown(search::shutdown);
 
         bind(SearchProductService.class);
