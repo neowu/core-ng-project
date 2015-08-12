@@ -2,6 +2,7 @@
 
 ### 3.3.8 (8/11/2015 - )
 * http server: interceptor ignore built-in controllers
+* mongo: use LinkedHashMap to keep same order as in mongo
 
 ### 3.3.7 (8/11/2015)
 * web: fix webservice controller inspection (getAnnotation/methodInfo)

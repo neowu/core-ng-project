@@ -1,6 +1,7 @@
 package core.framework.api.util;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -15,5 +16,9 @@ public final class Maps {
 
     public static <T, V> ConcurrentMap<T, V> newConcurrentHashMap() {
         return new ConcurrentHashMap<>();
+    }
+
+    public static <T, V> Map<T, V> newLinkedHashMap() {
+        return new LinkedHashMap<>();
     }
 }

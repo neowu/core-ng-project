@@ -37,5 +37,5 @@ public class User {
     public List<Role> roles = Lists.newArrayList();
 
     @Field(name = "map_roles")
-    public Map<String, Role> roleMatrix = Maps.newHashMap();
+    public Map<String, Role> roleMatrix = Maps.newLinkedHashMap();
 }

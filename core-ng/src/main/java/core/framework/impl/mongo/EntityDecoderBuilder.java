@@ -158,7 +158,7 @@ public class EntityDecoderBuilder<T> {
         builder.indent(1).append("}\n");
 
 
-        builder.indent(1).append("java.util.Map map = new java.util.HashMap();\n");
+        builder.indent(1).append("java.util.Map map = new java.util.LinkedHashMap();\n");
         builder.indent(1).append("reader.readStartDocument();\n");
         builder.indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n");
         builder.indent(2).append("String fieldName = reader.readName();\n");
