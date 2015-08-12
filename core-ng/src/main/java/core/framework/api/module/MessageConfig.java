@@ -6,7 +6,7 @@ import core.framework.impl.module.ModuleContext;
 /**
  * @author neo
  */
-public class MessageConfig {
+public final class MessageConfig {
     private final ModuleContext context;
 
     public MessageConfig(ModuleContext context) {

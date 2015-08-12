@@ -7,7 +7,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class RabbitMQConfig {
+public final class RabbitMQConfig {
     private final ModuleContext context;
 
     public RabbitMQConfig(ModuleContext context) {

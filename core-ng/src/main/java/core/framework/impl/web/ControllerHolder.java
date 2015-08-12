@@ -12,11 +12,24 @@ public class ControllerHolder {
     public final Method targetMethod;
     public final String controllerInfo;
 
-    boolean internal;
+    public final boolean skipInterceptor;
     public String action;
 
+    public ControllerHolder(Controller controller) {
+        this(controller, null, false);
+    }
+
+    public ControllerHolder(Controller controller, boolean skipInterceptor) {
+        this(controller, null, skipInterceptor);
+    }
+
     public ControllerHolder(Controller controller, Method targetMethod) {
+        this(controller, targetMethod, false);
+    }
+
+    public ControllerHolder(Controller controller, Method targetMethod, boolean skipInterceptor) {
         this.controller = controller;
+        this.skipInterceptor = skipInterceptor;
 
         if (targetMethod == null) {
             ControllerInspector inspector = new ControllerInspector(controller);
@@ -26,10 +39,5 @@ public class ControllerHolder {
             this.targetMethod = targetMethod;
             controllerInfo = targetMethod.getDeclaringClass().getCanonicalName() + "." + targetMethod.getName();
         }
-    }
-
-    public ControllerHolder internal() {
-        internal = true;
-        return this;
     }
 }

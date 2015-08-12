@@ -50,7 +50,7 @@ public class ModuleContext {
         }
 
         httpServer = new HTTPServer(logManager);
-        beanFactory.bind(WebContext.class, null, httpServer.webContext);
+        beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);
         if (!test) {
             startupHook.add(httpServer::start);
@@ -61,11 +61,11 @@ public class ModuleContext {
         beanFactory.bind(AsyncExecutor.class, null, new AsyncExecutor(executor, logManager));
 
         if (!test) {
-            httpServer.route.add(HTTPMethod.GET, "/health-check", new ControllerHolder(new HealthCheckController(), null).internal());
-            httpServer.route.add(HTTPMethod.GET, "/monitor/memory", new ControllerHolder(new MemoryUsageController(), null).internal());
+            httpServer.handler.route.add(HTTPMethod.GET, "/health-check", new ControllerHolder(new HealthCheckController(), true));
+            httpServer.handler.route.add(HTTPMethod.GET, "/monitor/memory", new ControllerHolder(new MemoryUsageController(), true));
             ThreadInfoController threadInfoController = new ThreadInfoController();
-            httpServer.route.add(HTTPMethod.GET, "/monitor/thread", new ControllerHolder(threadInfoController::threadUsage, null).internal());
-            httpServer.route.add(HTTPMethod.GET, "/monitor/thread-dump", new ControllerHolder(threadInfoController::threadDump, null).internal());
+            httpServer.handler.route.add(HTTPMethod.GET, "/monitor/thread", new ControllerHolder(threadInfoController::threadUsage, true));
+            httpServer.handler.route.add(HTTPMethod.GET, "/monitor/thread-dump", new ControllerHolder(threadInfoController::threadDump, true));
         }
     }
 }

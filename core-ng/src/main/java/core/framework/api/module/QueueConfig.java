@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class QueueConfig {
+public final class QueueConfig {
     private final ModuleContext context;
 
     public QueueConfig(ModuleContext context) {

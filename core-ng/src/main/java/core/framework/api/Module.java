@@ -87,11 +87,11 @@ public abstract class Module {
     }
 
     public HTTPConfig http() {
-        return context.httpServer;
+        return new HTTPConfig(context);
     }
 
     public RouteConfig route() {
-        return context.httpServer;
+        return new RouteConfig(context);
     }
 
     public SiteConfig site() {

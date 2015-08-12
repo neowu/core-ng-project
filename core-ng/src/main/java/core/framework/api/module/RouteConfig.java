@@ -2,26 +2,36 @@ package core.framework.api.module;
 
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.web.Controller;
+import core.framework.impl.module.ModuleContext;
+import core.framework.impl.web.ControllerHolder;
 
 /**
  * @author neo
  */
-public interface RouteConfig {
-    default void get(String path, Controller controller) {
+public final class RouteConfig {
+    private final ModuleContext context;
+
+    public RouteConfig(ModuleContext context) {
+        this.context = context;
+    }
+
+    public void get(String path, Controller controller) {
         add(HTTPMethod.GET, path, controller);
     }
 
-    default void post(String path, Controller controller) {
+    public void post(String path, Controller controller) {
         add(HTTPMethod.POST, path, controller);
     }
 
-    default void put(String path, Controller controller) {
+    public void put(String path, Controller controller) {
         add(HTTPMethod.PUT, path, controller);
     }
 
-    default void delete(String path, Controller controller) {
+    public void delete(String path, Controller controller) {
         add(HTTPMethod.DELETE, path, controller);
     }
 
-    void add(HTTPMethod method, String path, Controller controller);
+    public void add(HTTPMethod method, String path, Controller controller) {
+        context.httpServer.handler.route.add(method, path, new ControllerHolder(controller));
+    }
 }

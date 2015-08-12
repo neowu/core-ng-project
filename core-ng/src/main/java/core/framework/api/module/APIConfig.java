@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 /**
  * @author neo
  */
-public class APIConfig {
+public final class APIConfig {
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private final ModuleContext context;
 
@@ -31,7 +31,7 @@ public class APIConfig {
 
     public <T> void service(Class<T> serviceInterface, T service) {
         logger.info("create api service, interface={}", serviceInterface.getCanonicalName());
-        BeanValidator validator = context.httpServer.validator;
+        BeanValidator validator = context.httpServer.handler.validator;
         new ServiceInterfaceValidator(serviceInterface, validator).validate();
 
         Method[] methods = serviceInterface.getDeclaredMethods();
@@ -41,7 +41,7 @@ public class APIConfig {
             Controller controller = new ServiceControllerBuilder<>(serviceInterface, service, method).build();
             try {
                 Method targetMethod = service.getClass().getMethod(method.getName(), method.getParameterTypes());
-                context.httpServer.route.add(httpMethod, path, new ControllerHolder(controller, targetMethod));
+                context.httpServer.handler.route.add(httpMethod, path, new ControllerHolder(controller, targetMethod));
             } catch (NoSuchMethodException e) {
                 throw new Error("failed to find impl method", e);
             }
@@ -51,7 +51,7 @@ public class APIConfig {
     public <T> WebServiceClientConfig client(Class<T> serviceInterface, String serviceURL) {
         logger.info("create api service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         HTTPClient httpClient = httpClient();
-        BeanValidator validator = context.httpServer.validator;
+        BeanValidator validator = context.httpServer.handler.validator;
         new ServiceInterfaceValidator(serviceInterface, validator).validate();
 
         WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator, context.logManager);

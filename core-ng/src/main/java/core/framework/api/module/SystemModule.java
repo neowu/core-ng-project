@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 /**
  * @author neo
  */
-public class SystemModule extends Module {
+public final class SystemModule extends Module {
     private final String propertyFileName;
 
     public SystemModule(String propertyFileName) {

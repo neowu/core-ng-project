@@ -23,7 +23,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class CacheConfig {
+public final class CacheConfig {
     private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
     private final ModuleContext context;
 
@@ -71,9 +71,9 @@ public class CacheConfig {
 
         if (!context.test) {
             CacheController controller = new CacheController(context.cacheManager);
-            context.httpServer.route.add(HTTPMethod.GET, "/management/cache", new ControllerHolder(controller::list, null).internal());
-            context.httpServer.route.add(HTTPMethod.GET, "/management/cache/:name/:key", new ControllerHolder(controller::get, null).internal());
-            context.httpServer.route.add(HTTPMethod.DELETE, "/management/cache/:name/:key", new ControllerHolder(controller::delete, null).internal());
+            context.httpServer.handler.route.add(HTTPMethod.GET, "/management/cache", new ControllerHolder(controller::list, true));
+            context.httpServer.handler.route.add(HTTPMethod.GET, "/management/cache/:name/:key", new ControllerHolder(controller::get, true));
+            context.httpServer.handler.route.add(HTTPMethod.DELETE, "/management/cache/:name/:key", new ControllerHolder(controller::delete, true));
         }
     }
 

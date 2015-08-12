@@ -15,7 +15,7 @@ import java.time.LocalTime;
 /**
  * @author neo
  */
-public class SchedulerConfig {
+public final class SchedulerConfig {
     private final ModuleContext context;
 
     public SchedulerConfig(ModuleContext context) {
@@ -32,7 +32,7 @@ public class SchedulerConfig {
                 context.shutdownHook.add(scheduler::shutdown);
 
                 SchedulerController schedulerController = new SchedulerController(scheduler);
-                context.httpServer.route.add(HTTPMethod.POST, "/management/job/:job", new ControllerHolder(schedulerController::triggerJob, null).internal());
+                context.httpServer.handler.route.add(HTTPMethod.POST, "/management/job/:job", new ControllerHolder(schedulerController::triggerJob, true));
             }
             context.scheduler = scheduler;
             return scheduler;

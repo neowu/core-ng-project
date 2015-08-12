@@ -31,7 +31,7 @@ public class HTTPServerErrorHandler {
     private final Logger logger = LoggerFactory.getLogger(HTTPServerErrorHandler.class);
     private final ResponseHandler responseHandler;
     private final LogManager logManager;
-    ErrorHandler customErrorHandler;
+    public ErrorHandler customErrorHandler;
 
     public HTTPServerErrorHandler(ResponseHandler responseHandler, LogManager logManager) {
         this.responseHandler = responseHandler;

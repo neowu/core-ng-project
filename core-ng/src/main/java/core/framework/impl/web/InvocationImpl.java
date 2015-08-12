@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * @author neo
@@ -19,12 +18,12 @@ public class InvocationImpl implements Invocation {
     private final Logger logger = LoggerFactory.getLogger(InvocationImpl.class);
 
     private final ControllerHolder controller;
-    private final List<Interceptor> interceptors;
+    private final Interceptors interceptors;
     private final Request request;
     private final WebContextImpl context;
     private int currentStack;
 
-    public InvocationImpl(ControllerHolder controller, List<Interceptor> interceptors, Request request, WebContextImpl context) {
+    public InvocationImpl(ControllerHolder controller, Interceptors interceptors, Request request, WebContextImpl context) {
         this.controller = controller;
         this.interceptors = interceptors;
         this.request = request;
@@ -47,11 +46,11 @@ public class InvocationImpl implements Invocation {
 
     @Override
     public Response proceed() throws Exception {
-        if (interceptors == null || currentStack >= interceptors.size()) {
+        if (controller.skipInterceptor || currentStack >= interceptors.interceptors.size()) {
             logger.debug("execute controller, controller={}", controller.controllerInfo);
             return controller.controller.execute(request);
         } else {
-            Interceptor interceptor = interceptors.get(currentStack);
+            Interceptor interceptor = interceptors.interceptors.get(currentStack);
             currentStack++;
             logger.debug("intercept, interceptorClass={}", interceptor.getClass().getCanonicalName());
             return interceptor.intercept(this);

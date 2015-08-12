@@ -16,7 +16,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class DBConfig {
+public final class DBConfig {
     private final Logger logger = LoggerFactory.getLogger(DBConfig.class);
     private final ModuleContext context;
     private final String name;

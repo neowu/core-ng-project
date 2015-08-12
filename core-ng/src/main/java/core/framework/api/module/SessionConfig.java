@@ -13,7 +13,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class SessionConfig {
+public final class SessionConfig {
     private final Logger logger = LoggerFactory.getLogger(SessionConfig.class);
     private final ModuleContext context;
 

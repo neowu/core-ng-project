@@ -9,7 +9,7 @@ import java.nio.file.Path;
 /**
  * @author neo
  */
-public class LogConfig {
+public final class LogConfig {
     private final Logger logger = LoggerFactory.getLogger(LogConfig.class);
 
     private final ModuleContext context;

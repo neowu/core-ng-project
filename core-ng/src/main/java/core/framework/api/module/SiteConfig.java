@@ -1,13 +1,15 @@
 package core.framework.api.module;
 
+import core.framework.api.http.HTTPMethod;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.web.ControllerHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author neo
  */
-public class SiteConfig {
+public final class SiteConfig {
     private final Logger logger = LoggerFactory.getLogger(SiteConfig.class);
 
     private final ModuleContext context;
@@ -30,6 +32,6 @@ public class SiteConfig {
 
     public void staticContent(String root) {
         logger.info("add static content root, root={}", root);
-        context.httpServer.get(root + "/:path(*)", context.httpServer.siteManager.staticContentController(root));
+        context.httpServer.handler.route.add(HTTPMethod.GET, root + "/:path(*)", new ControllerHolder(context.httpServer.siteManager.staticContentController(root), true));
     }
 }
