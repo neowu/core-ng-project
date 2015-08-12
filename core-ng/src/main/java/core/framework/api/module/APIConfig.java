@@ -7,8 +7,7 @@ import core.framework.api.web.Controller;
 import core.framework.api.web.service.Path;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.BeanValidator;
-import core.framework.impl.web.ControllerProxy;
-import core.framework.impl.web.ControllerProxyBuilder;
+import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.client.WebServiceClient;
 import core.framework.impl.web.client.WebServiceClientBuilder;
 import core.framework.impl.web.service.HTTPMethodHelper;
@@ -42,8 +41,7 @@ public class APIConfig {
             Controller controller = new ServiceControllerBuilder<>(serviceInterface, service, method).build();
             try {
                 Method targetMethod = service.getClass().getMethod(method.getName(), method.getParameterTypes());
-                ControllerProxy proxy = new ControllerProxyBuilder(httpMethod, path, controller).targetMethod(targetMethod).build();
-                context.httpServer.route.add(httpMethod, path, proxy);
+                context.httpServer.route.add(httpMethod, path, new ControllerHolder(controller, targetMethod));
             } catch (NoSuchMethodException e) {
                 throw new Error("failed to find impl method", e);
             }

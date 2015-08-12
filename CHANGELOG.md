@@ -1,6 +1,9 @@
 ## Change log
 
-### 3.3.7
+### 3.3.8 (8/11/2015 - )
+* http server: interceptor ignore built-in controllers
+
+### 3.3.7 (8/11/2015)
 * web: fix webservice controller inspection (getAnnotation/methodInfo)
 * mongo: find supports orderby/skip/limit
 

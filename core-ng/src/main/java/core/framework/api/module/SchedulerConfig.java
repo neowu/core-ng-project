@@ -1,10 +1,12 @@
 package core.framework.api.module;
 
+import core.framework.api.http.HTTPMethod;
 import core.framework.api.scheduler.Job;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.scheduler.trigger.DailyTrigger;
 import core.framework.impl.scheduler.trigger.FixedRateTrigger;
+import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.management.SchedulerController;
 
 import java.time.Duration;
@@ -30,7 +32,7 @@ public class SchedulerConfig {
                 context.shutdownHook.add(scheduler::shutdown);
 
                 SchedulerController schedulerController = new SchedulerController(scheduler);
-                context.httpServer.post("/management/job/:job", schedulerController::triggerJob);
+                context.httpServer.route.add(HTTPMethod.POST, "/management/job/:job", new ControllerHolder(schedulerController::triggerJob, null).internal());
             }
             context.scheduler = scheduler;
             return scheduler;

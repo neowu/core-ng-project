@@ -18,13 +18,13 @@ import java.util.List;
 public class InvocationImpl implements Invocation {
     private final Logger logger = LoggerFactory.getLogger(InvocationImpl.class);
 
-    private final ControllerProxy controller;
+    private final ControllerHolder controller;
     private final List<Interceptor> interceptors;
     private final Request request;
     private final WebContextImpl context;
     private int currentStack;
 
-    public InvocationImpl(ControllerProxy controller, List<Interceptor> interceptors, Request request, WebContextImpl context) {
+    public InvocationImpl(ControllerHolder controller, List<Interceptor> interceptors, Request request, WebContextImpl context) {
         this.controller = controller;
         this.interceptors = interceptors;
         this.request = request;
@@ -47,8 +47,8 @@ public class InvocationImpl implements Invocation {
 
     @Override
     public Response proceed() throws Exception {
-        if (currentStack >= interceptors.size()) {
-            logger.debug("execute controller, controllerClass={}, controllerMethod={}", controller.targetClassName, controller.targetMethodName);
+        if (interceptors == null || currentStack >= interceptors.size()) {
+            logger.debug("execute controller, controller={}", controller.controllerInfo);
             return controller.controller.execute(request);
         } else {
             Interceptor interceptor = interceptors.get(currentStack);

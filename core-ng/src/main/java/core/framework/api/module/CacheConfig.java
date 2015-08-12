@@ -1,6 +1,7 @@
 package core.framework.api.module;
 
 import core.framework.api.cache.Cache;
+import core.framework.api.http.HTTPMethod;
 import core.framework.api.redis.Redis;
 import core.framework.api.redis.RedisBuilder;
 import core.framework.api.util.Exceptions;
@@ -10,6 +11,7 @@ import core.framework.impl.cache.CacheStore;
 import core.framework.impl.cache.LocalCacheStore;
 import core.framework.impl.cache.RedisCacheStore;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.management.CacheController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,9 +71,9 @@ public class CacheConfig {
 
         if (!context.test) {
             CacheController controller = new CacheController(context.cacheManager);
-            context.httpServer.get("/management/cache", controller::list);
-            context.httpServer.get("/management/cache/:name/:key", controller::get);
-            context.httpServer.delete("/management/cache/:name/:key", controller::delete);
+            context.httpServer.route.add(HTTPMethod.GET, "/management/cache", new ControllerHolder(controller::list, null).internal());
+            context.httpServer.route.add(HTTPMethod.GET, "/management/cache/:name/:key", new ControllerHolder(controller::get, null).internal());
+            context.httpServer.route.add(HTTPMethod.DELETE, "/management/cache/:name/:key", new ControllerHolder(controller::delete, null).internal());
         }
     }
 

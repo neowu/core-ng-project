@@ -59,9 +59,9 @@ public class HTTPServerHandler implements HttpHandler {
             String refId = headers.getFirst(HTTPServerHandler.HEADER_REF_ID);
             if (refId != null) actionLog.refId(refId);
 
-            ControllerProxy controller = route.get(request.path(), request.method(), request.pathParams);
+            ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams);
             actionLog.action(controller.action);
-            actionLog.putContext("controller", controller.targetClassName + "." + controller.targetMethodName);
+            actionLog.putContext("controller", controller.controllerInfo);
             logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());
 
             // trigger trace after action is determined due to trace log use action as part of path, is there better way?
@@ -70,7 +70,7 @@ public class HTTPServerHandler implements HttpHandler {
             }
 
             webContext.initialize(request);
-            Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
+            Response response = new InvocationImpl(controller, controller.internal ? null : interceptors, request, webContext).proceed();
             sessionManager.save(request, exchange);
             responseHandler.handle((ResponseImpl) response, exchange, request);
         } catch (Throwable e) {

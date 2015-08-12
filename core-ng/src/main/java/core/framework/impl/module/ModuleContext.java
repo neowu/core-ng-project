@@ -1,6 +1,7 @@
 package core.framework.impl.module;
 
 import core.framework.api.concurrent.AsyncExecutor;
+import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Properties;
 import core.framework.api.web.WebContext;
@@ -12,6 +13,7 @@ import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.scheduler.Scheduler;
+import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.HTTPServer;
 import core.framework.impl.web.management.HealthCheckController;
 import core.framework.impl.web.management.MemoryUsageController;
@@ -59,11 +61,11 @@ public class ModuleContext {
         beanFactory.bind(AsyncExecutor.class, null, new AsyncExecutor(executor, logManager));
 
         if (!test) {
-            httpServer.get("/health-check", new HealthCheckController());
-            httpServer.get("/monitor/memory", new MemoryUsageController());
+            httpServer.route.add(HTTPMethod.GET, "/health-check", new ControllerHolder(new HealthCheckController(), null).internal());
+            httpServer.route.add(HTTPMethod.GET, "/monitor/memory", new ControllerHolder(new MemoryUsageController(), null).internal());
             ThreadInfoController threadInfoController = new ThreadInfoController();
-            httpServer.get("/monitor/thread", threadInfoController::threadUsage);
-            httpServer.get("/monitor/thread-dump", threadInfoController::threadDump);
+            httpServer.route.add(HTTPMethod.GET, "/monitor/thread", new ControllerHolder(threadInfoController::threadUsage, null).internal());
+            httpServer.route.add(HTTPMethod.GET, "/monitor/thread-dump", new ControllerHolder(threadInfoController::threadDump, null).internal());
         }
     }
 }

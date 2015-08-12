@@ -82,8 +82,7 @@ public class HTTPServer implements RouteConfig, HTTPConfig {
 
     @Override
     public void add(HTTPMethod method, String path, Controller controller) {
-        ControllerProxy proxy = new ControllerProxyBuilder(method, path, controller).build();
-        route.add(method, path, proxy);
+        route.add(method, path, new ControllerHolder(controller, null));
     }
 
     @Override

@@ -4,7 +4,7 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.MethodNotAllowedException;
-import core.framework.impl.web.ControllerProxy;
+import core.framework.impl.web.ControllerHolder;
 
 import java.util.Map;
 
@@ -13,22 +13,22 @@ import java.util.Map;
  */
 class URLHandler {
     final String pathPattern;
-    private final Map<HTTPMethod, ControllerProxy> controllers = Maps.newHashMap();
+    private final Map<HTTPMethod, ControllerHolder> controllers = Maps.newHashMap();
 
     URLHandler(String pathPattern) {
         this.pathPattern = pathPattern;
     }
 
-    void put(HTTPMethod method, ControllerProxy controller) {
-        ControllerProxy previous = controllers.putIfAbsent(method, controller);
+    void put(HTTPMethod method, ControllerHolder controller) {
+        ControllerHolder previous = controllers.putIfAbsent(method, controller);
         if (previous != null) {
             throw Exceptions.error("conflicted controller found, path={}, method={}", pathPattern, method);
         }
     }
 
-    ControllerProxy get(HTTPMethod method) {
-        ControllerProxy proxy = controllers.get(method);
-        if (proxy == null) throw new MethodNotAllowedException(method);
-        return proxy;
+    ControllerHolder get(HTTPMethod method) {
+        ControllerHolder controller = controllers.get(method);
+        if (controller == null) throw new MethodNotAllowedException(method);
+        return controller;
     }
 }
