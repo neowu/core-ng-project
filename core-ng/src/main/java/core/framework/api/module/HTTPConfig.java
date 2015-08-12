@@ -2,14 +2,27 @@ package core.framework.api.module;
 
 import core.framework.api.web.ErrorHandler;
 import core.framework.api.web.Interceptor;
+import core.framework.impl.module.ModuleContext;
 
 /**
  * @author neo
  */
-public interface HTTPConfig {
-    void port(int port);
+public final class HTTPConfig {
+    private final ModuleContext context;
 
-    void intercept(Interceptor interceptor);
+    public HTTPConfig(ModuleContext context) {
+        this.context = context;
+    }
 
-    void errorHandler(ErrorHandler handler);
+    public void port(int port) {
+        context.httpServer.port = port;
+    }
+
+    public void intercept(Interceptor interceptor) {
+        context.httpServer.handler.interceptors.add(interceptor);
+    }
+
+    public void errorHandler(ErrorHandler handler) {
+        context.httpServer.handler.errorHandler.customErrorHandler = handler;
+    }
 }
