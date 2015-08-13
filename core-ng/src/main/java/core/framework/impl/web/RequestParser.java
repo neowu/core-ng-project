@@ -68,7 +68,7 @@ public class RequestParser {
     }
 
     void parseBody(RequestImpl request, HttpServerExchange exchange) throws IOException {
-        if (request.contentType.startsWith("application/json")) {
+        if (request.contentType != null && request.contentType.startsWith("application/json")) {
             exchange.startBlocking();
             byte[] bytes = InputStreams.bytes(exchange.getInputStream());
             request.body = new String(bytes, Charsets.UTF_8);
