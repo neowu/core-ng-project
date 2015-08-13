@@ -3,9 +3,14 @@ package core.framework.impl.log;
 import com.rabbitmq.client.AMQP;
 import core.framework.api.queue.Message;
 import core.framework.api.util.JSON;
+import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
+import core.framework.api.util.Network;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
+import core.framework.impl.log.queue.ActionLogMessage;
+import core.framework.impl.log.queue.PerformanceStatMessage;
+import core.framework.impl.log.queue.TraceLogMessage;
 import core.framework.impl.queue.RabbitMQ;
 import core.framework.impl.queue.RabbitMQChannel;
 import org.slf4j.Logger;
@@ -13,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -27,8 +33,10 @@ public class LogForwarder {
     private final PrintStream fallbackLogger = System.err;
     private final String appName;
     private final String actionLogMessageType;
+    private final String traceLogMessageType;
 
     private final BlockingQueue<ActionLogMessage> actionLogQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<TraceLogMessage> traceLogQueue = new LinkedBlockingQueue<>();
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
     private final RabbitMQ rabbitMQ = new RabbitMQ();
 
@@ -36,6 +44,7 @@ public class LogForwarder {
         rabbitMQ.hosts(host);
         this.appName = appName;
         actionLogMessageType = ActionLogMessage.class.getAnnotation(Message.class).name();
+        traceLogMessageType = TraceLogMessage.class.getAnnotation(Message.class).name();
     }
 
     public void initialize() {
@@ -48,6 +57,20 @@ public class LogForwarder {
                     sendActionLogs();
                 } catch (Exception e) {
                     logger.warn("failed to send action log, retry in 30 seconds");
+                    Threads.sleepRoughly(Duration.ofSeconds(30));
+                }
+            }
+        });
+
+        executor.submit(() -> {
+            Thread thread = Thread.currentThread();
+            thread.setName("log-forwarder-trace-log");
+            thread.setPriority(Thread.NORM_PRIORITY - 2);
+            while (!executor.isShutdown()) {
+                try {
+                    sendTraceLogs();
+                } catch (Exception e) {
+                    logger.warn("failed to send trace log, retry in 30 seconds");
                     Threads.sleepRoughly(Duration.ofSeconds(30));
                 }
             }
@@ -65,15 +88,27 @@ public class LogForwarder {
         }
     }
 
+    private void sendTraceLogs() throws InterruptedException {
+        AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().type(traceLogMessageType).build();
+
+        try (RabbitMQChannel channel = rabbitMQ.channel()) {
+            while (!executor.isShutdown()) {
+                TraceLogMessage message = traceLogQueue.take();
+                channel.publish("", "trace-log-queue", JSON.toJSON(message), properties);
+            }
+        }
+    }
+
     public void shutdown() {
         logger.info("shutdown log forwarder");
         executor.shutdown();
         rabbitMQ.shutdown();
     }
 
-    public void sendActionLog(ActionLog log) {
+    void sendActionLog(ActionLog log) {
         ActionLogMessage message = new ActionLogMessage();
         message.app = appName;
+        message.serverIP = Network.localHostAddress();
         message.id = log.id;
         message.date = log.startTime;
         message.result = log.result();
@@ -98,6 +133,27 @@ public class LogForwarder {
             actionLogQueue.put(message);
         } catch (InterruptedException e) {
             fallbackLogger.println(Strings.format("failed to queue action log message", e));
+        }
+    }
+
+    void sendTraceLog(ActionLog log, List<LogEvent> events) {
+        TraceLogMessage message = new TraceLogMessage();
+        message.id = log.id;
+        message.date = log.startTime;
+        message.app = appName;
+        message.action = log.action;
+        message.result = log.result();
+
+        StringBuilder content = new StringBuilder();
+        for (LogEvent event : events) {
+            content.append(event.logMessage());
+        }
+        message.content = Lists.newArrayList(content.toString());
+
+        try {
+            traceLogQueue.put(message);
+        } catch (InterruptedException e) {
+            fallbackLogger.println(Strings.format("failed to queue trace log message", e));
         }
     }
 }

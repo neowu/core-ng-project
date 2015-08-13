@@ -1,8 +1,8 @@
 package core.log.queue;
 
 import core.framework.api.queue.MessageHandler;
-import core.framework.api.search.ElasticSearch;
-import core.framework.impl.log.ActionLogMessage;
+import core.framework.api.search.ElasticSearchType;
+import core.framework.impl.log.queue.ActionLogMessage;
 
 import javax.inject.Inject;
 
@@ -11,10 +11,10 @@ import javax.inject.Inject;
  */
 public class ActionLogMessageHandler implements MessageHandler<ActionLogMessage> {
     @Inject
-    ElasticSearch elasticSearch;
+    ElasticSearchType<ActionLogMessage> actionType;
 
     @Override
     public void handle(ActionLogMessage message) throws Exception {
-        elasticSearch.index("action", message.id, message);
+        actionType.index(message.id, message);
     }
 }

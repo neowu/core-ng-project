@@ -1,6 +1,5 @@
-package core.framework.impl.queue;
+package core.framework.impl.search;
 
-import core.framework.api.queue.Message;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
@@ -23,19 +22,19 @@ import java.util.Set;
 /**
  * @author neo
  */
-class MessageClassValidator implements TypeVisitor {
+public final class ElasticSearchClassValidator implements TypeVisitor {
     private final DataTypeValidator validator;
     private final Map<Class, Set<String>> elements = Maps.newHashMap();
 
-    MessageClassValidator(Class<?> messageClass) {
-        validator = new DataTypeValidator(messageClass);
+    public ElasticSearchClassValidator(Class<?> documentClass) {
+        validator = new DataTypeValidator(documentClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;
         validator.visitor = this;
     }
 
-    void validate() {
+    public void validate() {
         validator.validate();
     }
 
@@ -54,12 +53,9 @@ class MessageClassValidator implements TypeVisitor {
 
     @Override
     public void visitClass(Class<?> instanceClass, boolean topLevel) {
-        if (topLevel && !instanceClass.isAnnotationPresent(Message.class)) {
-            throw Exceptions.error("message class must have @Message, class={}", instanceClass);
-        }
         XmlAccessorType accessorType = instanceClass.getDeclaredAnnotation(XmlAccessorType.class);
         if (accessorType == null || accessorType.value() != XmlAccessType.FIELD)
-            throw Exceptions.error("message class must have @XmlAccessorType(XmlAccessType.FIELD), class={}", instanceClass);
+            throw Exceptions.error("document class must have @XmlAccessorType(XmlAccessType.FIELD), class={}", instanceClass);
     }
 
     @Override
@@ -67,10 +63,10 @@ class MessageClassValidator implements TypeVisitor {
         XmlElement element = field.getDeclaredAnnotation(XmlElement.class);
 
         if (!Modifier.isPublic(field.getModifiers()) || element == null)
-            throw Exceptions.error("all fields of message class must be public and with @XmlElement(name=), field={}", field);
+            throw Exceptions.error("all fields of document class must be public and with @XmlElement(name=), field={}", field);
 
         if (field.isAnnotationPresent(XmlTransient.class))
-            throw Exceptions.error("message class field must not be transient, field={}", field);
+            throw Exceptions.error("document class field must not be transient, field={}", field);
 
         String name = element.name();
 

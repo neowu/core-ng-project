@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.3.9 (8/13/2015)
+* ES: API changed to provide more flexibility to operate index and type
+* log: draft of trace log forwarding
+
 ### 3.3.8 (8/11/2015 - 8/12/2015)
 * http server: interceptor ignore built-in controllers
 * mongo: use LinkedHashMap to keep same order as in mongo

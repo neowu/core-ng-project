@@ -1,4 +1,4 @@
-package core.framework.impl.queue;
+package core.framework.api.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -6,10 +6,10 @@ import java.net.UnknownHostException;
 /**
  * @author neo
  */
-public class Network {
+public final class Network {
     private static String localHostAddress;
 
-    static String localHostAddress() {
+    public static String localHostAddress() {
         if (localHostAddress == null)
             try {
                 String localHostName = InetAddress.getLocalHost().getHostAddress();

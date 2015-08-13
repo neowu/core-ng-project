@@ -21,7 +21,8 @@ public class TestModule extends AbstractTestModule {
         Path dataPath = Files.tempDirectory();
         ElasticSearch search = new ElasticSearchBuilder().local(dataPath).get();
         overrideBinding(ElasticSearch.class, null, search);
-        search.createIndex(ClasspathResources.text("mappings.json"));
+
+        search.createIndex("main", ClasspathResources.text("mappings.json"));
         onShutdown(() -> Files.deleteDirectory(dataPath));
 
         load(new SearchServiceApp());
@@ -33,6 +34,6 @@ public class TestModule extends AbstractTestModule {
         SearchProductService searchService = bean(SearchProductService.class);
         YAML.loadList(ProductIndex.class, ClasspathResources.text("products.yml")).forEach(searchService::index);
         YAML.loadList(SKUIndex.class, ClasspathResources.text("skus.yml")).forEach(searchService::index);
-        search.flush();
+        search.flush("main");
     }
 }

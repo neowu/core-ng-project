@@ -2,7 +2,7 @@ package app.service;
 
 import app.domain.ProductIndex;
 import app.domain.SKUIndex;
-import core.framework.api.search.ElasticSearch;
+import core.framework.api.search.ElasticSearchType;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Lists;
 import org.elasticsearch.action.search.SearchResponse;
@@ -19,14 +19,16 @@ import java.util.List;
  */
 public class SearchProductService {
     @Inject
-    ElasticSearch search;
+    ElasticSearchType<ProductIndex> productType;
+    @Inject
+    ElasticSearchType<SKUIndex> skuType;
 
     public void index(ProductIndex product) {
-        search.index("product", String.valueOf(product.id), product);
+        productType.index(String.valueOf(product.id), product);
     }
 
     public void index(SKUIndex sku) {
-        search.index("sku", sku.sku, String.valueOf(sku.productId), sku);
+        skuType.index(sku.sku, String.valueOf(sku.productId), sku);
     }
 
     public List<ProductIndex> search(SearchProductRequest request) {
@@ -35,7 +37,7 @@ public class SearchProductService {
         BoolQueryBuilder childQuery = QueryBuilders.boolQuery();
         childQuery.should(QueryBuilders.matchQuery("name", request.query));
 
-        SearchResponse response = search.search("product", new SearchSourceBuilder()
+        SearchResponse response = productType.search(new SearchSourceBuilder()
             .query(QueryBuilders.hasChildQuery("sku", childQuery))
 //            .aggregation(AggregationBuilders.children("test").childType("sku").subAggregation(AggregationBuilders.max("price")))
             .from(0)

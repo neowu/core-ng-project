@@ -1,4 +1,4 @@
-package core.framework.impl.log;
+package core.framework.impl.log.queue;
 
 import core.framework.api.queue.Message;
 
@@ -14,10 +14,12 @@ import java.util.Map;
 @Message(name = "action_log")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ActionLogMessage {
-    @XmlElement(name = "app")
-    public String app;
     @XmlElement(name = "date")
     public Instant date;
+    @XmlElement(name = "app")
+    public String app;
+    @XmlElement(name = "server_ip")
+    public String serverIP;
     @XmlElement(name = "id")
     public String id;
     @XmlElement(name = "result")

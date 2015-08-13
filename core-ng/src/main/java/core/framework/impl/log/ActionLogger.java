@@ -1,5 +1,7 @@
 package core.framework.impl.log;
 
+import core.framework.api.util.Lists;
+
 import java.io.Writer;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,10 +53,21 @@ class ActionLogger {
 
     private void flushTraceLogs() {
         traceWriter = logWriter.createTraceWriter(log);
-        events.forEach(this::writeTraceLog);
+
+        for (LogEvent event : events) {
+            logWriter.writeTraceLog(traceWriter, event);
+        }
+
+        if (logForwarder != null) {
+            logForwarder.sendTraceLog(log, events);
+        }
     }
 
     void writeTraceLog(LogEvent event) {
         logWriter.writeTraceLog(traceWriter, event);
+
+        if (logForwarder != null) {
+            logForwarder.sendTraceLog(log, Lists.newArrayList(event));
+        }
     }
 }

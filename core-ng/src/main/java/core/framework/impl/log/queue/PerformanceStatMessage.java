@@ -1,4 +1,4 @@
-package core.framework.impl.log;
+package core.framework.impl.log.queue;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

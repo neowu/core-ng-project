@@ -1,5 +1,6 @@
 package core.framework.impl.queue;
 
+import core.framework.api.util.Network;
 import org.junit.Assert;
 import org.junit.Test;
 
