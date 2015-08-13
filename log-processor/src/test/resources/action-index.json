@@ -1,0 +1,48 @@
+{
+  "settings": {
+  },
+  "mappings": {
+    "action": {
+      "_ttl": {
+        "enabled": true,
+        "default": "90d"
+      },
+      "properties": {
+        "date": {
+          "type": "date"
+        },
+        "id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "app": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "server_ip": {
+          "type": "ip"
+        },
+        "result": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "ref_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "action": {
+          "type": "string"
+        },
+        "error_message": {
+          "type": "string"
+        },
+        "exception_class": {
+          "type": "string"
+        },
+        "elapsed": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

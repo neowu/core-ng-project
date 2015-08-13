@@ -1,0 +1,35 @@
+{
+  "settings": {
+  },
+  "mappings": {
+    "trace": {
+      "_ttl": {
+        "enabled": true,
+        "default": "90d"
+      },
+      "properties": {
+        "date": {
+          "type": "date"
+        },
+        "id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "app": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "result": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "action": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
