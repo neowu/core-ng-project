@@ -31,13 +31,15 @@
           "index": "not_analyzed"
         },
         "action": {
-          "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "error_message": {
           "type": "string"
         },
         "exception_class": {
-          "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "elapsed": {
           "type": "integer"

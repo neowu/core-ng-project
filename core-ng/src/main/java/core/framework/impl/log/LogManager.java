@@ -2,13 +2,13 @@ package core.framework.impl.log;
 
 import core.framework.api.log.Warning;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author neo
  */
 public class LogManager {
     private final ThreadLocal<ActionLogger> loggers = new ThreadLocal<>();
+    Logger logger;
     public final LogWriter logWriter = new LogWriter();
     public LogForwarder logForwarder;
     public final String appName;
@@ -17,17 +17,18 @@ public class LogManager {
         this.appName = System.getProperty("core.appName");
     }
 
-    public void start(Logger logger, String message) {
+    public void start(String message) {
         ActionLogger actionLogger = new ActionLogger(logWriter, logForwarder);
         loggers.set(actionLogger);
         logger.debug(message);
-        actionLogger.log.logId();
+        logger.debug("[context] id={}", actionLogger.log.id);
     }
 
-    public void end(Logger logger, String message) {
+    public void end(String message) {
         logger.debug(message);
-        loggers.get().end();
-        loggers.remove();
+        ActionLogger actionLogger = loggers.get();
+        loggers.remove();   // remove action logger first, make all log during end() not appending to trace
+        actionLogger.end();
     }
 
     public void process(LogEvent event) {
@@ -42,13 +43,12 @@ public class LogManager {
     }
 
     public void shutdown() {
-        Logger logger = LoggerFactory.getLogger(LogManager.class.getName());
         logger.info("showdown log manager");
-        logWriter.close();
         if (logForwarder != null) logForwarder.shutdown();
+        logWriter.close();
     }
 
-    public void logError(Logger logger, Throwable e) {  // pass logger where the exception is caught
+    public void logError(Throwable e) {  // pass logger where the exception is caught
         ActionLog actionLog = currentActionLog();
         actionLog.error(e);
 

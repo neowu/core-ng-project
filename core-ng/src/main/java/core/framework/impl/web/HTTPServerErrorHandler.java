@@ -2,6 +2,7 @@ package core.framework.impl.web;
 
 import core.framework.api.http.ContentTypes;
 import core.framework.api.http.HTTPStatus;
+import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Exceptions;
 import core.framework.api.validate.ValidationException;
 import core.framework.api.web.ErrorHandler;
@@ -12,8 +13,6 @@ import core.framework.api.web.exception.ForbiddenException;
 import core.framework.api.web.exception.MethodNotAllowedException;
 import core.framework.api.web.exception.NotFoundException;
 import core.framework.api.web.exception.UnauthorizedException;
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.LogManager;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.exception.ValidationErrorResponse;
 import core.framework.impl.web.response.ResponseHandler;
@@ -30,17 +29,13 @@ import java.util.Optional;
 public class HTTPServerErrorHandler {
     private final Logger logger = LoggerFactory.getLogger(HTTPServerErrorHandler.class);
     private final ResponseHandler responseHandler;
-    private final LogManager logManager;
     public ErrorHandler customErrorHandler;
 
-    public HTTPServerErrorHandler(ResponseHandler responseHandler, LogManager logManager) {
+    public HTTPServerErrorHandler(ResponseHandler responseHandler) {
         this.responseHandler = responseHandler;
-        this.logManager = logManager;
     }
 
     public void handleError(Throwable e, HttpServerExchange exchange, RequestImpl request) {
-        logManager.logError(logger, e);
-
         if (exchange.isResponseStarted()) {
             logger.error("response was sent, discard the current http transaction");
             return;
@@ -104,14 +99,13 @@ public class HTTPServerErrorHandler {
     private void renderDefaultErrorPage(Throwable e, HttpServerExchange exchange) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ContentTypes.TEXT_HTML);
         exchange.setResponseCode(HTTPStatus.INTERNAL_SERVER_ERROR.code);
-        ActionLog actionLog = logManager.currentActionLog();
-        actionLog.context("responseCode", exchange.getResponseCode());
+        ActionLogContext.put("responseCode", exchange.getResponseCode());
         exchange.getResponseSender().send(errorHTML(e));
     }
 
     private ErrorResponse errorResponse(Throwable e) {
         ErrorResponse response = new ErrorResponse();
-        response.id = logManager.currentActionLog().id;
+        response.id = ActionLogContext.id();
         response.message = e.getMessage();
         response.stackTrace = Exceptions.stackTrace(e);
         return response;

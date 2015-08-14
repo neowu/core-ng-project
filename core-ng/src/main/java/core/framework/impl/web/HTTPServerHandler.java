@@ -39,7 +39,7 @@ public class HTTPServerHandler implements HttpHandler {
         sessionManager = siteManager.sessionManager;
 
         responseHandler = new ResponseHandler(validator, siteManager.templateManager);
-        errorHandler = new HTTPServerErrorHandler(responseHandler, logManager);
+        errorHandler = new HTTPServerErrorHandler(responseHandler);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class HTTPServerHandler implements HttpHandler {
             return;
         }
 
-        logManager.start(logger, "=== http transaction begin ===");
+        logManager.start("=== http transaction begin ===");
         RequestImpl request = new RequestImpl(exchange, validator);
         try {
             ActionLog actionLog = logManager.currentActionLog();
@@ -79,10 +79,11 @@ public class HTTPServerHandler implements HttpHandler {
             sessionManager.save(request, exchange);
             responseHandler.handle((ResponseImpl) response, exchange, request);
         } catch (Throwable e) {
+            logManager.logError(e);
             errorHandler.handleError(e, exchange, request);
         } finally {
             webContext.cleanup();
-            logManager.end(logger, "=== http transaction end ===");
+            logManager.end("=== http transaction end ===");
         }
     }
 }

@@ -33,7 +33,7 @@ public class TransactionManager {
         if (connection != null) {
             TransactionState state = currentTransactionState.get();
             if (state != TransactionState.START)
-                throw Exceptions.error("sql is not allowed after transaction ends, currentState={}", state);
+                throw Exceptions.error("db access is not allowed after transaction ends, currentState={}", state);
             return connection;
         }
 

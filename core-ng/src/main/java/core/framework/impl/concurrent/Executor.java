@@ -31,14 +31,14 @@ public class Executor {
     }
 
     private <T> T execute(Callable<T> task) {
-        logManager.start(logger, "=== task execution begin ===");
+        logManager.start("=== task execution begin ===");
         try {
             return task.call();
         } catch (Throwable e) {
-            logManager.logError(logger, e);
+            logManager.logError(e);
             return null;
         } finally {
-            logManager.end(logger, "=== task execution end ===");
+            logManager.end("=== task execution end ===");
         }
     }
 }

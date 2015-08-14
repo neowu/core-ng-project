@@ -41,14 +41,10 @@ class ActionLogger {
     public void end() {
         log.end();
 
-        if (logForwarder != null) {
-            logForwarder.sendActionLog(log);
-        }
-
         logWriter.writeActionLog(log);
+        if (traceWriter != null) logWriter.closeTraceLogWriter(traceWriter);
 
-        if (traceWriter != null)
-            logWriter.closeTraceLogWriter(traceWriter);
+        if (logForwarder != null) logForwarder.queueActionLog(log);
     }
 
     private void flushTraceLogs() {
@@ -59,15 +55,13 @@ class ActionLogger {
         }
 
         if (logForwarder != null) {
-            logForwarder.sendTraceLog(log, events);
+            logForwarder.queueTraceLog(log, events);
         }
     }
 
     void writeTraceLog(LogEvent event) {
         logWriter.writeTraceLog(traceWriter, event);
 
-        if (logForwarder != null) {
-            logForwarder.sendTraceLog(log, Lists.newArrayList(event));
-        }
+        if (logForwarder != null) logForwarder.queueTraceLog(log, Lists.newArrayList(event));
     }
 }

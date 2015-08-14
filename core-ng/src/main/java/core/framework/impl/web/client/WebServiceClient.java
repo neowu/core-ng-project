@@ -117,7 +117,8 @@ public class WebServiceClient implements WebServiceClientConfig {
                 throw new RemoteServiceException(Strings.format("failed to validate, errors={}", validationErrorResponse.errors));
             } else {
                 ErrorResponse errorResponse = JSON.fromJSON(ErrorResponse.class, responseText);
-                throw new RemoteServiceException(Strings.format("failed to call remote web service, error={}, remoteStackTrace={}", errorResponse.message, errorResponse.stackTrace));
+                throw new RemoteServiceException(Strings.format("failed to call remote web service, id={}, error={}, remoteStackTrace={}",
+                    errorResponse.id, errorResponse.message, errorResponse.stackTrace));
             }
         } catch (RemoteServiceException e) {
             throw e;

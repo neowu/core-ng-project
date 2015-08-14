@@ -11,6 +11,13 @@ import java.util.Optional;
  * @author neo
  */
 public final class ActionLogContext {
+    public static String id() {
+        LogManager logManager = logManager();
+        ActionLog actionLog = logManager.currentActionLog();
+        if (actionLog == null) return null;
+        return actionLog.id;
+    }
+
     public static Optional<String> get(String key) {
         LogManager logManager = logManager();
         ActionLog actionLog = logManager.currentActionLog();

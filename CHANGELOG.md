@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.4.0 (8/14/2015 - )
+* log: refactor/tuning impl
+* log: update log-processor ES mappings
+
 ### 3.3.9 (8/13/2015)
 * ES: API changed to provide more flexibility to operate index and type
 * log: draft of trace log forwarding

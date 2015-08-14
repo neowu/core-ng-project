@@ -11,19 +11,21 @@ import java.util.Map;
  */
 public class DefaultLoggerFactory implements ILoggerFactory {
     private final Map<String, Logger> loggers = Maps.newConcurrentHashMap();
-    public final LogManager logManager = new LogManager();
+    public final LogManager logManager;
+
+    public DefaultLoggerFactory() {
+        logManager = new LogManager();
+        logManager.logger = getLogger(LogManager.class.getName());
+    }
 
     @Override
     public Logger getLogger(String name) {
-        Logger logger = loggers.get(name);
-        if (logger != null) {
-            return logger;
-        } else {
-            LogLevel[] levels = logLevel(name);
-            logger = new LoggerImpl(name, logManager, levels[0], levels[1]);
-            Logger existingLogger = loggers.putIfAbsent(name, logger);
-            return existingLogger == null ? logger : existingLogger;
-        }
+        return loggers.computeIfAbsent(name, this::createLogger);
+    }
+
+    private Logger createLogger(String name) {
+        LogLevel[] levels = logLevel(name);
+        return new LoggerImpl(name, logManager, levels[0], levels[1]);
     }
 
     private LogLevel[] logLevel(String name) {

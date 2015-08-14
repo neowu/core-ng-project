@@ -28,10 +28,6 @@ public class ActionLog {
     final Map<String, String> context = Maps.newLinkedHashMap();
     final Map<String, PerformanceStat> performanceStats = Maps.newHashMap();
 
-    void logId() {
-        logger.debug("[context] id={}", id);
-    }
-
     void end() {
         elapsed = Duration.between(startTime, Instant.now()).toMillis();
     }
@@ -54,7 +50,7 @@ public class ActionLog {
     }
 
     public void track(String action, long elapsedTime) {
-        PerformanceStat tracking = this.performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
+        PerformanceStat tracking = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
         tracking.count++;
         tracking.totalElapsed += elapsedTime;
     }

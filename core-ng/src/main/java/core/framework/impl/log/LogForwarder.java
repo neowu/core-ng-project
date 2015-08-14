@@ -6,7 +6,6 @@ import core.framework.api.util.JSON;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Network;
-import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.framework.impl.log.queue.PerformanceStatMessage;
@@ -16,7 +15,6 @@ import core.framework.impl.queue.RabbitMQChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.PrintStream;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +28,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class LogForwarder {
     private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
-    private final PrintStream fallbackLogger = System.err;
     private final String appName;
     private final String actionLogMessageType;
     private final String traceLogMessageType;
@@ -56,7 +53,7 @@ public class LogForwarder {
                 try {
                     sendActionLogs();
                 } catch (Exception e) {
-                    logger.warn("failed to send action log, retry in 30 seconds");
+                    logger.warn("failed to send action log, retry in 30 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(30));
                 }
             }
@@ -70,7 +67,7 @@ public class LogForwarder {
                 try {
                     sendTraceLogs();
                 } catch (Exception e) {
-                    logger.warn("failed to send trace log, retry in 30 seconds");
+                    logger.warn("failed to send trace log, retry in 30 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(30));
                 }
             }
@@ -105,7 +102,7 @@ public class LogForwarder {
         rabbitMQ.shutdown();
     }
 
-    void sendActionLog(ActionLog log) {
+    void queueActionLog(ActionLog log) {
         ActionLogMessage message = new ActionLogMessage();
         message.app = appName;
         message.serverIP = Network.localHostAddress();
@@ -132,11 +129,11 @@ public class LogForwarder {
         try {
             actionLogQueue.put(message);
         } catch (InterruptedException e) {
-            fallbackLogger.println(Strings.format("failed to queue action log message", e));
+            logger.warn("failed to queue action log message", e);
         }
     }
 
-    void sendTraceLog(ActionLog log, List<LogEvent> events) {
+    void queueTraceLog(ActionLog log, List<LogEvent> events) {
         TraceLogMessage message = new TraceLogMessage();
         message.id = log.id;
         message.date = log.startTime;
@@ -153,7 +150,7 @@ public class LogForwarder {
         try {
             traceLogQueue.put(message);
         } catch (InterruptedException e) {
-            fallbackLogger.println(Strings.format("failed to queue trace log message", e));
+            logger.warn("failed to queue trace log message", e);
         }
     }
 }

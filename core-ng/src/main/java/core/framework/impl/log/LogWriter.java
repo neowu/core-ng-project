@@ -163,7 +163,7 @@ public class LogWriter {
                 .append(action).append("ElapsedTime=").append(tracking.totalElapsed);
         }
 
-        builder.append(LogEvent.LINE_SEPARATOR);
+        builder.append(System.lineSeparator());
 
         return builder.toString();
     }

@@ -43,7 +43,7 @@ class LoggerImpl extends AbstractLogger {
             LogEvent event = new LogEvent(level, System.currentTimeMillis(), logger, message, arguments, exception);
             logManager.process(event);
 
-            if (level.value >= this.logLevel.value) {
+            if (level.value >= logLevel.value) {
                 output.print(event.logMessage());
             }
         }
