@@ -1,6 +1,6 @@
 ## Change log
 
-### 3.4.0 (8/14/2015 - )
+### 3.4.0 (8/14/2015)
 * log: refactor/tuning impl
 * log: update log-processor ES mappings
 
