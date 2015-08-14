@@ -118,7 +118,7 @@ public class LogWriter {
     }
 
     String actionLogMessage(ActionLog log) {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(256);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(log.startTime))
             .append(LOG_SPLITTER)
             .append(log.result())

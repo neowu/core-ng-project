@@ -34,7 +34,7 @@ public class ModuleContext {
     public final Properties properties = new Properties();
 
     public final HTTPServer httpServer;
-    public Executor executor;
+    public final Executor executor;
     public Scheduler scheduler;
     public CacheManager cacheManager;
     public final QueueManager queueManager = new QueueManager();

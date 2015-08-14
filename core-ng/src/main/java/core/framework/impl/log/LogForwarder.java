@@ -141,7 +141,7 @@ public class LogForwarder {
         message.action = log.action;
         message.result = log.result();
 
-        StringBuilder content = new StringBuilder();
+        StringBuilder content = new StringBuilder(events.size() * 64);
         for (LogEvent event : events) {
             content.append(event.logMessage());
         }

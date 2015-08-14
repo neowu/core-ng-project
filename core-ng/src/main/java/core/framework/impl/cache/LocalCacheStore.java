@@ -1,11 +1,11 @@
 package core.framework.impl.cache;
 
+import core.framework.api.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class LocalCacheStore implements CacheStore {
     private final Logger logger = LoggerFactory.getLogger(LocalCacheStore.class);
 
-    private final Map<String, CacheItem> caches = new ConcurrentHashMap<>();
+    private final Map<String, CacheItem> caches = Maps.newConcurrentHashMap();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public void start() {
