@@ -57,7 +57,6 @@ public class TemplateManagerImpl implements TemplateManager {
     }
 
     private Template load(String templatePath, Class<?> modelClass) {
-        logger.debug("load template, path={}", templatePath);
         return new TemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass).build();
     }
 
