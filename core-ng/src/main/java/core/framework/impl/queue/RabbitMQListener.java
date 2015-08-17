@@ -1,6 +1,7 @@
 package core.framework.impl.queue;
 
 import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.ShutdownSignalException;
 import core.framework.api.module.MessageHandlerConfig;
 import core.framework.api.queue.Message;
 import core.framework.api.queue.MessageHandler;
@@ -77,6 +78,8 @@ public class RabbitMQListener implements Runnable, MessageHandlerConfig {
         while (!listenerExecutor.isShutdown()) {
             try (RabbitMQConsumer consumer = rabbitMQ.consumer(queue, maxConcurrentHandlers)) {
                 pullMessage(consumer);
+            } catch (ShutdownSignalException e) {
+                // pass thru if it's shutdown
             } catch (Throwable e) {
                 logger.error("failed to pull message, retry in 30 seconds", e);
                 Threads.sleepRoughly(Duration.ofSeconds(30));

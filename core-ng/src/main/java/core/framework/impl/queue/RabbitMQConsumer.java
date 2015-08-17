@@ -47,7 +47,7 @@ public class RabbitMQConsumer implements AutoCloseable {
         try {
             channel.basicAck(deliveryTag, false);
         } catch (IOException | AlreadyClosedException e) {
-            logger.error("failed to acknowledge message due to network issue, rabbitMQ will resend message if connection is closed");
+            logger.error("failed to acknowledge message due to network issue, rabbitMQ will resend message if connection is closed", e);
             throw new Error(e);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -58,11 +58,10 @@ public class RabbitMQConsumer implements AutoCloseable {
 
     @Override
     public void close() {
-        logger.info("close rabbitMQ consumer, queue={}", queue);
         try {
             channel.close();
         } catch (IOException | TimeoutException e) {
-            logger.warn("failed to close channel, error={}", e.getMessage(), e);
+            throw new Error(e);
         }
     }
 }

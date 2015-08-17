@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.4.1 (8/17/2015)
+* rabbitmq: handle ShutdownSignalException gracefully
+
 ### 3.4.0 (8/14/2015)
 * log: refactor/tuning impl
 * log: update log-processor ES mappings
