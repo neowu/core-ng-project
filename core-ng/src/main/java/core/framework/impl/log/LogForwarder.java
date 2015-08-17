@@ -52,7 +52,7 @@ public class LogForwarder {
             while (!executor.isShutdown()) {
                 try {
                     sendActionLogs();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.warn("failed to send action log, retry in 30 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(30));
                 }
@@ -66,7 +66,7 @@ public class LogForwarder {
             while (!executor.isShutdown()) {
                 try {
                     sendTraceLogs();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.warn("failed to send trace log, retry in 30 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(30));
                 }

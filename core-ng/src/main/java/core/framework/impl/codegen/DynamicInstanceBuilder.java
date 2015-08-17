@@ -68,7 +68,7 @@ public class DynamicInstanceBuilder<T> {
             classBuilder.addMethod(CtMethod.make(method, classBuilder));
             return this;
         } catch (CannotCompileException e) {
-            logger.error("failed method:\n{}", method);
+            logger.error("method failed to compile:\n{}", method);
             throw new CodeCompileException(e);
         }
     }
@@ -78,7 +78,7 @@ public class DynamicInstanceBuilder<T> {
             classBuilder.addField(CtField.make(field, classBuilder));
             return this;
         } catch (CannotCompileException e) {
-            logger.error("failed field:\n{}", field);
+            logger.error("field failed to compile:\n{}", field);
             throw new CodeCompileException(e);
         }
     }
