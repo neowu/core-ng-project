@@ -8,11 +8,11 @@ subprojects {
 }
 
 def awsVersion = '1.10.8'
-def jacksonVersion = '2.5.4'
+def jacksonVersion = '2.6.1'
 def redisVersion = '2.7.2'
 def mongoVersion = '3.0.3'
 def elasticVersion = '1.7.1'
-def rabbitVersion = '3.5.3'
+def rabbitVersion = '3.5.4'
 def c3p0Version = '0.9.5.1'
 
 project(':core-ng-api') {
@@ -24,7 +24,7 @@ project(':core-ng') {
     dependencies {
         provided(
                 "redis.clients:jedis:${redisVersion}",
-                "org.elasticsearch:elasticsearch:${elasticVersion}",
+                "org.elasticsearch:elasticsearch:${elasticVersion}@jar",
                 "com.mchange:c3p0:${c3p0Version}",
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
@@ -40,8 +40,8 @@ project(':core-ng') {
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
                 "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}",
-                'org.apache.httpcomponents:httpclient:4.4.1',
-                'io.undertow:undertow-core:1.2.8.Final'
+                'org.apache.httpcomponents:httpclient:4.5',
+                'io.undertow:undertow-core:1.2.10.Final'
         )
         testCompile(
                 'junit:junit:4.12',

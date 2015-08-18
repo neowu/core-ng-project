@@ -37,7 +37,7 @@ public final class HTTPClientBuilder {
             builder.setKeepAliveStrategy((response, context) -> keepAliveTimeout.toMillis());
 
             builder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                .setSslcontext(new SSLContextBuilder().loadTrustMaterial(TrustSelfSignedStrategy.INSTANCE).build());
+                .setSSLContext(new SSLContextBuilder().loadTrustMaterial(TrustSelfSignedStrategy.INSTANCE).build());
             // builder will use PoolingHttpClientConnectionManager by default
             builder.setDefaultSocketConfig(SocketConfig.custom()
                 .setSoKeepAlive(true)
