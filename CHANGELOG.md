@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.4.2 (8/19/2015)
+* FIX: make ControllerInspector works with jdk 1.8.0_60
+
 ### 3.4.1 (8/17/2015 - 8/19/2015)
 * rabbitmq: handle ShutdownSignalException gracefully
 * lib: updated jackson/undertow/rabbitmq/httpclient lib

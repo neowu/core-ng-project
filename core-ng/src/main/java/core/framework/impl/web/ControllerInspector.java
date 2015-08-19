@@ -1,8 +1,10 @@
 package core.framework.impl.web;
 
+import core.framework.api.util.Exceptions;
 import core.framework.api.web.Controller;
 import core.framework.api.web.Request;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -16,6 +18,7 @@ import java.security.PrivilegedAction;
 class ControllerInspector {
     static final Method GET_CONSTANT_POOL;
     static final Method CONTROLLER_METHOD;
+    static final int JDK_8_MINOR_VERSION;
 
     static {
         try {
@@ -28,6 +31,11 @@ class ControllerInspector {
         } catch (NoSuchMethodException e) {
             throw new Error("failed to initialize controller inspector, please contact arch team", e);
         }
+
+        String jdkVersion = System.getProperty("java.version");
+        if (!jdkVersion.startsWith("1.8.0_"))
+            throw Exceptions.error("unsupported jdk version, please contact arch team, jdk={}", jdkVersion);
+        JDK_8_MINOR_VERSION = Integer.parseInt(jdkVersion.substring(6));
     }
 
     final String targetClassName;
@@ -38,35 +46,33 @@ class ControllerInspector {
         Class<?> controllerClass = controller.getClass();
 
         try {
-            //TODO: investigate how to work with 1.8.0_60
-            targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
-            targetClassName = controllerClass.getCanonicalName();
-            targetMethodName = CONTROLLER_METHOD.getName();
-
-//            if (!controllerClass.isSynthetic()) {
-//                targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
-//                targetClassName = controllerClass.getCanonicalName();
-//                targetMethodName = CONTROLLER_METHOD.getName();
-//            } else {
-//                targetClassName = controllerClass.getCanonicalName();
-//                targetMethodName = CONTROLLER_METHOD.getName();
-//
-//                Object constantPool = GET_CONSTANT_POOL.invoke(controllerClass); // constantPool is sun.reflect.ConstantPool, it can be changed in future JDK
-//                Method getSize = constantPool.getClass().getMethod("getSize");
-//                int size = (int) getSize.invoke(constantPool);
-//                Method getMemberRefInfoAt = constantPool.getClass().getMethod("getMemberRefInfoAt", int.class);
-//                String[] methodRefInfo = (String[]) getMemberRefInfoAt.invoke(constantPool, size - 2);
-//                Class<?> targetClass = Class.forName(methodRefInfo[0].replaceAll("/", "."));
-//                targetClassName = targetClass.getCanonicalName();
-//                targetMethodName = methodRefInfo[1];
-//                if (targetMethodName.contains("$")) {
-//                    targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
-//                } else {
-//                    targetMethod = targetClass.getMethod(targetMethodName, CONTROLLER_METHOD.getParameterTypes());
-//                }
-//            }
-        } catch (NoSuchMethodException e) {
+            if (!controllerClass.isSynthetic()) {
+                targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
+                targetClassName = controllerClass.getCanonicalName();
+                targetMethodName = CONTROLLER_METHOD.getName();
+            } else {
+                Object constantPool = GET_CONSTANT_POOL.invoke(controllerClass); // constantPool is sun.reflect.ConstantPool, it can be changed in future JDK
+                Method getSize = constantPool.getClass().getMethod("getSize");
+                int size = (int) getSize.invoke(constantPool);
+                Method getMemberRefInfoAt = constantPool.getClass().getMethod("getMemberRefInfoAt", int.class);
+                String[] methodRefInfo = (String[]) getMemberRefInfoAt.invoke(constantPool, methodRefIndex(size));
+                Class<?> targetClass = Class.forName(methodRefInfo[0].replaceAll("/", "."));
+                targetClassName = targetClass.getCanonicalName();
+                targetMethodName = methodRefInfo[1];
+                if (targetMethodName.contains("$")) {
+                    targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
+                } else {
+                    targetMethod = targetClass.getMethod(targetMethodName, CONTROLLER_METHOD.getParameterTypes());
+                }
+            }
+        } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
             throw new Error("failed to inspect controller, please contact arch team", e);
         }
+    }
+
+    private int methodRefIndex(int size) {
+        if (JDK_8_MINOR_VERSION >= 60)
+            return size - 3; // from 1.8.0_60, the index of methodRefInfo is different from previous jdk
+        return size - 2;
     }
 }
