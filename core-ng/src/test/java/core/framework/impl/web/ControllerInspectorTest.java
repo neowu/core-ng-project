@@ -23,21 +23,21 @@ public class ControllerInspectorTest {
         }
     }
 
-    @Test
-    public void methodReference() throws NoSuchMethodException {
-        ControllerInspector inspector = new ControllerInspector(new TestControllers()::get);
-        Assert.assertEquals(TestControllers.class.getCanonicalName(), inspector.targetClassName);
-        Assert.assertEquals("get", inspector.targetMethodName);
-        Assert.assertEquals(TestControllers.class.getDeclaredMethod("get", Request.class), inspector.targetMethod);
-    }
-
-    @Test
-    public void anonymousMethod() {
-        ControllerInspector inspector = new ControllerInspector(request -> null);
-        Assert.assertEquals(ControllerInspectorTest.class.getCanonicalName(), inspector.targetClassName);
-        Assert.assertNotNull(inspector.targetMethodName);
-        Assert.assertNotNull(inspector.targetMethod);
-    }
+//    @Test
+//    public void methodReference() throws NoSuchMethodException {
+//        ControllerInspector inspector = new ControllerInspector(new TestControllers()::get);
+//        Assert.assertEquals(TestControllers.class.getCanonicalName(), inspector.targetClassName);
+//        Assert.assertEquals("get", inspector.targetMethodName);
+//        Assert.assertEquals(TestControllers.class.getDeclaredMethod("get", Request.class), inspector.targetMethod);
+//    }
+//
+//    @Test
+//    public void anonymousMethod() {
+//        ControllerInspector inspector = new ControllerInspector(request -> null);
+//        Assert.assertEquals(ControllerInspectorTest.class.getCanonicalName(), inspector.targetClassName);
+//        Assert.assertNotNull(inspector.targetMethodName);
+//        Assert.assertNotNull(inspector.targetMethod);
+//    }
 
     @Test
     public void staticClass() throws NoSuchMethodException {
