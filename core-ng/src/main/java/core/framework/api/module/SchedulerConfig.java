@@ -1,13 +1,9 @@
 package core.framework.api.module;
 
-import core.framework.api.http.HTTPMethod;
 import core.framework.api.scheduler.Job;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.scheduler.Scheduler;
-import core.framework.impl.scheduler.trigger.DailyTrigger;
-import core.framework.impl.scheduler.trigger.FixedRateTrigger;
-import core.framework.impl.web.ControllerHolder;
-import core.framework.impl.web.management.SchedulerController;
+import core.framework.impl.scheduler.DailyTrigger;
+import core.framework.impl.scheduler.FixedRateTrigger;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -22,28 +18,11 @@ public final class SchedulerConfig {
         this.context = context;
     }
 
-    private Scheduler scheduler() {
-        if (context.scheduler != null) {
-            return context.scheduler;
-        } else {
-            Scheduler scheduler = new Scheduler(context.executor, context.logManager);
-            if (!context.test) {
-                context.startupHook.add(scheduler::start);
-                context.shutdownHook.add(scheduler::shutdown);
-
-                SchedulerController schedulerController = new SchedulerController(scheduler);
-                context.httpServer.handler.route.add(HTTPMethod.POST, "/management/job/:job", new ControllerHolder(schedulerController::triggerJob, true));
-            }
-            context.scheduler = scheduler;
-            return scheduler;
-        }
-    }
-
     public void fixedRate(String name, Job job, Duration rate) {
-        scheduler().addTrigger(name, job, new FixedRateTrigger(rate));
+        context.scheduler().addTrigger(new FixedRateTrigger(name, job, rate));
     }
 
     public void dailyAt(String name, Job job, LocalTime time) {
-        scheduler().addTrigger(name, job, new DailyTrigger(time));
+        context.scheduler().addTrigger(new DailyTrigger(name, job, time));
     }
 }

@@ -3,7 +3,9 @@ package core.framework.api.module;
 import core.framework.api.redis.Redis;
 import core.framework.api.redis.RedisBuilder;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.scheduler.FixedRateTrigger;
 import core.framework.impl.web.session.LocalSessionStore;
+import core.framework.impl.web.session.LocalSessionStoreCleanupJob;
 import core.framework.impl.web.session.RedisSessionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +30,9 @@ public final class SessionConfig {
 
     public SessionConfig local() {
         logger.info("create local session provider");
-        LocalSessionStore provider = new LocalSessionStore();
-        if (!context.test) {
-            context.startupHook.add(provider::start);
-            context.shutdownHook.add(provider::shutdown);
-        }
-        context.httpServer.siteManager.sessionManager.sessionProvider(provider);
+        LocalSessionStore sessionStore = new LocalSessionStore();
+        context.scheduler().addTrigger(new FixedRateTrigger("local-session-cleanup", new LocalSessionStoreCleanupJob(sessionStore), Duration.ofMinutes(30)));
+        context.httpServer.siteManager.sessionManager.sessionStore(sessionStore);
         return this;
     }
 
@@ -46,7 +45,7 @@ public final class SessionConfig {
         logger.info("create redis session provider, host={}", host);
         Redis redis = new RedisBuilder().host(host).get();
         context.shutdownHook.add(redis::shutdown);
-        context.httpServer.siteManager.sessionManager.sessionProvider(new RedisSessionStore(redis));
+        context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
         return this;
     }
 }

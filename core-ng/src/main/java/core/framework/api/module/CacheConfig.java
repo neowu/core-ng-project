@@ -9,8 +9,10 @@ import core.framework.api.util.Types;
 import core.framework.impl.cache.CacheManager;
 import core.framework.impl.cache.CacheStore;
 import core.framework.impl.cache.LocalCacheStore;
+import core.framework.impl.cache.LocalCacheStoreCleanupJob;
 import core.framework.impl.cache.RedisCacheStore;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.scheduler.FixedRateTrigger;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.management.CacheController;
 import org.slf4j.Logger;
@@ -38,10 +40,7 @@ public final class CacheConfig {
 
         logger.info("create local cache store");
         LocalCacheStore cacheStore = new LocalCacheStore();
-        if (!context.test) {
-            context.startupHook.add(cacheStore::start);
-            context.shutdownHook.add(cacheStore::shutdown);
-        }
+        context.scheduler().addTrigger(new FixedRateTrigger("local-cache-cleanup", new LocalCacheStoreCleanupJob(cacheStore), Duration.ofMinutes(30)));
 
         configureCacheManager(cacheStore);
     }

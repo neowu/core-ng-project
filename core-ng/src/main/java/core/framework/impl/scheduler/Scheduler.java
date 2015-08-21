@@ -7,7 +7,6 @@ import core.framework.api.web.exception.NotFoundException;
 import core.framework.impl.concurrent.Executor;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.scheduler.trigger.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +26,7 @@ public final class Scheduler {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Executor executor;
     private final LogManager logManager;
-    private final Map<String, JobTrigger> triggers = Maps.newHashMap();
+    public final Map<String, Trigger> triggers = Maps.newHashMap();
 
     public Scheduler(Executor executor, LogManager logManager) {
         this.executor = executor;
@@ -35,7 +34,7 @@ public final class Scheduler {
     }
 
     public void start() {
-        triggers.forEach((name, trigger) -> trigger.trigger.schedule(this, name, trigger.job));
+        triggers.forEach((name, trigger) -> trigger.schedule(this));
         logger.info("scheduler started");
     }
 
@@ -44,23 +43,24 @@ public final class Scheduler {
         scheduler.shutdown();
     }
 
-    public void addTrigger(String name, Job job, Trigger trigger) {
-        if (job.getClass().isSynthetic())
-            throw Exceptions.error("job class must not be anonymous class or lambda, please create static class, jobClass={}", job.getClass().getCanonicalName());
+    public void addTrigger(Trigger trigger) {
+        Class<? extends Job> jobClass = trigger.job.getClass();
+        if (jobClass.isSynthetic())
+            throw Exceptions.error("job class must not be anonymous class or lambda, please create static class, jobClass={}", jobClass.getCanonicalName());
 
-        JobTrigger previous = triggers.putIfAbsent(name, new JobTrigger(job, trigger));
+        Trigger previous = triggers.putIfAbsent(trigger.name, trigger);
         if (previous != null)
-            throw Exceptions.error("duplicated job found, name={}, previousJobClass={}", name, previous.job.getClass().getCanonicalName());
+            throw Exceptions.error("duplicated job found, name={}, previousJobClass={}", previous.name, previous.job.getClass().getCanonicalName());
     }
 
     public void triggerNow(String name) {
-        JobTrigger trigger = triggers.get(name);
-        if (trigger == null) throw new NotFoundException("job name not found, name=" + name);
+        Trigger trigger = triggers.get(name);
+        if (trigger == null) throw new NotFoundException("job not found, name=" + name);
         Job job = trigger.job;
         executor.submit(task(name, job, true));
     }
 
-    public void schedule(String name, Job job, Duration initialDelay, Duration rate) {
+    void schedule(String name, Job job, Duration initialDelay, Duration rate) {
         scheduler.scheduleAtFixedRate(() -> executor.submit(task(name, job, false)), initialDelay.getSeconds(), rate.getSeconds(), TimeUnit.SECONDS);
     }
 

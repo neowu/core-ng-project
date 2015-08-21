@@ -60,7 +60,7 @@ public class SessionManager {
         }
     }
 
-    public void sessionProvider(SessionStore sessionStore) {
+    public void sessionStore(SessionStore sessionStore) {
         if (this.sessionStore != null)
             throw Exceptions.error("session store is already configured, previous={}", this.sessionStore);
         this.sessionStore = sessionStore;

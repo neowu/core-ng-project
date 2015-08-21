@@ -1,9 +1,9 @@
 package core.framework.impl.web.route;
 
 import core.framework.api.http.HTTPMethod;
-import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.NotFoundException;
+import core.framework.impl.log.ActionLog;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.PathParams;
 import org.slf4j.Logger;
@@ -39,11 +39,14 @@ public final class Route {
         handler.put(method, controller);
     }
 
-    public ControllerHolder get(String path, HTTPMethod method, PathParams pathParams) {
+    public ControllerHolder get(String path, HTTPMethod method, PathParams pathParams, ActionLog actionLog) {
         URLHandler handler = staticHandlers.get(path);
         if (handler == null) handler = dynamicRoot.find(path, pathParams);
-        if (handler == null) throw new NotFoundException("not found, path=" + path);
-        ActionLogContext.put("pathPattern", handler.pathPattern);
-        return handler.get(method);
+        if (handler == null) {
+            actionLog.action("web/not-found");
+            throw new NotFoundException("not found, path=" + path);
+        }
+        actionLog.context("pathPattern", handler.pathPattern);
+        return handler.get(method, actionLog);
     }
 }

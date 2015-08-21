@@ -12,11 +12,13 @@ import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
+import core.framework.impl.resource.ResourceManager;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.HTTPServer;
 import core.framework.impl.web.management.HealthCheckController;
 import core.framework.impl.web.management.MemoryUsageController;
+import core.framework.impl.web.management.SchedulerController;
 import core.framework.impl.web.management.ThreadInfoController;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +37,11 @@ public class ModuleContext {
 
     public final HTTPServer httpServer;
     public final Executor executor;
-    public Scheduler scheduler;
+    private Scheduler scheduler;
     public CacheManager cacheManager;
     public final QueueManager queueManager = new QueueManager();
     public final LogManager logManager;
+    public final ResourceManager resourceManager;
 
     public ModuleContext(BeanFactory beanFactory, boolean test) {
         this.beanFactory = beanFactory;
@@ -47,6 +50,12 @@ public class ModuleContext {
         this.logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
         if (!test) {
             shutdownHook.add(logManager::shutdown);
+        }
+
+        resourceManager = new ResourceManager(logManager);
+        if (!test) {
+            startupHook.add(resourceManager::initialize);
+            shutdownHook.add(resourceManager::shutdown);
         }
 
         httpServer = new HTTPServer(logManager);
@@ -67,5 +76,20 @@ public class ModuleContext {
             httpServer.handler.route.add(HTTPMethod.GET, "/monitor/thread", new ControllerHolder(threadInfoController::threadUsage, true));
             httpServer.handler.route.add(HTTPMethod.GET, "/monitor/thread-dump", new ControllerHolder(threadInfoController::threadDump, true));
         }
+    }
+
+    public Scheduler scheduler() {
+        if (scheduler == null) {
+            scheduler = new Scheduler(executor, logManager);
+            if (!test) {
+                startupHook.add(scheduler::start);
+                shutdownHook.add(scheduler::shutdown);
+
+                SchedulerController schedulerController = new SchedulerController(scheduler);
+                httpServer.handler.route.add(HTTPMethod.GET, "/management/job", new ControllerHolder(schedulerController::listJobs, true));
+                httpServer.handler.route.add(HTTPMethod.POST, "/management/job/:job", new ControllerHolder(schedulerController::triggerJob, true));
+            }
+        }
+        return scheduler;
     }
 }

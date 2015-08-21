@@ -126,11 +126,7 @@ public class LogForwarder {
         });
         message.performanceStats = performanceStats;
 
-        try {
-            actionLogQueue.put(message);
-        } catch (InterruptedException e) {
-            logger.warn("failed to queue action log message", e);
-        }
+        actionLogQueue.add(message);
     }
 
     void queueTraceLog(ActionLog log, List<LogEvent> events) {
@@ -147,10 +143,6 @@ public class LogForwarder {
         }
         message.content = Lists.newArrayList(content.toString());
 
-        try {
-            traceLogQueue.put(message);
-        } catch (InterruptedException e) {
-            logger.warn("failed to queue trace log message", e);
-        }
+        traceLogQueue.add(message);
     }
 }

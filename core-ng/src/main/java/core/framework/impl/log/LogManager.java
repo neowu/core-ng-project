@@ -43,7 +43,7 @@ public class LogManager {
     }
 
     public void shutdown() {
-        logger.info("showdown log manager");
+        logger.info("shutdown log manager");
         if (logForwarder != null) logForwarder.shutdown();
         logWriter.close();
     }
