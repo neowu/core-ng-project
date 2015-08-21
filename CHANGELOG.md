@@ -1,10 +1,12 @@
 ## Change log
 
+### 3.4.4 (to be done)
+* resource: draft generic resource manager
+* rabbitmq: channel pooling (send message perf is 20x faster if not closing channel)
+
 ### 3.4.3 (8/19/2015 - 8/21/2015)
 * web: assign action for 404 => web/not-found, 405 => web/method-not-allowed
 * scheduler: make scheduler for both internal and external scheduling
-* resource: draft generic resource manager
-* rabbitmq: channel pooling (send message perf is 20x faster if not closing channel)
 
 ### 3.4.2 (8/19/2015)
 * FIX: make ControllerInspector works with jdk 1.8.0_60

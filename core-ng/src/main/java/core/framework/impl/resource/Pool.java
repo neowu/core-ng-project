@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.Iterator;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -49,9 +50,9 @@ public class Pool<T extends AutoCloseable> {
             }
         } else {
             try {
-                return queue.take();
+                return queue.poll(30, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                throw new Error(e);
+                throw new Error("failed to retrieve resource from pool", e);
             }
         }
     }
