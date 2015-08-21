@@ -19,9 +19,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author neo
@@ -29,76 +28,59 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class LogForwarder {
     private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
     private final String appName;
-    private final String actionLogMessageType;
-    private final String traceLogMessageType;
 
-    private final BlockingQueue<ActionLogMessage> actionLogQueue = new LinkedBlockingQueue<>();
-    private final BlockingQueue<TraceLogMessage> traceLogQueue = new LinkedBlockingQueue<>();
-    private final ExecutorService executor = Executors.newFixedThreadPool(2);
+    private final AMQP.BasicProperties actionLogMessageProperties = new AMQP.BasicProperties.Builder().type(ActionLogMessage.class.getAnnotation(Message.class).name()).build();
+    private final AMQP.BasicProperties traceLogMessageProperties = new AMQP.BasicProperties.Builder().type(TraceLogMessage.class.getAnnotation(Message.class).name()).build();
+
+    private final BlockingQueue<Object> logMessageQueue = new LinkedBlockingQueue<>();
     private final RabbitMQ rabbitMQ = new RabbitMQ();
 
+    private final AtomicBoolean shutdown = new AtomicBoolean(false);
+    private final Thread logForwarderThread;
+
     public LogForwarder(String host, String appName) {
-        rabbitMQ.hosts(host);
         this.appName = appName;
-        actionLogMessageType = ActionLogMessage.class.getAnnotation(Message.class).name();
-        traceLogMessageType = TraceLogMessage.class.getAnnotation(Message.class).name();
+
+        rabbitMQ.hosts(host);
+
+        logForwarderThread = new Thread(() -> {
+            while (true) {
+                try {
+                    sendLogMessages();
+                } catch (Throwable e) {
+                    if (shutdown.get()) {
+                        logger.info("stop log-forwarder thread");
+                        break;
+                    }
+                    logger.warn("failed to send log message, retry in 30 seconds", e);
+                    Threads.sleepRoughly(Duration.ofSeconds(30));
+                }
+            }
+        });
+        logForwarderThread.setName("log-forwarder");
+        logForwarderThread.setPriority(Thread.NORM_PRIORITY - 1);
     }
 
     public void initialize() {
-        executor.submit(() -> {
-            Thread thread = Thread.currentThread();
-            thread.setName("log-forwarder-action-log");
-            thread.setPriority(Thread.NORM_PRIORITY - 1);
-            while (!executor.isShutdown()) {
-                try {
-                    sendActionLogs();
-                } catch (Throwable e) {
-                    logger.warn("failed to send action log, retry in 30 seconds", e);
-                    Threads.sleepRoughly(Duration.ofSeconds(30));
-                }
-            }
-        });
-
-        executor.submit(() -> {
-            Thread thread = Thread.currentThread();
-            thread.setName("log-forwarder-trace-log");
-            thread.setPriority(Thread.NORM_PRIORITY - 2);
-            while (!executor.isShutdown()) {
-                try {
-                    sendTraceLogs();
-                } catch (Throwable e) {
-                    logger.warn("failed to send trace log, retry in 30 seconds", e);
-                    Threads.sleepRoughly(Duration.ofSeconds(30));
-                }
-            }
-        });
+        logForwarderThread.start();
     }
 
-    private void sendActionLogs() throws InterruptedException {
-        AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().type(actionLogMessageType).build();
-
+    private void sendLogMessages() throws InterruptedException {
         try (RabbitMQChannel channel = rabbitMQ.channel()) {
-            while (!executor.isShutdown()) {
-                ActionLogMessage message = actionLogQueue.take();
-                channel.publish("", "action-log-queue", JSON.toJSON(message), properties);
-            }
-        }
-    }
-
-    private void sendTraceLogs() throws InterruptedException {
-        AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().type(traceLogMessageType).build();
-
-        try (RabbitMQChannel channel = rabbitMQ.channel()) {
-            while (!executor.isShutdown()) {
-                TraceLogMessage message = traceLogQueue.take();
-                channel.publish("", "trace-log-queue", JSON.toJSON(message), properties);
+            while (!shutdown.get()) {
+                Object message = logMessageQueue.take();
+                if (message instanceof ActionLogMessage) {
+                    channel.publish("", "action-log-queue", JSON.toJSON(message), actionLogMessageProperties);
+                } else if (message instanceof TraceLogMessage) {
+                    channel.publish("", "trace-log-queue", JSON.toJSON(message), traceLogMessageProperties);
+                }
             }
         }
     }
 
     public void shutdown() {
-        logger.info("shutdown log forwarder");
-        executor.shutdown();
+        shutdown.set(true);
+        logForwarderThread.interrupt();
         rabbitMQ.shutdown();
     }
 
@@ -126,7 +108,7 @@ public class LogForwarder {
         });
         message.performanceStats = performanceStats;
 
-        actionLogQueue.add(message);
+        logMessageQueue.add(message);
     }
 
     void queueTraceLog(ActionLog log, List<LogEvent> events) {
@@ -143,6 +125,6 @@ public class LogForwarder {
         }
         message.content = Lists.newArrayList(content.toString());
 
-        traceLogQueue.add(message);
+        logMessageQueue.add(message);
     }
 }

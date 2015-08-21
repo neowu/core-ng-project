@@ -29,7 +29,7 @@ public class ShutdownHook implements Runnable {
         for (Runnable method : methods) {
             try {
                 method.run();
-            } catch (RuntimeException e) {
+            } catch (Throwable e) {
                 logger.warn("failed to execute shutdown method, method={}", method, e);
             }
         }
