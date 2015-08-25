@@ -9,9 +9,9 @@ public class EntityView {
     @Column(name = "id")
     public Integer id;
 
-    @Column(name = "string_field")
+    @Column(name = "string_label")
     public String stringField;
 
-    @Column(name = "enum_field")
+    @Column(name = "enum_label")
     public TestEnum enumField;
 }

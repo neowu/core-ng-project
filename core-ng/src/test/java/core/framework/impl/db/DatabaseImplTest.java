@@ -43,7 +43,7 @@ public class DatabaseImplTest {
             .addParam("string")
             .addParam(TestEnum.V1));
 
-        Query query = new Query("SELECT string_field, enum_field FROM database_test where id = ?").addParam(1);
+        Query query = new Query("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?").addParam(1);
         EntityView view = database.selectOne(query, EntityView.class).get();
 
         Assert.assertEquals("string", view.stringField);
@@ -62,7 +62,7 @@ public class DatabaseImplTest {
             .addParam("string")
             .addParam(TestEnum.V2));
 
-        Query query = new Query("SELECT string_field, enum_field FROM database_test");
+        Query query = new Query("SELECT string_field as string_label, enum_field as enum_label FROM database_test");
         List<EntityView> views = database.select(query, EntityView.class);
 
         Assert.assertEquals(2, views.size());

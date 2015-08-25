@@ -58,7 +58,7 @@ public class ResultSetMapper implements Row {
         ResultSetMetaData meta = resultSet.getMetaData();
         int count = meta.getColumnCount();
         for (int i = 1; i < count + 1; i++) {
-            String column = meta.getColumnName(i);
+            String column = meta.getColumnLabel(i);
             index.put(column.toLowerCase(), i);
         }
         return index;
