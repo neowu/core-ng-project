@@ -34,7 +34,7 @@ public final class Redis {
 
     public String get(String key) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             return redis.get(key);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -46,7 +46,7 @@ public final class Redis {
 
     public void set(String key, String value) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             redis.set(key, value);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -58,7 +58,7 @@ public final class Redis {
 
     public void expire(String key, Duration duration) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             redis.expire(key, (int) duration.getSeconds());
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -70,7 +70,7 @@ public final class Redis {
 
     public void setExpire(String key, String value, Duration duration) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             redis.setex(key, (int) duration.getSeconds(), value);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -82,7 +82,7 @@ public final class Redis {
 
     public void del(String... keys) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             redis.del(keys);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -94,7 +94,7 @@ public final class Redis {
 
     public Map<String, String> hgetAll(String key) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             return redis.hgetAll(key);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -106,7 +106,7 @@ public final class Redis {
 
     public void hmset(String key, Map<String, String> value) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             redis.hmset(key, value);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -118,7 +118,7 @@ public final class Redis {
 
     public Set<String> keys(String pattern) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             return redis.keys(pattern);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -130,7 +130,7 @@ public final class Redis {
 
     public void lpush(String key, String value) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             redis.lpush(key, value);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -143,7 +143,7 @@ public final class Redis {
     // blocking right pop
     public String brpop(String key) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             List<String> result = redis.brpop(key, "0");
             return result.get(1);   // result[0] is key, result[1] is popped value
         } finally {
@@ -155,7 +155,7 @@ public final class Redis {
 
     public void pipeline(Consumer<Pipeline> consumer) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = redisPool.getResource()) {
+        try (Jedis redis = getResourceFromPool()) {
             Pipeline pipeline = redis.pipelined();
             consumer.accept(pipeline);
             pipeline.sync();
@@ -164,6 +164,15 @@ public final class Redis {
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("pipeline, elapsedTime={}", elapsedTime);
             checkSlowQuery(elapsedTime);
+        }
+    }
+
+    private Jedis getResourceFromPool() {
+        StopWatch watch = new StopWatch();
+        try {
+            return redisPool.getResource();
+        } finally {
+            logger.debug("get redis from pool, elapsedTime={}", watch.elapsedTime());
         }
     }
 

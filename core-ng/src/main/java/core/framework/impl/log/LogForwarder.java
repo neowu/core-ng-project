@@ -44,14 +44,13 @@ public class LogForwarder {
         rabbitMQ.hosts(host);
 
         logForwarderThread = new Thread(() -> {
-            while (true) {
+            logger.info("log forwarder thread started");
+            while (!shutdown.get()) {
                 try {
                     sendLogMessages();
+                } catch (InterruptedException e) {
+                    // pass thru for interruption during shutdown
                 } catch (Throwable e) {
-                    if (shutdown.get()) {
-                        logger.info("stop log-forwarder thread");
-                        break;
-                    }
                     logger.warn("failed to send log message, retry in 30 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(30));
                 }
@@ -61,7 +60,7 @@ public class LogForwarder {
         logForwarderThread.setPriority(Thread.NORM_PRIORITY - 1);
     }
 
-    public void initialize() {
+    public void start() {
         logForwarderThread.start();
     }
 
@@ -79,6 +78,7 @@ public class LogForwarder {
     }
 
     public void shutdown() {
+        logger.info("shutdown log forwarder");
         shutdown.set(true);
         logForwarderThread.interrupt();
         rabbitMQ.shutdown();

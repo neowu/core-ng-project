@@ -40,7 +40,7 @@ public final class LogConfig {
             logger.info("disable forwarding log to remote during test");
         } else {
             context.logManager.logForwarder = new LogForwarder(host, context.logManager.appName);
-            context.startupHook.add(context.logManager.logForwarder::initialize);
+            context.startupHook.add(context.logManager.logForwarder::start);
         }
     }
 }

@@ -37,13 +37,7 @@ public final class QueueConfig {
     }
 
     public MessageHandlerConfig subscribe(String queueURI) {
-        if (context.beanFactory.registered(MessageHandlerConfig.class, queueURI)) {
-            return context.beanFactory.bean(MessageHandlerConfig.class, queueURI);
-        } else {
-            MessageHandlerConfig listener = listener(queueURI);
-            context.beanFactory.bind(MessageHandlerConfig.class, queueURI, listener);
-            return listener;
-        }
+        return context.queueManager.listeners().computeIfAbsent(queueURI, this::listener);
     }
 
     public <T> void publish(String destination, Class<T> messageClass) {

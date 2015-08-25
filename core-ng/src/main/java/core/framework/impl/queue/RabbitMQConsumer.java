@@ -34,12 +34,8 @@ public class RabbitMQConsumer implements AutoCloseable {
         }
     }
 
-    public QueueingConsumer.Delivery nextDelivery() {
-        try {
-            return consumer.nextDelivery();
-        } catch (InterruptedException e) {
-            throw new Error(e);
-        }
+    public QueueingConsumer.Delivery nextDelivery() throws InterruptedException {
+        return consumer.nextDelivery();
     }
 
     public void acknowledge(long deliveryTag) {

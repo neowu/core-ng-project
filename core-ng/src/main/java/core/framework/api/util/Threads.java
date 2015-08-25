@@ -21,7 +21,7 @@ public final class Threads {
         try {
             Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
-            throw new Error(e);
+            LOGGER.debug("sleep is interrupted");
         }
     }
 }
