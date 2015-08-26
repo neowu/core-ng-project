@@ -28,14 +28,14 @@ public class Pool<T> {
 
     private final Supplier<T> factory;
     private final ResourceCloseHandler<T> closeHandler;
+
     final BlockingDeque<PoolItem<T>> queue = new LinkedBlockingDeque<>();
+    final AtomicInteger currentSize = new AtomicInteger(0);
 
     String name;
     int minSize = 1;
     int maxSize = 5;
-
     private Duration maxIdleTime = Duration.ofMinutes(30);
-    final AtomicInteger currentSize = new AtomicInteger(0);
 
     public Pool(Supplier<T> factory, ResourceCloseHandler<T> closeHandler) {
         this.factory = factory;
@@ -46,12 +46,9 @@ public class Pool<T> {
         this.name = name;
     }
 
-    public void poolSize(int minSize, int maxSize) {
+    public void configure(int minSize, int maxSize, Duration maxIdleTime) {
         this.minSize = minSize;
         this.maxSize = maxSize;
-    }
-
-    public void maxIdleTime(Duration maxIdleTime) {
         this.maxIdleTime = maxIdleTime;
     }
 
@@ -76,8 +73,13 @@ public class Pool<T> {
     }
 
     private void recycleItem(PoolItem<T> item) {
-        currentSize.getAndDecrement();
-        closeResource(item.resource);
+        StopWatch watch = new StopWatch();
+        int previousSize = currentSize.getAndDecrement();
+        try {
+            closeResource(item.resource);
+        } finally {
+            logger.debug("[pool:{}] recycle resource, previousSize={}, elapsed={}", name, previousSize, watch.elapsedTime());
+        }
     }
 
     private PoolItem<T> waitNextAvailableItem() {
@@ -95,14 +97,14 @@ public class Pool<T> {
 
     private PoolItem<T> createNewItem() {
         StopWatch watch = new StopWatch();
-        int currentSize = this.currentSize.getAndIncrement();
+        int previousSize = currentSize.getAndIncrement();
         try {
             return new PoolItem<>(factory.get());
         } catch (Throwable e) {
-            this.currentSize.getAndDecrement();
+            currentSize.getAndDecrement();
             throw e;
         } finally {
-            logger.debug("[pool:{}] create new resource, currentSize={}, elapsed={}", name, currentSize, watch.elapsedTime());
+            logger.debug("[pool:{}] create new resource, previousSize={}, elapsed={}", name, previousSize, watch.elapsedTime());
         }
     }
 
@@ -119,13 +121,12 @@ public class Pool<T> {
 
         while (iterator.hasNext()) {
             PoolItem<T> item = iterator.next();
-            if (Duration.between(item.returnTime, now).getSeconds() > maxIdleTimeInSeconds && currentSize.get() > minSize) {
+            if (Duration.between(item.returnTime, now).getSeconds() > maxIdleTimeInSeconds) {
                 boolean removed = queue.remove(item);
-                if (removed) {
-                    recycleItem(item);
-                }
+                if (!removed) return;
+                recycleItem(item);
             } else {
-                break;
+                return;
             }
         }
     }

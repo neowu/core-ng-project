@@ -27,24 +27,23 @@ public class RabbitMQ {
     public final ConnectionFactory connectionFactory = new ConnectionFactory();
     private Address[] addresses;
     private Connection connection;
-    public final Pool<Channel> channelPool;
+    public final Pool<Channel> pool;
 
     public RabbitMQ() {
         connectionFactory.setAutomaticRecoveryEnabled(true);
         timeout(Duration.ofSeconds(5));
         connectionFactory.setUsername("rabbitmq");  // default user/password
         connectionFactory.setPassword("rabbitmq");
-        channelPool = new Pool<>(this::createChannel, Channel::close);
-        channelPool.name("rabbitmq");
-        channelPool.poolSize(1, 5);
-        channelPool.maxIdleTime(Duration.ofMinutes(30));
+        pool = new Pool<>(this::createChannel, Channel::close);
+        pool.name("rabbitmq");
+        pool.configure(1, 5, Duration.ofMinutes(30));
     }
 
     public void shutdown() {
         if (connection != null) {
             logger.info("shutdown rabbitMQ client, hosts={}", Arrays.toString(addresses));
             try {
-                channelPool.close();
+                pool.close();
                 connection.close();
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -71,14 +70,14 @@ public class RabbitMQ {
 
     public void publish(String exchange, String routingKey, String message, AMQP.BasicProperties properties) {
         StopWatch watch = new StopWatch();
-        PoolItem<Channel> item = channelPool.borrowItem();
+        PoolItem<Channel> item = pool.borrowItem();
         try {
             item.resource.basicPublish(exchange, routingKey, properties, Strings.bytes(message));
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
         } finally {
-            channelPool.returnItem(item);
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("rabbitMQ", elapsedTime);
             logger.debug("publish, exchange={}, routingKey={}, elapsedTime={}", exchange, routingKey, elapsedTime);

@@ -61,7 +61,7 @@ public final class Scheduler {
     }
 
     void schedule(String name, Job job, Duration initialDelay, Duration rate) {
-        scheduler.scheduleAtFixedRate(() -> executor.submit(task(name, job, false)), initialDelay.getSeconds(), rate.getSeconds(), TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(() -> executor.submit(task(name, job, false)), initialDelay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     private Callable<Void> task(String name, Job job, boolean trace) {

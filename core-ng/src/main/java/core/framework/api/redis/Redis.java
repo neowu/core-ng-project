@@ -2,10 +2,13 @@ package core.framework.api.redis;
 
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.StopWatch;
+import core.framework.impl.resource.Pool;
+import core.framework.impl.resource.PoolItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Protocol;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.time.Duration;
 import java.util.List;
@@ -17,24 +20,40 @@ import java.util.Set;
  */
 public final class Redis {
     private final Logger logger = LoggerFactory.getLogger(Redis.class);
-    private final JedisPool redisPool;
-    private final long slowQueryThresholdInMs;
+    private final String host;
 
-    Redis(JedisPool redisPool, long slowQueryThresholdInMs) {
-        this.redisPool = redisPool;
-        this.slowQueryThresholdInMs = slowQueryThresholdInMs;
+    public final Pool<Jedis> pool;
+    public long slowQueryThresholdInMs = 100;
+    public Duration timeout = Duration.ofSeconds(2);
+
+    public Redis(String host) {
+        this.host = host;
+        pool = new Pool<>(this::createRedis, Jedis::close);
+        pool.name("redis");
+        pool.configure(5, 50, Duration.ofMinutes(30));
+    }
+
+    private Jedis createRedis() {
+        Jedis jedis = new Jedis(host, Protocol.DEFAULT_PORT, (int) timeout.toMillis());
+        jedis.connect();
+        return jedis;
     }
 
     public void shutdown() {
-        logger.info("shutdown redis connection pool");
-        redisPool.destroy();
+        logger.info("shutdown redis client, host={}", host);
+        pool.close();
     }
 
     public String get(String key) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            return redis.get(key);
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            return item.resource.get(key);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("get, key={}, elapsedTime={}", key, elapsedTime);
@@ -44,8 +63,12 @@ public final class Redis {
 
     public void set(String key, String value) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            redis.set(key, value);
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            item.resource.set(key, value);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
@@ -56,8 +79,12 @@ public final class Redis {
 
     public void expire(String key, Duration duration) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            redis.expire(key, (int) duration.getSeconds());
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            item.resource.expire(key, (int) duration.getSeconds());
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
@@ -68,8 +95,12 @@ public final class Redis {
 
     public void setExpire(String key, String value, Duration duration) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            redis.setex(key, (int) duration.getSeconds(), value);
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            item.resource.setex(key, (int) duration.getSeconds(), value);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
@@ -80,8 +111,12 @@ public final class Redis {
 
     public void del(String... keys) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            redis.del(keys);
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            item.resource.del(keys);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
@@ -92,8 +127,12 @@ public final class Redis {
 
     public Map<String, String> hgetAll(String key) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            return redis.hgetAll(key);
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            return item.resource.hgetAll(key);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
@@ -104,8 +143,12 @@ public final class Redis {
 
     public void hmset(String key, Map<String, String> value) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            redis.hmset(key, value);
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            item.resource.hmset(key, value);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
@@ -116,8 +159,12 @@ public final class Redis {
 
     public Set<String> keys(String pattern) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            return redis.keys(pattern);
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            return item.resource.keys(pattern);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
@@ -128,8 +175,12 @@ public final class Redis {
 
     public void lpush(String key, String value) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            redis.lpush(key, value);
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            item.resource.lpush(key, value);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
@@ -141,9 +192,13 @@ public final class Redis {
     // blocking right pop
     public String brpop(String key) {
         StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            List<String> result = redis.brpop(key, "0");
+        PoolItem<Jedis> item = pool.borrowItem();
+        try {
+            List<String> result = item.resource.brpop(key, "0");
             return result.get(1);   // result[0] is key, result[1] is popped value
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
@@ -151,21 +206,8 @@ public final class Redis {
         }
     }
 
-    private Jedis getResourceFromPool() {
-        StopWatch watch = new StopWatch();
-        try {
-            return redisPool.getResource();
-        } finally {
-            logger.debug("get redis from pool, elapsedTime={}", watch.elapsedTime());
-        }
-    }
-
     private void checkSlowQuery(long elapsedTime) {
         if (elapsedTime > slowQueryThresholdInMs) {
-            int activeNum = redisPool.getNumActive();
-            int idleNum = redisPool.getNumIdle();
-            int waitingNum = redisPool.getNumWaiters();
-            logger.debug("redis pool stats, active={}, idle={}, waiting={}", activeNum, idleNum, waitingNum);
             logger.warn("slow query detected");
         }
     }

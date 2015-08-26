@@ -3,7 +3,6 @@ package core.framework.api.module;
 import core.framework.api.cache.Cache;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.redis.Redis;
-import core.framework.api.redis.RedisBuilder;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Types;
 import core.framework.impl.cache.CacheManager;
@@ -12,6 +11,7 @@ import core.framework.impl.cache.LocalCacheStore;
 import core.framework.impl.cache.LocalCacheStoreCleanupJob;
 import core.framework.impl.cache.RedisCacheStore;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.resource.PoolMaintenanceJob;
 import core.framework.impl.scheduler.FixedRateTrigger;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.management.CacheController;
@@ -55,10 +55,13 @@ public final class CacheConfig {
             local();
         } else {
             logger.info("create redis cache manager, host={}", host);
-            Redis redis = new RedisBuilder()
-                .host(host)
-                .timeout(Duration.ofMillis(500))    // for cache, it should not be longer than 500ms to get value
-                .get();
+
+            Redis redis = new Redis(host);
+            redis.pool.name("redis-cache");
+            redis.pool.configure(5, 50, Duration.ofMinutes(30));
+            redis.timeout = Duration.ofMillis(500);   // for cache, it should not be longer than 500ms to get value
+
+            context.scheduler().addTrigger(new FixedRateTrigger("pool-maintenance-redis-cache", new PoolMaintenanceJob(redis.pool), Duration.ofMinutes(5)));
             context.shutdownHook.add(redis::shutdown);
 
             configureCacheManager(new RedisCacheStore(redis));

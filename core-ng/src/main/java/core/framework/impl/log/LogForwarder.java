@@ -2,6 +2,7 @@ package core.framework.impl.log;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.ShutdownSignalException;
 import core.framework.api.queue.Message;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Lists;
@@ -85,6 +86,8 @@ public class LogForwarder {
     private void closeChannel(Channel channel) {
         try {
             channel.close();
+        } catch (ShutdownSignalException e) {
+            // pass thru during shutdown
         } catch (IOException | TimeoutException e) {
             logger.warn("failed to close channel", e);
         }

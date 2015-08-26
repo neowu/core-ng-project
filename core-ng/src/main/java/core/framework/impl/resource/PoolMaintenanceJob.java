@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public class PoolResizeJob implements Job {
-    private final Logger logger = LoggerFactory.getLogger(PoolResizeJob.class);
+public class PoolMaintenanceJob implements Job {
+    private final Logger logger = LoggerFactory.getLogger(PoolMaintenanceJob.class);
 
     private final Pool<?> pool;
 
-    public PoolResizeJob(Pool<?> pool) {
+    public PoolMaintenanceJob(Pool<?> pool) {
         this.pool = pool;
     }
 
@@ -24,13 +24,10 @@ public class PoolResizeJob implements Job {
         int currentSize = pool.currentSize.get();
         logger.debug("currentPoolSize={}, minSize={}, maxSize={}", currentSize, pool.minSize, pool.maxSize);
 
-        if (currentSize > pool.minSize) {
-            pool.recycleIdleItems();
-        } else if (currentSize < pool.minSize) {
-            logger.debug("replenish pool");
-            pool.replenish();
-        } else {
-            logger.debug("skip, pool size is equal to min size");
-        }
+        logger.debug("recycle idle items");
+        pool.recycleIdleItems();
+
+        logger.debug("replenish items");
+        pool.replenish();
     }
 }
