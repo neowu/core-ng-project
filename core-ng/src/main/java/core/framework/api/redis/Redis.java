@@ -70,6 +70,7 @@ public final class Redis {
             item.broken = true;
             throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("set, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
@@ -86,6 +87,7 @@ public final class Redis {
             item.broken = true;
             throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("expire, key={}, duration={}, elapsedTime={}", key, duration, elapsedTime);
@@ -102,6 +104,7 @@ public final class Redis {
             item.broken = true;
             throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("setExpire, key={}, value={}, duration={}, elapsedTime={}", key, value, duration, elapsedTime);
@@ -118,6 +121,7 @@ public final class Redis {
             item.broken = true;
             throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("del, keys={}, elapsedTime={}", keys, elapsedTime);
@@ -134,6 +138,7 @@ public final class Redis {
             item.broken = true;
             throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("hgetAll, key={}, elapsedTime={}", key, elapsedTime);
@@ -150,6 +155,7 @@ public final class Redis {
             item.broken = true;
             throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("hmset, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
@@ -166,6 +172,7 @@ public final class Redis {
             item.broken = true;
             throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("keys, pattern={}, elapsedTime={}", pattern, elapsedTime);
@@ -182,6 +189,7 @@ public final class Redis {
             item.broken = true;
             throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("lpush, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
@@ -200,6 +208,7 @@ public final class Redis {
             item.broken = true;
             throw e;
         } finally {
+            pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("brpop, key={}, elapsedTime={}", key, elapsedTime);
