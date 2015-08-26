@@ -5,19 +5,12 @@ import java.time.Instant;
 /**
  * @author neo
  */
-public class PoolItem<T extends AutoCloseable> implements AutoCloseable {
-    private final Pool<T> pool;
+public class PoolItem<T> {
     public final T resource;
     Instant returnTime;
     public boolean broken;
 
-    public PoolItem(Pool<T> pool, T resource) {
-        this.pool = pool;
+    public PoolItem(T resource) {
         this.resource = resource;
-    }
-
-    @Override
-    public void close() {
-        pool.put(this);
     }
 }

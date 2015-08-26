@@ -13,7 +13,7 @@ import java.util.Map;
 public class QueueManager {
     public RabbitMQ rabbitMQ;
     private MessageValidator validator;
-    private Map<String, MessageHandlerConfig> listeners = Maps.newHashMap();
+    private Map<String, MessageHandlerConfig> listeners;
 
     public Map<String, MessageHandlerConfig> listeners() {
         if (listeners == null) {

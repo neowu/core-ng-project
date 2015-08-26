@@ -6,13 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Pipeline;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * @author neo
@@ -150,20 +148,6 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("brpop, key={}, elapsedTime={}", key, elapsedTime);
-        }
-    }
-
-    public void pipeline(Consumer<Pipeline> consumer) {
-        StopWatch watch = new StopWatch();
-        try (Jedis redis = getResourceFromPool()) {
-            Pipeline pipeline = redis.pipelined();
-            consumer.accept(pipeline);
-            pipeline.sync();
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
-            logger.debug("pipeline, elapsedTime={}", elapsedTime);
-            checkSlowQuery(elapsedTime);
         }
     }
 

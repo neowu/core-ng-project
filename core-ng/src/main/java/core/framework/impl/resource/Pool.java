@@ -1,5 +1,6 @@
 package core.framework.impl.resource;
 
+import core.framework.api.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,77 +14,105 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 /**
- * this is for internal use only
+ * this is for internal use only,
+ * <p>
+ * the reason not using template/lambda pattern but classic design
+ * is to keep original exception, and simplify value writing,
+ * <p>
+ * the downside is boilerplate code, so to keep it only for internal
  *
  * @author neo
  */
-public class Pool<T extends AutoCloseable> {
+public class Pool<T> {
     private final Logger logger = LoggerFactory.getLogger(Pool.class);
 
-    private final int minSize;
-    private final int maxSize;
-    private final Duration maxIdleTime;
-    private final Supplier<T> supplier;
-
-    private final AtomicInteger currentSize = new AtomicInteger(0);
+    private final Supplier<T> factory;
+    private final ResourceCloseHandler<T> closeHandler;
     final BlockingDeque<PoolItem<T>> queue = new LinkedBlockingDeque<>();
 
-    public Pool(Supplier<T> supplier, int minSize, int maxSize, Duration maxIdleTime) {
-        this.supplier = supplier;
+    String name;
+    int minSize = 1;
+    int maxSize = 5;
+
+    private Duration maxIdleTime = Duration.ofMinutes(30);
+    final AtomicInteger currentSize = new AtomicInteger(0);
+
+    public Pool(Supplier<T> factory, ResourceCloseHandler<T> closeHandler) {
+        this.factory = factory;
+        this.closeHandler = closeHandler;
+    }
+
+    public void name(String name) {
+        this.name = name;
+    }
+
+    public void poolSize(int minSize, int maxSize) {
         this.minSize = minSize;
         this.maxSize = maxSize;
+    }
+
+    public void maxIdleTime(Duration maxIdleTime) {
         this.maxIdleTime = maxIdleTime;
     }
 
-    public PoolItem<T> take() {
+    public PoolItem<T> borrowItem() {
         PoolItem<T> item = queue.poll();
         if (item != null) return item;
 
         if (currentSize.get() < maxSize) {
-            int currentSize = this.currentSize.getAndIncrement();
-            try {
-                logger.debug("create new resource, currentSize={}", currentSize);
-                return new PoolItem<>(this, supplier.get());
-            } catch (Throwable e) {
-                this.currentSize.getAndDecrement();
-                throw e;
-            }
+            return createNewItem();
         } else {
-            try {
-                return queue.poll(30, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                throw new Error("failed to retrieve resource from pool", e);
-            }
+            return waitNextAvailableItem();
         }
     }
 
-    public void put(PoolItem<T> item) {
+    public void returnItem(PoolItem<T> item) {
         if (item.broken) {
-            currentSize.getAndDecrement();
-            closeResource(item);
+            recycleItem(item);
         } else {
             item.returnTime = Instant.now();
             queue.push(item);
         }
     }
 
-    public void initialize() {
+    private void recycleItem(PoolItem<T> item) {
+        currentSize.getAndDecrement();
+        closeResource(item.resource);
+    }
+
+    private PoolItem<T> waitNextAvailableItem() {
+        StopWatch watch = new StopWatch();
+        try {
+            PoolItem<T> item = queue.poll(30, TimeUnit.SECONDS);
+            if (item == null) throw new Error("timeout to wait for next available resource");
+            return item;
+        } catch (InterruptedException e) {
+            throw new Error("interrupted during waiting for next available resource", e);
+        } finally {
+            logger.debug("[pool:{}] wait for next available resource, currentSize={}, elapsed={}", name, currentSize.get(), watch.elapsedTime());
+        }
+    }
+
+    private PoolItem<T> createNewItem() {
+        StopWatch watch = new StopWatch();
+        int currentSize = this.currentSize.getAndIncrement();
+        try {
+            return new PoolItem<>(factory.get());
+        } catch (Throwable e) {
+            this.currentSize.getAndDecrement();
+            throw e;
+        } finally {
+            logger.debug("[pool:{}] create new resource, currentSize={}, elapsed={}", name, currentSize, watch.elapsedTime());
+        }
+    }
+
+    void replenish() {
         while (currentSize.get() < minSize) {
-            put(new PoolItem<>(this, supplier.get()));
-            currentSize.getAndIncrement();
+            returnItem(createNewItem());
         }
     }
 
-    public void close() {
-        currentSize.set(maxSize);   // make sure no more new resource will be created
-        while (true) {
-            PoolItem<T> item = queue.poll();
-            if (item == null) return;
-            closeResource(item);
-        }
-    }
-
-    public void clearIdleItems() {
+    void recycleIdleItems() {
         Iterator<PoolItem<T>> iterator = queue.descendingIterator();
         long maxIdleTimeInSeconds = maxIdleTime.getSeconds();
         Instant now = Instant.now();
@@ -93,8 +122,7 @@ public class Pool<T extends AutoCloseable> {
             if (Duration.between(item.returnTime, now).getSeconds() > maxIdleTimeInSeconds && currentSize.get() > minSize) {
                 boolean removed = queue.remove(item);
                 if (removed) {
-                    currentSize.getAndDecrement();
-                    closeResource(item);
+                    recycleItem(item);
                 }
             } else {
                 break;
@@ -102,11 +130,20 @@ public class Pool<T extends AutoCloseable> {
         }
     }
 
-    private void closeResource(PoolItem<T> item) {
+    private void closeResource(T resource) {
         try {
-            item.resource.close();
+            closeHandler.close(resource);
         } catch (Exception e) {
-            logger.warn("failed to close resource", e);
+            logger.warn("[pool:{}] failed to close resource", name, e);
+        }
+    }
+
+    public void close() {
+        currentSize.set(maxSize);   // make sure no more new resource will be created
+        while (true) {
+            PoolItem<T> item = queue.poll();
+            if (item == null) return;
+            closeResource(item.resource);
         }
     }
 }

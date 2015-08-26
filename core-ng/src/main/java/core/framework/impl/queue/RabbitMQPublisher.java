@@ -53,9 +53,7 @@ public class RabbitMQPublisher<T> implements MessagePublisher<T> {
 
         linkContext(builder, headers);
 
-        try (RabbitMQChannel channel = rabbitMQ.channel()) {
-            channel.publish(exchange, routingKey, JSON.toJSON(message), builder.build());
-        }
+        rabbitMQ.publish(exchange, routingKey, JSON.toJSON(message), builder.build());
     }
 
     private void linkContext(AMQP.BasicProperties.Builder builder, Map<String, Object> headers) {

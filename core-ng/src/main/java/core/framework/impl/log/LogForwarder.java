@@ -1,25 +1,28 @@
 package core.framework.impl.log;
 
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
 import core.framework.api.queue.Message;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Network;
+import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.framework.impl.log.queue.PerformanceStatMessage;
 import core.framework.impl.log.queue.TraceLogMessage;
 import core.framework.impl.queue.RabbitMQ;
-import core.framework.impl.queue.RabbitMQChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -40,7 +43,6 @@ public class LogForwarder {
 
     public LogForwarder(String host, String appName) {
         this.appName = appName;
-
         rabbitMQ.hosts(host);
 
         logForwarderThread = new Thread(() -> {
@@ -64,16 +66,27 @@ public class LogForwarder {
         logForwarderThread.start();
     }
 
-    private void sendLogMessages() throws InterruptedException {
-        try (RabbitMQChannel channel = rabbitMQ.channel()) {
+    private void sendLogMessages() throws InterruptedException, IOException {
+        Channel channel = rabbitMQ.createChannel();
+        try {
             while (!shutdown.get()) {
                 Object message = logMessageQueue.take();
                 if (message instanceof ActionLogMessage) {
-                    channel.publish("", "action-log-queue", JSON.toJSON(message), actionLogMessageProperties);
+                    channel.basicPublish("", "action-log-queue", actionLogMessageProperties, Strings.bytes(JSON.toJSON(message)));
                 } else if (message instanceof TraceLogMessage) {
-                    channel.publish("", "trace-log-queue", JSON.toJSON(message), traceLogMessageProperties);
+                    channel.basicPublish("", "trace-log-queue", traceLogMessageProperties, Strings.bytes(JSON.toJSON(message)));
                 }
             }
+        } finally {
+            closeChannel(channel);
+        }
+    }
+
+    private void closeChannel(Channel channel) {
+        try {
+            channel.close();
+        } catch (IOException | TimeoutException e) {
+            logger.warn("failed to close channel", e);
         }
     }
 

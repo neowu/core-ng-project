@@ -1,9 +1,15 @@
 package core.framework.impl.queue;
 
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Address;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import core.framework.api.log.ActionLogContext;
+import core.framework.api.util.StopWatch;
+import core.framework.api.util.Strings;
+import core.framework.impl.resource.Pool;
+import core.framework.impl.resource.PoolItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,18 +27,24 @@ public class RabbitMQ {
     public final ConnectionFactory connectionFactory = new ConnectionFactory();
     private Address[] addresses;
     private Connection connection;
+    public final Pool<Channel> channelPool;
 
     public RabbitMQ() {
         connectionFactory.setAutomaticRecoveryEnabled(true);
         timeout(Duration.ofSeconds(5));
         connectionFactory.setUsername("rabbitmq");  // default user/password
         connectionFactory.setPassword("rabbitmq");
+        channelPool = new Pool<>(this::createChannel, Channel::close);
+        channelPool.name("rabbitmq");
+        channelPool.poolSize(1, 5);
+        channelPool.maxIdleTime(Duration.ofMinutes(30));
     }
 
     public void shutdown() {
         if (connection != null) {
-            logger.info("close rabbitMQ connection, hosts={}", Arrays.toString(addresses));
+            logger.info("shutdown rabbitMQ client, hosts={}", Arrays.toString(addresses));
             try {
+                channelPool.close();
                 connection.close();
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
@@ -57,11 +69,23 @@ public class RabbitMQ {
         return new RabbitMQConsumer(channel, queue, prefetchCount);
     }
 
-    public RabbitMQChannel channel() {
-        return new RabbitMQChannel(createChannel());
+    public void publish(String exchange, String routingKey, String message, AMQP.BasicProperties properties) {
+        StopWatch watch = new StopWatch();
+        PoolItem<Channel> item = channelPool.borrowItem();
+        try {
+            item.resource.basicPublish(exchange, routingKey, properties, Strings.bytes(message));
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            channelPool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("rabbitMQ", elapsedTime);
+            logger.debug("publish, exchange={}, routingKey={}, elapsedTime={}", exchange, routingKey, elapsedTime);
+        }
     }
 
-    private Channel createChannel() {
+    public Channel createChannel() {
         try {
             synchronized (this) {
                 if (connection == null) {

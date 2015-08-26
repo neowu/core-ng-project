@@ -44,4 +44,9 @@ public final class RabbitMQConfig {
         context.queueManager.rabbitMQ.timeout(timeout);
         return this;
     }
+
+    public RabbitMQConfig poolSize(int minSize, int maxSize) {
+        context.queueManager.rabbitMQ.channelPool.poolSize(minSize, maxSize);
+        return this;
+    }
 }

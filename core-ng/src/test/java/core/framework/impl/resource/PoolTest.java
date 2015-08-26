@@ -3,8 +3,6 @@ package core.framework.impl.resource;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.time.Duration;
-
 /**
  * @author neo
  */
@@ -19,12 +17,12 @@ public class PoolTest {
     }
 
     @Test
-    public void takeAndReturn() {
-        Pool<TestResource> pool = new Pool<>(TestResource::new, 0, 5, Duration.ofSeconds(1));
+    public void borrowAndReturn() {
+        Pool<TestResource> pool = new Pool<>(TestResource::new, TestResource::close);
 
-        try (PoolItem<TestResource> item = pool.take()) {
-            Assert.assertNotNull(item.resource);
-        }
+        PoolItem<TestResource> item = pool.borrowItem();
+        Assert.assertNotNull(item.resource);
+        pool.returnItem(item);
 
         Assert.assertEquals(1, pool.queue.size());
         Assert.assertNotNull(pool.queue.getFirst().returnTime);
@@ -32,14 +30,12 @@ public class PoolTest {
 
     @Test
     public void close() {
-        Pool<TestResource> pool = new Pool<>(TestResource::new, 0, 5, Duration.ofSeconds(1));
+        Pool<TestResource> pool = new Pool<>(TestResource::new, TestResource::close);
 
-        TestResource resource;
-        try (PoolItem<TestResource> item = pool.take()) {
-            resource = item.resource;
-        }
+        PoolItem<TestResource> item = pool.borrowItem();
+        pool.returnItem(item);
 
         pool.close();
-        Assert.assertTrue(resource.closed);
+        Assert.assertTrue(item.resource.closed);
     }
 }

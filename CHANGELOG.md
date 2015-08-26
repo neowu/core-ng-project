@@ -1,9 +1,8 @@
 ## Change log
 
-### 3.4.4 (8/25/2015 - )
+### 3.4.4 (8/25/2015 - 8/26/2015)
 * rabbitmq: make listener use native thread
 * redis: track time to retrieve redis client from pool
-* resource: draft generic resource manager
 * rabbitmq: channel pooling (send message perf is 20x faster if not closing channel)
 
 ### 3.4.3 (8/19/2015 - 8/25/2015)

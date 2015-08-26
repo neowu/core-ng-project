@@ -12,7 +12,6 @@ import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.resource.ResourceManager;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.HTTPServer;
@@ -41,7 +40,6 @@ public class ModuleContext {
     public CacheManager cacheManager;
     public final QueueManager queueManager = new QueueManager();
     public final LogManager logManager;
-    public final ResourceManager resourceManager;
 
     public ModuleContext(BeanFactory beanFactory, boolean test) {
         this.beanFactory = beanFactory;
@@ -50,12 +48,6 @@ public class ModuleContext {
         this.logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
         if (!test) {
             shutdownHook.add(logManager::shutdown);
-        }
-
-        resourceManager = new ResourceManager(logManager);
-        if (!test) {
-            startupHook.add(resourceManager::initialize);
-            shutdownHook.add(resourceManager::shutdown);
         }
 
         httpServer = new HTTPServer(logManager);
