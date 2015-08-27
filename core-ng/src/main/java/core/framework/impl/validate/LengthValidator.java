@@ -32,10 +32,9 @@ public class LengthValidator implements FieldValidator {
             throw Exceptions.error("unexpected value type, valueClass={}", value);
         }
 
-        if (this.length.min() > -1 && length < this.length.min())
+        if (this.length.min() > -1 && length < this.length.min()
+            || this.length.max() > -1 && length > this.length.max()) {
             errors.add(fieldPath, this.length.message());
-
-        if (this.length.max() > -1 && length > this.length.max())
-            errors.add(fieldPath, this.length.message());
+        }
     }
 }

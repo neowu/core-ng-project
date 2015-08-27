@@ -2,6 +2,8 @@ package core.framework.impl.validate;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.validate.Length;
+import core.framework.api.validate.Max;
+import core.framework.api.validate.Min;
 import core.framework.api.validate.NotNull;
 import core.framework.impl.type.TypeInspector;
 
@@ -81,6 +83,22 @@ public class ValidatorBuilder {
                 throw Exceptions.error("@Length must on String, List<> or Map<>, field={}", field);
             }
             validator.add(field, new LengthValidator(fieldPath(parentPath, field), length));
+        }
+
+        Min min = field.getDeclaredAnnotation(Min.class);
+        if (min != null) {
+            if (!Number.class.isAssignableFrom(fieldClass)) {
+                throw Exceptions.error("@Min must on numeric field, field={}", field);
+            }
+            validator.add(field, new MinValidator(fieldPath(parentPath, field), min));
+        }
+
+        Max max = field.getDeclaredAnnotation(Max.class);
+        if (max != null) {
+            if (!Number.class.isAssignableFrom(fieldClass)) {
+                throw Exceptions.error("@Max must on numeric field, field={}", field);
+            }
+            validator.add(field, new MaxValidator(fieldPath(parentPath, field), max));
         }
 
         if (!isValueClass(fieldClass)) {

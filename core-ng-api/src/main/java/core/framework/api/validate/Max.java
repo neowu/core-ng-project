@@ -7,16 +7,14 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Length can be used on String, List and Map fields.
+ * Min can be used on numeric fields.
  *
  * @author neo
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface Length {
-    int min() default -1;
+public @interface Max {
+    double value();
 
-    int max() default -1;
-
-    String message() default "the length of field must be within range";
+    String message() default "the value of field must not be greater than max";
 }

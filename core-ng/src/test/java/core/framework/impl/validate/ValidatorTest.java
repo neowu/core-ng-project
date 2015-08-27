@@ -19,7 +19,7 @@ import static org.junit.Assert.assertThat;
  * @author neo
  */
 public class ValidatorTest {
-    public static class Bean {
+    static class Bean {
         @NotNull
         @Length(max = 5, message = "stringField must not be longer than 5")
         public String stringField;
@@ -33,7 +33,7 @@ public class ValidatorTest {
         public List<ChildBean> children;
     }
 
-    public static class ChildBean {
+    static class ChildBean {
         @NotNull(message = "intField must not be null")
         public Integer intField;
     }

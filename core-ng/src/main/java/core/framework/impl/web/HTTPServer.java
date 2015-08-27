@@ -41,7 +41,9 @@ public class HTTPServer {
     }
 
     public void stop() {
-        logger.info("stop http server");
-        server.stop();
+        if (server != null) {
+            logger.info("stop http server");
+            server.stop();
+        }
     }
 }
