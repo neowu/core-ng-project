@@ -39,7 +39,7 @@ public class LogForwarder {
     private final BlockingQueue<Object> logMessageQueue = new LinkedBlockingQueue<>();
     private final RabbitMQ rabbitMQ = new RabbitMQ();
 
-    private final AtomicBoolean shutdown = new AtomicBoolean(false);
+    private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Thread logForwarderThread;
 
     public LogForwarder(String host, String appName) {
@@ -48,11 +48,11 @@ public class LogForwarder {
 
         logForwarderThread = new Thread(() -> {
             logger.info("log forwarder thread started");
-            while (!shutdown.get()) {
+            while (!stop.get()) {
                 try {
                     sendLogMessages();
-                } catch (InterruptedException e) {
-                    // pass thru for interruption during shutdown
+                } catch (ShutdownSignalException | InterruptedException e) {
+                    // pass thru for stopping
                 } catch (Throwable e) {
                     logger.warn("failed to send log message, retry in 30 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(30));
@@ -67,10 +67,17 @@ public class LogForwarder {
         logForwarderThread.start();
     }
 
+    public void stop() {
+        logger.info("stop log forwarder");
+        stop.set(true);
+        logForwarderThread.interrupt();
+        rabbitMQ.close();
+    }
+
     private void sendLogMessages() throws InterruptedException, IOException {
         Channel channel = rabbitMQ.createChannel();
         try {
-            while (!shutdown.get()) {
+            while (!stop.get()) {
                 Object message = logMessageQueue.take();
                 if (message instanceof ActionLogMessage) {
                     channel.basicPublish("", "action-log-queue", actionLogMessageProperties, Strings.bytes(JSON.toJSON(message)));
@@ -87,17 +94,10 @@ public class LogForwarder {
         try {
             channel.close();
         } catch (ShutdownSignalException e) {
-            // pass thru during shutdown
+            logger.debug("connection is closed", e);
         } catch (IOException | TimeoutException e) {
             logger.warn("failed to close channel", e);
         }
-    }
-
-    public void shutdown() {
-        logger.info("shutdown log forwarder");
-        shutdown.set(true);
-        logForwarderThread.interrupt();
-        rabbitMQ.shutdown();
     }
 
     void queueActionLog(ActionLog log) {

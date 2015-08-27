@@ -47,7 +47,7 @@ public class ModuleContext {
 
         this.logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
         if (!test) {
-            shutdownHook.add(logManager::shutdown);
+            shutdownHook.add(logManager::stop);
         }
 
         httpServer = new HTTPServer(logManager);
@@ -57,7 +57,7 @@ public class ModuleContext {
             startupHook.add(httpServer::start);
         }
         executor = new Executor(logManager);
-        shutdownHook.add(executor::shutdown);
+        shutdownHook.add(executor::stop);
 
         beanFactory.bind(AsyncExecutor.class, null, new AsyncExecutor(executor, logManager));
 
@@ -75,7 +75,7 @@ public class ModuleContext {
             scheduler = new Scheduler(executor, logManager);
             if (!test) {
                 startupHook.add(scheduler::start);
-                shutdownHook.add(scheduler::shutdown);
+                shutdownHook.add(scheduler::stop);
 
                 SchedulerController schedulerController = new SchedulerController(scheduler);
                 httpServer.handler.route.add(HTTPMethod.GET, "/management/job", new ControllerHolder(schedulerController::listJobs, true));

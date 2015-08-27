@@ -23,7 +23,7 @@ public class LogProcessorApp extends AbstractApplication {
 
         ElasticSearch search = bindSupplier(ElasticSearch.class, null, new ElasticSearchBuilder()
             .remote(requiredProperty("app.elasticSearchHost")));
-        onShutdown(search::shutdown);
+        onShutdown(search::close);
 
         bind(Types.generic(ElasticSearchType.class, ActionLogMessage.class), null, search.type("action", "action", ActionLogMessage.class));
         bind(Types.generic(ElasticSearchType.class, TraceLogMessage.class), null, search.type("trace", "trace", TraceLogMessage.class));

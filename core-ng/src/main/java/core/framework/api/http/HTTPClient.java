@@ -36,8 +36,8 @@ public final class HTTPClient {
         this.slowTransactionThresholdInMs = slowTransactionThresholdInMs;
     }
 
-    public void shutdown() {
-        logger.info("shutdown http client");
+    public void close() {
+        logger.info("close http client");
         try {
             client.close();
         } catch (IOException e) {

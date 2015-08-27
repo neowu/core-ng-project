@@ -24,8 +24,7 @@ public class ShutdownHook implements Runnable {
 
     @Override
     public void run() {
-        Thread.currentThread().setName("shutdown-hook");
-        logger.info("execute shutdown methods");
+        Thread.currentThread().setName("shutdown");
         for (Runnable method : methods) {
             try {
                 method.run();

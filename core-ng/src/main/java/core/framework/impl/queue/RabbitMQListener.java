@@ -31,7 +31,7 @@ public class RabbitMQListener implements MessageHandlerConfig {
 
     private final Logger logger = LoggerFactory.getLogger(RabbitMQListener.class);
 
-    private final AtomicBoolean shutdown = new AtomicBoolean(false);
+    private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Thread listenerThread;
     private int maxConcurrentHandlers = 10;
     private Semaphore semaphore;
@@ -51,11 +51,11 @@ public class RabbitMQListener implements MessageHandlerConfig {
 
         listenerThread = new Thread(() -> {
             logger.info("rabbitMQ message listener started, queue={}", queue);
-            while (!shutdown.get()) {
+            while (!stop.get()) {
                 try (RabbitMQConsumer consumer = rabbitMQ.consumer(queue, maxConcurrentHandlers)) {
                     pullMessages(consumer);
                 } catch (ShutdownSignalException | InterruptedException e) {
-                    // pass thru if it's shutdown
+                    // pass thru for stopping
                 } catch (Throwable e) {
                     logger.error("failed to pull message, retry in 30 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(30));
@@ -84,7 +84,7 @@ public class RabbitMQListener implements MessageHandlerConfig {
     }
 
     private void pullMessages(RabbitMQConsumer consumer) throws InterruptedException {
-        while (!shutdown.get()) {
+        while (!stop.get()) {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             semaphore.acquire(); // acquire permit right before submit, to avoid permit failing to release back due to exception in between
             executor.submit(() -> {
@@ -104,9 +104,9 @@ public class RabbitMQListener implements MessageHandlerConfig {
         listenerThread.start();
     }
 
-    public void shutdown() {
-        logger.info("shutdown rabbitMQ message listener, queue={}", queue);
-        shutdown.set(true);
+    public void stop() {
+        logger.info("stop rabbitMQ message listener, queue={}", queue);
+        stop.set(true);
         listenerThread.interrupt();
     }
 

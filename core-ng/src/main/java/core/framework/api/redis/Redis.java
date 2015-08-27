@@ -39,8 +39,8 @@ public final class Redis {
         return jedis;
     }
 
-    public void shutdown() {
-        logger.info("shutdown redis client, host={}", host);
+    public void close() {
+        logger.info("close redis client, host={}", host);
         pool.close();
     }
 

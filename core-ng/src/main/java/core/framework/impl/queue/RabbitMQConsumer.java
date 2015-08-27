@@ -3,6 +3,7 @@ package core.framework.impl.queue;
 import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.ShutdownSignalException;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.StopWatch;
 import org.slf4j.Logger;
@@ -56,8 +57,10 @@ public class RabbitMQConsumer implements AutoCloseable {
     public void close() {
         try {
             channel.close();
+        } catch (ShutdownSignalException e) {
+            logger.debug("connection is closed", e);
         } catch (IOException | TimeoutException e) {
-            throw new Error(e);
+            logger.warn("failed to close channel", e);
         }
     }
 }

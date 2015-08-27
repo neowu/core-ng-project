@@ -28,8 +28,8 @@ public final class ElasticSearch {
         return new ElasticSearchType<>(client, index, type, slowQueryThreshold);
     }
 
-    public void shutdown() {
-        logger.info("shutdown elastic search client");
+    public void close() {
+        logger.info("close elastic search client");
         try {
             client.close();
         } catch (ElasticsearchException e) {

@@ -55,12 +55,12 @@ public final class DatabaseImpl implements Database {
             dataSource.setMaxIdleTime((int) Duration.ofHours(2).getSeconds());  // close connection if be idle for more than 2 hours.
             transactionManager = new TransactionManager(dataSource);
         } finally {
-            logger.info("create database connection pool, elapsedTime={}", watch.elapsedTime());
+            logger.info("create database client, elapsedTime={}", watch.elapsedTime());
         }
     }
 
-    public void shutdown() {
-        logger.info("shutdown database connection pool, url={}", dataSource.getJdbcUrl());
+    public void close() {
+        logger.info("close database client, url={}", dataSource.getJdbcUrl());
         dataSource.close();
     }
 

@@ -39,9 +39,9 @@ public class RabbitMQ {
         pool.configure(1, 5, Duration.ofMinutes(30));
     }
 
-    public void shutdown() {
+    public void close() {
         if (connection != null) {
-            logger.info("shutdown rabbitMQ client, hosts={}", Arrays.toString(addresses));
+            logger.info("shut down rabbitMQ client, hosts={}", Arrays.toString(addresses));
             try {
                 pool.close();
                 connection.close();

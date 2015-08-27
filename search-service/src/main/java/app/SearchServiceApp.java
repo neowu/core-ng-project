@@ -18,7 +18,7 @@ public class SearchServiceApp extends AbstractApplication {
     protected void initialize() {
         ElasticSearch search = bindSupplier(ElasticSearch.class, null, new ElasticSearchBuilder()
             .remote("192.168.2.2"));
-        onShutdown(search::shutdown);
+        onShutdown(search::close);
 
         bind(Types.generic(ElasticSearchType.class, ProductIndex.class), null, search.type("main", "product", ProductIndex.class));
         bind(Types.generic(ElasticSearchType.class, SKUIndex.class), null, search.type("main", "sku", SKUIndex.class));

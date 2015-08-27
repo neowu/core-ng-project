@@ -21,8 +21,8 @@ public class Executor {
         this.logManager = logManager;
     }
 
-    public void shutdown() {
-        logger.info("shutdown executor");
+    public void stop() {
+        logger.info("stop executor");
         executorService.shutdown();
     }
 
@@ -31,7 +31,7 @@ public class Executor {
     }
 
     private <T> T execute(Callable<T> task) {
-        logManager.start("=== task execution begin ===");
+        logManager.begin("=== task execution begin ===");
         try {
             return task.call();
         } catch (Throwable e) {

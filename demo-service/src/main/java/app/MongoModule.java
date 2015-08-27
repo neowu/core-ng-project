@@ -17,7 +17,7 @@ public class MongoModule extends Module {
             .uri("mongodb://192.168.2.2:27017/main")
             .entityClass(User.class)
             .viewClass(MongoUserAggregateView.class));
-        onShutdown(mongo::shutdown);
+        onShutdown(mongo::close);
 
         bind(UserService.class);
     }

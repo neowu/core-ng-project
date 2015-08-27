@@ -34,7 +34,7 @@ public final class QueueConfig {
             context.queueManager.rabbitMQ = new RabbitMQ();
             if (!context.test) {
                 context.scheduler().addTrigger(new FixedRateTrigger("pool-maintenance-rabbitmq", new PoolMaintenanceJob(context.queueManager.rabbitMQ.pool), Duration.ofMinutes(5)));
-                context.shutdownHook.add(context.queueManager.rabbitMQ::shutdown);
+                context.shutdownHook.add(context.queueManager.rabbitMQ::close);
             }
         }
         return new RabbitMQConfig(context);
@@ -69,7 +69,7 @@ public final class QueueConfig {
             RabbitMQListener listener = new RabbitMQListener(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(queueURI).routingKey, context.executor, context.queueManager.validator(), context.logManager);
             if (!context.test) {
                 context.startupHook.add(listener::start);
-                context.shutdownHook.add(listener::shutdown);
+                context.shutdownHook.add(listener::stop);
             }
             return listener;
         } else {

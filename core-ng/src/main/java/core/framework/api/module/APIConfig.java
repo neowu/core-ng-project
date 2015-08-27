@@ -66,7 +66,7 @@ public final class APIConfig {
 
         HTTPClient httpClient = new HTTPClientBuilder().build();
         context.beanFactory.bind(HTTPClient.class, null, httpClient);
-        context.shutdownHook.add(httpClient::shutdown);
+        context.shutdownHook.add(httpClient::close);
         return httpClient;
     }
 }

@@ -30,7 +30,7 @@ public final class DBConfig {
             database = context.beanFactory.bean(Database.class, null);
         } else {
             database = new DatabaseImpl();
-            context.shutdownHook.add(database::shutdown);
+            context.shutdownHook.add(database::close);
             context.beanFactory.bind(Database.class, name, database);
         }
     }

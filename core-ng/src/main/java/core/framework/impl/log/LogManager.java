@@ -17,7 +17,7 @@ public class LogManager {
         this.appName = System.getProperty("core.appName");
     }
 
-    public void start(String message) {
+    public void begin(String message) {
         ActionLogger actionLogger = new ActionLogger(logWriter, logForwarder);
         loggers.set(actionLogger);
         logger.debug(message);
@@ -36,15 +36,15 @@ public class LogManager {
         if (logger != null) logger.process(event);
     }
 
+    public void stop() {
+        if (logForwarder != null) logForwarder.stop();
+        logWriter.close();
+    }
+
     public ActionLog currentActionLog() {
         ActionLogger logger = loggers.get();
         if (logger == null) return null;
         return logger.log;
-    }
-
-    public void shutdown() {
-        if (logForwarder != null) logForwarder.shutdown();
-        logWriter.close();
     }
 
     public void logError(Throwable e) {  // pass logger where the exception is caught

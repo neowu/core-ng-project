@@ -38,8 +38,8 @@ public final class Scheduler {
         logger.info("scheduler started");
     }
 
-    public void shutdown() {
-        logger.info("shutdown scheduler");
+    public void stop() {
+        logger.info("stop scheduler");
         scheduler.shutdown();
     }
 

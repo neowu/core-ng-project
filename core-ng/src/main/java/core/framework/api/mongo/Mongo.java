@@ -44,9 +44,9 @@ public final class Mongo {
         this.database = database;
     }
 
-    public void shutdown() {
+    public void close() {
         if (mongoClient != null) {  // for test env, the client will be null
-            logger.info("shutdown mongodb client, database={}", database.getName());
+            logger.info("close mongodb client, database={}", database.getName());
             mongoClient.close();
         }
     }

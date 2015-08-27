@@ -101,8 +101,8 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
         listenerExecutor.submit(this);
     }
 
-    public void shutdown() {
-        logger.info("shutdown sqs message listener, queueURL={}", queueURL);
+    public void stop() {
+        logger.info("stop sqs message listener, queueURL={}", queueURL);
         listenerExecutor.shutdown();
     }
 

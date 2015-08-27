@@ -48,7 +48,7 @@ public final class SessionConfig {
         redis.pool.name("redis-session");
         context.scheduler().addTrigger(new FixedRateTrigger("pool-maintenance-redis-session", new PoolMaintenanceJob(redis.pool), Duration.ofMinutes(5)));
 
-        context.shutdownHook.add(redis::shutdown);
+        context.shutdownHook.add(redis::close);
         context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
         return this;
     }

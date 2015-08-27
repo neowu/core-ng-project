@@ -49,7 +49,7 @@ public class HTTPServerHandler implements HttpHandler {
             return;
         }
 
-        logManager.start("=== http transaction begin ===");
+        logManager.begin("=== http transaction begin ===");
         RequestImpl request = new RequestImpl(exchange, validator);
         try {
             ActionLog actionLog = logManager.currentActionLog();

@@ -62,7 +62,7 @@ public final class CacheConfig {
             redis.timeout = Duration.ofMillis(500);   // for cache, it should not be longer than 500ms to get value
 
             context.scheduler().addTrigger(new FixedRateTrigger("pool-maintenance-redis-cache", new PoolMaintenanceJob(redis.pool), Duration.ofMinutes(5)));
-            context.shutdownHook.add(redis::shutdown);
+            context.shutdownHook.add(redis::close);
 
             configureCacheManager(new RedisCacheStore(redis));
         }
