@@ -28,14 +28,14 @@ public final class RabbitMQConfig {
 
     public RabbitMQConfig user(String user) {
         if (!context.test) {
-            context.queueManager.rabbitMQ.connectionFactory.setUsername(user);
+            context.queueManager.rabbitMQ.user(user);
         }
         return this;
     }
 
     public RabbitMQConfig password(String password) {
         if (!context.test) {
-            context.queueManager.rabbitMQ.connectionFactory.setPassword(password);
+            context.queueManager.rabbitMQ.password(password);
         }
         return this;
     }

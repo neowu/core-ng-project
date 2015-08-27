@@ -23,7 +23,7 @@ public final class Redis {
     private final String host;
 
     public final Pool<Jedis> pool;
-    public long slowQueryThresholdInMs = 100;
+    private long slowQueryThresholdInMs = 100;
     public Duration timeout = Duration.ofSeconds(2);
 
     public Redis(String host) {
@@ -31,6 +31,10 @@ public final class Redis {
         pool = new Pool<>(this::createRedis, Jedis::close);
         pool.name("redis");
         pool.configure(5, 50, Duration.ofMinutes(30));
+    }
+
+    public void slowQueryThreshold(Duration slowQueryThreshold) {
+        slowQueryThresholdInMs = slowQueryThreshold.toMillis();
     }
 
     private Jedis createRedis() {

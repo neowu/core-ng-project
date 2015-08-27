@@ -21,6 +21,7 @@ public class HTTPServer {
     public final SiteManager siteManager = new SiteManager();
     public final HTTPServerHandler handler;
     public int port = 8080;
+    private Undertow server;
 
     public HTTPServer(LogManager logManager) {
         handler = new HTTPServerHandler(logManager, siteManager);
@@ -29,7 +30,7 @@ public class HTTPServer {
     public void start() {
         StopWatch watch = new StopWatch();
         try {
-            Undertow server = Undertow.builder()
+            server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
                 .setHandler(handler)
                 .build();
@@ -37,5 +38,10 @@ public class HTTPServer {
         } finally {
             logger.info("http server started, elapsedTime={}", watch.elapsedTime());
         }
+    }
+
+    public void stop() {
+        logger.info("stop http server");
+        server.stop();
     }
 }

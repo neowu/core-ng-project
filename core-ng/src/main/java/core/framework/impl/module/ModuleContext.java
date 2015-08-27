@@ -55,6 +55,7 @@ public class ModuleContext {
         beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);
         if (!test) {
             startupHook.add(httpServer::start);
+            shutdownHook.add(httpServer::stop);
         }
         executor = new Executor(logManager);
         shutdownHook.add(executor::stop);

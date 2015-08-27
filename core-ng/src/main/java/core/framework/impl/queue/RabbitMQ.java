@@ -24,24 +24,26 @@ import java.util.concurrent.TimeoutException;
  */
 public class RabbitMQ {
     private final Logger logger = LoggerFactory.getLogger(RabbitMQ.class);
-    public final ConnectionFactory connectionFactory = new ConnectionFactory();
+
+    private final ConnectionFactory connectionFactory = new ConnectionFactory();
     private Address[] addresses;
+    private long slowQueryThresholdInMs = 100;
     private Connection connection;
     public final Pool<Channel> pool;
 
     public RabbitMQ() {
         connectionFactory.setAutomaticRecoveryEnabled(true);
         timeout(Duration.ofSeconds(5));
-        connectionFactory.setUsername("rabbitmq");  // default user/password
-        connectionFactory.setPassword("rabbitmq");
+        user("rabbitmq");       // default user/password
+        password("rabbitmq");
         pool = new Pool<>(this::createChannel, Channel::close);
         pool.name("rabbitmq");
-        pool.configure(1, 5, Duration.ofMinutes(30));
+        pool.configure(1, 20, Duration.ofMinutes(30));
     }
 
     public void close() {
         if (connection != null) {
-            logger.info("shut down rabbitMQ client, hosts={}", Arrays.toString(addresses));
+            logger.info("close rabbitMQ client, hosts={}", Arrays.toString(addresses));
             try {
                 pool.close();
                 connection.close();
@@ -49,6 +51,14 @@ public class RabbitMQ {
                 throw new UncheckedIOException(e);
             }
         }
+    }
+
+    public void user(String user) {
+        connectionFactory.setUsername(user);
+    }
+
+    public void password(String password) {
+        connectionFactory.setUsername(password);
     }
 
     public void hosts(String... hosts) {
@@ -61,6 +71,10 @@ public class RabbitMQ {
 
     public void timeout(Duration timeout) {
         connectionFactory.setConnectionTimeout((int) timeout.toMillis());
+    }
+
+    public void slowQueryThreshold(Duration slowQueryThreshold) {
+        slowQueryThresholdInMs = slowQueryThreshold.toMillis();
     }
 
     public RabbitMQConsumer consumer(String queue, int prefetchCount) {
@@ -81,6 +95,13 @@ public class RabbitMQ {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("rabbitMQ", elapsedTime);
             logger.debug("publish, exchange={}, routingKey={}, elapsedTime={}", exchange, routingKey, elapsedTime);
+            checkSlowQuery(elapsedTime);
+        }
+    }
+
+    private void checkSlowQuery(long elapsedTime) {
+        if (elapsedTime > slowQueryThresholdInMs) {
+            logger.warn("slow query detected");
         }
     }
 

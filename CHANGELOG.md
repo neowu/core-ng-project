@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.4.5 (8/27/2015)
+* sysmodule: removed sys.jdbc.pool.minSize/maxSize, all env should be same, and if need to specify, put to App
+* rabbitmq: check slow query
+
 ### 3.4.4 (8/25/2015 - 8/26/2015)
 * rabbitmq: make listener use native thread
 * redis: use internal pooling

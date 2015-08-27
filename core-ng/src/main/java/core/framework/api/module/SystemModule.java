@@ -45,9 +45,5 @@ public final class SystemModule extends Module {
         property("sys.jdbc.url").ifPresent(url -> db().url(url));
         property("sys.jdbc.user").ifPresent(user -> db().user(user));
         property("sys.jdbc.password").ifPresent(password -> db().password(password));
-        property("sys.jdbc.pool.minSize").ifPresent(minSize -> {
-            String maxSize = property("sys.jdbc.pool.maxSize").orElse(minSize);
-            db().poolSize(Integer.parseInt(minSize), Integer.parseInt(maxSize));
-        });
     }
 }
