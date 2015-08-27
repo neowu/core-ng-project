@@ -18,6 +18,8 @@ import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author neo
@@ -28,8 +30,9 @@ public class RabbitMQ {
     private final ConnectionFactory connectionFactory = new ConnectionFactory();
     private Address[] addresses;
     private long slowQueryThresholdInMs = 100;
-    private Connection connection;
+    private volatile Connection connection;
     public final Pool<Channel> pool;
+    private final Lock lock = new ReentrantLock();
 
     public RabbitMQ() {
         connectionFactory.setAutomaticRecoveryEnabled(true);
@@ -58,7 +61,7 @@ public class RabbitMQ {
     }
 
     public void password(String password) {
-        connectionFactory.setUsername(password);
+        connectionFactory.setPassword(password);
     }
 
     public void hosts(String... hosts) {
@@ -107,14 +110,22 @@ public class RabbitMQ {
 
     public Channel createChannel() {
         try {
-            synchronized (this) {
-                if (connection == null) {
-                    connection = connectionFactory.newConnection(addresses);
-                }
+            if (connection == null) {
+                createConnection();
             }
             return connection.createChannel();
         } catch (IOException | TimeoutException e) {
             throw new Error(e);
+        }
+    }
+
+    private void createConnection() throws IOException, TimeoutException {
+        lock.lock();
+        try {
+            if (connection == null)
+                connection = connectionFactory.newConnection(addresses);
+        } finally {
+            lock.unlock();
         }
     }
 }

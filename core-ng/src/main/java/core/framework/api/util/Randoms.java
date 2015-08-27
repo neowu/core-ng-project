@@ -15,4 +15,8 @@ public final class Randoms {
             builder.append(ALPHA_NUMERIC.charAt(RANDOM.nextInt(ALPHA_NUMERIC.length())));
         return builder.toString();
     }
+
+    public static double number(double min, double max) {
+        return (max - min) * RANDOM.nextDouble() + min;
+    }
 }
