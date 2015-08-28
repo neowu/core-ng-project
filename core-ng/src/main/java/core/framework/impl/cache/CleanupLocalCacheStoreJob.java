@@ -5,10 +5,10 @@ import core.framework.api.scheduler.Job;
 /**
  * @author neo
  */
-public class LocalCacheStoreCleanupJob implements Job {
+public class CleanupLocalCacheStoreJob implements Job {
     private final LocalCacheStore cacheStore;
 
-    public LocalCacheStoreCleanupJob(LocalCacheStore cacheStore) {
+    public CleanupLocalCacheStoreJob(LocalCacheStore cacheStore) {
         this.cacheStore = cacheStore;
     }
 

@@ -1,11 +1,11 @@
 package core.framework.impl.db;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import core.framework.api.db.IsolationLevel;
 import core.framework.api.db.Transaction;
 import core.framework.api.db.UncheckedSQLException;
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.StopWatch;
+import core.framework.impl.resource.Pool;
+import core.framework.impl.resource.PoolItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,62 +18,57 @@ import java.time.Duration;
  */
 public class TransactionManager {
     private final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
-    private final ThreadLocal<Connection> currentConnection = new ThreadLocal<>();
+    private final ThreadLocal<PoolItem<Connection>> currentConnection = new ThreadLocal<>();
     private final ThreadLocal<TransactionState> currentTransactionState = new ThreadLocal<>();
-    private final ComboPooledDataSource dataSource;
+    private final Pool<Connection> pool;
+    private final ConnectionTester tester;
     public IsolationLevel defaultIsolationLevel;
     public long longTransactionThresholdInMs = Duration.ofSeconds(10).toMillis();
 
-    public TransactionManager(ComboPooledDataSource dataSource) {
-        this.dataSource = dataSource;
+    public TransactionManager(Pool<Connection> pool, ConnectionTester tester) {
+        this.pool = pool;
+        this.tester = tester;
     }
 
-    public Connection getConnection() {
-        Connection connection = currentConnection.get();
+    public PoolItem<Connection> getConnection() {
+        PoolItem<Connection> connection = currentConnection.get();
         if (connection != null) {
             TransactionState state = currentTransactionState.get();
             if (state != TransactionState.START)
-                throw Exceptions.error("db access is not allowed after transaction ends, currentState={}", state);
+                throw Exceptions.error("db access is not allowed after transaction ended, currentState={}", state);
             return connection;
         }
 
         return getConnectionFromPool();
     }
 
-    public void releaseConnection(Connection connection) {
+    public void releaseConnection(PoolItem<Connection> connection) {
         if (currentConnection.get() == null)
-            closeConnection(connection);
+            returnConnection(connection);
     }
 
-    private Connection getConnectionFromPool() {
-        Connection connection;
-        StopWatch watch = new StopWatch();
-        int available = -1;
-        int total = -1;
+    private PoolItem<Connection> getConnectionFromPool() {
+        PoolItem<Connection> connection = pool.borrowItem();
         try {
-            available = dataSource.getNumIdleConnections();
-            total = dataSource.getNumConnections();
-            connection = dataSource.getConnection();
-            if (defaultIsolationLevel != null) connection.setTransactionIsolation(defaultIsolationLevel.level);
-            return connection;
+            if (defaultIsolationLevel != null)
+                connection.resource.setTransactionIsolation(defaultIsolationLevel.level);
         } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
+            pool.returnItem(connection);
             throw new UncheckedSQLException(e);
-        } finally {
-            logger.debug("get connection from pool, available={}, total={}, elapsedTime={}",
-                available,
-                total,
-                watch.elapsedTime());
         }
+        return connection;
     }
 
     public Transaction beginTransaction() {
         if (currentConnection.get() != null)
             throw new Error("nested transaction is not supported, please contact arch team");
 
-        Connection connection = getConnectionFromPool();
+        PoolItem<Connection> connection = getConnectionFromPool();
         try {
-            connection.setAutoCommit(false);
+            connection.resource.setAutoCommit(false);
         } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         }
 
@@ -85,27 +80,31 @@ public class TransactionManager {
     }
 
     public void commitTransaction() {
+        PoolItem<Connection> connection = currentConnection.get();
         try {
             logger.debug("commit transaction");
-            currentConnection.get().commit();
+            connection.resource.commit();
             currentTransactionState.set(TransactionState.COMMITTED);
         } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         }
     }
 
     public void rollbackTransaction() {
+        PoolItem<Connection> connection = currentConnection.get();
         try {
             logger.debug("rollback transaction");
-            currentConnection.get().rollback();
+            connection.resource.rollback();
             currentTransactionState.set(TransactionState.ROLLED_BACK);
         } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         }
     }
 
     public void endTransaction() {
-        Connection connection = currentConnection.get();
+        PoolItem<Connection> connection = currentConnection.get();
         TransactionState state = currentTransactionState.get();
         // clean up state first, to avoid ending up with unexpected state
         currentConnection.remove();
@@ -114,21 +113,25 @@ public class TransactionManager {
         try {
             if (state == TransactionState.START) {
                 logger.warn("roll back transaction due to state not changed, it could be either transaction.commit() not executed or exception occurred");
-                connection.rollback();
+                connection.resource.rollback();
             }
         } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
-            closeConnection(connection);
+            returnConnection(connection);
         }
     }
 
-    private void closeConnection(Connection connection) {
+    private void returnConnection(PoolItem<Connection> connection) {
         try {
-            connection.setAutoCommit(true);
-            connection.close();
+            if (!connection.broken)
+                connection.resource.setAutoCommit(true);
         } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
+        } finally {
+            pool.returnItem(connection);
         }
     }
 

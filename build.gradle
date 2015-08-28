@@ -13,7 +13,6 @@ def redisVersion = '2.7.2'
 def mongoVersion = '3.0.3'
 def elasticVersion = '1.7.1'
 def rabbitVersion = '3.5.4'
-def c3p0Version = '0.9.5.1'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -23,9 +22,8 @@ project(':core-ng') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         provided(
-                "redis.clients:jedis:${redisVersion}",
+                "redis.clients:jedis:${redisVersion}@jar",
                 "org.elasticsearch:elasticsearch:${elasticVersion}@jar",
-                "com.mchange:c3p0:${c3p0Version}",
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
                 "com.amazonaws:aws-java-sdk-core:${awsVersion}@jar",
@@ -103,9 +101,9 @@ project(':demo-service') {
                 "org.mongodb:mongo-java-driver:${mongoVersion}"
         )
         runtime(
-                "com.mchange:c3p0:${c3p0Version}",
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
-                "redis.clients:jedis:${redisVersion}"
+                "redis.clients:jedis:${redisVersion}",
+                'mysql:mysql-connector-java:5.1.36'
         )
         testCompile(
                 project(':core-ng-test')

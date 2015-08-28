@@ -1,19 +1,20 @@
 package app.service;
 
 import app.domain.Product;
+import app.web.ProductView;
 import core.framework.api.cache.Cache;
-import core.framework.api.db.Database;
+import core.framework.api.db.Repository;
+import core.framework.api.web.exception.NotFoundException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.time.LocalDateTime;
 
 /**
  * @author neo
  */
 public class ProductService {
     @Inject
-    Database database;
+    Repository<Product> repository;
     @Inject
     Cache<Product> cache;
 
@@ -31,12 +32,15 @@ public class ProductService {
     }
 
     private Product getProduct(int id) {
+        return repository.get(id).orElseThrow(() -> new NotFoundException("product not found, id=" + id));
+    }
+
+    public void save(ProductView view) {
         Product product = new Product();
-        product.id = id;
-        product.name = "test";
-        product.date = LocalDateTime.now();
-        product.price = 10.99;
-        product.description = "description";
-        return product;
+        product.name = view.name;
+        product.description = view.description;
+        product.date = view.date;
+        product.price = view.price;
+        repository.insert(product);
     }
 }

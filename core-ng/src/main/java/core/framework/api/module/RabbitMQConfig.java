@@ -45,8 +45,8 @@ public final class RabbitMQConfig {
         return this;
     }
 
-    public RabbitMQConfig pool(int minSize, int maxSize, Duration maxIdleTime) {
-        context.queueManager.rabbitMQ.pool.configure(minSize, maxSize, maxIdleTime);
+    public RabbitMQConfig poolSize(int minSize, int maxSize) {
+        context.queueManager.rabbitMQ.pool.size(minSize, maxSize);
         return this;
     }
 }

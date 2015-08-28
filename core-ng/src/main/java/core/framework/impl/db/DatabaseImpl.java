@@ -1,7 +1,5 @@
 package core.framework.impl.db;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.c3p0.management.NullManagementCoordinator;
 import core.framework.api.db.Database;
 import core.framework.api.db.Query;
 import core.framework.api.db.Repository;
@@ -12,11 +10,13 @@ import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
+import core.framework.impl.resource.Pool;
+import core.framework.impl.resource.PoolItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyVetoException;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,63 +25,87 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
 /**
  * @author neo
  */
 public final class DatabaseImpl implements Database {
-    static {
-        // disable c3p0 jmx bean
-        System.setProperty("com.mchange.v2.c3p0.management.ManagementCoordinator", NullManagementCoordinator.class.getName());
-    }
-
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
 
+    private final ConnectionTester tester = new ConnectionTester();
     public final TransactionManager transactionManager;
-    public final ComboPooledDataSource dataSource;
+    public final Pool<Connection> pool;
     public long slowQueryThresholdInMs = Duration.ofSeconds(7).toMillis();
     public int tooManyRowsReturnedThreshold = 2000;
-    private int timeoutInSeconds = 60;
     private final Map<Class, RowMapper> viewRowMappers = Maps.newHashMap();
+
+    private Duration timeout;
+    private Driver driver;
+    private String url;
+    private final Properties info = new Properties();
 
     public DatabaseImpl() {
         StopWatch watch = new StopWatch();
         try {
-            dataSource = new ComboPooledDataSource();
-            dataSource.setForceSynchronousCheckins(true);   // make c3p0 not use thread pool for checkin, we don't do test on checkin, this improves performance under high load
-            dataSource.setTestConnectionOnCheckout(true);
-            dataSource.setCheckoutTimeout(timeoutInSeconds * 1000);
-            poolSize(5, 50);    // default optimization for AWS medium/large instances
-            dataSource.setMaxIdleTime((int) Duration.ofHours(2).getSeconds());  // close connection if be idle for more than 2 hours.
-            transactionManager = new TransactionManager(dataSource);
+            pool = new Pool<>(this::createConnection, Connection::close);
+            pool.name("db");
+            pool.size(5, 50);    // default optimization for AWS medium/large instances
+            pool.maxIdleTime(Duration.ofHours(2));
+            timeout(Duration.ofSeconds(30));
+            transactionManager = new TransactionManager(pool, tester);
         } finally {
             logger.info("create database client, elapsedTime={}", watch.elapsedTime());
         }
     }
 
+    private Connection createConnection() {
+        if (url == null) throw new Error("url must not be null");
+        try {
+            return driver.connect(url, info);
+        } catch (SQLException e) {
+            throw new UncheckedSQLException(e);
+        }
+    }
+
     public void close() {
-        logger.info("close database client, url={}", dataSource.getJdbcUrl());
-        dataSource.close();
+        logger.info("close database client, url={}", url);
+        pool.close();
+    }
+
+    public void user(String user) {
+        info.put("user", user);
+    }
+
+    public void password(String password) {
+        info.put("password", password);
+    }
+
+    public void timeout(Duration timeout) {
+        this.timeout = timeout;
+        pool.checkoutTimeout(timeout);
+
+        if (url != null && url.startsWith("jdbc:mysql:")) {
+            info.put("connectTimeout", String.valueOf(timeout.toMillis()));
+            info.put("socketTimeout", String.valueOf(timeout.toMillis()));
+        }
     }
 
     public void url(String url) {
         if (!url.startsWith("jdbc:")) throw Exceptions.error("jdbc url must start with \"jdbc:\", url={}", url);
 
         logger.info("set database connection url, url={}", url);
-        dataSource.setJdbcUrl(url);
+        this.url = url;
         try {
-            if (url.startsWith("jdbc:mysql:")) {
-                dataSource.setDriverClass("com.mysql.jdbc.Driver");
-                dataSource.setPreferredTestQuery("select 1");
+            if (url.startsWith("jdbc:mysql://")) {
+                driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
+                timeout(timeout);
             } else if (url.startsWith("jdbc:hsqldb:")) {
-                dataSource.setDriverClass("org.hsqldb.jdbc.JDBCDriver");
-            } else if (url.startsWith("jdbc:sqlserver")) {
-                dataSource.setDriverClass("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                dataSource.setPreferredTestQuery("select 1");
+                driver = (Driver) Class.forName("org.hsqldb.jdbc.JDBCDriver").newInstance();
             } else {
                 throw Exceptions.error("not supported database, please contact arch team, url={}", url);
             }
-        } catch (PropertyVetoException e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new Error(e);
         }
     }
@@ -100,17 +124,6 @@ public final class DatabaseImpl implements Database {
         } finally {
             logger.info("create db repository, entityClass={}, elapsedTime={}", entityClass.getCanonicalName(), watch.elapsedTime());
         }
-    }
-
-    public void timeout(Duration timeout) {
-        this.timeoutInSeconds = (int) timeout.getSeconds();
-        dataSource.setCheckoutTimeout((int) timeout.toMillis());
-    }
-
-    public void poolSize(int minSize, int maxSize) {
-        dataSource.setMinPoolSize(minSize);
-        dataSource.setInitialPoolSize(minSize);
-        dataSource.setMaxPoolSize(maxSize);
     }
 
     @Override
@@ -198,12 +211,13 @@ public final class DatabaseImpl implements Database {
     }
 
     int update(String sql, List<Object> params) {
-        Connection connection = transactionManager.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setQueryTimeout(timeoutInSeconds);
+        PoolItem<Connection> connection = transactionManager.getConnection();
+        try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
+            statement.setQueryTimeout((int) timeout.getSeconds());
             PreparedStatements.setParams(statement, params);
             return statement.executeUpdate();
         } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);
@@ -211,15 +225,47 @@ public final class DatabaseImpl implements Database {
     }
 
     int[] batchUpdate(String sql, List<List<Object>> params) {
-        Connection connection = transactionManager.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setQueryTimeout(timeoutInSeconds);
+        PoolItem<Connection> connection = transactionManager.getConnection();
+        try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
+            statement.setQueryTimeout((int) timeout.getSeconds());
             for (List<Object> batchParams : params) {
                 PreparedStatements.setParams(statement, batchParams);
                 statement.addBatch();
             }
             return statement.executeBatch();
         } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
+            throw new UncheckedSQLException(e);
+        } finally {
+            transactionManager.releaseConnection(connection);
+        }
+    }
+
+    <T> List<T> executeQuery(String sql, List<Object> params, RowMapper<T> mapper) {
+        if (sql.contains("*"))
+            throw Exceptions.error("select statement should not contain wildcard(*), please only select columns needed, sql={}", sql);
+        PoolItem<Connection> connection = transactionManager.getConnection();
+        try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
+            statement.setQueryTimeout((int) timeout.getSeconds());
+            PreparedStatements.setParams(statement, params);
+            return fetchResultSet(statement, mapper);
+        } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
+            throw new UncheckedSQLException(e);
+        } finally {
+            transactionManager.releaseConnection(connection);
+        }
+    }
+
+    Optional<Long> insert(String sql, List<Object> params) {
+        PoolItem<Connection> connection = transactionManager.getConnection();
+        try (PreparedStatement statement = connection.resource.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setQueryTimeout((int) timeout.getSeconds());
+            PreparedStatements.setParams(statement, params);
+            statement.executeUpdate();
+            return fetchGeneratedKey(statement);
+        } catch (SQLException e) {
+            tester.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);
@@ -231,35 +277,6 @@ public final class DatabaseImpl implements Database {
         if (results.isEmpty()) return Optional.empty();
         if (results.size() > 1) throw new Error("more than one row returned, size=" + results.size());
         return Optional.of(results.get(0));
-    }
-
-    <T> List<T> executeQuery(String sql, List<Object> params, RowMapper<T> mapper) {
-        if (sql.contains("*"))
-            throw Exceptions.error("select statement should not contain wildcard(*), please only select columns needed, sql={}", sql);
-        Connection connection = transactionManager.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setQueryTimeout(timeoutInSeconds);
-            PreparedStatements.setParams(statement, params);
-            return fetchResultSet(statement, mapper);
-        } catch (SQLException e) {
-            throw new UncheckedSQLException(e);
-        } finally {
-            transactionManager.releaseConnection(connection);
-        }
-    }
-
-    Optional<Long> insert(String sql, List<Object> params) {
-        Connection connection = transactionManager.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setQueryTimeout(timeoutInSeconds);
-            PreparedStatements.setParams(statement, params);
-            statement.executeUpdate();
-            return fetchGeneratedKey(statement);
-        } catch (SQLException e) {
-            throw new UncheckedSQLException(e);
-        } finally {
-            transactionManager.releaseConnection(connection);
-        }
     }
 
     private <T> List<T> fetchResultSet(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {

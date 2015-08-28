@@ -36,12 +36,13 @@ public class RabbitMQ {
 
     public RabbitMQ() {
         connectionFactory.setAutomaticRecoveryEnabled(true);
-        timeout(Duration.ofSeconds(5));
         user("rabbitmq");       // default user/password
         password("rabbitmq");
         pool = new Pool<>(this::createChannel, Channel::close);
         pool.name("rabbitmq");
-        pool.configure(1, 20, Duration.ofMinutes(30));
+        pool.size(1, 20);
+        pool.maxIdleTime(Duration.ofMinutes(30));
+        timeout(Duration.ofSeconds(5));
     }
 
     public void close() {
@@ -74,6 +75,7 @@ public class RabbitMQ {
 
     public void timeout(Duration timeout) {
         connectionFactory.setConnectionTimeout((int) timeout.toMillis());
+        pool.checkoutTimeout(timeout);
     }
 
     public void slowQueryThreshold(Duration slowQueryThreshold) {

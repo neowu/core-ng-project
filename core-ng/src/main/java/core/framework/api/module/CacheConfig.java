@@ -7,11 +7,11 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Types;
 import core.framework.impl.cache.CacheManager;
 import core.framework.impl.cache.CacheStore;
+import core.framework.impl.cache.CleanupLocalCacheStoreJob;
 import core.framework.impl.cache.LocalCacheStore;
-import core.framework.impl.cache.LocalCacheStoreCleanupJob;
 import core.framework.impl.cache.RedisCacheStore;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.resource.PoolMaintenanceJob;
+import core.framework.impl.resource.RefreshPoolJob;
 import core.framework.impl.scheduler.FixedRateTrigger;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.management.CacheController;
@@ -40,7 +40,7 @@ public final class CacheConfig {
 
         logger.info("create local cache store");
         LocalCacheStore cacheStore = new LocalCacheStore();
-        context.scheduler().addTrigger(new FixedRateTrigger("local-cache-cleanup", new LocalCacheStoreCleanupJob(cacheStore), Duration.ofMinutes(30)));
+        context.scheduler().addTrigger(new FixedRateTrigger("cleanup-local-cache", new CleanupLocalCacheStoreJob(cacheStore), Duration.ofMinutes(30)));
 
         configureCacheManager(cacheStore);
     }
@@ -58,10 +58,9 @@ public final class CacheConfig {
 
             Redis redis = new Redis(host);
             redis.pool.name("redis-cache");
-            redis.pool.configure(5, 50, Duration.ofMinutes(30));
-            redis.timeout = Duration.ofMillis(500);   // for cache, it should not be longer than 500ms to get value
+            redis.timeout(Duration.ofMillis(500));   // for cache, it should not be longer than 500ms to get value
 
-            context.scheduler().addTrigger(new FixedRateTrigger("pool-maintenance-redis-cache", new PoolMaintenanceJob(redis.pool), Duration.ofMinutes(5)));
+            context.scheduler().addTrigger(new FixedRateTrigger("refresh-redis-cache-pool", new RefreshPoolJob(redis.pool), Duration.ofMinutes(5)));
             context.shutdownHook.add(redis::close);
 
             configureCacheManager(new RedisCacheStore(redis));

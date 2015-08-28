@@ -10,10 +10,10 @@ import core.framework.api.Module;
 public class QueueModule extends Module {
     @Override
     protected void initialize() {
+        queue().publish("rabbitmq://queue/test", CreateProductRequest.class);
+
         queue().subscribe("rabbitmq://queue/test")
             .handle(CreateProductRequest.class, bind(CreateProductRequestHandler.class))
             .maxConcurrentHandlers(100);
-
-        queue().publish("rabbitmq://queue/test", CreateProductRequest.class);
     }
 }

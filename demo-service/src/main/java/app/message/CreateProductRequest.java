@@ -18,4 +18,7 @@ public class CreateProductRequest {
     @NotNull(message = "name is required")
     @XmlElement(name = "name")
     public String name;
+
+    @XmlElement(name = "finish")
+    public Boolean finish;
 }

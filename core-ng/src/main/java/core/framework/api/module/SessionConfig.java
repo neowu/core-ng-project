@@ -2,10 +2,10 @@ package core.framework.api.module;
 
 import core.framework.api.redis.Redis;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.resource.PoolMaintenanceJob;
+import core.framework.impl.resource.RefreshPoolJob;
 import core.framework.impl.scheduler.FixedRateTrigger;
+import core.framework.impl.web.session.CleanupLocalSessionStoreJob;
 import core.framework.impl.web.session.LocalSessionStore;
-import core.framework.impl.web.session.LocalSessionStoreCleanupJob;
 import core.framework.impl.web.session.RedisSessionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public final class SessionConfig {
     public SessionConfig local() {
         logger.info("create local session provider");
         LocalSessionStore sessionStore = new LocalSessionStore();
-        context.scheduler().addTrigger(new FixedRateTrigger("local-session-cleanup", new LocalSessionStoreCleanupJob(sessionStore), Duration.ofMinutes(30)));
+        context.scheduler().addTrigger(new FixedRateTrigger("cleanup-local-session", new CleanupLocalSessionStoreJob(sessionStore), Duration.ofMinutes(30)));
         context.httpServer.siteManager.sessionManager.sessionStore(sessionStore);
         return this;
     }
@@ -46,7 +46,7 @@ public final class SessionConfig {
 
         Redis redis = new Redis(host);
         redis.pool.name("redis-session");
-        context.scheduler().addTrigger(new FixedRateTrigger("pool-maintenance-redis-session", new PoolMaintenanceJob(redis.pool), Duration.ofMinutes(5)));
+        context.scheduler().addTrigger(new FixedRateTrigger("refresh-redis-session-pool", new RefreshPoolJob(redis.pool), Duration.ofMinutes(5)));
 
         context.shutdownHook.add(redis::close);
         context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));

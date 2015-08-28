@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class UncheckedSQLException extends RuntimeException {
     private static final long serialVersionUID = 5857178985477320780L;
 
-    public UncheckedSQLException(SQLException cause) {
-        super(cause);
+    public UncheckedSQLException(SQLException e) {
+        super("message=" + e.getMessage() + ", sqlState=" + e.getSQLState() + ", errorCode=" + e.getErrorCode(), e);
     }
 }

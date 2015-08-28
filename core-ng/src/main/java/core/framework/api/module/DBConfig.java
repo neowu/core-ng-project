@@ -8,6 +8,8 @@ import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
 import core.framework.impl.db.DatabaseImpl;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.resource.RefreshPoolJob;
+import core.framework.impl.scheduler.FixedRateTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,9 @@ public final class DBConfig {
         } else {
             database = new DatabaseImpl();
             context.shutdownHook.add(database::close);
+            String poolName = "db" + (name == null ? "" : "-" + name);
+            database.pool.name(poolName);
+            context.scheduler().addTrigger(new FixedRateTrigger("refresh-" + poolName + "-pool", new RefreshPoolJob(database.pool), Duration.ofMinutes(15)));
             context.beanFactory.bind(Database.class, name, database);
         }
     }
@@ -47,14 +52,14 @@ public final class DBConfig {
 
     public DBConfig user(String user) {
         if (!context.test) {
-            database.dataSource.setUser(user);
+            database.user(user);
         }
         return this;
     }
 
     public DBConfig password(String password) {
         if (!context.test) {
-            database.dataSource.setPassword(password);
+            database.password(password);
         }
         return this;
     }
@@ -65,7 +70,7 @@ public final class DBConfig {
     }
 
     public DBConfig poolSize(int minSize, int maxSize) {
-        database.poolSize(minSize, maxSize);
+        database.pool.size(minSize, maxSize);
         return this;
     }
 

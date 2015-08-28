@@ -24,8 +24,8 @@ public class PoolTest {
         Assert.assertNotNull(item.resource);
         pool.returnItem(item);
 
-        Assert.assertEquals(1, pool.queue.size());
-        Assert.assertNotNull(pool.queue.getFirst().returnTime);
+        Assert.assertEquals(1, pool.idleItems.size());
+        Assert.assertNotNull(pool.idleItems.getFirst().returnTime);
     }
 
     @Test

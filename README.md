@@ -14,6 +14,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * review/refactory/unit-test all packages
 * website static content security check, (in server env, this is handled by nginx directly)
 * template security check, escaping and etc
+* db pool, actively check/close connection before using from transactionManager?
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)

@@ -13,7 +13,7 @@ import core.framework.impl.queue.RabbitMQ;
 import core.framework.impl.queue.RabbitMQEndpoint;
 import core.framework.impl.queue.RabbitMQListener;
 import core.framework.impl.queue.RabbitMQPublisher;
-import core.framework.impl.resource.PoolMaintenanceJob;
+import core.framework.impl.resource.RefreshPoolJob;
 import core.framework.impl.scheduler.FixedRateTrigger;
 
 import java.time.Duration;
@@ -33,7 +33,7 @@ public final class QueueConfig {
         if (context.queueManager.rabbitMQ == null) {
             context.queueManager.rabbitMQ = new RabbitMQ();
             if (!context.test) {
-                context.scheduler().addTrigger(new FixedRateTrigger("pool-maintenance-rabbitmq", new PoolMaintenanceJob(context.queueManager.rabbitMQ.pool), Duration.ofMinutes(5)));
+                context.scheduler().addTrigger(new FixedRateTrigger("refresh-rabbitmq-pool", new RefreshPoolJob(context.queueManager.rabbitMQ.pool), Duration.ofMinutes(5)));
                 context.shutdownHook.add(context.queueManager.rabbitMQ::close);
             }
         }

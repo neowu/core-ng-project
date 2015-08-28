@@ -3,6 +3,7 @@ package core.framework.impl.db;
 import core.framework.api.db.Query;
 import core.framework.api.db.Repository;
 import core.framework.api.db.RowMapper;
+import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ public class RepositoryImpl<T> implements Repository<T> {
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
             logger.debug("selectAll, sql={}, params={}, elapsedTime={}", sql, query.params, elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
@@ -67,6 +69,7 @@ public class RepositoryImpl<T> implements Repository<T> {
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
             logger.debug("select, sql={}, params={}, elapsedTime={}", sql, query.params, elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
@@ -84,6 +87,7 @@ public class RepositoryImpl<T> implements Repository<T> {
             return database.executeSelectOneQuery(sql, query.params, rowMapper);
         } finally {
             long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
             logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, query.params, elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
@@ -99,6 +103,7 @@ public class RepositoryImpl<T> implements Repository<T> {
             return database.executeSelectOneQuery(sql, query.params, rowMapper);
         } finally {
             long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
             logger.debug("get, sql={}, params={}, elapsedTime={}", sql, query.params, elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
@@ -115,6 +120,7 @@ public class RepositoryImpl<T> implements Repository<T> {
             return database.insert(sql, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
             logger.debug("insert, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
@@ -133,6 +139,7 @@ public class RepositoryImpl<T> implements Repository<T> {
                 logger.warn("updated rows is not 1, rows={}", updatedRows);
         } finally {
             long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
             logger.debug("update, sql={}, params={}, elapsedTime={}", sql, query.params, elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
@@ -150,6 +157,7 @@ public class RepositoryImpl<T> implements Repository<T> {
                 logger.warn("deleted rows is not 1, rows={}", deletedRows);
         } finally {
             long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
             logger.debug("delete, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
@@ -168,6 +176,7 @@ public class RepositoryImpl<T> implements Repository<T> {
             database.batchUpdate(sql, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
             logger.debug("batch insert, sql={}, size={}, elapsedTime={}", sql, entities.size(), elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
@@ -189,6 +198,7 @@ public class RepositoryImpl<T> implements Repository<T> {
             }
         } finally {
             long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
             logger.debug("delete, sql={}, size={}, elapsedTime={}", sql, primaryKeys.size(), elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");

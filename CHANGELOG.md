@@ -1,7 +1,8 @@
 ## Change log
 
-### 3.4.6 (8/27/2015 - )
+### 3.4.6 (8/27/2015 - 8/28/2015)
 * validation: added @Min/@Max
+* db: removed db c3p0 pool, use internal pool
 
 ### 3.4.5 (8/27/2015)
 * sysmodule: removed sys.jdbc.pool.minSize/maxSize, all env should be same, and if need to specify, put to App
