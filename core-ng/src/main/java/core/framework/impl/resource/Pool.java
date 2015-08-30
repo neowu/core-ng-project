@@ -116,13 +116,21 @@ public class Pool<T> {
         }
     }
 
-    void replenish() {
+    void refresh() {
+        logger.debug("[pool:{}] recycle idle items", name);
+        recycleIdleItems();
+
+        logger.debug("[pool:{}] replenish items", name);
+        replenish();
+    }
+
+    private void replenish() {
         while (total.get() < minSize) {
             returnItem(createNewItem());
         }
     }
 
-    void recycleIdleItems() {
+    private void recycleIdleItems() {
         Iterator<PoolItem<T>> iterator = idleItems.descendingIterator();
         long maxIdleTimeInSeconds = maxIdleTime.getSeconds();
         Instant now = Instant.now();

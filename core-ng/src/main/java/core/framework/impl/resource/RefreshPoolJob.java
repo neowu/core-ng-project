@@ -22,12 +22,7 @@ public class RefreshPoolJob implements Job {
         ActionLogContext.put("pool", pool.name);
 
         logger.debug("total={}, idle={}, minSize={}, maxSize={}", pool.total.get(), pool.idleItems.size(), pool.minSize, pool.maxSize);
-
-        logger.debug("recycle idle items");
-        pool.recycleIdleItems();
-
-        logger.debug("replenish items");
-        pool.replenish();
+        pool.refresh();
 
         ActionLogContext.put("total", pool.total.get());
         ActionLogContext.put("idle", pool.idleItems.size());
