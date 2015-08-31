@@ -16,7 +16,7 @@ import static org.junit.Assert.assertThat;
  * @author neo
  */
 public class MinMaxValidatorTest {
-    static class Bean {
+    static class TestBean {
         @Min(value = 1, message = "num1 must not be less than 1")
         public Integer num1;
 
@@ -26,11 +26,12 @@ public class MinMaxValidatorTest {
 
     @Test
     public void validate() {
-        Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
+        Validator validator = new ValidatorBuilder(TestBean.class, Field::getName).build();
 
-        Bean bean = new Bean();
+        TestBean bean = new TestBean();
         bean.num1 = 0;
         bean.num2 = 11;
+
         ValidationErrors validationErrors = new ValidationErrors();
         validator.validate(bean, validationErrors);
 

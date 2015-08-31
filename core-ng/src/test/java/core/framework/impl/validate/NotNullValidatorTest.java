@@ -2,7 +2,6 @@ package core.framework.impl.validate;
 
 import core.framework.api.util.Lists;
 import core.framework.api.util.Types;
-import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,12 +17,10 @@ import static org.junit.Assert.assertThat;
 /**
  * @author neo
  */
-public class ValidatorTest {
-    static class Bean {
-        @NotNull
-        @Length(max = 5, message = "stringField must not be longer than 5")
+public class NotNullValidatorTest {
+    static class TestBean {
+        @NotNull(message = "stringField must not be null")
         public String stringField;
-        @Length(min = 5, message = "optionalStringField must be longer than 5")
         public String optionalStringField;
         @NotNull(message = "booleanField must not be null")
         public Boolean booleanField;
@@ -40,10 +37,9 @@ public class ValidatorTest {
 
     @Test
     public void validate() {
-        Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
+        Validator validator = new ValidatorBuilder(TestBean.class, Field::getName).build();
 
-        Bean instance = new Bean();
-        instance.stringField = "123456";
+        TestBean instance = new TestBean();
         instance.child = new ChildBean();
         instance.children = Lists.newArrayList();
         instance.children.add(instance.child);
@@ -64,10 +60,9 @@ public class ValidatorTest {
 
     @Test
     public void validateList() {
-        Validator validator = new ValidatorBuilder(Types.list(Bean.class), Field::getName).build();
+        Validator validator = new ValidatorBuilder(Types.list(TestBean.class), Field::getName).build();
 
-        Bean instance = new Bean();
-        instance.stringField = "123456";
+        TestBean instance = new TestBean();
         instance.child = new ChildBean();
         instance.children = Lists.newArrayList();
         instance.children.add(instance.child);

@@ -3,6 +3,7 @@ package core.framework.api.search;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.JSON;
 import core.framework.api.util.StopWatch;
+import core.framework.impl.search.DocumentValidator;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
@@ -22,12 +23,14 @@ public final class ElasticSearchType<T> {
     private final Client client;
     private final String index;
     private final String type;
+    private final DocumentValidator<T> validator;
     private final long slowQueryThresholdInMs;
 
-    ElasticSearchType(Client client, String index, String type, Duration slowQueryThreshold) {
+    ElasticSearchType(Client client, String index, String type, DocumentValidator<T> validator, Duration slowQueryThreshold) {
         this.client = client;
         this.index = index;
         this.type = type;
+        this.validator = validator;
         this.slowQueryThresholdInMs = slowQueryThreshold.toMillis();
     }
 
@@ -37,6 +40,7 @@ public final class ElasticSearchType<T> {
 
     public void index(String id, String parentId, T source) {
         StopWatch watch = new StopWatch();
+        validator.validate(source);
         try {
             String document = JSON.toJSON(source);
             client.prepareIndex(index, type)
@@ -48,7 +52,8 @@ public final class ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("index, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            if (elapsedTime > slowQueryThresholdInMs)
+                logger.warn("slow query detected");
         }
     }
 
@@ -63,7 +68,8 @@ public final class ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("update, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            if (elapsedTime > slowQueryThresholdInMs)
+                logger.warn("slow query detected");
         }
     }
 
@@ -78,7 +84,8 @@ public final class ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("update, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            if (elapsedTime > slowQueryThresholdInMs)
+                logger.warn("slow query detected");
         }
     }
 
@@ -96,13 +103,8 @@ public final class ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("search, index={}, type={}, searchTime={}, elapsedTime={}", index, type, searchTime, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs) {
+            if (elapsedTime > slowQueryThresholdInMs)
                 logger.warn("slow query detected, query={}", source);
-            }
         }
-    }
-
-    private void checkSlowQuery(long elapsedTime) {
-        if (elapsedTime > slowQueryThresholdInMs) logger.warn("slow query detected");
     }
 }

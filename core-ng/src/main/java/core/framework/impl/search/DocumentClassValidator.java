@@ -22,11 +22,11 @@ import java.util.Set;
 /**
  * @author neo
  */
-public final class ElasticSearchClassValidator implements TypeVisitor {
+public final class DocumentClassValidator implements TypeVisitor {
     private final DataTypeValidator validator;
     private final Map<Class, Set<String>> elements = Maps.newHashMap();
 
-    public ElasticSearchClassValidator(Class<?> documentClass) {
+    public DocumentClassValidator(Class<?> documentClass) {
         validator = new DataTypeValidator(documentClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;

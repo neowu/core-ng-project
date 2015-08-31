@@ -12,9 +12,9 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class ElasticSearchClassValidatorTest {
+public class DocumentClassValidatorTest {
     @XmlAccessorType(XmlAccessType.FIELD)
-    public static class TestIndex {
+    public static class TestDocument {
         @XmlElement(name = "date_time_field")
         public LocalDateTime dateTimeField;
 
@@ -30,6 +30,6 @@ public class ElasticSearchClassValidatorTest {
 
     @Test
     public void validate() {
-        new ElasticSearchClassValidator(TestIndex.class).validate();
+        new DocumentClassValidator(TestDocument.class).validate();
     }
 }

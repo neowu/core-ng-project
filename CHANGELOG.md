@@ -1,6 +1,7 @@
 ## Change log
 
-### 3.4.7 (8/30/2015 - )
+### 3.4.7 (8/30/2015 - 8/31/2015)
+* validate search index document object
 
 ### 3.4.6 (8/27/2015 - 8/28/2015)
 * validation: added @Min/@Max
