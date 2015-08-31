@@ -110,6 +110,7 @@ public class RepositoryImplTest {
     public void delete() {
         EntityWithAssignedId entity = new EntityWithAssignedId();
         entity.id = UUID.randomUUID().toString();
+        entity.intField = 11;
         entityWithAssignedIdRepository.insert(entity);
 
         entityWithAssignedIdRepository.delete(entity.id);
@@ -123,10 +124,12 @@ public class RepositoryImplTest {
         EntityWithAssignedId entity1 = new EntityWithAssignedId();
         entity1.id = "1";
         entity1.stringField = "value1";
+        entity1.intField = 11;
 
         EntityWithAssignedId entity2 = new EntityWithAssignedId();
         entity2.id = "2";
         entity2.stringField = "value2";
+        entity2.intField = 12;
 
         entityWithAssignedIdRepository.batchInsert(Lists.newArrayList(entity1, entity2));
 
@@ -141,8 +144,10 @@ public class RepositoryImplTest {
     public void batchDelete() {
         EntityWithAssignedId entity1 = new EntityWithAssignedId();
         entity1.id = "3";
+        entity1.intField = 11;
         EntityWithAssignedId entity2 = new EntityWithAssignedId();
         entity2.id = "4";
+        entity2.intField = 12;
         entityWithAssignedIdRepository.batchInsert(Lists.newArrayList(entity1, entity2));
 
         entityWithAssignedIdRepository.batchDelete(Lists.newArrayList("3", "4"));

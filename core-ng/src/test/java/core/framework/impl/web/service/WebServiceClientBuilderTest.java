@@ -1,7 +1,6 @@
-package core.framework.impl.web.client;
+package core.framework.impl.web.service;
 
 import core.framework.api.http.HTTPMethod;
-import core.framework.impl.web.service.TestWebService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;

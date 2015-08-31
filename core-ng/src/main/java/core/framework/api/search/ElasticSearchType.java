@@ -59,6 +59,7 @@ public final class ElasticSearchType<T> {
 
     public void update(String id, T source) {
         StopWatch watch = new StopWatch();
+        validator.partialValidate(source);
         try {
             String document = JSON.toJSON(source);
             client.prepareUpdate(index, type, id)

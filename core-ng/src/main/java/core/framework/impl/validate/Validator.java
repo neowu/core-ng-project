@@ -13,17 +13,25 @@ public class Validator {
     }
 
     public void validate(Object instance) {
+        validate(instance, false);
+    }
+
+    public void partialValidate(Object instance) {
+        validate(instance, true);
+    }
+
+    void validate(Object instance, boolean partial) {
         ValidationErrors errors = new ValidationErrors();
-        validate(instance, errors);
+        validate(instance, errors, partial);
         if (errors.hasError())
             throw new ValidationException(errors.errors);
     }
 
-    void validate(Object instance, ValidationErrors errors) {
+    void validate(Object instance, ValidationErrors errors, boolean partial) {
         if (instance == null) {
             errors.add("instance", "instance must not be null");
         } else if (validator != null) { // validator can be null if no validation annotation presents
-            validator.validate(instance, errors);
+            validator.validate(instance, errors, partial);
         }
     }
 }

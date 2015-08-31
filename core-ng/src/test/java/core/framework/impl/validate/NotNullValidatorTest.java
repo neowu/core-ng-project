@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -44,18 +43,27 @@ public class NotNullValidatorTest {
         instance.children = Lists.newArrayList();
         instance.children.add(instance.child);
 
-        ValidationErrors validationErrors = new ValidationErrors();
-        validator.validate(instance, validationErrors);
+        ValidationErrors errors = new ValidationErrors();
+        validator.validate(instance, errors, false);
 
-        Assert.assertTrue(validationErrors.hasError());
+        Assert.assertTrue(errors.hasError());
+        assertEquals(4, errors.errors.size());
+        assertThat(errors.errors.get("stringField"), containsString("stringField"));
+        assertThat(errors.errors.get("booleanField"), containsString("booleanField"));
+        assertThat(errors.errors.get("child.intField"), containsString("intField"));
+        assertThat(errors.errors.get("children.intField"), containsString("intField"));
+    }
 
-        Map<String, String> errors = validationErrors.errors;
+    @Test
+    public void partialValidate() {
+        Validator validator = new ValidatorBuilder(TestBean.class, Field::getName).build();
 
-        assertEquals(4, errors.size());
-        assertThat(errors.get("stringField"), containsString("stringField"));
-        assertThat(errors.get("booleanField"), containsString("booleanField"));
-        assertThat(errors.get("child.intField"), containsString("intField"));
-        assertThat(errors.get("children.intField"), containsString("intField"));
+        TestBean instance = new TestBean();
+
+        ValidationErrors errors = new ValidationErrors();
+        validator.validate(instance, errors, true);
+
+        Assert.assertFalse(errors.hasError());
     }
 
     @Test
@@ -67,17 +75,14 @@ public class NotNullValidatorTest {
         instance.children = Lists.newArrayList();
         instance.children.add(instance.child);
 
-        ValidationErrors validationErrors = new ValidationErrors();
-        validator.validate(Lists.newArrayList(instance), validationErrors);
+        ValidationErrors errors = new ValidationErrors();
+        validator.validate(Lists.newArrayList(instance), errors, false);
 
-        Assert.assertTrue(validationErrors.hasError());
-
-        Map<String, String> errors = validationErrors.errors;
-
-        assertEquals(4, errors.size());
-        assertThat(errors.get("stringField"), containsString("stringField"));
-        assertThat(errors.get("booleanField"), containsString("booleanField"));
-        assertThat(errors.get("child.intField"), containsString("intField"));
-        assertThat(errors.get("children.intField"), containsString("intField"));
+        Assert.assertTrue(errors.hasError());
+        assertEquals(4, errors.errors.size());
+        assertThat(errors.errors.get("stringField"), containsString("stringField"));
+        assertThat(errors.errors.get("booleanField"), containsString("booleanField"));
+        assertThat(errors.errors.get("child.intField"), containsString("intField"));
+        assertThat(errors.errors.get("children.intField"), containsString("intField"));
     }
 }

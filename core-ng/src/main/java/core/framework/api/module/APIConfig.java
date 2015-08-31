@@ -8,11 +8,11 @@ import core.framework.api.web.service.Path;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.BeanValidator;
 import core.framework.impl.web.ControllerHolder;
-import core.framework.impl.web.client.WebServiceClient;
-import core.framework.impl.web.client.WebServiceClientBuilder;
 import core.framework.impl.web.service.HTTPMethodHelper;
 import core.framework.impl.web.service.ServiceControllerBuilder;
 import core.framework.impl.web.service.ServiceInterfaceValidator;
+import core.framework.impl.web.service.WebServiceClient;
+import core.framework.impl.web.service.WebServiceClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

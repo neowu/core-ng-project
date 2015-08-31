@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -32,14 +31,12 @@ public class MinMaxValidatorTest {
         bean.num1 = 0;
         bean.num2 = 11;
 
-        ValidationErrors validationErrors = new ValidationErrors();
-        validator.validate(bean, validationErrors);
+        ValidationErrors errors = new ValidationErrors();
+        validator.validate(bean, errors, false);
 
-        Assert.assertTrue(validationErrors.hasError());
-
-        Map<String, String> errors = validationErrors.errors;
-        assertEquals(2, errors.size());
-        assertThat(errors.get("num1"), containsString("num1"));
-        assertThat(errors.get("num2"), containsString("num2"));
+        Assert.assertTrue(errors.hasError());
+        assertEquals(2, errors.errors.size());
+        assertThat(errors.errors.get("num1"), containsString("num1"));
+        assertThat(errors.errors.get("num2"), containsString("num2"));
     }
 }

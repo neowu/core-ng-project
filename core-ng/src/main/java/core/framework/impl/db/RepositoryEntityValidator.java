@@ -18,4 +18,8 @@ public class RepositoryEntityValidator<T> {
     public void validate(T entity) {
         validator.validate(entity);
     }
+
+    public void partialValidate(T entity) {
+        validator.partialValidate(entity);
+    }
 }

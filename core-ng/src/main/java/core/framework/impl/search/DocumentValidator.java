@@ -19,4 +19,8 @@ public class DocumentValidator<T> {
     public void validate(T document) {
         validator.validate(document);
     }
+
+    public void partialValidate(T document) {
+        validator.partialValidate(document);
+    }
 }

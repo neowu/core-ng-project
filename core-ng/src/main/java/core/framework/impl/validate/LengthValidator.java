@@ -19,7 +19,7 @@ public class LengthValidator implements FieldValidator {
     }
 
     @Override
-    public void validate(Object value, ValidationErrors errors) {
+    public void validate(Object value, ValidationErrors errors, boolean partial) {
         if (value == null) return;
         int length;
         if (value instanceof String) {

@@ -1,4 +1,4 @@
-package core.framework.impl.web.client;
+package core.framework.impl.web.service;
 
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Maps;
@@ -7,7 +7,6 @@ import core.framework.api.web.service.PathParam;
 import core.framework.impl.codegen.CodeBuilder;
 import core.framework.impl.codegen.DynamicInstanceBuilder;
 import core.framework.impl.codegen.TypeHelper;
-import core.framework.impl.web.service.HTTPMethodHelper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

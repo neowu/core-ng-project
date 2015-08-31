@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -31,19 +30,31 @@ public class LengthValidatorTest {
     public void validate() {
         Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
 
-        Bean instance = new Bean();
-        instance.field1 = "123456";
-        instance.field2 = "1";
+        Bean bean = new Bean();
+        bean.field1 = "123456";
+        bean.field2 = "1";
 
-        ValidationErrors validationErrors = new ValidationErrors();
-        validator.validate(instance, validationErrors);
+        ValidationErrors errors = new ValidationErrors();
+        validator.validate(bean, errors, false);
 
-        Assert.assertTrue(validationErrors.hasError());
+        Assert.assertTrue(errors.hasError());
+        assertEquals(2, errors.errors.size());
+        assertThat(errors.errors.get("field1"), containsString("field1"));
+        assertThat(errors.errors.get("field2"), containsString("field2"));
+    }
 
-        Map<String, String> errors = validationErrors.errors;
+    @Test
+    public void partialValidate() {
+        Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
 
-        assertEquals(2, errors.size());
-        assertThat(errors.get("field1"), containsString("field1"));
-        assertThat(errors.get("field2"), containsString("field2"));
+        Bean bean = new Bean();
+        bean.field1 = "123456";
+
+        ValidationErrors errors = new ValidationErrors();
+        validator.validate(bean, errors, true);
+
+        Assert.assertTrue(errors.hasError());
+        assertEquals(1, errors.errors.size());
+        assertThat(errors.errors.get("field1"), containsString("field1"));
     }
 }

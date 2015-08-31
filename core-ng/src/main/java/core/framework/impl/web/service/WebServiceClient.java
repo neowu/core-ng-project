@@ -1,4 +1,4 @@
-package core.framework.impl.web.client;
+package core.framework.impl.web.service;
 
 import core.framework.api.http.ContentTypes;
 import core.framework.api.http.HTTPClient;

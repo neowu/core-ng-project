@@ -1,7 +1,9 @@
 ## Change log
 
 ### 3.4.7 (8/30/2015 - 8/31/2015)
-* validate search index document object
+* search: validate search index document object
+* validator: partial validate for update (ignore notNull)
+* db: validate for update
 
 ### 3.4.6 (8/27/2015 - 8/28/2015)
 * validation: added @Min/@Max

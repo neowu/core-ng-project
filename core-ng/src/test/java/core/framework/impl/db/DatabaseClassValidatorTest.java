@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  */
 public class DatabaseClassValidatorTest {
     @Table(name = "table")
-    public static class Entity {
+    public static class TestEntity {
         @PrimaryKey(autoIncrement = true)
         @Column(name = "id")
         public Integer id;
@@ -31,6 +31,6 @@ public class DatabaseClassValidatorTest {
 
     @Test
     public void validateEntityClass() {
-        new DatabaseClassValidator(Entity.class).validateEntityClass();
+        new DatabaseClassValidator(TestEntity.class).validateEntityClass();
     }
 }

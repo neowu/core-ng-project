@@ -15,7 +15,7 @@ public class NotNullValidator implements FieldValidator {
     }
 
     @Override
-    public void validate(Object value, ValidationErrors errors) {
-        if (value == null) errors.add(fieldPath, notNull.message());
+    public void validate(Object value, ValidationErrors errors, boolean partial) {
+        if (!partial && value == null) errors.add(fieldPath, notNull.message());
     }
 }

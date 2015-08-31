@@ -129,8 +129,8 @@ public class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public void update(T entity) {
-        // TODO: validate on update?
         StopWatch watch = new StopWatch();
+        validator.partialValidate(entity);
         Query query = updateQuery.query(entity);
         String sql = query.statement();
         try {
