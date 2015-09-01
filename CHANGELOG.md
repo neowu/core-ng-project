@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.4.8 (9/1/2015)
+* db: fix selectInt/String with null returned
+
 ### 3.4.7 (8/30/2015 - 8/31/2015)
 * search: validate search index document object
 * validator: partial validate for update (ignore notNull)

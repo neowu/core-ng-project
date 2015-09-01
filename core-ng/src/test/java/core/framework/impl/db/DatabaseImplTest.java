@@ -79,6 +79,18 @@ public class DatabaseImplTest {
     }
 
     @Test
+    public void selectNullInt() {
+        Optional<Integer> result = database.selectInt("SELECT max(id) FROM database_test");
+        Assert.assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void selectInt() {
+        Optional<Integer> result = database.selectInt("SELECT count(id) FROM database_test");
+        Assert.assertEquals(0, result.get().intValue());
+    }
+
+    @Test
     public void commitTransaction() {
         try (Transaction transaction = database.beginTransaction()) {
             database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")

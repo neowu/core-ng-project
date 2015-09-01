@@ -276,7 +276,7 @@ public final class DatabaseImpl implements Database {
         List<T> results = executeQuery(sql, params, mapper);
         if (results.isEmpty()) return Optional.empty();
         if (results.size() > 1) throw new Error("more than one row returned, size=" + results.size());
-        return Optional.of(results.get(0));
+        return Optional.ofNullable(results.get(0));
     }
 
     private <T> List<T> fetchResultSet(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {

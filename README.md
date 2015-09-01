@@ -10,12 +10,13 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * cache: pre warm, static or provide structure?
 * webservice: client retry on network issue?
 * template: "map" support?
-* review/refactory/unit-test all packages
+* review/refactory/unit-test all packages (final/encapsulation/etc)
 * website static content security check, (in server env, this is handled by nginx directly)
 * template security check, escaping and etc
 * db pool: actively check/close connection before using from transactionManager?
 * validator: annotation for website, like @Pattern or @SafeString?
 * webservice: @Version to let client pass thru header for action log?
+* cm: configration management, dynamic update properties?
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)
