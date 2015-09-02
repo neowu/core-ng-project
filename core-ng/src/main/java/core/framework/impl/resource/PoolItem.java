@@ -1,13 +1,11 @@
 package core.framework.impl.resource;
 
-import java.time.Instant;
-
 /**
  * @author neo
  */
 public class PoolItem<T> {
     public final T resource;
-    Instant returnTime;
+    long returnTime;    // according to profiling, use System.currentTimeMillis instead of Instant.now()
     public boolean broken;
 
     public PoolItem(T resource) {

@@ -75,7 +75,7 @@ public class Pool<T> {
         if (item.broken) {
             recycleItem(item);
         } else {
-            item.returnTime = Instant.now();
+            item.returnTime = System.currentTimeMillis();
             idleItems.push(item);
         }
     }
@@ -137,7 +137,7 @@ public class Pool<T> {
 
         while (iterator.hasNext()) {
             PoolItem<T> item = iterator.next();
-            if (Duration.between(item.returnTime, now).getSeconds() > maxIdleTimeInSeconds) {
+            if (Duration.between(Instant.ofEpochMilli(item.returnTime), now).getSeconds() > maxIdleTimeInSeconds) {
                 boolean removed = idleItems.remove(item);
                 if (!removed) return;
                 recycleItem(item);

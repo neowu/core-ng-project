@@ -1,5 +1,11 @@
 ## Change log
 
+### 3.4.9 (9/1/2015 - 9/2/2015)
+* db: lower the slow query to 5s and too many results to 1000
+* redis: raise slow query to 200ms, (considering GC and network latency)
+* redis: removed keys() (use SCAN in future if needed)
+* redis: use binaryJedis and other changes according to profiling
+
 ### 3.4.8 (9/1/2015)
 * db: fix selectInt/String with null returned
 

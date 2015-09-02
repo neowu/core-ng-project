@@ -36,8 +36,8 @@ public final class DatabaseImpl implements Database {
     private final ConnectionTester tester = new ConnectionTester();
     public final TransactionManager transactionManager;
     public final Pool<Connection> pool;
-    public long slowQueryThresholdInMs = Duration.ofSeconds(7).toMillis();
-    public int tooManyRowsReturnedThreshold = 2000;
+    public long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
+    public int tooManyRowsReturnedThreshold = 1000;
     private final Map<Class, RowMapper> viewRowMappers = Maps.newHashMap();
 
     private Duration timeout;
