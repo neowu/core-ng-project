@@ -1,10 +1,10 @@
-import app.DemoServiceApp;
+import app.DemoSiteApp;
 
 /**
  * @author neo
  */
 public class Main {
     public static void main(String[] args) {
-        new DemoServiceApp().start();
+        new DemoSiteApp().start();
     }
 }

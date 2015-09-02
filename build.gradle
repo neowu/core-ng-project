@@ -92,13 +92,29 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
     }
 }
 
+project(':log-processor') {
+    apply from: file("${rootDir}/gradle/app.gradle")
+
+    dependencies {
+        compile(
+                project(':core-ng'),
+                "org.elasticsearch:elasticsearch:${elasticVersion}",
+                "com.rabbitmq:amqp-client:${rabbitVersion}"
+        )
+        testCompile(
+                project(':core-ng-test')
+        )
+    }
+}
+
 project(':demo-service') {
     apply from: file("${rootDir}/gradle/app.gradle")
 
     dependencies {
         compile(
                 project(':core-ng'),
-                "org.mongodb:mongo-java-driver:${mongoVersion}"
+                "org.mongodb:mongo-java-driver:${mongoVersion}",
+                "org.elasticsearch:elasticsearch:${elasticVersion}"
         )
         runtime(
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
@@ -114,28 +130,12 @@ project(':demo-service') {
     }
 }
 
-project(':search-service') {
+project(':demo-site') {
     apply from: file("${rootDir}/gradle/app.gradle")
 
     dependencies {
         compile(
-                project(':core-ng'),
-                "org.elasticsearch:elasticsearch:${elasticVersion}"
-        )
-        testCompile(
-                project(':core-ng-test')
-        )
-    }
-}
-
-project(':log-processor') {
-    apply from: file("${rootDir}/gradle/app.gradle")
-
-    dependencies {
-        compile(
-                project(':core-ng'),
-                "org.elasticsearch:elasticsearch:${elasticVersion}",
-                "com.rabbitmq:amqp-client:${rabbitVersion}"
+                project(':core-ng')
         )
         testCompile(
                 project(':core-ng-test')
