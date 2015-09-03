@@ -2,13 +2,13 @@ package app;
 
 import app.web.AsyncTestController;
 import app.web.interceptor.TestInterceptor;
-import core.framework.api.AbstractApplication;
+import core.framework.api.App;
 import core.framework.api.module.SystemModule;
 
 /**
  * @author neo
  */
-public class DemoServiceApp extends AbstractApplication {
+public class DemoServiceApp extends App {
     @Override
     protected void initialize() {
         load(new SystemModule("sys.properties"));

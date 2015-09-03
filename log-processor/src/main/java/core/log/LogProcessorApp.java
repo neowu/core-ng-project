@@ -1,6 +1,6 @@
 package core.log;
 
-import core.framework.api.AbstractApplication;
+import core.framework.api.App;
 import core.framework.api.module.SystemModule;
 import core.framework.api.search.ElasticSearch;
 import core.framework.api.search.ElasticSearchBuilder;
@@ -14,7 +14,7 @@ import core.log.queue.TraceLogMessageHandler;
 /**
  * @author neo
  */
-public class LogProcessorApp extends AbstractApplication {
+public class LogProcessorApp extends App {
     @Override
     protected void initialize() {
         load(new SystemModule("sys.properties"));

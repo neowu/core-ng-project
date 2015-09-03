@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public abstract class AbstractApplication extends Module {
-    private final Logger logger = LoggerFactory.getLogger(AbstractApplication.class);
+public abstract class App extends Module {
+    private final Logger logger = LoggerFactory.getLogger(App.class);
 
     public final void start() {
         try {
