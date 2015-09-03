@@ -33,7 +33,6 @@ import java.util.Properties;
 public final class DatabaseImpl implements Database {
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
 
-    private final ConnectionTester tester = new ConnectionTester();
     public final TransactionManager transactionManager;
     public final Pool<Connection> pool;
     public long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
@@ -46,17 +45,12 @@ public final class DatabaseImpl implements Database {
     private final Properties info = new Properties();
 
     public DatabaseImpl() {
-        StopWatch watch = new StopWatch();
-        try {
-            pool = new Pool<>(this::createConnection, Connection::close);
-            pool.name("db");
-            pool.size(5, 50);    // default optimization for AWS medium/large instances
-            pool.maxIdleTime(Duration.ofHours(2));
-            timeout(Duration.ofSeconds(30));
-            transactionManager = new TransactionManager(pool, tester);
-        } finally {
-            logger.info("create database client, elapsedTime={}", watch.elapsedTime());
-        }
+        pool = new Pool<>(this::createConnection, Connection::close);
+        pool.name("db");
+        pool.size(5, 50);    // default optimization for AWS medium/large instances
+        pool.maxIdleTime(Duration.ofHours(2));
+        timeout(Duration.ofSeconds(30));
+        transactionManager = new TransactionManager(pool);
     }
 
     private Connection createConnection() {
@@ -217,7 +211,7 @@ public final class DatabaseImpl implements Database {
             PreparedStatements.setParams(statement, params);
             return statement.executeUpdate();
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);
@@ -234,7 +228,7 @@ public final class DatabaseImpl implements Database {
             }
             return statement.executeBatch();
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);
@@ -250,7 +244,7 @@ public final class DatabaseImpl implements Database {
             PreparedStatements.setParams(statement, params);
             return fetchResultSet(statement, mapper);
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);
@@ -265,7 +259,7 @@ public final class DatabaseImpl implements Database {
             statement.executeUpdate();
             return fetchGeneratedKey(statement);
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);

@@ -1,17 +1,13 @@
 package core.framework.api.module;
 
 import core.framework.impl.module.ModuleContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.Arrays;
 
 /**
  * @author neo
  */
 public final class RabbitMQConfig {
-    private final Logger logger = LoggerFactory.getLogger(RabbitMQConfig.class);
     private final ModuleContext context;
 
     public RabbitMQConfig(ModuleContext context) {
@@ -20,7 +16,6 @@ public final class RabbitMQConfig {
 
     public RabbitMQConfig hosts(String... hosts) {
         if (!context.test) {
-            logger.info("set rabbitMQ hosts, hosts={}", Arrays.toString(hosts));
             context.queueManager.rabbitMQ.hosts(hosts);
         }
         return this;

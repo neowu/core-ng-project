@@ -17,13 +17,13 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class DatabaseClassValidator implements TypeVisitor {
+final class DatabaseClassValidator implements TypeVisitor {
     private final DataTypeValidator validator;
     private boolean foundPK;
     private boolean validateView;
     private final Set<String> columns = Sets.newHashSet();
 
-    public DatabaseClassValidator(Class<?> entityClass) {
+    DatabaseClassValidator(Class<?> entityClass) {
         validator = new DataTypeValidator(entityClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.visitor = this;

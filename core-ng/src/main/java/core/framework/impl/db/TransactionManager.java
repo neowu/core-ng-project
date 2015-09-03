@@ -16,18 +16,16 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class TransactionManager {
+public final class TransactionManager {
     private final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
     private final ThreadLocal<PoolItem<Connection>> currentConnection = new ThreadLocal<>();
     private final ThreadLocal<TransactionState> currentTransactionState = new ThreadLocal<>();
     private final Pool<Connection> pool;
-    private final ConnectionTester tester;
     public IsolationLevel defaultIsolationLevel;
     public long longTransactionThresholdInMs = Duration.ofSeconds(10).toMillis();
 
-    public TransactionManager(Pool<Connection> pool, ConnectionTester tester) {
+    TransactionManager(Pool<Connection> pool) {
         this.pool = pool;
-        this.tester = tester;
     }
 
     public PoolItem<Connection> getConnection() {
@@ -53,7 +51,7 @@ public class TransactionManager {
             if (defaultIsolationLevel != null)
                 connection.resource.setTransactionIsolation(defaultIsolationLevel.level);
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             pool.returnItem(connection);
             throw new UncheckedSQLException(e);
         }
@@ -68,7 +66,7 @@ public class TransactionManager {
         try {
             connection.resource.setAutoCommit(false);
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         }
 
@@ -86,7 +84,7 @@ public class TransactionManager {
             connection.resource.commit();
             currentTransactionState.set(TransactionState.COMMITTED);
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         }
     }
@@ -98,7 +96,7 @@ public class TransactionManager {
             connection.resource.rollback();
             currentTransactionState.set(TransactionState.ROLLED_BACK);
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         }
     }
@@ -116,7 +114,7 @@ public class TransactionManager {
                 connection.resource.rollback();
             }
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             returnConnection(connection);
@@ -128,7 +126,7 @@ public class TransactionManager {
             if (!connection.broken)
                 connection.resource.setAutoCommit(true);
         } catch (SQLException e) {
-            tester.checkConnectionStatus(connection, e);
+            ConnectionHelper.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             pool.returnItem(connection);

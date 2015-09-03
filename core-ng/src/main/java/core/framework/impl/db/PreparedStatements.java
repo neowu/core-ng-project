@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author neo
  */
-class PreparedStatements {
+final class PreparedStatements {
     static void setParams(PreparedStatement statement, List<Object> params) throws SQLException {
         int index = 1;
         for (Object param : params) {

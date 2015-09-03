@@ -9,8 +9,8 @@ import java.lang.reflect.Field;
 /**
  * @author neo
  */
-public class DeleteQueryBuilder {
-    public final String sql;
+final class DeleteQueryBuilder {
+    final String sql;
 
     DeleteQueryBuilder(Class<?> entityClass) {
         Table table = entityClass.getDeclaredAnnotation(Table.class);

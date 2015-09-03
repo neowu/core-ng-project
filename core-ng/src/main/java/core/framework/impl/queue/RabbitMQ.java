@@ -66,6 +66,7 @@ public class RabbitMQ {
     }
 
     public void hosts(String... hosts) {
+        logger.info("set rabbitMQ hosts, hosts={}", Arrays.toString(hosts));
         addresses = new Address[hosts.length];
         for (int i = 0; i < hosts.length; i++) {
             String host = hosts[i];

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * @author neo
  */
-public class RepositoryImpl<T> implements Repository<T> {
+public final class RepositoryImpl<T> implements Repository<T> {
     private final Logger logger = LoggerFactory.getLogger(RepositoryImpl.class);
 
     private final DatabaseImpl database;
@@ -28,7 +28,7 @@ public class RepositoryImpl<T> implements Repository<T> {
     private final DeleteQueryBuilder deleteQuery;
     private final RowMapper<T> rowMapper;
 
-    public RepositoryImpl(DatabaseImpl database, RepositoryEntityValidator<T> validator, Class<T> entityClass, RowMapper<T> rowMapper) {
+    RepositoryImpl(DatabaseImpl database, RepositoryEntityValidator<T> validator, Class<T> entityClass, RowMapper<T> rowMapper) {
         this.database = database;
         this.validator = validator;
         insertQuery = new InsertQueryBuilder(entityClass);   //TODO: use javaassit to build code for all query builder

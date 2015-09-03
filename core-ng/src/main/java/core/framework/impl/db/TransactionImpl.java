@@ -9,14 +9,14 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public final class TransactionImpl implements Transaction {
+final class TransactionImpl implements Transaction {
     private final Logger logger = LoggerFactory.getLogger(TransactionImpl.class);
 
     private final TransactionManager transactionManager;
     private final StopWatch watch = new StopWatch();
     private final long longTransactionThresholdInMs;
 
-    public TransactionImpl(TransactionManager transactionManager, long longTransactionThresholdInMs) {
+    TransactionImpl(TransactionManager transactionManager, long longTransactionThresholdInMs) {
         logger.debug("begin transaction");
         this.transactionManager = transactionManager;
         this.longTransactionThresholdInMs = longTransactionThresholdInMs;

@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 /**
  * @author neo
  */
-public class ViewRowMapperBuilder<T> {
+final class ViewRowMapperBuilder<T> {
     private final Class<T> entityClass;
 
-    public ViewRowMapperBuilder(Class<T> entityClass) {
+    ViewRowMapperBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 

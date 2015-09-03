@@ -7,10 +7,10 @@ import core.framework.impl.validate.ValidatorBuilder;
 /**
  * @author neo
  */
-public class RepositoryEntityValidator<T> {
+final class RepositoryEntityValidator<T> {
     private final Validator validator;
 
-    public RepositoryEntityValidator(Class<T> entityClass) {
+    RepositoryEntityValidator(Class<T> entityClass) {
         new DatabaseClassValidator(entityClass).validateEntityClass();
         validator = new ValidatorBuilder(entityClass, field -> field.getDeclaredAnnotation(Column.class).name()).build();
     }

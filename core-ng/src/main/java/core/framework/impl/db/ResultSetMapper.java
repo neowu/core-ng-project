@@ -21,13 +21,13 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class ResultSetMapper implements Row {
+final class ResultSetMapper implements Row {
     private final ResultSet resultSet;
 
     // JDBC ResultSet doesn't support to ignore non-existed column, this to build index
     private final Map<String, Integer> columnIndex;
 
-    public ResultSetMapper(ResultSet resultSet) {
+    ResultSetMapper(ResultSet resultSet) {
         this.resultSet = resultSet;
         try {
             columnIndex = buildIndex();

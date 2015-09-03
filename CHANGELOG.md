@@ -2,6 +2,7 @@
 
 ### 3.5.0 (9/3/2015 - )
 * config: renamed AbstractApplication to App (broken change)
+* db: removed repository select where clause must contains '?', exception is like "where some_column is null";
 
 ### 3.4.9 (9/1/2015 - 9/2/2015)
 * db: lower the slow query to 5s and too many results to 1000

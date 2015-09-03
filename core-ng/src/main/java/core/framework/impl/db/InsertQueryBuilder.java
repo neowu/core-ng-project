@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class InsertQueryBuilder {
+final class InsertQueryBuilder {
     public final String sql;
     private final List<Field> params = Lists.newArrayList();
 
@@ -46,7 +46,7 @@ public class InsertQueryBuilder {
         sql = builder.toString();
     }
 
-    public List<Object> params(Object entity) {
+    List<Object> params(Object entity) {
         List<Object> queryParams = new ArrayList<>(this.params.size());
         try {
             for (Field param : params) {

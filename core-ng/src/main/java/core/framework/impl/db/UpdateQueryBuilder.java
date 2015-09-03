@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class UpdateQueryBuilder {
+final class UpdateQueryBuilder {
     private final List<Field> primaryKeyFields = Lists.newArrayList();
     private final List<Field> columnFields = Lists.newArrayList();
 
@@ -27,7 +27,7 @@ public class UpdateQueryBuilder {
         }
     }
 
-    public Query query(Object entity) {
+    Query query(Object entity) {
         try {
             Query query = new Query("UPDATE ");
 

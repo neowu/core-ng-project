@@ -4,14 +4,13 @@ import core.framework.api.db.Column;
 import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Query;
 import core.framework.api.db.Table;
-import core.framework.api.util.Exceptions;
 
 import java.lang.reflect.Field;
 
 /**
  * @author neo
  */
-public class SelectQueryBuilder {
+final class SelectQueryBuilder {
     private final String selectByPK;
     private final String selectAll;
 
@@ -45,7 +44,7 @@ public class SelectQueryBuilder {
         selectByPK = builder.toString();
     }
 
-    public Query byPK(Object... primaryKeys) {
+    Query byPK(Object... primaryKeys) {
         Query query = new Query(selectByPK);
         for (Object primaryKey : primaryKeys) {
             query.addParam(primaryKey);
@@ -53,14 +52,11 @@ public class SelectQueryBuilder {
         return query;
     }
 
-    public Query all() {
+    Query all() {
         return new Query(selectAll);
     }
 
-    public Query where(String whereClause, Object... params) {
-        if (!whereClause.contains("?"))
-            throw Exceptions.error("where clause must contain parameter holder, whereClause={}", whereClause);
-
+    Query where(String whereClause, Object... params) {
         Query query = new Query(selectAll).appendStatement(" WHERE ").appendStatement(whereClause);
         for (Object primaryKey : params) {
             query.addParam(primaryKey);
