@@ -2,8 +2,8 @@ package core.framework.impl.db;
 
 import core.framework.api.db.Column;
 import core.framework.api.db.RowMapper;
-import core.framework.impl.codegen.CodeBuilder;
-import core.framework.impl.codegen.DynamicInstanceBuilder;
+import core.framework.impl.code.CodeBuilder;
+import core.framework.impl.code.DynamicInstanceBuilder;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -56,6 +56,6 @@ final class ViewRowMapperBuilder<T> {
         builder.indent(1).append("return entity;\n");
         builder.append("}");
 
-        return builder.toString();
+        return builder.build();
     }
 }

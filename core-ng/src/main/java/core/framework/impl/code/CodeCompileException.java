@@ -1,4 +1,4 @@
-package core.framework.impl.codegen;
+package core.framework.impl.code;
 
 /**
  * @author neo

@@ -1,4 +1,4 @@
-package core.framework.impl.codegen;
+package core.framework.impl.code;
 
 import core.framework.api.util.Exceptions;
 import javassist.CannotCompileException;

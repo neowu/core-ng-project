@@ -1,8 +1,8 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
-import core.framework.impl.codegen.CodeBuilder;
-import core.framework.impl.codegen.DynamicInstanceBuilder;
+import core.framework.impl.code.CodeBuilder;
+import core.framework.impl.code.DynamicInstanceBuilder;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class EntityDecoderBuilder<T> {
             .indent(1).append("return {}(reader, \"\");\n", methodName)
             .append("}");
 
-        methods.put("decode", builder.toString());
+        methods.put("decode", builder.build());
     }
 
     private String decodeEntityMethod(Class entityClass) {
@@ -88,7 +88,7 @@ public class EntityDecoderBuilder<T> {
         builder.indent(1).append("return entity;\n");
         builder.append("}\n");
 
-        methods.put(methodName, builder.toString());
+        methods.put(methodName, builder.build());
         return methodName;
     }
 
@@ -192,7 +192,7 @@ public class EntityDecoderBuilder<T> {
         builder.indent(1).append("return map;\n");
         builder.append("}\n");
 
-        methods.put(methodName, builder.toString());
+        methods.put(methodName, builder.build());
         return methodName;
     }
 
@@ -247,7 +247,7 @@ public class EntityDecoderBuilder<T> {
         builder.indent(1).append("return list;\n");
         builder.append("}\n");
 
-        methods.put(methodName, builder.toString());
+        methods.put(methodName, builder.build());
         return methodName;
     }
 }

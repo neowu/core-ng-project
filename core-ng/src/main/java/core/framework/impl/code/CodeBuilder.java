@@ -1,4 +1,4 @@
-package core.framework.impl.codegen;
+package core.framework.impl.code;
 
 import core.framework.api.util.Strings;
 
@@ -6,7 +6,7 @@ import core.framework.api.util.Strings;
  * @author neo
  */
 public class CodeBuilder {
-    private final StringBuilder builder = new StringBuilder();
+    private final StringBuilder builder = new StringBuilder(256);
 
     public CodeBuilder append(String text) {
         builder.append(text);
@@ -24,8 +24,7 @@ public class CodeBuilder {
         return this;
     }
 
-    @Override
-    public String toString() {
+    public String build() {
         return builder.toString();
     }
 }

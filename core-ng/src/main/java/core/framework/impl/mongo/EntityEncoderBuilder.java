@@ -1,8 +1,8 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
-import core.framework.impl.codegen.CodeBuilder;
-import core.framework.impl.codegen.DynamicInstanceBuilder;
+import core.framework.impl.code.CodeBuilder;
+import core.framework.impl.code.DynamicInstanceBuilder;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
@@ -39,7 +39,7 @@ public class EntityEncoderBuilder<T> {
             .indent(1).append("{}(writer, ({}) entity);\n", methodName, entityClass.getCanonicalName())
             .append("}");
 
-        methods.put("encode", builder.toString());
+        methods.put("encode", builder.build());
     }
 
     private String encodeEntityMethod(Class entityClass) {
@@ -64,7 +64,7 @@ public class EntityEncoderBuilder<T> {
 
         builder.append("}\n");
 
-        methods.put(methodName, builder.toString());
+        methods.put(methodName, builder.build());
         return methodName;
     }
 
@@ -85,7 +85,7 @@ public class EntityEncoderBuilder<T> {
             .indent(1).append("writer.writeEndArray();\n")
             .append("}\n");
 
-        methods.put(methodName, builder.toString());
+        methods.put(methodName, builder.build());
         return methodName;
     }
 
@@ -109,7 +109,7 @@ public class EntityEncoderBuilder<T> {
             .indent(1).append("writer.writeEndDocument();\n")
             .append("}\n");
 
-        methods.put(methodName, builder.toString());
+        methods.put(methodName, builder.build());
         return methodName;
     }
 

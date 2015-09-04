@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.api.util.ClasspathResources;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,6 +12,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author neo
@@ -50,6 +52,6 @@ public class EntityEncoderBuilderTest {
         String methods = ClasspathResources.text("mongo-test/encode-methods.txt");
 
         builder.methods.values()
-            .forEach(method -> Assert.assertThat(methods, CoreMatchers.containsString(method)));
+            .forEach(method -> assertThat(methods, containsString(method)));
     }
 }

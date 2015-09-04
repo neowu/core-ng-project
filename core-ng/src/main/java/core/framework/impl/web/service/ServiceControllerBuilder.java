@@ -7,9 +7,9 @@ import core.framework.api.web.Request;
 import core.framework.api.web.Response;
 import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.ResponseStatus;
-import core.framework.impl.codegen.CodeBuilder;
-import core.framework.impl.codegen.DynamicInstanceBuilder;
-import core.framework.impl.codegen.TypeHelper;
+import core.framework.impl.code.CodeBuilder;
+import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.code.TypeHelper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -38,7 +38,7 @@ public class ServiceControllerBuilder<T> {
     public Controller build() {
         DynamicInstanceBuilder<Controller> builder = new DynamicInstanceBuilder<>(Controller.class, service.getClass().getCanonicalName() + "$" + method.getName());
 
-        builder.addField(new CodeBuilder().append("final {} delegate;", serviceInterface.getCanonicalName()).toString());
+        builder.addField(new CodeBuilder().append("final {} delegate;", serviceInterface.getCanonicalName()).build());
         builder.constructor(new Class[]{serviceInterface}, "this.delegate = $1;");
         builder.addMethod(buildMethod());
 
@@ -85,7 +85,7 @@ public class ServiceControllerBuilder<T> {
         }
 
         builder.append("}");
-        return builder.toString();
+        return builder.build();
     }
 
     private PathParam pathParam(Annotation[] annotations) {

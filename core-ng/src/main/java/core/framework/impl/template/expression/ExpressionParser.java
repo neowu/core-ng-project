@@ -1,6 +1,6 @@
 package core.framework.impl.template.expression;
 
-import core.framework.impl.codegen.CodeCompileException;
+import core.framework.impl.code.CodeCompileException;
 
 import java.util.regex.Pattern;
 

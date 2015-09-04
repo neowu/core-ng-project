@@ -4,9 +4,9 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Maps;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.impl.codegen.CodeBuilder;
-import core.framework.impl.codegen.DynamicInstanceBuilder;
-import core.framework.impl.codegen.TypeHelper;
+import core.framework.impl.code.CodeBuilder;
+import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.code.TypeHelper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -28,7 +28,7 @@ public class WebServiceClientBuilder<T> {
     public T build() {
         DynamicInstanceBuilder<T> builder = new DynamicInstanceBuilder<>(serviceInterface, serviceInterface.getCanonicalName() + "$Client");
 
-        builder.addField(new CodeBuilder().append("final {} client;", WebServiceClient.class.getCanonicalName()).toString());
+        builder.addField(new CodeBuilder().append("final {} client;", WebServiceClient.class.getCanonicalName()).build());
         builder.constructor(new Class[]{WebServiceClient.class}, "this.client = $1;");
 
         for (Method method : serviceInterface.getMethods()) {
@@ -84,7 +84,7 @@ public class WebServiceClientBuilder<T> {
         if (!returnType.isVoid()) builder.indent(1).append("return response;\n");
 
         builder.append("}");
-        return builder.toString();
+        return builder.build();
     }
 
     private PathParam pathParam(Annotation[] annotations) {

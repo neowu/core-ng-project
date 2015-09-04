@@ -2,7 +2,7 @@ package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Strings;
-import core.framework.impl.codegen.CodeCompileException;
+import core.framework.impl.code.CodeCompileException;
 import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;

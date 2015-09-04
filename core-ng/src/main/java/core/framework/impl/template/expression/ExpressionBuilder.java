@@ -1,7 +1,7 @@
 package core.framework.impl.template.expression;
 
-import core.framework.impl.codegen.CodeBuilder;
-import core.framework.impl.codegen.DynamicInstanceBuilder;
+import core.framework.impl.code.CodeBuilder;
+import core.framework.impl.code.DynamicInstanceBuilder;
 import core.framework.impl.template.CallStack;
 
 /**
@@ -30,6 +30,6 @@ public class ExpressionBuilder {
         }
 
         builder.append("}");
-        return builder.toString();
+        return builder.build();
     }
 }
