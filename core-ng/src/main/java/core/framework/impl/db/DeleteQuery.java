@@ -9,10 +9,10 @@ import java.lang.reflect.Field;
 /**
  * @author neo
  */
-final class DeleteQueryBuilder {
+final class DeleteQuery {
     final String sql;
 
-    DeleteQueryBuilder(Class<?> entityClass) {
+    DeleteQuery(Class<?> entityClass) {
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         StringBuilder builder = new StringBuilder("DELETE FROM ")
             .append(table.name())
@@ -23,7 +23,7 @@ final class DeleteQueryBuilder {
             if (field.isAnnotationPresent(PrimaryKey.class)) {
                 Column column = field.getDeclaredAnnotation(Column.class);
                 if (index > 0) builder.append(" AND ");
-                builder.append(column.name()).append("=?");
+                builder.append(column.name()).append(" = ?");
                 index++;
             }
         }

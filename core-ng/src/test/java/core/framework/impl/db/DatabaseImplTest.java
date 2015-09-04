@@ -1,6 +1,5 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Query;
 import core.framework.api.db.Transaction;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -38,13 +37,9 @@ public class DatabaseImplTest {
 
     @Test
     public void selectOneWithView() {
-        database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
-            .addParam(1)
-            .addParam("string")
-            .addParam(TestEnum.V1));
+        database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 1, "string", TestEnum.V1);
 
-        Query query = new Query("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?").addParam(1);
-        EntityView view = database.selectOne(query, EntityView.class).get();
+        EntityView view = database.selectOne("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?", EntityView.class, 1).get();
 
         Assert.assertEquals("string", view.stringField);
         Assert.assertEquals(TestEnum.V1, view.enumField);
@@ -52,18 +47,10 @@ public class DatabaseImplTest {
 
     @Test
     public void selectWithView() {
-        database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
-            .addParam(1)
-            .addParam("string")
-            .addParam(TestEnum.V1));
+        database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 1, "string", TestEnum.V1);
+        database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 2, "string", TestEnum.V2);
 
-        database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
-            .addParam(2)
-            .addParam("string")
-            .addParam(TestEnum.V2));
-
-        Query query = new Query("SELECT string_field as string_label, enum_field as enum_label FROM database_test");
-        List<EntityView> views = database.select(query, EntityView.class);
+        List<EntityView> views = database.select("SELECT string_field as string_label, enum_field as enum_label FROM database_test", EntityView.class);
 
         Assert.assertEquals(2, views.size());
         Assert.assertEquals(TestEnum.V1, views.get(0).enumField);
@@ -72,8 +59,7 @@ public class DatabaseImplTest {
 
     @Test
     public void selectEmptyWithView() {
-        Query query = new Query("SELECT string_field, enum_field FROM database_test where id = -1");
-        List<EntityView> views = database.select(query, EntityView.class);
+        List<EntityView> views = database.select("SELECT string_field, enum_field FROM database_test where id = -1", EntityView.class);
 
         Assert.assertTrue(views.isEmpty());
     }
@@ -93,30 +79,22 @@ public class DatabaseImplTest {
     @Test
     public void commitTransaction() {
         try (Transaction transaction = database.beginTransaction()) {
-            database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
-                .addParam(1)
-                .addParam("string")
-                .addParam(TestEnum.V1));
+            database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 1, "string", TestEnum.V1);
             transaction.commit();
         }
 
-        Query query = new Query("SELECT string_field, enum_field FROM database_test where id = ?").addParam(1);
-        Optional<EntityView> result = database.selectOne(query, EntityView.class);
+        Optional<EntityView> result = database.selectOne("SELECT string_field, enum_field FROM database_test where id = ?", EntityView.class, 1);
         Assert.assertTrue(result.isPresent());
     }
 
     @Test
     public void rollbackTransaction() {
         try (Transaction transaction = database.beginTransaction()) {
-            database.execute(new Query("INSERT INTO database_test VALUES (?, ?, ?)")
-                .addParam(1)
-                .addParam("string")
-                .addParam(TestEnum.V1));
+            database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 1, "string", TestEnum.V1);
             transaction.rollback();
         }
 
-        Query query = new Query("SELECT string_field, enum_field FROM database_test where id = ?").addParam(1);
-        Optional<EntityView> result = database.selectOne(query, EntityView.class);
+        Optional<EntityView> result = database.selectOne("SELECT string_field, enum_field FROM database_test where id = ?", EntityView.class, 1);
         Assert.assertFalse(result.isPresent());
     }
 }

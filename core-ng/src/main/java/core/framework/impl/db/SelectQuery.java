@@ -2,7 +2,6 @@ package core.framework.impl.db;
 
 import core.framework.api.db.Column;
 import core.framework.api.db.PrimaryKey;
-import core.framework.api.db.Query;
 import core.framework.api.db.Table;
 
 import java.lang.reflect.Field;
@@ -10,11 +9,11 @@ import java.lang.reflect.Field;
 /**
  * @author neo
  */
-final class SelectQueryBuilder {
-    private final String selectByPK;
-    private final String selectAll;
+final class SelectQuery {
+    final String selectByPrimaryKeys;
+    final String selectAll;
 
-    SelectQueryBuilder(Class<?> entityClass) {
+    SelectQuery(Class<?> entityClass) {
         StringBuilder builder = new StringBuilder("SELECT ");
         Field[] fields = entityClass.getFields();
         int index = 0;
@@ -41,26 +40,10 @@ final class SelectQueryBuilder {
             }
         }
 
-        selectByPK = builder.toString();
+        selectByPrimaryKeys = builder.toString();
     }
 
-    Query byPK(Object... primaryKeys) {
-        Query query = new Query(selectByPK);
-        for (Object primaryKey : primaryKeys) {
-            query.addParam(primaryKey);
-        }
-        return query;
-    }
-
-    Query all() {
-        return new Query(selectAll);
-    }
-
-    Query where(String whereClause, Object... params) {
-        Query query = new Query(selectAll).appendStatement(" WHERE ").appendStatement(whereClause);
-        for (Object primaryKey : params) {
-            query.addParam(primaryKey);
-        }
-        return query;
+    String byWhere(String whereClause) {
+        return selectAll + " WHERE " + whereClause;
     }
 }

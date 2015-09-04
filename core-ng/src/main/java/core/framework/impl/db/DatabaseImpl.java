@@ -1,7 +1,6 @@
 package core.framework.impl.db;
 
 import core.framework.api.db.Database;
-import core.framework.api.db.Query;
 import core.framework.api.db.Repository;
 import core.framework.api.db.RowMapper;
 import core.framework.api.db.Transaction;
@@ -126,17 +125,16 @@ public final class DatabaseImpl implements Database {
     }
 
     @Override
-    public <T> List<T> select(Query query, RowMapper<T> mapper) {
+    public <T> List<T> select(String sql, RowMapper<T> mapper, Object... params) {
         StopWatch watch = new StopWatch();
-        String sql = query.statement();
         List<T> results = null;
         try {
-            results = executeQuery(sql, query.params, mapper);
+            results = executeSelect(sql, params, mapper);
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
-            logger.debug("select, sql={}, params={}, elapsedTime={}", sql, query.params, elapsedTime);
+            logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             if (elapsedTime > slowQueryThresholdInMs)
                 logger.warn("slow query detected");
             if (results != null && results.size() > tooManyRowsReturnedThreshold)
@@ -145,66 +143,44 @@ public final class DatabaseImpl implements Database {
     }
 
     @Override
-    public <T> List<T> select(Query query, Class<T> viewClass) {
-        return select(query, viewRowMapper(viewClass));
+    public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
+        return select(sql, viewRowMapper(viewClass), params);
     }
 
     @Override
-    public <T> Optional<T> selectOne(Query query, RowMapper<T> mapper) {
+    public <T> Optional<T> selectOne(String sql, RowMapper<T> mapper, Object... params) {
         StopWatch watch = new StopWatch();
-        String sql = query.statement();
         try {
-            return executeSelectOneQuery(sql, query.params, mapper);
+            return executeSelectOne(sql, params, mapper);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
-            logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, query.params, elapsedTime);
+            logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             if (elapsedTime > slowQueryThresholdInMs)
                 logger.warn("slow query detected");
         }
     }
 
     @Override
-    public Optional<String> selectString(String sql, Object... params) {
-        return selectOne(Query.query(sql, params), row -> row.getString(1));
-    }
-
-    @Override
-    public Optional<Integer> selectInt(String sql, Object... params) {
-        return selectOne(Query.query(sql, params), row -> row.getInt(1));
-    }
-
-    @Override
-    public Optional<Long> selectLong(String sql, Object... params) {
-        return selectOne(Query.query(sql, params), row -> row.getLong(1));
-    }
-
-    @Override
-    public <T> Optional<T> selectOne(Query query, Class<T> viewClass) {
-        return selectOne(query, viewRowMapper(viewClass));
-    }
-
-    @Override
-    public int execute(Query query) {
-        StopWatch watch = new StopWatch();
-        String sql = query.statement();
-        try {
-            return update(sql, query.params);
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime);
-            logger.debug("execute, sql={}, params={}, elapsedTime={}", sql, query.params, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-        }
+    public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
+        return selectOne(sql, viewRowMapper(viewClass), params);
     }
 
     @Override
     public int execute(String sql, Object... params) {
-        return execute(Query.query(sql, params));
+        StopWatch watch = new StopWatch();
+        try {
+            return update(sql, params);
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
+            logger.debug("execute, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
+            if (elapsedTime > slowQueryThresholdInMs)
+                logger.warn("slow query detected");
+        }
     }
 
-    int update(String sql, List<Object> params) {
+    int update(String sql, Object[] params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout((int) timeout.getSeconds());
@@ -218,11 +194,11 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    int[] batchUpdate(String sql, List<List<Object>> params) {
+    int[] batchUpdate(String sql, List<Object[]> params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout((int) timeout.getSeconds());
-            for (List<Object> batchParams : params) {
+            for (Object[] batchParams : params) {
                 PreparedStatements.setParams(statement, batchParams);
                 statement.addBatch();
             }
@@ -235,7 +211,7 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    <T> List<T> executeQuery(String sql, List<Object> params, RowMapper<T> mapper) {
+    <T> List<T> executeSelect(String sql, Object[] params, RowMapper<T> mapper) {
         if (sql.contains("*"))
             throw Exceptions.error("select statement should not contain wildcard(*), please only select columns needed, sql={}", sql);
         PoolItem<Connection> connection = transactionManager.getConnection();
@@ -251,7 +227,7 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    Optional<Long> insert(String sql, List<Object> params) {
+    Optional<Long> insert(String sql, Object[] params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setQueryTimeout((int) timeout.getSeconds());
@@ -266,8 +242,8 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    <T> Optional<T> executeSelectOneQuery(String sql, List<Object> params, RowMapper<T> mapper) {
-        List<T> results = executeQuery(sql, params, mapper);
+    <T> Optional<T> executeSelectOne(String sql, Object[] params, RowMapper<T> mapper) {
+        List<T> results = executeSelect(sql, params, mapper);
         if (results.isEmpty()) return Optional.empty();
         if (results.size() > 1) throw new Error("more than one row returned, size=" + results.size());
         return Optional.ofNullable(results.get(0));
