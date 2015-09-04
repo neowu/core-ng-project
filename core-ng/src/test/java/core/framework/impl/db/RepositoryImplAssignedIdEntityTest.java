@@ -1,0 +1,121 @@
+package core.framework.impl.db;
+
+import core.framework.api.db.Repository;
+import core.framework.api.util.Lists;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.UUID;
+
+/**
+ * @author neo
+ */
+public class RepositoryImplAssignedIdEntityTest {
+    static DatabaseImpl database;
+    static Repository<AssignedIdEntity> repository;
+
+    @BeforeClass
+    public static void createDatabase() {
+        database = new DatabaseImpl();
+        database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
+        database.execute("CREATE TABLE assigned_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), int_field INT, big_decimal_field DECIMAL(10,2))");
+
+        repository = database.repository(AssignedIdEntity.class);
+    }
+
+    @AfterClass
+    public static void cleanupDatabase() {
+        database.execute("DROP TABLE assigned_id_entity");
+    }
+
+    @Test
+    public void insert() {
+        AssignedIdEntity entity = new AssignedIdEntity();
+        entity.id = UUID.randomUUID().toString();
+        entity.stringField = "string";
+        entity.intField = 12;
+        entity.bigDecimalField = new BigDecimal("86.99");
+
+        Optional<Long> id = repository.insert(entity);
+        Assert.assertFalse(id.isPresent());
+
+        AssignedIdEntity selectedEntity = repository.get(entity.id).get();
+
+        Assert.assertEquals(entity.id, selectedEntity.id);
+        Assert.assertEquals(entity.stringField, selectedEntity.stringField);
+        Assert.assertEquals(entity.intField, selectedEntity.intField);
+        Assert.assertEquals(entity.bigDecimalField, selectedEntity.bigDecimalField);
+    }
+
+    @Test
+    public void update() {
+        AssignedIdEntity entity = new AssignedIdEntity();
+        entity.id = UUID.randomUUID().toString();
+        entity.stringField = "string";
+        entity.intField = 11;
+        repository.insert(entity);
+
+        AssignedIdEntity updatedEntity = new AssignedIdEntity();
+        updatedEntity.id = entity.id;
+        updatedEntity.stringField = "updated";
+        repository.update(updatedEntity);
+
+        AssignedIdEntity selectedEntity = repository.get(entity.id).get();
+        Assert.assertEquals(updatedEntity.stringField, selectedEntity.stringField);
+        Assert.assertEquals(entity.intField, selectedEntity.intField);
+    }
+
+    @Test
+    public void delete() {
+        AssignedIdEntity entity = new AssignedIdEntity();
+        entity.id = UUID.randomUUID().toString();
+        entity.intField = 11;
+        repository.insert(entity);
+
+        repository.delete(entity.id);
+
+        Optional<AssignedIdEntity> result = repository.get(entity.id);
+        Assert.assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void batchInsert() {
+        AssignedIdEntity entity1 = new AssignedIdEntity();
+        entity1.id = "1";
+        entity1.stringField = "value1";
+        entity1.intField = 11;
+
+        AssignedIdEntity entity2 = new AssignedIdEntity();
+        entity2.id = "2";
+        entity2.stringField = "value2";
+        entity2.intField = 12;
+
+        repository.batchInsert(Lists.newArrayList(entity1, entity2));
+
+        AssignedIdEntity selectedEntity1 = repository.get("1").get();
+        Assert.assertEquals(entity1.stringField, selectedEntity1.stringField);
+
+        AssignedIdEntity selectedEntity2 = repository.get("2").get();
+        Assert.assertEquals(entity2.stringField, selectedEntity2.stringField);
+    }
+
+    @Test
+    public void batchDelete() {
+        AssignedIdEntity entity1 = new AssignedIdEntity();
+        entity1.id = "3";
+        entity1.intField = 11;
+        AssignedIdEntity entity2 = new AssignedIdEntity();
+        entity2.id = "4";
+        entity2.intField = 12;
+        repository.batchInsert(Lists.newArrayList(entity1, entity2));
+
+        repository.batchDelete(Lists.newArrayList("3", "4"));
+
+        Assert.assertFalse(repository.get("3").isPresent());
+        Assert.assertFalse(repository.get("4").isPresent());
+    }
+}

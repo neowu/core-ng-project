@@ -3,7 +3,6 @@ package core.framework.test.db;
 import core.framework.api.db.Column;
 import core.framework.api.db.Database;
 import core.framework.api.db.PrimaryKey;
-import core.framework.api.db.Query;
 import core.framework.api.db.Table;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
@@ -34,16 +33,15 @@ public class EntitySchemaGenerator {
 
     public void generate() {
         StopWatch watch = new StopWatch();
-        String sql = null;
+        String sql = schemeSQL();
         try {
-            sql = buildSchemaSQL();
-            database.execute(Query.query(sql));
+            database.execute(sql);
         } finally {
             logger.info("create schema, entityClass={}, sql={}, elapsedTime={}", entityClass.getCanonicalName(), sql, watch.elapsedTime());
         }
     }
 
-    private String buildSchemaSQL() {
+    private String schemeSQL() {
         StringBuilder builder = new StringBuilder("CREATE TABLE ");
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");

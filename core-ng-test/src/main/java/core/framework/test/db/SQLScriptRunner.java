@@ -1,14 +1,12 @@
 package core.framework.test.db;
 
 import core.framework.api.db.Database;
-import core.framework.api.db.Query;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,40 +31,38 @@ public class SQLScriptRunner {
     public void run() {
         int lineNumber = 0;
         try (BufferedReader reader = new BufferedReader(new StringReader(script))) {
-            Query query = null;
+            StringBuilder sql = new StringBuilder();
             String delimiter = DEFAULT_DELIMITER;
             String line;
             while (true) {
                 line = reader.readLine();
                 if (line == null) break;
                 lineNumber++;
-                if (query == null) {
-                    query = new Query("");
-                }
+
                 String trimmedLine = line.trim();
                 Matcher delimiterMatcher = NEW_DELIMITER_PATTERN.matcher(trimmedLine);
                 Matcher commentMatcher = COMMENT_PATTERN.matcher(trimmedLine);
                 if (delimiterMatcher.find()) {
                     delimiter = delimiterMatcher.group(1);
                 } else if (!commentMatcher.find()) {
-                    query.appendStatement(trimmedLine);
+                    sql.append(trimmedLine);
                     if (trimmedLine.endsWith(delimiter)) {
-                        executeSQL(query);
-                        query = null;
+                        executeSQL(sql.toString());
+                        sql = new StringBuilder();
                     }
                 }
             }
-        } catch (RuntimeException | IOException e) {
+        } catch (Exception e) {
             throw Exceptions.error("failed to run script, error={}, lineNumber={}", e.getMessage(), lineNumber, e);
         }
     }
 
-    private void executeSQL(Query query) {
+    private void executeSQL(String sql) {
         StopWatch watch = new StopWatch();
         try {
-            database.execute(query);
+            database.execute(sql);
         } finally {
-            logger.info("execute, sql={}, elapsedTime={}", query.statement(), watch.elapsedTime());
+            logger.info("execute, sql={}, elapsedTime={}", sql, watch.elapsedTime());
         }
     }
 }

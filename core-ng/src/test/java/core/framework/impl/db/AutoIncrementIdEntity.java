@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 /**
  * @author neo
  */
-@Table(name = "entity_with_auto_increment_id")
-public class EntityWithAutoIncrementId {
+@Table(name = "auto_increment_id_entity")
+public class AutoIncrementIdEntity {
     @PrimaryKey(autoIncrement = true)
     @Column(name = "id")
     public Integer id;

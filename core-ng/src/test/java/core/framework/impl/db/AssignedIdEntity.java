@@ -11,8 +11,8 @@ import java.math.BigDecimal;
 /**
  * @author neo
  */
-@Table(name = "entity_with_assigned_id")
-public class EntityWithAssignedId {
+@Table(name = "assigned_id_entity")
+public class AssignedIdEntity {
     @PrimaryKey
     @Column(name = "id")
     @Length(max = 36)
