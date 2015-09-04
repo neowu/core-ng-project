@@ -31,7 +31,7 @@ public class DatabaseImplTest {
     }
 
     @Before
-    public void truncateTables() {
+    public void truncateTable() {
         database.execute("TRUNCATE TABLE database_test");
     }
 

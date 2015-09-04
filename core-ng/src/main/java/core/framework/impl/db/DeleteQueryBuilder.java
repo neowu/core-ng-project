@@ -9,10 +9,8 @@ import java.lang.reflect.Field;
 /**
  * @author neo
  */
-final class DeleteQuery {
-    final String sql;
-
-    DeleteQuery(Class<?> entityClass) {
+final class DeleteQueryBuilder {
+    static String build(Class<?> entityClass) {
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         StringBuilder builder = new StringBuilder("DELETE FROM ")
             .append(table.name())
@@ -28,6 +26,6 @@ final class DeleteQuery {
             }
         }
 
-        sql = builder.toString();
+        return builder.toString();
     }
 }

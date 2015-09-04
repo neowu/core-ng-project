@@ -51,7 +51,7 @@ public final class TransactionManager {
             if (defaultIsolationLevel != null)
                 connection.resource.setTransactionIsolation(defaultIsolationLevel.level);
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             pool.returnItem(connection);
             throw new UncheckedSQLException(e);
         }
@@ -66,7 +66,7 @@ public final class TransactionManager {
         try {
             connection.resource.setAutoCommit(false);
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         }
 
@@ -84,7 +84,7 @@ public final class TransactionManager {
             connection.resource.commit();
             currentTransactionState.set(TransactionState.COMMITTED);
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         }
     }
@@ -96,7 +96,7 @@ public final class TransactionManager {
             connection.resource.rollback();
             currentTransactionState.set(TransactionState.ROLLED_BACK);
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         }
     }
@@ -114,7 +114,7 @@ public final class TransactionManager {
                 connection.resource.rollback();
             }
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             returnConnection(connection);
@@ -126,7 +126,7 @@ public final class TransactionManager {
             if (!connection.broken)
                 connection.resource.setAutoCommit(true);
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             pool.returnItem(connection);

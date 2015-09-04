@@ -43,7 +43,7 @@ final class SelectQuery {
         selectByPrimaryKeys = builder.toString();
     }
 
-    String byWhere(String whereClause) {
+    String where(String whereClause) {
         return selectAll + " WHERE " + whereClause;
     }
 }

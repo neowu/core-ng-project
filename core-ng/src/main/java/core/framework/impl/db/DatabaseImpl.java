@@ -187,7 +187,7 @@ public final class DatabaseImpl implements Database {
             PreparedStatements.setParams(statement, params);
             return statement.executeUpdate();
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);
@@ -204,7 +204,7 @@ public final class DatabaseImpl implements Database {
             }
             return statement.executeBatch();
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);
@@ -220,7 +220,7 @@ public final class DatabaseImpl implements Database {
             PreparedStatements.setParams(statement, params);
             return fetchResultSet(statement, mapper);
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);
@@ -235,7 +235,7 @@ public final class DatabaseImpl implements Database {
             statement.executeUpdate();
             return fetchGeneratedKey(statement);
         } catch (SQLException e) {
-            ConnectionHelper.checkConnectionStatus(connection, e);
+            Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.releaseConnection(connection);
@@ -277,7 +277,7 @@ public final class DatabaseImpl implements Database {
         if (viewRowMappers.containsKey(viewClass)) {
             throw Exceptions.error("duplicated view class found, viewClass={}", viewClass.getCanonicalName());
         }
-        RowMapper<T> mapper = new ViewRowMapperBuilder<>(viewClass).build();
+        RowMapper<T> mapper = ViewRowMapperBuilder.build(viewClass);
         viewRowMappers.put(viewClass, mapper);
         return mapper;
     }

@@ -4,6 +4,7 @@ import core.framework.api.db.Repository;
 import core.framework.api.util.Lists;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -30,6 +31,11 @@ public class RepositoryImplAssignedIdEntityTest {
     @AfterClass
     public static void cleanupDatabase() {
         database.execute("DROP TABLE assigned_id_entity");
+    }
+
+    @Before
+    public void truncateTable() {
+        database.execute("TRUNCATE TABLE assigned_id_entity");
     }
 
     @Test
@@ -113,9 +119,9 @@ public class RepositoryImplAssignedIdEntityTest {
         entity2.intField = 12;
         repository.batchInsert(Lists.newArrayList(entity1, entity2));
 
-        repository.batchDelete(Lists.newArrayList("3", "4"));
+        repository.batchDelete(Lists.newArrayList(entity1.id, entity2.id));
 
-        Assert.assertFalse(repository.get("3").isPresent());
-        Assert.assertFalse(repository.get("4").isPresent());
+        Assert.assertFalse(repository.get(entity1.id).isPresent());
+        Assert.assertFalse(repository.get(entity2.id).isPresent());
     }
 }

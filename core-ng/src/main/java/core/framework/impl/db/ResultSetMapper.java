@@ -5,6 +5,7 @@ import core.framework.api.db.RowMapper;
 import core.framework.api.db.UncheckedSQLException;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
+import core.framework.api.util.Maps;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -14,7 +15,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +54,7 @@ final class ResultSetMapper implements Row {
     }
 
     private Map<String, Integer> buildIndex() throws SQLException {
-        Map<String, Integer> index = new HashMap<>();
+        Map<String, Integer> index = Maps.newHashMap();
         ResultSetMetaData meta = resultSet.getMetaData();
         int count = meta.getColumnCount();
         for (int i = 1; i < count + 1; i++) {

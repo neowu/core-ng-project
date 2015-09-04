@@ -8,7 +8,7 @@ import java.sql.SQLException;
 /**
  * @author neo
  */
-final class ConnectionHelper {
+final class Connections {
     // refer to com.mysql.jdbc.integration.c3p0.MysqlConnectionTester, and standard sql state list:
     // http://dev.mysql.com/doc/connector-j/en/connector-j-reference-error-sqlstates.html
     static void checkConnectionStatus(PoolItem<Connection> connection, SQLException e) {

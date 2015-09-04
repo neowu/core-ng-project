@@ -22,18 +22,18 @@ public final class RepositoryImpl<T> implements Repository<T> {
     private final DatabaseImpl database;
     private final RepositoryEntityValidator<T> validator;
     private final SelectQuery selectQuery;
-    private final InsertQueryBuilder insertQuery;
-    private final UpdateQueryBuilder updateQuery;
-    private final DeleteQuery deleteQuery;
+    private final InsertQuery<T> insertQuery;
+    private final UpdateQuery<T> updateQuery;
+    private final String deleteSQL;
     private final RowMapper<T> rowMapper;
 
     RepositoryImpl(DatabaseImpl database, RepositoryEntityValidator<T> validator, Class<T> entityClass, RowMapper<T> rowMapper) {
         this.database = database;
         this.validator = validator;
-        insertQuery = new InsertQueryBuilder(entityClass);   //TODO: use java assist to build code
+        insertQuery = new InsertQuery<>(entityClass);
         selectQuery = new SelectQuery(entityClass);
-        updateQuery = new UpdateQueryBuilder(entityClass);   //TODO: use java assist to build code
-        deleteQuery = new DeleteQuery(entityClass);
+        updateQuery = new UpdateQuery<>(entityClass);
+        deleteSQL = DeleteQueryBuilder.build(entityClass);
         this.rowMapper = rowMapper;
     }
 
@@ -59,7 +59,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public List<T> select(String whereClause, Object... params) {
         StopWatch watch = new StopWatch();
-        String sql = selectQuery.byWhere(whereClause);
+        String sql = selectQuery.where(whereClause);
         List<T> results = null;
         try {
             results = database.executeSelect(sql, params, rowMapper);
@@ -78,7 +78,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public Optional<T> selectOne(String whereClause, Object... params) {
         StopWatch watch = new StopWatch();
-        String sql = selectQuery.byWhere(whereClause);
+        String sql = selectQuery.where(whereClause);
         try {
             return database.executeSelectOne(sql, params, rowMapper);
         } finally {
@@ -126,7 +126,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     public void update(T entity) {
         StopWatch watch = new StopWatch();
         validator.partialValidate(entity);
-        UpdateQueryBuilder.Query query = updateQuery.query(entity);
+        UpdateQuery.Query query = updateQuery.query(entity);
         try {
             int updatedRows = database.update(query.sql, query.params);
             if (updatedRows != 1)
@@ -143,15 +143,14 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public void delete(Object... primaryKeys) {
         StopWatch watch = new StopWatch();
-        String sql = deleteQuery.sql;
         try {
-            int deletedRows = database.update(sql, primaryKeys);
+            int deletedRows = database.update(deleteSQL, primaryKeys);
             if (deletedRows != 1)
                 logger.warn("deleted rows is not 1, rows={}", deletedRows);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
-            logger.debug("delete, sql={}, params={}, elapsedTime={}", sql, primaryKeys, elapsedTime);
+            logger.debug("delete, sql={}, params={}, elapsedTime={}", deleteSQL, primaryKeys, elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
         }
@@ -179,8 +178,6 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public void batchDelete(List<?> primaryKeys) {
         StopWatch watch = new StopWatch();
-        String sql = deleteQuery.sql;
-
         List<Object[]> params = Lists.newArrayList();
         for (Object primaryKey : primaryKeys) {
             if (primaryKey instanceof Object[]) {
@@ -190,7 +187,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             }
         }
         try {
-            int[] deletedRows = database.batchUpdate(sql, params);
+            int[] deletedRows = database.batchUpdate(deleteSQL, params);
             for (int deletedRow : deletedRows) {
                 if (deletedRow != 1)
                     logger.warn("deleted rows is not 1, rows={}", Arrays.toString(deletedRows));
@@ -198,7 +195,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
-            logger.debug("delete, sql={}, size={}, elapsedTime={}", sql, primaryKeys.size(), elapsedTime);
+            logger.debug("delete, sql={}, size={}, elapsedTime={}", deleteSQL, primaryKeys.size(), elapsedTime);
             if (elapsedTime > database.slowQueryThresholdInMs)
                 logger.warn("slow query detected");
         }

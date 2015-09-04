@@ -17,6 +17,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * webservice: @Version to let client pass thru header for action log?
 * cm: config management, dynamic update properties?
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
+* db: batch insert/update auto convert to small batch like 3000?
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)

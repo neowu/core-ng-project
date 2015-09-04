@@ -3,6 +3,7 @@ package core.framework.impl.db;
 import core.framework.api.db.Repository;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -29,6 +30,11 @@ public class RepositoryImplAutoIncrementIdEntityTest {
     @AfterClass
     public static void cleanupDatabase() {
         database.execute("DROP TABLE auto_increment_id_entity");
+    }
+
+    @Before
+    public void truncateTable() {
+        database.execute("TRUNCATE TABLE auto_increment_id_entity");
     }
 
     @Test

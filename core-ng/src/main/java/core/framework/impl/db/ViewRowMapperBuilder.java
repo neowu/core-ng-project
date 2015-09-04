@@ -1,6 +1,7 @@
 package core.framework.impl.db;
 
 import core.framework.api.db.Column;
+import core.framework.api.db.Row;
 import core.framework.api.db.RowMapper;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
@@ -12,23 +13,11 @@ import java.time.LocalDateTime;
 /**
  * @author neo
  */
-final class ViewRowMapperBuilder<T> {
-    private final Class<T> entityClass;
-
-    ViewRowMapperBuilder(Class<T> entityClass) {
-        this.entityClass = entityClass;
-    }
-
-    public RowMapper<T> build() {
-        DynamicInstanceBuilder<RowMapper<T>> builder = new DynamicInstanceBuilder<>(RowMapper.class, RowMapper.class.getCanonicalName() + "$" + entityClass.getCanonicalName());
-        builder.addMethod(mapMethod());
-        return builder.build();
-    }
-
-    private String mapMethod() {
+final class ViewRowMapperBuilder {
+    static <T> RowMapper<T> build(Class<T> entityClass) {
         String entityClassName = entityClass.getCanonicalName();
 
-        CodeBuilder builder = new CodeBuilder().append("public Object map(core.framework.api.db.Row row) {\n");
+        CodeBuilder builder = new CodeBuilder().append("public Object map({} row) {\n", Row.class.getCanonicalName());
         builder.indent(1).append("{} entity = new {}();\n", entityClassName, entityClassName);
 
         for (Field field : entityClass.getFields()) {
@@ -56,6 +45,8 @@ final class ViewRowMapperBuilder<T> {
         builder.indent(1).append("return entity;\n");
         builder.append("}");
 
-        return builder.build();
+        return new DynamicInstanceBuilder<RowMapper<T>>(RowMapper.class, RowMapper.class.getCanonicalName() + "$" + entityClass.getSimpleName())
+            .addMethod(builder.build())
+            .build();
     }
 }

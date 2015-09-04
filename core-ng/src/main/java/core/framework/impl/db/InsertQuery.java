@@ -4,18 +4,21 @@ import core.framework.api.db.Column;
 import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Table;
 import core.framework.api.util.Lists;
+import core.framework.impl.code.CodeBuilder;
+import core.framework.impl.code.DynamicInstanceBuilder;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author neo
  */
-final class InsertQueryBuilder {
+final class InsertQuery<T> {
     public final String sql;
-    private final Field[] paramFields;
+    private final Function<T, Object[]> paramBuilder;
 
-    InsertQueryBuilder(Class<?> entityClass) {
+    InsertQuery(Class<T> entityClass) {
         List<Field> paramFields = Lists.newArrayList();
 
         StringBuilder builder = new StringBuilder("INSERT INTO ");
@@ -24,7 +27,6 @@ final class InsertQueryBuilder {
         builder.append(table.name()).append(" (");
 
         Field[] fields = entityClass.getFields();
-
         int index = 0;
         for (Field field : fields) {
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
@@ -45,19 +47,31 @@ final class InsertQueryBuilder {
         builder.append(')');
 
         sql = builder.toString();
-        this.paramFields = paramFields.toArray(new Field[paramFields.size()]);
+
+        paramBuilder = paramBuilder(entityClass, paramFields);
     }
 
-    Object[] params(Object entity) {
-        Object[] params = new Object[paramFields.length];
-        try {
-            for (int i = 0; i < paramFields.length; i++) {
-                Field field = paramFields[i];
-                params[i] = field.get(entity);
-            }
-        } catch (IllegalAccessException e) {
-            throw new Error(e);
+    private Function<T, Object[]> paramBuilder(Class<T> entityClass, List<Field> paramFields) {
+        CodeBuilder builder = new CodeBuilder();
+        builder.append("public Object apply(Object value) {\n")
+            .indent(1).append("{} entity = ({}) value;", entityClass.getCanonicalName(), entityClass.getCanonicalName())
+            .indent(1).append("Object[] params = new Object[{}];\n", paramFields.size());
+
+        int index = 0;
+        for (Field paramField : paramFields) {
+            builder.indent(1).append("params[{}] = entity.{};\n", index, paramField.getName());
+            index++;
         }
-        return params;
+
+        builder.append("return params;\n")
+            .append("}");
+
+        return new DynamicInstanceBuilder<Function<T, Object[]>>(Function.class, entityClass.getCanonicalName() + "$InsertParamBuilder")
+            .addMethod(builder.build())
+            .build();
+    }
+
+    Object[] params(T entity) {
+        return paramBuilder.apply(entity);
     }
 }
