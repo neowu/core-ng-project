@@ -39,7 +39,7 @@ public class TestModule extends AbstractTestModule {
         load(new DemoServiceApp());
 
         initDB().createSchema();
-//        initDB().script("db.sql");
+        initDB().runScript("db.sql");
         indexTestData(search);
     }
 

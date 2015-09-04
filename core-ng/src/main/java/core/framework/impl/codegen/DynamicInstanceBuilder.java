@@ -28,13 +28,11 @@ public class DynamicInstanceBuilder<T> {
         if (!interfaceClass.isInterface())
             throw Exceptions.error("interface class must be interface, interfaceClass={}", interfaceClass);
 
-        String interfaceClassName = interfaceClass.getCanonicalName();
-
         classPool = ClassPool.getDefault();
         classBuilder = classPool.makeClass(className + "$" + (INDEX.getAndIncrement()));
 
         try {
-            classBuilder.addInterface(classPool.get(interfaceClassName));
+            classBuilder.addInterface(classPool.get(interfaceClass.getCanonicalName()));
             CtConstructor constructor = new CtConstructor(null, classBuilder);
             constructor.setBody(";");
             classBuilder.addConstructor(constructor);

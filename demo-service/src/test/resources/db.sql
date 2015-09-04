@@ -1,1 +1,1 @@
-CREATE TABLE product (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20), price DOUBLE, description VARCHAR(10), date TIMESTAMP);
+INSERT INTO product (name, price) VALUES ('product1', 12.0);
