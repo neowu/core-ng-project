@@ -13,7 +13,7 @@ public interface Request {
 
     String scheme();
 
-    String host();
+    String hostName();
 
     String path();  //requestPath decoded by server
 

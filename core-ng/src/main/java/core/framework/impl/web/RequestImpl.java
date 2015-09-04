@@ -51,7 +51,7 @@ public final class RequestImpl implements Request {
     }
 
     @Override
-    public String host() {
+    public String hostName() {
         return exchange.getHostName();
     }
 
