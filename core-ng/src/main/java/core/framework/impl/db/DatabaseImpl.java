@@ -14,6 +14,7 @@ import core.framework.impl.resource.PoolItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.PreparedStatement;
@@ -37,11 +38,12 @@ public final class DatabaseImpl implements Database {
     public long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
     public int tooManyRowsReturnedThreshold = 1000;
     private final Map<Class, RowMapper> viewRowMappers = Maps.newHashMap();
+    private final EnumDBMapper enumMapper = new EnumDBMapper();
 
-    private Duration timeout;
+    private int queryTimeoutInSeconds;
     private Driver driver;
     private String url;
-    private final Properties info = new Properties();
+    private final Properties driverProperites = new Properties();
 
     public DatabaseImpl() {
         pool = new Pool<>(this::createConnection, Connection::close);
@@ -55,7 +57,7 @@ public final class DatabaseImpl implements Database {
     private Connection createConnection() {
         if (url == null) throw new Error("url must not be null");
         try {
-            return driver.connect(url, info);
+            return driver.connect(url, driverProperites);
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);
         }
@@ -67,20 +69,20 @@ public final class DatabaseImpl implements Database {
     }
 
     public void user(String user) {
-        info.put("user", user);
+        driverProperites.put("user", user);
     }
 
     public void password(String password) {
-        info.put("password", password);
+        driverProperites.put("password", password);
     }
 
     public void timeout(Duration timeout) {
-        this.timeout = timeout;
+        queryTimeoutInSeconds = (int) timeout.getSeconds();
         pool.checkoutTimeout(timeout);
 
         if (url != null && url.startsWith("jdbc:mysql:")) {
-            info.put("connectTimeout", String.valueOf(timeout.toMillis()));
-            info.put("socketTimeout", String.valueOf(timeout.toMillis()));
+            driverProperites.put("connectTimeout", String.valueOf(timeout.toMillis()));
+            driverProperites.put("socketTimeout", String.valueOf(timeout.toMillis()));
         }
     }
 
@@ -92,7 +94,7 @@ public final class DatabaseImpl implements Database {
         try {
             if (url.startsWith("jdbc:mysql://")) {
                 driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
-                timeout(timeout);
+                timeout(Duration.ofSeconds(queryTimeoutInSeconds));
             } else if (url.startsWith("jdbc:hsqldb:")) {
                 driver = (Driver) Class.forName("org.hsqldb.jdbc.JDBCDriver").newInstance();
             } else {
@@ -183,8 +185,8 @@ public final class DatabaseImpl implements Database {
     int update(String sql, Object[] params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
-            statement.setQueryTimeout((int) timeout.getSeconds());
-            PreparedStatements.setParams(statement, params);
+            statement.setQueryTimeout(queryTimeoutInSeconds);
+            PreparedStatements.setParams(statement, params, enumMapper);
             return statement.executeUpdate();
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
@@ -197,9 +199,9 @@ public final class DatabaseImpl implements Database {
     int[] batchUpdate(String sql, List<Object[]> params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
-            statement.setQueryTimeout((int) timeout.getSeconds());
+            statement.setQueryTimeout(queryTimeoutInSeconds);
             for (Object[] batchParams : params) {
-                PreparedStatements.setParams(statement, batchParams);
+                PreparedStatements.setParams(statement, batchParams, enumMapper);
                 statement.addBatch();
             }
             return statement.executeBatch();
@@ -216,8 +218,8 @@ public final class DatabaseImpl implements Database {
             throw Exceptions.error("select statement should not contain wildcard(*), please only select columns needed, sql={}", sql);
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
-            statement.setQueryTimeout((int) timeout.getSeconds());
-            PreparedStatements.setParams(statement, params);
+            statement.setQueryTimeout(queryTimeoutInSeconds);
+            PreparedStatements.setParams(statement, params, enumMapper);
             return fetchResultSet(statement, mapper);
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
@@ -230,8 +232,8 @@ public final class DatabaseImpl implements Database {
     Optional<Long> insert(String sql, Object[] params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setQueryTimeout((int) timeout.getSeconds());
-            PreparedStatements.setParams(statement, params);
+            statement.setQueryTimeout(queryTimeoutInSeconds);
+            PreparedStatements.setParams(statement, params, enumMapper);
             statement.executeUpdate();
             return fetchGeneratedKey(statement);
         } catch (SQLException e) {
@@ -277,8 +279,18 @@ public final class DatabaseImpl implements Database {
         if (viewRowMappers.containsKey(viewClass)) {
             throw Exceptions.error("duplicated view class found, viewClass={}", viewClass.getCanonicalName());
         }
-        RowMapper<T> mapper = ViewRowMapperBuilder.build(viewClass);
+        RowMapper<T> mapper = new ViewRowMapperBuilder<>(viewClass).build();
         viewRowMappers.put(viewClass, mapper);
+        registerEnumClass(viewClass);
         return mapper;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void registerEnumClass(Class<T> viewClass) {
+        for (Field field : viewClass.getFields()) {
+            if (Enum.class.isAssignableFrom(field.getType())) {
+                enumMapper.registerEnumClass((Class<? extends Enum>) field.getType());
+            }
+        }
     }
 }

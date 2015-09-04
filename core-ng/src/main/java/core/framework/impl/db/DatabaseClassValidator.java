@@ -1,6 +1,7 @@
 package core.framework.impl.db;
 
 import core.framework.api.db.Column;
+import core.framework.api.db.EnumValue;
 import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Table;
 import core.framework.api.util.Exceptions;
@@ -80,11 +81,28 @@ final class DatabaseClassValidator implements TypeVisitor {
             columns.add(column.name());
         }
 
+        if (Enum.class.isAssignableFrom(fieldClass)) {
+            validateEnumClass(fieldClass);
+        }
+
         PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
         if (primaryKey != null) {
             foundPK = true;
             if (primaryKey.autoIncrement() && !(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
                 throw Exceptions.error("auto increment primary key must be Integer or Long, field={}", field);
+            }
+        }
+    }
+
+    private void validateEnumClass(Class<?> enumClass) {
+        Enum[] constants = (Enum[]) enumClass.getEnumConstants();
+        for (Enum constant : constants) {
+            try {
+                Field field = enumClass.getDeclaredField(constant.name());
+                if (!field.isAnnotationPresent(EnumValue.class))
+                    throw Exceptions.error("enum constant must have @EnumValue, enumClass={}, field={}", enumClass, field.getName());
+            } catch (NoSuchFieldException e) {
+                throw new Error(e);
             }
         }
     }

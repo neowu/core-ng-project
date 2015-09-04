@@ -1,19 +1,13 @@
 package core.framework.impl.db;
 
+import core.framework.api.db.EnumValue;
+
 /**
  * @author neo
  */
 public enum TestEnum {
-    V1("v1"), V2("v2");
-
-    private final String code;
-
-    TestEnum(String code) {
-        this.code = code;
-    }
-
-    @Override
-    public String toString() {
-        return code;
-    }
+    @EnumValue("DB_V1")
+    V1,
+    @EnumValue("DB_V2")
+    V2
 }

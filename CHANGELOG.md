@@ -1,12 +1,12 @@
 ## Change log
 
-### 3.5.0 (9/3/2015 - )
+### 3.5.0 (9/3/2015 - 9/4/2015)
 * config: renamed AbstractApplication to App (broken change!)
 * db: removed repository select where clause must contains '?', exception is like "where some_column is null";
 * db: removed Query, prefer use sql + param... (broken change!)
 * web: updated Request.host() to Request.hostName(), according to url standard: http://bl.ocks.org/abernier/3070589
 * db: replace repository insert/update query with dynamic code generation
-TODO: * db: use @DBValue to map the enum value in db
+* db: use @EnumValue to map the enum value in db (broken change!)
 
 ### 3.4.9 (9/1/2015 - 9/2/2015)
 * db: lower the slow query to 5s and too many results to 1000

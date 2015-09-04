@@ -13,23 +13,23 @@ import java.time.ZoneId;
  * @author neo
  */
 final class PreparedStatements {
-    static void setParams(PreparedStatement statement, Object[] params) throws SQLException {
+    static void setParams(PreparedStatement statement, Object[] params, EnumDBMapper mapper) throws SQLException {
         int index = 1;
         if (params != null) {
             for (Object param : params) {
-                setParam(statement, index, param);
+                setParam(statement, index, param, mapper);
                 index++;
             }
         }
     }
 
-    private static void setParam(PreparedStatement statement, int index, Object param) throws SQLException {
+    private static void setParam(PreparedStatement statement, int index, Object param, EnumDBMapper mapper) throws SQLException {
         if (param instanceof String) {
             statement.setString(index, (String) param);
         } else if (param instanceof Integer) {
             statement.setInt(index, (Integer) param);
         } else if (param instanceof Enum) {
-            statement.setString(index, String.valueOf(param));
+            statement.setString(index, mapper.getDBValue((Enum) param));
         } else if (param instanceof LocalDateTime) {
             Timestamp value = Timestamp.from(((LocalDateTime) param).atZone(ZoneId.systemDefault()).toInstant());
             statement.setTimestamp(index, value);

@@ -7,10 +7,12 @@ import java.util.Optional;
  * @author neo
  */
 public interface Database {
+    @Deprecated
     <T> List<T> select(String sql, RowMapper<T> mapper, Object... params);
 
     <T> List<T> select(String sql, Class<T> viewClass, Object... params);
 
+    @Deprecated
     <T> Optional<T> selectOne(String sql, RowMapper<T> mapper, Object... params);
 
     <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params);

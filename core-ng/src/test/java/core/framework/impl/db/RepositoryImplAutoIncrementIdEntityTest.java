@@ -75,4 +75,23 @@ public class RepositoryImplAutoIncrementIdEntityTest {
 
         Assert.assertTrue(entities.isEmpty());
     }
+
+    @Test
+    public void select() {
+        AutoIncrementIdEntity entity1 = new AutoIncrementIdEntity();
+        entity1.stringField = "string1";
+        entity1.enumField = TestEnum.V1;
+        repository.insert(entity1);
+
+        AutoIncrementIdEntity entity2 = new AutoIncrementIdEntity();
+        entity2.stringField = "string2";
+        entity2.enumField = TestEnum.V2;
+        repository.insert(entity2);
+
+        List<AutoIncrementIdEntity> entities = repository.select("enum_field = ?", TestEnum.V1);
+
+        Assert.assertEquals(1, entities.size());
+        Assert.assertEquals(entity1.enumField, entities.get(0).enumField);
+        Assert.assertEquals(entity1.stringField, entities.get(0).stringField);
+    }
 }

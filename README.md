@@ -4,6 +4,7 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
+* remove db rowmapper, enforce strong typed view
 * real time monitor to ES?
 * provide ws interface to send queue message for dev and prod troubleshoot?
 * general retry and throttling?

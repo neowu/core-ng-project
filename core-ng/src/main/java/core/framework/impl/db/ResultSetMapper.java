@@ -3,7 +3,6 @@ package core.framework.impl.db;
 import core.framework.api.db.Row;
 import core.framework.api.db.RowMapper;
 import core.framework.api.db.UncheckedSQLException;
-import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 
@@ -182,29 +181,6 @@ final class ResultSetMapper implements Row {
             if (timestamp == null) return null;
             Instant instant = timestamp.toInstant();
             return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        } catch (SQLException e) {
-            throw new UncheckedSQLException(e);
-        }
-    }
-
-    @Override
-    public <T extends Enum> T getEnum(String column, Class<T> enumClass) {
-        Integer index = index(column);
-        if (index == null) return null;
-        return getEnum(index, enumClass);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Enum> T getEnum(int columnIndex, Class<T> enumClass) {
-        try {
-            String value = resultSet.getString(columnIndex);
-            if (value == null) return null;
-            Enum[] enums = enumClass.getEnumConstants();
-            for (Enum item : enums) {
-                if (String.valueOf(item).equals(value)) return (T) item;
-            }
-            throw Exceptions.error("can not parse value to enum, enumType={}, value={}", enumClass.getCanonicalName(), value);
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);
         }

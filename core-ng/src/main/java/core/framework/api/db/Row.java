@@ -34,9 +34,4 @@ public interface Row {
     LocalDateTime getLocalDateTime(String column);
 
     LocalDateTime getLocalDateTime(int columnIndex);
-
-    <T extends Enum> T getEnum(String column, Class<T> enumClass);
-
-    @SuppressWarnings("unchecked")
-    <T extends Enum> T getEnum(int columnIndex, Class<T> enumClass);
 }
