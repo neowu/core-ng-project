@@ -1,6 +1,7 @@
 package core.framework.impl.db;
 
 import core.framework.api.db.EnumValue;
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 
 import java.lang.reflect.Field;
@@ -10,20 +11,24 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class EnumDBMapper {
-    private final Map<Class<? extends Enum>, EnumMap<?, String>> enumToDBValueMappings = Maps.newConcurrentHashMap();
+public final class EnumDBMapper {
+    private final Map<Class<? extends Enum>, EnumMap<?, String>> enumToDBValueMappings = Maps.newHashMap();
 
     void registerEnumClass(Class<? extends Enum> enumClass) {
-        enumToDBValueMappings.computeIfAbsent(enumClass, this::enumToDBValueMapping);
+        enumToDBValueMappings.computeIfAbsent(enumClass, this::mappings);
     }
 
-    String getDBValue(Enum enumValue) {
-        EnumMap<?, String> mapping = enumToDBValueMappings.computeIfAbsent(enumValue.getClass(), this::enumToDBValueMapping);
-        return mapping.get(enumValue);
+    String getDBValue(Enum value) {
+        Class<? extends Enum> enumClass = value.getClass();
+        EnumMap<?, String> mapping = enumToDBValueMappings.get(enumClass);
+        if (mapping == null)
+            throw Exceptions.error("enum class is not registered, register in module by db().view() or db().repository(), enumClass={}",
+                enumClass.getCanonicalName());
+        return mapping.get(value);
     }
 
     @SuppressWarnings("unchecked")
-    private EnumMap<?, String> enumToDBValueMapping(Class<? extends Enum> enumClass) {
+    private EnumMap<?, String> mappings(Class<? extends Enum> enumClass) {
         Enum[] constants = enumClass.getEnumConstants();
         EnumMap mapping = new EnumMap<>(enumClass);
         for (Enum constant : constants) {

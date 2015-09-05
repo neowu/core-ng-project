@@ -2,11 +2,11 @@ package core.framework.impl.db;
 
 import core.framework.api.db.Database;
 import core.framework.api.db.Repository;
-import core.framework.api.db.RowMapper;
 import core.framework.api.db.Transaction;
 import core.framework.api.db.UncheckedSQLException;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.resource.Pool;
@@ -127,11 +127,11 @@ public final class DatabaseImpl implements Database {
     }
 
     @Override
-    public <T> List<T> select(String sql, RowMapper<T> mapper, Object... params) {
+    public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
         StopWatch watch = new StopWatch();
         List<T> results = null;
         try {
-            results = executeSelect(sql, params, mapper);
+            results = executeSelect(sql, viewRowMapper(viewClass), params);
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -144,16 +144,10 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    @Override
-    public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
-        return select(sql, viewRowMapper(viewClass), params);
-    }
-
-    @Override
-    public <T> Optional<T> selectOne(String sql, RowMapper<T> mapper, Object... params) {
+    private <T> Optional<T> selectOne(String sql, RowMapper<T> mapper, Object[] params) {
         StopWatch watch = new StopWatch();
         try {
-            return executeSelectOne(sql, params, mapper);
+            return executeSelectOne(sql, mapper, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -166,6 +160,33 @@ public final class DatabaseImpl implements Database {
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
         return selectOne(sql, viewRowMapper(viewClass), params);
+    }
+
+    @Override
+    public Optional<String> selectString(String sql, Object... params) {
+        return Optional.ofNullable(selectScalar(sql, params));
+    }
+
+    @Override
+    public Optional<Integer> selectInt(String sql, Object... params) {
+        Object result = selectScalar(sql, params);
+        if (result == null) return Optional.empty();
+        if (result instanceof Number) {
+            return Optional.of(((Number) result).intValue());
+        } else {
+            throw Exceptions.error("result must be number, result={}", result);
+        }
+    }
+
+    @Override
+    public Optional<Long> selectLong(String sql, Object... params) {
+        Object result = selectScalar(sql, params);
+        if (result == null) return Optional.empty();
+        if (result instanceof Number) {
+            return Optional.of(((Number) result).longValue());
+        } else {
+            throw Exceptions.error("result must be number, result={}", result);
+        }
     }
 
     @Override
@@ -213,9 +234,37 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    <T> List<T> executeSelect(String sql, Object[] params, RowMapper<T> mapper) {
+    @SuppressWarnings("unchecked")
+    private <T> T selectScalar(String sql, Object[] params) {
         if (sql.contains("*"))
-            throw Exceptions.error("select statement should not contain wildcard(*), please only select columns needed, sql={}", sql);
+            throw Exceptions.error("sql must not contain wildcard(*), please only select columns needed, sql={}", sql);
+        PoolItem<Connection> connection = transactionManager.getConnection();
+        try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
+            statement.setQueryTimeout(queryTimeoutInSeconds);
+            PreparedStatements.setParams(statement, params, enumMapper);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                int columnCount = resultSet.getMetaData().getColumnCount();
+                if (columnCount > 1) throw Exceptions.error("more than one column returned, count={}", columnCount);
+                Object result = null;
+                boolean hasResult = resultSet.next();
+                if (hasResult) {
+                    result = resultSet.getObject(1);
+                    if (resultSet.next())
+                        throw new Error("more than one row returned");
+                }
+                return (T) result;
+            }
+        } catch (SQLException e) {
+            Connections.checkConnectionStatus(connection, e);
+            throw new UncheckedSQLException(e);
+        } finally {
+            transactionManager.releaseConnection(connection);
+        }
+    }
+
+    <T> List<T> executeSelect(String sql, RowMapper<T> mapper, Object[] params) {
+        if (sql.contains("*"))
+            throw Exceptions.error("sql must not contain wildcard(*), please only select columns needed, sql={}", sql);
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
@@ -244,16 +293,22 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    <T> Optional<T> executeSelectOne(String sql, Object[] params, RowMapper<T> mapper) {
-        List<T> results = executeSelect(sql, params, mapper);
+    <T> Optional<T> executeSelectOne(String sql, RowMapper<T> mapper, Object[] params) {
+        List<T> results = executeSelect(sql, mapper, params);
         if (results.isEmpty()) return Optional.empty();
-        if (results.size() > 1) throw new Error("more than one row returned, size=" + results.size());
+        if (results.size() > 1) throw Exceptions.error("more than one row returned, size={}", results.size());
         return Optional.ofNullable(results.get(0));
     }
 
     private <T> List<T> fetchResultSet(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {
         try (ResultSet resultSet = statement.executeQuery()) {
-            return new ResultSetMapper(resultSet).map(mapper);
+            ResultSetWrapper wrapper = new ResultSetWrapper(resultSet);
+            List<T> results = Lists.newArrayList();
+            while (resultSet.next()) {
+                T result = mapper.map(wrapper);
+                results.add(result);
+            }
+            return results;
         }
     }
 

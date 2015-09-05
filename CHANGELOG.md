@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.5.1 (9/4/2015 - )
+* db: removed RowMapper
+* web: enum must have @XmlEnumValue
+
 ### 3.5.0 (9/3/2015 - 9/4/2015)
 * config: renamed AbstractApplication to App (broken change!)
 * db: removed repository select where clause must contains '?', exception is like "where some_column is null";

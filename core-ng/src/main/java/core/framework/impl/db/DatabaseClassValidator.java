@@ -6,10 +6,12 @@ import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Table;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
+import core.framework.impl.type.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlEnumValue;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -57,10 +59,10 @@ final class DatabaseClassValidator implements TypeVisitor {
     public void visitClass(Class<?> instanceClass, boolean topLevel) {
         if (validateView) {
             if (instanceClass.isAnnotationPresent(Table.class))
-                throw Exceptions.error("view class must not have @Table, lass={}", instanceClass.getCanonicalName());
+                throw Exceptions.error("view class must not have @Table, class={}", instanceClass.getCanonicalName());
         } else {
             if (!instanceClass.isAnnotationPresent(Table.class))
-                throw Exceptions.error("entity class must have @Table, lass={}", instanceClass.getCanonicalName());
+                throw Exceptions.error("entity class must have @Table, class={}", instanceClass.getCanonicalName());
         }
 
         if (instanceClass.isAnnotationPresent(XmlAccessorType.class))
@@ -73,10 +75,10 @@ final class DatabaseClassValidator implements TypeVisitor {
 
         Column column = field.getDeclaredAnnotation(Column.class);
         if (column == null)
-            throw Exceptions.error("field must have @Column, field={}", field);
+            throw Exceptions.error("field must have @Column, field={}", Fields.path(field));
 
         if (columns.contains(column.name())) {
-            throw Exceptions.error("duplicated column found, column={}, field={}", column.name(), field);
+            throw Exceptions.error("duplicated column found, column={}, field={}", column.name(), Fields.path(field));
         } else {
             columns.add(column.name());
         }
@@ -89,7 +91,7 @@ final class DatabaseClassValidator implements TypeVisitor {
         if (primaryKey != null) {
             foundPK = true;
             if (primaryKey.autoIncrement() && !(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
-                throw Exceptions.error("auto increment primary key must be Integer or Long, field={}", field);
+                throw Exceptions.error("auto increment primary key must be Integer or Long, field={}", Fields.path(field));
             }
         }
     }
@@ -98,9 +100,13 @@ final class DatabaseClassValidator implements TypeVisitor {
         Enum[] constants = (Enum[]) enumClass.getEnumConstants();
         for (Enum constant : constants) {
             try {
-                Field field = enumClass.getDeclaredField(constant.name());
-                if (!field.isAnnotationPresent(EnumValue.class))
-                    throw Exceptions.error("enum constant must have @EnumValue, enumClass={}, field={}", enumClass, field.getName());
+                Field enumField = enumClass.getDeclaredField(constant.name());
+                if (!enumField.isAnnotationPresent(EnumValue.class))
+                    throw Exceptions.error("db enum must have @EnumValue, enum={}", Fields.path(enumField));
+
+                if (enumField.isAnnotationPresent(XmlEnumValue.class))
+                    throw Exceptions.error("db enum must not have jaxb annotation, please separate view and entity, enum={}", Fields.path(enumField));
+
             } catch (NoSuchFieldException e) {
                 throw new Error(e);
             }

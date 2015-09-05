@@ -10,13 +10,13 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class DBEnumMapper<T extends Enum> {
+public final class DBEnumMapper<T extends Enum> {
     private final Class<? extends Enum> enumClass;
     private final Map<String, Enum<?>> mappings;
 
     public DBEnumMapper(Class<? extends Enum> enumClass) {
         this.enumClass = enumClass;
-        mappings = dbValueToEnumMappings(enumClass);
+        mappings = mappings(enumClass);
     }
 
     @SuppressWarnings("unchecked")
@@ -28,7 +28,7 @@ public class DBEnumMapper<T extends Enum> {
         return (T) enumValue;
     }
 
-    private Map<String, Enum<?>> dbValueToEnumMappings(Class<? extends Enum> enumClass) {
+    private Map<String, Enum<?>> mappings(Class<? extends Enum> enumClass) {
         Enum[] constants = enumClass.getEnumConstants();
         Map<String, Enum<?>> mapping = new HashMap<>(constants.length);
         for (Enum constant : constants) {

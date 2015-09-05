@@ -1,7 +1,6 @@
 package core.framework.impl.db;
 
 import core.framework.api.db.Repository;
-import core.framework.api.db.RowMapper;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
@@ -43,7 +42,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         String sql = selectQuery.selectAll;
         List<T> results = null;
         try {
-            results = database.executeSelect(sql, null, rowMapper);
+            results = database.executeSelect(sql, rowMapper, null);
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -62,7 +61,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         String sql = selectQuery.where(whereClause);
         List<T> results = null;
         try {
-            results = database.executeSelect(sql, params, rowMapper);
+            results = database.executeSelect(sql, rowMapper, params);
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -80,7 +79,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         StopWatch watch = new StopWatch();
         String sql = selectQuery.where(whereClause);
         try {
-            return database.executeSelectOne(sql, params, rowMapper);
+            return database.executeSelectOne(sql, rowMapper, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -95,7 +94,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         StopWatch watch = new StopWatch();
         String sql = selectQuery.selectByPrimaryKeys;
         try {
-            return database.executeSelectOne(sql, primaryKeys, rowMapper);
+            return database.executeSelectOne(sql, rowMapper, primaryKeys);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);

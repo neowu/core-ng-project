@@ -3,12 +3,14 @@ package core.framework.impl.web;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
+import core.framework.impl.type.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlTransient;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -57,29 +59,48 @@ public class BeanTypeValidator implements TypeVisitor {
     public void visitClass(Class<?> instanceClass, boolean topLevel) {
         XmlAccessorType accessorType = instanceClass.getDeclaredAnnotation(XmlAccessorType.class);
         if (accessorType == null || accessorType.value() != XmlAccessType.FIELD)
-            throw Exceptions.error("bean class must have @XmlAccessorType(XmlAccessType.FIELD), class={}", instanceClass);
+            throw Exceptions.error("bean class must have @XmlAccessorType(XmlAccessType.FIELD), class={}", instanceClass.getCanonicalName());
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void visitField(Field field, boolean topLevel) {
         XmlElement element = field.getDeclaredAnnotation(XmlElement.class);
 
         if (!Modifier.isPublic(field.getModifiers()) || element == null)
-            throw Exceptions.error("all fields of bean class must be public and with @XmlElement(name=), field={}", field);
+            throw Exceptions.error("all fields of bean class must be public and with @XmlElement(name=), field={}", Fields.path(field));
 
         if (field.isAnnotationPresent(XmlTransient.class))
-            throw Exceptions.error("bean class field must not be transient, field={}", field);
+            throw Exceptions.error("bean class field must not be transient, field={}", Fields.path(field));
 
         String name = element.name();
 
         if ("##default".equals(name)) {
-            throw Exceptions.error("@XmlElement must have name attribute, field={}", field);
+            throw Exceptions.error("@XmlElement must have name attribute, field={}", Fields.path(field));
         }
 
         Set<String> elements = this.elements.computeIfAbsent(field.getDeclaringClass(), key -> Sets.newHashSet());
         if (elements.contains(name)) {
-            throw Exceptions.error("element is duplicated, field={}, name={}", field, name);
+            throw Exceptions.error("element is duplicated, field={}, name={}", Fields.path(field), name);
         }
         elements.add(name);
+
+        if (Enum.class.isAssignableFrom(field.getType())) {
+            validateEnumClass((Class<? extends Enum>) field.getType());
+        }
+    }
+
+    private void validateEnumClass(Class<? extends Enum> enumClass) {
+        Enum[] constants = enumClass.getEnumConstants();
+        for (Enum constant : constants) {
+            try {
+                Field enumField = enumClass.getField(constant.name());
+                if (!enumField.isAnnotationPresent(XmlEnumValue.class)) {
+                    throw Exceptions.error("enum must have @XmlEnumValue, enum={}", Fields.path(enumField));
+                }
+            } catch (NoSuchFieldException e) {
+                throw new Error(e);
+            }
+        }
     }
 }
