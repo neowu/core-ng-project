@@ -4,6 +4,7 @@ import core.framework.api.cache.Cache;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.redis.Redis;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
 import core.framework.impl.cache.CacheManager;
 import core.framework.impl.cache.CacheStore;
@@ -95,17 +96,18 @@ public final class CacheConfig {
 
     String cacheName(String name, Type valueType) {
         if (name != null) return name;
-        if (valueType instanceof Class) return ((Class) valueType).getSimpleName().toLowerCase();
-        else if (valueType instanceof ParameterizedType) {
+        if (valueType instanceof Class) {
+            return Strings.toLowerCase(((Class<?>) valueType).getSimpleName());
+        } else if (valueType instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) valueType;
             StringBuilder builder = new StringBuilder();
-            builder.append(((Class<?>) parameterizedType.getRawType()).getSimpleName().toLowerCase());
+            builder.append(Strings.toLowerCase(((Class<?>) parameterizedType.getRawType()).getSimpleName()));
             Type[] arguments = parameterizedType.getActualTypeArguments();
             for (Type argument : arguments) {
-                builder.append('-').append(((Class<?>) argument).getSimpleName().toLowerCase());
+                builder.append('-').append(Strings.toLowerCase(((Class<?>) argument).getSimpleName()));
             }
             return builder.toString();
         }
-        return valueType.getTypeName().toLowerCase();
+        return Strings.toLowerCase(valueType.getTypeName());
     }
 }

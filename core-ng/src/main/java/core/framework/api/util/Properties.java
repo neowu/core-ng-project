@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * @author neo
  */
-public class Properties {
+public final class Properties {
     final Map<String, String> properties = Maps.newHashMap();
 
     public void load(String path) {
@@ -28,7 +28,7 @@ public class Properties {
 
     public Optional<String> get(String key) {
         String value = properties.get(key);
-        if (!Strings.empty(value)) {
+        if (!Strings.isEmpty(value)) {
             return Optional.of(value);
         }
         return Optional.empty();

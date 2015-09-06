@@ -16,9 +16,11 @@ import java.util.List;
  */
 final class RowMapperBuilder<T> {
     private final Class<T> entityClass;
+    private final EnumDBMapper enumDBMapper;
 
-    RowMapperBuilder(Class<T> entityClass) {
+    RowMapperBuilder(Class<T> entityClass, EnumDBMapper enumDBMapper) {
         this.entityClass = entityClass;
+        this.enumDBMapper = enumDBMapper;
     }
 
     RowMapper<T> build() {
@@ -44,7 +46,12 @@ final class RowMapperBuilder<T> {
             } else if (LocalDateTime.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getLocalDateTime(\"{}\");\n", fieldName, column);
             } else if (Enum.class.isAssignableFrom(fieldClass)) {
+                @SuppressWarnings("unchecked")
+                Class<? extends Enum> enumClass = (Class<? extends Enum>) fieldClass;
+                enumDBMapper.registerEnumClass(enumClass);
+
                 enumMapperFields.add(Strings.format("private final {} {}Mappings = new {}({}.class);", DBEnumMapper.class.getCanonicalName(), fieldName, DBEnumMapper.class.getCanonicalName(), fieldClass.getCanonicalName()));
+
                 builder.indent(1).append("entity.{} = ({}){}Mappings.getEnum(resultSet.getString(\"{}\"));\n", fieldName, fieldClass.getCanonicalName(), fieldName, column);
             } else if (Double.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getDouble(\"{}\");\n", fieldName, column);

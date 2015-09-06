@@ -11,7 +11,6 @@ final class RepositoryEntityValidator<T> {
     private final Validator validator;
 
     RepositoryEntityValidator(Class<T> entityClass) {
-        new DatabaseClassValidator(entityClass).validateEntityClass();
         validator = new ValidatorBuilder(entityClass, field -> field.getDeclaredAnnotation(Column.class).name()).build();
     }
 

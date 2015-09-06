@@ -11,7 +11,7 @@ import java.util.Set;
  */
 class PathPatternValidator {
     void validate(String pathPattern) {
-        if (Strings.empty(pathPattern))
+        if (Strings.isEmpty(pathPattern))
             throw Exceptions.error("path pattern must not be empty, pathPattern={}", pathPattern);
 
         if (!pathPattern.startsWith("/"))

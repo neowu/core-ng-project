@@ -25,7 +25,7 @@ public final class Asserts {
     }
 
     public static <T> String notEmpty(String text, String message, Object... params) {
-        if (Strings.empty(text)) throw new AssertionError(Strings.format(message, params));
+        if (Strings.isEmpty(text)) throw new AssertionError(Strings.format(message, params));
         return text;
     }
 

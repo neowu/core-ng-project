@@ -26,7 +26,7 @@ public final class Strings {
         return text1.compareTo(text2);
     }
 
-    public static boolean empty(String text) {
+    public static boolean isEmpty(String text) {
         if (text == null)
             return true;
 
@@ -56,5 +56,51 @@ public final class Strings {
         if (text == null)
             return null;
         return text.trim();
+    }
+
+    // only convert ascii chars, faster than JDK String.toUpperCase due to JDK needs to handle UTF and locale
+    // impl refers to guava: https://github.com/google/guava/blob/master/guava/src/com/google/common/base/Ascii.java
+    public static String toUpperCase(String text) {
+        if (text == null) return null;
+        int length = text.length();
+        for (int i = 0; i < length; i++) {
+            if (isLowerCase(text.charAt(i))) {
+                char[] chars = text.toCharArray();
+                for (; i < length; i++) {
+                    char ch = chars[i];
+                    if (isLowerCase(ch)) {
+                        chars[i] = (char) (ch & 0x5f);
+                    }
+                }
+                return String.valueOf(chars);
+            }
+        }
+        return text;
+    }
+
+    public static String toLowerCase(String text) {
+        if (text == null) return null;
+        int length = text.length();
+        for (int i = 0; i < length; i++) {
+            if (isUpperCase(text.charAt(i))) {
+                char[] chars = text.toCharArray();
+                for (; i < length; i++) {
+                    char ch = chars[i];
+                    if (isUpperCase(ch)) {
+                        chars[i] = (char) (ch ^ 0x20);
+                    }
+                }
+                return String.valueOf(chars);
+            }
+        }
+        return text;
+    }
+
+    private static boolean isLowerCase(char ch) {
+        return ch >= 'a' && ch <= 'z';
+    }
+
+    private static boolean isUpperCase(char ch) {
+        return ch >= 'A' && ch <= 'Z';
     }
 }

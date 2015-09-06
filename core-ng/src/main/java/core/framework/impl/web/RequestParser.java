@@ -85,7 +85,7 @@ public class RequestParser {
     }
 
     String clientIP(String remoteAddress, String xForwardedFor) {
-        if (Strings.empty(xForwardedFor))
+        if (Strings.isEmpty(xForwardedFor))
             return remoteAddress;
         int index = xForwardedFor.indexOf(',');
         if (index > 0)

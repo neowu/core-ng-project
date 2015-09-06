@@ -2,6 +2,7 @@ package core.framework.impl.db;
 
 import core.framework.api.db.UncheckedSQLException;
 import core.framework.api.util.Maps;
+import core.framework.api.util.Strings;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -25,103 +26,94 @@ final class ResultSetWrapper {
     ResultSetWrapper(ResultSet resultSet) {
         this.resultSet = resultSet;
         try {
-            columnIndex = buildIndex();
+            columnIndex = columnIndex();
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);
         }
     }
 
     private Integer index(String column) {
-        return columnIndex.get(column.toLowerCase());
+        return columnIndex.get(Strings.toLowerCase(column));
     }
 
-    private Map<String, Integer> buildIndex() throws SQLException {
-        Map<String, Integer> index = Maps.newHashMap();
+    // different db are using various of rules to return column name/label, some of reserved case, some does not
+    // here we have to make name/column case insensitive for view mapping
+    // http://hsqldb.org/doc/guide/databaseobjects-chapt.html#dbc_collations
+    private Map<String, Integer> columnIndex() throws SQLException {
         ResultSetMetaData meta = resultSet.getMetaData();
         int count = meta.getColumnCount();
+        Map<String, Integer> index = Maps.newHashMapWithExpectedSize(count);
         for (int i = 1; i < count + 1; i++) {
             String column = meta.getColumnLabel(i);
-            index.put(column.toLowerCase(), i);
+            index.put(Strings.toLowerCase(column), i);
         }
         return index;
     }
 
-    public Integer getInt(String column) throws SQLException {
+    int columnCount() {
+        return columnIndex.size();
+    }
+
+    Integer getInt(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getInt(index);
     }
 
-    public Integer getInt(int columnIndex) throws SQLException {
-        int value = resultSet.getInt(columnIndex);
+    Integer getInt(int index) throws SQLException {
+        int value = resultSet.getInt(index);
         if (resultSet.wasNull()) return null;
         return value;
     }
 
-    public Boolean getBoolean(String column) throws SQLException {
+    Boolean getBoolean(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
-        return getBoolean(index);
-    }
-
-    public Boolean getBoolean(int columnIndex) throws SQLException {
-        boolean value = resultSet.getBoolean(columnIndex);
+        boolean value = resultSet.getBoolean(index);
         if (resultSet.wasNull()) return null;
         return value;
     }
 
-    public Long getLong(String column) throws SQLException {
+    Long getLong(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getLong(index);
     }
 
-    public Long getLong(int columnIndex) throws SQLException {
-        long value = resultSet.getLong(columnIndex);
+    Long getLong(int index) throws SQLException {
+        long value = resultSet.getLong(index);
         if (resultSet.wasNull()) return null;
         return value;
     }
 
-    public Double getDouble(String column) throws SQLException {
+    Double getDouble(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
-        return getDouble(index);
-    }
-
-    public Double getDouble(int columnIndex) throws SQLException {
-        double value = resultSet.getDouble(columnIndex);
+        double value = resultSet.getDouble(index);
         if (resultSet.wasNull()) return null;
         return value;
     }
 
-    public String getString(String column) throws SQLException {
+    String getString(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
         return getString(index);
     }
 
-    public String getString(int columnIndex) throws SQLException {
-        return resultSet.getString(columnIndex);
+    String getString(int index) throws SQLException {
+        return resultSet.getString(index);
     }
 
-    public BigDecimal getBigDecimal(String column) throws SQLException {
+    BigDecimal getBigDecimal(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
-        return getBigDecimal(index);
+        return resultSet.getBigDecimal(index);
     }
 
-    public BigDecimal getBigDecimal(int columnIndex) throws SQLException {
-        return resultSet.getBigDecimal(columnIndex);
-    }
-
-    public LocalDateTime getLocalDateTime(String column) throws SQLException {
+    LocalDateTime getLocalDateTime(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
-        return getLocalDateTime(index);
-    }
-
-    public LocalDateTime getLocalDateTime(int columnIndex) throws SQLException {
-        Timestamp timestamp = resultSet.getTimestamp(columnIndex);
+        Timestamp timestamp = resultSet.getTimestamp(index);
         if (timestamp == null) return null;
         Instant instant = timestamp.toInstant();
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());

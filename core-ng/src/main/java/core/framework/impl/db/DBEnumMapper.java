@@ -10,21 +10,21 @@ import java.util.Map;
 /**
  * @author neo
  */
-public final class DBEnumMapper<T extends Enum> {
+final class DBEnumMapper<T extends Enum> {
     private final Class<? extends Enum> enumClass;
     private final Map<String, Enum<?>> mappings;
 
-    public DBEnumMapper(Class<? extends Enum> enumClass) {
+    DBEnumMapper(Class<? extends Enum> enumClass) {
         this.enumClass = enumClass;
         mappings = mappings(enumClass);
     }
 
     @SuppressWarnings("unchecked")
-    public T getEnum(String dbValue) {
-        if (dbValue == null) return null;
-        Enum<?> enumValue = mappings.get(dbValue);
+    public T getEnum(String value) {
+        if (value == null) return null;
+        Enum<?> enumValue = mappings.get(value);
         if (enumValue == null)
-            throw Exceptions.error("can not parse value to enum, enumClass={}, value={}", enumClass.getCanonicalName(), dbValue);
+            throw Exceptions.error("can not parse value to enum, enumClass={}, value={}", enumClass.getCanonicalName(), value);
         return (T) enumValue;
     }
 

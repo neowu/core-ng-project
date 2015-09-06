@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public final class EnumDBMapper {
+final class EnumDBMapper {
     private final Map<Class<? extends Enum>, EnumMap<?, String>> enumToDBValueMappings = Maps.newHashMap();
 
     void registerEnumClass(Class<? extends Enum> enumClass) {
@@ -22,9 +22,8 @@ public final class EnumDBMapper {
         Class<? extends Enum> enumClass = value.getClass();
         EnumMap<?, String> mapping = enumToDBValueMappings.get(enumClass);
         if (mapping == null)
-            throw Exceptions.error("enum class is not registered, register in module by db().view() or db().repository(), enumClass={}",
-                enumClass.getCanonicalName());
-        return mapping.get(value);
+            throw Exceptions.error("enum class is not registered, register in module by db().view() or db().repository(), enumClass={}", enumClass.getCanonicalName());
+        return mapping.get(value);  // this won't return null since all fields of enum are registered
     }
 
     @SuppressWarnings("unchecked")

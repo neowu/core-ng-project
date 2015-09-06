@@ -153,7 +153,7 @@ public class SQSMessageListener implements Runnable, MessageHandlerConfig {
 
         }
         actionLog.context("messageType", messageType);
-        if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
+        if (Strings.isEmpty(messageType)) throw new Error("messageType must not be empty");
 
         Class<T> messageClass = messageClass(messageType);
         T message = JSON.fromJSON(messageClass, messageBody);

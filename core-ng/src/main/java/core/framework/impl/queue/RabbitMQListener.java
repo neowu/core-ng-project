@@ -120,7 +120,7 @@ public class RabbitMQListener implements MessageHandlerConfig {
 
         logger.debug("message={}", messageBody);
 
-        if (Strings.empty(messageType)) throw new Error("messageType must not be empty");
+        if (Strings.isEmpty(messageType)) throw new Error("messageType must not be empty");
 
         actionLog.refId(delivery.getProperties().getCorrelationId());
 

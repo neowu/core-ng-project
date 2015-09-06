@@ -12,66 +12,47 @@ import static org.junit.Assert.assertTrue;
  */
 public class StringsTest {
     @Test
-    public void nullStringsEqual() {
+    public void equals() {
         assertEquals(true, Strings.equals(null, null));
-    }
-
-    @Test
-    public void nullStringNotEqualsToEmpty() {
         assertEquals(false, Strings.equals(null, ""));
         assertEquals(false, Strings.equals("", null));
-    }
-
-    @Test
-    public void emptyStringsEqual() {
         assertEquals(true, Strings.equals("", ""));
     }
 
     @Test
-    public void nullStringIsLessThanEmptyString() {
+    public void compare() {
         assertEquals(-1, Strings.compare(null, ""));
-    }
-
-    @Test
-    public void nullStringEqualsToNull() {
+        assertEquals(1, Strings.compare("b", "a"));
         assertEquals(0, Strings.compare(null, null));
     }
 
     @Test
-    public void compareRegularStrings() {
-        assertEquals(1, Strings.compare("b", "a"));
+    public void truncate() {
+        assertNull(Strings.truncate(null, 10));
+        assertEquals("value", Strings.truncate("value", 10));
+        assertEquals("1234567890", Strings.truncate("123456789012345", 10));
     }
 
     @Test
-    public void truncateNull() {
-        String value = Strings.truncate(null, 10);
+    public void isEmpty() {
+        assertTrue(Strings.isEmpty(""));
+        assertTrue(Strings.isEmpty(" "));
 
-        assertNull(value);
+        assertFalse(Strings.isEmpty("1"));
+        assertFalse(Strings.isEmpty(" 1"));
     }
 
     @Test
-    public void truncateTextShorterThanMaxLength() {
-        String value = Strings.truncate("value", 10);
-
-        assertEquals("value", value);
+    public void upperCase() {
+        assertEquals("TEXT", Strings.toUpperCase("tExt"));
+        assertEquals("TEXT", Strings.toUpperCase("TEXT"));
+        assertEquals("01239_-", Strings.toUpperCase("01239_-"));
     }
 
     @Test
-    public void truncateTextLongerThanMaxLength() {
-        String value = Strings.truncate("123456789012345", 10);
-
-        assertEquals("1234567890", value);
-    }
-
-    @Test
-    public void empty() {
-        assertTrue(Strings.empty(""));
-        assertTrue(Strings.empty(" "));
-    }
-
-    @Test
-    public void notEmpty() {
-        assertFalse(Strings.empty("1"));
-        assertFalse(Strings.empty(" 1"));
+    public void lowerCase() {
+        assertEquals("text", Strings.toLowerCase("tExt"));
+        assertEquals("text", Strings.toLowerCase("TEXT"));
+        assertEquals("01239_-", Strings.toLowerCase("01239_-"));
     }
 }

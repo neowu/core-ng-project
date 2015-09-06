@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.5.2 (9/6/2015 - )
+
+
 ### 3.5.1 (9/4/2015 - 9/6/2015)
 * db: removed RowMapper, use view instead (broken change!)
 * web: enum must have @XmlEnumValue
