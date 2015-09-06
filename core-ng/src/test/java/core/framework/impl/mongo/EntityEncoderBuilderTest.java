@@ -3,6 +3,7 @@ package core.framework.impl.mongo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.api.util.ClasspathResources;
+import core.framework.api.util.Maps;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
 import org.junit.Assert;
@@ -11,7 +12,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -35,7 +35,7 @@ public class EntityEncoderBuilderTest {
         entity.listField = new ArrayList<>();
         entity.listField.add("V1");
         entity.listField.add("V2");
-        entity.mapField = new HashMap<>();
+        entity.mapField = Maps.newHashMap();
         entity.mapField.put("K1", "V1");
         entity.mapField.put("K2", "V2");
 

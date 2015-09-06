@@ -2,6 +2,7 @@ package core.framework.api.redis;
 
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Charsets;
+import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.api.util.Strings;
 import core.framework.impl.resource.Pool;
@@ -13,7 +14,6 @@ import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -146,12 +146,12 @@ public final class Redis {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
         try {
-            Map<byte[], byte[]> binaryResult = item.resource.hgetAll(encode(key));
-            Map<String, String> result = new HashMap<>(binaryResult.size());
-            for (Map.Entry<byte[], byte[]> entry : binaryResult.entrySet()) {
-                result.put(decode(entry.getKey()), decode(entry.getValue()));
+            Map<byte[], byte[]> binaryResults = item.resource.hgetAll(encode(key));
+            Map<String, String> results = Maps.newHashMapWithExpectedSize(binaryResults.size());
+            for (Map.Entry<byte[], byte[]> entry : binaryResults.entrySet()) {
+                results.put(decode(entry.getKey()), decode(entry.getValue()));
             }
-            return result;
+            return results;
         } catch (JedisConnectionException e) {
             item.broken = true;
             throw e;
@@ -168,7 +168,7 @@ public final class Redis {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
         try {
-            Map<byte[], byte[]> binaryValue = new HashMap<>(value.size());
+            Map<byte[], byte[]> binaryValue = Maps.newHashMapWithExpectedSize(value.size());
             for (Map.Entry<String, String> entry : value.entrySet()) {
                 binaryValue.put(encode(entry.getKey()), encode(entry.getValue()));
             }

@@ -14,10 +14,10 @@ import java.util.List;
 /**
  * @author neo
  */
-final class ViewRowMapperBuilder<T> {
+final class RowMapperBuilder<T> {
     private final Class<T> entityClass;
 
-    ViewRowMapperBuilder(Class<T> entityClass) {
+    RowMapperBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 

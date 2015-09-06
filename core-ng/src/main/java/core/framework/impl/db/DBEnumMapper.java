@@ -2,9 +2,9 @@ package core.framework.impl.db;
 
 import core.framework.api.db.EnumValue;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Maps;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +30,7 @@ public final class DBEnumMapper<T extends Enum> {
 
     private Map<String, Enum<?>> mappings(Class<? extends Enum> enumClass) {
         Enum[] constants = enumClass.getEnumConstants();
-        Map<String, Enum<?>> mapping = new HashMap<>(constants.length);
+        Map<String, Enum<?>> mapping = Maps.newHashMapWithExpectedSize(constants.length);
         for (Enum constant : constants) {
             try {
                 Field field = enumClass.getField(constant.name());

@@ -37,13 +37,13 @@ public final class DatabaseImpl implements Database {
     public final Pool<Connection> pool;
     public long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
     public int tooManyRowsReturnedThreshold = 1000;
-    private final Map<Class, RowMapper> viewRowMappers = Maps.newHashMap();
+    private final Map<Class, RowMapper> rowMappers = Maps.newHashMap();
     private final EnumDBMapper enumMapper = new EnumDBMapper();
 
     private int queryTimeoutInSeconds;
     private Driver driver;
     private String url;
-    private final Properties driverProperites = new Properties();
+    private final Properties driverProperties = new Properties();
 
     public DatabaseImpl() {
         pool = new Pool<>(this::createConnection, Connection::close);
@@ -57,7 +57,7 @@ public final class DatabaseImpl implements Database {
     private Connection createConnection() {
         if (url == null) throw new Error("url must not be null");
         try {
-            return driver.connect(url, driverProperites);
+            return driver.connect(url, driverProperties);
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);
         }
@@ -69,11 +69,11 @@ public final class DatabaseImpl implements Database {
     }
 
     public void user(String user) {
-        driverProperites.put("user", user);
+        driverProperties.put("user", user);
     }
 
     public void password(String password) {
-        driverProperites.put("password", password);
+        driverProperties.put("password", password);
     }
 
     public void timeout(Duration timeout) {
@@ -81,8 +81,8 @@ public final class DatabaseImpl implements Database {
         pool.checkoutTimeout(timeout);
 
         if (url != null && url.startsWith("jdbc:mysql:")) {
-            driverProperites.put("connectTimeout", String.valueOf(timeout.toMillis()));
-            driverProperites.put("socketTimeout", String.valueOf(timeout.toMillis()));
+            driverProperties.put("connectTimeout", String.valueOf(timeout.toMillis()));
+            driverProperties.put("socketTimeout", String.valueOf(timeout.toMillis()));
         }
     }
 
@@ -131,7 +131,7 @@ public final class DatabaseImpl implements Database {
         StopWatch watch = new StopWatch();
         List<T> results = null;
         try {
-            results = executeSelect(sql, viewRowMapper(viewClass), params);
+            results = executeSelect(sql, rowMapper(viewClass), params);
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -159,7 +159,7 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
-        return selectOne(sql, viewRowMapper(viewClass), params);
+        return selectOne(sql, rowMapper(viewClass), params);
     }
 
     @Override
@@ -321,9 +321,9 @@ public final class DatabaseImpl implements Database {
         return Optional.empty();
     }
 
-    private <T> RowMapper<T> viewRowMapper(Class<T> viewClass) {
+    private <T> RowMapper<T> rowMapper(Class<T> viewClass) {
         @SuppressWarnings("unchecked")
-        RowMapper<T> mapper = viewRowMappers.get(viewClass);
+        RowMapper<T> mapper = rowMappers.get(viewClass);
         if (mapper == null)
             throw Exceptions.error("view class is not registered, please register in module by db().view(), viewClass={}", viewClass.getCanonicalName());
         return mapper;
@@ -331,11 +331,11 @@ public final class DatabaseImpl implements Database {
 
 
     private <T> RowMapper<T> registerViewClass(Class<T> viewClass) {
-        if (viewRowMappers.containsKey(viewClass)) {
+        if (rowMappers.containsKey(viewClass)) {
             throw Exceptions.error("duplicated view class found, viewClass={}", viewClass.getCanonicalName());
         }
-        RowMapper<T> mapper = new ViewRowMapperBuilder<>(viewClass).build();
-        viewRowMappers.put(viewClass, mapper);
+        RowMapper<T> mapper = new RowMapperBuilder<>(viewClass).build();
+        rowMappers.put(viewClass, mapper);
         registerEnumClass(viewClass);
         return mapper;
     }
