@@ -27,13 +27,12 @@ import java.util.Properties;
 public final class DatabaseImpl implements Database {
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
 
-    public final TransactionManager transactionManager;
     public final Pool<Connection> pool;
+    public final DatabaseOperation operation;
     public long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
     public int tooManyRowsReturnedThreshold = 1000;
     private final Map<Class, RowMapper> rowMappers = Maps.newHashMap();
     private final ScalarRowMappers scalarRowMappers = new ScalarRowMappers();
-    final DatabaseOperation databaseOperation;
 
     private Driver driver;
     private String url;
@@ -44,8 +43,8 @@ public final class DatabaseImpl implements Database {
         pool.name("db");
         pool.size(5, 50);    // default optimization for AWS medium/large instances
         pool.maxIdleTime(Duration.ofHours(2));
-        transactionManager = new TransactionManager(pool);
-        databaseOperation = new DatabaseOperation(transactionManager);
+
+        operation = new DatabaseOperation(pool);
         timeout(Duration.ofSeconds(30));
     }
 
@@ -72,7 +71,7 @@ public final class DatabaseImpl implements Database {
     }
 
     public void timeout(Duration timeout) {
-        databaseOperation.queryTimeoutInSeconds = (int) timeout.getSeconds();
+        operation.queryTimeoutInSeconds = (int) timeout.getSeconds();
         pool.checkoutTimeout(timeout);
 
         if (url != null && url.startsWith("jdbc:mysql:")) {
@@ -89,7 +88,7 @@ public final class DatabaseImpl implements Database {
         try {
             if (url.startsWith("jdbc:mysql://")) {
                 driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
-                timeout(Duration.ofSeconds(databaseOperation.queryTimeoutInSeconds));
+                timeout(Duration.ofSeconds(operation.queryTimeoutInSeconds));
             } else if (url.startsWith("jdbc:hsqldb:")) {
                 driver = (Driver) Class.forName("org.hsqldb.jdbc.JDBCDriver").newInstance();
             } else {
@@ -118,7 +117,7 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public Transaction beginTransaction() {
-        return transactionManager.beginTransaction();
+        return operation.transactionManager.beginTransaction();
     }
 
     @Override
@@ -126,7 +125,7 @@ public final class DatabaseImpl implements Database {
         StopWatch watch = new StopWatch();
         List<T> results = null;
         try {
-            results = databaseOperation.select(sql, rowMapper(viewClass), params);
+            results = operation.select(sql, rowMapper(viewClass), params);
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -143,7 +142,7 @@ public final class DatabaseImpl implements Database {
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
         StopWatch watch = new StopWatch();
         try {
-            return databaseOperation.selectOne(sql, rowMapper(viewClass), params);
+            return operation.selectOne(sql, rowMapper(viewClass), params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -157,7 +156,7 @@ public final class DatabaseImpl implements Database {
     public Optional<String> selectString(String sql, Object... params) {
         StopWatch watch = new StopWatch();
         try {
-            return databaseOperation.selectOne(sql, scalarRowMappers.singleString, params);
+            return operation.selectOne(sql, scalarRowMappers.singleString, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -171,7 +170,7 @@ public final class DatabaseImpl implements Database {
     public Optional<Integer> selectInt(String sql, Object... params) {
         StopWatch watch = new StopWatch();
         try {
-            return databaseOperation.selectOne(sql, scalarRowMappers.singleInt, params);
+            return operation.selectOne(sql, scalarRowMappers.singleInt, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -185,7 +184,7 @@ public final class DatabaseImpl implements Database {
     public Optional<Long> selectLong(String sql, Object... params) {
         StopWatch watch = new StopWatch();
         try {
-            return databaseOperation.selectOne(sql, scalarRowMappers.singleLong, params);
+            return operation.selectOne(sql, scalarRowMappers.singleLong, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -199,7 +198,7 @@ public final class DatabaseImpl implements Database {
     public int execute(String sql, Object... params) {
         StopWatch watch = new StopWatch();
         try {
-            return databaseOperation.update(sql, params);
+            return operation.update(sql, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -222,7 +221,7 @@ public final class DatabaseImpl implements Database {
         if (rowMappers.containsKey(viewClass)) {
             throw Exceptions.error("duplicated view class found, viewClass={}", viewClass.getCanonicalName());
         }
-        RowMapper<T> mapper = new RowMapperBuilder<>(viewClass, databaseOperation.enumMapper).build();
+        RowMapper<T> mapper = new RowMapperBuilder<>(viewClass, operation.enumMapper).build();
         rowMappers.put(viewClass, mapper);
         return mapper;
     }

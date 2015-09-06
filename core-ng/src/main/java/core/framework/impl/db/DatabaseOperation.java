@@ -3,6 +3,7 @@ package core.framework.impl.db;
 import core.framework.api.db.UncheckedSQLException;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
+import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
 
 import java.math.BigDecimal;
@@ -22,12 +23,12 @@ import java.util.Optional;
  * @author neo
  */
 public class DatabaseOperation {
-    private final TransactionManager transactionManager;
+    public final TransactionManager transactionManager;
     final EnumDBMapper enumMapper = new EnumDBMapper();
     int queryTimeoutInSeconds;  //TODO: refactory timeout
 
-    public DatabaseOperation(TransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
+    public DatabaseOperation(Pool<Connection> pool) {
+        transactionManager = new TransactionManager(pool);
     }
 
     int update(String sql, Object[] params) {

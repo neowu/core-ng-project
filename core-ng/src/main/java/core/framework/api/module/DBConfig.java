@@ -75,7 +75,7 @@ public final class DBConfig {
     }
 
     public DBConfig defaultIsolationLevel(IsolationLevel defaultIsolationLevel) {
-        database.transactionManager.defaultIsolationLevel = defaultIsolationLevel;
+        database.operation.transactionManager.defaultIsolationLevel = defaultIsolationLevel;
         return this;
     }
 
@@ -90,7 +90,7 @@ public final class DBConfig {
     }
 
     public DBConfig longTransactionThreshold(Duration longTransactionThreshold) {
-        database.transactionManager.longTransactionThresholdInMs = longTransactionThreshold.toMillis();
+        database.operation.transactionManager.longTransactionThresholdInMs = longTransactionThreshold.toMillis();
         return this;
     }
 

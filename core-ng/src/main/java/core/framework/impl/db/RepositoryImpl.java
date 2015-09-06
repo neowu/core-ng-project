@@ -42,7 +42,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         String sql = selectQuery.selectAll;
         List<T> results = null;
         try {
-            results = database.databaseOperation.select(sql, rowMapper, null);
+            results = database.operation.select(sql, rowMapper, null);
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -61,7 +61,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         String sql = selectQuery.where(whereClause);
         List<T> results = null;
         try {
-            results = database.databaseOperation.select(sql, rowMapper, params);
+            results = database.operation.select(sql, rowMapper, params);
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -79,7 +79,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         StopWatch watch = new StopWatch();
         String sql = selectQuery.where(whereClause);
         try {
-            return database.databaseOperation.selectOne(sql, rowMapper, params);
+            return database.operation.selectOne(sql, rowMapper, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -94,7 +94,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         StopWatch watch = new StopWatch();
         String sql = selectQuery.selectByPrimaryKeys;
         try {
-            return database.databaseOperation.selectOne(sql, rowMapper, primaryKeys);
+            return database.operation.selectOne(sql, rowMapper, primaryKeys);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -111,7 +111,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         String sql = insertQuery.sql;
         Object[] params = insertQuery.params(entity);
         try {
-            return database.databaseOperation.insert(sql, params);
+            return database.operation.insert(sql, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -127,7 +127,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         validator.partialValidate(entity);
         UpdateQuery.Query query = updateQuery.query(entity);
         try {
-            int updatedRows = database.databaseOperation.update(query.sql, query.params);
+            int updatedRows = database.operation.update(query.sql, query.params);
             if (updatedRows != 1)
                 logger.warn("updated rows is not 1, rows={}", updatedRows);
         } finally {
@@ -143,7 +143,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     public void delete(Object... primaryKeys) {
         StopWatch watch = new StopWatch();
         try {
-            int deletedRows = database.databaseOperation.update(deleteSQL, primaryKeys);
+            int deletedRows = database.operation.update(deleteSQL, primaryKeys);
             if (deletedRows != 1)
                 logger.warn("deleted rows is not 1, rows={}", deletedRows);
         } finally {
@@ -164,7 +164,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             .map(insertQuery::params)
             .collect(Collectors.toList());
         try {
-            database.databaseOperation.batchUpdate(sql, params);
+            database.operation.batchUpdate(sql, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -186,7 +186,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             }
         }
         try {
-            int[] deletedRows = database.databaseOperation.batchUpdate(deleteSQL, params);
+            int[] deletedRows = database.operation.batchUpdate(deleteSQL, params);
             for (int deletedRow : deletedRows) {
                 if (deletedRow != 1)
                     logger.warn("deleted rows is not 1, rows={}", Arrays.toString(deletedRows));
