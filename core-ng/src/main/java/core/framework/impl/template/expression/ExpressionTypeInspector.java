@@ -1,7 +1,7 @@
 package core.framework.impl.template.expression;
 
 import core.framework.api.util.Exceptions;
-import core.framework.impl.type.TypeInspector;
+import core.framework.impl.reflect.TypeInspector;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;

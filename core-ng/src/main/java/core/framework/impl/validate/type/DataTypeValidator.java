@@ -2,7 +2,7 @@ package core.framework.impl.validate.type;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
-import core.framework.impl.type.TypeInspector;
+import core.framework.impl.reflect.TypeInspector;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

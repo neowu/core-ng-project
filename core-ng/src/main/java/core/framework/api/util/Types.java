@@ -1,6 +1,6 @@
 package core.framework.api.util;
 
-import core.framework.impl.type.ParameterizedTypeImpl;
+import core.framework.impl.reflect.ParameterizedTypeImpl;
 
 import java.lang.reflect.Type;
 import java.util.List;

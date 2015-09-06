@@ -3,7 +3,7 @@ package core.framework.impl.web;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
-import core.framework.impl.type.Fields;
+import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 

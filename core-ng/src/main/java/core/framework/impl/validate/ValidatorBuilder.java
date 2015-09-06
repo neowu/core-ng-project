@@ -5,7 +5,7 @@ import core.framework.api.validate.Length;
 import core.framework.api.validate.Max;
 import core.framework.api.validate.Min;
 import core.framework.api.validate.NotNull;
-import core.framework.impl.type.TypeInspector;
+import core.framework.impl.reflect.TypeInspector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

@@ -1,4 +1,4 @@
-package core.framework.impl.type;
+package core.framework.impl.reflect;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

@@ -1,7 +1,7 @@
 package core.framework.impl.code;
 
 import core.framework.api.util.Types;
-import core.framework.impl.type.TypeInspector;
+import core.framework.impl.reflect.TypeInspector;
 
 import java.lang.reflect.Type;
 
