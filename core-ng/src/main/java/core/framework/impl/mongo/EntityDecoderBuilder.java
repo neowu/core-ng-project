@@ -29,7 +29,7 @@ public class EntityDecoderBuilder<T> {
     }
 
     public EntityDecoder<T> build() {
-        DynamicInstanceBuilder<EntityDecoder<T>> builder = new DynamicInstanceBuilder<>(EntityDecoder.class, EntityDecoder.class.getCanonicalName() + "$" + entityClass.getCanonicalName());
+        DynamicInstanceBuilder<EntityDecoder<T>> builder = new DynamicInstanceBuilder<>(EntityDecoder.class, EntityDecoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
         builder.addField(loggerField());
         buildMethods();
         methods.values().forEach(builder::addMethod);

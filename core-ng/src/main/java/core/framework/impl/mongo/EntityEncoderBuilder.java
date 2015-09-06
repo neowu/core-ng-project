@@ -27,7 +27,7 @@ public class EntityEncoderBuilder<T> {
     }
 
     public EntityEncoder<T> build() {
-        DynamicInstanceBuilder<EntityEncoder<T>> builder = new DynamicInstanceBuilder<>(EntityEncoder.class, EntityEncoder.class.getCanonicalName() + "$" + entityClass.getCanonicalName());
+        DynamicInstanceBuilder<EntityEncoder<T>> builder = new DynamicInstanceBuilder<>(EntityEncoder.class, EntityEncoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
         buildMethods();
         methods.values().forEach(builder::addMethod);
         return builder.build();

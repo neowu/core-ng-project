@@ -14,7 +14,7 @@ public final class EntityIdHandlerBuilder<T> {
     }
 
     public EntityIdHandler<T> build() {
-        DynamicInstanceBuilder<EntityIdHandler<T>> builder = new DynamicInstanceBuilder<>(EntityIdHandler.class, EntityIdHandler.class.getCanonicalName() + "$" + entityClass.getCanonicalName());
+        DynamicInstanceBuilder<EntityIdHandler<T>> builder = new DynamicInstanceBuilder<>(EntityIdHandler.class, EntityIdHandler.class.getCanonicalName() + "$" + entityClass.getSimpleName());
         builder.addMethod(getMethod());
         builder.addMethod(setMethod());
         return builder.build();

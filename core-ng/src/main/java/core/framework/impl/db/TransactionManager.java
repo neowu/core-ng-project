@@ -50,12 +50,12 @@ public final class TransactionManager {
         try {
             if (defaultIsolationLevel != null)
                 connection.resource.setTransactionIsolation(defaultIsolationLevel.level);
+            return connection;
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
             pool.returnItem(connection);
             throw new UncheckedSQLException(e);
         }
-        return connection;
     }
 
     public Transaction beginTransaction() {

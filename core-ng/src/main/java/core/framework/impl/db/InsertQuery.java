@@ -66,7 +66,7 @@ final class InsertQuery<T> {
         builder.append("return params;\n")
             .append("}");
 
-        return new DynamicInstanceBuilder<Function<T, Object[]>>(Function.class, entityClass.getCanonicalName() + "$InsertParamBuilder")
+        return new DynamicInstanceBuilder<Function<T, Object[]>>(Function.class, InsertQuery.class.getCanonicalName() + "$" + entityClass.getSimpleName() + "$InsertQueryParamBuilder")
             .addMethod(builder.build())
             .build();
     }
