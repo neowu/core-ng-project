@@ -10,6 +10,7 @@ import core.framework.impl.validate.type.TypeVisitor;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlTransient;
 import java.lang.reflect.Field;
@@ -63,7 +64,6 @@ public class BeanTypeValidator implements TypeVisitor {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void visitField(Field field, boolean topLevel) {
         XmlElement element = field.getDeclaredAnnotation(XmlElement.class);
 
@@ -86,11 +86,16 @@ public class BeanTypeValidator implements TypeVisitor {
         elements.add(name);
 
         if (Enum.class.isAssignableFrom(field.getType())) {
-            validateEnumClass((Class<? extends Enum>) field.getType());
+            @SuppressWarnings("unchecked")
+            Class<? extends Enum> enumClass = (Class<? extends Enum>) field.getType();
+            validateEnumClass(enumClass);
         }
     }
 
     private void validateEnumClass(Class<? extends Enum> enumClass) {
+        if (enumClass.isAnnotationPresent(XmlEnum.class))
+            throw Exceptions.error("enum class must not have @XmlEnum, enumClass={}", enumClass.getCanonicalName());
+
         Enum[] constants = enumClass.getEnumConstants();
         for (Enum constant : constants) {
             try {

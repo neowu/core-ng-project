@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.5.3 (9/8/2015 - )
+* web: web bean validation, disallow to use @XmlEnum(Integer.class) on enum class, (in this case, not use enum, just use Integer, this is due to incomplete Jackson JAXB support)
+* bug: fixed when rabbitmq server is down, the rabbitmq listener/log forward may keep trying without wait, cause cpu 100%
+
 ### 3.5.2 (9/6/2015 - 9/8/2015)
 * tuning: various of tunings, utils/IO/random and etc
 * util: removed Asserts, not really needed, in actual business code, just throw error/validation exception

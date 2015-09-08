@@ -1,7 +1,9 @@
 package app;
 
+import app.product.domain.CreateProductRequest;
 import app.product.domain.Product;
 import app.product.domain.ProductDocument;
+import app.product.service.CreateProductRequestHandler;
 import app.product.service.ProductService;
 import app.product.service.SearchProductService;
 import app.product.web.ProductController;
@@ -32,11 +34,11 @@ public class ProductModule extends Module {
 
         configureSearch();
 
-//        queue().publish("rabbitmq://queue/test", CreateProductRequest.class);
+        queue().publish("rabbitmq://queue/test", CreateProductRequest.class);
 //
-//        queue().subscribe("rabbitmq://queue/test")
-//            .handle(CreateProductRequest.class, bind(CreateProductRequestHandler.class))
-//            .maxConcurrentHandlers(100);
+        queue().subscribe("rabbitmq://queue/test")
+            .handle(CreateProductRequest.class, bind(CreateProductRequestHandler.class))
+            .maxConcurrentHandlers(100);
 
         api().service(ProductWebService.class, bind(ProductController.class));
         api().client(ProductWebService.class, "http://localhost:8080");

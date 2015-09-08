@@ -6,6 +6,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 ## TODO
 * refactory TypeHelper/TypeInspector
 * template, use ByteBuffer[] for performance tuning
+* web: support upload file
 
 * real time monitor to ES?
 * provide ws interface to send queue message for dev and prod troubleshoot?

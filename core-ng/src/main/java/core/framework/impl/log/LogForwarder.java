@@ -51,11 +51,11 @@ public class LogForwarder {
             while (!stop.get()) {
                 try {
                     sendLogMessages();
-                } catch (ShutdownSignalException | InterruptedException e) {
-                    // pass thru for stopping
                 } catch (Throwable e) {
-                    logger.warn("failed to send log message, retry in 30 seconds", e);
-                    Threads.sleepRoughly(Duration.ofSeconds(30));
+                    if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
+                        logger.warn("failed to send log message, retry in 30 seconds", e);
+                        Threads.sleepRoughly(Duration.ofSeconds(30));
+                    }
                 }
             }
         });
