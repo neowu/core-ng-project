@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class EncodingsTest {
     @Test
-    public void encodeHex() {
+    public void hex() {
         assertEquals("74657374206d657373616765", Encodings.hex(Strings.bytes("test message")));
     }
 
@@ -20,12 +20,8 @@ public class EncodingsTest {
     }
 
     @Test
-    public void encodeBase64WithEmptyString() {
+    public void base64() {
         assertEquals("", Encodings.base64(""));
-    }
-
-    @Test
-    public void encodeBase64() {
         // from http://en.wikipedia.org/wiki/Base64
         assertEquals("bGVhc3VyZS4=", Encodings.base64("leasure."));
     }
@@ -37,14 +33,14 @@ public class EncodingsTest {
     }
 
     @Test
-    public void decodeBase64URLSafe() {
+    public void base64URLSafe() {
         String message = "leasure.";
         String encodedMessage = Encodings.base64URLSafe(Strings.bytes(message));
         assertEquals(message, new String(Encodings.decodeBase64(encodedMessage), Charsets.UTF_8));
     }
 
     @Test
-    public void encodeURL() {
+    public void url() {
         String urlParamValue = "key=value?";
         // from http://en.wikipedia.org/wiki/Percent-encoding
         assertEquals("key%3Dvalue%3F", Encodings.url(urlParamValue));
@@ -56,7 +52,7 @@ public class EncodingsTest {
     }
 
     @Test
-    public void encodeURLPath() {
+    public void urlPath() {
         Assert.assertEquals("v1", Encodings.urlPath("v1"));
         Assert.assertEquals("the path should use %20 for space, where queryString uses + for space", "v1%20v2", Encodings.urlPath("v1 v2"));
     }

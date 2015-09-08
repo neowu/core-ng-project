@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author neo
@@ -70,8 +71,7 @@ public class RequestParser {
     void parseBody(RequestImpl request, HttpServerExchange exchange) throws IOException {
         if (request.contentType != null && request.contentType.startsWith("application/json")) {
             exchange.startBlocking();
-            byte[] bytes = InputStreams.bytes(exchange.getInputStream());
-            request.body = new String(bytes, Charsets.UTF_8);
+            request.body = new String(readRequestBody(exchange), Charsets.UTF_8);
             logger.debug("[request] body={}", request.body);
         } else if (request.method() == HTTPMethod.POST) {
             FormDataParser parser = formParserFactory.createParser(exchange);
@@ -81,6 +81,16 @@ public class RequestParser {
                     logger.debug("[request:form] {}={}", name, request.formData.get(name));
                 }
             }
+        }
+    }
+
+    private byte[] readRequestBody(HttpServerExchange exchange) throws IOException {
+        int length = (int) exchange.getRequestContentLength();
+        try (InputStream stream = exchange.getInputStream()) {
+            if (length > 0)
+                return InputStreams.readAllWithExpectedSize(stream, length);
+            else
+                return InputStreams.readAll(stream);
         }
     }
 

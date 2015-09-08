@@ -1,10 +1,10 @@
 package core.framework.api.util;
 
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.net.URLCodec;
 
+import java.util.Base64;
 import java.util.BitSet;
 
 /**
@@ -28,19 +28,19 @@ public final class Encodings {
     }
 
     public static String base64(byte[] bytes) {
-        return new String(Base64.encodeBase64(bytes), Charsets.UTF_8);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
-    public static byte[] decodeBase64(String base64Text) {
-        return decodeBase64(Strings.bytes(base64Text));
+    public static byte[] decodeBase64(String text) {
+        return decodeBase64(Strings.bytes(text));
     }
 
-    public static byte[] decodeBase64(byte[] base64Bytes) {
-        return Base64.decodeBase64(base64Bytes);
+    public static byte[] decodeBase64(byte[] bytes) {
+        return Base64.getDecoder().decode(bytes);
     }
 
     public static String base64URLSafe(byte[] bytes) {
-        return new String(Base64.encodeBase64URLSafe(bytes), Charsets.UTF_8);
+        return Base64.getUrlEncoder().encodeToString(bytes);
     }
 
     // refer to org.apache.commons.codec.net.URLCodec.WWW_FORM_URL, not including space, url path requires space be encoded as %20
@@ -62,6 +62,7 @@ public final class Encodings {
         URL_PATH.set('*');
     }
 
+    // url encoding is for queryString, url path encoding is for url path, the difference is queryString uses + for space, url path uses %20 for space
     public static String urlPath(String text) {
         return new String(URLCodec.encodeUrl(URL_PATH, Strings.bytes(text)), Charsets.UTF_8);
     }

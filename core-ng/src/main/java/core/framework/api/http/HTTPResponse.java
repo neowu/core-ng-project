@@ -13,13 +13,13 @@ import java.util.Optional;
 public final class HTTPResponse {
     final HTTPStatus status;
     final Map<String, String> headers;
-    final byte[] bytes;
-    String responseText;
+    final byte[] body;
+    String text;
 
-    public HTTPResponse(HTTPStatus status, Map<String, String> headers, byte[] bytes) {
+    public HTTPResponse(HTTPStatus status, Map<String, String> headers, byte[] body) {
         this.status = status;
         this.headers = headers;
-        this.bytes = bytes;
+        this.body = body;
     }
 
     public HTTPStatus status() {
@@ -39,13 +39,13 @@ public final class HTTPResponse {
     }
 
     public String text() {
-        if (responseText == null)
-            responseText = new String(bytes, charset());
-        return responseText;
+        if (text == null)
+            text = new String(body, charset());
+        return text;
     }
 
     public byte[] bytes() {
-        return bytes;
+        return body;
     }
 
     private Charset charset() {

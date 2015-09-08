@@ -1,7 +1,7 @@
 package core.framework.api.util;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
@@ -13,9 +13,9 @@ public final class Properties {
     final Map<String, String> properties = Maps.newHashMap();
 
     public void load(String path) {
-        try {
+        try (InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path)) {
             java.util.Properties properties = new java.util.Properties();
-            properties.load(new StringReader(ClasspathResources.text(path)));
+            properties.load(stream);
             properties.forEach((key, value) -> {
                 String previous = this.properties.putIfAbsent((String) key, (String) value);
                 if (previous != null)

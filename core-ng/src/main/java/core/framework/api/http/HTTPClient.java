@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Map;
 
@@ -59,11 +60,9 @@ public final class HTTPClient {
             }
 
             HttpEntity entity = response.getEntity();
-            byte[] bytes = InputStreams.bytes(entity.getContent(), (int) entity.getContentLength());
-            HTTPResponse httpResponse = new HTTPResponse(HTTPStatus.parse(statusCode), headers, bytes);
-
+            byte[] responseBody = responseBody(entity);
+            HTTPResponse httpResponse = new HTTPResponse(HTTPStatus.parse(statusCode), headers, responseBody);
             logResponseText(httpResponse);
-
             return httpResponse;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -72,6 +71,14 @@ public final class HTTPClient {
             ActionLogContext.track("http", elapsedTime);
             logger.debug("execute, elapsedTime={}", elapsedTime);
             if (elapsedTime > slowTransactionThresholdInMs) logger.warn("slow http transaction detected");
+        }
+    }
+
+    private byte[] responseBody(HttpEntity entity) throws IOException {
+        try (InputStream stream = entity.getContent()) {
+            int length = (int) entity.getContentLength();
+            if (length > 0) return InputStreams.readAllWithExpectedSize(stream, length);
+            else return InputStreams.readAll(stream);
         }
     }
 

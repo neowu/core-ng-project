@@ -1,7 +1,8 @@
 ## Change log
 
-### 3.5.2 (9/6/2015 - )
-
+### 3.5.2 (9/6/2015 - 9/8/2015)
+* tuning: various of tunings, utils/IO/random and etc
+* util: removed Asserts, not really needed, in actual business code, just throw error/validation exception
 
 ### 3.5.1 (9/4/2015 - 9/6/2015)
 * db: removed RowMapper, use view instead (broken change!)
