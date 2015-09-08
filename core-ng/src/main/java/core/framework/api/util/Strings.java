@@ -66,10 +66,10 @@ public final class Strings {
         for (int i = 0; i < length; i++) {
             if (isLowerCase(text.charAt(i))) {
                 char[] chars = text.toCharArray();
-                for (; i < length; i++) {
-                    char ch = chars[i];
+                for (int j = i; j < length; j++) {
+                    char ch = chars[j];
                     if (isLowerCase(ch)) {
-                        chars[i] = (char) (ch & 0x5f);
+                        chars[j] = (char) (ch & 0x5f);
                     }
                 }
                 return String.valueOf(chars);
@@ -84,10 +84,10 @@ public final class Strings {
         for (int i = 0; i < length; i++) {
             if (isUpperCase(text.charAt(i))) {
                 char[] chars = text.toCharArray();
-                for (; i < length; i++) {
-                    char ch = chars[i];
+                for (int j = i; j < length; j++) {
+                    char ch = chars[j];
                     if (isUpperCase(ch)) {
-                        chars[i] = (char) (ch ^ 0x20);
+                        chars[j] = (char) (ch ^ 0x20);
                     }
                 }
                 return String.valueOf(chars);

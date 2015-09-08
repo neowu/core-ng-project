@@ -12,14 +12,14 @@ public final class InputStreams {
     // by following rule: who created InputStream close it, the place to close InputStream needs to handle IOException anyway
     public static byte[] readAllWithExpectedSize(InputStream stream, int size) throws IOException {
         byte[] bytes = new byte[size];
-        int offset = 0;
-        while (offset < size) {
-            int bytesRead = stream.read(bytes, offset, size - offset);
+        int position = 0;
+        while (position < size) {
+            int bytesRead = stream.read(bytes, position, size - position);
             if (bytesRead < 0) break;
-            offset += bytesRead;
+            position += bytesRead;
         }
-        if (offset < size) {
-            throw new EOFException("stream ends prematurely, expected=" + size + ", actual=" + offset);
+        if (position < size) {
+            throw new EOFException("stream ends prematurely, expected=" + size + ", actual=" + position);
         } else if (stream.read() != -1) {
             throw new IOException("stream does not end as expected, expected=" + size);
         }

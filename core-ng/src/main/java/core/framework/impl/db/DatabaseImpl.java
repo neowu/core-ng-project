@@ -33,6 +33,7 @@ public final class DatabaseImpl implements Database {
     public int tooManyRowsReturnedThreshold = 1000;
     private final Map<Class, RowMapper> rowMappers = Maps.newHashMap();
     private final ScalarRowMappers scalarRowMappers = new ScalarRowMappers();
+    private Duration timeout;
 
     private Driver driver;
     private String url;
@@ -71,6 +72,7 @@ public final class DatabaseImpl implements Database {
     }
 
     public void timeout(Duration timeout) {
+        this.timeout = timeout;
         operation.queryTimeoutInSeconds = (int) timeout.getSeconds();
         pool.checkoutTimeout(timeout);
 
@@ -88,7 +90,7 @@ public final class DatabaseImpl implements Database {
         try {
             if (url.startsWith("jdbc:mysql://")) {
                 driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
-                timeout(Duration.ofSeconds(operation.queryTimeoutInSeconds));
+                timeout(timeout);
             } else if (url.startsWith("jdbc:hsqldb:")) {
                 driver = (Driver) Class.forName("org.hsqldb.jdbc.JDBCDriver").newInstance();
             } else {

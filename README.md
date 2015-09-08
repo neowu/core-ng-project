@@ -5,7 +5,6 @@ It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
 * refactory TypeHelper/TypeInspector
-* refactory db operation
 * template, use ByteBuffer[] for performance tuning
 
 * real time monitor to ES?
