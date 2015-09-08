@@ -12,10 +12,23 @@ import java.util.Map;
  * @author neo
  */
 final class EnumDBMapper {
-    private final Map<Class<? extends Enum>, EnumMap<?, String>> enumToDBValueMappings = Maps.newHashMap();
+    private final Map<Class<?>, EnumMap<?, String>> enumToDBValueMappings = Maps.newHashMap();
 
-    void registerEnumClass(Class<? extends Enum> enumClass) {
-        enumToDBValueMappings.computeIfAbsent(enumClass, this::mappings);
+    <T extends Enum<T>> void registerEnumClass(Class<T> enumClass) {
+        if (!enumToDBValueMappings.containsKey(enumClass)) {
+            T[] constants = enumClass.getEnumConstants();
+            EnumMap<T, String> mappings = new EnumMap<>(enumClass);
+            for (T constant : constants) {
+                try {
+                    Field field = enumClass.getField(constant.name());
+                    String dbValue = field.getDeclaredAnnotation(EnumValue.class).value();
+                    mappings.put(constant, dbValue);
+                } catch (NoSuchFieldException e) {
+                    throw new Error(e);
+                }
+            }
+            enumToDBValueMappings.put(enumClass, mappings);
+        }
     }
 
     String getDBValue(Enum value) {
@@ -24,21 +37,5 @@ final class EnumDBMapper {
         if (mapping == null)
             throw Exceptions.error("enum class is not registered, register in module by db().view() or db().repository(), enumClass={}", enumClass.getCanonicalName());
         return mapping.get(value);  // this won't return null since all fields of enum are registered
-    }
-
-    @SuppressWarnings("unchecked")
-    private EnumMap<?, String> mappings(Class<? extends Enum> enumClass) {
-        Enum[] constants = enumClass.getEnumConstants();
-        EnumMap mapping = new EnumMap<>(enumClass);
-        for (Enum constant : constants) {
-            try {
-                Field field = enumClass.getField(constant.name());
-                String dbValue = field.getDeclaredAnnotation(EnumValue.class).value();
-                mapping.put(constant, dbValue);
-            } catch (NoSuchFieldException e) {
-                throw new Error(e);
-            }
-        }
-        return mapping;
     }
 }

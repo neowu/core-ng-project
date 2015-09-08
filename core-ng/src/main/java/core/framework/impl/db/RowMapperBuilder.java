@@ -46,12 +46,8 @@ final class RowMapperBuilder<T> {
             } else if (LocalDateTime.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getLocalDateTime(\"{}\");\n", fieldName, column);
             } else if (Enum.class.isAssignableFrom(fieldClass)) {
-                @SuppressWarnings("unchecked")
-                Class<? extends Enum> enumClass = (Class<? extends Enum>) fieldClass;
-                enumDBMapper.registerEnumClass(enumClass);
-
+                registerEnumClass(fieldClass);
                 enumMapperFields.add(Strings.format("private final {} {}Mappings = new {}({}.class);", DBEnumMapper.class.getCanonicalName(), fieldName, DBEnumMapper.class.getCanonicalName(), fieldClass.getCanonicalName()));
-
                 builder.indent(1).append("entity.{} = ({}){}Mappings.getEnum(resultSet.getString(\"{}\"));\n", fieldName, fieldClass.getCanonicalName(), fieldName, column);
             } else if (Double.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getDouble(\"{}\");\n", fieldName, column);
@@ -66,5 +62,11 @@ final class RowMapperBuilder<T> {
         enumMapperFields.forEach(instanceBuilder::addField);
         instanceBuilder.addMethod(builder.build());
         return instanceBuilder.build();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void registerEnumClass(Class<?> fieldClass) {
+        Class<? extends Enum> enumClass = (Class<? extends Enum>) fieldClass;
+        enumDBMapper.registerEnumClass(enumClass);
     }
 }
