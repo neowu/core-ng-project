@@ -28,7 +28,7 @@ public final class InputStreams {
 
     // java.io.ByteArrayOutputStream is slow impl due to synchronization, refer to sun.misc.IOUtils.readFully
     public static byte[] readAll(InputStream stream) throws IOException {
-        byte[] bytes = new byte[16384];     // use 16k as default buffer
+        byte[] bytes = new byte[8192];     // use 8k as default initial buffer
         int position = 0;
         while (true) {
             int bytesToRead;

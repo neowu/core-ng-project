@@ -78,7 +78,8 @@ public final class HTTPClient {
         try (InputStream stream = entity.getContent()) {
             int length = (int) entity.getContentLength();
             if (length > 0) return InputStreams.readAllWithExpectedSize(stream, length);
-            else return InputStreams.readAll(stream);
+            else
+                return InputStreams.readAll(stream);   // note: chunked response does not have content-length, e.g. nginx/gzip
         }
     }
 

@@ -27,6 +27,7 @@ public final class HTTPClientBuilder {
     private int maxConnections = 100;
     private Duration keepAliveTimeout = Duration.ofSeconds(60);
     private Duration slowTransactionThreshold = Duration.ofSeconds(30);
+    private boolean enableCookie = false;
 
     public HTTPClient build() {
         StopWatch watch = new StopWatch();
@@ -38,16 +39,24 @@ public final class HTTPClientBuilder {
 
             builder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                 .setSSLContext(new SSLContextBuilder().loadTrustMaterial(TrustSelfSignedStrategy.INSTANCE).build());
-            // builder will use PoolingHttpClientConnectionManager by default
-            builder.setDefaultSocketConfig(SocketConfig.custom()
-                .setSoKeepAlive(true)
-                .build());
+
+            // builder use PoolingHttpClientConnectionManager by default, and connTimeToLive will be set by keepAlive value
+
+            builder.setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(true).build());
+
             builder.setDefaultRequestConfig(RequestConfig.custom()
                 .setSocketTimeout((int) timeout.toMillis())
+                .setConnectionRequestTimeout((int) timeout.toMillis())
                 .setConnectTimeout((int) timeout.toMillis()).build());
 
             builder.setMaxConnPerRoute(maxConnections)
                 .setMaxConnTotal(maxConnections);
+
+            builder.disableAuthCaching();
+            builder.disableConnectionState();
+            builder.disableAutomaticRetries();  // retry should be handled in framework level with better trace log
+
+            if (!enableCookie) builder.disableCookieManagement();
 
             CloseableHttpClient httpClient = builder.build();
             return new HTTPClient(httpClient, slowTransactionThreshold.toMillis());
@@ -75,6 +84,11 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder slowTransactionThreshold(Duration slowTransactionThreshold) {
         this.slowTransactionThreshold = slowTransactionThreshold;
+        return this;
+    }
+
+    public HTTPClientBuilder enableCookie() {
+        enableCookie = true;
         return this;
     }
 }

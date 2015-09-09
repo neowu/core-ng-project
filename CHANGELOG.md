@@ -4,6 +4,8 @@
 * web: web bean validation, disallow to use @XmlEnum(Integer.class) on enum class, (in this case, not use enum, just use Integer, this is due to incomplete Jackson JAXB support)
 * bug: fixed when rabbitmq server is down, the rabbitmq listener/log forward may keep trying without wait, cause cpu 100%
 * httpClient: reduced default timeout to 1 min
+* httpClient: disable cookie and auth by default
+* util: InputStreams use 8K as buffer if length can not be determined, optimize for HTTPClient download with gzip
 
 ### 3.5.2 (9/6/2015 - 9/8/2015)
 * tuning: various of tunings, utils/IO/random and etc
