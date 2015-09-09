@@ -1,6 +1,6 @@
 package core.framework.impl.template;
 
-import core.framework.impl.validate.type.DataTypeValidator;
+import core.framework.impl.validate.type.TypeValidator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
  * @author neo
  */
 public class ModelClassValidator {
-    private final DataTypeValidator validator;
+    private final TypeValidator validator;
 
     public ModelClassValidator(Class<?> modelClass) {
-        validator = new DataTypeValidator(modelClass);
+        validator = new TypeValidator(modelClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;

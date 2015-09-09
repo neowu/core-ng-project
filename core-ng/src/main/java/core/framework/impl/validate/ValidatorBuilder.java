@@ -5,7 +5,7 @@ import core.framework.api.validate.Length;
 import core.framework.api.validate.Max;
 import core.framework.api.validate.Min;
 import core.framework.api.validate.NotNull;
-import core.framework.impl.reflect.TypeInspector;
+import core.framework.impl.reflect.GenericTypes;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -31,15 +31,14 @@ public class ValidatorBuilder {
     }
 
     public Validator build() {
-        TypeInspector inspector = new TypeInspector(instanceType);
         Class<?> targetClass;
-        if (inspector.isList()) {
-            targetClass = inspector.listValueClass();
+        if (GenericTypes.isList(instanceType)) { // type validator ensured list can only be generic type in advance
+            targetClass = GenericTypes.listValueClass(instanceType);
             if (isValueClass(targetClass)) {
-                return new Validator(null);
+                return new Validator(null); // not validate value List
             }
         } else {
-            targetClass = inspector.rawClass;
+            targetClass = GenericTypes.rawClass(instanceType);
         }
 
         Optional<ObjectValidator> objectValidator = createObjectValidator(targetClass, null);
@@ -48,7 +47,7 @@ public class ValidatorBuilder {
             return new Validator(null);
         }
 
-        if (inspector.isList()) {
+        if (GenericTypes.isList(instanceType)) {
             return new Validator(new ListValidator(objectValidator.get()));
         }
 
@@ -107,22 +106,22 @@ public class ValidatorBuilder {
     }
 
     private void createFieldValidator(Field field, ObjectValidator objectValidator, String parentPath) {
-        TypeInspector inspector = new TypeInspector(field.getGenericType());
+        Type fieldType = field.getGenericType();
 
-        if (inspector.isList()) {
-            Class<?> targetClass = inspector.listValueClass();
+        if (GenericTypes.isList(fieldType)) {
+            Class<?> targetClass = GenericTypes.listValueClass(fieldType);
             if (isValueClass(targetClass)) return;
 
             createObjectValidator(targetClass, fieldPath(parentPath, field))
                 .ifPresent(validator -> objectValidator.add(field, new ListValidator(validator)));
-        } else if (inspector.isMap()) {
-            Class<?> targetClass = inspector.mapValueClass();
+        } else if (GenericTypes.isMap(fieldType)) {
+            Class<?> targetClass = GenericTypes.mapValueClass(fieldType);
             if (isValueClass(targetClass)) return;
 
             createObjectValidator(targetClass, fieldPath(parentPath, field))
                 .ifPresent(validator -> objectValidator.add(field, new MapValidator(validator)));
         } else {
-            Class<?> targetClass = inspector.rawClass;
+            Class<?> targetClass = GenericTypes.rawClass(fieldType);
 
             createObjectValidator(targetClass, fieldPath(parentPath, field))
                 .ifPresent(validator -> objectValidator.add(field, validator));

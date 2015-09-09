@@ -1,7 +1,7 @@
 package core.framework.impl.template.expression;
 
 import core.framework.api.util.Exceptions;
-import core.framework.impl.reflect.TypeInspector;
+import core.framework.impl.reflect.GenericTypes;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -15,18 +15,18 @@ public class ExpressionTypeInspector {
             if (((MethodToken) expression).builtinMethod)
                 throw Exceptions.error("list expression must not be builtin method, expression={}", expressionText);
             String methodName = ((MethodToken) expression).name;
-            TypeInspector type = new TypeInspector(methodReturnType(modelClass, methodName));
+            Type returnType = methodReturnType(modelClass, methodName);
             if (((MethodToken) expression).next != null) {
-                return listValueClass(((MethodToken) expression).next, type.rawClass, expressionText);
+                return listValueClass(((MethodToken) expression).next, GenericTypes.rawClass(returnType), expressionText);
             }
-            if (type.isList()) return type.listValueClass();
+            if (GenericTypes.isList(returnType)) return GenericTypes.listValueClass(returnType);
         }
         if (expression instanceof FieldToken) {
-            TypeInspector type = new TypeInspector(fieldType(modelClass, ((FieldToken) expression).name));
+            Type fieldType = fieldType(modelClass, ((FieldToken) expression).name);
             if (((FieldToken) expression).next != null) {
-                return listValueClass(((FieldToken) expression).next, type.rawClass, expressionText);
+                return listValueClass(((FieldToken) expression).next, GenericTypes.rawClass(fieldType), expressionText);
             }
-            if (type.isList()) return type.listValueClass();
+            if (GenericTypes.isList(fieldType)) return GenericTypes.listValueClass(fieldType);
         }
         throw Exceptions.error("expression must return List<>, expression={}", expressionText);
     }

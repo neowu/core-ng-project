@@ -4,7 +4,7 @@ import core.framework.api.queue.Message;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
-import core.framework.impl.validate.type.DataTypeValidator;
+import core.framework.impl.validate.type.TypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -24,11 +24,11 @@ import java.util.Set;
  * @author neo
  */
 class MessageClassValidator implements TypeVisitor {
-    private final DataTypeValidator validator;
+    private final TypeValidator validator;
     private final Map<Class, Set<String>> elements = Maps.newHashMap();
 
     MessageClassValidator(Class<?> messageClass) {
-        validator = new DataTypeValidator(messageClass);
+        validator = new TypeValidator(messageClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;
@@ -53,13 +53,13 @@ class MessageClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> instanceClass, boolean topLevel) {
-        if (topLevel && !instanceClass.isAnnotationPresent(Message.class)) {
-            throw Exceptions.error("message class must have @Message, class={}", instanceClass);
+    public void visitClass(Class<?> objectClass, boolean topLevel) {
+        if (topLevel && !objectClass.isAnnotationPresent(Message.class)) {
+            throw Exceptions.error("message class must have @Message, class={}", objectClass.getCanonicalName());
         }
-        XmlAccessorType accessorType = instanceClass.getDeclaredAnnotation(XmlAccessorType.class);
+        XmlAccessorType accessorType = objectClass.getDeclaredAnnotation(XmlAccessorType.class);
         if (accessorType == null || accessorType.value() != XmlAccessType.FIELD)
-            throw Exceptions.error("message class must have @XmlAccessorType(XmlAccessType.FIELD), class={}", instanceClass);
+            throw Exceptions.error("message class must have @XmlAccessorType(XmlAccessType.FIELD), class={}", objectClass.getCanonicalName());
     }
 
     @Override

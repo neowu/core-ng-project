@@ -5,7 +5,7 @@ import core.framework.api.mongo.Id;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
-import core.framework.impl.validate.type.DataTypeValidator;
+import core.framework.impl.validate.type.TypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 import org.bson.types.ObjectId;
 
@@ -18,13 +18,13 @@ import java.util.Set;
  * @author neo
  */
 public class MongoClassValidator implements TypeVisitor {
-    private final DataTypeValidator validator;
+    private final TypeValidator validator;
     private boolean validateView;
     private final Map<Class, Set<String>> fields = Maps.newHashMap();
     private Field id;
 
     public MongoClassValidator(Class<?> entityClass) {
-        validator = new DataTypeValidator(entityClass);
+        validator = new TypeValidator(entityClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;
@@ -56,9 +56,9 @@ public class MongoClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> instanceClass, boolean topLevel) {
-        if (!validateView && topLevel && !instanceClass.isAnnotationPresent(Collection.class))
-            throw Exceptions.error("entity class must have @Collection, class={}", instanceClass);
+    public void visitClass(Class<?> objectClass, boolean topLevel) {
+        if (!validateView && topLevel && !objectClass.isAnnotationPresent(Collection.class))
+            throw Exceptions.error("entity class must have @Collection, class={}", objectClass.getCanonicalName());
     }
 
     @Override

@@ -23,7 +23,7 @@ import java.time.Duration;
 public final class HTTPClientBuilder {
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);
 
-    private Duration timeout = Duration.ofSeconds(120);
+    private Duration timeout = Duration.ofSeconds(60);
     private int maxConnections = 100;
     private Duration keepAliveTimeout = Duration.ofSeconds(60);
     private Duration slowTransactionThreshold = Duration.ofSeconds(30);

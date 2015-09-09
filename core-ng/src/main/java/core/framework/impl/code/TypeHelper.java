@@ -1,7 +1,7 @@
 package core.framework.impl.code;
 
 import core.framework.api.util.Types;
-import core.framework.impl.reflect.TypeInspector;
+import core.framework.impl.reflect.GenericTypes;
 
 import java.lang.reflect.Type;
 
@@ -9,30 +9,30 @@ import java.lang.reflect.Type;
  * @author neo
  */
 public class TypeHelper {
-    final TypeInspector inspector;
+    final Type type;
 
     public TypeHelper(Type type) {
-        inspector = new TypeInspector(type);
+        this.type = type;
     }
 
     public String variableValue() {
-        if (inspector.isList()) {
-            return Types.class.getCanonicalName() + ".list(" + inspector.listValueClass().getCanonicalName() + ".class)";
+        if (GenericTypes.isList(type)) {
+            return Types.class.getCanonicalName() + ".list(" + GenericTypes.listValueClass(type).getCanonicalName() + ".class)";
         } else {
-            return inspector.rawClass.getCanonicalName() + ".class";
+            return GenericTypes.rawClass(type).getCanonicalName() + ".class";
         }
     }
 
     public String variableType() {
-        if (inspector.rawClass == void.class) return Void.class.getCanonicalName();
-        return inspector.rawClass.getCanonicalName();
+        if (type == void.class) return Void.class.getCanonicalName();
+        return GenericTypes.rawClass(type).getCanonicalName();
     }
 
     public String canonicalName() {
-        return inspector.rawClass.getCanonicalName();
+        return GenericTypes.rawClass(type).getCanonicalName();
     }
 
     public boolean isVoid() {
-        return inspector.rawClass == void.class;
+        return type == void.class;
     }
 }

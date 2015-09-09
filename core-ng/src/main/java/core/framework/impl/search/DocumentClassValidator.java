@@ -3,7 +3,7 @@ package core.framework.impl.search;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
-import core.framework.impl.validate.type.DataTypeValidator;
+import core.framework.impl.validate.type.TypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -23,11 +23,11 @@ import java.util.Set;
  * @author neo
  */
 public final class DocumentClassValidator implements TypeVisitor {
-    private final DataTypeValidator validator;
+    private final TypeValidator validator;
     private final Map<Class, Set<String>> elements = Maps.newHashMap();
 
     public DocumentClassValidator(Class<?> documentClass) {
-        validator = new DataTypeValidator(documentClass);
+        validator = new TypeValidator(documentClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;
@@ -52,10 +52,10 @@ public final class DocumentClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> instanceClass, boolean topLevel) {
-        XmlAccessorType accessorType = instanceClass.getDeclaredAnnotation(XmlAccessorType.class);
+    public void visitClass(Class<?> objectClass, boolean topLevel) {
+        XmlAccessorType accessorType = objectClass.getDeclaredAnnotation(XmlAccessorType.class);
         if (accessorType == null || accessorType.value() != XmlAccessType.FIELD)
-            throw Exceptions.error("document class must have @XmlAccessorType(XmlAccessType.FIELD), class={}", instanceClass);
+            throw Exceptions.error("document class must have @XmlAccessorType(XmlAccessType.FIELD), class={}", objectClass.getCanonicalName());
     }
 
     @Override

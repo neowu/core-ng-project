@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author neo
  */
 public class ParameterizedTypeImpl implements ParameterizedType {
-    final Class<?> rawType;
+    final Type rawType;
     final Type[] arguments;
     final Type ownerType;
 
@@ -58,7 +58,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         if (ownerType != null) {
             builder.append(ownerType.getTypeName()).append('.');
         }
-        builder.append(rawType.getName())
+        builder.append(rawType.getTypeName())
             .append('<');
 
         int i = 0;

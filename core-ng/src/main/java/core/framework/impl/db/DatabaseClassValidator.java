@@ -7,7 +7,7 @@ import core.framework.api.db.Table;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
 import core.framework.impl.reflect.Fields;
-import core.framework.impl.validate.type.DataTypeValidator;
+import core.framework.impl.validate.type.TypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,13 +21,13 @@ import java.util.Set;
  * @author neo
  */
 final class DatabaseClassValidator implements TypeVisitor {
-    private final DataTypeValidator validator;
+    private final TypeValidator validator;
     private boolean foundPK;
     private boolean validateView;
     private final Set<String> columns = Sets.newHashSet();
 
     DatabaseClassValidator(Class<?> entityClass) {
-        validator = new DataTypeValidator(entityClass);
+        validator = new TypeValidator(entityClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.visitor = this;
     }
@@ -56,17 +56,17 @@ final class DatabaseClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> instanceClass, boolean topLevel) {
+    public void visitClass(Class<?> objectClass, boolean topLevel) {
         if (validateView) {
-            if (instanceClass.isAnnotationPresent(Table.class))
-                throw Exceptions.error("view class must not have @Table, class={}", instanceClass.getCanonicalName());
+            if (objectClass.isAnnotationPresent(Table.class))
+                throw Exceptions.error("view class must not have @Table, class={}", objectClass.getCanonicalName());
         } else {
-            if (!instanceClass.isAnnotationPresent(Table.class))
-                throw Exceptions.error("entity class must have @Table, class={}", instanceClass.getCanonicalName());
+            if (!objectClass.isAnnotationPresent(Table.class))
+                throw Exceptions.error("entity class must have @Table, class={}", objectClass.getCanonicalName());
         }
 
-        if (instanceClass.isAnnotationPresent(XmlAccessorType.class))
-            throw Exceptions.error("entity class must not have jaxb annotation, please separate view class and entity class, class={}", instanceClass.getCanonicalName());
+        if (objectClass.isAnnotationPresent(XmlAccessorType.class))
+            throw Exceptions.error("entity class must not have jaxb annotation, please separate view class and entity class, class={}", objectClass.getCanonicalName());
     }
 
     @Override
