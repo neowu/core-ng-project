@@ -22,14 +22,14 @@ public final class DBConfig {
     private final Logger logger = LoggerFactory.getLogger(DBConfig.class);
     private final ModuleContext context;
     private final String name;
-    private final DatabaseImpl database;
+    final DatabaseImpl database;
 
     public DBConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
 
-        if (context.beanFactory.registered(Database.class, null)) {
-            database = context.beanFactory.bean(Database.class, null);
+        if (context.beanFactory.registered(Database.class, name)) {
+            database = context.beanFactory.bean(Database.class, name);
         } else {
             database = new DatabaseImpl();
             context.shutdownHook.add(database::close);

@@ -41,7 +41,7 @@ public class JSONTest {
     }
 
     @Test
-    public void beanWithMapField() {
+    public void withMapField() {
         BeanWithMapField bean = new BeanWithMapField();
         bean.attributes.put("key1", "value1");
         bean.attributes.put("key2", "value2");
@@ -66,7 +66,7 @@ public class JSONTest {
     }
 
     @Test
-    public void beanWithDateField() {
+    public void withDateField() {
         BeanWithDateField bean = new BeanWithDateField();
         bean.instant = Instant.now();
         bean.dateTime = LocalDateTime.ofInstant(bean.instant, ZoneId.systemDefault());

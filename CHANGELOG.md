@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.5.4 (9/10/2015)
+* bug: fixed DBConfig to handle multiple DB with different name
+* search: added get()
+
 ### 3.5.3 (9/8/2015 - 9/9/2015)
 * web: web bean validation, disallow to use @XmlEnum(Integer.class) on enum class, (in this case, not use enum, just use Integer, this is due to incomplete Jackson JAXB support)
 * bug: fixed when rabbitmq server is down, the rabbitmq listener/log forward may keep trying without wait, cause cpu 100%

@@ -25,7 +25,7 @@ public final class ElasticSearch {
 
     public <T> ElasticSearchType<T> type(String index, String type, Class<T> documentClass) {
         DocumentValidator<T> validator = new DocumentValidator<>(documentClass);
-        return new ElasticSearchType<>(client, index, type, validator, slowQueryThreshold);
+        return new ElasticSearchType<>(client, index, type, documentClass, validator, slowQueryThreshold);
     }
 
     public void close() {

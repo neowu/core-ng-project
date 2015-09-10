@@ -4,6 +4,7 @@ import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.JSON;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.search.DocumentValidator;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -25,27 +27,24 @@ public final class ElasticSearchType<T> {
     private final String type;
     private final DocumentValidator<T> validator;
     private final long slowQueryThresholdInMs;
+    private final Class<T> documentClass;
 
-    ElasticSearchType(Client client, String index, String type, DocumentValidator<T> validator, Duration slowQueryThreshold) {
+    ElasticSearchType(Client client, String index, String type, Class<T> documentClass, DocumentValidator<T> validator, Duration slowQueryThreshold) {
         this.client = client;
         this.index = index;
         this.type = type;
+        this.documentClass = documentClass;
         this.validator = validator;
         this.slowQueryThresholdInMs = slowQueryThreshold.toMillis();
     }
 
     public void index(String id, T source) {
-        index(id, null, source);
-    }
-
-    public void index(String id, String parentId, T source) {
         StopWatch watch = new StopWatch();
         validator.validate(source);
         try {
             String document = JSON.toJSON(source);
             client.prepareIndex(index, type)
                 .setId(id)
-                .setParent(parentId)
                 .setSource(document)
                 .get();
         } finally {
@@ -57,18 +56,16 @@ public final class ElasticSearchType<T> {
         }
     }
 
-    public void update(String id, T source) {
+    public Optional<T> get(String id) {
         StopWatch watch = new StopWatch();
-        validator.partialValidate(source);
         try {
-            String document = JSON.toJSON(source);
-            client.prepareUpdate(index, type, id)
-                .setDoc(document)
-                .get();
+            GetResponse response = client.prepareGet(index, type, id).get();
+            if (!response.isExists()) return Optional.empty();
+            return Optional.of(JSON.fromJSON(documentClass, response.getSourceAsString()));
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("update, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
+            logger.debug("get, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
             if (elapsedTime > slowQueryThresholdInMs)
                 logger.warn("slow query detected");
         }
@@ -103,7 +100,7 @@ public final class ElasticSearchType<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("search, index={}, type={}, searchTime={}, elapsedTime={}", index, type, searchTime, elapsedTime);
+            logger.debug("search, index={}, type={}, searchTime={}, elapsedTime={}, query={}", index, type, searchTime, elapsedTime, source);
             if (elapsedTime > slowQueryThresholdInMs)
                 logger.warn("slow query detected, query={}", source);
         }
