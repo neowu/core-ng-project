@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.5.6 (9/11/2015 - )
+* search: support parent/child
+
 ### 3.5.5 (9/11/2015)
 * search: added delete and other tuning
 

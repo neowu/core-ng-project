@@ -43,6 +43,8 @@ public final class ElasticSearch {
                 .prepareCreate(index)
                 .setSource(source)
                 .get();
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             logger.debug("create index, index={}, elapsedTime={}", index, watch.elapsedTime());
         }
@@ -55,6 +57,8 @@ public final class ElasticSearch {
                 .indices()
                 .prepareFlush(index)
                 .get();
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             logger.debug("flush, index={}, elapsedTime={}", index, watch.elapsedTime());
         }
