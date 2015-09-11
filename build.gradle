@@ -125,6 +125,7 @@ project(':demo-service') {
                 project(':core-ng-test')
         )
         testRuntime(
+                'org.codehaus.groovy:groovy-all:2.4.4',  // for elastic search script test
                 'com.github.fakemongo:fongo:2.0.1'
         )
     }

@@ -17,7 +17,7 @@ public class ProductDocument {
     public Integer id;
     @XmlElement(name = "name")
     public String name;
-    @XmlElementWrapper(name = "skus")
-    @XmlElement(name = "sku")
-    public List<SKUDocument> skus = Lists.newArrayList();
+    @XmlElementWrapper(name = "items")
+    @XmlElement(name = "item")
+    public List<ProductItemDocument> items = Lists.newArrayList();
 }

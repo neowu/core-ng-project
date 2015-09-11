@@ -3,6 +3,7 @@ package core.framework.api.search;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.JSON;
 import core.framework.api.util.StopWatch;
+import core.framework.api.util.Strings;
 import core.framework.impl.search.DocumentValidator;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.get.GetResponse;
@@ -46,7 +47,7 @@ public final class ElasticSearchType<T> {
             String document = JSON.toJSON(source);
             client.prepareIndex(index, type)
                 .setId(id)
-                .setSource(document)
+                .setSource(Strings.bytes(document))
                 .get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception

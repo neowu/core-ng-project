@@ -1,6 +1,6 @@
 - id: 1
   name: Nike T-Shirt
-  skus:
+  item:
     - sku: NIKE-002
       name: Nike T-Shirt Green M
       price: 9.9
@@ -21,7 +21,7 @@
 
 - id: 2
   name: Levis Jeans
-  skus:
+  item:
     - sku: LEVIS-001
       name: Levis jeans loose
       price: 39.9
