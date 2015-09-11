@@ -1,7 +1,6 @@
 package core.framework.api.search;
 
 import core.framework.api.util.StopWatch;
-import core.framework.impl.search.DocumentValidator;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.client.Client;
 import org.slf4j.Logger;
@@ -24,8 +23,7 @@ public final class ElasticSearch {
     }
 
     public <T> ElasticSearchType<T> type(String index, String type, Class<T> documentClass) {
-        DocumentValidator<T> validator = new DocumentValidator<>(documentClass);
-        return new ElasticSearchType<>(client, index, type, documentClass, validator, slowQueryThreshold);
+        return new ElasticSearchType<>(client, index, type, documentClass, slowQueryThreshold);
     }
 
     public void close() {

@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.5.5 (9/11/2015)
+* search: added delete and other tuning
+
 ### 3.5.4 (9/10/2015)
 * bug: fixed DBConfig to handle multiple DB with different name
 * search: added get()

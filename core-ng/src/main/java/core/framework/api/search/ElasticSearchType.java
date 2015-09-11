@@ -4,6 +4,7 @@ import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.JSON;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.search.DocumentValidator;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -29,13 +30,13 @@ public final class ElasticSearchType<T> {
     private final long slowQueryThresholdInMs;
     private final Class<T> documentClass;
 
-    ElasticSearchType(Client client, String index, String type, Class<T> documentClass, DocumentValidator<T> validator, Duration slowQueryThreshold) {
+    ElasticSearchType(Client client, String index, String type, Class<T> documentClass, Duration slowQueryThreshold) {
         this.client = client;
         this.index = index;
         this.type = type;
         this.documentClass = documentClass;
-        this.validator = validator;
         this.slowQueryThresholdInMs = slowQueryThreshold.toMillis();
+        validator = new DocumentValidator<>(documentClass);
     }
 
     public void index(String id, T source) {
@@ -47,12 +48,13 @@ public final class ElasticSearchType<T> {
                 .setId(id)
                 .setSource(document)
                 .get();
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("index, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -62,12 +64,13 @@ public final class ElasticSearchType<T> {
             GetResponse response = client.prepareGet(index, type, id).get();
             if (!response.isExists()) return Optional.empty();
             return Optional.of(JSON.fromJSON(documentClass, response.getSourceAsString()));
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("get, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -78,12 +81,27 @@ public final class ElasticSearchType<T> {
                 .type(type)
                 .id(id);
             client.update(request).actionGet();
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("update, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
+        }
+    }
+
+    public void delete(String id) {
+        StopWatch watch = new StopWatch();
+        try {
+            client.prepareDelete(index, type, id).get();
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("elasticsearch", elapsedTime);
+            logger.debug("delete, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -91,18 +109,26 @@ public final class ElasticSearchType<T> {
         StopWatch watch = new StopWatch();
         long searchTime = 0;
         try {
+            logger.debug("search, index={}, type={}, source={}", index, type, source);
             SearchRequest request = new SearchRequest(index)
                 .source(source)
                 .types(type);
             SearchResponse response = client.search(request).actionGet();
             searchTime = response.getTookInMillis();
+            if (response.getFailedShards() > 0) logger.warn("some shard failed, response={}", response);
             return response;
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("search, index={}, type={}, searchTime={}, elapsedTime={}, query={}", index, type, searchTime, elapsedTime, source);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected, query={}", source);
+            logger.debug("search, searchTime={}, elapsedTime={}", searchTime, elapsedTime);
+            checkSlowQuery(elapsedTime);
         }
+    }
+
+    private void checkSlowQuery(long elapsedTime) {
+        if (elapsedTime > slowQueryThresholdInMs)
+            logger.warn("slow query detected");
     }
 }

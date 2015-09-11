@@ -25,10 +25,10 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 public final class ElasticSearchBuilder implements Supplier<ElasticSearch> {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchBuilder.class);
 
-    Path localDataPath;
-    List<TransportAddress> remoteAddresses = Lists.newArrayList();
-    Duration timeout = Duration.ofSeconds(10);
-    Duration slowQueryThreshold = Duration.ofSeconds(5);
+    private Path localDataPath;
+    private final List<TransportAddress> remoteAddresses = Lists.newArrayList();
+    private Duration timeout = Duration.ofSeconds(10);
+    private Duration slowQueryThreshold = Duration.ofSeconds(5);
 
     public ElasticSearchBuilder remote(String host) {
         remoteAddresses.add(new InetSocketTransportAddress(host, 9300));
@@ -66,8 +66,8 @@ public final class ElasticSearchBuilder implements Supplier<ElasticSearch> {
         try {
             ImmutableSettings.Builder settings = ImmutableSettings.settingsBuilder()
                 .put("http.enabled", "false")
+                .put("script.groovy.sandbox.enabled", "true")
                 .put("path.data", localDataPath);
-
             Node node = nodeBuilder().settings(settings).local(true).node();
             Client client = node.client();
             return new ElasticSearch(client, slowQueryThreshold);
