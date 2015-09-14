@@ -8,8 +8,8 @@ tasks.withType(Checkstyle) {
     }
 
     dependencies {
-        checkstyle 'com.puppycrawl.tools:checkstyle:6.7'
-        checkstyle files("${rootDir}/gradle/checkstyle/sevntu-checks-1.13.0.jar")
+        checkstyle 'com.puppycrawl.tools:checkstyle:6.10.1'
+        checkstyle files("${rootDir}/gradle/checkstyle/sevntu-checks-1.13.6.jar")
     }
 
     configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
