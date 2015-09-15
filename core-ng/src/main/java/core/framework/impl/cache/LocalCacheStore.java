@@ -27,10 +27,10 @@ public class LocalCacheStore implements CacheStore {
     }
 
     @Override
-    public void put(String name, String key, String value, Duration duration) {
+    public void put(String name, String key, String value, Duration expiration) {
         long now = System.currentTimeMillis();
         String cacheKey = cacheKey(name, key);
-        caches.put(cacheKey, new CacheItem(value, now + duration.toMillis()));
+        caches.put(cacheKey, new CacheItem(value, now + expiration.toMillis()));
     }
 
     @Override

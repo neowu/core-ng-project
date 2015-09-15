@@ -31,10 +31,10 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public void put(String name, String key, String value, Duration duration) {
+    public void put(String name, String key, String value, Duration expiration) {
         String redisKey = cacheKey(name, key);
         try {
-            redis.setExpire(redisKey, value, duration);
+            redis.set(redisKey, value, expiration);
         } catch (JedisConnectionException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
         }

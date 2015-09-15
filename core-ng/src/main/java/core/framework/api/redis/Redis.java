@@ -21,6 +21,9 @@ import java.util.Map;
  * @author neo
  */
 public final class Redis {
+    private static final byte[] NX = Strings.bytes("NX");
+    private static final byte[] EX = Strings.bytes("EX");
+
     private final Logger logger = LoggerFactory.getLogger(Redis.class);
     private final String host;
 
@@ -91,6 +94,41 @@ public final class Redis {
         }
     }
 
+    public void set(String key, String value, Duration expiration) {
+        StopWatch watch = new StopWatch();
+        PoolItem<BinaryJedis> item = pool.borrowItem();
+        try {
+            item.resource.setex(encode(key), (int) expiration.getSeconds(), encode(value));
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("setExpire, key={}, value={}, expiration={}, elapsedTime={}", key, value, expiration, elapsedTime);
+            checkSlowQuery(elapsedTime);
+        }
+    }
+
+    public boolean setIfAbsent(String key, String value, Duration expiration) {
+        StopWatch watch = new StopWatch();
+        PoolItem<BinaryJedis> item = pool.borrowItem();
+        try {
+            String result = item.resource.set(encode(key), encode(value), NX, EX, expiration.getSeconds());
+            return "OK".equals(result);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("setIfAbsent, key={}, value={}, expiration={}, elapsedTime={}", key, value, expiration, elapsedTime);
+            checkSlowQuery(elapsedTime);
+        }
+    }
+
     public void expire(String key, Duration duration) {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
@@ -104,23 +142,6 @@ public final class Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("expire, key={}, duration={}, elapsedTime={}", key, duration, elapsedTime);
-            checkSlowQuery(elapsedTime);
-        }
-    }
-
-    public void setExpire(String key, String value, Duration duration) {
-        StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = pool.borrowItem();
-        try {
-            item.resource.setex(encode(key), (int) duration.getSeconds(), encode(value));
-        } catch (JedisConnectionException e) {
-            item.broken = true;
-            throw e;
-        } finally {
-            pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
-            logger.debug("setExpire, key={}, value={}, duration={}, elapsedTime={}", key, value, duration, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }
