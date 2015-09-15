@@ -41,17 +41,12 @@ public final class ElasticSearchType<T> {
     }
 
     public void index(String id, T source) {
-        index(id, null, source);
-    }
-
-    public void index(String id, String parentId, T source) {
         StopWatch watch = new StopWatch();
         validator.validate(source);
         try {
             String document = JSON.toJSON(source);
             client.prepareIndex(index, type)
                 .setId(id)
-                .setParent(parentId)
                 .setSource(Strings.bytes(document))
                 .get();
         } catch (ElasticsearchException e) {
@@ -59,19 +54,15 @@ public final class ElasticSearchType<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("index, index={}, type={}, id={}, parentId={}, elapsedTime={}", index, type, id, parentId, elapsedTime);
+            logger.debug("index, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }
 
     public Optional<T> get(String id) {
-        return get(id, null);
-    }
-
-    public Optional<T> get(String id, String parentId) {
         StopWatch watch = new StopWatch();
         try {
-            GetResponse response = client.prepareGet(index, type, id).setParent(parentId).get();
+            GetResponse response = client.prepareGet(index, type, id).get();
             if (!response.isExists()) return Optional.empty();
             return Optional.of(JSON.fromJSON(documentClass, response.getSourceAsString()));
         } catch (ElasticsearchException e) {
@@ -79,47 +70,38 @@ public final class ElasticSearchType<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("get, index={}, type={}, id={}, parentId={}, elapsedTime={}", index, type, id, parentId, elapsedTime);
+            logger.debug("get, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }
 
     public void update(String id, UpdateRequest request) {
-        update(id, null, request);
-    }
-
-    public void update(String id, String parentId, UpdateRequest request) {
         StopWatch watch = new StopWatch();
         try {
             request.index(index)
                 .type(type)
-                .id(id)
-                .parent(parentId);
+                .id(id);
             client.update(request).actionGet();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("update, index={}, type={}, id={}, parentId={}, elapsedTime={}", index, type, id, parentId, elapsedTime);
+            logger.debug("update, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }
 
     public void delete(String id) {
-        delete(id, null);
-    }
-
-    public void delete(String id, String parentId) {
         StopWatch watch = new StopWatch();
         try {
-            client.prepareDelete(index, type, id).setParent(parentId).get();
+            client.prepareDelete(index, type, id).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("delete, index={}, type={}, id={}, parentId={}, elapsedTime={}", index, type, id, parentId, elapsedTime);
+            logger.debug("delete, index={}, type={}, id={}, elapsedTime={}", index, type, id, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }

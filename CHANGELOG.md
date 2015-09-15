@@ -1,7 +1,8 @@
 ## Change log
 
-### 3.5.7 (9/15/2015 - )
+### 3.5.7 (9/15/2015)
 * redis: added setIfAbsent, use SET to replace SETEX
+* search: removed parent/child support, always use nested from now on
 
 ### 3.5.6 (9/11/2015 - 9/14/2015)
 * search: support parent/child
