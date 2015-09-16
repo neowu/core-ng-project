@@ -36,89 +36,106 @@ public class TypeValidator {
         if (GenericTypes.isList(type)) {
             if (!allowTopLevelList)
                 throw Exceptions.error("top level list is not allowed, type={}", type.getTypeName());
-            visitList(type, null);
+
+            visitList(type, null, null);
         } else {
             if (allowTopLevelValue && allowedValueClass.apply(GenericTypes.rawClass(type))) return;
-            visitObject(GenericTypes.rawClass(type), true);
+
+            visitObject(GenericTypes.rawClass(type), null, null);
         }
     }
 
-    private void visitObject(Class<?> objectClass, boolean topLevel) {
+    private void visitObject(Class<?> objectClass, Field owner, String path) {
         if (visitedClasses.contains(objectClass)) {
-            return;
-        } else {
-            visitedClasses.add(objectClass);
+            throw Exceptions.error("class must not have circular reference, field={}", Fields.path(owner));
         }
 
-        if (objectClass.isInterface() || Modifier.isAbstract(objectClass.getModifiers()) || !Modifier.isPublic(objectClass.getModifiers()))
-            throw Exceptions.error("type must be public concrete class, class={}", objectClass.getCanonicalName());
-        if (!Object.class.equals(objectClass.getSuperclass())) {
-            throw Exceptions.error("class must not inherit from other class, type={}", objectClass.getCanonicalName());
-        }
-        Constructor[] constructors = objectClass.getDeclaredConstructors();
-        if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
-            throw Exceptions.error("class must contain only one public default constructor, constructors={}", Arrays.toString(constructors));
-        }
+        visitedClasses.add(objectClass);
 
-        if (visitor != null) visitor.visitClass(objectClass, topLevel);
+        validateClass(objectClass);
+        if (visitor != null) visitor.visitClass(objectClass, path);
+
         Field[] fields = objectClass.getDeclaredFields();
         for (Field field : fields) {
-            if (visitor != null) visitor.visitField(field, topLevel);
+            validateField(field);
+            if (visitor != null) visitor.visitField(field, path);
+
+            String fieldPath = path(path, field.getName());
             Type fieldType = field.getGenericType();
             if (GenericTypes.isList(fieldType)) {
                 if (!allowChildListAndMap)
-                    throw Exceptions.error("list is not allowed as field, field={}", Fields.path(field));
-                visitList(fieldType, field);
+                    throw Exceptions.error("list field is not allowed, field={}", Fields.path(field));
+                visitList(fieldType, field, fieldPath);
             } else if (GenericTypes.isMap(fieldType)) {
                 if (!allowChildListAndMap)
-                    throw Exceptions.error("map is not allowed as field, field={}", Fields.path(field));
+                    throw Exceptions.error("map field is not allowed, field={}", Fields.path(field));
                 if (!GenericTypes.isGenericStringMap(fieldType)) {
                     throw Exceptions.error("map must be Map<String,T> and T must be class, type={}, field={}", type.getTypeName(), Fields.path(field));
                 }
-                visitValue(GenericTypes.mapValueClass(fieldType), field);
+                visitValue(GenericTypes.mapValueClass(fieldType), field, fieldPath);
             } else {
-                visitValue(GenericTypes.rawClass(fieldType), field);
+                visitValue(GenericTypes.rawClass(fieldType), field, fieldPath);
             }
         }
+
+        visitedClasses.remove(objectClass);
     }
 
-    private void visitValue(Class<?> valueClass, Field field) {
-        if (field != null) {
-            if (!Modifier.isPublic(field.getModifiers()))
-                throw Exceptions.error("field must be public, field={}", Fields.path(field));
-
-            if (Modifier.isTransient(field.getModifiers()))
-                throw Exceptions.error("field must not be transient, field={}", Fields.path(field));
-
-            if (Modifier.isFinal(field.getModifiers())) {
-                throw Exceptions.error("field must not be final, field={}", Fields.path(field));
-            }
-        }
-
+    private void visitValue(Class<?> valueClass, Field owner, String path) {
         if (Date.class.isAssignableFrom(valueClass))
-            throw Exceptions.error("java.util.Date is not supported, please use java.time.LocalDateTime instead, field={}", Fields.path(field));
+            throw Exceptions.error("java.util.Date is not supported, please use java.time.LocalDateTime instead, field={}", Fields.path(owner));
 
         if (valueClass.isPrimitive()) {
-            throw Exceptions.error("primitive class is not supported, please use object type, class={}, field={}", valueClass.getCanonicalName(), Fields.path(field));
+            throw Exceptions.error("primitive class is not supported, please use object type, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
         }
 
         if (allowedValueClass.apply(valueClass)) return;
 
         if (valueClass.getPackage().getName().startsWith("java")) {
-            throw Exceptions.error("field class is not supported, please contract arch team, class={}, field={}", valueClass.getCanonicalName(), Fields.path(field));
+            throw Exceptions.error("field class is not supported, please contract arch team, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
         }
 
-        if (field != null && !allowChildObject) {
-            throw Exceptions.error("child object is not allowed, class={}, field={}", valueClass.getCanonicalName(), Fields.path(field));
+        if (owner != null && !allowChildObject) {
+            throw Exceptions.error("child object is not allowed, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
         }
-        visitObject(valueClass, false);
+
+        visitObject(valueClass, owner, path);
     }
 
-    private void visitList(Type listType, Field field) {
+    private void visitList(Type listType, Field owner, String path) {
         if (!GenericTypes.isGenericList(listType)) {
             throw Exceptions.error("list must be as List<T> and T must be class, type={}", listType.getTypeName());
         }
         Class<?> valueClass = GenericTypes.listValueClass(listType);
-        visitValue(valueClass, field);
+        visitValue(valueClass, owner, path);
+    }
+
+    private void validateClass(Class<?> objectClass) {
+        if (objectClass.isInterface() || Modifier.isAbstract(objectClass.getModifiers()) || !Modifier.isPublic(objectClass.getModifiers()))
+            throw Exceptions.error("class must be public concrete, class={}", objectClass.getCanonicalName());
+        if (!Object.class.equals(objectClass.getSuperclass())) {
+            throw Exceptions.error("class must not have super class, class={}", objectClass.getCanonicalName());
+        }
+        Constructor[] constructors = objectClass.getDeclaredConstructors();
+        if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
+            throw Exceptions.error("class must contain only one public default constructor, constructors={}", Arrays.toString(constructors));
+        }
+    }
+
+    private void validateField(Field field) {
+        if (!Modifier.isPublic(field.getModifiers()))
+            throw Exceptions.error("field must be public, field={}", Fields.path(field));
+
+        if (Modifier.isTransient(field.getModifiers()))
+            throw Exceptions.error("field must not be transient, field={}", Fields.path(field));
+
+        if (Modifier.isFinal(field.getModifiers())) {
+            throw Exceptions.error("field must not be final, field={}", Fields.path(field));
+        }
+    }
+
+    private String path(String parent, String field) {
+        if (parent == null) return field;
+        return parent + '.' + field;
     }
 }

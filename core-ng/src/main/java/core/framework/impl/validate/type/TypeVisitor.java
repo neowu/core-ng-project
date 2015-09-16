@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
  * @author neo
  */
 public interface TypeVisitor {
-    void visitClass(Class<?> objectClass, boolean topLevel);
+    void visitClass(Class<?> objectClass, String path);
 
-    void visitField(Field field, boolean topLevel);
+    void visitField(Field field, String parentPath);
 }

@@ -28,6 +28,18 @@ public class MessageClassValidatorTest {
 
         @XmlElement(name = "map_field")
         public Map<String, String> mapField;
+
+        @XmlElement(name = "child_field")
+        public TestChild childField;
+
+        @XmlElement(name = "children_field")
+        public List<TestChild> childrenField;
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class TestChild {
+        @XmlElement(name = "boolean_field")
+        public Boolean booleanField;
     }
 
     @Test

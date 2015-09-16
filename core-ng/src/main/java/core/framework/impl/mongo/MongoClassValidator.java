@@ -20,7 +20,7 @@ import java.util.Set;
 public class MongoClassValidator implements TypeVisitor {
     private final TypeValidator validator;
     private boolean validateView;
-    private final Map<Class, Set<String>> fields = Maps.newHashMap();
+    private final Map<String, Set<String>> fields = Maps.newHashMap();
     private Field id;
 
     public MongoClassValidator(Class<?> entityClass) {
@@ -56,21 +56,21 @@ public class MongoClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> objectClass, boolean topLevel) {
-        if (!validateView && topLevel && !objectClass.isAnnotationPresent(Collection.class))
+    public void visitClass(Class<?> objectClass, String path) {
+        if (!validateView && path == null && !objectClass.isAnnotationPresent(Collection.class))
             throw Exceptions.error("entity class must have @Collection, class={}", objectClass.getCanonicalName());
     }
 
     @Override
-    public void visitField(Field field, boolean topLevel) {
+    public void visitField(Field field, String parentPath) {
         if (field.isAnnotationPresent(Id.class)) {
-            validateId(field, topLevel);
+            validateId(field, parentPath == null);
         } else {
             core.framework.api.mongo.Field mongoField = field.getDeclaredAnnotation(core.framework.api.mongo.Field.class);
             if (mongoField == null) throw Exceptions.error("field must have @Field, field={}", field);
             String mongoFieldName = mongoField.name();
 
-            Set<String> fields = this.fields.computeIfAbsent(field.getDeclaringClass(), key -> Sets.newHashSet());
+            Set<String> fields = this.fields.computeIfAbsent(parentPath, key -> Sets.newHashSet());
             if (fields.contains(mongoFieldName)) {
                 throw Exceptions.error("field is duplicated, field={}, mongoField={}", field, mongoFieldName);
             }

@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.5.8 (9/16/2015)
+* validate: type validator disallow cycle reference data structure (include same node as parent/child)
+
 ### 3.5.7 (9/15/2015)
 * redis: added setIfAbsent, use SET to replace SETEX
 * search: removed parent/child support, always use nested from now on

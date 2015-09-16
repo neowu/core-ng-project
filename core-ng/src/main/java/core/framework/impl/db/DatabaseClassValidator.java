@@ -56,7 +56,7 @@ final class DatabaseClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> objectClass, boolean topLevel) {
+    public void visitClass(Class<?> objectClass, String path) {
         if (validateView) {
             if (objectClass.isAnnotationPresent(Table.class))
                 throw Exceptions.error("view class must not have @Table, class={}", objectClass.getCanonicalName());
@@ -70,7 +70,7 @@ final class DatabaseClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitField(Field field, boolean topLevel) {
+    public void visitField(Field field, String parentPath) {
         Class<?> fieldClass = field.getType();
 
         Column column = field.getDeclaredAnnotation(Column.class);
