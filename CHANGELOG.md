@@ -2,6 +2,7 @@
 
 ### 3.5.8 (9/16/2015)
 * validate: type validator disallow cycle reference data structure (include same node as parent/child)
+* redis: config support
 
 ### 3.5.7 (9/15/2015)
 * redis: added setIfAbsent, use SET to replace SETEX

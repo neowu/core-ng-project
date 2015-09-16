@@ -1,7 +1,7 @@
 package core.framework.api.module;
 
-import core.framework.api.redis.Redis;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.RefreshPoolJob;
 import core.framework.impl.scheduler.FixedRateTrigger;
 import core.framework.impl.web.session.CleanupLocalSessionStoreJob;
@@ -44,7 +44,8 @@ public final class SessionConfig {
 
         logger.info("create redis session provider, host={}", host);
 
-        Redis redis = new Redis(host);
+        RedisImpl redis = new RedisImpl();
+        redis.host(host);
         redis.pool.name("redis-session");
         context.scheduler().addTrigger(new FixedRateTrigger("refresh-redis-session-pool", new RefreshPoolJob(redis.pool), Duration.ofMinutes(5)));
 

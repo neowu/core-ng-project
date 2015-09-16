@@ -6,6 +6,7 @@ import core.framework.api.module.DBConfig;
 import core.framework.api.module.HTTPConfig;
 import core.framework.api.module.LogConfig;
 import core.framework.api.module.QueueConfig;
+import core.framework.api.module.RedisConfig;
 import core.framework.api.module.RouteConfig;
 import core.framework.api.module.SchedulerConfig;
 import core.framework.api.module.SiteConfig;
@@ -120,6 +121,14 @@ public abstract class Module {
 
     public DBConfig db(String name) {
         return new DBConfig(context, name);
+    }
+
+    public RedisConfig redis() {
+        return redis(null);
+    }
+
+    public RedisConfig redis(String name) {
+        return new RedisConfig(context, name);
     }
 
     protected abstract void initialize();

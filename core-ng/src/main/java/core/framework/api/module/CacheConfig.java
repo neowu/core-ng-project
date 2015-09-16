@@ -2,7 +2,6 @@ package core.framework.api.module;
 
 import core.framework.api.cache.Cache;
 import core.framework.api.http.HTTPMethod;
-import core.framework.api.redis.Redis;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
@@ -12,6 +11,7 @@ import core.framework.impl.cache.CleanupLocalCacheStoreJob;
 import core.framework.impl.cache.LocalCacheStore;
 import core.framework.impl.cache.RedisCacheStore;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.RefreshPoolJob;
 import core.framework.impl.scheduler.FixedRateTrigger;
 import core.framework.impl.web.ControllerHolder;
@@ -57,7 +57,8 @@ public final class CacheConfig {
         } else {
             logger.info("create redis cache manager, host={}", host);
 
-            Redis redis = new Redis(host);
+            RedisImpl redis = new RedisImpl();
+            redis.host(host);
             redis.pool.name("redis-cache");
             redis.timeout(Duration.ofMillis(500));   // for cache, it should not be longer than 500ms to get value
 
