@@ -15,7 +15,7 @@ public class DefaultLoggerFactory implements ILoggerFactory {
 
     public DefaultLoggerFactory() {
         logManager = new LogManager();
-        logManager.logger = getLogger(LogManager.class.getName());
+        logManager.logger = getLogger(LogManager.class.getName());  // create logger requires logManager, so this is to create logManager first then assign logger
     }
 
     @Override

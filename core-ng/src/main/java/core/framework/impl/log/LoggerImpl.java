@@ -20,7 +20,7 @@ class LoggerImpl extends AbstractLogger {
         this.traceLevel = traceLevel;
     }
 
-    String abbreviateLoggerName(String name) {
+    static String abbreviateLoggerName(String name) {
         String[] tokens = name.split("\\.");
         StringBuilder builder = new StringBuilder();
         int total = tokens.length >= 4 ? 3 : tokens.length - 1;

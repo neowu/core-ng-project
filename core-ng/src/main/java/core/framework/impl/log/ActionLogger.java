@@ -30,7 +30,7 @@ class ActionLogger {
         size++;
         if (events != null) {
             events.add(event);
-            if (event.level.value >= LogLevel.WARN.value || size > MAX_HOLD_SIZE) {
+            if (event.level.value >= LogLevel.WARN.value || size >= MAX_HOLD_SIZE) {
                 flushTraceLogs();
                 events = null;
             }
@@ -61,9 +61,19 @@ class ActionLogger {
     }
 
     void writeTraceLog(LogEvent event) {
+        if (size == MAX_HOLD_SIZE + 1) {
+            log.updateResult(LogLevel.WARN);
+
+            LogEvent warning = new LogEvent(LogLevel.WARN, System.currentTimeMillis(), LoggerImpl.abbreviateLoggerName(ActionLogger.class.getCanonicalName()), "reached max holding size of trace log, please contact arch team to split big task into smaller batch", null, null);
+            logWriter.writeTraceLog(traceWriter, warning);
+
+            if (logForwarder != null)
+                logForwarder.queueTraceLog(log, Lists.newArrayList(warning));
+        }
+
         logWriter.writeTraceLog(traceWriter, event);
 
-        if (logForwarder != null && size <= MAX_HOLD_SIZE) {    // not forward trace to queue if more than 5000 lines.
+        if (logForwarder != null && size <= MAX_HOLD_SIZE) {    // not forward trace to queue if more than max lines.
             logForwarder.queueTraceLog(log, Lists.newArrayList(event));
         }
     }
