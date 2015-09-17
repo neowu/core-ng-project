@@ -4,6 +4,8 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
+* async: think about batch and trace, make it easier to split task
+* elasticsearch: config support,
 * refactor: TypeHelper
 * template, use ByteBuffer[] for performance tuning
 * template: review expression, validate methods in model class

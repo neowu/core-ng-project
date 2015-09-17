@@ -17,6 +17,7 @@ class ActionLogger {
 
     final ActionLog log = new ActionLog();
     private List<LogEvent> events = new LinkedList<>();
+    private int size = 0;
     private Writer traceWriter;
 
     public ActionLogger(LogWriter logWriter, LogForwarder logForwarder) {
@@ -26,10 +27,10 @@ class ActionLogger {
 
     public void process(LogEvent event) {
         log.updateResult(event.level);
-
+        size++;
         if (events != null) {
             events.add(event);
-            if (event.level.value >= LogLevel.WARN.value || events.size() > MAX_HOLD_SIZE) {
+            if (event.level.value >= LogLevel.WARN.value || size > MAX_HOLD_SIZE) {
                 flushTraceLogs();
                 events = null;
             }
@@ -62,6 +63,8 @@ class ActionLogger {
     void writeTraceLog(LogEvent event) {
         logWriter.writeTraceLog(traceWriter, event);
 
-        if (logForwarder != null) logForwarder.queueTraceLog(log, Lists.newArrayList(event));
+        if (logForwarder != null && size <= MAX_HOLD_SIZE) {    // not forward trace to queue if more than 5000 lines.
+            logForwarder.queueTraceLog(log, Lists.newArrayList(event));
+        }
     }
 }

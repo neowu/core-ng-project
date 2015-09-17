@@ -53,13 +53,17 @@ public final class QueueConfig {
 
     // this is to support publish to SNS and RabbitMQ same time, as interim step to deprecate SNS/SQS
     public <T> void publish(String[] destinations, Class<T> messageClass) {
-        MessageValidator validator = context.queueManager.validator();
-        validator.register(messageClass);
-        List<MessagePublisher<T>> publishers = Lists.newArrayList();
-        for (String destination : destinations) {
-            publishers.add(publisher(destination, messageClass));
+        if (destinations.length == 1) {
+            publish(destinations[0], messageClass);
+        } else {
+            MessageValidator validator = context.queueManager.validator();
+            validator.register(messageClass);
+            List<MessagePublisher<T>> publishers = Lists.newArrayList();
+            for (String destination : destinations) {
+                publishers.add(publisher(destination, messageClass));
+            }
+            context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), null, new CompositePublisher<>(publishers));
         }
-        context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), null, new CompositePublisher<>(publishers));
     }
 
     private MessageHandlerConfig listener(String queueURI) {

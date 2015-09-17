@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.5.9 (9/17/2015)
+* queue: config, publish(String[] destinations) will call publish(String destination) if length = 1
+* log: to protect log ES, not forward trace log if lines is more than max hold size = 5000, the log will still be written to file and application is responsible to split task into smaller chunk
+
 ### 3.5.8 (9/16/2015)
 * validate: type validator disallow cycle reference data structure (include same node as parent/child)
 * redis: config support
