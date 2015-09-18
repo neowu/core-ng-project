@@ -5,6 +5,7 @@ import core.framework.api.search.ElasticSearchType;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Lists;
 import core.framework.impl.log.queue.TraceLogMessage;
+import core.log.domain.TraceLogDocument;
 import org.elasticsearch.action.update.UpdateRequest;
 
 import javax.inject.Inject;
@@ -14,11 +15,11 @@ import javax.inject.Inject;
  */
 public class TraceLogMessageHandler implements MessageHandler<TraceLogMessage> {
     @Inject
-    ElasticSearchType<TraceLogMessage> traceType;
+    ElasticSearchType<TraceLogDocument> traceType;
 
     @Override
     public void handle(TraceLogMessage message) throws Exception {
-        TraceLogMessage emptyTraceLog = new TraceLogMessage();
+        TraceLogDocument emptyTraceLog = new TraceLogDocument();
         emptyTraceLog.date = message.date;
         emptyTraceLog.id = message.id;
         emptyTraceLog.app = message.app;
@@ -27,8 +28,8 @@ public class TraceLogMessageHandler implements MessageHandler<TraceLogMessage> {
         emptyTraceLog.content = Lists.newArrayList();
 
         UpdateRequest request = new UpdateRequest()
-            .script("ctx._source.content+=lines")
-            .addScriptParam("lines", message.content)
+            .script("ctx._source.content+=line")
+            .addScriptParam("line", message.content)
             .upsert(JSON.toJSON(emptyTraceLog));
         request.scriptedUpsert(true);
 

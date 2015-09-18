@@ -13,13 +13,11 @@ public final class MessageConfig {
         this.context = context;
     }
 
-    public MessageConfig loadProperties(String path) {
+    public void loadProperties(String path) {
         context.httpServer.siteManager.messageManager.loadProperties(path);
-        return this;
     }
 
-    public MessageConfig messageProvider(MessageProvider messageProvider) {
+    public void messageProvider(MessageProvider messageProvider) {
         context.httpServer.siteManager.messageManager.messageProvider = messageProvider;
-        return this;
     }
 }

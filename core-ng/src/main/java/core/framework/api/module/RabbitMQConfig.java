@@ -14,34 +14,29 @@ public final class RabbitMQConfig {
         this.context = context;
     }
 
-    public RabbitMQConfig hosts(String... hosts) {
+    public void hosts(String... hosts) {
         if (!context.test) {
             context.queueManager.rabbitMQ.hosts(hosts);
         }
-        return this;
     }
 
-    public RabbitMQConfig user(String user) {
+    public void user(String user) {
         if (!context.test) {
             context.queueManager.rabbitMQ.user(user);
         }
-        return this;
     }
 
-    public RabbitMQConfig password(String password) {
+    public void password(String password) {
         if (!context.test) {
             context.queueManager.rabbitMQ.password(password);
         }
-        return this;
     }
 
-    public RabbitMQConfig timeout(Duration timeout) {
+    public void timeout(Duration timeout) {
         context.queueManager.rabbitMQ.timeout(timeout);
-        return this;
     }
 
-    public RabbitMQConfig poolSize(int minSize, int maxSize) {
+    public void poolSize(int minSize, int maxSize) {
         context.queueManager.rabbitMQ.pool.size(minSize, maxSize);
-        return this;
     }
 }

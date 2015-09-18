@@ -1,5 +1,6 @@
 package core.framework.impl.search;
 
+import core.framework.api.search.Index;
 import org.junit.Test;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -13,6 +14,7 @@ import java.util.Map;
  * @author neo
  */
 public class DocumentClassValidatorTest {
+    @Index(index = "main", type = "test")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class TestDocument {
         @XmlElement(name = "date_time_field")

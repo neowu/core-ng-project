@@ -3,8 +3,6 @@ package core.framework.api.concurrent;
 import core.framework.impl.concurrent.Executor;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -13,7 +11,6 @@ import java.util.concurrent.Future;
  * @author neo
  */
 public class AsyncExecutor {
-    private final Logger logger = LoggerFactory.getLogger(AsyncExecutor.class);
     private final Executor executor;
     private final LogManager logManager;
 
@@ -23,8 +20,7 @@ public class AsyncExecutor {
     }
 
     public <T> Future<T> submit(String name, Callable<T> task) {
-        logger.debug("submit async task, name={}", name);
-
+        // not log intentionally, so in batch pattern where one batch submit task for each item, the batch process won't reach max trace log line limit.
         ActionLog parentActionLog = logManager.currentActionLog();
         String refId = parentActionLog != null ? parentActionLog.refId() : null;
         String action = parentActionLog != null ? parentActionLog.action + "/" + name : name;

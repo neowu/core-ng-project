@@ -20,28 +20,27 @@ import java.util.Set;
  * @author neo
  */
 public class InitDBConfig {
-    private final ModuleContext moduleContext;
+    private final ModuleContext context;
     private final String name;
     private final Database database;
 
-    public InitDBConfig(ModuleContext moduleContext, String name) {
-        this.moduleContext = moduleContext;
+    public InitDBConfig(ModuleContext context, String name) {
+        this.context = context;
         this.name = name;
 
-        if (!moduleContext.beanFactory.registered(Database.class, name)) {
+        if (!context.beanFactory.registered(Database.class, name)) {
             throw Exceptions.error("database is not configured, please use db() to configure, name={}", name);
         }
 
-        database = moduleContext.beanFactory.bean(Database.class, name);
+        database = context.beanFactory.bean(Database.class, name);
     }
 
-    public InitDBConfig runScript(String scriptPath) {
+    public void runScript(String scriptPath) {
         new SQLScriptRunner(database, ClasspathResources.text(scriptPath)).run();
-        return this;
     }
 
-    public InitDBConfig createSchema() {
-        Set<Key> keys = moduleContext.beanFactory.keys();
+    public void createSchema() {
+        Set<Key> keys = context.beanFactory.keys();
         for (Key key : keys) {
             Type type = key.type;
             if (!(type instanceof ParameterizedType)) continue;
@@ -51,10 +50,9 @@ public class InitDBConfig {
                 new EntitySchemaGenerator(database, entityClass).generate();
             }
         }
-        return this;
     }
 
     public <T> Repository<T> repository(Class<T> entityClass) {
-        return moduleContext.beanFactory.bean(Types.generic(Repository.class, entityClass), name);
+        return context.beanFactory.bean(Types.generic(Repository.class, entityClass), name);
     }
 }

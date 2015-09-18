@@ -104,6 +104,9 @@ project(':log-processor') {
         testCompile(
                 project(':core-ng-test')
         )
+        testRuntime(
+                'org.codehaus.groovy:groovy-all:2.4.4',  // for elastic search script test
+        )
     }
 }
 

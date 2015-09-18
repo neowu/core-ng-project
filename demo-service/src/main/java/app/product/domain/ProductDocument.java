@@ -1,5 +1,6 @@
 package app.product.domain;
 
+import core.framework.api.search.Index;
 import core.framework.api.util.Lists;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * @author neo
  */
+@Index(index = "main", type = "product")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProductDocument {
     @XmlElement(name = "id")

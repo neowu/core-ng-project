@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -57,24 +56,22 @@ public final class Scheduler {
         Trigger trigger = triggers.get(name);
         if (trigger == null) throw new NotFoundException("job not found, name=" + name);
         Job job = trigger.job;
-        executor.submit(task(name, job, true));
+        executor.submit(() -> task(name, job, true));
     }
 
     void schedule(String name, Job job, Duration initialDelay, Duration rate) {
-        scheduler.scheduleAtFixedRate(() -> executor.submit(task(name, job, false)), initialDelay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(() -> executor.submit(() -> task(name, job, false)), initialDelay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
     }
 
-    private Callable<Void> task(String name, Job job, boolean trace) {
-        return () -> {
-            logger.info("execute scheduled job, name={}", name);
-            ActionLog actionLog = logManager.currentActionLog();
-            actionLog.action("job/" + name);
-            actionLog.context("jobClass", job.getClass().getCanonicalName());
-            if (trace) {
-                actionLog.triggerTraceLog();
-            }
-            job.execute();
-            return null;
-        };
+    private Void task(String name, Job job, boolean trace) throws Exception {
+        logger.info("execute scheduled job, name={}", name);
+        ActionLog actionLog = logManager.currentActionLog();
+        actionLog.action("job/" + name);
+        actionLog.context("jobClass", job.getClass().getCanonicalName());
+        if (trace) {
+            actionLog.triggerTraceLog();
+        }
+        job.execute();
+        return null;
     }
 }

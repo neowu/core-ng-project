@@ -21,10 +21,6 @@ public class SearchProductService {
     @Inject
     ElasticSearchType<ProductDocument> productType;
 
-    public void index(ProductDocument product) {
-        productType.index(String.valueOf(product.id), product);
-    }
-
     public List<ProductDocument> search(SearchProductRequest request) {
         List<ProductDocument> results = Lists.newArrayList();
 

@@ -9,6 +9,7 @@ import core.framework.api.module.QueueConfig;
 import core.framework.api.module.RedisConfig;
 import core.framework.api.module.RouteConfig;
 import core.framework.api.module.SchedulerConfig;
+import core.framework.api.module.SearchConfig;
 import core.framework.api.module.SiteConfig;
 import core.framework.api.util.Exceptions;
 import core.framework.impl.module.ModuleContext;
@@ -124,11 +125,11 @@ public abstract class Module {
     }
 
     public RedisConfig redis() {
-        return redis(null);
+        return new RedisConfig(context);
     }
 
-    public RedisConfig redis(String name) {
-        return new RedisConfig(context, name);
+    public SearchConfig search() {
+        return new SearchConfig(context);
     }
 
     protected abstract void initialize();

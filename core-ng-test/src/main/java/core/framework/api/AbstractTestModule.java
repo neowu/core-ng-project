@@ -3,6 +3,7 @@ package core.framework.api;
 import core.framework.impl.module.ModuleContext;
 import core.framework.test.inject.TestBeanFactory;
 import core.framework.test.module.InitDBConfig;
+import core.framework.test.module.InitSearchConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,5 +41,9 @@ public abstract class AbstractTestModule extends Module {
 
     public InitDBConfig initDB(String name) {
         return new InitDBConfig(context, name);
+    }
+
+    public InitSearchConfig initSearch() {
+        return new InitSearchConfig(context);
     }
 }

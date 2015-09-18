@@ -4,13 +4,14 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* async: think about batch and trace, make it easier to split task
-* elasticsearch: config support,
 * refactor: TypeHelper
 * template, use ByteBuffer[] for performance tuning
 * template: review expression, validate methods in model class
 * web: support upload file
+* async: think about how to support batch with fixed concurrency
+* redis: investigate redis hiccup, like 200ms for one operation under load
 
+* mongo: mongo config support?
 * real time monitor to ES?
 * provide ws interface to send queue message for dev and prod troubleshoot?
 * general retry and throttling?

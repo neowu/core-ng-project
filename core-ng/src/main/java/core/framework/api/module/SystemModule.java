@@ -45,5 +45,9 @@ public final class SystemModule extends Module {
         property("sys.jdbc.url").ifPresent(url -> db().url(url));
         property("sys.jdbc.user").ifPresent(user -> db().user(user));
         property("sys.jdbc.password").ifPresent(password -> db().password(password));
+
+        property("sys.redis.host").ifPresent(host -> redis().host(host));
+
+        property("sys.elasticsearch.host").ifPresent(host -> search().host(host));
     }
 }

@@ -5,7 +5,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ShutdownSignalException;
 import core.framework.api.queue.Message;
 import core.framework.api.util.JSON;
-import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Network;
 import core.framework.api.util.Strings;
@@ -139,7 +138,7 @@ public class LogForwarder {
         for (LogEvent event : events) {
             content.append(event.logMessage());
         }
-        message.content = Lists.newArrayList(content.toString());
+        message.content = content.toString();
 
         logMessageQueue.add(message);
     }

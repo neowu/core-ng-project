@@ -40,68 +40,58 @@ public final class DBConfig {
         }
     }
 
-    public DBConfig url(String url) {
+    public void url(String url) {
         if (context.test) {
             logger.info("use hsqldb during test");
             database.url(Strings.format("jdbc:hsqldb:mem:{};sql.syntax_mys=true", name == null ? "." : name));
         } else {
             database.url(url);
         }
-        return this;
     }
 
-    public DBConfig user(String user) {
+    public void user(String user) {
         if (!context.test) {
             database.user(user);
         }
-        return this;
     }
 
-    public DBConfig password(String password) {
+    public void password(String password) {
         if (!context.test) {
             database.password(password);
         }
-        return this;
     }
 
-    public DBConfig encryptedPassword(String encryptedPassword, String privateKey) {
+    public void encryptedPassword(String encryptedPassword, String privateKey) {
         String password = Password.decrypt(encryptedPassword, privateKey);
-        return password(password);
+        password(password);
     }
 
-    public DBConfig poolSize(int minSize, int maxSize) {
+    public void poolSize(int minSize, int maxSize) {
         database.pool.size(minSize, maxSize);
-        return this;
     }
 
-    public DBConfig defaultIsolationLevel(IsolationLevel defaultIsolationLevel) {
+    public void defaultIsolationLevel(IsolationLevel defaultIsolationLevel) {
         database.operation.transactionManager.defaultIsolationLevel = defaultIsolationLevel;
-        return this;
     }
 
-    public DBConfig slowQueryThreshold(Duration slowQueryThreshold) {
+    public void slowQueryThreshold(Duration slowQueryThreshold) {
         database.slowQueryThresholdInMs = slowQueryThreshold.toMillis();
-        return this;
     }
 
-    public DBConfig tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
+    public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
         database.tooManyRowsReturnedThreshold = tooManyRowsReturnedThreshold;
-        return this;
     }
 
-    public DBConfig longTransactionThreshold(Duration longTransactionThreshold) {
+    public void longTransactionThreshold(Duration longTransactionThreshold) {
         database.operation.transactionManager.longTransactionThresholdInMs = longTransactionThreshold.toMillis();
-        return this;
     }
 
-    public DBConfig timeout(Duration timeout) {
+    public void timeout(Duration timeout) {
         database.timeout(timeout);
-        return this;
     }
 
-    public <T> DBConfig view(Class<T> viewClass) {
+    public void view(Class<?> viewClass) {
         database.view(viewClass);
-        return this;
     }
 
     public <T> void repository(Class<T> entityClass) {
