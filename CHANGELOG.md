@@ -1,5 +1,12 @@
 ## Change log
 
+### 3.6.0 (9/18/2015 - 9/21/2015)
+* config: better error message for load not found property
+* lib: update all 3rd party lib up to date
+* web-service: fix web service GET query, not append param if null
+* log-forward: clear up queue if rabbitmq is down
+* log: support to disable action/trace, !!! sys.properties, use sys.log.actionLogPath=console, sys.log.traceLogPath=console in dev env.
+
 ### 3.5.9 (9/17/2015 - 9/18/2015)
 * queue: config, publish(String[] destinations) will call publish(String destination) if length = 1
 * log: to protect log ES, not forward trace log if lines is more than max hold size = 5000, the log will still be written to file and application is responsible to split task into smaller chunk

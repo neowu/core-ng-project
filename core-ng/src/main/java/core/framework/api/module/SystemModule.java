@@ -34,9 +34,21 @@ public final class SystemModule extends Module {
             }
         });
 
-        property("sys.log.traceLogPath").ifPresent(path -> log().traceLogPath(Paths.get(path)));
-        property("sys.log.actionLogPath").ifPresent(path -> log().actionLogPath(Paths.get(path)));
-        property("sys.log.remoteLogHost").ifPresent(host -> log().remoteLogHost(host));
+        property("sys.log.actionLogPath").ifPresent(path -> {
+            if ("console".equals(path)) {
+                log().writeActionLogToConsole();
+            } else {
+                log().writeActionLogToFile(Paths.get(path));
+            }
+        });
+        property("sys.log.traceLogPath").ifPresent(path -> {
+            if ("console".equals(path)) {
+                log().writeTraceLogToConsole();
+            } else {
+                log().writeTraceLogToFile(Paths.get(path));
+            }
+        });
+        property("sys.log.remoteLogHost").ifPresent(host -> log().forwardLogToRemote(host));
 
         property("sys.rabbitMQ.host").ifPresent(hosts -> queue().rabbitMQ().hosts(hosts.split(",")));
         property("sys.rabbitMQ.user").ifPresent(user -> queue().rabbitMQ().user(user));

@@ -40,6 +40,7 @@ public class LogForwarder {
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Thread logForwarderThread;
+    private int retryAttempts;
 
     public LogForwarder(String host, String appName) {
         this.appName = appName;
@@ -52,7 +53,13 @@ public class LogForwarder {
                     sendLogMessages();
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
-                        logger.warn("failed to send log message, retry in 30 seconds", e);
+
+                        retryAttempts++;
+                        if (retryAttempts >= 10) {  // roughly 5 mins to hold messages if log queue is not available
+                            logMessageQueue.clear();    // clear messages to clean up memory
+                        }
+
+                        logger.warn("failed to send log message, retry in 30 seconds, attempts={}", retryAttempts, e);
                         Threads.sleepRoughly(Duration.ofSeconds(30));
                     }
                 }
@@ -83,6 +90,7 @@ public class LogForwarder {
                 } else if (message instanceof TraceLogMessage) {
                     channel.basicPublish("", "trace-log-queue", traceLogMessageProperties, Strings.bytes(JSON.toJSON(message)));
                 }
+                retryAttempts = 0;  // reset retry attempts if one message sent successfully
             }
         } finally {
             closeChannel(channel);
@@ -99,7 +107,7 @@ public class LogForwarder {
         }
     }
 
-    void queueActionLog(ActionLog log) {
+    void forwardActionLog(ActionLog log) {
         ActionLogMessage message = new ActionLogMessage();
         message.app = appName;
         message.serverIP = Network.localHostAddress();
@@ -126,7 +134,7 @@ public class LogForwarder {
         logMessageQueue.add(message);
     }
 
-    void queueTraceLog(ActionLog log, List<LogEvent> events) {
+    void forwardTraceLog(ActionLog log, List<LogEvent> events) {
         TraceLogMessage message = new TraceLogMessage();
         message.id = log.id;
         message.date = log.startTime;

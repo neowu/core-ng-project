@@ -68,7 +68,7 @@ public class WebServiceClient implements WebServiceClientConfig {
             String json = JSON.toJSON(requestBean);
             if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
                 Map<String, String> queryParams = JSON.fromJSON(Types.map(String.class, String.class), json);
-                queryParams.forEach(httpRequest::addParam);
+                addQueryParams(httpRequest, queryParams);
             } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
                 httpRequest.text(json, ContentTypes.APPLICATION_JSON);
             } else {
@@ -88,6 +88,13 @@ public class WebServiceClient implements WebServiceClientConfig {
             return JSON.fromJSON(responseType, response.text());
         } else {
             return null;
+        }
+    }
+
+    void addQueryParams(HTTPRequest request, Map<String, String> queryParams) {
+        for (Map.Entry<String, String> entry : queryParams.entrySet()) {
+            String value = entry.getValue();
+            if (value != null) request.addParam(entry.getKey(), value);
         }
     }
 

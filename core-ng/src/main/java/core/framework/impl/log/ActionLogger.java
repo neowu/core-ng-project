@@ -12,16 +12,19 @@ import java.util.List;
 class ActionLogger {
     private static final int MAX_HOLD_SIZE = 5000;
 
-    private final LogWriter logWriter;
+    private final ActionLogWriter actionLogWriter;
+    private final TraceLogWriter traceLogWriter;
     private final LogForwarder logForwarder;
 
     final ActionLog log = new ActionLog();
+
     private List<LogEvent> events = new LinkedList<>();
     private int size = 0;
     private Writer traceWriter;
 
-    public ActionLogger(LogWriter logWriter, LogForwarder logForwarder) {
-        this.logWriter = logWriter;
+    public ActionLogger(ActionLogWriter actionLogWriter, TraceLogWriter traceLogWriter, LogForwarder logForwarder) {
+        this.actionLogWriter = actionLogWriter;
+        this.traceLogWriter = traceLogWriter;
         this.logForwarder = logForwarder;
     }
 
@@ -42,39 +45,41 @@ class ActionLogger {
     public void end() {
         log.end();
 
-        logWriter.writeActionLog(log);
-        if (traceWriter != null) logWriter.closeTraceLogWriter(traceWriter);
+        if (actionLogWriter != null) actionLogWriter.write(log);
 
-        if (logForwarder != null) logForwarder.queueActionLog(log);
+        if (traceWriter != null) traceLogWriter.closeWriter(traceWriter);
+
+        if (logForwarder != null) logForwarder.forwardActionLog(log);
     }
 
     private void flushTraceLogs() {
-        traceWriter = logWriter.createTraceWriter(log);
+        if (traceLogWriter != null) {
+            traceWriter = traceLogWriter.createWriter(log);
 
-        for (LogEvent event : events) {
-            logWriter.writeTraceLog(traceWriter, event);
+            for (LogEvent event : events) {
+                traceLogWriter.write(traceWriter, event);
+            }
         }
 
         if (logForwarder != null) {
-            logForwarder.queueTraceLog(log, events);
+            logForwarder.forwardTraceLog(log, events);
         }
     }
 
     void writeTraceLog(LogEvent event) {
         if (size == MAX_HOLD_SIZE + 1) {
             log.updateResult(LogLevel.WARN);
-
             LogEvent warning = new LogEvent(LogLevel.WARN, System.currentTimeMillis(), LoggerImpl.abbreviateLoggerName(ActionLogger.class.getCanonicalName()), "reached max holding size of trace log, please contact arch team to split big task into smaller batch", null, null);
-            logWriter.writeTraceLog(traceWriter, warning);
 
-            if (logForwarder != null)
-                logForwarder.queueTraceLog(log, Lists.newArrayList(warning));
+            if (traceLogWriter != null) traceLogWriter.write(traceWriter, warning);
+
+            if (logForwarder != null) logForwarder.forwardTraceLog(log, Lists.newArrayList(warning));
         }
 
-        logWriter.writeTraceLog(traceWriter, event);
+        if (traceLogWriter != null) traceLogWriter.write(traceWriter, event);
 
         if (logForwarder != null && size <= MAX_HOLD_SIZE) {    // not forward trace to queue if more than max lines.
-            logForwarder.queueTraceLog(log, Lists.newArrayList(event));
+            logForwarder.forwardTraceLog(log, Lists.newArrayList(event));
         }
     }
 }

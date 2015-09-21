@@ -4,14 +4,14 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '3.5.9'
+    version = '3.6.0'
 }
 
-def awsVersion = '1.10.8'
-def jacksonVersion = '2.6.1'
+def awsVersion = '1.10.20'
+def jacksonVersion = '2.6.2'
 def redisVersion = '2.7.2'
 def mongoVersion = '3.0.3'
-def elasticVersion = '1.7.1'
+def elasticVersion = '1.7.2'
 def rabbitVersion = '3.5.4'
 
 project(':core-ng-api') {
@@ -38,7 +38,7 @@ project(':core-ng') {
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
                 "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}",
-                'org.apache.httpcomponents:httpclient:4.5',
+                'org.apache.httpcomponents:httpclient:4.5.1',
                 'io.undertow:undertow-core:1.2.10.Final'
         )
         testCompile(
@@ -54,7 +54,7 @@ project(':core-ng-test') {
     dependencies {
         provided(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                'com.github.fakemongo:fongo:2.0.1'
+                'com.github.fakemongo:fongo:2.0.1@jar'
         )
         compile(
                 project(":core-ng"),

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public final class HTTPRequest {
+public class HTTPRequest {
     public static HTTPRequest get(String uri) {
         return new HTTPRequest(HTTPMethod.GET, uri);
     }

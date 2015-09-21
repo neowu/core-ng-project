@@ -4,11 +4,8 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* fix web service GET query, not append param if null
-* web: get/form post, validate bean class?
-* log forward: clear up queue if rabbitmq is down
-* log: way to disable action/trace
-* log forward: rabbitmq use non-durable queue
+* web: get/form post, validate bean class and code generation for param serialization?
+
 * refactor: TypeHelper
 * template, use ByteBuffer[] for performance tuning
 * template: review expression, validate methods in model class

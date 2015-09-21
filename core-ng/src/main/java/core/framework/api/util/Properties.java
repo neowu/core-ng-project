@@ -1,5 +1,6 @@
 package core.framework.api.util;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -14,6 +15,7 @@ public final class Properties {
 
     public void load(String path) {
         try (InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path)) {
+            if (stream == null) throw new FileNotFoundException("property not found in classpath, classpath=" + path);
             java.util.Properties properties = new java.util.Properties();
             properties.load(stream);
             properties.forEach((key, value) -> {

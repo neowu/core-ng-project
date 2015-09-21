@@ -13,17 +13,17 @@ import static org.junit.Assert.assertThat;
 /**
  * @author neo
  */
-public class LogWriterTest {
-    LogWriter logWriter;
+public class TraceLogWriterTest {
+    TraceLogWriter writer;
 
     @Before
-    public void createLogWriter() {
-        logWriter = new LogWriter();
+    public void createTraceLogWriter() {
+        writer = TraceLogWriter.console();
     }
 
     @Test
     public void traceLogFilePath() {
-        String logFilePath = logWriter.traceLogFilePath("/log", LocalDateTime.of(2012, Month.OCTOBER, 2, 14, 5), "someController-method", "requestId");
+        String logFilePath = writer.traceLogFilePath("/log", LocalDateTime.of(2012, Month.OCTOBER, 2, 14, 5), "someController-method", "requestId");
         assertThat(logFilePath, containsString("/log/someController-method/201210021405.requestId."));
         assertThat(logFilePath, endsWith(".log"));
     }

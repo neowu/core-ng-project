@@ -7,9 +7,10 @@ import org.slf4j.Logger;
  * @author neo
  */
 public class LogManager {
-    private final ThreadLocal<ActionLogger> loggers = new ThreadLocal<>();
+    private final ThreadLocal<ActionLogger> actionLoggers = new ThreadLocal<>();
     Logger logger;
-    public final LogWriter logWriter = new LogWriter();
+    public ActionLogWriter actionLogWriter;
+    public TraceLogWriter traceLogWriter;
     public LogForwarder logForwarder;
     public final String appName;
 
@@ -18,31 +19,33 @@ public class LogManager {
     }
 
     public void begin(String message) {
-        ActionLogger actionLogger = new ActionLogger(logWriter, logForwarder);
-        loggers.set(actionLogger);
+        if (actionLogWriter == null && traceLogWriter == null && logForwarder == null) return;
+
+        ActionLogger actionLogger = new ActionLogger(actionLogWriter, traceLogWriter, logForwarder);
+        actionLoggers.set(actionLogger);
         logger.debug(message);
         logger.debug("[context] id={}", actionLogger.log.id);
     }
 
     public void end(String message) {
         logger.debug(message);
-        ActionLogger actionLogger = loggers.get();
-        loggers.remove();   // remove action logger first, make all log during end() not appending to trace
+        ActionLogger actionLogger = actionLoggers.get();
+        actionLoggers.remove();   // remove action logger first, make all log during end() not appending to trace
         actionLogger.end();
     }
 
     public void process(LogEvent event) {
-        ActionLogger logger = loggers.get();
+        ActionLogger logger = actionLoggers.get();
         if (logger != null) logger.process(event);
     }
 
     public void stop() {
         if (logForwarder != null) logForwarder.stop();
-        logWriter.close();
+        if (actionLogWriter != null) actionLogWriter.close();
     }
 
     public ActionLog currentActionLog() {
-        ActionLogger logger = loggers.get();
+        ActionLogger logger = actionLoggers.get();
         if (logger == null) return null;
         return logger.log;
     }
