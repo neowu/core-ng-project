@@ -19,8 +19,6 @@ public class LogManager {
     }
 
     public void begin(String message) {
-        if (actionLogWriter == null && traceLogWriter == null && logForwarder == null) return;
-
         ActionLogger actionLogger = new ActionLogger(actionLogWriter, traceLogWriter, logForwarder);
         actionLoggers.set(actionLogger);
         logger.debug(message);
@@ -51,14 +49,14 @@ public class LogManager {
     }
 
     public void logError(Throwable e) {  // pass logger where the exception is caught
-        ActionLog actionLog = currentActionLog();
-        actionLog.error(e);
-
         String errorMessage = e.getMessage();
         if (e.getClass().isAnnotationPresent(Warning.class)) {
             logger.warn(errorMessage, e);
         } else {
             logger.error(errorMessage, e);
         }
+
+        ActionLog actionLog = currentActionLog();
+        actionLog.error(e);     // actionLog should not be null, logManager.begin should always be called before logError
     }
 }
