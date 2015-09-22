@@ -4,8 +4,6 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* web: get/form post, validate bean class and code generation for param serialization?
-
 * refactor: TypeHelper
 * template, use ByteBuffer[] for performance tuning
 * template: review expression, validate methods in model class
@@ -14,6 +12,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * redis: investigate redis hiccup, like 200ms for one operation under load
 
 * mongo: mongo config support?
+* web: get/form post, validate bean class and code generation for param serialization?
 * real time monitor to ES?
 * provide ws interface to send queue message for dev and prod troubleshoot?
 * general retry and throttling?

@@ -1,4 +1,4 @@
-package core.framework.api.web.client;
+package core.framework.api.web.service;
 
 import core.framework.api.http.HTTPRequest;
 

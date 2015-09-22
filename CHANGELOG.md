@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.6.1 (9/21/2015 - )
+* web-service: moved core.framework.api.web.client.WebServiceRequestSigner to core.framework.api.web.service.WebServiceRequestSigner
+
+
 ### 3.6.0 (9/18/2015 - 9/21/2015)
 * config: better error message for load not found property
 * lib: update all 3rd party lib up to date

@@ -48,7 +48,8 @@ public class LogManager {
         return logger.log;
     }
 
-    public void logError(Throwable e) {  // pass logger where the exception is caught
+    public void logError(Throwable e) {
+        // write exception first, to avoid hiding it by other mistake
         String errorMessage = e.getMessage();
         if (e.getClass().isAnnotationPresent(Warning.class)) {
             logger.warn(errorMessage, e);

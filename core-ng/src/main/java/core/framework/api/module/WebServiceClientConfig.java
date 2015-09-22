@@ -1,6 +1,6 @@
 package core.framework.api.module;
 
-import core.framework.api.web.client.WebServiceRequestSigner;
+import core.framework.api.web.service.WebServiceRequestSigner;
 
 /**
  * @author neo
