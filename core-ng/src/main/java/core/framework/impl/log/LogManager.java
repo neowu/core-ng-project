@@ -7,45 +7,65 @@ import org.slf4j.Logger;
  * @author neo
  */
 public class LogManager {
-    private final ThreadLocal<ActionLogger> actionLoggers = new ThreadLocal<>();
     Logger logger;
-    public ActionLogWriter actionLogWriter;
-    public TraceLogWriter traceLogWriter;
-    public LogForwarder logForwarder;
     public final String appName;
+
+    private final ThreadLocal<ActionLog> actionLog = new ThreadLocal<>();
+    private final ThreadLocal<TraceLogger> traceLogger = new ThreadLocal<>();
+
+    public TraceLoggerFactory traceLoggerFactory;
+    public LogForwarder logForwarder;
+    public ActionLogger actionLogger;
 
     public LogManager() {
         this.appName = System.getProperty("core.appName");
     }
 
     public void begin(String message) {
-        ActionLogger actionLogger = new ActionLogger(actionLogWriter, traceLogWriter, logForwarder);
-        actionLoggers.set(actionLogger);
-        logger.debug(message);
-        logger.debug("[context] id={}", actionLogger.log.id);
+        ActionLog actionLog = new ActionLog();
+        this.actionLog.set(actionLog);
+
+        if (traceLoggerFactory != null) {
+            traceLogger.set(traceLoggerFactory.create(actionLog, logForwarder));
+            logger.debug(message);     // if trace log is disabled, then no need to process debug log
+            logger.debug("[context] id={}", actionLog.id);
+        }
     }
 
     public void end(String message) {
         logger.debug(message);
-        ActionLogger actionLogger = actionLoggers.get();
-        actionLoggers.remove();   // remove action logger first, make all log during end() not appending to trace
-        actionLogger.end();
+
+        ActionLog actionLog = currentActionLog();
+        this.actionLog.remove();
+
+        actionLog.end();
+
+        if (actionLogger != null) actionLogger.write(actionLog);
+        if (logForwarder != null) logForwarder.forwardActionLog(actionLog);
+
+        if (traceLoggerFactory != null) {
+            TraceLogger traceLogger = this.traceLogger.get();
+            this.traceLogger.remove();
+            traceLogger.close();
+        }
     }
 
     public void process(LogEvent event) {
-        ActionLogger logger = actionLoggers.get();
-        if (logger != null) logger.process(event);
+        TraceLogger traceLogger = this.traceLogger.get();
+        if (traceLogger != null) traceLogger.process(event);
+    }
+
+    public void start() {
+        if (logForwarder != null) logForwarder.start();
     }
 
     public void stop() {
         if (logForwarder != null) logForwarder.stop();
-        if (actionLogWriter != null) actionLogWriter.close();
+        if (actionLogger != null) actionLogger.close();
     }
 
     public ActionLog currentActionLog() {
-        ActionLogger logger = actionLoggers.get();
-        if (logger == null) return null;
-        return logger.log;
+        return actionLog.get();
     }
 
     public void logError(Throwable e) {

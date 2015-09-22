@@ -13,13 +13,13 @@ import java.util.UUID;
 /**
  * @author neo
  */
-public class ActionLog {
+public final class ActionLog {
     private final Logger logger = LoggerFactory.getLogger(ActionLog.class);
 
     final Instant startTime = Instant.now();
     public final String id = UUID.randomUUID().toString();
     private LogLevel result = LogLevel.INFO;
-    public boolean trace;  // whether always write trace log for all subsequent actions
+    public boolean trace;  // whether flush trace log for all subsequent actions
     public String action = "unassigned";
     String refId;
     String errorMessage;

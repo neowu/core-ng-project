@@ -1,8 +1,8 @@
 package core.framework.api.module;
 
-import core.framework.impl.log.ActionLogWriter;
+import core.framework.impl.log.ActionLogger;
 import core.framework.impl.log.LogForwarder;
-import core.framework.impl.log.TraceLogWriter;
+import core.framework.impl.log.TraceLoggerFactory;
 import core.framework.impl.module.ModuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ public final class LogConfig {
         if (context.test) {
             logger.info("disable action log during test");
         } else {
-            context.logManager.actionLogWriter = ActionLogWriter.console();
+            context.logManager.actionLogger = ActionLogger.console();
         }
     }
 
@@ -33,7 +33,7 @@ public final class LogConfig {
         if (context.test) {
             logger.info("disable action log during test");
         } else {
-            context.logManager.actionLogWriter = ActionLogWriter.file(actionLogPath);
+            context.logManager.actionLogger = ActionLogger.file(actionLogPath);
         }
     }
 
@@ -41,7 +41,7 @@ public final class LogConfig {
         if (context.test) {
             logger.info("disable trace log during test");
         } else {
-            context.logManager.traceLogWriter = TraceLogWriter.console();
+            context.logManager.traceLoggerFactory = TraceLoggerFactory.console();
         }
     }
 
@@ -49,7 +49,7 @@ public final class LogConfig {
         if (context.test) {
             logger.info("disable trace log during test");
         } else {
-            context.logManager.traceLogWriter = TraceLogWriter.file(traceLogPath);
+            context.logManager.traceLoggerFactory = TraceLoggerFactory.file(traceLogPath);
         }
     }
 
@@ -58,7 +58,6 @@ public final class LogConfig {
             logger.info("disable log forwarding during test");
         } else {
             context.logManager.logForwarder = new LogForwarder(host, context.logManager.appName);
-            context.startupHook.add(context.logManager.logForwarder::start);
         }
     }
 }

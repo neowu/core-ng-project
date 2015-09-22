@@ -20,7 +20,7 @@ public class AsyncExecutor {
     }
 
     public <T> Future<T> submit(String name, Callable<T> task) {
-        // not log intentionally, so in batch pattern where one batch submit task for each item, the batch process won't reach max trace log line limit.
+        // do not log intentionally, so in batch pattern where one batch submit task for each item, the batch process won't reach max trace log line limit.
         ActionLog parentActionLog = logManager.currentActionLog();
         String refId = parentActionLog != null ? parentActionLog.refId() : null;
         String action = parentActionLog != null ? parentActionLog.action + "/" + name : name;

@@ -1,85 +1,125 @@
 package core.framework.impl.log;
 
-import core.framework.api.util.Lists;
+import core.framework.api.util.Charsets;
+import core.framework.api.util.Exceptions;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.UncheckedIOException;
 import java.io.Writer;
-import java.util.LinkedList;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 /**
  * @author neo
  */
-class ActionLogger {
-    private static final int MAX_HOLD_SIZE = 5000;
-
-    private final ActionLogWriter actionLogWriter;
-    private final TraceLogWriter traceLogWriter;
-    private final LogForwarder logForwarder;
-
-    final ActionLog log = new ActionLog();
-
-    private List<LogEvent> events = new LinkedList<>();
-    private int size = 0;
-    private Writer traceWriter;
-
-    public ActionLogger(ActionLogWriter actionLogWriter, TraceLogWriter traceLogWriter, LogForwarder logForwarder) {
-        this.actionLogWriter = actionLogWriter;
-        this.traceLogWriter = traceLogWriter;
-        this.logForwarder = logForwarder;
+public final class ActionLogger {
+    public static ActionLogger console() {
+        return new ActionLogger(new BufferedWriter(new OutputStreamWriter(System.out, Charsets.UTF_8)));
     }
 
-    public void process(LogEvent event) {
-        log.updateResult(event.level);
-        size++;
-        if (events != null) {
-            events.add(event);
-            if (event.level.value >= LogLevel.WARN.value || size >= MAX_HOLD_SIZE) {
-                flushTraceLogs();
-                events = null;
-            }
-        } else {
-            writeTraceLog(event);
+    public static ActionLogger file(Path actionLogPath) {
+        Path path = actionLogPath.toAbsolutePath();
+        try {
+            Files.createDirectories(path.getParent());
+            if (Files.notExists(path)) Files.createFile(path);
+            if (!Files.isWritable(path)) throw Exceptions.error("action log file is not writable, path={}", path);
+            return new ActionLogger(Files.newBufferedWriter(path, Charsets.UTF_8, StandardOpenOption.APPEND));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
-    public void end() {
-        log.end();
+    private static final String LOG_SPLITTER = " | ";
+    private final Writer writer;
+    private final PrintStream fallbackLogger = System.err;
 
-        if (actionLogWriter != null) actionLogWriter.write(log);
-
-        if (traceWriter != null) traceLogWriter.closeWriter(traceWriter);
-
-        if (logForwarder != null) logForwarder.forwardActionLog(log);
+    private ActionLogger(Writer writer) {
+        this.writer = writer;
     }
 
-    private void flushTraceLogs() {
-        if (traceLogWriter != null) {
-            traceWriter = traceLogWriter.createWriter(log);
-
-            for (LogEvent event : events) {
-                traceLogWriter.write(traceWriter, event);
-            }
-        }
-
-        if (logForwarder != null) {
-            logForwarder.forwardTraceLog(log, events);
+    void write(ActionLog log) {
+        String actionLogMessage = actionLogMessage(log);
+        try {
+            writer.write(actionLogMessage);
+            writer.flush();
+        } catch (IOException e) {
+            fallbackLogger.println("failed to write action log, log=" + actionLogMessage + ", error=" + Exceptions.stackTrace(e));
         }
     }
 
-    void writeTraceLog(LogEvent event) {
-        if (size == MAX_HOLD_SIZE + 1) {
-            log.updateResult(LogLevel.WARN);
-            LogEvent warning = new LogEvent(LogLevel.WARN, System.currentTimeMillis(), LoggerImpl.abbreviateLoggerName(ActionLogger.class.getCanonicalName()), "reached max holding size of trace log, please contact arch team to split big task into smaller batch", null, null);
+    void close() {
+        try {
+            writer.close();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
-            if (traceLogWriter != null) traceLogWriter.write(traceWriter, warning);
+    String actionLogMessage(ActionLog log) {
+        StringBuilder builder = new StringBuilder(256);
+        builder.append(DateTimeFormatter.ISO_INSTANT.format(log.startTime))
+            .append(LOG_SPLITTER)
+            .append(log.result())
+            .append(LOG_SPLITTER)
+            .append("elapsed=")
+            .append(log.elapsed)
+            .append(LOG_SPLITTER)
+            .append("id=")
+            .append(log.id)
+            .append(LOG_SPLITTER)
+            .append("action=")
+            .append(log.action);
 
-            if (logForwarder != null) logForwarder.forwardTraceLog(log, Lists.newArrayList(warning));
+        if (log.refId != null) {
+            builder.append(LOG_SPLITTER)
+                .append("refId=")
+                .append(log.refId);
         }
 
-        if (traceLogWriter != null) traceLogWriter.write(traceWriter, event);
-
-        if (logForwarder != null && size <= MAX_HOLD_SIZE) {    // not forward trace to queue if more than max lines.
-            logForwarder.forwardTraceLog(log, Lists.newArrayList(event));
+        if (log.exceptionClass != null) {
+            builder.append(LOG_SPLITTER)
+                .append("errorMessage=")
+                .append(filterLineSeparator(log.errorMessage))
+                .append(LOG_SPLITTER)
+                .append("exceptionClass=")
+                .append(log.exceptionClass.getCanonicalName());
         }
+
+        for (Map.Entry<String, String> entry : log.context.entrySet()) {
+            builder.append(LOG_SPLITTER)
+                .append(entry.getKey())
+                .append('=')
+                .append(filterLineSeparator(entry.getValue()));
+        }
+
+        for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
+            String action = entry.getKey();
+            PerformanceStat tracking = entry.getValue();
+            builder.append(LOG_SPLITTER)
+                .append(action).append("Count=").append(tracking.count)
+                .append(LOG_SPLITTER)
+                .append(action).append("ElapsedTime=").append(tracking.totalElapsed);
+        }
+
+        builder.append(System.lineSeparator());
+
+        return builder.toString();
+    }
+
+    String filterLineSeparator(String value) {
+        if (value == null) return "";
+        StringBuilder builder = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char ch = value.charAt(i);
+            if (ch == '\n' || ch == '\r') builder.append(' ');
+            else builder.append(ch);
+        }
+        return builder.toString();
     }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class DefaultLoggerFactory implements ILoggerFactory {
+public final class DefaultLoggerFactory implements ILoggerFactory {
     private final Map<String, Logger> loggers = Maps.newConcurrentHashMap();
     public final LogManager logManager;
 

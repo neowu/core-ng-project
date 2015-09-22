@@ -28,7 +28,7 @@ public final class ActionLogContext {
     public static void put(String key, Object value) {
         LogManager logManager = logManager();
         ActionLog actionLog = logManager.currentActionLog();
-        if (actionLog != null) {
+        if (actionLog != null) {    // here to check null is for unit testing the logManager.begin may not be called
             actionLog.context(key, value);
         }
     }

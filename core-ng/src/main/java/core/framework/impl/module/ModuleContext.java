@@ -47,6 +47,7 @@ public class ModuleContext {
 
         this.logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
         if (!test) {
+            startupHook.add(logManager::start);
             shutdownHook.add(logManager::stop);
         }
 

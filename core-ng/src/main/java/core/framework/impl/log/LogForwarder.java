@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author neo
  */
-public class LogForwarder {
+public final class LogForwarder {
     private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
     private final String appName;
 
@@ -69,11 +69,11 @@ public class LogForwarder {
         logForwarderThread.setPriority(Thread.NORM_PRIORITY - 1);
     }
 
-    public void start() {
+    void start() {
         logForwarderThread.start();
     }
 
-    public void stop() {
+    void stop() {
         logger.info("stop log forwarder");
         stop.set(true);
         logForwarderThread.interrupt();
@@ -147,6 +147,18 @@ public class LogForwarder {
             content.append(event.logMessage());
         }
         message.content = content.toString();
+
+        logMessageQueue.add(message);
+    }
+
+    void forwardTraceLog(ActionLog log, LogEvent event) {
+        TraceLogMessage message = new TraceLogMessage();
+        message.id = log.id;
+        message.date = log.startTime;
+        message.app = appName;
+        message.action = log.action;
+        message.result = log.result();
+        message.content = event.logMessage();
 
         logMessageQueue.add(message);
     }

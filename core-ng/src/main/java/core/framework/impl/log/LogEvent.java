@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * @author neo
  */
-class LogEvent {
+final class LogEvent {
     final LogLevel level;
     final long time;
     final String logger;
@@ -19,7 +19,7 @@ class LogEvent {
 
     String logMessage;
 
-    public LogEvent(LogLevel level, long time, String logger, String message, Object[] arguments, Throwable exception) {
+    LogEvent(LogLevel level, long time, String logger, String message, Object[] arguments, Throwable exception) {
         this.level = level;
         this.time = time;
         this.logger = logger;
@@ -28,7 +28,7 @@ class LogEvent {
         this.exception = exception;
     }
 
-    public String logMessage() {
+    String logMessage() {
         if (logMessage == null) {
             StringBuilder builder = new StringBuilder(64);
             builder.append(DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(time)))
