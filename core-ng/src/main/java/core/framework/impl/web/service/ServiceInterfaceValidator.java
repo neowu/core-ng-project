@@ -10,11 +10,9 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.web.BeanValidator;
 
-import javax.xml.bind.annotation.XmlAccessorType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,7 +29,7 @@ public class ServiceInterfaceValidator {
 
     public void validate() {
         if (!serviceInterface.isInterface())
-            throw Exceptions.error("service interface must be interface, serviceInterface={}", serviceInterface);
+            throw Exceptions.error("service interface must be interface, serviceInterface={}", serviceInterface.getCanonicalName());
 
         for (Method method : serviceInterface.getDeclaredMethods()) {
             validate(method);
@@ -50,25 +48,19 @@ public class ServiceInterfaceValidator {
         Type requestBeanType = null;
 
         Annotation[][] annotations = method.getParameterAnnotations();
-        Type[] parameterTypes = method.getGenericParameterTypes();
-        Class<?>[] parameterClasses = method.getParameterTypes();
+        Type[] paramTypes = method.getGenericParameterTypes();
         Set<String> pathParams = Sets.newHashSet();
 
-        for (int i = 0; i < parameterTypes.length; i++) {
-            Type paramType = parameterTypes[i];
+        for (int i = 0; i < paramTypes.length; i++) {
+            Type paramType = paramTypes[i];
             PathParam pathParam = pathParam(annotations[i]);
             if (pathParam != null) {
                 validatePathParamType(paramType);
                 pathParams.add(pathParam.value());
             } else {
                 if (requestBeanType != null)
-                    throw Exceptions.error("service method must not have more than one bean param, previous={}, current={}", requestBeanType, paramType);
+                    throw Exceptions.error("service method must not have more than one bean param, previous={}, current={}", requestBeanType.getTypeName(), paramType.getTypeName());
 
-                Class<?> paramClass = parameterClasses[i];
-
-                if (!paramClass.equals(List.class) && !paramClass.isAnnotationPresent(XmlAccessorType.class)) {
-                    throw Exceptions.error("bean param must have @XmlAccessorType, use @PathParam if it is path param, class={}", paramType);
-                }
                 requestBeanType = paramType;
                 validator.register(paramType);
             }

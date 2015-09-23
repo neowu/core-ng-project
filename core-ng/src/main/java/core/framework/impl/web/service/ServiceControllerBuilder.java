@@ -9,12 +9,14 @@ import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.ResponseStatus;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
-import core.framework.impl.code.TypeHelper;
+import core.framework.impl.reflect.GenericTypes;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
+
+import static core.framework.impl.code.CodeBuilder.typeVariableLiteral;
 
 /**
  * @author neo
@@ -53,18 +55,27 @@ public class ServiceControllerBuilder<T> {
         Annotation[][] annotations = method.getParameterAnnotations();
         Type[] paramTypes = method.getGenericParameterTypes();
         for (int i = 0, annotationsLength = annotations.length; i < annotationsLength; i++) {
-            TypeHelper paramType = new TypeHelper(paramTypes[i]);
+            Type paramType = paramTypes[i];
+            String paramTypeLiteral = GenericTypes.rawClass(paramType).getCanonicalName();
             PathParam pathParam = pathParam(annotations[i]);
             if (pathParam != null) {
                 params.add(pathParam.value());
-                builder.indent(1).append("{} {} = ({}) request.pathParam(\"{}\", {});\n", paramType.variableType(), pathParam.value(), paramType.variableType(), pathParam.value(), paramType.variableValue());
+                builder.indent(1).append("{} {} = ({}) request.pathParam(\"{}\", {});\n",
+                    paramTypeLiteral,
+                    pathParam.value(),
+                    paramTypeLiteral,
+                    pathParam.value(),
+                    typeVariableLiteral(paramType));
             } else {
                 params.add("bean");
-                builder.indent(1).append("{} bean = ({}) request.bean({});\n", paramType.variableType(), paramType.variableType(), paramType.variableValue());
+                builder.indent(1).append("{} bean = ({}) request.bean({});\n",
+                    paramTypeLiteral,
+                    paramTypeLiteral,
+                    typeVariableLiteral(paramType));
             }
         }
 
-        if (void.class.equals(method.getReturnType())) {
+        if (void.class == method.getReturnType()) {
             builder.indent(1).append("delegate.{}(", method.getName());
         } else {
             builder.indent(1).append("{} response = delegate.{}(", method.getReturnType().getCanonicalName(), method.getName());
@@ -79,9 +90,13 @@ public class ServiceControllerBuilder<T> {
         builder.append(");\n");
 
         if (void.class.equals(method.getReturnType())) {
-            builder.indent(1).append("return {}.empty().status({}.{});\n", Response.class.getCanonicalName(), HTTPStatus.class.getCanonicalName(), responseStatus.name());
+            builder.indent(1).append("return {}.empty().status({});\n",
+                Response.class.getCanonicalName(),
+                HTTPStatus.class.getCanonicalName() + "." + responseStatus.name());
         } else {
-            builder.indent(1).append("return {}.bean(response).status({}.{});\n", Response.class.getCanonicalName(), HTTPStatus.class.getCanonicalName(), responseStatus.name());
+            builder.indent(1).append("return {}.bean(response).status({});\n",
+                Response.class.getCanonicalName(),
+                HTTPStatus.class.getCanonicalName() + "." + responseStatus.name());
         }
 
         builder.append("}");

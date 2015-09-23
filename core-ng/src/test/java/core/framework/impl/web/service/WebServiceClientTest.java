@@ -2,6 +2,7 @@ package core.framework.impl.web.service;
 
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.util.Maps;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -21,7 +22,7 @@ public class WebServiceClientTest {
 
     @Before
     public void prepare() {
-        webServiceClient = new WebServiceClient(null, null, null, null);
+        webServiceClient = new WebServiceClient("http://localhost", null, null, null);
         request = Mockito.mock(HTTPRequest.class);
     }
 
@@ -37,5 +38,17 @@ public class WebServiceClientTest {
         verify(request, times(1)).addParam("p1", "v1");
         verify(request, never()).addParam("p2", null);
         verify(request, times(1)).addParam("p3", "v3");
+    }
+
+    @Test
+    public void serviceURL() {
+        Assert.assertEquals("http://localhost", webServiceClient.serviceURL("/", Maps.newHashMap()));     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
+        Assert.assertEquals("http://localhost/test", webServiceClient.serviceURL("/test", Maps.newHashMap()));
+
+        Map<String, String> pathParams = Maps.newHashMap();
+        pathParams.put("id", "1");
+
+        Assert.assertEquals("http://localhost/test/1", webServiceClient.serviceURL("/test/:id(\\d+)", pathParams));
+        Assert.assertEquals("http://localhost/test/1", webServiceClient.serviceURL("/test/:id", pathParams));
     }
 }

@@ -6,12 +6,14 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
-import core.framework.impl.code.TypeHelper;
+import core.framework.impl.reflect.GenericTypes;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Map;
+
+import static core.framework.impl.code.CodeBuilder.typeVariableLiteral;
 
 /**
  * @author neo
@@ -44,11 +46,12 @@ public class WebServiceClientBuilder<T> {
         String path = method.getDeclaredAnnotation(Path.class).value();
         HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
 
-        TypeHelper returnType = new TypeHelper(method.getGenericReturnType());
+        Type returnType = method.getGenericReturnType();
+
         Map<String, Integer> pathParamIndexes = Maps.newHashMap();
         Type requestBeanType = null;
         Integer requestBeanIndex = null;
-        builder.append("public {} {}(", returnType.canonicalName(), method.getName());
+        builder.append("public {} {}(", GenericTypes.rawClass(returnType).getCanonicalName(), method.getName());
         Annotation[][] annotations = method.getParameterAnnotations();
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
@@ -66,22 +69,24 @@ public class WebServiceClientBuilder<T> {
         }
         builder.append(") {\n");
 
-        builder.indent(1).append("java.lang.reflect.Type requestBeanType = {};\n", requestBeanType == null ? "null" : new TypeHelper(requestBeanType).variableValue());
+        builder.indent(1).append("java.lang.reflect.Type requestType = {};\n", requestBeanType == null ? "null" : typeVariableLiteral(requestBeanType));
         builder.indent(1).append("Object requestBean = {};\n", requestBeanIndex == null ? "null" : "param" + requestBeanIndex);
 
         builder.indent(1).append("java.util.Map pathParams = new java.util.HashMap();\n");
         pathParamIndexes.forEach((name, index) ->
             builder.indent(1).append("pathParams.put(\"{}\", String.valueOf(param{}));\n", name, index));
 
-        builder.indent(1).append("{} response = ({}) client.execute({}.{},\"{}\",pathParams,requestBeanType,requestBean,{});\n",
-            returnType.variableType(),
-            returnType.variableType(),
-            HTTPMethod.class.getCanonicalName(),
-            httpMethod.name(),
-            path,
-            returnType.variableValue());
+        String returnTypeLiteral = returnType == void.class ? Void.class.getCanonicalName() : GenericTypes.rawClass(returnType).getCanonicalName();
 
-        if (!returnType.isVoid()) builder.indent(1).append("return response;\n");
+        builder.indent(1).append("String serviceURL = client.serviceURL(\"{}\", pathParams);\n", path);
+
+        builder.indent(1).append("{} response = ({}) client.execute({}, serviceURL, requestType, requestBean, {});\n",
+            returnTypeLiteral,
+            returnTypeLiteral,
+            HTTPMethod.class.getCanonicalName() + "." + httpMethod.name(),
+            typeVariableLiteral(returnType));
+
+        if (returnType != void.class) builder.indent(1).append("return response;\n");
 
         builder.append("}");
         return builder.build();

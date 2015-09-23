@@ -47,30 +47,47 @@ public class WebServiceClient implements WebServiceClientConfig {
         this.logManager = logManager;
     }
 
-    public <T> T execute(HTTPMethod method, String path, Map<String, String> pathParams, Type requestType, Object requestBean, Type responseType) {
-        logger.debug("call web service, serviceURL={}, method={}, path={}, pathParams={}", serviceURL, method, path, pathParams);
+    public String serviceURL(String pathPattern, Map<String, String> pathParams) {
+        StringBuilder builder = new StringBuilder(serviceURL);
+        Path path = Path.parse(pathPattern).next; // skip the first '/'
+        while (path != null) {
+            String value = path.value;
+            if ("/".equals(value)) {
+                builder.append(value);
+            } else if (value.startsWith(":")) {
+                int paramIndex = value.indexOf('(');
+                int endIndex = paramIndex > 0 ? paramIndex : value.length();
+                String variable = value.substring(1, endIndex);
+                builder.append('/').append(Encodings.urlPath(pathParams.get(variable)));
+            } else {
+                builder.append('/').append(value);
+            }
+            path = path.next;
+        }
+        return builder.toString();
+    }
 
+    public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {
         if (requestType != null) {
             validator.validate(requestType, requestBean);
         }
 
-        String serviceURL = serviceURL(path, pathParams);
-        HTTPRequest httpRequest = new HTTPRequest(method, serviceURL);
-        httpRequest.header(HTTPHeaders.ACCEPT, ContentTypes.APPLICATION_JSON);
+        HTTPRequest request = new HTTPRequest(method, serviceURL);
+        request.header(HTTPHeaders.ACCEPT, ContentTypes.APPLICATION_JSON);
 
         if (logManager.appName != null) {
-            httpRequest.header(HTTPServerHandler.HEADER_CLIENT, logManager.appName);
+            request.header(HTTPServerHandler.HEADER_CLIENT, logManager.appName);
         }
 
-        linkContext(httpRequest);
+        linkContext(request);
 
         if (requestBean != null) {
             String json = JSON.toJSON(requestBean);
             if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
                 Map<String, String> queryParams = JSON.fromJSON(Types.map(String.class, String.class), json);
-                addQueryParams(httpRequest, queryParams);
+                addQueryParams(request, queryParams);
             } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
-                httpRequest.text(json, ContentTypes.APPLICATION_JSON);
+                request.text(json, ContentTypes.APPLICATION_JSON);
             } else {
                 throw Exceptions.error("not supported method, method={}", method);
             }
@@ -78,10 +95,10 @@ public class WebServiceClient implements WebServiceClientConfig {
 
         if (signer != null) {
             logger.debug("sign request, signer={}", signer.getClass().getCanonicalName());
-            signer.sign(httpRequest);
+            signer.sign(request);
         }
 
-        HTTPResponse response = httpClient.execute(httpRequest);
+        HTTPResponse response = httpClient.execute(request);
         validateResponse(response);
 
         if (void.class != responseType) {
@@ -133,24 +150,5 @@ public class WebServiceClient implements WebServiceClientConfig {
             logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, responseText, e);
             throw new RemoteServiceException(Strings.format("received non 2xx status code, status={}, responseText={}", status.code, responseText), e);
         }
-    }
-
-    private String serviceURL(String pathPattern, Map<String, String> pathParams) {
-        StringBuilder builder = new StringBuilder(this.serviceURL);
-        Path path = Path.parse(pathPattern).next; // skip the first '/'
-        while (path != null) {
-            String value = path.value;
-            if ("/".equals(value)) builder.append(value);
-            else if (value.startsWith(":")) {
-                int paramIndex = value.indexOf('(');
-                int endIndex = paramIndex > 0 ? paramIndex : value.length();
-                String variable = value.substring(1, endIndex);
-                builder.append('/').append(Encodings.urlPath(pathParams.get(variable)));
-            } else {
-                builder.append('/').append(value);
-            }
-            path = path.next;
-        }
-        return builder.toString();
     }
 }
