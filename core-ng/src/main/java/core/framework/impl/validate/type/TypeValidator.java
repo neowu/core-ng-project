@@ -136,6 +136,6 @@ public class TypeValidator {
 
     private String path(String parent, String field) {
         if (parent == null) return field;
-        return parent + '.' + field;
+        return parent + "/" + field;
     }
 }

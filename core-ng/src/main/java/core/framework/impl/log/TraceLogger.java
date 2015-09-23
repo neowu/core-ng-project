@@ -125,6 +125,6 @@ class TraceLogger {
     String traceLogFilePath(String logDirectory, LocalDateTime date, String action, String id) {
         String sequence = Randoms.alphaNumeric(5);
 
-        return logDirectory + '/' + action + '/' + TRACE_LOG_DATE_FORMAT.format(date) + '.' + id + '.' + sequence + ".log";
+        return logDirectory + "/" + action + "/" + TRACE_LOG_DATE_FORMAT.format(date) + "." + id + "." + sequence + ".log";
     }
 }

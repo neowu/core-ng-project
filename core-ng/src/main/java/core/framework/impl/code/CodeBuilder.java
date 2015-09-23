@@ -10,6 +10,10 @@ import java.lang.reflect.Type;
  * @author neo
  */
 public class CodeBuilder {
+    public static String enumVariableLiteral(Enum value) {
+        return value.getDeclaringClass().getCanonicalName() + "." + value.name();
+    }
+
     public static String typeVariableLiteral(Type type) {
         if (GenericTypes.isList(type)) {
             return Types.class.getCanonicalName() + ".list(" + GenericTypes.listValueClass(type).getCanonicalName() + ".class)";

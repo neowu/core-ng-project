@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+import static core.framework.impl.code.CodeBuilder.enumVariableLiteral;
 import static core.framework.impl.code.CodeBuilder.typeVariableLiteral;
 
 /**
@@ -78,12 +79,12 @@ public class WebServiceClientBuilder<T> {
 
         String returnTypeLiteral = returnType == void.class ? Void.class.getCanonicalName() : GenericTypes.rawClass(returnType).getCanonicalName();
 
-        builder.indent(1).append("String serviceURL = client.serviceURL(\"{}\", pathParams);\n", path);
+        builder.indent(1).append("String serviceURL = client.serviceURL(\"{}\", pathParams);\n", path); // to pass path as string literal, the escaped char will not be transferred, like \\, currently not convert is because only type regex may contain special char
 
         builder.indent(1).append("{} response = ({}) client.execute({}, serviceURL, requestType, requestBean, {});\n",
             returnTypeLiteral,
             returnTypeLiteral,
-            HTTPMethod.class.getCanonicalName() + "." + httpMethod.name(),
+            enumVariableLiteral(httpMethod),
             typeVariableLiteral(returnType));
 
         if (returnType != void.class) builder.indent(1).append("return response;\n");

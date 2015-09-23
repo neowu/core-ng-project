@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import static core.framework.impl.code.CodeBuilder.enumVariableLiteral;
 import static core.framework.impl.code.CodeBuilder.typeVariableLiteral;
 
 /**
@@ -54,7 +55,7 @@ public class ServiceControllerBuilder<T> {
 
         Annotation[][] annotations = method.getParameterAnnotations();
         Type[] paramTypes = method.getGenericParameterTypes();
-        for (int i = 0, annotationsLength = annotations.length; i < annotationsLength; i++) {
+        for (int i = 0; i < annotations.length; i++) {
             Type paramType = paramTypes[i];
             String paramTypeLiteral = GenericTypes.rawClass(paramType).getCanonicalName();
             PathParam pathParam = pathParam(annotations[i]);
@@ -92,11 +93,11 @@ public class ServiceControllerBuilder<T> {
         if (void.class.equals(method.getReturnType())) {
             builder.indent(1).append("return {}.empty().status({});\n",
                 Response.class.getCanonicalName(),
-                HTTPStatus.class.getCanonicalName() + "." + responseStatus.name());
+                enumVariableLiteral(responseStatus));
         } else {
             builder.indent(1).append("return {}.bean(response).status({});\n",
                 Response.class.getCanonicalName(),
-                HTTPStatus.class.getCanonicalName() + "." + responseStatus.name());
+                enumVariableLiteral(responseStatus));
         }
 
         builder.append("}");
