@@ -5,12 +5,14 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.web.CookieSpec;
+import core.framework.api.web.MultipartFile;
 import core.framework.api.web.Request;
 import core.framework.api.web.Session;
 import core.framework.api.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.form.FormData;
+import io.undertow.util.Headers;
 
 import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
@@ -108,10 +110,25 @@ public final class RequestImpl implements Request {
 
     @Override
     public Optional<String> formParam(String name) {
+        FormData.FormValue value = formValue(name);
+        if (value == null) return Optional.empty();
+        return Optional.ofNullable(value.getValue());
+    }
+
+    @Override
+    public Optional<MultipartFile> file(String name) {
+        FormData.FormValue value = formValue(name);
+        if (value == null) return Optional.empty();
+        if (!value.isFile())
+            throw new BadRequestException("form body must be multipart, method=" + method + ", contentType=" + contentType);
+        return Optional.of(new MultipartFile(value.getFile(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
+    }
+
+    private FormData.FormValue formValue(String name) {
         if (formData == null)
             throw new BadRequestException("form body is required, method=" + method + ", contentType=" + contentType);
 
-        return Optional.ofNullable(formData.getFirst(name).getValue());
+        return formData.getFirst(name);
     }
 
     @Override

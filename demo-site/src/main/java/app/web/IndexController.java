@@ -32,4 +32,8 @@ public class IndexController {
         model.backgroundColor = "gainsboro";
         return Response.template("/template/css/main.css", model).contentType(ContentTypes.TEXT_CSS);
     }
+
+    public Response submit(Request request) {
+        return Response.text("hello " + request.formParam("name").get(), ContentTypes.TEXT_PLAIN);
+    }
 }

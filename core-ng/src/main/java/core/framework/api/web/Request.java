@@ -27,6 +27,8 @@ public interface Request {
 
     Optional<String> formParam(String name);
 
+    Optional<MultipartFile> file(String name);
+
     <T> T bean(Type instanceType);
 
     String clientIP();

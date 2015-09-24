@@ -32,7 +32,7 @@ public class HTTPServer {
         try {
             server = Undertow.builder()
                 .addHttpListener(port, "0.0.0.0")
-                .setHandler(handler)
+                .setHandler(new HTTPServerIOHandler(handler))
                 .build();
             server.start();
         } finally {

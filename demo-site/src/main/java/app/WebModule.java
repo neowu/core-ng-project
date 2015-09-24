@@ -2,6 +2,7 @@ package app;
 
 import app.web.IndexController;
 import app.web.IndexPage;
+import app.web.UploadController;
 import app.web.WildcardController;
 import app.web.interceptor.TestInterceptor;
 import core.framework.api.Module;
@@ -25,9 +26,14 @@ public class WebModule extends Module {
         site().staticContent("/static");
         site().message().loadProperties("messages/main.properties");
 
-        IndexController controller = bind(IndexController.class);
-        route().get("/", controller::index);
-        route().get("/css/main.css", controller::css);
+        IndexController index = bind(IndexController.class);
+        route().get("/", index::index);
+        route().get("/css/main.css", index::css);
+        route().post("/submit", index::submit);
+
+        UploadController upload = bind(UploadController.class);
+        route().get("/upload", upload::get);
+        route().post("/upload", upload::post);
 
         WildcardController wildcardController = bind(WildcardController.class);
         route().get("/:all(*)", wildcardController::wildcard);

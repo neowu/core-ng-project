@@ -6,8 +6,8 @@ import core.framework.api.util.InputStreams;
 import core.framework.api.util.Strings;
 import core.framework.impl.log.ActionLog;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
-import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
@@ -22,7 +22,6 @@ import java.io.InputStream;
  */
 public class RequestParser {
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
-    private final FormParserFactory formParserFactory = FormParserFactory.builder().build();
 
     void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws IOException {
         request.method = HTTPMethod.valueOf(exchange.getRequestMethod().toString());
@@ -74,9 +73,9 @@ public class RequestParser {
             request.body = new String(readRequestBody(exchange), Charsets.UTF_8);
             logger.debug("[request] body={}", request.body);
         } else if (request.method() == HTTPMethod.POST) {
-            FormDataParser parser = formParserFactory.createParser(exchange);
-            if (parser != null) {
-                request.formData = parser.parseBlocking();
+            FormData formData = exchange.getAttachment(FormDataParser.FORM_DATA);
+            if (formData != null) {
+                request.formData = formData;
                 for (String name : request.formData) {
                     logger.debug("[request:form] {}={}", name, request.formData.get(name));
                 }
