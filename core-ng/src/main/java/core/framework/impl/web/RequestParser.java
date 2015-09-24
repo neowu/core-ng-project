@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Deque;
 
 /**
  * @author neo
@@ -72,12 +73,23 @@ public class RequestParser {
             exchange.startBlocking();
             request.body = new String(readRequestBody(exchange), Charsets.UTF_8);
             logger.debug("[request] body={}", request.body);
-        } else if (request.method() == HTTPMethod.POST) {
+        } else {
             FormData formData = exchange.getAttachment(FormDataParser.FORM_DATA);
             if (formData != null) {
                 request.formData = formData;
-                for (String name : request.formData) {
-                    logger.debug("[request:form] {}={}", name, request.formData.get(name));
+                logForm(request);
+            }
+        }
+    }
+
+    private void logForm(RequestImpl request) {
+        for (String name : request.formData) {
+            Deque<FormData.FormValue> values = request.formData.get(name);
+            for (FormData.FormValue value : values) {
+                if (value.isFile()) {
+                    logger.debug("[request:file] {}={}, size={}", name, value.getFileName(), value.getFile().length());
+                } else {
+                    logger.debug("[request:form] {}={}", name, value.getValue());
                 }
             }
         }
