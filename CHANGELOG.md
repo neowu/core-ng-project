@@ -1,8 +1,9 @@
 ## Change log
 
-### 3.6.1 (9/21/2015 - )
+### 3.6.1 (9/21/2015 - 9/25/2015)
 * web-service: moved core.framework.api.web.client.WebServiceRequestSigner to core.framework.api.web.service.WebServiceRequestSigner
 * web: changed form parsing threading model, support file upload
+* web: read json body in IO thread
 * refactory: web-service code generator, logger
 
 ### 3.6.0 (9/18/2015 - 9/21/2015)

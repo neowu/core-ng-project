@@ -5,7 +5,7 @@ import core.framework.api.util.JSON;
 import core.framework.api.util.Types;
 import core.framework.api.web.ResponseImpl;
 import core.framework.impl.web.BeanValidator;
-import core.framework.impl.web.RequestImpl;
+import core.framework.impl.web.request.RequestImpl;
 import io.undertow.io.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

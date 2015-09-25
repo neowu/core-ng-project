@@ -15,6 +15,7 @@ import core.framework.api.web.exception.NotFoundException;
 import core.framework.api.web.exception.UnauthorizedException;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.exception.ValidationErrorResponse;
+import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.response.ResponseHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;

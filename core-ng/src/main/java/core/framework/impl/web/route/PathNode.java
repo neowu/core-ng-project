@@ -4,7 +4,7 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
-import core.framework.impl.web.PathParams;
+import core.framework.impl.web.request.PathParams;
 
 import java.util.List;
 import java.util.Map;

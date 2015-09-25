@@ -2,7 +2,7 @@ package core.framework.impl.web.session;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.web.Session;
-import core.framework.impl.web.RequestImpl;
+import core.framework.impl.web.request.RequestImpl;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import org.slf4j.Logger;

@@ -4,7 +4,7 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* web: read json body in IO thread
+* byte[], general byte array buffer to write from ByteBuffer and InputStream
 * template, use ByteBuffer[] for performance tuning
 * template: review expression, validate methods in model class
 * async: think about how to support batch with fixed concurrency
@@ -25,6 +25,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * cm: config management, dynamic update properties?
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
 * db: batch insert/update auto convert to small batch like 3000?
+* web: better handle max size of post/multipart, with proper response code and action log?
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)

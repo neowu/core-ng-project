@@ -1,4 +1,4 @@
-package core.framework.impl.web;
+package core.framework.impl.web.request;
 
 import org.junit.Assert;
 import org.junit.Test;

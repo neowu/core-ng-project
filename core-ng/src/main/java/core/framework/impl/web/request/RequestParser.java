@@ -1,8 +1,6 @@
-package core.framework.impl.web;
+package core.framework.impl.web.request;
 
 import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.Charsets;
-import core.framework.api.util.InputStreams;
 import core.framework.api.util.Strings;
 import core.framework.impl.log.ActionLog;
 import io.undertow.server.HttpServerExchange;
@@ -15,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Deque;
 
 /**
@@ -24,7 +21,7 @@ import java.util.Deque;
 public class RequestParser {
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
-    void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws IOException {
+    public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws IOException {
         request.method = HTTPMethod.valueOf(exchange.getRequestMethod().toString());
         actionLog.context("method", request.method());
 
@@ -69,39 +66,26 @@ public class RequestParser {
     }
 
     void parseBody(RequestImpl request, HttpServerExchange exchange) throws IOException {
-        if (request.contentType != null && request.contentType.startsWith("application/json")) {
-            exchange.startBlocking();
-            request.body = new String(readRequestBody(exchange), Charsets.UTF_8);
+        TextBodyReader.TextBody body = exchange.getAttachment(TextBodyReader.TEXT_BODY);
+        if (body != null) {
+            request.body = body.content;
             logger.debug("[request] body={}", request.body);
-        } else {
-            FormData formData = exchange.getAttachment(FormDataParser.FORM_DATA);
-            if (formData != null) {
-                request.formData = formData;
-                logForm(request);
-            }
+            return;
         }
-    }
 
-    private void logForm(RequestImpl request) {
-        for (String name : request.formData) {
-            Deque<FormData.FormValue> values = request.formData.get(name);
-            for (FormData.FormValue value : values) {
-                if (value.isFile()) {
-                    logger.debug("[request:file] {}={}, size={}", name, value.getFileName(), value.getFile().length());
-                } else {
-                    logger.debug("[request:form] {}={}", name, value.getValue());
+        FormData formData = exchange.getAttachment(FormDataParser.FORM_DATA);
+        if (formData != null) {
+            request.formData = formData;
+            for (String name : request.formData) {
+                Deque<FormData.FormValue> values = request.formData.get(name);
+                for (FormData.FormValue value : values) {
+                    if (value.isFile()) {
+                        logger.debug("[request:file] {}={}, size={}", name, value.getFileName(), value.getFile().length());
+                    } else {
+                        logger.debug("[request:form] {}={}", name, value.getValue());
+                    }
                 }
             }
-        }
-    }
-
-    private byte[] readRequestBody(HttpServerExchange exchange) throws IOException {
-        int length = (int) exchange.getRequestContentLength();
-        try (InputStream stream = exchange.getInputStream()) {
-            if (length > 0)
-                return InputStreams.readAllWithExpectedSize(stream, length);
-            else
-                return InputStreams.readAll(stream);
         }
     }
 

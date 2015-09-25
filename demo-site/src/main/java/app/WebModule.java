@@ -4,6 +4,7 @@ import app.web.IndexController;
 import app.web.IndexPage;
 import app.web.UploadController;
 import app.web.WildcardController;
+import app.web.ajax.AJAXController;
 import app.web.interceptor.TestInterceptor;
 import core.framework.api.Module;
 import core.framework.api.http.ContentTypes;
@@ -34,6 +35,8 @@ public class WebModule extends Module {
         UploadController upload = bind(UploadController.class);
         route().get("/upload", upload::get);
         route().post("/upload", upload::post);
+
+        route().post("/ajax", bind(AJAXController.class)::ajax);
 
         WildcardController wildcardController = bind(WildcardController.class);
         route().get("/:all(*)", wildcardController::wildcard);

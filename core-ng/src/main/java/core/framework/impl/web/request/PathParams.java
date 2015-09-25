@@ -1,4 +1,4 @@
-package core.framework.impl.web;
+package core.framework.impl.web.request;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;

@@ -1,7 +1,7 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.web.ResponseImpl;
-import core.framework.impl.web.RequestImpl;
+import core.framework.impl.web.request.RequestImpl;
 import io.undertow.io.Sender;
 
 import java.nio.ByteBuffer;

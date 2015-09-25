@@ -1,4 +1,4 @@
-package core.framework.impl.web;
+package core.framework.impl.web.request;
 
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Exceptions;
@@ -9,6 +9,7 @@ import core.framework.api.web.MultipartFile;
 import core.framework.api.web.Request;
 import core.framework.api.web.Session;
 import core.framework.api.web.exception.BadRequestException;
+import core.framework.impl.web.BeanValidator;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.form.FormData;
@@ -32,12 +33,12 @@ public final class RequestImpl implements Request {
     int port;
     String requestURL;
     String contentType;
-    final PathParams pathParams = new PathParams();
+    public final PathParams pathParams = new PathParams();
     FormData formData;
     String body;
     public Session session;
 
-    RequestImpl(HttpServerExchange exchange, BeanValidator validator) {
+    public RequestImpl(HttpServerExchange exchange, BeanValidator validator) {
         this.exchange = exchange;
         this.validator = validator;
     }
