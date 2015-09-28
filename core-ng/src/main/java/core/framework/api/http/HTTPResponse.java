@@ -1,8 +1,10 @@
 package core.framework.api.http;
 
+import core.framework.api.util.ByteBuf;
 import core.framework.api.util.Charsets;
 import org.apache.http.entity.ContentType;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
@@ -13,10 +15,10 @@ import java.util.Optional;
 public final class HTTPResponse {
     final HTTPStatus status;
     final Map<String, String> headers;
-    final byte[] body;
-    String text;
+    final ByteBuf body;
+    private String text;
 
-    public HTTPResponse(HTTPStatus status, Map<String, String> headers, byte[] body) {
+    public HTTPResponse(HTTPStatus status, Map<String, String> headers, ByteBuf body) {
         this.status = status;
         this.headers = headers;
         this.body = body;
@@ -40,12 +42,12 @@ public final class HTTPResponse {
 
     public String text() {
         if (text == null)
-            text = new String(body, charset());
+            text = body.text(charset());
         return text;
     }
 
-    public byte[] bytes() {
-        return body;
+    public InputStream inputStream() {
+        return body.inputStream();
     }
 
     private Charset charset() {

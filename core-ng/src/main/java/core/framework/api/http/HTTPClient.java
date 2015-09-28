@@ -1,7 +1,7 @@
 package core.framework.api.http;
 
 import core.framework.api.log.ActionLogContext;
-import core.framework.api.util.InputStreams;
+import core.framework.api.util.ByteBuf;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import org.apache.http.Header;
@@ -49,21 +49,21 @@ public final class HTTPClient {
     public HTTPResponse execute(HTTPRequest request) {
         StopWatch watch = new StopWatch();
         HttpUriRequest httpRequest = request.builder.build();
-        try (CloseableHttpResponse response = client.execute(httpRequest)) {
-            int statusCode = response.getStatusLine().getStatusCode();
+        try (CloseableHttpResponse httpResponse = client.execute(httpRequest)) {
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
             logger.debug("[response] status={}", statusCode);
 
             Map<String, String> headers = Maps.newHashMap();
-            for (Header header : response.getAllHeaders()) {
+            for (Header header : httpResponse.getAllHeaders()) {
                 logger.debug("[response:header] {}={}", header.getName(), header.getValue());
                 headers.putIfAbsent(header.getName(), header.getValue());
             }
 
-            HttpEntity entity = response.getEntity();
-            byte[] responseBody = responseBody(entity);
-            HTTPResponse httpResponse = new HTTPResponse(HTTPStatus.parse(statusCode), headers, responseBody);
-            logResponseText(httpResponse);
-            return httpResponse;
+            HttpEntity entity = httpResponse.getEntity();
+            ByteBuf body = responseBody(entity);
+            HTTPResponse response = new HTTPResponse(HTTPStatus.parse(statusCode), headers, body);
+            logResponseText(response);
+            return response;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
@@ -74,14 +74,13 @@ public final class HTTPClient {
         }
     }
 
-    private byte[] responseBody(HttpEntity entity) throws IOException {
+    private ByteBuf responseBody(HttpEntity entity) throws IOException {
         try (InputStream stream = entity.getContent()) {
             int length = (int) entity.getContentLength();
-            if (length > 0) {
-                return InputStreams.readAllWithExpectedSize(stream, length);
-            } else {
-                return InputStreams.readAll(stream);   // note: chunked response does not have content-length, e.g. nginx/gzip
-            }
+
+            ByteBuf buffer = length > 0 ? ByteBuf.newBufferWithExpectedLength(length) : ByteBuf.newBuffer();
+            buffer.read(stream);
+            return buffer;
         }
     }
 

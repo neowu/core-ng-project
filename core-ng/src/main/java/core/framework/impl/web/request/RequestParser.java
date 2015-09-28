@@ -68,7 +68,7 @@ public class RequestParser {
     void parseBody(RequestImpl request, HttpServerExchange exchange) throws IOException {
         TextBodyReader.TextBody body = exchange.getAttachment(TextBodyReader.TEXT_BODY);
         if (body != null) {
-            request.body = body.content;
+            request.body = body.content();
             logger.debug("[request] body={}", request.body);
             return;
         }
