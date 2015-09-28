@@ -10,6 +10,7 @@ import java.util.Arrays;
  * @author neo
  */
 public final class ByteBuf {
+    // ByteBuf is not thread safe
     public static ByteBuf newBuffer() {
         return new ByteBuf(-1);
     }
@@ -84,6 +85,10 @@ public final class ByteBuf {
         }
     }
 
+    public int length() {
+        return position;
+    }
+
     public String text() {
         return text(Charsets.UTF_8);
     }
@@ -114,7 +119,6 @@ public final class ByteBuf {
             throw Exceptions.error("stream ends prematurely, expected={}, actual={}", expectedLength, position);
     }
 
-    // not thread safe
     private static class ByteBufInputStream extends InputStream {
         final byte[] bytes;
         final int length;

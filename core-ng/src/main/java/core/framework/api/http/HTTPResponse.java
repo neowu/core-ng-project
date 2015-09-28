@@ -4,7 +4,6 @@ import core.framework.api.util.ByteBuf;
 import core.framework.api.util.Charsets;
 import org.apache.http.entity.ContentType;
 
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
@@ -46,8 +45,8 @@ public final class HTTPResponse {
         return text;
     }
 
-    public InputStream inputStream() {
-        return body.inputStream();
+    public ByteBuf body() {
+        return body;
     }
 
     private Charset charset() {
