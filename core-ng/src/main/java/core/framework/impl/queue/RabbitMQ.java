@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author neo
  */
-public class RabbitMQ {
+public final class RabbitMQ {
     private final Logger logger = LoggerFactory.getLogger(RabbitMQ.class);
 
     private final ConnectionFactory connectionFactory = new ConnectionFactory();

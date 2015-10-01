@@ -5,6 +5,7 @@ import core.framework.impl.template.fragment.CompositeFragment;
 import core.framework.impl.template.fragment.Fragment;
 import core.framework.impl.template.function.Function;
 import core.framework.impl.template.function.HTMLFunction;
+import core.framework.impl.template.function.IfFunction;
 
 import java.util.Map;
 
@@ -26,13 +27,18 @@ public class Template extends CompositeFragment {
             throw Exceptions.error("model class does not match, expectedClass={}, actualClass={}", modelClass.getCanonicalName(), model.getClass().getCanonicalName());
 
         CallStack stack = new CallStack(model);
-        stack.functions.put("html", new HTMLFunction());
+        addBuiltInFunctions(stack);
         if (customFunctions != null)
             stack.functions.putAll(customFunctions);
 
         StringBuilder builder = new StringBuilder();
         process(builder, stack);
         return builder.toString();
+    }
+
+    private void addBuiltInFunctions(CallStack stack) {
+        stack.functions.put("html", new HTMLFunction());
+        stack.functions.put("if", new IfFunction());
     }
 
     @Override

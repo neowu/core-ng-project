@@ -21,4 +21,8 @@ public class TestModel {
     public String appendToStringField(String postfix) {
         return stringField + postfix;
     }
+
+    public Boolean booleanMethod() {
+        return true;
+    }
 }

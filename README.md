@@ -4,6 +4,7 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
+* validate: List<T> not contain null
 * template, use ByteBuffer[] for performance tuning
 * template: review expression, validate methods in model class
 * async: think about how to support batch with fixed concurrency, or Batch object and chain next easier
