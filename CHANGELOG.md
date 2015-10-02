@@ -3,6 +3,7 @@
 ### 3.6.3 (9/28/2015 - )
 * template: add #if as built-in method for inline condition
 * bug: fixed actionLog result is not updated
+* bug: fixed web/IO allow content-length = 0, and catch all errors during IO in order to generate action log
 
 ### 3.6.2 (9/25/2015 - 9/28/2015)
 * util: added ByteBuf for high performance network IO and NIO

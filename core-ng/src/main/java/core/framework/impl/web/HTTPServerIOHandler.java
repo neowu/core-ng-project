@@ -48,11 +48,13 @@ public class HTTPServerIOHandler implements HttpHandler {
     }
 
     private boolean hasTextBody(HttpServerExchange exchange) {
+        int length = (int) exchange.getRequestContentLength();
+        if (length == 0) return false;  // if body is empty, skip reading
+
         HttpString method = exchange.getRequestMethod();
-        if (Methods.POST.equals(method) || Methods.PUT.equals(method)) {
-            String contentType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
-            return contentType != null && contentType.startsWith("application/json");
-        }
-        return false;
+        if (!Methods.POST.equals(method) && !Methods.PUT.equals(method)) return false;
+
+        String contentType = exchange.getRequestHeaders().getFirst(Headers.CONTENT_TYPE);
+        return contentType != null && contentType.startsWith("application/json");
     }
 }

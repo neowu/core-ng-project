@@ -41,7 +41,7 @@ public final class HTTPResponse {
 
     public String text() {
         if (text == null)
-            text = body.text(charset());
+            text = body.text(charset());    // cache text string if created
         return text;
     }
 

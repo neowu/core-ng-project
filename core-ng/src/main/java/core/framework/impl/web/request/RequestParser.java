@@ -12,7 +12,6 @@ import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Deque;
 
 /**
@@ -21,7 +20,7 @@ import java.util.Deque;
 public class RequestParser {
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
-    public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws IOException {
+    public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
         request.method = HTTPMethod.valueOf(exchange.getRequestMethod().toString());
         actionLog.context("method", request.method());
 
@@ -65,7 +64,7 @@ public class RequestParser {
         }
     }
 
-    void parseBody(RequestImpl request, HttpServerExchange exchange) throws IOException {
+    void parseBody(RequestImpl request, HttpServerExchange exchange) throws Throwable {
         TextBodyReader.TextBody body = exchange.getAttachment(TextBodyReader.TEXT_BODY);
         if (body != null) {
             request.body = body.content();

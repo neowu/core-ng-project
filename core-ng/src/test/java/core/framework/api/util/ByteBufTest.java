@@ -97,4 +97,17 @@ public class ByteBufTest {
         buffer.read(ByteBuffer.wrap(bytes));
         Assert.assertArrayEquals(bytes, buffer.bytes());
     }
+
+    @Test
+    public void emptyByteBuff() throws IOException {
+        ByteBuf buffer = ByteBuf.newBufferWithExpectedLength(0);
+        Assert.assertEquals("", buffer.text());
+
+        byte[] bytes = new byte[0];
+        try (InputStream stream = new ByteArrayInputStream(bytes)) {
+            buffer.read(stream);
+        }
+
+        Assert.assertArrayEquals(bytes, buffer.bytes);
+    }
 }

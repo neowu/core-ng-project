@@ -16,7 +16,7 @@ public final class ByteBuf {
     }
 
     public static ByteBuf newBufferWithExpectedLength(int length) {
-        if (length <= 0) throw Exceptions.error("expected length must greater than 0, length={}", length);
+        if (length < 0) throw Exceptions.error("expected length must not less than 0, length={}", length);
         return new ByteBuf(length);
     }
 
@@ -25,7 +25,7 @@ public final class ByteBuf {
     int position;
 
     private ByteBuf(int expectedLength) {
-        if (expectedLength > 0) {
+        if (expectedLength >= 0) {
             bytes = new byte[expectedLength];
             this.expectedLength = expectedLength;
         } else {
@@ -52,7 +52,7 @@ public final class ByteBuf {
     }
 
     public void read(InputStream stream) throws IOException {
-        if (expectedLength > 0) {
+        if (expectedLength >= 0) {
             readInputStreamWithExpectedLength(stream);
         } else {
             readInputStream(stream);

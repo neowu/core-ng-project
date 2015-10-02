@@ -9,7 +9,6 @@ import org.xnio.IoUtils;
 import org.xnio.Pooled;
 import org.xnio.channels.StreamSourceChannel;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
@@ -54,7 +53,7 @@ public class TextBodyReader implements ChannelListener<StreamSourceChannel> {
                 complete = true;
                 exchange.putAttachment(TEXT_BODY, new TextBody(body.text(), null));
             }
-        } catch (IOException e) {
+        } catch (Throwable e) { // catch all errors during IO, to pass error to action log
             IoUtils.safeClose(channel);
             complete = true;
             exchange.putAttachment(TEXT_BODY, new TextBody(null, e));
@@ -67,14 +66,14 @@ public class TextBodyReader implements ChannelListener<StreamSourceChannel> {
 
     public static class TextBody {
         private final String content;
-        private final IOException exception;
+        private final Throwable exception;
 
-        TextBody(String content, IOException exception) {
+        TextBody(String content, Throwable exception) {
             this.content = content;
             this.exception = exception;
         }
 
-        public String content() throws IOException {
+        public String content() throws Throwable {
             if (exception != null) throw exception;
             return this.content;
         }

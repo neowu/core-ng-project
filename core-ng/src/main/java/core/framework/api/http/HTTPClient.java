@@ -77,8 +77,7 @@ public final class HTTPClient {
     private ByteBuf responseBody(HttpEntity entity) throws IOException {
         try (InputStream stream = entity.getContent()) {
             int length = (int) entity.getContentLength();
-
-            ByteBuf buffer = length > 0 ? ByteBuf.newBufferWithExpectedLength(length) : ByteBuf.newBuffer();
+            ByteBuf buffer = length >= 0 ? ByteBuf.newBufferWithExpectedLength(length) : ByteBuf.newBuffer();
             buffer.read(stream);
             return buffer;
         }
