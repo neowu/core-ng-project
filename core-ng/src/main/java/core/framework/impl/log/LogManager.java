@@ -51,6 +51,10 @@ public class LogManager {
     }
 
     public void process(LogEvent event) {
+        ActionLog actionLog = currentActionLog();
+        if (actionLog != null)
+            actionLog.updateResult(event.level); // process is called by loggerImpl.log, begin() may not be called
+
         TraceLogger traceLogger = this.traceLogger.get();
         if (traceLogger != null) traceLogger.process(event);
     }
