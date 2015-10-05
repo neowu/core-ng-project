@@ -15,11 +15,15 @@ public class MapValidator implements FieldValidator {
     }
 
     @Override
-    public void validate(Object map, ValidationErrors errors, boolean partial) {
-        if (map instanceof Map) {
-            ((Map<?, ?>) map).forEach((key, value) -> valueValidator.validate(value, errors, partial));
-        } else if (map != null) {
-            throw Exceptions.error("expected map, actualClass={}", map.getClass().getCanonicalName());
+    public void validate(Object value, ValidationErrors errors, boolean partial) {
+        if (value instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, ?> map = (Map<String, ?>) value;
+            for (Map.Entry<String, ?> entry : ((Map<String, ?>) map).entrySet()) {
+                valueValidator.validate(entry.getValue(), errors, partial);
+            }
+        } else if (value != null) {
+            throw Exceptions.error("value must be map, class={}", value.getClass().getCanonicalName());
         }
     }
 }

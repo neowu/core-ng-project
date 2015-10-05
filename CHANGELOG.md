@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.6.4 (10/02/2015 - )
+
+
 ### 3.6.3 (9/28/2015 - 10/02/2015)
 * template: add #if as built-in method for inline condition
 * bug: fixed actionLog result is not updated
