@@ -14,10 +14,11 @@ public class ExpressionParser {
 
     public Token parse(String expression) {
         int length = expression.length();
-        if (expression.charAt(0) == '"') {
-            if (length <= 1 || expression.charAt(length - 1) != '"')
-                throw new CodeCompileException("'\"' is not closed");
-            return new ValueToken(expression);
+        char firstChar = expression.charAt(0);
+        if (firstChar == '"' || firstChar == '\'') {
+            if (length <= 1 || expression.charAt(length - 1) != firstChar)
+                throw new CodeCompileException("\" or \' is not closed, expression=" + expression);
+            return new ValueToken("\"" + expression.substring(1, length - 1) + "\"");
         }
 
         for (int i = 0; i < length; i++) {

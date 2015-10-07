@@ -24,6 +24,13 @@ public class ExpressionParserTest {
     }
 
     @Test
+    public void singleQuoteString() {
+        Token stringValue = parser.parse("'text'");
+        assertThat(stringValue, instanceOf(ValueToken.class));
+        Assert.assertEquals("\"text\"", ((ValueToken) stringValue).value);
+    }
+
+    @Test
     public void singleField() {
         Token token = parser.parse("field");
         assertThat(token, instanceOf(FieldToken.class));

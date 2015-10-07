@@ -4,6 +4,7 @@
 * validate: added @NotEmpty (for string), @ValueNotEmpty, @ValueNotNull (for collection)
 * template: print location when expression failed
 * template: removed #if(condition?a:b), always prefer to write method in model
+* template: support single quote string
 
 ### 3.6.3 (9/28/2015 - 10/02/2015)
 * template: add #if as built-in method for inline condition
