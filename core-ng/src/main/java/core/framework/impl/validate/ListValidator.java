@@ -1,27 +1,25 @@
 package core.framework.impl.validate;
 
-import core.framework.api.util.Exceptions;
-
 import java.util.List;
 
 /**
  * @author neo
  */
 public class ListValidator implements FieldValidator {
-    private final ObjectValidator valueValidator;
+    private final List<FieldValidator> valueValidators;
 
-    public ListValidator(ObjectValidator valueValidator) {
-        this.valueValidator = valueValidator;
+    public ListValidator(List<FieldValidator> valueValidators) {
+        this.valueValidators = valueValidators;
     }
 
     @Override
     public void validate(Object list, ValidationErrors errors, boolean partial) {
-        if (list instanceof List) {
-            for (Object value : ((List<?>) list)) {
+        if (list == null) return;
+
+        for (Object value : (List<?>) list) {
+            for (FieldValidator valueValidator : valueValidators) {
                 valueValidator.validate(value, errors, partial);
             }
-        } else if (list != null) {
-            throw Exceptions.error("value must be list, class={}", list.getClass().getCanonicalName());
         }
     }
 }

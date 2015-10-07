@@ -1,8 +1,5 @@
 package core.framework.impl.validate;
 
-import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
-
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -11,15 +8,10 @@ import java.util.Map;
  * @author neo
  */
 public class ObjectValidator implements FieldValidator {
-    private final Map<Field, List<FieldValidator>> validators = Maps.newHashMap();
+    private final Map<Field, List<FieldValidator>> validators;
 
-    void add(Field field, FieldValidator validator) {
-        validators.computeIfAbsent(field, key -> Lists.newArrayList())
-            .add(validator);
-    }
-
-    boolean empty() {
-        return validators.isEmpty();
+    public ObjectValidator(Map<Field, List<FieldValidator>> validators) {
+        this.validators = validators;
     }
 
     @Override

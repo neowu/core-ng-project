@@ -1,21 +1,22 @@
 package core.framework.impl.validate;
 
-import core.framework.api.validate.NotNull;
-
 /**
  * @author neo
  */
 public class NotNullValidator implements FieldValidator {
     private final String fieldPath;
-    private final NotNull notNull;
+    private final String errorMessage;
+    private final boolean enablePartial;
 
-    public NotNullValidator(String fieldPath, NotNull notNull) {
+    public NotNullValidator(String fieldPath, String errorMessage, boolean enablePartial) {
         this.fieldPath = fieldPath;
-        this.notNull = notNull;
+        this.errorMessage = errorMessage;
+        this.enablePartial = enablePartial;
     }
 
     @Override
     public void validate(Object value, ValidationErrors errors, boolean partial) {
-        if (!partial && value == null) errors.add(fieldPath, notNull.message());
+        if (partial && enablePartial) return;
+        if (value == null) errors.add(fieldPath, errorMessage);
     }
 }

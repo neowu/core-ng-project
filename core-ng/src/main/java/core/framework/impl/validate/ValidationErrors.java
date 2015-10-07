@@ -11,7 +11,7 @@ public class ValidationErrors {
     public Map<String, String> errors;
 
     public void add(String field, String error) {
-        if (errors == null) errors = Maps.newHashMap();
+        if (errors == null) errors = Maps.newLinkedHashMap();
         errors.put(field, error);
     }
 

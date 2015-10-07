@@ -1,6 +1,5 @@
 package core.framework.impl.validate;
 
-import core.framework.api.util.Exceptions;
 import core.framework.api.validate.Min;
 
 /**
@@ -19,11 +18,7 @@ public class MinValidator implements FieldValidator {
     public void validate(Object value, ValidationErrors errors, boolean partial) {
         if (value == null) return;
 
-        if (value instanceof Number) {
-            double numberValue = ((Number) value).doubleValue();
-            if (numberValue < min.value()) errors.add(fieldPath, min.message());
-        } else {
-            throw Exceptions.error("unexpected value type, valueClass={}", value);
-        }
+        double numberValue = ((Number) value).doubleValue();
+        if (numberValue < min.value()) errors.add(fieldPath, min.message());
     }
 }

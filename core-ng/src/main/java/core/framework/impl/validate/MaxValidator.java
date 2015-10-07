@@ -1,6 +1,5 @@
 package core.framework.impl.validate;
 
-import core.framework.api.util.Exceptions;
 import core.framework.api.validate.Max;
 
 /**
@@ -19,11 +18,7 @@ public class MaxValidator implements FieldValidator {
     public void validate(Object value, ValidationErrors errors, boolean partial) {
         if (value == null) return;
 
-        if (value instanceof Number) {
-            double numberValue = ((Number) value).doubleValue();
-            if (numberValue > max.value()) errors.add(fieldPath, max.message());
-        } else {
-            throw Exceptions.error("unexpected value type, valueClass={}", value);
-        }
+        double numberValue = ((Number) value).doubleValue();
+        if (numberValue > max.value()) errors.add(fieldPath, max.message());
     }
 }
