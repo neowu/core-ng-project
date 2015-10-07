@@ -32,7 +32,7 @@ public final class TemplateEngine {
     public void addTemplate(String name, String templateContent, Class<?> modelClass) {
         StopWatch watch = new StopWatch();
         try {
-            templates.put(name, new TemplateBuilder(new StringTemplateSource(templateContent), modelClass).build());
+            templates.put(name, new TemplateBuilder(new StringTemplateSource(name, templateContent), modelClass).build());
         } finally {
             logger.info("add template, name={}, modelClass={}, elapsedTime={}", name, modelClass.getCanonicalName(), watch.elapsedTime());
         }

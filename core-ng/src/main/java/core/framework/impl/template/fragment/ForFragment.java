@@ -1,15 +1,10 @@
 package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.Strings;
-import core.framework.impl.code.CodeCompileException;
 import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
-import core.framework.impl.template.expression.ExpressionParser;
-import core.framework.impl.template.expression.ExpressionTypeInspector;
-import core.framework.impl.template.expression.Token;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -33,13 +28,9 @@ public class ForFragment extends CompositeFragment {
         variable = matcher.group(1);
         String list = matcher.group(2);
 
-        try {
-            Token expression = new ExpressionParser().parse(list);
-            valueClass = new ExpressionTypeInspector().listValueClass(expression, stack.rootClass, list);
-            this.expression = new ExpressionBuilder().build(expression, stack, List.class);
-        } catch (CodeCompileException e) {
-            throw new Error(Strings.format("failed to compile expression, statement={}, location={}", statement, location), e);
-        }
+        ExpressionBuilder builder = new ExpressionBuilder(list, stack, location);
+        this.expression = builder.build();
+        valueClass = builder.listValueClass();
     }
 
     @Override

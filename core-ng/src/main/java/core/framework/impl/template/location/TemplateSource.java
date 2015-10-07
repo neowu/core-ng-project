@@ -10,4 +10,6 @@ public interface TemplateSource {
     BufferedReader reader() throws IOException;
 
     TemplateSource resolve(String path);
+
+    String source();
 }

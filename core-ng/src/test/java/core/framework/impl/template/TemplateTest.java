@@ -32,6 +32,11 @@ public class TemplateTest {
             Assert.fail("unknown path, path=" + path);
             return null;
         }
+
+        @Override
+        public String source() {
+            return path;
+        }
     }
 
     @Test

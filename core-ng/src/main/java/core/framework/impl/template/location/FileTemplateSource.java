@@ -32,7 +32,7 @@ public final class FileTemplateSource implements TemplateSource {
     }
 
     @Override
-    public String toString() {
-        return String.valueOf(path.toAbsolutePath());
+    public String source() {
+        return String.valueOf(path);
     }
 }

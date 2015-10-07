@@ -6,6 +6,8 @@
 <body>
 <p>hello ${name}!</p>
 
+<p>${welcomeMessage()}</p>
+
 <p>this is msg: ${#msg("key.hello")}</p>
 
 <p>msg will return key if not found: ${#msg("key.world")}</p>
@@ -19,6 +21,14 @@
     <input name="name" type="text" rel="name">
     <input type="submit">
 </form>
+
+<hr/>
+
+<ul>
+    <!--% for x in items() %-->
+    <li>${x}</li>
+    <!--% end %-->
+</ul>
 
 <hr/>
 <!--% include /template/footer.html %-->

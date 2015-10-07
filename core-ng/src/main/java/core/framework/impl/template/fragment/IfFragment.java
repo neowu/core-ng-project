@@ -1,14 +1,10 @@
 package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.Strings;
-import core.framework.impl.code.CodeCompileException;
 import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
-import core.framework.impl.template.expression.ExpressionParser;
-import core.framework.impl.template.expression.Token;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,17 +25,13 @@ public class IfFragment extends CompositeFragment {
         reverse = "not ".equals(matcher.group(2));
         String condition = matcher.group(3);
 
-        try {
-            Token expression = new ExpressionParser().parse(condition);
-            this.expression = new ExpressionBuilder().build(expression, stack, Boolean.class);
-        } catch (CodeCompileException e) {
-            throw new Error(Strings.format("failed to compile expression, statement={}, location={}", statement, location), e);
-        }
+        expression = new ExpressionBuilder(condition, stack, location).build();
+        // TODO: validate return type is boolean
     }
 
     @Override
     public void process(StringBuilder builder, CallStack stack) {
-        Boolean result = (Boolean) expression.eval(stack);
+        Object result = expression.eval(stack);
         Boolean expected = reverse ? Boolean.FALSE : Boolean.TRUE;
         if (expected.equals(result)) {
             for (Fragment handler : handlers) {

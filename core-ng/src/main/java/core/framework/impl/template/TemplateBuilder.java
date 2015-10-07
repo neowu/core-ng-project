@@ -53,7 +53,7 @@ public class TemplateBuilder {
                 if (line == null) break;
 
                 lineNumber++;
-                String locationInfo = source + ":" + lineNumber;
+                String locationInfo = source.source() + ":" + lineNumber;
 
                 if (isDirective(line, locationInfo)) {
                     processDirective(line, source, locationInfo);

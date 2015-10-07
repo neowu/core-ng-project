@@ -4,6 +4,8 @@ import core.framework.api.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,11 +32,15 @@ public class WebDirectory {
                 return path;
             }
         } else {
-            Path path = Paths.get("./src/main/dist/web").toAbsolutePath();
+            Path path = Paths.get("./src/main/dist/web");
             if (Files.exists(path) && Files.isDirectory(path)) {
                 logger.warn("found local web directory, this should only happen in local dev env or test, path={}", path);
                 localEnv = true;
-                return path;
+                try {
+                    return path.toRealPath();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
             }
         }
         logger.info("can not locate web directory");

@@ -1,28 +1,19 @@
 package core.framework.impl.template.fragment;
 
-import core.framework.api.util.Strings;
-import core.framework.impl.code.CodeCompileException;
 import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
-import core.framework.impl.template.expression.ExpressionParser;
-import core.framework.impl.template.expression.Token;
 import core.framework.impl.template.function.HTMLText;
 
 /**
  * @author neo
  */
 public class ExpressionFragment implements Fragment {
-    final Expression expression;
+    private final Expression expression;
 
     public ExpressionFragment(String expression, CallTypeStack stack, String location) {
-        try {
-            Token token = new ExpressionParser().parse(expression);
-            this.expression = new ExpressionBuilder().build(token, stack, Object.class);
-        } catch (CodeCompileException e) {
-            throw new Error(Strings.format("failed to compile expression, expression={}, location={}", expression, location), e);
-        }
+        this.expression = new ExpressionBuilder(expression, stack, location).build();
     }
 
     @Override
