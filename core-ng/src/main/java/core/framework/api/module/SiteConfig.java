@@ -34,4 +34,8 @@ public final class SiteConfig {
         logger.info("add static content root, root={}", root);
         context.httpServer.handler.route.add(HTTPMethod.GET, root + "/:path(*)", new ControllerHolder(context.httpServer.siteManager.staticContentController(root), true));
     }
+
+    public void cdnHosts(String... hosts) {
+        context.httpServer.siteManager.templateManager.cdnHosts(hosts);
+    }
 }

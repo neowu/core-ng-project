@@ -4,7 +4,6 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* web: CDN tag, support single quote as string
 * template: expression validate return type, for for/if
 * web: think about how to handle content-length=0
 * template, use ByteBuffer[] for performance tuning

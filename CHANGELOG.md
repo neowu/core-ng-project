@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.6.5 (10/08/2015)
+* web: support CDN config and #cdn() function, in sys.properties uses sys.cdn.host=
+
 ### 3.6.4 (10/07/2015)
 * validate: added @NotEmpty (for string), @ValueNotEmpty, @ValueNotNull (for collection)
 * template: print location when expression failed

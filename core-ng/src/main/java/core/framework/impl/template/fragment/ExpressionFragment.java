@@ -21,10 +21,8 @@ public class ExpressionFragment implements Fragment {
         Object result = expression.eval(stack);
         if (result instanceof HTMLText) {
             builder.append(((HTMLText) result).html);
-        } else if (result instanceof String) {
-            builder.append(escapeHTML((String) result));
         } else {
-            builder.append(String.valueOf(result));
+            builder.append(escapeHTML(String.valueOf(result)));
         }
     }
 

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -23,6 +24,7 @@ public class TemplateManagerImpl implements TemplateManager {
     private final Map<String, Template> templates = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
     private final MessageManager messageManager;
+    private final CDNFunction cdnFunction = new CDNFunction();
 
     public TemplateManagerImpl(WebDirectory webDirectory, MessageManager messageManager) {
         this.webDirectory = webDirectory;
@@ -44,6 +46,7 @@ public class TemplateManagerImpl implements TemplateManager {
     private Map<String, Function> functions(Request request) {
         Map<String, Function> functions = Maps.newHashMap();
         functions.put("msg", new MessageFunction(messageManager, request));
+        functions.put("cdn", cdnFunction);
         return functions;
     }
 
@@ -54,6 +57,11 @@ public class TemplateManagerImpl implements TemplateManager {
         } finally {
             logger.info("add, templatePath={}, modelClass={}, elapsedTime={}", templatePath, modelClass.getCanonicalName(), watch.elapsedTime());
         }
+    }
+
+    public void cdnHosts(String... hosts) {
+        logger.info("set cdn hosts, hosts={}", Arrays.toString(hosts));
+        cdnFunction.hosts = hosts;
     }
 
     private Template load(String templatePath, Class<?> modelClass) {

@@ -53,7 +53,7 @@ public class ModuleContext {
 
         httpServer = new HTTPServer(logManager);
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
-        beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);
+        beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);  // expose TemplateManager to allow app handle template programmably, such as cms/widgets
         if (!test) {
             startupHook.add(httpServer::start);
             shutdownHook.add(httpServer::stop);
