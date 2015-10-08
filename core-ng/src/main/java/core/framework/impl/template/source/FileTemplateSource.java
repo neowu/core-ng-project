@@ -1,4 +1,4 @@
-package core.framework.impl.template.location;
+package core.framework.impl.template.source;
 
 import core.framework.api.util.Exceptions;
 

@@ -18,7 +18,7 @@ public class ExpressionParser {
         if (firstChar == '"' || firstChar == '\'') {
             if (length <= 1 || expression.charAt(length - 1) != firstChar)
                 throw new CodeCompileException("\" or \' is not closed, expression=" + expression);
-            return new ValueToken("\"" + expression.substring(1, length - 1) + "\"");
+            return new ValueToken("\"" + expression.substring(1, length - 1) + "\"", String.class);
         }
 
         for (int i = 0; i < length; i++) {
@@ -43,7 +43,7 @@ public class ExpressionParser {
         }
 
         if (NUMBER_PATTERN.matcher(expression).matches()) {
-            return new ValueToken(expression);
+            return new ValueToken(expression, Number.class);
         } else {
             if (!FIELD_PATTERN.matcher(expression).matches())
                 throw new CodeCompileException("invalid field name, field=" + expression);

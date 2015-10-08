@@ -1,10 +1,11 @@
 package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Exceptions;
+import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
-import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
+import core.framework.impl.template.expression.ExpressionHolder;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -16,7 +17,7 @@ import java.util.regex.Pattern;
 public class ForFragment extends CompositeFragment {
     private static final Pattern STATEMENT_PATTERN = Pattern.compile("for ([a-zA-Z1-9]+) in ([#a-zA-Z1-9\\.\\(\\)]+)");
 
-    private final Expression expression;
+    private final ExpressionHolder expression;
     public final String variable;
     public final Class<?> valueClass;
 
@@ -29,8 +30,11 @@ public class ForFragment extends CompositeFragment {
         String list = matcher.group(2);
 
         ExpressionBuilder builder = new ExpressionBuilder(list, stack, location);
-        this.expression = builder.build();
-        valueClass = builder.listValueClass();
+        expression = builder.build();
+        if (!GenericTypes.isGenericList(expression.returnType))
+            throw Exceptions.error("for statement must return List<T>, list={}, returnType={}, location={}",
+                list, expression.returnType.getTypeName(), location);
+        valueClass = GenericTypes.listValueClass(expression.returnType);
     }
 
     @Override

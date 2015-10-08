@@ -7,7 +7,7 @@ import core.framework.impl.template.fragment.ExpressionFragment;
 import core.framework.impl.template.fragment.ForFragment;
 import core.framework.impl.template.fragment.IfFragment;
 import core.framework.impl.template.fragment.StaticFragment;
-import core.framework.impl.template.location.TemplateSource;
+import core.framework.impl.template.source.TemplateSource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,7 +39,7 @@ public class TemplateBuilder {
         parse(source);
 
         if (fragmentStack.size() != 1) {
-            throw Exceptions.error("directive is not closed, handlers={}, location={}", fragmentStack.peek(), source);
+            throw Exceptions.error("directive is not closed, handlers={}, location={}", fragmentStack.peek(), source.source());
         }
 
         return (Template) fragmentStack.remove();
@@ -93,7 +93,7 @@ public class TemplateBuilder {
         } else if (statement.startsWith("include")) {
             processInclude(statement, source, locationInfo);
         } else {
-            throw Exceptions.error("unsupported directive, line={}, location={}", line, this.source);
+            throw Exceptions.error("unsupported directive, line={}, location={}", line, locationInfo);
         }
     }
 
@@ -110,7 +110,7 @@ public class TemplateBuilder {
         parse(includeSource);
 
         if (fragmentStack.size() != fragmentCountBeforeInclude) {
-            throw Exceptions.error("directives in include do not matches, location={}", statement, includeSource);
+            throw Exceptions.error("directives in include do not matches, location={}", statement, includeSource.source());
         }
     }
 

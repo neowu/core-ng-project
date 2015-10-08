@@ -2,7 +2,7 @@ package core.framework.impl.template;
 
 import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.Lists;
-import core.framework.impl.template.location.TemplateSource;
+import core.framework.impl.template.source.TemplateSource;
 import org.junit.Assert;
 import org.junit.Test;
 

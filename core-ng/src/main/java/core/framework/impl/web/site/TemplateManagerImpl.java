@@ -8,7 +8,7 @@ import core.framework.api.web.site.TemplateManager;
 import core.framework.impl.template.Template;
 import core.framework.impl.template.TemplateBuilder;
 import core.framework.impl.template.function.Function;
-import core.framework.impl.template.location.FileTemplateSource;
+import core.framework.impl.template.source.FileTemplateSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

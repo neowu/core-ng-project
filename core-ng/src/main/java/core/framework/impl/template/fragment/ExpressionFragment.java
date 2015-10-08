@@ -2,15 +2,15 @@ package core.framework.impl.template.fragment;
 
 import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
-import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
+import core.framework.impl.template.expression.ExpressionHolder;
 import core.framework.impl.template.function.HTMLText;
 
 /**
  * @author neo
  */
 public class ExpressionFragment implements Fragment {
-    private final Expression expression;
+    private final ExpressionHolder expression;
 
     public ExpressionFragment(String expression, CallTypeStack stack, String location) {
         this.expression = new ExpressionBuilder(expression, stack, location).build();

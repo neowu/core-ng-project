@@ -5,7 +5,7 @@ import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.template.Template;
 import core.framework.impl.template.TemplateBuilder;
-import core.framework.impl.template.location.StringTemplateSource;
+import core.framework.impl.template.source.StringTemplateSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

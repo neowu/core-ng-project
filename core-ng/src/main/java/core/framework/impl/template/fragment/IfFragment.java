@@ -1,10 +1,11 @@
 package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Exceptions;
+import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
-import core.framework.impl.template.expression.Expression;
 import core.framework.impl.template.expression.ExpressionBuilder;
+import core.framework.impl.template.expression.ExpressionHolder;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class IfFragment extends CompositeFragment {
     private static final Pattern STATEMENT_PATTERN = Pattern.compile("if ((not )?)([#a-zA-Z1-9\\.\\(\\)]+)");
-    final Expression expression;
+    final ExpressionHolder expression;
     final boolean reverse;
 
     public IfFragment(String statement, CallTypeStack stack, String location) {
@@ -26,7 +27,9 @@ public class IfFragment extends CompositeFragment {
         String condition = matcher.group(3);
 
         expression = new ExpressionBuilder(condition, stack, location).build();
-        // TODO: validate return type is boolean
+        if (!Boolean.class.equals(GenericTypes.rawClass(expression.returnType)))
+            throw Exceptions.error("if condition must return Boolean, condition={}, returnType={}, location={}",
+                condition, expression.returnType.getTypeName(), location);
     }
 
     @Override
