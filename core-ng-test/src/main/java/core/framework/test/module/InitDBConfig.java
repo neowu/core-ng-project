@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class InitDBConfig {
+public final class InitDBConfig {
     private final ModuleContext context;
     private final String name;
     private final Database database;

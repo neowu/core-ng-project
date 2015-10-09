@@ -2,6 +2,8 @@ package app;
 
 import app.product.domain.ProductDocument;
 import app.product.web.ProductController;
+import app.product.web.ProductView;
+import app.product.web.ProductWebService;
 import app.user.domain.MongoUserAggregateView;
 import app.user.domain.User;
 import core.framework.api.AbstractTestModule;
@@ -25,6 +27,9 @@ public class TestModule extends AbstractTestModule {
             .viewClass(MongoUserAggregateView.class).get());
 
         load(new DemoServiceApp());
+
+        // specify mock web service client behavior
+        Mockito.when(bean(ProductWebService.class).get(1)).thenReturn(new ProductView());
 
         initDB().createSchema();
         initDB().runScript("db.sql");

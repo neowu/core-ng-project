@@ -21,7 +21,7 @@ import java.util.Properties;
  * @author neo
  * @version 1.2
  */
-public class EnvConfValidator {
+public final class EnvConfValidator {
     private static final String ENV_ROOT_DIR = "conf";
     private static final String RESOURCE_DIR = "resources";
     private static final String MAIN_RESOURCE_DIR = "src/main/resources";

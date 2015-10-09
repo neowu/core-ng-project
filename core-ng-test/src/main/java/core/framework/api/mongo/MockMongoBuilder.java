@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public class MockMongoBuilder extends MongoBuilder {
+public final class MockMongoBuilder extends MongoBuilder {
     private final Logger logger = LoggerFactory.getLogger(MockMongoBuilder.class);
 
     @Override

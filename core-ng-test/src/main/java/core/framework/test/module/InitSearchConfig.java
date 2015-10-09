@@ -10,7 +10,7 @@ import core.framework.impl.search.ElasticSearchTypeImpl;
 /**
  * @author neo
  */
-public class InitSearchConfig {
+public final class InitSearchConfig {
     private final ModuleContext context;
     private final ElasticSearch search;
 

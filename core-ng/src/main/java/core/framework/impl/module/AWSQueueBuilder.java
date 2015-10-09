@@ -30,7 +30,7 @@ public class AWSQueueBuilder {
 
     public SQSMessageListener listener(String queueURL) {
         SQSMessageListener listener = new SQSMessageListener(context.executor, amazonSQS(), queueURL, context.queueManager.validator(), context.logManager);
-        if (!context.test) {
+        if (!context.isTest()) {
             context.startupHook.add(listener::start);
             context.shutdownHook.add(listener::stop);
         }

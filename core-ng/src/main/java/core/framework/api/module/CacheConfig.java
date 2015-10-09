@@ -51,7 +51,7 @@ public final class CacheConfig {
             throw new Error("cache store is configured, please only configure cache store once at beginning of application");
         }
 
-        if (context.test) {
+        if (context.isTest()) {
             logger.info("use local cache during test");
             local();
         } else {
@@ -72,7 +72,7 @@ public final class CacheConfig {
     private void configureCacheManager(CacheStore cacheStore) {
         context.cacheManager = new CacheManager(cacheStore);
 
-        if (!context.test) {
+        if (!context.isTest()) {
             CacheController controller = new CacheController(context.cacheManager);
             context.httpServer.handler.route.add(HTTPMethod.GET, "/management/cache", new ControllerHolder(controller::list, true));
             context.httpServer.handler.route.add(HTTPMethod.GET, "/management/cache/:name/:key", new ControllerHolder(controller::get, true));

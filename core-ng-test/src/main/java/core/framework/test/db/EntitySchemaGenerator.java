@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class EntitySchemaGenerator {
+public final class EntitySchemaGenerator {
     private final Logger logger = LoggerFactory.getLogger(EntitySchemaGenerator.class);
 
     private final Database database;

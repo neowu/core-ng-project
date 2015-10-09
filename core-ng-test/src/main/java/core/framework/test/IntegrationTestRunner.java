@@ -6,7 +6,7 @@ import org.junit.runners.model.InitializationError;
 /**
  * @author neo
  */
-public class IntegrationTestRunner extends BlockJUnit4ClassRunner {
+public final class IntegrationTestRunner extends BlockJUnit4ClassRunner {
     public IntegrationTestRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
         TestManager.get().init(testClass);

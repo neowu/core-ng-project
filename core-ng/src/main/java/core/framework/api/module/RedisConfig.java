@@ -2,7 +2,6 @@ package core.framework.api.module;
 
 import core.framework.api.redis.Redis;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.redis.MockRedis;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.RefreshPoolJob;
 import core.framework.impl.scheduler.FixedRateTrigger;
@@ -25,9 +24,9 @@ public class RedisConfig {
         if (context.beanFactory.registered(Redis.class, null)) {
             redis = context.beanFactory.bean(Redis.class, null);
         } else {
-            if (context.test) {
+            if (context.isTest()) {
                 redis = null;
-                context.beanFactory.bind(Redis.class, null, new MockRedis());
+                context.beanFactory.bind(Redis.class, null, context.mockFactory.create(Redis.class));
             } else {
                 redis = new RedisImpl();
                 context.shutdownHook.add(redis::close);
@@ -38,7 +37,7 @@ public class RedisConfig {
     }
 
     public void host(String host) {
-        if (context.test) {
+        if (context.isTest()) {
             logger.info("skip host during test");
         } else {
             redis.host(host);
@@ -46,19 +45,19 @@ public class RedisConfig {
     }
 
     public void poolSize(int minSize, int maxSize) {
-        if (!context.test) {
+        if (!context.isTest()) {
             redis.pool.size(minSize, maxSize);
         }
     }
 
     public void slowQueryThreshold(Duration slowQueryThreshold) {
-        if (!context.test) {
+        if (!context.isTest()) {
             redis.slowQueryThreshold(slowQueryThreshold);
         }
     }
 
     public void timeout(Duration timeout) {
-        if (!context.test) {
+        if (!context.isTest()) {
             redis.timeout(timeout);
         }
     }

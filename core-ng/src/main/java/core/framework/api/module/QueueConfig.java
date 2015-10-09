@@ -8,7 +8,6 @@ import core.framework.impl.module.AWSQueueBuilder;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.queue.CompositePublisher;
 import core.framework.impl.queue.MessageValidator;
-import core.framework.impl.queue.MockMessagePublisher;
 import core.framework.impl.queue.RabbitMQ;
 import core.framework.impl.queue.RabbitMQEndpoint;
 import core.framework.impl.queue.RabbitMQListener;
@@ -32,7 +31,7 @@ public final class QueueConfig {
     public RabbitMQConfig rabbitMQ() {
         if (context.queueManager.rabbitMQ == null) {
             context.queueManager.rabbitMQ = new RabbitMQ();
-            if (!context.test) {
+            if (!context.isTest()) {
                 context.scheduler().addTrigger(new FixedRateTrigger("refresh-rabbitmq-pool", new RefreshPoolJob(context.queueManager.rabbitMQ.pool), Duration.ofMinutes(5)));
                 context.shutdownHook.add(context.queueManager.rabbitMQ::close);
             }
@@ -71,7 +70,7 @@ public final class QueueConfig {
             return new AWSQueueBuilder(context).listener(queueURI);
         } else if (queueURI.startsWith("rabbitmq://queue/")) {
             RabbitMQListener listener = new RabbitMQListener(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(queueURI).routingKey, context.executor, context.queueManager.validator(), context.logManager);
-            if (!context.test) {
+            if (!context.isTest()) {
                 context.startupHook.add(listener::start);
                 context.shutdownHook.add(listener::stop);
             }
@@ -82,8 +81,10 @@ public final class QueueConfig {
     }
 
     private <T> MessagePublisher<T> publisher(String uri, Class<T> messageClass) {
-        if (context.test || uri.startsWith("mock://")) {
-            return new MockMessagePublisher<>(uri, context.queueManager.validator());
+        if (context.isTest()) {
+            @SuppressWarnings("unchecked")
+            MessagePublisher<T> mockPublisher = context.mockFactory.create(MessagePublisher.class, uri, context.queueManager.validator());
+            return mockPublisher;
         } else if (uri.startsWith("arn:aws:sns:")) {
             return new AWSQueueBuilder(context).snsPublisher(uri, messageClass);
         } else if (uri.startsWith("https://sqs.")) {

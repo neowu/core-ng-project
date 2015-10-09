@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 /**
  * @author neo
  */
-public class TestBeanFactory extends BeanFactory {
+public final class TestBeanFactory extends BeanFactory {
     private final Logger logger = LoggerFactory.getLogger(TestBeanFactory.class);
     private final Set<Key> overrideBindings = Sets.newHashSet();
 

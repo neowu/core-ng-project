@@ -11,7 +11,7 @@ import org.junit.Test;
 public class DBConfigTest {
     @Test
     public void multipleDB() {
-        ModuleContext context = new ModuleContext(new BeanFactory(), true);
+        ModuleContext context = new ModuleContext(new BeanFactory(), null);
         DBConfig defaultDB1 = new DBConfig(context, null);
         DBConfig otherDB1 = new DBConfig(context, "other");
         Assert.assertNotSame(defaultDB1.database, otherDB1.database);

@@ -41,7 +41,7 @@ public final class DBConfig {
     }
 
     public void url(String url) {
-        if (context.test) {
+        if (context.isTest()) {
             logger.info("use hsqldb during test");
             database.url(Strings.format("jdbc:hsqldb:mem:{};sql.syntax_mys=true", name == null ? "." : name));
         } else {
@@ -50,13 +50,13 @@ public final class DBConfig {
     }
 
     public void user(String user) {
-        if (!context.test) {
+        if (!context.isTest()) {
             database.user(user);
         }
     }
 
     public void password(String password) {
-        if (!context.test) {
+        if (!context.isTest()) {
             database.password(password);
         }
     }

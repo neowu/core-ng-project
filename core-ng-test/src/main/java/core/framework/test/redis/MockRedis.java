@@ -1,4 +1,4 @@
-package core.framework.impl.redis;
+package core.framework.test.redis;
 
 import core.framework.api.redis.Redis;
 import core.framework.api.util.Maps;
@@ -73,7 +73,7 @@ public final class MockRedis implements Redis {
         }
 
         boolean expired(long now) {
-            return now >= expirationTime;
+            return expirationTime != -1 && now >= expirationTime;
         }
     }
 }

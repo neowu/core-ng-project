@@ -22,7 +22,7 @@ public final class LogConfig {
     }
 
     public void writeActionLogToConsole() {
-        if (context.test) {
+        if (context.isTest()) {
             logger.info("disable action log during test");
         } else {
             context.logManager.actionLogger = ActionLogger.console();
@@ -30,7 +30,7 @@ public final class LogConfig {
     }
 
     public void writeActionLogToFile(Path actionLogPath) {
-        if (context.test) {
+        if (context.isTest()) {
             logger.info("disable action log during test");
         } else {
             context.logManager.actionLogger = ActionLogger.file(actionLogPath);
@@ -38,7 +38,7 @@ public final class LogConfig {
     }
 
     public void writeTraceLogToConsole() {
-        if (context.test) {
+        if (context.isTest()) {
             logger.info("disable trace log during test");
         } else {
             context.logManager.traceLoggerFactory = TraceLoggerFactory.console();
@@ -46,7 +46,7 @@ public final class LogConfig {
     }
 
     public void writeTraceLogToFile(Path traceLogPath) {
-        if (context.test) {
+        if (context.isTest()) {
             logger.info("disable trace log during test");
         } else {
             context.logManager.traceLoggerFactory = TraceLoggerFactory.file(traceLogPath);
@@ -54,7 +54,7 @@ public final class LogConfig {
     }
 
     public void forwardLogToRemote(String host) {
-        if (context.test) {
+        if (context.isTest()) {
             logger.info("disable log forwarding during test");
         } else {
             context.logManager.logForwarder = new LogForwarder(host, context.logManager.appName);

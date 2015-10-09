@@ -6,7 +6,7 @@ import core.framework.api.util.Exceptions;
 /**
  * @author neo
  */
-public class TestManager {
+public final class TestManager {
     private static final TestManager INSTANCE = new TestManager();
 
     static TestManager get() {

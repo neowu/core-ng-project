@@ -50,14 +50,19 @@ public final class APIConfig {
 
     public <T> WebServiceClientConfig client(Class<T> serviceInterface, String serviceURL) {
         logger.info("create api service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
-        HTTPClient httpClient = httpClient();
         BeanValidator validator = context.httpServer.handler.validator;
         new ServiceInterfaceValidator(serviceInterface, validator).validate();
 
-        WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator, context.logManager);
-        T client = new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
-        context.beanFactory.bind(serviceInterface, null, client);
-        return webServiceClient;
+        if (context.isTest()) {
+            context.beanFactory.bind(serviceInterface, null, context.mockFactory.create(serviceInterface));
+            return new WebServiceClientConfig(context, null);
+        } else {
+            HTTPClient httpClient = httpClient();
+            WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator, context.logManager);
+            T client = new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
+            context.beanFactory.bind(serviceInterface, null, client);
+            return new WebServiceClientConfig(context, webServiceClient);
+        }
     }
 
     private HTTPClient httpClient() {

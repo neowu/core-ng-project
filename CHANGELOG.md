@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.6.6 (10/09/2015)
+* test: refactory test dependency and structure, support api().client() mock
+
 ### 3.6.5 (10/08/2015)
 * web: support CDN config and #cdn() function, in sys.properties uses sys.cdn.host=
 * template: expression validate return type, for for/if

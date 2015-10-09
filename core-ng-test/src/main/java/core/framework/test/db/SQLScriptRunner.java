@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * @author neo
  */
-public class SQLScriptRunner {
+public final class SQLScriptRunner {
     private static final String DEFAULT_DELIMITER = ";";
     private static final Pattern NEW_DELIMITER_PATTERN = Pattern.compile("(?:--|\\/\\/|\\#)?!DELIMITER=(.+)");
     private static final Pattern COMMENT_PATTERN = Pattern.compile("^(?:--|\\/\\/|\\#).+");
@@ -52,8 +53,8 @@ public class SQLScriptRunner {
                     }
                 }
             }
-        } catch (Exception e) {
-            throw Exceptions.error("failed to run script, error={}, lineNumber={}", e.getMessage(), lineNumber, e);
+        } catch (RuntimeException | IOException e) {
+            throw Exceptions.error("failed to run script, error={}, line={}", e.getMessage(), lineNumber, e);
         }
     }
 

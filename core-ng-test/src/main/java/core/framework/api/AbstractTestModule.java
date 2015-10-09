@@ -4,6 +4,7 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.test.inject.TestBeanFactory;
 import core.framework.test.module.InitDBConfig;
 import core.framework.test.module.InitSearchConfig;
+import core.framework.test.module.MockFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +18,7 @@ public abstract class AbstractTestModule extends Module {
 
     public final void configure() {
         logger.info("initialize test context");
-        context = new ModuleContext(new TestBeanFactory(), true);
+        context = new ModuleContext(new TestBeanFactory(), new MockFactoryImpl());
 
         logger.info("initialize application");
         initialize();

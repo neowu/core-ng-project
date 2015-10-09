@@ -26,9 +26,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class ModuleContext {
-    public final boolean test;
-
+public final class ModuleContext {
     public final BeanFactory beanFactory;
     public final List<Runnable> startupHook = Lists.newArrayList();
     public final ShutdownHook shutdownHook = new ShutdownHook();
@@ -41,12 +39,14 @@ public class ModuleContext {
     public final QueueManager queueManager = new QueueManager();
     public final LogManager logManager;
 
-    public ModuleContext(BeanFactory beanFactory, boolean test) {
+    public final MockFactory mockFactory;
+
+    public ModuleContext(BeanFactory beanFactory, MockFactory mockFactory) {
         this.beanFactory = beanFactory;
-        this.test = test;
+        this.mockFactory = mockFactory;
 
         this.logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
-        if (!test) {
+        if (!isTest()) {
             startupHook.add(logManager::start);
             shutdownHook.add(logManager::stop);
         }
@@ -54,7 +54,7 @@ public class ModuleContext {
         httpServer = new HTTPServer(logManager);
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);  // expose TemplateManager to allow app handle template programmably, such as cms/widgets
-        if (!test) {
+        if (!isTest()) {
             startupHook.add(httpServer::start);
             shutdownHook.add(httpServer::stop);
         }
@@ -63,7 +63,7 @@ public class ModuleContext {
 
         beanFactory.bind(AsyncExecutor.class, null, new AsyncExecutor(executor, logManager));
 
-        if (!test) {
+        if (!isTest()) {
             httpServer.handler.route.add(HTTPMethod.GET, "/health-check", new ControllerHolder(new HealthCheckController(), true));
             httpServer.handler.route.add(HTTPMethod.GET, "/monitor/memory", new ControllerHolder(new MemoryUsageController(), true));
             ThreadInfoController threadInfoController = new ThreadInfoController();
@@ -75,7 +75,7 @@ public class ModuleContext {
     public Scheduler scheduler() {
         if (scheduler == null) {
             scheduler = new Scheduler(executor, logManager);
-            if (!test) {
+            if (!isTest()) {
                 startupHook.add(scheduler::start);
                 shutdownHook.add(scheduler::stop);
 
@@ -85,5 +85,9 @@ public class ModuleContext {
             }
         }
         return scheduler;
+    }
+
+    public boolean isTest() {
+        return mockFactory != null;
     }
 }

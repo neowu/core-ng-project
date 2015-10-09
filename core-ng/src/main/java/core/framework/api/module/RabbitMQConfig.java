@@ -15,19 +15,19 @@ public final class RabbitMQConfig {
     }
 
     public void hosts(String... hosts) {
-        if (!context.test) {
+        if (!context.isTest()) {
             context.queueManager.rabbitMQ.hosts(hosts);
         }
     }
 
     public void user(String user) {
-        if (!context.test) {
+        if (!context.isTest()) {
             context.queueManager.rabbitMQ.user(user);
         }
     }
 
     public void password(String password) {
-        if (!context.test) {
+        if (!context.isTest()) {
             context.queueManager.rabbitMQ.password(password);
         }
     }

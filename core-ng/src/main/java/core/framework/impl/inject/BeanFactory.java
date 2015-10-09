@@ -59,38 +59,38 @@ public class BeanFactory {
         return bean;
     }
 
-    public <T> T create(Class<T> instanceType) {
-        if (instanceType.isInterface() || Modifier.isAbstract(instanceType.getModifiers()))
-            throw new Error("instance type must be concrete class, instanceType=" + instanceType);
+    public <T> T create(Class<T> instanceClass) {
+        if (instanceClass.isInterface() || Modifier.isAbstract(instanceClass.getModifiers()))
+            throw new Error("instance class must be concrete, class=" + instanceClass.getCanonicalName());
 
         try {
-            T instance = construct(instanceType);
+            T instance = construct(instanceClass);
             inject(instance);
             return instance;
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException | RuntimeException e) {
-            throw new Error("failed to build bean, instanceType=" + instanceType + ", error=" + e.getMessage(), e);
+            throw new Error("failed to build bean, instanceClass=" + instanceClass + ", error=" + e.getMessage(), e);
         }
     }
 
-    private <T> T construct(Class<T> instanceType) throws IllegalAccessException, InvocationTargetException, InstantiationException {
+    private <T> T construct(Class<T> instanceClass) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor<?> targetConstructor = null;
 
-        for (Constructor<?> constructor : instanceType.getDeclaredConstructors()) {
+        for (Constructor<?> constructor : instanceClass.getDeclaredConstructors()) {
             if (constructor.isAnnotationPresent(Inject.class)) {
                 if (targetConstructor != null)
-                    throw new Error("@Inject can only be declared in one method, previous=" + targetConstructor + ", current=" + constructor);
+                    throw Exceptions.error("only one constructor can have @Inject, previous={}, current={}", targetConstructor, constructor);
                 targetConstructor = constructor;
             }
         }
         try {
-            if (targetConstructor == null) targetConstructor = instanceType.getDeclaredConstructor();
+            if (targetConstructor == null) targetConstructor = instanceClass.getDeclaredConstructor();
         } catch (NoSuchMethodException e) {
-            throw new Error("require default constructor, instanceType=" + instanceType, e);
+            throw Exceptions.error("default constructor is required, class={}", instanceClass, e);
         }
 
         Object[] params = lookupParams(targetConstructor);
 
-        return instanceType.cast(targetConstructor.newInstance(params));
+        return instanceClass.cast(targetConstructor.newInstance(params));
     }
 
     private <T> void inject(T instance) throws IllegalAccessException, InvocationTargetException {

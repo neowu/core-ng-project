@@ -31,7 +31,7 @@ public class SearchConfig {
     }
 
     public void host(String host) {
-        if (context.test) {
+        if (context.isTest()) {
             logger.info("use temp local index during test");
             Path dataPath = Files.tempDirectory();
             search.local(dataPath);

@@ -7,7 +7,6 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.http.HTTPResponse;
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.module.WebServiceClientConfig;
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
@@ -31,14 +30,14 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class WebServiceClient implements WebServiceClientConfig {
+public class WebServiceClient {
     private final Logger logger = LoggerFactory.getLogger(WebServiceClient.class);
 
     private final String serviceURL;
     private final HTTPClient httpClient;
     private final BeanValidator validator;
     private final LogManager logManager;
-    private WebServiceRequestSigner signer;
+    public WebServiceRequestSigner signer;
 
     public WebServiceClient(String serviceURL, HTTPClient httpClient, BeanValidator validator, LogManager logManager) {
         this.serviceURL = serviceURL;
@@ -124,11 +123,6 @@ public class WebServiceClient implements WebServiceClientConfig {
         if (actionLog.trace) {
             httpRequest.header(HTTPServerHandler.HEADER_TRACE, "true");
         }
-    }
-
-    @Override
-    public void signBy(WebServiceRequestSigner signer) {
-        this.signer = signer;
     }
 
     private void validateResponse(HTTPResponse response) {

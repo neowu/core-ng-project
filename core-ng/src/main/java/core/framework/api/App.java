@@ -25,7 +25,7 @@ public abstract class App extends Module {
 
     public final void configure() {
         logger.info("initialize framework");
-        context = new ModuleContext(new BeanFactory(), false);
+        context = new ModuleContext(new BeanFactory(), null);
 
         logger.info("initialize application");
         initialize();
