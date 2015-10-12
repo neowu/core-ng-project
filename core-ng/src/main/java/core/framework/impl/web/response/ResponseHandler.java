@@ -35,7 +35,7 @@ public class ResponseHandler {
 
     public void handle(ResponseImpl response, HttpServerExchange exchange, RequestImpl request) {
         HTTPStatus status = response.status();
-        exchange.setResponseCode(status.code);
+        exchange.setStatusCode(status.code);
         ActionLogContext.put("responseCode", status.code);
 
         HeaderMap headers = exchange.getResponseHeaders();

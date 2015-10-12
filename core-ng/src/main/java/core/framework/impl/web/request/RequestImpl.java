@@ -122,7 +122,7 @@ public final class RequestImpl implements Request {
         if (value == null) return Optional.empty();
         if (!value.isFile())
             throw new BadRequestException("form body must be multipart, method=" + method + ", contentType=" + contentType);
-        return Optional.of(new MultipartFile(value.getFile(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
+        return Optional.of(new MultipartFile(value.getPath(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
     }
 
     private FormData.FormValue formValue(String name) {

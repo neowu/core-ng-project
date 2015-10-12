@@ -1,17 +1,17 @@
 package core.framework.api.web;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * @author neo
  */
 public class MultipartFile {
-    public final File file;
+    public final Path path;
     public final String fileName;
     public final String contentType;
 
-    public MultipartFile(File file, String fileName, String contentType) {
-        this.file = file;
+    public MultipartFile(Path path, String fileName, String contentType) {
+        this.path = path;
         this.fileName = fileName;
         this.contentType = contentType;
     }

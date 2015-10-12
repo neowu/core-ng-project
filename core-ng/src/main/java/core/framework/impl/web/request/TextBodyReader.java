@@ -2,11 +2,11 @@ package core.framework.impl.web.request;
 
 import core.framework.api.util.ByteBuf;
 import core.framework.impl.web.HTTPServerHandler;
+import io.undertow.connector.PooledByteBuffer;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.AttachmentKey;
 import org.xnio.ChannelListener;
 import org.xnio.IoUtils;
-import org.xnio.Pooled;
 import org.xnio.channels.StreamSourceChannel;
 
 import java.nio.ByteBuffer;
@@ -39,8 +39,8 @@ public class TextBodyReader implements ChannelListener<StreamSourceChannel> {
     }
 
     public void read(StreamSourceChannel channel) {
-        try (Pooled<ByteBuffer> poolItem = exchange.getConnection().getBufferPool().allocate()) {
-            ByteBuffer buffer = poolItem.getResource();
+        try (PooledByteBuffer poolItem = exchange.getConnection().getByteBufferPool().allocate()) {
+            ByteBuffer buffer = poolItem.getBuffer();
             int bytesRead;
             while (true) {
                 buffer.clear();

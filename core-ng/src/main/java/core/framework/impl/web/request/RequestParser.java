@@ -12,6 +12,7 @@ import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
 import java.util.Deque;
 
 /**
@@ -79,7 +80,7 @@ public class RequestParser {
                 Deque<FormData.FormValue> values = request.formData.get(name);
                 for (FormData.FormValue value : values) {
                     if (value.isFile()) {
-                        logger.debug("[request:file] {}={}, size={}", name, value.getFileName(), value.getFile().length());
+                        logger.debug("[request:file] {}={}, size={}", name, value.getFileName(), Files.size(value.getPath()));
                     } else {
                         logger.debug("[request:form] {}={}", name, value.getValue());
                     }
