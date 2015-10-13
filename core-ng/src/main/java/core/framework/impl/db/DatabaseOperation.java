@@ -183,7 +183,7 @@ public class DatabaseOperation {
         } else if (param == null) {
             statement.setObject(index, null);
         } else {
-            throw Exceptions.error("unsupported param type, please contact arch team, param={}", param);
+            throw Exceptions.error("unsupported param type, please contact arch team, type={}, value={}", param.getClass().getCanonicalName(), param);
         }
     }
 }
