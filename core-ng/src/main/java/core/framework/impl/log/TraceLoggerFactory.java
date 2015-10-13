@@ -1,8 +1,7 @@
 package core.framework.impl.log;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
+import core.framework.api.util.Files;
+
 import java.nio.file.Path;
 
 /**
@@ -14,12 +13,8 @@ public final class TraceLoggerFactory {
     }
 
     public static TraceLoggerFactory file(Path traceLogPath) {
-        try {
-            Files.createDirectories(traceLogPath);
-            return new TraceLoggerFactory(traceLogPath);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        Files.createDir(traceLogPath);
+        return new TraceLoggerFactory(traceLogPath);
     }
 
     private final Path traceLogPath;

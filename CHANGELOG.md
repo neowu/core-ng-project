@@ -3,6 +3,7 @@
 ### 3.6.7 (10/12/2015 - )
 * web: update undertow to 1.3.0.Final
 * db: improve setParam error message
+* util: Files, added common functions
 
 ### 3.6.6 (10/09/2015)
 * test: refactory test dependency and structure, support api().client() mock

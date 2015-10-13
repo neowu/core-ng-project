@@ -33,9 +33,9 @@ public class SearchConfig {
     public void host(String host) {
         if (context.isTest()) {
             logger.info("use temp local index during test");
-            Path dataPath = Files.tempDirectory();
+            Path dataPath = Files.tempDir();
             search.local(dataPath);
-            context.shutdownHook.add(() -> Files.deleteDirectory(dataPath));
+            context.shutdownHook.add(() -> Files.deleteDir(dataPath));
         } else {
             search.remote(host);
         }

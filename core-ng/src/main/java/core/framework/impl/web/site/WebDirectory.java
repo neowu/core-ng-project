@@ -27,13 +27,13 @@ public class WebDirectory {
         String value = System.getProperty("core.webPath");
         if (value != null) {
             Path path = Paths.get(value).toAbsolutePath();
-            if (Files.exists(path) && Files.isDirectory(path)) {
+            if (Files.isDirectory(path)) {
                 logger.info("found -Dcore.webPath, use it as web directory, path={}", path);
                 return path;
             }
         } else {
             Path path = Paths.get("./src/main/dist/web");
-            if (Files.exists(path) && Files.isDirectory(path)) {
+            if (Files.isDirectory(path)) {
                 logger.warn("found local web directory, this should only happen in local dev env or test, path={}", path);
                 localEnv = true;
                 try {

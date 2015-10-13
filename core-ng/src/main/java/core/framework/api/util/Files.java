@@ -16,10 +16,9 @@ import java.util.UUID;
 
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createDirectories;
-import static java.nio.file.Files.createDirectory;
 import static java.nio.file.Files.delete;
-import static java.nio.file.Files.exists;
 import static java.nio.file.Files.getLastModifiedTime;
+import static java.nio.file.Files.move;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Files.walkFileTree;
 
@@ -29,29 +28,37 @@ import static java.nio.file.Files.walkFileTree;
 public final class Files {
     private static final Logger LOGGER = LoggerFactory.getLogger(Files.class);
 
-    public static String text(Path path) {
-        return new String(bytes(path), Charsets.UTF_8);
+    public static String text(Path file) {
+        return new String(bytes(file), Charsets.UTF_8);
     }
 
-    public static byte[] bytes(Path path) {
+    public static byte[] bytes(Path file) {
         StopWatch watch = new StopWatch();
         try {
-            return readAllBytes(path);
+            return readAllBytes(file);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            LOGGER.debug("bytes, path={}, elapsedTime={}", path, watch.elapsedTime());
+            LOGGER.debug("bytes, file={}, elapsedTime={}", file, watch.elapsedTime());
         }
     }
 
-    public static void copyDirectory(Path source, Path destination) {
+    public static void createDir(Path directory) {
+        try {
+            createDirectories(directory);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static void copyDir(Path source, Path destination) {
         StopWatch watch = new StopWatch();
         try {
             walkFileTree(source, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attributes) throws IOException {
                     Path targetPath = destination.resolve(source.relativize(dir));
-                    if (!exists(targetPath)) createDirectory(targetPath);
+                    if (!exists(targetPath)) createDirectories(targetPath);
                     return FileVisitResult.CONTINUE;
                 }
 
@@ -64,11 +71,11 @@ public final class Files {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            LOGGER.debug("copy directory, source={}, destination={}, elapsedTime={}", source, destination, watch.elapsedTime());
+            LOGGER.debug("copyDir, source={}, destination={}, elapsedTime={}", source, destination, watch.elapsedTime());
         }
     }
 
-    public static void deleteDirectory(Path directory) {
+    public static void deleteDir(Path directory) {
         StopWatch watch = new StopWatch();
         try {
             walkFileTree(directory, new SimpleFileVisitor<Path>() {
@@ -87,32 +94,53 @@ public final class Files {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            LOGGER.debug("delete directory, path={}, elapsedTime={}", directory, watch.elapsedTime());
+            LOGGER.debug("deleteDir, directory={}, elapsedTime={}", directory, watch.elapsedTime());
         }
     }
 
     public static Path tempFile() {
         String tempDir = System.getProperty("java.io.tmpdir");
-        Path path = Paths.get(tempDir + "/" + UUID.randomUUID().toString() + ".tmp");
-        LOGGER.debug("create temp file path, path={}", path);
+        return Paths.get(tempDir + "/" + UUID.randomUUID().toString() + ".tmp");
+    }
+
+    public static Path tempDir() {
+        String tempDir = System.getProperty("java.io.tmpdir");
+        Path path = Paths.get(tempDir + "/" + UUID.randomUUID().toString());
+        createDir(path);
         return path;
     }
 
-    public static Path tempDirectory() {
-        String tempDir = System.getProperty("java.io.tmpdir");
-        Path path = Paths.get(tempDir + "/" + UUID.randomUUID().toString());
+    public static void deleteFile(Path file) {
         try {
-            createDirectories(path);
+            delete(file);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        LOGGER.debug("create temp directory, path={}", path);
-        return path;
     }
 
-    public static Instant lastModified(Path path) {
+    public static void moveFile(Path source, Path destination) {
         try {
-            return getLastModifiedTime(path).toInstant();
+            move(source, destination, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static boolean exists(Path file) {
+        return java.nio.file.Files.exists(file);
+    }
+
+    public static long size(Path file) {
+        try {
+            return java.nio.file.Files.size(file);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static Instant lastModified(Path file) {
+        try {
+            return getLastModifiedTime(file).toInstant();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

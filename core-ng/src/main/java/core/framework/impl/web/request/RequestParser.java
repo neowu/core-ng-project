@@ -1,6 +1,7 @@
 package core.framework.impl.web.request;
 
 import core.framework.api.http.HTTPMethod;
+import core.framework.api.util.Files;
 import core.framework.api.util.Strings;
 import core.framework.impl.log.ActionLog;
 import io.undertow.server.HttpServerExchange;
@@ -12,7 +13,6 @@ import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Files;
 import java.util.Deque;
 
 /**
