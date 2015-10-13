@@ -1,6 +1,6 @@
 ## Change log
 
-### 3.6.7 (10/12/2015 - )
+### 3.6.7 (10/12/2015 - 10/13/2015)
 * web: update undertow to 1.3.0.Final
 * db: improve setParam error message
 * util: Files, added common functions
