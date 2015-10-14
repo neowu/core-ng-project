@@ -4,7 +4,7 @@
 <!--refer to http://checkstyle.sourceforge.net/availablechecks.html-->
 <module name="Checker">
     <module name="TreeWalker">
-        <!--<module name="Indentation"/>-->
+        <module name="Indentation"/>
 
         <!--Checks the placement of left curly braces on types, methods and other blocks:-->
         <module name="LeftCurly"/>
@@ -36,6 +36,8 @@
             <property name="countEmpty" value="false"/>
             <property name="max" value="50"/>
         </module>
+
+        <module name="AvoidStarImport"/>
 
         <!--Checks for unused import statements.-->
         <module name="UnusedImports"/>

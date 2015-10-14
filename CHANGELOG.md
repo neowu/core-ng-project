@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.6.8 (10/14/2014)
+* gradle: checkstyle update to 6.11.2, finally support intention for lambda
+
 ### 3.6.7 (10/12/2015 - 10/13/2015)
 * web: update undertow to 1.3.0.Final
 * db: improve setParam error message
