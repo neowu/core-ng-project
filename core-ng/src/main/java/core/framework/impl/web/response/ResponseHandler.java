@@ -23,7 +23,6 @@ import java.util.Map;
 public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
     private final Map<Class, BodyHandler> handlers = Maps.newHashMap();
-    private final HTTPHeaderMappings headerMappings = new HTTPHeaderMappings();
 
     public ResponseHandler(BeanValidator validator, TemplateManager templateManager) {
         handlers.put(BeanBody.class, new BeanBodyResponseHandler(validator));
@@ -39,10 +38,9 @@ public class ResponseHandler {
         ActionLogContext.put("responseCode", status.code);
 
         HeaderMap headers = exchange.getResponseHeaders();
-        response.headers.forEach((name, value) -> {
-            String headerValue = String.valueOf(value);
-            logger.debug("[response:header] {}={}", name, headerValue);
-            headers.put(headerMappings.undertowHeader(name), headerValue);
+        response.headers.forEach((header, value) -> {
+            logger.debug("[response:header] {}={}", header, value);
+            headers.put(header, value);
         });
 
         if (response.cookies != null) {

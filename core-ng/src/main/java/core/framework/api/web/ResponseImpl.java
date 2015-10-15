@@ -1,9 +1,10 @@
 package core.framework.api.web;
 
-import core.framework.api.http.HTTPHeaders;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.util.Maps;
 import core.framework.impl.web.response.Body;
+import io.undertow.util.Headers;
+import io.undertow.util.HttpString;
 
 import java.util.Map;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  */
 public final class ResponseImpl implements Response {
     private HTTPStatus status = HTTPStatus.OK;
-    public final Map<String, String> headers = Maps.newHashMap();
+    public final Map<HttpString, String> headers = Maps.newHashMap();
     public Map<CookieSpec, String> cookies;
     public final Body body;
 
@@ -33,7 +34,7 @@ public final class ResponseImpl implements Response {
 
     @Override
     public Response header(String name, Object value) {
-        headers.put(name, String.valueOf(value));
+        headers.put(new HttpString(name), String.valueOf(value));
         return this;
     }
 
@@ -47,7 +48,7 @@ public final class ResponseImpl implements Response {
     @Override
     public Response contentType(String contentType) {
         if (contentType != null)
-            header(HTTPHeaders.CONTENT_TYPE, contentType);
+            headers.put(Headers.CONTENT_TYPE, contentType);
         return this;
     }
 }

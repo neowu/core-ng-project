@@ -23,10 +23,12 @@ public class WebModule extends Module {
         route().get("/hello/", request -> Response.text("hello with ending slash", HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
         route().get("/hello/:name", request -> Response.text("hello " + request.pathParam("name"), HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
 
-        site().template("/template/index.html", IndexPage.class);
         site().staticContent("/static");
+        site().staticContent("/favicon.ico");
+        site().staticContent("/robots.txt");
         site().message().loadProperties("messages/main.properties");
 
+        site().template("/template/index.html", IndexPage.class);
         IndexController index = bind(IndexController.class);
         route().get("/", index::index);
         route().get("/css/main.css", index::css);
