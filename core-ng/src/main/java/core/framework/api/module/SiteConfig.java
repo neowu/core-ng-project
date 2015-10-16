@@ -33,6 +33,10 @@ public final class SiteConfig {
         return new MessageConfig(context);
     }
 
+    public CDNConfig cdn() {
+        return new CDNConfig(context);
+    }
+
     public void template(String path, Class<?> modelClass) {
         context.httpServer.siteManager.templateManager.add(path, modelClass);
     }
@@ -49,9 +53,5 @@ public final class SiteConfig {
         } else {
             context.httpServer.handler.route.add(HTTPMethod.GET, path, new ControllerHolder(new StaticFileController(contentPath), true));
         }
-    }
-
-    public void cdnHosts(String... hosts) {
-        context.httpServer.siteManager.templateManager.cdnHosts(hosts);
     }
 }

@@ -3,6 +3,7 @@
 ### 3.6.9 (10/16/2015)
 * gradle: core-ng app support ant property filtering, conf/env/web content override
 * test: rewrite env conf validator, to verify /conf/env/resources and /conf/env/web
+* web: #cdn function append version param
 
 ### 3.6.8 (10/14/2015)
 * gradle: checkstyle update to 6.11.2, finally support intention for lambda

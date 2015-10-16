@@ -64,6 +64,11 @@ public class TemplateManagerImpl implements TemplateManager {
         cdnFunction.hosts = hosts;
     }
 
+    public void cdnVersion(String version) {
+        logger.info("set cdn version, version={}", version);
+        cdnFunction.version = version;
+    }
+
     private Template load(String templatePath, Class<?> modelClass) {
         return new TemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass).build();
     }

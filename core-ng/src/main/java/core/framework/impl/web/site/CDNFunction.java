@@ -9,6 +9,7 @@ import core.framework.impl.template.function.HTMLText;
  */
 public class CDNFunction implements Function {
     String[] hosts;
+    String version;
 
     @Override
     public Object apply(Object[] params) {
@@ -21,6 +22,13 @@ public class CDNFunction implements Function {
     String buildURL(String url) {
         int hash = url.hashCode();
         int hostIndex = hash % hosts.length;
-        return "//" + hosts[hostIndex] + url;
+        StringBuilder builder = new StringBuilder(url.length() + 50);
+        builder.append("//").append(hosts[hostIndex]).append(url);
+        if (version != null) {
+            if (url.contains("?")) builder.append("&v=");
+            else builder.append("?v=");
+            builder.append(version);
+        }
+        return builder.toString();
     }
 }

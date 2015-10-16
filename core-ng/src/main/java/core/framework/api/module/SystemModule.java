@@ -34,7 +34,8 @@ public final class SystemModule extends Module {
             }
         });
 
-        property("sys.cdn.host").ifPresent(hosts -> site().cdnHosts(hosts.split(",")));
+        property("sys.cdn.host").ifPresent(hosts -> site().cdn().hosts(hosts.split(",")));
+        property("sys.cdn.version").ifPresent(version -> site().cdn().version(version));
 
         property("sys.log.actionLogPath").ifPresent(path -> {
             if ("console".equals(path)) {
