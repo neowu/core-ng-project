@@ -1,6 +1,10 @@
 ## Change log
 
-### 3.6.8 (10/14/2014)
+### 3.6.9 (10/16/2015)
+* gradle: core-ng app support ant property filtering, conf/env/web content override
+* test: rewrite env conf validator, to verify /conf/env/resources and /conf/env/web
+
+### 3.6.8 (10/14/2015)
 * gradle: checkstyle update to 6.11.2, finally support intention for lambda
 * web: static content supports file under root directly (like robot.txt and favicon.ico)
 * web: static content removed 304 support, because static content is always handled by nginx in server env.

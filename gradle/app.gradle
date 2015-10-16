@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ExpandProperties
+
 // use gradlew -Penv=${env} to pass
 def environment = hasProperty('env') ? env : null
 
@@ -17,12 +19,31 @@ afterEvaluate {
     }
 }
 
+processResources {
+    // ant.properties requires baseDir of project
+    projectDir.mkdirs()
+
+    project.ext.properties.each { key, value ->
+        ant.properties[key] = value
+    }
+
+    filesMatching('**/*.properties') {
+        filter ExpandProperties, project: project.ant.project
+    }
+}
+
 distributions {
     main {
         if (environment != null) {
             def envProperties = "conf/${environment}/resources"
             assert project.file(envProperties).exists()
             sourceSets.main.resources.srcDirs envProperties
+
+            contents {
+                from("conf/${environment}/web") {
+                    into "web"
+                }
+            }
         }
     }
 }
