@@ -59,7 +59,6 @@
     <rule ref="rulesets/java/design.xml/SimplifyConditional"/>
     <rule ref="rulesets/java/design.xml/CompareObjectsWithEquals"/>
     <rule ref="rulesets/java/design.xml/PositionLiteralsFirstInComparisons"/>
-    <!--<rule ref="rulesets/java/design.xml/UnnecessaryLocalBeforeReturn"/> has bug disable for now, false positive with "return localVariable.field" -->
     <rule ref="rulesets/java/design.xml/AvoidConstantsInterface"/>
     <rule ref="rulesets/java/design.xml/UnsynchronizedStaticDateFormatter"/>
     <rule ref="rulesets/java/design.xml/PreserveStackTrace"/>
@@ -87,6 +86,7 @@
     <rule ref="rulesets/java/unnecessary.xml/UnusedNullCheckInEquals"/>
     <rule ref="rulesets/java/unnecessary.xml/UselessOperationOnImmutable"/>
     <rule ref="rulesets/java/unnecessary.xml/UselessOverridingMethod"/>
+    <rule ref="rulesets/java/unnecessary.xml/UselessQualifiedThis"/>
     <rule ref="rulesets/java/unnecessary.xml/UnnecessaryFinalModifier"/>
     <rule ref="rulesets/java/unnecessary.xml/UnnecessaryReturn"/>
     <rule ref="rulesets/java/unnecessary.xml/UnnecessaryConversionTemporary"/>

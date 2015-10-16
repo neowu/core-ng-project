@@ -20,7 +20,7 @@ tasks.withType(Checkstyle) {
 pmd {
     ruleSets = []
     ruleSetFiles = rootProject.files('gradle/pmd/rule-set.xml')
-    toolVersion = '5.3.4'
+    toolVersion = '5.4.0'
     consoleOutput = true
 }
 
