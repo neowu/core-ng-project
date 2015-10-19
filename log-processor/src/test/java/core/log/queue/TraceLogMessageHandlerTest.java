@@ -25,7 +25,7 @@ public class TraceLogMessageHandlerTest extends IntegrationTest {
         TraceLogMessage message = new TraceLogMessage();
         message.id = "1";
         message.date = Instant.now();
-        message.result = "OK";
+        message.result = "WARN";
         message.content = "line1";
         handler.handle(message);
 
@@ -34,10 +34,12 @@ public class TraceLogMessageHandlerTest extends IntegrationTest {
         Assert.assertEquals(1, trace.content.size());
         Assert.assertEquals("line1", trace.content.get(0));
 
+        message.result = "ERROR";
         message.content = "line2";
         handler.handle(message);
 
         trace = traceType.get(message.id).get();
+        Assert.assertEquals(message.result, trace.result);
         Assert.assertEquals(2, trace.content.size());
         Assert.assertEquals("line1", trace.content.get(0));
         Assert.assertEquals("line2", trace.content.get(1));

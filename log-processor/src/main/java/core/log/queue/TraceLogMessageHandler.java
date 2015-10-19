@@ -27,8 +27,12 @@ public class TraceLogMessageHandler implements MessageHandler<TraceLogMessage> {
         emptyTraceLog.result = message.result;
         emptyTraceLog.content = Lists.newArrayList();
 
+        StringBuilder script = new StringBuilder("ctx._source.content+=line");
+        if ("ERROR".equals(message.result))
+            script.append("; ctx._source.result=\"ERROR\"");    // if log doc is created by WARN, ERROR should update result
+
         UpdateRequest request = new UpdateRequest()
-            .script("ctx._source.content+=line")
+            .script(script.toString())
             .addScriptParam("line", message.content)
             .upsert(JSON.toJSON(emptyTraceLog));
         request.scriptedUpsert(true);
