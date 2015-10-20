@@ -15,7 +15,7 @@ public final class MockFactoryImpl implements MockFactory {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> instanceClass, Object... params) {
-        if (instanceClass.equals(Redis.class)) return (T) new MockRedis();
+        if (Redis.class.equals(instanceClass)) return (T) new MockRedis();
         if (MessagePublisher.class.equals(instanceClass))
             return (T) new MockMessagePublisher<>((String) params[0], (MessageValidator) params[1]);
         return Mockito.mock(instanceClass);
