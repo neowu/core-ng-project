@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.7.0 (10/20/2015)
+* mongo: config support
+* lib: removed hsql to default test-compile scope, not all services had db.
+
 ### 3.6.9 (10/16/2015)
 * gradle: core-ng app support ant property filtering, conf/env/web content override
 * test: rewrite env conf validator, to verify /conf/env/resources and /conf/env/web

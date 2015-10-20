@@ -19,10 +19,10 @@ import java.time.Duration;
  * @author neo
  */
 public final class DBConfig {
+    final DatabaseImpl database;
     private final Logger logger = LoggerFactory.getLogger(DBConfig.class);
     private final ModuleContext context;
     private final String name;
-    final DatabaseImpl database;
 
     public DBConfig(ModuleContext context, String name) {
         this.context = context;
@@ -75,7 +75,7 @@ public final class DBConfig {
     }
 
     public void slowQueryThreshold(Duration slowQueryThreshold) {
-        database.slowQueryThresholdInMs = slowQueryThreshold.toMillis();
+        database.slowQueryThreshold(slowQueryThreshold);
     }
 
     public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {

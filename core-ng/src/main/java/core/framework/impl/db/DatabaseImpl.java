@@ -25,19 +25,19 @@ import java.util.Properties;
  * @author neo
  */
 public final class DatabaseImpl implements Database {
-    private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
-
     public final Pool<Connection> pool;
     public final DatabaseOperation operation;
-    public long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
-    public int tooManyRowsReturnedThreshold = 1000;
+
+    private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class, RowMapper> rowMappers = Maps.newHashMap();
     private final ScalarRowMappers scalarRowMappers = new ScalarRowMappers();
-    private Duration timeout;
+    private final Properties driverProperties = new Properties();
 
+    public int tooManyRowsReturnedThreshold = 1000;
+    long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
+    private Duration timeout;
     private Driver driver;
     private String url;
-    private final Properties driverProperties = new Properties();
 
     public DatabaseImpl() {
         pool = new Pool<>(this::createConnection, Connection::close);
@@ -99,6 +99,10 @@ public final class DatabaseImpl implements Database {
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new Error(e);
         }
+    }
+
+    public void slowQueryThreshold(Duration slowQueryThreshold) {
+        slowQueryThresholdInMs = slowQueryThreshold.toMillis();
     }
 
     public <T> void view(Class<T> viewClass) {

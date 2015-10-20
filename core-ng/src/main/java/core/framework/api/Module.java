@@ -5,6 +5,7 @@ import core.framework.api.module.CacheConfig;
 import core.framework.api.module.DBConfig;
 import core.framework.api.module.HTTPConfig;
 import core.framework.api.module.LogConfig;
+import core.framework.api.module.MongoConfig;
 import core.framework.api.module.QueueConfig;
 import core.framework.api.module.RedisConfig;
 import core.framework.api.module.RouteConfig;
@@ -130,6 +131,10 @@ public abstract class Module {
 
     public SearchConfig search() {
         return new SearchConfig(context);
+    }
+
+    public MongoConfig mongo() {
+        return new MongoConfig(context);
     }
 
     protected abstract void initialize();

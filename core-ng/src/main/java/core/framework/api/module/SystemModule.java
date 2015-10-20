@@ -64,5 +64,7 @@ public final class SystemModule extends Module {
         property("sys.redis.host").ifPresent(host -> redis().host(host));
 
         property("sys.elasticsearch.host").ifPresent(host -> search().host(host));
+
+        property("sys.mongo.uri").ifPresent(uri -> mongo().uri(uri));
     }
 }

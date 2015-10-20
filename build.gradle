@@ -4,13 +4,13 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '3.6.9'
+    version = '3.7.0'
 }
 
-def awsVersion = '1.10.20'
+def awsVersion = '1.10.27'
 def jacksonVersion = '2.6.2'
 def redisVersion = '2.7.2'
-def mongoVersion = '3.0.3'
+def mongoVersion = '3.0.4'
 def elasticVersion = '1.7.2'
 def rabbitVersion = '3.5.4'
 
@@ -54,13 +54,13 @@ project(':core-ng-test') {
     dependencies {
         provided(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                'com.github.fakemongo:fongo:2.0.1@jar'
+                'com.github.fakemongo:fongo:2.0.1@jar',
+                'org.hsqldb:hsqldb:2.3.3'
         )
         compile(
                 project(":core-ng"),
                 'junit:junit:4.12',
-                'org.mockito:mockito-core:1.10.19',
-                'org.hsqldb:hsqldb:2.3.3'
+                'org.mockito:mockito-core:1.10.19'
         )
     }
 }
@@ -128,6 +128,7 @@ project(':demo-service') {
                 project(':core-ng-test')
         )
         testRuntime(
+                'org.hsqldb:hsqldb:2.3.3',
                 'org.codehaus.groovy:groovy-all:2.4.4',  // for elastic search script test
                 'com.github.fakemongo:fongo:2.0.1'
         )

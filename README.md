@@ -8,7 +8,6 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * template, use ByteBuffer[] for performance tuning
 * async: think about how to support batch with fixed concurrency, or Batch object and chain next easier
 * redis: investigate redis hiccup, like 200ms for one operation under load
-* mongo: mongo config support?
 * web: get/form post, validate bean class and code generation for param serialization?
 * real time monitor to ES?
 * provide ws interface to send queue message for dev and prod troubleshoot?

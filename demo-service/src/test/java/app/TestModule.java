@@ -4,11 +4,7 @@ import app.product.domain.ProductDocument;
 import app.product.web.ProductController;
 import app.product.web.ProductView;
 import app.product.web.ProductWebService;
-import app.user.domain.MongoUserAggregateView;
-import app.user.domain.User;
 import core.framework.api.AbstractTestModule;
-import core.framework.api.mongo.MockMongoBuilder;
-import core.framework.api.mongo.Mongo;
 import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.YAML;
 import core.framework.impl.search.ElasticSearchTypeImpl;
@@ -21,10 +17,6 @@ public class TestModule extends AbstractTestModule {
     @Override
     protected void initialize() {
         overrideBinding(ProductController.class, Mockito.mock(ProductController.class));
-        overrideBinding(Mongo.class, new MockMongoBuilder()
-            .uri("mongodb://localhost/main")
-            .entityClass(User.class)
-            .viewClass(MongoUserAggregateView.class).get());
 
         load(new DemoServiceApp());
 

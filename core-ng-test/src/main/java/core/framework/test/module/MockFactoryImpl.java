@@ -1,5 +1,6 @@
 package core.framework.test.module;
 
+import com.github.fakemongo.Fongo;
 import core.framework.api.queue.MessagePublisher;
 import core.framework.api.redis.Redis;
 import core.framework.impl.module.MockFactory;
@@ -18,6 +19,9 @@ public final class MockFactoryImpl implements MockFactory {
         if (Redis.class.equals(instanceClass)) return (T) new MockRedis();
         if (MessagePublisher.class.equals(instanceClass))
             return (T) new MockMessagePublisher<>((String) params[0], (MessageValidator) params[1]);
+        // mongo jar is optional for project
+        if ("com.mongodb.MongoClient".equals(instanceClass.getCanonicalName()))
+            return (T) new Fongo("test").getMongo();
         return Mockito.mock(instanceClass);
     }
 }
