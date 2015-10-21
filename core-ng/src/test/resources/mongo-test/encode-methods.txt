@@ -67,7 +67,8 @@ private void encode_java_util_Map_core_framework_impl_mongo_TestEntityChild(org.
 
 private void encode_core_framework_impl_mongo_TestEntity(org.bson.BsonWriter writer, core.framework.impl.mongo.TestEntity entity) {
     writer.writeStartDocument();
-    if (entity.id != null) writer.writeObjectId("_id", entity.id);
+    writer.writeName("_id");
+    core.framework.impl.mongo.EntityCodecHelper.writeObjectId(writer, entity.id);
     writer.writeName("int_field");
     core.framework.impl.mongo.EntityCodecHelper.writeInteger(writer, entity.intField);
     writer.writeName("double_field");

@@ -2,6 +2,7 @@ package core.framework.impl.mongo;
 
 import core.framework.api.util.ClasspathResources;
 import org.bson.json.JsonReader;
+import org.bson.types.ObjectId;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -20,6 +21,8 @@ public class EntityDecoderBuilderTest {
         String entityJSON = ClasspathResources.text("mongo-test/entity.json");
 
         TestEntity entity = decoder.decode(new JsonReader(entityJSON));
+
+        Assert.assertEquals(new ObjectId("5627b47d54b92d03adb9e9cf"), entity.id);
         Assert.assertEquals("string", entity.stringField);
         Assert.assertEquals(TestEntityChild.TestEnum.ITEM1, entity.child.enumField);
         Assert.assertEquals(2, entity.listField.size());

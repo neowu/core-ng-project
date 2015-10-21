@@ -164,8 +164,9 @@ public core.framework.impl.mongo.TestEntity decode_core_framework_impl_mongo_Tes
         String fieldName = reader.readName();
         String fieldPath = parentField + "." + fieldName;
         currentType = reader.getCurrentBsonType();
-        if ("_id".equals(fieldName) && currentType == org.bson.BsonType.OBJECT_ID) {
-            entity.id = reader.readObjectId(); continue;
+        if ("_id".equals(fieldName)) {
+            entity.id = core.framework.impl.mongo.EntityCodecHelper.readObjectId(reader, currentType, fieldPath);
+            continue;
         }
         if ("int_field".equals(fieldName)) {
             entity.intField = core.framework.impl.mongo.EntityCodecHelper.readInteger(reader, currentType, fieldPath);

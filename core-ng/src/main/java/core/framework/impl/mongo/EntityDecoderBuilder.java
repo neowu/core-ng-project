@@ -3,12 +3,12 @@ package core.framework.impl.mongo;
 import core.framework.api.mongo.Id;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.reflect.GenericTypes;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -19,10 +19,9 @@ import java.util.Map;
  * @author neo
  */
 public class EntityDecoderBuilder<T> {
+    final Map<String, String> methods = new LinkedHashMap<>();
     private final Class<T> entityClass;
     private final String helper = EntityCodecHelper.class.getCanonicalName();
-
-    final Map<String, String> methods = new LinkedHashMap<>();
 
     public EntityDecoderBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -94,50 +93,47 @@ public class EntityDecoderBuilder<T> {
 
     private void decodeEntityField(CodeBuilder builder, Field field) {
         String fieldVariable = "entity." + field.getName();
-        if (field.isAnnotationPresent(Id.class)) {
-            builder.indent(2).append("if (\"_id\".equals(fieldName) && currentType == org.bson.BsonType.OBJECT_ID) {\n", fieldVariable);
-            builder.indent(3).append("{} = reader.readObjectId(); continue;\n", fieldVariable);
-            builder.indent(2).append("}\n", fieldVariable);
+        Class fieldClass = field.getType();
+        Type fieldType = field.getGenericType();
+
+        String mongoFieldName;
+        if (field.isAnnotationPresent(Id.class)) mongoFieldName = "_id";
+        else mongoFieldName = field.getDeclaredAnnotation(core.framework.api.mongo.Field.class).name();
+
+        builder.indent(2).append("if (\"{}\".equals(fieldName)) {\n", mongoFieldName);
+
+        if (Integer.class.equals(fieldClass)) {
+            builder.indent(3).append("{} = {}.readInteger(reader, currentType, fieldPath);\n", fieldVariable, helper);
+        } else if (String.class.equals(fieldClass)) {
+            builder.indent(3).append("{} = {}.readString(reader, currentType, fieldPath);\n", fieldVariable, helper);
+        } else if (Long.class.equals(fieldClass)) {
+            builder.indent(3).append("{} = {}.readLong(reader, currentType, fieldPath);\n", fieldVariable, helper);
+        } else if (LocalDateTime.class.equals(fieldClass)) {
+            builder.indent(3).append("{} = {}.readLocalDateTime(reader, currentType, fieldPath);\n", fieldVariable, helper);
+        } else if (Enum.class.isAssignableFrom(fieldClass)) {
+            builder.indent(3).append("{} = ({}) {}.readEnum(reader, currentType, {}.class, fieldPath);\n", fieldVariable, fieldClass.getCanonicalName(), helper, fieldClass.getCanonicalName());
+        } else if (Double.class.equals(fieldClass)) {
+            builder.indent(3).append("{} = {}.readDouble(reader, currentType, fieldPath);\n", fieldVariable, helper);
+        } else if (ObjectId.class.equals(fieldClass)) {
+            builder.indent(3).append("{} = {}.readObjectId(reader, currentType, fieldPath);\n", fieldVariable, helper);
+        } else if (Boolean.class.equals(fieldClass)) {
+            builder.indent(3).append("{} = {}.readBoolean(reader, currentType, fieldPath);\n", fieldVariable, helper);
+        } else if (GenericTypes.isGenericList(fieldType)) {
+            String method = decodeListMethod(GenericTypes.listValueClass(fieldType));
+            builder.indent(3).append("{} = {}(reader, fieldPath);\n", fieldVariable, method);
+        } else if (GenericTypes.isGenericStringMap(fieldType)) {
+            String method = decodeMapMethod(GenericTypes.mapValueClass(fieldType));
+            builder.indent(3).append("{} = {}(reader, fieldPath);\n", fieldVariable, method);
         } else {
-            Type fieldType = field.getGenericType();
-            builder.indent(2).append("if (\"{}\".equals(fieldName)) {\n", field.getDeclaredAnnotation(core.framework.api.mongo.Field.class).name());
-            Class fieldClass = (Class) (fieldType instanceof Class ? fieldType : ((ParameterizedType) fieldType).getRawType());
-
-            if (Integer.class.equals(fieldClass)) {
-                builder.indent(3).append("{} = {}.readInteger(reader, currentType, fieldPath);\n", fieldVariable, helper);
-            } else if (String.class.equals(fieldClass)) {
-                builder.indent(3).append("{} = {}.readString(reader, currentType, fieldPath);\n", fieldVariable, helper);
-            } else if (Long.class.equals(fieldClass)) {
-                builder.indent(3).append("{} = {}.readLong(reader, currentType, fieldPath);\n", fieldVariable, helper);
-            } else if (LocalDateTime.class.equals(fieldClass)) {
-                builder.indent(3).append("{} = {}.readLocalDateTime(reader, currentType, fieldPath);\n", fieldVariable, helper);
-            } else if (Enum.class.isAssignableFrom(fieldClass)) {
-                builder.indent(3).append("{} = ({}) {}.readEnum(reader, currentType, {}.class, fieldPath);\n", fieldVariable, fieldClass.getCanonicalName(), helper, fieldClass.getCanonicalName());
-            } else if (Double.class.equals(fieldClass)) {
-                builder.indent(3).append("{} = {}.readDouble(reader, currentType, fieldPath);\n", fieldVariable, helper);
-            } else if (ObjectId.class.equals(fieldClass)) {
-                builder.indent(3).append("{} = {}.readObjectId(reader, currentType, fieldPath);\n", fieldVariable, helper);
-            } else if (Boolean.class.equals(fieldClass)) {
-                builder.indent(3).append("{} = {}.readBoolean(reader, currentType, fieldPath);\n", fieldVariable, helper);
-            } else if (List.class.equals(fieldClass) && fieldType instanceof ParameterizedType) {
-                Class valueClass = (Class) ((ParameterizedType) fieldType).getActualTypeArguments()[0];
-                String method = decodeListMethod(valueClass);
-                builder.indent(3).append("{} = {}(reader, fieldPath);\n", fieldVariable, method);
-            } else if (Map.class.equals(fieldClass) && fieldType instanceof ParameterizedType) {
-                Class valueClass = (Class) ((ParameterizedType) fieldType).getActualTypeArguments()[1];
-                String method = decodeMapMethod(valueClass);
-                builder.indent(3).append("{} = {}(reader, fieldPath);\n", fieldVariable, method);
-            } else {
-                String method = decodeEntityMethod(fieldClass);
-                builder.indent(3).append("{} = {}(reader, fieldPath);\n", fieldVariable, method);
-            }
-
-            builder.indent(3).append("continue;\n");
-            builder.indent(2).append("}\n");
+            String method = decodeEntityMethod(fieldClass);
+            builder.indent(3).append("{} = {}(reader, fieldPath);\n", fieldVariable, method);
         }
+
+        builder.indent(3).append("continue;\n");
+        builder.indent(2).append("}\n");
     }
 
-    private String decodeMapMethod(Class valueClass) {
+    private String decodeMapMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
         String methodName = ("decode_" + Map.class.getCanonicalName() + "_" + valueClassName).replaceAll("\\.", "_");
         if (methods.containsKey(methodName)) return methodName;

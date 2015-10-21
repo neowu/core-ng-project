@@ -23,8 +23,8 @@ public class UserService {
         mongo.insert(user);
     }
 
-    public User find(String id) {
-        return mongo.findOne(User.class, new ObjectId(id)).get();
+    public User find(ObjectId id) {
+        return mongo.findOne(User.class, id).get();
     }
 
     public List<User> findByStatus(Status status) {

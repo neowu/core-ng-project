@@ -25,7 +25,7 @@ public class EntityIdHandlerBuilderTest {
 
         TestEntity entity = new TestEntity();
         entity.id = new ObjectId();
-        ObjectId id = handler.get(entity);
+        ObjectId id = (ObjectId) handler.get(entity);
 
         Assert.assertEquals(entity.id, id);
     }

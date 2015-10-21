@@ -5,6 +5,7 @@ import core.framework.api.mongo.Id;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
+import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.TypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 import org.bson.types.ObjectId;
@@ -19,8 +20,8 @@ import java.util.Set;
  */
 public class MongoClassValidator implements TypeVisitor {
     private final TypeValidator validator;
-    private boolean validateView;
     private final Map<String, Set<String>> fields = Maps.newHashMap();
+    private boolean validateView;
     private Field id;
 
     public MongoClassValidator(Class<?> entityClass) {
@@ -81,9 +82,11 @@ public class MongoClassValidator implements TypeVisitor {
     private void validateId(Field field, boolean topLevel) {
         if (topLevel) {
             if (id != null)
-                throw Exceptions.error("entity class must have only one @Id field, previous={}, current={}", id, field);
-            if (!ObjectId.class.equals(field.getType()) || !"id".equals(field.getName()))
-                throw Exceptions.error("@Id must be \"public org.bson.types.ObjectId id;\", field={}", field);
+                throw Exceptions.error("entity class must have only one @Id field, previous={}, current={}", Fields.path(id), Fields.path(field));
+            Class<?> fieldClass = field.getType();
+            if (!ObjectId.class.equals(fieldClass) && !String.class.equals(fieldClass)) {
+                throw Exceptions.error("@Id field must be either ObjectId or String, field={}, class={}", Fields.path(field), fieldClass.getCanonicalName());
+            }
             id = field;
         } else {
             throw Exceptions.error("child class must not have @Id field, field={}", field);

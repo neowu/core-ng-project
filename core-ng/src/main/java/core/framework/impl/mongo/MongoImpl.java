@@ -22,7 +22,6 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,7 +126,7 @@ public final class MongoImpl implements Mongo {
     }
 
     @Override
-    public <T> Optional<T> findOne(Class<T> entityClass, ObjectId id) {
+    public <T> Optional<T> findOne(Class<T> entityClass, Object id) {
         return findOne(entityClass, Filters.eq("_id", id));
     }
 
@@ -237,7 +236,7 @@ public final class MongoImpl implements Mongo {
     }
 
     @Override
-    public <T> void delete(Class<T> entityClass, ObjectId id) {
+    public <T> void delete(Class<T> entityClass, Object id) {
         StopWatch watch = new StopWatch();
         try {
             collection(entityClass).deleteOne(Filters.eq("_id", id));

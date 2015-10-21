@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.7.1 (10/21/2015)
+* mongo: support assigned id
+
 ### 3.7.0 (10/20/2015)
 * mongo: config support
 * lib: removed hsql to default test-compile scope, not all services had db.

@@ -34,9 +34,7 @@ public class UserServiceTest extends IntegrationTest {
         user.name = "test";
         userService.save(user);
 
-        userService.save(user);
-
-        User loadedUser = userService.find(user.id.toString());
+        User loadedUser = userService.find(user.id);
 
         Assert.assertNotSame(user, loadedUser);
         Assert.assertEquals(user.name, loadedUser.name);
@@ -63,7 +61,7 @@ public class UserServiceTest extends IntegrationTest {
     @Test
     public void aggregate() {
         User user = new User();
-        user.name = "test1";
+        user.name = "test";
         user.level = 2;
         user.status = Status.ACTIVE;
         user.createdDate = LocalDateTime.now();

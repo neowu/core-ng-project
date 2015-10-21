@@ -3,10 +3,10 @@ package core.framework.impl.mongo;
 import core.framework.api.mongo.Id;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.reflect.GenericTypes;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -17,10 +17,9 @@ import java.util.Map;
  * @author neo
  */
 public class EntityEncoderBuilder<T> {
+    final Map<String, String> methods = new LinkedHashMap<>();
     private final Class<T> entityClass;
     private final String helper = EntityCodecHelper.class.getCanonicalName();
-
-    final Map<String, String> methods = new LinkedHashMap<>();
 
     public EntityEncoderBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -52,13 +51,12 @@ public class EntityEncoderBuilder<T> {
         for (Field field : entityClass.getFields()) {
             Type fieldType = field.getGenericType();
             String fieldVariable = "entity." + field.getName();
-            if (field.isAnnotationPresent(Id.class)) {
-                builder.indent(1).append("if ({} != null) writer.writeObjectId(\"_id\", {});\n", fieldVariable, fieldVariable);
-            } else {
-                String fieldName = field.getDeclaredAnnotation(core.framework.api.mongo.Field.class).name();
-                builder.indent(1).append("writer.writeName(\"{}\");\n", fieldName);
-                encodeField(builder, fieldVariable, fieldType, 1);
-            }
+
+            String mongoFieldName;
+            if (field.isAnnotationPresent(Id.class)) mongoFieldName = "_id";
+            else mongoFieldName = field.getDeclaredAnnotation(core.framework.api.mongo.Field.class).name();
+            builder.indent(1).append("writer.writeName(\"{}\");\n", mongoFieldName);
+            encodeField(builder, fieldVariable, fieldType, 1);
         }
         builder.indent(1).append("writer.writeEndDocument();\n");
 
@@ -114,7 +112,7 @@ public class EntityEncoderBuilder<T> {
     }
 
     private void encodeField(CodeBuilder builder, String fieldVariable, Type fieldType, int indent) {
-        Class fieldClass = (Class) (fieldType instanceof Class ? fieldType : ((ParameterizedType) fieldType).getRawType());
+        Class<?> fieldClass = GenericTypes.rawClass(fieldType);
 
         if (String.class.equals(fieldClass)) {
             builder.indent(indent).append("{}.writeString(writer, {});\n", helper, fieldVariable);
@@ -132,14 +130,12 @@ public class EntityEncoderBuilder<T> {
             builder.indent(indent).append("{}.writeBoolean(writer, {});\n", helper, fieldVariable);
         } else if (ObjectId.class.equals(fieldClass)) {
             builder.indent(indent).append("{}.writeObjectId(writer, {});\n", helper, fieldVariable);
-        } else if (List.class.equals(fieldClass) && fieldType instanceof ParameterizedType) {
-            Class valueClass = (Class) ((ParameterizedType) fieldType).getActualTypeArguments()[0];
-            String methodName = encodeListMethod(valueClass);
+        } else if (GenericTypes.isGenericList(fieldType)) {
+            String methodName = encodeListMethod(GenericTypes.listValueClass(fieldType));
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, {});\n", methodName, fieldVariable);
-        } else if (Map.class.equals(fieldClass) && fieldType instanceof ParameterizedType) {
-            Class valueClass = (Class) ((ParameterizedType) fieldType).getActualTypeArguments()[1];
-            String methodName = encodeMapMethod(valueClass);
+        } else if (GenericTypes.isGenericStringMap(fieldType)) {
+            String methodName = encodeMapMethod(GenericTypes.mapValueClass(fieldType));
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, {});\n", methodName, fieldVariable);
         } else {

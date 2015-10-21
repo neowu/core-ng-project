@@ -1,7 +1,6 @@
 package core.framework.api.mongo;
 
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +11,7 @@ import java.util.Optional;
 public interface Mongo {
     <T> void insert(T entity);
 
-    <T> Optional<T> findOne(Class<T> entityClass, ObjectId id);
+    <T> Optional<T> findOne(Class<T> entityClass, Object id);
 
     <T> Optional<T> findOne(Class<T> entityClass, Bson filter);
 
@@ -26,7 +25,7 @@ public interface Mongo {
 
     <T> long update(Class<T> entityClass, Bson filter, Bson update);
 
-    <T> void delete(Class<T> entityClass, ObjectId id);
+    <T> void delete(Class<T> entityClass, Object id);
 
     <T> long delete(Class<T> entityClass, Bson filter);
 }

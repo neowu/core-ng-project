@@ -6,6 +6,7 @@ import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.Maps;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
+import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,6 +30,7 @@ public class EntityEncoderBuilderTest {
 
         StringWriter writer = new StringWriter();
         TestEntity entity = new TestEntity();
+        entity.id = new ObjectId("5627b47d54b92d03adb9e9cf");
         entity.stringField = "string";
         entity.child = new TestEntityChild();
         entity.child.enumField = TestEntityChild.TestEnum.ITEM1;
