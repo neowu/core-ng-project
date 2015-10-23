@@ -24,7 +24,7 @@ public class TemplateTest {
 
         String result = template.process(new CallStack(model));
 
-        Assert.assertEquals(ClasspathResources.text("template-test/template-result.html"), result);
+        Assert.assertEquals(ClasspathResources.text("template-test/template-result.html").replaceAll("\r\n", "\n"), result);
     }
 
     private TestModelChild child(String stringField, Double doubleField, Boolean booleanField) {

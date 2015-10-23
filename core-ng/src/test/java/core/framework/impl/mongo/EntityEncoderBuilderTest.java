@@ -51,7 +51,7 @@ public class EntityEncoderBuilderTest {
     }
 
     private void verifyGeneratedMethods(EntityEncoderBuilder<TestEntity> builder) {
-        String methods = ClasspathResources.text("mongo-test/encode-methods.txt");
+        String methods = ClasspathResources.text("mongo-test/encode-methods.txt").replaceAll("\r\n", "\n");
 
         builder.methods.values()
             .forEach(method -> assertThat(methods, containsString(method)));

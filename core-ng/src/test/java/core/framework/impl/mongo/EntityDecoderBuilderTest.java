@@ -35,7 +35,7 @@ public class EntityDecoderBuilderTest {
     }
 
     private void verifyGeneratedMethods(EntityDecoderBuilder<TestEntity> builder) {
-        String methods = ClasspathResources.text("mongo-test/decode-methods.txt");
+        String methods = ClasspathResources.text("mongo-test/decode-methods.txt").replaceAll("\r\n", "\n");
 
         builder.methods.values()
             .forEach(method -> Assert.assertThat(methods, CoreMatchers.containsString(method)));
