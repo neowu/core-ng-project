@@ -18,7 +18,7 @@ import java.util.Deque;
 public class HTMLParser {
     private final HTMLLexer lexer;
 
-    private Deque<Node> stack = new ArrayDeque<>();
+    private final Deque<Node> stack = new ArrayDeque<>();
 
     public HTMLParser(TemplateSource source) {
         this.lexer = new HTMLLexer(source.source(), source.content());
@@ -29,7 +29,9 @@ public class HTMLParser {
         stack.push(document);
         while (true) {
             HTMLTokenType type = lexer.nextNodeToken();
-            if (type == HTMLTokenType.TEXT) {
+            if (type == HTMLTokenType.EOF) {
+                break;
+            } else if (type == HTMLTokenType.TEXT) {
                 addChild(new Text(lexer.currentToken()));
             } else if (type == HTMLTokenType.COMMENT_START) {
                 lexer.nextCommentEndToken();
@@ -37,11 +39,11 @@ public class HTMLParser {
             } else if (type == HTMLTokenType.START_TAG) {
                 parseElement();
             } else if (type == HTMLTokenType.END_TAG) {
-                String closeTag = lexer.currentToken();
-                String tagName = closeTag.substring(2, closeTag.length() - 1);
+                String endTag = lexer.currentToken();
+                String tagName = endTag.substring(2, endTag.length() - 1);
                 closeTag(tagName);
-            } else if (type == HTMLTokenType.EOF) {
-                break;
+            } else {
+                throw Exceptions.error("unexpected type, type={}, location={}", type, lexer.currentLocation());
             }
         }
         return document;
@@ -54,7 +56,7 @@ public class HTMLParser {
                 throw Exceptions.error("can not find matched tag to close, tagName={}, location={}", tagName, lexer.currentLocation());
             Element element = (Element) lastNode;
             if (element.name.equals(tagName)) {
-                element.hasCloseTag = true;
+                element.hasEndTag = true;
                 return;
             }
         }
@@ -66,26 +68,25 @@ public class HTMLParser {
 
         Attribute currentAttribute = null;
         while (true) {
-            HTMLTokenType currentType = lexer.nextElementToken();
-            if (currentType == HTMLTokenType.START_TAG_END_CLOSE) {
+            HTMLTokenType type = lexer.nextElementToken();
+            if (type == HTMLTokenType.EOF) {
+                return;
+            } else if (type == HTMLTokenType.START_TAG_END_CLOSE) {
                 currentElem.startTagClosed = true;
                 return;
-            } else if (currentType == HTMLTokenType.START_TAG_END) {
+            } else if (type == HTMLTokenType.START_TAG_END) {
                 stack.push(currentElem);
-
                 if ("script".equals(currentElem.name) || "style".equals(currentElem.name)) {
                     lexer.nextScriptToken(currentElem.name);
                     addChild(new Text(lexer.currentToken()));
                 }
                 return;
-            } else if (currentType == HTMLTokenType.EOF) {
-                return;
-            } else if (currentType == HTMLTokenType.ATTR_NAME) {
+            } else if (type == HTMLTokenType.ATTR_NAME) {
                 String attrName = lexer.currentToken();
                 currentAttribute = new Attribute(attrName);
                 if (attrName.startsWith("c:")) currentAttribute.location = lexer.currentLocation();
                 currentElem.attributes.add(currentAttribute);
-            } else if (currentType == HTMLTokenType.ATTR_VALUE) {
+            } else if (type == HTMLTokenType.ATTR_VALUE) {
                 if (currentAttribute == null)
                     throw Exceptions.error("attr is invalid, location={}", lexer.currentLocation());
 
@@ -95,6 +96,8 @@ public class HTMLParser {
                     currentAttribute.hasDoubleQuote = true;
                 } else
                     currentAttribute.value = attrValue.substring(1);
+            } else {
+                throw Exceptions.error("unexpected type, type={}, location={}", type, lexer.currentLocation());
             }
         }
     }

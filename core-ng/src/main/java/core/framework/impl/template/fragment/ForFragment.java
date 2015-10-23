@@ -23,7 +23,7 @@ public class ForFragment extends CompositeFragment {
     public ForFragment(String statement, CallTypeStack stack, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);
         if (!matcher.matches())
-            throw Exceptions.error("statement must match \"for var in list\", statement={}, location={}", statement, location);
+            throw Exceptions.error("statement must match \"var:list\", statement={}, location={}", statement, location);
 
         variable = matcher.group(1);
         String list = matcher.group(2);
@@ -41,8 +41,8 @@ public class ForFragment extends CompositeFragment {
         List<?> list = (List<?>) expression.eval(stack);
         for (Object item : list) {
             stack.contextObjects.put(variable, item);
-            for (Fragment handler : fragments) {
-                handler.process(builder, stack);
+            for (Fragment fragment : fragments) {
+                fragment.process(builder, stack);
             }
         }
         stack.contextObjects.remove(variable);

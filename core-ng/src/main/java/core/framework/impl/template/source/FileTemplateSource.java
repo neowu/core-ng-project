@@ -3,11 +3,7 @@ package core.framework.impl.template.source;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Files;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.nio.file.Path;
-
-import static java.nio.file.Files.newBufferedReader;
 
 /**
  * @author neo
@@ -25,11 +21,6 @@ public final class FileTemplateSource implements TemplateSource {
     @Override
     public String content() {
         return Files.text(path);
-    }
-
-    @Override
-    public BufferedReader reader() throws IOException {
-        return newBufferedReader(path);
     }
 
     @Override

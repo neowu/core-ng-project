@@ -21,7 +21,7 @@ public class Element implements Node {
     public final Attributes attributes = new Attributes();
     public final String name;
     public boolean startTagClosed;
-    public boolean hasCloseTag;
+    public boolean hasEndTag;
 
     public Element(String name) {
         this.name = name;
@@ -87,7 +87,7 @@ public class Element implements Node {
             node.buildTemplate(root, stack, source);
         }
 
-        if (hasCloseTag) {
+        if (hasEndTag) {
             root.addStaticContent("</");
             root.addStaticContent(name);
             root.addStaticContent(">");

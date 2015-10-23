@@ -6,10 +6,6 @@ import core.framework.impl.template.source.TemplateSource;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-
 /**
  * @author neo
  */
@@ -49,11 +45,6 @@ public class TemplateTest {
         @Override
         public String content() {
             return ClasspathResources.text(path);
-        }
-
-        @Override
-        public BufferedReader reader() throws IOException {
-            return new BufferedReader(new StringReader(ClasspathResources.text(path)));
         }
 
         @Override

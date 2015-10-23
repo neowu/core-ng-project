@@ -35,13 +35,9 @@ public interface Response {
             .status(status);
     }
 
-    static Response template(String templatePath, Object model) {
-        return new ResponseImpl(new TemplateBody(templatePath, model))
-            .status(HTTPStatus.OK);
-    }
-
     static Response html(String templatePath, Object model) {
-        return template(templatePath, model)
+        return new ResponseImpl(new TemplateBody(templatePath, model))
+            .status(HTTPStatus.OK)
             .contentType(ContentTypes.TEXT_HTML);
     }
 

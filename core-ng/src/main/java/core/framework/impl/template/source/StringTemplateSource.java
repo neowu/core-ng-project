@@ -1,9 +1,5 @@
 package core.framework.impl.template.source;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-
 /**
  * @author neo
  */
@@ -19,11 +15,6 @@ public final class StringTemplateSource implements TemplateSource {
     @Override
     public String content() {
         return template;
-    }
-
-    @Override
-    public BufferedReader reader() throws IOException {
-        return new BufferedReader(new StringReader(template));
     }
 
     @Override

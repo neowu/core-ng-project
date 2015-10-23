@@ -152,7 +152,7 @@ public class HTMLLexer {
                 started = true;
                 if (ch == '"') hasDoubleQuote = true;
             } else if (started) {
-                if ((!hasDoubleQuote && (Character.isWhitespace(ch) || ch == '>'))) {
+                if (!hasDoubleQuote && (Character.isWhitespace(ch) || ch == '>')) {
                     return i - currentIndex;
                 } else if (ch == '"') {
                     return i - currentIndex + 1;

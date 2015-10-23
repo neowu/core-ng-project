@@ -14,10 +14,12 @@ public abstract class CompositeFragment implements Fragment {
         if (!fragments.isEmpty()) {
             Fragment lastFragment = fragments.get(fragments.size() - 1);
             if (lastFragment instanceof StaticFragment) {
-                ((StaticFragment) lastFragment).append(content);
+                ((StaticFragment) lastFragment).content.append(content);
                 return;
             }
         }
-        fragments.add(new StaticFragment(content));
+        StaticFragment fragment = new StaticFragment();
+        fragment.content.append(content);
+        fragments.add(fragment);
     }
 }
