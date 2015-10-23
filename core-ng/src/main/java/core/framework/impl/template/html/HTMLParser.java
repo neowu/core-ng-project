@@ -1,15 +1,14 @@
-package core.framework.impl.template.v2.html;
+package core.framework.impl.template.html;
 
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.Files;
-import core.framework.impl.template.v2.html.ast.Attribute;
-import core.framework.impl.template.v2.html.ast.Comment;
-import core.framework.impl.template.v2.html.ast.Document;
-import core.framework.impl.template.v2.html.ast.Element;
-import core.framework.impl.template.v2.html.ast.Node;
-import core.framework.impl.template.v2.html.ast.Text;
+import core.framework.impl.template.html.node.Attribute;
+import core.framework.impl.template.html.node.Comment;
+import core.framework.impl.template.html.node.Document;
+import core.framework.impl.template.html.node.Element;
+import core.framework.impl.template.html.node.Node;
+import core.framework.impl.template.html.node.Text;
+import core.framework.impl.template.source.TemplateSource;
 
-import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -21,22 +20,8 @@ public class HTMLParser {
 
     private Deque<Node> stack = new ArrayDeque<>();
 
-    public HTMLParser(String html) {
-        this.lexer = new HTMLLexer(html);
-    }
-
-    public static void main(String[] args) {
-        String html = Files.text(Paths.get("etc/template.html"));
-//        String html = "<html>\n" +
-//            "  <body>\n" +
-//            "    <p>\n" +
-//            "      Hello World\n" +
-//            "    </p>\n" +
-//            "    <div> <img src=\"example.png\"/></div>\n" +
-//            "  </body>\n" +
-//            "</html>";
-        Document parse = new HTMLParser(html).parse();
-        System.out.println(parse.content());
+    public HTMLParser(TemplateSource source) {
+        this.lexer = new HTMLLexer(source.source(), source.content());
     }
 
     public Document parse() {
@@ -49,9 +34,9 @@ public class HTMLParser {
             } else if (type == HTMLTokenType.COMMENT_START) {
                 lexer.nextCommentEndToken();
                 addChild(new Comment(lexer.currentToken()));
-            } else if (type == HTMLTokenType.TAG_START) {
+            } else if (type == HTMLTokenType.START_TAG) {
                 parseElement();
-            } else if (type == HTMLTokenType.TAG_CLOSE) {
+            } else if (type == HTMLTokenType.END_TAG) {
                 String closeTag = lexer.currentToken();
                 String tagName = closeTag.substring(2, closeTag.length() - 1);
                 closeTag(tagName);
@@ -66,7 +51,7 @@ public class HTMLParser {
         while (true) {
             Node lastNode = stack.pop();
             if (lastNode instanceof Document)
-                throw Exceptions.error("can not find matched tag to close, tagName={}, L{}:{}", tagName, lexer.currentLine, lexer.currentColumn);
+                throw Exceptions.error("can not find matched tag to close, tagName={}, location={}", tagName, lexer.currentLocation());
             Element element = (Element) lastNode;
             if (element.name.equals(tagName)) {
                 element.hasCloseTag = true;
@@ -82,10 +67,10 @@ public class HTMLParser {
         Attribute currentAttribute = null;
         while (true) {
             HTMLTokenType currentType = lexer.nextElementToken();
-            if (currentType == HTMLTokenType.TAG_END_CLOSE) {
+            if (currentType == HTMLTokenType.START_TAG_END_CLOSE) {
                 currentElem.startTagClosed = true;
                 return;
-            } else if (currentType == HTMLTokenType.TAG_END) {
+            } else if (currentType == HTMLTokenType.START_TAG_END) {
                 stack.push(currentElem);
 
                 if ("script".equals(currentElem.name) || "style".equals(currentElem.name)) {
@@ -96,11 +81,13 @@ public class HTMLParser {
             } else if (currentType == HTMLTokenType.EOF) {
                 return;
             } else if (currentType == HTMLTokenType.ATTR_NAME) {
-                currentAttribute = new Attribute(lexer.currentToken());
+                String attrName = lexer.currentToken();
+                currentAttribute = new Attribute(attrName);
+                if (attrName.startsWith("c:")) currentAttribute.location = lexer.currentLocation();
                 currentElem.attributes.add(currentAttribute);
             } else if (currentType == HTMLTokenType.ATTR_VALUE) {
                 if (currentAttribute == null)
-                    throw Exceptions.error("attr is invalid, L{}:{}", lexer.currentLine, lexer.currentColumn);
+                    throw Exceptions.error("attr is invalid, location={}", lexer.currentLocation());
 
                 String attrValue = lexer.currentToken();
                 if (attrValue.startsWith("=\"")) {

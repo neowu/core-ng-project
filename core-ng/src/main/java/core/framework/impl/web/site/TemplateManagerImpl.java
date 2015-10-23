@@ -5,9 +5,9 @@ import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.api.web.Request;
 import core.framework.api.web.site.TemplateManager;
+import core.framework.impl.template.CallStack;
 import core.framework.impl.template.Template;
 import core.framework.impl.template.TemplateBuilder;
-import core.framework.impl.template.function.Function;
 import core.framework.impl.template.source.FileTemplateSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ public class TemplateManagerImpl implements TemplateManager {
     private final Map<String, Template> templates = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
     private final MessageManager messageManager;
-    private final CDNFunction cdnFunction = new CDNFunction();
+    private final CDNFunctionImpl cdnManager = new CDNFunctionImpl();
 
     public TemplateManagerImpl(WebDirectory webDirectory, MessageManager messageManager) {
         this.webDirectory = webDirectory;
@@ -36,18 +36,13 @@ public class TemplateManagerImpl implements TemplateManager {
         StopWatch watch = new StopWatch();
         try {
             Template template = templates.computeIfAbsent(templateKey(templatePath), (key) -> load(templatePath, model.getClass()));
-            Map<String, Function> functions = functions(request);
-            return template.process(model, functions);
+            CallStack stack = new CallStack(model);
+            stack.cdnFunction = cdnManager;
+            stack.messageFunction = new MessageFunctionImpl(messageManager, request);
+            return template.process(stack);
         } finally {
             logger.debug("process, templatePath={}, elapsedTime={}", templatePath, watch.elapsedTime());
         }
-    }
-
-    private Map<String, Function> functions(Request request) {
-        Map<String, Function> functions = Maps.newHashMap();
-        functions.put("msg", new MessageFunction(messageManager, request));
-        functions.put("cdn", cdnFunction);
-        return functions;
     }
 
     public void add(String templatePath, Class<?> modelClass) {
@@ -61,12 +56,12 @@ public class TemplateManagerImpl implements TemplateManager {
 
     public void cdnHosts(String... hosts) {
         logger.info("set cdn hosts, hosts={}", Arrays.toString(hosts));
-        cdnFunction.hosts = hosts;
+        cdnManager.hosts = hosts;
     }
 
     public void cdnVersion(String version) {
         logger.info("set cdn version, version={}", version);
-        cdnFunction.version = version;
+        cdnManager.version = version;
     }
 
     private Template load(String templatePath, Class<?> modelClass) {

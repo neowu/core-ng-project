@@ -50,32 +50,6 @@ public class ExpressionParserTest {
     }
 
     @Test
-    public void builtinMethod() {
-        Token token = parser.parse("#html(f1.f2.m1(f3.m2()))");
-
-        MethodToken html = (MethodToken) token;
-        Assert.assertEquals("#html", html.name);
-        Assert.assertEquals(1, html.params.size());
-
-        FieldToken f1 = (FieldToken) html.params.get(0);
-        Assert.assertEquals("f1", f1.name);
-
-        FieldToken f2 = (FieldToken) f1.next;
-        Assert.assertEquals("f2", f2.name);
-
-        MethodToken m1 = (MethodToken) f2.next;
-        Assert.assertEquals("m1", m1.name);
-        Assert.assertEquals(1, m1.params.size());
-        FieldToken f3 = (FieldToken) m1.params.get(0);
-        Assert.assertEquals("f3", f3.name);
-        MethodToken m2 = (MethodToken) f3.next;
-        Assert.assertEquals("m2", m2.name);
-        Assert.assertTrue(m2.params.isEmpty());
-
-        Assert.assertNull(m1.next);
-    }
-
-    @Test
     public void expression() {
         Token token = parser.parse("f1.f2.m1(f3.m2(), \"v1\", f4).f5");
 

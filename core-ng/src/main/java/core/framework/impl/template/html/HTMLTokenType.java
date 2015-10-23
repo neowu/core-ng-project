@@ -1,13 +1,13 @@
-package core.framework.impl.template.v2.html;
+package core.framework.impl.template.html;
 
 /**
  * @author neo
  */
 public enum HTMLTokenType {
-    TAG_START,      // <tag
-    TAG_CLOSE,      // </tag>
-    TAG_END,        // >
-    TAG_END_CLOSE,  // />
+    START_TAG,              // <tag
+    START_TAG_END,          // >
+    START_TAG_END_CLOSE,    // />
+    END_TAG,        // </tag>
     TEXT,
     ATTR_NAME,      // attr
     ATTR_VALUE,     // =value or ="value"

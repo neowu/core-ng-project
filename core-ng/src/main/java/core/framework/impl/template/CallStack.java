@@ -1,7 +1,6 @@
 package core.framework.impl.template;
 
 import core.framework.api.util.Maps;
-import core.framework.impl.template.function.Function;
 
 import java.util.Map;
 
@@ -11,7 +10,8 @@ import java.util.Map;
 public class CallStack {
     public final Object root;
     public final Map<String, Object> contextObjects = Maps.newHashMap();
-    public final Map<String, Function> functions = Maps.newHashMap();
+    public CDNFunction cdnFunction;
+    public MessageFunction messageFunction;
 
     public CallStack(Object root) {
         this.root = root;
@@ -22,8 +22,13 @@ public class CallStack {
         return contextObjects.get(name);
     }
 
-    // used by generated code
-    public Function function(String name) {
-        return functions.get(name);
+    public String cdn(String url) {
+        if (cdnFunction == null) throw new Error("cdn is not in context");
+        return cdnFunction.url(url);
+    }
+
+    public String message(String key) {
+        if (messageFunction == null) throw new Error("message is not in context");
+        return messageFunction.message(key);
     }
 }

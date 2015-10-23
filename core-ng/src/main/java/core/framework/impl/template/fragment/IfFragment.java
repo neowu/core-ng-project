@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * @author neo
  */
 public class IfFragment extends CompositeFragment {
-    private static final Pattern STATEMENT_PATTERN = Pattern.compile("if ((not )?)([#a-zA-Z1-9\\.\\(\\)]+)");
+    private static final Pattern STATEMENT_PATTERN = Pattern.compile("((!)?)([#a-zA-Z1-9\\.\\(\\)]+)");
     final ExpressionHolder expression;
     final boolean reverse;
 
@@ -23,7 +23,7 @@ public class IfFragment extends CompositeFragment {
         if (!matcher.matches())
             throw Exceptions.error("statement must match \"if (not) condition\", statement={}, location={}", statement, location);
 
-        reverse = "not ".equals(matcher.group(2));
+        reverse = "!".equals(matcher.group(2));
         String condition = matcher.group(3);
 
         expression = new ExpressionBuilder(condition, stack, location).build();
@@ -37,7 +37,7 @@ public class IfFragment extends CompositeFragment {
         Object result = expression.eval(stack);
         Boolean expected = reverse ? Boolean.FALSE : Boolean.TRUE;
         if (expected.equals(result)) {
-            for (Fragment handler : handlers) {
+            for (Fragment handler : fragments) {
                 handler.process(builder, stack);
             }
         }

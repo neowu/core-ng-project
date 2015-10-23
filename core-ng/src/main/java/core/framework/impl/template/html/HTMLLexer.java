@@ -1,4 +1,4 @@
-package core.framework.impl.template.v2.html;
+package core.framework.impl.template.html;
 
 import core.framework.api.util.Exceptions;
 
@@ -6,14 +6,17 @@ import core.framework.api.util.Exceptions;
  * @author neo
  */
 public class HTMLLexer {
+    private final String source;
     private final String html;
 
     int startIndex;
     int currentIndex;
+
     int currentLine = 1;
     int currentColumn = 1;
 
-    public HTMLLexer(String html) {
+    public HTMLLexer(String source, String html) {
+        this.source = source;
         this.html = html;
     }
 
@@ -22,60 +25,39 @@ public class HTMLLexer {
 
         if (currentIndex >= html.length()) {
             return HTMLTokenType.EOF;
-        }
-
-        if (match(currentIndex, "<!--")) {
+        } else if (match(currentIndex, "<!--")) {
             move(4);
             return HTMLTokenType.COMMENT_START;
-        }
-
-        if (match(currentIndex, "</")) {
+        } else if (match(currentIndex, "</")) {
             move(findCloseElementLength());
-            return HTMLTokenType.TAG_CLOSE;
-        }
-
-        if (isStartTag(currentIndex)) {
+            return HTMLTokenType.END_TAG;
+        } else if (isStartTag(currentIndex)) {
             move(findStartElementLength());
-            return HTMLTokenType.TAG_START;
+            return HTMLTokenType.START_TAG;
+        } else {
+            move(findTextLength());
+            return HTMLTokenType.TEXT;
         }
-
-        move(findTextLength());
-        return HTMLTokenType.TEXT;
     }
 
     public HTMLTokenType nextElementToken() {
-        // read all following white spaces
-        int length = 0;
-        for (int i = currentIndex; i < html.length(); i++) {
-            if (!Character.isWhitespace(html.charAt(i))) {
-                break;
-            }
-            length++;
-        }
-        if (length > 0) move(length);
-        reset();
+        skipWhitespaces();
 
         if (currentIndex >= html.length()) {
             return HTMLTokenType.EOF;
-        }
-
-        if (match(currentIndex, ">")) {
+        } else if (match(currentIndex, ">")) {
             move(1);
-            return HTMLTokenType.TAG_END;
-        }
-
-        if (match(currentIndex, "/>")) {
+            return HTMLTokenType.START_TAG_END;
+        } else if (match(currentIndex, "/>")) {
             move(2);
-            return HTMLTokenType.TAG_END_CLOSE;
-        }
-
-        if (match(currentIndex, "=")) {
+            return HTMLTokenType.START_TAG_END_CLOSE;
+        } else if (match(currentIndex, "=")) {
             move(findAttrValueLength());
             return HTMLTokenType.ATTR_VALUE;
+        } else {
+            move(findAttrNameLength());
+            return HTMLTokenType.ATTR_NAME;
         }
-
-        move(findAttrNameLength());
-        return HTMLTokenType.ATTR_NAME;
     }
 
     public HTMLTokenType nextCommentEndToken() {
@@ -88,7 +70,7 @@ public class HTMLLexer {
                 break;
             }
         }
-        if (length == -1) throw Exceptions.error("comment is not closed, L{}:{}", currentLine, currentColumn);
+        if (length == -1) throw Exceptions.error("comment is not closed, location={}", currentLocation());
         move(length);
 
         return HTMLTokenType.COMMENT_END;
@@ -105,9 +87,21 @@ public class HTMLLexer {
                 break;
             }
         }
-        if (length == -1) throw Exceptions.error("script/css is not closed, L{}:{}", currentLine, currentColumn);
+        if (length == -1) throw Exceptions.error("script/css is not closed, location={}", currentLocation());
         move(length);
         return HTMLTokenType.TEXT;
+    }
+
+    private void skipWhitespaces() {
+        int length = 0;
+        for (int i = currentIndex; i < html.length(); i++) {
+            if (!Character.isWhitespace(html.charAt(i))) {
+                break;
+            }
+            length++;
+        }
+        if (length > 0) move(length);
+        reset();
     }
 
     private int findStartElementLength() {
@@ -117,7 +111,7 @@ public class HTMLLexer {
                 return i - currentIndex;
             }
         }
-        throw Exceptions.error("start tag is invalid, L{}:{}", currentLine, currentColumn);
+        throw Exceptions.error("start tag is invalid, location={}", currentLocation());
     }
 
     private int findCloseElementLength() {
@@ -128,7 +122,7 @@ public class HTMLLexer {
                 return i - currentIndex + 1;
             }
         }
-        throw Exceptions.error("close tag is invalid, L{}:{}", currentLine, currentColumn);
+        throw Exceptions.error("close tag is invalid, location={}", currentLocation());
     }
 
     private int findTextLength() {
@@ -144,8 +138,9 @@ public class HTMLLexer {
         for (int i = currentIndex; i < html.length(); i++) {
             char ch = html.charAt(i);
             if (Character.isWhitespace(ch) || ch == '=' || ch == '/' || ch == '>') return i - currentIndex;
+            if (ch == '<') throw Exceptions.error("attr is invalid, location={}", currentLocation());
         }
-        throw Exceptions.error("attr is invalid, L{}:{}", currentLine, currentColumn);
+        throw Exceptions.error("attr is invalid, location={}", currentLocation());
     }
 
     private int findAttrValueLength() {
@@ -166,11 +161,15 @@ public class HTMLLexer {
                 return i - currentIndex + 1;
             }
         }
-        throw Exceptions.error("attr value is invalid, L{}:{}", currentLine, currentColumn);
+        throw Exceptions.error("attr value is invalid, location={}", currentLocation());
     }
 
     public String currentToken() {
         return html.substring(startIndex, currentIndex);
+    }
+
+    public String currentLocation() {
+        return source + ":" + currentLine + ":" + currentColumn;
     }
 
     private boolean isStartTag(int index) {

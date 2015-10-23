@@ -1,6 +1,7 @@
 package core.framework.impl.template.source;
 
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Files;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,13 +13,18 @@ import static java.nio.file.Files.newBufferedReader;
  * @author neo
  */
 public final class FileTemplateSource implements TemplateSource {
-    private final Path root;
     public final Path path;
+    private final Path root;
 
     public FileTemplateSource(Path root, String path) {
         this.root = root;
         if (!path.startsWith("/")) throw Exceptions.error("path must start with '/', path={}", path);
         this.path = root.resolve(path.substring(1));
+    }
+
+    @Override
+    public String content() {
+        return Files.text(path);
     }
 
     @Override

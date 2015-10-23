@@ -15,11 +15,10 @@ import java.util.regex.Pattern;
  * @author neo
  */
 public class ForFragment extends CompositeFragment {
-    private static final Pattern STATEMENT_PATTERN = Pattern.compile("for ([a-zA-Z1-9]+) in ([#a-zA-Z1-9\\.\\(\\)]+)");
-
-    private final ExpressionHolder expression;
+    private static final Pattern STATEMENT_PATTERN = Pattern.compile("([a-zA-Z1-9]+):([#a-zA-Z1-9\\.\\(\\)]+)");
     public final String variable;
     public final Class<?> valueClass;
+    private final ExpressionHolder expression;
 
     public ForFragment(String statement, CallTypeStack stack, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);
@@ -42,7 +41,7 @@ public class ForFragment extends CompositeFragment {
         List<?> list = (List<?>) expression.eval(stack);
         for (Object item : list) {
             stack.contextObjects.put(variable, item);
-            for (Fragment handler : handlers) {
+            for (Fragment handler : fragments) {
                 handler.process(builder, stack);
             }
         }

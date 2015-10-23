@@ -1,25 +1,16 @@
 package core.framework.impl.web.site;
 
-import core.framework.api.util.Exceptions;
-import core.framework.impl.template.function.Function;
-import core.framework.impl.template.function.HTMLText;
+import core.framework.impl.template.CDNFunction;
 
 /**
  * @author neo
  */
-public class CDNFunction implements Function {
+public class CDNFunctionImpl implements CDNFunction {
     String[] hosts;
     String version;
 
     @Override
-    public Object apply(Object[] params) {
-        String url = String.valueOf(params[0]);
-        if (url.charAt(0) != '/') throw Exceptions.error("url must start with /, url={}", url);
-        if (hosts == null) return new HTMLText(url);
-        return new HTMLText(buildURL(url));
-    }
-
-    String buildURL(String url) {
+    public String url(String url) {
         int hash = url.hashCode();
         int hostIndex = hash % hosts.length;
         StringBuilder builder = new StringBuilder(url.length() + 50);

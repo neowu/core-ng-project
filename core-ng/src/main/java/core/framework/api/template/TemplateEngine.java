@@ -3,6 +3,7 @@ package core.framework.api.template;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
+import core.framework.impl.template.CallStack;
 import core.framework.impl.template.Template;
 import core.framework.impl.template.TemplateBuilder;
 import core.framework.impl.template.source.StringTemplateSource;
@@ -23,7 +24,7 @@ public final class TemplateEngine {
         try {
             Template template = templates.get(templateName);
             if (template == null) throw Exceptions.error("not found template, name={}", templateName);
-            return template.process(model, null);
+            return template.process(new CallStack(model));
         } finally {
             logger.debug("process, templateName={}, elapsedTime={}", templateName, watch.elapsedTime());
         }

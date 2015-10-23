@@ -1,23 +1,22 @@
 package core.framework.impl.web.site;
 
 import core.framework.api.web.Request;
-import core.framework.impl.template.function.Function;
+import core.framework.impl.template.MessageFunction;
 
 /**
  * @author neo
  */
-public class MessageFunction implements Function {
+public class MessageFunctionImpl implements MessageFunction {
     private final MessageManager messageManager;
     private final Request request;
 
-    public MessageFunction(MessageManager messageManager, Request request) {
+    public MessageFunctionImpl(MessageManager messageManager, Request request) {
         this.messageManager = messageManager;
         this.request = request;
     }
 
     @Override
-    public Object apply(Object[] params) {
-        String key = String.valueOf(params[0]);
+    public String message(String key) {
         return messageManager.message(key, request);
     }
 }

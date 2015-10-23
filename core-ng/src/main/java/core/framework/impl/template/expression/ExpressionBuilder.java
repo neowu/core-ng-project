@@ -59,8 +59,6 @@ public class ExpressionBuilder {
 
     private Type returnType(Token token, Class<?> modelClass) {
         if (token instanceof MethodToken) {
-            if (((MethodToken) token).builtinMethod)
-                return Object.class;
             String methodName = ((MethodToken) token).name;
             Type returnType = methodReturnType(modelClass, methodName);
             if (((MethodToken) token).next != null) {

@@ -4,6 +4,7 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
+* test: change multiple line text compare to ignore CRLF vs LF.
 * web: think about how to handle content-length=0
 * template, use ByteBuffer[] for performance tuning
 * async: think about how to support batch with fixed concurrency, or Batch object and chain next easier

@@ -4,26 +4,21 @@ import core.framework.impl.template.CallStack;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionHolder;
-import core.framework.impl.template.function.HTMLText;
 
 /**
  * @author neo
  */
-public class ExpressionFragment implements Fragment {
+public class TextContentFragment implements Fragment {
     private final ExpressionHolder expression;
 
-    public ExpressionFragment(String expression, CallTypeStack stack, String location) {
+    public TextContentFragment(String expression, CallTypeStack stack, String location) {
         this.expression = new ExpressionBuilder(expression, stack, location).build();
     }
 
     @Override
     public void process(StringBuilder builder, CallStack stack) {
         Object result = expression.eval(stack);
-        if (result instanceof HTMLText) {
-            builder.append(((HTMLText) result).html);
-        } else {
-            builder.append(escapeHTML(String.valueOf(result)));
-        }
+        builder.append(escapeHTML(String.valueOf(result)));
     }
 
     private String escapeHTML(String text) {

@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html xmlns:c="http://www.w3.org/1999/xhtml">
 <head>
     <title>template test</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -8,39 +8,31 @@
 <div>
     <p>field access</p>
 
-    <p>${stringField}</p>
+    <p c:text="stringField"></p>
 
-    <p>${numberField}</p>
+    <p c:text="numberField"></p>
 
-    <p>${addToNumberField()}</p>
+    <p c:text="addToNumberField()"></p>
 
-    <p>${appendToStringField("postfix")}</p>
+    <p c:text="appendToStringField('postfix')"></p>
 
-    ${#html(htmlField)}
+    <span c:html="htmlField"></span>
 </div>
 
 <div>
     <p>loop test</p>
     <ul>
-        <!--% for x in items %-->
-        <li>${x}</li>
-        <!--% end %-->
+        <li c:for="x:items" c:text="x"></li>
     </ul>
     <ul>
-        <!--% for child in children %-->
-        <!--% if child.booleanField %-->
-        <li>${child.stringField} ${child.doubleField}</li>
-        <!--% end %-->
-        <!--% end %-->
+        <li c:for="child:children" c:if="child.booleanField" c:text="child.stringField"></li>
     </ul>
 </div>
 
 <div>
-    <!--% if booleanMethod() %-->
-    ${"true"}
-    <!--% end %-->
+    <span c:if="booleanMethod()" c:text="'true'"></span>
 </div>
 
-<!--% include footer.html %-->
+<div c:include="footer.html"></div>
 </body>
 </html>

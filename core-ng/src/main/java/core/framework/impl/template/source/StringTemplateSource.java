@@ -17,6 +17,11 @@ public final class StringTemplateSource implements TemplateSource {
     }
 
     @Override
+    public String content() {
+        return template;
+    }
+
+    @Override
     public BufferedReader reader() throws IOException {
         return new BufferedReader(new StringReader(template));
     }

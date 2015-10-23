@@ -28,25 +28,11 @@ public class ExpressionTranslatorTest {
     }
 
     @Test
-    public void builtinMethod() {
-        String expression = new ExpressionTranslator(parser.parse("#html(field)"), new CallTypeStack(Object.class)).translate();
-        Assert.assertEquals("stack.function(\"html\").apply(new Object[]{$root.field})", expression);
-    }
-
-    @Test
     public void contextVariable() {
         CallTypeStack stack = new CallTypeStack(Object.class);
         stack.paramClasses.put("item", Object.class);
         String expression = new ExpressionTranslator(parser.parse("item"), stack).translate();
         Assert.assertEquals("item", expression);
-    }
-
-    @Test
-    public void methodCall() {
-        CallTypeStack stack = new CallTypeStack(Object.class);
-        stack.paramClasses.put("item", Object.class);
-        Token expression = parser.parse("#html(field.method(), item.field, \"text\")");
-        Assert.assertEquals("stack.function(\"html\").apply(new Object[]{$root.field.method(),item.field,\"text\"})", new ExpressionTranslator(expression, stack).translate());
     }
 
     @Test

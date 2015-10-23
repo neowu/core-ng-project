@@ -39,22 +39,17 @@ public class ExpressionTranslator {
     }
 
     private void appendMethod(StringBuilder builder, MethodToken method, boolean root) {
-        if (method.builtinMethod) {
-            builder.append("stack.function(\"").append(method.name.substring(1)).append("\").apply(");
-        } else {
-            if (root && !stack.paramClasses.containsKey(method.name)) {
-                builder.append("$root.");
-            }
-            builder.append(method.name).append('(');
+        if (root && !stack.paramClasses.containsKey(method.name)) {
+            builder.append("$root.");
         }
-        if (!method.params.isEmpty() && method.builtinMethod) builder.append("new Object[]{");
+        builder.append(method.name).append('(');
+
         int index = 0;
         for (Token param : method.params) {
             if (index > 0) builder.append(',');
             append(builder, param, true);
             index++;
         }
-        if (!method.params.isEmpty() && method.builtinMethod) builder.append('}');
         builder.append(')');
         if (method.next != null) {
             builder.append('.');
