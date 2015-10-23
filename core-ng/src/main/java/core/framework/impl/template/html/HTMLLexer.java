@@ -29,10 +29,10 @@ public class HTMLLexer {
             move(4);
             return HTMLTokenType.COMMENT_START;
         } else if (match(currentIndex, "</")) {
-            move(findCloseElementLength());
+            move(findEndTagLength());
             return HTMLTokenType.END_TAG;
         } else if (isStartTag(currentIndex)) {
-            move(findStartElementLength());
+            move(findStartTagLength());
             return HTMLTokenType.START_TAG;
         } else {
             move(findTextLength());
@@ -104,7 +104,7 @@ public class HTMLLexer {
         reset();
     }
 
-    private int findStartElementLength() {
+    private int findStartTagLength() {
         for (int i = currentIndex + 1; i < html.length(); i++) {
             char ch = html.charAt(i);
             if (Character.isWhitespace(ch) || ch == '>' || ch == '/') {
@@ -114,7 +114,7 @@ public class HTMLLexer {
         throw Exceptions.error("start tag is invalid, location={}", currentLocation());
     }
 
-    private int findCloseElementLength() {
+    private int findEndTagLength() {
         for (int i = currentIndex + 2; i < html.length(); i++) {
             char ch = html.charAt(i);
             if (Character.isWhitespace(ch)) break;
@@ -122,7 +122,7 @@ public class HTMLLexer {
                 return i - currentIndex + 1;
             }
         }
-        throw Exceptions.error("close tag is invalid, location={}", currentLocation());
+        throw Exceptions.error("end tag is invalid, location={}", currentLocation());
     }
 
     private int findTextLength() {

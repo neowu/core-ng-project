@@ -44,21 +44,17 @@ public class Attributes {
                 fragment.fragments.add(new TextContentFragment(attr.value, stack, attr.location));
                 fragment.addStaticContent("\"");
             } else if ("c:href".equals(name)) {
-                fragment.addStaticContent(" href=\"");
+                fragment.addStaticContent(" href=");
                 fragment.fragments.add(new URLFragment(attr.value, stack, attr.location, hasCDN));
-                fragment.addStaticContent("\"");
             } else if ("href".equals(name) && hasCDN) {
-                fragment.addStaticContent(" href=\"");
+                fragment.addStaticContent(" href=");
                 fragment.fragments.add(new URLFragment(attr.value));
-                fragment.addStaticContent("\"");
             } else if ("c:src".equals(name)) {
-                fragment.addStaticContent(" src=\"");
+                fragment.addStaticContent(" src=");
                 fragment.fragments.add(new URLFragment(attr.value, stack, attr.location, hasCDN));
-                fragment.addStaticContent("\"");
             } else if ("src".equals(name) && hasCDN) {
-                fragment.addStaticContent(" src=\"");
+                fragment.addStaticContent(" src=");
                 fragment.fragments.add(new URLFragment(attr.value));
-                fragment.addStaticContent("\"");
             } else {
                 attr.addStaticContent(fragment);
             }
