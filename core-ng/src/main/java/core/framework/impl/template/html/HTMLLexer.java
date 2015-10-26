@@ -9,11 +9,11 @@ public class HTMLLexer {
     private final String source;
     private final String html;
 
-    int startIndex;
-    int currentIndex;
+    private int startIndex;
+    private int currentIndex;
 
-    int currentLine = 1;
-    int currentColumn = 1;
+    private int currentLine = 1;
+    private int currentColumn = 1;
 
     public HTMLLexer(String source, String html) {
         this.source = source;
@@ -190,7 +190,7 @@ public class HTMLLexer {
     }
 
     private void move(int length) {
-        if (length == 0) throw Exceptions.error("syntax is invalid, L{}:{}", currentLine, currentColumn);
+        if (length == 0) throw Exceptions.error("syntax is invalid, location={}", currentLocation());
         for (int i = 0; i < length; i++) {
             char ch = html.charAt(currentIndex);
             if (ch == '\n') {
