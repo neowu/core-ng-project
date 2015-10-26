@@ -96,11 +96,11 @@ public final class Strings {
         return text;
     }
 
-    private static boolean isLowerCase(char ch) {
+    public static boolean isLowerCase(char ch) {
         return ch >= 'a' && ch <= 'z';
     }
 
-    private static boolean isUpperCase(char ch) {
+    public static boolean isUpperCase(char ch) {
         return ch >= 'A' && ch <= 'Z';
     }
 }

@@ -1,6 +1,7 @@
 package core.framework.impl.template.html;
 
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Strings;
 import core.framework.impl.template.html.node.Attribute;
 import core.framework.impl.template.html.node.Comment;
 import core.framework.impl.template.html.node.ContainerNode;
@@ -38,10 +39,13 @@ public class HTMLParser {
                 lexer.nextEndCommentToken();
                 addChild(new Comment(lexer.currentToken()));
             } else if (type == HTMLTokenType.START_TAG) {
-                parseElement();
+                String tagName = lexer.currentToken().substring(1);
+                validateTagName(tagName);
+                parseElement(tagName);
             } else if (type == HTMLTokenType.END_TAG) {
                 String endTag = lexer.currentToken();
                 String tagName = endTag.substring(2, endTag.length() - 1);
+                validateTagName(tagName);
                 closeTag(tagName);
             } else {
                 throw Exceptions.error("unexpected type, type={}, location={}", type, lexer.currentLocation());
@@ -63,8 +67,8 @@ public class HTMLParser {
         }
     }
 
-    private void parseElement() {
-        Element currentElem = new Element(lexer.currentToken().substring(1));
+    private void parseElement(String tagName) {
+        Element currentElem = new Element(tagName);
         addChild(currentElem);
 
         Attribute currentAttribute = null;
@@ -100,6 +104,13 @@ public class HTMLParser {
             } else {
                 throw Exceptions.error("unexpected type, type={}, location={}", type, lexer.currentLocation());
             }
+        }
+    }
+
+    private void validateTagName(String name) {
+        for (int i = 0; i < name.length(); i++) {
+            if (Strings.isUpperCase(name.charAt(i)))
+                throw Exceptions.error("tag name must be in lower case, name={}, location={}", name, lexer.currentLocation());
         }
     }
 
