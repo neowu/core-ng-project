@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public abstract class CompositeFragment implements Fragment {
+public abstract class ContainerFragment implements Fragment {
     public final List<Fragment> fragments = Lists.newArrayList();
 
     public void addStaticContent(String content) {

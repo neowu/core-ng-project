@@ -1,6 +1,6 @@
 package core.framework.impl.template.html.node;
 
-import core.framework.impl.template.fragment.CompositeFragment;
+import core.framework.impl.template.fragment.ContainerFragment;
 
 /**
  * @author neo
@@ -15,7 +15,7 @@ public class Attribute {
         this.name = name;
     }
 
-    public void addStaticContent(CompositeFragment fragment) {
+    public void addStaticContent(ContainerFragment fragment) {
         fragment.addStaticContent(" ");
         fragment.addStaticContent(name);
         if (value != null) {

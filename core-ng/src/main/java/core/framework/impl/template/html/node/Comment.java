@@ -1,7 +1,7 @@
 package core.framework.impl.template.html.node;
 
 import core.framework.impl.template.expression.CallTypeStack;
-import core.framework.impl.template.fragment.CompositeFragment;
+import core.framework.impl.template.fragment.ContainerFragment;
 import core.framework.impl.template.source.TemplateSource;
 
 /**
@@ -15,7 +15,7 @@ public class Comment implements Node {
     }
 
     @Override
-    public void buildTemplate(CompositeFragment fragment, CallTypeStack stack, TemplateSource source) {
+    public void buildTemplate(ContainerFragment fragment, CallTypeStack stack, TemplateSource source) {
         fragment.addStaticContent("<!--");
         fragment.addStaticContent(content);
     }

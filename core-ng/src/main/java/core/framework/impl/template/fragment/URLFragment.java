@@ -48,7 +48,7 @@ public class URLFragment implements Fragment {
 
     private String sanitize(String url) {
         //TODO: better way to prevent XSS?
-        if (url.contains("javascript:") || url.contains("<") || url.contains(">")) {
+        if (url.contains("javascript:") || url.contains("<") || url.contains(">") || url.contains(" ")) {
             logger.warn("illegal url detected, url={}, location={}", url, location);
             return "";
         }

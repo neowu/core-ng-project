@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 /**
  * @author neo
  */
-public class IfFragment extends CompositeFragment {
+public class IfFragment extends ContainerFragment {
     private static final Pattern STATEMENT_PATTERN = Pattern.compile("((!)?)([#a-zA-Z1-9\\.\\(\\)]+)");
     final ExpressionHolder expression;
     final boolean reverse;

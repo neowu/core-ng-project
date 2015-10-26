@@ -3,6 +3,7 @@ package core.framework.impl.template.html;
 import core.framework.api.util.Exceptions;
 import core.framework.impl.template.html.node.Attribute;
 import core.framework.impl.template.html.node.Comment;
+import core.framework.impl.template.html.node.ContainerNode;
 import core.framework.impl.template.html.node.Document;
 import core.framework.impl.template.html.node.Element;
 import core.framework.impl.template.html.node.Node;
@@ -18,7 +19,7 @@ import java.util.Deque;
 public class HTMLParser {
     private final HTMLLexer lexer;
 
-    private final Deque<Node> stack = new ArrayDeque<>();
+    private final Deque<ContainerNode> stack = new ArrayDeque<>();
 
     public HTMLParser(TemplateSource source) {
         this.lexer = new HTMLLexer(source.source(), source.content());
@@ -51,7 +52,7 @@ public class HTMLParser {
 
     private void closeTag(String tagName) {
         while (true) {
-            Node lastNode = stack.pop();
+            ContainerNode lastNode = stack.pop();
             if (lastNode instanceof Document)
                 throw Exceptions.error("can not find matched tag to close, tagName={}, location={}", tagName, lexer.currentLocation());
             Element element = (Element) lastNode;
@@ -103,11 +104,7 @@ public class HTMLParser {
     }
 
     private void addChild(Node node) {
-        Node currentNode = stack.peek();
-        if (currentNode instanceof Document) {
-            ((Document) currentNode).nodes.add(node);
-        } else {
-            ((Element) currentNode).nodes.add(node);
-        }
+        ContainerNode currentNode = stack.peek();
+        currentNode.add(node);
     }
 }

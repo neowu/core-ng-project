@@ -1,13 +1,13 @@
 package core.framework.impl.template;
 
 import core.framework.api.util.Exceptions;
-import core.framework.impl.template.fragment.CompositeFragment;
+import core.framework.impl.template.fragment.ContainerFragment;
 import core.framework.impl.template.fragment.Fragment;
 
 /**
  * @author neo
  */
-public class Template extends CompositeFragment {
+public class Template extends ContainerFragment {
     private final Class<?> modelClass;
 
     public Template(Class<?> modelClass) {

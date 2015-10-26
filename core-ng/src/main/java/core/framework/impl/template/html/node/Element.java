@@ -1,8 +1,7 @@
 package core.framework.impl.template.html.node;
 
-import core.framework.api.util.Lists;
 import core.framework.impl.template.expression.CallTypeStack;
-import core.framework.impl.template.fragment.CompositeFragment;
+import core.framework.impl.template.fragment.ContainerFragment;
 import core.framework.impl.template.fragment.ForFragment;
 import core.framework.impl.template.fragment.HTMLContentFragment;
 import core.framework.impl.template.fragment.IfFragment;
@@ -11,13 +10,10 @@ import core.framework.impl.template.fragment.TextContentFragment;
 import core.framework.impl.template.html.HTMLParser;
 import core.framework.impl.template.source.TemplateSource;
 
-import java.util.List;
-
 /**
  * @author neo
  */
-public class Element implements Node {
-    public final List<Node> nodes = Lists.newArrayList();
+public class Element extends ContainerNode {
     public final Attributes attributes = new Attributes();
     public final String name;
     public boolean startTagClosed;
@@ -28,8 +24,8 @@ public class Element implements Node {
     }
 
     @Override
-    public void buildTemplate(CompositeFragment fragment, CallTypeStack stack, TemplateSource source) {
-        CompositeFragment root = fragment;
+    public void buildTemplate(ContainerFragment fragment, CallTypeStack stack, TemplateSource source) {
+        ContainerFragment root = fragment;
         ForFragment forFragment = null;
         for (Attribute attribute : attributes.flowAttributes()) {
             if ("c:if".equals(attribute.name)) {
@@ -78,7 +74,7 @@ public class Element implements Node {
         }
     }
 
-    private void buildStaticContent(CompositeFragment root, CallTypeStack stack, TemplateSource source) {
+    private void buildStaticContent(ContainerFragment root, CallTypeStack stack, TemplateSource source) {
         if (startTagClosed) root.addStaticContent("/>");
         else root.addStaticContent(">");
 

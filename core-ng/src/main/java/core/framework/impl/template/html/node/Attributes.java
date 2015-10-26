@@ -2,7 +2,7 @@ package core.framework.impl.template.html.node;
 
 import core.framework.api.util.Maps;
 import core.framework.impl.template.expression.CallTypeStack;
-import core.framework.impl.template.fragment.CompositeFragment;
+import core.framework.impl.template.fragment.ContainerFragment;
 import core.framework.impl.template.fragment.TextContentFragment;
 import core.framework.impl.template.fragment.URLFragment;
 
@@ -20,7 +20,7 @@ public class Attributes {
         attributes.put(attribute.name, attribute);
     }
 
-    public void buildTemplate(CompositeFragment fragment, CallTypeStack stack) {
+    public void buildTemplate(ContainerFragment fragment, CallTypeStack stack) {
         boolean hasDynamicSrc = attributes.containsKey("c:src");
         boolean hasDynamicClass = attributes.containsKey("c:class");
         boolean hasDynamicHref = attributes.containsKey("c:href");
