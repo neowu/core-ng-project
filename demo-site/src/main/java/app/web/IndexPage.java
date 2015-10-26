@@ -18,4 +18,8 @@ public class IndexPage {
     public List<String> items() {
         return Lists.newArrayList("a", "b", "c");
     }
+
+    public Boolean selected(String item) {
+        return "b".equals(item);
+    }
 }

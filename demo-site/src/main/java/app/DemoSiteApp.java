@@ -11,8 +11,6 @@ public class DemoSiteApp extends App {
     protected void initialize() {
         load(new SystemModule("sys.properties"));
 
-        redis().host("localhost");
-
         load(new WebModule());
     }
 }

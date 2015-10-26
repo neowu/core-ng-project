@@ -21,7 +21,7 @@ public class IfFragment extends ContainerFragment {
     public IfFragment(String statement, CallTypeStack stack, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);
         if (!matcher.matches())
-            throw Exceptions.error("statement must match \"if (not) condition\", statement={}, location={}", statement, location);
+            throw Exceptions.error("statement must match \"(!)condition\", statement={}, location={}", statement, location);
 
         reverse = "!".equals(matcher.group(2));
         String condition = matcher.group(3);

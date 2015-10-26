@@ -2,7 +2,6 @@
 
 ### 3.7.2 (10/21/2015 - )
 * template: new template syntax
-* message: support locale for i18n
 
 ### 3.7.1 (10/21/2015)
 * mongo: support assigned id

@@ -43,9 +43,9 @@ public class Element extends ContainerNode {
         root.addStaticContent("<");
         root.addStaticContent(name);
 
-        attributes.buildTemplate(fragment, stack);
+        attributes.buildTemplate(root, stack);
 
-        if (attributes.isContentDynamic()) {
+        if (attributes.containDynamicContent()) {
             root.addStaticContent(">");
 
             Attribute attribute = attributes.dynamicContentAttribute();
@@ -77,7 +77,6 @@ public class Element extends ContainerNode {
     private void buildStaticContent(ContainerFragment root, CallTypeStack stack, TemplateSource source) {
         if (startTagClosed) root.addStaticContent("/>");
         else root.addStaticContent(">");
-
 
         for (Node node : nodes) {
             node.buildTemplate(root, stack, source);

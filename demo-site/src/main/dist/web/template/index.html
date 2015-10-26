@@ -1,15 +1,15 @@
-<html>
+<html xmlns:c="http://www.w3.org/1999/xhtml" value="">
 <head>
-    <link rel="stylesheet" type="text/css" href="${#cdn('/css/main.css')}">
+    <link rel="stylesheet" type="text/css" c:cdn href="/css/main.css">
 </head>
 <body>
-<p>hello ${name}!</p>
+<p>hello <span c:text="name"></span>!</p>
 
-<p>${welcomeMessage()}</p>
+<p c:text="welcomeMessage()"></p>
 
-<p>this is msg: ${#msg("key.hello")}</p>
+<p>this is msg: <span c:msg="'key.hello'"></span></p>
 
-<p>msg will return key if not found: ${#msg("key.world")}</p>
+<p>msg will return key if not found: <span c:msg="'key.notfound'"></span></p>
 
 <hr/>
 
@@ -24,12 +24,14 @@
 <hr/>
 
 <ul>
-    <!--% for x in items() %-->
-    <li>${x}</li>
-    <!--% end %-->
+    <li c:for="x:items()" c:text="x"></li>
 </ul>
 
+<select>
+    <option c:for="x:items()" c:text="x" c:value="x" c:selected="selected(x)"></option>
+</select>
+
 <hr/>
-<!--% include /template/footer.html %-->
+<div c:include="/template/footer.html"></div>
 </body>
 </html>
