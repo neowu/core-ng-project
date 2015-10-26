@@ -20,7 +20,6 @@ public class IndexController {
         Session session = request.session();
         Optional<String> hello = session.get("hello");
         session.set("hello", "world");
-
 //        response.cookie(CookieConstraints.TEST, null);
 //        response.cookie(CookieConstraints.TEST1, null);
 
@@ -30,7 +29,8 @@ public class IndexController {
     public Response css(Request request) {
         IndexPage model = new IndexPage();
         model.backgroundColor = "gainsboro";
-        return Response.template("/template/css/main.css", model).contentType(ContentTypes.TEXT_CSS);
+        return Response.text("test", ContentTypes.TEXT_CSS);
+//        return Response.template("/template/css/main.css", model).contentType(ContentTypes.TEXT_CSS);
     }
 
     public Response submit(Request request) {

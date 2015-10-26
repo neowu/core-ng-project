@@ -33,8 +33,8 @@ public class HTMLParser {
                 break;
             } else if (type == HTMLTokenType.TEXT) {
                 addChild(new Text(lexer.currentToken()));
-            } else if (type == HTMLTokenType.COMMENT_START) {
-                lexer.nextCommentEndToken();
+            } else if (type == HTMLTokenType.START_COMMENT) {
+                lexer.nextEndCommentToken();
                 addChild(new Comment(lexer.currentToken()));
             } else if (type == HTMLTokenType.START_TAG) {
                 parseElement();

@@ -11,7 +11,7 @@ public enum HTMLTokenType {
     TEXT,
     ATTR_NAME,      // attr
     ATTR_VALUE,     // =value or ="value"
-    COMMENT_START,  // <!--
-    COMMENT_END,    // comment-->
+    START_COMMENT,  // <!--
+    END_COMMENT,    // comment-->
     EOF
 }

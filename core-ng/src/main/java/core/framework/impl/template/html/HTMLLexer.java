@@ -27,7 +27,7 @@ public class HTMLLexer {
             return HTMLTokenType.EOF;
         } else if (match(currentIndex, "<!--")) {
             move(4);
-            return HTMLTokenType.COMMENT_START;
+            return HTMLTokenType.START_COMMENT;
         } else if (match(currentIndex, "</")) {
             move(findEndTagLength());
             return HTMLTokenType.END_TAG;
@@ -60,7 +60,7 @@ public class HTMLLexer {
         }
     }
 
-    public HTMLTokenType nextCommentEndToken() {
+    public HTMLTokenType nextEndCommentToken() {
         reset();
 
         int length = -1;
@@ -73,7 +73,7 @@ public class HTMLLexer {
         if (length == -1) throw Exceptions.error("comment is not closed, location={}", currentLocation());
         move(length);
 
-        return HTMLTokenType.COMMENT_END;
+        return HTMLTokenType.END_COMMENT;
     }
 
     public HTMLTokenType nextScriptToken(String tagName) {
