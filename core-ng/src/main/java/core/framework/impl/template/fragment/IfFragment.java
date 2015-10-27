@@ -37,9 +37,7 @@ public class IfFragment extends ContainerFragment {
         Object result = expression.eval(stack);
         Boolean expected = reverse ? Boolean.FALSE : Boolean.TRUE;
         if (expected.equals(result)) {
-            for (Fragment handler : fragments) {
-                handler.process(builder, stack);
-            }
+            processChildren(builder, stack);
         }
     }
 }

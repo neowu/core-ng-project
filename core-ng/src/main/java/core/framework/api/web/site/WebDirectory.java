@@ -1,4 +1,4 @@
-package core.framework.impl.web.site;
+package core.framework.api.web.site;
 
 import core.framework.api.util.Exceptions;
 import org.slf4j.Logger;
@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 /**
  * @author neo
  */
-public class WebDirectory {
+public final class WebDirectory {
     private final Logger logger = LoggerFactory.getLogger(WebDirectory.class);
 
     private final Path root;

@@ -1,13 +1,10 @@
-package core.framework.impl.template.html.node;
+package core.framework.impl.template.node;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
-import core.framework.api.util.Strings;
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.fragment.ContainerFragment;
-import core.framework.impl.template.fragment.EmptyAttributeFragment;
-import core.framework.impl.template.fragment.TextContentFragment;
 import core.framework.impl.template.fragment.URLFragment;
 
 import java.util.ArrayList;
@@ -24,73 +21,54 @@ public class Attributes {
 
     public void add(Attribute attribute) {
         attributes.put(attribute.name, attribute);
-        if (attribute.name.startsWith("c:")) dynamicAttributes.add(attribute.name);
+        if (attribute.isDynamic()) dynamicAttributes.add(attribute.name);
     }
 
-    public void buildTemplate(ContainerFragment fragment, CallTypeStack stack) {
-        validateDynamicContentAttribute();
+    public void buildTemplate(ContainerFragment parent, CallTypeStack stack) {
+        validate();
 
         for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
             String name = entry.getKey();
-            Attribute attr = entry.getValue();
+            Attribute attribute = entry.getValue();
             if (skip(name)) continue;
 
-            if (isURL(name)) {
-                buildURLAttribute(fragment, stack, attr);
-            } else if (isEmptyAttribute(name)) {
-                fragment.fragments.add(new EmptyAttributeFragment(name.substring(2), attr.value, stack, attr.location));
-            } else if (name.startsWith("c:")) {
-                buildAttribute(name.substring(2), fragment, stack, attr);
+            if (attribute.isURLAttribute()) {
+                buildURLAttribute(parent, stack, attribute);
+            } else if (attribute.isEmptyAttribute()) {
+                attribute.addEmptyAttribute(parent, stack);
+            } else if (attribute.isDynamic()) {
+                attribute.addValueAttribute(parent, stack);
             } else {
-                attr.addStaticContent(fragment);
+                attribute.addStaticContent(parent);
             }
         }
     }
 
-    private boolean isEmptyAttribute(String name) {
-        return "c:disabled".equals(name) || "c:checked".equals(name) || "c:selected".equals(name);
-    }
-
-    private void buildURLAttribute(ContainerFragment fragment, CallTypeStack stack, Attribute attr) {
-        String name = attr.name;
+    private void buildURLAttribute(ContainerFragment parent, CallTypeStack stack, Attribute attribute) {
+        String name = attribute.name;
         boolean hasCDN = dynamicAttributes.contains("c:cdn");
 
         if ("c:href".equals(name)) {
-            fragment.addStaticContent(" href=");
-            fragment.fragments.add(new URLFragment(attr.value, stack, attr.location, hasCDN));
+            parent.addStaticContent(" href=");
+            parent.add(new URLFragment(attribute.value, stack, attribute.location, hasCDN));
         } else if ("href".equals(name)) {
             if (hasCDN) {
-                fragment.addStaticContent(" href=");
-                fragment.fragments.add(new URLFragment(attr.value));
+                parent.addStaticContent(" href=");
+                parent.add(new URLFragment(attribute.value));
             } else {
-                attr.addStaticContent(fragment);
+                attribute.addStaticContent(parent);
             }
         } else if ("c:src".equals(name)) {
-            fragment.addStaticContent(" src=");
-            fragment.fragments.add(new URLFragment(attr.value, stack, attr.location, hasCDN));
+            parent.addStaticContent(" src=");
+            parent.add(new URLFragment(attribute.value, stack, attribute.location, hasCDN));
         } else if ("src".equals(name)) {
             if (hasCDN) {
-                fragment.addStaticContent(" src=");
-                fragment.fragments.add(new URLFragment(attr.value));
+                parent.addStaticContent(" src=");
+                parent.add(new URLFragment(attribute.value));
             } else {
-                attr.addStaticContent(fragment);
+                attribute.addStaticContent(parent);
             }
         }
-    }
-
-    private boolean isURL(String name) {
-        return "c:href".equals(name) || "href".equals(name) || "c:src".equals(name) || "src".equals(name);
-    }
-
-    private void buildAttribute(String name, ContainerFragment fragment, CallTypeStack stack, Attribute attr) {
-        if (Strings.isEmpty(attr.value))
-            throw Exceptions.error("dynamic attribute value must not be empty, attr={}, location={}", attr.name, attr.location);
-
-        fragment.addStaticContent(" ");
-        fragment.addStaticContent(name);
-        fragment.addStaticContent("=\"");
-        fragment.fragments.add(new TextContentFragment(attr.value, stack, attr.location));
-        fragment.addStaticContent("\"");
     }
 
     private boolean skip(String name) {
@@ -121,9 +99,7 @@ public class Attributes {
         if (attribute != null) return attribute;
         attribute = attributes.get("c:html");
         if (attribute != null) return attribute;
-        attribute = attributes.get("c:include");
-        if (attribute != null) return attribute;
-        throw new Error("can not find dynamic content attribute");
+        return attributes.get("c:include");
     }
 
     public List<Attribute> flowAttributes() {
@@ -134,7 +110,9 @@ public class Attributes {
         return attributes;
     }
 
-    private void validateDynamicContentAttribute() {
+    private void validate() {
+        attributes.values().forEach(core.framework.impl.template.node.Attribute::validate);
+
         int count = 0;
 
         Attribute attribute = attributes.get("c:text");

@@ -1,4 +1,4 @@
-package core.framework.impl.template.html;
+package core.framework.impl.template.parser;
 
 /**
  * @author neo

@@ -1,5 +1,6 @@
 package core.framework.impl.web.site;
 
+import core.framework.api.web.site.WebDirectory;
 import core.framework.impl.web.session.SessionManager;
 
 /**

@@ -2,6 +2,7 @@ package core.framework.impl.queue;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Address;
+import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -25,14 +26,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author neo
  */
 public final class RabbitMQ {
+    public final Pool<Channel> pool;
     private final Logger logger = LoggerFactory.getLogger(RabbitMQ.class);
-
     private final ConnectionFactory connectionFactory = new ConnectionFactory();
+    private final Lock lock = new ReentrantLock();
     private Address[] addresses;
     private long slowQueryThresholdInMs = 100;
     private volatile Connection connection;
-    public final Pool<Channel> pool;
-    private final Lock lock = new ReentrantLock();
 
     public RabbitMQ() {
         connectionFactory.setAutomaticRecoveryEnabled(true);
@@ -93,6 +93,9 @@ public final class RabbitMQ {
         PoolItem<Channel> item = pool.borrowItem();
         try {
             item.resource.basicPublish(exchange, routingKey, properties, Strings.bytes(message));
+        } catch (AlreadyClosedException e) {    // rabbitmq throws AlreadyClosedException for channel error, e.g. channel is not configured correctly or not exists
+            item.broken = true;
+            throw e;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);

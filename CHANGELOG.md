@@ -1,7 +1,9 @@
 ## Change log
 
-### 3.7.2 (10/21/2015 - )
-* template: new template syntax
+### 3.7.2 (10/21/2015 - 10/27/2015)
+* template: new template syntax, only support HTML template
+* rabbitmq: publisher mark pool item to be broken if AlreadyClosedException (throws when exchange/queue is not configured correctly in RabbitMQ)
+* site: exposed WebDirectory to injection context to provide way let website access web directory
 
 ### 3.7.1 (10/21/2015)
 * mongo: support assigned id

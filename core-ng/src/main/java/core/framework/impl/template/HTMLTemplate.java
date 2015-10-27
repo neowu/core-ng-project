@@ -2,15 +2,14 @@ package core.framework.impl.template;
 
 import core.framework.api.util.Exceptions;
 import core.framework.impl.template.fragment.ContainerFragment;
-import core.framework.impl.template.fragment.Fragment;
 
 /**
  * @author neo
  */
-public class Template extends ContainerFragment {
+public class HTMLTemplate extends ContainerFragment {
     private final Class<?> modelClass;
 
-    public Template(Class<?> modelClass) {
+    public HTMLTemplate(Class<?> modelClass) {
         this.modelClass = modelClass;
     }
 
@@ -28,8 +27,6 @@ public class Template extends ContainerFragment {
 
     @Override
     public void process(StringBuilder builder, CallStack stack) {
-        for (Fragment handler : this.fragments) {
-            handler.process(builder, stack);
-        }
+        processChildren(builder, stack);
     }
 }

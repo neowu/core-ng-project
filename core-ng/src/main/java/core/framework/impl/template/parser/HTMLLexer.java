@@ -1,4 +1,4 @@
-package core.framework.impl.template.html;
+package core.framework.impl.template.parser;
 
 import core.framework.api.util.Exceptions;
 
@@ -6,7 +6,7 @@ import core.framework.api.util.Exceptions;
  * @author neo
  */
 public class HTMLLexer {
-    private final String source;
+    private final String name;
     private final String html;
 
     private int startIndex;
@@ -15,8 +15,8 @@ public class HTMLLexer {
     private int currentLine = 1;
     private int currentColumn = 1;
 
-    public HTMLLexer(String source, String html) {
-        this.source = source;
+    public HTMLLexer(String name, String html) {
+        this.name = name;
         this.html = html;
     }
 
@@ -52,10 +52,10 @@ public class HTMLLexer {
             move(2);
             return HTMLTokenType.START_TAG_END_CLOSE;
         } else if (match(currentIndex, "=")) {
-            move(findAttrValueLength());
+            move(findAttributeValueLength());
             return HTMLTokenType.ATTR_VALUE;
         } else {
-            move(findAttrNameLength());
+            move(findAttributeNameLength());
             return HTMLTokenType.ATTR_NAME;
         }
     }
@@ -90,6 +90,14 @@ public class HTMLLexer {
         if (length == -1) throw Exceptions.error("script/css is not closed, location={}", currentLocation());
         move(length);
         return HTMLTokenType.TEXT;
+    }
+
+    public String currentToken() {
+        return html.substring(startIndex, currentIndex);
+    }
+
+    public String currentLocation() {
+        return name + ":" + currentLine + ":" + currentColumn;
     }
 
     private void skipWhitespaces() {
@@ -134,7 +142,7 @@ public class HTMLLexer {
         return length;
     }
 
-    private int findAttrNameLength() {
+    private int findAttributeNameLength() {
         for (int i = currentIndex; i < html.length(); i++) {
             char ch = html.charAt(i);
             if (Character.isWhitespace(ch) || ch == '=' || ch == '/' || ch == '>') return i - currentIndex;
@@ -143,7 +151,7 @@ public class HTMLLexer {
         throw Exceptions.error("attr is invalid, location={}", currentLocation());
     }
 
-    private int findAttrValueLength() {
+    private int findAttributeValueLength() {
         boolean started = false;
         boolean hasDoubleQuote = false;
         for (int i = currentIndex + 1; i < html.length(); i++) {  // skip first '='
@@ -162,14 +170,6 @@ public class HTMLLexer {
             }
         }
         throw Exceptions.error("attr value is invalid, location={}", currentLocation());
-    }
-
-    public String currentToken() {
-        return html.substring(startIndex, currentIndex);
-    }
-
-    public String currentLocation() {
-        return source + ":" + currentLine + ":" + currentColumn;
     }
 
     private boolean isStartTag(int index) {

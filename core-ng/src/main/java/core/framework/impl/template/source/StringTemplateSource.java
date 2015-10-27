@@ -13,6 +13,11 @@ public final class StringTemplateSource implements TemplateSource {
     }
 
     @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
     public String content() {
         return template;
     }
@@ -20,10 +25,5 @@ public final class StringTemplateSource implements TemplateSource {
     @Override
     public TemplateSource resolve(String path) {
         throw new Error("string template does not support include");
-    }
-
-    @Override
-    public String source() {
-        return name;
     }
 }

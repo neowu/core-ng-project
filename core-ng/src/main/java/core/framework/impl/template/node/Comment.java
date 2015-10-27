@@ -1,4 +1,4 @@
-package core.framework.impl.template.html.node;
+package core.framework.impl.template.node;
 
 import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.fragment.ContainerFragment;
@@ -8,15 +8,15 @@ import core.framework.impl.template.source.TemplateSource;
  * @author neo
  */
 public class Comment implements Node {
-    public final String content;
+    private final String content;
 
     public Comment(String content) {
         this.content = content;
     }
 
     @Override
-    public void buildTemplate(ContainerFragment fragment, CallTypeStack stack, TemplateSource source) {
-        fragment.addStaticContent("<!--");
-        fragment.addStaticContent(content);
+    public void buildTemplate(ContainerFragment parent, CallTypeStack stack, TemplateSource source) {
+        parent.addStaticContent("<!--");
+        parent.addStaticContent(content);
     }
 }

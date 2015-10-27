@@ -9,10 +9,10 @@ import org.junit.Test;
 /**
  * @author neo
  */
-public class TemplateTest {
+public class HTMLTemplateTest {
     @Test
     public void process() {
-        Template template = new TemplateBuilder(new TestTemplateSource("template-test/template.html"), TestModel.class).build();
+        HTMLTemplate template = new HTMLTemplateBuilder(new TestTemplateSource("template-test/template.html"), TestModel.class).build();
 
         TestModel model = new TestModel();
         model.stringField = "string<";
@@ -55,7 +55,7 @@ public class TemplateTest {
         }
 
         @Override
-        public String source() {
+        public String name() {
             return path;
         }
     }

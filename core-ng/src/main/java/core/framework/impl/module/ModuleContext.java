@@ -6,6 +6,7 @@ import core.framework.api.util.Lists;
 import core.framework.api.util.Properties;
 import core.framework.api.web.WebContext;
 import core.framework.api.web.site.TemplateManager;
+import core.framework.api.web.site.WebDirectory;
 import core.framework.impl.cache.CacheManager;
 import core.framework.impl.concurrent.Executor;
 import core.framework.impl.inject.BeanFactory;
@@ -34,12 +35,11 @@ public final class ModuleContext {
 
     public final HTTPServer httpServer;
     public final Executor executor;
-    private Scheduler scheduler;
-    public CacheManager cacheManager;
     public final QueueManager queueManager = new QueueManager();
     public final LogManager logManager;
-
     public final MockFactory mockFactory;
+    public CacheManager cacheManager;
+    private Scheduler scheduler;
 
     public ModuleContext(BeanFactory beanFactory, MockFactory mockFactory) {
         this.beanFactory = beanFactory;
@@ -53,7 +53,8 @@ public final class ModuleContext {
 
         httpServer = new HTTPServer(logManager);
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
-        beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);  // expose TemplateManager to allow app handle template programmably, such as cms/widgets
+        beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
+        beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);  // expose WebDirectory and TemplateManager to allow app handle template programmably, such as cms/widgets
         if (!isTest()) {
             startupHook.add(httpServer::start);
             shutdownHook.add(httpServer::stop);

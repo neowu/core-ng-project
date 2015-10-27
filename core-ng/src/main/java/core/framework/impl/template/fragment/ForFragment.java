@@ -41,9 +41,7 @@ public class ForFragment extends ContainerFragment {
         List<?> list = (List<?>) expression.eval(stack);
         for (Object item : list) {
             stack.contextObjects.put(variable, item);
-            for (Fragment fragment : fragments) {
-                fragment.process(builder, stack);
-            }
+            processChildren(builder, stack);
         }
         stack.contextObjects.remove(variable);
     }

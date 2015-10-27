@@ -1,4 +1,4 @@
-package core.framework.impl.template.html.node;
+package core.framework.impl.template.node;
 
 import core.framework.api.util.Lists;
 
