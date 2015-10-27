@@ -2,87 +2,59 @@ package core.framework.impl.template.node;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
-import core.framework.api.util.Sets;
-import core.framework.impl.template.expression.CallTypeStack;
+import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.fragment.ContainerFragment;
-import core.framework.impl.template.fragment.URLFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author neo
  */
 public class Attributes {
+    private final String tagName;
     private final Map<String, Attribute> attributes = Maps.newLinkedHashMap();
-    private final Set<String> dynamicAttributes = Sets.newHashSet();
+
+    public Attributes(String tagName) {
+        this.tagName = tagName;
+    }
 
     public void add(Attribute attribute) {
         attributes.put(attribute.name, attribute);
-        if (attribute.isDynamic()) dynamicAttributes.add(attribute.name);
     }
 
-    public void buildTemplate(ContainerFragment parent, CallTypeStack stack) {
+    public void buildTemplate(ContainerFragment parent, TemplateMetaContext context) {
         validate();
 
-        for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
-            String name = entry.getKey();
-            Attribute attribute = entry.getValue();
-            if (skip(name)) continue;
+        for (Attribute attribute : attributes.values()) {
+            if (skip(attribute)) continue;
 
-            if (attribute.isURLAttribute()) {
-                buildURLAttribute(parent, stack, attribute);
+            if (attribute.isCDNAttribute(tagName)) {
+                attribute.addCDNAttribute(parent, context);
             } else if (attribute.isEmptyAttribute()) {
-                attribute.addEmptyAttribute(parent, stack);
+                attribute.addEmptyAttribute(parent, context);
             } else if (attribute.isDynamic()) {
-                attribute.addValueAttribute(parent, stack);
+                attribute.addValueAttribute(parent, context);
             } else {
                 attribute.addStaticContent(parent);
             }
         }
     }
 
-    private void buildURLAttribute(ContainerFragment parent, CallTypeStack stack, Attribute attribute) {
+    private boolean skip(Attribute attribute) {
         String name = attribute.name;
-        boolean hasCDN = dynamicAttributes.contains("c:cdn");
 
-        if ("c:href".equals(name)) {
-            parent.addStaticContent(" href=");
-            parent.add(new URLFragment(attribute.value, stack, attribute.location, hasCDN));
-        } else if ("href".equals(name)) {
-            if (hasCDN) {
-                parent.addStaticContent(" href=");
-                parent.add(new URLFragment(attribute.value));
-            } else {
-                attribute.addStaticContent(parent);
-            }
-        } else if ("c:src".equals(name)) {
-            parent.addStaticContent(" src=");
-            parent.add(new URLFragment(attribute.value, stack, attribute.location, hasCDN));
-        } else if ("src".equals(name)) {
-            if (hasCDN) {
-                parent.addStaticContent(" src=");
-                parent.add(new URLFragment(attribute.value));
-            } else {
-                attribute.addStaticContent(parent);
-            }
-        }
-    }
-
-    private boolean skip(String name) {
         if ("xmlns:c".equals(name)
             || "c:text".equals(name)
             || "c:html".equals(name)
             || "c:msg".equals(name)
             || "c:include".equals(name)
             || "c:for".equals(name)
-            || "c:if".equals(name)
-            || "c:cdn".equals(name))
+            || "c:if".equals(name))
             return true;
 
-        return dynamicAttributes.contains("c:" + name);
+        return !attribute.isDynamic() && attributes.containsKey("c:" + name);
     }
 
     public boolean containDynamicContent() {
@@ -111,7 +83,7 @@ public class Attributes {
     }
 
     private void validate() {
-        attributes.values().forEach(core.framework.impl.template.node.Attribute::validate);
+        attributes.values().forEach(Attribute::validate);
 
         int count = 0;
 

@@ -1,15 +1,17 @@
 package core.framework.impl.template.expression;
 
+import core.framework.impl.template.TemplateMetaContext;
+
 /**
  * @author neo
  */
 public class ExpressionTranslator {
     private final Token expression;
-    private final CallTypeStack stack;
+    private final TemplateMetaContext context;
 
-    public ExpressionTranslator(Token expression, CallTypeStack stack) {
+    public ExpressionTranslator(Token expression, TemplateMetaContext context) {
         this.expression = expression;
-        this.stack = stack;
+        this.context = context;
     }
 
     public String translate() {
@@ -23,7 +25,7 @@ public class ExpressionTranslator {
     private void append(StringBuilder builder, Token token, boolean root) {
         if (token instanceof FieldToken) {
             FieldToken field = (FieldToken) token;
-            if (root && !stack.paramClasses.containsKey(field.name)) {
+            if (root && !context.paramClasses.containsKey(field.name)) {
                 builder.append("$root.");
             }
             builder.append(field.name);
@@ -39,7 +41,7 @@ public class ExpressionTranslator {
     }
 
     private void appendMethod(StringBuilder builder, MethodToken method, boolean root) {
-        if (root && !stack.paramClasses.containsKey(method.name)) {
+        if (root && !context.paramClasses.containsKey(method.name)) {
             builder.append("$root.");
         }
         builder.append(method.name).append('(');

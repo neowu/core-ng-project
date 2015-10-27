@@ -6,7 +6,8 @@ import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.CodeCompileException;
 import core.framework.impl.code.DynamicInstanceBuilder;
 import core.framework.impl.reflect.GenericTypes;
-import core.framework.impl.template.CallStack;
+import core.framework.impl.template.TemplateContext;
+import core.framework.impl.template.TemplateMetaContext;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -16,20 +17,20 @@ import java.lang.reflect.Type;
  */
 public class ExpressionBuilder {
     private final String expressionSource;
-    private final CallTypeStack stack;
+    private final TemplateMetaContext context;
     private final String location;
     private final Token token;
 
-    public ExpressionBuilder(String expressionSource, CallTypeStack stack, String location) {
+    public ExpressionBuilder(String expressionSource, TemplateMetaContext context, String location) {
         this.expressionSource = expressionSource;
-        this.stack = stack;
+        this.context = context;
         this.location = location;
         token = new ExpressionParser().parse(expressionSource);
     }
 
     public ExpressionHolder build() {
         Expression expression = buildExpression();
-        Type returnType = returnType(token, stack.rootClass);
+        Type returnType = returnType(token, context.rootClass);
         return new ExpressionHolder(expression, returnType, expressionSource, location);
     }
 
@@ -45,12 +46,12 @@ public class ExpressionBuilder {
 
     private String buildEval() {
         CodeBuilder builder = new CodeBuilder();
-        builder.append("public Object eval({} stack) {\n", CallStack.class.getCanonicalName());
-        builder.indent(1).append("{} $root = ({})stack.root;\n", stack.rootClass.getCanonicalName(), stack.rootClass.getCanonicalName());
-        stack.paramClasses.forEach((name, paramClass) -> builder.indent(1).append("{} {} = ({})stack.context(\"{}\");\n",
+        builder.append("public Object eval({} context) {\n", TemplateContext.class.getCanonicalName());
+        builder.indent(1).append("{} $root = ({})context.root;\n", context.rootClass.getCanonicalName(), context.rootClass.getCanonicalName());
+        context.paramClasses.forEach((name, paramClass) -> builder.indent(1).append("{} {} = ({})context.context(\"{}\");\n",
             paramClass.getCanonicalName(), name, paramClass.getCanonicalName(), name));
 
-        String translatedExpression = new ExpressionTranslator(token, stack).translate();
+        String translatedExpression = new ExpressionTranslator(token, context).translate();
         builder.indent(1).append("return {};\n", translatedExpression);
 
         builder.append("}");
@@ -77,7 +78,7 @@ public class ExpressionBuilder {
     }
 
     private Type fieldType(Class<?> modelClass, String fieldName) {
-        Class<?> fieldClass = stack.paramClasses.get(fieldName);
+        Class<?> fieldClass = context.paramClasses.get(fieldName);
         if (fieldClass != null) return fieldClass;
         try {
             return modelClass.getField(fieldName).getGenericType();

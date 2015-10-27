@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.7.3 (10/27/2015)
+* template: removed c:cdn, automatically replace all src/href applies
+
 ### 3.7.2 (10/21/2015 - 10/27/2015)
 * template: new template syntax, only support HTML template
 * rabbitmq: publisher mark pool item to be broken if AlreadyClosedException (throws when exchange/queue is not configured correctly in RabbitMQ)

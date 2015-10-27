@@ -1,6 +1,6 @@
 package core.framework.impl.template.node;
 
-import core.framework.impl.template.expression.CallTypeStack;
+import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.fragment.ContainerFragment;
 import core.framework.impl.template.source.TemplateSource;
 
@@ -15,7 +15,7 @@ public class Comment implements Node {
     }
 
     @Override
-    public void buildTemplate(ContainerFragment parent, CallTypeStack stack, TemplateSource source) {
+    public void buildTemplate(ContainerFragment parent, TemplateMetaContext context, TemplateSource source) {
         parent.addStaticContent("<!--");
         parent.addStaticContent(content);
     }

@@ -1,6 +1,5 @@
 package core.framework.impl.template;
 
-import core.framework.impl.template.expression.CallTypeStack;
 import core.framework.impl.template.node.Document;
 import core.framework.impl.template.parser.HTMLParser;
 import core.framework.impl.template.source.TemplateSource;
@@ -10,18 +9,22 @@ import core.framework.impl.template.source.TemplateSource;
  */
 public class HTMLTemplateBuilder {
     private final TemplateSource source;
-    private final CallTypeStack stack;
+    private final TemplateMetaContext context;
 
     public HTMLTemplateBuilder(TemplateSource source, Class<?> modelClass) {
         new ModelClassValidator(modelClass).validate();
         this.source = source;
-        this.stack = new CallTypeStack(modelClass);
+        this.context = new TemplateMetaContext(modelClass);
+    }
+
+    public void cdn(CDNFunction function) {
+        context.cdn = function;
     }
 
     public HTMLTemplate build() {
-        HTMLTemplate template = new HTMLTemplate(stack.rootClass);
+        HTMLTemplate template = new HTMLTemplate(context.rootClass);
         Document document = new HTMLParser(source).parse();
-        document.buildTemplate(template, stack, source);
+        document.buildTemplate(template, context, source);
         return template;
     }
 }

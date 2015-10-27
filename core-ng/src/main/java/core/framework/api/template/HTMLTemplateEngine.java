@@ -3,9 +3,9 @@ package core.framework.api.template;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
-import core.framework.impl.template.CallStack;
 import core.framework.impl.template.HTMLTemplate;
 import core.framework.impl.template.HTMLTemplateBuilder;
+import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.source.StringTemplateSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ public final class HTMLTemplateEngine {
         try {
             HTMLTemplate template = templates.get(name);
             if (template == null) throw Exceptions.error("not found template, name={}", name);
-            return template.process(new CallStack(model));
+            return template.process(new TemplateContext(model));
         } finally {
             logger.debug("process, name={}, elapsedTime={}", name, watch.elapsedTime());
         }

@@ -7,24 +7,19 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class CallStack {
+public class TemplateContext {
     public final Object root;
     public final Map<String, Object> contextObjects = Maps.newHashMap();
-    public CDNFunction cdnFunction;
+    public CDNFunction cdn;
     public MessageFunction messageFunction;
 
-    public CallStack(Object root) {
+    public TemplateContext(Object root) {
         this.root = root;
     }
 
     // used by generated code
     public Object context(String name) {
         return contextObjects.get(name);
-    }
-
-    public String cdn(String url) {
-        if (cdnFunction == null) throw new Error("cdn is not in context");
-        return cdnFunction.url(url);
     }
 
     public String message(String key) {

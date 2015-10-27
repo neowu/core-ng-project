@@ -88,8 +88,13 @@ public class HTMLLexer {
             }
         }
         if (length == -1) throw Exceptions.error("script/css is not closed, location={}", currentLocation());
-        move(length);
-        return HTMLTokenType.TEXT;
+
+        if (length > 0) {
+            move(length);
+            return HTMLTokenType.TEXT;
+        } else {
+            return HTMLTokenType.END_TAG;   // empty tag
+        }
     }
 
     public String currentToken() {

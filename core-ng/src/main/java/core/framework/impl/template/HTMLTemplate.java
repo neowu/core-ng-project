@@ -13,20 +13,20 @@ public class HTMLTemplate extends ContainerFragment {
         this.modelClass = modelClass;
     }
 
-    public String process(CallStack stack) {
-        if (stack.root == null)
+    public String process(TemplateContext context) {
+        if (context.root == null)
             throw Exceptions.error("root must not be null");
 
-        if (!modelClass.isInstance(stack.root))
-            throw Exceptions.error("model class does not match, expectedClass={}, actualClass={}", modelClass.getCanonicalName(), stack.root.getClass().getCanonicalName());
+        if (!modelClass.isInstance(context.root))
+            throw Exceptions.error("model class does not match, expectedClass={}, actualClass={}", modelClass.getCanonicalName(), context.root.getClass().getCanonicalName());
 
         StringBuilder builder = new StringBuilder();
-        process(builder, stack);
+        process(builder, context);
         return builder.toString();
     }
 
     @Override
-    public void process(StringBuilder builder, CallStack stack) {
-        processChildren(builder, stack);
+    public void process(StringBuilder builder, TemplateContext context) {
+        processChildren(builder, context);
     }
 }

@@ -19,7 +19,6 @@ import java.util.Deque;
  */
 public class HTMLParser {
     private final HTMLLexer lexer;
-
     private final Deque<ContainerNode> stack = new ArrayDeque<>();
 
     public HTMLParser(TemplateSource source) {
@@ -74,8 +73,8 @@ public class HTMLParser {
                 case START_TAG_END:
                     stack.push(currentElement);
                     if ("script".equals(currentElement.name) || "style".equals(currentElement.name)) {
-                        lexer.nextScriptToken(currentElement.name);
-                        addChild(new Text(lexer.currentToken()));
+                        HTMLTokenType contentType = lexer.nextScriptToken(currentElement.name);
+                        if (contentType == HTMLTokenType.TEXT) addChild(new Text(lexer.currentToken()));
                     }
                     return;
                 case ATTR_NAME:

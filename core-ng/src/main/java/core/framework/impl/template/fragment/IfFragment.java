@@ -2,8 +2,8 @@ package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Exceptions;
 import core.framework.impl.reflect.GenericTypes;
-import core.framework.impl.template.CallStack;
-import core.framework.impl.template.expression.CallTypeStack;
+import core.framework.impl.template.TemplateContext;
+import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionHolder;
 
@@ -18,7 +18,7 @@ public class IfFragment extends ContainerFragment {
     final ExpressionHolder expression;
     final boolean reverse;
 
-    public IfFragment(String statement, CallTypeStack stack, String location) {
+    public IfFragment(String statement, TemplateMetaContext context, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);
         if (!matcher.matches())
             throw Exceptions.error("statement must match \"(!)condition\", statement={}, location={}", statement, location);
@@ -26,18 +26,18 @@ public class IfFragment extends ContainerFragment {
         reverse = "!".equals(matcher.group(2));
         String condition = matcher.group(3);
 
-        expression = new ExpressionBuilder(condition, stack, location).build();
+        expression = new ExpressionBuilder(condition, context, location).build();
         if (!Boolean.class.equals(GenericTypes.rawClass(expression.returnType)))
             throw Exceptions.error("if condition must return Boolean, condition={}, returnType={}, location={}",
                 condition, expression.returnType.getTypeName(), location);
     }
 
     @Override
-    public void process(StringBuilder builder, CallStack stack) {
-        Object result = expression.eval(stack);
+    public void process(StringBuilder builder, TemplateContext context) {
+        Object result = expression.eval(context);
         Boolean expected = reverse ? Boolean.FALSE : Boolean.TRUE;
         if (expected.equals(result)) {
-            processChildren(builder, stack);
+            processChildren(builder, context);
         }
     }
 }

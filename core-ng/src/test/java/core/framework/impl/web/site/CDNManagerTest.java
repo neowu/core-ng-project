@@ -7,12 +7,12 @@ import org.junit.Test;
 /**
  * @author neo
  */
-public class CDNFunctionImplTest {
-    CDNFunctionImpl function;
+public class CDNManagerTest {
+    CDNManager function;
 
     @Before
     public void createCDNFunction() {
-        function = new CDNFunctionImpl();
+        function = new CDNManager();
         function.hosts = new String[]{"host1", "host2"};
         function.version = "100";
     }
@@ -27,5 +27,10 @@ public class CDNFunctionImplTest {
 
         url = function.url("/image/image3.png?param=value");
         Assert.assertEquals("//host1/image/image3.png?param=value&v=100", url);
+    }
+
+    @Test
+    public void absoluteURL() {
+        Assert.assertEquals("//host2/image/image1.png", function.url("//host2/image/image1.png"));
     }
 }

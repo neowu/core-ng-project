@@ -1,7 +1,7 @@
 package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Lists;
-import core.framework.impl.template.CallStack;
+import core.framework.impl.template.TemplateContext;
 
 import java.util.List;
 
@@ -28,9 +28,9 @@ public abstract class ContainerFragment implements Fragment {
         children.add(fragment);
     }
 
-    protected void processChildren(StringBuilder builder, CallStack stack) {
+    protected void processChildren(StringBuilder builder, TemplateContext context) {
         for (Fragment child : children) {
-            child.process(builder, stack);
+            child.process(builder, context);
         }
     }
 }

@@ -1,7 +1,7 @@
 package core.framework.impl.template.expression;
 
 import core.framework.api.util.Strings;
-import core.framework.impl.template.CallStack;
+import core.framework.impl.template.TemplateContext;
 
 import java.lang.reflect.Type;
 
@@ -9,8 +9,8 @@ import java.lang.reflect.Type;
  * @author neo
  */
 public class ExpressionHolder {
-    private final Expression expression;
     public final Type returnType;
+    private final Expression expression;
     private final String expressionSource;
     private final String location;
 
@@ -21,9 +21,9 @@ public class ExpressionHolder {
         this.location = location;
     }
 
-    public Object eval(CallStack stack) {
+    public Object eval(TemplateContext context) {
         try {
-            return expression.eval(stack);
+            return expression.eval(context);
         } catch (Throwable e) {
             throw new Error(Strings.format("failed to eval expression, location={}, expression={}, error={}",
                 location, expressionSource, e.getMessage()), e);

@@ -6,9 +6,9 @@ import core.framework.api.util.StopWatch;
 import core.framework.api.web.Request;
 import core.framework.api.web.site.TemplateManager;
 import core.framework.api.web.site.WebDirectory;
-import core.framework.impl.template.CallStack;
 import core.framework.impl.template.HTMLTemplate;
 import core.framework.impl.template.HTMLTemplateBuilder;
+import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.source.FileTemplateSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class TemplateManagerImpl implements TemplateManager {
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
     private final MessageManager messageManager;
-    private final CDNFunctionImpl cdnFunction = new CDNFunctionImpl();
+    private final CDNManager cdnManager = new CDNManager();
 
     public TemplateManagerImpl(WebDirectory webDirectory, MessageManager messageManager) {
         this.webDirectory = webDirectory;
@@ -39,8 +39,8 @@ public class TemplateManagerImpl implements TemplateManager {
         StopWatch watch = new StopWatch();
         try {
             HTMLTemplate template = get(templatePath, model.getClass());
-            CallStack stack = new CallStack(model);
-            stack.cdnFunction = cdnFunction;
+            TemplateContext stack = new TemplateContext(model);
+            stack.cdn = cdnManager;
             stack.messageFunction = new MessageFunctionImpl(messageManager, request);
             return template.process(stack);
         } finally {
@@ -78,15 +78,17 @@ public class TemplateManagerImpl implements TemplateManager {
 
     public void cdnHosts(String... hosts) {
         logger.info("set cdn hosts, hosts={}", Arrays.toString(hosts));
-        cdnFunction.hosts = hosts;
+        cdnManager.hosts = hosts;
     }
 
     public void cdnVersion(String version) {
         logger.info("set cdn version, version={}", version);
-        cdnFunction.version = version;
+        cdnManager.version = version;
     }
 
     private HTMLTemplate load(String templatePath, Class<?> modelClass) {
-        return new HTMLTemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass).build();
+        HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass);
+        if (cdnManager.hosts != null) builder.cdn(cdnManager);
+        return builder.build();
     }
 }

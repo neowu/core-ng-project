@@ -2,8 +2,8 @@ package core.framework.impl.template.fragment;
 
 import core.framework.api.util.Exceptions;
 import core.framework.impl.reflect.GenericTypes;
-import core.framework.impl.template.CallStack;
-import core.framework.impl.template.expression.CallTypeStack;
+import core.framework.impl.template.TemplateContext;
+import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionHolder;
 
@@ -20,7 +20,7 @@ public class ForFragment extends ContainerFragment {
     public final Class<?> valueClass;
     private final ExpressionHolder expression;
 
-    public ForFragment(String statement, CallTypeStack stack, String location) {
+    public ForFragment(String statement, TemplateMetaContext context, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);
         if (!matcher.matches())
             throw Exceptions.error("statement must match \"var:list\", statement={}, location={}", statement, location);
@@ -28,7 +28,7 @@ public class ForFragment extends ContainerFragment {
         variable = matcher.group(1);
         String list = matcher.group(2);
 
-        ExpressionBuilder builder = new ExpressionBuilder(list, stack, location);
+        ExpressionBuilder builder = new ExpressionBuilder(list, context, location);
         expression = builder.build();
         if (!GenericTypes.isGenericList(expression.returnType))
             throw Exceptions.error("for statement must return List<T>, list={}, returnType={}, location={}",
@@ -37,12 +37,12 @@ public class ForFragment extends ContainerFragment {
     }
 
     @Override
-    public void process(StringBuilder builder, CallStack stack) {
-        List<?> list = (List<?>) expression.eval(stack);
+    public void process(StringBuilder builder, TemplateContext context) {
+        List<?> list = (List<?>) expression.eval(context);
         for (Object item : list) {
-            stack.contextObjects.put(variable, item);
-            processChildren(builder, stack);
+            context.contextObjects.put(variable, item);
+            processChildren(builder, context);
         }
-        stack.contextObjects.remove(variable);
+        context.contextObjects.remove(variable);
     }
 }
