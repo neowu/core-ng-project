@@ -14,22 +14,17 @@ public class CDNFragment implements Fragment {
     private final Logger logger = LoggerFactory.getLogger(CDNFragment.class);
 
     private final ExpressionHolder expression;
-    private final String value;
     private final String location;
 
     public CDNFragment(String expression, TemplateMetaContext context, String location) {
         this.expression = new ExpressionBuilder(expression, context, location).build();
         this.location = location;
-        value = null;
     }
 
     @Override
     public void process(StringBuilder builder, TemplateContext context) {
-        String url = value;
-        if (expression != null) {
-            url = String.valueOf(expression.eval(context));
-            url = sanitize(url);
-        }
+        String url = String.valueOf(expression.eval(context));
+        url = sanitize(url);
         builder.append(context.cdn.url(url));
     }
 
