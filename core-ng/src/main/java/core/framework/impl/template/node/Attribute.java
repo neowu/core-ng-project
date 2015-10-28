@@ -29,9 +29,19 @@ public class Attribute {
         return name.startsWith("c:");
     }
 
-    void validate() {
+    void validate(String tagName) {
         if (isDynamic() && Strings.isEmpty(value)) {
             throw Exceptions.error("dynamic attribute value must not be empty, attribute={}, location={}", name, location);
+        }
+
+        if (("link".equals(tagName) && "href".equals(name))
+            || ("script".equals(tagName) && "src".equals(name))
+            || ("img".equals(tagName) && "src".equals(name))) {
+            if (!value.startsWith("http://")
+                && !value.startsWith("https://")
+                && value.startsWith("//")
+                && value.startsWith("/"))
+                throw Exceptions.error("static resource url attribute value must be either absolute or start with '/', value={}, location={}", value, location);
         }
     }
 
@@ -58,28 +68,26 @@ public class Attribute {
     }
 
     void addCDNAttribute(ContainerFragment parent, TemplateMetaContext context) {
-        if ("c:href".equals(name)) {
-            parent.addStaticContent(" href=");
+        String targetAttributeName = isDynamic() ? name.substring(2) : name;
+        addCDNAttribute(targetAttributeName, parent, context);
+    }
+
+    void addCDNAttribute(String targetAttributeName, ContainerFragment parent, TemplateMetaContext context) {
+        if (isDynamic()) {
+            parent.addStaticContent(" ");
+            parent.addStaticContent(targetAttributeName);
+            parent.addStaticContent("=");
             parent.add(new CDNFragment(value, context, location));
-        } else if ("href".equals(name)) {
-            if (context.withCDN()) {
-                parent.addStaticContent(" href=");
-                parent.addStaticContent(context.cdn.url(value));
-            } else {
-                addStaticContent(parent);
-            }
-        } else if ("c:src".equals(name)) {
-            parent.addStaticContent(" src=");
-            parent.add(new CDNFragment(value, context, location));
-        } else if ("src".equals(name)) {
-            if (context.withCDN()) {
-                parent.addStaticContent(" src=");
+        } else {
+            if (context.cdn != null) {  // expand cdn during compiling
+                parent.addStaticContent(" ");
+                parent.addStaticContent(targetAttributeName);
+                parent.addStaticContent("=");
                 parent.addStaticContent(context.cdn.url(value));
             } else {
                 addStaticContent(parent);
             }
         }
-
     }
 
     void addEmptyAttribute(ContainerFragment parent, TemplateMetaContext context) {
@@ -95,16 +103,23 @@ public class Attribute {
     }
 
     void addDynamicContent(ContainerFragment parent, TemplateMetaContext context, TemplateSource source) {
-        if ("c:text".equals(name)) {
-            parent.add(new TextContentFragment(value, context, location));
-        } else if ("c:html".equals(name)) {
-            parent.add(new HTMLContentFragment(value, context, location));
-        } else if ("c:msg".equals(name)) {
-            parent.add(new MessageFragment(value, context, location));
-        } else if ("c:include".equals(name)) {
-            TemplateSource includedSource = source.resolve(value);
-            Document document = new HTMLParser(includedSource).parse();
-            document.buildTemplate(parent, context, includedSource);
+        switch (name) {
+            case "c:text":
+                parent.add(new TextContentFragment(value, context, location));
+                break;
+            case "c:html":
+                parent.add(new HTMLContentFragment(value, context, location));
+                break;
+            case "c:msg":
+                parent.add(new MessageFragment(value));
+                break;
+            case "c:include":
+                TemplateSource includedSource = source.resolve(value);
+                Document document = new HTMLParser(includedSource).parse();
+                document.buildTemplate(parent, context, includedSource);
+                break;
+            default:
+                throw Exceptions.error("not supported dynamic content attribute, name={}", name);
         }
     }
 }

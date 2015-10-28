@@ -11,12 +11,9 @@ public class TemplateMetaContext {
     public final Class<?> rootClass;
     public final Map<String, Class<?>> paramClasses = Maps.newHashMap();
     public CDNFunction cdn;
+    public MessageFunction message;
 
     public TemplateMetaContext(Class<?> rootClass) {
         this.rootClass = rootClass;
-    }
-
-    public boolean withCDN() {
-        return cdn != null;
     }
 }

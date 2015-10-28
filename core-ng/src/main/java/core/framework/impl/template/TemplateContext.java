@@ -11,7 +11,7 @@ public class TemplateContext {
     public final Object root;
     public final Map<String, Object> contextObjects = Maps.newHashMap();
     public CDNFunction cdn;
-    public MessageFunction messageFunction;
+    public MessageFunction message;
 
     public TemplateContext(Object root) {
         this.root = root;
@@ -20,10 +20,5 @@ public class TemplateContext {
     // used by generated code
     public Object context(String name) {
         return contextObjects.get(name);
-    }
-
-    public String message(String key) {
-        if (messageFunction == null) throw new Error("message is not in context");
-        return messageFunction.message(key);
     }
 }

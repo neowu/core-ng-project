@@ -41,7 +41,7 @@ public class TemplateManagerImpl implements TemplateManager {
             HTMLTemplate template = get(templatePath, model.getClass());
             TemplateContext stack = new TemplateContext(model);
             stack.cdn = cdnManager;
-            stack.messageFunction = new MessageFunctionImpl(messageManager, request);
+            stack.message = new MessageFunctionImpl(messageManager, request);
             return template.process(stack);
         } finally {
             logger.debug("process, templatePath={}, elapsedTime={}", templatePath, watch.elapsedTime());

@@ -22,8 +22,8 @@ public class HTMLTemplateBuilder {
     }
 
     public HTMLTemplate build() {
-        HTMLTemplate template = new HTMLTemplate(context.rootClass);
         Document document = new HTMLParser(source).parse();
+        HTMLTemplate template = new HTMLTemplate(context.rootClass);
         document.buildTemplate(template, context, source);
         return template;
     }

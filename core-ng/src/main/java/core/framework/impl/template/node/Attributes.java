@@ -83,7 +83,7 @@ public class Attributes {
     }
 
     private void validate() {
-        attributes.values().forEach(Attribute::validate);
+        attributes.values().forEach(attribute -> attribute.validate(tagName));
 
         int count = 0;
 
