@@ -7,7 +7,6 @@ import core.framework.impl.template.fragment.CDNFragment;
 import core.framework.impl.template.fragment.ContainerFragment;
 import core.framework.impl.template.fragment.EmptyAttributeFragment;
 import core.framework.impl.template.fragment.HTMLContentFragment;
-import core.framework.impl.template.fragment.MessageFragment;
 import core.framework.impl.template.fragment.TextContentFragment;
 import core.framework.impl.template.parser.HTMLParser;
 import core.framework.impl.template.source.TemplateSource;
@@ -37,12 +36,16 @@ public class Attribute {
         if (("link".equals(tagName) && "href".equals(name))
             || ("script".equals(tagName) && "src".equals(name))
             || ("img".equals(tagName) && "src".equals(name))) {
-            if (!value.startsWith("http://")
-                && !value.startsWith("https://")
-                && value.startsWith("//")
-                && value.startsWith("/"))
-                throw Exceptions.error("static resource url attribute value must be either absolute or start with '/', value={}, location={}", value, location);
+            validateStaticResourceURL();
         }
+    }
+
+    private void validateStaticResourceURL() {
+        if (!value.startsWith("http://")
+            && !value.startsWith("https://")
+            && value.startsWith("//")
+            && value.startsWith("/"))
+            throw Exceptions.error("static resource url attribute value must be either absolute or start with '/', value={}, location={}", value, location);
     }
 
     void addStaticContent(ContainerFragment parent) {
@@ -111,7 +114,10 @@ public class Attribute {
                 parent.add(new HTMLContentFragment(value, context, location));
                 break;
             case "c:msg":
-                parent.add(new MessageFragment(value));
+                if (context.message == null)
+                    throw Exceptions.error("c:msg must not be used without messages, location={}", location);
+                String message = context.message.message(value, context.language).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
+                parent.addStaticContent(message);
                 break;
             case "c:include":
                 TemplateSource includedSource = source.resolve(value);

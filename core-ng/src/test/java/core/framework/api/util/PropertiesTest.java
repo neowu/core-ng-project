@@ -6,8 +6,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.io.UncheckedIOException;
-
 /**
  * @author neo
  */
@@ -31,8 +29,8 @@ public class PropertiesTest {
 
     @Test
     public void loadNotExistedFile() {
-        exception.expect(UncheckedIOException.class);
-        exception.expectMessage("not found");
+        exception.expect(Error.class);
+        exception.expectMessage("can not find");
 
         properties.load("not-existed-property.properties");
     }

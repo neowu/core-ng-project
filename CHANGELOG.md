@@ -3,7 +3,8 @@
 ### 3.7.4 (10/28/2015)
 * template: validate cdn attribute, url must start with /
 * template: c:msg="" use key directly, removed expression support
-TODO: template: built-in i18n support
+* template: built-in i18n support
+* properties: read in utf-8
 
 ### 3.7.3 (10/27/2015)
 * template: removed c:cdn, automatically replace all src/href applies

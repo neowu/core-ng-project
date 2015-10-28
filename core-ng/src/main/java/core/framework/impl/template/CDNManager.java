@@ -1,20 +1,25 @@
-package core.framework.impl.web.site;
+package core.framework.impl.template;
 
 import core.framework.api.util.Exceptions;
-import core.framework.impl.template.CDNFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 /**
  * @author neo
  */
-public class CDNManager implements CDNFunction {
-    String[] hosts;
-    String version;
+public class CDNManager {
+    private final Logger logger = LoggerFactory.getLogger(CDNManager.class);
 
-    @Override
+    private String[] hosts;
+    private String version;
+
     public String url(String url) {
         if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//")) return url;
-
         if (!url.startsWith("/")) throw Exceptions.error("url must start with '/', url={}", url);
+
+        if (hosts == null) return url;
 
         int hash = url.hashCode();
         int hostIndex = hash % hosts.length;
@@ -26,5 +31,15 @@ public class CDNManager implements CDNFunction {
             builder.append(version);
         }
         return builder.toString();
+    }
+
+    public void hosts(String... hosts) {
+        logger.info("set cdn hosts, hosts={}", Arrays.toString(hosts));
+        this.hosts = hosts;
+    }
+
+    public void version(String version) {
+        logger.info("set cdn version, version={}", version);
+        this.version = version;
     }
 }

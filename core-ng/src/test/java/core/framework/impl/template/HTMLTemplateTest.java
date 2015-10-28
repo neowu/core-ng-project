@@ -12,7 +12,9 @@ import org.junit.Test;
 public class HTMLTemplateTest {
     @Test
     public void process() {
-        HTMLTemplate template = new HTMLTemplateBuilder(new TestTemplateSource("template-test/template.html"), TestModel.class).build();
+        HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new TestTemplateSource("template-test/template.html"), TestModel.class);
+        builder.parse();
+        HTMLTemplate template = builder.build();
 
         TestModel model = new TestModel();
         model.stringField = "string<";

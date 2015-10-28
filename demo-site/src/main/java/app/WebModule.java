@@ -11,6 +11,8 @@ import core.framework.api.http.ContentTypes;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.web.Response;
 
+import java.util.Optional;
+
 /**
  * @author neo
  */
@@ -27,6 +29,8 @@ public class WebModule extends Module {
         site().staticContent("/favicon.ico");
         site().staticContent("/robots.txt");
         site().message().loadProperties("messages/main.properties");
+        site().message().loadProperties("messages/main_zh_CN.properties");
+        site().message().language(request -> Optional.of("zh_CN"));
 
         site().template("/template/index.html", IndexPage.class);
         IndexController index = bind(IndexController.class);

@@ -9,20 +9,29 @@ import core.framework.impl.template.source.TemplateSource;
  */
 public class HTMLTemplateBuilder {
     private final TemplateSource source;
-    private final TemplateMetaContext context;
+    private final Class<?> modelClass;
+
+    public CDNManager cdn;
+    public MessageManager message;
+    public String language;
+
+    private Document document;
 
     public HTMLTemplateBuilder(TemplateSource source, Class<?> modelClass) {
         new ModelClassValidator(modelClass).validate();
         this.source = source;
-        this.context = new TemplateMetaContext(modelClass);
+        this.modelClass = modelClass;
     }
 
-    public void cdn(CDNFunction function) {
-        context.cdn = function;
+    public void parse() {
+        document = new HTMLParser(source).parse();
     }
 
     public HTMLTemplate build() {
-        Document document = new HTMLParser(source).parse();
+        TemplateMetaContext context = new TemplateMetaContext(modelClass);
+        context.cdn = cdn;
+        context.message = message;
+        context.language = language;
         HTMLTemplate template = new HTMLTemplate(context.rootClass);
         document.buildTemplate(template, context, source);
         return template;

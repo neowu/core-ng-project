@@ -7,6 +7,6 @@ import java.util.Optional;
 /**
  * @author neo
  */
-public interface MessageProvider {
-    Optional<String> get(String key, Request request);
+public interface LanguageProvider {
+    Optional<String> get(Request request);
 }

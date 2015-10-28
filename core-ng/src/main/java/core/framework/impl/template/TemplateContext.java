@@ -10,8 +10,7 @@ import java.util.Map;
 public class TemplateContext {
     public final Object root;
     public final Map<String, Object> contextObjects = Maps.newHashMap();
-    public CDNFunction cdn;
-    public MessageFunction message;
+    public CDNManager cdn;
 
     public TemplateContext(Object root) {
         this.root = root;

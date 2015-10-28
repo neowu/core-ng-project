@@ -9,6 +9,5 @@ import core.framework.impl.web.session.SessionManager;
 public class SiteManager {
     public final WebDirectory webDirectory = new WebDirectory();
     public final SessionManager sessionManager = new SessionManager();
-    public final MessageManager messageManager = new MessageManager();
-    public final TemplateManagerImpl templateManager = new TemplateManagerImpl(webDirectory, messageManager);
+    public final TemplateManagerImpl templateManager = new TemplateManagerImpl(webDirectory);
 }

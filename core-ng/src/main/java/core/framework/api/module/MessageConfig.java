@@ -1,6 +1,6 @@
 package core.framework.api.module;
 
-import core.framework.api.web.site.MessageProvider;
+import core.framework.api.web.site.LanguageProvider;
 import core.framework.impl.module.ModuleContext;
 
 /**
@@ -14,10 +14,10 @@ public final class MessageConfig {
     }
 
     public void loadProperties(String path) {
-        context.httpServer.siteManager.messageManager.loadProperties(path);
+        context.httpServer.siteManager.templateManager.messageManager.loadProperties(path);
     }
 
-    public void messageProvider(MessageProvider messageProvider) {
-        context.httpServer.siteManager.messageManager.messageProvider = messageProvider;
+    public void language(LanguageProvider provider) {
+        context.httpServer.siteManager.templateManager.languageProvider = provider;
     }
 }

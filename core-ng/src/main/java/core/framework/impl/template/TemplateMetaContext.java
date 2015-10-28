@@ -10,8 +10,9 @@ import java.util.Map;
 public class TemplateMetaContext {
     public final Class<?> rootClass;
     public final Map<String, Class<?>> paramClasses = Maps.newHashMap();
-    public CDNFunction cdn;
-    public MessageFunction message;
+    public CDNManager cdn;
+    public MessageManager message;
+    public String language;
 
     public TemplateMetaContext(Class<?> rootClass) {
         this.rootClass = rootClass;
