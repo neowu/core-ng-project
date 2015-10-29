@@ -15,7 +15,7 @@ import java.util.Optional;
  * @author neo
  */
 public class MessageManager {
-    public static final String DEFAULT_LANGUAGE_KEY = "default";
+    public static final String DEFAULT_LANGUAGE = "default";
 
     private final Logger logger = LoggerFactory.getLogger(MessageManager.class);
     private final Map<String, Properties> messages = Maps.newHashMap();
@@ -33,8 +33,7 @@ public class MessageManager {
     }
 
     public Optional<String> message(String key, String language) {
-        String languageKey = language == null ? DEFAULT_LANGUAGE_KEY : language;
-        Properties properties = messages.get(languageKey);
+        Properties properties = messages.get(language);
         if (properties == null) throw Exceptions.error("can not find messages, language={}", language);
         return properties.get(key);
     }
@@ -53,6 +52,6 @@ public class MessageManager {
             return path.substring(length - 16, length - 11);
         }
 
-        return DEFAULT_LANGUAGE_KEY;
+        return DEFAULT_LANGUAGE;
     }
 }

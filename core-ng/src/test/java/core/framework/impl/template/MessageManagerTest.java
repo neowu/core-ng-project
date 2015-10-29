@@ -18,7 +18,7 @@ public class MessageManagerTest {
     @Test
     public void language() {
         Assert.assertEquals("en_US", messageManager.language("messages_en_US.properties"));
-        Assert.assertEquals(MessageManager.DEFAULT_LANGUAGE_KEY, messageManager.language("messages.properties"));
-        Assert.assertEquals(MessageManager.DEFAULT_LANGUAGE_KEY, messageManager.language("m.properties"));
+        Assert.assertEquals(MessageManager.DEFAULT_LANGUAGE, messageManager.language("messages.properties"));
+        Assert.assertEquals(MessageManager.DEFAULT_LANGUAGE, messageManager.language("m.properties"));
     }
 }

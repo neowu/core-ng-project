@@ -1,6 +1,5 @@
 package core.framework.impl.web.site;
 
-import core.framework.api.util.Exceptions;
 import core.framework.api.util.Files;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
@@ -21,7 +20,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author neo
@@ -31,7 +29,7 @@ public class TemplateManagerImpl implements TemplateManager {
     public final CDNManager cdnManager = new CDNManager();
 
     private final Logger logger = LoggerFactory.getLogger(TemplateManagerImpl.class);
-    private final Map<String, HTMLTemplate> templates = Maps.newConcurrentHashMap();
+    private final Map<String, Templates> templates = Maps.newConcurrentHashMap();
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
 
@@ -54,35 +52,10 @@ public class TemplateManagerImpl implements TemplateManager {
         }
     }
 
-    private HTMLTemplate get(String templatePath, Class<?> modelClass, Request request) {
-        String templateKey = templateKey(templatePath, request);
-        if (webDirectory.localEnv) {
-            HTMLTemplate template = templates.get(templateKey);
-            Path path = webDirectory.path(templatePath);
-            if (template == null || Files.lastModified(path).isAfter(templateLastModifiedTimes.get(templatePath))) {
-                templateLastModifiedTimes.put(templatePath, Files.lastModified(path)); // put modified time first, then template, for zero cost to handle local threading
-                return load(templatePath, modelClass, templateKey);
-            }
-            return template;
-        } else {
-            HTMLTemplate template = templates.get(templateKey);
-            if (template == null)
-                return load(templatePath, modelClass, templateKey);
-            return template;
-        }
-    }
-
-    private String templateKey(String templatePath, Request request) {
-        if (languageProvider == null) return templatePath;
-        Optional<String> language = languageProvider.get(request);
-        if (language.isPresent()) return templatePath + ":" + language.get();
-        return templatePath;
-    }
-
     public void add(String templatePath, Class<?> modelClass) {
         StopWatch watch = new StopWatch();
         try {
-            load(templatePath, modelClass, null);
+            this.templates.put(templatePath, load(templatePath, modelClass));
             if (webDirectory.localEnv) {
                 Path path = webDirectory.path(templatePath);
                 templateLastModifiedTimes.put(templatePath, Files.lastModified(path));
@@ -92,29 +65,42 @@ public class TemplateManagerImpl implements TemplateManager {
         }
     }
 
-    private HTMLTemplate load(String templatePath, Class<?> modelClass, String templateKey) {
+    private HTMLTemplate get(String templatePath, Class<?> modelClass, Request request) {
+        Templates templates;
+        if (webDirectory.localEnv) {
+            templates = this.templates.get(templatePath);
+            Path path = webDirectory.path(templatePath);
+            if (templates == null || Files.lastModified(path).isAfter(templateLastModifiedTimes.get(templatePath))) {
+                templateLastModifiedTimes.put(templatePath, Files.lastModified(path)); // put modified time first, then template, for zero cost to handle local threading
+                templates = load(templatePath, modelClass);
+                this.templates.putIfAbsent(templatePath, templates);
+            }
+        } else {
+            templates = this.templates.computeIfAbsent(templatePath, key -> load(templatePath, modelClass));
+        }
+        return templates.get(language(request));
+    }
+
+    private String language(Request request) {
+        return languageProvider == null ? null : languageProvider.get(request).orElse(null);
+    }
+
+    private Templates load(String templatePath, Class<?> modelClass) {
         HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass);
         builder.cdn = cdnManager;
-        builder.message = messageManager;
-        builder.parse();
 
+        Templates templates = new Templates();
         List<String> languages = messageManager.languages();
         if (languages.isEmpty()) {
-            HTMLTemplate template = builder.build();
-            templates.put(templatePath, template);
-            return template;
+            templates.defaultTemplate = builder.build();
         } else {
-            HTMLTemplate matchedTemplate = null;
+            builder.message = messageManager;
             for (String language : languages) {
                 builder.language = language;
                 HTMLTemplate template = builder.build();
-                String key = MessageManager.DEFAULT_LANGUAGE_KEY.equals(language) ? templatePath : templatePath + ":" + language;
-                if (key.equals(templateKey)) matchedTemplate = template;
-                templates.put(key, template);
+                templates.add(language, template);
             }
-            if (templateKey != null && matchedTemplate == null)
-                throw Exceptions.error("can not find template, please check message/language, key={}", templateKey);
-            return matchedTemplate;
         }
+        return templates;
     }
 }

@@ -10,20 +10,16 @@ import core.framework.impl.template.source.TemplateSource;
 public class HTMLTemplateBuilder {
     private final TemplateSource source;
     private final Class<?> modelClass;
+    private final Document document;
 
     public CDNManager cdn;
     public MessageManager message;
     public String language;
 
-    private Document document;
-
     public HTMLTemplateBuilder(TemplateSource source, Class<?> modelClass) {
         new ModelClassValidator(modelClass).validate();
         this.source = source;
         this.modelClass = modelClass;
-    }
-
-    public void parse() {
         document = new HTMLParser(source).parse();
     }
 
