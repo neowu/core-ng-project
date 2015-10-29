@@ -6,7 +6,8 @@
 * template: built-in i18n support
 * properties: read in utf-8
 * httpclient: fix text() to use utf-8 as encoding
-TODO: refactory i18n template, webservice wire exception
+* webservice: unified web service call error flow, RemoteServiceException provided structural info to be handled in client service app
+TODO: refactory i18n template
 
 ### 3.7.3 (10/27/2015)
 * template: removed c:cdn, automatically replace all src/href applies

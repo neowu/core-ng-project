@@ -14,7 +14,6 @@ import core.framework.api.web.exception.MethodNotAllowedException;
 import core.framework.api.web.exception.NotFoundException;
 import core.framework.api.web.exception.UnauthorizedException;
 import core.framework.impl.web.exception.ErrorResponse;
-import core.framework.impl.web.exception.ValidationErrorResponse;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.response.ResponseHandler;
 import io.undertow.server.HttpServerExchange;
@@ -81,13 +80,7 @@ public class HTTPServerErrorHandler {
         }
 
         if (accept != null && accept.contains("application/json")) {
-            Object bean;
-            if (e instanceof ValidationException) {
-                bean = validationErrorResponse((ValidationException) e);
-            } else {
-                bean = errorResponse(e);
-            }
-            return Response.bean(bean, status);
+            return Response.bean(errorResponse(e), status);
         } else {
             return Response.text(errorHTML(e), status, ContentTypes.TEXT_HTML);
         }
@@ -109,12 +102,6 @@ public class HTTPServerErrorHandler {
         response.id = ActionLogContext.id();
         response.message = e.getMessage();
         response.stackTrace = Exceptions.stackTrace(e);
-        return response;
-    }
-
-    private ValidationErrorResponse validationErrorResponse(ValidationException e) {
-        ValidationErrorResponse response = new ValidationErrorResponse();
-        response.errors = e.errors;
         return response;
     }
 }

@@ -1,6 +1,5 @@
 package core.framework.api.http;
 
-import core.framework.api.util.Charsets;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -15,6 +14,7 @@ public class HTTPRequest {
     private final Logger logger = LoggerFactory.getLogger(HTTPRequest.class);
     private final String uri;
     private String body;
+
     public HTTPRequest(HTTPMethod method, String uri) {
         logger.debug("[request] method={}, uri={}", method, uri);
         this.uri = uri;
@@ -48,8 +48,7 @@ public class HTTPRequest {
     public HTTPRequest text(String body, String contentType) {
         logger.debug("[request] body={}, contentType={}", body, contentType);
         this.body = body;
-        // this is for core-ng app to initiate request, and it uses utf-8 in all OS/env, so to hard code utf-8 as input string
-        builder.setEntity(new StringEntity(body, ContentType.create(contentType, Charsets.UTF_8)));
+        builder.setEntity(new StringEntity(body, ContentType.parse(contentType)));
         return this;
     }
 

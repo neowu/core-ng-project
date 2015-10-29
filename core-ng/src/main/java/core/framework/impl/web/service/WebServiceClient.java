@@ -19,7 +19,6 @@ import core.framework.impl.log.LogManager;
 import core.framework.impl.web.BeanValidator;
 import core.framework.impl.web.HTTPServerHandler;
 import core.framework.impl.web.exception.ErrorResponse;
-import core.framework.impl.web.exception.ValidationErrorResponse;
 import core.framework.impl.web.route.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,19 +129,17 @@ public class WebServiceClient {
         if (status.code >= HTTPStatus.OK.code && status.code <= 300) return;
         String responseText = response.text();
         try {
-            if (status == HTTPStatus.BAD_REQUEST) {
-                ValidationErrorResponse validationErrorResponse = JSON.fromJSON(ValidationErrorResponse.class, responseText);
-                throw new RemoteServiceException(Strings.format("failed to validate, errors={}", validationErrorResponse.errors));
-            } else {
-                ErrorResponse errorResponse = JSON.fromJSON(ErrorResponse.class, responseText);
-                throw new RemoteServiceException(Strings.format("failed to call remote web service, id={}, error={}, remoteStackTrace={}",
-                    errorResponse.id, errorResponse.message, errorResponse.stackTrace));
-            }
+            ErrorResponse error = JSON.fromJSON(ErrorResponse.class, responseText);
+            logger.debug("failed to call remote service, id={}, error={}, remoteStackTrace={}", error.id, error.message, error.stackTrace);
+            RemoteServiceException exception = new RemoteServiceException(error.message, status);
+            exception.id = error.id;
+            exception.remoteStackTrace = error.stackTrace;
+            throw exception;
         } catch (RemoteServiceException e) {
             throw e;
         } catch (Exception e) {
             logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, responseText, e);
-            throw new RemoteServiceException(Strings.format("received non 2xx status code, status={}, responseText={}", status.code, responseText), e);
+            throw new RemoteServiceException(Strings.format("received non 2xx status code, status={}, responseText={}", status.code, responseText), status, e);
         }
     }
 }

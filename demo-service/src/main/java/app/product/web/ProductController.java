@@ -6,6 +6,7 @@ import app.web.interceptor.Protected;
 import core.framework.api.db.Database;
 import core.framework.api.db.Transaction;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.web.exception.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,8 @@ public class ProductController implements ProductWebService {
         product.id = 1;
         product.date = LocalDateTime.now();
         product.instant = Instant.now();
-        productService.save(product);
+        throw new BadRequestException("bad");
+//        productService.save(product);
     }
 
     @Override
