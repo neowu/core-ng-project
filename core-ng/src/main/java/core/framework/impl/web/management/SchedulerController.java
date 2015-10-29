@@ -8,6 +8,7 @@ import core.framework.impl.scheduler.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.UnknownHostException;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ public class SchedulerController {
         this.scheduler = scheduler;
     }
 
-    public Response listJobs(Request request) {
+    public Response listJobs(Request request) throws UnknownHostException {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
         List<JobView> jobs = Lists.newArrayList();
@@ -37,7 +38,7 @@ public class SchedulerController {
         return Response.bean(jobs);
     }
 
-    public Response triggerJob(Request request) {
+    public Response triggerJob(Request request) throws UnknownHostException {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
         String jobName = request.pathParam("job");

@@ -9,14 +9,10 @@ import java.net.UnknownHostException;
  * @author neo
  */
 final class ControllerHelper {
-    static void validateFromLocalNetwork(String clientIP) {
-        try {
-            InetAddress address = InetAddress.getByName(clientIP);
-            if (!address.isLoopbackAddress() && !address.isSiteLocalAddress()) {
-                throw new ForbiddenException("access denied");
-            }
-        } catch (UnknownHostException e) {
-            throw new ForbiddenException("access denied", e);
+    static void validateFromLocalNetwork(String clientIP) throws UnknownHostException {
+        InetAddress address = InetAddress.getByName(clientIP);
+        if (!address.isLoopbackAddress() && !address.isSiteLocalAddress()) {
+            throw new ForbiddenException("access denied");
         }
     }
 }

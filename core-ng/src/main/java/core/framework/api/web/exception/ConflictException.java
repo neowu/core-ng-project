@@ -6,24 +6,24 @@ import core.framework.api.log.Warning;
  * @author neo
  */
 @Warning
-public class UnauthorizedException extends RuntimeException implements ErrorCode {
-    public static final String DEFAULT_ERROR_CODE = "UNAUTHORIZED";
+public class ConflictException extends RuntimeException implements ErrorCode {
+    public static final String DEFAULT_ERROR_CODE = "CONFLICT";
 
-    private static final long serialVersionUID = 5545181864430282120L;
+    private static final long serialVersionUID = 7787085179989898162L;
 
     private final String errorCode;
 
-    public UnauthorizedException(String message) {
+    public ConflictException(String message) {
         super(message);
         errorCode = DEFAULT_ERROR_CODE;
     }
 
-    public UnauthorizedException(String message, String errorCode) {
+    public ConflictException(String message, String errorCode) {
         super(message);
         this.errorCode = errorCode;
     }
 
-    public UnauthorizedException(String message, String errorCode, Throwable cause) {
+    public ConflictException(String message, String errorCode, Throwable cause) {
         super(message, cause);
         this.errorCode = errorCode;
     }

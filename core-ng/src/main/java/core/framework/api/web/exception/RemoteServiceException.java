@@ -7,9 +7,10 @@ import core.framework.api.http.HTTPStatus;
  */
 public class RemoteServiceException extends RuntimeException {
     private static final long serialVersionUID = 6935063785656278927L;
+
     public final HTTPStatus status;
     public String id;
-    public String remoteStackTrace;
+    public String errorCode;
 
     public RemoteServiceException(String message, HTTPStatus status) {
         super(message);

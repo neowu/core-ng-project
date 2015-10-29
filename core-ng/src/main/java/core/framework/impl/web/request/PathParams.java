@@ -39,7 +39,7 @@ public class PathParams {
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException("failed to parse value to long, value=" + value, e);
+            throw new BadRequestException("failed to parse value to long, value=" + value, BadRequestException.DEFAULT_ERROR_CODE, e);
         }
     }
 
@@ -47,7 +47,7 @@ public class PathParams {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException("failed to parse value to int, value=" + value, e);
+            throw new BadRequestException("failed to parse value to int, value=" + value, BadRequestException.DEFAULT_ERROR_CODE, e);
         }
     }
 }

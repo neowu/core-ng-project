@@ -9,12 +9,13 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.net.UnknownHostException;
 
 /**
  * @author neo
  */
 public class ThreadInfoController {
-    public Response threadUsage(Request request) {
+    public Response threadUsage(Request request) throws UnknownHostException {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
         ThreadUsage usage = new ThreadUsage();
@@ -25,7 +26,7 @@ public class ThreadInfoController {
         return Response.bean(usage);
     }
 
-    public Response threadDump(Request request) {
+    public Response threadDump(Request request) throws UnknownHostException {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
         StringBuilder builder = new StringBuilder();

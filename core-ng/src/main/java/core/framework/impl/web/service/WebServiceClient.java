@@ -130,10 +130,10 @@ public class WebServiceClient {
         String responseText = response.text();
         try {
             ErrorResponse error = JSON.fromJSON(ErrorResponse.class, responseText);
-            logger.debug("failed to call remote service, id={}, error={}, remoteStackTrace={}", error.id, error.message, error.stackTrace);
+            logger.debug("failed to call remote service, id={}, errorCode={}, remoteStackTrace={}", error.id, error.errorCode, error.stackTrace);
             RemoteServiceException exception = new RemoteServiceException(error.message, status);
             exception.id = error.id;
-            exception.remoteStackTrace = error.stackTrace;
+            exception.errorCode = error.errorCode;
             throw exception;
         } catch (RemoteServiceException e) {
             throw e;

@@ -25,18 +25,18 @@ import java.util.Optional;
  * @author neo
  */
 public final class RequestImpl implements Request {
+    public final PathParams pathParams = new PathParams();
     private final HttpServerExchange exchange;
     private final BeanValidator validator;
+    public Session session;
     HTTPMethod method;
     String clientIP;
     String scheme;
     int port;
     String requestURL;
     String contentType;
-    public final PathParams pathParams = new PathParams();
     FormData formData;
     String body;
-    public Session session;
 
     public RequestImpl(HttpServerExchange exchange, BeanValidator validator) {
         this.exchange = exchange;
@@ -138,7 +138,7 @@ public final class RequestImpl implements Request {
             T bean = parseBean(instanceType);
             return validator.validate(instanceType, bean);
         } catch (UncheckedIOException e) {
-            throw new BadRequestException(e);
+            throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
         }
     }
 

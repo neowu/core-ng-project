@@ -9,6 +9,8 @@ import core.framework.api.web.ErrorHandler;
 import core.framework.api.web.Response;
 import core.framework.api.web.ResponseImpl;
 import core.framework.api.web.exception.BadRequestException;
+import core.framework.api.web.exception.ConflictException;
+import core.framework.api.web.exception.ErrorCode;
 import core.framework.api.web.exception.ForbiddenException;
 import core.framework.api.web.exception.MethodNotAllowedException;
 import core.framework.api.web.exception.NotFoundException;
@@ -65,6 +67,7 @@ public class HTTPServerErrorHandler {
 
     private Response defaultErrorResponse(Throwable e, String accept) {
         HTTPStatus status;
+
         if (e instanceof BadRequestException || e instanceof ValidationException) {
             status = HTTPStatus.BAD_REQUEST;
         } else if (e instanceof MethodNotAllowedException) {
@@ -75,6 +78,8 @@ public class HTTPServerErrorHandler {
             status = HTTPStatus.UNAUTHORIZED;
         } else if (e instanceof ForbiddenException) {
             status = HTTPStatus.FORBIDDEN;
+        } else if (e instanceof ConflictException) {
+            status = HTTPStatus.CONFLICT;
         } else {
             status = HTTPStatus.INTERNAL_SERVER_ERROR;
         }
@@ -102,6 +107,9 @@ public class HTTPServerErrorHandler {
         response.id = ActionLogContext.id();
         response.message = e.getMessage();
         response.stackTrace = Exceptions.stackTrace(e);
+        if (e instanceof ErrorCode) response.errorCode = ((ErrorCode) e).errorCode();
+        else if (e instanceof ValidationException) response.errorCode = "VALIDATION_ERROR";
+        else response.errorCode = "INTERNAL_ERROR";
         return response;
     }
 }
