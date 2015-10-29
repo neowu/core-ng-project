@@ -1,10 +1,8 @@
 package app.product.service;
 
 import app.product.domain.CreateProductRequest;
-import core.framework.api.http.HTTPStatus;
 import core.framework.api.queue.MessageHandler;
 import core.framework.api.queue.MessagePublisher;
-import core.framework.api.web.exception.RemoteServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +20,7 @@ public class CreateProductRequestHandler implements MessageHandler<CreateProduct
     @Override
     public void handle(CreateProductRequest message) throws Exception {
 //        logger.info("consumed message, message={}", JSON.toJSON(message));
-        if (message.id == 500) throw new RemoteServiceException("test error", HTTPStatus.INTERNAL_SERVER_ERROR);
+        if (message.id == 500) throw new Error("test error");
 
         if (message.finish == null) {
             message.finish = true;

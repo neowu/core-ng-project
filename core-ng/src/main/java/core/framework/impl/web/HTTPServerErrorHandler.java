@@ -14,6 +14,7 @@ import core.framework.api.web.exception.ErrorCode;
 import core.framework.api.web.exception.ForbiddenException;
 import core.framework.api.web.exception.MethodNotAllowedException;
 import core.framework.api.web.exception.NotFoundException;
+import core.framework.api.web.exception.RemoteServiceException;
 import core.framework.api.web.exception.UnauthorizedException;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.request.RequestImpl;
@@ -109,6 +110,7 @@ public class HTTPServerErrorHandler {
         response.stackTrace = Exceptions.stackTrace(e);
         if (e instanceof ErrorCode) response.errorCode = ((ErrorCode) e).errorCode();
         else if (e instanceof ValidationException) response.errorCode = "VALIDATION_ERROR";
+        else if (e instanceof RemoteServiceException) response.errorCode = ((RemoteServiceException) e).errorCode;
         else response.errorCode = "INTERNAL_ERROR";
         return response;
     }
