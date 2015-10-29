@@ -141,7 +141,7 @@ public class HTMLLexer {
     private int findTextLength() {
         int length = 0;
         for (int i = currentIndex; i < html.length(); i++) {
-            if (isStartTag(i) || match(i, "</")) break;
+            if (isStartTag(i) || match(i, "<!--") || match(i, "</")) break;
             length++;
         }
         return length;

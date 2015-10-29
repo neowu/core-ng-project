@@ -24,6 +24,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * db: batch insert/update auto convert to small batch like 3000?
 * web: rewrite undertow built-in form/multi part parser for seamless integration and exception handling?
 * review/refactory/unit-test all packages (final/encapsulation/etc)
+* template: unit test html parser
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)
