@@ -1,6 +1,8 @@
 package core.framework.impl.web.request;
 
+import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPMethod;
+import core.framework.api.util.Charsets;
 import core.framework.api.util.Files;
 import core.framework.api.util.Strings;
 import core.framework.impl.log.ActionLog;
@@ -60,16 +62,22 @@ public class RequestParser {
         if (userAgent != null) actionLog.context("userAgent", userAgent);
 
         if (request.method == HTTPMethod.POST || request.method == HTTPMethod.PUT) {
-            request.contentType = headers.getFirst(Headers.CONTENT_TYPE);
+            String contentType = headers.getFirst(Headers.CONTENT_TYPE);
+            request.contentType = contentType == null ? null : ContentType.parse(contentType);
             parseBody(request, exchange);
         }
     }
 
     void parseBody(RequestImpl request, HttpServerExchange exchange) throws Throwable {
-        TextBodyReader.TextBody body = exchange.getAttachment(TextBodyReader.TEXT_BODY);
+        RequestBodyReader.RequestBody body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
         if (body != null) {
-            request.body = body.content();
-            logger.debug("[request] body={}", request.body);
+            if (request.contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())) {
+                request.body = body.body().text(request.contentType.charset().orElse(Charsets.UTF_8));
+                logger.debug("[request] body={}", request.body);
+            } else {
+                logger.warn("unsupported body, contentType={}", request.contentType == null ? null : request.contentType.value());
+            }
+            exchange.removeAttachment(RequestBodyReader.REQUEST_BODY);
             return;
         }
 

@@ -2,7 +2,6 @@ package core.framework.api.http;
 
 import core.framework.api.util.ByteBuf;
 import core.framework.api.util.Charsets;
-import org.apache.http.entity.ContentType;
 
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -12,15 +11,19 @@ import java.util.Optional;
  * @author neo
  */
 public final class HTTPResponse {
-    final HTTPStatus status;
-    final Map<String, String> headers;
-    final ByteBuf body;
+    private final HTTPStatus status;
+    private final Map<String, String> headers;
+    private final ByteBuf body;
+    private final ContentType contentType;
     private String text;
 
     public HTTPResponse(HTTPStatus status, Map<String, String> headers, ByteBuf body) {
         this.status = status;
         this.headers = headers;
         this.body = body;
+
+        String contentType = headers.get(HTTPHeaders.CONTENT_TYPE);
+        this.contentType = contentType == null ? null : ContentType.parse(contentType);
     }
 
     public HTTPStatus status() {
@@ -35,8 +38,8 @@ public final class HTTPResponse {
         return Optional.ofNullable(headers.get(name));
     }
 
-    public String contentType() {
-        return headers.get(HTTPHeaders.CONTENT_TYPE);
+    public Optional<ContentType> contentType() {
+        return Optional.ofNullable(contentType);
     }
 
     public String text() {
@@ -50,11 +53,7 @@ public final class HTTPResponse {
     }
 
     private Charset charset() {
-        String contentTypeValue = contentType();
-        if (contentTypeValue == null) return Charsets.UTF_8;
-        ContentType contentType = ContentType.parse(contentTypeValue);
-        Charset charset = contentType.getCharset();
-        if (charset == null) return Charsets.UTF_8;
-        return charset;
+        if (contentType == null) return Charsets.UTF_8;
+        return contentType.charset().orElse(Charsets.UTF_8);
     }
 }

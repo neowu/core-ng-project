@@ -1,5 +1,10 @@
 ## Change log
 
+### 3.7.5 (11/2/2015)
+* search: update to elasticsearch 2.0
+* lib: update undertow to 1.3.4, jackson to 2.6.3
+* http: introduced strong typed ContentType
+
 ### 3.7.4 (10/28/2015 - 10/29/2015)
 * template: validate cdn attribute, url must start with /
 * template: c:msg="" use key directly, removed expression support

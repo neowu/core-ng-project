@@ -1,6 +1,6 @@
 package core.framework.impl.web.management;
 
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.web.Request;
 import core.framework.api.web.Response;
 
@@ -34,7 +34,7 @@ public class ThreadInfoController {
         for (ThreadInfo thread : threads) {
             builder.append(toString(thread)).append('\n');
         }
-        return Response.text(builder.toString(), ContentTypes.TEXT_PLAIN);
+        return Response.text(builder.toString(), ContentType.TEXT_PLAIN);
     }
 
     // port from ThreadInfo.toString, to print all stack frames (ThreadInfo.toString() only print 8 frames)

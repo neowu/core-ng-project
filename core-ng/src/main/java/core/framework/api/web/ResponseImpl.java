@@ -1,5 +1,6 @@
 package core.framework.api.web;
 
+import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.util.Maps;
 import core.framework.impl.web.response.Body;
@@ -12,10 +13,10 @@ import java.util.Map;
  * @author neo
  */
 public final class ResponseImpl implements Response {
-    private HTTPStatus status = HTTPStatus.OK;
     public final Map<HttpString, String> headers = Maps.newHashMap();
-    public Map<CookieSpec, String> cookies;
     public final Body body;
+    public Map<CookieSpec, String> cookies;
+    private HTTPStatus status = HTTPStatus.OK;
 
     ResponseImpl(Body body) {
         this.body = body;
@@ -46,9 +47,9 @@ public final class ResponseImpl implements Response {
     }
 
     @Override
-    public Response contentType(String contentType) {
+    public Response contentType(ContentType contentType) {
         if (contentType != null)
-            headers.put(Headers.CONTENT_TYPE, contentType);
+            headers.put(Headers.CONTENT_TYPE, contentType.value());
         return this;
     }
 }

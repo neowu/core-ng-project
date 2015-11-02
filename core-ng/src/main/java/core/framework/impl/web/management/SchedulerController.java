@@ -1,6 +1,6 @@
 package core.framework.impl.web.management;
 
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.util.Lists;
 import core.framework.api.web.Request;
 import core.framework.api.web.Response;
@@ -44,6 +44,6 @@ public class SchedulerController {
         String jobName = request.pathParam("job");
         logger.info("trigger job, jobName={}, clientIP={}", jobName, request.clientIP());
         scheduler.triggerNow(jobName);
-        return Response.text("job triggered, name=" + jobName, ContentTypes.TEXT_PLAIN);
+        return Response.text("job triggered, name=" + jobName, ContentType.TEXT_PLAIN);
     }
 }

@@ -1,7 +1,7 @@
 package app.web;
 
 import app.web.interceptor.Protected;
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.util.Files;
 import core.framework.api.web.Request;
 import core.framework.api.web.Response;
@@ -36,10 +36,10 @@ public class IndexController {
     public Response css(Request request) {
         String cssTemplate = Files.text(webDirectory.path("/template/css/main.css"));
         String css = cssTemplate.replaceAll("$\\{backgroundColor\\}", "gainsboro");
-        return Response.text(css, ContentTypes.TEXT_CSS);
+        return Response.text(css, ContentType.TEXT_CSS);
     }
 
     public Response submit(Request request) {
-        return Response.text("hello " + request.formParam("name").get(), ContentTypes.TEXT_PLAIN);
+        return Response.text("hello " + request.formParam("name").get(), ContentType.TEXT_PLAIN);
     }
 }

@@ -4,11 +4,15 @@ import core.framework.api.queue.MessageHandler;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Lists;
+import core.framework.api.util.Maps;
 import core.framework.impl.log.queue.TraceLogMessage;
 import core.log.domain.TraceLogDocument;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptService;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 /**
  * @author neo
@@ -31,9 +35,10 @@ public class TraceLogMessageHandler implements MessageHandler<TraceLogMessage> {
         if ("ERROR".equals(message.result))
             script.append("; ctx._source.result=\"ERROR\"");    // if log doc is created by WARN, ERROR should update result
 
+        Map<String, String> params = Maps.newHashMap("line", message.content);
+
         UpdateRequest request = new UpdateRequest()
-            .script(script.toString())
-            .addScriptParam("line", message.content)
+            .script(new Script(script.toString(), ScriptService.ScriptType.INLINE, null, params))
             .upsert(JSON.toJSON(emptyTraceLog));
         request.scriptedUpsert(true);
 

@@ -1,6 +1,6 @@
 package core.framework.impl.web;
 
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Exceptions;
@@ -85,10 +85,10 @@ public class HTTPServerErrorHandler {
             status = HTTPStatus.INTERNAL_SERVER_ERROR;
         }
 
-        if (accept != null && accept.contains("application/json")) {
+        if (accept != null && accept.contains(ContentType.APPLICATION_JSON.mediaType())) {
             return Response.bean(errorResponse(e), status);
         } else {
-            return Response.text(errorHTML(e), status, ContentTypes.TEXT_HTML);
+            return Response.text(errorHTML(e), status, ContentType.TEXT_HTML);
         }
     }
 
@@ -97,7 +97,7 @@ public class HTTPServerErrorHandler {
     }
 
     private void renderDefaultErrorPage(Throwable e, HttpServerExchange exchange) {
-        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ContentTypes.TEXT_HTML);
+        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ContentType.TEXT_HTML.value());
         exchange.setStatusCode(HTTPStatus.INTERNAL_SERVER_ERROR.code);
         ActionLogContext.put("responseCode", exchange.getStatusCode());
         exchange.getResponseSender().send(errorHTML(e));

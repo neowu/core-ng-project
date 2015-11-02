@@ -1,5 +1,6 @@
 package core.framework.impl.web.site;
 
+import core.framework.api.http.ContentType;
 import core.framework.api.web.Controller;
 import core.framework.api.web.Request;
 import core.framework.api.web.Response;
@@ -15,7 +16,7 @@ import java.nio.file.Path;
 public final class StaticFileController implements Controller {
     private final Logger logger = LoggerFactory.getLogger(StaticFileController.class);
     private final Path contentFile;
-    private final String contentType;
+    private final ContentType contentType;
 
     public StaticFileController(Path contentFile) {
         this.contentFile = contentFile;

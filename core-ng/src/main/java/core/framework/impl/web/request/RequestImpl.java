@@ -1,5 +1,6 @@
 package core.framework.impl.web.request;
 
+import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
@@ -34,7 +35,7 @@ public final class RequestImpl implements Request {
     String scheme;
     int port;
     String requestURL;
-    String contentType;
+    ContentType contentType;
     FormData formData;
     String body;
 
@@ -156,10 +157,10 @@ public final class RequestImpl implements Request {
                 }
                 String formJSON = JSON.toJSON(form);
                 return JSON.fromJSON(instanceType, formJSON);
-            } else if (body != null && contentType != null && contentType.contains("application/json")) {
+            } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
                 return JSON.fromJSON(instanceType, body);
             }
-            throw new BadRequestException("body is required, method=" + method + ", contentType=" + contentType);
+            throw new BadRequestException("body is missing or unsupported content type, method=" + method + ", contentType=" + contentType);
         } else {
             throw Exceptions.error("not supported method, method={}", method);
         }

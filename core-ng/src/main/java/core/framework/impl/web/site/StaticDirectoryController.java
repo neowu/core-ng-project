@@ -1,5 +1,6 @@
 package core.framework.impl.web.site;
 
+import core.framework.api.http.ContentType;
 import core.framework.api.web.Controller;
 import core.framework.api.web.Request;
 import core.framework.api.web.Response;
@@ -34,7 +35,7 @@ public final class StaticDirectoryController implements Controller {
 
         File file = filePath.toFile();
         Response response = Response.file(file);
-        String contentType = MimeTypes.get(file.getName());
+        ContentType contentType = MimeTypes.get(file.getName());
         if (contentType != null) response.contentType(contentType);
         return response;
     }

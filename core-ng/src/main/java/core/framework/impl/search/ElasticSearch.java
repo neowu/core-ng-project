@@ -9,27 +9,27 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.network.NetworkService;
-import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.Node;
+import org.elasticsearch.node.NodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
-
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 /**
  * @author neo
  */
 public final class ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearch.class);
-
-    private Path localDataPath;
     private final List<TransportAddress> remoteAddresses = Lists.newArrayList();
+    private Path localHomePath;
     private Duration timeout = Duration.ofSeconds(10);
     private Duration slowQueryThreshold = Duration.ofSeconds(5);
 
@@ -37,12 +37,12 @@ public final class ElasticSearch {
 
     public void remote(String host) {
         if (client != null) throw new Error("remote() must be called before creating client");
-        remoteAddresses.add(new InetSocketTransportAddress(host, 9300));
+        remoteAddresses.add(new InetSocketTransportAddress(new InetSocketAddress(host, 9300)));
     }
 
-    public void local(Path localDataPath) {
+    public void local(Path localHomePath) {
         if (client != null) throw new Error("local() must be called before creating client");
-        this.localDataPath = localDataPath;
+        this.localHomePath = localHomePath;
     }
 
     public void slowQueryThreshold(Duration slowQueryThreshold) {
@@ -105,7 +105,7 @@ public final class ElasticSearch {
         if (client == null) {
             if (!remoteAddresses.isEmpty()) {
                 client = createRemoteElasticSearch();
-            } else if (localDataPath != null) {
+            } else if (localHomePath != null) {
                 client = createLocalElasticSearch();
             } else {
                 throw new Error("failed to create elastic search client, please specify either remote or local");
@@ -117,23 +117,23 @@ public final class ElasticSearch {
     private Client createLocalElasticSearch() {
         StopWatch watch = new StopWatch();
         try {
-            ImmutableSettings.Builder settings = ImmutableSettings.settingsBuilder()
-                .put("http.enabled", "false")
-                .put("script.groovy.sandbox.enabled", "true")
-                .put("path.data", localDataPath);
-            Node node = nodeBuilder().settings(settings).local(true).node();
+            Settings.Builder settings = Settings.settingsBuilder()
+                .put("http.enabled", "false")       // refer to org.elasticsearch.node.Node.start()
+                .put("script.inline", "on")         // refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/_setting_changes.html#migration-script-settings
+                .put("path.home", localHomePath);   // refer to org.elasticsearch.env.Environment.Environment()
+            Node node = NodeBuilder.nodeBuilder().settings(settings).local(true).node();
             return node.client();
         } finally {
-            logger.info("create local elastic search client, dataPath={}, elapsedTime={}", localDataPath, watch.elapsedTime());
+            logger.info("create local elastic search client, dataPath={}, elapsedTime={}", localHomePath, watch.elapsedTime());
         }
     }
 
     private Client createRemoteElasticSearch() {
         StopWatch watch = new StopWatch();
         try {
-            ImmutableSettings.Builder settings = ImmutableSettings.settingsBuilder()
-                .put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT, timeout.toMillis());
-            TransportClient client = new TransportClient(settings);
+            Settings.Builder settings = Settings.settingsBuilder()
+                .put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT, new TimeValue(timeout.toMillis()));
+            TransportClient client = TransportClient.builder().settings(settings).build();
             remoteAddresses.forEach(client::addTransportAddress);
             return client;
         } finally {

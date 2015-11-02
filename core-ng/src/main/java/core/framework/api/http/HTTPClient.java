@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -83,9 +84,11 @@ public final class HTTPClient {
         }
     }
 
-    private void logResponseText(HTTPResponse httpResponse) {
-        String contentType = httpResponse.contentType();
-        if (contentType != null && (contentType.contains("text") || contentType.contains("json")))
-            logger.debug("[response] body={}", httpResponse.text());
+    private void logResponseText(HTTPResponse response) {
+        Optional<ContentType> contentType = response.contentType();
+        if (!contentType.isPresent()) return;
+        String mediaType = contentType.get().mediaType();
+        if (mediaType.contains("text") || mediaType.contains("json"))
+            logger.debug("[response] body={}", response.text());
     }
 }

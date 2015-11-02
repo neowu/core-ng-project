@@ -1,5 +1,6 @@
 package core.framework.impl.web.site;
 
+import core.framework.api.http.ContentType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -10,6 +11,9 @@ public class MimeTypesTest {
     @Test
     public void get() {
         Assert.assertNull(MimeTypes.get("file"));
-        Assert.assertEquals("image/x-icon", MimeTypes.get("favicon.ico"));
+
+        ContentType contentType = MimeTypes.get("favicon.ico");
+        Assert.assertNotNull(contentType);
+        Assert.assertEquals("image/x-icon", contentType.mediaType());
     }
 }

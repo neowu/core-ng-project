@@ -1,6 +1,6 @@
 package app.web;
 
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.web.MultipartFile;
 import core.framework.api.web.Request;
 import core.framework.api.web.Response;
@@ -15,6 +15,6 @@ public class UploadController {
 
     public Response post(Request request) {
         MultipartFile file = request.file("test").get();
-        return Response.text("uploaded, fileName=" + file.fileName, ContentTypes.TEXT_PLAIN);
+        return Response.text("uploaded, fileName=" + file.fileName, ContentType.TEXT_PLAIN);
     }
 }

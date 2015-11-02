@@ -7,7 +7,7 @@ import app.web.WildcardController;
 import app.web.ajax.AJAXController;
 import app.web.interceptor.TestInterceptor;
 import core.framework.api.Module;
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.web.Response;
 
@@ -21,9 +21,9 @@ public class WebModule extends Module {
     protected void initialize() {
         http().intercept(bind(TestInterceptor.class));
 
-        route().get("/hello", request -> Response.text("hello", HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
-        route().get("/hello/", request -> Response.text("hello with ending slash", HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
-        route().get("/hello/:name", request -> Response.text("hello " + request.pathParam("name"), HTTPStatus.CREATED, ContentTypes.TEXT_PLAIN));
+        route().get("/hello", request -> Response.text("hello", HTTPStatus.CREATED, ContentType.TEXT_PLAIN));
+        route().get("/hello/", request -> Response.text("hello with ending slash", HTTPStatus.CREATED, ContentType.TEXT_PLAIN));
+        route().get("/hello/:name", request -> Response.text("hello " + request.pathParam("name"), HTTPStatus.CREATED, ContentType.TEXT_PLAIN));
 
         site().staticContent("/static");
         site().staticContent("/favicon.ico");

@@ -14,15 +14,15 @@ import java.nio.ByteBuffer;
 /**
  * @author neo
  */
-public class TextBodyReader implements ChannelListener<StreamSourceChannel> {
-    static final AttachmentKey<TextBody> TEXT_BODY = AttachmentKey.create(TextBody.class);
+public class RequestBodyReader implements ChannelListener<StreamSourceChannel> {
+    static final AttachmentKey<RequestBody> REQUEST_BODY = AttachmentKey.create(RequestBody.class);
 
     private final HttpServerExchange exchange;
     private final HTTPServerHandler handler;
     private ByteBuf body;
     private boolean complete;
 
-    public TextBodyReader(HttpServerExchange exchange, HTTPServerHandler handler) {
+    public RequestBodyReader(HttpServerExchange exchange, HTTPServerHandler handler) {
         this.exchange = exchange;
         this.handler = handler;
         int length = (int) exchange.getRequestContentLength();
@@ -51,12 +51,12 @@ public class TextBodyReader implements ChannelListener<StreamSourceChannel> {
             }
             if (bytesRead == -1) {
                 complete = true;
-                exchange.putAttachment(TEXT_BODY, new TextBody(body.text(), null));
+                exchange.putAttachment(REQUEST_BODY, new RequestBody(body, null));
             }
         } catch (Throwable e) { // catch all errors during IO, to pass error to action log
             IoUtils.safeClose(channel);
             complete = true;
-            exchange.putAttachment(TEXT_BODY, new TextBody(null, e));
+            exchange.putAttachment(REQUEST_BODY, new RequestBody(null, e));
         }
     }
 
@@ -64,18 +64,18 @@ public class TextBodyReader implements ChannelListener<StreamSourceChannel> {
         return complete;
     }
 
-    public static class TextBody {
-        private final String content;
+    public static class RequestBody {
+        private final ByteBuf body;
         private final Throwable exception;
 
-        TextBody(String content, Throwable exception) {
-            this.content = content;
+        RequestBody(ByteBuf body, Throwable exception) {
+            this.body = body;
             this.exception = exception;
         }
 
-        public String content() throws Throwable {
+        public ByteBuf body() throws Throwable {
             if (exception != null) throw exception;
-            return this.content;
+            return this.body;
         }
     }
 }

@@ -1,6 +1,6 @@
 package core.framework.impl.web.service;
 
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPClient;
 import core.framework.api.http.HTTPHeaders;
 import core.framework.api.http.HTTPMethod;
@@ -71,7 +71,7 @@ public class WebServiceClient {
         }
 
         HTTPRequest request = new HTTPRequest(method, serviceURL);
-        request.header(HTTPHeaders.ACCEPT, ContentTypes.APPLICATION_JSON);
+        request.header(HTTPHeaders.ACCEPT, ContentType.APPLICATION_JSON.value());
 
         if (logManager.appName != null) {
             request.header(HTTPServerHandler.HEADER_CLIENT, logManager.appName);
@@ -85,7 +85,7 @@ public class WebServiceClient {
                 Map<String, String> queryParams = JSON.fromJSON(Types.map(String.class, String.class), json);
                 addQueryParams(request, queryParams);
             } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
-                request.text(json, ContentTypes.APPLICATION_JSON);
+                request.text(json, ContentType.APPLICATION_JSON);
             } else {
                 throw Exceptions.error("not supported method, method={}", method);
             }

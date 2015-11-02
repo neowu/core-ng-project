@@ -1,6 +1,6 @@
 package core.framework.api.web;
 
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPHeaders;
 import core.framework.api.http.HTTPStatus;
 import core.framework.impl.web.response.BeanBody;
@@ -15,13 +15,13 @@ import java.io.File;
  * @author neo
  */
 public interface Response {
-    static Response text(String text, HTTPStatus status, String contentType) {
+    static Response text(String text, HTTPStatus status, ContentType contentType) {
         return new ResponseImpl(new TextBody(text))
             .contentType(contentType)
             .status(status);
     }
 
-    static Response text(String text, String contentType) {
+    static Response text(String text, ContentType contentType) {
         return text(text, HTTPStatus.OK, contentType);
     }
 
@@ -31,14 +31,14 @@ public interface Response {
 
     static Response bean(Object bean, HTTPStatus status) {
         return new ResponseImpl(new BeanBody(bean))
-            .contentType(ContentTypes.APPLICATION_JSON)
+            .contentType(ContentType.APPLICATION_JSON)
             .status(status);
     }
 
     static Response html(String templatePath, Object model) {
         return new ResponseImpl(new TemplateBody(templatePath, model))
             .status(HTTPStatus.OK)
-            .contentType(ContentTypes.TEXT_HTML);
+            .contentType(ContentType.TEXT_HTML);
     }
 
     static Response empty() {
@@ -47,10 +47,10 @@ public interface Response {
     }
 
     static Response bytes(byte[] bytes) {
-        return bytes(bytes, ContentTypes.APPLICATION_OCTET_STREAM);
+        return bytes(bytes, ContentType.APPLICATION_OCTET_STREAM);
     }
 
-    static Response bytes(byte[] bytes, String contentType) {
+    static Response bytes(byte[] bytes, ContentType contentType) {
         return new ResponseImpl(new ByteArrayBody(bytes))
             .status(HTTPStatus.OK)
             .contentType(contentType);
@@ -85,7 +85,7 @@ public interface Response {
 
     Response header(String name, Object value);
 
-    Response contentType(String contentType);
+    Response contentType(ContentType contentType);
 
     Response cookie(CookieSpec spec, String value);
 }

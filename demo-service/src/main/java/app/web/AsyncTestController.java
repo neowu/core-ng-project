@@ -1,7 +1,7 @@
 package app.web;
 
 import core.framework.api.concurrent.AsyncExecutor;
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.util.Threads;
 import core.framework.api.web.Controller;
 import core.framework.api.web.Request;
@@ -22,7 +22,7 @@ public class AsyncTestController implements Controller {
     public Response execute(Request request) throws Exception {
         Future<String> future1 = asyncExecutor.submit("task1", this::task1);
         Future<String> future2 = asyncExecutor.submit("task2", this::task2);
-        return Response.text(future1.get() + "-" + future2.get(), ContentTypes.TEXT_PLAIN);
+        return Response.text(future1.get() + "-" + future2.get(), ContentType.TEXT_PLAIN);
     }
 
     private String task1() {

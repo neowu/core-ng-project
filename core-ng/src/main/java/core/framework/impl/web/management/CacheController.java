@@ -1,6 +1,6 @@
 package core.framework.impl.web.management;
 
-import core.framework.api.http.ContentTypes;
+import core.framework.api.http.ContentType;
 import core.framework.api.web.Request;
 import core.framework.api.web.Response;
 import core.framework.api.web.exception.NotFoundException;
@@ -26,7 +26,7 @@ public class CacheController {
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
         String value = cache.get(key).orElseThrow(() -> new NotFoundException("cache key not found, name=" + name + ", key=" + key));
-        return Response.text(value, ContentTypes.APPLICATION_JSON);
+        return Response.text(value, ContentType.APPLICATION_JSON);
     }
 
     public Response delete(Request request) throws Exception {
@@ -35,7 +35,7 @@ public class CacheController {
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
         cache.evict(key);
-        return Response.text("cache evicted, name=" + name + ", key=" + key, ContentTypes.TEXT_PLAIN);
+        return Response.text("cache evicted, name=" + name + ", key=" + key, ContentType.TEXT_PLAIN);
     }
 
     public Response list(Request request) throws Exception {
