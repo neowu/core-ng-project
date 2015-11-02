@@ -11,11 +11,11 @@ import java.util.Optional;
 public interface Mongo {
     <T> void insert(T entity);
 
-    <T> Optional<T> findOne(Class<T> entityClass, Object id);
+    <T> Optional<T> get(Class<T> entityClass, Object id);
 
     <T> Optional<T> findOne(Class<T> entityClass, Bson filter);
 
-    <T> List<T> find(Class<T> entityClass, Bson filter, Bson sort, Integer skip, Integer limit);
+    <T> List<T> find(Class<T> entityClass, Query query);
 
     <T> List<T> find(Class<T> entityClass, Bson filter);
 

@@ -6,6 +6,7 @@ import app.user.domain.User;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import core.framework.api.mongo.Mongo;
+import core.framework.api.mongo.Query;
 import org.bson.BsonDocument;
 import org.bson.types.ObjectId;
 
@@ -24,11 +25,14 @@ public class UserService {
     }
 
     public User find(ObjectId id) {
-        return mongo.findOne(User.class, id).get();
+        return mongo.get(User.class, id).get();
     }
 
     public List<User> findByStatus(Status status) {
-        return mongo.find(User.class, Filters.eq("status", status.toString()), Sorts.ascending("name"), null, null);
+        Query query = new Query();
+        query.filter = Filters.eq("status", status.toString());
+        query.sort = Sorts.ascending("name");
+        return mongo.find(User.class, query);
     }
 
     public List<MongoUserAggregateView> aggregate() {

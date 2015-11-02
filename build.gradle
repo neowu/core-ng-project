@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '3.7.5'
+    version = '3.7.6'
 }
 
 def awsVersion = '1.10.27'
@@ -130,7 +130,7 @@ project(':demo-service') {
         testRuntime(
                 'org.hsqldb:hsqldb:2.3.3',
                 'org.codehaus.groovy:groovy-all:2.4.4',  // for elastic search script test
-                'com.github.fakemongo:fongo:2.0.1'
+                'com.github.fakemongo:fongo:2.0.3'
         )
     }
 }

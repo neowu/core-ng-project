@@ -13,6 +13,7 @@ import com.mongodb.client.result.UpdateResult;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.mongo.Collection;
 import core.framework.api.mongo.Mongo;
+import core.framework.api.mongo.Query;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
@@ -126,8 +127,17 @@ public final class MongoImpl implements Mongo {
     }
 
     @Override
-    public <T> Optional<T> findOne(Class<T> entityClass, Object id) {
-        return findOne(entityClass, Filters.eq("_id", id));
+    public <T> Optional<T> get(Class<T> entityClass, Object id) {
+        StopWatch watch = new StopWatch();
+        try {
+            T result = collection(entityClass).find(Filters.eq("_id", id)).first();
+            return Optional.ofNullable(result);
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("mongo", elapsedTime);
+            logger.debug("get, entityClass={}, id={}, elapsedTime={}", entityClass.getName(), id, elapsedTime);
+            checkSlowQuery(elapsedTime);
+        }
     }
 
     @Override
@@ -153,34 +163,54 @@ public final class MongoImpl implements Mongo {
     }
 
     @Override
-    public <T> List<T> find(Class<T> entityClass, Bson filter, Bson sort, Integer skip, Integer limit) {
+    public <T> List<T> find(Class<T> entityClass, Query query) {
         StopWatch watch = new StopWatch();
         List<T> results = Lists.newArrayList();
         try {
-            FindIterable<T> query = collection(entityClass)
-                .find(filter == null ? new BsonDocument() : filter);
+            FindIterable<T> collection = collection(entityClass)
+                .find(query.filter == null ? new BsonDocument() : query.filter);
+            if (query.projection != null) collection.projection(query.projection);
+            if (query.sort != null) collection.sort(query.sort);
+            if (query.skip != null) collection.skip(query.skip);
+            if (query.limit != null) collection.limit(query.limit);
 
-            if (sort != null) query.sort(sort);
-            if (skip != null) query.skip(skip);
-            if (limit != null) query.limit(limit);
-
-            for (T document : query) {
+            for (T document : collection) {
                 results.add(document);
             }
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
-            logger.debug("find, entityClass={}, filter={}, sort={}, skip={}, limit={}, elapsedTime={}", entityClass.getName(), filter, sort, skip, limit, elapsedTime);
+            logger.debug("find, entityClass={}, filter={}, projection={}, sort={}, skip={}, limit={}, elapsedTime={}",
+                entityClass.getName(),
+                query.filter,
+                query.projection,
+                query.sort,
+                query.skip,
+                query.limit,
+                elapsedTime);
             checkSlowQuery(elapsedTime);
-            if (results.size() > tooManyRowsReturnedThreshold)
-                logger.warn("too many rows returned, returnedRows={}", results.size());
+            checkTooManyRowsReturned(results.size());
         }
     }
 
     @Override
     public <T> List<T> find(Class<T> entityClass, Bson filter) {
-        return find(entityClass, filter, null, null, null);
+        StopWatch watch = new StopWatch();
+        List<T> results = Lists.newArrayList();
+        try {
+            FindIterable<T> collection = collection(entityClass).find(filter == null ? new BsonDocument() : filter);
+            for (T document : collection) {
+                results.add(document);
+            }
+            return results;
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("mongo", elapsedTime);
+            logger.debug("find, entityClass={}, filter={}, elapsedTime={}", entityClass.getName(), filter, elapsedTime);
+            checkSlowQuery(elapsedTime);
+            checkTooManyRowsReturned(results.size());
+        }
     }
 
     @Override
@@ -271,6 +301,11 @@ public final class MongoImpl implements Mongo {
     private void checkSlowQuery(long elapsedTime) {
         if (elapsedTime > slowQueryThresholdInMs)
             logger.warn("slow query detected");
+    }
+
+    private <T> void checkTooManyRowsReturned(int size) {
+        if (size > tooManyRowsReturnedThreshold)
+            logger.warn("too many rows returned, returnedRows={}", size);
     }
 
     private <T> MongoCollection<T> collection(Class<T> entityClass) {

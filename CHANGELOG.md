@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.7.6 (11/2/2015 - )
+* mongo: added get(id) method to replace findOne()
+* mongo: added Query to support complex query
+
 ### 3.7.5 (11/2/2015)
 * search: update to elasticsearch 2.0
 * lib: update undertow to 1.3.4, jackson to 2.6.3
