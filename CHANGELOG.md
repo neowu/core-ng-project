@@ -1,6 +1,6 @@
 ## Change log
 
-### 3.7.6 (11/2/2015 - )
+### 3.7.6 (11/2/2015 - 11/3/2015)
 * mongo: added get(id) method to replace findOne()
 * mongo: added Query to support complex query
 
