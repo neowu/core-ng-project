@@ -19,14 +19,13 @@ import java.util.function.Function;
  */
 public class TypeValidator {
     public final Type type;
+    private final Set<Class<?>> visitedClasses = Sets.newHashSet();
     public boolean allowTopLevelList;
     public boolean allowTopLevelValue;
     public boolean allowChildObject;
     public boolean allowChildListAndMap;
     public Function<Class, Boolean> allowedValueClass;
     public TypeVisitor visitor;
-
-    private final Set<Class<?>> visitedClasses = Sets.newHashSet();
 
     public TypeValidator(Type type) {
         this.type = type;
@@ -118,7 +117,7 @@ public class TypeValidator {
         }
         Constructor[] constructors = objectClass.getDeclaredConstructors();
         if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
-            throw Exceptions.error("class must contain only one public default constructor, constructors={}", Arrays.toString(constructors));
+            throw Exceptions.error("class must contain only one public default constructor, class={}, constructors={}", objectClass.getCanonicalName(), Arrays.toString(constructors));
         }
     }
 
