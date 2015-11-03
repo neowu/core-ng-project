@@ -54,7 +54,7 @@ project(':core-ng-test') {
     dependencies {
         provided(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                'com.github.fakemongo:fongo:2.0.1@jar',
+                'com.github.fakemongo:fongo:2.0.3@jar',
                 'org.hsqldb:hsqldb:2.3.3'
         )
         compile(
