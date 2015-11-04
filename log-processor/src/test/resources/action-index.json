@@ -5,7 +5,10 @@
     "action": {
       "_ttl": {
         "enabled": true,
-        "default": "90d"
+        "default": "15d"
+      },
+      "_all": {
+        "enabled": false
       },
       "properties": {
         "date": {
