@@ -102,7 +102,7 @@ public class Attribute {
         parent.addStaticContent(" ");
         parent.addStaticContent(name.substring(2));
         parent.addStaticContent("=\"");
-        if ("href".equals(name)) {
+        if ("c:href".equals(name)) {
             parent.add(new URLFragment(value, context, location));
         } else {
             parent.add(new TextContentFragment(value, context, location));

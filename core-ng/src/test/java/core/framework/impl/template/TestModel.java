@@ -25,4 +25,8 @@ public class TestModel {
     public Boolean booleanMethod() {
         return true;
     }
+
+    public String url() {
+        return "/test";
+    }
 }
