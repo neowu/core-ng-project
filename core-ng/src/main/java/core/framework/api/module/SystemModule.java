@@ -18,6 +18,8 @@ public final class SystemModule extends Module {
     protected void initialize() {
         loadProperties(propertyFileName);
 
+        property("sys.http.port").ifPresent(port -> http().port(Integer.parseInt(port)));
+
         property("sys.cache.host").ifPresent(host -> {
             if ("local".equals(host)) {
                 cache().local();

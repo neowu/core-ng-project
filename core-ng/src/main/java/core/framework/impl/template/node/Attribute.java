@@ -8,6 +8,7 @@ import core.framework.impl.template.fragment.ContainerFragment;
 import core.framework.impl.template.fragment.EmptyAttributeFragment;
 import core.framework.impl.template.fragment.HTMLContentFragment;
 import core.framework.impl.template.fragment.TextContentFragment;
+import core.framework.impl.template.fragment.URLFragment;
 import core.framework.impl.template.parser.HTMLParser;
 import core.framework.impl.template.source.TemplateSource;
 
@@ -101,7 +102,11 @@ public class Attribute {
         parent.addStaticContent(" ");
         parent.addStaticContent(name.substring(2));
         parent.addStaticContent("=\"");
-        parent.add(new TextContentFragment(value, context, location));
+        if ("href".equals(name)) {
+            parent.add(new URLFragment(value, context, location));
+        } else {
+            parent.add(new TextContentFragment(value, context, location));
+        }
         parent.addStaticContent("\"");
     }
 
@@ -115,7 +120,7 @@ public class Attribute {
                 break;
             case "c:msg":
                 if (context.message == null)
-                    throw Exceptions.error("c:msg must not be used without messages, location={}", location);
+                    throw Exceptions.error("c:msg must be used with messages, location={}", location);
                 String message = context.message.message(value, context.language).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
                 parent.addStaticContent(message);
                 break;

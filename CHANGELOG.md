@@ -1,5 +1,10 @@
 ## Change log
 
+### 3.7.7 (11/4/2015)
+* config: support sys.http.port
+* template: support i18n message with hierarchy, "en_US" fall back to "en"
+* template: support dynamic href
+
 ### 3.7.6 (11/2/2015 - 11/3/2015)
 * mongo: added get(id) method to replace findOne()
 * mongo: added Query to support complex query
