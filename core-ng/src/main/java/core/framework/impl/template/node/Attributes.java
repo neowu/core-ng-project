@@ -13,8 +13,8 @@ import java.util.Map;
  * @author neo
  */
 public class Attributes {
+    public final Map<String, Attribute> attributes = Maps.newLinkedHashMap();
     private final String tagName;
-    private final Map<String, Attribute> attributes = Maps.newLinkedHashMap();
 
     public Attributes(String tagName) {
         this.tagName = tagName;

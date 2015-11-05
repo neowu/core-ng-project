@@ -1,6 +1,7 @@
 package core.framework.impl.template.parser;
 
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
 import core.framework.impl.template.node.Attribute;
 import core.framework.impl.template.node.Comment;
@@ -13,11 +14,14 @@ import core.framework.impl.template.source.TemplateSource;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Set;
 
 /**
  * @author neo
  */
 public class HTMLParser {
+    private final Set<String> voidElements = Sets.newHashSet("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
+
     private final HTMLLexer lexer;
     private final Deque<ContainerNode> stack = new ArrayDeque<>();
 
@@ -25,6 +29,7 @@ public class HTMLParser {
         this.lexer = new HTMLLexer(source.name(), source.content());
     }
 
+    // only support subnet of HTML, which means enforce strict and consistence rules
     public Document parse() {
         Document document = new Document();
         stack.push(document);
@@ -48,6 +53,8 @@ public class HTMLParser {
                 case END_TAG:
                     String endTag = lexer.currentToken();
                     String endTagName = validateTagName(endTag.substring(2, endTag.length() - 1));
+                    if (voidElements.contains(endTagName))
+                        throw Exceptions.error("void element must not have close tag, tag={}, location={}", endTagName, lexer.currentLocation());
                     closeTag(endTagName);
                     break;
                 default:
@@ -68,10 +75,9 @@ public class HTMLParser {
                 case EOF:
                     return;
                 case START_TAG_END_CLOSE:
-                    currentElement.startTagClosed = true;
-                    return;
+                    throw Exceptions.error("start tag must not self-closed, non void element must not be self-closed, and we recommend not closing void element, tag={}, location={}", tagName, lexer.currentLocation());
                 case START_TAG_END:
-                    stack.push(currentElement);
+                    if (!voidElements.contains(tagName)) stack.push(currentElement);
                     if ("script".equals(currentElement.name) || "style".equals(currentElement.name)) {
                         HTMLTokenType contentType = lexer.nextScriptToken(currentElement.name);
                         if (contentType == HTMLTokenType.TEXT) addChild(new Text(lexer.currentToken()));
@@ -113,8 +119,9 @@ public class HTMLParser {
 
     private String validateTagName(String name) {
         for (int i = 0; i < name.length(); i++) {
-            if (Strings.isUpperCase(name.charAt(i)))
-                throw Exceptions.error("tag name must be in lower case, name={}, location={}", name, lexer.currentLocation());
+            char ch = name.charAt(i);
+            if (!(Strings.isLowerCase(ch) || (ch >= '0' && ch <= '9')))
+                throw Exceptions.error("tag name must only contain lower case letter or digit, name={}, location={}", name, lexer.currentLocation());
         }
         return name;
     }

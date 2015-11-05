@@ -8,7 +8,7 @@ import java.util.List;
  * @author neo
  */
 public abstract class ContainerNode implements Node {
-    protected final List<Node> nodes = Lists.newArrayList();
+    public final List<Node> nodes = Lists.newArrayList();
 
     public void add(Node node) {
         this.nodes.add(node);

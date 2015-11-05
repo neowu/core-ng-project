@@ -117,6 +117,11 @@ public class HTMLLexer {
         reset();
     }
 
+    private boolean isStartTag(int index) {
+        if (index + 1 >= html.length()) return false;
+        return html.charAt(index) == '<' && Character.isLetter(html.charAt(index + 1));
+    }
+
     private int findStartTagLength() {
         for (int i = currentIndex + 1; i < html.length(); i++) {
             char ch = html.charAt(i);
@@ -175,11 +180,6 @@ public class HTMLLexer {
             }
         }
         throw Exceptions.error("attr value is invalid, location={}", currentLocation());
-    }
-
-    private boolean isStartTag(int index) {
-        if (index + 1 >= html.length()) return false;
-        return html.charAt(index) == '<' && Character.isLetter(html.charAt(index + 1));
     }
 
     private boolean match(int index, String token) {

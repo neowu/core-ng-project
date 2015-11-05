@@ -13,18 +13,14 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * provide ws interface to send queue message for dev and prod troubleshoot?
 * general retry and throttling?
 * webservice: client retry on network issue?
-* template: "map" support?
 * website static content security check, (in server env, this is handled by nginx directly)
-* template security check, escaping and etc
 * db pool: actively check/close connection before using from transactionManager?
 * validator: annotation for website, like @Pattern or @SafeString?
-* webservice: @Version to let client pass thru header for action log?
 * cm: config management, dynamic update properties?
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
 * db: batch insert/update auto convert to small batch like 3000?
-* web: rewrite undertow built-in form/multi part parser for seamless integration and exception handling?
 * review/refactory/unit-test all packages (final/encapsulation/etc)
-* template: unit test html parser
+* template security check, escaping and etc
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)

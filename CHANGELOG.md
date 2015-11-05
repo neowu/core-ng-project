@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.7.8 (11/5/2015)
+* template: refactory html parser, html validation, void element
+
 ### 3.7.7 (11/4/2015)
 * config: support sys.http.port
 * template: support i18n message with hierarchy, "en_US" fall back to "en"

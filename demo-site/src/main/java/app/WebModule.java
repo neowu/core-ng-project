@@ -29,7 +29,7 @@ public class WebModule extends Module {
         site().staticContent("/favicon.ico");
         site().staticContent("/robots.txt");
         site().message().loadProperties("messages/main.properties");
-        site().message().loadProperties("messages/main_zh_CN.properties");
+        site().message().loadProperties("messages/main_zh.properties");
         site().message().language(request -> Optional.of("zh_CN"));
 
         site().template("/template/index.html", IndexPage.class);

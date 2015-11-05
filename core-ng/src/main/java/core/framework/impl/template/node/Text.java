@@ -8,7 +8,7 @@ import core.framework.impl.template.source.TemplateSource;
  * @author neo
  */
 public class Text implements Node {
-    private final String content;
+    public final String content;
 
     public Text(String content) {
         this.content = content;

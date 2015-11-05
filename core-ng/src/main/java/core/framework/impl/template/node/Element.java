@@ -12,7 +12,6 @@ import core.framework.impl.template.source.TemplateSource;
 public class Element extends ContainerNode {
     public final Attributes attributes;
     public final String name;
-    public boolean startTagClosed;
     public boolean hasEndTag;
 
     public Element(String name) {
@@ -59,8 +58,7 @@ public class Element extends ContainerNode {
     }
 
     private void buildStaticContent(ContainerFragment parent, TemplateMetaContext context, TemplateSource source) {
-        if (startTagClosed) parent.addStaticContent("/>");
-        else parent.addStaticContent(">");
+        parent.addStaticContent(">");
 
         for (Node node : nodes) {
             node.buildTemplate(parent, context, source);
