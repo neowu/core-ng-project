@@ -29,7 +29,7 @@ public class ValueNotNullValidatorTest {
         public Map<String, ChildBean> field3;
     }
 
-    static class ChildBean {
+    private static class ChildBean {
     }
 
     @Test

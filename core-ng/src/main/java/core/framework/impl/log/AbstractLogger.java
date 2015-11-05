@@ -9,7 +9,7 @@ import org.slf4j.Marker;
 abstract class AbstractLogger implements Logger {
     private final String name;
 
-    public AbstractLogger(String name) {
+    AbstractLogger(String name) {
         this.name = name;
     }
 

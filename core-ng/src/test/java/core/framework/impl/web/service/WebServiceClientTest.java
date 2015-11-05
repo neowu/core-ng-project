@@ -17,8 +17,8 @@ import static org.mockito.Mockito.verify;
  * @author neo
  */
 public class WebServiceClientTest {
-    WebServiceClient webServiceClient;
-    HTTPRequest request;
+    private WebServiceClient webServiceClient;
+    private HTTPRequest request;
 
     @Before
     public void prepare() {

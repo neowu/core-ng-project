@@ -61,7 +61,7 @@ public final class ActionLogger {
         }
     }
 
-    String actionLogMessage(ActionLog log) {
+    private String actionLogMessage(ActionLog log) {
         StringBuilder builder = new StringBuilder(256);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(log.startTime))
             .append(LOG_SPLITTER)

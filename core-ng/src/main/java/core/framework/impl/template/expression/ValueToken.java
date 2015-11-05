@@ -3,7 +3,7 @@ package core.framework.impl.template.expression;
 /**
  * @author neo
  */
-public class ValueToken implements Token {
+class ValueToken implements Token {
     final String value;
     final Class<?> type;
 

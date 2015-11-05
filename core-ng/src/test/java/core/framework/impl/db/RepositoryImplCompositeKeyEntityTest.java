@@ -40,7 +40,7 @@ public class RepositoryImplCompositeKeyEntityTest {
         entity.id1 = "id1";
         entity.id2 = "id2";
         entity.booleanField = true;
-        entity.longField = 1l;
+        entity.longField = 1L;
 
         repository.insert(entity);
 
@@ -58,10 +58,10 @@ public class RepositoryImplCompositeKeyEntityTest {
         entity.id1 = "id1";
         entity.id2 = "id2";
         entity.booleanField = true;
-        entity.longField = 1l;
+        entity.longField = 1L;
         repository.insert(entity);
 
-        entity.longField = 2l;
+        entity.longField = 2L;
         repository.update(entity);
 
         CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).get();

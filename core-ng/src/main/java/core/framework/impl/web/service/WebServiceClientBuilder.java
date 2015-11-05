@@ -20,8 +20,8 @@ import static core.framework.impl.code.CodeBuilder.typeVariableLiteral;
  * @author neo
  */
 public class WebServiceClientBuilder<T> {
-    final Class<T> serviceInterface;
-    final WebServiceClient client;
+    private final Class<T> serviceInterface;
+    private final WebServiceClient client;
 
     public WebServiceClientBuilder(Class<T> serviceInterface, WebServiceClient client) {
         this.serviceInterface = serviceInterface;

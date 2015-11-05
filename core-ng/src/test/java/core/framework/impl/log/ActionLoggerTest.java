@@ -8,7 +8,7 @@ import org.junit.Test;
  * @author neo
  */
 public class ActionLoggerTest {
-    ActionLogger actionLogger;
+    private ActionLogger actionLogger;
 
     @Before
     public void createActionLogger() {

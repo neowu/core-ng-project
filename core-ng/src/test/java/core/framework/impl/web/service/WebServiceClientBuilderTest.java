@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
  * @author neo
  */
 public class WebServiceClientBuilderTest {
-    WebServiceClient webServiceClient;
+    private WebServiceClient webServiceClient;
 
     @Before
     public void prepare() {
