@@ -12,7 +12,7 @@ def jacksonVersion = '2.6.3'
 def redisVersion = '2.7.2'
 def mongoVersion = '3.0.4'
 def elasticVersion = '2.0.0'
-def rabbitVersion = '3.5.4'
+def rabbitVersion = '3.5.6'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
