@@ -1,4 +1,4 @@
-package app.product.web;
+package app.product.api;
 
 /**
  * @author neo

@@ -115,22 +115,10 @@ project(':demo-service') {
 
     dependencies {
         compile(
-                project(':core-ng'),
-                "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "org.elasticsearch:elasticsearch:${elasticVersion}"
-        )
-        runtime(
-                "com.rabbitmq:amqp-client:${rabbitVersion}",
-                "redis.clients:jedis:${redisVersion}",
-                'mysql:mysql-connector-java:5.1.36'
+                project(':core-ng')
         )
         testCompile(
                 project(':core-ng-test')
-        )
-        testRuntime(
-                'org.hsqldb:hsqldb:2.3.3',
-                'org.codehaus.groovy:groovy-all:2.4.4',  // for elastic search script test
-                'com.github.fakemongo:fongo:2.0.3'
         )
     }
 }

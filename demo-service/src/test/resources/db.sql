@@ -1,1 +1,1 @@
-INSERT INTO product (name, price) VALUES ('product1', 12.0);
+INSERT INTO product (name, description) VALUES ('product1', 'desc1');

@@ -1,24 +1,27 @@
-package app.product.domain;
+package app.product.api;
 
-import core.framework.api.queue.Message;
 import core.framework.api.validate.NotNull;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import java.time.LocalDateTime;
 
 /**
  * @author neo
  */
-@Message(name = "product_request")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class CreateProductRequest {
+public class ProductView {
     @XmlElement(name = "id")
     public Integer id;
+
     @NotNull(message = "name is required")
     @XmlElement(name = "name")
     public String name;
 
-    @XmlElement(name = "finish")
-    public Boolean finish;
+    @XmlElement(name = "desc")
+    public String description;
+
+    @XmlElement(name = "created_time")
+    public LocalDateTime createdTime;
 }

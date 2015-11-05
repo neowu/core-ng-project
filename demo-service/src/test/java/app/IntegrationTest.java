@@ -10,5 +10,4 @@ import org.junit.runner.RunWith;
 @RunWith(IntegrationTestRunner.class)
 @Context(module = TestModule.class)
 public abstract class IntegrationTest {
-
 }
