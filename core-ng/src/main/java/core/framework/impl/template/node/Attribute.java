@@ -3,7 +3,6 @@ package core.framework.impl.template.node;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Strings;
 import core.framework.impl.template.TemplateMetaContext;
-import core.framework.impl.template.fragment.CDNFragment;
 import core.framework.impl.template.fragment.ContainerFragment;
 import core.framework.impl.template.fragment.EmptyAttributeFragment;
 import core.framework.impl.template.fragment.HTMLContentFragment;
@@ -76,16 +75,16 @@ public class Attribute {
         addCDNAttribute(targetAttributeName, parent, context);
     }
 
-    void addCDNAttribute(String targetAttributeName, ContainerFragment parent, TemplateMetaContext context) {
+    void addCDNAttribute(String attributeName, ContainerFragment parent, TemplateMetaContext context) {
         if (isDynamic()) {
             parent.addStaticContent(" ");
-            parent.addStaticContent(targetAttributeName);
+            parent.addStaticContent(attributeName);
             parent.addStaticContent("=");
-            parent.add(new CDNFragment(value, context, location));
+            parent.add(new URLFragment(value, context, true, location));
         } else {
             if (context.cdn != null) {  // expand cdn during compiling
                 parent.addStaticContent(" ");
-                parent.addStaticContent(targetAttributeName);
+                parent.addStaticContent(attributeName);
                 parent.addStaticContent("=");
                 parent.addStaticContent(context.cdn.url(value));
             } else {
@@ -101,13 +100,14 @@ public class Attribute {
     void addValueAttribute(ContainerFragment parent, TemplateMetaContext context) {
         parent.addStaticContent(" ");
         parent.addStaticContent(name.substring(2));
-        parent.addStaticContent("=\"");
         if ("c:href".equals(name)) {
-            parent.add(new URLFragment(value, context, location));
+            parent.addStaticContent("=");
+            parent.add(new URLFragment(value, context, false, location));
         } else {
+            parent.addStaticContent("=\"");
             parent.add(new TextContentFragment(value, context, location));
+            parent.addStaticContent("\"");
         }
-        parent.addStaticContent("\"");
     }
 
     void addDynamicContent(ContainerFragment parent, TemplateMetaContext context, TemplateSource source) {

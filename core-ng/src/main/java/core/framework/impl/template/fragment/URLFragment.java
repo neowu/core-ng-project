@@ -10,29 +10,54 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public class URLFragment implements Fragment {  // this is for dynamic href only, static href won't be touched during compilation
+public class URLFragment implements Fragment {  // this is for dynamic href/src only, static href won't be processed during compilation
     private final Logger logger = LoggerFactory.getLogger(URLFragment.class);
 
     private final ExpressionHolder expression;
     private final String location;
+    private final boolean cdn;
 
-    public URLFragment(String expression, TemplateMetaContext context, String location) {
+    public URLFragment(String expression, TemplateMetaContext context, boolean cdn, String location) {
         this.expression = new ExpressionBuilder(expression, context, location).build();
+        this.cdn = cdn;
         this.location = location;
     }
 
     @Override
     public void process(StringBuilder builder, TemplateContext context) {
         String url = String.valueOf(expression.eval(context));
-        builder.append(sanitize(url));
+        builder.append(url(url, context));
     }
 
-    private String sanitize(String url) {
-        //TODO: better way to prevent XSS? href should be more strict than cdn
-        if (url.contains("javascript:") || url.contains("<") || url.contains(">") || url.contains(" ")) {
+    private String url(String url, TemplateContext context) {
+        if (!valid(url)) {
             logger.warn("illegal url detected, url={}, location={}", url, location);
             return "";
         }
-        return url;
+        return cdn ? context.cdn.url(url) : url;
+    }
+
+    private boolean valid(String url) {
+        //TODO: better way to prevent XSS?
+        int length = url.length();
+        if (length == 0) return false;
+        if (url.contains("javascript:")) return false;
+        for (int i = 0; i < length; i++) {
+            char ch = url.charAt(i);
+            if (Character.isWhitespace(ch)) return false;
+            switch (ch) {
+                case '<':
+                    return false;
+                case '>':
+                    return false;
+                case '\'':
+                    return false;
+                case '"':
+                    return false;
+                default:
+                    break;
+            }
+        }
+        return true;
     }
 }

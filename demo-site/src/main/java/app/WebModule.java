@@ -30,7 +30,7 @@ public class WebModule extends Module {
         site().staticContent("/robots.txt");
         site().message().loadProperties("messages/main.properties");
         site().message().loadProperties("messages/main_zh.properties");
-        site().message().language(request -> Optional.of("zh_CN"));
+        site().message().language(request -> Optional.of("zh"));
 
         site().template("/template/index.html", IndexPage.class);
         IndexController index = bind(IndexController.class);
