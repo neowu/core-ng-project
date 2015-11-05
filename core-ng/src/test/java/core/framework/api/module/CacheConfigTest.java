@@ -9,7 +9,7 @@ import org.junit.Test;
  * @author neo
  */
 public class CacheConfigTest {
-    CacheConfig config;
+    private CacheConfig config;
 
     @Before
     public void createCacheConfig() {

@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class EntityEncoderBuilder<T> {
+class EntityEncoderBuilder<T> {
     final Map<String, String> methods = new LinkedHashMap<>();
     private final Class<T> entityClass;
     private final String helper = EntityCodecHelper.class.getCanonicalName();

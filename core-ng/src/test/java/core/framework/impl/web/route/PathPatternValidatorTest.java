@@ -1,5 +1,6 @@
 package core.framework.impl.web.route;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -11,7 +12,12 @@ public class PathPatternValidatorTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    PathPatternValidator validator = new PathPatternValidator();
+    private PathPatternValidator validator;
+
+    @Before
+    public void createPathPatternValidator() {
+        validator = new PathPatternValidator();
+    }
 
     @Test
     public void duplicatedVariable() {

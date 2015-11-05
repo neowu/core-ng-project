@@ -19,7 +19,7 @@ public class RequestBodyReader implements ChannelListener<StreamSourceChannel> {
 
     private final HttpServerExchange exchange;
     private final HTTPServerHandler handler;
-    private ByteBuf body;
+    private final ByteBuf body;
     private boolean complete;
 
     public RequestBodyReader(HttpServerExchange exchange, HTTPServerHandler handler) {

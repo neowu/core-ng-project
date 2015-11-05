@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class Templates {
+class Templates {
     public HTMLTemplate defaultTemplate;
     private Map<String, HTMLTemplate> languageTemplates;
 

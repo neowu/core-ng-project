@@ -13,7 +13,7 @@ import org.xnio.channels.StreamSourceChannel;
 /**
  * @author neo
  */
-public class HTTPServerIOHandler implements HttpHandler {
+class HTTPServerIOHandler implements HttpHandler {
     private final FormParserFactory formParserFactory;
     private final HTTPServerHandler handler;
 

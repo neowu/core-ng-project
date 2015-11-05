@@ -21,36 +21,8 @@ import static org.mockito.Mockito.when;
  * @author neo
  */
 public class ServiceControllerBuilderTest {
-    public static class TestWebServiceImpl implements TestWebService {
-        @Override
-        public TestResponse get(Integer id) {
-            assertEquals(1, (int) id);
-
-            TestResponse response = new TestResponse();
-            response.intField = 2;
-            return response;
-        }
-
-        @Override
-        public void create(Integer id, TestRequest request) {
-            assertEquals(1, (int) id);
-            assertEquals("value", request.stringField);
-        }
-
-        @Override
-        public void delete(String id) {
-
-        }
-
-        @Override
-        public List<TestResponse> batch(List<TestRequest> requests) {
-            assertEquals(1, requests.size());
-            return Lists.newArrayList();
-        }
-    }
-
-    Request request;
-    TestWebServiceImpl serviceImpl;
+    private Request request;
+    private TestWebServiceImpl serviceImpl;
 
     @Before
     public void prepare() {
@@ -101,5 +73,33 @@ public class ServiceControllerBuilderTest {
             .build();
         Response response = controller.execute(request);
         assertEquals(HTTPStatus.OK, response.status());
+    }
+
+    public static class TestWebServiceImpl implements TestWebService {
+        @Override
+        public TestResponse get(Integer id) {
+            assertEquals(1, (int) id);
+
+            TestResponse response = new TestResponse();
+            response.intField = 2;
+            return response;
+        }
+
+        @Override
+        public void create(Integer id, TestRequest request) {
+            assertEquals(1, (int) id);
+            assertEquals("value", request.stringField);
+        }
+
+        @Override
+        public void delete(String id) {
+
+        }
+
+        @Override
+        public List<TestResponse> batch(List<TestRequest> requests) {
+            assertEquals(1, requests.size());
+            return Lists.newArrayList();
+        }
     }
 }

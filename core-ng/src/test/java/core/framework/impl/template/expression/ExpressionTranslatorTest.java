@@ -2,13 +2,19 @@ package core.framework.impl.template.expression;
 
 import core.framework.impl.template.TemplateMetaContext;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author neo
  */
 public class ExpressionTranslatorTest {
-    ExpressionParser parser = new ExpressionParser();
+    private ExpressionParser parser;
+
+    @Before
+    public void createExpressionParser() {
+        parser = new ExpressionParser();
+    }
 
     @Test
     public void text() {

@@ -12,6 +12,11 @@ import java.time.LocalDateTime;
  * @author neo
  */
 public class DatabaseClassValidatorTest {
+    @Test
+    public void validateEntityClass() {
+        new DatabaseClassValidator(TestEntity.class).validateEntityClass();
+    }
+
     @Table(name = "table")
     public static class TestEntity {
         @PrimaryKey(autoIncrement = true)
@@ -27,10 +32,5 @@ public class DatabaseClassValidatorTest {
 
         @Column(name = "date_time_column")
         public LocalDateTime dateTimeColumn;
-    }
-
-    @Test
-    public void validateEntityClass() {
-        new DatabaseClassValidator(TestEntity.class).validateEntityClass();
     }
 }

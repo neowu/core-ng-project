@@ -14,7 +14,7 @@ import java.util.Optional;
  * @author neo
  */
 public class DatabaseImplTest {
-    static DatabaseImpl database;
+    private static DatabaseImpl database;
 
     @BeforeClass
     public static void createDatabase() {

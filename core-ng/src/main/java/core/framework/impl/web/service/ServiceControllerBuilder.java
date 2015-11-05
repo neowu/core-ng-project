@@ -23,10 +23,10 @@ import static core.framework.impl.code.CodeBuilder.typeVariableLiteral;
  * @author neo
  */
 public class ServiceControllerBuilder<T> {
-    final Class<T> serviceInterface;
-    final T service;
-    final Method method;
-    final HTTPStatus responseStatus;
+    private final Class<T> serviceInterface;
+    private final T service;
+    private final Method method;
+    private final HTTPStatus responseStatus;
 
     public ServiceControllerBuilder(Class<T> serviceInterface, T service, Method method) {
         this.serviceInterface = serviceInterface;

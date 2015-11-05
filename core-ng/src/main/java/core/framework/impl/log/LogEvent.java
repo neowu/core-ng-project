@@ -11,13 +11,13 @@ import java.time.format.DateTimeFormatter;
  */
 final class LogEvent {
     final LogLevel level;
-    final long time;
-    final String logger;
-    final String message;
-    final Object[] arguments;
-    final Throwable exception;
+    private final long time;
+    private final String logger;
+    private final String message;
+    private final Object[] arguments;
+    private final Throwable exception;
 
-    String logMessage;
+    private String logMessage;
 
     LogEvent(LogLevel level, long time, String logger, String message, Object[] arguments, Throwable exception) {
         this.level = level;

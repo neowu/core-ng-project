@@ -5,7 +5,7 @@ import core.framework.impl.template.TemplateMetaContext;
 /**
  * @author neo
  */
-public class ExpressionTranslator {
+class ExpressionTranslator {
     private final Token expression;
     private final TemplateMetaContext context;
 

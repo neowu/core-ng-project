@@ -11,7 +11,13 @@ import java.lang.management.MemoryMXBean;
  * @author neo
  */
 public class MemoryUsageController implements Controller {
-    MemoryUsage memoryUsage() {
+    @Override
+    public Response execute(Request request) throws Exception {
+        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        return Response.bean(memoryUsage());
+    }
+
+    private MemoryUsage memoryUsage() {
         MemoryUsage usage = new MemoryUsage();
         MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
         java.lang.management.MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
@@ -27,11 +33,5 @@ public class MemoryUsageController implements Controller {
         usage.nonHeapMax = nonHeapMemoryUsage.getMax();
 
         return usage;
-    }
-
-    @Override
-    public Response execute(Request request) throws Exception {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
-        return Response.bean(memoryUsage());
     }
 }

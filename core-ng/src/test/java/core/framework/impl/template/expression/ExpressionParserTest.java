@@ -1,6 +1,7 @@
 package core.framework.impl.template.expression;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -10,7 +11,12 @@ import static org.junit.Assert.assertThat;
  * @author neo
  */
 public class ExpressionParserTest {
-    ExpressionParser parser = new ExpressionParser();
+    private ExpressionParser parser;
+
+    @Before
+    public void createExpressionParser() {
+        parser = new ExpressionParser();
+    }
 
     @Test
     public void singleValue() {

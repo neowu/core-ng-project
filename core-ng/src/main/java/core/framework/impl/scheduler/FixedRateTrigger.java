@@ -14,7 +14,7 @@ import java.time.Duration;
 public class FixedRateTrigger extends Trigger {
     private final Logger logger = LoggerFactory.getLogger(FixedRateTrigger.class);
 
-    final Duration rate;
+    private final Duration rate;
 
     public FixedRateTrigger(String name, Job job, Duration rate) {
         super(name, job);

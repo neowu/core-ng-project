@@ -20,7 +20,7 @@ public class Validator {
         validate(instance, true);
     }
 
-    void validate(Object instance, boolean partial) {
+    private void validate(Object instance, boolean partial) {
         ValidationErrors errors = new ValidationErrors();
         validate(instance, errors, partial);
         if (errors.hasError())

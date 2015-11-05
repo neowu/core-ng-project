@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 /**
  * @author neo
  */
-public final class EntityIdHandlerBuilder<T> {
+final class EntityIdHandlerBuilder<T> {
     private final Class<T> entityClass;
     private final Field idField;
 

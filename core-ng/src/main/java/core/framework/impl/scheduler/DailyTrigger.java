@@ -13,7 +13,7 @@ import java.time.LocalTime;
 public class DailyTrigger extends Trigger {
     private final Logger logger = LoggerFactory.getLogger(DailyTrigger.class);
 
-    final LocalTime time;
+    private final LocalTime time;
 
     public DailyTrigger(String name, Job job, LocalTime time) {
         super(name, job);

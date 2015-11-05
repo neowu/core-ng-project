@@ -45,6 +45,10 @@ public class MongoConfig {
         mongo.slowQueryThreshold(slowQueryThreshold);
     }
 
+    public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
+        mongo.tooManyRowsReturnedThreshold = tooManyRowsReturnedThreshold;
+    }
+
     public void timeout(Duration timeout) {
         mongo.timeout(timeout);
     }

@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public interface SessionStore {
+interface SessionStore {
     Map<String, String> getAndRefresh(String sessionId, Duration sessionTimeout);
 
     void save(String sessionId, Map<String, String> sessionData, Duration sessionTimeout);

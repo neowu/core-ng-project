@@ -16,8 +16,8 @@ import java.util.UUID;
  * @author neo
  */
 public class RepositoryImplAssignedIdEntityTest {
-    static DatabaseImpl database;
-    static Repository<AssignedIdEntity> repository;
+    private static DatabaseImpl database;
+    private static Repository<AssignedIdEntity> repository;
 
     @BeforeClass
     public static void createDatabase() {

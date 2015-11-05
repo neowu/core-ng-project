@@ -14,6 +14,11 @@ import java.util.Map;
  * @author neo
  */
 public class MessageClassValidatorTest {
+    @Test
+    public void validate() {
+        new MessageClassValidator(TestMessage.class).validate();
+    }
+
     @Message(name = "test_message")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class TestMessage {
@@ -40,10 +45,5 @@ public class MessageClassValidatorTest {
     public static class TestChild {
         @XmlElement(name = "boolean_field")
         public Boolean booleanField;
-    }
-
-    @Test
-    public void validate() {
-        new MessageClassValidator(TestMessage.class).validate();
     }
 }

@@ -9,9 +9,9 @@ import java.util.Objects;
  * @author neo
  */
 public class ParameterizedTypeImpl implements ParameterizedType {
-    final Type rawType;
-    final Type[] arguments;
-    final Type ownerType;
+    private final Type rawType;
+    private final Type[] arguments;
+    private final Type ownerType;
 
     public ParameterizedTypeImpl(Class<?> rawType, Type[] arguments, Type ownerType) {
         this.rawType = rawType;

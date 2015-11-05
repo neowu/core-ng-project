@@ -15,8 +15,8 @@ import java.util.Optional;
  * @author neo
  */
 public class RepositoryImplAutoIncrementIdEntityTest {
-    static DatabaseImpl database;
-    static Repository<AutoIncrementIdEntity> repository;
+    private static DatabaseImpl database;
+    private static Repository<AutoIncrementIdEntity> repository;
 
     @BeforeClass
     public static void createDatabase() {

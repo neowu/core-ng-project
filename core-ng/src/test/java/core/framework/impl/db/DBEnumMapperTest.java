@@ -8,7 +8,7 @@ import org.junit.Test;
  * @author neo
  */
 public class DBEnumMapperTest {
-    DBEnumMapper<TestEnum> mapper;
+    private DBEnumMapper<TestEnum> mapper;
 
     @Before
     public void createDBEnumMapper() {

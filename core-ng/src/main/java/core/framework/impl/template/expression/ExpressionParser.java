@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 /**
  * @author neo
  */
-public class ExpressionParser {
+class ExpressionParser {
     private static final Pattern NUMBER_PATTERN = Pattern.compile("[\\d\\.]+");
     private static final Pattern METHOD_PATTERN = Pattern.compile("[a-z][a-zA-Z\\d]*");
     private static final Pattern FIELD_PATTERN = Pattern.compile("[a-z][a-zA-Z\\d]*");

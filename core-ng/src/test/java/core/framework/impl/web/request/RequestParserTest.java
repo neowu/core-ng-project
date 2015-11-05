@@ -1,6 +1,7 @@
 package core.framework.impl.web.request;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -9,7 +10,12 @@ import static org.junit.Assert.assertEquals;
  * @author neo
  */
 public class RequestParserTest {
-    RequestParser parser = new RequestParser();
+    private RequestParser parser;
+
+    @Before
+    public void createRequestParser() {
+        parser = new RequestParser();
+    }
 
     @Test
     public void clientIP() {

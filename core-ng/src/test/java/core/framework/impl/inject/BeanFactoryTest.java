@@ -14,42 +14,11 @@ import java.util.function.Supplier;
  * @author neo
  */
 public class BeanFactoryTest {
-    BeanFactory beanFactory;
+    private BeanFactory beanFactory;
 
     @Before
     public void createBeanFactory() {
         beanFactory = new BeanFactory();
-    }
-
-    static class Dependency1 {
-
-    }
-
-    static class Dependency2 {
-
-    }
-
-    static class Dependency3 {
-
-    }
-
-    static class Bean {
-        @Inject
-        Dependency1 dependency1;
-
-        Dependency2 dependency2;
-
-        final Dependency3 dependency3;
-
-        @Inject
-        public Bean(Dependency3 dependency3) {
-            this.dependency3 = dependency3;
-        }
-
-        @Inject
-        public void setDependency2(@Named("dep2") Dependency2 dependency2) {
-            this.dependency2 = dependency2;
-        }
     }
 
     @Test
@@ -69,5 +38,34 @@ public class BeanFactoryTest {
         beanFactory.bind(Types.list(String.class), null, new ArrayList<String>());
 
         beanFactory.bind(Types.supplier(String.class), null, (Supplier<String>) () -> null);
+    }
+
+    static class Dependency1 {
+
+    }
+
+    static class Dependency2 {
+
+    }
+
+    static class Dependency3 {
+
+    }
+
+    static class Bean {
+        final Dependency3 dependency3;
+        @Inject
+        Dependency1 dependency1;
+        Dependency2 dependency2;
+
+        @Inject
+        public Bean(Dependency3 dependency3) {
+            this.dependency3 = dependency3;
+        }
+
+        @Inject
+        public void setDependency2(@Named("dep2") Dependency2 dependency2) {
+            this.dependency2 = dependency2;
+        }
     }
 }

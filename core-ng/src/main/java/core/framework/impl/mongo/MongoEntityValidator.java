@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class MongoEntityValidator {
+class MongoEntityValidator {
     private final Map<Class<?>, Validator> validators = Maps.newHashMap();
 
     public void register(Class<?> entityClass) {

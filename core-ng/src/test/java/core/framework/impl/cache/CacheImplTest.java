@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
  * @author neo
  */
 public class CacheImplTest {
-    CacheStore cacheStore;
+    private CacheStore cacheStore;
 
     @Before
     public void prepare() {

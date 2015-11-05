@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 /**
  * @author neo
  */
-public class CacheTypeValidator {
+class CacheTypeValidator {
     private final TypeValidator validator;
 
     public CacheTypeValidator(Type instanceType) {

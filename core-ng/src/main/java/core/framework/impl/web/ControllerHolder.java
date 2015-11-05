@@ -27,7 +27,7 @@ public class ControllerHolder {
         this(controller, targetMethod, false);
     }
 
-    public ControllerHolder(Controller controller, Method targetMethod, boolean skipInterceptor) {
+    private ControllerHolder(Controller controller, Method targetMethod, boolean skipInterceptor) {
         this.controller = controller;
         this.skipInterceptor = skipInterceptor;
 

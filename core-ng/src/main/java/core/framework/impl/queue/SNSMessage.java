@@ -9,6 +9,8 @@ import javax.xml.bind.annotation.XmlElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SNSMessage {
+    @XmlElement(name = "MessageAttributes")
+    public final SNSMessageAttributes attributes = new SNSMessageAttributes();
     @XmlElement(name = "Type")
     public String type;
     @XmlElement(name = "MessageId")
@@ -21,8 +23,6 @@ public class SNSMessage {
     public String message;
     @XmlElement(name = "Timestamp")
     public String timestamp;
-    @XmlElement(name = "MessageAttributes")
-    public SNSMessageAttributes attributes = new SNSMessageAttributes();
 
     public static class SNSMessageAttributes {
         @XmlElement(name = SQSMessageListener.MESSAGE_ATTR_CLIENT_IP)

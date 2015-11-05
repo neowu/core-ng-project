@@ -8,7 +8,7 @@ import org.junit.Test;
  * @author neo
  */
 public class CDNManagerTest {
-    CDNManager manager;
+    private CDNManager manager;
 
     @Before
     public void createCDNManager() {

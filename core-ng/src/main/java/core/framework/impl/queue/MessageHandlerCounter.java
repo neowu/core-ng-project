@@ -7,11 +7,11 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author neo
  */
-public class MessageHandlerCounter {
+class MessageHandlerCounter {
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition condition = lock.newCondition();
-    int maxConcurrentHandlers = 10;
     private final AtomicInteger counter = new AtomicInteger(0);
+    int maxConcurrentHandlers = 10;
 
     public void waitUntilAvailable() throws InterruptedException {
         try {

@@ -16,7 +16,7 @@ import org.bson.types.ObjectId;
 /**
  * @author neo
  */
-public class EntityCodec<T> implements CollectibleCodec<T> {
+class EntityCodec<T> implements CollectibleCodec<T> {
     private final Class<T> entityClass;
     private final EntityEncoder<T> entityEncoder;
     private final EntityDecoder<T> entityDecoder;

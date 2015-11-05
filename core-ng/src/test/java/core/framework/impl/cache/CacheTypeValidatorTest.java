@@ -12,6 +12,21 @@ import java.util.Map;
  * @author neo
  */
 public class CacheTypeValidatorTest {
+    @Test
+    public void validate() {
+        new CacheTypeValidator(CacheItem.class).validate();
+    }
+
+    @Test
+    public void validateListType() {
+        new CacheTypeValidator(Types.list(CacheItem.class)).validate();
+    }
+
+    @Test
+    public void validateValueType() {
+        new CacheTypeValidator(String.class).validate();
+    }
+
     public static class CacheItem {
         public LocalDateTime dateTimeField;
 
@@ -28,20 +43,5 @@ public class CacheTypeValidatorTest {
 
     public static class CacheChildItem {
         public BigDecimal bigDecimalField = BigDecimal.ZERO;
-    }
-
-    @Test
-    public void validate() {
-        new CacheTypeValidator(CacheItem.class).validate();
-    }
-
-    @Test
-    public void validateListType() {
-        new CacheTypeValidator(Types.list(CacheItem.class)).validate();
-    }
-
-    @Test
-    public void validateValueType() {
-        new CacheTypeValidator(String.class).validate();
     }
 }

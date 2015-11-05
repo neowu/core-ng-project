@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
  * @author neo
  */
 public class TraceLoggerTest {
-    TraceLogger logger;
+    private TraceLogger logger;
 
     @Before
     public void createTraceLogger() {

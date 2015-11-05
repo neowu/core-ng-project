@@ -13,7 +13,7 @@ public class PropertiesTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    Properties properties;
+    private Properties properties;
 
     @Before
     public void createProperties() {

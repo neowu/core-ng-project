@@ -15,8 +15,8 @@ import java.util.regex.Pattern;
  */
 public class IfFragment extends ContainerFragment {
     private static final Pattern STATEMENT_PATTERN = Pattern.compile("((!)?)([#a-zA-Z1-9\\.\\(\\)]+)");
-    final ExpressionHolder expression;
-    final boolean reverse;
+    private final ExpressionHolder expression;
+    private final boolean reverse;
 
     public IfFragment(String statement, TemplateMetaContext context, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);

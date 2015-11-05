@@ -68,7 +68,7 @@ public class RequestParser {
         }
     }
 
-    void parseBody(RequestImpl request, HttpServerExchange exchange) throws Throwable {
+    private void parseBody(RequestImpl request, HttpServerExchange exchange) throws Throwable {
         RequestBodyReader.RequestBody body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
         if (body != null) {
             if (request.contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())) {
@@ -117,7 +117,7 @@ public class RequestParser {
         return hostPort;
     }
 
-    String requestURL(RequestImpl request, HttpServerExchange exchange) {
+    private String requestURL(RequestImpl request, HttpServerExchange exchange) {
         if (exchange.isHostIncludedInRequestURI()) {    // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
             return exchange.getRequestURI();
         } else {

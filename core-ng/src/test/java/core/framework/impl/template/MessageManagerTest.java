@@ -8,7 +8,7 @@ import org.junit.Test;
  * @author neo
  */
 public class MessageManagerTest {
-    MessageManager messageManager;
+    private MessageManager messageManager;
 
     @Before
     public void createMessageManager() {

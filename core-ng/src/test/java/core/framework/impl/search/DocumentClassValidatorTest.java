@@ -14,6 +14,11 @@ import java.util.Map;
  * @author neo
  */
 public class DocumentClassValidatorTest {
+    @Test
+    public void validate() {
+        new DocumentClassValidator(TestDocument.class).validate();
+    }
+
     @Index(index = "main", type = "test")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class TestDocument {
@@ -28,10 +33,5 @@ public class DocumentClassValidatorTest {
 
         @XmlElement(name = "map_field")
         public Map<String, String> mapField;
-    }
-
-    @Test
-    public void validate() {
-        new DocumentClassValidator(TestDocument.class).validate();
     }
 }

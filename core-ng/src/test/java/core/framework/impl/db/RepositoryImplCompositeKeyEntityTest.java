@@ -12,8 +12,8 @@ import org.junit.Test;
  * @author neo
  */
 public class RepositoryImplCompositeKeyEntityTest {
-    static DatabaseImpl database;
-    static Repository<CompositeKeyEntity> repository;
+    private static DatabaseImpl database;
+    private static Repository<CompositeKeyEntity> repository;
 
     @BeforeClass
     public static void createDatabase() {

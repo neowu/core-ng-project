@@ -5,7 +5,7 @@ import core.framework.api.util.Exceptions;
 /**
  * @author neo
  */
-public class HTMLLexer {
+class HTMLLexer {
     private final String name;
     private final String html;
 

@@ -4,8 +4,8 @@ package core.framework.impl.template.source;
  * @author neo
  */
 public final class StringTemplateSource implements TemplateSource {
-    public final String name;
-    public final String template;
+    private final String name;
+    private final String template;
 
     public StringTemplateSource(String name, String template) {
         this.name = name;

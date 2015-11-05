@@ -16,9 +16,9 @@ import java.security.PrivilegedAction;
  * @author neo
  */
 class ControllerInspector {
-    static final Method GET_CONSTANT_POOL;
-    static final Method CONTROLLER_METHOD;
-    static final int JDK_8_MINOR_VERSION;
+    private static final Method GET_CONSTANT_POOL;
+    private static final Method CONTROLLER_METHOD;
+    private static final int JDK_8_MINOR_VERSION;
 
     static {
         try {

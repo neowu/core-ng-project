@@ -7,6 +7,6 @@ import io.undertow.io.Sender;
 /**
  * @author neo
  */
-public interface BodyHandler {
+interface BodyHandler {
     void handle(ResponseImpl response, Sender sender, RequestImpl request);
 }
