@@ -1,5 +1,6 @@
 package core.framework.impl.web.site;
 
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Files;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
@@ -55,7 +56,8 @@ public class TemplateManagerImpl implements TemplateManager {
     public void add(String templatePath, Class<?> modelClass) {
         StopWatch watch = new StopWatch();
         try {
-            this.templates.put(templatePath, load(templatePath, modelClass));
+            Templates previous = this.templates.putIfAbsent(templatePath, load(templatePath, modelClass));
+            if (previous != null) throw Exceptions.error("template path is registered, templatePath={}", templatePath);
             if (webDirectory.localEnv) {
                 Path path = webDirectory.path(templatePath);
                 templateLastModifiedTimes.put(templatePath, Files.lastModified(path));
@@ -66,18 +68,19 @@ public class TemplateManagerImpl implements TemplateManager {
     }
 
     private HTMLTemplate get(String templatePath, Class<?> modelClass, Request request) {
-        Templates templates;
+        Templates templates = this.templates.get(templatePath);
+        if (templates == null)
+            throw Exceptions.error("template is not registered, please use site().template() to add template, templatePath={}", templatePath);
+
         if (webDirectory.localEnv) {
-            templates = this.templates.get(templatePath);
             Path path = webDirectory.path(templatePath);
-            if (templates == null || Files.lastModified(path).isAfter(templateLastModifiedTimes.get(templatePath))) {
+            if (Files.lastModified(path).isAfter(templateLastModifiedTimes.get(templatePath))) {
                 templateLastModifiedTimes.put(templatePath, Files.lastModified(path)); // put modified time first, then template, for zero cost to handle local threading
                 templates = load(templatePath, modelClass);
-                this.templates.putIfAbsent(templatePath, templates);
+                this.templates.put(templatePath, templates);
             }
-        } else {
-            templates = this.templates.computeIfAbsent(templatePath, key -> load(templatePath, modelClass));
         }
+
         return templates.get(language(request));
     }
 

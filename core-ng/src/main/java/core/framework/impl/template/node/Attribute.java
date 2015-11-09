@@ -59,8 +59,14 @@ public class Attribute {
         }
     }
 
-    boolean isEmptyAttribute() {
-        return "c:disabled".equals(name) || "c:checked".equals(name) || "c:selected".equals(name);
+    boolean isDynamicEmptyAttribute() {
+        return "c:checked".equals(name)
+            || "c:selected".equals(name)
+            || "c:disabled".equals(name)
+            || "c:readonly".equals(name)
+            || "c:multiple".equals(name)
+            || "c:ismap".equals(name)
+            || "c:defer".equals(name);
     }
 
     boolean isCDNAttribute(String tagName) {

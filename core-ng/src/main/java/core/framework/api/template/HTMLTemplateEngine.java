@@ -23,7 +23,7 @@ public final class HTMLTemplateEngine {
         StopWatch watch = new StopWatch();
         try {
             HTMLTemplate template = templates.get(name);
-            if (template == null) throw Exceptions.error("not found template, name={}", name);
+            if (template == null) throw Exceptions.error("template not found, name={}", name);
             return template.process(new TemplateContext(model));
         } finally {
             logger.debug("process, name={}, elapsedTime={}", name, watch.elapsedTime());
@@ -33,7 +33,8 @@ public final class HTMLTemplateEngine {
     public void add(String name, String template, Class<?> modelClass) {
         StopWatch watch = new StopWatch();
         try {
-            templates.put(name, new HTMLTemplateBuilder(new StringTemplateSource(name, template), modelClass).build());
+            HTMLTemplate previous = templates.putIfAbsent(name, new HTMLTemplateBuilder(new StringTemplateSource(name, template), modelClass).build());
+            if (previous != null) throw Exceptions.error("template is already added, name={}", name);
         } finally {
             logger.info("add, name={}, modelClass={}, elapsedTime={}", name, modelClass.getCanonicalName(), watch.elapsedTime());
         }

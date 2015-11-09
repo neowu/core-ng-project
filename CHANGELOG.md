@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.7.9 (11/9/2015)
+* template: template must register in config before using, enforce safety
+* template: validate empty attribute
+
 ### 3.7.8 (11/5/2015)
 * template: refactory html parser, html validation, void element
 

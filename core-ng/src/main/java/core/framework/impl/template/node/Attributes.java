@@ -32,10 +32,9 @@ public class Attributes {
 
             if (attribute.isCDNAttribute(tagName)) {
                 attribute.addCDNAttribute(parent, context);
-            } else if (attribute.isEmptyAttribute()) {
-                attribute.addEmptyAttribute(parent, context);
             } else if (attribute.isDynamic()) {
-                attribute.addValueAttribute(parent, context);
+                if (attribute.isDynamicEmptyAttribute()) attribute.addEmptyAttribute(parent, context);
+                else attribute.addValueAttribute(parent, context);
             } else {
                 attribute.addStaticContent(parent);
             }
@@ -54,7 +53,7 @@ public class Attributes {
             || "c:if".equals(name))
             return true;
 
-        return !attribute.isDynamic() && attributes.containsKey("c:" + name);
+        return !attribute.isDynamic() && attributes.containsKey("c:" + name);   // there is dynamic attribute to overwrite
     }
 
     public boolean containDynamicContent() {

@@ -3,6 +3,7 @@ package app;
 import app.web.IndexController;
 import app.web.IndexPage;
 import app.web.UploadController;
+import app.web.UploadPage;
 import app.web.WildcardController;
 import app.web.ajax.AJAXController;
 import app.web.interceptor.TestInterceptor;
@@ -33,6 +34,8 @@ public class WebModule extends Module {
         site().message().language(request -> Optional.of("zh"));
 
         site().template("/template/index.html", IndexPage.class);
+        site().template("/template/upload.html", UploadPage.class);
+
         IndexController index = bind(IndexController.class);
         route().get("/", index::index);
         route().get("/css/main.css", index::css);

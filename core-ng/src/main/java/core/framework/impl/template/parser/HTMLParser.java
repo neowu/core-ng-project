@@ -22,6 +22,9 @@ import java.util.Set;
 public class HTMLParser {
     private final Set<String> voidElements = Sets.newHashSet("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
 
+    // loose checking to cover common cases, precise checking will be like e.g. checked attribute on input tag can be boolean attribute
+    private final Set<String> booleanAttributes = Sets.newHashSet("checked", "selected", "disabled", "readonly", "multiple", "ismap", "defer");
+
     private final HTMLLexer lexer;
     private final Deque<ContainerNode> stack = new ArrayDeque<>();
 
@@ -75,7 +78,10 @@ public class HTMLParser {
                 case EOF:
                     return;
                 case START_TAG_END_CLOSE:
-                    throw Exceptions.error("start tag must not self-closed, non void element must not be self-closed, and we recommend not closing void element, tag={}, location={}", tagName, lexer.currentLocation());
+                    if (voidElements.contains(tagName))
+                        throw Exceptions.error("we recommend not closing void element, tag={}, location={}", tagName, lexer.currentLocation());
+                    else
+                        throw Exceptions.error("non void element must not be self-closed, tag={}, location={}", tagName, lexer.currentLocation());
                 case START_TAG_END:
                     if (!voidElements.contains(tagName)) stack.push(currentElement);
                     if ("script".equals(currentElement.name) || "style".equals(currentElement.name)) {
@@ -91,6 +97,10 @@ public class HTMLParser {
                 case ATTR_VALUE:
                     if (currentAttribute == null)
                         throw Exceptions.error("attr is invalid, location={}", lexer.currentLocation());
+
+                    if (booleanAttributes.contains(currentAttribute.name))
+                        throw Exceptions.error("we recommend not putting value for boolean attribute, attribute={}, location={}", currentAttribute.name, lexer.currentLocation());
+
                     String attrValue = lexer.currentToken();
                     if (attrValue.startsWith("=\"")) {
                         currentAttribute.value = attrValue.substring(2, attrValue.length() - 1);
