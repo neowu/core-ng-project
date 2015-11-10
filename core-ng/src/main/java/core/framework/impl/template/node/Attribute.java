@@ -1,7 +1,6 @@
 package core.framework.impl.template.node;
 
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.Strings;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.fragment.ContainerFragment;
 import core.framework.impl.template.fragment.EmptyAttributeFragment;
@@ -16,36 +15,20 @@ import core.framework.impl.template.source.TemplateSource;
  */
 public class Attribute {
     public final String name;
+    public final String tagName;
+    public final String location;
+
     public String value;
     public boolean hasDoubleQuote;
-    public String location;
 
-    public Attribute(String name) {
+    public Attribute(String name, String tagName, String location) {
         this.name = name;
+        this.tagName = tagName;
+        this.location = location;
     }
 
     public boolean isDynamic() {
         return name.startsWith("c:");
-    }
-
-    void validate(String tagName) {
-        if (isDynamic() && Strings.isEmpty(value)) {
-            throw Exceptions.error("dynamic attribute value must not be empty, attribute={}, location={}", name, location);
-        }
-
-        if (("link".equals(tagName) && "href".equals(name))
-            || ("script".equals(tagName) && "src".equals(name))
-            || ("img".equals(tagName) && "src".equals(name))) {
-            validateStaticResourceURL();
-        }
-    }
-
-    private void validateStaticResourceURL() {
-        if (!value.startsWith("http://")
-            && !value.startsWith("https://")
-            && value.startsWith("//")
-            && value.startsWith("/"))
-            throw Exceptions.error("static resource url attribute value must be either absolute or start with '/', value={}, location={}", value, location);
     }
 
     void addStaticContent(ContainerFragment parent) {
@@ -69,7 +52,7 @@ public class Attribute {
             || "c:defer".equals(name);
     }
 
-    boolean isCDNAttribute(String tagName) {
+    boolean isCDNAttribute() {
         if ("link".equals(tagName) && ("c:href".equals(name) || "href".equals(name))) return true;
         if ("script".equals(tagName) && ("c:src".equals(name) || "src".equals(name))) return true;
         if ("img".equals(tagName) && ("c:src".equals(name) || "src".equals(name))) return true;

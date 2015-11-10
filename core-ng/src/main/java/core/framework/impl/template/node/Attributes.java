@@ -14,11 +14,6 @@ import java.util.Map;
  */
 public class Attributes {
     public final Map<String, Attribute> attributes = Maps.newLinkedHashMap();
-    private final String tagName;
-
-    public Attributes(String tagName) {
-        this.tagName = tagName;
-    }
 
     public void add(Attribute attribute) {
         attributes.put(attribute.name, attribute);
@@ -30,7 +25,7 @@ public class Attributes {
         for (Attribute attribute : attributes.values()) {
             if (skip(attribute)) continue;
 
-            if (attribute.isCDNAttribute(tagName)) {
+            if (attribute.isCDNAttribute()) {
                 attribute.addCDNAttribute(parent, context);
             } else if (attribute.isDynamic()) {
                 if (attribute.isDynamicEmptyAttribute()) attribute.addEmptyAttribute(parent, context);
@@ -82,8 +77,6 @@ public class Attributes {
     }
 
     private void validate() {
-        attributes.values().forEach(attribute -> attribute.validate(tagName));
-
         int count = 0;
 
         Attribute attribute = attributes.get("c:text");

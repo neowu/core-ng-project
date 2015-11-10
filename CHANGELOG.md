@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.8.0 (11/10/2015)
+* template: refactory html parser validation, validate boolean attribute
+
 ### 3.7.9 (11/9/2015)
 * template: template must register in config before using, enforce safety
 * template: validate empty attribute

@@ -53,10 +53,10 @@ class HTMLLexer {
             return HTMLTokenType.START_TAG_END_CLOSE;
         } else if (match(currentIndex, "=")) {
             move(findAttributeValueLength());
-            return HTMLTokenType.ATTR_VALUE;
+            return HTMLTokenType.ATTRIBUTE_VALUE;
         } else {
             move(findAttributeNameLength());
-            return HTMLTokenType.ATTR_NAME;
+            return HTMLTokenType.ATTRIBUTE_NAME;
         }
     }
 
@@ -156,9 +156,9 @@ class HTMLLexer {
         for (int i = currentIndex; i < html.length(); i++) {
             char ch = html.charAt(i);
             if (Character.isWhitespace(ch) || ch == '=' || ch == '/' || ch == '>') return i - currentIndex;
-            if (ch == '<') throw Exceptions.error("attr is invalid, location={}", currentLocation());
+            if (ch == '<') throw Exceptions.error("attribute name is invalid, location={}", currentLocation());
         }
-        throw Exceptions.error("attr is invalid, location={}", currentLocation());
+        throw Exceptions.error("attribute name is invalid, location={}", currentLocation());
     }
 
     private int findAttributeValueLength() {
@@ -179,7 +179,7 @@ class HTMLLexer {
                 return i - currentIndex + 1;
             }
         }
-        throw Exceptions.error("attr value is invalid, location={}", currentLocation());
+        throw Exceptions.error("attribute value is invalid, location={}", currentLocation());
     }
 
     private boolean match(int index, String token) {

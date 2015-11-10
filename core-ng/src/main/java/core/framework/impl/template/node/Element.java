@@ -10,13 +10,12 @@ import core.framework.impl.template.source.TemplateSource;
  * @author neo
  */
 public class Element extends ContainerNode {
-    public final Attributes attributes;
+    public final Attributes attributes = new Attributes();
     public final String name;
     public boolean hasEndTag;
 
     public Element(String name) {
         this.name = name;
-        attributes = new Attributes(name);
     }
 
     @Override

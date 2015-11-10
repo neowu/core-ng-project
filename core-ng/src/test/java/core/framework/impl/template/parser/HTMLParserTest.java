@@ -13,7 +13,7 @@ import org.junit.Test;
 public class HTMLParserTest {
     @Test
     public void parseVoidElements() {
-        String content = "<html><div><img src=img.png>text</div></html>";
+        String content = "<html><div><img src=//img.png>text</div></html>";
 
         Document document = new HTMLParser(new StringTemplateSource("test", content)).parse();
         Assert.assertEquals(1, document.nodes.size());
@@ -30,7 +30,7 @@ public class HTMLParserTest {
         Element img = (Element) div.nodes.get(0);
         Assert.assertEquals("img", img.name);
         Assert.assertFalse(img.hasEndTag);
-        Assert.assertEquals("img.png", img.attributes.attributes.get("src").value);
+        Assert.assertEquals("//img.png", img.attributes.attributes.get("src").value);
 
         Text text = (Text) div.nodes.get(1);
         Assert.assertEquals("text", text.content);

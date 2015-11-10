@@ -9,8 +9,8 @@ public enum HTMLTokenType {
     START_TAG_END_CLOSE,    // />
     END_TAG,        // </tag>
     TEXT,
-    ATTR_NAME,      // attr
-    ATTR_VALUE,     // =value or ="value"
+    ATTRIBUTE_NAME,      // attr
+    ATTRIBUTE_VALUE,     // =value or ="value"
     START_COMMENT,  // <!--
     END_COMMENT,    // comment-->
     EOF
