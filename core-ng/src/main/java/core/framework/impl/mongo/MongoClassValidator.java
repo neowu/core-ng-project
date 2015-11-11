@@ -10,6 +10,7 @@ import core.framework.impl.validate.type.TypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 import org.bson.types.ObjectId;
 
+import javax.xml.bind.annotation.XmlEnumValue;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class MongoClassValidator implements TypeVisitor {
         validator.validate();
 
         if (id == null) {
-            throw Exceptions.error("entity class must have @Id field, class={}", validator.type.getTypeName());
+            throw Exceptions.error("mongo entity class must have @Id field, class={}", validator.type.getTypeName());
         }
     }
 
@@ -59,7 +60,7 @@ public class MongoClassValidator implements TypeVisitor {
     @Override
     public void visitClass(Class<?> objectClass, String path) {
         if (!validateView && path == null && !objectClass.isAnnotationPresent(Collection.class))
-            throw Exceptions.error("entity class must have @Collection, class={}", objectClass.getCanonicalName());
+            throw Exceptions.error("mongo entity class must have @Collection, class={}", objectClass.getCanonicalName());
     }
 
     @Override
@@ -68,28 +69,47 @@ public class MongoClassValidator implements TypeVisitor {
             validateId(field, parentPath == null);
         } else {
             core.framework.api.mongo.Field mongoField = field.getDeclaredAnnotation(core.framework.api.mongo.Field.class);
-            if (mongoField == null) throw Exceptions.error("field must have @Field, field={}", field);
+            if (mongoField == null)
+                throw Exceptions.error("mongo entity field must have @Field, field={}", Fields.path(field));
             String mongoFieldName = mongoField.name();
 
             Set<String> fields = this.fields.computeIfAbsent(parentPath, key -> Sets.newHashSet());
             if (fields.contains(mongoFieldName)) {
-                throw Exceptions.error("field is duplicated, field={}, mongoField={}", field, mongoFieldName);
+                throw Exceptions.error("duplicated field found, field={}, mongoField={}", Fields.path(field), mongoFieldName);
             }
             fields.add(mongoFieldName);
+
+            Class<?> fieldClass = field.getType();
+            if (Enum.class.isAssignableFrom(fieldClass)) {
+                validateEnumClass(fieldClass, field);
+            }
+        }
+    }
+
+    private void validateEnumClass(Class<?> enumClass, Field field) {
+        Enum[] constants = (Enum[]) enumClass.getEnumConstants();
+        for (Enum constant : constants) {
+            try {
+                Field enumField = enumClass.getDeclaredField(constant.name());
+                if (enumField.isAnnotationPresent(XmlEnumValue.class))
+                    throw Exceptions.error("mongo enum must not have jaxb annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Fields.path(enumField));
+            } catch (NoSuchFieldException e) {
+                throw new Error(e);
+            }
         }
     }
 
     private void validateId(Field field, boolean topLevel) {
         if (topLevel) {
             if (id != null)
-                throw Exceptions.error("entity class must have only one @Id field, previous={}, current={}", Fields.path(id), Fields.path(field));
+                throw Exceptions.error("mongo entity class must have only one @Id field, previous={}, current={}", Fields.path(id), Fields.path(field));
             Class<?> fieldClass = field.getType();
             if (!ObjectId.class.equals(fieldClass) && !String.class.equals(fieldClass)) {
                 throw Exceptions.error("@Id field must be either ObjectId or String, field={}, class={}", Fields.path(field), fieldClass.getCanonicalName());
             }
             id = field;
         } else {
-            throw Exceptions.error("child class must not have @Id field, field={}", field);
+            throw Exceptions.error("mongo nested entity class must not have @Id field, field={}", field);
         }
     }
 }

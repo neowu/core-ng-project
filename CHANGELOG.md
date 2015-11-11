@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.8.1 (11/11/2015)
+* mongo: entity validation, not allow mix with JAXB
+
 ### 3.8.0 (11/10/2015)
 * template: refactory html parser validation, validate boolean attribute
 

@@ -22,9 +22,9 @@ import java.util.Set;
  */
 final class DatabaseClassValidator implements TypeVisitor {
     private final TypeValidator validator;
+    private final Set<String> columns = Sets.newHashSet();
     private boolean foundPK;
     private boolean validateView;
-    private final Set<String> columns = Sets.newHashSet();
 
     DatabaseClassValidator(Class<?> entityClass) {
         validator = new TypeValidator(entityClass);
@@ -36,7 +36,7 @@ final class DatabaseClassValidator implements TypeVisitor {
         validator.validate();
 
         if (!foundPK)
-            throw Exceptions.error("entity class must have @PrimaryKey, class={}", validator.type.getTypeName());
+            throw Exceptions.error("db entity class must have @PrimaryKey, class={}", validator.type.getTypeName());
     }
 
     public void validateViewClass() {
@@ -59,14 +59,14 @@ final class DatabaseClassValidator implements TypeVisitor {
     public void visitClass(Class<?> objectClass, String path) {
         if (validateView) {
             if (objectClass.isAnnotationPresent(Table.class))
-                throw Exceptions.error("view class must not have @Table, class={}", objectClass.getCanonicalName());
+                throw Exceptions.error("db view class must not have @Table, class={}", objectClass.getCanonicalName());
         } else {
             if (!objectClass.isAnnotationPresent(Table.class))
-                throw Exceptions.error("entity class must have @Table, class={}", objectClass.getCanonicalName());
+                throw Exceptions.error("db entity class must have @Table, class={}", objectClass.getCanonicalName());
         }
 
         if (objectClass.isAnnotationPresent(XmlAccessorType.class))
-            throw Exceptions.error("entity class must not have jaxb annotation, please separate view class and entity class, class={}", objectClass.getCanonicalName());
+            throw Exceptions.error("db entity class must not have jaxb annotation, please separate view class and entity class, class={}", objectClass.getCanonicalName());
     }
 
     @Override
@@ -75,16 +75,16 @@ final class DatabaseClassValidator implements TypeVisitor {
 
         Column column = field.getDeclaredAnnotation(Column.class);
         if (column == null)
-            throw Exceptions.error("field must have @Column, field={}", Fields.path(field));
+            throw Exceptions.error("db entity field must have @Column, field={}", Fields.path(field));
 
         if (columns.contains(column.name())) {
-            throw Exceptions.error("duplicated column found, column={}, field={}", column.name(), Fields.path(field));
+            throw Exceptions.error("duplicated column found, field={}, column={}", Fields.path(field), column.name());
         } else {
             columns.add(column.name());
         }
 
         if (Enum.class.isAssignableFrom(fieldClass)) {
-            validateEnumClass(fieldClass);
+            validateEnumClass(fieldClass, field);
         }
 
         PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
@@ -96,17 +96,15 @@ final class DatabaseClassValidator implements TypeVisitor {
         }
     }
 
-    private void validateEnumClass(Class<?> enumClass) {
+    private void validateEnumClass(Class<?> enumClass, Field field) {
         Enum[] constants = (Enum[]) enumClass.getEnumConstants();
         for (Enum constant : constants) {
             try {
                 Field enumField = enumClass.getDeclaredField(constant.name());
                 if (!enumField.isAnnotationPresent(EnumValue.class))
-                    throw Exceptions.error("db enum must have @EnumValue, enum={}", Fields.path(enumField));
-
+                    throw Exceptions.error("db enum must have @EnumValue, field={}, enum={}", Fields.path(field), Fields.path(enumField));
                 if (enumField.isAnnotationPresent(XmlEnumValue.class))
-                    throw Exceptions.error("db enum must not have jaxb annotation, please separate view and entity, enum={}", Fields.path(enumField));
-
+                    throw Exceptions.error("db enum must not have jaxb annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Fields.path(enumField));
             } catch (NoSuchFieldException e) {
                 throw new Error(e);
             }
