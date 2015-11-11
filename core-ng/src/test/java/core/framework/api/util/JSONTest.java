@@ -19,12 +19,6 @@ import static org.junit.Assert.assertEquals;
  * @author neo
  */
 public class JSONTest {
-    @XmlAccessorType(XmlAccessType.FIELD)
-    static class Bean {
-        @XmlElement(name = "name")
-        public String name;
-    }
-
     @Test
     public void fromJSONArray() {
         List<Bean> beans = JSON.fromJSON(Types.list(Bean.class), "[{\"name\":\"n1\"},{\"name\":\"n2\"}]");
@@ -32,12 +26,6 @@ public class JSONTest {
         assertEquals(2, beans.size());
         assertEquals("n1", beans.get(0).name);
         assertEquals("n2", beans.get(1).name);
-    }
-
-    @XmlAccessorType(XmlAccessType.FIELD)
-    static class BeanWithMapField {
-        @XmlElement(name = "attributes")
-        public final Map<String, String> attributes = Maps.newHashMap();
     }
 
     @Test
@@ -51,18 +39,6 @@ public class JSONTest {
         BeanWithMapField parsedBean = JSON.fromJSON(BeanWithMapField.class, json);
         Assert.assertEquals("value1", parsedBean.attributes.get("key1"));
         Assert.assertEquals("value2", parsedBean.attributes.get("key2"));
-    }
-
-    @XmlAccessorType(XmlAccessType.FIELD)
-    static class BeanWithDateField {
-        @XmlElement(name = "date")
-        public LocalDate date;
-
-        @XmlElement(name = "dateTime")
-        public LocalDateTime dateTime;
-
-        @XmlElement(name = "instant")
-        public Instant instant;
     }
 
     @Test
@@ -85,5 +61,29 @@ public class JSONTest {
         Bean bean = JSON.fromJSON(Bean.class, json);
 
         Assert.assertNull(bean);
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    static class Bean {
+        @XmlElement(name = "name")
+        public String name;
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    static class BeanWithMapField {
+        @XmlElement(name = "attributes")
+        public final Map<String, String> attributes = Maps.newHashMap();
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    static class BeanWithDateField {
+        @XmlElement(name = "date")
+        public LocalDate date;
+
+        @XmlElement(name = "dateTime")
+        public LocalDateTime dateTime;
+
+        @XmlElement(name = "instant")
+        public Instant instant;
     }
 }
