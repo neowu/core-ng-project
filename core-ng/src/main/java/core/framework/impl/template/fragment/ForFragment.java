@@ -29,10 +29,10 @@ public class ForFragment extends ContainerFragment {
         String list = matcher.group(2);
 
         ExpressionBuilder builder = new ExpressionBuilder(list, context, location);
-        expression = builder.build();
+        this.expression = builder.build();
         if (!GenericTypes.isGenericList(expression.returnType))
-            throw Exceptions.error("for statement must return List<T>, list={}, returnType={}, location={}",
-                list, expression.returnType.getTypeName(), location);
+            throw Exceptions.error("for statement must return List<T>, list={}, returnType={}, location={}", list, expression.returnType.getTypeName(), location);
+
         valueClass = GenericTypes.listValueClass(expression.returnType);
     }
 

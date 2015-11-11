@@ -28,7 +28,7 @@ public class IfFragment extends ContainerFragment {
 
         expression = new ExpressionBuilder(condition, context, location).build();
         if (!Boolean.class.equals(GenericTypes.rawClass(expression.returnType)))
-            throw Exceptions.error("if condition must return Boolean, condition={}, returnType={}, location={}",
+            throw Exceptions.error("if statement must return Boolean, condition={}, returnType={}, location={}",
                 condition, expression.returnType.getTypeName(), location);
     }
 

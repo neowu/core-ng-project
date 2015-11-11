@@ -10,15 +10,15 @@ import core.framework.impl.template.expression.ExpressionHolder;
 /**
  * @author neo
  */
-public class EmptyAttributeFragment implements Fragment {
+public class BooleanAttributeFragment implements Fragment {
     private final String name;
     private final ExpressionHolder expression;
 
-    public EmptyAttributeFragment(String name, String expression, TemplateMetaContext context, String location) {
+    public BooleanAttributeFragment(String name, String expression, TemplateMetaContext context, String location) {
         this.name = name;
         this.expression = new ExpressionBuilder(expression, context, location).build();
         if (!Boolean.class.equals(GenericTypes.rawClass(this.expression.returnType)))
-            throw Exceptions.error("expression must return Boolean, condition={}, returnType={}, location={}",
+            throw Exceptions.error("boolean attribute expression must return Boolean, condition={}, returnType={}, location={}",
                 expression, this.expression.returnType.getTypeName(), location);
     }
 

@@ -28,7 +28,7 @@ public class Attributes {
             if (attribute.isCDNAttribute()) {
                 attribute.addCDNAttribute(parent, context);
             } else if (attribute.isDynamic()) {
-                if (attribute.isDynamicEmptyAttribute()) attribute.addEmptyAttribute(parent, context);
+                if (attribute.isDynamicBooleanAttribute()) attribute.addBooleanAttribute(parent, context);
                 else attribute.addValueAttribute(parent, context);
             } else {
                 attribute.addStaticContent(parent);

@@ -2,8 +2,8 @@ package core.framework.impl.template.node;
 
 import core.framework.api.util.Exceptions;
 import core.framework.impl.template.TemplateMetaContext;
+import core.framework.impl.template.fragment.BooleanAttributeFragment;
 import core.framework.impl.template.fragment.ContainerFragment;
-import core.framework.impl.template.fragment.EmptyAttributeFragment;
 import core.framework.impl.template.fragment.HTMLContentFragment;
 import core.framework.impl.template.fragment.TextContentFragment;
 import core.framework.impl.template.fragment.URLFragment;
@@ -42,7 +42,7 @@ public class Attribute {
         }
     }
 
-    boolean isDynamicEmptyAttribute() {
+    boolean isDynamicBooleanAttribute() {
         return "c:checked".equals(name)
             || "c:selected".equals(name)
             || "c:disabled".equals(name)
@@ -50,6 +50,10 @@ public class Attribute {
             || "c:multiple".equals(name)
             || "c:ismap".equals(name)
             || "c:defer".equals(name);
+    }
+
+    void addBooleanAttribute(ContainerFragment parent, TemplateMetaContext context) {
+        parent.add(new BooleanAttributeFragment(name.substring(2), value, context, location));
     }
 
     boolean isCDNAttribute() {
@@ -80,10 +84,6 @@ public class Attribute {
                 addStaticContent(parent);
             }
         }
-    }
-
-    void addEmptyAttribute(ContainerFragment parent, TemplateMetaContext context) {
-        parent.add(new EmptyAttributeFragment(name.substring(2), value, context, location));
     }
 
     void addValueAttribute(ContainerFragment parent, TemplateMetaContext context) {

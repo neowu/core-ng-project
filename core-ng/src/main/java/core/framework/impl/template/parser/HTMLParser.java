@@ -160,5 +160,4 @@ public class HTMLParser {
             throw Exceptions.error("static resource url value must be either absolute or start with '/', attribute={}>{}, value={}, location={}",
                 attribute.tagName, attribute.name, attribute.value, attribute.location);
     }
-
 }
