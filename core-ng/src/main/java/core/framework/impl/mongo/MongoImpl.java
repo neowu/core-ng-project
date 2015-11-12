@@ -50,7 +50,7 @@ public final class MongoImpl implements Mongo, MongoOption {
             mongoClient = new MongoClient(uri);
             database = mongoClient.getDatabase(uri.getDatabase());
         } finally {
-            logger.info("mongo client initialized, uri={}", uri);
+            logger.info("initialize mongo client, uri={}", uri);
         }
     }
 
