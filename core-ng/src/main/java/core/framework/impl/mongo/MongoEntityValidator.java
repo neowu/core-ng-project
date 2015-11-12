@@ -12,12 +12,10 @@ import java.util.Map;
 /**
  * @author neo
  */
-class MongoEntityValidator {
+public final class MongoEntityValidator {
     private final Map<Class<?>, Validator> validators = Maps.newHashMap();
 
     public void register(Class<?> entityClass) {
-        new MongoClassValidator(entityClass).validateEntityClass();
-
         validators.computeIfAbsent(entityClass,
             key -> new ValidatorBuilder(key, field -> {
                 if (field.isAnnotationPresent(Id.class)) return "_id";

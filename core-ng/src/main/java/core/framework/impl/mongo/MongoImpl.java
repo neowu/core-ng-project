@@ -8,6 +8,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import core.framework.api.log.ActionLogContext;
@@ -16,98 +17,87 @@ import core.framework.api.mongo.Mongo;
 import core.framework.api.mongo.Query;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import org.bson.BsonDocument;
-import org.bson.codecs.Codec;
-import org.bson.codecs.configuration.CodecRegistries;
-import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
  * @author neo
  */
-public final class MongoImpl implements Mongo {
+public final class MongoImpl implements Mongo, MongoOption {
     private final Logger logger = LoggerFactory.getLogger(MongoImpl.class);
     private final MongoClientOptions.Builder builder = MongoClientOptions.builder().socketKeepAlive(true);
-    private final Map<Class<?>, Codec<?>> codecs = Maps.newHashMap();
-    private final Map<Class, EntityIdHandler> idHandlers = Maps.newHashMap();
+    private final EntityCodecs codecs = new EntityCodecs();
     private final MongoEntityValidator validator = new MongoEntityValidator();
-    public MongoClient mongoClient;
-    public int tooManyRowsReturnedThreshold = 2000;
-    private MongoDatabase database;
-    private long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
-    private MongoClientURI uri;
 
+    private int tooManyRowsReturnedThreshold = 2000;
+    private long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
+
+    private MongoClientURI uri;
+    private MongoClient mongoClient;
+    private MongoDatabase database;
+
+    public void initialize() {
+        try {
+            if (uri == null) throw new Error("uri() must be called before initialize");
+            builder.codecRegistry(codecs.codecRegistry());
+            mongoClient = new MongoClient(uri);
+            database = mongoClient.getDatabase(uri.getDatabase());
+        } finally {
+            logger.info("mongo client initialized, uri={}", uri);
+        }
+    }
+
+    public void close() {
+        logger.info("close mongodb client, uri={}", uri);
+        mongoClient.close();
+    }
+
+    @Override
     public void uri(String uri) {
-        logger.info("set mongo uri, uri={}", uri);
         this.uri = new MongoClientURI(uri, builder);
         if (this.uri.getDatabase() == null) throw Exceptions.error("uri must have database, uri={}", uri);
     }
 
+    @Override
     public void poolSize(int minSize, int maxSize) {
         builder.minConnectionsPerHost(minSize)
             .connectionsPerHost(maxSize);
     }
 
+    @Override
     public void timeout(Duration timeout) {
         builder.connectTimeout((int) timeout.toMillis()) // default is 10s
             .socketTimeout((int) timeout.toMillis());
     }
 
-    public void close() {
-        if (mongoClient != null) {
-            logger.info("close mongodb client, database={}", database.getName());
-            mongoClient.close();
-        }
-    }
-
+    @Override
     public <T> void entityClass(Class<T> entityClass) {
+        new MongoClassValidator(entityClass).validateEntityClass();
         validator.register(entityClass);
-        EntityIdHandler<T> entityIdHandler = new EntityIdHandlerBuilder<>(entityClass).build();
-        idHandlers.put(entityClass, entityIdHandler);
-        registerCodec(entityClass, entityIdHandler);
+        codecs.entityClass(entityClass);
     }
 
+    @Override
     public <T> void viewClass(Class<T> viewClass) {
         new MongoClassValidator(viewClass).validateViewClass();
-        registerCodec(viewClass, null);
+        codecs.viewClass(viewClass);
     }
 
-    private <T> void registerCodec(Class<T> entityClass, EntityIdHandler<T> entityIdHandler) {
-        EntityEncoder<T> entityEncoder = new EntityEncoderBuilder<>(entityClass).build();
-        EntityDecoder<T> entityDecoder = new EntityDecoderBuilder<>(entityClass).build();
-        EntityCodec<T> codec = new EntityCodec<>(entityClass, entityIdHandler, entityEncoder, entityDecoder);
-        Codec<?> previous = codecs.putIfAbsent(entityClass, codec);
-        if (previous != null)
-            throw Exceptions.error("entity or view class is registered, class={}", entityClass.getCanonicalName());
+    @Override
+    public void setTooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
+        this.tooManyRowsReturnedThreshold = tooManyRowsReturnedThreshold;
     }
 
+    @Override
     public void slowQueryThreshold(Duration slowQueryThreshold) {
         slowQueryThresholdInMs = slowQueryThreshold.toMillis();
-    }
-
-    private MongoDatabase database() {
-        if (mongoClient == null) {
-            if (uri == null) throw new Error("uri() must be called before initialize");
-            mongoClient = new MongoClient(uri);
-        }
-
-        if (database == null) {
-            CodecRegistry codecRegistry = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(),
-                CodecRegistries.fromCodecs(new ArrayList<>(codecs.values())));
-            database = mongoClient.getDatabase(uri.getDatabase()).withCodecRegistry(codecRegistry);
-        }
-
-        return database;
     }
 
     @Override
@@ -195,25 +185,6 @@ public final class MongoImpl implements Mongo {
     }
 
     @Override
-    public <T> List<T> find(Class<T> entityClass, Bson filter) {
-        StopWatch watch = new StopWatch();
-        List<T> results = Lists.newArrayList();
-        try {
-            FindIterable<T> collection = collection(entityClass).find(filter == null ? new BsonDocument() : filter);
-            for (T document : collection) {
-                results.add(document);
-            }
-            return results;
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
-            logger.debug("find, entityClass={}, filter={}, elapsedTime={}", entityClass.getName(), filter, elapsedTime);
-            checkSlowQuery(elapsedTime);
-            checkTooManyRowsReturned(results.size());
-        }
-    }
-
-    @Override
     public <T, V> List<V> aggregate(Class<T> entityClass, Class<V> resultClass, Bson... pipeline) {
         StopWatch watch = new StopWatch();
         List<V> results = Lists.newArrayList();
@@ -235,14 +206,16 @@ public final class MongoImpl implements Mongo {
     }
 
     @Override
-    public <T> void update(T entity) {
+    @SuppressWarnings("unchecked")
+    public <T> long update(T entity) {
         StopWatch watch = new StopWatch();
         try {
             validator.validate(entity);
-            @SuppressWarnings("unchecked")
-            Class<T> entityClass = (Class<T>) entity.getClass();
-            Bson filter = idEqualsFilter(entity);
-            collection(entityClass).replaceOne(filter, entity);
+            Object id = codecs.id(entity);
+            if (id == null) throw Exceptions.error("entity must have id to update, entityClass={}", entity.getClass().getCanonicalName());
+            Bson filter = Filters.eq("_id", id);
+            UpdateResult result = collection((Class<T>) entity.getClass()).replaceOne(filter, entity, new UpdateOptions().upsert(true));
+            return result.getModifiedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
@@ -266,10 +239,11 @@ public final class MongoImpl implements Mongo {
     }
 
     @Override
-    public <T> void delete(Class<T> entityClass, Object id) {
+    public <T> long delete(Class<T> entityClass, Object id) {
         StopWatch watch = new StopWatch();
         try {
-            collection(entityClass).deleteOne(Filters.eq("_id", id));
+            DeleteResult result = collection(entityClass).deleteOne(Filters.eq("_id", id));
+            return result.getDeletedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongo", elapsedTime);
@@ -292,24 +266,18 @@ public final class MongoImpl implements Mongo {
         }
     }
 
-    private <T> Bson idEqualsFilter(T entity) {
-        @SuppressWarnings("unchecked")
-        EntityIdHandler<T> idHandler = idHandlers.get(entity.getClass());
-        return Filters.eq("_id", idHandler.get(entity));
-    }
-
     private void checkSlowQuery(long elapsedTime) {
         if (elapsedTime > slowQueryThresholdInMs)
             logger.warn("slow query detected");
     }
 
-    private <T> void checkTooManyRowsReturned(int size) {
+    private void checkTooManyRowsReturned(int size) {
         if (size > tooManyRowsReturnedThreshold)
             logger.warn("too many rows returned, returnedRows={}", size);
     }
 
     private <T> MongoCollection<T> collection(Class<T> entityClass) {
         Collection collection = entityClass.getDeclaredAnnotation(Collection.class);
-        return database().getCollection(collection.name(), entityClass);
+        return database.getCollection(collection.name(), entityClass);
     }
 }

@@ -17,15 +17,19 @@ public interface Mongo {
 
     <T> List<T> find(Class<T> entityClass, Query query);
 
-    <T> List<T> find(Class<T> entityClass, Bson filter);
+    default <T> List<T> find(Class<T> entityClass, Bson filter) {
+        Query query = new Query();
+        query.filter = filter;
+        return find(entityClass, query);
+    }
 
     <T, V> List<V> aggregate(Class<T> entityClass, Class<V> resultClass, Bson... pipeline);
 
-    <T> void update(T entity);
+    <T> long update(T entity);
 
     <T> long update(Class<T> entityClass, Bson filter, Bson update);
 
-    <T> void delete(Class<T> entityClass, Object id);
+    <T> long delete(Class<T> entityClass, Object id);
 
     <T> long delete(Class<T> entityClass, Bson filter);
 }

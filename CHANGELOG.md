@@ -1,7 +1,8 @@
 ## Change log
 
-### 3.8.2 (11/11/2015 - )
+### 3.8.2 (11/11/2015 - 11/12/2015)
 * yml: removed yml support, use JSON instead
+* mongo: removed fongo, updated mongo driver to 3.1.0
 
 ### 3.8.1 (11/11/2015)
 * mongo: entity validation, not allow mix with JAXB

@@ -16,38 +16,38 @@ import org.bson.types.ObjectId;
 /**
  * @author neo
  */
-class EntityCodec<T> implements CollectibleCodec<T> {
+public final class EntityCodec<T> implements CollectibleCodec<T> {
+    final EntityIdHandler<T> idHandler;
     private final Class<T> entityClass;
-    private final EntityEncoder<T> entityEncoder;
-    private final EntityDecoder<T> entityDecoder;
-    private final EntityIdHandler<T> entityIdHandler;
+    private final EntityEncoder<T> encoder;
+    private final EntityDecoder<T> decoder;
     private final IdGenerator idGenerator = new ObjectIdGenerator();
 
-    public EntityCodec(Class<T> entityClass, EntityIdHandler<T> entityIdHandler, EntityEncoder<T> entityEncoder, EntityDecoder<T> entityDecoder) {
+    public EntityCodec(Class<T> entityClass, EntityIdHandler<T> idHandler, EntityEncoder<T> encoder, EntityDecoder<T> decoder) {
         this.entityClass = entityClass;
-        this.entityIdHandler = entityIdHandler;
-        this.entityEncoder = entityEncoder;
-        this.entityDecoder = entityDecoder;
+        this.idHandler = idHandler;
+        this.encoder = encoder;
+        this.decoder = decoder;
     }
 
     @Override
     public T generateIdIfAbsentFromDocument(T document) {
         if (!documentHasId(document)) {
-            if (!entityIdHandler.generateIdIfAbsent())
+            if (!idHandler.generateIdIfAbsent())
                 throw Exceptions.error("id must be assigned, documentClass={}", document.getClass().getCanonicalName());
-            entityIdHandler.set(document, idGenerator.generate());
+            idHandler.set(document, idGenerator.generate());
         }
         return document;
     }
 
     @Override
     public boolean documentHasId(T document) {
-        return entityIdHandler.get(document) != null;
+        return idHandler.get(document) != null;
     }
 
     @Override
     public BsonValue getDocumentId(T document) {
-        Object id = entityIdHandler.get(document);
+        Object id = idHandler.get(document);
         if (id instanceof ObjectId) return new BsonObjectId((ObjectId) id);
         if (id instanceof String) new BsonString((String) id);
         throw Exceptions.error("unsupported id type, id={}", id);
@@ -55,12 +55,12 @@ class EntityCodec<T> implements CollectibleCodec<T> {
 
     @Override
     public void encode(BsonWriter writer, T value, EncoderContext encoderContext) {
-        entityEncoder.encode(writer, value);
+        encoder.encode(writer, value);
     }
 
     @Override
     public T decode(BsonReader reader, DecoderContext decoderContext) {
-        return entityDecoder.decode(reader);
+        return decoder.decode(reader);
     }
 
     @Override

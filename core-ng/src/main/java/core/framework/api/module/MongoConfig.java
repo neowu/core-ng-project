@@ -1,9 +1,9 @@
 package core.framework.api.module;
 
-import com.mongodb.MongoClient;
 import core.framework.api.mongo.Mongo;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.mongo.MongoImpl;
+import core.framework.impl.mongo.MongoOption;
 
 import java.time.Duration;
 
@@ -11,30 +11,26 @@ import java.time.Duration;
  * @author neo
  */
 public class MongoConfig {
-    private final ModuleContext context;
-    private final MongoImpl mongo;
+    private final MongoOption mongo;
 
     public MongoConfig(ModuleContext context) {
-        this.context = context;
         if (context.beanFactory.registered(Mongo.class, null)) {
             mongo = context.beanFactory.bean(Mongo.class, null);
         } else {
-            mongo = new MongoImpl();
             if (context.isTest()) {
-                mongo.mongoClient = context.mockFactory.create(MongoClient.class);
+                mongo = (MongoOption) context.mockFactory.create(Mongo.class);
             } else {
+                MongoImpl mongo = new MongoImpl();
+                context.startupHook.add(mongo::initialize);
                 context.shutdownHook.add(mongo::close);
+                this.mongo = mongo;
             }
             context.beanFactory.bind(Mongo.class, null, mongo);
         }
     }
 
     public void uri(String uri) {
-        if (context.isTest()) {
-            mongo.uri("mongodb://localhost/test");
-        } else {
-            mongo.uri(uri);
-        }
+        mongo.uri(uri);
     }
 
     public void poolSize(int minSize, int maxSize) {
@@ -46,7 +42,7 @@ public class MongoConfig {
     }
 
     public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
-        mongo.tooManyRowsReturnedThreshold = tooManyRowsReturnedThreshold;
+        mongo.setTooManyRowsReturnedThreshold(tooManyRowsReturnedThreshold);
     }
 
     public void timeout(Duration timeout) {

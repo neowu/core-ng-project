@@ -8,7 +8,7 @@ subprojects {
 }
 
 def awsVersion = '1.10.27'
-def mongoVersion = '3.0.4'
+def mongoVersion = '3.1.0'
 def elasticVersion = '2.0.0'
 def rabbitVersion = '3.5.6'
 
@@ -51,7 +51,6 @@ project(':core-ng-test') {
     dependencies {
         provided(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                'com.github.fakemongo:fongo:2.0.3@jar',
                 'org.hsqldb:hsqldb:2.3.3'
         )
         compile(
@@ -115,7 +114,8 @@ project(':demo-service') {
                 project(':core-ng')
         )
         testCompile(
-                project(':core-ng-test')
+                project(':core-ng-test'),
+                "org.mongodb:mongo-java-driver:${mongoVersion}"
         )
     }
 }
