@@ -20,12 +20,13 @@ public class LogProcessorApp extends App {
         search().type(ActionLogDocument.class);
         search().type(TraceLogDocument.class);
 
+        // with typical t2.medium/t2.large setup, 15/10 are optimal number to keep CPU around 50%~70% with large amount of messages
         queue().subscribe("rabbitmq://queue/action-log-queue")
             .handle(ActionLogMessage.class, bind(ActionLogMessageHandler.class))
-            .maxConcurrentHandlers(1);
+            .maxConcurrentHandlers(15);
 
         queue().subscribe("rabbitmq://queue/trace-log-queue")
             .handle(TraceLogMessage.class, bind(TraceLogMessageHandler.class))
-            .maxConcurrentHandlers(1);
+            .maxConcurrentHandlers(10);
     }
 }
