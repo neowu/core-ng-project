@@ -75,7 +75,7 @@ public class RequestParser {
                 request.body = body.body().text(request.contentType.charset().orElse(Charsets.UTF_8));
                 logger.debug("[request] body={}", request.body);
             } else {
-                logger.warn("unsupported body, contentType={}", request.contentType == null ? null : request.contentType.value());
+                logger.warn("unsupported body, contentType={}", request.contentType);
             }
             exchange.removeAttachment(RequestBodyReader.REQUEST_BODY);
             return;

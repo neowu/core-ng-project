@@ -129,7 +129,6 @@ public final class RequestImpl implements Request {
     private FormData.FormValue formValue(String name) {
         if (formData == null)
             throw new BadRequestException("form body is required, method=" + method + ", contentType=" + contentType);
-
         return formData.getFirst(name);
     }
 

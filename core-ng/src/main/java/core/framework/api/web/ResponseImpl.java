@@ -49,7 +49,7 @@ public final class ResponseImpl implements Response {
     @Override
     public Response contentType(ContentType contentType) {
         if (contentType != null)
-            headers.put(Headers.CONTENT_TYPE, contentType.value());
+            headers.put(Headers.CONTENT_TYPE, contentType.toString());
         return this;
     }
 }

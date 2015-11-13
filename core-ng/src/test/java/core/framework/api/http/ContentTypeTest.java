@@ -17,11 +17,15 @@ public class ContentTypeTest {
         type = ContentType.parse("image/png");
         Assert.assertEquals("image/png", type.mediaType());
         Assert.assertFalse(type.charset().isPresent());
+
+        type = ContentType.parse("multipart/form-data; boundary=----WebKitFormBoundaryaANA7UQAvnwa2EkM");
+        Assert.assertEquals("multipart/form-data", type.mediaType());
+        Assert.assertFalse(type.charset().isPresent());
     }
 
     @Test
     public void value() {
-        Assert.assertEquals("application/json; charset=utf-8", ContentType.APPLICATION_JSON.value());
-        Assert.assertEquals("application/octet-stream", ContentType.APPLICATION_OCTET_STREAM.value());
+        Assert.assertEquals("application/json; charset=utf-8", ContentType.APPLICATION_JSON.toString());
+        Assert.assertEquals("application/octet-stream", ContentType.APPLICATION_OCTET_STREAM.toString());
     }
 }

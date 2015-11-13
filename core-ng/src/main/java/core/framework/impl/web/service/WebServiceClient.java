@@ -71,7 +71,7 @@ public class WebServiceClient {
         }
 
         HTTPRequest request = new HTTPRequest(method, serviceURL);
-        request.header(HTTPHeaders.ACCEPT, ContentType.APPLICATION_JSON.value());
+        request.header(HTTPHeaders.ACCEPT, ContentType.APPLICATION_JSON.toString());
 
         if (logManager.appName != null) {
             request.header(HTTPServerHandler.HEADER_CLIENT, logManager.appName);
