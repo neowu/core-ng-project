@@ -4,6 +4,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -16,7 +17,9 @@ public interface ElasticSearchType<T> {
 
     void index(String id, T source);
 
+    void bulkIndex(Map<String, T> sources);
+
     void update(String id, UpdateRequest request);
 
-    void delete(String id);
+    boolean delete(String id);
 }

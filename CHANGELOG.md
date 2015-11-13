@@ -2,6 +2,7 @@
 
 ### 3.8.3 (11/13/2015)
 * bug: fix http content type parsing multipart
+* search: support bulk index
 
 ### 3.8.2 (11/11/2015 - 11/12/2015)
 * yml: removed yml support, use JSON instead

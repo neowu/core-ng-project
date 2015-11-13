@@ -39,8 +39,8 @@ public class TraceLogMessageHandler implements MessageHandler<TraceLogMessage> {
 
         UpdateRequest request = new UpdateRequest()
             .script(new Script(script.toString(), ScriptService.ScriptType.INLINE, null, params))
-            .upsert(JSON.toJSON(emptyTraceLog));
-        request.scriptedUpsert(true);
+            .upsert(JSON.toJSON(emptyTraceLog))
+            .scriptedUpsert(true);
 
         traceType.update(message.id, request);
     }
