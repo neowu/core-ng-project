@@ -27,6 +27,6 @@ public class LogProcessorApp extends App {
 
         queue().subscribe("rabbitmq://queue/trace-log-queue")
             .handle(TraceLogMessage.class, bind(TraceLogMessageHandler.class))
-            .maxConcurrentHandlers(10);
+            .maxConcurrentHandlers(1);  // trace message is to append to existing message id, must be handled in single thread, otherwise ES will lost trace log
     }
 }
