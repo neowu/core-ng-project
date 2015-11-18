@@ -5,8 +5,11 @@ import core.framework.api.util.JSON;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 /**
  * @author neo
@@ -25,14 +28,37 @@ public class CacheImpl<T> implements Cache<T> {
     }
 
     @Override
-    public T get(String key, Supplier<T> supplier) {
-        String result = cacheStore.get(name, key);
-        if (result == null) {
-            T value = supplier.get();
+    public T get(String key, Function<String, T> loader) {
+        String cacheValue = cacheStore.get(name, key);
+        if (cacheValue == null) {
+            T value = loader.apply(key);
             put(key, value);
             return value;
         }
-        return JSON.fromJSON(valueType, result);
+        return JSON.fromJSON(valueType, cacheValue);
+    }
+
+    @Override
+    public List<T> getAll(List<String> keys, Function<String, T> loader) {
+        Iterator<String> keyIterator = keys.iterator();
+        Iterator<String> cacheValueIterator = cacheStore.getAll(name, keys).iterator();
+        List<T> values = new ArrayList<>(keys.size());
+
+        while (true) {
+            if (!cacheValueIterator.hasNext()) break;
+            String cacheValue = cacheValueIterator.next();
+            String key = keyIterator.next();
+
+            if (cacheValue == null) {
+                T value = loader.apply(key);
+                put(key, value);
+                values.add(value);
+            } else {
+                values.add(JSON.fromJSON(valueType, cacheValue));
+            }
+        }
+
+        return values;
     }
 
     @Override

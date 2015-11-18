@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '3.8.3'
+    version = '3.8.4'
 }
 
 def awsVersion = '1.10.27'
@@ -20,7 +20,7 @@ project(':core-ng') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         provided(
-                'redis.clients:jedis:2.7.2@jar',
+                'redis.clients:jedis:2.7.3@jar',
                 "org.elasticsearch:elasticsearch:${elasticVersion}@jar",
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
                 "com.rabbitmq:amqp-client:${rabbitVersion}",

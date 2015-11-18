@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +26,15 @@ public class LocalCacheStore implements CacheStore {
             return null;
         }
         return item.value;
+    }
+
+    @Override
+    public List<String> getAll(String name, List<String> keys) {
+        List<String> results = new ArrayList<>(keys.size());
+        for (String key : keys) {
+            results.add(get(name, key));
+        }
+        return results;
     }
 
     @Override

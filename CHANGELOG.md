@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.8.4 (11/18/2015)
+* cache: support get multiple keys in batch
+* cache: changed get(Supplier) to get(Function<String,T>) to keep consistent with getAll, and be more functional style
+
 ### 3.8.3 (11/13/2015)
 * bug: fix http content type parsing multipart
 * search: support bulk index

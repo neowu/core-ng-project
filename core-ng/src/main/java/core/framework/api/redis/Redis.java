@@ -1,6 +1,7 @@
 package core.framework.api.redis;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,6 +19,8 @@ public interface Redis {
     void expire(String key, Duration duration);
 
     void del(String key);
+
+    List<String> mget(List<String> keys);
 
     Map<String, String> hgetAll(String key);
 

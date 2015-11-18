@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author neo
@@ -27,6 +29,25 @@ public class RedisCacheStore implements CacheStore {
         } catch (JedisConnectionException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
             return null;
+        }
+    }
+
+    @Override
+    public List<String> getAll(String name, List<String> keys) {
+        int size = keys.size();
+        List<String> redisKeys = new ArrayList<>(size);
+        for (String key : keys) {
+            redisKeys.add(cacheKey(name, key));
+        }
+        try {
+            return redis.mget(redisKeys);
+        } catch (JedisConnectionException e) {
+            logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
+            List<String> results = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                results.add(null);
+            }
+            return results;
         }
     }
 

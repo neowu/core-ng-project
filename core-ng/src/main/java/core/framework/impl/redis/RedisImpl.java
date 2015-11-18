@@ -15,6 +15,8 @@ import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,11 +25,9 @@ import java.util.Map;
 public final class RedisImpl implements Redis {
     private static final byte[] NX = Strings.bytes("NX");
     private static final byte[] EX = Strings.bytes("EX");
-
-    private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
-
-    private String host;
     public final Pool<BinaryJedis> pool;
+    private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
+    private String host;
     private long slowQueryThresholdInMs = 200;
     private Duration timeout;
 
@@ -169,6 +169,36 @@ public final class RedisImpl implements Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("del, key={}, elapsedTime={}", key, elapsedTime);
+            checkSlowQuery(elapsedTime);
+        }
+    }
+
+    @Override
+    public List<String> mget(List<String> keys) {
+        StopWatch watch = new StopWatch();
+        PoolItem<BinaryJedis> item = pool.borrowItem();
+        try {
+            int size = keys.size();
+            byte[][] binaryKeys = new byte[size][];
+            int i = 0;
+            for (String key : keys) {
+                binaryKeys[i] = encode(key);
+                i++;
+            }
+            List<String> results = new ArrayList<>(size);
+            List<byte[]> binaryResults = item.resource.mget(binaryKeys);
+            for (byte[] binaryResult : binaryResults) {
+                results.add(decode(binaryResult));
+            }
+            return results;
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("mget, keys={}, elapsedTime={}", keys, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }

@@ -4,6 +4,8 @@ import core.framework.api.redis.Redis;
 import core.framework.api.util.Maps;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,6 +17,7 @@ public final class MockRedis implements Redis {
     @Override
     public String get(String key) {
         Value value = (Value) store.get(key);
+        if (value == null) return null;
         if (value.expired(System.currentTimeMillis())) {
             store.remove(key);
             return null;
@@ -47,6 +50,15 @@ public final class MockRedis implements Redis {
     @Override
     public void del(String key) {
         store.remove(key);
+    }
+
+    @Override
+    public List<String> mget(List<String> keys) {
+        List<String> results = new ArrayList<>(keys.size());
+        for (String key : keys) {
+            results.add(get(key));
+        }
+        return results;
     }
 
     @Override
