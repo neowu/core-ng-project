@@ -4,9 +4,9 @@ import core.framework.api.redis.Redis;
 import core.framework.api.util.Maps;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -54,11 +54,12 @@ public final class MockRedis implements Redis {
 
     @Override
     public List<String> mget(List<String> keys) {
-        List<String> results = new ArrayList<>(keys.size());
-        for (String key : keys) {
-            results.add(get(key));
-        }
-        return results;
+        return keys.stream().map(this::get).collect(Collectors.toList());
+    }
+
+    @Override
+    public void mset(Map<String, String> values) {
+        values.forEach(this::set);
     }
 
     @Override

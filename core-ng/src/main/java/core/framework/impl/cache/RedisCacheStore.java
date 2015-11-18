@@ -1,6 +1,7 @@
 package core.framework.impl.cache;
 
 import core.framework.api.redis.Redis;
+import core.framework.api.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -8,6 +9,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author neo
@@ -56,6 +58,19 @@ public class RedisCacheStore implements CacheStore {
         String redisKey = cacheKey(name, key);
         try {
             redis.set(redisKey, value, expiration);
+        } catch (JedisConnectionException e) {
+            logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void putAll(String name, Map<String, String> values, Duration expiration) {
+        Map<String, String> redisValues = Maps.newHashMapWithExpectedSize(values.size());
+        for (Map.Entry<String, String> entry : values.entrySet()) {
+            redisValues.put(cacheKey(name, entry.getKey()), entry.getValue());
+        }
+        try {
+            redis.mset(redisValues);
         } catch (JedisConnectionException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
         }

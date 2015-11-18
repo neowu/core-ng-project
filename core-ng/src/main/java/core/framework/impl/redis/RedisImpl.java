@@ -204,6 +204,33 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
+    public void mset(Map<String, String> values) {
+        StopWatch watch = new StopWatch();
+        PoolItem<BinaryJedis> item = pool.borrowItem();
+        try {
+            byte[][] params = new byte[values.size() * 2][];
+            int i = 0;
+            for (Map.Entry<String, String> entry : values.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                params[i] = encode(key);
+                params[i + 1] = encode(value);
+                i = i + 2;
+            }
+            item.resource.mset(params);
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("mget, values={}, elapsedTime={}", values, elapsedTime);
+            checkSlowQuery(elapsedTime);
+        }
+    }
+
+    @Override
     public Map<String, String> hgetAll(String key) {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();

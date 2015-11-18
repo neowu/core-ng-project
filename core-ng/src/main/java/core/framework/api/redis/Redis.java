@@ -22,6 +22,8 @@ public interface Redis {
 
     List<String> mget(List<String> keys);
 
+    void mset(Map<String, String> values);
+
     Map<String, String> hgetAll(String key);
 
     void hmset(String key, Map<String, String> value);

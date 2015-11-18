@@ -45,6 +45,11 @@ public class LocalCacheStore implements CacheStore {
     }
 
     @Override
+    public void putAll(String name, Map<String, String> values, Duration expiration) {
+        values.forEach((key, value) -> put(name, key, value, expiration));
+    }
+
+    @Override
     public void delete(String name, String key) {
         String cacheKey = cacheKey(name, key);
         caches.remove(cacheKey);

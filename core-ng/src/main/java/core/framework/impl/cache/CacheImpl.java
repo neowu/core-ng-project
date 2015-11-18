@@ -2,12 +2,14 @@ package core.framework.impl.cache;
 
 import core.framework.api.cache.Cache;
 import core.framework.api.util.JSON;
+import core.framework.api.util.Maps;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -44,6 +46,7 @@ public class CacheImpl<T> implements Cache<T> {
         Iterator<String> cacheValueIterator = cacheStore.getAll(name, keys).iterator();
         List<T> values = new ArrayList<>(keys.size());
 
+        Map<String, String> newValues = Maps.newHashMap();
         while (true) {
             if (!cacheValueIterator.hasNext()) break;
             String cacheValue = cacheValueIterator.next();
@@ -51,13 +54,13 @@ public class CacheImpl<T> implements Cache<T> {
 
             if (cacheValue == null) {
                 T value = loader.apply(key);
-                put(key, value);
+                newValues.put(key, JSON.toJSON(value));
                 values.add(value);
             } else {
                 values.add(JSON.fromJSON(valueType, cacheValue));
             }
         }
-
+        if (!newValues.isEmpty()) cacheStore.putAll(name, newValues, duration);
         return values;
     }
 

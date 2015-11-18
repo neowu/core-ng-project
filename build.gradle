@@ -111,7 +111,8 @@ project(':demo-service') {
 
     dependencies {
         compile(
-                project(':core-ng')
+                project(':core-ng'),
+                'redis.clients:jedis:2.7.3@jar'
         )
         testCompile(
                 project(':core-ng-test'),

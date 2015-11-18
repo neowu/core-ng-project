@@ -1,6 +1,7 @@
 package core.framework.impl.cache;
 
 import core.framework.api.util.Lists;
+import core.framework.api.util.Maps;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +35,16 @@ public class CacheImplTest {
     }
 
     @Test
+    public void getIfMiss() {
+        when(cacheStore.get("name", "key")).thenReturn(null);
+
+        Integer value = cache.get("key", key -> 1);
+        Assert.assertEquals(1, (int) value);
+
+        verify(cacheStore).put("name", "key", "1", Duration.ofHours(1));
+    }
+
+    @Test
     public void put() {
         cache.put("key", 1);
 
@@ -48,6 +59,6 @@ public class CacheImplTest {
         List<Integer> results = cache.getAll(keys, key -> 2);
         Assert.assertEquals(Lists.newArrayList(1, 2, 3), results);
 
-        verify(cacheStore).put("name", "key2", "2", Duration.ofHours(1));
+        verify(cacheStore).putAll("name", Maps.newHashMap("key2", "2"), Duration.ofHours(1));
     }
 }
