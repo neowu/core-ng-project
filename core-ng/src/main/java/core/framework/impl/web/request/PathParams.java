@@ -1,5 +1,6 @@
 package core.framework.impl.web.request;
 
+import core.framework.api.util.Charsets;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.BadRequestException;
@@ -13,7 +14,7 @@ public class PathParams {
     final Map<String, String> params = Maps.newHashMap();
 
     public void put(String name, String value) {
-        String previousValue = params.putIfAbsent(name, value);
+        String previousValue = params.putIfAbsent(name, decodePathSegment(value));
         if (previousValue != null) throw Exceptions.error("duplicated path variable found, name={}", name);
     }
 
@@ -49,5 +50,37 @@ public class PathParams {
         } catch (NumberFormatException e) {
             throw new BadRequestException("failed to parse value to int, value=" + value, BadRequestException.DEFAULT_ERROR_CODE, e);
         }
+    }
+
+    // refer to http://www.ietf.org/rfc/rfc3986.txt
+    // refer to org.springframework.web.util.UriUtils#decode
+    String decodePathSegment(String path) {
+        int length = path.length();
+        byte[] buffer = new byte[length];
+        int offset = 0;
+        boolean changed = false;
+        for (int i = 0; i < length; i++) {
+            int ch = path.charAt(i);
+            if (ch == '%') {
+                if ((i + 2) >= length) throw Exceptions.error("invalid encoded sequence, value={}", path.substring(i));
+
+                char hex1 = path.charAt(i + 1);
+                char hex2 = path.charAt(i + 2);
+                int u = Character.digit(hex1, 16);
+                int l = Character.digit(hex2, 16);
+
+                if (u == -1 || l == -1) throw Exceptions.error("invalid encoded sequence, value={}", path.substring(i));
+
+                buffer[offset] = (byte) ((u << 4) + l);
+                offset++;
+                i += 2;
+
+                changed = true;
+            } else {
+                buffer[offset] = (byte) ch;
+                offset++;
+            }
+        }
+        return changed ? new String(buffer, 0, offset, Charsets.UTF_8) : path;
     }
 }

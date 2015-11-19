@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.8.5 (11/19/2015)
+* encodings: removed hex encoding, we don't have use case any more, use base64 instead
+* encodings: removed url encoding from Encodings, added URIBuilder
+
 ### 3.8.4 (11/18/2015)
 * cache: support get multiple keys in batch
 * cache: changed get(Supplier) to get(Function<String,T>) to keep consistent with getAll, and be more functional style

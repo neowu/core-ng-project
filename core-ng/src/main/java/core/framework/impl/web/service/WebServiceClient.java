@@ -7,11 +7,11 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.http.HTTPResponse;
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
+import core.framework.api.util.URIBuilder;
 import core.framework.api.web.exception.RemoteServiceException;
 import core.framework.api.web.service.WebServiceRequestSigner;
 import core.framework.impl.log.ActionLog;
@@ -56,7 +56,7 @@ public class WebServiceClient {
                 int paramIndex = value.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : value.length();
                 String variable = value.substring(1, endIndex);
-                builder.append('/').append(Encodings.urlPath(pathParams.get(variable)));
+                builder.append('/').append(URIBuilder.encodePathSegment(pathParams.get(variable)));
             } else {
                 builder.append('/').append(value);
             }

@@ -1,5 +1,6 @@
 package core.framework.impl.template.fragment;
 
+import core.framework.api.util.URIBuilder;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
@@ -38,25 +39,12 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
     }
 
     private boolean valid(String url) {
-        //TODO: better way to prevent XSS?
         int length = url.length();
         if (length == 0) return false;
         if (url.contains("javascript:")) return false;
         for (int i = 0; i < length; i++) {
             char ch = url.charAt(i);
-            if (Character.isWhitespace(ch)) return false;
-            switch (ch) {
-                case '<':
-                    return false;
-                case '>':
-                    return false;
-                case '\'':
-                    return false;
-                case '"':
-                    return false;
-                default:
-                    break;
-            }
+            if (!URIBuilder.isValidURIChar(ch)) return false;
         }
         return true;
     }

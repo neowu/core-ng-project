@@ -69,7 +69,7 @@ public final class Strings {
                 for (int j = i; j < length; j++) {
                     char ch = chars[j];
                     if (isLowerCase(ch)) {
-                        chars[j] = (char) (ch & 0x5f);
+                        chars[j] = (char) (ch & 0x5F);
                     }
                 }
                 return String.valueOf(chars);
