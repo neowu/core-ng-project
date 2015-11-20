@@ -19,9 +19,10 @@ public final class URIBuilder {
        query         = *( pchar / "/" / "?" )
        fragment      = *( pchar / "/" / "?" )
     */
-    static final BitSet P_CHAR = new BitSet(128);
-    static final BitSet QUERY_OR_FRAGMENT = new BitSet(128);
-    static final BitSet GEN_DELIMS = new BitSet(8);
+    private static final BitSet P_CHAR = new BitSet(128);
+    private static final BitSet QUERY_PARAM = new BitSet(128);
+    private static final BitSet FRAGMENT = new BitSet(128);
+    private static final BitSet GEN_DELIMS = new BitSet(8);
 
     static {
         // unreserved
@@ -54,9 +55,14 @@ public final class URIBuilder {
         P_CHAR.set(':');
         P_CHAR.set('@');
 
-        P_CHAR.stream().forEach(QUERY_OR_FRAGMENT::set);
-        QUERY_OR_FRAGMENT.set('/');
-        QUERY_OR_FRAGMENT.set('?');
+        P_CHAR.stream().forEach(FRAGMENT::set);
+        FRAGMENT.set('/');
+        FRAGMENT.set('?');
+
+        FRAGMENT.stream().forEach(QUERY_PARAM::set);
+        QUERY_PARAM.clear('+');   // this is not on rfc3986, but query param can not contains +/=/& (not like query), another wise it will mislead query string parsing
+        QUERY_PARAM.clear('=');
+        QUERY_PARAM.clear('&');
 
         GEN_DELIMS.set(':');
         GEN_DELIMS.set('/');
@@ -73,6 +79,14 @@ public final class URIBuilder {
 
     public static String encodePathSegment(String segment) {
         return encode(P_CHAR, segment);
+    }
+
+    static String encodeQueryParam(String param) {
+        return encode(QUERY_PARAM, param);
+    }
+
+    static String encodeFragment(String fragment) {
+        return encode(FRAGMENT, fragment);
     }
 
     // refer to http://www.ietf.org/rfc/rfc3986.txt
@@ -138,7 +152,7 @@ public final class URIBuilder {
     }
 
     public URIBuilder fragment(String fragment) {
-        this.fragment = encode(QUERY_OR_FRAGMENT, fragment);
+        this.fragment = encodeFragment(fragment);
         return this;
     }
 
@@ -159,7 +173,7 @@ public final class URIBuilder {
     public URIBuilder addQueryParam(String name, String value) {
         if (query == null) query = new StringBuilder();
         else query.append('&');
-        query.append(encode(QUERY_OR_FRAGMENT, name)).append('=').append(encode(QUERY_OR_FRAGMENT, value));
+        query.append(encodeQueryParam(name)).append('=').append(encodeQueryParam(value));
         return this;
     }
 

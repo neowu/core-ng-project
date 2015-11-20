@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.8.7 (11/20/2015)
+* bug: fixed QueryParam encoding to encode +/?/=
+
 ### 3.8.6 (11/20/2015)
 * bug: fixed URLFragment.isValidURL to allow '%'
 * util: enhanced ByteBuf to make it can be used in broader scenario.
