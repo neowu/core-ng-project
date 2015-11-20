@@ -1,6 +1,5 @@
 package core.framework.api.util;
 
-import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
@@ -80,22 +79,22 @@ public final class URIBuilder {
     // refer to org.springframework.web.util.HierarchicalUriComponents#encodeUriComponent
     static String encode(BitSet safeChars, String value) {
         byte[] bytes = Strings.bytes(value);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream(bytes.length * 2);
+        ByteBuf buffer = ByteBuf.newBuffer(bytes.length * 2);
         boolean changed = false;
         for (byte b : bytes) {
             if (b >= 0 && safeChars.get(b)) {   // the bytes java returned is signed, but we only need to check ascii (0-127)
-                stream.write(b);
+                buffer.put(b);
             } else {
-                stream.write('%');
+                buffer.put((byte) '%');
                 char hex1 = toUpper(Character.forDigit((b >> 4) & 0xF, 16));
                 char hex2 = toUpper(Character.forDigit(b & 0xF, 16));
-                stream.write(hex1);
-                stream.write(hex2);
+                buffer.put((byte) hex1);
+                buffer.put((byte) hex2);
 
                 changed = true;
             }
         }
-        return changed ? new String(stream.toByteArray(), StandardCharsets.US_ASCII) : value;    // return original string to help GC
+        return changed ? buffer.text(StandardCharsets.US_ASCII) : value;    // return original string to help GC
     }
 
     private static char toUpper(char ch) {
@@ -114,13 +113,13 @@ public final class URIBuilder {
     }
 
     public URIBuilder(String uri) {
-        URI uriValue = URI.create(uri);
-        this.hostAddress = uriValue.getHost();
-        this.scheme = uriValue.getScheme();
-        if (uriValue.getPort() != -1) port = uriValue.getPort();
-        if (uriValue.getRawPath() != null) path = new StringBuilder(uriValue.getRawPath());
-        if (uriValue.getRawQuery() != null) query = new StringBuilder(uriValue.getRawQuery());
-        fragment = uriValue.getRawFragment();
+        URI parsedURI = URI.create(uri);
+        this.hostAddress = parsedURI.getHost();
+        this.scheme = parsedURI.getScheme();
+        if (parsedURI.getPort() != -1) port = parsedURI.getPort();
+        if (parsedURI.getRawPath() != null) path = new StringBuilder(parsedURI.getRawPath());
+        if (parsedURI.getRawQuery() != null) query = new StringBuilder(parsedURI.getRawQuery());
+        fragment = parsedURI.getRawFragment();
     }
 
     public URIBuilder scheme(String scheme) {

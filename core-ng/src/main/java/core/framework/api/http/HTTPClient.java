@@ -76,12 +76,12 @@ public final class HTTPClient {
     }
 
     private ByteBuf responseBody(HttpEntity entity) throws IOException {
+        int length = (int) entity.getContentLength();
+        ByteBuf buffer = length >= 0 ? ByteBuf.newBufferWithExpectedLength(length) : ByteBuf.newBuffer(4096);
         try (InputStream stream = entity.getContent()) {
-            int length = (int) entity.getContentLength();
-            ByteBuf buffer = length >= 0 ? ByteBuf.newBufferWithExpectedLength(length) : ByteBuf.newBuffer();
-            buffer.read(stream);
-            return buffer;
+            buffer.put(stream);
         }
+        return buffer;
     }
 
     private void logResponseText(HTTPResponse response) {

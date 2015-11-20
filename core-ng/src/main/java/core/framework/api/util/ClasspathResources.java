@@ -33,7 +33,7 @@ public final class ClasspathResources {
 
         try (InputStream stream = connection.getInputStream()) {
             ByteBuf buffer = ByteBuf.newBufferWithExpectedLength(length);
-            buffer.read(stream);
+            buffer.put(stream);
             return buffer.bytes();
         } catch (IOException e) {
             throw new UncheckedIOException(e);

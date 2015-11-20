@@ -1,6 +1,6 @@
 package core.framework.impl.web.request;
 
-import core.framework.api.util.Charsets;
+import core.framework.api.util.ByteBuf;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.BadRequestException;
@@ -56,31 +56,24 @@ public class PathParams {
     // refer to org.springframework.web.util.UriUtils#decode
     String decodePathSegment(String path) {
         int length = path.length();
-        byte[] buffer = new byte[length];
-        int offset = 0;
+        ByteBuf buffer = ByteBuf.newBuffer(length);
         boolean changed = false;
         for (int i = 0; i < length; i++) {
             int ch = path.charAt(i);
             if (ch == '%') {
-                if ((i + 2) >= length) throw Exceptions.error("invalid encoded sequence, value={}", path.substring(i));
-
+                if ((i + 2) >= length) throw new BadRequestException("invalid path, value=" + path.substring(i));
                 char hex1 = path.charAt(i + 1);
                 char hex2 = path.charAt(i + 2);
                 int u = Character.digit(hex1, 16);
                 int l = Character.digit(hex2, 16);
-
-                if (u == -1 || l == -1) throw Exceptions.error("invalid encoded sequence, value={}", path.substring(i));
-
-                buffer[offset] = (byte) ((u << 4) + l);
-                offset++;
+                if (u == -1 || l == -1) throw new BadRequestException("invalid path, value=" + path.substring(i));
+                buffer.put((byte) ((u << 4) + l));
                 i += 2;
-
                 changed = true;
             } else {
-                buffer[offset] = (byte) ch;
-                offset++;
+                buffer.put((byte) ch);
             }
         }
-        return changed ? new String(buffer, 0, offset, Charsets.UTF_8) : path;
+        return changed ? buffer.text() : path;
     }
 }

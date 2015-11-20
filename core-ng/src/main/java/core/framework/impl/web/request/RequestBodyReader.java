@@ -26,7 +26,7 @@ public class RequestBodyReader implements ChannelListener<StreamSourceChannel> {
         this.exchange = exchange;
         this.handler = handler;
         int length = (int) exchange.getRequestContentLength();
-        if (length < 0) body = ByteBuf.newBuffer();
+        if (length < 0) body = ByteBuf.newBuffer(4096);
         else body = ByteBuf.newBufferWithExpectedLength(length);
     }
 
@@ -47,7 +47,7 @@ public class RequestBodyReader implements ChannelListener<StreamSourceChannel> {
                 bytesRead = channel.read(buffer);
                 if (bytesRead <= 0) break;
                 buffer.flip();
-                body.read(buffer);
+                body.put(buffer);
             }
             if (bytesRead == -1) {
                 complete = true;

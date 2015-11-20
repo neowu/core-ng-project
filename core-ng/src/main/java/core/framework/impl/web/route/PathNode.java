@@ -19,8 +19,8 @@ class PathNode {
 
     private final Map<String, PathNode> staticNodes = Maps.newHashMap();
     private final List<DynamicNode> dynamicNodes = Lists.newArrayList();
+    protected URLHandler handler;
     private DynamicNode wildcardNode;
-    URLHandler handler;
 
     URLHandler register(String pathPattern) {
         return register(pathPattern, Path.parse(pathPattern).next);
@@ -33,7 +33,7 @@ class PathNode {
         } else if (currentPath.value.startsWith(":")) {
             Matcher matcher = DYNAMIC_PATH_PATTERN.matcher(currentPath.value);
             if (!matcher.matches())
-                throw new Error("path param must follow :name or :name(regex|*), path=" + pathPattern);
+                throw Exceptions.error("path param must follow :name or :name(regex|*), path={}", pathPattern);
             String name = matcher.group(1);
             String pattern = matcher.group(3);
             return registerDynamicNode(pathPattern, currentPath, name, pattern);

@@ -11,36 +11,47 @@ import java.util.Arrays;
  */
 public final class ByteBuf {
     // ByteBuf is not thread safe
-    public static ByteBuf newBuffer() {
-        return new ByteBuf(-1);
+    public static ByteBuf newBuffer(int initialCapacity) {
+        return new ByteBuf(initialCapacity, -1);
     }
 
     public static ByteBuf newBufferWithExpectedLength(int length) {
         if (length < 0) throw Exceptions.error("expected length must not less than 0, length={}", length);
-        return new ByteBuf(length);
+        return new ByteBuf(-1, length);
     }
 
-    byte[] bytes;
     private final int expectedLength;
+    byte[] bytes;
     int position;
 
-    private ByteBuf(int expectedLength) {
+    private ByteBuf(int initialCapacity, int expectedLength) {
         if (expectedLength >= 0) {
             bytes = new byte[expectedLength];
             this.expectedLength = expectedLength;
         } else {
-            bytes = new byte[4096];    // 4k as minimal buffer
+            bytes = new byte[initialCapacity];    // 4k as minimal buffer
             this.expectedLength = -1;
         }
     }
 
-    public void read(ByteBuffer buffer) throws IOException {
+    public void put(byte value) {
+        int currentLength = bytes.length;
+        if (position >= currentLength) {
+            if (expectedLength > 0)
+                throw Exceptions.error("input exceeds expected length, expected={}", expectedLength);
+            bytes = Arrays.copyOf(bytes, currentLength * 2);
+        }
+        bytes[position] = value;
+        position++;
+    }
+
+    public void put(ByteBuffer buffer) throws IOException {
         int size = buffer.remaining();
         if (size == 0) return;
 
         if (position + size > bytes.length) {
             if (expectedLength > 0)
-                throw new IOException("stream does not end as expected, expected=" + expectedLength);
+                throw new IOException("input exceeds expected length, expected=" + expectedLength);
 
             int newSize = bytes.length * 2;
             if (newSize < position + size) newSize = position + size;
@@ -51,7 +62,7 @@ public final class ByteBuf {
         position += size;
     }
 
-    public void read(InputStream stream) throws IOException {
+    public void put(InputStream stream) throws IOException {
         if (expectedLength >= 0) {
             readInputStreamWithExpectedLength(stream);
         } else {
@@ -66,7 +77,7 @@ public final class ByteBuf {
             position += bytesRead;
         }
         if (stream.read() != -1) {
-            throw new IOException("stream does not end as expected, expected=" + expectedLength);
+            throw new IOException("input exceeds expected length, expected=" + expectedLength);
         }
     }
 
