@@ -2,6 +2,7 @@ package core.framework.api.util;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -23,8 +24,11 @@ public class EncodingsTest {
 
     @Test
     public void base64URLSafe() {
-        String message = "leasure.";
-        String encodedMessage = Encodings.base64URLSafe(Strings.bytes(message));
-        assertEquals(message, new String(Encodings.decodeBase64(encodedMessage), Charsets.UTF_8));
+        byte[] bytes = new byte[256];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) i;
+        }
+        String encodedMessage = Encodings.base64URLSafe(bytes);
+        assertArrayEquals(bytes, Encodings.decodeBase64URLSafe(encodedMessage));
     }
 }

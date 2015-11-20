@@ -15,10 +15,14 @@ public final class Encodings {
     }
 
     public static byte[] decodeBase64(String text) {
-        return Base64.getDecoder().decode(Strings.bytes(text));
+        return Base64.getDecoder().decode(text);
     }
 
     public static String base64URLSafe(byte[] bytes) {
         return Base64.getUrlEncoder().encodeToString(bytes);
+    }
+
+    public static byte[] decodeBase64URLSafe(String text) {
+        return Base64.getUrlDecoder().decode(text);
     }
 }
