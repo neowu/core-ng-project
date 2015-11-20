@@ -12,8 +12,17 @@ import org.slf4j.LoggerFactory;
  * @author neo
  */
 public class URLFragment implements Fragment {  // this is for dynamic href/src only, static href won't be processed during compilation
+    static boolean isValidURL(String url) {
+        int length = url.length();
+        if (length == 0) return false;
+        if (url.contains("javascript:")) return false;
+        for (int i = 0; i < length; i++) {
+            char ch = url.charAt(i);
+            if (!URIBuilder.isValidURIChar(ch)) return false;
+        }
+        return true;
+    }
     private final Logger logger = LoggerFactory.getLogger(URLFragment.class);
-
     private final ExpressionHolder expression;
     private final String location;
     private final boolean cdn;
@@ -31,21 +40,10 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
     }
 
     private String url(String url, TemplateContext context) {
-        if (!valid(url)) {
+        if (!isValidURL(url)) {
             logger.warn("illegal url detected, url={}, location={}", url, location);
             return "";
         }
         return cdn ? context.cdn.url(url) : url;
-    }
-
-    private boolean valid(String url) {
-        int length = url.length();
-        if (length == 0) return false;
-        if (url.contains("javascript:")) return false;
-        for (int i = 0; i < length; i++) {
-            char ch = url.charAt(i);
-            if (!URIBuilder.isValidURIChar(ch)) return false;
-        }
-        return true;
     }
 }

@@ -42,25 +42,33 @@ public class URIBuilderTest {
     }
 
     @Test
+    public void buildFromExistingURI() {
+        URIBuilder builder = new URIBuilder("http://localhost/path%201/path2?k1=v1+v1&k2=v2");
+        Assert.assertEquals("http://localhost/path%201/path2?k1=v1+v1&k2=v2", builder.toURI());
+    }
+
+    @Test
     public void buildRelativeURL() {
         URIBuilder builder = new URIBuilder()
             .addPath("path1")
             .addPath("path2");
 
-        Assert.assertEquals("/path1/path2", builder.toURI());
+        Assert.assertEquals("path1/path2", builder.toURI());
 
         builder.addQueryParam("k1", "v1");
         builder.addQueryParam("k2", "v2");
 
-        Assert.assertEquals("/path1/path2?k1=v1&k2=v2", builder.toURI());
+        Assert.assertEquals("path1/path2?k1=v1&k2=v2", builder.toURI());
     }
 
     @Test
-    public void isValidURIChar() {
-        String uri = "http://example.com/:@-._~!$&'()*+,=;:@-._~!$&'()*+,=:@-._~!$&'()*+,==?/?:@-._~!$'()*+,;=/?:@-._~!$'()*+,;==#/?:@-._~!$&'()*+,;=";
+    public void buildRelativeURLWithTrailingSlash() {
+        URIBuilder builder = new URIBuilder()
+            .addSlash()
+            .addPath("path1")
+            .addPath("path2")
+            .addSlash();
 
-        for (int i = 0; i < uri.length(); i++) {
-            Assert.assertTrue(URIBuilder.isValidURIChar(uri.charAt(i)));
-        }
+        Assert.assertEquals("/path1/path2/", builder.toURI());
     }
 }

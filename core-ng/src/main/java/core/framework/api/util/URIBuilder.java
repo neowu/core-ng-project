@@ -1,6 +1,7 @@
 package core.framework.api.util;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 
@@ -20,8 +21,8 @@ public final class URIBuilder {
        segment       = *pchar
        query         = *( pchar / "/" / "?" )
     */
-    static final BitSet P_CHAR = new BitSet(256);
-    static final BitSet QUERY = new BitSet(256);
+    static final BitSet P_CHAR = new BitSet(128);
+    static final BitSet QUERY = new BitSet(128);
     static final BitSet GEN_DELIMS = new BitSet(8);
 
     static {
@@ -83,13 +84,12 @@ public final class URIBuilder {
         ByteArrayOutputStream stream = new ByteArrayOutputStream(bytes.length * 2);
         boolean changed = false;
         for (byte b : bytes) {
-            int ch = b & 0xFF;
-            if (safeChars.get(ch)) {
-                stream.write(ch);
+            if (b >= 0 && safeChars.get(b)) {   // the bytes java returned is signed, but we only need to check ascii (0-127)
+                stream.write(b);
             } else {
                 stream.write('%');
-                char hex1 = toUpper(Character.forDigit((ch >> 4) & 0xF, 16));
-                char hex2 = toUpper(Character.forDigit(ch & 0xF, 16));
+                char hex1 = toUpper(Character.forDigit((b >> 4) & 0xF, 16));
+                char hex2 = toUpper(Character.forDigit(b & 0xF, 16));
                 stream.write(hex1);
                 stream.write(hex2);
 
@@ -108,7 +108,19 @@ public final class URIBuilder {
     private String hostAddress;
     private Integer port;
     private StringBuilder path;
-    private StringBuffer query;
+    private StringBuilder query;
+
+    public URIBuilder() {
+    }
+
+    public URIBuilder(String uri) {
+        URI uriValue = URI.create(uri);
+        this.hostAddress = uriValue.getHost();
+        this.scheme = uriValue.getScheme();
+        if (uriValue.getPort() != -1) this.port = uriValue.getPort();
+        if (uriValue.getRawPath() != null) path = new StringBuilder(uriValue.getRawPath());
+        if (uriValue.getRawQuery() != null) query = new StringBuilder("?").append(uriValue.getRawQuery());
+    }
 
     public URIBuilder scheme(String scheme) {
         this.scheme = scheme;
@@ -125,14 +137,22 @@ public final class URIBuilder {
         return this;
     }
 
+    public URIBuilder addSlash() {
+        if (path == null) path = new StringBuilder("/");
+        else if (path.length() > 0 && path.charAt(path.length() - 1) == '/') throw Exceptions.error("current path is already ended with '/', path={}", path);
+        else path.append('/');
+        return this;
+    }
+
     public URIBuilder addPath(String segment) {
         if (path == null) path = new StringBuilder();
-        path.append('/').append(encode(P_CHAR, segment));
+        if (path.length() > 0 && path.charAt(path.length() - 1) != '/') path.append('/');
+        path.append(encode(P_CHAR, segment));
         return this;
     }
 
     public URIBuilder addQueryParam(String name, String value) {
-        if (query == null) query = new StringBuffer("?");
+        if (query == null) query = new StringBuilder("?");
         else query.append('&');
         query.append(encode(QUERY, name)).append('=').append(encode(QUERY, value));
         return this;
