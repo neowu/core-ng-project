@@ -14,7 +14,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class SearchConfig {
+public final class SearchConfig {
     private final Logger logger = LoggerFactory.getLogger(SearchConfig.class);
     private final ModuleContext context;
     private final ElasticSearch search;

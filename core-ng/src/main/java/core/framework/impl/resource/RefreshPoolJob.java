@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public class RefreshPoolJob implements Job {
+public final class RefreshPoolJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(RefreshPoolJob.class);
 
     private final Pool<?> pool;

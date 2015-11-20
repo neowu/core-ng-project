@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  * @author neo
  */
-public class ParameterizedTypeImpl implements ParameterizedType {
+public final class ParameterizedTypeImpl implements ParameterizedType {
     private final Type rawType;
     private final Type[] arguments;
     private final Type ownerType;

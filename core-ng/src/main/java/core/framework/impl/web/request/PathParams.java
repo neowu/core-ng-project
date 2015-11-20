@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class PathParams {
+public final class PathParams {
     final Map<String, String> params = Maps.newHashMap();
 
     public void put(String name, String value) {

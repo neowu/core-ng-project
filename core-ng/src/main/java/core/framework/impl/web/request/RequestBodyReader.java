@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 /**
  * @author neo
  */
-public class RequestBodyReader implements ChannelListener<StreamSourceChannel> {
+public final class RequestBodyReader implements ChannelListener<StreamSourceChannel> {
     static final AttachmentKey<RequestBody> REQUEST_BODY = AttachmentKey.create(RequestBody.class);
 
     private final HttpServerExchange exchange;

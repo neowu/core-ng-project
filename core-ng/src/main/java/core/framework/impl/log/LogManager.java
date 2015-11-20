@@ -6,16 +6,14 @@ import org.slf4j.Logger;
 /**
  * @author neo
  */
-public class LogManager {
-    Logger logger;
+public final class LogManager {
     public final String appName;
-
     private final ThreadLocal<ActionLog> actionLog = new ThreadLocal<>();
     private final ThreadLocal<TraceLogger> traceLogger = new ThreadLocal<>();
-
     public TraceLoggerFactory traceLoggerFactory;
     public LogForwarder logForwarder;
     public ActionLogger actionLogger;
+    Logger logger;
 
     public LogManager() {
         this.appName = System.getProperty("core.appName");

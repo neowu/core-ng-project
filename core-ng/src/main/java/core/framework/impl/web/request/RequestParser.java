@@ -20,7 +20,7 @@ import java.util.Deque;
 /**
  * @author neo
  */
-public class RequestParser {
+public final class RequestParser {
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {

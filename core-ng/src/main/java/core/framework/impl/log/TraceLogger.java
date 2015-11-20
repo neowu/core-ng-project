@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author neo
  */
-class TraceLogger {
+final class TraceLogger {
     private static final DateTimeFormatter TRACE_LOG_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
     private static final int MAX_HOLD_SIZE = 5000;
     private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLogger.class.getCanonicalName());

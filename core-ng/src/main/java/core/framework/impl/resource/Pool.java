@@ -17,21 +17,18 @@ import java.util.function.Supplier;
  * this is for internal use only,
  * <p>
  * the reason not using template/lambda pattern but classic design
- * is to keep original exception, and simplify value writing,
+ * is to keep original exception, and simplify context variable access (read or write var within method),
  * <p>
  * the downside is boilerplate code, so to keep it only for internal
  *
  * @author neo
  */
-public class Pool<T> {
-    private final Logger logger = LoggerFactory.getLogger(Pool.class);
-
-    private final Supplier<T> factory;
-    private final ResourceCloseHandler<T> closeHandler;
-
+public final class Pool<T> {
     final BlockingDeque<PoolItem<T>> idleItems = new LinkedBlockingDeque<>();
     final AtomicInteger total = new AtomicInteger(0);
-
+    private final Logger logger = LoggerFactory.getLogger(Pool.class);
+    private final Supplier<T> factory;
+    private final ResourceCloseHandler<T> closeHandler;
     String name;
     int minSize = 1;
     int maxSize = 50;

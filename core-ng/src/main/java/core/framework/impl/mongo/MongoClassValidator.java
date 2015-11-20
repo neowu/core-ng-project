@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class MongoClassValidator implements TypeVisitor {
+public final class MongoClassValidator implements TypeVisitor {
     private final TypeValidator validator;
     private final Map<String, Set<String>> fields = Maps.newHashMap();
     private boolean validateView;

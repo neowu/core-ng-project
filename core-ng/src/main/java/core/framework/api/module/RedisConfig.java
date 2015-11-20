@@ -11,7 +11,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class RedisConfig {
+public final class RedisConfig {
     private final ModuleContext context;
     private final RedisImpl redis;
 

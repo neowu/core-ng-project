@@ -10,7 +10,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class MongoConfig {
+public final class MongoConfig {
     private final MongoOption mongo;
 
     public MongoConfig(ModuleContext context) {

@@ -9,7 +9,7 @@ import java.util.Deque;
 /**
  * @author neo
  */
-public class ShutdownHook implements Runnable {
+public final class ShutdownHook implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
 
     private final Deque<Runnable> methods = new ArrayDeque<>();
