@@ -68,7 +68,7 @@ public final class URIBuilder {
     }
 
     public static boolean isValidURIChar(char ch) {
-        return P_CHAR.get(ch) || GEN_DELIMS.get(ch);
+        return P_CHAR.get(ch) || GEN_DELIMS.get(ch) || ch == '%';
     }
 
     public static String encodePathSegment(String segment) {

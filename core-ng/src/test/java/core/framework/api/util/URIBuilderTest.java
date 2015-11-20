@@ -51,6 +51,8 @@ public class URIBuilderTest {
 
     @Test
     public void buildRelativeURL() {
+        assertEquals("/?k1=v1%20v2", new URIBuilder().addSlash().addQueryParam("k1", "v1 v2").toURI());
+
         URIBuilder builder = new URIBuilder()
             .addPath("path1")
             .addPath("path2");
