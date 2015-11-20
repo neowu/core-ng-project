@@ -1,7 +1,8 @@
 package core.framework.api.util;
 
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author neo
@@ -9,17 +10,17 @@ import org.junit.Test;
 public class URIBuilderTest {
     @Test
     public void encodePathSegment() {
-        Assert.assertEquals("utf-8:%E2%9C%93", URIBuilder.encodePathSegment("utf-8:✓"));
-        Assert.assertEquals("v1%20v2", URIBuilder.encodePathSegment("v1 v2"));
-        Assert.assertEquals("v1+v2", URIBuilder.encodePathSegment("v1+v2"));
-        Assert.assertEquals("v1%2Fv2", URIBuilder.encodePathSegment("v1/v2"));
+        assertEquals("utf-8:%E2%9C%93", URIBuilder.encodePathSegment("utf-8:✓"));
+        assertEquals("v1%20v2", URIBuilder.encodePathSegment("v1 v2"));
+        assertEquals("v1+v2", URIBuilder.encodePathSegment("v1+v2"));
+        assertEquals("v1%2Fv2", URIBuilder.encodePathSegment("v1/v2"));
     }
 
     @Test
     public void encodeQuery() {
-        Assert.assertEquals("k1=v1", URIBuilder.encode(URIBuilder.QUERY, "k1=v1"));
-        Assert.assertEquals("k1=v1%20v2", URIBuilder.encode(URIBuilder.QUERY, "k1=v1 v2"));
-        Assert.assertEquals("k1=v1/v2?", URIBuilder.encode(URIBuilder.QUERY, "k1=v1/v2?"));
+        assertEquals("k1=v1", URIBuilder.encode(URIBuilder.QUERY_OR_FRAGMENT, "k1=v1"));
+        assertEquals("k1=v1%20v2", URIBuilder.encode(URIBuilder.QUERY_OR_FRAGMENT, "k1=v1 v2"));
+        assertEquals("k1=v1/v2?", URIBuilder.encode(URIBuilder.QUERY_OR_FRAGMENT, "k1=v1/v2?"));
     }
 
     @Test
@@ -29,22 +30,23 @@ public class URIBuilderTest {
             .addPath("path1")
             .addPath("path2");
 
-        Assert.assertEquals("//example.com/path1/path2", builder.toURI());
+        assertEquals("//example.com/path1/path2", builder.toURI());
 
         builder.addQueryParam("k1", "v1")
             .addQueryParam("k2", "v2");
 
-        Assert.assertEquals("//example.com/path1/path2?k1=v1&k2=v2", builder.toURI());
+        assertEquals("//example.com/path1/path2?k1=v1&k2=v2", builder.toURI());
 
         builder.scheme("http")
             .port(8080);
-        Assert.assertEquals("http://example.com:8080/path1/path2?k1=v1&k2=v2", builder.toURI());
+        assertEquals("http://example.com:8080/path1/path2?k1=v1&k2=v2", builder.toURI());
     }
 
     @Test
     public void buildFromExistingURI() {
-        URIBuilder builder = new URIBuilder("http://localhost/path%201/path2?k1=v1+v1&k2=v2");
-        Assert.assertEquals("http://localhost/path%201/path2?k1=v1+v1&k2=v2", builder.toURI());
+        assertEquals("http://localhost/path%201/path2?k1=v1+v1&k2=v2", new URIBuilder("http://localhost/path%201/path2?k1=v1+v1&k2=v2").toURI());
+
+        assertEquals("//localhost:8080/path1/path2/", new URIBuilder("//localhost:8080/path1").addPath("path2").addSlash().toURI());
     }
 
     @Test
@@ -53,12 +55,15 @@ public class URIBuilderTest {
             .addPath("path1")
             .addPath("path2");
 
-        Assert.assertEquals("path1/path2", builder.toURI());
+        assertEquals("path1/path2", builder.toURI());
 
         builder.addQueryParam("k1", "v1");
         builder.addQueryParam("k2", "v2");
 
-        Assert.assertEquals("path1/path2?k1=v1&k2=v2", builder.toURI());
+        assertEquals("path1/path2?k1=v1&k2=v2", builder.toURI());
+
+        builder.fragment("f1/f2");
+        assertEquals("path1/path2?k1=v1&k2=v2#f1/f2", builder.toURI());
     }
 
     @Test
@@ -69,6 +74,6 @@ public class URIBuilderTest {
             .addPath("path2")
             .addSlash();
 
-        Assert.assertEquals("/path1/path2/", builder.toURI());
+        assertEquals("/path1/path2/", builder.toURI());
     }
 }

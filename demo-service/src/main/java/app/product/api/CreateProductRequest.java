@@ -11,6 +11,10 @@ import javax.xml.bind.annotation.XmlElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CreateProductRequest {
+    @NotNull(message = "id is required")
+    @XmlElement(name = "id")
+    public String id;
+
     @NotNull(message = "name is required")
     @XmlElement(name = "name")
     public String name;

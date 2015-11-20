@@ -12,9 +12,9 @@ import java.util.Map;
  * @author neo
  */
 public class ProductService {
-    private final Map<Integer, ProductView> products = Maps.newConcurrentHashMap();
+    private final Map<String, ProductView> products = Maps.newConcurrentHashMap();
 
-    public ProductView get(int id) {
+    public ProductView get(String id) {
         ProductView view = products.get(id);
         if (view == null) throw new NotFoundException("product not found, id=" + id);
         return view;
@@ -23,7 +23,7 @@ public class ProductService {
 
     public void create(CreateProductRequest request) {
         ProductView product = new ProductView();
-        product.id = products.size() + 1;
+        product.id = request.id;
         product.name = request.name;
         product.description = request.description;
         product.createdTime = LocalDateTime.now();

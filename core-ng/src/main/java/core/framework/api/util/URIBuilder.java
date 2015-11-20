@@ -11,8 +11,6 @@ import java.util.BitSet;
 public final class URIBuilder {
     /*
        pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
-       query         = *( pchar / "/" / "?" )
-       fragment      = *( pchar / "/" / "?" )
        pct-encoded   = "%" HEXDIG HEXDIG
        unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
        sub-delims    = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
@@ -20,9 +18,10 @@ public final class URIBuilder {
 
        segment       = *pchar
        query         = *( pchar / "/" / "?" )
+       fragment      = *( pchar / "/" / "?" )
     */
     static final BitSet P_CHAR = new BitSet(128);
-    static final BitSet QUERY = new BitSet(128);
+    static final BitSet QUERY_OR_FRAGMENT = new BitSet(128);
     static final BitSet GEN_DELIMS = new BitSet(8);
 
     static {
@@ -56,9 +55,9 @@ public final class URIBuilder {
         P_CHAR.set(':');
         P_CHAR.set('@');
 
-        P_CHAR.stream().forEach(QUERY::set);
-        QUERY.set('/');
-        QUERY.set('?');
+        P_CHAR.stream().forEach(QUERY_OR_FRAGMENT::set);
+        QUERY_OR_FRAGMENT.set('/');
+        QUERY_OR_FRAGMENT.set('?');
 
         GEN_DELIMS.set(':');
         GEN_DELIMS.set('/');
@@ -109,6 +108,7 @@ public final class URIBuilder {
     private Integer port;
     private StringBuilder path;
     private StringBuilder query;
+    private String fragment;
 
     public URIBuilder() {
     }
@@ -117,9 +117,10 @@ public final class URIBuilder {
         URI uriValue = URI.create(uri);
         this.hostAddress = uriValue.getHost();
         this.scheme = uriValue.getScheme();
-        if (uriValue.getPort() != -1) this.port = uriValue.getPort();
+        if (uriValue.getPort() != -1) port = uriValue.getPort();
         if (uriValue.getRawPath() != null) path = new StringBuilder(uriValue.getRawPath());
-        if (uriValue.getRawQuery() != null) query = new StringBuilder("?").append(uriValue.getRawQuery());
+        if (uriValue.getRawQuery() != null) query = new StringBuilder(uriValue.getRawQuery());
+        fragment = uriValue.getRawFragment();
     }
 
     public URIBuilder scheme(String scheme) {
@@ -134,6 +135,11 @@ public final class URIBuilder {
 
     public URIBuilder port(Integer port) {
         this.port = port;
+        return this;
+    }
+
+    public URIBuilder fragment(String fragment) {
+        this.fragment = encode(QUERY_OR_FRAGMENT, fragment);
         return this;
     }
 
@@ -152,9 +158,9 @@ public final class URIBuilder {
     }
 
     public URIBuilder addQueryParam(String name, String value) {
-        if (query == null) query = new StringBuilder("?");
+        if (query == null) query = new StringBuilder();
         else query.append('&');
-        query.append(encode(QUERY, name)).append('=').append(encode(QUERY, value));
+        query.append(encode(QUERY_OR_FRAGMENT, name)).append('=').append(encode(QUERY_OR_FRAGMENT, value));
         return this;
     }
 
@@ -174,7 +180,11 @@ public final class URIBuilder {
         }
 
         if (query != null) {
-            builder.append(query);
+            builder.append('?').append(query);
+        }
+
+        if (fragment != null) {
+            builder.append('#').append(fragment);
         }
 
         return builder.toString();

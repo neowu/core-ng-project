@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ProductView {
     @XmlElement(name = "id")
-    public Integer id;
+    public String id;
 
     @NotNull(message = "name is required")
     @XmlElement(name = "name")

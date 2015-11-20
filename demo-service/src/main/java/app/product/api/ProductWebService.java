@@ -12,8 +12,8 @@ import core.framework.api.web.service.ResponseStatus;
  */
 public interface ProductWebService {
     @GET
-    @Path("/product/:id(\\d+)")
-    ProductView get(@PathParam("id") Integer id);
+    @Path("/product/:id")
+    ProductView get(@PathParam("id") String id);
 
     @POST
     @Path("/product")

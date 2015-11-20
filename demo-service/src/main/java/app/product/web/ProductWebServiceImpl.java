@@ -16,7 +16,7 @@ public class ProductWebServiceImpl implements ProductWebService {
     ProductService productService;
 
     @Override
-    public ProductView get(Integer id) {
+    public ProductView get(String id) {
         ActionLogContext.put("pid", id);
         return productService.get(id);
     }
