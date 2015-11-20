@@ -29,7 +29,7 @@ public final class ByteBuf {
             bytes = new byte[expectedLength];
             this.expectedLength = expectedLength;
         } else {
-            bytes = new byte[initialCapacity];    // 4k as minimal buffer
+            bytes = new byte[initialCapacity];
             this.expectedLength = -1;
         }
     }
