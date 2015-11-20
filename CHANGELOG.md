@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.8.6 (11/20/2015)
+* bug: fixed URLFragment.isValidURL to allow '%'
+* util: enhanced ByteBuf to make it can be used in broader scenario.
+
 ### 3.8.5 (11/19/2015)
 * encodings: removed hex encoding, we don't have use case any more, use base64 instead
 * encodings: removed url encoding from Encodings, added URIBuilder
