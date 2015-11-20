@@ -145,7 +145,7 @@ public final class URIBuilder {
 
     public URIBuilder addSlash() {
         if (path == null) path = new StringBuilder("/");
-        else if (path.length() > 0 && path.charAt(path.length() - 1) == '/') throw Exceptions.error("current path is already ended with '/', path={}", path);
+        else if (path.length() > 0 && path.charAt(path.length() - 1) == '/') throw Exceptions.error("current path already ends with '/', path={}", path);
         else path.append('/');
         return this;
     }
