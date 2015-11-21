@@ -46,23 +46,23 @@ public class WebServiceClient {
     }
 
     public String serviceURL(String pathPattern, Map<String, String> pathParams) {
-        StringBuilder builder = new StringBuilder(serviceURL);
+        URIBuilder builder = new URIBuilder(serviceURL);
         Path path = Path.parse(pathPattern).next; // skip the first '/'
         while (path != null) {
             String value = path.value;
             if ("/".equals(value)) {
-                builder.append(value);
+                builder.addPath("");
             } else if (value.startsWith(":")) {
                 int paramIndex = value.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : value.length();
                 String variable = value.substring(1, endIndex);
-                builder.append('/').append(URIBuilder.encodePathSegment(pathParams.get(variable)));
+                builder.addPath(pathParams.get(variable));
             } else {
-                builder.append('/').append(value);
+                builder.addPath(value);
             }
             path = path.next;
         }
-        return builder.toString();
+        return builder.toURI();
     }
 
     public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {

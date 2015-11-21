@@ -44,10 +44,9 @@ public class WebServiceClientTest {
     public void serviceURL() {
         Assert.assertEquals("http://localhost", webServiceClient.serviceURL("/", Maps.newHashMap()));     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
         Assert.assertEquals("http://localhost/test", webServiceClient.serviceURL("/test", Maps.newHashMap()));
+        Assert.assertEquals("http://localhost/test/", webServiceClient.serviceURL("/test/", Maps.newHashMap()));
 
-        Map<String, String> pathParams = Maps.newHashMap();
-        pathParams.put("id", "1");
-
+        Map<String, String> pathParams = Maps.newHashMap("id", "1");
         Assert.assertEquals("http://localhost/test/1", webServiceClient.serviceURL("/test/:id(\\d+)", pathParams));
         Assert.assertEquals("http://localhost/test/1", webServiceClient.serviceURL("/test/:id", pathParams));
     }

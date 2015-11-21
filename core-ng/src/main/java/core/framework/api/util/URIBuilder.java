@@ -1,6 +1,5 @@
 package core.framework.api.util;
 
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 
@@ -22,7 +21,6 @@ public final class URIBuilder {
     private static final BitSet P_CHAR = new BitSet(128);
     private static final BitSet QUERY_PARAM = new BitSet(128);
     private static final BitSet FRAGMENT = new BitSet(128);
-    private static final BitSet GEN_DELIMS = new BitSet(8);
 
     static {
         // unreserved
@@ -55,29 +53,17 @@ public final class URIBuilder {
         P_CHAR.set(':');
         P_CHAR.set('@');
 
-        P_CHAR.stream().forEach(FRAGMENT::set);
+        FRAGMENT.or(P_CHAR);
         FRAGMENT.set('/');
         FRAGMENT.set('?');
 
-        FRAGMENT.stream().forEach(QUERY_PARAM::set);
+        QUERY_PARAM.or(FRAGMENT);
         QUERY_PARAM.clear('+');   // this is not on rfc3986, but query param can not contains +/=/& (not like query), another wise it will mislead query string parsing
         QUERY_PARAM.clear('=');
         QUERY_PARAM.clear('&');
-
-        GEN_DELIMS.set(':');
-        GEN_DELIMS.set('/');
-        GEN_DELIMS.set('?');
-        GEN_DELIMS.set('#');
-        GEN_DELIMS.set('[');
-        GEN_DELIMS.set(']');
-        GEN_DELIMS.set('@');
     }
 
-    public static boolean isValidURIChar(char ch) {
-        return P_CHAR.get(ch) || GEN_DELIMS.get(ch) || ch == '%';
-    }
-
-    public static String encodePathSegment(String segment) {
+    static String encodePathSegment(String segment) {
         return encode(P_CHAR, segment);
     }
 
@@ -116,90 +102,37 @@ public final class URIBuilder {
         return ch;
     }
 
-    private String scheme;
-    private String hostAddress;
-    private Integer port;
-    private StringBuilder path;
-    private StringBuilder query;
-    private String fragment;
+    private final StringBuilder uri;
+    private boolean queryStarted;
 
     public URIBuilder() {
+        uri = new StringBuilder();
     }
 
-    public URIBuilder(String uri) {
-        URI parsedURI = URI.create(uri);
-        this.hostAddress = parsedURI.getHost();
-        this.scheme = parsedURI.getScheme();
-        if (parsedURI.getPort() != -1) port = parsedURI.getPort();
-        if (parsedURI.getRawPath() != null) path = new StringBuilder(parsedURI.getRawPath());
-        if (parsedURI.getRawQuery() != null) query = new StringBuilder(parsedURI.getRawQuery());
-        fragment = parsedURI.getRawFragment();
-    }
-
-    public URIBuilder scheme(String scheme) {
-        this.scheme = scheme;
-        return this;
-    }
-
-    public URIBuilder hostAddress(String hostAddress) {
-        this.hostAddress = hostAddress;
-        return this;
-    }
-
-    public URIBuilder port(Integer port) {
-        this.port = port;
-        return this;
+    public URIBuilder(String prefix) {
+        uri = new StringBuilder(prefix);
+        queryStarted = prefix.indexOf('?') > 0;
     }
 
     public URIBuilder fragment(String fragment) {
-        this.fragment = encodeFragment(fragment);
-        return this;
-    }
-
-    public URIBuilder addSlash() {
-        if (path == null) path = new StringBuilder("/");
-        else if (path.length() > 0 && path.charAt(path.length() - 1) == '/') throw Exceptions.error("current path already ends with '/', path={}", path);
-        else path.append('/');
+        uri.append('#').append(encodeFragment(fragment));
         return this;
     }
 
     public URIBuilder addPath(String segment) {
-        if (path == null) path = new StringBuilder();
-        if (path.length() > 0 && path.charAt(path.length() - 1) != '/') path.append('/');
-        path.append(encode(P_CHAR, segment));
+        if (queryStarted) throw Exceptions.error("path segment must not be added after query, uri={}", uri.toString());
+        if (uri.length() > 0 && uri.charAt(uri.length() - 1) != '/') uri.append('/');
+        uri.append(encode(P_CHAR, segment));
         return this;
     }
 
     public URIBuilder addQueryParam(String name, String value) {
-        if (query == null) query = new StringBuilder();
-        else query.append('&');
-        query.append(encodeQueryParam(name)).append('=').append(encodeQueryParam(value));
+        uri.append(queryStarted ? '&' : '?').append(encodeQueryParam(name)).append('=').append(encodeQueryParam(value));
+        queryStarted = true;
         return this;
     }
 
     public String toURI() {
-        StringBuilder builder = new StringBuilder(64);
-
-        if (hostAddress != null) {
-            if (scheme == null) builder.append("//");
-            else builder.append(scheme).append("://");
-            builder.append(hostAddress);
-            if (port != null) builder.append(':').append(port);
-            if (path != null && path.charAt(0) != '/') builder.append('/');
-        }
-
-        if (path != null) {
-            builder.append(path);
-        }
-
-        if (query != null) {
-            builder.append('?').append(query);
-        }
-
-        if (fragment != null) {
-            builder.append('#').append(fragment);
-        }
-
-        return builder.toString();
+        return uri.toString();
     }
 }
