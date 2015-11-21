@@ -15,7 +15,7 @@ public class TextContentFragment implements Fragment {
         if (index == length) return text;
         StringBuilder builder = new StringBuilder(length * 2);
         for (int i = 0; i < index; i++) builder.append(text.charAt(i));
-        for (; index < text.length(); index++) {
+        for (; index < length; index++) {
             char ch = text.charAt(index);
             switch (ch) {
                 case '<':

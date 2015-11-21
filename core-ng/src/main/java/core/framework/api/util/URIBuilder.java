@@ -87,7 +87,7 @@ public final class URIBuilder {
             }
         }
         if (index == length) return value;
-        ByteBuf buffer = ByteBuf.newBuffer(bytes.length * 2);
+        ByteBuf buffer = ByteBuf.newBuffer(length * 2);
         if (index > 0) buffer.put(bytes, 0, index);
         for (; index < length; index++) {
             byte b = bytes[index];
