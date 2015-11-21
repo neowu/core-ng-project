@@ -20,7 +20,6 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
        unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
        sub-delims    = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
        gen-delims    = ":" / "/" / "?" / "#" / "[" / "]" / "@"
-
        segment       = *pchar
        query         = *( pchar / "/" / "?" )
        fragment      = *( pchar / "/" / "?" )
@@ -57,11 +56,9 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
         // ":" and "@"
         VALID_URI.set(':');
         VALID_URI.set('@');
-
         // fragment and query
         VALID_URI.set('/');
         VALID_URI.set('?');
-
         // gen-delims
         VALID_URI.set(':');
         VALID_URI.set('/');
@@ -70,7 +67,6 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
         VALID_URI.set('[');
         VALID_URI.set(']');
         VALID_URI.set('@');
-
         // escape char
         VALID_URI.set('%');
     }

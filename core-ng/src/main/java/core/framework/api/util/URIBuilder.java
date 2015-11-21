@@ -58,7 +58,7 @@ public final class URIBuilder {
         FRAGMENT.set('?');
 
         QUERY_PARAM.or(FRAGMENT);
-        QUERY_PARAM.clear('+');   // this is not on rfc3986, but query param can not contains +/=/& (not like query), another wise it will mislead query string parsing
+        QUERY_PARAM.clear('+');   // this is not defined in rfc3986, but query param can not contains +/=/& (not like query), another wise it will mislead query string parsing
         QUERY_PARAM.clear('=');
         QUERY_PARAM.clear('&');
     }
@@ -75,14 +75,23 @@ public final class URIBuilder {
         return encode(FRAGMENT, fragment);
     }
 
-    // refer to http://www.ietf.org/rfc/rfc3986.txt
-    // refer to org.springframework.web.util.HierarchicalUriComponents#encodeUriComponent
+    // refer to http://www.ietf.org/rfc/rfc3986.txt, org.springframework.web.util.HierarchicalUriComponents#encodeUriComponent
     static String encode(BitSet safeChars, String value) {
         byte[] bytes = Strings.bytes(value);
+        int length = bytes.length;
+        int index = 0;
+        for (; index < length; index++) {
+            byte b = bytes[index];
+            if (b < 0 || !safeChars.get(b)) {   // the bytes java returned is signed, but we only need to check ascii (0-127)
+                break;
+            }
+        }
+        if (index == length) return value;
         ByteBuf buffer = ByteBuf.newBuffer(bytes.length * 2);
-        boolean changed = false;
-        for (byte b : bytes) {
-            if (b >= 0 && safeChars.get(b)) {   // the bytes java returned is signed, but we only need to check ascii (0-127)
+        if (index > 0) buffer.put(bytes, 0, index);
+        for (; index < length; index++) {
+            byte b = bytes[index];
+            if (b >= 0 && safeChars.get(b)) {
                 buffer.put(b);
             } else {
                 buffer.put((byte) '%');
@@ -90,11 +99,9 @@ public final class URIBuilder {
                 char hex2 = toUpper(Character.forDigit(b & 0xF, 16));
                 buffer.put((byte) hex1);
                 buffer.put((byte) hex2);
-
-                changed = true;
             }
         }
-        return changed ? buffer.text(StandardCharsets.US_ASCII) : value;    // return original string to help GC
+        return buffer.text(StandardCharsets.US_ASCII);
     }
 
     private static char toUpper(char ch) {

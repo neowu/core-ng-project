@@ -60,18 +60,18 @@ public class ByteBufTest {
     }
 
     @Test
-    public void growCapacity() throws IOException {
+    public void expandCapacity() throws IOException {
         String text = "12345678901234567890";
         byte[] bytes = Strings.bytes(text);
         ByteBuf buffer = ByteBuf.newBuffer(128);
 
         buffer.bytes = new byte[4];
         buffer.put(ByteBuffer.wrap(bytes, 0, 6));
-        assertEquals("grow 2x size", 8, buffer.bytes.length);
+        assertEquals("expand 2x size", 8, buffer.bytes.length);
         assertEquals(6, buffer.position);
 
         buffer.put(ByteBuffer.wrap(bytes, 6, 14));
-        assertEquals("grow to available size", 20, buffer.bytes.length);
+        assertEquals("expand to available size", 20, buffer.bytes.length);
         assertEquals(20, buffer.position);
 
         assertEquals(text, buffer.text());
@@ -79,13 +79,31 @@ public class ByteBufTest {
 
     @Test
     public void putByte() {
+        String text = "12345678901234567890";
+        byte[] bytes = Strings.bytes(text);
+
         ByteBuf buffer = ByteBuf.newBuffer(2);
-        for (int i = 0; i < 255; i++) {
-            buffer.put((byte) i);
+        for (byte b : bytes) {
+            buffer.put(b);
         }
-        assertEquals(255, buffer.bytes().length);
-        assertEquals((byte) 0, buffer.bytes()[0]);
-        assertEquals((byte) 254, buffer.bytes()[254]);
+        assertEquals(bytes.length, buffer.bytes().length);
+        assertEquals(bytes[0], buffer.bytes()[0]);
+        assertEquals(bytes[bytes.length - 1], buffer.bytes()[bytes.length - 1]);
+    }
+
+    @Test
+    public void putBytes() {
+        String text = "01234567890123456789";
+        byte[] bytes = Strings.bytes(text);
+
+        ByteBuf buffer = ByteBuf.newBuffer(2);
+        buffer.put(bytes, 0, 1);
+        buffer.put(bytes, 10, 10);
+
+        assertEquals(11, buffer.bytes().length);
+        assertEquals(bytes[0], buffer.bytes()[0]);
+        assertEquals(bytes[10], buffer.bytes()[1]);
+        assertEquals(bytes[19], buffer.bytes()[10]);
     }
 
     @Test
@@ -104,7 +122,7 @@ public class ByteBufTest {
     }
 
     @Test
-    public void bytes() throws IOException {
+    public void bytes() {
         byte[] bytes = Strings.bytes("12345678901234567890");
         ByteBuf buffer = ByteBuf.newBuffer(128);
         buffer.put(ByteBuffer.wrap(bytes));

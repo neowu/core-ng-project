@@ -10,42 +10,65 @@ import core.framework.impl.template.expression.ExpressionHolder;
  */
 public class TextContentFragment implements Fragment {
     static String escapeHTML(String text) {
-        boolean changed = false;
-        StringBuilder builder = new StringBuilder(text.length() * 2);
-        for (int i = 0; i < text.length(); i++) {
-            char ch = text.charAt(i);
+        int length = text.length();
+        int index = findHTMLReservedChar(text);
+        if (index == length) return text;
+        StringBuilder builder = new StringBuilder(length * 2);
+        for (int i = 0; i < index; i++) builder.append(text.charAt(i));
+        for (; index < text.length(); index++) {
+            char ch = text.charAt(index);
             switch (ch) {
                 case '<':
                     builder.append("&lt;");
-                    changed = true;
                     break;
                 case '>':
                     builder.append("&gt;");
-                    changed = true;
                     break;
                 case '"':
                     builder.append("&quot;");
-                    changed = true;
                     break;
                 case '&':
                     builder.append("&amp;");
-                    changed = true;
                     break;
                 case '\'':
                     builder.append("&#39;");
-                    changed = true;
                     break;
                 case '/':
                     builder.append("&#47;");
-                    changed = true;
                     break;
                 default:
                     builder.append(ch);
                     break;
             }
         }
-        return changed ? builder.toString() : text;
+        return builder.toString();
     }
+
+    private static int findHTMLReservedChar(String text) {
+        int length = text.length();
+        int index = 0;
+        for (; index < length; index++) {
+            char ch = text.charAt(index);
+            switch (ch) {
+                case '<':
+                    return index;
+                case '>':
+                    return index;
+                case '"':
+                    return index;
+                case '&':
+                    return index;
+                case '\'':
+                    return index;
+                case '/':
+                    return index;
+                default:
+                    break;
+            }
+        }
+        return index;
+    }
+
     private final ExpressionHolder expression;
 
     public TextContentFragment(String expression, TemplateMetaContext context, String location) {

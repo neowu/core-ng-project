@@ -52,28 +52,32 @@ public final class PathParams {
         }
     }
 
-    // refer to http://www.ietf.org/rfc/rfc3986.txt
-    // refer to org.springframework.web.util.UriUtils#decode
+    // refer to http://www.ietf.org/rfc/rfc3986.txt, org.springframework.web.util.UriUtils#decode
     String decodePathSegment(String path) {
         int length = path.length();
+        int index = 0;
+        for (; index < length; index++) {
+            int ch = path.charAt(index);
+            if (ch == '%') break;
+        }
+        if (index == length) return path;
         ByteBuf buffer = ByteBuf.newBuffer(length);
-        boolean changed = false;
-        for (int i = 0; i < length; i++) {
-            int ch = path.charAt(i);
+        for (int i = 0; i < index; i++) buffer.put((byte) path.charAt(i));
+        for (; index < length; index++) {
+            int ch = path.charAt(index);
             if (ch == '%') {
-                if ((i + 2) >= length) throw new BadRequestException("invalid path, value=" + path.substring(i));
-                char hex1 = path.charAt(i + 1);
-                char hex2 = path.charAt(i + 2);
+                if ((index + 2) >= length) throw new BadRequestException("invalid path, value=" + path.substring(index));
+                char hex1 = path.charAt(index + 1);
+                char hex2 = path.charAt(index + 2);
                 int u = Character.digit(hex1, 16);
                 int l = Character.digit(hex2, 16);
-                if (u == -1 || l == -1) throw new BadRequestException("invalid path, value=" + path.substring(i));
+                if (u == -1 || l == -1) throw new BadRequestException("invalid path, value=" + path.substring(index));
                 buffer.put((byte) ((u << 4) + l));
-                i += 2;
-                changed = true;
+                index += 2;
             } else {
                 buffer.put((byte) ch);
             }
         }
-        return changed ? buffer.text() : path;
+        return buffer.text();
     }
 }

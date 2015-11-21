@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 
 /**
  * @author neo
@@ -35,29 +34,21 @@ public final class ByteBuf {
     }
 
     public void put(byte value) {
-        int currentLength = bytes.length;
-        if (position >= currentLength) {
-            if (expectedLength > 0)
-                throw Exceptions.error("input exceeds expected length, expected={}", expectedLength);
-            bytes = Arrays.copyOf(bytes, currentLength * 2);
-        }
+        ensureCapacity(1);
         bytes[position] = value;
         position++;
     }
 
-    public void put(ByteBuffer buffer) throws IOException {
+    public void put(byte[] bytes, int offset, int length) {
+        ensureCapacity(length);
+        System.arraycopy(bytes, offset, this.bytes, position, length);
+        position += length;
+    }
+
+    public void put(ByteBuffer buffer) {
         int size = buffer.remaining();
         if (size == 0) return;
-
-        if (position + size > bytes.length) {
-            if (expectedLength > 0)
-                throw new IOException("input exceeds expected length, expected=" + expectedLength);
-
-            int newSize = bytes.length * 2;
-            if (newSize < position + size) newSize = position + size;
-            bytes = Arrays.copyOf(bytes, newSize);
-        }
-
+        ensureCapacity(size);
         buffer.get(bytes, position, size);
         position += size;
     }
@@ -67,6 +58,22 @@ public final class ByteBuf {
             readInputStreamWithExpectedLength(stream);
         } else {
             readInputStream(stream);
+        }
+    }
+
+    private void ensureCapacity(int lengthToAdd) {
+        int currentLength = bytes.length;
+        int newLength = position + lengthToAdd;
+        if (newLength > currentLength) {
+            if (expectedLength > 0)
+                throw Exceptions.error("input exceeds expected length, expected={}", expectedLength);
+
+            int newSize = currentLength * 2;    // expand to 2x at least
+            if (newSize < newLength) newSize = newLength;
+
+            byte[] newBytes = new byte[newSize];
+            System.arraycopy(bytes, 0, newBytes, 0, position);
+            bytes = newBytes;
         }
     }
 
@@ -83,13 +90,8 @@ public final class ByteBuf {
 
     private void readInputStream(InputStream stream) throws IOException {
         while (true) {
-            int bytesToRead;
-            if (position < bytes.length) {
-                bytesToRead = bytes.length - position;
-            } else {
-                bytesToRead = bytes.length;    // double the buffer
-                bytes = Arrays.copyOf(bytes, position * 2);
-            }
+            ensureCapacity(1);
+            int bytesToRead = bytes.length - position;
             int bytesRead = stream.read(bytes, position, bytesToRead);
             if (bytesRead < 0) break;
             position += bytesRead;
@@ -112,7 +114,9 @@ public final class ByteBuf {
     public byte[] bytes() {
         checkLength();
         if (position == bytes.length) return bytes;
-        return Arrays.copyOf(bytes, position);
+        byte[] result = new byte[position];
+        System.arraycopy(bytes, 0, result, 0, position);
+        return result;
     }
 
     public ByteBuffer byteBuffer() {
