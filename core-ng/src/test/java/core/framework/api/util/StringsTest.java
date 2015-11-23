@@ -41,18 +41,4 @@ public class StringsTest {
         assertFalse(Strings.isEmpty("1"));
         assertFalse(Strings.isEmpty(" 1"));
     }
-
-    @Test
-    public void upperCase() {
-        assertEquals("TEXT", Strings.toUpperCase("tExt"));
-        assertEquals("TEXT", Strings.toUpperCase("TEXT"));
-        assertEquals("01239_-", Strings.toUpperCase("01239_-"));
-    }
-
-    @Test
-    public void lowerCase() {
-        assertEquals("text", Strings.toLowerCase("tExt"));
-        assertEquals("text", Strings.toLowerCase("TEXT"));
-        assertEquals("01239_-", Strings.toLowerCase("01239_-"));
-    }
 }

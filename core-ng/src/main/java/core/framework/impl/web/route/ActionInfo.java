@@ -1,7 +1,7 @@
 package core.framework.impl.web.route;
 
 import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.Strings;
+import core.framework.api.util.ASCII;
 
 /**
  * @author neo
@@ -16,7 +16,7 @@ class ActionInfo {
     }
 
     String action() {
-        return "web/" + Strings.toLowerCase(method.name()) + "-" + transformPathPattern();
+        return "web/" + ASCII.toLowerCase(method.name()) + "-" + transformPathPattern();
     }
 
     private String transformPathPattern() {

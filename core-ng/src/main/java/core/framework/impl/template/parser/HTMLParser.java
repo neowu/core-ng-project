@@ -1,8 +1,8 @@
 package core.framework.impl.template.parser;
 
+import core.framework.api.util.ASCII;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
-import core.framework.api.util.Strings;
 import core.framework.impl.template.node.Attribute;
 import core.framework.impl.template.node.Comment;
 import core.framework.impl.template.node.ContainerNode;
@@ -125,7 +125,7 @@ public class HTMLParser {
     private String validateTagName(String name) {
         for (int i = 0; i < name.length(); i++) {
             char ch = name.charAt(i);
-            if (!(Strings.isLowerCase(ch) || (ch >= '0' && ch <= '9')))
+            if (!ASCII.isLowerCase(ch) && !ASCII.isDigit(ch))
                 throw Exceptions.error("tag name must only contain lower case letter or digit, name={}, location={}", name, lexer.currentLocation());
         }
         return name;

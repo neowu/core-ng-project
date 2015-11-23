@@ -1,7 +1,7 @@
 package core.framework.api.http;
 
+import core.framework.api.util.ASCII;
 import core.framework.api.util.Charsets;
-import core.framework.api.util.Strings;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
@@ -36,7 +36,7 @@ public final class ContentType {
     }
 
     public static ContentType create(String mediaType, Charset charset) {
-        String contentType = charset == null ? mediaType : mediaType + "; charset=" + Strings.toLowerCase(charset.name());
+        String contentType = charset == null ? mediaType : mediaType + "; charset=" + ASCII.toLowerCase(charset.name());
         return new ContentType(contentType, mediaType, charset);
     }
 

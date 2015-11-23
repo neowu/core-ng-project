@@ -1,8 +1,8 @@
 package core.framework.impl.db;
 
 import core.framework.api.db.UncheckedSQLException;
+import core.framework.api.util.ASCII;
 import core.framework.api.util.Maps;
-import core.framework.api.util.Strings;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -33,7 +33,7 @@ final class ResultSetWrapper {
     }
 
     private Integer index(String column) {
-        return columnIndex.get(Strings.toLowerCase(column));
+        return columnIndex.get(ASCII.toLowerCase(column));
     }
 
     // different db are using various of rules to return column name/label, some of reserved case, some does not
@@ -45,7 +45,7 @@ final class ResultSetWrapper {
         Map<String, Integer> index = Maps.newHashMapWithExpectedSize(count);
         for (int i = 1; i < count + 1; i++) {
             String column = meta.getColumnLabel(i);
-            index.put(Strings.toLowerCase(column), i);
+            index.put(ASCII.toLowerCase(column), i);
         }
         return index;
     }

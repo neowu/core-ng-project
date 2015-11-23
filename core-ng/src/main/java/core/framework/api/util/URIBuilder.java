@@ -95,18 +95,13 @@ public final class URIBuilder {
                 buffer.put(b);
             } else {
                 buffer.put((byte) '%');
-                char hex1 = toUpper(Character.forDigit((b >> 4) & 0xF, 16));
-                char hex2 = toUpper(Character.forDigit(b & 0xF, 16));
+                char hex1 = ASCII.toUpperCase(Character.forDigit((b >> 4) & 0xF, 16));
+                char hex2 = ASCII.toUpperCase(Character.forDigit(b & 0xF, 16));
                 buffer.put((byte) hex1);
                 buffer.put((byte) hex2);
             }
         }
         return buffer.text(StandardCharsets.US_ASCII);
-    }
-
-    private static char toUpper(char ch) {
-        if (ch >= 'a' && ch <= 'z') return (char) (ch & 0x5F);
-        return ch;
     }
 
     private final StringBuilder uri;

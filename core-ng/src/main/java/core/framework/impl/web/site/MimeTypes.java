@@ -1,8 +1,8 @@
 package core.framework.impl.web.site;
 
 import core.framework.api.http.ContentType;
+import core.framework.api.util.ASCII;
 import core.framework.api.util.Maps;
-import core.framework.api.util.Strings;
 
 import java.util.Map;
 
@@ -53,7 +53,7 @@ final class MimeTypes {
         int index = fileName.lastIndexOf('.');
         if (index > 0 && index + 1 < fileName.length()) {
             String extension = fileName.substring(index + 1);
-            return MIME_TYPES.get(Strings.toLowerCase(extension));
+            return MIME_TYPES.get(ASCII.toLowerCase(extension));
         }
         return null;
     }

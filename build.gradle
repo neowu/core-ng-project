@@ -106,6 +106,17 @@ project(':log-processor') {
     }
 }
 
+project(':benchmark') {
+    apply from: file("${rootDir}/gradle/app.gradle")
+
+    dependencies {
+        compile(
+                project(':core-ng'),
+                'org.openjdk.jmh:jmh-generator-annprocess:1.11.2'
+        )
+    }
+}
+
 project(':demo-service') {
     apply from: file("${rootDir}/gradle/app.gradle")
 

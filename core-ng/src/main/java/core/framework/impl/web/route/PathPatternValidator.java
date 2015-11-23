@@ -1,5 +1,6 @@
 package core.framework.impl.web.route;
 
+import core.framework.api.util.ASCII;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
@@ -42,7 +43,7 @@ class PathPatternValidator {
 
         for (int i = 0; i < segment.length(); i++) {
             char ch = segment.charAt(i);
-            if (!isLetter(ch) && !isDigit(ch) && ch != '_' && ch != '-' && ch != '.') {
+            if (!ASCII.isLetter(ch) && !ASCII.isDigit(ch) && ch != '_' && ch != '-' && ch != '.') {
                 throw Exceptions.error("path segment must only contain (letter / digit / _ / - / .), segment={}, pathPattern={}", segment, pathPattern);
             }
         }
@@ -51,15 +52,7 @@ class PathPatternValidator {
     private void validateVariable(String variable, String pathPattern) {
         for (int i = 0; i < variable.length(); i++) {
             char ch = variable.charAt(i);
-            if (!isLetter(ch)) throw Exceptions.error("path variable must be letter, variable={}, pathPattern={}", variable, pathPattern);
+            if (!ASCII.isLetter(ch)) throw Exceptions.error("path variable must be letter, variable={}, pathPattern={}", variable, pathPattern);
         }
-    }
-
-    private boolean isLetter(char ch) {
-        return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
-    }
-
-    private boolean isDigit(char ch) {
-        return ch >= '0' && ch <= '9';
     }
 }
