@@ -80,8 +80,8 @@ class HTMLLexer {
         reset();
         String closeTag = "</" + tagName + ">";
         int length = -1;
-        int maxLength = html.length() - closeTag.length();
-        for (int i = currentIndex; i < maxLength; i++) {
+        int maxIndex = html.length() - closeTag.length() + 1;
+        for (int i = currentIndex; i < maxIndex; i++) {
             if (match(i, closeTag)) {
                 length = i - currentIndex;
                 break;
@@ -183,7 +183,7 @@ class HTMLLexer {
     }
 
     private boolean match(int index, String token) {
-        if (index + token.length() >= html.length()) return false;
+        if (index + token.length() > html.length()) return false;
         for (int i = 0; i < token.length(); i++) {
             if (html.charAt(index + i) != token.charAt(i)) return false;
         }

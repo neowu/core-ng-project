@@ -20,7 +20,7 @@ public class HTMLTemplate extends ContainerFragment {
         if (!modelClass.isInstance(context.root))
             throw Exceptions.error("model class does not match, expectedClass={}, actualClass={}", modelClass.getCanonicalName(), context.root.getClass().getCanonicalName());
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(2048);
         process(builder, context);
         return builder.toString();
     }

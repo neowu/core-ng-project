@@ -4,6 +4,7 @@
 * uri: simplify URIBuilder to match our use cases and performance tuning
 * util: ByteBuf put byte[]
 * refactory: performance tuning for html/uri encode/decode
+* bug: fix html parser/lexer process emtpty end script tag.
 
 ### 3.8.7 (11/20/2015)
 * bug: fixed QueryParam encoding to encode +/?/=

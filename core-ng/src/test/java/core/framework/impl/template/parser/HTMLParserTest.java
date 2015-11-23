@@ -7,32 +7,47 @@ import core.framework.impl.template.source.StringTemplateSource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author neo
  */
 public class HTMLParserTest {
     @Test
-    public void parseVoidElements() {
+    public void voidElements() {
         String content = "<html><div><img src=//img.png>text</div></html>";
 
         Document document = new HTMLParser(new StringTemplateSource("test", content)).parse();
-        Assert.assertEquals(1, document.nodes.size());
+        assertEquals(1, document.nodes.size());
 
         Element html = (Element) document.nodes.get(0);
-        Assert.assertEquals("html", html.name);
-        Assert.assertEquals(1, html.nodes.size());
+        assertEquals("html", html.name);
+        assertEquals(1, html.nodes.size());
 
         Element div = (Element) html.nodes.get(0);
-        Assert.assertEquals("div", div.name);
-        Assert.assertEquals(2, div.nodes.size());
-        Assert.assertTrue(div.hasEndTag);
+        assertEquals("div", div.name);
+        assertEquals(2, div.nodes.size());
+        assertTrue(div.hasEndTag);
 
         Element img = (Element) div.nodes.get(0);
-        Assert.assertEquals("img", img.name);
+        assertEquals("img", img.name);
         Assert.assertFalse(img.hasEndTag);
-        Assert.assertEquals("//img.png", img.attributes.attributes.get("src").value);
+        assertEquals("//img.png", img.attributes.attributes.get("src").value);
 
         Text text = (Text) div.nodes.get(1);
-        Assert.assertEquals("text", text.content);
+        assertEquals("text", text.content);
+    }
+
+    @Test
+    public void emptyScript() {
+        String content = "<script type=\"text/javascript\"></script>";
+
+        Document document = new HTMLParser(new StringTemplateSource("test", content)).parse();
+        assertEquals(1, document.nodes.size());
+
+        Element script = (Element) document.nodes.get(0);
+        assertEquals("script", script.name);
+        assertTrue(script.nodes.isEmpty());
     }
 }
