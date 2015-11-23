@@ -79,29 +79,33 @@ public final class URIBuilder {
     static String encode(BitSet safeChars, String value) {
         byte[] bytes = Strings.bytes(value);
         int length = bytes.length;
-        int index = 0;
-        for (; index < length; index++) {
-            byte b = bytes[index];
-            if (b < 0 || !safeChars.get(b)) {   // the bytes java returned is signed, but we only need to check ascii (0-127)
-                break;
+
+        for (int i = 0; i < length; i++) {
+            byte b1 = bytes[i];
+            if (b1 < 0 || !safeChars.get(b1)) {   // the bytes java returned is signed, but we only need to check ascii (0-127)
+                ByteBuf buffer = ByteBuf.newBuffer(length * 2);
+                if (i > 0) buffer.put(bytes, 0, i);
+                for (int j = i; j < length; j++) {
+                    byte b2 = bytes[j];
+                    if (b2 >= 0 && safeChars.get(b2)) {
+                        buffer.put(b2);
+                    } else {
+                        buffer.put((byte) '%');
+                        buffer.put(toDigit((b2 >> 4) & 0xF));
+                        buffer.put(toDigit(b2 & 0xF));
+                    }
+                }
+                return buffer.text(StandardCharsets.US_ASCII);
             }
         }
-        if (index == length) return value;
-        ByteBuf buffer = ByteBuf.newBuffer(length * 2);
-        if (index > 0) buffer.put(bytes, 0, index);
-        for (; index < length; index++) {
-            byte b = bytes[index];
-            if (b >= 0 && safeChars.get(b)) {
-                buffer.put(b);
-            } else {
-                buffer.put((byte) '%');
-                char hex1 = ASCII.toUpperCase(Character.forDigit((b >> 4) & 0xF, 16));
-                char hex2 = ASCII.toUpperCase(Character.forDigit(b & 0xF, 16));
-                buffer.put((byte) hex1);
-                buffer.put((byte) hex2);
-            }
+        return value;
+    }
+
+    private static byte toDigit(int number) {
+        if (number < 10) {
+            return (byte) ('0' + number);
         }
-        return buffer.text(StandardCharsets.US_ASCII);
+        return (byte) ('A' - 10 + number);
     }
 
     private final StringBuilder uri;

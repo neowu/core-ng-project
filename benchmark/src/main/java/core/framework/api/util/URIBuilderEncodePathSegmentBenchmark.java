@@ -26,8 +26,11 @@ public class URIBuilderEncodePathSegmentBenchmark {
         pathSegments.add("path2");
         pathSegments.add("path3");
         pathSegments.add("value1 value2");
+        pathSegments.add("value1+value2");
         pathSegments.add("value1/value2");
         pathSegments.add("/value1");
+        pathSegments.add("utf-8-✓");
+        pathSegments.add("value1?value2");
     }
 
     @Benchmark
