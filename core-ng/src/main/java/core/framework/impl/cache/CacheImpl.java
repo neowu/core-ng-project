@@ -7,7 +7,6 @@ import core.framework.api.util.Maps;
 import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,16 +41,12 @@ public class CacheImpl<T> implements Cache<T> {
 
     @Override
     public List<T> getAll(List<String> keys, Function<String, T> loader) {
-        Iterator<String> keyIterator = keys.iterator();
-        Iterator<String> cacheValueIterator = cacheStore.getAll(name, keys).iterator();
-        List<T> values = new ArrayList<>(keys.size());
-
-        Map<String, String> newValues = Maps.newHashMap();
-        while (true) {
-            if (!cacheValueIterator.hasNext()) break;
-            String cacheValue = cacheValueIterator.next();
-            String key = keyIterator.next();
-
+        int size = keys.size();
+        List<T> values = new ArrayList<>(size);
+        Map<String, String> cacheValues = cacheStore.getAll(name, keys);
+        Map<String, String> newValues = Maps.newHashMapWithExpectedSize(size);
+        for (String key : keys) {
+            String cacheValue = cacheValues.get(key);
             if (cacheValue == null) {
                 T value = loader.apply(key);
                 newValues.put(key, JSON.toJSON(value));
@@ -60,6 +55,7 @@ public class CacheImpl<T> implements Cache<T> {
                 values.add(JSON.fromJSON(valueType, cacheValue));
             }
         }
+
         if (!newValues.isEmpty()) cacheStore.putAll(name, newValues, duration);
         return values;
     }

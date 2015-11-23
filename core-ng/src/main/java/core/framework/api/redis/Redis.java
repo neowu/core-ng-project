@@ -1,7 +1,6 @@
 package core.framework.api.redis;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,11 +19,11 @@ public interface Redis {
 
     void del(String key);
 
-    List<String> mget(List<String> keys);
+    Map<String, String> mget(String... keys);
 
     void mset(Map<String, String> values);
 
     Map<String, String> hgetAll(String key);
 
-    void hmset(String key, Map<String, String> value);
+    void hmset(String key, Map<String, String> values);
 }

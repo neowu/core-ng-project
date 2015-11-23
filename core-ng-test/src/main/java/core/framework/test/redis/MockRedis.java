@@ -4,9 +4,7 @@ import core.framework.api.redis.Redis;
 import core.framework.api.util.Maps;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -53,8 +51,13 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public List<String> mget(List<String> keys) {
-        return keys.stream().map(this::get).collect(Collectors.toList());
+    public Map<String, String> mget(String... keys) {
+        Map<String, String> results = Maps.newHashMapWithExpectedSize(keys.length);
+        for (String key : keys) {
+            String value = get(key);
+            if (value != null) results.put(key, value);
+        }
+        return results;
     }
 
     @Override
@@ -70,10 +73,10 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public void hmset(String key, Map<String, String> value) {
+    public void hmset(String key, Map<String, String> values) {
         @SuppressWarnings("unchecked")
-        Map<String, String> hash = (Map<String, String>) store.computeIfAbsent(key, key1 -> Maps.newConcurrentHashMap());
-        hash.putAll(value);
+        Map<String, String> hash = (Map<String, String>) store.computeIfAbsent(key, redisKey -> Maps.newConcurrentHashMap());
+        hash.putAll(values);
     }
 
     static class Value {

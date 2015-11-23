@@ -1,11 +1,12 @@
 package core.framework.test.redis;
 
-import core.framework.api.util.Lists;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author neo
@@ -23,7 +24,7 @@ public class MockRedisTest {
         redis.set("key", "value");
 
         String value = redis.get("key");
-        Assert.assertEquals("value", value);
+        assertEquals("value", value);
     }
 
     @Test
@@ -31,7 +32,9 @@ public class MockRedisTest {
         redis.set("key1", "value1");
         redis.set("key2", "value2");
 
-        List<String> values = redis.mget(Lists.newArrayList("key1", "key3", "key2"));
-        Assert.assertEquals(Lists.newArrayList("value1", null, "value2"), values);
+        Map<String, String> values = redis.mget("key1", "key3", "key2");
+        assertEquals("value1", values.get("key1"));
+        assertEquals("value2", values.get("key2"));
+        assertNull(values.get("key3"));
     }
 }

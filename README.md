@@ -5,7 +5,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
 * route: validate predefined route can only be alphanum / - / _
-* encoding/escape use most efficient way.
+* create benchmark: refactory and performance tuning
 
 * template, use ByteBuffer[] for performance tuning?
 * async: think about how to support batch with fixed concurrency, or Batch object and chain next easier

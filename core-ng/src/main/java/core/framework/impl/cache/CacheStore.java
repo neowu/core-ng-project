@@ -10,7 +10,7 @@ import java.util.Map;
 public interface CacheStore {
     String get(String name, String key);
 
-    List<String> getAll(String name, List<String> keys);
+    Map<String, String> getAll(String name, List<String> keys);
 
     void put(String name, String key, String value, Duration expiration);
 

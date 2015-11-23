@@ -5,6 +5,7 @@
 * util: ByteBuf put byte[]
 * refactory: performance tuning for html/uri encode/decode
 * bug: fix html parser/lexer process emtpty end script tag.
+* redis: update redis mget to return Map<String,String>
 
 ### 3.8.7 (11/20/2015)
 * bug: fixed QueryParam encoding to encode +/?/=

@@ -2,13 +2,14 @@ package core.framework.impl.cache;
 
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author neo
@@ -23,8 +24,9 @@ public class LocalCacheStoreTest {
 
     @Test
     public void getAll() {
-        List<String> values = cacheStore.getAll("name", Lists.newArrayList("key1", "key2"));
-        Assert.assertEquals(Lists.newArrayList(null, null), values);
+        Map<String, String> values = cacheStore.getAll("name", Lists.newArrayList("key1", "key2"));
+        assertNull(values.get("key1"));
+        assertNull(values.get("key2"));
     }
 
     @Test
@@ -34,7 +36,7 @@ public class LocalCacheStoreTest {
         values.put("key2", "v2");
         cacheStore.putAll("name", values, Duration.ofHours(1));
 
-        Assert.assertEquals("v1", cacheStore.get("name", "key1"));
-        Assert.assertEquals(Lists.newArrayList("v1", "v2"), cacheStore.getAll("name", Lists.newArrayList("key1", "key2")));
+        assertEquals("v1", cacheStore.get("name", "key1"));
+        assertEquals(values, cacheStore.getAll("name", Lists.newArrayList("key1", "key2")));
     }
 }

@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,7 +55,10 @@ public class CacheImplTest {
     @Test
     public void getAll() {
         List<String> keys = Lists.newArrayList("key1", "key2", "key3");
-        when(cacheStore.getAll("name", keys)).thenReturn(Lists.newArrayList("1", null, "3"));
+        Map<String, String> values = Maps.newHashMap();
+        values.put("key1", "1");
+        values.put("key3", "3");
+        when(cacheStore.getAll("name", keys)).thenReturn(values);
 
         List<Integer> results = cache.getAll(keys, key -> 2);
         Assert.assertEquals(Lists.newArrayList(1, 2, 3), results);

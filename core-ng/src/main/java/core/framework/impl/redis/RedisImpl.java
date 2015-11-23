@@ -15,7 +15,6 @@ import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -174,23 +173,23 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
-    public List<String> mget(List<String> keys) {
+    public Map<String, String> mget(String... keys) {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
         try {
-            int size = keys.size();
-            byte[][] binaryKeys = new byte[size][];
-            int i = 0;
-            for (String key : keys) {
-                binaryKeys[i] = encode(key);
-                i++;
+            int size = keys.length;
+            byte[][] redisKeys = new byte[size][];
+            for (int i = 0; i < size; i++) {
+                redisKeys[i] = encode(keys[i]);
             }
-            List<String> results = new ArrayList<>(size);
-            List<byte[]> binaryResults = item.resource.mget(binaryKeys);
-            for (byte[] binaryResult : binaryResults) {
-                results.add(decode(binaryResult));
+            Map<String, String> values = Maps.newHashMapWithExpectedSize(size);
+            List<byte[]> redisValues = item.resource.mget(redisKeys);
+            int index = 0;
+            for (byte[] redisValue : redisValues) {
+                if (redisValue != null) values.put(keys[index], decode(redisValue));
+                index++;
             }
-            return results;
+            return values;
         } catch (JedisConnectionException e) {
             item.broken = true;
             throw e;
@@ -208,16 +207,16 @@ public final class RedisImpl implements Redis {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
         try {
-            byte[][] params = new byte[values.size() * 2][];
+            byte[][] keyValues = new byte[values.size() * 2][];
             int i = 0;
             for (Map.Entry<String, String> entry : values.entrySet()) {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                params[i] = encode(key);
-                params[i + 1] = encode(value);
+                keyValues[i] = encode(key);
+                keyValues[i + 1] = encode(value);
                 i = i + 2;
             }
-            item.resource.mset(params);
+            item.resource.mset(keyValues);
         } catch (JedisConnectionException e) {
             item.broken = true;
             throw e;
@@ -235,12 +234,12 @@ public final class RedisImpl implements Redis {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
         try {
-            Map<byte[], byte[]> binaryResults = item.resource.hgetAll(encode(key));
-            Map<String, String> results = Maps.newHashMapWithExpectedSize(binaryResults.size());
-            for (Map.Entry<byte[], byte[]> entry : binaryResults.entrySet()) {
-                results.put(decode(entry.getKey()), decode(entry.getValue()));
+            Map<byte[], byte[]> redisValues = item.resource.hgetAll(encode(key));
+            Map<String, String> values = Maps.newHashMapWithExpectedSize(redisValues.size());
+            for (Map.Entry<byte[], byte[]> entry : redisValues.entrySet()) {
+                values.put(decode(entry.getKey()), decode(entry.getValue()));
             }
-            return results;
+            return values;
         } catch (JedisConnectionException e) {
             item.broken = true;
             throw e;
@@ -254,15 +253,15 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
-    public void hmset(String key, Map<String, String> value) {
+    public void hmset(String key, Map<String, String> values) {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
         try {
-            Map<byte[], byte[]> binaryValue = Maps.newHashMapWithExpectedSize(value.size());
-            for (Map.Entry<String, String> entry : value.entrySet()) {
-                binaryValue.put(encode(entry.getKey()), encode(entry.getValue()));
+            Map<byte[], byte[]> redisValues = Maps.newHashMapWithExpectedSize(values.size());
+            for (Map.Entry<String, String> entry : values.entrySet()) {
+                redisValues.put(encode(entry.getKey()), encode(entry.getValue()));
             }
-            item.resource.hmset(encode(key), binaryValue);
+            item.resource.hmset(encode(key), redisValues);
         } catch (JedisConnectionException e) {
             item.broken = true;
             throw e;
@@ -270,7 +269,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
-            logger.debug("hmset, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
+            logger.debug("hmset, key={}, values={}, elapsedTime={}", key, values, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }
