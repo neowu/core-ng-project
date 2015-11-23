@@ -1,11 +1,12 @@
 ## Change log
 
-### 3.8.8 (11/20/2015 - )
+### 3.8.8 (11/20/2015 - 11/23/2015)
 * uri: simplify URIBuilder to match our use cases and performance tuning
 * util: ByteBuf put byte[]
 * refactory: performance tuning for html/uri encode/decode
 * bug: fix html parser/lexer process emtpty end script tag.
 * redis: update redis mget to return Map<String,String>
+* route: validate path segment and variable
 
 ### 3.8.7 (11/20/2015)
 * bug: fixed QueryParam encoding to encode +/?/=

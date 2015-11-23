@@ -26,4 +26,15 @@ public class PathPatternValidatorTest {
 
         validator.validate("/:name/path/:name");
     }
+
+    @Test
+    public void validate() {
+        validator.validate("/robot.txt");
+        validator.validate("/images");
+
+        validator.validate("/path-with-trailing-slash/");
+
+        validator.validate("/user/:id/name");
+        validator.validate("/v2/user/:id");
+    }
 }

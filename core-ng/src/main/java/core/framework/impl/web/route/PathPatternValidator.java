@@ -15,14 +15,7 @@ class PathPatternValidator {
             throw Exceptions.error("path pattern must not be empty, pathPattern={}", pathPattern);
 
         if (!pathPattern.startsWith("/"))
-            throw Exceptions.error("path pattern must start with \"/\", pathPattern={}", pathPattern);
-
-        if (pathPattern.contains("./") || pathPattern.endsWith("."))
-            throw Exceptions.error("path pattern must not contain \"/./\", \"/../\" or end with \".\", pathPattern={}", pathPattern);
-
-        // to make sure anyone to use /{name} as dynamic path by mistake
-        if (pathPattern.contains("{") || pathPattern.contains("}"))
-            throw Exceptions.error("path pattern must not contain \"{\", \"}\", pathPattern={}", pathPattern);
+            throw Exceptions.error("path pattern must start with '/', pathPattern={}", pathPattern);
 
         Set<String> variables = Sets.newHashSet();
         String[] tokens = pathPattern.split("/");
@@ -30,10 +23,43 @@ class PathPatternValidator {
             if (token.startsWith(":")) {
                 int paramIndex = token.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : token.length();
-                boolean notDuplicated = variables.add(token.substring(1, endIndex));
+                String variable = token.substring(1, endIndex);
+                validateVariable(variable, pathPattern);
+                boolean notDuplicated = variables.add(variable);
                 if (!notDuplicated)
                     throw Exceptions.error("path must not have duplicated param name, path={}", pathPattern);
+            } else {
+                validatePathSegment(token, pathPattern);
             }
         }
+    }
+
+    private void validatePathSegment(String segment, String pathPattern) {
+        if (segment.length() == 0) return;
+
+        if (segment.charAt(segment.length() - 1) == '.')
+            throw Exceptions.error("path segment must not end with '.', segment={}, pathPattern={}", segment, pathPattern);
+
+        for (int i = 0; i < segment.length(); i++) {
+            char ch = segment.charAt(i);
+            if (!isLetter(ch) && !isDigit(ch) && ch != '_' && ch != '-' && ch != '.') {
+                throw Exceptions.error("path segment must only contain (letter / digit / _ / - / .), segment={}, pathPattern={}", segment, pathPattern);
+            }
+        }
+    }
+
+    private void validateVariable(String variable, String pathPattern) {
+        for (int i = 0; i < variable.length(); i++) {
+            char ch = variable.charAt(i);
+            if (!isLetter(ch)) throw Exceptions.error("path variable must be letter, variable={}, pathPattern={}", variable, pathPattern);
+        }
+    }
+
+    private boolean isLetter(char ch) {
+        return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+    }
+
+    private boolean isDigit(char ch) {
+        return ch >= '0' && ch <= '9';
     }
 }

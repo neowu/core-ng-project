@@ -4,8 +4,9 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* route: validate predefined route can only be alphanum / - / _
 * create benchmark: refactory and performance tuning
+* create ASCII to handle ASCII chars/string
+* String.split by char
 
 * template, use ByteBuffer[] for performance tuning?
 * async: think about how to support batch with fixed concurrency, or Batch object and chain next easier
