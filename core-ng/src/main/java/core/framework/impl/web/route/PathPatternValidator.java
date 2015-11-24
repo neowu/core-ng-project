@@ -19,7 +19,7 @@ class PathPatternValidator {
             throw Exceptions.error("path pattern must start with '/', pathPattern={}", pathPattern);
 
         Set<String> variables = Sets.newHashSet();
-        String[] tokens = pathPattern.split("/");
+        String[] tokens = Strings.split(pathPattern, '/');
         for (String token : tokens) {
             if (token.startsWith(":")) {
                 int paramIndex = token.indexOf('(');

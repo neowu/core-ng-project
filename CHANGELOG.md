@@ -4,6 +4,7 @@
 * benchmark: added jmh for systemically performance turning
 * util: added ASCII to handle ASCII chars
 * web: validate empty pathParam on both server and client side
+* util: fast impl of Strings.split(char)
 
 ### 3.8.8 (11/20/2015 - 11/23/2015)
 * uri: simplify URIBuilder to match our use cases and performance tuning

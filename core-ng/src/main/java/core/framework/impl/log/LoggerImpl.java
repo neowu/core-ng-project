@@ -1,5 +1,7 @@
 package core.framework.impl.log;
 
+import core.framework.api.util.Strings;
+
 import java.io.PrintStream;
 
 /**
@@ -7,7 +9,7 @@ import java.io.PrintStream;
  */
 final class LoggerImpl extends AbstractLogger {
     static String abbreviateLoggerName(String name) {
-        String[] tokens = name.split("\\.");
+        String[] tokens = Strings.split(name, '.');
         StringBuilder builder = new StringBuilder();
         int total = tokens.length >= 4 ? 3 : tokens.length - 1;
         int index = 1;

@@ -1,6 +1,7 @@
 package core.framework.api.module;
 
 import core.framework.api.Module;
+import core.framework.api.util.Strings;
 
 import java.nio.file.Paths;
 
@@ -36,7 +37,7 @@ public final class SystemModule extends Module {
             }
         });
 
-        property("sys.cdn.host").ifPresent(hosts -> site().cdn().hosts(hosts.split(",")));
+        property("sys.cdn.host").ifPresent(hosts -> site().cdn().hosts(Strings.split(hosts, ',')));
         property("sys.cdn.version").ifPresent(version -> site().cdn().version(version));
 
         property("sys.log.actionLogPath").ifPresent(path -> {
@@ -55,7 +56,7 @@ public final class SystemModule extends Module {
         });
         property("sys.log.remoteLogHost").ifPresent(host -> log().forwardLogToRemote(host));
 
-        property("sys.rabbitMQ.host").ifPresent(hosts -> queue().rabbitMQ().hosts(hosts.split(",")));
+        property("sys.rabbitMQ.host").ifPresent(hosts -> queue().rabbitMQ().hosts(Strings.split(hosts, ',')));
         property("sys.rabbitMQ.user").ifPresent(user -> queue().rabbitMQ().user(user));
         property("sys.rabbitMQ.password").ifPresent(password -> queue().rabbitMQ().password(password));
 

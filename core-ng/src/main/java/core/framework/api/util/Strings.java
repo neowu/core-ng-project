@@ -2,6 +2,8 @@ package core.framework.api.util;
 
 import org.slf4j.helpers.MessageFormatter;
 
+import java.util.List;
+
 /**
  * @author neo
  */
@@ -56,5 +58,19 @@ public final class Strings {
         if (text == null)
             return null;
         return text.trim();
+    }
+
+    public static String[] split(String text, char delimiter) {
+        List<String> tokens = Lists.newArrayList();
+        int start = 0;
+        int next;
+        while ((next = text.indexOf(delimiter, start)) != -1) {
+            tokens.add(text.substring(start, next));
+            start = next + 1;
+        }
+        if (start == 0) return new String[]{text};
+        else tokens.add(text.substring(start));
+
+        return tokens.toArray(new String[tokens.size()]);
     }
 }

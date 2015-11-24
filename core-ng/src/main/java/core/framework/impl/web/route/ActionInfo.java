@@ -2,6 +2,7 @@ package core.framework.impl.web.route;
 
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.ASCII;
+import core.framework.api.util.Strings;
 
 /**
  * @author neo
@@ -22,7 +23,7 @@ class ActionInfo {
     private String transformPathPattern() {
         if ("/".equals(pathPattern)) return "root";
 
-        String[] tokens = pathPattern.split("/");
+        String[] tokens = Strings.split(pathPattern, '/');
         StringBuilder builder = new StringBuilder(pathPattern.length());
         int index = 0;
         for (String token : tokens) {

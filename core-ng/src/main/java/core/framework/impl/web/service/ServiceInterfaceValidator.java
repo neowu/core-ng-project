@@ -2,6 +2,7 @@ package core.framework.impl.web.service;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
+import core.framework.api.util.Strings;
 import core.framework.api.web.service.DELETE;
 import core.framework.api.web.service.GET;
 import core.framework.api.web.service.POST;
@@ -72,7 +73,7 @@ public class ServiceInterfaceValidator {
 
     private Set<String> pathVariables(String path) {
         Set<String> names = Sets.newHashSet();
-        String[] tokens = path.split("/");
+        String[] tokens = Strings.split(path, '/');
         for (String token : tokens) {
             if (token.startsWith(":")) {
                 int paramIndex = token.indexOf('(');

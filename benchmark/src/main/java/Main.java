@@ -1,4 +1,4 @@
-import core.framework.api.util.URIBuilderEncodePathSegmentBenchmark;
+import core.framework.api.util.StringsSplitBenchmark;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
@@ -11,10 +11,8 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public class Main {
     public static void main(String[] args) throws RunnerException {
         ChainedOptionsBuilder builder = new OptionsBuilder()
-            .include(URIBuilderEncodePathSegmentBenchmark.class.getSimpleName())
-            .forks(2)
-            .warmupIterations(4)
-            .measurementIterations(10);
+            .include(StringsSplitBenchmark.class.getSimpleName())
+            .forks(1);
 
 //        builder.addProfiler(StackProfiler.class)
 //            .jvmArgsAppend("-Djmh.stack.lines=3");
