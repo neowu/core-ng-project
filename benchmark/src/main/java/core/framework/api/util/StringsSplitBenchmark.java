@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit;
  */
 @State(Scope.Thread)
 @BenchmarkMode(Mode.AverageTime)
-@Warmup(time = 1, timeUnit = TimeUnit.SECONDS, iterations = 3)
+@Warmup(iterations = 3)
+@Measurement(iterations = 10)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-@Measurement(iterations = 10, batchSize = 100)
 public class StringsSplitBenchmark {
     private final List<String> texts = Lists.newArrayList();
 
