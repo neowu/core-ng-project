@@ -1,8 +1,9 @@
 ## Change log
 
-### 3.8.9 (11/23/2015 - )
+### 3.8.9 (11/23/2015 - 11/24/2015)
 * benchmark: added jmh for systemically performance turning
 * util: added ASCII to handle ASCII chars
+* web: validate empty pathParam on both server and client side
 
 ### 3.8.8 (11/20/2015 - 11/23/2015)
 * uri: simplify URIBuilder to match our use cases and performance tuning

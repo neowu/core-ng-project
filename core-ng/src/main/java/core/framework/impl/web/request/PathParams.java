@@ -14,6 +14,7 @@ public final class PathParams {
     final Map<String, String> params = Maps.newHashMap();
 
     public void put(String name, String value) {
+        if (value.length() == 0) throw new BadRequestException("path param must not be empty, name=" + name + ", value=" + value);
         String previousValue = params.putIfAbsent(name, decodePathSegment(value));
         if (previousValue != null) throw Exceptions.error("duplicated path variable found, name={}", name);
     }

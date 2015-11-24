@@ -2,9 +2,12 @@ package core.framework.impl.web.service;
 
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.util.Maps;
+import core.framework.api.validate.ValidationException;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 
 import java.util.Map;
@@ -17,6 +20,9 @@ import static org.mockito.Mockito.verify;
  * @author neo
  */
 public class WebServiceClientTest {
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     private WebServiceClient webServiceClient;
     private HTTPRequest request;
 
@@ -49,5 +55,13 @@ public class WebServiceClientTest {
         Map<String, String> pathParams = Maps.newHashMap("id", "1");
         Assert.assertEquals("http://localhost/test/1", webServiceClient.serviceURL("/test/:id(\\d+)", pathParams));
         Assert.assertEquals("http://localhost/test/1", webServiceClient.serviceURL("/test/:id", pathParams));
+    }
+
+    @Test
+    public void serviceURLWithEmptyPathParam() {
+        exception.expect(ValidationException.class);
+        exception.expectMessage("name=id, value=");
+
+        webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", ""));
     }
 }
