@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.9.0 (11/24/2015 - )
+
+
 ### 3.8.9 (11/23/2015 - 11/24/2015)
 * benchmark: added jmh for systemically performance turning
 * util: added ASCII to handle ASCII chars

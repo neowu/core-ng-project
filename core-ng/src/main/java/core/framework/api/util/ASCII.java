@@ -14,7 +14,9 @@ public final class ASCII {
                 char[] chars = text.toCharArray();
                 for (int j = i; j < length; j++) {
                     char ch = chars[j];
-                    chars[j] = toUpperCase(ch);
+                    if (isLowerCase(ch)) {
+                        chars[j] = (char) (ch & 0x5F);
+                    }
                 }
                 return String.valueOf(chars);
             }
@@ -30,26 +32,14 @@ public final class ASCII {
                 char[] chars = text.toCharArray();
                 for (int j = i; j < length; j++) {
                     char ch = chars[j];
-                    chars[j] = toLowerCase(ch);
+                    if (isUpperCase(ch)) {
+                        chars[j] = (char) (ch ^ 0x20);
+                    }
                 }
                 return String.valueOf(chars);
             }
         }
         return text;
-    }
-
-    public static char toUpperCase(char ch) {
-        if (isLowerCase(ch)) {
-            return (char) (ch & 0x5F);
-        }
-        return ch;
-    }
-
-    public static char toLowerCase(char ch) {
-        if (isUpperCase(ch)) {
-            return (char) (ch ^ 0x20);
-        }
-        return ch;
     }
 
     public static boolean isLowerCase(char ch) {
