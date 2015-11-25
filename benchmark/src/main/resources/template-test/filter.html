@@ -1,0 +1,120 @@
+<aside xmlns:c="http://www.w3.org/1999/xhtml" class="aside">
+    <div class="aside-title">Filters</div>
+    <div class="list-wrapper category-list">
+        <div class="list-heading" c:msg="plp.filter.category">
+            Category
+        </div>
+        <div class="list-body" c:html="categoryTree()">
+        </div>
+        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
+        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+    </div>
+
+    <div class="list-wrapper" c:if="hasVendors()">
+        <div class="list-heading" c:msg="plp.filter.store">
+            Store
+        </div>
+        <div class="list-body">
+            <ul class="list">
+                <li class="list-item active" c:for="vendor:vendors" c:if="isVendorSelected(vendor)">
+                    <a c:href="searchURL(vendor)"><span c:text="vendor.vendorName"></span>(<span
+                            c:text="vendor.total"></span>)</a>
+
+                    <a class="reset-filter" data-exclude-filter="vendor"
+                       c:data-filter-value="vendor.vendorNumber"><i class="fa fa-close"></i></a>
+                </li>
+                <li class="list-item" c:for="vendor:vendors" c:if="!isVendorSelected(vendor)">
+                    <a c:href="searchURL(vendor)"><span c:text="vendor.vendorName"></span>(<span
+                            c:text="vendor.total"></span>)</a>
+                </li>
+            </ul>
+        </div>
+        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
+        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+    </div>
+    <div class="list-wrapper" c:if="hasBrands()">
+        <div class="list-heading" c:msg="plp.filter.brand">
+            Brand
+        </div>
+        <div class="list-body">
+            <ul class="list color-list">
+                <li class="list-item active" c:for="brand:brands" c:if="isBrandSelected(brand)">
+                    <a c:href="searchURL(brand)"><span c:text="brand.brandName"></span>(<span
+                            c:text="brand.total"></span>)</a>
+                    <a class="reset-filter" data-exclude-filter="brand"
+                       c:data-filter-value="brand.brandName"><i class="fa fa-close"></i></a>
+                </li>
+                <li class="list-item" c:for="brand:brands" c:if="!isBrandSelected(brand)">
+                    <a c:href="searchURL(brand)"><span c:text="brand.brandName"></span>(<span
+                            c:text="brand.total"></span>)</a>
+
+                </li>
+            </ul>
+        </div>
+        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
+        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+    </div>
+    <div class="list-wrapper" c:if="hasColors()">
+        <div class="list-heading" c:msg="plp.filter.color">
+            Color
+        </div>
+        <div class="list-body">
+            <ul class="list color-list">
+                <li class="list-item active" c:for="color:colors" c:if="isColorSelected(color)">
+                    <a c:href="searchURL(color)"><span c:text="color.colorName"></span>(<span
+                            c:text="color.total"></span>)</a>
+                    <a class="reset-filter" data-exclude-filter="color"
+                       c:data-filter-value="color.colorName"><i class="fa fa-close"></i></a>
+                </li>
+                <li class="list-item" c:for="color:colors" c:if="!isColorSelected(color)">
+                    <a c:href="searchURL(color)"><span c:text="color.colorName"></span>(<span
+                            c:text="color.total"></span>)</a>
+                </li>
+            </ul>
+        </div>
+        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
+        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+    </div>
+    <div class="list-wrapper" c:if="hasSizes()">
+        <div class="list-heading" c:msg="plp.filter.size">
+            Size
+        </div>
+        <div class="list-body">
+            <ul class="list">
+                <li class="list-item active" c:for="size:sizes" c:if="isSizeSelected(size)">
+                    <a c:href="searchURL(size)"><span c:text="size.sizeName"></span>(<span c:text="size.total"></span>)</a>
+
+                    <a class="reset-filter" data-exclude-filter="size"
+                       c:data-filter-value="size.sizeName"><i class="fa fa-close"></i></a>
+                </li>
+                <li class="list-item" c:for="size:sizes" c:if="!isSizeSelected(size)">
+                    <a c:href="searchURL(size)"><span c:text="size.sizeName"></span>(<span c:text="size.total"></span>)</a>
+                </li>
+            </ul>
+        </div>
+        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
+        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+    </div>
+    <div class="list-wrapper" c:if="hasPrices()">
+        <div class="list-heading" c:msg="plp.filter.price">
+            Price
+        </div>
+        <div class="list-body">
+            <ul class="list">
+                <li class="list-item active" c:for="price:prices" c:if="isPriceSelected(price)">
+                    <a c:href="searchURL(price)"><span c:text="priceLabel(price)"></span>(<span
+                            c:text="price.total"></span>)</a>
+                    <a class="reset-filter" data-exclude-filter="price"
+                       c:data-filter-value="price.priceName"><i class="fa fa-close"></i></a>
+                </li>
+                <li class="list-item" c:for="price:prices" c:if="!isPriceSelected(price)">
+                    <a c:href="searchURL(price)"><span c:text="priceLabel(price)"></span>(<span
+                            c:text="price.total"></span>)</a>
+
+                </li>
+            </ul>
+        </div>
+        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
+        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+    </div>
+</aside>
