@@ -4,8 +4,6 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
-* String.split by char
-
 * template, use ByteBuffer[] for performance tuning?
 * async: think about how to support batch with fixed concurrency, or Batch object and chain next easier
 * redis: investigate redis hiccup, like 200ms for one operation under load
@@ -21,6 +19,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
 * db: batch insert/update auto convert to small batch like 3000?
 * template security check, escaping and etc
+* db: support mysql insert on duplicated key (benchmark speed vs select + insert or update)?
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)
