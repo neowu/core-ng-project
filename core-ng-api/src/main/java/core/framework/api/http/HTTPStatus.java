@@ -6,6 +6,7 @@ package core.framework.api.http;
 public enum HTTPStatus {
     OK(200),
     CREATED(201),
+    ACCEPTED(202),
     NO_CONTENT(204),
     MOVED_PERMANENTLY(301),
     SEE_OTHER(303),
@@ -24,16 +25,15 @@ public enum HTTPStatus {
     SERVICE_UNAVAILABLE(503),
     GATEWAY_TIMEOUT(504);
 
-    public final int code;
-
-    HTTPStatus(int code) {
-        this.code = code;
-    }
-
     public static HTTPStatus parse(int code) {
         for (HTTPStatus status : HTTPStatus.values()) {
             if (status.code == code) return status;
         }
         throw new Error("unsupported http status code, code=" + code);
+    }
+    public final int code;
+
+    HTTPStatus(int code) {
+        this.code = code;
     }
 }

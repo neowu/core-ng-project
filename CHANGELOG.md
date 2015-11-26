@@ -1,7 +1,7 @@
 ## Change log
 
 ### 3.9.0 (11/24/2015 - )
-
+* http: added ACCEPTED(202) for async response code
 
 ### 3.8.9 (11/23/2015 - 11/24/2015)
 * benchmark: added jmh for systemically performance turning

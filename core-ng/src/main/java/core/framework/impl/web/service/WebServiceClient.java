@@ -147,7 +147,7 @@ public class WebServiceClient {
             throw e;
         } catch (Exception e) {
             logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, responseText, e);
-            throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), status, "COMMUNICATION_ERROR", e);
+            throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), status, "REMOTE_ERROR", e);
         }
     }
 }
