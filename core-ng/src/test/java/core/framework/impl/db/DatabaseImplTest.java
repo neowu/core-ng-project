@@ -66,13 +66,13 @@ public class DatabaseImplTest {
 
     @Test
     public void selectNullInt() {
-        Optional<Integer> result = database.selectInt("SELECT max(id) FROM database_test");
+        Optional<Integer> result = database.selectOne("SELECT max(id) FROM database_test", Integer.class);
         Assert.assertFalse(result.isPresent());
     }
 
     @Test
     public void selectInt() {
-        Optional<Integer> result = database.selectInt("SELECT count(id) FROM database_test");
+        Optional<Integer> result = database.selectOne("SELECT count(id) FROM database_test", Integer.class);
         Assert.assertEquals(0, result.get().intValue());
     }
 

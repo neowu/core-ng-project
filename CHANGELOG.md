@@ -1,7 +1,8 @@
 ## Change log
 
-### 3.9.0 (11/24/2015 - )
+### 3.9.0 (11/24/2015 - 11/30/2015)
 * http: added ACCEPTED(202) for async response code
+* db: removed selectInt/selectLong/selectString, use selectOne instead with target view class, e.g. selectOne(sql, String.class, params)
 
 ### 3.8.9 (11/23/2015 - 11/24/2015)
 * benchmark: added jmh for systemically performance turning

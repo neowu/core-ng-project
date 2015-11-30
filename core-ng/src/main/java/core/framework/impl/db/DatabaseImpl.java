@@ -12,10 +12,12 @@ import core.framework.impl.resource.Pool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +32,6 @@ public final class DatabaseImpl implements Database {
 
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class, RowMapper> rowMappers = Maps.newHashMap();
-    private final ScalarRowMappers scalarRowMappers = new ScalarRowMappers();
     private final Properties driverProperties = new Properties();
 
     public int tooManyRowsReturnedThreshold = 1000;
@@ -40,6 +41,14 @@ public final class DatabaseImpl implements Database {
     private String url;
 
     public DatabaseImpl() {
+        rowMappers.put(String.class, new RowMapper.StringRowMapper());
+        rowMappers.put(Integer.class, new RowMapper.IntegerRowMapper());
+        rowMappers.put(Long.class, new RowMapper.LongRowMapper());
+        rowMappers.put(Double.class, new RowMapper.DoubleRowMapper());
+        rowMappers.put(BigDecimal.class, new RowMapper.BigDecimalRowMapper());
+        rowMappers.put(Boolean.class, new RowMapper.BooleanRowMapper());
+        rowMappers.put(LocalDateTime.class, new RowMapper.LocalDateTimeRowMapper());
+
         pool = new Pool<>(this::createConnection, Connection::close);
         pool.name("db");
         pool.size(5, 50);    // default optimization for AWS medium/large instances
@@ -153,48 +162,6 @@ public final class DatabaseImpl implements Database {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-        }
-    }
-
-    @Override
-    public Optional<String> selectString(String sql, Object... params) {
-        StopWatch watch = new StopWatch();
-        try {
-            return operation.selectOne(sql, scalarRowMappers.singleString, params);
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime);
-            logger.debug("selectString, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-        }
-    }
-
-    @Override
-    public Optional<Integer> selectInt(String sql, Object... params) {
-        StopWatch watch = new StopWatch();
-        try {
-            return operation.selectOne(sql, scalarRowMappers.singleInt, params);
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime);
-            logger.debug("selectInt, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-        }
-    }
-
-    @Override
-    public Optional<Long> selectLong(String sql, Object... params) {
-        StopWatch watch = new StopWatch();
-        try {
-            return operation.selectOne(sql, scalarRowMappers.singleLong, params);
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime);
-            logger.debug("selectLong, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             if (elapsedTime > slowQueryThresholdInMs)
                 logger.warn("slow query detected");
         }

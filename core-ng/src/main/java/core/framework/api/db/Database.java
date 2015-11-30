@@ -11,12 +11,6 @@ public interface Database {
 
     <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params);
 
-    Optional<String> selectString(String sql, Object... params);
-
-    Optional<Integer> selectInt(String sql, Object... params);
-
-    Optional<Long> selectLong(String sql, Object... params);
-
     int execute(String sql, Object... params);
 
     Transaction beginTransaction();

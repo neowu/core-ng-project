@@ -69,6 +69,10 @@ final class ResultSetWrapper {
     Boolean getBoolean(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
+        return getBoolean(index);
+    }
+
+    Boolean getBoolean(int index) throws SQLException {
         boolean value = resultSet.getBoolean(index);
         if (resultSet.wasNull()) return null;
         return value;
@@ -89,6 +93,10 @@ final class ResultSetWrapper {
     Double getDouble(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
+        return getDouble(index);
+    }
+
+    Double getDouble(int index) throws SQLException {
         double value = resultSet.getDouble(index);
         if (resultSet.wasNull()) return null;
         return value;
@@ -107,12 +115,20 @@ final class ResultSetWrapper {
     BigDecimal getBigDecimal(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
+        return getBigDecimal(index);
+    }
+
+    BigDecimal getBigDecimal(int index) throws SQLException {
         return resultSet.getBigDecimal(index);
     }
 
     LocalDateTime getLocalDateTime(String column) throws SQLException {
         Integer index = index(column);
         if (index == null) return null;
+        return getLocalDateTime(index);
+    }
+
+    LocalDateTime getLocalDateTime(int index) throws SQLException {
         Timestamp timestamp = resultSet.getTimestamp(index);
         if (timestamp == null) return null;
         Instant instant = timestamp.toInstant();

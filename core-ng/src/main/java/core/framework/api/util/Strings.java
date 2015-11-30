@@ -50,8 +50,9 @@ public final class Strings {
     public static String[] split(String text, char delimiter) {
         List<String> tokens = Lists.newArrayList();
         int start = 0;
-        int next;
-        while ((next = text.indexOf(delimiter, start)) != -1) {
+        while (true) {
+            int next = text.indexOf(delimiter, start);
+            if (next == -1) break;
             tokens.add(text.substring(start, next));
             start = next + 1;
         }
