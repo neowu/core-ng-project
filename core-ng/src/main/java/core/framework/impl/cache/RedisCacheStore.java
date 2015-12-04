@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,10 +22,9 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public String get(String name, String key) {
-        String redisKey = cacheKey(name, key);
+    public String get(String key) {
         try {
-            return redis.get(redisKey);
+            return redis.get(key);
         } catch (JedisConnectionException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
             return null;
@@ -34,16 +32,9 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public Map<String, String> getAll(String name, List<String> keys) {
-        int size = keys.size();
-        String[] redisKeys = new String[size];
-        int index = 0;
-        for (String key : keys) {
-            redisKeys[index] = cacheKey(name, key);
-            index++;
-        }
+    public Map<String, String> getAll(String[] keys) {
         try {
-            return redis.mget(redisKeys);
+            return redis.mget(keys);
         } catch (JedisConnectionException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
             return Maps.newHashMap();
@@ -51,39 +42,20 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public void put(String name, String key, String value, Duration expiration) {
-        String redisKey = cacheKey(name, key);
+    public void put(String key, String value, Duration expiration) {
         try {
-            redis.set(redisKey, value, expiration);
+            redis.set(key, value, expiration);
         } catch (JedisConnectionException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
         }
     }
 
     @Override
-    public void putAll(String name, Map<String, String> values, Duration expiration) {
-        Map<String, String> redisValues = Maps.newHashMapWithExpectedSize(values.size());
-        for (Map.Entry<String, String> entry : values.entrySet()) {
-            redisValues.put(cacheKey(name, entry.getKey()), entry.getValue());
-        }
+    public void delete(String key) {
         try {
-            redis.mset(redisValues);
+            redis.del(key);
         } catch (JedisConnectionException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
         }
-    }
-
-    @Override
-    public void delete(String name, String key) {
-        String redisKey = cacheKey(name, key);
-        try {
-            redis.del(redisKey);
-        } catch (JedisConnectionException e) {
-            logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
-        }
-    }
-
-    private String cacheKey(String name, String key) {
-        return name + ":" + key;
     }
 }

@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class CacheImplTest {
 
     @Test
     public void get() {
-        when(cacheStore.get("name", "key")).thenReturn("1");
+        when(cacheStore.get("name:key")).thenReturn("1");
 
         Integer value = cache.get("key", key -> null);
         Assert.assertEquals(1, (int) value);
@@ -37,32 +38,31 @@ public class CacheImplTest {
 
     @Test
     public void getIfMiss() {
-        when(cacheStore.get("name", "key")).thenReturn(null);
+        when(cacheStore.get("name:key")).thenReturn(null);
 
         Integer value = cache.get("key", key -> 1);
         Assert.assertEquals(1, (int) value);
 
-        verify(cacheStore).put("name", "key", "1", Duration.ofHours(1));
+        verify(cacheStore).put("name:key", "1", Duration.ofHours(1));
     }
 
     @Test
     public void put() {
         cache.put("key", 1);
 
-        verify(cacheStore).put("name", "key", "1", Duration.ofHours(1));
+        verify(cacheStore).put("name:key", "1", Duration.ofHours(1));
     }
 
     @Test
     public void getAll() {
-        List<String> keys = Lists.newArrayList("key1", "key2", "key3");
         Map<String, String> values = Maps.newHashMap();
-        values.put("key1", "1");
-        values.put("key3", "3");
-        when(cacheStore.getAll("name", keys)).thenReturn(values);
+        values.put("name:key1", "1");
+        values.put("name:key3", "3");
+        when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key3"})).thenReturn(values);
 
-        List<Integer> results = cache.getAll(keys, key -> 2);
+        List<Integer> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> 2);
         Assert.assertEquals(Lists.newArrayList(1, 2, 3), results);
 
-        verify(cacheStore).putAll("name", Maps.newHashMap("key2", "2"), Duration.ofHours(1));
+        verify(cacheStore).put("name:key2", "2", Duration.ofHours(1));
     }
 }

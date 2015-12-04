@@ -1,5 +1,9 @@
 ## Change log
 
+### 3.9.1 (12/4/2015)
+* redis: fix the typo in log,
+* bug: fix cache getAll/setAll
+
 ### 3.9.0 (11/24/2015 - 11/30/2015)
 * http: added ACCEPTED(202) for async response code
 * db: removed selectInt/selectLong/selectString, use selectOne instead with target view class, e.g. selectOne(sql, String.class, params)

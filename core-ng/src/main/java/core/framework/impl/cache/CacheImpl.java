@@ -2,7 +2,6 @@ package core.framework.impl.cache;
 
 import core.framework.api.cache.Cache;
 import core.framework.api.util.JSON;
-import core.framework.api.util.Maps;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -30,10 +29,11 @@ public class CacheImpl<T> implements Cache<T> {
 
     @Override
     public T get(String key, Function<String, T> loader) {
-        String cacheValue = cacheStore.get(name, key);
+        String cacheKey = cacheKey(key);
+        String cacheValue = cacheStore.get(cacheKey);
         if (cacheValue == null) {
             T value = loader.apply(key);
-            put(key, value);
+            cacheStore.put(cacheKey, JSON.toJSON(value), duration);
             return value;
         }
         return JSON.fromJSON(valueType, cacheValue);
@@ -42,36 +42,46 @@ public class CacheImpl<T> implements Cache<T> {
     @Override
     public List<T> getAll(List<String> keys, Function<String, T> loader) {
         int size = keys.size();
-        List<T> values = new ArrayList<>(size);
-        Map<String, String> cacheValues = cacheStore.getAll(name, keys);
-        Map<String, String> newValues = Maps.newHashMapWithExpectedSize(size);
+        String[] cacheKeys = new String[size];
+        int index = 0;
         for (String key : keys) {
-            String cacheValue = cacheValues.get(key);
+            cacheKeys[index] = cacheKey(key);
+            index++;
+        }
+        List<T> values = new ArrayList<>(size);
+        Map<String, String> cacheValues = cacheStore.getAll(cacheKeys);
+        index = 0;
+        for (String key : keys) {
+            String cacheKey = cacheKeys[index];
+            String cacheValue = cacheValues.get(cacheKey);
             if (cacheValue == null) {
                 T value = loader.apply(key);
-                newValues.put(key, JSON.toJSON(value));
+                cacheStore.put(cacheKey, JSON.toJSON(value), duration);
                 values.add(value);
             } else {
                 values.add(JSON.fromJSON(valueType, cacheValue));
             }
+            index++;
         }
-
-        if (!newValues.isEmpty()) cacheStore.putAll(name, newValues, duration);
         return values;
     }
 
     @Override
     public void put(String key, T value) {
-        cacheStore.put(name, key, JSON.toJSON(value), duration);
+        cacheStore.put(cacheKey(key), JSON.toJSON(value), duration);
     }
 
     @Override
     public void evict(String key) {
-        cacheStore.delete(name, key);
+        cacheStore.delete(cacheKey(key));
     }
 
     public Optional<String> get(String key) {
-        String result = cacheStore.get(name, key);
+        String result = cacheStore.get(cacheKey(key));
         return Optional.ofNullable(result);
+    }
+
+    private String cacheKey(String key) {
+        return name + ":" + key;
     }
 }

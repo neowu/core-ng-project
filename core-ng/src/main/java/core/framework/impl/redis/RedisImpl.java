@@ -224,7 +224,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
-            logger.debug("mget, values={}, elapsedTime={}", values, elapsedTime);
+            logger.debug("mset, values={}, elapsedTime={}", values, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }
