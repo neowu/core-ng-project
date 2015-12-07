@@ -13,5 +13,7 @@ public interface CacheStore {   // all keys here are direct cacheKey, not the ke
 
     void put(String key, String value, Duration expiration);
 
+    void putAll(Map<String, String> values, Duration expiration);
+
     void delete(String key);
 }

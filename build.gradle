@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '3.9.1'
+    version = '3.9.2'
 }
 
 def awsVersion = '1.10.27'
@@ -20,7 +20,7 @@ project(':core-ng') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         provided(
-                'redis.clients:jedis:2.7.3@jar',
+                'redis.clients:jedis:2.8.0@jar',
                 "org.elasticsearch:elasticsearch:${elasticVersion}@jar",
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
@@ -114,6 +114,9 @@ project(':benchmark') {
                 project(':core-ng'),
                 'org.openjdk.jmh:jmh-generator-annprocess:1.11.2'
         )
+        runtime(
+                'redis.clients:jedis:2.8.0@jar'
+        )
     }
 }
 
@@ -123,11 +126,10 @@ project(':demo-service') {
     dependencies {
         compile(
                 project(':core-ng'),
-                'redis.clients:jedis:2.7.3@jar'
+                'redis.clients:jedis:2.8.0@jar'
         )
         testCompile(
-                project(':core-ng-test'),
-                "org.mongodb:mongo-java-driver:${mongoVersion}"
+                project(':core-ng-test')
         )
     }
 }

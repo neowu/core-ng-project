@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.9.2 (12/7/2015)
+* redis/cache: mset with expiration, update jedis to 2.8.0
+
 ### 3.9.1 (12/4/2015)
 * redis: fix the typo in log,
 * bug: fix cache getAll/setAll

@@ -23,6 +23,8 @@ public interface Redis {
 
     void mset(Map<String, String> values);
 
+    void mset(Map<String, String> values, Duration expiration);
+
     Map<String, String> hgetAll(String key);
 
     void hmset(String key, Map<String, String> values);

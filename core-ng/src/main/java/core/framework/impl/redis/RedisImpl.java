@@ -11,9 +11,12 @@ import core.framework.impl.resource.PoolItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.BinaryJedis;
+import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Protocol;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +115,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
-            logger.debug("setExpire, key={}, value={}, expiration={}, elapsedTime={}", key, value, expiration, elapsedTime);
+            logger.debug("set, key={}, value={}, expiration={}, elapsedTime={}", key, value, expiration, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }
@@ -225,6 +228,30 @@ public final class RedisImpl implements Redis {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime);
             logger.debug("mset, values={}, elapsedTime={}", values, elapsedTime);
+            checkSlowQuery(elapsedTime);
+        }
+    }
+
+    @Override
+    public void mset(Map<String, String> values, Duration expiration) {
+        StopWatch watch = new StopWatch();
+        int expirationInSeconds = (int) expiration.getSeconds();
+        PoolItem<BinaryJedis> item = pool.borrowItem();
+        try (Pipeline pipeline = item.resource.pipelined()) {
+            for (Map.Entry<String, String> entry : values.entrySet()) {
+                pipeline.setex(encode(entry.getKey()), expirationInSeconds, encode(entry.getValue()));
+            }
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("mset, values={}, expiration={}, elapsedTime={}", values, expiration, elapsedTime);
             checkSlowQuery(elapsedTime);
         }
     }

@@ -51,6 +51,15 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
+    public void putAll(Map<String, String> values, Duration expiration) {
+        try {
+            redis.mset(values, expiration);
+        } catch (JedisConnectionException e) {
+            logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
+        }
+    }
+
+    @Override
     public void delete(String key) {
         try {
             redis.del(key);

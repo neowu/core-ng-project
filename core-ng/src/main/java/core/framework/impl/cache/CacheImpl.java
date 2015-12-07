@@ -2,6 +2,7 @@ package core.framework.impl.cache;
 
 import core.framework.api.cache.Cache;
 import core.framework.api.util.JSON;
+import core.framework.api.util.Maps;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -49,6 +50,7 @@ public class CacheImpl<T> implements Cache<T> {
             index++;
         }
         List<T> values = new ArrayList<>(size);
+        Map<String, String> newValues = Maps.newHashMapWithExpectedSize(size);
         Map<String, String> cacheValues = cacheStore.getAll(cacheKeys);
         index = 0;
         for (String key : keys) {
@@ -56,13 +58,14 @@ public class CacheImpl<T> implements Cache<T> {
             String cacheValue = cacheValues.get(cacheKey);
             if (cacheValue == null) {
                 T value = loader.apply(key);
-                cacheStore.put(cacheKey, JSON.toJSON(value), duration);
+                newValues.put(cacheKey, JSON.toJSON(value));
                 values.add(value);
             } else {
                 values.add(JSON.fromJSON(valueType, cacheValue));
             }
             index++;
         }
+        if (!newValues.isEmpty()) cacheStore.putAll(newValues, duration);
         return values;
     }
 

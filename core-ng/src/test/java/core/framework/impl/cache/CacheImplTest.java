@@ -63,6 +63,6 @@ public class CacheImplTest {
         List<Integer> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> 2);
         Assert.assertEquals(Lists.newArrayList(1, 2, 3), results);
 
-        verify(cacheStore).put("name:key2", "2", Duration.ofHours(1));
+        verify(cacheStore).putAll(Maps.newHashMap("name:key2", "2"), Duration.ofHours(1));
     }
 }
