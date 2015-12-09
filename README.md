@@ -4,6 +4,7 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
+* queue: batch handle messages for batching ES index
 * async: think about how to support batch with fixed concurrency, or Batch object and chain next easier
 * template, use ByteBuffer[] for performance tuning?
 * redis: investigate redis hiccup, like 200ms for one operation under load
@@ -13,7 +14,6 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * general retry and throttling?
 * webservice: client retry on network issue?
 * website static content security check, (in server env, this is handled by nginx directly)
-* db pool: actively check/close connection before using from transactionManager?
 * validator: annotation for website, like @Pattern or @SafeString?
 * cm: config management, dynamic update properties?
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
