@@ -1,12 +1,8 @@
 package core.framework.api.module;
 
 import core.framework.api.queue.MessagePublisher;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Lists;
 import core.framework.api.util.Types;
-import core.framework.impl.module.AWSQueueBuilder;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.queue.CompositePublisher;
 import core.framework.impl.queue.MessageValidator;
 import core.framework.impl.queue.RabbitMQ;
 import core.framework.impl.queue.RabbitMQEndpoint;
@@ -16,7 +12,6 @@ import core.framework.impl.resource.RefreshPoolJob;
 import core.framework.impl.scheduler.FixedRateTrigger;
 
 import java.time.Duration;
-import java.util.List;
 
 /**
  * @author neo
@@ -50,49 +45,21 @@ public final class QueueConfig {
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), null, publisher);
     }
 
-    // this is to support publish to SNS and RabbitMQ same time, as interim step to deprecate SNS/SQS
-    public <T> void publish(String[] destinations, Class<T> messageClass) {
-        if (destinations.length == 1) {
-            publish(destinations[0], messageClass);
-        } else {
-            MessageValidator validator = context.queueManager.validator();
-            validator.register(messageClass);
-            List<MessagePublisher<T>> publishers = Lists.newArrayList();
-            for (String destination : destinations) {
-                publishers.add(publisher(destination, messageClass));
-            }
-            context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), null, new CompositePublisher<>(publishers));
-        }
-    }
-
     private MessageHandlerConfig listener(String queueURI) {
-        if (queueURI.startsWith("https://sqs.")) {
-            return new AWSQueueBuilder(context).listener(queueURI);
-        } else if (queueURI.startsWith("rabbitmq://queue/")) {
-            RabbitMQListener listener = new RabbitMQListener(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(queueURI).routingKey, context.executor, context.queueManager.validator(), context.logManager);
-            if (!context.isTest()) {
-                context.startupHook.add(listener::start);
-                context.shutdownHook.add(listener::stop);
-            }
-            return listener;
-        } else {
-            throw Exceptions.error("unsupported protocol, queueURI={}", queueURI);
+        RabbitMQListener listener = new RabbitMQListener(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(queueURI).routingKey, context.executor, context.queueManager.validator(), context.logManager);
+        if (!context.isTest()) {
+            context.startupHook.add(listener::start);
+            context.shutdownHook.add(listener::stop);
         }
+        return listener;
     }
 
+    @SuppressWarnings("unchecked")
     private <T> MessagePublisher<T> publisher(String uri, Class<T> messageClass) {
         if (context.isTest()) {
-            @SuppressWarnings("unchecked")
-            MessagePublisher<T> mockPublisher = context.mockFactory.create(MessagePublisher.class, uri, context.queueManager.validator());
-            return mockPublisher;
-        } else if (uri.startsWith("arn:aws:sns:")) {
-            return new AWSQueueBuilder(context).snsPublisher(uri, messageClass);
-        } else if (uri.startsWith("https://sqs.")) {
-            return new AWSQueueBuilder(context).sqsPublisher(uri, messageClass);
-        } else if (uri.startsWith("rabbitmq://")) {
-            return new RabbitMQPublisher<>(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(uri), messageClass, context.queueManager.validator(), context.logManager);
+            return context.mockFactory.create(MessagePublisher.class, uri, context.queueManager.validator());
         } else {
-            throw Exceptions.error("unsupported protocol, uri={}", uri);
+            return new RabbitMQPublisher<>(context.queueManager.rabbitMQ(), new RabbitMQEndpoint(uri), messageClass, context.queueManager.validator(), context.logManager);
         }
     }
 }

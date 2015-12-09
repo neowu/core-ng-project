@@ -2,6 +2,7 @@
 
 ### 3.9.3 (12/9/2015)
 * hash: added md5 support
+* queue: removed sns/sqs support, only use rabbitmq from now on
 
 ### 3.9.2 (12/7/2015)
 * redis/cache: mset with expiration, update jedis to 2.8.0

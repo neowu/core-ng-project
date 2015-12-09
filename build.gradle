@@ -7,7 +7,6 @@ subprojects {
     version = '3.9.3'
 }
 
-def awsVersion = '1.10.27'
 def mongoVersion = '3.1.0'
 def elasticVersion = '2.0.0'
 def rabbitVersion = '3.5.6'
@@ -23,10 +22,7 @@ project(':core-ng') {
                 'redis.clients:jedis:2.8.0@jar',
                 "org.elasticsearch:elasticsearch:${elasticVersion}@jar",
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "com.rabbitmq:amqp-client:${rabbitVersion}",
-                "com.amazonaws:aws-java-sdk-core:${awsVersion}@jar",
-                "com.amazonaws:aws-java-sdk-sqs:${awsVersion}@jar",
-                "com.amazonaws:aws-java-sdk-sns:${awsVersion}@jar"
+                "com.rabbitmq:amqp-client:${rabbitVersion}"
         )
         compile(
                 project(":core-ng-api"),
