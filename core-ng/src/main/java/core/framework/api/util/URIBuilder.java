@@ -7,6 +7,8 @@ import java.util.BitSet;
  * @author neo
  */
 public final class URIBuilder {
+    private static final byte[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
     /*
        pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
        pct-encoded   = "%" HEXDIG HEXDIG
@@ -91,21 +93,14 @@ public final class URIBuilder {
                         buffer.put(b2);
                     } else {
                         buffer.put((byte) '%');
-                        buffer.put(toDigit((b2 >> 4) & 0xF));
-                        buffer.put(toDigit(b2 & 0xF));
+                        buffer.put(HEX_CHARS[(b2 >> 4) & 0xF]);
+                        buffer.put(HEX_CHARS[b2 & 0xF]);
                     }
                 }
                 return buffer.text(StandardCharsets.US_ASCII);
             }
         }
         return value;
-    }
-
-    private static byte toDigit(int number) {
-        if (number < 10) {
-            return (byte) ('0' + number);
-        }
-        return (byte) ('A' - 10 + number);
     }
 
     private final StringBuilder uri;
