@@ -17,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
 public final class HMAC {
     public static byte[] generateKey(Hash hash) {
         try {
-            KeyGenerator generator = KeyGenerator.getInstance(algorithm(hash));
+            KeyGenerator generator = KeyGenerator.getInstance(hash.algorithm);
             generator.init(128);
             return generator.generateKey().getEncoded();
         } catch (NoSuchAlgorithmException e) {
@@ -36,10 +36,8 @@ public final class HMAC {
     public byte[] digest(String message) {
         if (key == null) throw new Error("key must not be null");
         try {
-            String algorithm = algorithm(hash);
-            Mac mac = Mac.getInstance(algorithm);
-
-            SecretKey secretKey = new SecretKeySpec(key, algorithm);
+            Mac mac = Mac.getInstance(hash.algorithm);
+            SecretKey secretKey = new SecretKeySpec(key, hash.algorithm);
             mac.init(secretKey);
             return mac.doFinal(message.getBytes(Charsets.UTF_8));
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
@@ -47,16 +45,12 @@ public final class HMAC {
         }
     }
 
-    private static String algorithm(Hash hash) {
-        return "Hmac" + hash.value;
-    }
-
     public enum Hash {
-        MD5("MD5"), SHA1("SHA1"), SHA256("SHA256"), SHA512("SHA512");
-        final String value;
+        MD5("HmacMD5"), SHA1("HmacSHA1"), SHA256("HmacSHA256"), SHA512("HmacSHA512");
+        final String algorithm;
 
-        Hash(String value) {
-            this.value = value;
+        Hash(String algorithm) {
+            this.algorithm = algorithm;
         }
     }
 }
