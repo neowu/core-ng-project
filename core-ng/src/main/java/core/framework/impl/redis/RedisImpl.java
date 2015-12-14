@@ -1,6 +1,7 @@
 package core.framework.impl.redis;
 
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Markers;
 import core.framework.api.redis.Redis;
 import core.framework.api.util.Charsets;
 import core.framework.api.util.Maps;
@@ -312,7 +313,7 @@ public final class RedisImpl implements Redis {
 
     private void checkSlowQuery(long elapsedTime) {
         if (elapsedTime > slowQueryThresholdInMs) {
-            logger.warn("slow query detected");
+            logger.warn(Markers.errorType("SLOW_QUERY"), "slow redis query, elapsedTime={}", elapsedTime);
         }
     }
 }

@@ -10,8 +10,8 @@ import java.util.Map;
  * @author neo
  */
 public final class DefaultLoggerFactory implements ILoggerFactory {
-    private final Map<String, Logger> loggers = Maps.newConcurrentHashMap();
     public final LogManager logManager;
+    private final Map<String, Logger> loggers = Maps.newConcurrentHashMap();
 
     public DefaultLoggerFactory() {
         logManager = new LogManager();
@@ -29,11 +29,10 @@ public final class DefaultLoggerFactory implements ILoggerFactory {
     }
 
     private LogLevel[] logLevel(String name) {
-        if (name.startsWith("com.mchange")
-            || name.startsWith("org.elasticsearch")
+        if (name.startsWith("org.elasticsearch")
             || name.startsWith("org.mongodb")
-            || name.startsWith("org.xnio")
-            || name.startsWith("org.apache")) {
+            || name.startsWith("org.apache")
+            || name.startsWith("org.xnio")) {
             return new LogLevel[]{LogLevel.WARN, LogLevel.INFO};
         }
         return new LogLevel[]{LogLevel.INFO, LogLevel.DEBUG};

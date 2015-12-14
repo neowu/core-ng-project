@@ -73,7 +73,7 @@ public class HTTPServerHandler implements HttpHandler {
 
             // trigger trace after action is determined due to trace log use action as part of path, is there better way?
             if ("true".equals(headers.getFirst(HEADER_TRACE))) {
-                actionLog.triggerTraceLog();
+                logManager.triggerTraceLog();
             }
 
             webContext.initialize(request);

@@ -7,6 +7,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Markers;
 import core.framework.api.util.StopWatch;
 import core.framework.api.util.Strings;
 import core.framework.impl.resource.Pool;
@@ -31,7 +32,7 @@ public final class RabbitMQ {
     private final ConnectionFactory connectionFactory = new ConnectionFactory();
     private final Lock lock = new ReentrantLock();
     private Address[] addresses;
-    private long slowQueryThresholdInMs = 100;
+    private long slowMessageThresholdInMs = 100;
     private volatile Connection connection;
 
     public RabbitMQ() {
@@ -79,8 +80,8 @@ public final class RabbitMQ {
         pool.checkoutTimeout(timeout);
     }
 
-    public void slowQueryThreshold(Duration slowQueryThreshold) {
-        slowQueryThresholdInMs = slowQueryThreshold.toMillis();
+    public void slowMessageThreshold(Duration slowMessageThreshold) {
+        slowMessageThresholdInMs = slowMessageThreshold.toMillis();
     }
 
     public RabbitMQConsumer consumer(String queue, int prefetchCount) {
@@ -104,13 +105,13 @@ public final class RabbitMQ {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("rabbitMQ", elapsedTime);
             logger.debug("publish, exchange={}, routingKey={}, elapsedTime={}", exchange, routingKey, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowMessage(elapsedTime);
         }
     }
 
-    private void checkSlowQuery(long elapsedTime) {
-        if (elapsedTime > slowQueryThresholdInMs) {
-            logger.warn("slow query detected");
+    private void checkSlowMessage(long elapsedTime) {
+        if (elapsedTime > slowMessageThresholdInMs) {
+            logger.warn(Markers.errorType("SLOW_MESSAGE"), "slow rabbitmq message, elapsedTime={}", elapsedTime);
         }
     }
 

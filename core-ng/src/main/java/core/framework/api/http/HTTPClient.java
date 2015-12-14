@@ -1,6 +1,7 @@
 package core.framework.api.http;
 
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Markers;
 import core.framework.api.util.ByteBuf;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
@@ -71,7 +72,9 @@ public final class HTTPClient {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("http", elapsedTime);
             logger.debug("execute, elapsedTime={}", elapsedTime);
-            if (elapsedTime > slowTransactionThresholdInMs) logger.warn("slow http transaction detected");
+            if (elapsedTime > slowTransactionThresholdInMs) {
+                logger.warn(Markers.errorType("SLOW_HTTP"), "slow http transaction, elapsedTime={}", elapsedTime);
+            }
         }
     }
 

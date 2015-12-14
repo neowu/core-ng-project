@@ -1,6 +1,8 @@
 package core.framework.impl.log;
 
+import core.framework.api.log.Markers;
 import core.framework.api.log.Warning;
+import core.framework.impl.log.marker.ErrorTypeMarker;
 import org.slf4j.Logger;
 
 /**
@@ -49,9 +51,10 @@ public final class LogManager {
     }
 
     public void process(LogEvent event) {
-        ActionLog actionLog = currentActionLog();
-        if (actionLog != null)
-            actionLog.updateResult(event.level); // process is called by loggerImpl.log, begin() may not be called
+        if (event.isWarningOrError() || event.trace()) {
+            ActionLog actionLog = currentActionLog();
+            if (actionLog != null) actionLog.process(event);    // process is called by loggerImpl.log, begin() may not be called
+        }
 
         TraceLogger traceLogger = this.traceLogger.get();
         if (traceLogger != null) traceLogger.process(event);
@@ -70,16 +73,19 @@ public final class LogManager {
         return actionLog.get();
     }
 
+    public void triggerTraceLog() {
+        ActionLog actionLog = currentActionLog();   // actionLog should not be null, logManager.begin should always be called before triggerTraceLog
+        logger.debug(Markers.TRACE, "trigger trace log, id={}, action={}", actionLog.id, actionLog.action);
+    }
+
     public void logError(Throwable e) {
         // write exception first, to avoid hiding it by other mistake
         String errorMessage = e.getMessage();
+        ErrorTypeMarker errorType = Markers.errorType(e.getClass().getCanonicalName());
         if (e.getClass().isAnnotationPresent(Warning.class)) {
-            logger.warn(errorMessage, e);
+            logger.warn(errorType, errorMessage, e);
         } else {
-            logger.error(errorMessage, e);
+            logger.error(errorType, errorMessage, e);
         }
-
-        ActionLog actionLog = currentActionLog();
-        actionLog.error(e);     // actionLog should not be null, logManager.begin should always be called before logError
     }
 }

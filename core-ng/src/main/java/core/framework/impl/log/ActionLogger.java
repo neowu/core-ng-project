@@ -19,6 +19,8 @@ import java.util.Map;
  * @author neo
  */
 public final class ActionLogger {
+    private static final String LOG_SPLITTER = " | ";
+
     public static ActionLogger console() {
         return new ActionLogger(new BufferedWriter(new OutputStreamWriter(System.out, Charsets.UTF_8)));
     }
@@ -35,7 +37,6 @@ public final class ActionLogger {
         }
     }
 
-    private static final String LOG_SPLITTER = " | ";
     private final Writer writer;
     private final PrintStream fallbackLogger = System.err;
 
@@ -82,13 +83,14 @@ public final class ActionLogger {
                 .append(log.refId);
         }
 
-        if (log.exceptionClass != null) {
+        String errorType = log.errorType();
+        if (errorType != null) {
             builder.append(LOG_SPLITTER)
-                .append("errorMessage=")
-                .append(filterLineSeparator(log.errorMessage))
+                .append("errorType=")
+                .append(errorType)
                 .append(LOG_SPLITTER)
-                .append("exceptionClass=")
-                .append(log.exceptionClass.getCanonicalName());
+                .append("errorMessage=")
+                .append(filterLineSeparator(log.errorMessage));
         }
 
         for (Map.Entry<String, String> entry : log.context.entrySet()) {

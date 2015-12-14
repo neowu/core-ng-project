@@ -14,30 +14,46 @@ import java.util.UUID;
  * @author neo
  */
 public final class ActionLog {
-    private final Logger logger = LoggerFactory.getLogger(ActionLog.class);
-
-    final Instant startTime = Instant.now();
     public final String id = UUID.randomUUID().toString();
-    private LogLevel result = LogLevel.INFO;
+    final Instant startTime = Instant.now();
+    final Map<String, String> context = Maps.newLinkedHashMap();
+    final Map<String, PerformanceStat> performanceStats = Maps.newHashMap();
+    private final Logger logger = LoggerFactory.getLogger(ActionLog.class);
     public boolean trace;  // whether flush trace log for all subsequent actions
     public String action = "unassigned";
     String refId;
     String errorMessage;
-    Class<?> exceptionClass;
     long elapsed;
-    final Map<String, String> context = Maps.newLinkedHashMap();
-    final Map<String, PerformanceStat> performanceStats = Maps.newHashMap();
+    LogLevel result = LogLevel.INFO;
+    private String errorType;
 
     void end() {
         elapsed = Duration.between(startTime, Instant.now()).toMillis();
     }
 
-    void updateResult(LogLevel level) {
-        if (level.value > result.value) result = level;
+    void process(LogEvent event) {
+        if (event.level.value > result.value) result = event.level;
+        String errorType = event.errorType();
+        if (errorType != null) {
+            this.errorType = errorType;
+            this.errorMessage = event.message();
+        }
+        if (event.trace()) {
+            trace = true;
+        }
     }
 
-    public String result() {
-        return result == LogLevel.INFO ? "OK" : String.valueOf(result);
+    String result() {
+        if (result == LogLevel.INFO) {
+            return trace ? "TRACE" : "OK";
+        }
+        return String.valueOf(result);
+    }
+
+    String errorType() {
+        if (errorType != null) return errorType;
+        if (result.value >= LogLevel.WARN.value) return "UNASSIGNED";
+        return null;
     }
 
     public Optional<String> context(String key) {
@@ -70,15 +86,5 @@ public final class ActionLog {
     public void action(String action) {
         logger.debug("[context] action={}", action);
         this.action = action;
-    }
-
-    public void triggerTraceLog() {
-        logger.warn("trigger trace log, id={}, action={}", id, action);
-        trace = true;
-    }
-
-    void error(Throwable e) {
-        errorMessage = e.getMessage();
-        exceptionClass = e.getClass();
     }
 }

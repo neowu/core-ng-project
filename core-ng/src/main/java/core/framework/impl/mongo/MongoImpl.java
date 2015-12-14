@@ -12,6 +12,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Markers;
 import core.framework.api.mongo.Collection;
 import core.framework.api.mongo.Mongo;
 import core.framework.api.mongo.Query;
@@ -200,8 +201,7 @@ public final class MongoImpl implements Mongo, MongoOption {
             ActionLogContext.track("mongo", elapsedTime);
             logger.debug("aggregate, entityClass={}, pipeline={}, elapsedTime={}", entityClass.getName(), pipeline, elapsedTime);
             checkSlowQuery(elapsedTime);
-            if (results.size() > tooManyRowsReturnedThreshold)
-                logger.warn("too many rows returned, returnedRows={}", results.size());
+            checkTooManyRowsReturned(results.size());
         }
     }
 
@@ -267,13 +267,15 @@ public final class MongoImpl implements Mongo, MongoOption {
     }
 
     private void checkSlowQuery(long elapsedTime) {
-        if (elapsedTime > slowQueryThresholdInMs)
-            logger.warn("slow query detected");
+        if (elapsedTime > slowQueryThresholdInMs) {
+            logger.warn(Markers.errorType("SLOW_QUERY"), "slow mongo query, elapsedTime={}", elapsedTime);
+        }
     }
 
     private void checkTooManyRowsReturned(int size) {
-        if (size > tooManyRowsReturnedThreshold)
-            logger.warn("too many rows returned, returnedRows={}", size);
+        if (size > tooManyRowsReturnedThreshold) {
+            logger.warn(Markers.errorType("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
+        }
     }
 
     private <T> MongoCollection<T> collection(Class<T> entityClass) {

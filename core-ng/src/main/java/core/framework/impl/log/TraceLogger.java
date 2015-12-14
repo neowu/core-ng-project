@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.api.log.Markers;
 import core.framework.api.util.Charsets;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Randoms;
@@ -46,7 +47,7 @@ final class TraceLogger {
         size++;
         if (events != null) {
             events.add(event);
-            if (event.level.value >= LogLevel.WARN.value || size >= MAX_HOLD_SIZE) {
+            if (event.isWarningOrError() || size >= MAX_HOLD_SIZE || event.trace()) {
                 flushTraceLogs();
                 events = null;
             }
@@ -83,8 +84,8 @@ final class TraceLogger {
 
     void writeTraceLog(LogEvent event) {
         if (size == MAX_HOLD_SIZE + 1) {
-            actionLog.updateResult(LogLevel.WARN);
-            LogEvent warning = new LogEvent(LogLevel.WARN, System.currentTimeMillis(), LOGGER, "reached max holding size of trace log, please contact arch team to split big task into smaller batch", null, null);
+            LogEvent warning = new LogEvent(LOGGER, Markers.errorType("TRACE_TOO_LONG"), LogLevel.WARN, "reached max holding size of trace log, please contact arch team", null, null);
+            actionLog.process(warning);
             write(warning);
             if (logForwarder != null) logForwarder.forwardTraceLog(actionLog, warning);
         }

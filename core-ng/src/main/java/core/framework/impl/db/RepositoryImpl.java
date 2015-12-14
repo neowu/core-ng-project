@@ -2,6 +2,7 @@ package core.framework.impl.db;
 
 import core.framework.api.db.Repository;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Markers;
 import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
 import org.slf4j.Logger;
@@ -49,8 +50,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             ActionLogContext.track("db", elapsedTime);
             logger.debug("selectAll, sql={}, elapsedTime={}", sql, elapsedTime);
             checkSlowQuery(elapsedTime);
-            if (results != null && results.size() > database.tooManyRowsReturnedThreshold)
-                logger.warn("too many rows returned, returnedRows={}", results.size());
+            if (results != null) checkTooManyRows(results.size());
         }
     }
 
@@ -67,8 +67,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             ActionLogContext.track("db", elapsedTime);
             logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             checkSlowQuery(elapsedTime);
-            if (results != null && results.size() > database.tooManyRowsReturnedThreshold)
-                logger.warn("too many rows returned, returnedRows={}", results.size());
+            if (results != null) checkTooManyRows(results.size());
         }
     }
 
@@ -124,7 +123,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         try {
             int updatedRows = database.operation.update(query.sql, query.params);
             if (updatedRows != 1)
-                logger.warn("updated rows is not 1, rows={}", updatedRows);
+                logger.warn(Markers.errorType("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -139,7 +138,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         try {
             int deletedRows = database.operation.update(deleteSQL, primaryKeys);
             if (deletedRows != 1)
-                logger.warn("deleted rows is not 1, rows={}", deletedRows);
+                logger.warn(Markers.errorType("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", deletedRows);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -180,8 +179,10 @@ public final class RepositoryImpl<T> implements Repository<T> {
         try {
             int[] deletedRows = database.operation.batchUpdate(deleteSQL, params);
             for (int deletedRow : deletedRows) {
-                if (deletedRow != 1)
-                    logger.warn("deleted rows is not 1, rows={}", Arrays.toString(deletedRows));
+                if (deletedRow != 1) {
+                    logger.warn(Markers.errorType("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", Arrays.toString(deletedRows));
+                    break;
+                }
             }
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -191,8 +192,15 @@ public final class RepositoryImpl<T> implements Repository<T> {
         }
     }
 
+    private void checkTooManyRows(int size) {
+        if (size > database.tooManyRowsReturnedThreshold) {
+            logger.warn(Markers.errorType("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
+        }
+    }
+
     private void checkSlowQuery(long elapsedTime) {
-        if (elapsedTime > database.slowQueryThresholdInMs)
-            logger.warn("slow query detected");
+        if (elapsedTime > database.slowQueryThresholdInMs) {
+            logger.warn(Markers.errorType("SLOW_QUERY"), "slow db query, elapsedTime={}", elapsedTime);
+        }
     }
 }

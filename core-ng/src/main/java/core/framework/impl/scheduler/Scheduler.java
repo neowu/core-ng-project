@@ -20,12 +20,11 @@ import java.util.concurrent.TimeUnit;
  * @author neo
  */
 public final class Scheduler {
+    public final Map<String, Trigger> triggers = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
-
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Executor executor;
     private final LogManager logManager;
-    public final Map<String, Trigger> triggers = Maps.newHashMap();
 
     public Scheduler(Executor executor, LogManager logManager) {
         this.executor = executor;
@@ -69,7 +68,7 @@ public final class Scheduler {
         actionLog.action("job/" + name);
         actionLog.context("jobClass", job.getClass().getCanonicalName());
         if (trace) {
-            actionLog.triggerTraceLog();
+            logManager.triggerTraceLog();
         }
         job.execute();
         return null;

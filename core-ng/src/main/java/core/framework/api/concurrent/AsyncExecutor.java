@@ -31,7 +31,7 @@ public class AsyncExecutor {
             currentActionLog.refId(refId);
             currentActionLog.action(action);
             if (trace) {
-                currentActionLog.triggerTraceLog();
+                logManager.triggerTraceLog();
             }
             return task.call();
         });

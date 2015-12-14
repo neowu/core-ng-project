@@ -1,5 +1,6 @@
 package core.framework.impl.template.fragment;
 
+import core.framework.api.log.Markers;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
@@ -101,7 +102,7 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
 
     private String url(String url, TemplateContext context) {
         if (!isValidURL(url)) {
-            logger.warn("illegal url detected, url={}, location={}", url, location);
+            logger.warn(Markers.errorType("ILLEGAL_URL"), "illegal url detected, url={}, location={}", url, location);
             return "";
         }
         return cdn ? context.cdn.url(url) : url;

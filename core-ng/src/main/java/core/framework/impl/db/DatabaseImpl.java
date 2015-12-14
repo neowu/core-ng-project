@@ -5,6 +5,7 @@ import core.framework.api.db.Repository;
 import core.framework.api.db.Transaction;
 import core.framework.api.db.UncheckedSQLException;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Markers;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
@@ -146,10 +147,10 @@ public final class DatabaseImpl implements Database {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
-            if (results != null && results.size() > tooManyRowsReturnedThreshold)
-                logger.warn("too many rows returned, returnedRows={}", results.size());
+            checkSlowQuery(elapsedTime);
+            if (results != null && results.size() > tooManyRowsReturnedThreshold) {
+                logger.warn(Markers.errorType("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", results.size());
+            }
         }
     }
 
@@ -162,8 +163,7 @@ public final class DatabaseImpl implements Database {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -176,8 +176,7 @@ public final class DatabaseImpl implements Database {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("execute, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            if (elapsedTime > slowQueryThresholdInMs)
-                logger.warn("slow query detected");
+            checkSlowQuery(elapsedTime);
         }
     }
 
@@ -189,7 +188,6 @@ public final class DatabaseImpl implements Database {
         return mapper;
     }
 
-
     private <T> RowMapper<T> registerViewClass(Class<T> viewClass) {
         if (rowMappers.containsKey(viewClass)) {
             throw Exceptions.error("duplicated view class found, viewClass={}", viewClass.getCanonicalName());
@@ -197,5 +195,12 @@ public final class DatabaseImpl implements Database {
         RowMapper<T> mapper = new RowMapperBuilder<>(viewClass, operation.enumMapper).build();
         rowMappers.put(viewClass, mapper);
         return mapper;
+    }
+
+
+    private void checkSlowQuery(long elapsedTime) {
+        if (elapsedTime > slowQueryThresholdInMs) {
+            logger.warn(Markers.errorType("SLOW_QUERY"), "slow db query, elapsedTime={}", elapsedTime);
+        }
     }
 }

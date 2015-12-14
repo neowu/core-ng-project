@@ -2,6 +2,7 @@ package core.framework.impl.db;
 
 
 import core.framework.api.db.Transaction;
+import core.framework.api.log.Markers;
 import core.framework.api.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,9 @@ final class TransactionImpl implements Transaction {
         } finally {
             long elapsedTime = watch.elapsedTime();
             logger.debug("end transaction, elapsedTime={}", elapsedTime);
-            if (elapsedTime > longTransactionThresholdInMs) logger.warn("long transaction detected");
+            if (elapsedTime > longTransactionThresholdInMs) {
+                logger.warn(Markers.errorType("LONG_TRANSACTION"), "long db transaction, elapsedTime={}", elapsedTime);
+            }
         }
     }
 }

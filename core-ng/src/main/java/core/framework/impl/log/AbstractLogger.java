@@ -13,31 +13,31 @@ abstract class AbstractLogger implements Logger {
         this.name = name;
     }
 
-    abstract void log(LogLevel level, String message, Object[] arguments, Throwable exception);
+    abstract void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception);
 
-    private void logWithOneArgument(LogLevel level, String format, Object arg) {
+    private void logWithOneArgument(Marker marker, LogLevel level, String format, Object arg) {
         if (arg instanceof Throwable)
-            log(level, format, null, (Throwable) arg);
+            log(marker, level, format, null, (Throwable) arg);
         else
-            log(level, format, new Object[]{arg}, null);
+            log(marker, level, format, new Object[]{arg}, null);
     }
 
-    private void logWithTwoArguments(LogLevel level, String format, Object arg1, Object arg2) {
+    private void logWithTwoArguments(Marker marker, LogLevel level, String format, Object arg1, Object arg2) {
         if (arg2 instanceof Throwable)
-            log(level, format, new Object[]{arg1}, (Throwable) arg2);
+            log(marker, level, format, new Object[]{arg1}, (Throwable) arg2);
         else
-            log(level, format, new Object[]{arg1, arg2}, null);
+            log(marker, level, format, new Object[]{arg1, arg2}, null);
     }
 
-    private void logWithArguments(LogLevel level, String format, Object[] arguments) {
+    private void logWithArguments(Marker marker, LogLevel level, String format, Object[] arguments) {
         // arguments length must be greater than 1, because there are same method with 2 arguments
         Object lastArgument = arguments[arguments.length - 1];
         if (lastArgument instanceof Throwable) {
             Object[] messageArguments = new Object[arguments.length - 1];
             System.arraycopy(arguments, 0, messageArguments, 0, arguments.length - 1);
-            log(level, format, messageArguments, (Throwable) lastArgument);
+            log(marker, level, format, messageArguments, (Throwable) lastArgument);
         } else {
-            log(level, format, arguments, null);
+            log(marker, level, format, arguments, null);
         }
     }
 
@@ -103,27 +103,27 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public void debug(String msg) {
-        log(LogLevel.DEBUG, msg, null, null);
+        log(null, LogLevel.DEBUG, msg, null, null);
     }
 
     @Override
     public void debug(String format, Object arg) {
-        logWithOneArgument(LogLevel.DEBUG, format, arg);
+        logWithOneArgument(null, LogLevel.DEBUG, format, arg);
     }
 
     @Override
     public void debug(String format, Object arg1, Object arg2) {
-        logWithTwoArguments(LogLevel.DEBUG, format, arg1, arg2);
+        logWithTwoArguments(null, LogLevel.DEBUG, format, arg1, arg2);
     }
 
     @Override
     public void debug(String format, Object... arguments) {
-        logWithArguments(LogLevel.DEBUG, format, arguments);
+        logWithArguments(null, LogLevel.DEBUG, format, arguments);
     }
 
     @Override
     public void debug(String msg, Throwable t) {
-        log(LogLevel.DEBUG, msg, null, t);
+        log(null, LogLevel.DEBUG, msg, null, t);
     }
 
     @Override
@@ -133,27 +133,27 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public void debug(Marker marker, String msg) {
-        log(LogLevel.DEBUG, msg, null, null);
+        log(marker, LogLevel.DEBUG, msg, null, null);
     }
 
     @Override
     public void debug(Marker marker, String format, Object arg) {
-        logWithOneArgument(LogLevel.DEBUG, format, arg);
+        logWithOneArgument(marker, LogLevel.DEBUG, format, arg);
     }
 
     @Override
     public void debug(Marker marker, String format, Object arg1, Object arg2) {
-        logWithTwoArguments(LogLevel.DEBUG, format, arg1, arg2);
+        logWithTwoArguments(marker, LogLevel.DEBUG, format, arg1, arg2);
     }
 
     @Override
     public void debug(Marker marker, String format, Object... arguments) {
-        logWithArguments(LogLevel.DEBUG, format, arguments);
+        logWithArguments(marker, LogLevel.DEBUG, format, arguments);
     }
 
     @Override
     public void debug(Marker marker, String msg, Throwable t) {
-        log(LogLevel.DEBUG, msg, null, t);
+        log(marker, LogLevel.DEBUG, msg, null, t);
     }
 
     @Override
@@ -163,27 +163,27 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public void info(String msg) {
-        log(LogLevel.INFO, msg, null, null);
+        log(null, LogLevel.INFO, msg, null, null);
     }
 
     @Override
     public void info(String format, Object arg) {
-        logWithOneArgument(LogLevel.INFO, format, arg);
+        logWithOneArgument(null, LogLevel.INFO, format, arg);
     }
 
     @Override
     public void info(String format, Object arg1, Object arg2) {
-        logWithTwoArguments(LogLevel.INFO, format, arg1, arg2);
+        logWithTwoArguments(null, LogLevel.INFO, format, arg1, arg2);
     }
 
     @Override
     public void info(String format, Object... arguments) {
-        logWithArguments(LogLevel.INFO, format, arguments);
+        logWithArguments(null, LogLevel.INFO, format, arguments);
     }
 
     @Override
     public void info(String msg, Throwable t) {
-        log(LogLevel.INFO, msg, null, t);
+        log(null, LogLevel.INFO, msg, null, t);
     }
 
     @Override
@@ -193,27 +193,27 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public void info(Marker marker, String msg) {
-        log(LogLevel.INFO, msg, null, null);
+        log(marker, LogLevel.INFO, msg, null, null);
     }
 
     @Override
     public void info(Marker marker, String format, Object arg) {
-        logWithOneArgument(LogLevel.INFO, format, arg);
+        logWithOneArgument(marker, LogLevel.INFO, format, arg);
     }
 
     @Override
     public void info(Marker marker, String format, Object arg1, Object arg2) {
-        logWithTwoArguments(LogLevel.INFO, format, arg1, arg2);
+        logWithTwoArguments(marker, LogLevel.INFO, format, arg1, arg2);
     }
 
     @Override
     public void info(Marker marker, String format, Object... arguments) {
-        logWithArguments(LogLevel.INFO, format, arguments);
+        logWithArguments(marker, LogLevel.INFO, format, arguments);
     }
 
     @Override
     public void info(Marker marker, String msg, Throwable t) {
-        log(LogLevel.INFO, msg, null, t);
+        log(marker, LogLevel.INFO, msg, null, t);
     }
 
     @Override
@@ -223,27 +223,27 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public void warn(String msg) {
-        log(LogLevel.WARN, msg, null, null);
+        log(null, LogLevel.WARN, msg, null, null);
     }
 
     @Override
     public void warn(String format, Object arg) {
-        logWithOneArgument(LogLevel.WARN, format, arg);
+        logWithOneArgument(null, LogLevel.WARN, format, arg);
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
-        logWithTwoArguments(LogLevel.WARN, format, arg1, arg2);
+        logWithTwoArguments(null, LogLevel.WARN, format, arg1, arg2);
     }
 
     @Override
     public void warn(String format, Object... arguments) {
-        logWithArguments(LogLevel.WARN, format, arguments);
+        logWithArguments(null, LogLevel.WARN, format, arguments);
     }
 
     @Override
     public void warn(String msg, Throwable t) {
-        log(LogLevel.WARN, msg, null, t);
+        log(null, LogLevel.WARN, msg, null, t);
     }
 
     @Override
@@ -253,27 +253,27 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public void warn(Marker marker, String msg) {
-        log(LogLevel.WARN, msg, null, null);
+        log(marker, LogLevel.WARN, msg, null, null);
     }
 
     @Override
     public void warn(Marker marker, String format, Object arg) {
-        logWithOneArgument(LogLevel.WARN, format, arg);
+        logWithOneArgument(marker, LogLevel.WARN, format, arg);
     }
 
     @Override
     public void warn(Marker marker, String format, Object arg1, Object arg2) {
-        logWithTwoArguments(LogLevel.WARN, format, arg1, arg2);
+        logWithTwoArguments(marker, LogLevel.WARN, format, arg1, arg2);
     }
 
     @Override
     public void warn(Marker marker, String format, Object... arguments) {
-        logWithArguments(LogLevel.WARN, format, arguments);
+        logWithArguments(marker, LogLevel.WARN, format, arguments);
     }
 
     @Override
     public void warn(Marker marker, String msg, Throwable t) {
-        log(LogLevel.WARN, msg, null, t);
+        log(marker, LogLevel.WARN, msg, null, t);
     }
 
     @Override
@@ -283,27 +283,27 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public void error(String msg) {
-        log(LogLevel.ERROR, msg, null, null);
+        log(null, LogLevel.ERROR, msg, null, null);
     }
 
     @Override
     public void error(String format, Object arg) {
-        logWithOneArgument(LogLevel.ERROR, format, arg);
+        logWithOneArgument(null, LogLevel.ERROR, format, arg);
     }
 
     @Override
     public void error(String format, Object arg1, Object arg2) {
-        logWithTwoArguments(LogLevel.ERROR, format, arg1, arg2);
+        logWithTwoArguments(null, LogLevel.ERROR, format, arg1, arg2);
     }
 
     @Override
     public void error(String format, Object... arguments) {
-        logWithArguments(LogLevel.ERROR, format, arguments);
+        logWithArguments(null, LogLevel.ERROR, format, arguments);
     }
 
     @Override
     public void error(String msg, Throwable t) {
-        log(LogLevel.ERROR, msg, null, t);
+        log(null, LogLevel.ERROR, msg, null, t);
     }
 
     @Override
@@ -313,26 +313,26 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public void error(Marker marker, String msg) {
-        log(LogLevel.ERROR, msg, null, null);
+        log(marker, LogLevel.ERROR, msg, null, null);
     }
 
     @Override
     public void error(Marker marker, String format, Object arg) {
-        logWithOneArgument(LogLevel.ERROR, format, arg);
+        logWithOneArgument(marker, LogLevel.ERROR, format, arg);
     }
 
     @Override
     public void error(Marker marker, String format, Object arg1, Object arg2) {
-        logWithTwoArguments(LogLevel.ERROR, format, arg1, arg2);
+        logWithTwoArguments(marker, LogLevel.ERROR, format, arg1, arg2);
     }
 
     @Override
     public void error(Marker marker, String format, Object... arguments) {
-        logWithArguments(LogLevel.ERROR, format, arguments);
+        logWithArguments(marker, LogLevel.ERROR, format, arguments);
     }
 
     @Override
     public void error(Marker marker, String msg, Throwable t) {
-        log(LogLevel.ERROR, msg, null, t);
+        log(marker, LogLevel.ERROR, msg, null, t);
     }
 }

@@ -31,7 +31,7 @@ public class ActionLogMessage {
     @XmlElement(name = "error_message")
     public String errorMessage;
     @XmlElement(name = "exception_class")
-    public String exceptionClass;
+    public String errorType;
     @XmlElement(name = "elapsed")
     public Long elapsed;
     @XmlElement(name = "context")

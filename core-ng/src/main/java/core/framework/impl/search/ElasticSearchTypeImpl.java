@@ -1,6 +1,7 @@
 package core.framework.impl.search;
 
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Markers;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.search.SearchException;
 import core.framework.api.util.JSON;
@@ -168,7 +169,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     }
 
     private void checkSlowQuery(long elapsedTime) {
-        if (elapsedTime > slowQueryThresholdInMs)
-            logger.warn("slow query detected");
+        if (elapsedTime > slowQueryThresholdInMs) {
+            logger.warn(Markers.errorType("SLOW_QUERY"), "slow elasticsearch query, elapsedTime={}", elapsedTime);
+        }
     }
 }

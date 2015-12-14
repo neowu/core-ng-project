@@ -117,9 +117,8 @@ public final class LogForwarder {
         message.refId = log.refId;
         message.elapsed = log.elapsed;
         message.action = log.action;
+        message.errorType = log.errorType();
         message.errorMessage = log.errorMessage;
-        if (log.exceptionClass != null)
-            message.exceptionClass = log.exceptionClass.getCanonicalName();
         message.context = log.context;
 
         Map<String, PerformanceStatMessage> performanceStats = Maps.newLinkedHashMap();

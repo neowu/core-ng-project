@@ -1,7 +1,8 @@
 ## Change log
 
-### 3.9.4 (12/10/2015 - )
+### 3.9.4 (12/10/2015 - 12/14/2015)
 * elasticsearch: update to 2.1.0
+* log: restructure trace/warning log, for prod log aggregation
 
 ### 3.9.3 (12/9/2015)
 * hash: added md5 support

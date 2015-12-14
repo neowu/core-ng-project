@@ -32,15 +32,14 @@ public class RabbitMQListener implements MessageHandlerConfig {
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Thread listenerThread;
-    private int maxConcurrentHandlers = 10;
-    private Semaphore semaphore;
-
     private final String queue;
     private final Executor executor;
     private final LogManager logManager;
     private final MessageValidator validator;
     private final Map<String, MessageHandler> handlers = Maps.newHashMap();
     private final Map<String, Class> messageClasses = Maps.newHashMap();
+    private int maxConcurrentHandlers = 10;
+    private Semaphore semaphore;
 
     public RabbitMQListener(RabbitMQ rabbitMQ, String queue, Executor executor, MessageValidator validator, LogManager logManager) {
         this.executor = executor;
@@ -126,7 +125,7 @@ public class RabbitMQListener implements MessageHandlerConfig {
         Map<String, Object> headers = delivery.getProperties().getHeaders();
         if (headers != null) {
             if ("true".equals(String.valueOf(headers.get(HEADER_TRACE)))) {
-                actionLog.triggerTraceLog();
+                logManager.triggerTraceLog();
             }
 
             Object clientIP = headers.get(HEADER_CLIENT_IP);

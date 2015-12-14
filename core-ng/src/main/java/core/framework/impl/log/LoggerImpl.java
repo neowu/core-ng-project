@@ -1,6 +1,7 @@
 package core.framework.impl.log;
 
 import core.framework.api.util.Strings;
+import org.slf4j.Marker;
 
 import java.io.PrintStream;
 
@@ -40,9 +41,9 @@ final class LoggerImpl extends AbstractLogger {
     }
 
     @Override
-    void log(LogLevel level, String message, Object[] arguments, Throwable exception) {
+    void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
         if (level.value >= traceLevel.value) {
-            LogEvent event = new LogEvent(level, System.currentTimeMillis(), logger, message, arguments, exception);
+            LogEvent event = new LogEvent(logger, marker, level, message, arguments, exception);
             logManager.process(event);
 
             if (level.value >= logLevel.value) {
