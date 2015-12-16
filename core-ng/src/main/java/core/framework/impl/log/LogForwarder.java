@@ -10,18 +10,19 @@ import core.framework.api.util.Network;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
 import core.framework.impl.log.queue.ActionLogMessage;
+import core.framework.impl.log.queue.ActionLogMessages;
 import core.framework.impl.log.queue.PerformanceStatMessage;
-import core.framework.impl.log.queue.TraceLogMessage;
 import core.framework.impl.queue.RabbitMQ;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,10 +33,9 @@ public final class LogForwarder {
     private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
     private final String appName;
 
-    private final AMQP.BasicProperties actionLogMessageProperties = new AMQP.BasicProperties.Builder().type(ActionLogMessage.class.getAnnotation(Message.class).name()).build();
-    private final AMQP.BasicProperties traceLogMessageProperties = new AMQP.BasicProperties.Builder().type(TraceLogMessage.class.getAnnotation(Message.class).name()).build();
+    private final AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().type(ActionLogMessages.class.getAnnotation(Message.class).name()).build();
 
-    private final BlockingQueue<Object> logMessageQueue = new LinkedBlockingQueue<>();
+    private final Queue<ActionLogMessage> queue = new ConcurrentLinkedQueue<>();
     private final RabbitMQ rabbitMQ = new RabbitMQ();
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
@@ -50,13 +50,13 @@ public final class LogForwarder {
             logger.info("log forwarder thread started");
             while (!stop.get()) {
                 try {
-                    sendLogMessages();
+                    sendActionLogMessages();
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
 
                         retryAttempts++;
                         if (retryAttempts >= 10) {  // roughly 5 mins to hold messages if log queue is not available
-                            logMessageQueue.clear();    // clear messages to clean up memory
+                            queue.clear();    // clear messages to clean up memory
                         }
 
                         logger.warn("failed to send log message, retry in 30 seconds, attempts={}", retryAttempts, e);
@@ -80,17 +80,25 @@ public final class LogForwarder {
         rabbitMQ.close();
     }
 
-    private void sendLogMessages() throws InterruptedException, IOException {
+    private void sendActionLogMessages() throws InterruptedException, IOException {
         Channel channel = rabbitMQ.createChannel();
         try {
+            List<ActionLogMessage> logs = new LinkedList<>();
             while (!stop.get()) {
-                Object message = logMessageQueue.take();
-                if (message instanceof ActionLogMessage) {
-                    channel.basicPublish("", "action-log-queue", actionLogMessageProperties, Strings.bytes(JSON.toJSON(message)));
-                } else if (message instanceof TraceLogMessage) {
-                    channel.basicPublish("", "trace-log-queue", traceLogMessageProperties, Strings.bytes(JSON.toJSON(message)));
+                ActionLogMessage message = queue.poll();
+                if (message != null) logs.add(message);
+
+                if ((message == null && !logs.isEmpty()) || logs.size() >= 1000) {
+                    ActionLogMessages messages = new ActionLogMessages();
+                    messages.logs = logs;
+                    channel.basicPublish("", "action-log-queue", properties, Strings.bytes(JSON.toJSON(messages)));
+                    retryAttempts = 0;  // reset retry attempts if one message sent successfully
+                    logs = new LinkedList<>();
                 }
-                retryAttempts = 0;  // reset retry attempts if one message sent successfully
+
+                if (message == null) {
+                    Thread.sleep(5000);
+                }
             }
         } finally {
             closeChannel(channel);
@@ -107,7 +115,7 @@ public final class LogForwarder {
         }
     }
 
-    void forwardActionLog(ActionLog log) {
+    void forward(ActionLog log) {
         ActionLogMessage message = new ActionLogMessage();
         message.app = appName;
         message.serverIP = Network.localHostAddress();
@@ -130,35 +138,14 @@ public final class LogForwarder {
         });
         message.performanceStats = performanceStats;
 
-        logMessageQueue.add(message);
-    }
-
-    void forwardTraceLog(ActionLog log, List<LogEvent> events) {
-        TraceLogMessage message = new TraceLogMessage();
-        message.id = log.id;
-        message.date = log.startTime;
-        message.app = appName;
-        message.action = log.action;
-        message.result = log.result();
-
-        StringBuilder content = new StringBuilder(events.size() * 64);
-        for (LogEvent event : events) {
-            content.append(event.logMessage());
+        if (log.flushTraceLog()) {
+            StringBuilder traceLog = new StringBuilder(log.events.size() * 64);
+            for (LogEvent event : log.events) {
+                traceLog.append(event.logMessage());
+            }
+            message.traceLog = traceLog.toString();
         }
-        message.content = content.toString();
 
-        logMessageQueue.add(message);
-    }
-
-    void forwardTraceLog(ActionLog log, LogEvent event) {
-        TraceLogMessage message = new TraceLogMessage();
-        message.id = log.id;
-        message.date = log.startTime;
-        message.app = appName;
-        message.action = log.action;
-        message.result = log.result();
-        message.content = event.logMessage();
-
-        logMessageQueue.add(message);
+        queue.add(message);
     }
 }

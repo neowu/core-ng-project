@@ -1,7 +1,5 @@
 package core.framework.impl.log.queue;
 
-import core.framework.api.queue.Message;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -11,7 +9,6 @@ import java.util.Map;
 /**
  * @author neo
  */
-@Message(name = "action_log")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ActionLogMessage {
     @XmlElement(name = "date")
@@ -28,14 +25,16 @@ public class ActionLogMessage {
     public String refId;
     @XmlElement(name = "action")
     public String action;
+    @XmlElement(name = "error_type")
+    public String errorType;
     @XmlElement(name = "error_message")
     public String errorMessage;
-    @XmlElement(name = "exception_class")
-    public String errorType;
     @XmlElement(name = "elapsed")
     public Long elapsed;
     @XmlElement(name = "context")
     public Map<String, String> context;
     @XmlElement(name = "perf_stats")
     public Map<String, PerformanceStatMessage> performanceStats;
+    @XmlElement(name = "trace_log")
+    public String traceLog;
 }

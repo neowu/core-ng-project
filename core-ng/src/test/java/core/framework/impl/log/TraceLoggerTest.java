@@ -18,7 +18,7 @@ public class TraceLoggerTest {
 
     @Before
     public void createTraceLogger() {
-        logger = new TraceLogger(null, null, null);
+        logger = new TraceLogger(null);
     }
 
     @Test

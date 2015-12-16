@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +16,7 @@ import java.util.UUID;
  * @author neo
  */
 public final class ActionLog {
+    private static final int MAX_TRACE_HOLD_SIZE = 5000;
     public final String id = UUID.randomUUID().toString();
     final Instant startTime = Instant.now();
     final Map<String, String> context = Maps.newLinkedHashMap();
@@ -25,22 +28,33 @@ public final class ActionLog {
     String errorMessage;
     long elapsed;
     LogLevel result = LogLevel.INFO;
+    List<LogEvent> events = new LinkedList<>();
     private String errorType;
 
-    void end() {
-        elapsed = Duration.between(startTime, Instant.now()).toMillis();
-    }
-
     void process(LogEvent event) {
-        if (event.level.value > result.value) result = event.level;
+        if (event.level.value > result.value) {
+            result = event.level;
+        }
         String errorType = event.errorType();
         if (errorType != null) {
             this.errorType = errorType;
             this.errorMessage = event.message();
         }
-        if (event.trace()) {
-            trace = true;
+        if (events.size() < MAX_TRACE_HOLD_SIZE) {
+            events.add(event);
         }
+    }
+
+    void end() {
+        if (events.size() == MAX_TRACE_HOLD_SIZE) {
+            String message = "reached max holding size of trace log, please contact arch team";
+            if (result.value < LogLevel.WARN.value) result = LogLevel.WARN;
+            this.errorType = "TRACE_LOG_TOO_LONG";
+            this.errorMessage = message;
+            LogEvent warning = new LogEvent(logger.getName(), null, LogLevel.WARN, message, null, null);
+            events.add(warning);
+        }
+        elapsed = Duration.between(startTime, Instant.now()).toMillis();
     }
 
     String result() {
@@ -48,6 +62,10 @@ public final class ActionLog {
             return trace ? "TRACE" : "OK";
         }
         return String.valueOf(result);
+    }
+
+    boolean flushTraceLog() {
+        return trace || result.value >= LogLevel.WARN.value;
     }
 
     String errorType() {

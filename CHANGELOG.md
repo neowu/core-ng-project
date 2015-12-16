@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.9.5 (12/16/2015 - )
+* log: update log forwarding structure, send in batch
+
 ### 3.9.4 (12/10/2015 - 12/14/2015)
 * elasticsearch: update to 2.1.0
 * log: restructure trace/warning log, for prod log aggregation

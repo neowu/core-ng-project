@@ -12,7 +12,6 @@ public abstract class AbstractMarker implements Marker {
 
     @Override
     public void add(Marker reference) {
-
     }
 
     @Override

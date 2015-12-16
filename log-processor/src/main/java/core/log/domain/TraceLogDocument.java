@@ -6,7 +6,6 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.Instant;
-import java.util.List;
 
 /**
  * @author neo
@@ -25,5 +24,5 @@ public class TraceLogDocument {
     @XmlElement(name = "action")
     public String action;
     @XmlElement(name = "content")
-    public List<String> content;
+    public String content;
 }

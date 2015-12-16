@@ -2,7 +2,7 @@ package core.framework.api.module;
 
 import core.framework.impl.log.ActionLogger;
 import core.framework.impl.log.LogForwarder;
-import core.framework.impl.log.TraceLoggerFactory;
+import core.framework.impl.log.TraceLogger;
 import core.framework.impl.module.ModuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public final class LogConfig {
         if (context.isTest()) {
             logger.info("disable trace log during test");
         } else {
-            context.logManager.traceLoggerFactory = TraceLoggerFactory.console();
+            context.logManager.traceLogger = TraceLogger.console();
         }
     }
 
@@ -49,7 +49,7 @@ public final class LogConfig {
         if (context.isTest()) {
             logger.info("disable trace log during test");
         } else {
-            context.logManager.traceLoggerFactory = TraceLoggerFactory.file(traceLogPath);
+            context.logManager.traceLogger = TraceLogger.file(traceLogPath);
         }
     }
 

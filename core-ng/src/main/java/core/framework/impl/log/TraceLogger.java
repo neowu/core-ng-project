@@ -1,6 +1,5 @@
 package core.framework.impl.log;
 
-import core.framework.api.log.Markers;
 import core.framework.api.util.Charsets;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Randoms;
@@ -17,115 +16,70 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
-import java.util.List;
+
+import static core.framework.api.util.Files.createDir;
+import static java.nio.file.Files.createFile;
 
 /**
  * @author neo
  */
-final class TraceLogger {
+public final class TraceLogger {
     private static final DateTimeFormatter TRACE_LOG_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
-    private static final int MAX_HOLD_SIZE = 5000;
-    private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLogger.class.getCanonicalName());
+
+    public static TraceLogger console() {
+        return new TraceLogger(null);
+    }
+
+    public static TraceLogger file(Path traceLogPath) {
+        createDir(traceLogPath);
+        return new TraceLogger(traceLogPath);
+    }
 
     private final PrintStream fallbackLogger = System.err;
 
     private final Path traceLogPath;
-    private final ActionLog actionLog;
-    private final LogForwarder logForwarder;
-    private List<LogEvent> events = new LinkedList<>();
-    private int size = 0;
-    private Writer writer;
 
-    TraceLogger(Path traceLogPath, ActionLog actionLog, LogForwarder logForwarder) {
+    TraceLogger(Path traceLogPath) {
         this.traceLogPath = traceLogPath;
-        this.actionLog = actionLog;
-        this.logForwarder = logForwarder;
     }
 
-    void process(LogEvent event) {
-        size++;
-        if (events != null) {
-            events.add(event);
-            if (event.isWarningOrError() || size >= MAX_HOLD_SIZE || event.trace()) {
-                flushTraceLogs();
-                events = null;
+    void write(ActionLog log) {
+        if (!log.flushTraceLog()) return;
+
+        Writer writer = createWriter(log);
+        try {
+            for (LogEvent event : log.events) {
+                String message = event.logMessage();
+                writer.write(message);
             }
-        } else {
-            writeTraceLog(event);
-        }
-    }
-
-    void close() {
-        if (writer != null) {
-            try {
-                if (traceLogPath == null) {
-                    writer.flush();     // do not close System.err (when traceLogPath is null)
-                } else {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                fallbackLogger.println("failed to flush trace log, error=" + Exceptions.stackTrace(e));
+            if (traceLogPath == null) {
+                writer.flush();     // do not close System.err (when traceLogPath is null)
+            } else {
+                writer.close();
             }
+        } catch (IOException e) {
+            fallbackLogger.println("failed to write trace log, error=" + Exceptions.stackTrace(e));
         }
     }
 
-    private void flushTraceLogs() {
-        writer = createWriter();
-
-        for (LogEvent event : events) {
-            write(event);
-        }
-
-        if (logForwarder != null) {
-            logForwarder.forwardTraceLog(actionLog, events);
-        }
-    }
-
-    void writeTraceLog(LogEvent event) {
-        if (size == MAX_HOLD_SIZE + 1) {
-            LogEvent warning = new LogEvent(LOGGER, Markers.errorType("TRACE_TOO_LONG"), LogLevel.WARN, "reached max holding size of trace log, please contact arch team", null, null);
-            actionLog.process(warning);
-            write(warning);
-            if (logForwarder != null) logForwarder.forwardTraceLog(actionLog, warning);
-        }
-
-        write(event);
-
-        if (logForwarder != null && size <= MAX_HOLD_SIZE) {    // not forward trace to queue if more than max lines.
-            logForwarder.forwardTraceLog(actionLog, event);
-        }
-    }
-
-    Writer createWriter() {
+    Writer createWriter(ActionLog log) {
         if (traceLogPath != null) {
             try {
-                String logPath = traceLogFilePath(traceLogPath.toString(), LocalDateTime.ofInstant(actionLog.startTime, ZoneId.systemDefault()), actionLog.action, actionLog.id);
-                actionLog.context("logPath", logPath);
+                String logPath = traceLogFilePath(traceLogPath.toString(), LocalDateTime.ofInstant(log.startTime, ZoneId.systemDefault()), log.action, log.id);
+                log.context("logPath", logPath);
                 Path path = Paths.get(logPath).toAbsolutePath();
-                Files.createDirectories(path.getParent());
-                Files.createFile(path);
+                createDir(path.getParent());
+                createFile(path);
                 return Files.newBufferedWriter(path, Charsets.UTF_8, StandardOpenOption.APPEND);
             } catch (IOException e) {
                 fallbackLogger.println("failed to create trace log file, error=" + Exceptions.stackTrace(e));
-                // fall back to console writer as below
             }
         }
         return new BufferedWriter(new OutputStreamWriter(System.err, Charsets.UTF_8));
     }
 
-    void write(LogEvent event) {
-        String message = event.logMessage();
-        try {
-            writer.write(message);
-        } catch (IOException e) {
-            fallbackLogger.println("failed to write log, log=" + message + ", error=" + Exceptions.stackTrace(e));
-        }
-    }
-
     String traceLogFilePath(String logDirectory, LocalDateTime date, String action, String id) {
         String sequence = Randoms.alphaNumeric(5);
-
         return logDirectory + "/" + action + "/" + TRACE_LOG_DATE_FORMAT.format(date) + "." + id + "." + sequence + ".log";
     }
 }

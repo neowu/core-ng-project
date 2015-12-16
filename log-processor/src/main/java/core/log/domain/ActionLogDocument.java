@@ -29,10 +29,10 @@ public class ActionLogDocument {
     public String refId;
     @XmlElement(name = "action")
     public String action;
+    @XmlElement(name = "error_type")
+    public String errorType;
     @XmlElement(name = "error_message")
     public String errorMessage;
-    @XmlElement(name = "exception_class")
-    public String errorType;
     @XmlElement(name = "elapsed")
     public Long elapsed;
     @XmlElement(name = "context")

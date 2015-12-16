@@ -1,6 +1,5 @@
 package core.framework.impl.log;
 
-import core.framework.api.log.Markers;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Strings;
 import core.framework.impl.log.marker.ErrorTypeMarker;
@@ -60,22 +59,15 @@ final class LogEvent {
     }
 
     String message() {
-        if (arguments == null)
+        if (arguments == null) {
             return message;
-        else
+        } else {
             return Strings.format(message, arguments);
-    }
-
-    boolean trace() {
-        return marker == Markers.TRACE;
+        }
     }
 
     String errorType() {
         if (marker instanceof ErrorTypeMarker) return marker.getName();
         return null;
-    }
-
-    boolean isWarningOrError() {
-        return level.value >= LogLevel.WARN.value;
     }
 }
