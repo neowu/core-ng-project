@@ -40,7 +40,7 @@
         "error_message": {
           "type": "string"
         },
-        "exception_class": {
+        "error_type": {
           "type": "string",
           "index": "not_analyzed"
         },
