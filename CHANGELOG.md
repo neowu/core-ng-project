@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.9.6 (12/17/2015)
+* log: dynamic group action log message to forward, 2000 or 5M which comes first
+
 ### 3.9.5 (12/16/2015 - 12/17/2015)
 * log: update log forwarding structure, send in batch
 * log: moved ErrorCode to core.framework.api.log.ErrorCode

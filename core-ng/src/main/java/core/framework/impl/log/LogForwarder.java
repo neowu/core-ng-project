@@ -84,16 +84,22 @@ public final class LogForwarder {
         Channel channel = rabbitMQ.createChannel();
         try {
             List<ActionLogMessage> logs = new LinkedList<>();
+            int messageSize = 0;
             while (!stop.get()) {
                 ActionLogMessage message = queue.poll();
-                if (message != null) logs.add(message);
+                if (message != null) {
+                    logs.add(message);
+                    messageSize += 1000;    // action log without trace is roughly 1k
+                    messageSize += message.traceLog == null ? 0 : message.traceLog.length();
+                }
 
-                if ((message == null && !logs.isEmpty()) || logs.size() >= 1000) {
+                if ((message == null && !logs.isEmpty()) || logs.size() >= 2000 || messageSize >= 5000000) {    // send if more than 2000 logs or larger than 5M
                     ActionLogMessages messages = new ActionLogMessages();
                     messages.logs = logs;
                     channel.basicPublish("", "action-log-queue", properties, Strings.bytes(JSON.toJSON(messages)));
                     retryAttempts = 0;  // reset retry attempts if one message sent successfully
                     logs = new LinkedList<>();
+                    messageSize = 0;
                 }
 
                 if (message == null) {
