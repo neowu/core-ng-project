@@ -122,6 +122,9 @@ project(':demo-service') {
                 project(':core-ng'),
                 'redis.clients:jedis:2.8.0@jar'
         )
+        runtime(
+                "com.rabbitmq:amqp-client:${rabbitVersion}"
+        )
         testCompile(
                 project(':core-ng-test')
         )

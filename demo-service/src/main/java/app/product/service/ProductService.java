@@ -18,7 +18,6 @@ public class ProductService {
         ProductView view = products.get(id);
         if (view == null) throw new NotFoundException("product not found, id=" + id);
         return view;
-
     }
 
     public void create(CreateProductRequest request) {
