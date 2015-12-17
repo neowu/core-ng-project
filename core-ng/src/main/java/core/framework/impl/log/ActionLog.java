@@ -27,19 +27,18 @@ public final class ActionLog {
     String refId;
     String errorMessage;
     long elapsed;
-    LogLevel result = LogLevel.INFO;
     List<LogEvent> events = new LinkedList<>();
+    private LogLevel result = LogLevel.INFO;
     private String errorType;
 
     void process(LogEvent event) {
         if (event.level.value > result.value) {
             result = event.level;
-        }
-        String errorType = event.errorType();
-        if (errorType != null) {
-            this.errorType = errorType;
+
+            this.errorType = event.errorType(); // only update error type/message if result raised, so error type will be first WARN or first ERROR
             this.errorMessage = event.message();
         }
+
         if (events.size() < MAX_TRACE_HOLD_SIZE) {
             events.add(event);
         }

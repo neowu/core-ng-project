@@ -103,8 +103,6 @@ project(':log-processor') {
 }
 
 project(':benchmark') {
-    apply from: file("${rootDir}/gradle/app.gradle")
-
     dependencies {
         compile(
                 project(':core-ng'),
