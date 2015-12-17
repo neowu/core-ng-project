@@ -170,7 +170,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     private void checkSlowQuery(long elapsedTime) {
         if (elapsedTime > slowQueryThresholdInMs) {
-            logger.warn(Markers.errorType("SLOW_QUERY"), "slow elasticsearch query, elapsedTime={}", elapsedTime);
+            logger.warn(Markers.errorCode("SLOW_QUERY"), "slow elasticsearch query, elapsedTime={}", elapsedTime);
         }
     }
 }

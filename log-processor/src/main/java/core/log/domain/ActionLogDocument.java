@@ -29,8 +29,8 @@ public class ActionLogDocument {
     public String refId;
     @XmlElement(name = "action")
     public String action;
-    @XmlElement(name = "error_type")
-    public String errorType;
+    @XmlElement(name = "error_code")
+    public String errorCode;
     @XmlElement(name = "error_message")
     public String errorMessage;
     @XmlElement(name = "elapsed")

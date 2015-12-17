@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.api.log.ErrorCode;
 import core.framework.api.log.Markers;
 import core.framework.api.log.Warning;
 import org.slf4j.Logger;
@@ -68,11 +69,12 @@ public final class LogManager {
 
     public void logError(Throwable e) {
         String errorMessage = e.getMessage();
-        Marker errorType = Markers.errorType(e.getClass().getCanonicalName());
+        String errorCode = e instanceof ErrorCode ? ((ErrorCode) e).errorCode() : e.getClass().getCanonicalName();
+        Marker marker = Markers.errorCode(errorCode);
         if (e.getClass().isAnnotationPresent(Warning.class)) {
-            logger.warn(errorType, errorMessage, e);
+            logger.warn(marker, errorMessage, e);
         } else {
-            logger.error(errorType, errorMessage, e);
+            logger.error(marker, errorMessage, e);
         }
     }
 }

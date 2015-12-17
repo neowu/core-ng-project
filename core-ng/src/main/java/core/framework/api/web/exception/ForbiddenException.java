@@ -1,5 +1,7 @@
 package core.framework.api.web.exception;
 
+import core.framework.api.log.ErrorCode;
+
 /**
  * @author neo
  */

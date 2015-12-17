@@ -1,4 +1,4 @@
-package core.framework.api.web.exception;
+package core.framework.api.log;
 
 /**
  * @author neo

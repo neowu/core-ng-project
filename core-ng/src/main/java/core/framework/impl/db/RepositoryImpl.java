@@ -123,7 +123,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         try {
             int updatedRows = database.operation.update(query.sql, query.params);
             if (updatedRows != 1)
-                logger.warn(Markers.errorType("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
+                logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -138,7 +138,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         try {
             int deletedRows = database.operation.update(deleteSQL, primaryKeys);
             if (deletedRows != 1)
-                logger.warn(Markers.errorType("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", deletedRows);
+                logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", deletedRows);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
@@ -180,7 +180,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             int[] deletedRows = database.operation.batchUpdate(deleteSQL, params);
             for (int deletedRow : deletedRows) {
                 if (deletedRow != 1) {
-                    logger.warn(Markers.errorType("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", Arrays.toString(deletedRows));
+                    logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", Arrays.toString(deletedRows));
                     break;
                 }
             }
@@ -194,13 +194,13 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     private void checkTooManyRows(int size) {
         if (size > database.tooManyRowsReturnedThreshold) {
-            logger.warn(Markers.errorType("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
+            logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }
     }
 
     private void checkSlowQuery(long elapsedTime) {
         if (elapsedTime > database.slowQueryThresholdInMs) {
-            logger.warn(Markers.errorType("SLOW_QUERY"), "slow db query, elapsedTime={}", elapsedTime);
+            logger.warn(Markers.errorCode("SLOW_QUERY"), "slow db query, elapsedTime={}", elapsedTime);
         }
     }
 }

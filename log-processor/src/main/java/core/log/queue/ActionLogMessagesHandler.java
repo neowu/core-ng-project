@@ -55,7 +55,7 @@ public class ActionLogMessagesHandler implements MessageHandler<ActionLogMessage
         actionLog.result = message.result;
         actionLog.refId = message.refId;
         actionLog.action = message.action;
-        actionLog.errorType = message.errorType;
+        actionLog.errorCode = message.errorCode;
         actionLog.errorMessage = message.errorMessage;
         actionLog.elapsed = message.elapsed;
         actionLog.context = message.context;

@@ -125,7 +125,7 @@ public final class LogForwarder {
         message.refId = log.refId;
         message.elapsed = log.elapsed;
         message.action = log.action;
-        message.errorType = log.errorType();
+        message.errorCode = log.errorCode();
         message.errorMessage = log.errorMessage;
         message.context = log.context;
 

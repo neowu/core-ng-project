@@ -83,11 +83,11 @@ public final class ActionLogger {
                 .append(log.refId);
         }
 
-        String errorType = log.errorType();
-        if (errorType != null) {
+        String errorCode = log.errorCode();
+        if (errorCode != null) {
             builder.append(LOG_SPLITTER)
-                .append("errorType=")
-                .append(errorType)
+                .append("errorCode=")
+                .append(errorCode)
                 .append(LOG_SPLITTER)
                 .append("errorMessage=")
                 .append(filterLineSeparator(log.errorMessage));

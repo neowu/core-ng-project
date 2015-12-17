@@ -111,7 +111,7 @@ public final class RabbitMQ {
 
     private void checkSlowMessage(long elapsedTime) {
         if (elapsedTime > slowMessageThresholdInMs) {
-            logger.warn(Markers.errorType("SLOW_MESSAGE"), "slow rabbitmq message, elapsedTime={}", elapsedTime);
+            logger.warn(Markers.errorCode("SLOW_MESSAGE"), "slow rabbitmq message, elapsedTime={}", elapsedTime);
         }
     }
 

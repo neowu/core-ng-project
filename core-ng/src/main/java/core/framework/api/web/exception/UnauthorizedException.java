@@ -1,5 +1,6 @@
 package core.framework.api.web.exception;
 
+import core.framework.api.log.ErrorCode;
 import core.framework.api.log.Warning;
 
 /**

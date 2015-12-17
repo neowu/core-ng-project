@@ -2,6 +2,7 @@
 
 ### 3.9.5 (12/16/2015 - )
 * log: update log forwarding structure, send in batch
+* log: moved ErrorCode to core.framework.api.log.ErrorCode
 
 ### 3.9.4 (12/10/2015 - 12/14/2015)
 * elasticsearch: update to 2.1.0

@@ -102,7 +102,7 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
 
     private String url(String url, TemplateContext context) {
         if (!isValidURL(url)) {
-            logger.warn(Markers.errorType("ILLEGAL_URL"), "illegal url detected, url={}, location={}", url, location);
+            logger.warn(Markers.errorCode("ILLEGAL_URL"), "illegal url detected, url={}, location={}", url, location);
             return "";
         }
         return cdn ? context.cdn.url(url) : url;

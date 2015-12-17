@@ -149,7 +149,7 @@ public final class DatabaseImpl implements Database {
             logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             checkSlowQuery(elapsedTime);
             if (results != null && results.size() > tooManyRowsReturnedThreshold) {
-                logger.warn(Markers.errorType("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", results.size());
+                logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", results.size());
             }
         }
     }
@@ -200,7 +200,7 @@ public final class DatabaseImpl implements Database {
 
     private void checkSlowQuery(long elapsedTime) {
         if (elapsedTime > slowQueryThresholdInMs) {
-            logger.warn(Markers.errorType("SLOW_QUERY"), "slow db query, elapsedTime={}", elapsedTime);
+            logger.warn(Markers.errorCode("SLOW_QUERY"), "slow db query, elapsedTime={}", elapsedTime);
         }
     }
 }

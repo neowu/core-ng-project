@@ -41,7 +41,7 @@ final class TransactionImpl implements Transaction {
             long elapsedTime = watch.elapsedTime();
             logger.debug("end transaction, elapsedTime={}", elapsedTime);
             if (elapsedTime > longTransactionThresholdInMs) {
-                logger.warn(Markers.errorType("LONG_TRANSACTION"), "long db transaction, elapsedTime={}", elapsedTime);
+                logger.warn(Markers.errorCode("LONG_TRANSACTION"), "long db transaction, elapsedTime={}", elapsedTime);
             }
         }
     }

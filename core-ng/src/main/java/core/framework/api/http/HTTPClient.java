@@ -73,7 +73,7 @@ public final class HTTPClient {
             ActionLogContext.track("http", elapsedTime);
             logger.debug("execute, elapsedTime={}", elapsedTime);
             if (elapsedTime > slowTransactionThresholdInMs) {
-                logger.warn(Markers.errorType("SLOW_HTTP"), "slow http transaction, elapsedTime={}", elapsedTime);
+                logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http transaction, elapsedTime={}", elapsedTime);
             }
         }
     }

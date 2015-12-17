@@ -37,12 +37,12 @@
           "type": "string",
           "index": "not_analyzed"
         },
-        "error_message": {
-          "type": "string"
-        },
-        "error_type": {
+        "error_code": {
           "type": "string",
           "index": "not_analyzed"
+        },
+        "error_message": {
+          "type": "string"
         },
         "elapsed": {
           "type": "integer"

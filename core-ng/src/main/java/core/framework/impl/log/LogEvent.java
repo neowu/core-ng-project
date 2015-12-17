@@ -2,7 +2,7 @@ package core.framework.impl.log;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Strings;
-import core.framework.impl.log.marker.ErrorTypeMarker;
+import core.framework.impl.log.marker.ErrorCodeMarker;
 import org.slf4j.Marker;
 
 import java.time.Instant;
@@ -66,8 +66,8 @@ final class LogEvent {
         }
     }
 
-    String errorType() {
-        if (marker instanceof ErrorTypeMarker) return marker.getName();
+    String errorCode() {
+        if (marker instanceof ErrorCodeMarker) return marker.getName();
         return null;
     }
 }

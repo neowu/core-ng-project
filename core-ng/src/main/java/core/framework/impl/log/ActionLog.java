@@ -29,13 +29,13 @@ public final class ActionLog {
     long elapsed;
     List<LogEvent> events = new LinkedList<>();
     private LogLevel result = LogLevel.INFO;
-    private String errorType;
+    private String errorCode;
 
     void process(LogEvent event) {
         if (event.level.value > result.value) {
             result = event.level;
 
-            this.errorType = event.errorType(); // only update error type/message if result raised, so error type will be first WARN or first ERROR
+            this.errorCode = event.errorCode(); // only update error type/message if result raised, so error type will be first WARN or first ERROR
             this.errorMessage = event.message();
         }
 
@@ -48,7 +48,7 @@ public final class ActionLog {
         if (events.size() == MAX_TRACE_HOLD_SIZE) {
             String message = "reached max holding size of trace log, please contact arch team";
             if (result.value < LogLevel.WARN.value) result = LogLevel.WARN;
-            this.errorType = "TRACE_LOG_TOO_LONG";
+            this.errorCode = "TRACE_LOG_TOO_LONG";
             this.errorMessage = message;
             LogEvent warning = new LogEvent(logger.getName(), null, LogLevel.WARN, message, null, null);
             events.add(warning);
@@ -67,8 +67,8 @@ public final class ActionLog {
         return trace || result.value >= LogLevel.WARN.value;
     }
 
-    String errorType() {
-        if (errorType != null) return errorType;
+    String errorCode() {
+        if (errorCode != null) return errorCode;
         if (result.value >= LogLevel.WARN.value) return "UNASSIGNED";
         return null;
     }
