@@ -8,7 +8,7 @@ tasks.withType(Checkstyle) {
     }
 
     dependencies {
-        checkstyle 'com.puppycrawl.tools:checkstyle:6.12.1'
+        checkstyle 'com.puppycrawl.tools:checkstyle:6.13'
         checkstyle files("${rootDir}/gradle/checkstyle/sevntu-checks-1.13.6.jar")
     }
 
@@ -20,7 +20,7 @@ tasks.withType(Checkstyle) {
 pmd {
     ruleSets = []
     ruleSetFiles = rootProject.files('gradle/pmd/rule-set.xml')
-    toolVersion = '5.4.0'
+    toolVersion = '5.4.1'
     consoleOutput = true
 }
 
