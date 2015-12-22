@@ -5,7 +5,7 @@ import java.sql.SQLException;
 /**
  * @author neo
  */
-public class UncheckedSQLException extends RuntimeException {
+public final class UncheckedSQLException extends RuntimeException {
     private static final long serialVersionUID = 5857178985477320780L;
 
     public UncheckedSQLException(SQLException e) {

@@ -7,7 +7,7 @@ import core.framework.api.log.Warning;
  * @author neo
  */
 @Warning
-public class UnauthorizedException extends RuntimeException implements ErrorCode {
+public final class UnauthorizedException extends RuntimeException implements ErrorCode {
     public static final String DEFAULT_ERROR_CODE = "UNAUTHORIZED";
 
     private static final long serialVersionUID = 5545181864430282120L;

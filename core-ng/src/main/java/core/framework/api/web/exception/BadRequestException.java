@@ -7,7 +7,7 @@ import core.framework.api.log.Warning;
  * @author neo
  */
 @Warning
-public class BadRequestException extends RuntimeException implements ErrorCode {
+public final class BadRequestException extends RuntimeException implements ErrorCode {
     public static final String DEFAULT_ERROR_CODE = "BAD_REQUEST";
 
     private static final long serialVersionUID = -2304226404736886782L;

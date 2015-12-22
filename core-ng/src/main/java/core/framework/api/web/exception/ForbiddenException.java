@@ -5,7 +5,7 @@ import core.framework.api.log.ErrorCode;
 /**
  * @author neo
  */
-public class ForbiddenException extends RuntimeException implements ErrorCode {
+public final class ForbiddenException extends RuntimeException implements ErrorCode {
     public static final String DEFAULT_ERROR_CODE = "FORBIDDEN";
 
     private static final long serialVersionUID = 5472429043879214361L;

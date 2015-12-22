@@ -8,7 +8,7 @@ import core.framework.api.log.Warning;
  * @author neo
  */
 @Warning
-public class MethodNotAllowedException extends RuntimeException implements ErrorCode {
+public final class MethodNotAllowedException extends RuntimeException implements ErrorCode {
     private static final long serialVersionUID = 2349080664326196294L;
 
     public MethodNotAllowedException(HTTPMethod method) {

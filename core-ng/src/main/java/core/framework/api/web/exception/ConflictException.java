@@ -7,7 +7,7 @@ import core.framework.api.log.Warning;
  * @author neo
  */
 @Warning
-public class ConflictException extends RuntimeException implements ErrorCode {
+public final class ConflictException extends RuntimeException implements ErrorCode {
     public static final String DEFAULT_ERROR_CODE = "CONFLICT";
 
     private static final long serialVersionUID = 7787085179989898162L;

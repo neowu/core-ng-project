@@ -7,7 +7,7 @@ import core.framework.api.log.Warning;
  * @author neo
  */
 @Warning
-public class NotFoundException extends RuntimeException implements ErrorCode {
+public final class NotFoundException extends RuntimeException implements ErrorCode {
     private static final String DEFAULT_ERROR_CODE = "NOT_FOUND";
     private static final long serialVersionUID = 8663360723004690205L;
 
