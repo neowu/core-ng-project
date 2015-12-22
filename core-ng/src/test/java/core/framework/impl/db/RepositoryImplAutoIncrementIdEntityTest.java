@@ -1,5 +1,6 @@
 package core.framework.impl.db;
 
+import core.framework.api.db.Query;
 import core.framework.api.db.Repository;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -71,8 +72,21 @@ public class RepositoryImplAutoIncrementIdEntityTest {
 
     @Test
     public void selectAll() {
-        List<AutoIncrementIdEntity> entities = repository.selectAll();
+        List<AutoIncrementIdEntity> entities = repository.select(new Query());
+        Assert.assertTrue(entities.isEmpty());
+    }
 
+    @Test
+    public void selectWithLimit() {
+        Query query = new Query();
+        query.skip = 0;
+        query.limit = 1000;
+        List<AutoIncrementIdEntity> entities = repository.select(query);
+        Assert.assertTrue(entities.isEmpty());
+
+        query.where = "string_field = ?";
+        query.params = new Object[]{"value"};
+        entities = repository.select(query);
         Assert.assertTrue(entities.isEmpty());
     }
 

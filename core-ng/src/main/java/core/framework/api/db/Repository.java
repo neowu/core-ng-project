@@ -7,11 +7,16 @@ import java.util.Optional;
  * @author neo
  */
 public interface Repository<T> {
-    List<T> selectAll();
+    List<T> select(Query query);
 
-    List<T> select(String whereClause, Object... params);
+    default List<T> select(String where, Object... params) {
+        Query query = new Query();
+        query.where = where;
+        query.params = params;
+        return select(query);
+    }
 
-    Optional<T> selectOne(String whereClause, Object... params);
+    Optional<T> selectOne(String where, Object... params);
 
     Optional<T> get(Object... primaryKeys);
 

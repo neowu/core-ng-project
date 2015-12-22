@@ -1,5 +1,6 @@
 package core.framework.impl.db;
 
+import core.framework.api.db.Query;
 import core.framework.api.db.Repository;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
@@ -38,26 +39,10 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public List<T> selectAll() {
+    public List<T> select(Query query) {
         StopWatch watch = new StopWatch();
-        String sql = selectQuery.selectAll;
-        List<T> results = null;
-        try {
-            results = database.operation.select(sql, rowMapper, null);
-            return results;
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime);
-            logger.debug("selectAll, sql={}, elapsedTime={}", sql, elapsedTime);
-            checkSlowQuery(elapsedTime);
-            if (results != null) checkTooManyRows(results.size());
-        }
-    }
-
-    @Override
-    public List<T> select(String whereClause, Object... params) {
-        StopWatch watch = new StopWatch();
-        String sql = selectQuery.where(whereClause);
+        String sql = selectQuery.sql(query.where, query.skip, query.limit);
+        Object[] params = selectQuery.params(query);
         List<T> results = null;
         try {
             results = database.operation.select(sql, rowMapper, params);
@@ -72,9 +57,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public Optional<T> selectOne(String whereClause, Object... params) {
+    public Optional<T> selectOne(String where, Object... params) {
         StopWatch watch = new StopWatch();
-        String sql = selectQuery.where(whereClause);
+        String sql = selectQuery.sql(where, null, null);
         try {
             return database.operation.selectOne(sql, rowMapper, params);
         } finally {

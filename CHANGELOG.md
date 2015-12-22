@@ -1,8 +1,8 @@
 ## Change log
 
-### 3.9.7 (12/18/2015 - )
+### 3.9.7 (12/18/2015 - 12/22/2015)
 * lib: updated undertow to 1.3.10, jackson to 2.6.4, update quality check lib
-
+* db: added repository.select(query) to support complex query + limit
 
 ### 3.9.6 (12/17/2015)
 * log: dynamic group action log message to forward, 2000 or 5M which comes first
