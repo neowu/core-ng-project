@@ -280,6 +280,7 @@ public final class MongoImpl implements Mongo, MongoOption {
 
     private <T> MongoCollection<T> collection(Class<T> entityClass) {
         Collection collection = entityClass.getDeclaredAnnotation(Collection.class);
+        if (database == null) initialize(); // lazy init for dev test, initialize will be called in startup hook for complete env
         return database.getCollection(collection.name(), entityClass);
     }
 }

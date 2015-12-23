@@ -7,7 +7,7 @@ subprojects {
     version = '3.9.8'
 }
 
-def mongoVersion = '3.1.0'
+def mongoVersion = '3.2.0'
 def elasticVersion = '2.1.0'
 def rabbitVersion = '3.5.6'
 
