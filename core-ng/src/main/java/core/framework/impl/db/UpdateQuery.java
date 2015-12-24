@@ -23,7 +23,7 @@ final class UpdateQuery<T> {
         for (Field field : entityClass.getDeclaredFields()) {
             if (field.isAnnotationPresent(PrimaryKey.class)) {
                 primaryKeyFields.add(field);
-            } else {
+            } else if (field.isAnnotationPresent(Column.class)) {
                 columnFields.add(field);
             }
         }

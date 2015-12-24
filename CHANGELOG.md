@@ -1,8 +1,8 @@
 ## Change log
 
-### 3.9.8 (12/22/2015 - )
+### 3.9.8 (12/22/2015 - 12/24/2015)
 * mongo: update driver to 3.2.0
-TODO: mongo: support count()
+* quality: support jacoco report
 
 ### 3.9.7 (12/18/2015 - 12/22/2015)
 * lib: updated undertow to 1.3.10, jackson to 2.6.4, update quality check lib

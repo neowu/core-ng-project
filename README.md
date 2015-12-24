@@ -4,6 +4,7 @@ core-ng is a webapp framework. it's designed to support our own projects, not as
 It's still working in progress, so all API is subjected to change. keep in mind
 
 ## TODO
+* mongo: support count()
 * async: think about how to support batch with fixed concurrency, or Batch object and chain next easier
 * template, use ByteBuffer[] for performance tuning?
 * redis: investigate redis hiccup, like 200ms for one operation under load

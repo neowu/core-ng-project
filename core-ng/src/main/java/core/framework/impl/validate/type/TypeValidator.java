@@ -56,6 +56,7 @@ public class TypeValidator {
 
         Field[] fields = objectClass.getDeclaredFields();
         for (Field field : fields) {
+            if (field.getName().startsWith("$")) continue;  // ignore dynamic/generated field, e.g. jacoco
             validateField(field);
             if (visitor != null) visitor.visitField(field, path);
 
