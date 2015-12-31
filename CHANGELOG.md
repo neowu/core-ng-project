@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.9.9 (12/31/2015)
+* url: encode '+' for path segment to keep compatible with other impl, e.g. undertow, AWS S3
+
 ### 3.9.8 (12/22/2015 - 12/24/2015)
 * mongo: update driver to 3.2.0
 * quality: support jacoco report

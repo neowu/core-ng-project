@@ -47,7 +47,11 @@ public final class URIBuilder {
         P_CHAR.set('(');
         P_CHAR.set(')');
         P_CHAR.set('*');
-        P_CHAR.set('+');
+
+        // there was P_CHAR.set('+')
+        // due to common mis-understanding, e.g. undertow/AWS S3, is implemented to encode '+' as part of url fragment, we have to encode it
+        // in theory only QUERY_PARAM needs to clear '+'
+
         P_CHAR.set(',');
         P_CHAR.set(';');
         P_CHAR.set('=');
@@ -56,12 +60,14 @@ public final class URIBuilder {
         P_CHAR.set('@');
 
         FRAGMENT.or(P_CHAR);
+        FRAGMENT.set('+');  // '+' should be P_CHAR, but since we have to keep compatible with other bad impl, so only put '+' in fragment
         FRAGMENT.set('/');
         FRAGMENT.set('?');
 
-        QUERY_PARAM.or(FRAGMENT);
-        QUERY_PARAM.clear('+');   // this is not defined in rfc3986, but query param can not contains +/=/& (not like query), another wise it will mislead query string parsing
-        QUERY_PARAM.clear('=');
+        QUERY_PARAM.or(P_CHAR);
+        QUERY_PARAM.set('/');
+        QUERY_PARAM.set('?');
+        QUERY_PARAM.clear('='); // this is not defined in rfc3986, but query param can not contains +/=/& (not like query), another wise it will mislead query string parsing
         QUERY_PARAM.clear('&');
     }
 

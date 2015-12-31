@@ -12,7 +12,7 @@ public class URIBuilderTest {
     public void encodePathSegment() {
         assertEquals("encode utf-8", "%E2%9C%93", URIBuilder.encodePathSegment("✓"));
         assertEquals("a%20b", URIBuilder.encodePathSegment("a b"));
-        assertEquals("a+b", URIBuilder.encodePathSegment("a+b"));
+        assertEquals("a%2Bb", URIBuilder.encodePathSegment("a+b")); // per RFC + should not be encoded by path segment, but we have to do it to keep compatible with other wrong impl, e.g. undertow and AWS S3
         assertEquals("a=b", URIBuilder.encodePathSegment("a=b"));
         assertEquals("a%3Fb", URIBuilder.encodePathSegment("a?b"));
         assertEquals("a%2Fb", URIBuilder.encodePathSegment("a/b"));
