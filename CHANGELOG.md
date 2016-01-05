@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.9.10 (1/5/2016)
+* elasticsearch: ignore cluster name for transport client
+
 ### 3.9.9 (12/31/2015)
 * url: encode '+' for path segment to keep compatible with other impl, e.g. undertow, AWS S3
 
