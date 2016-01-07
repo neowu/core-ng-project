@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.10.0 (1/7/2016)
+* httpclient: fix NPE with HttpEntity is null on 204
+
 ### 3.9.10 (1/5/2016)
 * elasticsearch: ignore cluster name for transport client
 
