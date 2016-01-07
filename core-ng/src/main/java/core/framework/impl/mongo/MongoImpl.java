@@ -20,11 +20,15 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
 import org.bson.BsonDocument;
+import org.bson.codecs.Codec;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,12 +51,18 @@ public final class MongoImpl implements Mongo, MongoOption {
     public void initialize() {
         try {
             if (uri == null) throw new Error("uri() must be called before initialize");
-            builder.codecRegistry(codecs.codecRegistry());
+            builder.codecRegistry(codecRegistry());
             mongoClient = new MongoClient(uri);
             database = mongoClient.getDatabase(uri.getDatabase());
         } finally {
             logger.info("initialize mongo client, uri={}", uri);
         }
+    }
+
+    private CodecRegistry codecRegistry() {
+        List<Codec<?>> codecs = new ArrayList<>(this.codecs.codecs.values());
+        codecs.add(new LocalDateTimeCodec());
+        return CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), CodecRegistries.fromCodecs(codecs));
     }
 
     public void close() {

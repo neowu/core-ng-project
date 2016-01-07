@@ -21,7 +21,7 @@ public class HTTPClientTest {
 
     @Test
     public void responseBodyWithNoContent() throws IOException {
-        ByteBuf body = httpClient.responseBody(null);// apache http client return null for HEAD/204/205/304
+        ByteBuf body = httpClient.responseBody(null);   // apache http client return null for HEAD/204/205/304
 
         assertEquals("", body.text());
     }

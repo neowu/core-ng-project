@@ -7,9 +7,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 /**
  * @author neo
@@ -50,7 +48,7 @@ public final class EntityCodecHelper {
 
     public static void writeLocalDateTime(BsonWriter writer, LocalDateTime value) {
         if (value == null) writer.writeNull();
-        else writer.writeDateTime(value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        else LocalDateTimeCodec.write(writer, value);
     }
 
     public static void writeEnum(BsonWriter writer, Enum value) {
@@ -160,7 +158,7 @@ public final class EntityCodecHelper {
             reader.readNull();
             return null;
         } else if (currentType == BsonType.DATE_TIME) {
-            return LocalDateTime.ofInstant(Instant.ofEpochMilli(reader.readDateTime()), ZoneId.systemDefault());
+            return LocalDateTimeCodec.read(reader);
         } else {
             LOGGER.warn("field returned from mongo is ignored, field={}", field);
             reader.skipValue();

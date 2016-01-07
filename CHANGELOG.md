@@ -1,5 +1,8 @@
 ## Change log
 
+### 3.10.1 (1/7/2016)
+* mongo: support LocalDateTime in filter
+
 ### 3.10.0 (1/7/2016)
 * httpclient: fix NPE with HttpEntity is null on 204
 
