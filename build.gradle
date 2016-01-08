@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '3.10.1'
+    version = '3.10.2'
 }
 
 def mongoVersion = '3.2.0'
@@ -120,7 +120,8 @@ project(':demo-service') {
     dependencies {
         compile(
                 project(':core-ng'),
-                'redis.clients:jedis:2.8.0@jar'
+                'redis.clients:jedis:2.8.0@jar',
+                "com.amazonaws:aws-java-sdk-s3:1.10.43"
         )
         runtime(
                 "com.rabbitmq:amqp-client:${rabbitVersion}"

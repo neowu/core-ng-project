@@ -153,6 +153,18 @@ public final class ByteBuf {
         }
 
         @Override
+        public int available() throws IOException {
+            return Math.max(0, length - position);
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            int actualSkipped = (int) Math.min(length - position, n);
+            position += actualSkipped;
+            return actualSkipped;
+        }
+
+        @Override
         public int read(byte[] bytes, int offset, int length) throws IOException {
             if (position >= this.length) {
                 return -1;

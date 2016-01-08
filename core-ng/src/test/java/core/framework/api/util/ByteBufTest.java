@@ -122,6 +122,24 @@ public class ByteBufTest {
     }
 
     @Test
+    public void inputStreamAvailableAndSkip() throws IOException {
+        byte[] bytes = Strings.bytes("1234567890");
+        ByteBuf buffer = ByteBuf.newBufferWithExpectedLength(bytes.length);
+        buffer.put(ByteBuffer.wrap(bytes));
+        InputStream inputStream = buffer.inputStream();
+        assertEquals(10, inputStream.available());
+        assertEquals('1', inputStream.read());
+        assertEquals(9, inputStream.available());
+        assertEquals(1, inputStream.skip(1));
+        assertEquals(8, inputStream.available());
+        assertEquals('3', inputStream.read());
+        assertEquals(7, inputStream.available());
+        assertEquals(7, inputStream.skip(10));
+        assertEquals(0, inputStream.available());
+        assertEquals(-1, inputStream.read());
+    }
+
+    @Test
     public void bytes() {
         byte[] bytes = Strings.bytes("12345678901234567890");
         ByteBuf buffer = ByteBuf.newBuffer(128);
