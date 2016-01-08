@@ -1,6 +1,7 @@
 package core.framework.impl.module;
 
 import core.framework.api.concurrent.AsyncExecutor;
+import core.framework.api.concurrent.BatchFactory;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Properties;
@@ -63,6 +64,7 @@ public final class ModuleContext {
         shutdownHook.add(executor::stop);
 
         beanFactory.bind(AsyncExecutor.class, null, new AsyncExecutor(executor, logManager));
+        beanFactory.bind(BatchFactory.class, null, new BatchFactory(executor, logManager));
 
         if (!isTest()) {
             httpServer.handler.route.add(HTTPMethod.GET, "/health-check", new ControllerHolder(new HealthCheckController(), true));
