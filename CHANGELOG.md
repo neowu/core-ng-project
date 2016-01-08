@@ -2,6 +2,7 @@
 
 ### 3.10.2 (1/8/2016 - )
 * bytebuf: improve for skip/available as it will be wrapped by buffered stream or S3 client
+* web: mark path not found error code to PATH_NOT_FOUND (to ignore 3rd party scan)
 
 ### 3.10.1 (1/7/2016)
 * mongo: support LocalDateTime in filter
