@@ -1,12 +1,11 @@
 package core.framework.impl.scheduler;
 
+import core.framework.api.async.Executor;
+import core.framework.api.log.ActionLogContext;
 import core.framework.api.scheduler.Job;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.NotFoundException;
-import core.framework.impl.concurrent.Executor;
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +23,9 @@ public final class Scheduler {
     private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Executor executor;
-    private final LogManager logManager;
 
-    public Scheduler(Executor executor, LogManager logManager) {
+    public Scheduler(Executor executor) {
         this.executor = executor;
-        this.logManager = logManager;
     }
 
     public void start() {
@@ -55,22 +52,21 @@ public final class Scheduler {
         Trigger trigger = triggers.get(name);
         if (trigger == null) throw new NotFoundException("job not found, name=" + name);
         Job job = trigger.job;
-        executor.submit(() -> task(name, job, true));
+        executeJob(name, job);
     }
 
     void schedule(String name, Job job, Duration initialDelay, Duration rate) {
-        scheduler.scheduleAtFixedRate(() -> executor.submit(() -> task(name, job, false)), initialDelay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(() -> executeJob(name, job), initialDelay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
     }
 
-    private Void task(String name, Job job, boolean trace) throws Exception {
-        logger.info("execute scheduled job, name={}", name);
-        ActionLog actionLog = logManager.currentActionLog();
-        actionLog.action("job/" + name);
-        actionLog.context("jobClass", job.getClass().getCanonicalName());
-        if (trace) {
-            logManager.triggerTraceLog();
-        }
-        job.execute();
-        return null;
+    private void executeJob(String name, Job job) {
+        String action = "job/" + name;
+        executor.submit(action, () -> {
+            logger.info("execute scheduled job, name={}", name);
+            ActionLogContext.put("job", name);
+            ActionLogContext.put("jobClass", job.getClass().getCanonicalName());
+            job.execute();
+            return null;
+        });
     }
 }

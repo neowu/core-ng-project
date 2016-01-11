@@ -1,15 +1,14 @@
 package core.framework.impl.module;
 
-import core.framework.api.concurrent.AsyncExecutor;
-import core.framework.api.concurrent.BatchFactory;
+import core.framework.api.async.Executor;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Properties;
 import core.framework.api.web.WebContext;
 import core.framework.api.web.site.TemplateManager;
 import core.framework.api.web.site.WebDirectory;
+import core.framework.impl.async.ExecutorImpl;
 import core.framework.impl.cache.CacheManager;
-import core.framework.impl.concurrent.Executor;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
@@ -35,7 +34,7 @@ public final class ModuleContext {
     public final Properties properties = new Properties();
 
     public final HTTPServer httpServer;
-    public final Executor executor;
+    public final ExecutorImpl executor;
     public final QueueManager queueManager = new QueueManager();
     public final LogManager logManager;
     public final MockFactory mockFactory;
@@ -60,11 +59,10 @@ public final class ModuleContext {
             startupHook.add(httpServer::start);
             shutdownHook.add(httpServer::stop);
         }
-        executor = new Executor(logManager);
+        executor = new ExecutorImpl(logManager);
         shutdownHook.add(executor::stop);
 
-        beanFactory.bind(AsyncExecutor.class, null, new AsyncExecutor(executor, logManager));
-        beanFactory.bind(BatchFactory.class, null, new BatchFactory(executor, logManager));
+        beanFactory.bind(Executor.class, null, executor);
 
         if (!isTest()) {
             httpServer.handler.route.add(HTTPMethod.GET, "/health-check", new ControllerHolder(new HealthCheckController(), true));
@@ -77,7 +75,7 @@ public final class ModuleContext {
 
     public Scheduler scheduler() {
         if (scheduler == null) {
-            scheduler = new Scheduler(executor, logManager);
+            scheduler = new Scheduler(executor);
             if (!isTest()) {
                 startupHook.add(scheduler::start);
                 shutdownHook.add(scheduler::stop);

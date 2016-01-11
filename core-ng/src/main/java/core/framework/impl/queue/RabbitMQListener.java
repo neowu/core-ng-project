@@ -1,6 +1,7 @@
 package core.framework.impl.queue;
 
 import com.rabbitmq.client.QueueingConsumer;
+import core.framework.api.async.Executor;
 import core.framework.api.module.MessageHandlerConfig;
 import core.framework.api.queue.Message;
 import core.framework.api.queue.MessageHandler;
@@ -10,7 +11,6 @@ import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
-import core.framework.impl.concurrent.Executor;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
@@ -82,10 +82,11 @@ public class RabbitMQListener implements MessageHandlerConfig {
     }
 
     private void pullMessages(RabbitMQConsumer consumer) throws InterruptedException {
+        String action = "queue/" + queue;
         while (!stop.get()) {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             semaphore.acquire(); // acquire permit right before submit, to avoid permit failing to release back due to exception in between
-            executor.submit(() -> {
+            executor.submit(action, () -> {
                 try {
                     process(delivery);
                     return null;
@@ -110,7 +111,6 @@ public class RabbitMQListener implements MessageHandlerConfig {
 
     private <T> void process(QueueingConsumer.Delivery delivery) throws Exception {
         ActionLog actionLog = logManager.currentActionLog();
-        actionLog.action("queue/" + queue);
 
         String messageBody = new String(delivery.getBody(), Charsets.UTF_8);
         String messageType = delivery.getProperties().getType();

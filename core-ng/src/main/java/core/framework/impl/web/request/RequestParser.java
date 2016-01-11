@@ -71,16 +71,21 @@ public final class RequestParser {
     private void parseBody(RequestImpl request, HttpServerExchange exchange) throws Throwable {
         RequestBodyReader.RequestBody body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
         if (body != null) {
-            if (request.contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())) {
+            if (request.contentType == null) return;    // pass if post empty body without content type
+
+            if (ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())) {
                 request.body = body.body().text(request.contentType.charset().orElse(Charsets.UTF_8));
                 logger.debug("[request] body={}", request.body);
             } else {
                 logger.warn("unsupported body, contentType={}", request.contentType);
             }
             exchange.removeAttachment(RequestBodyReader.REQUEST_BODY);
-            return;
+        } else {
+            parseForm(request, exchange);
         }
+    }
 
+    private void parseForm(RequestImpl request, HttpServerExchange exchange) {
         FormData formData = exchange.getAttachment(FormDataParser.FORM_DATA);
         if (formData != null) {
             request.formData = formData;

@@ -1,9 +1,9 @@
 ## Change log
 
-### 4.0.0 (1/8/2016 - )
+### 4.0.0 (1/8/2016 - 1/11/2016)
 * bytebuf: improve for skip/available as it will be wrapped by buffered stream or S3 client
 * web: mark path not found error code to PATH_NOT_FOUND (to ignore 3rd party scan)
-* batch: new batch manager
+* batch: new async support, use Executor
 
 ### 3.10.1 (1/7/2016)
 * mongo: support LocalDateTime in filter
