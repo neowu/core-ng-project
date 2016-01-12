@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * @author neo
@@ -58,8 +59,19 @@ public final class Scheduler {
         executor.submit(() -> task(name, job, true));
     }
 
+    void schedule(String name, Job job, Duration initialDelay) {
+        scheduler.schedule(() -> executor.submit(() -> task(name, job, false)), initialDelay.toMillis(), TimeUnit.MILLISECONDS);
+    }
+
     void schedule(String name, Job job, Duration initialDelay, Duration rate) {
         scheduler.scheduleAtFixedRate(() -> executor.submit(() -> task(name, job, false)), initialDelay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    void schedule(String name, Job job, Duration initialDelay, Supplier<Duration> nextDelay) {
+        scheduler.schedule(() -> executor.submit(() -> {
+            scheduler.schedule(() -> executor.submit(() -> task(name, job, false)), nextDelay.get().toMillis(), TimeUnit.MILLISECONDS);
+            return task(name, job, false);
+        }), initialDelay.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     private Void task(String name, Job job, boolean trace) throws Exception {
