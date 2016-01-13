@@ -45,7 +45,7 @@ public final class Scheduler {
 
         Trigger previous = triggers.putIfAbsent(trigger.name, trigger);
         if (previous != null)
-            throw Exceptions.error("duplicated job found, name={}, previousJobClass={}", previous.name, previous.job.getClass().getCanonicalName());
+            throw Exceptions.error("duplicated job found, name={}, previousJobClass={}", trigger.name, previous.job.getClass().getCanonicalName());
     }
 
     public void triggerNow(String name) {
