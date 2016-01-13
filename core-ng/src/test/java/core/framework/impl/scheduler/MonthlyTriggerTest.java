@@ -5,37 +5,16 @@ import org.junit.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class MonthlyTriggerTest {
-
     @Test
-    public void testInitialDelay() {
-        int currDayOfMonth = LocalDateTime.now().getDayOfMonth();
-        LocalDateTime atTime = LocalDateTime.now().withHour(8);
+    public void nextDelay() {
+        MonthlyTrigger trigger = new MonthlyTrigger(null, null, 2, LocalTime.of(3, 0, 0));  // @2T3:00 every month
 
-        int beforeDay = currDayOfMonth -1;
-        if (beforeDay > 0) {
-            MonthlyTrigger trigger = new MonthlyTrigger("test", null, beforeDay, atTime.toLocalTime());
-            Duration initialDelay = trigger.initialDelay();
-            Duration expected = Duration.between(LocalDateTime.now(), atTime.minusDays(1).plusMonths(1));
-            assertEquals(expected, initialDelay);
-        }
-
-        int afterDay = currDayOfMonth +1;
-        if (afterDay <= 28) {
-            MonthlyTrigger trigger = new MonthlyTrigger("test", null, afterDay, atTime.toLocalTime());
-            Duration initialDelay = trigger.initialDelay();
-            Duration expected = Duration.between(LocalDateTime.now(), atTime.plusDays(1));
-            assertEquals(expected, initialDelay);
-        }
-    }
-
-    @Test
-    public void testNextDelay() {
-        MonthlyTrigger trigger = new MonthlyTrigger("test", null, 3, LocalTime.now());
-        Duration expected = Duration.between(LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
-        assertEquals(expected, trigger.nextDelay());
+        assertEquals(Duration.ofHours(1), trigger.nextDelay(LocalDateTime.of(2016, Month.JANUARY, 2, 2, 0, 0)));
+        assertEquals("wait 2 days and 1 hour to next month", Duration.ofHours(2 * 24 + 1), trigger.nextDelay(LocalDateTime.of(2016, Month.JANUARY, 31, 2, 0, 0)));
     }
 }

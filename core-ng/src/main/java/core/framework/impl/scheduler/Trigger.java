@@ -2,6 +2,9 @@ package core.framework.impl.scheduler;
 
 import core.framework.api.scheduler.Job;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 /**
  * @author neo
  */
@@ -14,7 +17,7 @@ public abstract class Trigger {
         this.job = job;
     }
 
-    abstract void schedule(Scheduler scheduler);
+    abstract Duration nextDelay(LocalDateTime now);
 
-    public abstract String scheduleInfo();
+    public abstract String schedule();
 }
