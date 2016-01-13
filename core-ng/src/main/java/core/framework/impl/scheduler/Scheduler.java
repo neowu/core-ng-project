@@ -68,5 +68,22 @@ public final class Scheduler {
             job.execute();
             return null;
         });
+    void schedule(String name, Job job, Duration initialDelay, Supplier<Duration> nextDelay) {
+        scheduler.schedule(() -> executor.submit(() -> {
+            scheduler.schedule(() -> executor.submit(() -> task(name, job, false)), nextDelay.get().toMillis(), TimeUnit.MILLISECONDS);
+            return task(name, job, false);
+        }), initialDelay.toMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    private Void task(String name, Job job, boolean trace) throws Exception {
+        logger.info("execute scheduled job, name={}", name);
+        ActionLog actionLog = logManager.currentActionLog();
+        actionLog.action("job/" + name);
+        actionLog.context("jobClass", job.getClass().getCanonicalName());
+        if (trace) {
+            logManager.triggerTraceLog();
+        }
+        job.execute();
+        return null;
     }
 }
