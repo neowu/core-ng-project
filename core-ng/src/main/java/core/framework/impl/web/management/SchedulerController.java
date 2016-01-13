@@ -26,24 +26,22 @@ public class SchedulerController {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
         List<JobView> jobs = Lists.newArrayList();
-
         scheduler.triggers.forEach((name, trigger) -> {
             JobView job = new JobView();
             job.name = trigger.name;
             job.jobClass = trigger.job.getClass().getCanonicalName();
-            job.schedule = trigger.scheduleInfo();
+            job.schedule = trigger.schedule();
             jobs.add(job);
         });
-
         return Response.bean(jobs);
     }
 
     public Response triggerJob(Request request) throws UnknownHostException {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
-        String jobName = request.pathParam("job");
-        logger.info("trigger job, jobName={}, clientIP={}", jobName, request.clientIP());
-        scheduler.triggerNow(jobName);
-        return Response.text("job triggered, name=" + jobName, ContentType.TEXT_PLAIN);
+        String job = request.pathParam("job");
+        logger.info("trigger job, job={}, clientIP={}", job, request.clientIP());
+        scheduler.triggerNow(job);
+        return Response.text("job triggered, job=" + job, ContentType.TEXT_PLAIN);
     }
 }

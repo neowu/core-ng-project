@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,7 +30,12 @@ public final class Scheduler {
     }
 
     public void start() {
-        triggers.forEach((name, trigger) -> trigger.schedule(this));
+        LocalDateTime now = LocalDateTime.now();
+        triggers.forEach((name, trigger) -> {
+            logger.info("schedule job, job={}, schedule={}, jobClass={}", name, trigger.schedule(), trigger.job.getClass().getCanonicalName());
+            Duration delay = trigger.nextDelay(now);
+            schedule(new JobTask(this, trigger), delay);
+        });
         logger.info("scheduler started");
     }
 
@@ -45,28 +51,27 @@ public final class Scheduler {
 
         Trigger previous = triggers.putIfAbsent(trigger.name, trigger);
         if (previous != null)
-            throw Exceptions.error("duplicated job found, name={}, previousJobClass={}", previous.name, previous.job.getClass().getCanonicalName());
+            throw Exceptions.error("duplicated job found, name={}, previousJobClass={}", trigger.name, previous.job.getClass().getCanonicalName());
+    }
+
+    void schedule(JobTask task, Duration delay) {
+        scheduler.schedule(task, delay.toMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    void submitJob(Trigger trigger) {
+        executor.submit("job/" + trigger.name, () -> {
+            logger.info("execute scheduled job, job={}", trigger.name);
+            Job job = trigger.job;
+            ActionLogContext.put("job", trigger.name);
+            ActionLogContext.put("jobClass", job.getClass().getCanonicalName());
+            job.execute();
+            return null;
+        });
     }
 
     public void triggerNow(String name) {
         Trigger trigger = triggers.get(name);
         if (trigger == null) throw new NotFoundException("job not found, name=" + name);
-        Job job = trigger.job;
-        executeJob(name, job);
-    }
-
-    void schedule(String name, Job job, Duration initialDelay, Duration rate) {
-        scheduler.scheduleAtFixedRate(() -> executeJob(name, job), initialDelay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
-    }
-
-    private void executeJob(String name, Job job) {
-        String action = "job/" + name;
-        executor.submit(action, () -> {
-            logger.info("execute scheduled job, name={}", name);
-            ActionLogContext.put("job", name);
-            ActionLogContext.put("jobClass", job.getClass().getCanonicalName());
-            job.execute();
-            return null;
-        });
+        submitJob(trigger);
     }
 }

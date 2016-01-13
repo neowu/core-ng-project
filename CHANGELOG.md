@@ -1,5 +1,8 @@
 ## Change log
 
+### 4.0.1 (1/13/2016)
+* schedule: support weekly and monthly trigger
+
 ### 4.0.0 (1/8/2016 - 1/11/2016)
 * bytebuf: improve for skip/available as it will be wrapped by buffered stream or S3 client
 * web: mark path not found error code to PATH_NOT_FOUND (to ignore 3rd party scan)
