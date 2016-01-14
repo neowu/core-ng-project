@@ -13,6 +13,6 @@ public class JobView {
     public String name;
     @XmlElement(name = "job_class")
     public String jobClass;
-    @XmlElement(name = "schedule")
-    public String schedule;
+    @XmlElement(name = "frequency")
+    public String frequency;
 }

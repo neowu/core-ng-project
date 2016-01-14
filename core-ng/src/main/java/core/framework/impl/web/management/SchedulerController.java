@@ -28,9 +28,9 @@ public class SchedulerController {
         List<JobView> jobs = Lists.newArrayList();
         scheduler.triggers.forEach((name, trigger) -> {
             JobView job = new JobView();
-            job.name = trigger.name;
-            job.jobClass = trigger.job.getClass().getCanonicalName();
-            job.schedule = trigger.schedule();
+            job.name = trigger.name();
+            job.jobClass = trigger.job().getClass().getCanonicalName();
+            job.frequency = trigger.frequency();
             jobs.add(job);
         });
         return Response.bean(jobs);

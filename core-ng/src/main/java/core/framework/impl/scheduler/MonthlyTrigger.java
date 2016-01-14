@@ -10,12 +10,15 @@ import java.time.LocalTime;
 /**
  * @author tminglei
  */
-public final class MonthlyTrigger extends Trigger {
+public final class MonthlyTrigger implements DynamicTrigger {
+    private final String name;
+    private final Job job;
     private final int dayOfMonth;
     private final LocalTime time;
 
     public MonthlyTrigger(String name, Job job, int dayOfMonth, LocalTime time) {
-        super(name, job);
+        this.name = name;
+        this.job = job;
         this.dayOfMonth = dayOfMonth;
         this.time = time;
 
@@ -25,18 +28,34 @@ public final class MonthlyTrigger extends Trigger {
     }
 
     @Override
-    Duration nextDelay(LocalDateTime now) {
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public Job job() {
+        return job;
+    }
+
+    @Override
+    public void schedule(Scheduler scheduler) {
+        Duration delay = nextDelay(LocalDateTime.now());
+        scheduler.schedule(this, delay);
+    }
+
+    @Override
+    public String frequency() {
+        return "monthly@" + dayOfMonth + "/" + time;
+    }
+
+    @Override
+    public Duration nextDelay(LocalDateTime now) {
         LocalDateTime target = LocalDateTime.of(now.toLocalDate(), time).withDayOfMonth(dayOfMonth);
         Duration delay = Duration.between(now, target);
-        if (delay.isNegative()) {
+        if (delay.isZero() || delay.isNegative()) { // make sure delay is positive
             target = target.plusMonths(1);
             return Duration.between(now, target);
         }
         return delay;
-    }
-
-    @Override
-    public String schedule() {
-        return "monthly@" + dayOfMonth + "/" + time;
     }
 }
