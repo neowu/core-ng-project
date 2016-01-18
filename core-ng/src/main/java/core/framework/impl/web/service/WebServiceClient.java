@@ -7,12 +7,12 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.http.HTTPResponse;
 import core.framework.api.http.HTTPStatus;
+import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
-import core.framework.api.util.URIBuilder;
 import core.framework.api.validate.ValidationException;
 import core.framework.api.web.exception.RemoteServiceException;
 import core.framework.api.web.service.WebServiceRequestSigner;
@@ -48,25 +48,25 @@ public class WebServiceClient {
     }
 
     public String serviceURL(String pathPattern, Map<String, String> pathParams) {
-        URIBuilder builder = new URIBuilder(serviceURL);
+        StringBuilder builder = new StringBuilder(serviceURL);
         Path path = Path.parse(pathPattern).next; // skip the first '/'
         while (path != null) {
             String value = path.value;
             if ("/".equals(value)) {
-                builder.addPath("");
+                builder.append(value);
             } else if (value.startsWith(":")) {
                 int paramIndex = value.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : value.length();
                 String variable = value.substring(1, endIndex);
                 String pathParam = pathParams.get(variable);
                 validatePathParam(pathParam, variable);
-                builder.addPath(pathParam);
+                builder.append('/').append(Encodings.encodeURIComponent(pathParam));
             } else {
-                builder.addPath(value);
+                builder.append('/').append(value);
             }
             path = path.next;
         }
-        return builder.toURI();
+        return builder.toString();
     }
 
     private void validatePathParam(String pathParam, String variable) {

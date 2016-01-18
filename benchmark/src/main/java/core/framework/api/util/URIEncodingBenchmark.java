@@ -18,7 +18,7 @@ import java.util.List;
 @BenchmarkMode(Mode.Throughput)
 @Warmup(iterations = 3)
 @Measurement(iterations = 10)
-public class URIBuilderEncodePathSegmentBenchmark {
+public class URIEncodingBenchmark {
     private final List<String> pathSegments = Lists.newArrayList();
 
     @Setup
@@ -37,7 +37,7 @@ public class URIBuilderEncodePathSegmentBenchmark {
     @Benchmark
     public void current() {
         for (String pathSegment : pathSegments) {
-            URIBuilder.encodePathSegment(pathSegment);
+            Encodings.encodeURIComponent(pathSegment);
         }
     }
 }

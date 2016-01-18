@@ -2,8 +2,10 @@ package core.framework.impl.web.response;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
+import core.framework.api.web.CookieSpec;
 import core.framework.api.web.ResponseImpl;
 import core.framework.api.web.site.TemplateManager;
 import core.framework.impl.web.BeanValidator;
@@ -46,18 +48,7 @@ public class ResponseHandler {
         if (response.cookies != null) {
             Map<String, Cookie> responseCookies = exchange.getResponseCookies();
             response.cookies.forEach((spec, value) -> {
-                CookieImpl cookie = new CookieImpl(spec.name);
-                if (value == null) {
-                    cookie.setMaxAge(0);
-                    cookie.setValue("");
-                } else {
-                    cookie.setMaxAge((int) spec.maxAge.getSeconds());
-                    cookie.setValue(value);
-                }
-                cookie.setDomain(spec.domain);
-                cookie.setPath(spec.path);
-                cookie.setSecure(spec.secure);
-                cookie.setHttpOnly(spec.httpOnly);
+                CookieImpl cookie = cookie(spec, value);
                 logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
                     cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
                 responseCookies.put(spec.name, cookie);
@@ -69,5 +60,21 @@ public class ResponseHandler {
             throw Exceptions.error("unexpected body class, body={}", response.body.getClass().getCanonicalName());
         logger.debug("responseHandlerClass={}", handler.getClass().getCanonicalName());
         handler.handle(response, exchange.getResponseSender(), request);
+    }
+
+    CookieImpl cookie(CookieSpec spec, String value) {
+        CookieImpl cookie = new CookieImpl(spec.name);
+        if (value == null) {
+            cookie.setMaxAge(0);
+            cookie.setValue("");
+        } else {
+            if (spec.maxAge != null) cookie.setMaxAge((int) spec.maxAge.getSeconds());
+            cookie.setValue(Encodings.encodeURIComponent(value));
+        }
+        cookie.setDomain(spec.domain);
+        cookie.setPath(spec.path);
+        cookie.setSecure(spec.secure);
+        cookie.setHttpOnly(spec.httpOnly);
+        return cookie;
     }
 }

@@ -3,7 +3,6 @@ package core.framework.impl.template.model;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
-import core.framework.api.util.URIBuilder;
 
 import java.util.List;
 import java.util.Set;
@@ -83,11 +82,11 @@ public class SearchURLBuilder {
     }
 
     public String build() {
-        URIBuilder builder = new URIBuilder("/");
+        URIBuilder builder = new URIBuilder("/").addPath(countryCode);
         if (global) {
-            builder.addPath(countryCode).addPath("search");
+            builder.addPath("search");
         } else {
-            builder.addPath(countryCode).addPath("s").addPath(storeName);
+            builder.addPath("s").addPath(storeName);
         }
 
         if (searchProductRequest.query != null) {
@@ -134,6 +133,7 @@ public class SearchURLBuilder {
         if (offset != null) {
             builder.addQueryParam("offset", String.valueOf(offset));
         }
+
         return builder.toURI();
     }
 

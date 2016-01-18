@@ -6,8 +6,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author neo
  */
@@ -20,17 +18,6 @@ public class PathParamsTest {
     @Before
     public void createPathParams() {
         pathParams = new PathParams();
-    }
-
-    @Test
-    public void decodePathSegment() {
-        assertEquals("decode utf-8", "✓", pathParams.decodePathSegment("%E2%9C%93"));
-        assertEquals("a b", pathParams.decodePathSegment("a%20b"));
-        assertEquals("a+b", pathParams.decodePathSegment("a+b"));
-        assertEquals("a=b", pathParams.decodePathSegment("a=b"));
-        assertEquals("a?b", pathParams.decodePathSegment("a%3Fb"));
-        assertEquals("a/b", pathParams.decodePathSegment("a%2Fb"));
-        assertEquals("a&b", pathParams.decodePathSegment("a&b"));
     }
 
     @Test

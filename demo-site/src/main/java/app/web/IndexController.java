@@ -26,10 +26,10 @@ public class IndexController {
         Session session = request.session();
         Optional<String> hello = session.get("hello");
         session.set("hello", "world");
-//        response.cookie(CookieConstraints.TEST, null);
+        Response response = Response.html("/template/index.html", model);
+        response.cookie(Cookies.TEST, "1+2");
 //        response.cookie(CookieConstraints.TEST1, null);
-
-        return Response.html("/template/index.html", model);
+        return response;
     }
 
     // just simple demo for non-html template, real project needs sophisticated impl

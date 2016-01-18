@@ -2,6 +2,7 @@ package core.framework.impl.web.request;
 
 import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPMethod;
+import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
@@ -78,7 +79,11 @@ public final class RequestImpl implements Request {
     public Optional<String> cookie(String name) {
         Cookie cookie = exchange.getRequestCookies().get(name);
         if (cookie == null) return Optional.empty();
-        return Optional.of(cookie.getValue());
+        try {
+            return Optional.of(Encodings.decodeURIComponent(cookie.getValue()));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
+        }
     }
 
     @Override
