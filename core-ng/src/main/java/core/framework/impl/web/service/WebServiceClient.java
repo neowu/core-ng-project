@@ -60,7 +60,7 @@ public class WebServiceClient {
                 String variable = value.substring(1, endIndex);
                 String pathParam = pathParams.get(variable);
                 validatePathParam(pathParam, variable);
-                builder.append('/').append(Encodings.encodeURIComponent(pathParam));
+                builder.append('/').append(Encodings.uriComponent(pathParam));
             } else {
                 builder.append('/').append(value);
             }

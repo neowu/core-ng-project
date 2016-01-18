@@ -22,12 +22,12 @@ public class URIBuilder {
     public URIBuilder addPath(String segment) {
         if (queryStarted) throw Exceptions.error("path segment must not be added after query, uri={}", uri.toString());
         if (uri.length() > 0 && uri.charAt(uri.length() - 1) != '/') uri.append('/');
-        uri.append(Encodings.encodeURIComponent(segment));
+        uri.append(Encodings.uriComponent(segment));
         return this;
     }
 
     public URIBuilder addQueryParam(String name, String value) {
-        uri.append(queryStarted ? '&' : '?').append(Encodings.encodeURIComponent(name)).append('=').append(Encodings.encodeURIComponent(value));
+        uri.append(queryStarted ? '&' : '?').append(Encodings.uriComponent(name)).append('=').append(Encodings.uriComponent(value));
         queryStarted = true;
         return this;
     }

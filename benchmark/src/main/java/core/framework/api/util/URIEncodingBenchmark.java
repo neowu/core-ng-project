@@ -37,7 +37,7 @@ public class URIEncodingBenchmark {
     @Benchmark
     public void current() {
         for (String pathSegment : pathSegments) {
-            Encodings.encodeURIComponent(pathSegment);
+            Encodings.uriComponent(pathSegment);
         }
     }
 }

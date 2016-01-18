@@ -33,14 +33,14 @@ public class EncodingsTest {
     }
 
     @Test
-    public void encodeURIComponent() {
-        assertEquals("encode utf-8", "%E2%9C%93", Encodings.encodeURIComponent("✓"));
-        assertEquals("a%20b", Encodings.encodeURIComponent("a b"));
-        assertEquals("a%2Bb", Encodings.encodeURIComponent("a+b"));
-        assertEquals("a%3Db", Encodings.encodeURIComponent("a=b"));
-        assertEquals("a%3Fb", Encodings.encodeURIComponent("a?b"));
-        assertEquals("a%2Fb", Encodings.encodeURIComponent("a/b"));
-        assertEquals("a%26b", Encodings.encodeURIComponent("a&b"));
+    public void uriComponent() {
+        assertEquals("encode utf-8", "%E2%9C%93", Encodings.uriComponent("✓"));
+        assertEquals("a%20b", Encodings.uriComponent("a b"));
+        assertEquals("a%2Bb", Encodings.uriComponent("a+b"));
+        assertEquals("a%3Db", Encodings.uriComponent("a=b"));
+        assertEquals("a%3Fb", Encodings.uriComponent("a?b"));
+        assertEquals("a%2Fb", Encodings.uriComponent("a/b"));
+        assertEquals("a%26b", Encodings.uriComponent("a&b"));
     }
 
     @Test

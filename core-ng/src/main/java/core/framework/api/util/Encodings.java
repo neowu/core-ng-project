@@ -35,7 +35,7 @@ public final class Encodings {
     }
 
     // refer to impl from org.springframework.web.util.HierarchicalUriComponents#encodeUriComponent
-    public static String encodeURIComponent(String value) {
+    public static String uriComponent(String value) {
         byte[] bytes = Strings.bytes(value);
         int length = bytes.length;
 
