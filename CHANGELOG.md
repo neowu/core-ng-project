@@ -1,5 +1,8 @@
 ## Change log
 
+### 4.0.3 (1/19/2016)
+* cache: update getAll to return Map<String, T>
+
 ### 4.0.2 (1/18/2016)
 * web: removed URIBuilder, added Encodings.encodeURIComponent and decodeURIComponent
 * web: use URI query param encoding/decoding to set/get cookie (refered as URLEncoding in other place, e.g. jquery)

@@ -6,7 +6,7 @@ import core.framework.api.util.Maps;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class CacheImpl<T> implements Cache<T> {
     }
 
     @Override
-    public List<T> getAll(List<String> keys, Function<String, T> loader) {
+    public Map<String, T> getAll(List<String> keys, Function<String, T> loader) {
         int size = keys.size();
         String[] cacheKeys = new String[size];
         int index = 0;
@@ -49,7 +49,7 @@ public class CacheImpl<T> implements Cache<T> {
             cacheKeys[index] = cacheKey(key);
             index++;
         }
-        List<T> values = new ArrayList<>(size);
+        Map<String, T> values = new LinkedHashMap<>(size);
         Map<String, String> newValues = Maps.newHashMapWithExpectedSize(size);
         Map<String, String> cacheValues = cacheStore.getAll(cacheKeys);
         index = 0;
@@ -59,9 +59,9 @@ public class CacheImpl<T> implements Cache<T> {
             if (cacheValue == null) {
                 T value = loader.apply(key);
                 newValues.put(cacheKey, JSON.toJSON(value));
-                values.add(value);
+                values.put(key, value);
             } else {
-                values.add(JSON.fromJSON(valueType, cacheValue));
+                values.put(key, JSON.fromJSON(valueType, cacheValue));
             }
             index++;
         }

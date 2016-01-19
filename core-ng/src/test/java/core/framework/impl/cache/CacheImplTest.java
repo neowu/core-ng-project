@@ -1,17 +1,15 @@
 package core.framework.impl.cache;
 
-import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +31,7 @@ public class CacheImplTest {
         when(cacheStore.get("name:key")).thenReturn("1");
 
         Integer value = cache.get("key", key -> null);
-        Assert.assertEquals(1, (int) value);
+        assertEquals(1, (int) value);
     }
 
     @Test
@@ -41,7 +39,7 @@ public class CacheImplTest {
         when(cacheStore.get("name:key")).thenReturn(null);
 
         Integer value = cache.get("key", key -> 1);
-        Assert.assertEquals(1, (int) value);
+        assertEquals(1, (int) value);
 
         verify(cacheStore).put("name:key", "1", Duration.ofHours(1));
     }
@@ -60,8 +58,11 @@ public class CacheImplTest {
         values.put("name:key3", "3");
         when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key3"})).thenReturn(values);
 
-        List<Integer> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> 2);
-        Assert.assertEquals(Lists.newArrayList(1, 2, 3), results);
+        Map<String, Integer> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> 2);
+        assertEquals(3, results.size());
+        assertEquals(1, results.get("key1").intValue());
+        assertEquals(2, results.get("key2").intValue());
+        assertEquals(3, results.get("key3").intValue());
 
         verify(cacheStore).putAll(Maps.newHashMap("name:key2", "2"), Duration.ofHours(1));
     }
