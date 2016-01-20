@@ -31,8 +31,26 @@ public class ActionLogMessagesHandler implements MessageHandler<ActionLogMessage
                 traceLogs.put(message.id, traceLog(message));
             }
         }
-        actionType.bulkIndex(actionLogs);
-        if (!traceLogs.isEmpty()) traceType.bulkIndex(traceLogs);
+        indexActionLogs(actionLogs);
+        indexTraceLogs(traceLogs);
+    }
+
+    private void indexActionLogs(Map<String, ActionLogDocument> actionLogs) {
+        if (actionLogs.size() < 50) {  // use regular index if size is small
+            actionLogs.forEach((id, log) -> actionType.index(id, log));
+        } else {
+            actionType.bulkIndex(actionLogs);
+        }
+    }
+
+    private void indexTraceLogs(Map<String, TraceLogDocument> traceLogs) {
+        if (traceLogs.isEmpty()) return;
+
+        if (traceLogs.size() < 50) {
+            traceLogs.forEach((id, log) -> traceType.index(id, log));
+        } else {
+            traceType.bulkIndex(traceLogs);
+        }
     }
 
     private TraceLogDocument traceLog(ActionLogMessage message) {
