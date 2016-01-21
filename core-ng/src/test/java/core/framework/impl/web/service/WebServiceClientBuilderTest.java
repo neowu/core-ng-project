@@ -6,8 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.Map;
-
 import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.startsWith;
@@ -27,11 +25,9 @@ public class WebServiceClientBuilderTest {
 
     @Test
     public void get() {
-        Map<String, String> pathParams = Maps.newHashMap();
-        pathParams.put("id", "1");
         TestWebService.TestResponse expectedResponse = new TestWebService.TestResponse();
 
-        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(pathParams)))
+        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Maps.newHashMap("id", 1))))
             .thenReturn("http://localhost/test/1");
         when(webServiceClient.execute(HTTPMethod.GET, "http://localhost/test/1", null, null, TestWebService.TestResponse.class))
             .thenReturn(expectedResponse);
@@ -44,10 +40,7 @@ public class WebServiceClientBuilderTest {
 
     @Test
     public void create() {
-        Map<String, String> pathParams = Maps.newHashMap();
-        pathParams.put("id", "1");
-
-        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(pathParams)))
+        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Maps.newHashMap("id", 1))))
             .thenReturn("http://localhost/test/1");
 
         TestWebService client = new WebServiceClientBuilder<>(TestWebService.class, webServiceClient).build();

@@ -15,5 +15,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface NotEmpty {
-    String message() default "field must not be emtpy";
+    String message() default "field must not be empty";
 }

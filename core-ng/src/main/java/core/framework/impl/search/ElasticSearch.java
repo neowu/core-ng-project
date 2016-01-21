@@ -87,6 +87,21 @@ public final class ElasticSearch {
         }
     }
 
+    public void createIndexTemplate(String name, String source) {
+        StopWatch watch = new StopWatch();
+        try {
+            client().admin()
+                .indices()
+                .preparePutTemplate(name)
+                .setSource(source)
+                .get();
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            logger.debug("create index template, name={}, elapsedTime={}", name, watch.elapsedTime());
+        }
+    }
+
     public void flush(String index) {
         StopWatch watch = new StopWatch();
         try {

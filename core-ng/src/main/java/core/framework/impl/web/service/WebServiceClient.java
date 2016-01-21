@@ -47,7 +47,7 @@ public class WebServiceClient {
         this.logManager = logManager;
     }
 
-    public String serviceURL(String pathPattern, Map<String, String> pathParams) {
+    public String serviceURL(String pathPattern, Map<String, Object> pathParams) {
         StringBuilder builder = new StringBuilder(serviceURL);
         Path path = Path.parse(pathPattern).next; // skip the first '/'
         while (path != null) {
@@ -58,8 +58,7 @@ public class WebServiceClient {
                 int paramIndex = value.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : value.length();
                 String variable = value.substring(1, endIndex);
-                String pathParam = pathParams.get(variable);
-                validatePathParam(pathParam, variable);
+                String pathParam = pathParam(pathParams, variable);
                 builder.append('/').append(Encodings.uriComponent(pathParam));
             } else {
                 builder.append('/').append(value);
@@ -69,9 +68,20 @@ public class WebServiceClient {
         return builder.toString();
     }
 
-    private void validatePathParam(String pathParam, String variable) {
-        if (pathParam == null || pathParam.length() == 0)
-            throw new ValidationException(Maps.newHashMap(variable, "path param must not be empty, name=" + variable + ", value=" + pathParam));
+    private String pathParam(Map<String, Object> pathParams, String variable) {
+        Object param = pathParams.get(variable);
+        if (param == null) throw new ValidationException(Maps.newHashMap(variable, Strings.format("path param must not null, name={}", variable)));
+        // convert logic matches PathParams
+        if (param instanceof String) {
+            String paramValue = (String) param;
+            if (Strings.isEmpty(paramValue))
+                throw new ValidationException(Maps.newHashMap(variable, Strings.format("path param must not be empty, name={}", variable)));
+            return paramValue;
+        } else if (param instanceof Integer) {
+            return String.valueOf(param);
+        } else {
+            return JSON.toJSONValue(param);
+        }
     }
 
     public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {

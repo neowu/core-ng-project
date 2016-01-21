@@ -2,7 +2,9 @@ package core.framework.impl.web.request;
 
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
+import core.framework.api.util.Strings;
 import core.framework.api.web.exception.BadRequestException;
 
 import java.util.Map;
@@ -36,15 +38,25 @@ public final class PathParams {
             return (T) toInt(value);
         } else if (Long.class.equals(valueClass)) {
             return (T) toLong(value);
+        } else if (Enum.class.isAssignableFrom(valueClass)) {
+            return toEnum(value, valueClass);
         }
         throw Exceptions.error("not supported path param type, please contact arch team, type={}", valueClass);
+    }
+
+    private <T> T toEnum(String value, Class<T> valueClass) {
+        try {
+            return JSON.fromJSONValue(valueClass, value);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(Strings.format("failed to parse value to enum, enumClass={}, value={}", valueClass.getCanonicalName(), value), BadRequestException.DEFAULT_ERROR_CODE, e);
+        }
     }
 
     private Long toLong(String value) {
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException("failed to parse value to long, value=" + value, BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(Strings.format("failed to parse value to long, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
         }
     }
 
@@ -52,7 +64,7 @@ public final class PathParams {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException("failed to parse value to int, value=" + value, BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(Strings.format("failed to parse value to int, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
         }
     }
 }

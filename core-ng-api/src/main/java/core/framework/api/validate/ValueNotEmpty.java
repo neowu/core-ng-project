@@ -7,12 +7,12 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * used for List<T> and Map<String, T> to check values are not emtpy
+ * used for List<T> and Map<String, T> to check values are not empty
  *
  * @author neo
  */
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface ValueNotEmpty {
-    String message() default "value must not be emtpy";
+    String message() default "value must not be empty";
 }

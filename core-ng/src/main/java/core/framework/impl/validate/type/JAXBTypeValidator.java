@@ -24,6 +24,22 @@ import java.util.Set;
  * @author neo
  */
 public class JAXBTypeValidator implements TypeVisitor {
+    public static void validateEnumClass(Class<? extends Enum> enumClass) {
+        if (enumClass.isAnnotationPresent(XmlEnum.class))
+            throw Exceptions.error("enum class must not have @XmlEnum, enumClass={}", enumClass.getCanonicalName());
+
+        Enum[] constants = enumClass.getEnumConstants();
+        for (Enum constant : constants) {
+            try {
+                Field enumField = enumClass.getField(constant.name());
+                if (!enumField.isAnnotationPresent(XmlEnumValue.class)) {
+                    throw Exceptions.error("enum must have @XmlEnumValue, enum={}", Fields.path(enumField));
+                }
+            } catch (NoSuchFieldException e) {
+                throw new Error(e);
+            }
+        }
+    }
     protected final TypeValidator validator;
     private final Map<String, Set<String>> elements = Maps.newHashMap();
 
@@ -84,23 +100,6 @@ public class JAXBTypeValidator implements TypeVisitor {
             @SuppressWarnings("unchecked")
             Class<? extends Enum> enumClass = (Class<? extends Enum>) field.getType();
             validateEnumClass(enumClass);
-        }
-    }
-
-    private void validateEnumClass(Class<? extends Enum> enumClass) {
-        if (enumClass.isAnnotationPresent(XmlEnum.class))
-            throw Exceptions.error("enum class must not have @XmlEnum, enumClass={}", enumClass.getCanonicalName());
-
-        Enum[] constants = enumClass.getEnumConstants();
-        for (Enum constant : constants) {
-            try {
-                Field enumField = enumClass.getField(constant.name());
-                if (!enumField.isAnnotationPresent(XmlEnumValue.class)) {
-                    throw Exceptions.error("enum must have @XmlEnumValue, enum={}", Fields.path(enumField));
-                }
-            } catch (NoSuchFieldException e) {
-                throw new Error(e);
-            }
         }
     }
 }

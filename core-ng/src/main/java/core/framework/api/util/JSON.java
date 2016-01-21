@@ -17,7 +17,7 @@ import java.lang.reflect.Type;
  * @author neo
  */
 public final class JSON {
-    private static final ObjectMapper OBJECT_MAPPER = createMapper();
+    public static final ObjectMapper OBJECT_MAPPER = createMapper();
 
     private static ObjectMapper createMapper() {
         ObjectMapper mapper = new ObjectMapper();
@@ -46,11 +46,20 @@ public final class JSON {
         }
     }
 
-    public static String toJSON(Object object) {
+    public static String toJSON(Object instance) {
         try {
-            return OBJECT_MAPPER.writeValueAsString(object);
+            return OBJECT_MAPPER.writeValueAsString(instance);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    // json type converter
+    public static <T> T fromJSONValue(Class<T> valueType, String jsonValue) {
+        return OBJECT_MAPPER.convertValue(jsonValue, valueType);
+    }
+
+    public static String toJSONValue(Object value) {
+        return OBJECT_MAPPER.convertValue(value, String.class);
     }
 }

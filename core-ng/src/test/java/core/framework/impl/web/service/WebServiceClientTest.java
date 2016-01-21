@@ -52,7 +52,7 @@ public class WebServiceClientTest {
         Assert.assertEquals("http://localhost/test", webServiceClient.serviceURL("/test", Maps.newHashMap()));
         Assert.assertEquals("http://localhost/test/", webServiceClient.serviceURL("/test/", Maps.newHashMap()));
 
-        Map<String, String> pathParams = Maps.newHashMap("id", "1+2");
+        Map<String, Object> pathParams = Maps.newHashMap("id", "1+2");
         Assert.assertEquals("http://localhost/test/1%2B2", webServiceClient.serviceURL("/test/:id(\\d+)", pathParams));
         Assert.assertEquals("http://localhost/test/1%2B2", webServiceClient.serviceURL("/test/:id", pathParams));
     }
@@ -60,7 +60,7 @@ public class WebServiceClientTest {
     @Test
     public void serviceURLWithEmptyPathParam() {
         exception.expect(ValidationException.class);
-        exception.expectMessage("name=id, value=");
+        exception.expectMessage("name=id");
 
         webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", ""));
     }

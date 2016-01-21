@@ -1,5 +1,9 @@
 ## Change log
 
+### 4.0.4 (1/21/2016)
+* fix: typo in @NotEmpty/@ValueNotEmpty
+* ws: support enum in path param
+
 ### 4.0.3 (1/19/2016)
 * cache: update getAll to return Map<String, T>
 

@@ -75,7 +75,7 @@ public class WebServiceClientBuilder<T> {
 
         builder.indent(1).append("java.util.Map pathParams = new java.util.HashMap();\n");
         pathParamIndexes.forEach((name, index) ->
-            builder.indent(1).append("pathParams.put(\"{}\", String.valueOf(param{}));\n", name, index));
+            builder.indent(1).append("pathParams.put(\"{}\", param{});\n", name, index));
 
         String returnTypeLiteral = returnType == void.class ? Void.class.getCanonicalName() : GenericTypes.rawClass(returnType).getCanonicalName();
 
