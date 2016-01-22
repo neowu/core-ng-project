@@ -1,8 +1,6 @@
 package core.framework.api.search;
 
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.util.Map;
 import java.util.Optional;
@@ -11,15 +9,38 @@ import java.util.Optional;
  * @author neo
  */
 public interface ElasticSearchType<T> {
-    SearchResponse search(SearchSourceBuilder source);
+    SearchResponse search(SearchRequest request);
 
-    Optional<T> get(String id);
+    Optional<T> get(GetRequest request);
 
-    void index(String id, T source);
+    default Optional<T> get(String id) {
+        GetRequest request = new GetRequest();
+        request.id = id;
+        return get(request);
+    }
 
-    void bulkIndex(Map<String, T> sources);
+    void index(IndexRequest<T> request);
 
-    void update(String id, UpdateRequest request);
+    default void index(String id, T source) {
+        IndexRequest<T> request = new IndexRequest<>();
+        request.id = id;
+        request.source = source;
+        index(request);
+    }
 
-    boolean delete(String id);
+    void bulkIndex(BulkIndexRequest<T> request);
+
+    default void bulkIndex(Map<String, T> sources) {
+        BulkIndexRequest<T> request = new BulkIndexRequest<>();
+        request.sources = sources;
+        bulkIndex(request);
+    }
+
+    boolean delete(DeleteRequest request);
+
+    default boolean delete(String id) {
+        DeleteRequest request = new DeleteRequest();
+        request.id = id;
+        return delete(request);
+    }
 }

@@ -5,7 +5,10 @@ import core.framework.api.module.SystemModule;
 import core.framework.impl.log.queue.ActionLogMessages;
 import core.log.domain.ActionLogDocument;
 import core.log.domain.TraceLogDocument;
+import core.log.job.DeleteOldIndexJob;
 import core.log.queue.ActionLogMessagesHandler;
+
+import java.time.LocalTime;
 
 /**
  * @author neo
@@ -23,5 +26,7 @@ public class LogProcessorApp extends App {
         queue().subscribe("rabbitmq://queue/action-log-queue")
             .handle(ActionLogMessages.class, bind(ActionLogMessagesHandler.class))
             .maxConcurrentHandlers(2);
+
+        schedule().dailyAt("delete-old-index-job", bind(DeleteOldIndexJob.class), LocalTime.of(1, 0));
     }
 }

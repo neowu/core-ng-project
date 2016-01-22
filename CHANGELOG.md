@@ -1,5 +1,9 @@
 ## Change log
 
+### 4.0.5 (1/22/2016)
+* log: make 3rd party log level to info, (e.g. ES log sampler error by INFO level in separated thread)
+* elasticsearch: set ping timeout, support dynamic index name (for alias or time serial index name)
+
 ### 4.0.4 (1/21/2016)
 * fix: typo in @NotEmpty/@ValueNotEmpty
 * ws: support enum in path param

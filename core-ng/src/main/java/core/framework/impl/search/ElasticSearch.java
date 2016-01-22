@@ -1,7 +1,6 @@
 package core.framework.impl.search;
 
 import core.framework.api.search.ElasticSearchType;
-import core.framework.api.search.Index;
 import core.framework.api.search.SearchException;
 import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
@@ -57,8 +56,7 @@ public final class ElasticSearch {
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
         new DocumentClassValidator(documentClass).validate();
-        Index index = documentClass.getDeclaredAnnotation(Index.class);
-        return new ElasticSearchTypeImpl<>(client(), index.index(), index.type(), documentClass, slowQueryThreshold);
+        return new ElasticSearchTypeImpl<>(client(), documentClass, slowQueryThreshold);
     }
 
     public void close() {
@@ -116,7 +114,7 @@ public final class ElasticSearch {
         }
     }
 
-    private Client client() {
+    public Client client() {
         if (client == null) {
             if (!remoteAddresses.isEmpty()) {
                 client = createRemoteElasticSearch();
@@ -148,6 +146,7 @@ public final class ElasticSearch {
         try {
             Settings.Builder settings = Settings.settingsBuilder()
                 .put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT, new TimeValue(timeout.toMillis()))
+                .put("client.transport.ping_timeout", new TimeValue(timeout.toMillis()))
                 .put("client.transport.ignore_cluster_name", "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
             TransportClient client = TransportClient.builder().settings(settings).build();
             remoteAddresses.forEach(client::addTransportAddress);

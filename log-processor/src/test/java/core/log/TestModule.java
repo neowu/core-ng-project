@@ -10,7 +10,7 @@ public class TestModule extends AbstractTestModule {
     protected void initialize() {
         load(new LogProcessorApp());
 
-        initSearch().createIndex("action", "action-index.json");
-        initSearch().createIndex("trace", "trace-index.json");
+        initSearch().createIndexTemplate("action", "action-index-template.json");
+        initSearch().createIndexTemplate("trace", "trace-index-template.json");
     }
 }

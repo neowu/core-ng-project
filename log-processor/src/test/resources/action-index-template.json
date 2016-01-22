@@ -1,12 +1,11 @@
 {
+  "template": "action-*",
+  "order": 1,
   "settings": {
+    "number_of_shards": 1
   },
   "mappings": {
     "action": {
-      "_ttl": {
-        "enabled": true,
-        "default": "15d"
-      },
       "_all": {
         "enabled": false
       },

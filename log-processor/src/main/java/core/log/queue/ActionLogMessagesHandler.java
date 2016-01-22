@@ -1,6 +1,7 @@
 package core.log.queue;
 
 import core.framework.api.queue.MessageHandler;
+import core.framework.api.search.BulkIndexRequest;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.util.Maps;
 import core.framework.impl.log.queue.ActionLogMessage;
@@ -9,6 +10,8 @@ import core.log.domain.ActionLogDocument;
 import core.log.domain.TraceLogDocument;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 /**
@@ -22,6 +25,11 @@ public class ActionLogMessagesHandler implements MessageHandler<ActionLogMessage
 
     @Override
     public void handle(ActionLogMessages messages) throws Exception {
+        LocalDate now = LocalDate.now();
+        handle(messages, now);
+    }
+
+    void handle(ActionLogMessages messages, LocalDate now) {
         Map<String, ActionLogDocument> actionLogs = Maps.newHashMapWithExpectedSize(messages.logs.size());
         Map<String, TraceLogDocument> traceLogs = Maps.newHashMap();
         for (ActionLogMessage message : messages.logs) {
@@ -31,26 +39,28 @@ public class ActionLogMessagesHandler implements MessageHandler<ActionLogMessage
                 traceLogs.put(message.id, traceLog(message));
             }
         }
-        indexActionLogs(actionLogs);
-        indexTraceLogs(traceLogs);
-    }
-
-    private void indexActionLogs(Map<String, ActionLogDocument> actionLogs) {
-        if (actionLogs.size() < 50) {  // use regular index if size is small
-            actionLogs.forEach((id, log) -> actionType.index(id, log));
-        } else {
-            actionType.bulkIndex(actionLogs);
+        indexActionLogs(actionLogs, now);
+        if (!traceLogs.isEmpty()) {
+            indexTraceLogs(traceLogs, now);
         }
     }
 
-    private void indexTraceLogs(Map<String, TraceLogDocument> traceLogs) {
-        if (traceLogs.isEmpty()) return;
+    private void indexTraceLogs(Map<String, TraceLogDocument> traceLogs, LocalDate now) {
+        BulkIndexRequest<TraceLogDocument> request = new BulkIndexRequest<>();
+        request.index = index("trace", now);
+        request.sources = traceLogs;
+        traceType.bulkIndex(request);
+    }
 
-        if (traceLogs.size() < 50) {
-            traceLogs.forEach((id, log) -> traceType.index(id, log));
-        } else {
-            traceType.bulkIndex(traceLogs);
-        }
+    private void indexActionLogs(Map<String, ActionLogDocument> actionLogs, LocalDate now) {
+        BulkIndexRequest<ActionLogDocument> request = new BulkIndexRequest<>();
+        request.index = index("action", now);
+        request.sources = actionLogs;
+        actionType.bulkIndex(request);
+    }
+
+    String index(String type, LocalDate now) {
+        return type + "-" + now.format(DateTimeFormatter.ISO_DATE);
     }
 
     private TraceLogDocument traceLog(ActionLogMessage message) {
