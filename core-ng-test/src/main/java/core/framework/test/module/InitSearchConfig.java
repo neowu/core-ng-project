@@ -27,8 +27,8 @@ public final class InitSearchConfig {
         search.createIndex(index, ClasspathResources.text(sourcePath));
     }
 
-    public void createIndexTemplate(String index, String sourcePath) {
-        search.createIndexTemplate(index, ClasspathResources.text(sourcePath));
+    public void createIndexTemplate(String name, String sourcePath) {
+        search.createIndexTemplate(name, ClasspathResources.text(sourcePath));
     }
 
     public <T> ElasticSearchTypeImpl<T> type(Class<T> documentClass) {

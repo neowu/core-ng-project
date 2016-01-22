@@ -15,15 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.time.Duration;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @author neo
  */
-public class DeleteOldIndexJob implements Job {
-    private final Logger logger = LoggerFactory.getLogger(DeleteOldIndexJob.class);
-
+public class CleanupOldIndexJob implements Job {
+    private final Logger logger = LoggerFactory.getLogger(CleanupOldIndexJob.class);
     @Inject
     ElasticSearch elasticSearch;
 
@@ -42,16 +41,16 @@ public class DeleteOldIndexJob implements Job {
 
     private void process(IndexMetaData metaData, LocalDate now) {
         String index = metaData.getIndex();
-        if (!index.startsWith("action-") || !index.startsWith("trace-")) return;
+        if (!index.startsWith("action-") && !index.startsWith("trace-")) return;
 
         int i = index.indexOf('-');
         String postfix = index.substring(i + 1);
         LocalDate date = LocalDate.parse(postfix);
-        long days = Duration.between(date, now).toDays();
-        if (days >= 15 && metaData.getState() == IndexMetaData.State.OPEN) {
-            closeIndex(index);
-        } else if (days >= 30) {
+        long days = ChronoUnit.DAYS.between(date, now);
+        if (days >= 30) {
             deleteIndex(index);
+        } else if (days >= 15 && metaData.getState() == IndexMetaData.State.OPEN) {
+            closeIndex(index);
         }
     }
 

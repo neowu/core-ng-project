@@ -8,9 +8,9 @@ import javax.inject.Inject;
 /**
  * @author neo
  */
-public class DeleteOldIndexJobTest extends IntegrationTest {
+public class CleanupOldIndexJobTest extends IntegrationTest {
     @Inject
-    DeleteOldIndexJob job;
+    CleanupOldIndexJob job;
 
     @Test
     public void execute() throws Exception {
