@@ -16,20 +16,20 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author neo
  */
-public class RabbitMQConsumer implements AutoCloseable {
+public final class RabbitMQConsumer implements AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(RabbitMQConsumer.class);
 
     private final String queue;
     private final Channel channel;
     private final QueueingConsumer consumer;
 
-    public RabbitMQConsumer(Channel channel, String queue, int prefetchCount) {
+    RabbitMQConsumer(Channel channel, String queue, int prefetchCount) {
         this.channel = channel;
         this.queue = queue;
         consumer = new QueueingConsumer(channel);
         try {
             channel.basicQos(prefetchCount);
-            channel.basicConsume(queue, false, consumer);
+            channel.basicConsume(queue, false, consumer);   // QOS only works with manual ack
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

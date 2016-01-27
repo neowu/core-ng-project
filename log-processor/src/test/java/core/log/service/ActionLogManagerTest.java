@@ -1,10 +1,9 @@
-package core.log.queue;
+package core.log.service;
 
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.search.GetRequest;
 import core.framework.api.util.Lists;
 import core.framework.impl.log.queue.ActionLogMessage;
-import core.framework.impl.log.queue.ActionLogMessages;
 import core.log.IntegrationTest;
 import core.log.domain.ActionLogDocument;
 import core.log.domain.TraceLogDocument;
@@ -20,9 +19,9 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author neo
  */
-public class ActionLogMessagesHandlerTest extends IntegrationTest {
+public class ActionLogManagerTest extends IntegrationTest {
     @Inject
-    ActionLogMessagesHandler handler;
+    ActionLogManager actionLogManager;
 
     @Inject
     ElasticSearchType<ActionLogDocument> actionType;
@@ -31,7 +30,7 @@ public class ActionLogMessagesHandlerTest extends IntegrationTest {
     ElasticSearchType<TraceLogDocument> traceType;
 
     @Test
-    public void handle() throws Exception {
+    public void index() throws Exception {
         ActionLogMessage message1 = new ActionLogMessage();
         message1.id = "1";
         message1.date = Instant.now();
@@ -42,19 +41,17 @@ public class ActionLogMessagesHandlerTest extends IntegrationTest {
         message2.result = "WARN";
         message2.traceLog = "trace";
 
-        ActionLogMessages messages = new ActionLogMessages();
-        messages.logs = Lists.newArrayList(message1, message2);
         LocalDate now = LocalDate.of(2016, Month.JANUARY, 15);
-        handler.handle(messages, now);
+        actionLogManager.index(Lists.newArrayList(message1, message2), now);
 
         GetRequest request = new GetRequest();
-        request.index = handler.index("action", now);
+        request.index = actionLogManager.indexName("action", now);
         request.id = message1.id;
         ActionLogDocument action = actionType.get(request).get();
         assertEquals(message1.result, action.result);
 
         request = new GetRequest();
-        request.index = handler.index("trace", now);
+        request.index = actionLogManager.indexName("trace", now);
         request.id = message2.id;
         TraceLogDocument trace = traceType.get(request).get();
         assertEquals(message2.id, trace.id);
@@ -62,7 +59,7 @@ public class ActionLogMessagesHandlerTest extends IntegrationTest {
     }
 
     @Test
-    public void index() {
-        assertEquals("action-2016-01-15", handler.index("action", LocalDate.of(2016, Month.JANUARY, 15)));
+    public void indexName() {
+        assertEquals("action-2016-01-15", actionLogManager.indexName("action", LocalDate.of(2016, Month.JANUARY, 15)));
     }
 }

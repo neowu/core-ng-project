@@ -1,38 +1,36 @@
-package core.log.queue;
+package core.log.service;
 
-import core.framework.api.queue.MessageHandler;
 import core.framework.api.search.BulkIndexRequest;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.util.Maps;
 import core.framework.impl.log.queue.ActionLogMessage;
-import core.framework.impl.log.queue.ActionLogMessages;
 import core.log.domain.ActionLogDocument;
 import core.log.domain.TraceLogDocument;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author neo
  */
-public class ActionLogMessagesHandler implements MessageHandler<ActionLogMessages> {
+public class ActionLogManager {
     @Inject
     ElasticSearchType<ActionLogDocument> actionType;
     @Inject
     ElasticSearchType<TraceLogDocument> traceType;
 
-    @Override
-    public void handle(ActionLogMessages messages) throws Exception {
+    public void index(List<ActionLogMessage> logs) {
         LocalDate now = LocalDate.now();
-        handle(messages, now);
+        index(logs, now);
     }
 
-    void handle(ActionLogMessages messages, LocalDate now) {
-        Map<String, ActionLogDocument> actionLogs = Maps.newHashMapWithExpectedSize(messages.logs.size());
+    void index(List<ActionLogMessage> logs, LocalDate now) {
+        Map<String, ActionLogDocument> actionLogs = Maps.newHashMapWithExpectedSize(logs.size());
         Map<String, TraceLogDocument> traceLogs = Maps.newHashMap();
-        for (ActionLogMessage message : messages.logs) {
+        for (ActionLogMessage message : logs) {
             ActionLogDocument actionLog = actionLog(message);
             actionLogs.put(actionLog.id, actionLog);
             if (message.traceLog != null) {
@@ -47,19 +45,19 @@ public class ActionLogMessagesHandler implements MessageHandler<ActionLogMessage
 
     private void indexTraceLogs(Map<String, TraceLogDocument> traceLogs, LocalDate now) {
         BulkIndexRequest<TraceLogDocument> request = new BulkIndexRequest<>();
-        request.index = index("trace", now);
+        request.index = indexName("trace", now);
         request.sources = traceLogs;
         traceType.bulkIndex(request);
     }
 
     private void indexActionLogs(Map<String, ActionLogDocument> actionLogs, LocalDate now) {
         BulkIndexRequest<ActionLogDocument> request = new BulkIndexRequest<>();
-        request.index = index("action", now);
+        request.index = indexName("action", now);
         request.sources = actionLogs;
         actionType.bulkIndex(request);
     }
 
-    String index(String type, LocalDate now) {
+    String indexName(String type, LocalDate now) {
         return type + "-" + now.format(DateTimeFormatter.ISO_DATE);
     }
 

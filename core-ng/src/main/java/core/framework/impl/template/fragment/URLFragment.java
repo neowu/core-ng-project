@@ -1,6 +1,8 @@
 package core.framework.impl.template.fragment;
 
 import core.framework.api.log.Markers;
+import core.framework.api.util.Exceptions;
+import core.framework.api.util.Strings;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
@@ -73,10 +75,9 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
     }
 
     static boolean isValidURL(String url) {
-        int length = url.length();
-        if (length == 0) return false;
+        if (Strings.isEmpty(url)) return false;
         if (url.contains("javascript:")) return false;
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < url.length(); i++) {
             char ch = url.charAt(i);
             if (!VALID_URI.get(ch)) return false;
         }
@@ -92,11 +93,14 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
         this.expression = new ExpressionBuilder(expression, context, location).build();
         this.cdn = cdn;
         this.location = location;
+
+        if (!String.class.equals(this.expression.returnType))
+            throw Exceptions.error("url statement must return String, expression={}, returnType={}, location={}", expression, this.expression.returnType.getTypeName(), location);
     }
 
     @Override
     public void process(StringBuilder builder, TemplateContext context) {
-        String url = String.valueOf(expression.eval(context));
+        String url = (String) expression.eval(context);
         builder.append(url(url, context));
     }
 

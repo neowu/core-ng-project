@@ -1,5 +1,9 @@
 ## Change log
 
+### 4.0.6 (1/27/2016)
+* template: warning if url fragment gets null url
+* log: forward log one by one to simplify, batch happens on log-processor
+
 ### 4.0.5 (1/22/2016)
 * log: make 3rd party log level to info, (e.g. ES log sampler error by INFO level in separated thread)
 * elasticsearch: set ping timeout, support dynamic index name (for alias or time serial index name)

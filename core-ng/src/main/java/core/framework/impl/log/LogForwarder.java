@@ -10,7 +10,6 @@ import core.framework.api.util.Network;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
 import core.framework.impl.log.queue.ActionLogMessage;
-import core.framework.impl.log.queue.ActionLogMessages;
 import core.framework.impl.log.queue.PerformanceStatMessage;
 import core.framework.impl.queue.RabbitMQ;
 import org.slf4j.Logger;
@@ -18,11 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,9 +30,9 @@ public final class LogForwarder {
     private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
     private final String appName;
 
-    private final AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().type(ActionLogMessages.class.getAnnotation(Message.class).name()).build();
+    private final AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().type(ActionLogMessage.class.getAnnotation(Message.class).name()).build();
 
-    private final Queue<ActionLogMessage> queue = new ConcurrentLinkedQueue<>();
+    private final BlockingQueue<ActionLogMessage> queue = new LinkedBlockingQueue<>();
     private final RabbitMQ rabbitMQ = new RabbitMQ();
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
@@ -50,7 +47,7 @@ public final class LogForwarder {
             logger.info("log forwarder thread started");
             while (!stop.get()) {
                 try {
-                    sendActionLogMessages();
+                    sendActionLogs();
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
 
@@ -80,31 +77,13 @@ public final class LogForwarder {
         rabbitMQ.close();
     }
 
-    private void sendActionLogMessages() throws InterruptedException, IOException {
+    private void sendActionLogs() throws InterruptedException, IOException {
         Channel channel = rabbitMQ.createChannel();
         try {
-            List<ActionLogMessage> logs = new LinkedList<>();
-            int messageSize = 0;
             while (!stop.get()) {
-                ActionLogMessage message = queue.poll();
-                if (message != null) {
-                    logs.add(message);
-                    messageSize += 1000;    // action log without trace is roughly 1k
-                    messageSize += message.traceLog == null ? 0 : message.traceLog.length();
-                }
-
-                if ((message == null && !logs.isEmpty()) || logs.size() >= 2000 || messageSize >= 5000000) {    // send if more than 2000 logs or larger than 5M
-                    ActionLogMessages messages = new ActionLogMessages();
-                    messages.logs = logs;
-                    channel.basicPublish("", "action-log-queue", properties, Strings.bytes(JSON.toJSON(messages)));
-                    retryAttempts = 0;  // reset retry attempts if one message sent successfully
-                    logs = new LinkedList<>();
-                    messageSize = 0;
-                }
-
-                if (message == null) {
-                    Thread.sleep(5000);
-                }
+                ActionLogMessage message = queue.take();
+                channel.basicPublish("", "action-log-queue", properties, Strings.bytes(JSON.toJSON(message)));
+                retryAttempts = 0;  // reset retry attempts if one message sent successfully
             }
         } finally {
             closeChannel(channel);

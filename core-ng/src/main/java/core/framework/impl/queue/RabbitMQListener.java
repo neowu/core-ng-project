@@ -48,9 +48,9 @@ public class RabbitMQListener implements MessageHandlerConfig {
         this.logManager = logManager;
 
         listenerThread = new Thread(() -> {
-            logger.info("rabbitMQ message listener started, queue={}", queue);
+            logger.info("rabbitMQ listener started, queue={}", queue);
             while (!stop.get()) {
-                try (RabbitMQConsumer consumer = rabbitMQ.consumer(queue, maxConcurrentHandlers)) {
+                try (RabbitMQConsumer consumer = rabbitMQ.consumer(queue, maxConcurrentHandlers * 2)) { // prefetch one more for each handler to improve throughput
                     pullMessages(consumer);
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
@@ -104,7 +104,7 @@ public class RabbitMQListener implements MessageHandlerConfig {
     }
 
     public void stop() {
-        logger.info("stop rabbitMQ message listener, queue={}", queue);
+        logger.info("stop rabbitMQ listener, queue={}", queue);
         stop.set(true);
         listenerThread.interrupt();
     }
