@@ -91,7 +91,7 @@ public final class Pool<T> {
         StopWatch watch = new StopWatch();
         try {
             PoolItem<T> item = idleItems.poll(checkoutTimeoutInMs, TimeUnit.MILLISECONDS);
-            if (item == null) throw new Error("timeout to wait for next available resource");
+            if (item == null) throw new PoolException("timeout to wait for next available resource", "POOL_TIME_OUT");
             return item;
         } catch (InterruptedException e) {
             throw new Error("interrupted during waiting for next available resource", e);

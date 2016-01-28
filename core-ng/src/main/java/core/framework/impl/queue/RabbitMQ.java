@@ -32,7 +32,7 @@ public final class RabbitMQ {
     private final ConnectionFactory connectionFactory = new ConnectionFactory();
     private final Lock lock = new ReentrantLock();
     private Address[] addresses;
-    private long slowMessageThresholdInMs = 100;
+    private long slowOperationThresholdInMs = 100;
     private volatile Connection connection;
 
     public RabbitMQ() {
@@ -41,7 +41,7 @@ public final class RabbitMQ {
         password("rabbitmq");
         pool = new Pool<>(this::createChannel, Channel::close);
         pool.name("rabbitmq");
-        pool.size(1, 20);
+        pool.size(1, 50);
         pool.maxIdleTime(Duration.ofMinutes(30));
         timeout(Duration.ofSeconds(5));
     }
@@ -80,8 +80,8 @@ public final class RabbitMQ {
         pool.checkoutTimeout(timeout);
     }
 
-    public void slowMessageThreshold(Duration slowMessageThreshold) {
-        slowMessageThresholdInMs = slowMessageThreshold.toMillis();
+    public void slowOperationThreshold(Duration threshold) {
+        slowOperationThresholdInMs = threshold.toMillis();
     }
 
     public RabbitMQConsumer consumer(String queue, int prefetchCount) {
@@ -105,13 +105,13 @@ public final class RabbitMQ {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("rabbitMQ", elapsedTime);
             logger.debug("publish, exchange={}, routingKey={}, elapsedTime={}", exchange, routingKey, elapsedTime);
-            checkSlowMessage(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
-    private void checkSlowMessage(long elapsedTime) {
-        if (elapsedTime > slowMessageThresholdInMs) {
-            logger.warn(Markers.errorCode("SLOW_MESSAGE"), "slow rabbitmq message, elapsedTime={}", elapsedTime);
+    private void checkSlowOperation(long elapsedTime) {
+        if (elapsedTime > slowOperationThresholdInMs) {
+            logger.warn(Markers.errorCode("SLOW_RABBITMQ"), "slow rabbitMQ operation, elapsedTime={}", elapsedTime);
         }
     }
 

@@ -51,7 +51,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
             if (results != null) checkTooManyRows(results.size());
         }
     }
@@ -66,7 +66,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -80,7 +80,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("get, sql={}, params={}, elapsedTime={}", sql, primaryKeys, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -96,7 +96,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("insert, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -113,7 +113,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("update, sql={}, params={}, elapsedTime={}", query.sql, query.params, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -128,7 +128,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("delete, sql={}, params={}, elapsedTime={}", deleteSQL, primaryKeys, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -146,7 +146,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("batch insert, sql={}, size={}, elapsedTime={}", sql, entities.size(), elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -173,7 +173,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("delete, sql={}, size={}, elapsedTime={}", deleteSQL, primaryKeys.size(), elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -183,9 +183,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
         }
     }
 
-    private void checkSlowQuery(long elapsedTime) {
-        if (elapsedTime > database.slowQueryThresholdInMs) {
-            logger.warn(Markers.errorCode("SLOW_QUERY"), "slow db query, elapsedTime={}", elapsedTime);
+    private void checkSlowOperation(long elapsedTime) {
+        if (elapsedTime > database.slowOperationThresholdInMs) {
+            logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsedTime={}", elapsedTime);
         }
     }
 }

@@ -42,7 +42,7 @@ public final class MongoImpl implements Mongo, MongoOption {
     private final MongoEntityValidator validator = new MongoEntityValidator();
 
     private int tooManyRowsReturnedThreshold = 2000;
-    private long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
+    private long slowOperationThresholdInMs = Duration.ofSeconds(5).toMillis();
 
     private MongoClientURI uri;
     private MongoClient mongoClient;
@@ -107,8 +107,8 @@ public final class MongoImpl implements Mongo, MongoOption {
     }
 
     @Override
-    public void slowQueryThreshold(Duration slowQueryThreshold) {
-        slowQueryThresholdInMs = slowQueryThreshold.toMillis();
+    public void slowOperationThreshold(Duration threshold) {
+        slowOperationThresholdInMs = threshold.toMillis();
     }
 
     @Override
@@ -121,9 +121,9 @@ public final class MongoImpl implements Mongo, MongoOption {
             collection.insertOne(entity);
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
+            ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("insert, entityClass={}, elapsedTime={}", entity.getClass().getName(), elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -135,9 +135,9 @@ public final class MongoImpl implements Mongo, MongoOption {
             return Optional.ofNullable(result);
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
+            ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("get, entityClass={}, id={}, elapsedTime={}", entityClass.getName(), id, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -157,9 +157,9 @@ public final class MongoImpl implements Mongo, MongoOption {
             return Optional.of(results.get(0));
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
+            ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("findOne, entityClass={}, filter={}, elapsedTime={}", entityClass.getName(), filter, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -181,7 +181,7 @@ public final class MongoImpl implements Mongo, MongoOption {
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
+            ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("find, entityClass={}, filter={}, projection={}, sort={}, skip={}, limit={}, elapsedTime={}",
                 entityClass.getName(),
                 query.filter,
@@ -190,7 +190,7 @@ public final class MongoImpl implements Mongo, MongoOption {
                 query.skip,
                 query.limit,
                 elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
             checkTooManyRowsReturned(results.size());
         }
     }
@@ -208,9 +208,9 @@ public final class MongoImpl implements Mongo, MongoOption {
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
+            ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("aggregate, entityClass={}, pipeline={}, elapsedTime={}", entityClass.getName(), pipeline, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
             checkTooManyRowsReturned(results.size());
         }
     }
@@ -228,9 +228,9 @@ public final class MongoImpl implements Mongo, MongoOption {
             return result.getModifiedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
+            ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("update, entityClass={}, elapsedTime={}", entity.getClass().getName(), elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -242,9 +242,9 @@ public final class MongoImpl implements Mongo, MongoOption {
             return result.getModifiedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
+            ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("update, entityClass={}, filter={}, update={}, elapsedTime={}", entityClass, filter, update, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -256,9 +256,9 @@ public final class MongoImpl implements Mongo, MongoOption {
             return result.getDeletedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
+            ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("delete, entityClass={}, id={}, elapsedTime={}", entityClass.getName(), id, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -270,15 +270,15 @@ public final class MongoImpl implements Mongo, MongoOption {
             return result.getDeletedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("mongo", elapsedTime);
+            ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("delete, entityClass={}, filter={}, elapsedTime={}", entityClass, filter, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
-    private void checkSlowQuery(long elapsedTime) {
-        if (elapsedTime > slowQueryThresholdInMs) {
-            logger.warn(Markers.errorCode("SLOW_QUERY"), "slow mongo query, elapsedTime={}", elapsedTime);
+    private void checkSlowOperation(long elapsedTime) {
+        if (elapsedTime > slowOperationThresholdInMs) {
+            logger.warn(Markers.errorCode("SLOW_MONGODB"), "slow mongoDB query, elapsedTime={}", elapsedTime);
         }
     }
 

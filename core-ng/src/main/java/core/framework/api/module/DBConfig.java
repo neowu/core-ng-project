@@ -70,20 +70,20 @@ public final class DBConfig {
         database.pool.size(minSize, maxSize);
     }
 
-    public void defaultIsolationLevel(IsolationLevel defaultIsolationLevel) {
-        database.operation.transactionManager.defaultIsolationLevel = defaultIsolationLevel;
+    public void defaultIsolationLevel(IsolationLevel level) {
+        database.operation.transactionManager.defaultIsolationLevel = level;
     }
 
-    public void slowQueryThreshold(Duration slowQueryThreshold) {
-        database.slowQueryThreshold(slowQueryThreshold);
+    public void slowOperationThreshold(Duration threshold) {
+        database.slowOperationThreshold(threshold);
     }
 
-    public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
-        database.tooManyRowsReturnedThreshold = tooManyRowsReturnedThreshold;
+    public void tooManyRowsReturnedThreshold(int threshold) {
+        database.tooManyRowsReturnedThreshold = threshold;
     }
 
-    public void longTransactionThreshold(Duration longTransactionThreshold) {
-        database.operation.transactionManager.longTransactionThresholdInMs = longTransactionThreshold.toMillis();
+    public void longTransactionThreshold(Duration threshold) {
+        database.operation.transactionManager.longTransactionThresholdInMs = threshold.toMillis();
     }
 
     public void timeout(Duration timeout) {

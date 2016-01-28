@@ -43,9 +43,9 @@ public final class RedisConfig {
         }
     }
 
-    public void slowQueryThreshold(Duration slowQueryThreshold) {
+    public void slowOperationThreshold(Duration threshold) {
         if (!context.isTest()) {
-            redis.slowQueryThreshold(slowQueryThreshold);
+            redis.slowOperationThreshold(threshold);
         }
     }
 

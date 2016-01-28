@@ -41,8 +41,8 @@ public final class SearchConfig {
         }
     }
 
-    public void slowQueryThreshold(Duration slowQueryThreshold) {
-        search.slowQueryThreshold(slowQueryThreshold);
+    public void slowOperationThreshold(Duration threshold) {
+        search.slowOperationThreshold(threshold);
     }
 
     public void timeout(Duration timeout) {

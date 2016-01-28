@@ -38,13 +38,13 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     private final String index;
     private final String type;
     private final DocumentValidator<T> validator;
-    private final long slowQueryThresholdInMs;
+    private final long slowOperationThresholdInMs;
     private final Class<T> documentClass;
 
-    ElasticSearchTypeImpl(Client client, Class<T> documentClass, Duration slowQueryThreshold) {
+    ElasticSearchTypeImpl(Client client, Class<T> documentClass, Duration slowOperationThreshold) {
         this.client = client;
         this.documentClass = documentClass;
-        this.slowQueryThresholdInMs = slowQueryThreshold.toMillis();
+        this.slowOperationThresholdInMs = slowOperationThreshold.toMillis();
         Index index = documentClass.getDeclaredAnnotation(Index.class);
         this.index = index.index();
         this.type = index.type();
@@ -74,7 +74,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("search, esTookTime={}, elapsedTime={}", esTookTime, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -92,7 +92,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("get, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -112,7 +112,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("index, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -140,7 +140,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("bulkIndex, index={}, type={}, size={}, esTookTime={}, elapsedTime={}", index, type, request.sources.size(), esTookTime, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -157,13 +157,13 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("delete, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
-    private void checkSlowQuery(long elapsedTime) {
-        if (elapsedTime > slowQueryThresholdInMs) {
-            logger.warn(Markers.errorCode("SLOW_QUERY"), "slow elasticsearch query, elapsedTime={}", elapsedTime);
+    private void checkSlowOperation(long elapsedTime) {
+        if (elapsedTime > slowOperationThresholdInMs) {
+            logger.warn(Markers.errorCode("SLOW_ES"), "slow elasticsearch operation, elapsedTime={}", elapsedTime);
         }
     }
 }

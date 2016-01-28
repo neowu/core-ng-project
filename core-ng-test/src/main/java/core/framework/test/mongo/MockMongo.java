@@ -62,7 +62,7 @@ public class MockMongo implements Mongo, MongoOption {
     }
 
     @Override
-    public void slowQueryThreshold(Duration slowQueryThreshold) {
+    public void slowOperationThreshold(Duration threshold) {
 
     }
 

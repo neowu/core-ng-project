@@ -26,7 +26,7 @@ public final class HTTPClientBuilder {
     private Duration timeout = Duration.ofSeconds(60);
     private int maxConnections = 100;
     private Duration keepAliveTimeout = Duration.ofSeconds(60);
-    private Duration slowTransactionThreshold = Duration.ofSeconds(30);
+    private Duration slowOperationThreshold = Duration.ofSeconds(30);
     private boolean enableCookie = false;
 
     public HTTPClient build() {
@@ -59,7 +59,7 @@ public final class HTTPClientBuilder {
             if (!enableCookie) builder.disableCookieManagement();
 
             CloseableHttpClient httpClient = builder.build();
-            return new HTTPClient(httpClient, slowTransactionThreshold.toMillis());
+            return new HTTPClient(httpClient, slowOperationThreshold.toMillis());
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
         } finally {
@@ -82,8 +82,8 @@ public final class HTTPClientBuilder {
         return this;
     }
 
-    public HTTPClientBuilder slowTransactionThreshold(Duration slowTransactionThreshold) {
-        this.slowTransactionThreshold = slowTransactionThreshold;
+    public HTTPClientBuilder slowOperationThreshold(Duration slowOperationThreshold) {
+        this.slowOperationThreshold = slowOperationThreshold;
         return this;
     }
 

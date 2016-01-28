@@ -37,8 +37,8 @@ public final class MongoConfig {
         mongo.poolSize(minSize, maxSize);
     }
 
-    public void slowQueryThreshold(Duration slowQueryThreshold) {
-        mongo.slowQueryThreshold(slowQueryThreshold);
+    public void slowOperationThreshold(Duration threshold) {
+        mongo.slowOperationThreshold(threshold);
     }
 
     public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {

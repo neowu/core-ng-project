@@ -18,5 +18,5 @@ public interface MongoOption {
 
     void setTooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold);
 
-    void slowQueryThreshold(Duration slowQueryThreshold);
+    void slowOperationThreshold(Duration threshold);
 }

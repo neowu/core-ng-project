@@ -30,7 +30,7 @@ public final class ElasticSearch {
     private final List<TransportAddress> remoteAddresses = Lists.newArrayList();
     private Path localHomePath;
     private Duration timeout = Duration.ofSeconds(10);
-    private Duration slowQueryThreshold = Duration.ofSeconds(5);
+    private Duration slowOperationThreshold = Duration.ofSeconds(5);
 
     private Client client;
 
@@ -44,9 +44,9 @@ public final class ElasticSearch {
         this.localHomePath = localHomePath;
     }
 
-    public void slowQueryThreshold(Duration slowQueryThreshold) {
-        if (client != null) throw new Error("slowQueryThreshold() must be called before creating client");
-        this.slowQueryThreshold = slowQueryThreshold;
+    public void slowOperationThreshold(Duration slowOperationThreshold) {
+        if (client != null) throw new Error("slowOperationThreshold() must be called before creating client");
+        this.slowOperationThreshold = slowOperationThreshold;
     }
 
     public void timeout(Duration timeout) {
@@ -56,7 +56,7 @@ public final class ElasticSearch {
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
         new DocumentClassValidator(documentClass).validate();
-        return new ElasticSearchTypeImpl<>(client(), documentClass, slowQueryThreshold);
+        return new ElasticSearchTypeImpl<>(client(), documentClass, slowOperationThreshold);
     }
 
     public void close() {

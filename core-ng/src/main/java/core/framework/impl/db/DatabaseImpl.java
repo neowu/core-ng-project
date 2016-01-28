@@ -36,7 +36,7 @@ public final class DatabaseImpl implements Database {
     private final Properties driverProperties = new Properties();
 
     public int tooManyRowsReturnedThreshold = 1000;
-    long slowQueryThresholdInMs = Duration.ofSeconds(5).toMillis();
+    long slowOperationThresholdInMs = Duration.ofSeconds(5).toMillis();
     private Duration timeout;
     private Driver driver;
     private String url;
@@ -111,8 +111,8 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    public void slowQueryThreshold(Duration slowQueryThreshold) {
-        slowQueryThresholdInMs = slowQueryThreshold.toMillis();
+    public void slowOperationThreshold(Duration slowOperationThreshold) {
+        slowOperationThresholdInMs = slowOperationThreshold.toMillis();
     }
 
     public <T> void view(Class<T> viewClass) {
@@ -147,7 +147,7 @@ public final class DatabaseImpl implements Database {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
             if (results != null && results.size() > tooManyRowsReturnedThreshold) {
                 logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", results.size());
             }
@@ -163,7 +163,7 @@ public final class DatabaseImpl implements Database {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -176,7 +176,7 @@ public final class DatabaseImpl implements Database {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("execute, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            checkSlowQuery(elapsedTime);
+            checkSlowOperation(elapsedTime);
         }
     }
 
@@ -198,9 +198,9 @@ public final class DatabaseImpl implements Database {
     }
 
 
-    private void checkSlowQuery(long elapsedTime) {
-        if (elapsedTime > slowQueryThresholdInMs) {
-            logger.warn(Markers.errorCode("SLOW_QUERY"), "slow db query, elapsedTime={}", elapsedTime);
+    private void checkSlowOperation(long elapsedTime) {
+        if (elapsedTime > slowOperationThresholdInMs) {
+            logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsedTime={}", elapsedTime);
         }
     }
 }

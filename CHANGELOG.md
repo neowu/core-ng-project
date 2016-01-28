@@ -1,5 +1,9 @@
 ## Change log
 
+### 4.0.7 (1/28/2016)
+* log: renamed all slow query error_code and naming
+* pool: add error code POOL_TIME_OUT
+
 ### 4.0.6 (1/27/2016)
 * template: warning if url fragment gets null url
 * log: forward log one by one to simplify, batch happens on log-processor

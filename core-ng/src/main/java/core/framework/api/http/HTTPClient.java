@@ -32,11 +32,11 @@ public final class HTTPClient {
     private final Logger logger = LoggerFactory.getLogger(HTTPClient.class);
 
     private final CloseableHttpClient client;
-    private final long slowTransactionThresholdInMs;
+    private final long slowOperationThresholdInMs;
 
-    public HTTPClient(CloseableHttpClient client, long slowTransactionThresholdInMs) {
+    public HTTPClient(CloseableHttpClient client, long slowOperationThresholdInMs) {
         this.client = client;
-        this.slowTransactionThresholdInMs = slowTransactionThresholdInMs;
+        this.slowOperationThresholdInMs = slowOperationThresholdInMs;
     }
 
     public void close() {
@@ -72,8 +72,8 @@ public final class HTTPClient {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("http", elapsedTime);
             logger.debug("execute, elapsedTime={}", elapsedTime);
-            if (elapsedTime > slowTransactionThresholdInMs) {
-                logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http transaction, elapsedTime={}", elapsedTime);
+            if (elapsedTime > slowOperationThresholdInMs) {
+                logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http operation, elapsedTime={}", elapsedTime);
             }
         }
     }
