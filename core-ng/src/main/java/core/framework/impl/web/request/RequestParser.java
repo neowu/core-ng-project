@@ -49,10 +49,8 @@ public final class RequestParser {
 
         actionLog.context("path", request.path());
 
-        String requestURL = requestURL(request, exchange);
-        request.requestURL = requestURL;
-        logger.debug("[request] requestURL={}", requestURL);
-        logger.debug("[request] queryString={}", exchange.getQueryString());
+        request.requestURL = requestURL(request, exchange);
+        logger.debug("[request] requestURL={}", request.requestURL);
 
         for (HeaderValues header : headers) {
             logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
@@ -123,13 +121,15 @@ public final class RequestParser {
     }
 
     private String requestURL(RequestImpl request, HttpServerExchange exchange) {
+        StringBuilder builder = new StringBuilder();
+
         if (exchange.isHostIncludedInRequestURI()) {    // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
-            return exchange.getRequestURI();
+            builder.append(exchange.getRequestURI());
         } else {
             String scheme = request.scheme;
             int port = request.port;
 
-            StringBuilder builder = new StringBuilder(scheme)
+            builder.append(scheme)
                 .append("://")
                 .append(exchange.getHostName());
 
@@ -139,7 +139,11 @@ public final class RequestParser {
             }
 
             builder.append(exchange.getRequestURI());
-            return builder.toString();
         }
+
+        String queryString = exchange.getQueryString();
+        if (queryString != null) builder.append('?').append(queryString);
+
+        return builder.toString();
     }
 }

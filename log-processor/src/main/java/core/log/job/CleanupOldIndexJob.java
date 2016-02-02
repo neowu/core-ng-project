@@ -47,9 +47,9 @@ public class CleanupOldIndexJob implements Job {
         String postfix = index.substring(i + 1);
         LocalDate date = LocalDate.parse(postfix);
         long days = ChronoUnit.DAYS.between(date, now);
-        if (days > 30) {        // delete log older than 30 days, close index older than 7 days
+        if (days >= 30) {        // delete log older than 30 days, close index older than 7 days
             deleteIndex(index);
-        } else if (days > 7 && metaData.getState() == IndexMetaData.State.OPEN) {
+        } else if (days >= 7 && metaData.getState() == IndexMetaData.State.OPEN) {
             closeIndex(index);
         }
     }

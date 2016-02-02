@@ -1,5 +1,8 @@
 ## Change log
 
+### 4.0.8 (2/2/2016)
+* web: requestURL now contains QueryString, (requestURL is url without decoding)
+
 ### 4.0.7 (1/28/2016)
 * log: renamed all slow query error_code and naming
 * pool: add error code POOL_TIME_OUT
