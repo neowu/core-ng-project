@@ -1,5 +1,8 @@
 ## Change log
 
+### 4.0.9 (2/3/2016)
+* redis: loose slow_redis warning threshold and timeout, on busy server due to CPU context switch, it's relative easy to hit it
+
 ### 4.0.8 (2/2/2016)
 * web: requestURL now contains QueryString, (requestURL is url without decoding)
 

@@ -14,6 +14,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * webservice: client retry on network issue?
 * website static content security check, (in server env, this is handled by nginx directly)
 * validator: annotation for website, like @Pattern or @SafeString?
+* thread: dynamically adjust thread pool based on load?
 * cm: config management, dynamic update properties?
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
 * db: batch insert/update auto convert to small batch like 3000?

@@ -31,7 +31,7 @@ public final class RedisImpl implements Redis {
     public final Pool<BinaryJedis> pool;
     private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
     private String host;
-    private long slowOperationThresholdInMs = 200;
+    private long slowOperationThresholdInMs = 500;
     private Duration timeout;
 
     public RedisImpl() {

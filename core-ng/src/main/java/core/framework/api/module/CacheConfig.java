@@ -60,7 +60,7 @@ public final class CacheConfig {
             RedisImpl redis = new RedisImpl();
             redis.host(host);
             redis.pool.name("redis-cache");
-            redis.timeout(Duration.ofMillis(500));   // for cache, it should not be longer than 500ms to get value
+            redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
 
             context.scheduler().addTrigger(new FixedRateTrigger("refresh-redis-cache-pool", new RefreshPoolJob(redis.pool), Duration.ofMinutes(5)));
             context.shutdownHook.add(redis::close);
