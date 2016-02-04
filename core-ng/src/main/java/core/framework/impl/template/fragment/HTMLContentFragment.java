@@ -18,6 +18,8 @@ public class HTMLContentFragment implements Fragment {
     @Override
     public void process(StringBuilder builder, TemplateContext context) {
         Object result = expression.eval(context);
-        builder.append(String.valueOf(result));
+        if (result != null) {
+            builder.append(String.valueOf(result));
+        }
     }
 }

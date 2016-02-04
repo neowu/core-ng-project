@@ -97,11 +97,11 @@ public class HTMLParser {
                     if (currentAttribute == null)
                         throw Exceptions.error("attribute syntax is invalid, location={}", lexer.currentLocation());
                     String attributeValue = lexer.currentToken();
-                    if (attributeValue.startsWith("=\"")) {
-                        currentAttribute.value = attributeValue.substring(2, attributeValue.length() - 1);
+                    if (attributeValue.startsWith("\"")) {
+                        currentAttribute.value = attributeValue.substring(1, attributeValue.length() - 1);
                         currentAttribute.hasDoubleQuote = true;
                     } else
-                        currentAttribute.value = attributeValue.substring(1);
+                        currentAttribute.value = attributeValue;
                     break;
                 default:
                     throw Exceptions.error("unexpected type, type={}, location={}", type, lexer.currentLocation());

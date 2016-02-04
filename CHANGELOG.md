@@ -1,5 +1,8 @@
 ## Change log
 
+### 4.1.0 (2/4/2016)
+* template: invalid url attr will write src="", container will write empty if content is null
+
 ### 4.0.9 (2/3/2016)
 * redis: loose slow_redis warning threshold and timeout, on busy server due to CPU context switch, it's relative easy to hit it
 

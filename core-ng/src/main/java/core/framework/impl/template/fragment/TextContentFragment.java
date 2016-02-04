@@ -78,6 +78,8 @@ public class TextContentFragment implements Fragment {
     @Override
     public void process(StringBuilder builder, TemplateContext context) {
         Object result = expression.eval(context);
-        builder.append(escapeHTML(String.valueOf(result)));
+        if (result != null) {
+            builder.append(escapeHTML(String.valueOf(result)));
+        }
     }
 }

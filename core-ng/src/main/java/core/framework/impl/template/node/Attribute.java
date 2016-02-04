@@ -64,11 +64,7 @@ public class Attribute {
     }
 
     void addCDNAttribute(ContainerFragment parent, TemplateMetaContext context) {
-        String targetAttributeName = isDynamic() ? name.substring(2) : name;
-        addCDNAttribute(targetAttributeName, parent, context);
-    }
-
-    private void addCDNAttribute(String attributeName, ContainerFragment parent, TemplateMetaContext context) {
+        String attributeName = isDynamic() ? name.substring(2) : name;
         if (isDynamic()) {
             parent.addStaticContent(" ");
             parent.addStaticContent(attributeName);

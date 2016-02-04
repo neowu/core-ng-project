@@ -52,7 +52,10 @@ class HTMLLexer {
             move(2);
             return HTMLTokenType.START_TAG_END_CLOSE;
         } else if (match(currentIndex, "=")) {
-            move(findAttributeValueLength());
+            move(1);
+            skipWhitespaces();
+            int length = findAttributeValueLength();
+            if (length > 0) move(length);
             return HTMLTokenType.ATTRIBUTE_VALUE;
         } else {
             move(findAttributeNameLength());
@@ -155,27 +158,24 @@ class HTMLLexer {
     private int findAttributeNameLength() {
         for (int i = currentIndex; i < html.length(); i++) {
             char ch = html.charAt(i);
-            if (Character.isWhitespace(ch) || ch == '=' || ch == '/' || ch == '>') return i - currentIndex;
-            if (ch == '<') throw Exceptions.error("attribute name is invalid, location={}", currentLocation());
+            if (Character.isWhitespace(ch) || ch == '=' || ch == '/' || ch == '>') {
+                return i - currentIndex;
+            }
+            if (ch == '<') {
+                throw Exceptions.error("attribute name is invalid, location={}", currentLocation());
+            }
         }
         throw Exceptions.error("attribute name is invalid, location={}", currentLocation());
     }
 
     private int findAttributeValueLength() {
-        boolean started = false;
-        boolean hasDoubleQuote = false;
-        for (int i = currentIndex + 1; i < html.length(); i++) {  // skip first '='
+        boolean hasDoubleQuote = currentIndex < html.length() && html.charAt(currentIndex) == '"';
+        int i = hasDoubleQuote ? currentIndex + 1 : currentIndex;
+        for (; i < html.length(); i++) {
             char ch = html.charAt(i);
-            if (!started && !Character.isWhitespace(ch)) {
-                started = true;
-                if (ch == '"') hasDoubleQuote = true;
-            } else if (started) {
-                if (!hasDoubleQuote && (Character.isWhitespace(ch) || ch == '>')) {
-                    return i - currentIndex;
-                } else if (ch == '"') {
-                    return i - currentIndex + 1;
-                }
-            } else if (ch == '>' || ch == '/') {
+            if (!hasDoubleQuote && (Character.isWhitespace(ch) || ch == '>' || match(i, "/>"))) {
+                return i - currentIndex;
+            } else if (ch == '"') {
                 return i - currentIndex + 1;
             }
         }
