@@ -47,7 +47,9 @@ project(':core-ng-test') {
     dependencies {
         provided(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                'org.hsqldb:hsqldb:2.3.3'
+                'org.hsqldb:hsqldb:2.3.3',
+                "org.elasticsearch:elasticsearch:${elasticVersion}",
+                'org.codehaus.groovy:groovy-all:2.4.4'  // for elasticsearch groovy script support
         )
         compile(
                 project(":core-ng"),
