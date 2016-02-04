@@ -12,7 +12,7 @@ import java.nio.file.Path;
 /**
  * @author neo
  */
-public class MockNode extends Node {
+public class LocalNode extends Node {
     private static Settings settings(Path dataPath) {
         return Settings.settingsBuilder()
             .put("node.local", "true")          // refer to org.elasticsearch.node.NodeBuilder.local()
@@ -22,7 +22,7 @@ public class MockNode extends Node {
             .build();
     }
 
-    public MockNode(Path dataPath) {
+    public LocalNode(Path dataPath) {
         super(InternalSettingsPreparer.prepareEnvironment(settings(dataPath), null), Version.CURRENT, Lists.newArrayList(GroovyPlugin.class));
     }
 }

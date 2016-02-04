@@ -23,7 +23,7 @@ public class MockElasticSearch extends ElasticSearch {
     protected Client createClient() {
         StopWatch watch = new StopWatch();
         try {
-            MockNode node = new MockNode(dataPath);
+            LocalNode node = new LocalNode(dataPath);
             node.start();
             return node.client();
         } finally {
