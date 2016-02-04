@@ -100,8 +100,9 @@ public class HTMLParser {
                     if (attributeValue.startsWith("\"")) {
                         currentAttribute.value = attributeValue.substring(1, attributeValue.length() - 1);
                         currentAttribute.hasDoubleQuote = true;
-                    } else
+                    } else if (!"".equals(attributeValue)) {    // not assign null attribute value, e.g. <p class=/>
                         currentAttribute.value = attributeValue;
+                    }
                     break;
                 default:
                     throw Exceptions.error("unexpected type, type={}, location={}", type, lexer.currentLocation());
