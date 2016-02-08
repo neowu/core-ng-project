@@ -24,8 +24,6 @@ public class ActionLogProcessor {
     private final Thread fetchThread;
     private final RabbitMQ rabbitMQ;
     private final ActionLogManager actionLogManager;
-    private List<ActionLogMessage> logs = new LinkedList<>();
-    private long lastDeliveryTag;
 
     public ActionLogProcessor(String queueHost, ActionLogManager actionLogManager) {
         rabbitMQ = new RabbitMQ();
@@ -47,6 +45,9 @@ public class ActionLogProcessor {
     }
 
     private void process(RabbitMQConsumer consumer) throws InterruptedException, IOException {
+        List<ActionLogMessage> logs = new LinkedList<>();
+        long lastDeliveryTag = 0;
+
         while (!stop.get()) {
             RabbitMQConsumer.Message message = consumer.poll();
             if (message != null) {
