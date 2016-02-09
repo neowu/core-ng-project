@@ -12,7 +12,7 @@ import java.time.Instant;
  */
 @Index(index = "trace", type = "trace")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class TraceLogDocument {
+public class TraceDocument {
     @XmlElement(name = "date")
     public Instant date;
     @XmlElement(name = "id")
@@ -23,6 +23,8 @@ public class TraceLogDocument {
     public String result;
     @XmlElement(name = "action")
     public String action;
+    @XmlElement(name = "error_code")
+    public String errorCode;
     @XmlElement(name = "content")
     public String content;
 }

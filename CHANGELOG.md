@@ -1,5 +1,8 @@
 ## Change log
 
+### 4.1.1 (2/9/2016)
+* monitor: initial monitoring draft, forward monitor metrics via logforwarder
+
 ### 4.1.0 (2/4/2016)
 * template: invalid url attr will write src="", container will write empty if content is null
 * elasticsearch: support 2.2.0, load groovy plugin in test context

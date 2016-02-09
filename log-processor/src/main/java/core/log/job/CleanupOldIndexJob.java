@@ -41,7 +41,7 @@ public class CleanupOldIndexJob implements Job {
 
     private void process(IndexMetaData metaData, LocalDate now) {
         String index = metaData.getIndex();
-        if (!index.startsWith("action-") && !index.startsWith("trace-")) return;
+        if (!index.startsWith("action-") && !index.startsWith("trace-") && !index.startsWith("stat-")) return;
 
         int i = index.indexOf('-');
         String postfix = index.substring(i + 1);

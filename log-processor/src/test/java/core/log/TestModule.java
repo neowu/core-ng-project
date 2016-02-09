@@ -12,5 +12,6 @@ public class TestModule extends AbstractTestModule {
 
         initSearch().createIndexTemplate("action", "action-index-template.json");
         initSearch().createIndexTemplate("trace", "trace-index-template.json");
+        initSearch().createIndexTemplate("stat", "stat-index-template.json");
     }
 }

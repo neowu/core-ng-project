@@ -41,7 +41,7 @@ public final class LogManager {
 
         if (actionLogger != null) actionLogger.write(actionLog);
         if (traceLogger != null) traceLogger.write(actionLog);
-        if (logForwarder != null) logForwarder.forward(actionLog);
+        if (logForwarder != null) logForwarder.forwardLog(actionLog);
     }
 
     public void process(LogEvent event) {

@@ -1,11 +1,11 @@
 {
-  "template": "trace-*",
+  "template": "stat-*",
   "order": 1,
   "settings": {
     "number_of_shards": 1
   },
   "mappings": {
-    "trace": {
+    "stat": {
       "_all": {
         "enabled": false
       },
@@ -21,20 +21,8 @@
           "type": "string",
           "index": "not_analyzed"
         },
-        "result": {
-          "type": "string",
-          "index": "not_analyzed"
-        },
-        "action": {
-          "type": "string",
-          "index": "not_analyzed"
-        },
-        "error_code": {
-          "type": "string",
-          "index": "not_analyzed"
-        },
-        "content": {
-          "type": "string"
+        "server_ip": {
+          "type": "ip"
         }
       }
     }

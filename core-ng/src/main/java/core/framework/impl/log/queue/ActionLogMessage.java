@@ -1,7 +1,5 @@
 package core.framework.impl.log.queue;
 
-import core.framework.api.queue.Message;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -11,7 +9,6 @@ import java.util.Map;
 /**
  * @author neo
  */
-@Message(name = "action_log")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ActionLogMessage {
     @XmlElement(name = "date")

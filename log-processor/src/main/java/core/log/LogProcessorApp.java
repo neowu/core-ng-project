@@ -2,11 +2,13 @@ package core.log;
 
 import core.framework.api.App;
 import core.framework.api.module.SystemModule;
-import core.log.domain.ActionLogDocument;
-import core.log.domain.TraceLogDocument;
+import core.log.domain.ActionDocument;
+import core.log.domain.StatDocument;
+import core.log.domain.TraceDocument;
 import core.log.job.CleanupOldIndexJob;
-import core.log.queue.ActionLogProcessor;
-import core.log.service.ActionLogManager;
+import core.log.queue.LogProcessor;
+import core.log.service.ActionManager;
+import core.log.service.StatManager;
 
 import java.time.LocalTime;
 
@@ -19,12 +21,14 @@ public class LogProcessorApp extends App {
         load(new SystemModule("sys.properties"));
         loadProperties("app.properties");
 
-        search().type(ActionLogDocument.class);
-        search().type(TraceLogDocument.class);
+        search().type(ActionDocument.class);
+        search().type(TraceDocument.class);
+        search().type(StatDocument.class);
 
-        ActionLogManager actionLogManager = bind(ActionLogManager.class);
+        ActionManager actionManager = bind(ActionManager.class);
+        StatManager statManager = bind(StatManager.class);
 
-        ActionLogProcessor processor = new ActionLogProcessor(requiredProperty("app.rabbitMQ.host"), actionLogManager);
+        LogProcessor processor = new LogProcessor(requiredProperty("app.rabbitMQ.host"), actionManager, statManager);
         onStartup(processor::start);
         onShutdown(processor::stop);
 

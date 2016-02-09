@@ -5,8 +5,8 @@ import core.framework.api.search.GetRequest;
 import core.framework.api.util.Lists;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.log.IntegrationTest;
-import core.log.domain.ActionLogDocument;
-import core.log.domain.TraceLogDocument;
+import core.log.domain.ActionDocument;
+import core.log.domain.TraceDocument;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -19,15 +19,15 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author neo
  */
-public class ActionLogManagerTest extends IntegrationTest {
+public class ActionManagerTest extends IntegrationTest {
     @Inject
-    ActionLogManager actionLogManager;
+    ActionManager actionManager;
 
     @Inject
-    ElasticSearchType<ActionLogDocument> actionType;
+    ElasticSearchType<ActionDocument> actionType;
 
     @Inject
-    ElasticSearchType<TraceLogDocument> traceType;
+    ElasticSearchType<TraceDocument> traceType;
 
     @Test
     public void index() throws Exception {
@@ -42,24 +42,19 @@ public class ActionLogManagerTest extends IntegrationTest {
         message2.traceLog = "trace";
 
         LocalDate now = LocalDate.of(2016, Month.JANUARY, 15);
-        actionLogManager.index(Lists.newArrayList(message1, message2), now);
+        actionManager.index(Lists.newArrayList(message1, message2), now);
 
         GetRequest request = new GetRequest();
-        request.index = actionLogManager.indexName("action", now);
+        request.index = IndexName.name("action", now);
         request.id = message1.id;
-        ActionLogDocument action = actionType.get(request).get();
+        ActionDocument action = actionType.get(request).get();
         assertEquals(message1.result, action.result);
 
         request = new GetRequest();
-        request.index = actionLogManager.indexName("trace", now);
+        request.index = IndexName.name("trace", now);
         request.id = message2.id;
-        TraceLogDocument trace = traceType.get(request).get();
+        TraceDocument trace = traceType.get(request).get();
         assertEquals(message2.id, trace.id);
         assertEquals(message2.traceLog, trace.content);
-    }
-
-    @Test
-    public void indexName() {
-        assertEquals("action-2016-01-15", actionLogManager.indexName("action", LocalDate.of(2016, Month.JANUARY, 15)));
     }
 }

@@ -14,7 +14,7 @@ import java.util.Map;
  */
 @Index(index = "action", type = "action")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ActionLogDocument {
+public class ActionDocument {
     @XmlElement(name = "date")
     public Instant date;
     @XmlElement(name = "app")
