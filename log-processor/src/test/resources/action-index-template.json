@@ -9,6 +9,18 @@
       "_all": {
         "enabled": false
       },
+      "dynamic_templates": [
+        {
+          "context": {
+            "path_match": "context.*",
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        }
+      ],
       "properties": {
         "date": {
           "type": "date"
