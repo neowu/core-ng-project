@@ -51,8 +51,8 @@ public class LocalCacheStore implements CacheStore {
         caches.remove(key);
     }
 
-    void cleanup() {
-        logger.debug("clean up expired cache items");
+    public void cleanup() {
+        logger.info("clean up local cache store");
         long now = System.currentTimeMillis();
         caches.forEach((key, value) -> {
             if (value.expired(now)) caches.remove(key);

@@ -40,6 +40,7 @@ public final class ModuleContext {
     public final MockFactory mockFactory;
     public CacheManager cacheManager;
     private Scheduler scheduler;
+    private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext(BeanFactory beanFactory, MockFactory mockFactory) {
         this.beanFactory = beanFactory;
@@ -66,11 +67,21 @@ public final class ModuleContext {
 
         if (!isTest()) {
             httpServer.handler.route.add(HTTPMethod.GET, "/health-check", new ControllerHolder(new HealthCheckController(), true));
-            httpServer.handler.route.add(HTTPMethod.GET, "/management/memory", new ControllerHolder(new MemoryUsageController(), true));
+            httpServer.handler.route.add(HTTPMethod.GET, "/_sys/memory", new ControllerHolder(new MemoryUsageController(), true));
             ThreadInfoController threadInfoController = new ThreadInfoController();
-            httpServer.handler.route.add(HTTPMethod.GET, "/management/thread", new ControllerHolder(threadInfoController::threadUsage, true));
-            httpServer.handler.route.add(HTTPMethod.GET, "/management/thread-dump", new ControllerHolder(threadInfoController::threadDump, true));
+            httpServer.handler.route.add(HTTPMethod.GET, "/_sys/thread", new ControllerHolder(threadInfoController::threadUsage, true));
+            httpServer.handler.route.add(HTTPMethod.GET, "/_sys/thread-dump", new ControllerHolder(threadInfoController::threadDump, true));
         }
+    }
+
+    public BackgroundTaskExecutor backgroundTask() {
+        if (backgroundTask == null) {
+            backgroundTask = new BackgroundTaskExecutor();
+            if (!isTest()) {
+                shutdownHook.add(backgroundTask::stop);
+            }
+        }
+        return backgroundTask;
     }
 
     public Scheduler scheduler() {
@@ -81,8 +92,8 @@ public final class ModuleContext {
                 shutdownHook.add(scheduler::stop);
 
                 SchedulerController schedulerController = new SchedulerController(scheduler);
-                httpServer.handler.route.add(HTTPMethod.GET, "/management/job", new ControllerHolder(schedulerController::listJobs, true));
-                httpServer.handler.route.add(HTTPMethod.POST, "/management/job/:job", new ControllerHolder(schedulerController::triggerJob, true));
+                httpServer.handler.route.add(HTTPMethod.GET, "/_sys/job", new ControllerHolder(schedulerController::listJobs, true));
+                httpServer.handler.route.add(HTTPMethod.POST, "/_sys/job/:job", new ControllerHolder(schedulerController::triggerJob, true));
             }
         }
         return scheduler;

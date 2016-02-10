@@ -3,8 +3,6 @@ package core.framework.api.module;
 import core.framework.api.redis.Redis;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
-import core.framework.impl.resource.RefreshPoolJob;
-import core.framework.impl.scheduler.FixedRateTrigger;
 
 import java.time.Duration;
 
@@ -26,7 +24,7 @@ public final class RedisConfig {
         } else {
             redis = new RedisImpl();
             context.shutdownHook.add(redis::close);
-            context.scheduler().addTrigger(new FixedRateTrigger("refresh-redis-pool", new RefreshPoolJob(redis.pool), Duration.ofMinutes(5)));
+            context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
             context.beanFactory.bind(Redis.class, null, redis);
         }
     }

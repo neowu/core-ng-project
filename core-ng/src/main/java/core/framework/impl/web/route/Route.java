@@ -43,10 +43,9 @@ public final class Route {
         URLHandler handler = staticHandlers.get(path);
         if (handler == null) handler = dynamicRoot.find(path, pathParams);
         if (handler == null) {
-            actionLog.action("web/not-found");
             throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
         }
         actionLog.context("pathPattern", handler.pathPattern);
-        return handler.get(method, actionLog);
+        return handler.get(method);
     }
 }

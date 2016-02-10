@@ -45,8 +45,8 @@ public class LocalSessionStore implements SessionStore {
         return Instant.now().plus(sessionTimeout);
     }
 
-    void cleanup() {
-        logger.debug("cleanup expired sessions");
+    public void cleanup() {
+        logger.info("cleanup local session store");
         Instant now = Instant.now();
         values.forEach((id, session) -> {
             if (now.isAfter(session.expiredTime)) {

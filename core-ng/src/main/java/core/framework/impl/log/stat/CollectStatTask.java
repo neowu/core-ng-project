@@ -1,6 +1,5 @@
 package core.framework.impl.log.stat;
 
-import core.framework.api.scheduler.Job;
 import core.framework.api.util.Maps;
 import core.framework.impl.log.LogForwarder;
 
@@ -14,18 +13,18 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class CollectStatJob implements Job {
+public class CollectStatTask implements Runnable {
     private final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final LogForwarder logForwarder;
 
-    public CollectStatJob(LogForwarder logForwarder) {
+    public CollectStatTask(LogForwarder logForwarder) {
         this.logForwarder = logForwarder;
     }
 
     @Override
-    public void execute() throws Exception {
+    public void run() {
         Map<String, Double> stats = Maps.newLinkedHashMap();
         stats.put("sys_load_avg", os.getSystemLoadAverage());
         stats.put("thread_count", (double) thread.getThreadCount());

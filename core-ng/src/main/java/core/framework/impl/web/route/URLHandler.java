@@ -4,7 +4,6 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.MethodNotAllowedException;
-import core.framework.impl.log.ActionLog;
 import core.framework.impl.web.ControllerHolder;
 
 import java.util.Map;
@@ -27,10 +26,9 @@ class URLHandler {
         }
     }
 
-    ControllerHolder get(HTTPMethod method, ActionLog actionLog) {
+    ControllerHolder get(HTTPMethod method) {
         ControllerHolder controller = controllers.get(method);
         if (controller == null) {
-            actionLog.action("web/method-not-allowed");
             throw new MethodNotAllowedException(method);
         }
         return controller;

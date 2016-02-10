@@ -1,5 +1,10 @@
 ## Change log
 
+### 4.1.2 (2/10/2016)
+* web: removed web/not-found, web/method-not-allowed action assign, since we use error_code now
+* background: moved pool-cleanup, collect-stat job to background thread, not included in action
+* web: renamed all internal /management/* path to /_sys/*
+
 ### 4.1.1 (2/9/2016)
 * monitor: initial monitoring draft, forward monitor metrics via logforwarder
 

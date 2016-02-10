@@ -3,9 +3,8 @@ package core.framework.api.module;
 import core.framework.impl.log.ActionLogger;
 import core.framework.impl.log.LogForwarder;
 import core.framework.impl.log.TraceLogger;
-import core.framework.impl.log.stat.CollectStatJob;
+import core.framework.impl.log.stat.CollectStatTask;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.scheduler.FixedRateTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +60,7 @@ public final class LogConfig {
             logger.info("disable log forwarding during test");
         } else {
             context.logManager.logForwarder = new LogForwarder(host, context.logManager.appName);
-            context.scheduler().addTrigger(new FixedRateTrigger("collect-stat", new CollectStatJob(context.logManager.logForwarder), Duration.ofSeconds(10)));
+            context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(context.logManager.logForwarder), Duration.ofSeconds(10));
         }
     }
 }

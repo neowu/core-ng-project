@@ -7,13 +7,10 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Types;
 import core.framework.impl.cache.CacheManager;
 import core.framework.impl.cache.CacheStore;
-import core.framework.impl.cache.CleanupLocalCacheStoreJob;
 import core.framework.impl.cache.LocalCacheStore;
 import core.framework.impl.cache.RedisCacheStore;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
-import core.framework.impl.resource.RefreshPoolJob;
-import core.framework.impl.scheduler.FixedRateTrigger;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.management.CacheController;
 import org.slf4j.Logger;
@@ -41,8 +38,9 @@ public final class CacheConfig {
 
         logger.info("create local cache store");
         LocalCacheStore cacheStore = new LocalCacheStore();
-        context.scheduler().addTrigger(new FixedRateTrigger("cleanup-local-cache", new CleanupLocalCacheStoreJob(cacheStore), Duration.ofMinutes(30)));
-
+        if (!context.isTest()) {
+            context.backgroundTask().scheduleWithFixedDelay(cacheStore::cleanup, Duration.ofMinutes(30));
+        }
         configureCacheManager(cacheStore);
     }
 
@@ -62,8 +60,8 @@ public final class CacheConfig {
             redis.pool.name("redis-cache");
             redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
 
-            context.scheduler().addTrigger(new FixedRateTrigger("refresh-redis-cache-pool", new RefreshPoolJob(redis.pool), Duration.ofMinutes(5)));
             context.shutdownHook.add(redis::close);
+            context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
 
             configureCacheManager(new RedisCacheStore(redis));
         }
@@ -74,9 +72,9 @@ public final class CacheConfig {
 
         if (!context.isTest()) {
             CacheController controller = new CacheController(context.cacheManager);
-            context.httpServer.handler.route.add(HTTPMethod.GET, "/management/cache", new ControllerHolder(controller::list, true));
-            context.httpServer.handler.route.add(HTTPMethod.GET, "/management/cache/:name/:key", new ControllerHolder(controller::get, true));
-            context.httpServer.handler.route.add(HTTPMethod.DELETE, "/management/cache/:name/:key", new ControllerHolder(controller::delete, true));
+            context.httpServer.handler.route.add(HTTPMethod.GET, "/_sys/cache", new ControllerHolder(controller::list, true));
+            context.httpServer.handler.route.add(HTTPMethod.GET, "/_sys/cache/:name/:key", new ControllerHolder(controller::get, true));
+            context.httpServer.handler.route.add(HTTPMethod.DELETE, "/_sys/cache/:name/:key", new ControllerHolder(controller::delete, true));
         }
     }
 

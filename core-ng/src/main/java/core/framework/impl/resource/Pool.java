@@ -83,7 +83,7 @@ public final class Pool<T> {
         try {
             closeResource(item.resource);
         } finally {
-            logger.debug("[pool:{}] recycle resource, total={}, elapsed={}", name, total, watch.elapsedTime());
+            logger.debug("recycle resource, pool={}, total={}, elapsed={}", name, total, watch.elapsedTime());
         }
     }
 
@@ -96,7 +96,7 @@ public final class Pool<T> {
         } catch (InterruptedException e) {
             throw new Error("interrupted during waiting for next available resource", e);
         } finally {
-            logger.debug("[pool:{}] wait for next available resource, total={}, elapsed={}", name, total.get(), watch.elapsedTime());
+            logger.debug("wait for next available resource, pool={}, total={}, elapsed={}", name, total.get(), watch.elapsedTime());
         }
     }
 
@@ -109,22 +109,14 @@ public final class Pool<T> {
             total.getAndDecrement();
             throw e;
         } finally {
-            logger.debug("[pool:{}] create new resource, total={}, elapsed={}", name, total.get(), watch.elapsedTime());
+            logger.debug("create new resource, pool={}, total={}, elapsed={}", name, total.get(), watch.elapsedTime());
         }
     }
 
-    void refresh() {
-        logger.debug("[pool:{}] recycle idle items", name);
+    public void refresh() {
+        logger.info("refresh resource pool, pool={}", name);
         recycleIdleItems();
-
-        logger.debug("[pool:{}] replenish items", name);
         replenish();
-    }
-
-    private void replenish() {
-        while (total.get() < minSize) {
-            returnItem(createNewItem());
-        }
     }
 
     private void recycleIdleItems() {
@@ -144,11 +136,17 @@ public final class Pool<T> {
         }
     }
 
+    private void replenish() {
+        while (total.get() < minSize) {
+            returnItem(createNewItem());
+        }
+    }
+
     private void closeResource(T resource) {
         try {
             closeHandler.close(resource);
         } catch (Exception e) {
-            logger.warn("[pool:{}] failed to close resource", name, e);
+            logger.warn("failed to close resource, pool={}", name, e);
         }
     }
 
