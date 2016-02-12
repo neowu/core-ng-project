@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -30,7 +31,7 @@ public class JSONTest {
     }
 
     @Test
-    public void withMapField() {
+    public void mapField() {
         BeanWithMapField bean = new BeanWithMapField();
         bean.attributes.put("key1", "value1");
         bean.attributes.put("key2", "value2");
@@ -43,7 +44,20 @@ public class JSONTest {
     }
 
     @Test
-    public void withDateField() {
+    public void mapFieldWithBytes() {
+        BeanWithMapField bean = new BeanWithMapField();
+        bean.attributes.put("key1", "value1");
+        bean.attributes.put("key2", "value2");
+        byte[] json = JSON.toJSONBytes(bean);
+        assertArrayEquals(Strings.bytes("{\"attributes\":{\"key1\":\"value1\",\"key2\":\"value2\"}}"), json);
+
+        BeanWithMapField parsedBean = JSON.fromJSON(BeanWithMapField.class, json);
+        assertEquals("value1", parsedBean.attributes.get("key1"));
+        assertEquals("value2", parsedBean.attributes.get("key2"));
+    }
+
+    @Test
+    public void dateField() {
         BeanWithDateField bean = new BeanWithDateField();
         bean.instant = Instant.now();
         bean.dateTime = LocalDateTime.ofInstant(bean.instant, ZoneId.systemDefault());
@@ -57,7 +71,7 @@ public class JSONTest {
     }
 
     @Test
-    public void withNull() {
+    public void nullObject() {
         String json = JSON.toJSON(null);
         Bean bean = JSON.fromJSON(Bean.class, json);
 
@@ -65,7 +79,7 @@ public class JSONTest {
     }
 
     @Test
-    public void withEnum() {
+    public void enumValue() {
         assertEquals(TestEnum.A, JSON.fromJSONValue(TestEnum.class, "A1"));
         assertEquals("B1", JSON.toJSONValue(TestEnum.B));
     }

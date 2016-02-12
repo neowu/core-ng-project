@@ -1,5 +1,6 @@
 package core.log.queue;
 
+import core.framework.api.util.JSON;
 import core.framework.api.util.StopWatch;
 import core.framework.api.util.Threads;
 import core.framework.impl.queue.RabbitMQ;
@@ -21,18 +22,20 @@ public class BulkMessageProcessor<T> {
     private final Logger logger = LoggerFactory.getLogger(BulkMessageProcessor.class);
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final String queue;
+    private final Class<T> messageClass;
     private final int bulkSize;
     private final Consumer<List<T>> consumer;
     private final Thread processThread;
 
     public BulkMessageProcessor(RabbitMQ rabbitMQ, String queue, Class<T> messageClass, int bulkSize, Consumer<List<T>> consumer) {
         this.queue = queue;
+        this.messageClass = messageClass;
         this.bulkSize = bulkSize;
         this.consumer = consumer;
         processThread = new Thread(() -> {
             logger.info("message processor thread started, queue={}", queue);
             while (!stop.get()) {
-                try (RabbitMQConsumer<T> queueConsumer = new RabbitMQConsumer<>(((RabbitMQImpl) rabbitMQ).createChannel(), queue, messageClass, bulkSize * 2)) {    // prefetch twice as batch size
+                try (RabbitMQConsumer queueConsumer = new RabbitMQConsumer(((RabbitMQImpl) rabbitMQ).createChannel(), queue, bulkSize * 2)) {    // prefetch twice as batch size
                     process(queueConsumer);
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
@@ -54,18 +57,18 @@ public class BulkMessageProcessor<T> {
         processThread.interrupt();
     }
 
-    private void process(RabbitMQConsumer<T> consumer) throws IOException, InterruptedException {
+    private void process(RabbitMQConsumer consumer) throws IOException, InterruptedException {
         List<T> messages = new LinkedList<>();
         int messageSize = 0;
         long lastDeliveryTag = 0;   // according to AMQP, acknowledge with deliveryTag=0 will acknowledge all outstanding messages
 
         while (!stop.get()) {
             try {
-                RabbitMQMessage<T> message = consumer.poll();
+                RabbitMQMessage message = consumer.poll();
                 if (message != null) {
                     lastDeliveryTag = message.deliveryTag;
-                    messageSize += message.messageSize;
-                    messages.add(message.body);
+                    messageSize += message.body.length;
+                    messages.add(JSON.fromJSON(messageClass, message.body));
                 }
                 if (messages.size() >= bulkSize || messageSize >= 15000000 || (message == null && !messages.isEmpty())) {   // process every bulkSize or 15M or no more messages
                     consume(messages, messageSize);

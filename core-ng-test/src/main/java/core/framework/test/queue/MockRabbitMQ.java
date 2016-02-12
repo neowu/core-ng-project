@@ -13,11 +13,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @author neo
  */
 public class MockRabbitMQ implements RabbitMQ {
-    private final Map<String, Queue<String>> publishedMessages = new ConcurrentHashMap<>();
+    private final Map<String, Queue<byte[]>> publishedMessages = new ConcurrentHashMap<>();
 
     @Override
-    public void publish(String exchange, String routingKey, String message, AMQP.BasicProperties properties) {
-        Queue<String> queue = publishedMessages.computeIfAbsent(exchange + ":" + routingKey, key -> new ConcurrentLinkedQueue<>());
+    public void publish(String exchange, String routingKey, byte[] message, AMQP.BasicProperties properties) {
+        Queue<byte[]> queue = publishedMessages.computeIfAbsent(exchange + ":" + routingKey, key -> new ConcurrentLinkedQueue<>());
         queue.add(message);
     }
 
@@ -26,7 +26,7 @@ public class MockRabbitMQ implements RabbitMQ {
         throw new Error("not supported");
     }
 
-    public Queue<String> publishedMessages(String exchange, String routingKey) {
+    public Queue<byte[]> publishedMessages(String exchange, String routingKey) {
         return publishedMessages.remove(exchange + ":" + routingKey);
     }
 }

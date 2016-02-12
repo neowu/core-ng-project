@@ -7,7 +7,6 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Network;
-import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.framework.impl.log.queue.PerformanceStatMessage;
@@ -84,7 +83,7 @@ public final class LogForwarder {
             while (!stop.get()) {
                 Object message = queue.take();
                 String queueName = queueName(message);
-                channel.basicPublish("", queueName, properties, Strings.bytes(JSON.toJSON(message)));
+                channel.basicPublish("", queueName, properties, JSON.toJSONBytes(message));
                 retryAttempts = 0;  // reset retry attempts if one message sent successfully
             }
         } finally {

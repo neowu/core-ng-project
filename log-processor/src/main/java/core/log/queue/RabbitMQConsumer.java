@@ -7,8 +7,6 @@ import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ShutdownSignalException;
 import com.rabbitmq.utility.Utility;
-import core.framework.api.util.Charsets;
-import core.framework.api.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,19 +19,17 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author neo
  */
-public class RabbitMQConsumer<T> implements Consumer, AutoCloseable {
-    // refer to com.rabbitmq.client.QueueingConsumer
-    private final RabbitMQMessage<T> stopSignal = new RabbitMQMessage<>(0, null, 0);
+public class RabbitMQConsumer implements Consumer, AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(RabbitMQConsumer.class);
-    private final Queue<RabbitMQMessage<T>> queue = new ConcurrentLinkedQueue<>();
+    private final RabbitMQMessage stopSignal = new RabbitMQMessage(0, null);
+    private final Queue<RabbitMQMessage> queue = new ConcurrentLinkedQueue<>();
     private final Channel channel;
-    private final Class<T> messageClass;
     private volatile ShutdownSignalException shutdown;
     private volatile ConsumerCancelledException cancelled;
 
-    public RabbitMQConsumer(Channel channel, String queue, Class<T> messageClass, int prefetchCount) {
+    // refer to com.rabbitmq.client.QueueingConsumer
+    public RabbitMQConsumer(Channel channel, String queue, int prefetchCount) {
         this.channel = channel;
-        this.messageClass = messageClass;
         try {
             channel.basicQos(prefetchCount);
             channel.basicConsume(queue, false, this);   // QOS only works with manual ack
@@ -73,17 +69,11 @@ public class RabbitMQConsumer<T> implements Consumer, AutoCloseable {
     public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
         if (shutdown != null) throw Utility.fixStackTrace(shutdown);
         long deliveryTag = envelope.getDeliveryTag();
-        String content = new String(body, Charsets.UTF_8);
-        try {
-            queue.add(new RabbitMQMessage<>(deliveryTag, JSON.fromJSON(messageClass, content), body.length));    // parse message to object in order to minimize memory footprint before indexing
-        } catch (Throwable e) {
-            logger.warn("failed to parse message, body={}", content);
-            channel.basicAck(deliveryTag, false);   // acknowledge invalid messages
-        }
+        queue.add(new RabbitMQMessage(deliveryTag, body));
     }
 
-    public RabbitMQMessage<T> poll() throws ShutdownSignalException, ConsumerCancelledException {
-        RabbitMQMessage<T> message = queue.poll();
+    public RabbitMQMessage poll() throws ShutdownSignalException, ConsumerCancelledException {
+        RabbitMQMessage message = queue.poll();
         if (stopSignal.equals(message) || message == null && (shutdown != null || cancelled != null)) {
             if (stopSignal.equals(message)) queue.add(stopSignal);
             if (shutdown != null) throw Utility.fixStackTrace(shutdown);

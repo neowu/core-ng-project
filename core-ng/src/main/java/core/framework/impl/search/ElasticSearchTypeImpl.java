@@ -12,7 +12,6 @@ import core.framework.api.search.SearchException;
 import core.framework.api.search.SearchRequest;
 import core.framework.api.util.JSON;
 import core.framework.api.util.StopWatch;
-import core.framework.api.util.Strings;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -85,7 +84,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         try {
             GetResponse response = client.prepareGet(index, type, request.id).get();
             if (!response.isExists()) return Optional.empty();
-            return Optional.of(JSON.fromJSON(documentClass, response.getSourceAsString()));
+            return Optional.of(JSON.fromJSON(documentClass, response.getSourceAsBytes()));
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -101,10 +100,10 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         validator.validate(request.source);
+        byte[] document = JSON.toJSONBytes(request.source);
         try {
-            String document = JSON.toJSON(request.source);
             client.prepareIndex(index, type, request.id)
-                .setSource(Strings.bytes(document))
+                .setSource(document)
                 .get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
@@ -120,17 +119,17 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     public void bulkIndex(BulkIndexRequest<T> request) {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
+        BulkRequestBuilder builder = client.prepareBulk();
+        for (Map.Entry<String, T> entry : request.sources.entrySet()) {
+            String id = entry.getKey();
+            T source = entry.getValue();
+            validator.validate(source);
+            byte[] document = JSON.toJSONBytes(source);
+            builder.add(client.prepareIndex(index, type, id)
+                .setSource(document));
+        }
         long esTookTime = 0;
         try {
-            BulkRequestBuilder builder = client.prepareBulk();
-            for (Map.Entry<String, T> entry : request.sources.entrySet()) {
-                String id = entry.getKey();
-                T source = entry.getValue();
-                validator.validate(source);
-                String document = JSON.toJSON(source);
-                builder.add(client.prepareIndex(index, type, id)
-                    .setSource(Strings.bytes(document)));
-            }
             BulkResponse response = builder.get();
             esTookTime = response.getTookInMillis();
             if (response.hasFailures()) throw new SearchException(response.buildFailureMessage());

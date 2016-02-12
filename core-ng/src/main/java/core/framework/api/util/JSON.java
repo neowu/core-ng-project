@@ -46,9 +46,25 @@ public final class JSON {
         }
     }
 
+    public static <T> T fromJSON(Class<T> instanceType, byte[] json) {
+        try {
+            return OBJECT_MAPPER.readValue(json, instanceType);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public static String toJSON(Object instance) {
         try {
             return OBJECT_MAPPER.writeValueAsString(instance);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static byte[] toJSONBytes(Object instance) {
+        try {
+            return OBJECT_MAPPER.writeValueAsBytes(instance);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

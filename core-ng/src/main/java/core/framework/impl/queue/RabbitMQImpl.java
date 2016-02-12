@@ -9,7 +9,6 @@ import com.rabbitmq.client.ConnectionFactory;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
 import core.framework.api.util.StopWatch;
-import core.framework.api.util.Strings;
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
 import org.slf4j.Logger;
@@ -91,11 +90,11 @@ public final class RabbitMQImpl implements RabbitMQ {
     }
 
     @Override
-    public void publish(String exchange, String routingKey, String message, AMQP.BasicProperties properties) {
+    public void publish(String exchange, String routingKey, byte[] message, AMQP.BasicProperties properties) {
         StopWatch watch = new StopWatch();
         PoolItem<Channel> item = pool.borrowItem();
         try {
-            item.resource.basicPublish(exchange, routingKey, properties, Strings.bytes(message));
+            item.resource.basicPublish(exchange, routingKey, properties, message);
         } catch (AlreadyClosedException e) {    // rabbitmq throws AlreadyClosedException for channel error, e.g. channel is not configured correctly or not exists
             item.broken = true;
             throw e;

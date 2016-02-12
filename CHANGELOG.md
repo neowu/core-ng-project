@@ -3,6 +3,7 @@
 ### 4.1.3 (2/11/2016)
 * db: lower default db timeout to 15s
 * queue: updated rabbitMQ api and config api
+* json: start convert json to bytes directly, to lower memory footprint with queue/ES/cache
 
 ### 4.1.2 (2/10/2016)
 * web: removed web/not-found, web/method-not-allowed action assign, since we use error_code now

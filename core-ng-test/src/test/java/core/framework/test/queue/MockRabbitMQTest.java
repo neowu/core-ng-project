@@ -1,5 +1,7 @@
 package core.framework.test.queue;
 
+import core.framework.api.util.Charsets;
+import core.framework.api.util.Strings;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,12 +23,12 @@ public class MockRabbitMQTest {
 
     @Test
     public void publish() {
-        Queue<String> messages = rabbitMQ.publishedMessages("", "queue");
+        Queue<byte[]> messages = rabbitMQ.publishedMessages("", "queue");
         assertNull(messages);
 
-        rabbitMQ.publish("", "queue", "message", null);
+        rabbitMQ.publish("", "queue", Strings.bytes("message"), null);
         messages = rabbitMQ.publishedMessages("", "queue");
         assertEquals(1, messages.size());
-        assertEquals("message", messages.poll());
+        assertEquals("message", new String(messages.poll(), Charsets.UTF_8));
     }
 }
