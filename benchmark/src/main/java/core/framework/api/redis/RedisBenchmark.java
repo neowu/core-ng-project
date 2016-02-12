@@ -1,6 +1,7 @@
 package core.framework.api.redis;
 
 import core.framework.api.util.Maps;
+import core.framework.api.util.Strings;
 import core.framework.impl.redis.RedisImpl;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -24,7 +25,7 @@ import java.util.Map;
 @Measurement(iterations = 10)
 public class RedisBenchmark {
     private RedisImpl redis;
-    private Map<String, String> values;
+    private Map<String, byte[]> values;
 
     @Setup
     public void setup() {
@@ -32,11 +33,11 @@ public class RedisBenchmark {
         redis.host("52.6.213.238");
 
         values = Maps.newHashMap();
-        values.put("key1", "v1");
-        values.put("key2", "v2");
-        values.put("key3", "v3");
-        values.put("key4", "v4");
-        values.put("key5", "v5");
+        values.put("key1", Strings.bytes("v1"));
+        values.put("key2", Strings.bytes("v2"));
+        values.put("key3", Strings.bytes("v3"));
+        values.put("key4", Strings.bytes("v4"));
+        values.put("key5", Strings.bytes("v5"));
     }
 
     @TearDown

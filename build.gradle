@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '4.1.3'
+    version = '4.1.4'
 }
 
 def mongoVersion = '3.2.1'
@@ -109,7 +109,7 @@ project(':benchmark') {
     dependencies {
         compile(
                 project(':core-ng'),
-                'org.openjdk.jmh:jmh-generator-annprocess:1.11.2'
+                'org.openjdk.jmh:jmh-generator-annprocess:1.11.3'
         )
         runtime(
                 'redis.clients:jedis:2.8.0@jar'

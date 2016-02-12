@@ -12,8 +12,8 @@ public final class Strings {
         return text.getBytes(Charsets.UTF_8);
     }
 
-    public static String format(String pattern, Object... arguments) {
-        return MessageFormatter.arrayFormat(pattern, arguments).getMessage();
+    public static String format(String pattern, Object... params) {
+        return MessageFormatter.arrayFormat(pattern, params).getMessage();
     }
 
     public static int compare(String text1, String text2) {

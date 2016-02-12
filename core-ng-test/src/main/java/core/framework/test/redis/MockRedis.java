@@ -66,11 +66,6 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public void mset(Map<String, String> values, Duration expiration) {
-        values.forEach((key, value) -> set(key, value, expiration));
-    }
-
-    @Override
     public Map<String, String> hgetAll(String key) {
         @SuppressWarnings("unchecked")
         Map<String, String> value = (Map<String, String>) store.get(key);

@@ -7,13 +7,13 @@ import java.util.Map;
  * @author neo
  */
 public interface CacheStore {   // all keys here are direct cacheKey, not the key passed to Cache<T>
-    String get(String key);
+    byte[] get(String key);
 
-    Map<String, String> getAll(String[] keys);
+    Map<String, byte[]> getAll(String[] keys);
 
-    void put(String key, String value, Duration expiration);
+    void put(String key, byte[] value, Duration expiration);
 
-    void putAll(Map<String, String> values, Duration expiration);
+    void putAll(Map<String, byte[]> values, Duration expiration);
 
     void delete(String key);
 }

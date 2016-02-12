@@ -20,7 +20,7 @@ public class LocalCacheStoreTest {
 
     @Test
     public void getAll() {
-        Map<String, String> values = cacheStore.getAll(new String[]{"key1", "key2"});
+        Map<String, byte[]> values = cacheStore.getAll(new String[]{"key1", "key2"});
         assertNull(values.get("key1"));
         assertNull(values.get("key2"));
     }

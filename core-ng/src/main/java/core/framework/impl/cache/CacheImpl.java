@@ -1,6 +1,7 @@
 package core.framework.impl.cache;
 
 import core.framework.api.cache.Cache;
+import core.framework.api.util.Charsets;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 
@@ -31,10 +32,10 @@ public class CacheImpl<T> implements Cache<T> {
     @Override
     public T get(String key, Function<String, T> loader) {
         String cacheKey = cacheKey(key);
-        String cacheValue = cacheStore.get(cacheKey);
+        byte[] cacheValue = cacheStore.get(cacheKey);
         if (cacheValue == null) {
             T value = loader.apply(key);
-            cacheStore.put(cacheKey, JSON.toJSON(value), duration);
+            cacheStore.put(cacheKey, JSON.toJSONBytes(value), duration);
             return value;
         }
         return JSON.fromJSON(valueType, cacheValue);
@@ -50,15 +51,15 @@ public class CacheImpl<T> implements Cache<T> {
             index++;
         }
         Map<String, T> values = new LinkedHashMap<>(size);
-        Map<String, String> newValues = Maps.newHashMapWithExpectedSize(size);
-        Map<String, String> cacheValues = cacheStore.getAll(cacheKeys);
+        Map<String, byte[]> newValues = Maps.newHashMapWithExpectedSize(size);
+        Map<String, byte[]> cacheValues = cacheStore.getAll(cacheKeys);
         index = 0;
         for (String key : keys) {
             String cacheKey = cacheKeys[index];
-            String cacheValue = cacheValues.get(cacheKey);
+            byte[] cacheValue = cacheValues.get(cacheKey);
             if (cacheValue == null) {
                 T value = loader.apply(key);
-                newValues.put(cacheKey, JSON.toJSON(value));
+                newValues.put(cacheKey, JSON.toJSONBytes(value));
                 values.put(key, value);
             } else {
                 values.put(key, JSON.fromJSON(valueType, cacheValue));
@@ -71,7 +72,7 @@ public class CacheImpl<T> implements Cache<T> {
 
     @Override
     public void put(String key, T value) {
-        cacheStore.put(cacheKey(key), JSON.toJSON(value), duration);
+        cacheStore.put(cacheKey(key), JSON.toJSONBytes(value), duration);
     }
 
     @Override
@@ -80,8 +81,9 @@ public class CacheImpl<T> implements Cache<T> {
     }
 
     public Optional<String> get(String key) {
-        String result = cacheStore.get(cacheKey(key));
-        return Optional.ofNullable(result);
+        byte[] result = cacheStore.get(cacheKey(key));
+        if (result == null) return Optional.empty();
+        return Optional.of(new String(result, Charsets.UTF_8));
     }
 
     private String cacheKey(String key) {

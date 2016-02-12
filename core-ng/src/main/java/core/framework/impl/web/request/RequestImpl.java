@@ -151,7 +151,7 @@ public final class RequestImpl implements Request {
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
             Map<String, String> params = Maps.newHashMap();
             exchange.getQueryParameters().forEach((name, values) -> params.put(name, values.element()));
-            String formJSON = JSON.toJSON(params);
+            byte[] formJSON = JSON.toJSONBytes(params);
             return JSON.fromJSON(instanceType, formJSON);
         } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
             if (formData != null) {
@@ -159,7 +159,7 @@ public final class RequestImpl implements Request {
                 for (String name : formData) {
                     form.put(name, formData.getFirst(name).getValue());
                 }
-                String formJSON = JSON.toJSON(form);
+                byte[] formJSON = JSON.toJSONBytes(form);
                 return JSON.fromJSON(instanceType, formJSON);
             } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
                 return JSON.fromJSON(instanceType, body);

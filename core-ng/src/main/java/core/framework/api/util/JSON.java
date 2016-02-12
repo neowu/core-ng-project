@@ -38,6 +38,15 @@ public final class JSON {
         }
     }
 
+    public static <T> T fromJSON(Type instanceType, byte[] json) {
+        try {
+            JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructType(instanceType);
+            return OBJECT_MAPPER.readValue(json, javaType);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public static <T> T fromJSON(Class<T> instanceType, String json) {
         try {
             return OBJECT_MAPPER.readValue(json, instanceType);

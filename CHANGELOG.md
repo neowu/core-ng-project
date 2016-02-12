@@ -1,4 +1,13 @@
+## TODO
+* think about /test//b, and /:path(*)
+* refactory rabbitmq binding, unify
+* replace json bytes<->string, lower memory usage, cache
+* check prod log, large trace, limit trace log size?
+
 ## Change log
+
+### 4.1.4 (2/12/2016 - )
+* cache: make cache process byte[] directly to redis
 
 ### 4.1.3 (2/11/2016)
 * db: lower default db timeout to 15s

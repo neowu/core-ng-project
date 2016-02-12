@@ -15,7 +15,7 @@ public class LocalCacheStore implements CacheStore {
     private final Map<String, CacheItem> caches = Maps.newConcurrentHashMap();
 
     @Override
-    public String get(String key) {
+    public byte[] get(String key) {
         CacheItem item = caches.get(key);
         if (item == null) return null;
         if (item.expired(System.currentTimeMillis())) {
@@ -26,23 +26,23 @@ public class LocalCacheStore implements CacheStore {
     }
 
     @Override
-    public Map<String, String> getAll(String[] keys) {
-        Map<String, String> results = Maps.newHashMapWithExpectedSize(keys.length);
+    public Map<String, byte[]> getAll(String[] keys) {
+        Map<String, byte[]> results = Maps.newHashMapWithExpectedSize(keys.length);
         for (String key : keys) {
-            String value = get(key);
+            byte[] value = get(key);
             if (value != null) results.put(key, value);
         }
         return results;
     }
 
     @Override
-    public void put(String key, String value, Duration expiration) {
+    public void put(String key, byte[] value, Duration expiration) {
         long now = System.currentTimeMillis();
         caches.put(key, new CacheItem(value, now + expiration.toMillis()));
     }
 
     @Override
-    public void putAll(Map<String, String> values, Duration expiration) {
+    public void putAll(Map<String, byte[]> values, Duration expiration) {
         values.forEach((key, value) -> put(key, value, expiration));
     }
 
@@ -60,10 +60,10 @@ public class LocalCacheStore implements CacheStore {
     }
 
     public static class CacheItem {
-        final String value;
+        final byte[] value;
         final long expirationTime;
 
-        public CacheItem(String value, long expirationTime) {
+        public CacheItem(byte[] value, long expirationTime) {
             this.value = value;
             this.expirationTime = expirationTime;
         }

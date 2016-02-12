@@ -5,7 +5,6 @@ import core.framework.api.async.Executor;
 import core.framework.api.module.MessageHandlerConfig;
 import core.framework.api.queue.Message;
 import core.framework.api.queue.MessageHandler;
-import core.framework.api.util.Charsets;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
@@ -13,6 +12,7 @@ import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
+import core.framework.impl.log.LogParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,11 +112,11 @@ public class RabbitMQListener implements MessageHandlerConfig {
     private <T> void process(QueueingConsumer.Delivery delivery) throws Exception {
         ActionLog actionLog = logManager.currentActionLog();
 
-        String messageBody = new String(delivery.getBody(), Charsets.UTF_8);
+        byte[] body = delivery.getBody();
         String messageType = delivery.getProperties().getType();
         actionLog.context("messageType", messageType);
 
-        logger.debug("message={}", messageBody);
+        logger.debug("body={}", LogParam.of(body));
 
         if (Strings.isEmpty(messageType)) throw new Error("messageType must not be empty");
 
@@ -144,7 +144,7 @@ public class RabbitMQListener implements MessageHandlerConfig {
         if (messageClass == null) {
             throw Exceptions.error("can not find message class, messageType={}", messageType);
         }
-        T message = JSON.fromJSON(messageClass, messageBody);
+        T message = JSON.fromJSON(messageClass, body);
         validator.validate(message);
 
         @SuppressWarnings("unchecked")

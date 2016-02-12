@@ -13,6 +13,7 @@
         <!--BC: BC_UNCONFIRMED_CAST: Unchecked/unconfirmed cast-->
         <!--SQL: SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING-->
         <!--UuF: UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD: Unused public or protected field (TemplateModel uses public field in template)-->
-        <Bug code="RV,EI,EI2,Dm,CN,SIC,UrF,UwF,NP,BC,SQL,UuF"/>
+        <!--PZLA: PZLA_PREFER_ZERO_LENGTH_ARRAYS: Consider returning a zero length array rather than null-->
+        <Bug code="RV,EI,EI2,Dm,CN,SIC,UrF,UwF,NP,BC,SQL,UuF,PZLA"/>
     </Match>
 </FindBugsFilter>
