@@ -17,12 +17,16 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author neo
  */
 public class CleanupOldIndexJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(CleanupOldIndexJob.class);
+    private final Pattern pattern = Pattern.compile("[a-z]+-(\\d{4}-\\d{2}-\\d{2})");
     @Inject
     ElasticSearch elasticSearch;
 
@@ -39,19 +43,23 @@ public class CleanupOldIndexJob implements Job {
         }
     }
 
+    Optional<LocalDate> createdDate(String index) {
+        Matcher matcher = pattern.matcher(index);
+        if (!matcher.matches()) return Optional.empty();
+        String timestamp = matcher.group(1);
+        return Optional.of(LocalDate.parse(timestamp));
+    }
+
     private void process(IndexMetaData metaData, LocalDate now) {
         String index = metaData.getIndex();
-        if (!index.startsWith("action-") && !index.startsWith("trace-") && !index.startsWith("stat-")) return;
-
-        int i = index.indexOf('-');
-        String postfix = index.substring(i + 1);
-        LocalDate date = LocalDate.parse(postfix);
-        long days = ChronoUnit.DAYS.between(date, now);
-        if (days >= 30) {        // delete log older than 30 days, close index older than 7 days
-            deleteIndex(index);
-        } else if (days >= 7 && metaData.getState() == IndexMetaData.State.OPEN) {
-            closeIndex(index);
-        }
+        createdDate(index).ifPresent(date -> {
+            long days = ChronoUnit.DAYS.between(date, now);
+            if (days >= 30) {        // delete log older than 30 days, close index older than 7 days
+                deleteIndex(index);
+            } else if (days >= 7 && metaData.getState() == IndexMetaData.State.OPEN) {
+                closeIndex(index);
+            }
+        });
     }
 
     private void deleteIndex(String index) {
