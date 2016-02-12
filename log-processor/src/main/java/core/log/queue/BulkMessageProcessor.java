@@ -3,6 +3,7 @@ package core.log.queue;
 import core.framework.api.util.StopWatch;
 import core.framework.api.util.Threads;
 import core.framework.impl.queue.RabbitMQ;
+import core.framework.impl.queue.RabbitMQImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class BulkMessageProcessor<T> {
         processThread = new Thread(() -> {
             logger.info("message processor thread started, queue={}", queue);
             while (!stop.get()) {
-                try (RabbitMQConsumer<T> queueConsumer = new RabbitMQConsumer<>(rabbitMQ.createChannel(), queue, messageClass, bulkSize * 2)) {    // prefetch twice as batch size
+                try (RabbitMQConsumer<T> queueConsumer = new RabbitMQConsumer<>(((RabbitMQImpl) rabbitMQ).createChannel(), queue, messageClass, bulkSize * 2)) {    // prefetch twice as batch size
                     process(queueConsumer);
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException

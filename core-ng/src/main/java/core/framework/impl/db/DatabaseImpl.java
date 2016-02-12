@@ -56,7 +56,7 @@ public final class DatabaseImpl implements Database {
         pool.maxIdleTime(Duration.ofHours(2));  // make sure db server does not kill connection shorter than this, e.g. MySQL default wait_timeout is 8 hours
 
         operation = new DatabaseOperation(pool);
-        timeout(Duration.ofSeconds(30));
+        timeout(Duration.ofSeconds(15));
     }
 
     private Connection createConnection() {

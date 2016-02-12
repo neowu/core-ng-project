@@ -14,8 +14,6 @@ import java.util.Map;
 @Index(index = "stat", type = "stat")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class StatDocument {
-    @XmlElement(name = "id")
-    public String id;
     @XmlElement(name = "date")
     public Instant date;
     @XmlElement(name = "app")

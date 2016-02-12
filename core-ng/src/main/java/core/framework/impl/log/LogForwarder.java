@@ -12,7 +12,7 @@ import core.framework.api.util.Threads;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.framework.impl.log.queue.PerformanceStatMessage;
 import core.framework.impl.log.queue.StatMessage;
-import core.framework.impl.queue.RabbitMQ;
+import core.framework.impl.queue.RabbitMQImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public final class LogForwarder {
     private final AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().build();
 
     private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
-    private final RabbitMQ rabbitMQ = new RabbitMQ();
+    private final RabbitMQImpl rabbitMQ = new RabbitMQImpl();
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Thread logForwarderThread;

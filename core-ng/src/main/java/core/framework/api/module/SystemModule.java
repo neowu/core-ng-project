@@ -56,9 +56,9 @@ public final class SystemModule extends Module {
         });
         property("sys.log.remoteLogHost").ifPresent(host -> log().forwardLogToRemote(host));
 
-        property("sys.rabbitMQ.host").ifPresent(hosts -> queue().rabbitMQ().hosts(Strings.split(hosts, ',')));
-        property("sys.rabbitMQ.user").ifPresent(user -> queue().rabbitMQ().user(user));
-        property("sys.rabbitMQ.password").ifPresent(password -> queue().rabbitMQ().password(password));
+        property("sys.rabbitMQ.host").ifPresent(hosts -> queue().hosts(Strings.split(hosts, ',')));
+        property("sys.rabbitMQ.user").ifPresent(user -> queue().user(user));
+        property("sys.rabbitMQ.password").ifPresent(password -> queue().password(password));
 
         property("sys.jdbc.url").ifPresent(url -> db().url(url));
         property("sys.jdbc.user").ifPresent(user -> db().user(user));

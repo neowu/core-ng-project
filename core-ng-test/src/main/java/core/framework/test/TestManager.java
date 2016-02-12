@@ -34,9 +34,9 @@ public final class TestManager {
     private AbstractTestModule initializeTestContext(Class<?> testClass) {
         Context context = findContext(testClass);
         try {
-            AbstractTestModule testContext = context.module().newInstance();
-            testContext.configure();
-            return testContext;
+            AbstractTestModule module = context.module().newInstance();
+            module.configure();
+            return module;
         } catch (InstantiationException | IllegalAccessException e) {
             throw new Error("failed to create test context", e);
         }

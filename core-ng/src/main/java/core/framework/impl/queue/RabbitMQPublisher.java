@@ -16,14 +16,16 @@ import java.util.Map;
  */
 public class RabbitMQPublisher<T> implements MessagePublisher<T> {
     private final RabbitMQ rabbitMQ;
-    private final RabbitMQEndpoint endpoint;
+    private final String exchange;
+    private final String routingKey;
     private final String messageType;
     private final MessageValidator validator;
     private final LogManager logManager;
 
-    public RabbitMQPublisher(RabbitMQ rabbitMQ, RabbitMQEndpoint endpoint, Class<T> messageClass, MessageValidator validator, LogManager logManager) {
+    public RabbitMQPublisher(RabbitMQ rabbitMQ, String exchange, String routingKey, Class<T> messageClass, MessageValidator validator, LogManager logManager) {
         this.rabbitMQ = rabbitMQ;
-        this.endpoint = endpoint;
+        this.exchange = exchange;
+        this.routingKey = routingKey;
         this.messageType = messageClass.getDeclaredAnnotation(Message.class).name();
         this.validator = validator;
         this.logManager = logManager;
@@ -31,15 +33,11 @@ public class RabbitMQPublisher<T> implements MessagePublisher<T> {
 
     @Override
     public void publish(T message) {
-        publish(endpoint.exchange, endpoint.routingKey, message);
+        publish(exchange, routingKey, message);
     }
 
     @Override
-    public void publish(String routingKey, T message) {
-        publish(endpoint.exchange, routingKey, message);
-    }
-
-    private void publish(String exchange, String routingKey, T message) {
+    public void publish(String exchange, String routingKey, T message) {
         validator.validate(message);
 
         Map<String, Object> headers = Maps.newHashMap();

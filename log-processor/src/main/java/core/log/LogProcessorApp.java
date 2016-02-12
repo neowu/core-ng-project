@@ -22,7 +22,6 @@ public class LogProcessorApp extends App {
     @Override
     protected void initialize() {
         load(new SystemModule("sys.properties"));
-        loadProperties("app.properties");
 
         search().type(ActionDocument.class);
         search().type(TraceDocument.class);
@@ -31,9 +30,9 @@ public class LogProcessorApp extends App {
         ActionManager actionManager = bind(ActionManager.class);
         StatManager statManager = bind(StatManager.class);
 
-        RabbitMQ rabbitMQ = new RabbitMQ();
-        rabbitMQ.hosts(requiredProperty("app.rabbitMQ.host"));
-        onShutdown(rabbitMQ::close);
+        queue().poolSize(0, 5); // disable publisher channel pool
+
+        RabbitMQ rabbitMQ = bean(RabbitMQ.class);
 
         BulkMessageProcessor<ActionLogMessage> actionProcessor = new BulkMessageProcessor<>(rabbitMQ, "action-log-queue", ActionLogMessage.class, 2000, actionManager::index);
         onStartup(actionProcessor::start);

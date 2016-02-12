@@ -99,6 +99,7 @@ public class DatabaseOperation {
     Optional<Long> insert(String sql, Object[] params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setQueryTimeout(queryTimeoutInSeconds);
             setParams(statement, params);
             statement.executeUpdate();
             return fetchGeneratedKey(statement);

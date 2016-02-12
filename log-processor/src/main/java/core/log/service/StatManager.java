@@ -36,7 +36,6 @@ public class StatManager {
 
     private StatDocument stat(StatMessage message) {
         StatDocument stat = new StatDocument();
-        stat.id = message.id;
         stat.date = message.date;
         stat.app = message.app;
         stat.serverIP = message.serverIP;
