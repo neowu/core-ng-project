@@ -6,8 +6,10 @@
 
 ## Change log
 
-### 4.1.4 (2/12/2016 - )
+### 4.1.4 (2/12/2016 - 2/15/2016)
 * cache: make cache process byte[] directly to redis
+* log: limit trace log 200k max per line, rise max log events per action to 10,000
+* json: add afterburner module for object binding performance
 
 ### 4.1.3 (2/11/2016)
 * db: lower default db timeout to 15s

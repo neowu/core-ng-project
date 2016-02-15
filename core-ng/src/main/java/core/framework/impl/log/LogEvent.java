@@ -47,7 +47,7 @@ final class LogEvent {
                 builder.append('[').append(marker.getName()).append("] ");
             }
 
-            builder.append(message());
+            builder.append(message(100000));    // limit 100K per event log
 
             builder.append(System.lineSeparator());
             if (exception != null)
@@ -58,12 +58,17 @@ final class LogEvent {
         return logMessage;
     }
 
-    String message() {
+    String message(int maxSize) {
+        String result;
         if (arguments == null) {
-            return message;
+            result = message;
         } else {
-            return Strings.format(message, arguments);
+            result = Strings.format(message, arguments);
         }
+        if (result.length() > maxSize) {
+            return result.substring(0, maxSize) + "...(truncated)";
+        }
+        return result;
     }
 
     String errorCode() {

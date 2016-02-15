@@ -18,7 +18,7 @@ import java.util.UUID;
  * @author neo
  */
 public final class ActionLog {
-    private static final int MAX_TRACE_HOLD_SIZE = 5000;
+    private static final int MAX_TRACE_HOLD_SIZE = 10000;
     public final String id = UUID.randomUUID().toString();
     final Instant startTime = Instant.now();
     final Map<String, String> context = Maps.newLinkedHashMap();
@@ -37,7 +37,7 @@ public final class ActionLog {
         if (event.level.value > result.value) {
             result = event.level;
             errorCode = event.errorCode(); // only update error type/message if level raised, so error type will be first WARN or first ERROR
-            errorMessage = event.message();
+            errorMessage = event.message(200);  // limit 200 chars in action log
         }
 
         if (events.size() < MAX_TRACE_HOLD_SIZE) {
@@ -46,7 +46,7 @@ public final class ActionLog {
     }
 
     void end() {
-        if (events.size() == MAX_TRACE_HOLD_SIZE) {
+        if (events.size() >= MAX_TRACE_HOLD_SIZE) {
             Marker marker = Markers.errorCode("TRACE_LOG_TOO_LONG");
             String message = "reached max holding size of trace log, please contact arch team";
             if (result.value < LogLevel.WARN.value) {       // not hide existing warn/error if there is already one

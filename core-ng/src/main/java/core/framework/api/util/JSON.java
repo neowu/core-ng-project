@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 import java.io.IOException;
@@ -17,11 +18,12 @@ import java.lang.reflect.Type;
  * @author neo
  */
 public final class JSON {
-    public static final ObjectMapper OBJECT_MAPPER = createMapper();
+    private static final ObjectMapper OBJECT_MAPPER = createMapper();
 
     private static ObjectMapper createMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new AfterburnerModule());
         mapper.setDateFormat(new ISO8601DateFormat());
         mapper.setAnnotationIntrospector(new JaxbAnnotationIntrospector(TypeFactory.defaultInstance()));
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

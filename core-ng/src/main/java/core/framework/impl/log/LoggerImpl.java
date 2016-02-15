@@ -40,6 +40,8 @@ final class LoggerImpl extends AbstractLogger {
 
     @Override
     void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
+        if (message == null) throw new Error("log message must not be null");
+
         if (level.value >= traceLevel.value) {
             LogEvent event = new LogEvent(logger, marker, level, message, arguments, exception);
             logManager.process(event);

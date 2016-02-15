@@ -34,11 +34,12 @@ public class LogProcessorApp extends App {
 
         RabbitMQ rabbitMQ = bean(RabbitMQ.class);
 
-        BulkMessageProcessor<ActionLogMessage> actionProcessor = new BulkMessageProcessor<>(rabbitMQ, "action-log-queue", ActionLogMessage.class, 2000, actionManager::index);
+        // our regular action logs are about 1.5M per 2000 messages
+        BulkMessageProcessor<ActionLogMessage> actionProcessor = new BulkMessageProcessor<>(rabbitMQ, "action-log-queue", ActionLogMessage.class, 6000, actionManager::index);
         onStartup(actionProcessor::start);
         onShutdown(actionProcessor::stop);
 
-        BulkMessageProcessor<StatMessage> statProcessor = new BulkMessageProcessor<>(rabbitMQ, "stat-queue", StatMessage.class, 2000, statManager::index);
+        BulkMessageProcessor<StatMessage> statProcessor = new BulkMessageProcessor<>(rabbitMQ, "stat-queue", StatMessage.class, 1000, statManager::index);
         onStartup(statProcessor::start);
         onShutdown(statProcessor::stop);
 
