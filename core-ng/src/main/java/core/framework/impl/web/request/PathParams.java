@@ -2,10 +2,10 @@ package core.framework.impl.web.request;
 
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.web.exception.BadRequestException;
+import core.framework.impl.json.JSONMapper;
 
 import java.util.Map;
 
@@ -46,7 +46,7 @@ public final class PathParams {
 
     private <T> T toEnum(String value, Class<T> valueClass) {
         try {
-            return JSON.fromJSONValue(valueClass, value);
+            return JSONMapper.fromJSONValue(valueClass, value);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(Strings.format("failed to parse value to enum, enumClass={}, value={}", valueClass.getCanonicalName(), value), BadRequestException.DEFAULT_ERROR_CODE, e);
         }

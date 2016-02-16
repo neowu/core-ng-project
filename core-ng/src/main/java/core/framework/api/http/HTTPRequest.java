@@ -1,7 +1,9 @@
 package core.framework.api.http;
 
+import core.framework.api.util.Charsets;
+import core.framework.impl.log.LogParam;
 import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +21,9 @@ public class HTTPRequest {
 
     final RequestBuilder builder;
     private final Logger logger = LoggerFactory.getLogger(HTTPRequest.class);
-    private final String uri;
-    private String body;
 
     public HTTPRequest(HTTPMethod method, String uri) {
         logger.debug("[request] method={}, uri={}", method, uri);
-        this.uri = uri;
         builder = RequestBuilder.create(method.name()).setUri(uri);
     }
 
@@ -44,19 +43,15 @@ public class HTTPRequest {
         return this;
     }
 
-    public HTTPRequest text(String body, ContentType contentType) {
-        logger.debug("[request] body={}, contentType={}", body, contentType);
-        this.body = body;
-        org.apache.http.entity.ContentType type = org.apache.http.entity.ContentType.create(contentType.mediaType(), contentType.charset().get());
-        builder.setEntity(new StringEntity(body, type));
+    public HTTPRequest body(String body, ContentType contentType) {
+        byte[] bytes = body.getBytes(contentType.charset != null ? contentType.charset : Charsets.UTF_8);
+        return body(bytes, contentType);
+    }
+
+    public HTTPRequest body(byte[] body, ContentType contentType) {
+        logger.debug("[request] contentType={}, body={}", contentType, LogParam.of(body));
+        org.apache.http.entity.ContentType type = org.apache.http.entity.ContentType.create(contentType.mediaType(), contentType.charset);
+        builder.setEntity(new ByteArrayEntity(body, type));
         return this;
-    }
-
-    public String uri() {
-        return uri;
-    }
-
-    public String body() {
-        return body;
     }
 }

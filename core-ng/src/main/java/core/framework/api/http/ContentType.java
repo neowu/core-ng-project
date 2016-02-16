@@ -40,9 +40,9 @@ public final class ContentType {
         return new ContentType(contentType, mediaType, charset);
     }
 
+    final Charset charset;
     private final String contentType;
     private final String mediaType;
-    private final Charset charset;
 
     private ContentType(String contentType, String mediaType, Charset charset) {
         this.contentType = contentType;

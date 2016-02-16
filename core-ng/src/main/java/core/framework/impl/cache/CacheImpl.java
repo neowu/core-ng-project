@@ -2,8 +2,9 @@ package core.framework.impl.cache;
 
 import core.framework.api.cache.Cache;
 import core.framework.api.util.Charsets;
-import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
+import core.framework.impl.json.JSONReader;
+import core.framework.impl.json.JSONWriter;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -21,12 +22,16 @@ public class CacheImpl<T> implements Cache<T> {
     public final Type valueType;
     public final Duration duration;
     private final CacheStore cacheStore;
+    private final JSONReader<T> reader;
+    private final JSONWriter<T> writer;
 
     public CacheImpl(String name, Type valueType, Duration duration, CacheStore cacheStore) {
         this.name = name;
         this.valueType = valueType;
         this.duration = duration;
         this.cacheStore = cacheStore;
+        reader = JSONReader.of(valueType);
+        writer = JSONWriter.of(valueType);
     }
 
     @Override
@@ -35,10 +40,10 @@ public class CacheImpl<T> implements Cache<T> {
         byte[] cacheValue = cacheStore.get(cacheKey);
         if (cacheValue == null) {
             T value = loader.apply(key);
-            cacheStore.put(cacheKey, JSON.toJSONBytes(value), duration);
+            cacheStore.put(cacheKey, writer.toJSON(value), duration);
             return value;
         }
-        return JSON.fromJSON(valueType, cacheValue);
+        return reader.fromJSON(cacheValue);
     }
 
     @Override
@@ -59,10 +64,10 @@ public class CacheImpl<T> implements Cache<T> {
             byte[] cacheValue = cacheValues.get(cacheKey);
             if (cacheValue == null) {
                 T value = loader.apply(key);
-                newValues.put(cacheKey, JSON.toJSONBytes(value));
+                newValues.put(cacheKey, writer.toJSON(value));
                 values.put(key, value);
             } else {
-                values.put(key, JSON.fromJSON(valueType, cacheValue));
+                values.put(key, reader.fromJSON(cacheValue));
             }
             index++;
         }
@@ -72,7 +77,7 @@ public class CacheImpl<T> implements Cache<T> {
 
     @Override
     public void put(String key, T value) {
-        cacheStore.put(cacheKey(key), JSON.toJSONBytes(value), duration);
+        cacheStore.put(cacheKey(key), writer.toJSON(value), duration);
     }
 
     @Override

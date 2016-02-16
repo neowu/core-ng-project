@@ -1,4 +1,4 @@
-import core.framework.api.util.JSONObjectReaderBenchmark;
+import core.framework.api.util.JSONBenchmark;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
@@ -11,7 +11,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public class Main {
     public static void main(String[] args) throws RunnerException {
         ChainedOptionsBuilder builder = new OptionsBuilder()
-            .include(JSONObjectReaderBenchmark.class.getSimpleName())
+            .include(JSONBenchmark.class.getSimpleName())
             .forks(1);
 
 //        builder.addProfiler(StackProfiler.class)

@@ -22,18 +22,18 @@ public class BeanBodyResponseHandlerTest {
     @Test
     public void validateList() {
         List<TestBean> list = Lists.newArrayList(new TestBean());
-        handler.validateBeanClass(list);
+        handler.validateBeanType(list);
     }
 
     @Test
     public void validateEmptyList() {
         List<TestBean> list = Lists.newArrayList();
-        handler.validateBeanClass(list);
+        handler.validateBeanType(list);
     }
 
     @Test
     public void validateBean() {
         TestBean bean = new TestBean();
-        handler.validateBeanClass(bean);
+        handler.validateBeanType(bean);
     }
 }

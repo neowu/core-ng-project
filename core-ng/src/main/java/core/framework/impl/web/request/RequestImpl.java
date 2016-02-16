@@ -11,6 +11,7 @@ import core.framework.api.web.MultipartFile;
 import core.framework.api.web.Request;
 import core.framework.api.web.Session;
 import core.framework.api.web.exception.BadRequestException;
+import core.framework.impl.json.JSONMapper;
 import core.framework.impl.web.BeanValidator;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
@@ -151,16 +152,14 @@ public final class RequestImpl implements Request {
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
             Map<String, String> params = Maps.newHashMap();
             exchange.getQueryParameters().forEach((name, values) -> params.put(name, values.element()));
-            byte[] formJSON = JSON.toJSONBytes(params);
-            return JSON.fromJSON(instanceType, formJSON);
+            return JSONMapper.fromMapValue(instanceType, params);
         } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
             if (formData != null) {
                 Map<String, String> form = Maps.newHashMap();
                 for (String name : formData) {
                     form.put(name, formData.getFirst(name).getValue());
                 }
-                byte[] formJSON = JSON.toJSONBytes(form);
-                return JSON.fromJSON(instanceType, formJSON);
+                return JSONMapper.fromMapValue(instanceType, form);
             } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
                 return JSON.fromJSON(instanceType, body);
             }

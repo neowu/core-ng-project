@@ -6,10 +6,10 @@ import core.framework.api.module.MessageHandlerConfig;
 import core.framework.api.queue.Message;
 import core.framework.api.queue.MessageHandler;
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Threads;
+import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.LogParam;
@@ -37,7 +37,7 @@ public class RabbitMQListener implements MessageHandlerConfig {
     private final LogManager logManager;
     private final MessageValidator validator;
     private final Map<String, MessageHandler> handlers = Maps.newHashMap();
-    private final Map<String, Class> messageClasses = Maps.newHashMap();
+    private final Map<String, JSONReader> readers = Maps.newHashMap();
     private int maxConcurrentHandlers = 10;
     private Semaphore semaphore;
 
@@ -70,7 +70,7 @@ public class RabbitMQListener implements MessageHandlerConfig {
 
         validator.register(messageClass);
         String messageType = messageClass.getDeclaredAnnotation(Message.class).name();
-        messageClasses.put(messageType, messageClass);
+        readers.put(messageType, JSONReader.of(messageClass));
         handlers.put(messageType, handler);
         return this;
     }
@@ -140,11 +140,11 @@ public class RabbitMQListener implements MessageHandlerConfig {
         }
 
         @SuppressWarnings("unchecked")
-        Class<T> messageClass = messageClasses.get(messageType);
-        if (messageClass == null) {
-            throw Exceptions.error("can not find message class, messageType={}", messageType);
+        JSONReader<T> reader = readers.get(messageType);
+        if (reader == null) {
+            throw Exceptions.error("unknown message type, messageType={}", messageType);
         }
-        T message = JSON.fromJSON(messageClass, body);
+        T message = reader.fromJSON(body);
         validator.validate(message);
 
         @SuppressWarnings("unchecked")

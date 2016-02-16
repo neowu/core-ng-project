@@ -10,8 +10,9 @@ import core.framework.api.search.Index;
 import core.framework.api.search.IndexRequest;
 import core.framework.api.search.SearchException;
 import core.framework.api.search.SearchRequest;
-import core.framework.api.util.JSON;
 import core.framework.api.util.StopWatch;
+import core.framework.impl.json.JSONReader;
+import core.framework.impl.json.JSONWriter;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -38,16 +39,18 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     private final String type;
     private final DocumentValidator<T> validator;
     private final long slowOperationThresholdInMs;
-    private final Class<T> documentClass;
+    private final JSONReader<T> reader;
+    private final JSONWriter<T> writer;
 
     ElasticSearchTypeImpl(Client client, Class<T> documentClass, Duration slowOperationThreshold) {
         this.client = client;
-        this.documentClass = documentClass;
         this.slowOperationThresholdInMs = slowOperationThreshold.toMillis();
         Index index = documentClass.getDeclaredAnnotation(Index.class);
         this.index = index.index();
         this.type = index.type();
         validator = new DocumentValidator<>(documentClass);
+        reader = JSONReader.of(documentClass);
+        writer = JSONWriter.of(documentClass);
     }
 
     @Override
@@ -84,7 +87,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         try {
             GetResponse response = client.prepareGet(index, type, request.id).get();
             if (!response.isExists()) return Optional.empty();
-            return Optional.of(JSON.fromJSON(documentClass, response.getSourceAsBytes()));
+            return Optional.of(reader.fromJSON(response.getSourceAsBytes()));
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -100,7 +103,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         validator.validate(request.source);
-        byte[] document = JSON.toJSONBytes(request.source);
+        byte[] document = writer.toJSON(request.source);
         try {
             client.prepareIndex(index, type, request.id)
                 .setSource(document)
@@ -124,7 +127,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             String id = entry.getKey();
             T source = entry.getValue();
             validator.validate(source);
-            byte[] document = JSON.toJSONBytes(source);
+            byte[] document = writer.toJSON(source);
             builder.add(client.prepareIndex(index, type, id)
                 .setSource(document));
         }

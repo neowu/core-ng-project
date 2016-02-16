@@ -1,8 +1,8 @@
 package core.log.queue;
 
-import core.framework.api.util.JSON;
 import core.framework.api.util.StopWatch;
 import core.framework.api.util.Threads;
+import core.framework.impl.json.JSONReader;
 import core.framework.impl.queue.RabbitMQ;
 import core.framework.impl.queue.RabbitMQImpl;
 import org.slf4j.Logger;
@@ -22,16 +22,16 @@ public class BulkMessageProcessor<T> {
     private final Logger logger = LoggerFactory.getLogger(BulkMessageProcessor.class);
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final String queue;
-    private final Class<T> messageClass;
     private final int bulkSize;
     private final Consumer<List<T>> consumer;
     private final Thread processThread;
+    private final JSONReader<T> reader;
 
     public BulkMessageProcessor(RabbitMQ rabbitMQ, String queue, Class<T> messageClass, int bulkSize, Consumer<List<T>> consumer) {
         this.queue = queue;
-        this.messageClass = messageClass;
         this.bulkSize = bulkSize;
         this.consumer = consumer;
+        reader = JSONReader.of(messageClass);
         processThread = new Thread(() -> {
             logger.info("message processor thread started, queue={}", queue);
             while (!stop.get()) {
@@ -68,7 +68,7 @@ public class BulkMessageProcessor<T> {
                 if (message != null) {
                     lastDeliveryTag = message.deliveryTag;
                     messageSize += message.body.length;
-                    messages.add(JSON.fromJSON(messageClass, message.body));
+                    messages.add(reader.fromJSON(message.body));
                 }
                 if (messages.size() >= bulkSize || messageSize >= 15000000 || (message == null && !messages.isEmpty())) {   // process every bulkSize or 15M or no more messages
                     consume(messages, messageSize);

@@ -3,11 +3,10 @@ package core.framework.impl.log;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ShutdownSignalException;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Network;
 import core.framework.api.util.Threads;
+import core.framework.impl.json.JSONWriter;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.framework.impl.log.queue.PerformanceStatMessage;
 import core.framework.impl.log.queue.StatMessage;
@@ -39,6 +38,8 @@ public final class LogForwarder {
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Thread logForwarderThread;
+    private final JSONWriter<ActionLogMessage> actionLogWriter = JSONWriter.of(ActionLogMessage.class);
+    private final JSONWriter<StatMessage> statWriter = JSONWriter.of(StatMessage.class);
     private int retryAttempts;
 
     public LogForwarder(String host, String appName) {
@@ -82,22 +83,18 @@ public final class LogForwarder {
         try {
             while (!stop.get()) {
                 Object message = queue.take();
-                String queueName = queueName(message);
-                channel.basicPublish("", queueName, properties, JSON.toJSONBytes(message));
+
+                if (message instanceof ActionLogMessage) {
+                    channel.basicPublish("", "action-log-queue", properties, actionLogWriter.toJSON((ActionLogMessage) message));
+                } else if (message instanceof StatMessage) {
+                    channel.basicPublish("", "stat-queue", properties, statWriter.toJSON((StatMessage) message));
+                }
+
                 retryAttempts = 0;  // reset retry attempts if one message sent successfully
             }
         } finally {
             closeChannel(channel);
         }
-    }
-
-    private String queueName(Object message) {
-        if (message instanceof ActionLogMessage) {
-            return "action-log-queue";
-        } else if (message instanceof StatMessage) {
-            return "stat-queue";
-        }
-        throw Exceptions.error("unexpected message, messageClass={}", message.getClass().getCanonicalName());
     }
 
     private void closeChannel(Channel channel) {

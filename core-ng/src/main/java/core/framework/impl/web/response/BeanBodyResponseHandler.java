@@ -1,9 +1,9 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.JSON;
 import core.framework.api.util.Types;
 import core.framework.api.web.ResponseImpl;
+import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.LogParam;
 import core.framework.impl.web.BeanValidator;
 import core.framework.impl.web.request.RequestImpl;
@@ -30,14 +30,14 @@ public class BeanBodyResponseHandler implements BodyHandler {
     @Override
     public void handle(ResponseImpl response, Sender sender, RequestImpl request) {
         Object bean = ((BeanBody) response.body).bean;
-        validateBeanClass(bean);
-        byte[] responseText = JSON.toJSONBytes(bean);
+        validateBeanType(bean);
+        byte[] responseText = JSONMapper.toJSON(bean);
         logger.debug("[response] body={}", LogParam.of(responseText));
         sender.send(ByteBuffer.wrap(responseText));
     }
 
     // to validate response bean, since it can not get declaration type from instance, try to construct original type as much as it can.
-    void validateBeanClass(Object bean) {
+    void validateBeanType(Object bean) {
         Type instanceType;
 
         if (bean instanceof List) {

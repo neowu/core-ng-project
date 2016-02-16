@@ -78,6 +78,7 @@ public final class ModuleContext {
         if (backgroundTask == null) {
             backgroundTask = new BackgroundTaskExecutor();
             if (!isTest()) {
+                startupHook.add(backgroundTask::start);
                 shutdownHook.add(backgroundTask::stop);
             }
         }

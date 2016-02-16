@@ -12,10 +12,10 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
-import core.framework.api.util.Types;
 import core.framework.api.validate.ValidationException;
 import core.framework.api.web.exception.RemoteServiceException;
 import core.framework.api.web.service.WebServiceRequestSigner;
+import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.BeanValidator;
@@ -80,7 +80,7 @@ public class WebServiceClient {
         } else if (param instanceof Integer) {
             return String.valueOf(param);
         } else {
-            return JSON.toJSONValue(param);
+            return JSONMapper.toJSONValue(param);
         }
     }
 
@@ -99,12 +99,12 @@ public class WebServiceClient {
         linkContext(request);
 
         if (requestBean != null) {
-            String json = JSON.toJSON(requestBean);
             if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-                Map<String, String> queryParams = JSON.fromJSON(Types.map(String.class, String.class), json);
+                Map<String, String> queryParams = JSONMapper.toMapValue(requestBean);
                 addQueryParams(request, queryParams);
             } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
-                request.text(json, ContentType.APPLICATION_JSON);
+                byte[] json = JSONMapper.toJSON(requestBean);
+                request.body(json, ContentType.APPLICATION_JSON);
             } else {
                 throw Exceptions.error("not supported method, method={}", method);
             }

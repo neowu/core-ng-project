@@ -5,7 +5,6 @@ import org.junit.Test;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlEnumValue;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,7 +12,6 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -44,19 +42,6 @@ public class JSONTest {
     }
 
     @Test
-    public void mapFieldWithBytes() {
-        BeanWithMapField bean = new BeanWithMapField();
-        bean.attributes.put("key1", "value1");
-        bean.attributes.put("key2", "value2");
-        byte[] json = JSON.toJSONBytes(bean);
-        assertArrayEquals(Strings.bytes("{\"attributes\":{\"key1\":\"value1\",\"key2\":\"value2\"}}"), json);
-
-        BeanWithMapField parsedBean = JSON.fromJSON(BeanWithMapField.class, json);
-        assertEquals("value1", parsedBean.attributes.get("key1"));
-        assertEquals("value2", parsedBean.attributes.get("key2"));
-    }
-
-    @Test
     public void dateField() {
         BeanWithDateField bean = new BeanWithDateField();
         bean.instant = Instant.now();
@@ -76,19 +61,6 @@ public class JSONTest {
         Bean bean = JSON.fromJSON(Bean.class, json);
 
         assertNull(bean);
-    }
-
-    @Test
-    public void enumValue() {
-        assertEquals(TestEnum.A, JSON.fromJSONValue(TestEnum.class, "A1"));
-        assertEquals("B1", JSON.toJSONValue(TestEnum.B));
-    }
-
-    enum TestEnum {
-        @XmlEnumValue("A1")
-        A,
-        @XmlEnumValue("B1")
-        B
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

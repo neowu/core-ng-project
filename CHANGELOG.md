@@ -5,6 +5,8 @@
 * check prod log, large trace, limit trace log size?
 
 ## Change log
+### 4.1.5 (2/16/2016)
+* tuning: internal tuning, move low level optimization class to impl package, leave core.framework.util simple ones
 
 ### 4.1.4 (2/12/2016 - 2/15/2016)
 * cache: make cache process byte[] directly to redis

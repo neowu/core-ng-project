@@ -18,7 +18,7 @@ import java.lang.reflect.Type;
  * @author neo
  */
 public final class JSON {
-    private static final ObjectMapper OBJECT_MAPPER = createMapper();
+    public static final ObjectMapper OBJECT_MAPPER = createMapper();
 
     private static ObjectMapper createMapper() {
         ObjectMapper mapper = new ObjectMapper();
@@ -40,24 +40,7 @@ public final class JSON {
         }
     }
 
-    public static <T> T fromJSON(Type instanceType, byte[] json) {
-        try {
-            JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructType(instanceType);
-            return OBJECT_MAPPER.readValue(json, javaType);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     public static <T> T fromJSON(Class<T> instanceType, String json) {
-        try {
-            return OBJECT_MAPPER.readValue(json, instanceType);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    public static <T> T fromJSON(Class<T> instanceType, byte[] json) {
         try {
             return OBJECT_MAPPER.readValue(json, instanceType);
         } catch (IOException e) {
@@ -71,22 +54,5 @@ public final class JSON {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-    }
-
-    public static byte[] toJSONBytes(Object instance) {
-        try {
-            return OBJECT_MAPPER.writeValueAsBytes(instance);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    // json type converter
-    public static <T> T fromJSONValue(Class<T> valueType, String jsonValue) {
-        return OBJECT_MAPPER.convertValue(jsonValue, valueType);
-    }
-
-    public static String toJSONValue(Object value) {
-        return OBJECT_MAPPER.convertValue(value, String.class);
     }
 }
