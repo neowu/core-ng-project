@@ -2,6 +2,7 @@ package core.framework.impl.log;
 
 import core.framework.api.util.Charsets;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -9,7 +10,11 @@ import java.util.Map;
  */
 public class LogParam {  // used to hold bytes in log message, only eval on flush, to save memory
     public static Object of(byte[] bytes) {
-        return new StringParam(bytes);
+        return of(bytes, null);
+    }
+
+    public static Object of(byte[] bytes, Charset charset) {
+        return new StringParam(bytes, charset);
     }
 
     public static Object of(Map<?, ?> map) {
@@ -18,15 +23,17 @@ public class LogParam {  // used to hold bytes in log message, only eval on flus
 
     private static class StringParam {
         private final byte[] bytes;
+        private final Charset charset;
 
-        StringParam(byte[] bytes) {
+        StringParam(byte[] bytes, Charset charset) {
             this.bytes = bytes;
+            this.charset = charset;
         }
 
         @Override
         public String toString() {
             if (bytes == null) return null;
-            return new String(bytes, Charsets.UTF_8);
+            return new String(bytes, charset != null ? charset : Charsets.UTF_8);
         }
     }
 

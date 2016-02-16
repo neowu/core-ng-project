@@ -9,7 +9,6 @@ import core.framework.api.http.HTTPResponse;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.validate.ValidationException;
@@ -119,7 +118,7 @@ public class WebServiceClient {
         validateResponse(response);
 
         if (void.class != responseType) {
-            return JSON.fromJSON(responseType, response.text());
+            return JSONMapper.fromJSON(responseType, response.body());
         } else {
             return null;
         }
@@ -146,9 +145,9 @@ public class WebServiceClient {
     private void validateResponse(HTTPResponse response) {
         HTTPStatus status = response.status();
         if (status.code >= HTTPStatus.OK.code && status.code <= 300) return;
-        String responseText = response.text();
+        byte[] responseBody = response.body();
         try {
-            ErrorResponse error = JSON.fromJSON(ErrorResponse.class, responseText);
+            ErrorResponse error = JSONMapper.fromJSON(ErrorResponse.class, responseBody);
             logger.debug("failed to call remote service, id={}, errorCode={}, remoteStackTrace={}", error.id, error.errorCode, error.stackTrace);
             RemoteServiceException exception = new RemoteServiceException(error.message, status, error.errorCode);
             exception.id = error.id;
@@ -156,6 +155,7 @@ public class WebServiceClient {
         } catch (RemoteServiceException e) {
             throw e;
         } catch (Exception e) {
+            String responseText = response.text();
             logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, responseText, e);
             throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), status, "REMOTE_ERROR", e);
         }

@@ -2,9 +2,10 @@ package core.framework.api.http;
 
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
-import core.framework.api.util.ByteBuf;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
+import core.framework.impl.io.ByteStreams;
+import core.framework.impl.log.LogParam;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -62,7 +63,7 @@ public final class HTTPClient {
             }
 
             HttpEntity entity = httpResponse.getEntity();
-            ByteBuf body = responseBody(entity);
+            byte[] body = responseBody(entity);
             HTTPResponse response = new HTTPResponse(HTTPStatus.parse(statusCode), headers, body);
             logResponseText(response);
             return response;
@@ -78,15 +79,17 @@ public final class HTTPClient {
         }
     }
 
-    ByteBuf responseBody(HttpEntity entity) throws IOException {
-        if (entity == null) return ByteBuf.newBufferWithExpectedLength(0);  // for HEAD request, 204/304/205, http client will not create entity
+    byte[] responseBody(HttpEntity entity) throws IOException {
+        if (entity == null) return new byte[0];  // for HEAD request, 204/304/205, http client will not create entity
 
-        int length = (int) entity.getContentLength();
-        ByteBuf buffer = length >= 0 ? ByteBuf.newBufferWithExpectedLength(length) : ByteBuf.newBuffer(4096);
         try (InputStream stream = entity.getContent()) {
-            buffer.put(stream);
+            int length = (int) entity.getContentLength();
+            if (length >= 0) {
+                return ByteStreams.readWithExpectedLength(stream, length);
+            } else {
+                return ByteStreams.read(stream, 4096);
+            }
         }
-        return buffer;
     }
 
     private void logResponseText(HTTPResponse response) {
@@ -94,6 +97,6 @@ public final class HTTPClient {
         if (!contentType.isPresent()) return;
         String mediaType = contentType.get().mediaType();
         if (mediaType.contains("text") || mediaType.contains("json"))
-            logger.debug("[response] body={}", response.text());
+            logger.debug("[response] body={}", LogParam.of(response.body(), contentType.get().charset));
     }
 }

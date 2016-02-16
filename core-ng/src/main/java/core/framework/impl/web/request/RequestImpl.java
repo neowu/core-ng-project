@@ -4,7 +4,6 @@ import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.web.CookieSpec;
 import core.framework.api.web.MultipartFile;
@@ -39,7 +38,7 @@ public final class RequestImpl implements Request {
     String requestURL;
     ContentType contentType;
     FormData formData;
-    String body;
+    byte[] body;
 
     public RequestImpl(HttpServerExchange exchange, BeanValidator validator) {
         this.exchange = exchange;
@@ -161,7 +160,7 @@ public final class RequestImpl implements Request {
                 }
                 return JSONMapper.fromMapValue(instanceType, form);
             } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
-                return JSON.fromJSON(instanceType, body);
+                return JSONMapper.fromJSON(instanceType, body);
             }
             throw new BadRequestException("body is missing or unsupported content type, method=" + method + ", contentType=" + contentType);
         } else {

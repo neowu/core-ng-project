@@ -1,5 +1,7 @@
 package core.framework.api.util;
 
+import core.framework.impl.io.ByteStreams;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -32,9 +34,7 @@ public final class ClasspathResources {
             throw Exceptions.error("unexpected length of classpath resource, path={}, length={}", path, length);
 
         try (InputStream stream = connection.getInputStream()) {
-            ByteBuf buffer = ByteBuf.newBufferWithExpectedLength(length);
-            buffer.put(stream);
-            return buffer.bytes();
+            return ByteStreams.readWithExpectedLength(stream, length);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

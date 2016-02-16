@@ -2,10 +2,10 @@ package core.framework.impl.web.request;
 
 import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.Charsets;
 import core.framework.api.util.Files;
 import core.framework.api.util.Strings;
 import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogParam;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
@@ -72,8 +72,8 @@ public final class RequestParser {
             if (request.contentType == null) return;    // pass if post empty body without content type
 
             if (ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())) {
-                request.body = body.body().text(request.contentType.charset().orElse(Charsets.UTF_8));
-                logger.debug("[request] body={}", request.body);
+                request.body = body.body();
+                logger.debug("[request] body={}", LogParam.of(request.body));
             } else {
                 logger.warn("unsupported body, contentType={}", request.contentType);
             }

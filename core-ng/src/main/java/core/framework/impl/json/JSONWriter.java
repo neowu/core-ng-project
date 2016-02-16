@@ -3,7 +3,6 @@ package core.framework.impl.json;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import core.framework.api.util.JSON;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -16,7 +15,7 @@ import java.lang.reflect.Type;
  */
 public final class JSONWriter<T> {
     public static <T> JSONWriter<T> of(Type instanceType) {
-        ObjectMapper objectMapper = JSON.OBJECT_MAPPER;
+        ObjectMapper objectMapper = JSONMapper.OBJECT_MAPPER;
         JavaType type = objectMapper.getTypeFactory().constructType(instanceType);
         return new JSONWriter<>(objectMapper.writerFor(type));
     }

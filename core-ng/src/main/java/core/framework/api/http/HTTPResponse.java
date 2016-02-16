@@ -1,6 +1,5 @@
 package core.framework.api.http;
 
-import core.framework.api.util.ByteBuf;
 import core.framework.api.util.Charsets;
 
 import java.nio.charset.Charset;
@@ -13,11 +12,10 @@ import java.util.Optional;
 public final class HTTPResponse {
     private final HTTPStatus status;
     private final Map<String, String> headers;
-    private final ByteBuf body;
+    private final byte[] body;
     private final ContentType contentType;
-    private String text;
 
-    public HTTPResponse(HTTPStatus status, Map<String, String> headers, ByteBuf body) {
+    public HTTPResponse(HTTPStatus status, Map<String, String> headers, byte[] body) {
         this.status = status;
         this.headers = headers;
         this.body = body;
@@ -43,12 +41,10 @@ public final class HTTPResponse {
     }
 
     public String text() {
-        if (text == null)
-            text = body.text(charset());    // cache text string if created
-        return text;
+        return new String(body, charset());
     }
 
-    public ByteBuf body() {
+    public byte[] body() {
         return body;
     }
 

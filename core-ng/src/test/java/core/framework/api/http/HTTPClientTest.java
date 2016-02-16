@@ -1,6 +1,6 @@
 package core.framework.api.http;
 
-import core.framework.api.util.ByteBuf;
+import core.framework.api.util.Charsets;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,8 +21,8 @@ public class HTTPClientTest {
 
     @Test
     public void responseBodyWithNoContent() throws IOException {
-        ByteBuf body = httpClient.responseBody(null);   // apache http client return null for HEAD/204/205/304
+        byte[] body = httpClient.responseBody(null);   // apache http client return null for HEAD/204/205/304
 
-        assertEquals("", body.text());
+        assertEquals("", new String(body, Charsets.UTF_8));
     }
 }
