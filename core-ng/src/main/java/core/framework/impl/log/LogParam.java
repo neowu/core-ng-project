@@ -8,36 +8,45 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class LogParam {  // used to hold bytes in log message, only eval on flush, to save memory
+public final class LogParam {  // used to hold bytes in log message, only eval on flush, to save memory
+    private static final int MAX_LONG_STRING_SIZE = 50 * 1000; // limit long string to 50k
+
     public static Object of(byte[] bytes) {
-        return of(bytes, null);
+        return of(bytes, Charsets.UTF_8);
     }
 
     public static Object of(byte[] bytes, Charset charset) {
-        return new StringParam(bytes, charset);
+        return new StringParam(bytes, charset, MAX_LONG_STRING_SIZE);
     }
 
     public static Object of(Map<?, ?> map) {
         return new MapParam(map);
     }
 
-    private static class StringParam {
+    static class StringParam {
         private final byte[] bytes;
         private final Charset charset;
+        private final int maxSize;
 
-        StringParam(byte[] bytes, Charset charset) {
+        StringParam(byte[] bytes, Charset charset, int maxSize) {
             this.bytes = bytes;
             this.charset = charset;
+            this.maxSize = maxSize;
         }
 
         @Override
         public String toString() {
             if (bytes == null) return null;
-            return new String(bytes, charset != null ? charset : Charsets.UTF_8);
+            if (bytes.length <= maxSize) return new String(bytes, charset);
+            StringBuilder builder = new StringBuilder(maxSize + 10);
+            String value = new String(bytes, 0, maxSize, charset);
+            builder.append(value, 0, value.length() - 1);   // remove the last incomplete char, in utf8, one char takes 1 to 3 bytes
+            builder.append("...(truncated)");
+            return builder.toString();
         }
     }
 
-    private static class MapParam {
+    static class MapParam {
         private final Map<?, ?> map;
 
         MapParam(Map<?, ?> map) {

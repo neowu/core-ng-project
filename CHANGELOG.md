@@ -1,12 +1,14 @@
 ## TODO
+* make http session https only
 * think about /test//b, and /:path(*)
 * refactory rabbitmq binding, unify
-* check prod log, large trace, limit trace log size?
+* framework error, queue listener, background task error notification?
 
 ## Change log
 ### 4.1.5 (2/16/2016)
 * tuning: internal tuning, move low level optimization class to impl package, leave core.framework.util simple ones
 * httpclient: use byte[] as body, remove ByteBuf
+* log: use 500k as max trace log to forward to log processor, removed max trace event size limit, truncate after 5000 and only add warning events
 
 ### 4.1.4 (2/12/2016 - 2/15/2016)
 * cache: make cache process byte[] directly to redis

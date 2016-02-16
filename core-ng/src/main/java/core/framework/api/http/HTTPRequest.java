@@ -44,13 +44,13 @@ public class HTTPRequest {
     }
 
     public HTTPRequest body(String body, ContentType contentType) {
-        byte[] bytes = body.getBytes(contentType.charset != null ? contentType.charset : Charsets.UTF_8);
+        byte[] bytes = body.getBytes(contentType.charset().orElse(Charsets.UTF_8));
         return body(bytes, contentType);
     }
 
     public HTTPRequest body(byte[] body, ContentType contentType) {
         logger.debug("[request] contentType={}, body={}", contentType, LogParam.of(body));
-        org.apache.http.entity.ContentType type = org.apache.http.entity.ContentType.create(contentType.mediaType(), contentType.charset);
+        org.apache.http.entity.ContentType type = org.apache.http.entity.ContentType.create(contentType.mediaType(), contentType.charset().orElse(null));
         builder.setEntity(new ByteArrayEntity(body, type));
         return this;
     }

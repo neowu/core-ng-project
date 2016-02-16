@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
  */
 final class LogEvent {
     final LogLevel level;
+    private final String thread;
     private final String logger;
     private final Marker marker;
     private final long time = System.currentTimeMillis();
@@ -29,14 +30,15 @@ final class LogEvent {
         this.message = message;
         this.arguments = arguments;
         this.exception = exception;
+        thread = Thread.currentThread().getName();
     }
 
     String logMessage() {
         if (logMessage == null) {
-            StringBuilder builder = new StringBuilder(64);
+            StringBuilder builder = new StringBuilder(256);
             builder.append(DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(time)))
                 .append(" [")
-                .append(Thread.currentThread().getName())
+                .append(thread)
                 .append("] ")
                 .append(level.name())
                 .append(' ')
@@ -47,7 +49,7 @@ final class LogEvent {
                 builder.append('[').append(marker.getName()).append("] ");
             }
 
-            builder.append(message(100000));    // limit 100K per event log
+            builder.append(message());
 
             builder.append(System.lineSeparator());
             if (exception != null)
@@ -58,17 +60,12 @@ final class LogEvent {
         return logMessage;
     }
 
-    String message(int maxSize) {
-        String result;
+    String message() {
         if (arguments == null) {
-            result = message;
+            return message;
         } else {
-            result = Strings.format(message, arguments);
+            return Strings.format(message, arguments);
         }
-        if (result.length() > maxSize) {
-            return result.substring(0, maxSize) + "...(truncated)";
-        }
-        return result;
     }
 
     String errorCode() {

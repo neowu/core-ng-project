@@ -70,7 +70,7 @@ public class BulkMessageProcessor<T> {
                     messageSize += message.body.length;
                     messages.add(reader.fromJSON(message.body));
                 }
-                if (messages.size() >= bulkSize || messageSize >= 15000000 || (message == null && !messages.isEmpty())) {   // process every bulkSize or 15M or no more messages
+                if (messages.size() >= bulkSize || messageSize >= 10000000 || (message == null && !messages.isEmpty())) {   // process every bulkSize or 10M or no more messages
                     consume(messages, messageSize);
                     messages = new LinkedList<>();
                     messageSize = 0;

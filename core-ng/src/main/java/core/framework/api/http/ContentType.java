@@ -40,7 +40,7 @@ public final class ContentType {
         return new ContentType(contentType, mediaType, charset);
     }
 
-    final Charset charset;
+    private final Charset charset;
     private final String contentType;
     private final String mediaType;
 

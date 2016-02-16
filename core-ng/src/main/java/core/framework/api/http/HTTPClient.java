@@ -2,6 +2,7 @@ package core.framework.api.http;
 
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
+import core.framework.api.util.Charsets;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.io.ByteStreams;
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author neo
@@ -93,10 +93,10 @@ public final class HTTPClient {
     }
 
     private void logResponseText(HTTPResponse response) {
-        Optional<ContentType> contentType = response.contentType();
-        if (!contentType.isPresent()) return;
-        String mediaType = contentType.get().mediaType();
+        ContentType contentType = response.contentType;
+        if (contentType == null) return;
+        String mediaType = contentType.mediaType();
         if (mediaType.contains("text") || mediaType.contains("json"))
-            logger.debug("[response] body={}", LogParam.of(response.body(), contentType.get().charset));
+            logger.debug("[response] body={}", LogParam.of(response.body(), contentType.charset().orElse(Charsets.UTF_8)));
     }
 }

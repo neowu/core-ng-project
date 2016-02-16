@@ -8,9 +8,9 @@ import org.junit.Test;
  */
 public class LogEventTest {
     @Test
-    public void truncateMessage() {
-        LogEvent event = new LogEvent(null, null, null, "long-message-{}{}{}{}{}", new Object[]{1, 2, 3, 4, 5}, null);
-        String message = event.message(15);
-        Assert.assertEquals("long-message-12...(truncated)", message);
+    public void message() {
+        LogEvent event = new LogEvent(null, null, null, "message-{}", new Object[]{1}, null);
+        String message = event.message();
+        Assert.assertEquals("message-1", message);
     }
 }
