@@ -129,16 +129,9 @@ public final class LogForwarder {
         });
         message.performanceStats = performanceStats;
         if (log.flushTraceLog()) {
-            StringBuilder builder = new StringBuilder(log.events.size() * 64);
+            StringBuilder builder = new StringBuilder(log.events.size() << 8);  // length * 256 as rough initial capacity
             for (LogEvent event : log.events) {
-                String trace = event.logMessage();
-                if (trace.length() + builder.length() <= 500000) {
-                    builder.append(trace);
-                } else {    // limit the trace log size send to log processor to 500k, check before append is to for huge single event log case
-                    builder.append(trace, 0, 500000 - builder.length());
-                    builder.append("...(truncated)\n");
-                    break;
-                }
+                builder.append(event.logMessage());
             }
             message.traceLog = builder.toString();
         }

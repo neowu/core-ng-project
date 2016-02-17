@@ -63,8 +63,7 @@ public class HTTPServerHandler implements HttpHandler {
             String client = headers.getFirst(HTTPServerHandler.HEADER_CLIENT);
             if (client != null) actionLog.context("client", client);
 
-            String refId = headers.getFirst(HTTPServerHandler.HEADER_REF_ID);
-            if (refId != null) actionLog.refId(refId);
+            actionLog.refId(headers.getFirst(HTTPServerHandler.HEADER_REF_ID));
 
             ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams, actionLog);
             actionLog.action(controller.action);

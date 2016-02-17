@@ -3,9 +3,9 @@ package core.framework.api.http;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
 import core.framework.api.util.Charsets;
+import core.framework.api.util.InputStreams;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
-import core.framework.impl.io.ByteStreams;
 import core.framework.impl.log.LogParam;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -85,9 +85,9 @@ public final class HTTPClient {
         try (InputStream stream = entity.getContent()) {
             int length = (int) entity.getContentLength();
             if (length >= 0) {
-                return ByteStreams.readWithExpectedLength(stream, length);
+                return InputStreams.bytesWithExpectedLength(stream, length);
             } else {
-                return ByteStreams.read(stream, 4096);
+                return InputStreams.bytes(stream, 4096);
             }
         }
     }

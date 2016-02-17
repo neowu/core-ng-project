@@ -142,7 +142,7 @@ public final class RequestParser {
         }
 
         String queryString = exchange.getQueryString();
-        if (queryString != null) builder.append('?').append(queryString);
+        if (!Strings.isEmpty(queryString)) builder.append('?').append(queryString);
 
         return builder.toString();
     }

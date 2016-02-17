@@ -45,15 +45,15 @@ public class JSONBenchmark {
         JSONMapper.toJSON(object);
     }
 
-//    @Benchmark
-//    public void toJSONString() {
-//        JSON.toJSON(object);
-//    }
+    @Benchmark
+    public void toJSONString() {
+        JSON.toJSON(object);
+    }
 
-//    @Benchmark
-//    public void fromJSONString() {
-//        JSON.fromJSON(UpdateProductRequest.class, json);
-//    }
+    @Benchmark
+    public void fromJSONString() {
+        JSON.fromJSON(UpdateProductRequest.class, json);
+    }
 
     @Benchmark
     public void fromJSONBytes() {

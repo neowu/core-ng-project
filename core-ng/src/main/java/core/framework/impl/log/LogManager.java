@@ -13,31 +13,23 @@ public final class LogManager {
     public final String appName;
 
     private final ThreadLocal<ActionLog> actionLog = new ThreadLocal<>();
-
+    private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.DEBUG);
     public ActionLogger actionLogger;
     public TraceLogger traceLogger;
     public LogForwarder logForwarder;
-    Logger logger;
 
     public LogManager() {
         this.appName = System.getProperty("core.appName");
     }
 
     public void begin(String message) {
-        ActionLog actionLog = new ActionLog();
-        this.actionLog.set(actionLog);
-
-        logger.debug(message);
-        logger.debug("[context] id={}", actionLog.id);
+        this.actionLog.set(new ActionLog(message));
     }
 
     public void end(String message) {
-        logger.debug(message);
-
         ActionLog actionLog = currentActionLog();
         this.actionLog.remove();
-
-        actionLog.end();
+        actionLog.end(message);
 
         if (actionLogger != null) actionLogger.write(actionLog);
         if (traceLogger != null) traceLogger.write(actionLog);

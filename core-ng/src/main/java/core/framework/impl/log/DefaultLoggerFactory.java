@@ -10,13 +10,8 @@ import java.util.Map;
  * @author neo
  */
 public final class DefaultLoggerFactory implements ILoggerFactory {
-    public final LogManager logManager;
+    public final LogManager logManager = new LogManager();
     private final Map<String, Logger> loggers = Maps.newConcurrentHashMap();
-
-    public DefaultLoggerFactory() {
-        logManager = new LogManager();
-        logManager.logger = getLogger(LogManager.class.getName());  // create logger requires logManager, so this is to create logManager first then assign logger
-    }
 
     @Override
     public Logger getLogger(String name) {

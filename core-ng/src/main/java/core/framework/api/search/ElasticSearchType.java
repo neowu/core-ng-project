@@ -1,7 +1,5 @@
 package core.framework.api.search;
 
-import org.elasticsearch.action.search.SearchResponse;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -9,7 +7,7 @@ import java.util.Optional;
  * @author neo
  */
 public interface ElasticSearchType<T> {
-    SearchResponse search(SearchRequest request);
+    SearchResponse<T> search(SearchRequest request);
 
     Optional<T> get(GetRequest request);
 

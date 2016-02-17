@@ -85,7 +85,7 @@ public final class Encodings {
                 buffer[position] = (byte) ((u << 4) + l);
                 index += 2;
             } else {
-                buffer[position] = (byte) ch;
+                buffer[position] = (byte) ch;   // here assume value is valid uri encoded string, if it contains multi-bytes (which should be encoded), here will not give right result
             }
             position++;
         }

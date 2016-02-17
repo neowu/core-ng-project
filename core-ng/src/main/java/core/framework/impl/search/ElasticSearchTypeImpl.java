@@ -10,6 +10,7 @@ import core.framework.api.search.Index;
 import core.framework.api.search.IndexRequest;
 import core.framework.api.search.SearchException;
 import core.framework.api.search.SearchRequest;
+import core.framework.api.search.SearchResponse;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.json.JSONWriter;
@@ -19,12 +20,15 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.Aggregation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,7 +58,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     }
 
     @Override
-    public SearchResponse search(SearchRequest request) {
+    public SearchResponse<T> search(SearchRequest request) {
         StopWatch watch = new StopWatch();
         long esTookTime = 0;
         String index = request.index == null ? this.index : request.index;
@@ -66,10 +70,10 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             if (request.skip != null) builder.setFrom(request.skip);
             if (request.limit != null) builder.setSize(request.limit);
             logger.debug("search, index={}, type={}, request={}", index, type, builder);
-            SearchResponse response = builder.get();
-            esTookTime = response.getTookInMillis();
-            if (response.getFailedShards() > 0) logger.warn("some shard failed, response={}", response);
-            return response;
+            org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
+            esTookTime = searchResponse.getTookInMillis();
+            if (searchResponse.getFailedShards() > 0) logger.warn("some shard failed, response={}", searchResponse);
+            return searchResponse(searchResponse);
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -78,6 +82,16 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             logger.debug("search, esTookTime={}, elapsedTime={}", esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
+    }
+
+    private SearchResponse<T> searchResponse(org.elasticsearch.action.search.SearchResponse response) {
+        SearchHit[] hits = response.getHits().hits();
+        List<T> items = new ArrayList<>(hits.length);
+        for (SearchHit hit : hits) {
+            items.add(reader.fromJSON(hit.source()));
+        }
+        Map<String, Aggregation> aggregations = response.getAggregations().asMap();
+        return new SearchResponse<>(items, response.getHits().totalHits(), aggregations);
     }
 
     @Override
