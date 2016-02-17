@@ -11,6 +11,7 @@ import core.framework.api.search.IndexRequest;
 import core.framework.api.search.SearchException;
 import core.framework.api.search.SearchRequest;
 import core.framework.api.search.SearchResponse;
+import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.json.JSONWriter;
@@ -23,6 +24,7 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.Aggregations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +92,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         for (SearchHit hit : hits) {
             items.add(reader.fromJSON(hit.source()));
         }
-        Map<String, Aggregation> aggregations = response.getAggregations().asMap();
+        Aggregations aggregationResponse = response.getAggregations();
+        Map<String, Aggregation> aggregations = aggregationResponse == null ? Maps.newHashMap() : aggregationResponse.asMap();
         return new SearchResponse<>(items, response.getHits().totalHits(), aggregations);
     }
 
