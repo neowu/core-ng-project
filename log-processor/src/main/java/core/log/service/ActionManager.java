@@ -2,6 +2,7 @@ package core.log.service;
 
 import core.framework.api.search.BulkIndexRequest;
 import core.framework.api.search.ElasticSearchType;
+import core.framework.api.search.IndexRequest;
 import core.framework.api.util.Maps;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.log.domain.ActionDocument;
@@ -27,26 +28,35 @@ public class ActionManager {
     }
 
     void index(List<ActionLogMessage> messages, LocalDate now) {
-        Map<String, ActionDocument> actions = Maps.newHashMapWithExpectedSize(messages.size());
-        Map<String, TraceDocument> traces = Maps.newHashMap();
-        for (ActionLogMessage message : messages) {
-            ActionDocument actionLog = action(message);
-            actions.put(actionLog.id, actionLog);
-            if (message.traceLog != null) {
-                traces.put(message.id, trace(message));
+        if (messages.size() <= 5) { // use single index in quiet time
+            for (ActionLogMessage message : messages) {
+                indexAction(action(message), now);
+                if (message.traceLog != null) {
+                    indexTrace(trace(message), now);
+                }
             }
-        }
-        indexActions(actions, now);
-        if (!traces.isEmpty()) {
-            indexTraces(traces, now);
+        } else {
+            Map<String, ActionDocument> actions = Maps.newHashMapWithExpectedSize(messages.size());
+            Map<String, TraceDocument> traces = Maps.newHashMap();
+            for (ActionLogMessage message : messages) {
+                actions.put(message.id, action(message));
+                if (message.traceLog != null) {
+                    traces.put(message.id, trace(message));
+                }
+            }
+            indexActions(actions, now);
+            if (!traces.isEmpty()) {
+                indexTraces(traces, now);
+            }
         }
     }
 
-    private void indexTraces(Map<String, TraceDocument> traces, LocalDate now) {
-        BulkIndexRequest<TraceDocument> request = new BulkIndexRequest<>();
-        request.index = IndexName.name("trace", now);
-        request.sources = traces;
-        traceType.bulkIndex(request);
+    private void indexAction(ActionDocument action, LocalDate now) {
+        IndexRequest<ActionDocument> request = new IndexRequest<>();
+        request.index = IndexName.name("action", now);
+        request.id = action.id;
+        request.source = action;
+        actionType.index(request);
     }
 
     private void indexActions(Map<String, ActionDocument> actions, LocalDate now) {
@@ -54,6 +64,21 @@ public class ActionManager {
         request.index = IndexName.name("action", now);
         request.sources = actions;
         actionType.bulkIndex(request);
+    }
+
+    private void indexTrace(TraceDocument trace, LocalDate now) {
+        IndexRequest<TraceDocument> request = new IndexRequest<>();
+        request.index = IndexName.name("trace", now);
+        request.id = trace.id;
+        request.source = trace;
+        traceType.index(request);
+    }
+
+    private void indexTraces(Map<String, TraceDocument> traces, LocalDate now) {
+        BulkIndexRequest<TraceDocument> request = new BulkIndexRequest<>();
+        request.index = IndexName.name("trace", now);
+        request.sources = traces;
+        traceType.bulkIndex(request);
     }
 
     private TraceDocument trace(ActionLogMessage message) {
