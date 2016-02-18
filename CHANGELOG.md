@@ -1,14 +1,15 @@
 ## TODO
-* make http session https only
 * think about /test//b, and /:path(*)
-* refactory rabbitmq binding, unify
 * framework error, queue listener, background task error notification?
 * search require JSONMapper.toJSONValue()
 
 ## Change log
+### 4.1.7 (2/17/2016 - 2/18/2016)
+* rabbitmq: unified single/batch message polling
+
 ### 4.1.6 (2/17/2016)
 * util: moved InputStreams to util, open to use
-* log: make max trace log 2000, and only append warn/error after
+* log: make max trace log 3000, and only append warn/error after
 * search: added SearchResponse<T> to convert hits to object on framework level
 
 ### 4.1.5 (2/16/2016)

@@ -1,16 +1,18 @@
 package core.log.queue;
 
+import com.rabbitmq.client.QueueingConsumer;
 import core.framework.api.util.StopWatch;
 import core.framework.api.util.Threads;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.queue.RabbitMQ;
-import core.framework.impl.queue.RabbitMQImpl;
+import core.framework.impl.queue.RabbitMQConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -35,7 +37,7 @@ public class BulkMessageProcessor<T> {
         processThread = new Thread(() -> {
             logger.info("message processor thread started, queue={}", queue);
             while (!stop.get()) {
-                try (RabbitMQConsumer queueConsumer = new RabbitMQConsumer(((RabbitMQImpl) rabbitMQ).createChannel(), queue, bulkSize * 2)) {    // prefetch twice as batch size
+                try (RabbitMQConsumer queueConsumer = rabbitMQ.consumer(queue, bulkSize * 2)) {
                     process(queueConsumer);
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
@@ -58,29 +60,22 @@ public class BulkMessageProcessor<T> {
     }
 
     private void process(RabbitMQConsumer consumer) throws IOException, InterruptedException {
-        List<T> messages = new LinkedList<>();
-        int messageSize = 0;
-        long lastDeliveryTag = 0;   // according to AMQP, acknowledge with deliveryTag=0 will acknowledge all outstanding messages
-
         while (!stop.get()) {
+            Deque<QueueingConsumer.Delivery> deliveries = consumer.nextDeliveries(bulkSize);
             try {
-                RabbitMQMessage message = consumer.poll();
-                if (message != null) {
-                    lastDeliveryTag = message.deliveryTag;
-                    messageSize += message.body.length;
-                    messages.add(reader.fromJSON(message.body));
+                int messageSize = 0;
+                List<T> messages = new ArrayList<>(deliveries.size());
+                for (QueueingConsumer.Delivery delivery : deliveries) {
+                    byte[] body = delivery.getBody();
+                    messages.add(reader.fromJSON(body));
+                    messageSize += body.length;
                 }
-                if (messages.size() >= bulkSize || messageSize >= 10000000 || (message == null && !messages.isEmpty())) {   // process every bulkSize or 10M or no more messages
-                    consume(messages, messageSize);
-                    messages = new LinkedList<>();
-                    messageSize = 0;
-                    consumer.acknowledgeAll(lastDeliveryTag);
-                }
-                if (message == null) {
-                    Thread.sleep(5000);
-                }
+                consume(messages, messageSize);
+                consumer.acknowledgeAll(deliveries.getLast().getEnvelope().getDeliveryTag());
             } catch (Throwable e) {
-                consumer.acknowledgeAll(lastDeliveryTag);   // clear message on error, otherwise MQ will not send new messages due to prefetch value
+                // clear message on error, otherwise MQ will not send new messages due to prefetch value,
+                // according to AMQP, acknowledge with deliveryTag=0 will acknowledge all outstanding messages
+                consumer.acknowledgeAll(0);
                 throw e;
             }
         }

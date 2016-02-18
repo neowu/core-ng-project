@@ -9,7 +9,7 @@ import java.util.Map;
  * @author neo
  */
 public final class LogParam {  // used to hold bytes in log message, only eval on flush, to save memory
-    private static final int MAX_LONG_STRING_SIZE = 50 * 1000; // limit long string to 50k
+    private static final int MAX_LONG_STRING_SIZE = 30000; // limit long string to 30k
 
     public static Object of(byte[] bytes) {
         return of(bytes, Charsets.UTF_8);

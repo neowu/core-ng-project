@@ -31,9 +31,9 @@ public class BeanBodyResponseHandler implements BodyHandler {
     public void handle(ResponseImpl response, Sender sender, RequestImpl request) {
         Object bean = ((BeanBody) response.body).bean;
         validateBeanType(bean);
-        byte[] responseText = JSONMapper.toJSON(bean);
-        logger.debug("[response] body={}", LogParam.of(responseText));
-        sender.send(ByteBuffer.wrap(responseText));
+        byte[] body = JSONMapper.toJSON(bean);
+        logger.debug("[response] body={}", LogParam.of(body));
+        sender.send(ByteBuffer.wrap(body));
     }
 
     // to validate response bean, since it can not get declaration type from instance, try to construct original type as much as it can.

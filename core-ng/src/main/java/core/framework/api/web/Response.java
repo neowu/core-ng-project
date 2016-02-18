@@ -3,11 +3,11 @@ package core.framework.api.web;
 import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPHeaders;
 import core.framework.api.http.HTTPStatus;
+import core.framework.api.util.Strings;
 import core.framework.impl.web.response.BeanBody;
 import core.framework.impl.web.response.ByteArrayBody;
 import core.framework.impl.web.response.FileBody;
 import core.framework.impl.web.response.TemplateBody;
-import core.framework.impl.web.response.TextBody;
 
 import java.io.File;
 
@@ -16,7 +16,7 @@ import java.io.File;
  */
 public interface Response {
     static Response text(String text, HTTPStatus status, ContentType contentType) {
-        return new ResponseImpl(new TextBody(text))
+        return new ResponseImpl(new ByteArrayBody(Strings.bytes(text), contentType))
             .contentType(contentType)
             .status(status);
     }
@@ -42,7 +42,7 @@ public interface Response {
     }
 
     static Response empty() {
-        return new ResponseImpl(new TextBody(""))
+        return new ResponseImpl(new ByteArrayBody(new byte[0], null))
             .status(HTTPStatus.NO_CONTENT);
     }
 
@@ -51,7 +51,7 @@ public interface Response {
     }
 
     static Response bytes(byte[] bytes, ContentType contentType) {
-        return new ResponseImpl(new ByteArrayBody(bytes))
+        return new ResponseImpl(new ByteArrayBody(bytes, contentType))
             .status(HTTPStatus.OK)
             .contentType(contentType);
     }
@@ -62,7 +62,7 @@ public interface Response {
     }
 
     static Response redirect(String url) {
-        return new ResponseImpl(new TextBody(""))
+        return new ResponseImpl(new ByteArrayBody(new byte[0], null))
             .header(HTTPHeaders.LOCATION, url)
             .status(HTTPStatus.SEE_OTHER);
     }
@@ -74,7 +74,7 @@ public interface Response {
             && redirectStatus != HTTPStatus.TEMPORARY_REDIRECT)
             throw new Error("redirect status is not valid, status=" + redirectStatus);
 
-        return new ResponseImpl(new TextBody(""))
+        return new ResponseImpl(new ByteArrayBody(new byte[0], null))
             .header(HTTPHeaders.LOCATION, url)
             .status(redirectStatus);
     }

@@ -20,6 +20,7 @@ It's still working in progress, so all API is subjected to change. keep in mind
 * db: batch insert/update auto convert to small batch like 3000?
 * template security check, escaping and etc
 * db: support mysql insert on duplicated key (benchmark speed vs select + insert or update)?
+* http: make http session https only?
 
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)

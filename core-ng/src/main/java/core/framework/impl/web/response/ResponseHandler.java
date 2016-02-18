@@ -28,7 +28,6 @@ public class ResponseHandler {
 
     public ResponseHandler(BeanValidator validator, TemplateManager templateManager) {
         handlers.put(BeanBody.class, new BeanBodyResponseHandler(validator));
-        handlers.put(TextBody.class, new TextBodyResponseHandler());
         handlers.put(TemplateBody.class, new TemplateBodyResponseHandler(templateManager));
         handlers.put(ByteArrayBody.class, new ByteArrayBodyResponseHandler());
         handlers.put(FileBody.class, new FileBodyResponseHandler());
