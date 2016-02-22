@@ -62,7 +62,7 @@ public final class ActionLog {
 
     private String errorMessage(LogEvent event) {
         String message = event.message();
-        if (message.length() > 200)
+        if (message != null && message.length() > 200)
             return message.substring(0, 200);    // limit 200 chars in action log
         return message;
     }

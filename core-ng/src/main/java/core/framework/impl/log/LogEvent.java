@@ -62,7 +62,7 @@ final class LogEvent {
 
     String message() {
         if (arguments == null) {
-            return message;
+            return message;    // log message can be null, e.g. message of NPE
         } else {
             return Strings.format(message, arguments);
         }

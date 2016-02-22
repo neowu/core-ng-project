@@ -4,6 +4,9 @@
 * search require JSONMapper.toJSONValue()
 
 ## Change log
+### 4.1.8 (2/22/2016)
+* fix: allow logger to log null message, e.g. errorMessage of NullPointerException
+
 ### 4.1.7 (2/17/2016 - 2/18/2016)
 * rabbitmq: unified single/batch message polling
 
