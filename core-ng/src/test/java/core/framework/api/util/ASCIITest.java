@@ -31,7 +31,7 @@ public class ASCIITest {
     }
 
     @Test
-    public void upperCase() {
+    public void toUpperCase() {
         assertEquals("TEXT", ASCII.toUpperCase("text"));
         assertEquals("TEXT", ASCII.toUpperCase("tExt"));
         assertEquals("TEXT", ASCII.toUpperCase("TEXT"));
@@ -39,10 +39,30 @@ public class ASCIITest {
     }
 
     @Test
-    public void lowerCase() {
+    public void toLowerCase() {
         assertEquals("text", ASCII.toLowerCase("text"));
         assertEquals("text", ASCII.toLowerCase("tExt"));
         assertEquals("text", ASCII.toLowerCase("TEXT"));
         assertEquals("01239_-", ASCII.toLowerCase("01239_-"));
+    }
+
+    @Test
+    public void toUpperCaseChar() {
+        assertEquals('-', ASCII.toUpperCase('-'));
+        assertEquals('A', ASCII.toUpperCase('a'));
+        assertEquals('Z', ASCII.toUpperCase('z'));
+        assertEquals('0', ASCII.toUpperCase('0'));
+        assertEquals('9', ASCII.toUpperCase('9'));
+        assertEquals('A', ASCII.toUpperCase('A'));
+    }
+
+    @Test
+    public void toLowerCaseChar() {
+        assertEquals('-', ASCII.toLowerCase('-'));
+        assertEquals('a', ASCII.toLowerCase('A'));
+        assertEquals('z', ASCII.toLowerCase('Z'));
+        assertEquals('0', ASCII.toLowerCase('0'));
+        assertEquals('9', ASCII.toLowerCase('9'));
+        assertEquals('a', ASCII.toLowerCase('a'));
     }
 }

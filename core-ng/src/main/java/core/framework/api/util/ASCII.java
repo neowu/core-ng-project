@@ -42,6 +42,16 @@ public final class ASCII {
         return text;
     }
 
+    public static char toLowerCase(char ch) {
+        if (isUpperCase(ch)) return (char) (ch ^ 0x20);
+        return ch;
+    }
+
+    public static char toUpperCase(char ch) {
+        if (isLowerCase(ch)) return (char) (ch & 0x5F);
+        return ch;
+    }
+
     public static boolean isLowerCase(char ch) {
         return ch >= 'a' && ch <= 'z';
     }

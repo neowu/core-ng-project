@@ -35,9 +35,9 @@ public final class TraceLogger {
         return new TraceLogger(traceLogPath);
     }
 
-    private final PrintStream fallbackLogger = System.err;
-
+    private final PrintStream errorLogger = System.err;
     private final Path traceLogPath;
+    private boolean console;
 
     TraceLogger(Path traceLogPath) {
         this.traceLogPath = traceLogPath;
@@ -52,13 +52,22 @@ public final class TraceLogger {
                 String message = event.logMessage();
                 writer.write(message);
             }
-            if (traceLogPath == null) {
+        } catch (IOException e) {
+            errorLogger.println("failed to write trace log, error=" + Exceptions.stackTrace(e));
+        } finally {
+            close(writer);
+        }
+    }
+
+    private void close(Writer writer) {
+        try {
+            if (console) {
                 writer.flush();     // do not close System.err (when traceLogPath is null)
             } else {
                 writer.close();
             }
         } catch (IOException e) {
-            fallbackLogger.println("failed to write trace log, error=" + Exceptions.stackTrace(e));
+            errorLogger.println("failed to close writer, error=" + Exceptions.stackTrace(e));
         }
     }
 
@@ -66,15 +75,16 @@ public final class TraceLogger {
         if (traceLogPath != null) {
             try {
                 String logPath = traceLogFilePath(traceLogPath.toString(), LocalDateTime.ofInstant(log.startTime, ZoneId.systemDefault()), log.action, log.id);
-                log.context("logPath", logPath);
+                log.context.put("logPath", logPath);    // not log as event but add value to context, no need to see logPath in trace
                 Path path = Paths.get(logPath).toAbsolutePath();
                 createDir(path.getParent());
                 createFile(path);
                 return Files.newBufferedWriter(path, Charsets.UTF_8, StandardOpenOption.APPEND);
             } catch (IOException e) {
-                fallbackLogger.println("failed to create trace log file, error=" + Exceptions.stackTrace(e));
+                errorLogger.println("failed to create trace log file, error=" + Exceptions.stackTrace(e));
             }
         }
+        console = true;
         return new BufferedWriter(new OutputStreamWriter(System.err, Charsets.UTF_8));
     }
 

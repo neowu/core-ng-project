@@ -4,6 +4,10 @@
 * search require JSONMapper.toJSONValue()
 
 ## Change log
+### 4.1.9 (2/23/2016)
+* util: ASCII supports char
+* log: improve log error handling
+
 ### 4.1.8 (2/22/2016)
 * fix: allow logger to log null message, e.g. errorMessage of NullPointerException
 

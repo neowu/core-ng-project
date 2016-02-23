@@ -31,8 +31,8 @@ public final class LogManager {
         this.actionLog.remove();
         actionLog.end(message);
 
+        if (traceLogger != null) traceLogger.write(actionLog);  // trace log generate logPath context to action log, so make it process first
         if (actionLogger != null) actionLogger.write(actionLog);
-        if (traceLogger != null) traceLogger.write(actionLog);
         if (logForwarder != null) logForwarder.forwardLog(actionLog);
     }
 

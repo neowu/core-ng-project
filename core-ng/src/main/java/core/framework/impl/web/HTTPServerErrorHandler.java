@@ -58,8 +58,9 @@ public class HTTPServerErrorHandler {
             if (errorResponse == null) errorResponse = defaultErrorResponse(e, accept);
             responseHandler.handle((ResponseImpl) errorResponse, exchange, request);
         } catch (Throwable error) {
+            logger.error(error.getMessage(), e);
             if (exchange.isResponseStarted()) {
-                logger.error("response was sent, discard the current http transaction", error);
+                logger.error("failed to render error page, response was sent, discard the current http transaction");
                 return;
             }
             renderDefaultErrorPage(error, exchange);
