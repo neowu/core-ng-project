@@ -5,7 +5,6 @@ import org.junit.Test;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlEnumValue;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Map;
@@ -18,14 +17,8 @@ import static org.junit.Assert.assertNull;
  */
 public class JSONMapperTest {
     @Test
-    public void enumValue() {
-        assertEquals(TestEnum.A, JSONMapper.fromJSONValue(TestEnum.class, "A1"));
-        assertEquals("B1", JSONMapper.toJSONValue(TestEnum.B));
-    }
-
-    @Test
     public void map() {
-        TestMapBean bean = new TestMapBean();
+        TestBean bean = new TestBean();
         bean.stringField = "value";
         bean.dateTimeField = LocalDateTime.of(2016, Month.FEBRUARY, 15, 0, 0, 0);
         bean.numberField = 1;
@@ -35,22 +28,15 @@ public class JSONMapperTest {
         assertEquals("1", map.get("number_field"));
         assertNull(map.get("null_field"));
 
-        TestMapBean convertedBean = JSONMapper.fromMapValue(TestMapBean.class, map);
+        TestBean convertedBean = JSONMapper.fromMapValue(TestBean.class, map);
         assertEquals(bean.stringField, convertedBean.stringField);
         assertEquals(bean.dateTimeField, convertedBean.dateTimeField);
         assertEquals(bean.numberField, convertedBean.numberField);
         assertNull(convertedBean.nullField);
     }
 
-    enum TestEnum {
-        @XmlEnumValue("A1")
-        A,
-        @XmlEnumValue("B1")
-        B
-    }
-
     @XmlAccessorType(XmlAccessType.FIELD)
-    static class TestMapBean {
+    static class TestBean {
         @XmlElement(name = "string_field")
         public String stringField;
 

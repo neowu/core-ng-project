@@ -2,10 +2,10 @@ package core.framework.impl.web.request;
 
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.web.exception.BadRequestException;
-import core.framework.impl.json.JSONMapper;
 
 import java.util.Map;
 
@@ -39,14 +39,14 @@ public final class PathParams {
         } else if (Long.class.equals(valueClass)) {
             return (T) toLong(value);
         } else if (Enum.class.isAssignableFrom(valueClass)) {
-            return toEnum(value, valueClass);
+            return (T) toEnum(value, (Class<? extends Enum>) valueClass);
         }
-        throw Exceptions.error("not supported path param type, please contact arch team, type={}", valueClass);
+        throw Exceptions.error("not supported path param type, please contact arch team, type={}", valueClass.getCanonicalName());
     }
 
-    private <T> T toEnum(String value, Class<T> valueClass) {
+    private <T extends Enum> T toEnum(String value, Class<T> valueClass) {
         try {
-            return JSONMapper.fromJSONValue(valueClass, value);
+            return JSON.fromEnumValue(valueClass, value);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(Strings.format("failed to parse value to enum, enumClass={}, value={}", valueClass.getCanonicalName(), value), BadRequestException.DEFAULT_ERROR_CODE, e);
         }

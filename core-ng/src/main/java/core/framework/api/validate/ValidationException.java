@@ -14,7 +14,7 @@ public class ValidationException extends RuntimeException {
     public final Map<String, String> errors;
 
     public ValidationException(Map<String, String> errors) {
-        super(Strings.format("failed to validate, error={}", errors));
+        super(Strings.format("validation failed, error={}", errors));
         this.errors = errors;
     }
 }

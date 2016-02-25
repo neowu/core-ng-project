@@ -35,14 +35,6 @@ public final class JSONMapper {
         return mapper;
     }
 
-    public static <T> T fromJSONValue(Class<T> valueType, String jsonValue) {
-        return OBJECT_MAPPER.convertValue(jsonValue, valueType);
-    }
-
-    public static String toJSONValue(Object value) {
-        return OBJECT_MAPPER.convertValue(value, String.class);
-    }
-
     public static <T> T fromMapValue(Type instanceType, Map<String, String> map) {
         ObjectMapper objectMapper = OBJECT_MAPPER;
         JavaType type = objectMapper.getTypeFactory().constructType(instanceType);

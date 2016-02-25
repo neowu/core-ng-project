@@ -5,6 +5,7 @@ import org.junit.Test;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlEnumValue;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -61,6 +62,19 @@ public class JSONTest {
         Bean bean = JSON.fromJSON(Bean.class, json);
 
         assertNull(bean);
+    }
+
+    @Test
+    public void enumValue() {
+        assertEquals(TestEnum.A, JSON.fromEnumValue(TestEnum.class, "A1"));
+        assertEquals("B1", JSON.toEnumValue(TestEnum.B));
+    }
+
+    enum TestEnum {
+        @XmlEnumValue("A1")
+        A,
+        @XmlEnumValue("B1")
+        B
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

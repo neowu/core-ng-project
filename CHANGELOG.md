@@ -1,9 +1,12 @@
 ## TODO
 * think about /test//b, and /:path(*)
 * framework error, queue listener, background task error notification?
-* search require JSONMapper.toJSONValue()
 
 ## Change log
+### 4.2.0 (2/24/2016)
+* validation: update validation exception message
+* json: add from/to enum value to JSON, to support search query build with enum
+
 ### 4.1.9 (2/23/2016)
 * util: ASCII supports char
 * log: improve log error handling

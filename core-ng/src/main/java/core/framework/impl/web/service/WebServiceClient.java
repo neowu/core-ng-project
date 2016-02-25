@@ -9,6 +9,7 @@ import core.framework.api.http.HTTPResponse;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.validate.ValidationException;
@@ -69,17 +70,19 @@ public class WebServiceClient {
 
     private String pathParam(Map<String, Object> pathParams, String variable) {
         Object param = pathParams.get(variable);
-        if (param == null) throw new ValidationException(Maps.newHashMap(variable, Strings.format("path param must not null, name={}", variable)));
+        if (param == null) throw new ValidationException(Maps.newHashMap(variable, Strings.format("path param must not be null, name={}", variable)));
         // convert logic matches PathParams
         if (param instanceof String) {
             String paramValue = (String) param;
             if (Strings.isEmpty(paramValue))
                 throw new ValidationException(Maps.newHashMap(variable, Strings.format("path param must not be empty, name={}", variable)));
             return paramValue;
-        } else if (param instanceof Integer) {
+        } else if (param instanceof Number) {
             return String.valueOf(param);
+        } else if (param instanceof Enum) {
+            return JSON.toEnumValue((Enum) param);
         } else {
-            return JSONMapper.toJSONValue(param);
+            throw Exceptions.error("not supported path param type, please contact arch team, type={}", param.getClass().getCanonicalName());
         }
     }
 
