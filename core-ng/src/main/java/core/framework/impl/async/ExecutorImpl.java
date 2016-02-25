@@ -11,13 +11,15 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author neo
  */
 public final class ExecutorImpl implements Executor {
     private final Logger logger = LoggerFactory.getLogger(ExecutorImpl.class);
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ExecutorService executorService = Executors.newCachedThreadPool(new ExecutorThreadFactory());
     private final LogManager logManager;
 
     public ExecutorImpl(LogManager logManager) {
@@ -31,7 +33,12 @@ public final class ExecutorImpl implements Executor {
 
     @Override
     public <T> Batch<T> batch(String action) {
-        return new Batch<>(action, this);
+        return batch(action, Runtime.getRuntime().availableProcessors() * 4);
+    }
+
+    @Override
+    public <T> Batch<T> batch(String action, int maxConcurrentHandlers) {
+        return new Batch<>(action, maxConcurrentHandlers, this);
     }
 
     @Override
@@ -42,5 +49,14 @@ public final class ExecutorImpl implements Executor {
         String refId = parentActionLog != null ? parentActionLog.refId() : null;
         boolean trace = parentActionLog != null && parentActionLog.trace;
         return executorService.submit(new Task<>(task, logManager, childAction, refId, trace));
+    }
+
+    private static class ExecutorThreadFactory implements ThreadFactory {
+        private final AtomicInteger count = new AtomicInteger(1);
+
+        @Override
+        public Thread newThread(Runnable runnable) {
+            return new Thread(runnable, "executor-thread-" + count.getAndIncrement());
+        }
     }
 }

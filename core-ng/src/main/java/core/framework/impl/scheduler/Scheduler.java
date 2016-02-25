@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public final class Scheduler {
     public final Map<String, Trigger> triggers = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new SchedulerThreadFactory());
     private final Executor executor;
 
     public Scheduler(Executor executor) {
@@ -81,5 +82,12 @@ public final class Scheduler {
         Trigger trigger = triggers.get(name);
         if (trigger == null) throw new NotFoundException("job not found, name=" + name);
         submitJob(trigger.name(), trigger);
+    }
+
+    private static class SchedulerThreadFactory implements ThreadFactory {
+        @Override
+        public Thread newThread(Runnable runnable) {
+            return new Thread(runnable, "scheduler");
+        }
     }
 }

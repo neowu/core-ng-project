@@ -1,8 +1,14 @@
 ## TODO
 * think about /test//b, and /:path(*)
 * framework error, queue listener, background task error notification?
+* expose ElasticSearch as interface?
 
 ## Change log
+### 4.2.1 (2/24/2016)
+* batch: allow specify maxConcurrentHandlers for batch
+* async: provide thread name for all thread pool
+* redis: update default redis timeout to 5s
+
 ### 4.2.0 (2/24/2016)
 * validation: update validation exception message
 * json: add from/to enum value to JSON, to support search query build with enum

@@ -42,8 +42,7 @@ public class BackgroundTaskExecutor {
     private static class BackgroundTaskThreadFactory implements ThreadFactory {
         @Override
         public Thread newThread(Runnable runnable) {
-            Thread thread = new Thread(runnable);
-            thread.setName("background-task");
+            Thread thread = new Thread(runnable, "background-task");
             thread.setPriority(Thread.NORM_PRIORITY - 1);
             thread.setDaemon(true);
             return thread;

@@ -13,11 +13,11 @@ public final class Batch<T> implements AutoCloseable {
     private final Semaphore semaphore;
     private final int maxConcurrentHandlers;
 
-    public Batch(String action, Executor executor) {
+    public Batch(String action, int maxConcurrentHandlers, Executor executor) {
         this.action = action;
-        this.executor = executor;
-        maxConcurrentHandlers = Runtime.getRuntime().availableProcessors() * 4;
+        this.maxConcurrentHandlers = maxConcurrentHandlers;
         semaphore = new Semaphore(maxConcurrentHandlers);
+        this.executor = executor;
     }
 
     public Future<T> submit(Callable<T> task) {

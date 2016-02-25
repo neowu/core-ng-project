@@ -9,5 +9,7 @@ import java.util.concurrent.Future;
 public interface Executor {
     <T> Batch<T> batch(String action);
 
+    <T> Batch<T> batch(String action, int maxConcurrentHandlers);
+
     <T> Future<T> submit(String action, Callable<T> task);
 }

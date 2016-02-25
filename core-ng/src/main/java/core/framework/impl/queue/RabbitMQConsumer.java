@@ -29,8 +29,9 @@ import java.util.concurrent.locks.LockSupport;
 public class RabbitMQConsumer implements Consumer, AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(RabbitMQConsumer.class);
     private final QueueingConsumer.Delivery stopSignal = new QueueingConsumer.Delivery(null, null, null);
-    private final Queue<QueueingConsumer.Delivery> queue = new ConcurrentLinkedQueue<>();
+    private final Queue<QueueingConsumer.Delivery> deliveries = new ConcurrentLinkedQueue<>();
     private final Channel channel;
+    private final String queue;
     private final Thread consumerThread;
     private volatile ShutdownSignalException shutdown;
     private volatile ConsumerCancelledException cancelled;
@@ -38,6 +39,7 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
     // refer to com.rabbitmq.client.QueueingConsumer
     public RabbitMQConsumer(Channel channel, String queue, int prefetchCount) {
         this.channel = channel;
+        this.queue = queue;
         try {
             channel.basicQos(prefetchCount);
             channel.basicConsume(queue, false, this);   // QOS only works with manual ack
@@ -50,7 +52,7 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
     @Override
     public void handleShutdownSignal(String consumerTag, ShutdownSignalException shutdown) {
         this.shutdown = shutdown;
-        queue.add(stopSignal);
+        deliveries.add(stopSignal);
         LockSupport.unpark(consumerThread);
     }
 
@@ -72,14 +74,14 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
     @Override
     public void handleCancel(String consumerTag) throws IOException {
         cancelled = new ConsumerCancelledException();
-        queue.add(stopSignal);
+        deliveries.add(stopSignal);
         LockSupport.unpark(consumerThread);
     }
 
     @Override
     public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
         if (shutdown != null) throw Utility.fixStackTrace(shutdown);
-        queue.add(new QueueingConsumer.Delivery(envelope, properties, body));
+        deliveries.add(new QueueingConsumer.Delivery(envelope, properties, body));
         LockSupport.unpark(consumerThread);
     }
 
@@ -113,9 +115,9 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
     }
 
     private QueueingConsumer.Delivery poll() {
-        QueueingConsumer.Delivery delivery = queue.poll();
+        QueueingConsumer.Delivery delivery = deliveries.poll();
         if (stopSignal.equals(delivery) || delivery == null && (shutdown != null || cancelled != null)) {
-            if (stopSignal.equals(delivery)) queue.add(stopSignal);
+            if (stopSignal.equals(delivery)) deliveries.add(stopSignal);
             if (shutdown != null) throw Utility.fixStackTrace(shutdown);
             if (cancelled != null) throw Utility.fixStackTrace(cancelled);
         }
@@ -140,8 +142,7 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
         try {
             channel.basicAck(deliveryTag, multiple);
         } catch (IOException | AlreadyClosedException e) {
-            logger.error("failed to acknowledge message due to network issue, rabbitMQ will resend message if connection is closed", e);
-            throw new Error(e);
+            throw new Error("failed to acknowledge message due to shutdown or network issue, rabbitMQ will resend message", e);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("rabbitMQ", elapsedTime);

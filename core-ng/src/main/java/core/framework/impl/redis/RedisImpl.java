@@ -40,7 +40,7 @@ public final class RedisImpl implements Redis {
         pool.name("redis");
         pool.size(5, 50);
         pool.maxIdleTime(Duration.ofMinutes(30));
-        timeout(Duration.ofSeconds(2));
+        timeout(Duration.ofSeconds(5));
     }
 
     public void host(String host) {
