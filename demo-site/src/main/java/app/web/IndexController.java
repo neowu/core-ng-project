@@ -9,7 +9,6 @@ import core.framework.api.web.Session;
 import core.framework.api.web.site.WebDirectory;
 
 import javax.inject.Inject;
-import java.util.Optional;
 
 /**
  * @author neo
@@ -24,7 +23,7 @@ public class IndexController {
         model.name = "world";
 
         Session session = request.session();
-        Optional<String> hello = session.get("hello");
+//        Optional<String> hello = session.get("hello");
         session.set("hello", "world");
         Response response = Response.html("/template/index.html", model);
         response.cookie(Cookies.TEST, "1+2");

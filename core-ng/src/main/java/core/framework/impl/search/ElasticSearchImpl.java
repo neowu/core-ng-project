@@ -1,5 +1,6 @@
 package core.framework.impl.search;
 
+import core.framework.api.search.ElasticSearch;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.search.SearchException;
 import core.framework.api.util.Lists;
@@ -22,8 +23,8 @@ import java.util.List;
 /**
  * @author neo
  */
-public class ElasticSearch {
-    private final Logger logger = LoggerFactory.getLogger(ElasticSearch.class);
+public class ElasticSearchImpl implements ElasticSearch {
+    private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
     private final List<TransportAddress> addresses = Lists.newArrayList();
     private Duration timeout = Duration.ofSeconds(10);
     private Duration slowOperationThreshold = Duration.ofSeconds(5);
@@ -61,6 +62,7 @@ public class ElasticSearch {
         }
     }
 
+    @Override
     public void createIndex(String index, String source) {
         StopWatch watch = new StopWatch();
         try {
@@ -76,6 +78,7 @@ public class ElasticSearch {
         }
     }
 
+    @Override
     public void createIndexTemplate(String name, String source) {
         StopWatch watch = new StopWatch();
         try {
@@ -91,6 +94,7 @@ public class ElasticSearch {
         }
     }
 
+    @Override
     public void flush(String index) {
         StopWatch watch = new StopWatch();
         try {
@@ -105,6 +109,7 @@ public class ElasticSearch {
         }
     }
 
+    @Override
     public Client client() {
         if (client == null) {
             client = createClient();

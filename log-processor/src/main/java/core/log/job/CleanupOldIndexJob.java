@@ -2,7 +2,7 @@ package core.log.job;
 
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import core.framework.api.scheduler.Job;
-import core.framework.impl.search.ElasticSearch;
+import core.framework.api.search.ElasticSearch;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;

@@ -86,7 +86,7 @@ public final class RabbitMQImpl implements RabbitMQ {
     @Override
     public RabbitMQConsumer consumer(String queue, int prefetchCount) {
         Channel channel = createChannel();
-        return new RabbitMQConsumer(channel, queue, prefetchCount);
+        return new RabbitMQConsumer(channel, queue, prefetchCount, slowOperationThresholdInMs);
     }
 
     @Override

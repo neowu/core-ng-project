@@ -1,10 +1,11 @@
 package core.framework.api.module;
 
+import core.framework.api.search.ElasticSearch;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.util.Files;
 import core.framework.api.util.Types;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.search.ElasticSearch;
+import core.framework.impl.search.ElasticSearchImpl;
 
 import java.nio.file.Path;
 import java.time.Duration;
@@ -14,7 +15,7 @@ import java.time.Duration;
  */
 public final class SearchConfig {
     private final ModuleContext context;
-    private final ElasticSearch search;
+    private final ElasticSearchImpl search;
 
     public SearchConfig(ModuleContext context) {
         this.context = context;
@@ -23,10 +24,10 @@ public final class SearchConfig {
         } else {
             if (context.isTest()) {
                 Path dataPath = Files.tempDir();
-                search = context.mockFactory.create(ElasticSearch.class, dataPath);
+                search = context.mockFactory.create(ElasticSearchImpl.class, dataPath);
                 context.shutdownHook.add(() -> Files.deleteDir(dataPath));
             } else {
-                search = new ElasticSearch();
+                search = new ElasticSearchImpl();
             }
             context.shutdownHook.add(search::close);
             context.beanFactory.bind(ElasticSearch.class, null, search);

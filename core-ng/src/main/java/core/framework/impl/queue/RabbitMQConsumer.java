@@ -10,6 +10,7 @@ import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
 import com.rabbitmq.utility.Utility;
 import core.framework.api.log.ActionLogContext;
+import core.framework.api.log.Markers;
 import core.framework.api.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +33,16 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
     private final Queue<QueueingConsumer.Delivery> deliveries = new ConcurrentLinkedQueue<>();
     private final Channel channel;
     private final String queue;
+    private final long slowOperationThresholdInMs;
     private final Thread consumerThread;
     private volatile ShutdownSignalException shutdown;
     private volatile ConsumerCancelledException cancelled;
 
     // refer to com.rabbitmq.client.QueueingConsumer
-    public RabbitMQConsumer(Channel channel, String queue, int prefetchCount) {
+    public RabbitMQConsumer(Channel channel, String queue, int prefetchCount, long slowOperationThresholdInMs) {
         this.channel = channel;
         this.queue = queue;
+        this.slowOperationThresholdInMs = slowOperationThresholdInMs;
         try {
             channel.basicQos(prefetchCount);
             channel.basicConsume(queue, false, this);   // QOS only works with manual ack
@@ -147,6 +150,9 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("rabbitMQ", elapsedTime);
             logger.debug("acknowledge, queue={}, deliveryTag={}, multiple={}, elapsedTime={}", queue, deliveryTag, multiple, elapsedTime);
+            if (elapsedTime > slowOperationThresholdInMs) {
+                logger.warn(Markers.errorCode("SLOW_RABBITMQ"), "slow rabbitMQ operation, elapsedTime={}", elapsedTime);
+            }
         }
     }
 

@@ -1,10 +1,10 @@
 package core.framework.test.module;
 
+import core.framework.api.search.ElasticSearch;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.Types;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.search.ElasticSearch;
 import core.framework.impl.search.ElasticSearchTypeImpl;
 
 /**

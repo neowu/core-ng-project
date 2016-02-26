@@ -2,19 +2,25 @@ apply plugin: 'checkstyle'
 apply plugin: 'pmd'
 apply plugin: 'findbugs'
 
-tasks.withType(Checkstyle) {
+checkstyle {
+    repositories {
+        mavenCentral()
+        maven {
+            url "http://sevntu-checkstyle.github.com/sevntu.checkstyle/maven2"
+        }
+    }
+
     configurations {
         checkstyle
     }
 
     dependencies {
-        checkstyle 'com.puppycrawl.tools:checkstyle:6.13'
-        checkstyle files("${rootDir}/gradle/checkstyle/sevntu-checks-1.13.6.jar")
+        checkstyle 'com.puppycrawl.tools:checkstyle:6.15'
+        checkstyle 'com.github.sevntu.checkstyle:sevntu-checks:1.18.0'
     }
 
     configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
     configProperties['configDir'] = configFile.parentFile
-    checkstyleClasspath = configurations.checkstyle
 }
 
 pmd {

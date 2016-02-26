@@ -35,7 +35,7 @@ import java.util.Optional;
 /**
  * @author neo
  */
-public final class MongoImpl implements Mongo, MongoOption {
+public class MongoImpl implements Mongo {
     private final Logger logger = LoggerFactory.getLogger(MongoImpl.class);
     private final MongoClientOptions.Builder builder = MongoClientOptions.builder().socketKeepAlive(true);
     private final EntityCodecs codecs = new EntityCodecs();
@@ -51,12 +51,16 @@ public final class MongoImpl implements Mongo, MongoOption {
     public void initialize() {
         try {
             if (uri == null) throw new Error("uri() must be called before initialize");
-            builder.codecRegistry(codecRegistry());
-            mongoClient = new MongoClient(uri);
-            database = mongoClient.getDatabase(uri.getDatabase());
+            database = createDatabase(uri, codecRegistry());
         } finally {
             logger.info("initialize mongo client, uri={}", uri);
         }
+    }
+
+    protected MongoDatabase createDatabase(MongoClientURI uri, CodecRegistry registry) {
+        builder.codecRegistry(registry);
+        mongoClient = new MongoClient(uri);
+        return mongoClient.getDatabase(uri.getDatabase());
     }
 
     private CodecRegistry codecRegistry() {
@@ -70,43 +74,36 @@ public final class MongoImpl implements Mongo, MongoOption {
         mongoClient.close();
     }
 
-    @Override
     public void uri(String uri) {
         this.uri = new MongoClientURI(uri, builder);
         if (this.uri.getDatabase() == null) throw Exceptions.error("uri must have database, uri={}", uri);
     }
 
-    @Override
     public void poolSize(int minSize, int maxSize) {
         builder.minConnectionsPerHost(minSize)
             .connectionsPerHost(maxSize);
     }
 
-    @Override
     public void timeout(Duration timeout) {
         builder.connectTimeout((int) timeout.toMillis()) // default is 10s
             .socketTimeout((int) timeout.toMillis());
     }
 
-    @Override
     public <T> void entityClass(Class<T> entityClass) {
         new MongoClassValidator(entityClass).validateEntityClass();
         validator.register(entityClass);
         codecs.entityClass(entityClass);
     }
 
-    @Override
     public <T> void viewClass(Class<T> viewClass) {
         new MongoClassValidator(viewClass).validateViewClass();
         codecs.viewClass(viewClass);
     }
 
-    @Override
-    public void setTooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
+    public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
         this.tooManyRowsReturnedThreshold = tooManyRowsReturnedThreshold;
     }
 
-    @Override
     public void slowOperationThreshold(Duration threshold) {
         slowOperationThresholdInMs = threshold.toMillis();
     }

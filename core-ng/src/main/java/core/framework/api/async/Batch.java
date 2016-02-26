@@ -1,5 +1,7 @@
 package core.framework.api.async;
 
+import core.framework.api.util.Exceptions;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
@@ -14,6 +16,7 @@ public final class Batch<T> implements AutoCloseable {
     private final int maxConcurrentHandlers;
 
     public Batch(String action, int maxConcurrentHandlers, Executor executor) {
+        if (maxConcurrentHandlers <= 0) throw Exceptions.error("maxConcurrentHandlers must be greater than 0, maxConcurrentHandlers={}", maxConcurrentHandlers);
         this.action = action;
         this.maxConcurrentHandlers = maxConcurrentHandlers;
         semaphore = new Semaphore(maxConcurrentHandlers);

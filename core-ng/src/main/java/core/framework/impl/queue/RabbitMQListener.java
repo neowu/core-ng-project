@@ -1,5 +1,6 @@
 package core.framework.impl.queue;
 
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.QueueingConsumer;
 import core.framework.api.async.Executor;
 import core.framework.api.module.MessageHandlerConfig;
@@ -91,10 +92,17 @@ public class RabbitMQListener implements MessageHandlerConfig {
                     process(delivery);
                     return null;
                 } finally {
-                    semaphore.release(); // release permit first, not let exception from basic ack bypass it.
-                    consumer.acknowledge(delivery.getEnvelope().getDeliveryTag());
+                    complete(consumer, delivery);
                 }
             });
+        }
+    }
+
+    private void complete(RabbitMQConsumer consumer, QueueingConsumer.Delivery delivery) {
+        try {
+            consumer.acknowledge(delivery.getEnvelope().getDeliveryTag());
+        } finally {
+            semaphore.release(); // make sure release semaphore at end, not release before acknowledge is to reduce the num of thread to be created in pool
         }
     }
 
@@ -112,17 +120,19 @@ public class RabbitMQListener implements MessageHandlerConfig {
     private <T> void process(QueueingConsumer.Delivery delivery) throws Exception {
         ActionLog actionLog = logManager.currentActionLog();
 
+        AMQP.BasicProperties properties = delivery.getProperties();
         byte[] body = delivery.getBody();
-        String messageType = delivery.getProperties().getType();
+
+        String messageType = properties.getType();
         actionLog.context("messageType", messageType);
 
         logger.debug("body={}", LogParam.of(body));
 
         if (Strings.isEmpty(messageType)) throw new Error("messageType must not be empty");
 
-        actionLog.refId(delivery.getProperties().getCorrelationId());
+        actionLog.refId(properties.getCorrelationId());
 
-        Map<String, Object> headers = delivery.getProperties().getHeaders();
+        Map<String, Object> headers = properties.getHeaders();
         if (headers != null) {
             if ("true".equals(String.valueOf(headers.get(HEADER_TRACE)))) {
                 logManager.triggerTraceLog();
@@ -134,7 +144,7 @@ public class RabbitMQListener implements MessageHandlerConfig {
             }
         }
 
-        String appId = delivery.getProperties().getAppId();
+        String appId = properties.getAppId();
         if (appId != null) {
             actionLog.context("client", appId);
         }

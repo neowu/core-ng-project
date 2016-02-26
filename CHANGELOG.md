@@ -1,9 +1,15 @@
 ## TODO
 * think about /test//b, and /:path(*)
 * framework error, queue listener, background task error notification?
-* expose ElasticSearch as interface?
+* use smile for cache/queue?
+* think about Batch, and make it interface if design is final
 
 ## Change log
+### 4.2.2 (2/25/2016)
+* mongo: updated to 3.2.2
+* search: exposed ElasticSearch as interface
+* queue: tweak queue listener to result in less thread when rabbitmq is busy, track slow acknowledge
+
 ### 4.2.1 (2/24/2016)
 * batch: allow specify maxConcurrentHandlers for batch
 * async: provide thread name for all thread pool
