@@ -6,7 +6,7 @@
 
 ## Change log
 ### 4.2.2 (2/25/2016)
-* mongo: updated to 3.2.2
+* mongo: updated to 3.2.2, added fongo support back
 * search: exposed ElasticSearch as interface
 * queue: tweak queue listener to result in less thread when rabbitmq is busy, track slow acknowledge
 
