@@ -29,14 +29,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class MongoCollectionImpl<T> implements MongoCollection<T> {
     private final Logger logger = LoggerFactory.getLogger(MongoCollectionImpl.class);
-    private final MongoImpl mongo;
+    private final Mongo mongo;
     private final Class<T> entityClass;
     private final String collectionName;
+    private final EntityValidator<T> validator;
     private com.mongodb.client.MongoCollection<T> collection;
 
-    public MongoCollectionImpl(MongoImpl mongo, Class<T> entityClass) {
+    public MongoCollectionImpl(Mongo mongo, Class<T> entityClass) {
         this.mongo = mongo;
         this.entityClass = entityClass;
+        validator = new EntityValidator<>(entityClass);
         collectionName = entityClass.getDeclaredAnnotation(Collection.class).name();
     }
 
@@ -56,7 +58,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public void insert(T entity) {
         StopWatch watch = new StopWatch();
-        mongo.validator.validate(entity);
+        validator.validate(entity);
         try {
             collection().insertOne(entity);
         } finally {
@@ -155,10 +157,10 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
     public void replace(T entity) {
         StopWatch watch = new StopWatch();
         Object id = null;
-        mongo.validator.validate(entity);
+        validator.validate(entity);
         try {
             id = mongo.codecs.id(entity);
-            if (id == null) throw Exceptions.error("entity must have id to update, entityClass={}", entity.getClass().getCanonicalName());
+            if (id == null) throw Exceptions.error("entity must have id, entityClass={}", entityClass.getCanonicalName());
             collection().replaceOne(Filters.eq("_id", id), entity, new UpdateOptions().upsert(true));
         } finally {
             long elapsedTime = watch.elapsedTime();

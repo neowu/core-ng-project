@@ -5,6 +5,9 @@
 * think about Batch, and make it interface if design is final
 
 ## Change log
+### 4.2.4 (2/29/2016 - )
+* mongo: removed old Mongo interface
+
 ### 4.2.3 (2/29/2016)
 * mongo: add timeout to query, support MongoCollection<T>
 

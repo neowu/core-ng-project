@@ -5,14 +5,14 @@ import org.junit.Test;
 /**
  * @author neo
  */
-public class MongoClassValidatorTest {
+public class EntityClassValidatorTest {
     @Test
     public void validateEntityClass() {
-        new MongoClassValidator(TestEntity.class).validateEntityClass();
+        new EntityClassValidator(TestEntity.class).validateEntityClass();
     }
 
     @Test
     public void validateViewClass() {
-        new MongoClassValidator(TestView.class).validateViewClass();
+        new EntityClassValidator(TestView.class).validateViewClass();
     }
 }

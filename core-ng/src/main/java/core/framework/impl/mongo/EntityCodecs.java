@@ -12,13 +12,12 @@ import java.util.Map;
 public final class EntityCodecs {
     public final Map<Class<?>, EntityCodec<?>> codecs = Maps.newHashMap();
 
-    public <T> void entityClass(Class<T> entityClass) {
+    public <T> void registerEntity(Class<T> entityClass) {
         EntityIdHandler<T> entityIdHandler = new EntityIdHandlerBuilder<>(entityClass).build();
         register(entityClass, entityIdHandler);
     }
 
-    public <T> void viewClass(Class<T> viewClass) {
-        new MongoClassValidator(viewClass).validateViewClass();
+    public <T> void registerView(Class<T> viewClass) {
         register(viewClass, null);
     }
 
