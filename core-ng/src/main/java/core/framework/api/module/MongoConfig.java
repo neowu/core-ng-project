@@ -1,6 +1,8 @@
 package core.framework.api.module;
 
 import core.framework.api.mongo.Mongo;
+import core.framework.api.mongo.MongoCollection;
+import core.framework.api.util.Types;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.mongo.MongoImpl;
 
@@ -57,11 +59,11 @@ public final class MongoConfig {
         }
     }
 
-    public <T> void entityClass(Class<T> entityClass) {
-        mongo.entityClass(entityClass);
+    public <T> void collection(Class<T> entityClass) {
+        context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), null, mongo.collection(entityClass));
     }
 
-    public <T> void viewClass(Class<T> viewClass) {
+    public <T> void view(Class<T> viewClass) {
         mongo.viewClass(viewClass);
     }
 }

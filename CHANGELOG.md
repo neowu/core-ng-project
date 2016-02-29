@@ -5,6 +5,9 @@
 * think about Batch, and make it interface if design is final
 
 ## Change log
+### 4.2.3 (2/29/2016)
+* mongo: add timeout to query, support MongoCollection<T>
+
 ### 4.2.2 (2/25/2016)
 * mongo: updated to 3.2.2, added fongo support back
 * search: exposed ElasticSearch as interface

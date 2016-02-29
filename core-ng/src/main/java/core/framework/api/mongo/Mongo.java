@@ -8,6 +8,7 @@ import java.util.Optional;
 /**
  * @author neo
  */
+@Deprecated
 public interface Mongo {
     <T> void insert(T entity);
 

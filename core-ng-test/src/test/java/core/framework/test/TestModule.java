@@ -10,6 +10,6 @@ public class TestModule extends AbstractTestModule {
     @Override
     protected void initialize() {
         mongo().uri("mongodb://localhost/test");
-        mongo().entityClass(TestEntity.class);
+        mongo().collection(TestEntity.class);
     }
 }

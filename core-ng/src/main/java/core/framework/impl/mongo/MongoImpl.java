@@ -5,7 +5,6 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
@@ -15,6 +14,7 @@ import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
 import core.framework.api.mongo.Collection;
 import core.framework.api.mongo.Mongo;
+import core.framework.api.mongo.MongoCollection;
 import core.framework.api.mongo.Query;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
@@ -31,33 +31,37 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
  */
 public class MongoImpl implements Mongo {
+    final EntityCodecs codecs = new EntityCodecs();
+    final MongoEntityValidator validator = new MongoEntityValidator();
     private final Logger logger = LoggerFactory.getLogger(MongoImpl.class);
     private final MongoClientOptions.Builder builder = MongoClientOptions.builder().socketKeepAlive(true);
-    private final EntityCodecs codecs = new EntityCodecs();
-    private final MongoEntityValidator validator = new MongoEntityValidator();
-
-    private int tooManyRowsReturnedThreshold = 2000;
-    private long slowOperationThresholdInMs = Duration.ofSeconds(5).toMillis();
+    int timeoutInMs = (int) Duration.ofSeconds(10).toMillis();
+    int tooManyRowsReturnedThreshold = 2000;
+    long slowOperationThresholdInMs = Duration.ofSeconds(5).toMillis();
 
     private MongoClientURI uri;
     private MongoClient mongoClient;
     private MongoDatabase database;
 
     public void initialize() {
+        StopWatch watch = new StopWatch();
         try {
             if (uri == null) throw new Error("uri() must be called before initialize");
             database = createDatabase(uri, codecRegistry());
         } finally {
-            logger.info("initialize mongo client, uri={}", uri);
+            logger.info("initialize mongo client, uri={}, elapsedTime={}", uri, watch.elapsedTime());
         }
     }
 
     protected MongoDatabase createDatabase(MongoClientURI uri, CodecRegistry registry) {
+        builder.connectTimeout(timeoutInMs);
+        builder.socketTimeout(timeoutInMs);
         builder.codecRegistry(registry);
         mongoClient = new MongoClient(uri);
         return mongoClient.getDatabase(uri.getDatabase());
@@ -80,19 +84,19 @@ public class MongoImpl implements Mongo {
     }
 
     public void poolSize(int minSize, int maxSize) {
-        builder.minConnectionsPerHost(minSize)
-            .connectionsPerHost(maxSize);
+        builder.minConnectionsPerHost(minSize);
+        builder.connectionsPerHost(maxSize);
     }
 
-    public void timeout(Duration timeout) {
-        builder.connectTimeout((int) timeout.toMillis()) // default is 10s
-            .socketTimeout((int) timeout.toMillis());
+    public final void timeout(Duration timeout) {
+        timeoutInMs = (int) timeout.toMillis();
     }
 
-    public <T> void entityClass(Class<T> entityClass) {
+    public <T> MongoCollection<T> collection(Class<T> entityClass) {
         new MongoClassValidator(entityClass).validateEntityClass();
         validator.register(entityClass);
         codecs.entityClass(entityClass);
+        return new MongoCollectionImpl<>(this, entityClass);
     }
 
     public <T> void viewClass(Class<T> viewClass) {
@@ -114,7 +118,7 @@ public class MongoImpl implements Mongo {
         try {
             validator.validate(entity);
             @SuppressWarnings("unchecked")
-            MongoCollection<T> collection = collection((Class<T>) entity.getClass());
+            com.mongodb.client.MongoCollection<T> collection = mongoCollection((Class<T>) entity.getClass());
             collection.insertOne(entity);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -128,7 +132,7 @@ public class MongoImpl implements Mongo {
     public <T> Optional<T> get(Class<T> entityClass, Object id) {
         StopWatch watch = new StopWatch();
         try {
-            T result = collection(entityClass).find(Filters.eq("_id", id)).first();
+            T result = mongoCollection(entityClass).find(Filters.eq("_id", id)).first();
             return Optional.ofNullable(result);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -142,8 +146,9 @@ public class MongoImpl implements Mongo {
     public <T> Optional<T> findOne(Class<T> entityClass, Bson filter) {
         StopWatch watch = new StopWatch();
         try {
-            FindIterable<T> query = collection(entityClass)
+            FindIterable<T> query = mongoCollection(entityClass)
                 .find(filter == null ? new BsonDocument() : filter)
+                .maxTime(timeoutInMs, TimeUnit.MILLISECONDS)
                 .limit(2);
             List<T> results = Lists.newArrayList();
             for (T document : query) {
@@ -165,8 +170,9 @@ public class MongoImpl implements Mongo {
         StopWatch watch = new StopWatch();
         List<T> results = Lists.newArrayList();
         try {
-            FindIterable<T> collection = collection(entityClass)
-                .find(query.filter == null ? new BsonDocument() : query.filter);
+            FindIterable<T> collection = mongoCollection(entityClass)
+                .find(query.filter == null ? new BsonDocument() : query.filter)
+                .maxTime(timeoutInMs, TimeUnit.MILLISECONDS);
             if (query.projection != null) collection.projection(query.projection);
             if (query.sort != null) collection.sort(query.sort);
             if (query.skip != null) collection.skip(query.skip);
@@ -197,8 +203,8 @@ public class MongoImpl implements Mongo {
         StopWatch watch = new StopWatch();
         List<V> results = Lists.newArrayList();
         try {
-            MongoCollection<T> collection = collection(entityClass);
-            AggregateIterable<V> documents = collection.aggregate(Lists.newArrayList(pipeline), resultClass);
+            AggregateIterable<V> documents = mongoCollection(entityClass).aggregate(Lists.newArrayList(pipeline), resultClass)
+                .maxTime(timeoutInMs, TimeUnit.MILLISECONDS);
             for (V document : documents) {
                 results.add(document);
             }
@@ -221,7 +227,7 @@ public class MongoImpl implements Mongo {
             Object id = codecs.id(entity);
             if (id == null) throw Exceptions.error("entity must have id to update, entityClass={}", entity.getClass().getCanonicalName());
             Bson filter = Filters.eq("_id", id);
-            UpdateResult result = collection((Class<T>) entity.getClass()).replaceOne(filter, entity, new UpdateOptions().upsert(true));
+            UpdateResult result = mongoCollection((Class<T>) entity.getClass()).replaceOne(filter, entity, new UpdateOptions().upsert(true));
             return result.getModifiedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -235,7 +241,7 @@ public class MongoImpl implements Mongo {
     public <T> long update(Class<T> entityClass, Bson filter, Bson update) {
         StopWatch watch = new StopWatch();
         try {
-            UpdateResult result = collection(entityClass).updateMany(filter, update);
+            UpdateResult result = mongoCollection(entityClass).updateMany(filter, update);
             return result.getModifiedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -249,7 +255,7 @@ public class MongoImpl implements Mongo {
     public <T> long delete(Class<T> entityClass, Object id) {
         StopWatch watch = new StopWatch();
         try {
-            DeleteResult result = collection(entityClass).deleteOne(Filters.eq("_id", id));
+            DeleteResult result = mongoCollection(entityClass).deleteOne(Filters.eq("_id", id));
             return result.getDeletedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -263,7 +269,7 @@ public class MongoImpl implements Mongo {
     public <T> long delete(Class<T> entityClass, Bson filter) {
         StopWatch watch = new StopWatch();
         try {
-            DeleteResult result = collection(entityClass).deleteMany(filter);
+            DeleteResult result = mongoCollection(entityClass).deleteMany(filter);
             return result.getDeletedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -285,7 +291,7 @@ public class MongoImpl implements Mongo {
         }
     }
 
-    private <T> MongoCollection<T> collection(Class<T> entityClass) {
+    <T> com.mongodb.client.MongoCollection<T> mongoCollection(Class<T> entityClass) {
         Collection collection = entityClass.getDeclaredAnnotation(Collection.class);
         if (database == null) initialize(); // lazy init for dev test, initialize will be called in startup hook for complete env
         return database.getCollection(collection.name(), entityClass);

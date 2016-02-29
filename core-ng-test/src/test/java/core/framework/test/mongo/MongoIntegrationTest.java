@@ -1,7 +1,7 @@
 package core.framework.test.mongo;
 
 import com.mongodb.client.model.Filters;
-import core.framework.api.mongo.Mongo;
+import core.framework.api.mongo.MongoCollection;
 import core.framework.test.IntegrationTest;
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -19,35 +19,35 @@ import static org.junit.Assert.assertTrue;
  */
 public class MongoIntegrationTest extends IntegrationTest {
     @Inject
-    Mongo mongo;
+    MongoCollection<TestEntity> collection;
 
     @Test
     public void insert() {
         TestEntity entity = new TestEntity();
         entity.stringField = "string";
-        mongo.insert(entity);
+        collection.insert(entity);
 
         assertNotNull(entity.id);
 
-        Optional<TestEntity> loadedEntity = mongo.get(TestEntity.class, entity.id);
+        Optional<TestEntity> loadedEntity = collection.get(entity.id);
         assertTrue(loadedEntity.isPresent());
         assertEquals(entity.stringField, loadedEntity.get().stringField);
     }
 
     @Test
-    public void update() {
+    public void replace() {
         TestEntity entity = new TestEntity();
         entity.id = new ObjectId();
         entity.stringField = "value1";
-        mongo.update(entity);
+        collection.replace(entity);
 
-        TestEntity loadedEntity = mongo.get(TestEntity.class, entity.id).get();
+        TestEntity loadedEntity = collection.get(entity.id).get();
         assertEquals(entity.stringField, loadedEntity.stringField);
 
         entity.stringField = "value2";
-        mongo.update(entity);
+        collection.replace(entity);
 
-        loadedEntity = mongo.get(TestEntity.class, entity.id).get();
+        loadedEntity = collection.get(entity.id).get();
         assertEquals(entity.stringField, loadedEntity.stringField);
     }
 
@@ -56,9 +56,9 @@ public class MongoIntegrationTest extends IntegrationTest {
         TestEntity entity = new TestEntity();
         entity.id = new ObjectId();
         entity.stringField = "value";
-        mongo.insert(entity);
+        collection.insert(entity);
 
-        List<TestEntity> entities = mongo.find(TestEntity.class, Filters.eq("string_field", "value"));
+        List<TestEntity> entities = collection.find(Filters.eq("string_field", "value"));
         assertEquals(1, entities.size());
         assertEquals(entity.id, entities.get(0).id);
         assertEquals(entity.stringField, entities.get(0).stringField);
