@@ -139,18 +139,15 @@ public final class DatabaseImpl implements Database {
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
         StopWatch watch = new StopWatch();
-        List<T> results = null;
         try {
-            results = operation.select(sql, rowMapper(viewClass), params);
+            List<T> results = operation.select(sql, rowMapper(viewClass), params);
+            checkTooManyRowsReturned(results.size());
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             checkSlowOperation(elapsedTime);
-            if (results != null && results.size() > tooManyRowsReturnedThreshold) {
-                logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", results.size());
-            }
         }
     }
 
@@ -195,6 +192,12 @@ public final class DatabaseImpl implements Database {
         RowMapper<T> mapper = new RowMapperBuilder<>(viewClass, operation.enumMapper).build();
         rowMappers.put(viewClass, mapper);
         return mapper;
+    }
+
+    private <T> void checkTooManyRowsReturned(int size) {
+        if (size > tooManyRowsReturnedThreshold) {
+            logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
+        }
     }
 
 

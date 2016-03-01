@@ -140,12 +140,12 @@ public final class EntityCodecHelper {
             return null;
         } else if (currentType == BsonType.STRING) {
             String value = reader.readString();
-            Object[] enums = enumClass.getEnumConstants();
-            for (Object item : enums) {
-                if (String.valueOf(item).equals(value)) return item;
+            try {
+                return Enum.valueOf(enumClass, value);
+            } catch (Exception e) {
+                LOGGER.warn("enum returned from mongo is ignored, enumClass={}, value={}, field={}", enumClass, value, field, e);
+                return null;
             }
-            LOGGER.warn("enum returned from mongo is ignored, enumClass={}, value={}, field={}", enumClass, value, field);
-            return null;
         } else {
             LOGGER.warn("field returned from mongo is ignored, field={}", field);
             reader.skipValue();

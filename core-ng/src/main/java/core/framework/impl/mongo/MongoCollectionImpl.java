@@ -2,6 +2,8 @@ package core.framework.impl.mongo;
 
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
@@ -20,9 +22,11 @@ import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * @author neo
@@ -86,13 +90,13 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public Optional<T> findOne(Bson filter) {
         StopWatch watch = new StopWatch();
-        List<T> results = Lists.newArrayList();
         try {
-            FindIterable<T> cursor = collection()
+            List<T> results = new ArrayList<>(2);
+            FindIterable<T> query = collection()
                 .find(filter == null ? new BsonDocument() : filter)
-                .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS)
-                .limit(2);
-            cursor.into(results);
+                .limit(2)
+                .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
+            fetch(query, results);
             if (results.isEmpty()) return Optional.empty();
             if (results.size() > 1) throw Exceptions.error("more than one row returned, size={}", results.size());
             return Optional.of(results.get(0));
@@ -107,16 +111,11 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public List<T> find(Query query) {
         StopWatch watch = new StopWatch();
-        List<T> results = Lists.newArrayList();
         try {
-            FindIterable<T> cursor = collection()
-                .find(query.filter == null ? new BsonDocument() : query.filter)
-                .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
-            if (query.projection != null) cursor.projection(query.projection);
-            if (query.sort != null) cursor.sort(query.sort);
-            if (query.skip != null) cursor.skip(query.skip);
-            if (query.limit != null) cursor.limit(query.limit);
-            cursor.into(results);
+            List<T> results = query.limit == null ? Lists.newArrayList() : new ArrayList<>(query.limit);
+            FindIterable<T> mongoQuery = mongoQuery(query);
+            fetch(mongoQuery, results);
+            checkTooManyRowsReturned(results.size());
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -130,30 +129,81 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
                 query.limit,
                 elapsedTime);
             checkSlowOperation(elapsedTime);
-            checkTooManyRowsReturned(results.size());
         }
+    }
+
+    @Override
+    public void forEach(Query query, Consumer<T> consumer) {
+        StopWatch watch = new StopWatch();
+        int total = 0;
+        try {
+            FindIterable<T> mongoQuery = mongoQuery(query);
+            total = apply(mongoQuery, consumer);
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("mongoDB", elapsedTime);
+            logger.debug("find, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, total={}, elapsedTime={}",
+                collectionName,
+                query.filter,
+                query.projection,
+                query.sort,
+                query.skip,
+                query.limit,
+                total,
+                elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    private FindIterable<T> mongoQuery(Query query) {
+        FindIterable<T> mongoQuery = collection().find(query.filter == null ? new BsonDocument() : query.filter)
+            .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
+        if (query.projection != null) mongoQuery.projection(query.projection);
+        if (query.sort != null) mongoQuery.sort(query.sort);
+        if (query.skip != null) mongoQuery.skip(query.skip);
+        if (query.limit != null) mongoQuery.limit(query.limit);
+        return mongoQuery;
+    }
+
+    private int apply(MongoIterable<T> mongoQuery, Consumer<T> consumer) {
+        int total = 0;
+        try (MongoCursor<T> cursor = mongoQuery.iterator()) {
+            while (cursor.hasNext()) {
+                T result = cursor.next();
+                total++;
+                consumer.accept(result);
+            }
+        }
+        return total;
     }
 
     @Override
     public <V> List<V> aggregate(Class<V> resultClass, Bson... pipeline) {
         StopWatch watch = new StopWatch();
-        List<V> results = Lists.newArrayList();
         try {
-            AggregateIterable<V> cursor = collection().aggregate(Lists.newArrayList(pipeline), resultClass)
+            List<V> results = Lists.newArrayList();
+            AggregateIterable<V> query = collection().aggregate(Lists.newArrayList(pipeline), resultClass)
                 .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
-            cursor.into(results);
+            fetch(query, results);
+            checkTooManyRowsReturned(results.size());
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("aggregate, collection={}, pipeline={}, elapsedTime={}", collectionName, pipeline, elapsedTime);
             checkSlowOperation(elapsedTime);
-            checkTooManyRowsReturned(results.size());
+        }
+    }
+
+    private <V> void fetch(MongoIterable<V> query, List<V> results) {
+        try (MongoCursor<V> cursor = query.iterator()) {
+            while (cursor.hasNext()) {
+                results.add(cursor.next());
+            }
         }
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void replace(T entity) {
         StopWatch watch = new StopWatch();
         Object id = null;

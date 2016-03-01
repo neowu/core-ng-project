@@ -43,16 +43,15 @@ public final class RepositoryImpl<T> implements Repository<T> {
         StopWatch watch = new StopWatch();
         String sql = selectQuery.sql(query.where, query.skip, query.limit);
         Object[] params = selectQuery.params(query);
-        List<T> results = null;
         try {
-            results = database.operation.select(sql, rowMapper, params);
+            List<T> results = database.operation.select(sql, rowMapper, params);
+            checkTooManyRowsReturned(results.size());
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
             logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             checkSlowOperation(elapsedTime);
-            if (results != null) checkTooManyRows(results.size());
         }
     }
 
@@ -177,7 +176,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         }
     }
 
-    private void checkTooManyRows(int size) {
+    private void checkTooManyRowsReturned(int size) {
         if (size > database.tooManyRowsReturnedThreshold) {
             logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }

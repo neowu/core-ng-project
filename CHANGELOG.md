@@ -3,10 +3,11 @@
 * framework error, queue listener, background task error notification?
 * use smile for cache/queue?
 * think about Batch, and make it interface if design is final
+* mongo support @EnumValue?
 
 ## Change log
-### 4.2.4 (2/29/2016 - )
-* mongo: removed old Mongo interface
+### 4.2.4 (2/29/2016 - 3/1/2016)
+* mongo: removed old Mongo interface, refined mongo impl
 
 ### 4.2.3 (2/29/2016)
 * mongo: add timeout to query, support MongoCollection<T>
