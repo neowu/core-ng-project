@@ -135,7 +135,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public void forEach(Query query, Consumer<T> consumer) {
         StopWatch watch = new StopWatch();
-        int total = 0;
+        Integer total = null;
         try {
             FindIterable<T> mongoQuery = mongoQuery(query);
             total = apply(mongoQuery, consumer);
@@ -151,7 +151,6 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
                 query.limit,
                 total,
                 elapsedTime);
-            checkSlowOperation(elapsedTime);
         }
     }
 
