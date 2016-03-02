@@ -53,7 +53,7 @@ public final class EntityCodecHelper {
 
     public static void writeEnum(BsonWriter writer, Enum value) {
         if (value == null) writer.writeNull();
-        else writer.writeString(String.valueOf(value));
+        else writer.writeString(value.name());
     }
 
     public static Integer readInteger(BsonReader reader, BsonType currentType, String field) {
@@ -134,7 +134,7 @@ public final class EntityCodecHelper {
         }
     }
 
-    public static Object readEnum(BsonReader reader, BsonType currentType, Class enumClass, String field) {
+    public static <T extends Enum<T>> T readEnum(BsonReader reader, BsonType currentType, Class<T> enumClass, String field) {
         if (currentType == BsonType.NULL) {
             reader.readNull();
             return null;
@@ -143,7 +143,7 @@ public final class EntityCodecHelper {
             try {
                 return Enum.valueOf(enumClass, value);
             } catch (Exception e) {
-                LOGGER.warn("enum returned from mongo is ignored, enumClass={}, value={}, field={}", enumClass, value, field, e);
+                LOGGER.warn("enum returned from mongo is ignored, enumClass={}, value={}, field={}", enumClass.getCanonicalName(), value, field, e);
                 return null;
             }
         } else {
