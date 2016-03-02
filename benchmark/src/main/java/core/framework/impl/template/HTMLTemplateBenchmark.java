@@ -2,6 +2,7 @@ package core.framework.impl.template;
 
 import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.JSON;
+import core.framework.api.util.Properties;
 import core.framework.impl.template.model.FilterUIView;
 import core.framework.impl.template.source.StringTemplateSource;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -32,11 +33,10 @@ public class HTMLTemplateBenchmark {
     public void setup() {
         model = JSON.fromJSON(FilterUIView.class, ClasspathResources.text("template-test/filter.json"));
 
-        MessageManager messageManager = new MessageManager();
-        messageManager.loadProperties("template-test/plp_es_GT.properties");
+        Properties messages = new Properties();
+        messages.load("template-test/plp_es_GT.properties");
         HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new StringTemplateSource("filter", ClasspathResources.text("template-test/filter.html")), FilterUIView.class);
-        builder.language = "es_GT";
-        builder.message = messageManager;
+        builder.message = messages::get;
         template = builder.build();
     }
 

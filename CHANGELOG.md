@@ -6,6 +6,9 @@
 * mongo support @EnumValue?
 
 ## Change log
+### 4.2.5 (3/2/2016)
+* template: refine i18n language support
+
 ### 4.2.4 (2/29/2016 - 3/1/2016)
 * mongo: removed old Mongo interface, refined mongo impl
 

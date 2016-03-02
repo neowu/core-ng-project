@@ -11,7 +11,6 @@ import core.framework.api.web.site.WebDirectory;
 import core.framework.impl.template.CDNManager;
 import core.framework.impl.template.HTMLTemplate;
 import core.framework.impl.template.HTMLTemplateBuilder;
-import core.framework.impl.template.MessageManager;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.source.FileTemplateSource;
 import org.slf4j.Logger;
@@ -19,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -85,24 +83,23 @@ public class TemplateManagerImpl implements TemplateManager {
     }
 
     private String language(Request request) {
-        return languageProvider == null ? null : languageProvider.get(request).orElse(null);
+        return languageProvider == null ? MessageManager.DEFAULT_LANGUAGE : languageProvider.get(request).orElse(MessageManager.DEFAULT_LANGUAGE);
     }
 
     private Templates load(String templatePath, Class<?> modelClass) {
         HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass);
         builder.cdn = cdnManager;
-
         Templates templates = new Templates();
-        List<String> languages = messageManager.languages();
-        if (languages.isEmpty()) {
-            templates.defaultTemplate = builder.build();
-        } else {
-            builder.message = messageManager;
-            for (String language : languages) {
-                builder.language = language;
-                HTMLTemplate template = builder.build();
-                templates.add(language, template);
+        Map<String, HTMLTemplate> effectiveTemplates = Maps.newHashMap();
+        for (String language : messageManager.languages) {
+            String effectiveLanguage = messageManager.effectiveLanguage(language);
+            HTMLTemplate htmlTemplate = effectiveTemplates.get(effectiveLanguage);
+            if (htmlTemplate == null) {
+                builder.message = messageManager.messageProvider(effectiveLanguage);
+                htmlTemplate = builder.build();
+                effectiveTemplates.put(effectiveLanguage, htmlTemplate);
             }
+            templates.add(language, htmlTemplate);
         }
         return templates;
     }

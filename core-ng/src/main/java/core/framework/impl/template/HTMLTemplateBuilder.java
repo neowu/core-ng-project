@@ -13,8 +13,7 @@ public class HTMLTemplateBuilder {
     private final Document document;
 
     public CDNManager cdn;
-    public MessageManager message;
-    public String language;
+    public MessageProvider message;
 
     public HTMLTemplateBuilder(TemplateSource source, Class<?> modelClass) {
         new ModelClassValidator(modelClass).validate();
@@ -27,7 +26,6 @@ public class HTMLTemplateBuilder {
         TemplateMetaContext context = new TemplateMetaContext(modelClass);
         context.cdn = cdn;
         context.message = message;
-        context.language = language;
         HTMLTemplate template = new HTMLTemplate(context.rootClass);
         document.buildTemplate(template, context, source);
         return template;

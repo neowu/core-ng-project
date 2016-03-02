@@ -38,6 +38,7 @@ public final class SiteConfig {
     }
 
     public void template(String path, Class<?> modelClass) {
+        context.httpServer.siteManager.templateManager.messageManager.initialize();
         context.httpServer.siteManager.templateManager.add(path, modelClass);
     }
 
