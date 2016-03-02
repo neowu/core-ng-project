@@ -30,9 +30,10 @@ public class WebModule extends Module {
         site().staticContent("/static");
         site().staticContent("/favicon.ico");
         site().staticContent("/robots.txt");
-        site().message().loadProperties("messages/main.properties");
-        site().message().loadProperties("messages/main_zh.properties");
-        site().message().language(request -> Optional.of("zh"));
+        site().message().loadProperties("messages/main_en.properties");
+        site().message().loadProperties("messages/main_en_CA.properties");
+        site().message().loadProperties("messages/main_en_US.properties");
+        site().message().language(request -> Optional.of("en"));
 
         site().template("/template/index.html", IndexPage.class);
         site().template("/template/upload.html", UploadPage.class);
