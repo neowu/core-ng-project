@@ -35,12 +35,16 @@ public class MessageManager {
 
     public void initialize() {
         if (initialized) return;
+
+        if (languages == null && messages.keySet().stream().anyMatch(language -> !language.equals(DEFAULT_LANGUAGE)))
+            throw Exceptions.error("site().message().language() must be called first if language specific message loaded");
+
         if (languages == null) languages = new String[]{DEFAULT_LANGUAGE};
         messages.keySet().stream()
             .filter(effectiveLanguage -> !DEFAULT_LANGUAGE.equals(effectiveLanguage)
                 && Arrays.stream(languages).noneMatch(language -> language.startsWith(effectiveLanguage)))
             .forEach(effectiveLanguage -> {
-                throw Exceptions.error("language loaded by message properties not used in enabled languages, please check, language={}", effectiveLanguage);
+                throw Exceptions.error("language loaded by message properties but not used in enabled languages, please check, language={}", effectiveLanguage);
             });
         initialized = true;
     }
