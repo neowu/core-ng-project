@@ -23,30 +23,25 @@ public class MessageManager {
     private static final Pattern MESSAGE_PROPERTY_PATH_PATTERN = Pattern.compile("[^_]+((_[a-zA-Z0-9]{2,4})*)\\.properties");
     private final Map<String, Properties> messages = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(MessageManager.class);
-    public String[] languages;
-    public boolean initialized;
+    public String[] languages = new String[]{DEFAULT_LANGUAGE};
 
-    public void loadProperties(String path) {
+    public void load(String path) {
         String language = language(path);
         logger.info("load message properties, path={}", path);
         Properties messages = this.messages.computeIfAbsent(language, key -> new Properties());
         messages.load(path);
     }
 
-    public void initialize() {
-        if (initialized) return;
+    public void validate() {
+        if (languages.length == 1 && DEFAULT_LANGUAGE.equals(languages[0]) && messages.keySet().stream().anyMatch(language -> !language.equals(DEFAULT_LANGUAGE)))
+            throw Exceptions.error("site().template().language() must be called before site().template().add() if language specific message loaded");
 
-        if (languages == null && messages.keySet().stream().anyMatch(language -> !language.equals(DEFAULT_LANGUAGE)))
-            throw Exceptions.error("site().message().language() must be called first if language specific message loaded");
-
-        if (languages == null) languages = new String[]{DEFAULT_LANGUAGE};
         messages.keySet().stream()
             .filter(effectiveLanguage -> !DEFAULT_LANGUAGE.equals(effectiveLanguage)
                 && Arrays.stream(languages).noneMatch(language -> language.startsWith(effectiveLanguage)))
             .forEach(effectiveLanguage -> {
-                throw Exceptions.error("language loaded by message properties but not used in enabled languages, please check, language={}", effectiveLanguage);
+                throw Exceptions.error("message loaded by site().template().message() but not used in enabled languages, language={}", effectiveLanguage);
             });
-        initialized = true;
     }
 
     String language(String path) {

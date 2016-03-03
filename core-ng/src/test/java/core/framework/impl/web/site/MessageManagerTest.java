@@ -14,9 +14,9 @@ public class MessageManagerTest {
     @Before
     public void createMessageManager() {
         messageManager = new MessageManager();
-        messageManager.loadProperties("message-test/messages.properties");
-        messageManager.loadProperties("message-test/messages_en.properties");
-        messageManager.loadProperties("message-test/messages_en_US.properties");
+        messageManager.load("message-test/messages.properties");
+        messageManager.load("message-test/messages_en.properties");
+        messageManager.load("message-test/messages_en_US.properties");
     }
 
     @Test

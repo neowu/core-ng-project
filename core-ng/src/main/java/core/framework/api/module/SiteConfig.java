@@ -29,17 +29,12 @@ public final class SiteConfig {
         return new SessionConfig(context);
     }
 
-    public MessageConfig message() {
-        return new MessageConfig(context);
-    }
-
     public CDNConfig cdn() {
         return new CDNConfig(context);
     }
 
-    public void template(String path, Class<?> modelClass) {
-        context.httpServer.siteManager.templateManager.messageManager.initialize();
-        context.httpServer.siteManager.templateManager.add(path, modelClass);
+    public TemplateConfig template() {
+        return new TemplateConfig(context);
     }
 
     public void staticContent(String path) {

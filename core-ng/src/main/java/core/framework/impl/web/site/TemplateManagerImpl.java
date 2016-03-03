@@ -26,9 +26,8 @@ import java.util.Map;
 public class TemplateManagerImpl implements TemplateManager {
     public final MessageManager messageManager = new MessageManager();
     public final CDNManager cdnManager = new CDNManager();
-
+    public final Map<String, Templates> templates = Maps.newConcurrentHashMap();
     private final Logger logger = LoggerFactory.getLogger(TemplateManagerImpl.class);
-    private final Map<String, Templates> templates = Maps.newConcurrentHashMap();
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
 
