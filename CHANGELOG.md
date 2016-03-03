@@ -6,6 +6,10 @@
 * mongo support @EnumValue?
 
 ## Change log
+### 4.2.7 (3/3/2016)
+* mongo: disable cursorFinalizer, framework always close cursor
+* thread: limit executor to processor*4 thread, to collect data for next phase design
+
 ### 4.2.6 (3/3/2016)
 * config: update template and message config API
 * web: support convert query param as value type

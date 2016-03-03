@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class ExecutorImpl implements Executor {
     private final Logger logger = LoggerFactory.getLogger(ExecutorImpl.class);
-    private final ExecutorService executorService = Executors.newCachedThreadPool(new ExecutorThreadFactory());
+    private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4, new ExecutorThreadFactory());
     private final LogManager logManager;
 
     public ExecutorImpl(LogManager logManager) {

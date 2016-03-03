@@ -24,7 +24,9 @@ import java.util.List;
 public class Mongo {
     final EntityCodecs codecs = new EntityCodecs();
     private final Logger logger = LoggerFactory.getLogger(Mongo.class);
-    private final MongoClientOptions.Builder builder = MongoClientOptions.builder().socketKeepAlive(true);
+    private final MongoClientOptions.Builder builder = MongoClientOptions.builder()
+        .socketKeepAlive(true)
+        .cursorFinalizerEnabled(false); // framework always close db cursor
     int timeoutInMs = (int) Duration.ofSeconds(10).toMillis();
     int tooManyRowsReturnedThreshold = 2000;
     long slowOperationThresholdInMs = Duration.ofSeconds(5).toMillis();
