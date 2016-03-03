@@ -2,9 +2,7 @@ package core.framework.impl.web.request;
 
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
-import core.framework.api.util.Strings;
 import core.framework.api.web.exception.BadRequestException;
 
 import java.util.Map;
@@ -24,47 +22,9 @@ public final class PathParams {
         }
     }
 
-    public <T> T get(String name, Class<T> valueClass) {
+    public String get(String name) {
         String value = params.get(name);
         if (value == null) throw Exceptions.error("path variable not found, name={}", name);
-        return convert(value, valueClass);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> T convert(String value, Class<T> valueClass) {
-        if (String.class.equals(valueClass)) {
-            return (T) value;
-        } else if (Integer.class.equals(valueClass)) {
-            return (T) toInt(value);
-        } else if (Long.class.equals(valueClass)) {
-            return (T) toLong(value);
-        } else if (Enum.class.isAssignableFrom(valueClass)) {
-            return (T) toEnum(value, (Class<? extends Enum>) valueClass);
-        }
-        throw Exceptions.error("not supported path param type, please contact arch team, type={}", valueClass.getCanonicalName());
-    }
-
-    private <T extends Enum> T toEnum(String value, Class<T> valueClass) {
-        try {
-            return JSON.fromEnumValue(valueClass, value);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(Strings.format("failed to parse value to enum, enumClass={}, value={}", valueClass.getCanonicalName(), value), BadRequestException.DEFAULT_ERROR_CODE, e);
-        }
-    }
-
-    private Long toLong(String value) {
-        try {
-            return Long.parseLong(value);
-        } catch (NumberFormatException e) {
-            throw new BadRequestException(Strings.format("failed to parse value to long, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
-        }
-    }
-
-    private Integer toInt(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            throw new BadRequestException(Strings.format("failed to parse value to int, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
-        }
+        return value;
     }
 }

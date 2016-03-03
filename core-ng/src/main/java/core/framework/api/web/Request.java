@@ -23,7 +23,7 @@ public interface Request {
 
     <T> T pathParam(String name, Class<T> valueClass);
 
-    Optional<String> queryParam(String name);
+    <T> Optional<T> queryParam(String name, Class<T> valueClass);
 
     Optional<String> formParam(String name);
 
@@ -39,5 +39,9 @@ public interface Request {
 
     default String pathParam(String name) {
         return pathParam(name, String.class);
+    }
+
+    default Optional<String> queryParam(String name) {
+        return queryParam(name, String.class);
     }
 }

@@ -35,17 +35,17 @@ public class PathNodeTest {
         PathParams pathParams = new PathParams();
         URLHandler found = root.find("/value", pathParams);
         Assert.assertSame(handler1, found);
-        Assert.assertEquals("value", pathParams.get("var1", String.class));
+        Assert.assertEquals("value", pathParams.get("var1"));
 
         pathParams = new PathParams();
         found = root.find("/path1/value", pathParams);
         Assert.assertSame(handler2, found);
-        Assert.assertEquals("value", pathParams.get("var1", String.class));
+        Assert.assertEquals("value", pathParams.get("var1"));
 
         pathParams = new PathParams();
         found = root.find("/path1/value/path2", pathParams);
         Assert.assertSame(handler3, found);
-        Assert.assertEquals("value", pathParams.get("var1", String.class));
+        Assert.assertEquals("value", pathParams.get("var1"));
     }
 
     @Test
@@ -59,12 +59,12 @@ public class PathNodeTest {
         PathParams pathParams = new PathParams();
         URLHandler found = root.find(Path.parse("/path1/100/path2"), pathParams);
         Assert.assertSame(handler2, found);
-        Assert.assertEquals("100", pathParams.get("var1", String.class));
+        Assert.assertEquals("100", pathParams.get("var1"));
 
         pathParams = new PathParams();
         found = root.find(Path.parse("/path1/value/path2"), pathParams);
         Assert.assertSame(handler3, found);
-        Assert.assertEquals("value", pathParams.get("var1", String.class));
+        Assert.assertEquals("value", pathParams.get("var1"));
     }
 
     @Test
@@ -77,12 +77,12 @@ public class PathNodeTest {
         PathParams pathParams = new PathParams();
         URLHandler found = root.find(Path.parse("/path1/value"), pathParams);
         Assert.assertSame(handler1, found);
-        Assert.assertEquals("value", pathParams.get("var", String.class));
+        Assert.assertEquals("value", pathParams.get("var"));
 
         pathParams = new PathParams();
         found = root.find(Path.parse("/path1/value/"), pathParams);
         Assert.assertSame(handler2, found);
-        Assert.assertEquals("value", pathParams.get("var", String.class));
+        Assert.assertEquals("value", pathParams.get("var"));
     }
 
     @Test
@@ -96,12 +96,12 @@ public class PathNodeTest {
         PathParams pathParams = new PathParams();
         URLHandler matchedHandler = root.find("/path1/path2/path3/value", pathParams);
         Assert.assertSame(handler, matchedHandler);
-        Assert.assertEquals("path3/value", pathParams.get("url", String.class));
+        Assert.assertEquals("path3/value", pathParams.get("url"));
 
         pathParams = new PathParams();
         matchedHandler = root.find("/path1/path2/path3/value/", pathParams);
         Assert.assertSame(handler, matchedHandler);
-        Assert.assertEquals("path3/value/", pathParams.get("url", String.class));
+        Assert.assertEquals("path3/value/", pathParams.get("url"));
     }
 
     @Test

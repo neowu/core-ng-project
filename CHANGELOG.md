@@ -7,8 +7,9 @@
 * make config class statefull to make validation order of config easier? for site().message()/template()
 
 ## Change log
-### 4.2.6
+### 4.2.6 (3/3/2016)
 * config: update template and message config API
+* web: support convert query param as value type
 
 ### 4.2.5 (3/2/2016)
 * template: refine i18n language support
