@@ -4,7 +4,6 @@
 * use smile for cache/queue?
 * think about Batch, and make it interface if design is final
 * mongo support @EnumValue?
-* make config class statefull to make validation order of config easier? for site().message()/template()
 
 ## Change log
 ### 4.2.6 (3/3/2016)
