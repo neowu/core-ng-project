@@ -2,6 +2,7 @@ package core.framework.impl.search;
 
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
+import core.framework.api.search.AnalyzeRequest;
 import core.framework.api.search.BulkIndexRequest;
 import core.framework.api.search.DeleteRequest;
 import core.framework.api.search.ElasticSearchType;
@@ -16,6 +17,7 @@ import core.framework.api.util.StopWatch;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.json.JSONWriter;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -176,6 +179,23 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("delete, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public List<String> analyze(AnalyzeRequest request) {
+        StopWatch watch = new StopWatch();
+        String index = request.index == null ? this.index : request.index;
+        try {
+            AnalyzeResponse response = client.admin().indices().prepareAnalyze(index, request.text).setAnalyzer(request.analyzer).get();
+            return response.getTokens().stream().map(AnalyzeResponse.AnalyzeToken::getTerm).collect(Collectors.toList());
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("elasticsearch", elapsedTime);
+            logger.debug("analyze, index={}, analyzer={}, elapsedTime={}", index, request.analyzer, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

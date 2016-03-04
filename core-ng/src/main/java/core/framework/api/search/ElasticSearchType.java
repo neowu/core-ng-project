@@ -1,5 +1,6 @@
 package core.framework.api.search;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,5 +41,14 @@ public interface ElasticSearchType<T> {
         DeleteRequest request = new DeleteRequest();
         request.id = id;
         return delete(request);
+    }
+
+    List<String> analyze(AnalyzeRequest request);
+
+    default List<String> analyze(String analyzer, String text) {
+        AnalyzeRequest request = new AnalyzeRequest();
+        request.analyzer = analyzer;
+        request.text = text;
+        return analyze(request);
     }
 }

@@ -5,8 +5,12 @@
 * think about Batch, and make it interface if design is final
 * mongo support @EnumValue?
 * extend i18n message to validator/format/called by code directly
+* search, make analyze to ES
 
 ## Change log
+### 4.2.7-b3 (3/4/2016)
+* search: remove client(), add analyze/index meta support
+
 ### 4.2.7-b2 (3/4/2016)
 * validation: support @Pattern
 

@@ -1,13 +1,20 @@
 package core.framework.impl.search;
 
+import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import core.framework.api.search.ElasticSearch;
+import core.framework.api.search.ElasticSearchIndex;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.search.SearchException;
 import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
+import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
@@ -18,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,15 +74,11 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndex(String index, String source) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin()
-                .indices()
-                .prepareCreate(index)
-                .setSource(source)
-                .get();
+            client().admin().indices().prepareCreate(index).setSource(source).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            logger.debug("create index, index={}, elapsedTime={}", index, watch.elapsedTime());
+            logger.info("create index, index={}, elapsedTime={}", index, watch.elapsedTime());
         }
     }
 
@@ -82,15 +86,11 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndexTemplate(String name, String source) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin()
-                .indices()
-                .preparePutTemplate(name)
-                .setSource(source)
-                .get();
+            client().admin().indices().preparePutTemplate(name).setSource(source).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            logger.debug("create index template, name={}, elapsedTime={}", name, watch.elapsedTime());
+            logger.info("create index template, name={}, elapsedTime={}", name, watch.elapsedTime());
         }
     }
 
@@ -98,18 +98,61 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void flush(String index) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin()
-                .indices()
-                .prepareFlush(index)
-                .get();
+            client().admin().indices().prepareFlush(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            logger.debug("flush, index={}, elapsedTime={}", index, watch.elapsedTime());
+            logger.info("flush, index={}, elapsedTime={}", index, watch.elapsedTime());
         }
     }
 
     @Override
+    public void closeIndex(String index) {
+        StopWatch watch = new StopWatch();
+        try {
+            client().admin().indices().prepareClose(index).get();
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            logger.info("close, index={}, elapsedTime={}", index, watch.elapsedTime());
+        }
+    }
+
+    @Override
+    public void deleteIndex(String index) {
+        StopWatch watch = new StopWatch();
+        try {
+            client().admin().indices().prepareDelete(index).get();
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            logger.info("delete, index={}, elapsedTime={}", index, watch.elapsedTime());
+        }
+    }
+
+    @Override
+    public List<ElasticSearchIndex> indices() {
+        StopWatch watch = new StopWatch();
+        try {
+            AdminClient adminClient = client().admin();
+            ClusterStateResponse response = adminClient.cluster().state(new ClusterStateRequest().clear().metaData(true)).actionGet();
+            ImmutableOpenMap<String, IndexMetaData> indices = response.getState().getMetaData().indices();
+            List<ElasticSearchIndex> results = new ArrayList<>(indices.size());
+            for (ObjectObjectCursor<String, IndexMetaData> cursor : indices) {
+                IndexMetaData metaData = cursor.value;
+                ElasticSearchIndex index = new ElasticSearchIndex();
+                index.index = metaData.getIndex();
+                index.state = metaData.getState();
+                results.add(index);
+            }
+            return results;
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            logger.info("indices, elapsedTime={}", watch.elapsedTime());
+        }
+    }
+
     public Client client() {
         if (client == null) {
             client = createClient();

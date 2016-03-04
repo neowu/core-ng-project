@@ -1,6 +1,6 @@
 package core.framework.api.search;
 
-import org.elasticsearch.client.Client;
+import java.util.List;
 
 /**
  * @author neo
@@ -10,7 +10,11 @@ public interface ElasticSearch {
 
     void createIndexTemplate(String name, String source);
 
-    void flush(String index);
+    void closeIndex(String index);
 
-    Client client();
+    void deleteIndex(String index);
+
+    List<ElasticSearchIndex> indices();
+
+    void flush(String index);
 }
