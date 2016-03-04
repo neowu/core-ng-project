@@ -153,7 +153,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         }
     }
 
-    public Client client() {
+    private Client client() {
         if (client == null) {
             client = createClient();
         }

@@ -8,7 +8,7 @@
 * search, make analyze to ES
 
 ## Change log
-### 4.2.7-b3 (3/4/2016)
+### 4.2.7-b3 (3/4/2016 - )
 * search: remove client(), add analyze/index meta support
 
 ### 4.2.7-b2 (3/4/2016)
