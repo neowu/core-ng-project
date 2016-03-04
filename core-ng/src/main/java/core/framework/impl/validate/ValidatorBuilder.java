@@ -8,6 +8,7 @@ import core.framework.api.validate.Max;
 import core.framework.api.validate.Min;
 import core.framework.api.validate.NotEmpty;
 import core.framework.api.validate.NotNull;
+import core.framework.api.validate.Pattern;
 import core.framework.api.validate.ValueNotEmpty;
 import core.framework.api.validate.ValueNotNull;
 import core.framework.impl.reflect.Fields;
@@ -77,6 +78,7 @@ public class ValidatorBuilder {
     private void createValidators(List<FieldValidator> validators, Field field, String parentPath) {
         createNotNullValidator(validators, field, parentPath);
         createNotEmptyValidator(validators, field, parentPath);
+        createPatternValidator(validators, field, parentPath);
         createLengthValidator(validators, field, parentPath);
         createMinValidator(validators, field, parentPath);
         createMaxValidator(validators, field, parentPath);
@@ -175,9 +177,20 @@ public class ValidatorBuilder {
         NotEmpty notEmpty = field.getDeclaredAnnotation(NotEmpty.class);
         if (notEmpty != null) {
             if (!String.class.equals(fieldClass)) {
-                throw Exceptions.error("@Length must on String, field={}, fieldClass={}", Fields.path(field), fieldClass.getCanonicalName());
+                throw Exceptions.error("@NotEmpty must on String, field={}, fieldClass={}", Fields.path(field), fieldClass.getCanonicalName());
             }
             validators.add(new NotEmptyValidator(fieldPath(parentPath, field), notEmpty.message()));
+        }
+    }
+
+    private void createPatternValidator(List<FieldValidator> validators, Field field, String parentPath) {
+        Class<?> fieldClass = field.getType();
+        Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
+        if (pattern != null) {
+            if (!String.class.equals(fieldClass)) {
+                throw Exceptions.error("@Pattern must on String, field={}, fieldClass={}", Fields.path(field), fieldClass.getCanonicalName());
+            }
+            validators.add(new PatternValidator(pattern.value(), fieldPath(parentPath, field), pattern.message()));
         }
     }
 

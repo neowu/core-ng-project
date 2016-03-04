@@ -7,14 +7,12 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Min can be used on numeric fields.
- *
  * @author neo
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface Min {
-    double value();
+public @interface Pattern {
+    String value();
 
-    String message() default "field must not be less than min";
+    String message() default "field must match pattern";
 }

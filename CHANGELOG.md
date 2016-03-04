@@ -4,9 +4,13 @@
 * use smile for cache/queue?
 * think about Batch, and make it interface if design is final
 * mongo support @EnumValue?
+* extend i18n message to validator/format/called by code directly
 
 ## Change log
-### 4.2.7 (3/3/2016)
+### 4.2.7-b2 (3/4/2016)
+* validation: support @Pattern
+
+### 4.2.7-b1 (3/3/2016)
 * mongo: disable cursorFinalizer, framework always close cursor
 * thread: limit executor to processor*4 thread, to collect data for next phase design
 

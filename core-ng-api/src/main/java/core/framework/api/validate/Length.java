@@ -18,5 +18,5 @@ public @interface Length {
 
     int max() default -1;
 
-    String message() default "the length of field must be within range";
+    String message() default "length must be between min and max";
 }
