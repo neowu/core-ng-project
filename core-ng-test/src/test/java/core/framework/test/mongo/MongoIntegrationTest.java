@@ -1,9 +1,11 @@
 package core.framework.test.mongo;
 
 import com.mongodb.client.model.Filters;
+import core.framework.api.mongo.Mongo;
 import core.framework.api.mongo.MongoCollection;
 import core.framework.test.IntegrationTest;
 import org.bson.types.ObjectId;
+import org.junit.After;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -20,6 +22,13 @@ import static org.junit.Assert.assertTrue;
 public class MongoIntegrationTest extends IntegrationTest {
     @Inject
     MongoCollection<TestEntity> collection;
+    @Inject
+    Mongo mongo;
+
+    @After
+    public void cleanup() {
+        mongo.dropCollection("entity");
+    }
 
     @Test
     public void insert() {

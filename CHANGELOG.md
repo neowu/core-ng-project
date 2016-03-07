@@ -3,13 +3,13 @@
 * framework error, queue listener, background task error notification?
 * use smile for cache/queue?
 * think about Batch, and make it interface if design is final
-* mongo support @EnumValue?
+* mongo support @EnumValue? and register enum codec for Query/Filters
 * extend i18n message to validator/format/called by code directly
-* search, make analyze to ES
 
 ## Change log
-### 4.2.7-b3 (3/4/2016 - )
+### 4.2.7-b3 (3/4/2016 - 3/7/2016)
 * search: remove client(), add analyze/index meta support
+* mongo: added Mongo interface for unit test and management
 
 ### 4.2.7-b2 (3/4/2016)
 * validation: support @Pattern

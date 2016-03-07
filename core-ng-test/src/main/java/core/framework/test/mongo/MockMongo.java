@@ -3,13 +3,13 @@ package core.framework.test.mongo;
 import com.github.fakemongo.Fongo;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
-import core.framework.impl.mongo.Mongo;
+import core.framework.impl.mongo.MongoImpl;
 import org.bson.codecs.configuration.CodecRegistry;
 
 /**
  * @author neo
  */
-public class MockMongo extends Mongo {
+public class MockMongo extends MongoImpl {
     private final Fongo fongo = new Fongo("fongo");
 
     @Override
@@ -19,6 +19,5 @@ public class MockMongo extends Mongo {
 
     @Override
     public void close() {
-
     }
 }

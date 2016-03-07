@@ -1,9 +1,10 @@
 package core.framework.api.module;
 
+import core.framework.api.mongo.Mongo;
 import core.framework.api.mongo.MongoCollection;
 import core.framework.api.util.Types;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.mongo.Mongo;
+import core.framework.impl.mongo.MongoImpl;
 
 import java.time.Duration;
 
@@ -12,7 +13,7 @@ import java.time.Duration;
  */
 public final class MongoConfig {
     private final ModuleContext context;
-    private final Mongo mongo;
+    private final MongoImpl mongo;
 
     public MongoConfig(ModuleContext context) {
         this.context = context;
@@ -20,9 +21,9 @@ public final class MongoConfig {
             mongo = context.beanFactory.bean(Mongo.class, null);
         } else {
             if (context.isTest()) {
-                mongo = context.mockFactory.create(Mongo.class);
+                mongo = context.mockFactory.create(MongoImpl.class);
             } else {
-                mongo = new Mongo();
+                mongo = new MongoImpl();
                 context.startupHook.add(mongo::initialize);
                 context.shutdownHook.add(mongo::close);
             }

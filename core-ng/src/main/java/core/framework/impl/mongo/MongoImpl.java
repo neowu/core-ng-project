@@ -5,6 +5,7 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
 import core.framework.api.mongo.Collection;
+import core.framework.api.mongo.Mongo;
 import core.framework.api.mongo.MongoCollection;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.StopWatch;
@@ -21,9 +22,9 @@ import java.util.List;
 /**
  * @author neo
  */
-public class Mongo {
+public class MongoImpl implements Mongo {
     final EntityCodecs codecs = new EntityCodecs();
-    private final Logger logger = LoggerFactory.getLogger(Mongo.class);
+    private final Logger logger = LoggerFactory.getLogger(MongoImpl.class);
     private final MongoClientOptions.Builder builder = MongoClientOptions.builder()
         .socketKeepAlive(true)
         .cursorFinalizerEnabled(false); // framework always close db cursor
@@ -56,6 +57,16 @@ public class Mongo {
     public void close() {
         logger.info("close mongodb client, uri={}", uri);
         mongoClient.close();
+    }
+
+    @Override
+    public void dropCollection(String collection) {
+        StopWatch watch = new StopWatch();
+        try {
+            database().getCollection(collection).drop();
+        } finally {
+            logger.info("dropCollection, collection={}, elapsedTime={}", collection, watch.elapsedTime());
+        }
     }
 
     private CodecRegistry codecRegistry() {
@@ -105,7 +116,11 @@ public class Mongo {
 
     <T> com.mongodb.client.MongoCollection<T> mongoCollection(Class<T> entityClass) {
         Collection collection = entityClass.getDeclaredAnnotation(Collection.class);
+        return database().getCollection(collection.name(), entityClass);
+    }
+
+    private MongoDatabase database() {
         if (database == null) initialize(); // lazy init for dev test, initialize will be called in startup hook for complete env
-        return database.getCollection(collection.name(), entityClass);
+        return database;
     }
 }

@@ -33,13 +33,13 @@ import java.util.function.Consumer;
  */
 public class MongoCollectionImpl<T> implements MongoCollection<T> {
     private final Logger logger = LoggerFactory.getLogger(MongoCollectionImpl.class);
-    private final Mongo mongo;
+    private final MongoImpl mongo;
     private final Class<T> entityClass;
     private final String collectionName;
     private final EntityValidator<T> validator;
     private com.mongodb.client.MongoCollection<T> collection;
 
-    public MongoCollectionImpl(Mongo mongo, Class<T> entityClass) {
+    public MongoCollectionImpl(MongoImpl mongo, Class<T> entityClass) {
         this.mongo = mongo;
         this.entityClass = entityClass;
         validator = new EntityValidator<>(entityClass);
