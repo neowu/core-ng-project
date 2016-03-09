@@ -1,6 +1,7 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
+import core.framework.api.util.Sets;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
 import core.framework.impl.reflect.GenericTypes;
@@ -12,12 +13,14 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author neo
  */
 final class EntityEncoderBuilder<T> {
     final Map<String, String> methods = new LinkedHashMap<>();
+    final Set<Class<? extends Enum>> enumClasses = Sets.newHashSet();
     private final Class<T> entityClass;
     private final String helper = EntityCodecHelper.class.getCanonicalName();
 
@@ -123,6 +126,7 @@ final class EntityEncoderBuilder<T> {
         } else if (LocalDateTime.class.equals(fieldClass)) {
             builder.indent(indent).append("{}.writeLocalDateTime(writer, {});\n", helper, fieldVariable);
         } else if (Enum.class.isAssignableFrom(fieldClass)) {
+            registerEnumClass(fieldClass);
             builder.indent(indent).append("{}.writeEnum(writer, (Enum) {});\n", helper, fieldVariable);
         } else if (Double.class.equals(fieldClass)) {
             builder.indent(indent).append("{}.writeDouble(writer, {});\n", helper, fieldVariable);
@@ -143,5 +147,10 @@ final class EntityEncoderBuilder<T> {
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, {});\n", encodeFieldMethod, fieldVariable);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void registerEnumClass(Class<?> fieldClass) {
+        enumClasses.add((Class<? extends Enum>) fieldClass);
     }
 }

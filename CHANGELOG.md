@@ -3,27 +3,22 @@
 * framework error, queue listener, background task error notification?
 * use smile for cache/queue?
 * think about Batch, and make it interface if design is final
-* mongo support @EnumValue? and register enum codec for Query/Filters
+* mongo support @EnumValue?
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
-### 4.2.8-b1 (3/9/2016)
+### 4.2.8-b1,b2 (3/9/2016 - )
 * stopwatch: start to use nanoTime
 * log: actionlog start to trace cpuTime
+* mongo: register enum codec from entity, for filter
 
-### 4.2.7-b4 (3/7/2016 - 3/8/2016)
+### 4.2.7-b1,b2,b3,b4 (3/3/2016 - 3/8/2016)
 * rabbitmq: make rabbitmq listener use dedicated thread pool
 * executor: remove Batch<T> support
 * scheduler: use dedicated thread pool
-
-### 4.2.7-b3 (3/4/2016 - 3/7/2016)
 * search: remove client(), add analyze/index meta support
 * mongo: added Mongo interface for unit test and management
-
-### 4.2.7-b2 (3/4/2016)
 * validation: support @Pattern
-
-### 4.2.7-b1 (3/3/2016)
 * mongo: disable cursorFinalizer, framework always close cursor
 * thread: limit executor to processor*4 thread, to collect data for next phase design
 

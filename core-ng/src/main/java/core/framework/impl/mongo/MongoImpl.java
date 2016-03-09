@@ -72,6 +72,7 @@ public class MongoImpl implements Mongo {
     private CodecRegistry codecRegistry() {
         List<Codec<?>> codecs = new ArrayList<>(this.codecs.codecs.values());
         codecs.add(new LocalDateTimeCodec());
+        this.codecs.enumClasses.forEach(enumClass -> codecs.add(new EnumCodec<>(enumClass)));
         return CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), CodecRegistries.fromCodecs(codecs));
     }
 

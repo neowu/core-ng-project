@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.Maps;
+import core.framework.api.util.Sets;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;
@@ -15,6 +16,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -24,7 +26,10 @@ public class EntityEncoderBuilderTest {
     @Test
     public void encode() throws IOException {
         EntityEncoderBuilder<TestEntity> builder = new EntityEncoderBuilder<>(TestEntity.class);
+
         EntityEncoder<TestEntity> encoder = builder.build();
+
+        assertEquals(Sets.newHashSet(TestEntityChild.TestEnum.class), builder.enumClasses);
 
         verifyGeneratedMethods(builder);
 

@@ -39,7 +39,7 @@ public final class RabbitMQListener implements MessageHandlerConfig {
     private final Map<String, MessageHandler> handlers = Maps.newHashMap();
     private final Map<String, JSONReader> readers = Maps.newHashMap();
     private int poolSize = Runtime.getRuntime().availableProcessors() * 2;
-    private ExecutorService handlerThreadPool;
+    private ExecutorService handlerExecutor;
 
     public RabbitMQListener(RabbitMQ rabbitMQ, String queue, MessageValidator validator, LogManager logManager) {
         this.queue = queue;
@@ -52,7 +52,7 @@ public final class RabbitMQListener implements MessageHandlerConfig {
                 try (RabbitMQConsumer consumer = rabbitMQ.consumer(queue, poolSize * 2)) { // prefetch one more for each handler to improve throughput
                     while (!stop.get()) {
                         QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-                        handlerThreadPool.submit(() -> handle(consumer, delivery));
+                        handlerExecutor.submit(() -> handle(consumer, delivery));
                     }
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
@@ -83,7 +83,7 @@ public final class RabbitMQListener implements MessageHandlerConfig {
     }
 
     public void start() {
-        handlerThreadPool = ThreadPools.cachedThreadPool(poolSize, "rabbitMQ-" + queue + "-handler-");
+        handlerExecutor = ThreadPools.cachedThreadPool(poolSize, "rabbitMQ-" + queue + "-handler-");
         listenerThread.start();
     }
 
@@ -91,7 +91,7 @@ public final class RabbitMQListener implements MessageHandlerConfig {
         logger.info("stop rabbitMQ listener, queue={}", queue);
         stop.set(true);
         listenerThread.interrupt();
-        handlerThreadPool.shutdown();
+        handlerExecutor.shutdown();
     }
 
     private Void handle(RabbitMQConsumer consumer, QueueingConsumer.Delivery delivery) throws Exception {

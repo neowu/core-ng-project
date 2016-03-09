@@ -15,4 +15,11 @@ public class TestEntity {
 
     @Field(name = "string_field")
     public String stringField;
+
+    @Field(name = "enum_field")
+    public TestEnum enumField;
+
+    public enum TestEnum {
+        VALUE1, VALUE2
+    }
 }

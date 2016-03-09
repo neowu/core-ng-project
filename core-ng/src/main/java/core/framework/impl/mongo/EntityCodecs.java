@@ -2,15 +2,18 @@ package core.framework.impl.mongo;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
+import core.framework.api.util.Sets;
 import org.bson.codecs.Codec;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author neo
  */
 public final class EntityCodecs {
-    public final Map<Class<?>, EntityCodec<?>> codecs = Maps.newHashMap();
+    final Map<Class<?>, EntityCodec<?>> codecs = Maps.newHashMap();
+    final Set<Class<? extends Enum>> enumClasses = Sets.newHashSet();
 
     public <T> void registerEntity(Class<T> entityClass) {
         EntityIdHandler<T> entityIdHandler = new EntityIdHandlerBuilder<>(entityClass).build();
@@ -29,7 +32,9 @@ public final class EntityCodecs {
     }
 
     private <T> void register(Class<T> entityClass, EntityIdHandler<T> idHandler) {
-        EntityEncoder<T> entityEncoder = new EntityEncoderBuilder<>(entityClass).build();
+        EntityEncoderBuilder<T> builder = new EntityEncoderBuilder<>(entityClass);
+        EntityEncoder<T> entityEncoder = builder.build();
+        enumClasses.addAll(builder.enumClasses);
         EntityDecoder<T> entityDecoder = new EntityDecoderBuilder<>(entityClass).build();
         EntityCodec<T> codec = new EntityCodec<>(entityClass, idHandler, entityEncoder, entityDecoder);
         Codec<?> previous = codecs.putIfAbsent(entityClass, codec);
