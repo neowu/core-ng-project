@@ -5,6 +5,7 @@ import core.framework.api.search.GetRequest;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.impl.log.queue.ActionLogMessage;
+import core.framework.impl.log.queue.PerformanceStatMessage;
 import core.log.IntegrationTest;
 import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;
@@ -37,6 +38,10 @@ public class ActionManagerTest extends IntegrationTest {
         message1.date = Instant.now();
         message1.result = "OK";
         message1.context = Maps.newHashMap("key", "value");
+        PerformanceStatMessage stat = new PerformanceStatMessage();
+        stat.count = 1;
+        stat.totalElapsed = 10L;
+        message1.performanceStats = Maps.newHashMap("redis", stat);
         ActionLogMessage message2 = new ActionLogMessage();
         message2.id = "2";
         message2.date = Instant.now();

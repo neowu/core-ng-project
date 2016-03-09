@@ -13,10 +13,25 @@
         {
           "context": {
             "path_match": "context.*",
-            "match_mapping_type": "string",
             "mapping": {
               "type": "string",
               "index": "not_analyzed"
+            }
+          }
+        },
+        {
+          "perf_stats.count": {
+            "path_match": "perf_stats.*.count",
+            "mapping": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "perf_stats.total_elapsed": {
+            "path_match": "perf_stats.*.total_elapsed",
+            "mapping": {
+              "type": "long"
             }
           }
         }
