@@ -262,7 +262,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
     }
 
     private void checkSlowOperation(long elapsedTime) {
-        if (elapsedTime > mongo.slowOperationThresholdInMs) {
+        if (elapsedTime > mongo.slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_MONGODB"), "slow mongoDB query, elapsedTime={}", elapsedTime);
         }
     }

@@ -105,6 +105,7 @@ public class ActionManager {
         actionLog.errorCode = message.errorCode;
         actionLog.errorMessage = message.errorMessage;
         actionLog.elapsed = message.elapsed;
+        actionLog.cpuTime = message.cpuTime;
         actionLog.context = message.context;
         actionLog.performanceStats = message.performanceStats;
         return actionLog;

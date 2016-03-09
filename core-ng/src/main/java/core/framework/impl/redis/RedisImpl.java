@@ -32,7 +32,7 @@ public final class RedisImpl implements Redis {
     public final Pool<BinaryJedis> pool;
     private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
     private String host;
-    private long slowOperationThresholdInMs = 500;
+    private long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
     private Duration timeout;
 
     public RedisImpl() {
@@ -53,7 +53,7 @@ public final class RedisImpl implements Redis {
     }
 
     public void slowOperationThreshold(Duration slowOperationThreshold) {
-        slowOperationThresholdInMs = slowOperationThreshold.toMillis();
+        slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
     }
 
     private BinaryJedis createClient() {
@@ -334,7 +334,7 @@ public final class RedisImpl implements Redis {
     }
 
     private void checkSlowOperation(long elapsedTime) {
-        if (elapsedTime > slowOperationThresholdInMs) {
+        if (elapsedTime > slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_REDIS"), "slow redis operation, elapsedTime={}", elapsedTime);
         }
     }

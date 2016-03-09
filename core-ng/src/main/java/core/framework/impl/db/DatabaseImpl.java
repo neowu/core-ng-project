@@ -36,7 +36,7 @@ public final class DatabaseImpl implements Database {
     private final Properties driverProperties = new Properties();
 
     public int tooManyRowsReturnedThreshold = 1000;
-    long slowOperationThresholdInMs = Duration.ofSeconds(5).toMillis();
+    long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     private Duration timeout;
     private Driver driver;
     private String url;
@@ -112,7 +112,7 @@ public final class DatabaseImpl implements Database {
     }
 
     public void slowOperationThreshold(Duration slowOperationThreshold) {
-        slowOperationThresholdInMs = slowOperationThreshold.toMillis();
+        slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
     }
 
     public <T> void view(Class<T> viewClass) {
@@ -202,7 +202,7 @@ public final class DatabaseImpl implements Database {
 
 
     private void checkSlowOperation(long elapsedTime) {
-        if (elapsedTime > slowOperationThresholdInMs) {
+        if (elapsedTime > slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsedTime={}", elapsedTime);
         }
     }

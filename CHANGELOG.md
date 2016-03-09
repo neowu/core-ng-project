@@ -7,7 +7,11 @@
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
-### 4.2.7-b4 (3/7/2016)
+### 4.2.8-b1 (3/9/2016)
+* stopwatch: start to use nanoTime
+* log: actionlog start to trace cpuTime
+
+### 4.2.7-b4 (3/7/2016 - 3/8/2016)
 * rabbitmq: make rabbitmq listener use dedicated thread pool
 * executor: remove Batch<T> support
 * scheduler: use dedicated thread pool

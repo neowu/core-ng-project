@@ -1,8 +1,10 @@
 package core.framework.impl.log;
 
 import core.framework.api.util.Maps;
+import core.framework.api.util.StopWatch;
 
-import java.time.Duration;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,18 +16,23 @@ import java.util.UUID;
  * @author neo
  */
 public final class ActionLog {
+    private static final ThreadMXBean THREAD = ManagementFactory.getThreadMXBean();
+
     private static final int MAX_TRACE_HOLD_SIZE = 3000;    // normal trace 3000 lines is about 350k
     public final String id = UUID.randomUUID().toString();
     final Instant startTime = Instant.now();
+    final long startCPUTime = THREAD.getCurrentThreadCpuTime();
     final Map<String, String> context = Maps.newLinkedHashMap();
     final Map<String, PerformanceStat> performanceStats = Maps.newHashMap();
     final List<LogEvent> events = new LinkedList<>();
     private final String logger = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
+    private final StopWatch watch = new StopWatch();
     public boolean trace;  // whether flush trace log for all subsequent actions
     public String action = "unassigned";
     String refId;
     String errorMessage;
     long elapsed;
+    long cpuTime;
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
@@ -35,7 +42,9 @@ public final class ActionLog {
     }
 
     void end(String message) {
-        elapsed = Duration.between(startTime, Instant.now()).toMillis();
+        long endCPUTime = THREAD.getCurrentThreadCpuTime();
+        cpuTime = endCPUTime - startCPUTime;
+        elapsed = watch.elapsedTime();
         log("[context] elapsed={}", elapsed);
         log(message);
     }

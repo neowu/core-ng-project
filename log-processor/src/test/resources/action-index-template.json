@@ -57,7 +57,10 @@
           "index": "no"
         },
         "elapsed": {
-          "type": "integer"
+          "type": "long"
+        },
+        "cpu_time": {
+          "type": "long"
         }
       }
     }

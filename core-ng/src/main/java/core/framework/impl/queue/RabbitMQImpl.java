@@ -36,7 +36,7 @@ public final class RabbitMQImpl implements RabbitMQ {
     private final ScheduledExecutorService heartbeatExecutor;
     private final Lock lock = new ReentrantLock();
     private Address[] addresses;
-    private long slowOperationThresholdInMs = 100;
+    private long slowOperationThresholdInNanos = Duration.ofMillis(100).toNanos();
     private volatile Connection connection;
 
     public RabbitMQImpl() {
@@ -91,13 +91,13 @@ public final class RabbitMQImpl implements RabbitMQ {
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        slowOperationThresholdInMs = threshold.toMillis();
+        slowOperationThresholdInNanos = threshold.toMillis();
     }
 
     @Override
     public RabbitMQConsumer consumer(String queue, int prefetchCount) {
         Channel channel = createChannel();
-        return new RabbitMQConsumer(channel, queue, prefetchCount, slowOperationThresholdInMs);
+        return new RabbitMQConsumer(channel, queue, prefetchCount, slowOperationThresholdInNanos);
     }
 
     @Override
@@ -122,7 +122,7 @@ public final class RabbitMQImpl implements RabbitMQ {
     }
 
     private void checkSlowOperation(long elapsedTime) {
-        if (elapsedTime > slowOperationThresholdInMs) {
+        if (elapsedTime > slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_RABBITMQ"), "slow rabbitMQ operation, elapsedTime={}", elapsedTime);
         }
     }

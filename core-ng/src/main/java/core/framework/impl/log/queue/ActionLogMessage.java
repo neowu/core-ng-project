@@ -31,6 +31,8 @@ public class ActionLogMessage {
     public String errorMessage;
     @XmlElement(name = "elapsed")
     public Long elapsed;
+    @XmlElement(name = "cpu_time")
+    public Long cpuTime;
     @XmlElement(name = "context")
     public Map<String, String> context;
     @XmlElement(name = "perf_stats")

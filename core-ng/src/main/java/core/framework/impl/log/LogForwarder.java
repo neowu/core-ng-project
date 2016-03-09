@@ -116,6 +116,7 @@ public final class LogForwarder {
         message.result = log.result();
         message.refId = log.refId;
         message.elapsed = log.elapsed;
+        message.cpuTime = log.cpuTime;
         message.action = log.action;
         message.errorCode = log.errorCode();
         message.errorMessage = log.errorMessage;

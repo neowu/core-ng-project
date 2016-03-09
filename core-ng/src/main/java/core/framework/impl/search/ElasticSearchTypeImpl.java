@@ -47,13 +47,13 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     private final String index;
     private final String type;
     private final DocumentValidator<T> validator;
-    private final long slowOperationThresholdInMs;
+    private final long slowOperationThresholdInNanos;
     private final JSONReader<T> reader;
     private final JSONWriter<T> writer;
 
     ElasticSearchTypeImpl(Client client, Class<T> documentClass, Duration slowOperationThreshold) {
         this.client = client;
-        this.slowOperationThresholdInMs = slowOperationThreshold.toMillis();
+        this.slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
         Index index = documentClass.getDeclaredAnnotation(Index.class);
         this.index = index.index();
         this.type = index.type();
@@ -201,7 +201,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     }
 
     private void checkSlowOperation(long elapsedTime) {
-        if (elapsedTime > slowOperationThresholdInMs) {
+        if (elapsedTime > slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_ES"), "slow elasticsearch operation, elapsedTime={}", elapsedTime);
         }
     }

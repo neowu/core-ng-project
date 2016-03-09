@@ -183,7 +183,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     private void checkSlowOperation(long elapsedTime) {
-        if (elapsedTime > database.slowOperationThresholdInMs) {
+        if (elapsedTime > database.slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsedTime={}", elapsedTime);
         }
     }

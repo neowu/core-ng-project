@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -33,11 +34,11 @@ public final class HTTPClient {
     private final Logger logger = LoggerFactory.getLogger(HTTPClient.class);
 
     private final CloseableHttpClient client;
-    private final long slowOperationThresholdInMs;
+    private final long slowOperationThresholdInNanos;
 
-    public HTTPClient(CloseableHttpClient client, long slowOperationThresholdInMs) {
+    public HTTPClient(CloseableHttpClient client, Duration slowOperationThreshold) {
         this.client = client;
-        this.slowOperationThresholdInMs = slowOperationThresholdInMs;
+        slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
     }
 
     public void close() {
@@ -73,7 +74,7 @@ public final class HTTPClient {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("http", elapsedTime);
             logger.debug("execute, elapsedTime={}", elapsedTime);
-            if (elapsedTime > slowOperationThresholdInMs) {
+            if (elapsedTime > slowOperationThresholdInNanos) {
                 logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http operation, elapsedTime={}", elapsedTime);
             }
         }

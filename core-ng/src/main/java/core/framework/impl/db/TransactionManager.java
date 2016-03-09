@@ -22,7 +22,7 @@ public final class TransactionManager {
     private final ThreadLocal<TransactionState> currentTransactionState = new ThreadLocal<>();
     private final Pool<Connection> pool;
     public IsolationLevel defaultIsolationLevel;
-    public long longTransactionThresholdInMs = Duration.ofSeconds(10).toMillis();
+    public long longTransactionThresholdInNanos = Duration.ofSeconds(10).toMillis();
 
     TransactionManager(Pool<Connection> pool) {
         this.pool = pool;
@@ -74,7 +74,7 @@ public final class TransactionManager {
         currentTransactionState.set(TransactionState.START);
         currentConnection.set(connection);
 
-        return new TransactionImpl(this, longTransactionThresholdInMs);
+        return new TransactionImpl(this, longTransactionThresholdInNanos);
     }
 
     public void commitTransaction() {

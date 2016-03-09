@@ -12,6 +12,6 @@ public class DemoServiceApp extends App {
         load(new SystemModule("sys.properties"));
 
         load(new ProductModule());
-        load(new JobModule());
+//        load(new JobModule());
     }
 }

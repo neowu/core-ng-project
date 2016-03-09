@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import static org.junit.Assert.assertEquals;
 
@@ -16,7 +17,7 @@ public class HTTPClientTest {
 
     @Before
     public void createHTTPClient() {
-        httpClient = new HTTPClient(null, 0);
+        httpClient = new HTTPClient(null, Duration.ofSeconds(5));
     }
 
     @Test

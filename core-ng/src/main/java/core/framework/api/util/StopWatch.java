@@ -11,11 +11,11 @@ public final class StopWatch {
     }
 
     public void reset() {
-        start = System.currentTimeMillis();
+        start = System.nanoTime();
     }
 
     public long elapsedTime() {
-        long end = System.currentTimeMillis();
+        long end = System.nanoTime();
         return end - start;
     }
 }

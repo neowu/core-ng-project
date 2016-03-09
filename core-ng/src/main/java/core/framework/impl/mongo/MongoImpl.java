@@ -30,7 +30,7 @@ public class MongoImpl implements Mongo {
         .cursorFinalizerEnabled(false); // framework always close db cursor
     int timeoutInMs = (int) Duration.ofSeconds(10).toMillis();
     int tooManyRowsReturnedThreshold = 2000;
-    long slowOperationThresholdInMs = Duration.ofSeconds(5).toMillis();
+    long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
 
     private MongoClientURI uri;
     private MongoClient mongoClient;
@@ -111,7 +111,7 @@ public class MongoImpl implements Mongo {
 
     public void slowOperationThreshold(Duration threshold) {
         if (database != null) throw new Error("slowOperationThreshold() must be called before initialize");
-        slowOperationThresholdInMs = threshold.toMillis();
+        slowOperationThresholdInNanos = threshold.toNanos();
     }
 
     <T> com.mongodb.client.MongoCollection<T> mongoCollection(Class<T> entityClass) {

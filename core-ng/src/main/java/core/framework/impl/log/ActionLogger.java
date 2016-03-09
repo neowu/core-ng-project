@@ -93,6 +93,8 @@ public final class ActionLogger {
                 .append(filterLineSeparator(log.errorMessage));
         }
 
+        builder.append(LOG_SPLITTER).append("cpuTime=").append(log.cpuTime);
+
         for (Map.Entry<String, String> entry : log.context.entrySet()) {
             builder.append(LOG_SPLITTER)
                 .append(entry.getKey())

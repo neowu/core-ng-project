@@ -15,12 +15,12 @@ final class TransactionImpl implements Transaction {
 
     private final TransactionManager transactionManager;
     private final StopWatch watch = new StopWatch();
-    private final long longTransactionThresholdInMs;
+    private final long longTransactionThresholdInNanos;
 
-    TransactionImpl(TransactionManager transactionManager, long longTransactionThresholdInMs) {
+    TransactionImpl(TransactionManager transactionManager, long longTransactionThresholdInNanos) {
         logger.debug("begin transaction");
         this.transactionManager = transactionManager;
-        this.longTransactionThresholdInMs = longTransactionThresholdInMs;
+        this.longTransactionThresholdInNanos = longTransactionThresholdInNanos;
     }
 
     @Override
@@ -40,7 +40,7 @@ final class TransactionImpl implements Transaction {
         } finally {
             long elapsedTime = watch.elapsedTime();
             logger.debug("end transaction, elapsedTime={}", elapsedTime);
-            if (elapsedTime > longTransactionThresholdInMs) {
+            if (elapsedTime > longTransactionThresholdInNanos) {
                 logger.warn(Markers.errorCode("LONG_TRANSACTION"), "long db transaction, elapsedTime={}", elapsedTime);
             }
         }
