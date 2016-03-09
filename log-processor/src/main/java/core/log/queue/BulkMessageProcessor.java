@@ -26,7 +26,7 @@ public class BulkMessageProcessor<T> {
     private final String queue;
     private final int bulkSize;
     private final Consumer<List<T>> consumer;
-    private final Thread processThread;
+    private final Thread processorThread;
     private final JSONReader<T> reader;
 
     public BulkMessageProcessor(RabbitMQ rabbitMQ, String queue, Class<T> messageClass, int bulkSize, Consumer<List<T>> consumer) {
@@ -34,7 +34,7 @@ public class BulkMessageProcessor<T> {
         this.bulkSize = bulkSize;
         this.consumer = consumer;
         reader = JSONReader.of(messageClass);
-        processThread = new Thread(() -> {
+        processorThread = new Thread(() -> {
             logger.info("message processor thread started, queue={}", queue);
             while (!stop.get()) {
                 try (RabbitMQConsumer queueConsumer = rabbitMQ.consumer(queue, bulkSize * 2)) {
@@ -47,16 +47,16 @@ public class BulkMessageProcessor<T> {
                 }
             }
             logger.info("message processor thread stopped, queue={}", queue);
-        });
+        }, "bulk-message-processor-" + queue);
     }
 
     public void start() {
-        processThread.start();
+        processorThread.start();
     }
 
     public void stop() {
         stop.set(true);
-        processThread.interrupt();
+        processorThread.interrupt();
     }
 
     private void process(RabbitMQConsumer consumer) throws IOException, InterruptedException {

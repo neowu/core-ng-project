@@ -1,7 +1,6 @@
 package core.framework.impl.log;
 
 import core.framework.api.util.Maps;
-import core.framework.api.util.StopWatch;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -19,14 +18,15 @@ public final class ActionLog {
     private static final ThreadMXBean THREAD = ManagementFactory.getThreadMXBean();
 
     private static final int MAX_TRACE_HOLD_SIZE = 3000;    // normal trace 3000 lines is about 350k
-    public final String id = UUID.randomUUID().toString();
-    final Instant startTime = Instant.now();
-    final long startCPUTime = THREAD.getCurrentThreadCpuTime();
-    final Map<String, String> context = Maps.newLinkedHashMap();
-    final Map<String, PerformanceStat> performanceStats = Maps.newHashMap();
-    final List<LogEvent> events = new LinkedList<>();
-    private final String logger = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
-    private final StopWatch watch = new StopWatch();
+    private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
+
+    public final String id;
+    final Instant date;
+    final long startCPUTime;
+    final Map<String, String> context;
+    final Map<String, PerformanceStat> performanceStats;
+    final List<LogEvent> events;
+    private final long startElapsed;
     public boolean trace;  // whether flush trace log for all subsequent actions
     public String action = "unassigned";
     String refId;
@@ -37,14 +37,20 @@ public final class ActionLog {
     private String errorCode;
 
     ActionLog(String message) {
+        startElapsed = System.nanoTime();
+        startCPUTime = THREAD.getCurrentThreadCpuTime();
+        date = Instant.now();
+        events = new LinkedList<>();
+        performanceStats = Maps.newHashMap();
+        context = Maps.newLinkedHashMap();
+        id = UUID.randomUUID().toString();
         log(message);
         log("[context] id={}", id);
     }
 
     void end(String message) {
-        long endCPUTime = THREAD.getCurrentThreadCpuTime();
-        cpuTime = endCPUTime - startCPUTime;
-        elapsed = watch.elapsedTime();
+        cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
+        elapsed = System.nanoTime() - startElapsed;
         log("[context] elapsed={}", elapsed);
         log(message);
     }
@@ -66,8 +72,7 @@ public final class ActionLog {
     }
 
     private void log(String message, Object... argument) {  // add log event directly, so internal message and won't be suspended
-        LogEvent event = new LogEvent(logger, null, LogLevel.DEBUG, message, argument, null);
-        events.add(event);
+        events.add(new LogEvent(LOGGER, null, LogLevel.DEBUG, message, argument, null));
     }
 
     private String errorMessage(LogEvent event) {

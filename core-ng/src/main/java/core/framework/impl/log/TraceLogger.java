@@ -74,7 +74,7 @@ public final class TraceLogger {
     Writer createWriter(ActionLog log) {
         if (traceLogPath != null) {
             try {
-                String logPath = traceLogFilePath(traceLogPath.toString(), LocalDateTime.ofInstant(log.startTime, ZoneId.systemDefault()), log.action, log.id);
+                String logPath = traceLogFilePath(traceLogPath.toString(), LocalDateTime.ofInstant(log.date, ZoneId.systemDefault()), log.action, log.id);
                 log.context.put("logPath", logPath);    // not log as event but add value to context, no need to see logPath in trace
                 Path path = Paths.get(logPath).toAbsolutePath();
                 createDir(path.getParent());

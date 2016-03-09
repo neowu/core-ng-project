@@ -112,7 +112,7 @@ public final class LogForwarder {
         message.app = appName;
         message.serverIP = Network.localHostAddress();
         message.id = log.id;
-        message.date = log.startTime;
+        message.date = log.date;
         message.result = log.result();
         message.refId = log.refId;
         message.elapsed = log.elapsed;
