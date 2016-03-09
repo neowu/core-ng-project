@@ -15,7 +15,7 @@ public final class ShutdownHook implements Runnable {
     private final Deque<Runnable> methods = new ArrayDeque<>();
 
     public ShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(this));
+        Runtime.getRuntime().addShutdownHook(new Thread(this, "shutdown"));
     }
 
     public void add(Runnable method) {
@@ -24,7 +24,6 @@ public final class ShutdownHook implements Runnable {
 
     @Override
     public void run() {
-        Thread.currentThread().setName("shutdown");
         for (Runnable method : methods) {
             try {
                 method.run();

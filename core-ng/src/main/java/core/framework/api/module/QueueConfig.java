@@ -37,7 +37,7 @@ public final class QueueConfig {
 
     public MessageHandlerConfig subscribe(String queue) {
         return context.queueManager.listeners().computeIfAbsent(queue, key -> {
-            RabbitMQListener listener = new RabbitMQListener(rabbitMQ, queue, context.executor, context.queueManager.validator(), context.logManager);
+            RabbitMQListener listener = new RabbitMQListener(rabbitMQ, queue, context.queueManager.validator(), context.logManager);
             if (!context.isTest()) {
                 context.startupHook.add(listener::start);
                 context.shutdownHook.add(listener::stop);

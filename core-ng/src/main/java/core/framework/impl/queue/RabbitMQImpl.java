@@ -9,6 +9,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
 import core.framework.api.util.StopWatch;
+import core.framework.impl.async.ThreadPools;
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
 import org.slf4j.Logger;
@@ -18,6 +19,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -29,12 +32,18 @@ public final class RabbitMQImpl implements RabbitMQ {
     public final Pool<Channel> pool;
     private final Logger logger = LoggerFactory.getLogger(RabbitMQImpl.class);
     private final ConnectionFactory connectionFactory = new ConnectionFactory();
+    private final ExecutorService workerExecutor;
+    private final ScheduledExecutorService heartbeatExecutor;
     private final Lock lock = new ReentrantLock();
     private Address[] addresses;
     private long slowOperationThresholdInMs = 100;
     private volatile Connection connection;
 
     public RabbitMQImpl() {
+        workerExecutor = ThreadPools.fixedThreadPool(1, "rabbitMQ-worker-");
+        connectionFactory.setSharedExecutor(workerExecutor);
+        heartbeatExecutor = ThreadPools.singleThreadScheduler("rabbitMQ-heartbeat-");
+        connectionFactory.setHeartbeatExecutor(heartbeatExecutor);
         connectionFactory.setAutomaticRecoveryEnabled(true);
         user("rabbitmq");       // default user/password
         password("rabbitmq");
@@ -55,6 +64,8 @@ public final class RabbitMQImpl implements RabbitMQ {
                 throw new UncheckedIOException(e);
             }
         }
+        workerExecutor.shutdown();
+        heartbeatExecutor.shutdown();
     }
 
     public void user(String user) {
@@ -128,6 +139,7 @@ public final class RabbitMQImpl implements RabbitMQ {
     }
 
     private void createConnection() throws IOException, TimeoutException {
+        if (addresses == null) throw new Error("addresses must not be null");
         lock.lock();
         try {
             if (connection == null)

@@ -54,11 +54,6 @@ public final class LogManager {
         return actionLog.get();
     }
 
-    public void triggerTraceLog() {
-        ActionLog actionLog = currentActionLog();   // actionLog should not be null, logManager.begin should always be called before triggerTraceLog
-        actionLog.trace = true;
-    }
-
     public void logError(Throwable e) {
         String errorMessage = e.getMessage();
         String errorCode = e instanceof ErrorCode ? ((ErrorCode) e).errorCode() : e.getClass().getCanonicalName();

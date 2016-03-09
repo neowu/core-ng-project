@@ -50,8 +50,9 @@ public final class ActionLog {
         int size = events.size();
         if (size < MAX_TRACE_HOLD_SIZE || event.level.value >= LogLevel.WARN.value) {  // after reach max holding lines, only add warning/error events
             events.add(event);
-            if (size == MAX_TRACE_HOLD_SIZE)
+            if (size == MAX_TRACE_HOLD_SIZE) {
                 log("reached max trace log holding size, only collect critical log event from now on");
+            }
         }
     }
 

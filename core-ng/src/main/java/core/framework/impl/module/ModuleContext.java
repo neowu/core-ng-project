@@ -87,7 +87,7 @@ public final class ModuleContext {
 
     public Scheduler scheduler() {
         if (scheduler == null) {
-            scheduler = new Scheduler(executor);
+            scheduler = new Scheduler(logManager);
             if (!isTest()) {
                 startupHook.add(scheduler::start);
                 shutdownHook.add(scheduler::stop);

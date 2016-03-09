@@ -7,6 +7,11 @@
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
+### 4.2.7-b4 (3/7/2016)
+* rabbitmq: make rabbitmq listener use dedicated thread pool
+* executor: remove Batch<T> support
+* scheduler: use dedicated thread pool
+
 ### 4.2.7-b3 (3/4/2016 - 3/7/2016)
 * search: remove client(), add analyze/index meta support
 * mongo: added Mongo interface for unit test and management

@@ -1,7 +1,6 @@
 package core.framework.impl.queue;
 
 import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.AlreadyClosedException;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.ConsumerCancelledException;
@@ -119,7 +118,7 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
 
     private QueueingConsumer.Delivery poll() {
         QueueingConsumer.Delivery delivery = deliveries.poll();
-        if (stopSignal.equals(delivery) || delivery == null && (shutdown != null || cancelled != null)) {
+        if (stopSignal.equals(delivery) || shutdown != null || cancelled != null) {
             if (stopSignal.equals(delivery)) deliveries.add(stopSignal);
             if (shutdown != null) throw Utility.fixStackTrace(shutdown);
             if (cancelled != null) throw Utility.fixStackTrace(cancelled);
@@ -144,8 +143,8 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
         StopWatch watch = new StopWatch();
         try {
             channel.basicAck(deliveryTag, multiple);
-        } catch (IOException | AlreadyClosedException e) {
-            throw new Error("failed to acknowledge message due to shutdown or network issue, rabbitMQ will resend message", e);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e.getMessage(), e);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("rabbitMQ", elapsedTime);

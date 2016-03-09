@@ -8,5 +8,5 @@ import core.framework.api.queue.MessageHandler;
 public interface MessageHandlerConfig {
     <T> MessageHandlerConfig handle(Class<T> messageClass, MessageHandler<T> handler);
 
-    MessageHandlerConfig maxConcurrentHandlers(int maxConcurrentHandlers);
+    MessageHandlerConfig poolSize(int poolSize);
 }

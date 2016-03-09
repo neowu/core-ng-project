@@ -1,20 +1,20 @@
 package core.framework.impl.scheduler;
 
-import core.framework.api.async.Executor;
-import core.framework.api.log.ActionLogContext;
 import core.framework.api.scheduler.Job;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.NotFoundException;
+import core.framework.impl.async.ThreadPools;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,11 +23,12 @@ import java.util.concurrent.TimeUnit;
 public final class Scheduler {
     public final Map<String, Trigger> triggers = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new SchedulerThreadFactory());
-    private final Executor executor;
+    private final ScheduledExecutorService scheduler = ThreadPools.singleThreadScheduler("scheduler-");
+    private final ExecutorService jobExecutor = ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 4, "scheduler-job-");
+    private final LogManager logManager;
 
-    public Scheduler(Executor executor) {
-        this.executor = executor;
+    public Scheduler(LogManager logManager) {
+        this.logManager = logManager;
     }
 
     public void start() {
@@ -41,6 +42,7 @@ public final class Scheduler {
     public void stop() {
         logger.info("stop scheduler");
         scheduler.shutdown();
+        jobExecutor.shutdown();
     }
 
     public void addTrigger(Trigger trigger) {
@@ -59,35 +61,42 @@ public final class Scheduler {
             LocalDateTime now = LocalDateTime.now();
             Duration nextDelay = trigger.nextDelay(now);
             schedule(trigger, nextDelay);
-            submitJob("job/" + trigger.name(), trigger);
+            submitJob(trigger, false);
         }, delay.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     void schedule(Trigger trigger, Duration delay, Duration rate) {
-        scheduler.scheduleAtFixedRate(() -> submitJob("job/" + trigger.name(), trigger), delay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
-    }
-
-    void submitJob(String action, Trigger trigger) {
-        executor.submit(action, () -> {
-            logger.info("execute scheduled job, job={}", trigger.name());
-            Job job = trigger.job();
-            ActionLogContext.put("job", trigger.name());
-            ActionLogContext.put("jobClass", job.getClass().getCanonicalName());
-            job.execute();
-            return null;
-        });
+        scheduler.scheduleAtFixedRate(() -> submitJob(trigger, false), delay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     public void triggerNow(String name) {
         Trigger trigger = triggers.get(name);
         if (trigger == null) throw new NotFoundException("job not found, name=" + name);
-        submitJob(trigger.name(), trigger);
+        submitJob(trigger, true);
     }
 
-    private static class SchedulerThreadFactory implements ThreadFactory {
-        @Override
-        public Thread newThread(Runnable runnable) {
-            return new Thread(runnable, "scheduler");
-        }
+    void submitJob(Trigger trigger, boolean trace) {
+        jobExecutor.submit(() -> {
+            try {
+                logManager.begin("=== job execution begin ===");
+                String name = trigger.name();
+                ActionLog actionLog = logManager.currentActionLog();
+                actionLog.action("job/" + name);
+                if (trace) {
+                    actionLog.trace = true;
+                }
+                logger.info("execute scheduled job, job={}", name);
+                Job job = trigger.job();
+                actionLog.context("job", name);
+                actionLog.context("jobClass", job.getClass().getCanonicalName());
+                job.execute();
+                return null;
+            } catch (Throwable e) {
+                logManager.logError(e);
+                throw e;
+            } finally {
+                logManager.end("=== job execution end ===");
+            }
+        });
     }
 }
