@@ -47,7 +47,7 @@ public class BulkMessageProcessor<T> {
                 }
             }
             logger.info("message processor thread stopped, queue={}", queue);
-        }, "bulk-message-processor-" + queue);
+        }, "message-processor-" + queue);
     }
 
     public void start() {
