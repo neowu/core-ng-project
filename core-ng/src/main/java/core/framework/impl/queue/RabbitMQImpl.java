@@ -91,7 +91,7 @@ public final class RabbitMQImpl implements RabbitMQ {
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        slowOperationThresholdInNanos = threshold.toMillis();
+        slowOperationThresholdInNanos = threshold.toNanos();
     }
 
     @Override
