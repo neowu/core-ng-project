@@ -17,12 +17,12 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
     }
 
     @Override
-    public void encode(BsonWriter writer, T value, EncoderContext encoderContext) {
+    public void encode(BsonWriter writer, T value, EncoderContext context) {
         writer.writeString(value.name());
     }
 
     @Override
-    public T decode(BsonReader reader, DecoderContext decoderContext) {
+    public T decode(BsonReader reader, DecoderContext context) {
         return Enum.valueOf(enumClass, reader.readString());
     }
 

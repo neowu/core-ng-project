@@ -2,16 +2,16 @@
 * think about /test//b, and /:path(*)
 * framework error, queue listener, background task error notification?
 * use smile for cache/queue?
-* think about Batch, and make it interface if design is final
 * mongo support @EnumValue?
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
-### 4.2.8-b1,b2,GA (3/9/2016 - )
+### 4.2.8-b1,b2,GA (3/9/2016 - 3/10/2016)
 * stopwatch: start to use nanoTime
 * log: actionlog start to trace cpuTime
 * mongo: register enum codec from entity, for filter
 * http: support statusCode 429
+* rabbitmq: update to 3.6.1
 
 ### 4.2.7-b1,b2,b3,b4 (3/3/2016 - 3/8/2016)
 * rabbitmq: make rabbitmq listener use dedicated thread pool

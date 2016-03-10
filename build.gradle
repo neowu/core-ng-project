@@ -9,7 +9,7 @@ subprojects {
 
 def mongoVersion = '3.2.2'
 def elasticVersion = '2.2.0'
-def rabbitVersion = '3.6.0'
+def rabbitVersion = '3.6.1'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -125,8 +125,7 @@ project(':demo-service') {
     dependencies {
         compile(
                 project(':core-ng'),
-                'redis.clients:jedis:2.8.0@jar',
-                "com.rabbitmq:amqp-client:${rabbitVersion}"
+                'redis.clients:jedis:2.8.0@jar'
         )
         runtime(
                 "com.rabbitmq:amqp-client:${rabbitVersion}"

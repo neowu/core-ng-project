@@ -19,11 +19,13 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -35,7 +37,7 @@ public final class RabbitMQImpl implements RabbitMQ {
     private final ExecutorService workerExecutor;
     private final ScheduledExecutorService heartbeatExecutor;
     private final Lock lock = new ReentrantLock();
-    private Address[] addresses;
+    private List<Address> addresses;
     private long slowOperationThresholdInNanos = Duration.ofMillis(100).toNanos();
     private volatile Connection connection;
 
@@ -56,7 +58,7 @@ public final class RabbitMQImpl implements RabbitMQ {
 
     public void close() {
         if (connection != null) {
-            logger.info("close rabbitMQ client, hosts={}", Arrays.toString(addresses));
+            logger.info("close rabbitMQ client, hosts={}", addresses);
             try {
                 pool.close();
                 connection.close();
@@ -78,11 +80,7 @@ public final class RabbitMQImpl implements RabbitMQ {
 
     public void hosts(String... hosts) {
         logger.info("set rabbitMQ hosts, hosts={}", Arrays.toString(hosts));
-        addresses = new Address[hosts.length];
-        for (int i = 0; i < hosts.length; i++) {
-            String host = hosts[i];
-            addresses[i] = new Address(host);
-        }
+        addresses = Arrays.stream(hosts).map(Address::new).collect(Collectors.toList());
     }
 
     public void timeout(Duration timeout) {
@@ -139,7 +137,7 @@ public final class RabbitMQImpl implements RabbitMQ {
     }
 
     private void createConnection() throws IOException, TimeoutException {
-        if (addresses == null) throw new Error("addresses must not be null");
+        if (addresses == null || addresses.isEmpty()) throw new Error("addresses must not be empty");
         lock.lock();
         try {
             if (connection == null)

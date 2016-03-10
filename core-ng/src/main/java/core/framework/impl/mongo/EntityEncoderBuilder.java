@@ -20,7 +20,7 @@ import java.util.Set;
  */
 final class EntityEncoderBuilder<T> {
     final Map<String, String> methods = new LinkedHashMap<>();
-    final Set<Class<? extends Enum>> enumClasses = Sets.newHashSet();
+    final Set<Class<? extends Enum<?>>> enumClasses = Sets.newHashSet();
     private final Class<T> entityClass;
     private final String helper = EntityCodecHelper.class.getCanonicalName();
 
@@ -151,6 +151,6 @@ final class EntityEncoderBuilder<T> {
 
     @SuppressWarnings("unchecked")
     private void registerEnumClass(Class<?> fieldClass) {
-        enumClasses.add((Class<? extends Enum>) fieldClass);
+        enumClasses.add((Class<? extends Enum<?>>) fieldClass);
     }
 }

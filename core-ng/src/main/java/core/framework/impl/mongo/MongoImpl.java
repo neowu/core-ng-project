@@ -9,15 +9,12 @@ import core.framework.api.mongo.Mongo;
 import core.framework.api.mongo.MongoCollection;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.StopWatch;
-import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author neo
@@ -40,7 +37,8 @@ public class MongoImpl implements Mongo {
         StopWatch watch = new StopWatch();
         try {
             if (uri == null) throw new Error("uri() must be called before initialize");
-            database = createDatabase(uri, codecRegistry());
+            CodecRegistry registry = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), codecs.codecRegistry());
+            database = createDatabase(uri, registry);
         } finally {
             logger.info("initialize mongo client, uri={}, elapsedTime={}", uri, watch.elapsedTime());
         }
@@ -67,13 +65,6 @@ public class MongoImpl implements Mongo {
         } finally {
             logger.info("dropCollection, collection={}, elapsedTime={}", collection, watch.elapsedTime());
         }
-    }
-
-    private CodecRegistry codecRegistry() {
-        List<Codec<?>> codecs = new ArrayList<>(this.codecs.codecs.values());
-        codecs.add(new LocalDateTimeCodec());
-        this.codecs.enumClasses.forEach(enumClass -> codecs.add(new EnumCodec<>(enumClass)));
-        return CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), CodecRegistries.fromCodecs(codecs));
     }
 
     public void uri(String uri) {
