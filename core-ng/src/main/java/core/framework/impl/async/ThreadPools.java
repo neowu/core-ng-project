@@ -31,7 +31,7 @@ public final class ThreadPools {
         private final AtomicInteger count = new AtomicInteger(1);
         private final String prefix;
 
-        public ThreadFactoryImpl(String prefix) {
+        ThreadFactoryImpl(String prefix) {
             this.prefix = prefix;
         }
 

@@ -68,7 +68,7 @@ public class ResponseHandler {
             cookie.setValue("");
         } else {
             if (spec.maxAge != null) cookie.setMaxAge((int) spec.maxAge.getSeconds());
-            cookie.setValue(Encodings.uriComponent(value));
+            cookie.setValue(Encodings.uriComponent(value));     // recommended to use URI encoding for cookie value, https://curl.haxx.se/rfc/cookie_spec.html
         }
         cookie.setDomain(spec.domain);
         cookie.setPath(spec.path);
