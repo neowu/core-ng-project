@@ -3,6 +3,7 @@ package core.framework.api.http;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
 import core.framework.api.util.Charsets;
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.InputStreams;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
@@ -19,20 +20,34 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author neo
  */
 public final class HTTPClient {
+    private static final Map<Integer, HTTPStatus> HTTP_STATUSES;
+
     static {
         // allow server ssl cert change during renegotiation
         // http client uses pooled connection, multiple requests to same host may hit different server behind LB
         System.setProperty("jdk.tls.allowUnsafeServerCertChange", "true");
+
+        HTTPStatus[] values = HTTPStatus.values();
+        HTTP_STATUSES = new HashMap<>(values.length);
+        for (HTTPStatus status : values) {
+            HTTP_STATUSES.put(status.code, status);
+        }
+    }
+
+    static HTTPStatus parseHTTPStatus(int statusCode) {
+        HTTPStatus status = HTTP_STATUSES.get(statusCode);
+        if (status == null) throw Exceptions.error("unsupported http status code, code={}", statusCode);
+        return status;
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClient.class);
-
     private final CloseableHttpClient client;
     private final long slowOperationThresholdInNanos;
 
@@ -65,7 +80,7 @@ public final class HTTPClient {
 
             HttpEntity entity = httpResponse.getEntity();
             byte[] body = responseBody(entity);
-            HTTPResponse response = new HTTPResponse(HTTPStatus.parse(statusCode), headers, body);
+            HTTPResponse response = new HTTPResponse(parseHTTPStatus(statusCode), headers, body);
             logResponseText(response);
             return response;
         } catch (IOException e) {

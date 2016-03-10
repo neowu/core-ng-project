@@ -26,4 +26,9 @@ public class HTTPClientTest {
 
         assertEquals("", new String(body, Charsets.UTF_8));
     }
+
+    @Test
+    public void parseHTTPStatus() {
+        assertEquals(HTTPStatus.OK, HTTPClient.parseHTTPStatus(200));
+    }
 }
