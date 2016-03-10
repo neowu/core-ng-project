@@ -22,7 +22,7 @@ public final class TransactionManager {
     private final ThreadLocal<TransactionState> currentTransactionState = new ThreadLocal<>();
     private final Pool<Connection> pool;
     public IsolationLevel defaultIsolationLevel;
-    public long longTransactionThresholdInNanos = Duration.ofSeconds(10).toMillis();
+    public long longTransactionThresholdInNanos = Duration.ofSeconds(10).toNanos();
 
     TransactionManager(Pool<Connection> pool) {
         this.pool = pool;
