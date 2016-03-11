@@ -16,6 +16,8 @@ import javax.inject.Inject;
 public class IndexController {
     @Inject
     WebDirectory webDirectory;
+    @Inject
+    LanguageManager languageManager;
 
     @Protected(operation = "index")
     public Response index(Request request) {
@@ -25,7 +27,7 @@ public class IndexController {
         Session session = request.session();
 //        Optional<String> hello = session.get("hello");
         session.set("hello", "world");
-        Response response = Response.html("/template/index.html", model);
+        Response response = Response.html("/template/index.html", model, languageManager.language());
         response.cookie(Cookies.TEST, "1+2");
 //        response.cookie(CookieConstraints.TEST1, null);
         return response;

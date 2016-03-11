@@ -18,7 +18,7 @@ public class TemplateBodyResponseHandler implements BodyHandler {
     @Override
     public void handle(ResponseImpl response, Sender sender, RequestImpl request) {
         TemplateBody body = (TemplateBody) response.body;
-        String content = templateManager.process(body.templatePath, body.model, request);
+        String content = templateManager.process(body.templatePath, body.model, body.language);
         sender.send(content);
     }
 }

@@ -1,4 +1,14 @@
 ## TODO
+* template, use ByteBuffer[] for performance tuning?
+* web: get/form post, validate bean class and code generation for param serialization?
+* general retry and throttling?
+* webservice: client retry on network issue?
+* website static content security check, (in server env, this is handled by nginx directly)
+* validator: annotation for website, like @HTMLSafeString?
+* cm: config management, dynamic update properties?
+* cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
+* template security check, escaping and etc
+* http: make http session https only?
 * think about /test//b, and /:path(*)
 * framework error, queue listener, background task error notification?
 * use smile for cache/queue?
@@ -6,6 +16,9 @@
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
+### 4.2.9 (3/11/2016)
+* template: remove LanguageProvider as first step for i18n message support refactory
+
 ### 4.2.8-b1,b2,GA (3/9/2016 - 3/10/2016)
 * stopwatch: start to use nanoTime
 * log: actionlog start to trace cpuTime

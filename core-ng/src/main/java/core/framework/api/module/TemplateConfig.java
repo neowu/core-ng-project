@@ -1,6 +1,5 @@
 package core.framework.api.module;
 
-import core.framework.api.web.site.LanguageProvider;
 import core.framework.impl.module.ModuleContext;
 
 /**
@@ -23,18 +22,13 @@ public final class TemplateConfig {
     public void message(String path) {
         if (!context.httpServer.siteManager.templateManager.templates.isEmpty())
             throw new Error("site().template().message() must be called before site().template().add()");
-
         context.httpServer.siteManager.templateManager.messageManager.load(path);
     }
 
-    public void language(LanguageProvider provider, String... languages) {
+    public void languages(String... languages) {
         if (!context.httpServer.siteManager.templateManager.templates.isEmpty())
-            throw new Error("site().template().language() must be called before site().template().add()");
-
-        if (provider == null) throw new Error("language provider must not be null");
+            throw new Error("site().template().languages() must be called before site().template().add()");
         if (languages.length == 0) throw new Error("languages must not be empty");
-
-        context.httpServer.siteManager.templateManager.languageProvider = provider;
         context.httpServer.siteManager.templateManager.messageManager.languages = languages;
     }
 }

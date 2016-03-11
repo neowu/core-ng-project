@@ -4,8 +4,6 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Files;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
-import core.framework.api.web.Request;
-import core.framework.api.web.site.LanguageProvider;
 import core.framework.api.web.site.TemplateManager;
 import core.framework.api.web.site.WebDirectory;
 import core.framework.impl.template.CDNManager;
@@ -31,20 +29,18 @@ public class TemplateManagerImpl implements TemplateManager {
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
 
-    public LanguageProvider languageProvider;
-
     public TemplateManagerImpl(WebDirectory webDirectory) {
         this.webDirectory = webDirectory;
     }
 
     @Override
-    public String process(String templatePath, Object model, Request request) {
+    public String process(String templatePath, Object model, String language) {
         StopWatch watch = new StopWatch();
         try {
-            HTMLTemplate template = get(templatePath, model.getClass(), request);
-            TemplateContext stack = new TemplateContext(model);
-            stack.cdn = cdnManager;
-            return template.process(stack);
+            HTMLTemplate template = get(templatePath, model.getClass(), language);
+            TemplateContext context = new TemplateContext(model);
+            context.cdn = cdnManager;
+            return template.process(context);
         } finally {
             logger.debug("process, templatePath={}, elapsedTime={}", templatePath, watch.elapsedTime());
         }
@@ -53,7 +49,7 @@ public class TemplateManagerImpl implements TemplateManager {
     public void add(String templatePath, Class<?> modelClass) {
         StopWatch watch = new StopWatch();
         try {
-            Templates previous = this.templates.putIfAbsent(templatePath, load(templatePath, modelClass));
+            Templates previous = templates.putIfAbsent(templatePath, load(templatePath, modelClass));
             if (previous != null) throw Exceptions.error("template path is registered, templatePath={}", templatePath);
             if (webDirectory.localEnv) {
                 Path path = webDirectory.path(templatePath);
@@ -64,7 +60,7 @@ public class TemplateManagerImpl implements TemplateManager {
         }
     }
 
-    private HTMLTemplate get(String templatePath, Class<?> modelClass, Request request) {
+    private HTMLTemplate get(String templatePath, Class<?> modelClass, String language) {
         Templates templates = this.templates.get(templatePath);
         if (templates == null)
             throw Exceptions.error("template is not registered, please use site().template() to add template, templatePath={}", templatePath);
@@ -78,11 +74,7 @@ public class TemplateManagerImpl implements TemplateManager {
             }
         }
 
-        return templates.get(language(request));
-    }
-
-    private String language(Request request) {
-        return languageProvider == null ? MessageManager.DEFAULT_LANGUAGE : languageProvider.get(request).orElse(MessageManager.DEFAULT_LANGUAGE);
+        return templates.get(language == null ? MessageManager.DEFAULT_LANGUAGE : language);
     }
 
     private Templates load(String templatePath, Class<?> modelClass) {
