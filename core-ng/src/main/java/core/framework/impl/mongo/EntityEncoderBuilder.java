@@ -1,7 +1,9 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
+import core.framework.api.util.Lists;
 import core.framework.api.util.Sets;
+import core.framework.api.util.Strings;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
 import core.framework.impl.reflect.GenericTypes;
@@ -21,6 +23,7 @@ import java.util.Set;
 final class EntityEncoderBuilder<T> {
     final Map<String, String> methods = new LinkedHashMap<>();
     final Set<Class<? extends Enum<?>>> enumClasses = Sets.newHashSet();
+    final List<String> fields = Lists.newArrayList();
     private final Class<T> entityClass;
     private final String helper = EntityCodecHelper.class.getCanonicalName();
 
@@ -31,6 +34,7 @@ final class EntityEncoderBuilder<T> {
     public EntityEncoder<T> build() {
         DynamicInstanceBuilder<EntityEncoder<T>> builder = new DynamicInstanceBuilder<>(EntityEncoder.class, EntityEncoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
         buildMethods();
+        fields.forEach(builder::addField);
         methods.values().forEach(builder::addMethod);
         return builder.build();
     }
@@ -126,8 +130,8 @@ final class EntityEncoderBuilder<T> {
         } else if (LocalDateTime.class.equals(fieldClass)) {
             builder.indent(indent).append("{}.writeLocalDateTime(writer, {});\n", helper, fieldVariable);
         } else if (Enum.class.isAssignableFrom(fieldClass)) {
-            registerEnumClass(fieldClass);
-            builder.indent(indent).append("{}.writeEnum(writer, (Enum) {});\n", helper, fieldVariable);
+            String enumCodecVariable = registerEnumCodec(fieldClass);
+            builder.indent(indent).append("{}.encode(writer, {}, null);\n", enumCodecVariable, fieldVariable);
         } else if (Double.class.equals(fieldClass)) {
             builder.indent(indent).append("{}.writeDouble(writer, {});\n", helper, fieldVariable);
         } else if (Boolean.class.equals(fieldClass)) {
@@ -150,7 +154,17 @@ final class EntityEncoderBuilder<T> {
     }
 
     @SuppressWarnings("unchecked")
-    private void registerEnumClass(Class<?> fieldClass) {
-        enumClasses.add((Class<? extends Enum<?>>) fieldClass);
+    private String registerEnumCodec(Class<?> fieldClass) {
+        boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
+        String fieldVariable = fieldClass.getCanonicalName().replaceAll("\\.", "_") + "Codec";
+        if (added) {
+            String field = Strings.format("private final {} {} = new {}({}.class);\n",
+                EnumCodec.class.getCanonicalName(),
+                fieldVariable,
+                EnumCodec.class.getCanonicalName(),
+                fieldClass.getCanonicalName());
+            fields.add(field);
+        }
+        return fieldVariable;
     }
 }

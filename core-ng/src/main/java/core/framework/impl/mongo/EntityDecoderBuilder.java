@@ -1,6 +1,9 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
+import core.framework.api.util.Lists;
+import core.framework.api.util.Sets;
+import core.framework.api.util.Strings;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
 import core.framework.impl.reflect.GenericTypes;
@@ -14,13 +17,16 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author neo
  */
 final class EntityDecoderBuilder<T> {
     final Map<String, String> methods = new LinkedHashMap<>();
+    final List<String> fields = Lists.newArrayList();
     private final Class<T> entityClass;
+    private final Set<Class<? extends Enum<?>>> enumClasses = Sets.newHashSet();
     private final String helper = EntityCodecHelper.class.getCanonicalName();
 
     public EntityDecoderBuilder(Class<T> entityClass) {
@@ -29,14 +35,11 @@ final class EntityDecoderBuilder<T> {
 
     public EntityDecoder<T> build() {
         DynamicInstanceBuilder<EntityDecoder<T>> builder = new DynamicInstanceBuilder<>(EntityDecoder.class, EntityDecoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
-        builder.addField(loggerField());
+        fields.add("private final " + Logger.class.getCanonicalName() + " logger = " + LoggerFactory.class.getCanonicalName() + ".getLogger(" + EntityDecoder.class.getCanonicalName() + ".class);\n");
         buildMethods();
+        fields.forEach(builder::addField);
         methods.values().forEach(builder::addMethod);
         return builder.build();
-    }
-
-    private String loggerField() {
-        return "private final " + Logger.class.getCanonicalName() + " logger = " + LoggerFactory.class.getCanonicalName() + ".getLogger(" + EntityDecoder.class.getCanonicalName() + ".class);";
     }
 
     private void buildMethods() {
@@ -111,7 +114,8 @@ final class EntityDecoderBuilder<T> {
         } else if (LocalDateTime.class.equals(fieldClass)) {
             builder.indent(3).append("{} = {}.readLocalDateTime(reader, currentType, fieldPath);\n", fieldVariable, helper);
         } else if (Enum.class.isAssignableFrom(fieldClass)) {
-            builder.indent(3).append("{} = ({}) {}.readEnum(reader, currentType, {}.class, fieldPath);\n", fieldVariable, fieldClass.getCanonicalName(), helper, fieldClass.getCanonicalName());
+            String enumCodecVariable = registerEnumCodec(fieldClass);
+            builder.indent(3).append("{} = ({}) {}.decode(reader, null);\n", fieldVariable, fieldClass.getCanonicalName(), enumCodecVariable);
         } else if (Double.class.equals(fieldClass)) {
             builder.indent(3).append("{} = {}.readDouble(reader, currentType, fieldPath);\n", fieldVariable, helper);
         } else if (ObjectId.class.equals(fieldClass)) {
@@ -170,7 +174,8 @@ final class EntityDecoderBuilder<T> {
         } else if (LocalDateTime.class.equals(valueClass)) {
             builder.indent(2).append("map.put(fieldName, {}.readLocalDateTime(reader, currentType, fieldPath));\n", helper);
         } else if (Enum.class.isAssignableFrom(valueClass)) {
-            builder.indent(2).append("map.put(fieldName, {}.readEnum(reader, currentType, {}.class, fieldPath));\n", helper, valueClassName);
+            String enumCodecVariable = registerEnumCodec(valueClass);
+            builder.indent(2).append("map.put(fieldName, {}.decode(reader, null));\n", enumCodecVariable);
         } else if (Double.class.equals(valueClass)) {
             builder.indent(2).append("map.put(fieldName, {}.readDouble(reader, currentType, fieldPath));\n", helper);
         } else if (ObjectId.class.equals(valueClass)) {
@@ -226,7 +231,8 @@ final class EntityDecoderBuilder<T> {
         } else if (LocalDateTime.class.equals(valueClass)) {
             builder.indent(2).append("list.add({}.readLocalDateTime(reader, currentType, fieldPath));\n", helper);
         } else if (Enum.class.isAssignableFrom(valueClass)) {
-            builder.indent(2).append("list.add({}.readEnum(reader, currentType, {}.class, fieldPath));\n", helper, valueClassName);
+            String enumCodecVariable = registerEnumCodec(valueClass);
+            builder.indent(2).append("list.add({}.decode(reader, null));\n", enumCodecVariable, valueClassName);
         } else if (Double.class.equals(valueClass)) {
             builder.indent(2).append("list.add({}.readDouble(reader, currentType, fieldPath));\n", helper);
         } else if (ObjectId.class.equals(valueClass)) {
@@ -245,5 +251,20 @@ final class EntityDecoderBuilder<T> {
 
         methods.put(methodName, builder.build());
         return methodName;
+    }
+
+    @SuppressWarnings("unchecked")
+    private String registerEnumCodec(Class<?> fieldClass) {
+        boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
+        String fieldVariable = fieldClass.getCanonicalName().replaceAll("\\.", "_") + "Codec";
+        if (added) {
+            String field = Strings.format("private final {} {} = new {}({}.class);\n",
+                EnumCodec.class.getCanonicalName(),
+                fieldVariable,
+                EnumCodec.class.getCanonicalName(),
+                fieldClass.getCanonicalName());
+            fields.add(field);
+        }
+        return fieldVariable;
     }
 }

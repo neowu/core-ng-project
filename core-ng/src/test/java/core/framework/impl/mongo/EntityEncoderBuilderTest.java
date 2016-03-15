@@ -3,21 +3,18 @@ package core.framework.impl.mongo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.api.util.ClasspathResources;
+import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 /**
  * @author neo
@@ -39,9 +36,8 @@ public class EntityEncoderBuilderTest {
         entity.stringField = "string";
         entity.child = new TestEntityChild();
         entity.child.enumField = TestEntityChild.TestEnum.ITEM1;
-        entity.listField = new ArrayList<>();
-        entity.listField.add("V1");
-        entity.listField.add("V2");
+        entity.child.enumListField = Lists.newArrayList(TestEntityChild.TestEnum.ITEM2);
+        entity.listField = Lists.newArrayList("V1", "V2");
         entity.mapField = Maps.newHashMap();
         entity.mapField.put("K1", "V1");
         entity.mapField.put("K2", "V2");
@@ -52,13 +48,16 @@ public class EntityEncoderBuilderTest {
         JsonNode expectedEntityNode = mapper.readTree(ClasspathResources.text("mongo-test/entity.json"));
         JsonNode entityNode = mapper.readTree(writer.toString());
 
-        Assert.assertEquals(expectedEntityNode, entityNode);
+        assertEquals(expectedEntityNode, entityNode);
     }
 
     private void verifyGeneratedMethods(EntityEncoderBuilder<TestEntity> builder) {
-        String methods = ClasspathResources.text("mongo-test/encode-methods.txt").replaceAll("\r\n", "\n");
+        String code = ClasspathResources.text("mongo-test/encoder-code.txt").replaceAll("\r\n", "\n");
 
-        builder.methods.values()
-            .forEach(method -> assertThat(methods, containsString(method)));
+        StringBuilder stringBuilder = new StringBuilder();
+        builder.fields.forEach(stringBuilder::append);
+        builder.methods.values().forEach(stringBuilder::append);
+
+        assertEquals(code, stringBuilder.toString());
     }
 }

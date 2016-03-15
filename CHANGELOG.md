@@ -12,10 +12,13 @@
 * think about /test//b, and /:path(*)
 * framework error, queue listener, background task error notification?
 * use smile for cache/queue?
-* mongo support @EnumValue?
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
+### 4.3.0 (3/15/2016)
+* mongo: support @MongoEnumValue
+* db: renamed @EnumValue to @DBEnumValue
+
 ### 4.2.9 (3/11/2016)
 * template: remove LanguageProvider as first step for i18n message support refactory
 

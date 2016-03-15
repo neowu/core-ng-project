@@ -2,6 +2,7 @@ package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Collection;
 import core.framework.api.mongo.Id;
+import core.framework.api.mongo.MongoEnumValue;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
@@ -88,11 +89,21 @@ public final class EntityClassValidator implements TypeVisitor {
 
     private void validateEnumClass(Class<?> enumClass, Field field) {
         Enum[] constants = (Enum[]) enumClass.getEnumConstants();
+        Set<String> enumValues = Sets.newHashSet();
         for (Enum constant : constants) {
             try {
                 Field enumField = enumClass.getDeclaredField(constant.name());
-                if (enumField.isAnnotationPresent(XmlEnumValue.class))
+                MongoEnumValue enumValue = enumField.getDeclaredAnnotation(MongoEnumValue.class);
+                if (enumValue == null) {
+                    throw Exceptions.error("mongo enum must have @MongoEnumValue, field={}, enum={}", Fields.path(field), Fields.path(enumField));
+                }
+                boolean added = enumValues.add(enumValue.value());
+                if (!added) {
+                    throw Exceptions.error("mongo enum value must be unique, enum={}, value={}", enumClass.getCanonicalName() + "." + constant, enumValue.value());
+                }
+                if (enumField.isAnnotationPresent(XmlEnumValue.class)) {
                     throw Exceptions.error("mongo enum must not have jaxb annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Fields.path(enumField));
+                }
             } catch (NoSuchFieldException e) {
                 throw new Error(e);
             }

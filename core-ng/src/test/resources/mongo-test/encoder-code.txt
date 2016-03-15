@@ -1,3 +1,4 @@
+private final core.framework.impl.mongo.EnumCodec core_framework_impl_mongo_TestEntityChild_TestEnumCodec = new core.framework.impl.mongo.EnumCodec(core.framework.impl.mongo.TestEntityChild.TestEnum.class);
 private void encode_java_util_List_java_lang_String(org.bson.BsonWriter writer, java.util.List list) {
     writer.writeStartArray();
     for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
@@ -6,7 +7,6 @@ private void encode_java_util_List_java_lang_String(org.bson.BsonWriter writer, 
     }
     writer.writeEndArray();
 }
-
 private void encode_java_util_Map_java_lang_String(org.bson.BsonWriter writer, java.util.Map map) {
     writer.writeStartDocument();
     for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
@@ -18,22 +18,20 @@ private void encode_java_util_Map_java_lang_String(org.bson.BsonWriter writer, j
     }
     writer.writeEndDocument();
 }
-
 private void encode_java_util_List_core_framework_impl_mongo_TestEntityChild_TestEnum(org.bson.BsonWriter writer, java.util.List list) {
     writer.writeStartArray();
     for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
         core.framework.impl.mongo.TestEntityChild.TestEnum value = (core.framework.impl.mongo.TestEntityChild.TestEnum) iterator.next();
-        core.framework.impl.mongo.EntityCodecHelper.writeEnum(writer, (Enum) value);
+        core_framework_impl_mongo_TestEntityChild_TestEnumCodec.encode(writer, value, null);
     }
     writer.writeEndArray();
 }
-
 private void encode_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWriter writer, core.framework.impl.mongo.TestEntityChild entity) {
     writer.writeStartDocument();
     writer.writeName("boolean_field");
     core.framework.impl.mongo.EntityCodecHelper.writeBoolean(writer, entity.booleanField);
     writer.writeName("enum_field");
-    core.framework.impl.mongo.EntityCodecHelper.writeEnum(writer, (Enum) entity.enumField);
+    core_framework_impl_mongo_TestEntityChild_TestEnumCodec.encode(writer, entity.enumField, null);
     writer.writeName("enum_list_field");
     if (entity.enumListField == null) writer.writeNull();
     else encode_java_util_List_core_framework_impl_mongo_TestEntityChild_TestEnum(writer, entity.enumListField);
@@ -41,7 +39,6 @@ private void encode_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWrite
     core.framework.impl.mongo.EntityCodecHelper.writeObjectId(writer, entity.refId);
     writer.writeEndDocument();
 }
-
 private void encode_java_util_List_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWriter writer, java.util.List list) {
     writer.writeStartArray();
     for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
@@ -51,7 +48,6 @@ private void encode_java_util_List_core_framework_impl_mongo_TestEntityChild(org
     }
     writer.writeEndArray();
 }
-
 private void encode_java_util_Map_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWriter writer, java.util.Map map) {
     writer.writeStartDocument();
     for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
@@ -64,7 +60,6 @@ private void encode_java_util_Map_core_framework_impl_mongo_TestEntityChild(org.
     }
     writer.writeEndDocument();
 }
-
 private void encode_core_framework_impl_mongo_TestEntity(org.bson.BsonWriter writer, core.framework.impl.mongo.TestEntity entity) {
     writer.writeStartDocument();
     writer.writeName("_id");
@@ -97,7 +92,6 @@ private void encode_core_framework_impl_mongo_TestEntity(org.bson.BsonWriter wri
     else encode_core_framework_impl_mongo_TestEntityChild(writer, entity.nullChild);
     writer.writeEndDocument();
 }
-
 public void encode(org.bson.BsonWriter writer, Object entity) {
     encode_core_framework_impl_mongo_TestEntity(writer, (core.framework.impl.mongo.TestEntity) entity);
 }

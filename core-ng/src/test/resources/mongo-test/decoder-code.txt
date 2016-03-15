@@ -1,3 +1,5 @@
+private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(core.framework.impl.mongo.EntityDecoder.class);
+private final core.framework.impl.mongo.EnumCodec core_framework_impl_mongo_TestEntityChild_TestEnumCodec = new core.framework.impl.mongo.EnumCodec(core.framework.impl.mongo.TestEntityChild.TestEnum.class);
 private java.util.List decode_java_util_List_java_lang_String(org.bson.BsonReader reader, String fieldPath) {
     org.bson.BsonType currentType = reader.getCurrentBsonType();
     if (currentType == org.bson.BsonType.NULL) {
@@ -18,7 +20,6 @@ private java.util.List decode_java_util_List_java_lang_String(org.bson.BsonReade
     reader.readEndArray();
     return list;
 }
-
 private java.util.Map decode_java_util_Map_java_lang_String(org.bson.BsonReader reader, String parentField) {
     org.bson.BsonType currentType = reader.getCurrentBsonType();
     if (currentType == org.bson.BsonType.NULL) {
@@ -41,7 +42,6 @@ private java.util.Map decode_java_util_Map_java_lang_String(org.bson.BsonReader 
     reader.readEndDocument();
     return map;
 }
-
 private java.util.List decode_java_util_List_core_framework_impl_mongo_TestEntityChild_TestEnum(org.bson.BsonReader reader, String fieldPath) {
     org.bson.BsonType currentType = reader.getCurrentBsonType();
     if (currentType == org.bson.BsonType.NULL) {
@@ -57,12 +57,11 @@ private java.util.List decode_java_util_List_core_framework_impl_mongo_TestEntit
     reader.readStartArray();
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
         currentType = reader.getCurrentBsonType();
-        list.add(core.framework.impl.mongo.EntityCodecHelper.readEnum(reader, currentType, core.framework.impl.mongo.TestEntityChild.TestEnum.class, fieldPath));
+        list.add(core_framework_impl_mongo_TestEntityChild_TestEnumCodec.decode(reader, null));
     }
     reader.readEndArray();
     return list;
 }
-
 public core.framework.impl.mongo.TestEntityChild decode_core_framework_impl_mongo_TestEntityChild(org.bson.BsonReader reader, String parentField) {
     org.bson.BsonType currentType = reader.getCurrentBsonType();
     if (currentType != null && currentType == org.bson.BsonType.NULL) {
@@ -85,7 +84,7 @@ public core.framework.impl.mongo.TestEntityChild decode_core_framework_impl_mong
             continue;
         }
         if ("enum_field".equals(fieldName)) {
-            entity.enumField = (core.framework.impl.mongo.TestEntityChild.TestEnum) core.framework.impl.mongo.EntityCodecHelper.readEnum(reader, currentType, core.framework.impl.mongo.TestEntityChild.TestEnum.class, fieldPath);
+            entity.enumField = (core.framework.impl.mongo.TestEntityChild.TestEnum) core_framework_impl_mongo_TestEntityChild_TestEnumCodec.decode(reader, null);
             continue;
         }
         if ("enum_list_field".equals(fieldName)) {
@@ -102,7 +101,6 @@ public core.framework.impl.mongo.TestEntityChild decode_core_framework_impl_mong
     reader.readEndDocument();
     return entity;
 }
-
 private java.util.List decode_java_util_List_core_framework_impl_mongo_TestEntityChild(org.bson.BsonReader reader, String fieldPath) {
     org.bson.BsonType currentType = reader.getCurrentBsonType();
     if (currentType == org.bson.BsonType.NULL) {
@@ -123,7 +121,6 @@ private java.util.List decode_java_util_List_core_framework_impl_mongo_TestEntit
     reader.readEndArray();
     return list;
 }
-
 private java.util.Map decode_java_util_Map_core_framework_impl_mongo_TestEntityChild(org.bson.BsonReader reader, String parentField) {
     org.bson.BsonType currentType = reader.getCurrentBsonType();
     if (currentType == org.bson.BsonType.NULL) {
@@ -146,7 +143,6 @@ private java.util.Map decode_java_util_Map_core_framework_impl_mongo_TestEntityC
     reader.readEndDocument();
     return map;
 }
-
 public core.framework.impl.mongo.TestEntity decode_core_framework_impl_mongo_TestEntity(org.bson.BsonReader reader, String parentField) {
     org.bson.BsonType currentType = reader.getCurrentBsonType();
     if (currentType != null && currentType == org.bson.BsonType.NULL) {
@@ -214,7 +210,6 @@ public core.framework.impl.mongo.TestEntity decode_core_framework_impl_mongo_Tes
     reader.readEndDocument();
     return entity;
 }
-
 public Object decode(org.bson.BsonReader reader) {
     return decode_core_framework_impl_mongo_TestEntity(reader, "");
 }

@@ -16,8 +16,10 @@
   },
   "child": {
     "boolean_field": null,
-    "enum_field": "ITEM1",
-    "enum_list_field": null,
+    "enum_field": "I1",
+    "enum_list_field": [
+      "I2"
+    ],
     "ref_id_field": null
   },
   "children": null,

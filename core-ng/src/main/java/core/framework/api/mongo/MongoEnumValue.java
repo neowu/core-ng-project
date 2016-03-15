@@ -1,4 +1,4 @@
-package core.framework.api.db;
+package core.framework.api.mongo;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -11,6 +11,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface EnumValue {
+public @interface MongoEnumValue {
     String value();
 }

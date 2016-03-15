@@ -47,13 +47,7 @@ public final class EntityCodecHelper {
     }
 
     public static void writeLocalDateTime(BsonWriter writer, LocalDateTime value) {
-        if (value == null) writer.writeNull();
-        else LocalDateTimeCodec.write(writer, value);
-    }
-
-    public static void writeEnum(BsonWriter writer, Enum value) {
-        if (value == null) writer.writeNull();
-        else writer.writeString(value.name());
+        LocalDateTimeCodec.write(writer, value);
     }
 
     public static Integer readInteger(BsonReader reader, BsonType currentType, String field) {
@@ -134,35 +128,7 @@ public final class EntityCodecHelper {
         }
     }
 
-    public static <T extends Enum<T>> T readEnum(BsonReader reader, BsonType currentType, Class<T> enumClass, String field) {
-        if (currentType == BsonType.NULL) {
-            reader.readNull();
-            return null;
-        } else if (currentType == BsonType.STRING) {
-            String value = reader.readString();
-            try {
-                return Enum.valueOf(enumClass, value);
-            } catch (Exception e) {
-                LOGGER.warn("enum returned from mongo is ignored, enumClass={}, value={}, field={}", enumClass.getCanonicalName(), value, field, e);
-                return null;
-            }
-        } else {
-            LOGGER.warn("field returned from mongo is ignored, field={}", field);
-            reader.skipValue();
-            return null;
-        }
-    }
-
     public static LocalDateTime readLocalDateTime(BsonReader reader, BsonType currentType, String field) {
-        if (currentType == BsonType.NULL) {
-            reader.readNull();
-            return null;
-        } else if (currentType == BsonType.DATE_TIME) {
-            return LocalDateTimeCodec.read(reader);
-        } else {
-            LOGGER.warn("field returned from mongo is ignored, field={}", field);
-            reader.skipValue();
-            return null;
-        }
+        return LocalDateTimeCodec.read(reader);
     }
 }

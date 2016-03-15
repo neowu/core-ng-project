@@ -3,9 +3,10 @@ package core.framework.impl.mongo;
 import core.framework.api.util.ClasspathResources;
 import org.bson.json.JsonReader;
 import org.bson.types.ObjectId;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author neo
@@ -22,22 +23,25 @@ public class EntityDecoderBuilderTest {
 
         TestEntity entity = decoder.decode(new JsonReader(entityJSON));
 
-        Assert.assertEquals(new ObjectId("5627b47d54b92d03adb9e9cf"), entity.id);
-        Assert.assertEquals("string", entity.stringField);
-        Assert.assertEquals(TestEntityChild.TestEnum.ITEM1, entity.child.enumField);
-        Assert.assertEquals(2, entity.listField.size());
-        Assert.assertEquals("V1", entity.listField.get(0));
-        Assert.assertEquals("V2", entity.listField.get(1));
+        assertEquals(new ObjectId("5627b47d54b92d03adb9e9cf"), entity.id);
+        assertEquals("string", entity.stringField);
+        assertEquals(TestEntityChild.TestEnum.ITEM1, entity.child.enumField);
+        assertEquals(2, entity.listField.size());
+        assertEquals("V1", entity.listField.get(0));
+        assertEquals("V2", entity.listField.get(1));
         Assert.assertNull(entity.nullChild);
 
-        Assert.assertEquals("V1", entity.mapField.get("K1"));
-        Assert.assertEquals("V2", entity.mapField.get("K2"));
+        assertEquals("V1", entity.mapField.get("K1"));
+        assertEquals("V2", entity.mapField.get("K2"));
     }
 
     private void verifyGeneratedMethods(EntityDecoderBuilder<TestEntity> builder) {
-        String methods = ClasspathResources.text("mongo-test/decode-methods.txt").replaceAll("\r\n", "\n");
+        String code = ClasspathResources.text("mongo-test/decoder-code.txt").replaceAll("\r\n", "\n");
 
-        builder.methods.values()
-            .forEach(method -> Assert.assertThat(methods, CoreMatchers.containsString(method)));
+        StringBuilder stringBuilder = new StringBuilder();
+        builder.fields.forEach(stringBuilder::append);
+        builder.methods.values().forEach(stringBuilder::append);
+
+        assertEquals(code, stringBuilder.toString());
     }
 }

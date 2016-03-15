@@ -1,6 +1,6 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.EnumValue;
+import core.framework.api.db.DBEnumValue;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 
@@ -21,7 +21,7 @@ final class EnumDBMapper {
             for (T constant : constants) {
                 try {
                     Field field = enumClass.getField(constant.name());
-                    String dbValue = field.getDeclaredAnnotation(EnumValue.class).value();
+                    String dbValue = field.getDeclaredAnnotation(DBEnumValue.class).value();
                     mappings.put(constant, dbValue);
                 } catch (NoSuchFieldException e) {
                     throw new Error(e);

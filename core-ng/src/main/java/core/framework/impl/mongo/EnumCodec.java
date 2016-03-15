@@ -1,29 +1,73 @@
 package core.framework.impl.mongo;
 
+import core.framework.api.mongo.MongoEnumValue;
+import core.framework.api.util.Exceptions;
 import org.bson.BsonReader;
+import org.bson.BsonType;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author neo
  */
 public class EnumCodec<T extends Enum<T>> implements Codec<T> {
+    private final Logger logger = LoggerFactory.getLogger(EnumCodec.class);
+
     private final Class<T> enumClass;
+    private final EnumMap<T, String> encodingMappings;
+    private final Map<String, T> decodingMappings;
 
     public EnumCodec(Class<T> enumClass) {
+        T[] constants = enumClass.getEnumConstants();
         this.enumClass = enumClass;
+        encodingMappings = new EnumMap<>(enumClass);
+        decodingMappings = new HashMap<>(constants.length);
+        for (T constant : constants) {
+            try {
+                Field field = enumClass.getField(constant.name());
+                String value = field.getDeclaredAnnotation(MongoEnumValue.class).value();
+                encodingMappings.put(constant, value);
+                decodingMappings.put(value, constant);
+            } catch (NoSuchFieldException e) {
+                throw new Error(e);
+            }
+        }
     }
 
     @Override
     public void encode(BsonWriter writer, T value, EncoderContext context) {
-        writer.writeString(value.name());
+        if (value == null) {
+            writer.writeNull();
+        } else {
+            writer.writeString(encodingMappings.get(value));
+        }
     }
 
     @Override
     public T decode(BsonReader reader, DecoderContext context) {
-        return Enum.valueOf(enumClass, reader.readString());
+        BsonType currentType = reader.getCurrentBsonType();
+        if (currentType == BsonType.NULL) {
+            reader.readNull();
+            return null;
+        } else if (currentType == BsonType.STRING) {
+            String enumValue = reader.readString();
+            T value = decodingMappings.get(enumValue);
+            if (value == null) throw Exceptions.error("can not decode value to enum, enumClass={}, value={}", enumClass.getCanonicalName(), enumValue);
+            return value;
+        } else {
+            logger.warn("field returned from mongo is ignored, field={}, type={}", reader.getCurrentName(), currentType);
+            reader.skipValue();
+            return null;
+        }
     }
 
     @Override
