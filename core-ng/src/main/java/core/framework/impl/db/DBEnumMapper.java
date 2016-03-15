@@ -12,7 +12,7 @@ import java.util.Map;
  */
 final class DBEnumMapper<T extends Enum<T>> {
     private final Class<T> enumClass;
-    private final Map<String, Enum<T>> mappings;
+    private final Map<String, T> mappings;
 
     DBEnumMapper(Class<T> enumClass) {
         this.enumClass = enumClass;
@@ -28,9 +28,9 @@ final class DBEnumMapper<T extends Enum<T>> {
         return enumValue;
     }
 
-    private Map<String, Enum<T>> mappings(Class<T> enumClass) {
+    private Map<String, T> mappings(Class<T> enumClass) {
         T[] constants = enumClass.getEnumConstants();
-        Map<String, Enum<T>> mapping = Maps.newHashMapWithExpectedSize(constants.length);
+        Map<String, T> mapping = Maps.newHashMapWithExpectedSize(constants.length);
         for (T constant : constants) {
             try {
                 Field field = enumClass.getField(constant.name());
