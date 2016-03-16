@@ -113,7 +113,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
         StopWatch watch = new StopWatch();
         try {
             List<T> results = query.limit == null ? Lists.newArrayList() : new ArrayList<>(query.limit);
-            FindIterable<T> mongoQuery = mongoQuery(query);
+            FindIterable<T> mongoQuery = mongoQuery(query).maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
             fetch(mongoQuery, results);
             checkTooManyRowsReturned(results.size());
             return results;
@@ -155,8 +155,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
     }
 
     private FindIterable<T> mongoQuery(Query query) {
-        FindIterable<T> mongoQuery = collection().find(query.filter == null ? new BsonDocument() : query.filter)
-            .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
+        FindIterable<T> mongoQuery = collection().find(query.filter == null ? new BsonDocument() : query.filter);
         if (query.projection != null) mongoQuery.projection(query.projection);
         if (query.sort != null) mongoQuery.sort(query.sort);
         if (query.skip != null) mongoQuery.skip(query.skip);
