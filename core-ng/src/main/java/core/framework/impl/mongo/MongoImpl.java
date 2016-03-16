@@ -53,8 +53,10 @@ public class MongoImpl implements Mongo {
     }
 
     public void close() {
-        logger.info("close mongodb client, uri={}", uri);
-        mongoClient.close();
+        if (mongoClient != null) {  // if app didn't call createDatabase, then mongoClient will be null
+            logger.info("close mongodb client, uri={}", uri);
+            mongoClient.close();
+        }
     }
 
     @Override
