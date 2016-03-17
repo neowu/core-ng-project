@@ -4,15 +4,12 @@ buildscript {
     }
     dependencies {
         classpath 'mysql:mysql-connector-java:5.1.38'
-        classpath 'org.flywaydb:flyway-gradle-plugin:3.2.1'
+        classpath 'org.flywaydb:flyway-gradle-plugin:4.0'
     }
 }
 
 apply plugin: org.flywaydb.gradle.FlywayPlugin
-// TODO: flyway has bug to use flyway.placeholderReplacement = false, I submitted bug https://github.com/flyway/flyway/issues/1001
-// for now disable it with custom prefix/suffix
-flyway.placeholderPrefix = '#DISABLED_FLYWAY_PLACEHOLDER_PREFIX'
-flyway.placeholderSuffix = '#DISABLED_FLYWAY_PLACEHOLDER_SUFFIX'
+flyway.placeholderReplacement = false
 
 // use gradlew -Penv=${env} to pass
 def environment = hasProperty('env') ? env : null

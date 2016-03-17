@@ -15,6 +15,10 @@
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
+### 4.3.1 (3/17/2016)
+* http: added status code 410
+* build: update gradle 2.12, flyway 4.0
+
 ### 4.3.0 (3/15/2016)
 * mongo: support @MongoEnumValue
 * db: renamed @EnumValue to @DBEnumValue
