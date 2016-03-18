@@ -3,6 +3,7 @@ package core.framework.test.mongo;
 import core.framework.api.mongo.Collection;
 import core.framework.api.mongo.Field;
 import core.framework.api.mongo.Id;
+import core.framework.api.mongo.MongoEnumValue;
 import org.bson.types.ObjectId;
 
 /**
@@ -20,6 +21,9 @@ public class TestEntity {
     public TestEnum enumField;
 
     public enum TestEnum {
-        VALUE1, VALUE2
+        @MongoEnumValue("VALUE1")
+        VALUE1,
+        @MongoEnumValue("VALUE2")
+        VALUE2
     }
 }

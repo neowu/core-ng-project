@@ -5,3 +5,4 @@ build/
 classes/
 gradle.properties
 */src/dev/java/
+.DS_Store

@@ -9,7 +9,8 @@
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
 * template security check, escaping and etc
 * http: make http session https only?
-* think about /test//b, and /:path(*)
+* think about /test//b, and /:path(\*)
+
 * framework error, queue listener, background task error notification?
 * use smile for cache/queue?
 * extend i18n message to validator/format/called by code directly
@@ -107,7 +108,7 @@
 ### 4.1.2 (2/10/2016)
 * web: removed web/not-found, web/method-not-allowed action assign, since we use error_code now
 * background: moved pool-cleanup, collect-stat job to background thread, not included in action
-* web: renamed all internal /management/* path to /_sys/*
+* web: renamed all internal /management/ path to /\_sys/
 
 ### 4.1.1 (2/9/2016)
 * monitor: initial monitoring draft, forward monitor metrics via logforwarder
@@ -506,16 +507,16 @@
 * standardized validation exception and make validator throw validationException, refactory validator
 
 ### 3.2.4 (7/15/2015)
-* fix: http response body validation pass empty list 
+* fix: http response body validation pass empty list
 * databaseImpl, track available/total connections when getting conn from pool
-* httpClient, allow server ssl cert change during renegotiation 
+* httpClient, allow server ssl cert change during renegotiation
 
 ### 3.2.3 (7/14/2015)
 * tune http client log info
-* enhanced Files, create temp file, logging 
+* enhanced Files, create temp file, logging
 
 ### 3.2.2 (7/13/2015)
-* fix: api() client to pass "Accept: application/json" 
+* fix: api() client to pass "Accept: application/json"
 * replace URL/URLPath encoding with apache common codec
 * tuned async task begin/end log message
 
@@ -533,7 +534,7 @@
 
 ### 3.1.8 (6/30/2015)
 * fix: requestURL(), parse x-forwarded-port to get requested port  
-  
+
 ### 3.1.7.1 (6/30/2015)
 * fix: test hsql db map BigDecimal to DECIMAL(10,2)
 
@@ -548,15 +549,15 @@
 
 ### 3.1.5 (6/24/2015)
 * async task support, inject AsyncExecutor
-* webservice support List as request/response, for channel-advisor and also for us 
+* webservice support List as request/response, for channel-advisor and also for us
 
 ### 3.1.4 (6/22/2015 - 6/23/2015)
 * removed module.loadYML(), use YAML.load(ClasspathResources.text()) instead, for db init data, use YAML loadlist then call repository.batchInsert
-* improve web service interface validator, better error message for bean param/path param missing @PathParam 
-* Cache management controllers (list names/clear key) 
+* improve web service interface validator, better error message for bean param/path param missing @PathParam
+* Cache management controllers (list names/clear key)
 
 ### 3.1.3 (6/22/2015)
-* move repository() into db() and register db entity class to view. 
+* move repository() into db() and register db entity class to view.
 
 ### 3.1.2 (6/22/2015)
 * fix: webservice interface validator should allow String as @PathParam
@@ -566,7 +567,7 @@
 * update ElasticSearch API according to ES 1.6.0
 * bind with supplier to support for expensive or external dependent object, test context can override by not calling supplier.get()
 * mark trace in ActionLogContext, write trace log for all subsequent actions (apiCall/messages)
-* create Application.configure()/start(), to make core-ng be used as script for testing/scripting 
+* create Application.configure()/start(), to make core-ng be used as script for testing/scripting
 * trace external calling time and count, e.g. db, redis
 
 ### 3.1.0 (6/15/2015)
@@ -575,7 +576,7 @@
 ### 3.0.9 (6/15/2015)
 * cache value type validator
 * refactory cache impl
-* Cache error handle, fault tolerant 
+* Cache error handle, fault tolerant
 
 ### 3.0.8
 * database batchInsert/Delete
