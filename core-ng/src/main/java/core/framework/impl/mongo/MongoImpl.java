@@ -25,7 +25,7 @@ public class MongoImpl implements Mongo {
     private final MongoClientOptions.Builder builder = MongoClientOptions.builder()
         .socketKeepAlive(true)
         .cursorFinalizerEnabled(false); // framework always close db cursor
-    int timeoutInMs = (int) Duration.ofSeconds(10).toMillis();
+    int timeoutInMs = (int) Duration.ofSeconds(15).toMillis();
     int tooManyRowsReturnedThreshold = 2000;
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
 
@@ -47,6 +47,8 @@ public class MongoImpl implements Mongo {
     protected MongoDatabase createDatabase(MongoClientURI uri, CodecRegistry registry) {
         builder.connectTimeout(timeoutInMs);
         builder.socketTimeout(timeoutInMs);
+        builder.maxWaitTime(timeoutInMs);   // pool checkout timeout
+        builder.serverSelectionTimeout(timeoutInMs * 3);    // able to try 3 servers
         builder.codecRegistry(registry);
         mongoClient = new MongoClient(uri);
         return mongoClient.getDatabase(uri.getDatabase());

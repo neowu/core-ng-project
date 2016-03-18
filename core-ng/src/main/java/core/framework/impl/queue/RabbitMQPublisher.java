@@ -34,12 +34,16 @@ public class RabbitMQPublisher<T> implements MessagePublisher<T> {
     }
 
     @Override
-    public void publish(T message) {
-        publish(exchange, routingKey, message);
+    public void publish(T message, int priority) {
+        publish(exchange, routingKey, message, priority);
     }
 
     @Override
     public void publish(String exchange, String routingKey, T message) {
+        publish(exchange, routingKey, message, 0);
+    }
+
+    private void publish(String exchange, String routingKey, T message, int priority) {
         validator.validate(message);
 
         Map<String, Object> headers = Maps.newHashMap();
@@ -50,6 +54,8 @@ public class RabbitMQPublisher<T> implements MessagePublisher<T> {
             .deliveryMode(2)   // persistent mode
             .appId(logManager.appName)
             .headers(headers);
+
+        if (priority > 0) builder.priority(priority);
 
         linkContext(builder, headers);
 
