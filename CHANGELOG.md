@@ -16,6 +16,9 @@
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
+### 4.3.3 (3/23/2016 - )
+* es: update es to 2.2.1
+
 ### 4.3.2 (3/18/2016)
 * mongo: update default timeout to 15s
 * rabbitmq: publisher supports message with priority
