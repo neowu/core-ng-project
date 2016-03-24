@@ -10,9 +10,7 @@
 * template security check, escaping and etc
 * http: make http session https only?
 * think about /test//b, and /:path(\*)
-
 * framework error, queue listener, background task error notification?
-* use smile for cache/queue?
 * extend i18n message to validator/format/called by code directly
 
 ## Change log

@@ -22,9 +22,9 @@ import java.util.Map;
  * @author neo
  */
 public final class JSONMapper {
-    public static final ObjectMapper OBJECT_MAPPER = createMapper();
+    public static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
 
-    private static ObjectMapper createMapper() {
+    private static ObjectMapper createObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new AfterburnerModule());

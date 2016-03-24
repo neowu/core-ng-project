@@ -36,7 +36,7 @@ public class JSONMapperTest {
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
-    static class TestBean {
+    private static class TestBean {
         @XmlElement(name = "string_field")
         public String stringField;
 

@@ -20,7 +20,8 @@ project(':core-ng') {
     dependencies {
         provided(
                 'redis.clients:jedis:2.8.0@jar',
-                "org.elasticsearch:elasticsearch:${elasticVersion}",
+                "org.elasticsearch:elasticsearch:${elasticVersion}@jar",
+                'com.carrotsearch:hppc:0.7.1@jar',  // used by elasticsearch
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
                 "com.rabbitmq:amqp-client:${rabbitVersion}"
         )
@@ -29,11 +30,11 @@ project(':core-ng') {
                 'javax.inject:javax.inject:1',
                 'org.javassist:javassist:3.20.0-GA',
                 'org.slf4j:slf4j-api:1.7.12',
-                'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.7.1',
-                'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.1',
-                'com.fasterxml.jackson.module:jackson-module-afterburner:2.7.1',
-                'org.apache.httpcomponents:httpclient:4.5.1',
-                'io.undertow:undertow-core:1.3.17.Final'
+                'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.7.3',
+                'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.3',
+                'com.fasterxml.jackson.module:jackson-module-afterburner:2.7.3',
+                'org.apache.httpcomponents:httpclient:4.5.2',
+                'io.undertow:undertow-core:1.3.19.Final'
         )
         testCompile(
                 'junit:junit:4.12',

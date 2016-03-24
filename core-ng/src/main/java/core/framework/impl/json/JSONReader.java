@@ -22,7 +22,7 @@ public final class JSONReader<T> {
 
     private final ObjectReader reader;
 
-    public JSONReader(ObjectReader reader) {
+    private JSONReader(ObjectReader reader) {
         this.reader = reader;
     }
 

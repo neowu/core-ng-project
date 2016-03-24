@@ -22,7 +22,7 @@ public final class JSONWriter<T> {
 
     private final ObjectWriter writer;
 
-    public JSONWriter(ObjectWriter writer) {
+    private JSONWriter(ObjectWriter writer) {
         this.writer = writer;
     }
 

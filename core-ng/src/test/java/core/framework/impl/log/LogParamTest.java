@@ -24,7 +24,7 @@ public class LogParamTest {
     @Test
     public void truncateLongString() {
         String message = "1234567890";
-        LogParam.StringParam param = new LogParam.StringParam(Strings.bytes(message), Charsets.UTF_8, 5);
-        assertEquals("1234...(truncated)", param.toString());
+        String value = LogParam.toString(Strings.bytes(message), Charsets.UTF_8, 5);
+        assertEquals("1234...(truncated)", value);
     }
 }

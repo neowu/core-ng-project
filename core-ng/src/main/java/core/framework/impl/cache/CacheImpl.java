@@ -25,7 +25,7 @@ public class CacheImpl<T> implements Cache<T> {
     private final JSONReader<T> reader;
     private final JSONWriter<T> writer;
 
-    public CacheImpl(String name, Type valueType, Duration duration, CacheStore cacheStore) {
+    CacheImpl(String name, Type valueType, Duration duration, CacheStore cacheStore) {
         this.name = name;
         this.valueType = valueType;
         this.duration = duration;
