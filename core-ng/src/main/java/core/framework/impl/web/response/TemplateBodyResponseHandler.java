@@ -8,10 +8,10 @@ import io.undertow.io.Sender;
 /**
  * @author neo
  */
-public class TemplateBodyResponseHandler implements BodyHandler {
+class TemplateBodyResponseHandler implements BodyHandler {
     private final TemplateManager templateManager;
 
-    public TemplateBodyResponseHandler(TemplateManager templateManager) {
+    TemplateBodyResponseHandler(TemplateManager templateManager) {
         this.templateManager = templateManager;
     }
 

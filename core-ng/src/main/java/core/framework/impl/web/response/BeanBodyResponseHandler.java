@@ -18,12 +18,12 @@ import java.util.List;
 /**
  * @author neo
  */
-public class BeanBodyResponseHandler implements BodyHandler {
+class BeanBodyResponseHandler implements BodyHandler {
     private final Logger logger = LoggerFactory.getLogger(BeanBodyResponseHandler.class);
 
     private final BeanValidator validator;
 
-    public BeanBodyResponseHandler(BeanValidator validator) {
+    BeanBodyResponseHandler(BeanValidator validator) {
         this.validator = validator;
     }
 

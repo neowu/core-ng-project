@@ -18,6 +18,7 @@
 ## Change log
 ### 4.3.3 (3/23/2016 - )
 * es: update es to 2.2.1
+* web: for file response, close exchange when end
 
 ### 4.3.2 (3/18/2016)
 * mongo: update default timeout to 15s

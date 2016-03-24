@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 /**
  * @author rainbow.cai
  */
-public class ByteArrayBodyResponseHandler implements BodyHandler {
+class ByteArrayBodyResponseHandler implements BodyHandler {
     private final Logger logger = LoggerFactory.getLogger(ByteArrayBodyResponseHandler.class);
 
     @Override
