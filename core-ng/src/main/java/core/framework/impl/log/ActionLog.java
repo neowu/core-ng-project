@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 
 import java.lang.management.ManagementFactory;
@@ -22,10 +23,10 @@ public final class ActionLog {
 
     public final String id;
     final Instant date;
-    final long startCPUTime;
     final Map<String, String> context;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
+    private final long startCPUTime;
     private final long startElapsed;
     public boolean trace;  // whether flush trace log for all subsequent actions
     public String action = "unassigned";
@@ -61,18 +62,20 @@ public final class ActionLog {
             errorCode = event.errorCode(); // only update error type/message if level raised, so error type will be first WARN or first ERROR
             errorMessage = errorMessage(event);
         }
-
-        int size = events.size();
-        if (size < MAX_TRACE_HOLD_SIZE || event.level.value >= LogLevel.WARN.value) {  // after reach max holding lines, only add warning/error events
-            events.add(event);
-            if (size == MAX_TRACE_HOLD_SIZE) {
-                log("reached max trace log holding size, only collect critical log event from now on");
-            }
+        if (events.size() < MAX_TRACE_HOLD_SIZE || event.level.value >= LogLevel.WARN.value) {  // after reach max holding lines, only add warning/error events
+            add(event);
         }
     }
 
     private void log(String message, Object... argument) {  // add log event directly, so internal message and won't be suspended
-        events.add(new LogEvent(LOGGER, null, LogLevel.DEBUG, message, argument, null));
+        add(new LogEvent(LOGGER, null, LogLevel.DEBUG, message, argument, null));
+    }
+
+    private void add(LogEvent event) {
+        events.add(event);
+        if (events.size() == MAX_TRACE_HOLD_SIZE) {
+            events.add(new LogEvent(LOGGER, null, LogLevel.DEBUG, "reached max trace log holding size, only collect critical log event from now on", null, null));
+        }
     }
 
     private String errorMessage(LogEvent event) {
@@ -103,8 +106,10 @@ public final class ActionLog {
     }
 
     public void context(String key, Object value) {
+        String previous = context.put(key, String.valueOf(value));
+        // put context can be called by application code, check duplication to avoid producing huge trace log by accident
+        if (previous != null) throw Exceptions.error("context key must only be set once, key={}, value={}, previous={}", key, value, previous);
         log("[context] {}={}", key, value);
-        context.put(key, String.valueOf(value));
     }
 
     public void track(String action, long elapsedTime) {
