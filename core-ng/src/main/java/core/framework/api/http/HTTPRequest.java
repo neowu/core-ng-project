@@ -19,6 +19,14 @@ public class HTTPRequest {
         return new HTTPRequest(HTTPMethod.POST, uri);
     }
 
+    public static HTTPRequest put(String uri) {
+        return new HTTPRequest(HTTPMethod.PUT, uri);
+    }
+
+    public static HTTPRequest delete(String uri) {
+        return new HTTPRequest(HTTPMethod.DELETE, uri);
+    }
+
     final RequestBuilder builder;
     private final Logger logger = LoggerFactory.getLogger(HTTPRequest.class);
 

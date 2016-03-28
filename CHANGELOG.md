@@ -14,6 +14,9 @@
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
+### 4.3.5 (3/28/2016)
+* http: added 422 status code
+
 ### 4.3.4 (3/25/2016)
 * log: actionLogContext.put checks duplication to avoid huge trace log
 
