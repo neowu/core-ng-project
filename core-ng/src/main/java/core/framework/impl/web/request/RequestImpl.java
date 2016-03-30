@@ -133,6 +133,11 @@ public final class RequestImpl implements Request {
         return Optional.of(new MultipartFile(value.getPath(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
     }
 
+    @Override
+    public Optional<byte[]> body() {
+        return Optional.ofNullable(body);
+    }
+
     private FormData.FormValue formValue(String name) {
         if (formData == null)
             throw new BadRequestException("form body is required, method=" + method + ", contentType=" + contentType);

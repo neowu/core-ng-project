@@ -14,6 +14,9 @@
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
+### 4.3.6 (3/30/2016)
+* http: request supports body() method
+
 ### 4.3.5 (3/28/2016)
 * http: added 422 status code
 

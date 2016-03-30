@@ -29,6 +29,8 @@ public interface Request {
 
     Optional<MultipartFile> file(String name);
 
+    Optional<byte[]> body();
+
     <T> T bean(Type instanceType);
 
     String clientIP();

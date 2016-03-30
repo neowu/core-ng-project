@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '4.3.5'
+    version = '4.3.6'
 }
 
 def mongoVersion = '3.2.2'
