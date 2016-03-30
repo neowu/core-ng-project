@@ -5,10 +5,10 @@ import java.util.List;
 /**
  * @author neo
  */
-public class ListValidator implements FieldValidator {
+class ListValidator implements FieldValidator {
     private final List<FieldValidator> valueValidators;
 
-    public ListValidator(List<FieldValidator> valueValidators) {
+    ListValidator(List<FieldValidator> valueValidators) {
         this.valueValidators = valueValidators;
     }
 

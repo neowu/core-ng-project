@@ -9,11 +9,11 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class LengthValidator implements FieldValidator {
+class LengthValidator implements FieldValidator {
     private final String fieldPath;
     private final Length length;
 
-    public LengthValidator(String fieldPath, Length length) {
+    LengthValidator(String fieldPath, Length length) {
         this.fieldPath = fieldPath;
         this.length = length;
     }

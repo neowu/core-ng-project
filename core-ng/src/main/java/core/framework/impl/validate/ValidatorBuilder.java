@@ -11,6 +11,7 @@ import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Pattern;
 import core.framework.api.validate.ValueNotEmpty;
 import core.framework.api.validate.ValueNotNull;
+import core.framework.api.validate.ValuePattern;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.reflect.GenericTypes;
 
@@ -83,8 +84,6 @@ public class ValidatorBuilder {
         createMinValidator(validators, field, parentPath);
         createMaxValidator(validators, field, parentPath);
 
-        validateCollectionAnnotations(field);
-
         Class<?> fieldClass = field.getType();
         if (List.class.equals(fieldClass) || Map.class.equals(fieldClass)) {
             FieldValidator collectionValidator = createCollectionValidator(field, parentPath);
@@ -105,6 +104,7 @@ public class ValidatorBuilder {
 
         createValueNotNullValidator(valueValidators, parentPath, field);
         createValueNotEmptyValidator(valueValidators, parentPath, field);
+        createValuePatternValidator(valueValidators, parentPath, field);
 
         if (!isValueClass(targetClass)) {
             ObjectValidator objectValidator = createObjectValidator(targetClass, fieldPath(parentPath, field));
@@ -115,28 +115,6 @@ public class ValidatorBuilder {
 
         if (isList) return new ListValidator(valueValidators);
         else return new MapValidator(valueValidators);
-    }
-
-    private void validateCollectionAnnotations(Field field) {
-        Class<?> fieldClass = field.getType();
-        Type fieldType = field.getGenericType();
-
-        if (field.isAnnotationPresent(ValueNotNull.class) && !(List.class.equals(fieldClass) || Map.class.equals(fieldClass))) {
-            throw Exceptions.error("@ValueNotNull must on List<T> or Map<String, T>, field={}, fieldClass={}", field, fieldClass.getCanonicalName());
-        }
-
-        if (field.isAnnotationPresent(ValueNotEmpty.class)) {
-            if (!(List.class.equals(fieldClass) || Map.class.equals(fieldClass)))
-                throw Exceptions.error("@ValueNotEmpty must on List<String> or Map<String, String>, field={}, fieldClass={}", field, fieldClass.getCanonicalName());
-
-            if (List.class.equals(fieldClass) && !String.class.equals(GenericTypes.listValueClass(fieldType))) {
-                throw Exceptions.error("@ValueNotEmpty must on List<String>, field={}, fieldType={}", field, fieldType.getTypeName());
-            }
-
-            if (Map.class.equals(fieldClass) && !String.class.equals(GenericTypes.mapValueClass(fieldType))) {
-                throw Exceptions.error("@ValueNotEmpty must on Map<String, String>, field={}, fieldType={}", field, fieldType.getTypeName());
-            }
-        }
     }
 
     private void createMaxValidator(List<FieldValidator> validators, Field field, String parentPath) {
@@ -204,13 +182,40 @@ public class ValidatorBuilder {
     private void createValueNotEmptyValidator(List<FieldValidator> valueValidators, String parentPath, Field field) {
         ValueNotEmpty valueNotEmpty = field.getDeclaredAnnotation(ValueNotEmpty.class);
         if (valueNotEmpty != null) {
+            Type fieldType = field.getGenericType();
+            Class<?> fieldClass = field.getType();
+            boolean isStringListOrStringMap = (List.class.equals(fieldClass) && String.class.equals(GenericTypes.listValueClass(fieldType)))
+                || (Map.class.equals(fieldClass) && String.class.equals(GenericTypes.mapValueClass(fieldType)));
+            if (!isStringListOrStringMap) {
+                throw Exceptions.error("@ValueNotEmpty must on List<String> or Map<String, String>, field={}, fieldType={}", field, fieldType.getTypeName());
+            }
+
             valueValidators.add(new NotEmptyValidator(fieldPath(parentPath, field), valueNotEmpty.message()));
+        }
+    }
+
+    private void createValuePatternValidator(List<FieldValidator> valueValidators, String parentPath, Field field) {
+        ValuePattern valuePattern = field.getDeclaredAnnotation(ValuePattern.class);
+        if (valuePattern != null) {
+            Type fieldType = field.getGenericType();
+            Class<?> fieldClass = field.getType();
+            boolean isStringListOrStringMap = (List.class.equals(fieldClass) && String.class.equals(GenericTypes.listValueClass(fieldType)))
+                || (Map.class.equals(fieldClass) && String.class.equals(GenericTypes.mapValueClass(fieldType)));
+            if (!isStringListOrStringMap) {
+                throw Exceptions.error("@ValuePattern must on List<String> or Map<String, String>, field={}, fieldType={}", field, fieldType.getTypeName());
+            }
+
+            valueValidators.add(new PatternValidator(valuePattern.value(), fieldPath(parentPath, field), valuePattern.message()));
         }
     }
 
     private void createValueNotNullValidator(List<FieldValidator> valueValidators, String parentPath, Field field) {
         ValueNotNull valueNotNull = field.getDeclaredAnnotation(ValueNotNull.class);
         if (valueNotNull != null) {
+            Class<?> fieldClass = field.getType();
+            if (!(List.class.equals(fieldClass) || Map.class.equals(fieldClass))) {
+                throw Exceptions.error("@ValueNotNull must on List<T> or Map<String, T>, field={}, fieldClass={}", field, fieldClass.getCanonicalName());
+            }
             valueValidators.add(new NotNullValidator(fieldPath(parentPath, field), valueNotNull.message(), false));
         }
     }

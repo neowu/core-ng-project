@@ -7,10 +7,10 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class ObjectValidator implements FieldValidator {
+class ObjectValidator implements FieldValidator {
     private final Map<Field, List<FieldValidator>> validators;
 
-    public ObjectValidator(Map<Field, List<FieldValidator>> validators) {
+    ObjectValidator(Map<Field, List<FieldValidator>> validators) {
         this.validators = validators;
     }
 

@@ -5,11 +5,11 @@ import core.framework.api.validate.Min;
 /**
  * @author neo
  */
-public class MinValidator implements FieldValidator {
+class MinValidator implements FieldValidator {
     private final String fieldPath;
     private final Min min;
 
-    public MinValidator(String fieldPath, Min min) {
+    MinValidator(String fieldPath, Min min) {
         this.fieldPath = fieldPath;
         this.min = min;
     }

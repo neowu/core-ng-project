@@ -5,11 +5,11 @@ import core.framework.api.util.Strings;
 /**
  * @author neo
  */
-public class NotEmptyValidator implements FieldValidator {
+class NotEmptyValidator implements FieldValidator {
     private final String fieldPath;
     private final String errorMessage;
 
-    public NotEmptyValidator(String fieldPath, String errorMessage) {
+    NotEmptyValidator(String fieldPath, String errorMessage) {
         this.fieldPath = fieldPath;
         this.errorMessage = errorMessage;
     }

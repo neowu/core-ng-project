@@ -5,11 +5,11 @@ import core.framework.api.validate.Max;
 /**
  * @author neo
  */
-public class MaxValidator implements FieldValidator {
+class MaxValidator implements FieldValidator {
     private final String fieldPath;
     private final Max max;
 
-    public MaxValidator(String fieldPath, Max max) {
+    MaxValidator(String fieldPath, Max max) {
         this.fieldPath = fieldPath;
         this.max = max;
     }
