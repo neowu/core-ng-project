@@ -14,6 +14,10 @@
 * extend i18n message to validator/format/called by code directly
 
 ## Change log
+### 4.3.8 (3/31/2016)
+* hmac: changed input from String to bytes
+* es: update to 2.3.0
+
 ### 4.3.7 (3/30/2016)
 * validate: add @ValuePattern
 

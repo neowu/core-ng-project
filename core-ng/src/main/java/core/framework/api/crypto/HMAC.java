@@ -1,7 +1,5 @@
 package core.framework.api.crypto;
 
-import core.framework.api.util.Charsets;
-
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -33,13 +31,13 @@ public final class HMAC {
         this.hash = hash;
     }
 
-    public byte[] digest(String message) {
+    public byte[] digest(byte[] message) {
         if (key == null) throw new Error("key must not be null");
         try {
             Mac mac = Mac.getInstance(hash.algorithm);
             SecretKey secretKey = new SecretKeySpec(key, hash.algorithm);
             mac.init(secretKey);
-            return mac.doFinal(message.getBytes(Charsets.UTF_8));
+            return mac.doFinal(message);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new Error(e);
         }

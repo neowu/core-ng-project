@@ -1,6 +1,24 @@
+/*
+ * Licensed to Elasticsearch under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.elasticsearch.script.groovy;
 
-import com.google.common.hash.Hashing;
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyCodeSource;
@@ -22,6 +40,7 @@ import org.elasticsearch.SpecialPermission;
 import org.elasticsearch.bootstrap.BootstrapInfo;
 import org.elasticsearch.common.Nullable;
 import org.elasticsearch.common.component.AbstractComponent;
+import org.elasticsearch.common.hash.MessageDigests;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.logging.ESLogger;
 import org.elasticsearch.common.settings.Settings;
@@ -131,23 +150,21 @@ public class GroovyScriptEngineService extends AbstractComponent implements Scri
     }
 
     @Override
-    public Object compile(final String script) {
+    public Object compile(final String script, Map<String, String> params) {
         try {
             // we reuse classloader, so do a security check just in case.
             SecurityManager sm = System.getSecurityManager();
             if (sm != null) {
                 sm.checkPermission(new SpecialPermission());
             }
-            final String fake = Hashing.sha1().hashString(script, StandardCharsets.UTF_8).toString();
+            final String fake = MessageDigests.toHexString(MessageDigests.sha1().digest(script.getBytes(StandardCharsets.UTF_8)));
             // same logic as GroovyClassLoader.parseClass() but with a different codesource string:
-            return AccessController.doPrivileged(new PrivilegedAction<Object>() {
-                public Class<?> run() {
-                    GroovyCodeSource gcs = new GroovyCodeSource(script, fake, BootstrapInfo.UNTRUSTED_CODEBASE);
-                    gcs.setCachable(false);
-                    // TODO: we could be more complicated and paranoid, and move this to separate block, to
-                    // sandbox the compilation process itself better.
-                    return loader.parseClass(gcs);
-                }
+            return AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+                GroovyCodeSource gcs = new GroovyCodeSource(script, fake, BootstrapInfo.UNTRUSTED_CODEBASE);
+                gcs.setCachable(false);
+                // TODO: we could be more complicated and paranoid, and move this to separate block, to
+                // sandbox the compilation process itself better.
+                return loader.parseClass(gcs);
             });
         } catch (Throwable e) {
             if (logger.isTraceEnabled()) {
@@ -179,7 +196,7 @@ public class GroovyScriptEngineService extends AbstractComponent implements Scri
                 allVars.putAll(vars);
             }
             return new GroovyScript(compiledScript, createScript(compiledScript.compiled(), allVars), this.logger);
-        } catch (InstantiationException | IllegalAccessException | RuntimeException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new ScriptException("failed to build executable " + compiledScript, e);
         }
     }
@@ -190,7 +207,7 @@ public class GroovyScriptEngineService extends AbstractComponent implements Scri
         return new GroovySearchScript(lookup, vars, compiledScript);
     }
 
-    public static final class GroovyScript implements ExecutableScript, LeafSearchScript {
+    private static final class GroovyScript implements ExecutableScript, LeafSearchScript {
 
         private final CompiledScript compiledScript;
         private final Script script;
@@ -198,12 +215,12 @@ public class GroovyScriptEngineService extends AbstractComponent implements Scri
         private final Map<String, Object> variables;
         private final ESLogger logger;
 
-        public GroovyScript(CompiledScript compiledScript, Script script, ESLogger logger) {
+        GroovyScript(CompiledScript compiledScript, Script script, ESLogger logger) {
             this(compiledScript, script, null, logger);
         }
 
         @SuppressWarnings("unchecked")
-        public GroovyScript(CompiledScript compiledScript, Script script, @Nullable LeafSearchLookup lookup, ESLogger logger) {
+        GroovyScript(CompiledScript compiledScript, Script script, @Nullable LeafSearchLookup lookup, ESLogger logger) {
             this.compiledScript = compiledScript;
             this.script = script;
             this.lookup = lookup;
@@ -281,7 +298,8 @@ public class GroovyScriptEngineService extends AbstractComponent implements Scri
      * A compilation customizer that is used to transform a number like 1.23,
      * which would normally be a BigDecimal, into a double value.
      */
-    static class GroovyBigDecimalTransformer extends CompilationCustomizer {
+    class GroovyBigDecimalTransformer extends CompilationCustomizer {
+
         GroovyBigDecimalTransformer(CompilePhase phase) {
             super(phase);
         }
@@ -295,7 +313,7 @@ public class GroovyScriptEngineService extends AbstractComponent implements Scri
     /**
      * Groovy expression transformer that converts BigDecimals to doubles
      */
-    static class BigDecimalExpressionTransformer extends ClassCodeExpressionTransformer {
+    class BigDecimalExpressionTransformer extends ClassCodeExpressionTransformer {
 
         private final SourceUnit source;
 
@@ -322,7 +340,37 @@ public class GroovyScriptEngineService extends AbstractComponent implements Scri
         }
     }
 
+    private class GroovyClassLoaderPrivilegedAction implements PrivilegedAction<GroovyClassLoader> {
+        private final SecurityManager sm;
+        private final CompilerConfiguration config;
+
+        public GroovyClassLoaderPrivilegedAction(SecurityManager sm, CompilerConfiguration config) {
+            this.sm = sm;
+            this.config = config;
+        }
+
+        @Override
+        public GroovyClassLoader run() {
+            // snapshot our context (which has permissions for classes), since the script has none
+            final AccessControlContext engineContext = AccessController.getContext();
+            return new GroovyClassLoader(new ClassLoader(getClass().getClassLoader()) {
+                @Override
+                protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+                    if (sm != null) {
+                        try {
+                            engineContext.checkPermission(new ClassPermission(name));
+                        } catch (SecurityException e) {
+                            throw new ClassNotFoundException(name, e);
+                        }
+                    }
+                    return super.loadClass(name, resolve);
+                }
+            }, config);
+        }
+    }
+
     private class GroovySearchScript implements SearchScript {
+
         private final SearchLookup lookup;
         private final Map<String, Object> vars;
         private final CompiledScript compiledScript;
@@ -354,35 +402,6 @@ public class GroovyScriptEngineService extends AbstractComponent implements Scri
         public boolean needsScores() {
             // TODO: can we reliably know if a groovy script makes use of _score
             return true;
-        }
-    }
-
-    private class GroovyClassLoaderPrivilegedAction implements PrivilegedAction<GroovyClassLoader> {
-        private final SecurityManager sm;
-        private final CompilerConfiguration config;
-
-        public GroovyClassLoaderPrivilegedAction(SecurityManager sm, CompilerConfiguration config) {
-            this.sm = sm;
-            this.config = config;
-        }
-
-        @Override
-        public GroovyClassLoader run() {
-            // snapshot our context (which has permissions for classes), since the script has none
-            final AccessControlContext engineContext = AccessController.getContext();
-            return new GroovyClassLoader(new ClassLoader(getClass().getClassLoader()) {
-                @Override
-                protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-                    if (sm != null) {
-                        try {
-                            engineContext.checkPermission(new ClassPermission(name));
-                        } catch (SecurityException e) {
-                            throw new ClassNotFoundException(name, e);
-                        }
-                    }
-                    return super.loadClass(name, resolve);
-                }
-            }, config);
         }
     }
 }
