@@ -9,6 +9,14 @@ import core.framework.api.mongo.Mongo;
 import core.framework.api.mongo.MongoCollection;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.StopWatch;
+import org.bson.BsonArray;
+import org.bson.BsonBoolean;
+import org.bson.BsonDocument;
+import org.bson.BsonDouble;
+import org.bson.BsonInt32;
+import org.bson.BsonInt64;
+import org.bson.BsonString;
+import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
@@ -23,6 +31,7 @@ public class MongoImpl implements Mongo {
     final EntityCodecs codecs = new EntityCodecs();
     private final Logger logger = LoggerFactory.getLogger(MongoImpl.class);
     private final MongoClientOptions.Builder builder = MongoClientOptions.builder()
+        .maxConnectionIdleTime((int) Duration.ofMinutes(30).toMillis())
         .socketKeepAlive(true)
         .cursorFinalizerEnabled(false); // framework always close db cursor
     int timeoutInMs = (int) Duration.ofSeconds(15).toMillis();
@@ -68,6 +77,34 @@ public class MongoImpl implements Mongo {
             database().getCollection(collection).drop();
         } finally {
             logger.info("dropCollection, collection={}, elapsedTime={}", collection, watch.elapsedTime());
+        }
+    }
+
+    @Override
+    public Document eval(String function, Object... arguments) {
+        StopWatch watch = new StopWatch();
+        try {
+            BsonDocument command = new BsonDocument();
+            command.put("eval", new BsonString(function));
+            BsonArray evalArguments = new BsonArray();
+            for (Object argument : arguments) {
+                if (argument instanceof Integer) {
+                    evalArguments.add(new BsonInt32((Integer) argument));
+                } else if (argument instanceof Long) {
+                    evalArguments.add(new BsonInt64((Long) argument));
+                } else if (argument instanceof Boolean) {
+                    evalArguments.add(new BsonBoolean((Boolean) argument));
+                } else if (argument instanceof Double) {
+                    evalArguments.add(new BsonDouble((Double) argument));
+                } else {
+                    evalArguments.add(new BsonString(String.valueOf(argument)));
+                }
+            }
+            command.put("args", evalArguments);
+            command.put("nolock", BsonBoolean.TRUE);
+            return database().runCommand(command);
+        } finally {
+            logger.info("eval, function={}, args={}, elapsedTime={}", function, arguments, watch.elapsedTime());
         }
     }
 

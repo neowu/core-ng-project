@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '4.3.8'
+    version = '4.3.9'
 }
 
 def mongoVersion = '3.2.2'
@@ -126,7 +126,8 @@ project(':demo-service') {
     dependencies {
         compile(
                 project(':core-ng'),
-                'redis.clients:jedis:2.8.0@jar'
+                'redis.clients:jedis:2.8.0@jar',
+                "org.mongodb:mongo-java-driver:${mongoVersion}"
         )
         runtime(
                 "com.rabbitmq:amqp-client:${rabbitVersion}"

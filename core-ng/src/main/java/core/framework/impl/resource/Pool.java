@@ -25,13 +25,13 @@ import java.util.function.Supplier;
  */
 public final class Pool<T> {
     final BlockingDeque<PoolItem<T>> idleItems = new LinkedBlockingDeque<>();
-    final AtomicInteger total = new AtomicInteger(0);
     private final Logger logger = LoggerFactory.getLogger(Pool.class);
+    private final AtomicInteger total = new AtomicInteger(0);
     private final Supplier<T> factory;
     private final ResourceCloseHandler<T> closeHandler;
-    String name;
-    int minSize = 1;
-    int maxSize = 50;
+    private String name;
+    private int minSize = 1;
+    private int maxSize = 50;
     private Duration maxIdleTime = Duration.ofMinutes(30);
     private long checkoutTimeoutInMs = Duration.ofSeconds(30).toMillis();
 
