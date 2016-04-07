@@ -42,6 +42,7 @@ final class LoggerImpl extends AbstractLogger {
     void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
         if (level.value >= traceLevel.value) {
             LogEvent event = new LogEvent(logger, marker, level, message, arguments, exception);
+            event.filter = logManager.filter;
             logManager.process(event);
 
             if (level.value >= LogLevel.INFO.value) {

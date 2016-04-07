@@ -28,6 +28,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author neo
  */
 public final class LogForwarder {
+    private static final int MAX_TRACE_LENGTH = 1000000; // 1M
+
     private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
     private final String appName;
 
@@ -132,7 +134,13 @@ public final class LogForwarder {
         if (log.flushTraceLog()) {
             StringBuilder builder = new StringBuilder(log.events.size() << 8);  // length * 256 as rough initial capacity
             for (LogEvent event : log.events) {
-                builder.append(event.logMessage());
+                String traceMessage = event.logMessage();
+                if (builder.length() + traceMessage.length() >= MAX_TRACE_LENGTH) {
+                    builder.append(traceMessage.substring(0, MAX_TRACE_LENGTH - builder.length()));
+                    builder.append("...(truncated)");
+                    break;
+                }
+                builder.append(traceMessage);
             }
             message.traceLog = builder.toString();
         }

@@ -1,5 +1,6 @@
 package core.framework.api.module;
 
+import core.framework.api.log.MessageFilter;
 import core.framework.impl.log.ActionLogger;
 import core.framework.impl.log.LogForwarder;
 import core.framework.impl.log.TraceLogger;
@@ -62,5 +63,9 @@ public final class LogConfig {
             context.logManager.logForwarder = new LogForwarder(host, context.logManager.appName);
             context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(context.logManager.logForwarder), Duration.ofSeconds(10));
         }
+    }
+
+    public void filter(MessageFilter filter) {
+        context.logManager.filter = filter;
     }
 }

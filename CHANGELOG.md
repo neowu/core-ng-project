@@ -12,8 +12,13 @@
 * think about /test//b, and /:path(\*)
 * framework error, queue listener, background task error notification?
 * extend i18n message to validator/format/called by code directly
+* faster synchronous rpc
 
 ## Change log
+### 4.4.0 (4/7/2016)
+* log: put 1M limit of trace log to forward to remote
+* log: add message filter support
+
 ### 4.3.9 (4/1/2016)
 * mongo: support eval for db-migration
 * mongo: set connection max idle time to 30mins

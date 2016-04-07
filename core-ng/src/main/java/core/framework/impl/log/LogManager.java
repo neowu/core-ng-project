@@ -2,6 +2,7 @@ package core.framework.impl.log;
 
 import core.framework.api.log.ErrorCode;
 import core.framework.api.log.Markers;
+import core.framework.api.log.MessageFilter;
 import core.framework.api.log.Warning;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -17,6 +18,7 @@ public final class LogManager {
     public ActionLogger actionLogger;
     public TraceLogger traceLogger;
     public LogForwarder logForwarder;
+    public MessageFilter filter;
 
     public LogManager() {
         this.appName = System.getProperty("core.appName");

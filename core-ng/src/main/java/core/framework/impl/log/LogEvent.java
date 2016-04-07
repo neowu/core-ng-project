@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.api.log.MessageFilter;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Strings;
 import core.framework.impl.log.marker.ErrorCodeMarker;
@@ -20,7 +21,7 @@ final class LogEvent {
     private final String message;
     private final Object[] arguments;
     private final Throwable exception;
-
+    MessageFilter filter;
     private String logMessage;
 
     LogEvent(String logger, Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
@@ -61,11 +62,18 @@ final class LogEvent {
     }
 
     String message() {
+        String message;
         if (arguments == null) {
-            return message;    // log message can be null, e.g. message of NPE
+            message = this.message;    // log message can be null, e.g. message of NPE
         } else {
-            return Strings.format(message, arguments);
+            message = Strings.format(this.message, arguments);
         }
+        try {
+            if (filter != null) return filter.filter(logger, message);
+        } catch (Throwable e) {
+            return "failed to filter log message, error=" + e.getMessage() + System.lineSeparator() + Exceptions.stackTrace(e);
+        }
+        return message;
     }
 
     String errorCode() {
