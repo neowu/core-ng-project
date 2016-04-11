@@ -32,11 +32,15 @@ public class HTTPRequest {
 
     public HTTPRequest(HTTPMethod method, String uri) {
         logger.debug("[request] method={}, uri={}", method, uri);
-        builder = RequestBuilder.create(method.name()).setUri(uri);
+        try {
+            builder = RequestBuilder.create(method.name()).setUri(uri);
+        } catch (IllegalArgumentException e) {
+            throw new HTTPClientException(e.getMessage(), "INVALID_URL", e);
+        }
     }
 
-    public HTTPRequest accept(String contentType) {
-        return header(HTTPHeaders.ACCEPT, contentType);
+    public HTTPRequest accept(ContentType contentType) {
+        return header(HTTPHeaders.ACCEPT, contentType.toString());
     }
 
     public HTTPRequest header(String name, String value) {

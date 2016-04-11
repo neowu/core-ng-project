@@ -2,7 +2,6 @@ package core.framework.impl.web.service;
 
 import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPClient;
-import core.framework.api.http.HTTPHeaders;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.http.HTTPResponse;
@@ -92,7 +91,7 @@ public class WebServiceClient {
         }
 
         HTTPRequest request = new HTTPRequest(method, serviceURL);
-        request.header(HTTPHeaders.ACCEPT, ContentType.APPLICATION_JSON.toString());
+        request.accept(ContentType.APPLICATION_JSON);
 
         if (logManager.appName != null) {
             request.header(HTTPServerHandler.HEADER_CLIENT, logManager.appName);

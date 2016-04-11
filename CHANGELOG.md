@@ -15,6 +15,11 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.4.1 (4/8/2016)
+* http: update httpclient request to accept ContentType
+* es: update to 2.3.1
+* httpclient: throw HTTPClientException for invalid url
+
 ### 4.4.0 (4/7/2016)
 * log: put 1M limit of trace log to forward to remote
 * log: add message filter support
