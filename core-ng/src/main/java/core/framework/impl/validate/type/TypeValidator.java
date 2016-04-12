@@ -24,6 +24,7 @@ public class TypeValidator {
     public boolean allowTopLevelValue;
     public boolean allowChildObject;
     public boolean allowChildListAndMap;
+    public boolean allowOptional;
     public Function<Class, Boolean> allowedValueClass;
     public TypeVisitor visitor;
 
@@ -32,16 +33,26 @@ public class TypeValidator {
     }
 
     public void validate() {
-        if (GenericTypes.isList(type)) {
-            if (!allowTopLevelList)
-                throw Exceptions.error("top level list is not allowed, type={}", type.getTypeName());
+        Type type = extractOptionalType(this.type, "");
 
+        if (GenericTypes.isList(type)) {
+            if (!allowTopLevelList) throw Exceptions.error("top level list is not allowed, type={}", type.getTypeName());
             visitList(type, null, null);
         } else {
             if (allowTopLevelValue && allowedValueClass.apply(GenericTypes.rawClass(type))) return;
 
             visitObject(GenericTypes.rawClass(type), null, null);
         }
+    }
+
+    private Type extractOptionalType(Type type, String fieldPath) {
+        if (GenericTypes.isOptional(type)) {
+            if (!allowOptional) throw Exceptions.error("optional is not allowed, type={}, field={}", type.getTypeName(), fieldPath);
+            if (!GenericTypes.isGenericOptional(type))
+                throw Exceptions.error("optional must be Optional<T> and T must be class, type={}, field={}", type.getTypeName(), fieldPath);
+            return GenericTypes.optionalValueClass(type);
+        }
+        return type;
     }
 
     private void visitObject(Class<?> objectClass, Field owner, String path) {
@@ -61,7 +72,7 @@ public class TypeValidator {
             if (visitor != null) visitor.visitField(field, path);
 
             String fieldPath = path(path, field.getName());
-            Type fieldType = field.getGenericType();
+            Type fieldType = extractOptionalType(field.getGenericType(), Fields.path(field));
             if (GenericTypes.isList(fieldType)) {
                 if (!allowChildListAndMap)
                     throw Exceptions.error("list field is not allowed, field={}", Fields.path(field));
@@ -104,7 +115,7 @@ public class TypeValidator {
 
     private void visitList(Type listType, Field owner, String path) {
         if (!GenericTypes.isGenericList(listType)) {
-            throw Exceptions.error("list must be as List<T> and T must be class, type={}", listType.getTypeName());
+            throw Exceptions.error("list must be List<T> and T must be class, type={}", listType.getTypeName());
         }
         Class<?> valueClass = GenericTypes.listValueClass(listType);
         visitValue(valueClass, owner, path);

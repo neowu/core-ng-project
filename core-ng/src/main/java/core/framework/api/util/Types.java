@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -14,6 +15,10 @@ import java.util.function.Supplier;
 public final class Types {
     public static Type generic(Class<?> rawType, Type... arguments) {
         return new ParameterizedTypeImpl(rawType, arguments, null);
+    }
+
+    public static Type optional(Type valueType) {
+        return generic(Optional.class, valueType);
     }
 
     public static Type list(Type valueType) {

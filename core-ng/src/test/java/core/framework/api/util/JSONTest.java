@@ -12,8 +12,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 /**
@@ -27,6 +29,19 @@ public class JSONTest {
         assertEquals(2, beans.size());
         assertEquals("n1", beans.get(0).name);
         assertEquals("n2", beans.get(1).name);
+    }
+
+    @Test
+    public void optionalField() {
+        BeanWithOptionalField bean = new BeanWithOptionalField();
+        bean.optionalString = Optional.empty();
+        assertFalse(JSON.fromJSON(BeanWithOptionalField.class, JSON.toJSON(bean)).optionalString.isPresent());
+
+        bean.optionalString = null;
+        assertNull(JSON.fromJSON(BeanWithOptionalField.class, JSON.toJSON(bean)).optionalString);
+
+        bean.optionalString = Optional.of("value");
+        assertEquals("value", JSON.fromJSON(BeanWithOptionalField.class, JSON.toJSON(bean)).optionalString.get());
     }
 
     @Test
@@ -100,4 +115,11 @@ public class JSONTest {
         @XmlElement(name = "instant")
         public Instant instant;
     }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    static class BeanWithOptionalField {
+        @XmlElement(name = "optional_string")
+        public Optional<String> optionalString;
+    }
+
 }

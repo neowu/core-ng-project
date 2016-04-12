@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.4.2 (4/12/2016)
+* json: support Optional as field, queue/ws interface supported too
+
 ### 4.4.1 (4/8/2016)
 * http: update httpclient request to accept ContentType
 * es: update to 2.3.1

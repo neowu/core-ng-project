@@ -6,6 +6,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -35,6 +36,23 @@ public final class GenericTypes {
     }
 
     public static Class<?> listValueClass(Type type) {
+        return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+    }
+
+    public static boolean isOptional(Type type) {
+        return Optional.class.isAssignableFrom(rawClass(type));
+    }
+
+    public static boolean isGenericOptional(Type type) {
+        if (type instanceof ParameterizedType) {
+            Class<?> rawClass = (Class<?>) ((ParameterizedType) type).getRawType();
+            return Optional.class.isAssignableFrom(rawClass)
+                && ((ParameterizedType) type).getActualTypeArguments()[0] instanceof Class;
+        }
+        return false;
+    }
+
+    public static Class<?> optionalValueClass(Type type) {
         return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
     }
 

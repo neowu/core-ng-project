@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -32,8 +33,20 @@ public class BeanBodyResponseHandlerTest {
     }
 
     @Test
+    public void validateEmptyOptional() {
+        Optional<TestBean> optional = Optional.empty();
+        handler.validateBeanType(optional);
+    }
+
+    @Test
     public void validateBean() {
         TestBean bean = new TestBean();
         handler.validateBeanType(bean);
+    }
+
+    @Test
+    public void validateOptionalBean() {
+        Optional<TestBean> optional = Optional.of(new TestBean());
+        handler.validateBeanType(optional);
     }
 }

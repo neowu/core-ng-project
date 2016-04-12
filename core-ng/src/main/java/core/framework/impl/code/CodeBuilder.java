@@ -17,6 +17,8 @@ public class CodeBuilder {
     public static String typeVariableLiteral(Type type) {
         if (GenericTypes.isList(type)) {
             return Types.class.getCanonicalName() + ".list(" + GenericTypes.listValueClass(type).getCanonicalName() + ".class)";
+        } else if (GenericTypes.isOptional(type)) {
+            return Types.class.getCanonicalName() + ".optional(" + GenericTypes.optionalValueClass(type).getCanonicalName() + ".class)";
         } else {
             return GenericTypes.rawClass(type).getCanonicalName() + ".class";
         }

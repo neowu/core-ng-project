@@ -36,7 +36,6 @@ public class ResponseHandler {
     public void handle(ResponseImpl response, HttpServerExchange exchange, RequestImpl request) {
         HTTPStatus status = response.status();
         exchange.setStatusCode(status.code);
-        ActionLogContext.put("responseCode", status.code);
 
         HeaderMap headers = exchange.getResponseHeaders();
         response.headers.forEach((header, value) -> {
@@ -59,6 +58,8 @@ public class ResponseHandler {
             throw Exceptions.error("unexpected body class, body={}", response.body.getClass().getCanonicalName());
         logger.debug("responseHandlerClass={}", handler.getClass().getCanonicalName());
         handler.handle(response, exchange.getResponseSender(), request);
+
+        ActionLogContext.put("responseCode", status.code);  // set response code context at last, to avoid error handle to log same action log key on exception
     }
 
     CookieImpl cookie(CookieSpec spec, String value) {

@@ -40,6 +40,7 @@ public class JAXBTypeValidator implements TypeVisitor {
             }
         }
     }
+
     protected final TypeValidator validator;
     private final Map<String, Set<String>> elements = Maps.newHashMap();
 
@@ -48,6 +49,7 @@ public class JAXBTypeValidator implements TypeVisitor {
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;
+        validator.allowOptional = true;
         validator.visitor = this;
     }
 

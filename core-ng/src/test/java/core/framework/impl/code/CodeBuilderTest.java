@@ -20,5 +20,7 @@ public class CodeBuilderTest {
         assertEquals("java.lang.String.class", CodeBuilder.typeVariableLiteral(String.class));
 
         assertEquals("core.framework.api.util.Types.list(java.lang.String.class)", CodeBuilder.typeVariableLiteral(Types.list(String.class)));
+
+        assertEquals("core.framework.api.util.Types.optional(java.lang.String.class)", CodeBuilder.typeVariableLiteral(Types.optional(String.class)));
     }
 }

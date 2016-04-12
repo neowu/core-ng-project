@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -46,6 +47,10 @@ class BeanBodyResponseHandler implements BodyHandler {
             Object item = ((List) bean).get(0);
             if (item == null) throw Exceptions.error("response bean must not be list with null item, list={}", bean);
             instanceType = Types.list(item.getClass());
+        } else if (bean instanceof Optional) {
+            Optional<?> optional = (Optional) bean;
+            if (!optional.isPresent()) return;
+            instanceType = Types.generic(Optional.class, optional.get().getClass());
         } else {
             instanceType = bean.getClass();
         }

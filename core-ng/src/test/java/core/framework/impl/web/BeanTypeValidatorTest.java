@@ -14,6 +14,11 @@ public class BeanTypeValidatorTest {
     }
 
     @Test
+    public void validateOptionalType() {
+        new BeanTypeValidator(Types.optional(TestBean.class)).validate();
+    }
+
+    @Test
     public void validate() {
         new BeanTypeValidator(TestBean.class).validate();
     }

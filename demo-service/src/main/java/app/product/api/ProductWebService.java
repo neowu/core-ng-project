@@ -7,13 +7,15 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.ResponseStatus;
 
+import java.util.Optional;
+
 /**
  * @author neo
  */
 public interface ProductWebService {
     @GET
     @Path("/product/:id")
-    ProductView get(@PathParam("id") String id);
+    Optional<ProductView> get(@PathParam("id") String id);
 
     @POST
     @Path("/product")

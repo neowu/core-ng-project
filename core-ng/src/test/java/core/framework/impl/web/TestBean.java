@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlEnumValue;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -19,6 +20,9 @@ public class TestBean {
     @XmlElement(name = "string_field")
     public String stringField;
 
+    @XmlElement(name = "optional_string_field")
+    public Optional<String> optionalStringField;
+
     @XmlElement(name = "list_field")
     public List<String> listField;
 
@@ -28,15 +32,11 @@ public class TestBean {
     @XmlElement(name = "child_field")
     public Child childField;
 
+    @XmlElement(name = "optional_child_field")
+    public Optional<Child> optionalChildField;
+
     @XmlElement(name = "children_field")
     public List<Child> childrenField;
-
-    @XmlAccessorType(XmlAccessType.FIELD)
-    public static class Child {
-        @XmlElement(name = "boolean_field")
-        public String booleanField;
-    }
-
     @XmlElement(name = "enum_field")
     public TestEnum enumField;
 
@@ -45,5 +45,11 @@ public class TestBean {
         VALUE1,
         @XmlEnumValue("V2")
         VALUE2
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class Child {
+        @XmlElement(name = "boolean_field")
+        public String booleanField;
     }
 }
