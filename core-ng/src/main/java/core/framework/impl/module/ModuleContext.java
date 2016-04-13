@@ -5,7 +5,6 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Properties;
 import core.framework.api.web.WebContext;
-import core.framework.api.web.site.TemplateManager;
 import core.framework.api.web.site.WebDirectory;
 import core.framework.impl.async.ExecutorImpl;
 import core.framework.impl.cache.CacheManager;
@@ -55,7 +54,6 @@ public final class ModuleContext {
         httpServer = new HTTPServer(logManager);
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
-        beanFactory.bind(TemplateManager.class, null, httpServer.siteManager.templateManager);  // expose WebDirectory and TemplateManager to allow app handle template programmably, such as cms/widgets
         if (!isTest()) {
             startupHook.add(httpServer::start);
             shutdownHook.add(httpServer::stop);

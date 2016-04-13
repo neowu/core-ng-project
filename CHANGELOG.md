@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.4.3 (4/13/2016)
+* template: hide templateManager, not needed by application
+
 ### 4.4.2 (4/12/2016)
 * json: support Optional as field, queue/ws interface supported too
 

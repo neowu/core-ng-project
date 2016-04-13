@@ -4,7 +4,6 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Files;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
-import core.framework.api.web.site.TemplateManager;
 import core.framework.api.web.site.WebDirectory;
 import core.framework.impl.template.CDNManager;
 import core.framework.impl.template.HTMLTemplate;
@@ -21,19 +20,18 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class TemplateManagerImpl implements TemplateManager {
+public class TemplateManager {
     public final MessageManager messageManager = new MessageManager();
     public final CDNManager cdnManager = new CDNManager();
     public final Map<String, Templates> templates = Maps.newConcurrentHashMap();
-    private final Logger logger = LoggerFactory.getLogger(TemplateManagerImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
 
-    public TemplateManagerImpl(WebDirectory webDirectory) {
+    public TemplateManager(WebDirectory webDirectory) {
         this.webDirectory = webDirectory;
     }
 
-    @Override
     public String process(String templatePath, Object model, String language) {
         StopWatch watch = new StopWatch();
         try {
