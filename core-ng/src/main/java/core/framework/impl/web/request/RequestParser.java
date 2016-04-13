@@ -2,6 +2,7 @@ package core.framework.impl.web.request;
 
 import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPMethod;
+import core.framework.api.log.Markers;
 import core.framework.api.util.Files;
 import core.framework.api.util.Strings;
 import core.framework.impl.log.ActionLog;
@@ -75,7 +76,7 @@ public final class RequestParser {
                 request.body = body.body();
                 logger.debug("[request] body={}", LogParam.of(request.body));
             } else {
-                logger.warn("unsupported body, contentType={}", request.contentType);
+                logger.warn(Markers.errorCode("UNSUPPORTED_CONTENT_TYPE"), "unsupported content type, contentType={}", request.contentType);
             }
             exchange.removeAttachment(RequestBodyReader.REQUEST_BODY);
         } else {

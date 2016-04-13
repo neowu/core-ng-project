@@ -17,6 +17,7 @@
 ## Change log
 ### 4.4.3 (4/13/2016)
 * template: hide templateManager, not needed by application
+* mongo: log Bson filter/projection/sort in json string format
 
 ### 4.4.2 (4/12/2016)
 * json: support Optional as field, queue/ws interface supported too

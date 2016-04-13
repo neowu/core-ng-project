@@ -37,6 +37,7 @@ public class MongoImpl implements Mongo {
     int timeoutInMs = (int) Duration.ofSeconds(15).toMillis();
     int tooManyRowsReturnedThreshold = 2000;
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
+    CodecRegistry registry;
 
     private MongoClientURI uri;
     private MongoClient mongoClient;
@@ -46,7 +47,7 @@ public class MongoImpl implements Mongo {
         StopWatch watch = new StopWatch();
         try {
             if (uri == null) throw new Error("uri() must be called before initialize");
-            CodecRegistry registry = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), codecs.codecRegistry());
+            registry = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), codecs.codecRegistry());
             database = createDatabase(uri, registry);
         } finally {
             logger.info("initialize mongo client, uri={}, elapsedTime={}", uri, watch.elapsedTime());

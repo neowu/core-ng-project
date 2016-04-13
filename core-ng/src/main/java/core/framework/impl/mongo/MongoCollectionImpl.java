@@ -18,6 +18,7 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
 import org.bson.BsonDocument;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ import java.util.function.Consumer;
 /**
  * @author neo
  */
-public class MongoCollectionImpl<T> implements MongoCollection<T> {
+class MongoCollectionImpl<T> implements MongoCollection<T> {
     private final Logger logger = LoggerFactory.getLogger(MongoCollectionImpl.class);
     private final MongoImpl mongo;
     private final Class<T> entityClass;
@@ -39,7 +40,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
     private final EntityValidator<T> validator;
     private com.mongodb.client.MongoCollection<T> collection;
 
-    public MongoCollectionImpl(MongoImpl mongo, Class<T> entityClass) {
+    MongoCollectionImpl(MongoImpl mongo, Class<T> entityClass) {
         this.mongo = mongo;
         this.entityClass = entityClass;
         validator = new EntityValidator<>(entityClass);
@@ -54,7 +55,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
-            logger.debug("count, collection={}, filter={}, elapsedTime={}", collectionName, filter, elapsedTime);
+            logger.debug("count, collection={}, filter={}, elapsedTime={}", collectionName, new BsonParam(filter, mongo.registry), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -103,7 +104,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
-            logger.debug("findOne, collection={}, filter={}, elapsedTime={}", collectionName, filter, elapsedTime);
+            logger.debug("findOne, collection={}, filter={}, elapsedTime={}", collectionName, new BsonParam(filter, mongo.registry), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -122,9 +123,9 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
             ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("find, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, elapsedTime={}",
                 collectionName,
-                query.filter,
-                query.projection,
-                query.sort,
+                new BsonParam(query.filter, mongo.registry),
+                new BsonParam(query.projection, mongo.registry),
+                new BsonParam(query.sort, mongo.registry),
                 query.skip,
                 query.limit,
                 elapsedTime);
@@ -144,9 +145,9 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
             ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("find, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, total={}, elapsedTime={}",
                 collectionName,
-                query.filter,
-                query.projection,
-                query.sort,
+                new BsonParam(query.filter, mongo.registry),
+                new BsonParam(query.projection, mongo.registry),
+                new BsonParam(query.sort, mongo.registry),
                 query.skip,
                 query.limit,
                 total,
@@ -227,7 +228,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
-            logger.debug("update, collection={}, filter={}, update={}, elapsedTime={}", collectionName, filter, update, elapsedTime);
+            logger.debug("update, collection={}, filter={}, update={}, elapsedTime={}", collectionName, new BsonParam(filter, mongo.registry), update, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -255,7 +256,7 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
-            logger.debug("delete, collection={}, filter={}, elapsedTime={}", collectionName, filter, elapsedTime);
+            logger.debug("delete, collection={}, filter={}, elapsedTime={}", collectionName, new BsonParam(filter, mongo.registry), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -277,5 +278,21 @@ public class MongoCollectionImpl<T> implements MongoCollection<T> {
             collection = mongo.mongoCollection(entityClass);
         }
         return collection;
+    }
+
+    static class BsonParam {
+        final Bson bson;
+        final CodecRegistry registry;
+
+        BsonParam(Bson bson, CodecRegistry registry) {
+            this.bson = bson;
+            this.registry = registry;
+        }
+
+        @Override
+        public String toString() {
+            if (bson == null) return null;
+            return bson.toBsonDocument(null, registry).toJson();
+        }
     }
 }
