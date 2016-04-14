@@ -43,6 +43,11 @@ public final class Scheduler {
         logger.info("stop scheduler");
         scheduler.shutdown();
         jobExecutor.shutdown();
+        try {
+            jobExecutor.awaitTermination(10, TimeUnit.SECONDS);     // wait 10 seconds to finish current tasks
+        } catch (InterruptedException e) {
+            logger.warn("failed to wait all tasks to finish", e);
+        }
     }
 
     public void addTrigger(Trigger trigger) {

@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -92,6 +93,11 @@ public final class RabbitMQListener implements MessageHandlerConfig {
         stop.set(true);
         listenerThread.interrupt();
         handlerExecutor.shutdown();
+        try {
+            handlerExecutor.awaitTermination(10, TimeUnit.SECONDS);     // wait 10 seconds to finish current tasks
+        } catch (InterruptedException e) {
+            logger.warn("failed to wait all tasks to finish", e);
+        }
     }
 
     private Void handle(RabbitMQConsumer consumer, QueueingConsumer.Delivery delivery) throws Exception {
@@ -112,7 +118,7 @@ public final class RabbitMQListener implements MessageHandlerConfig {
         try {
             consumer.acknowledge(delivery.getEnvelope().getDeliveryTag());
         } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
+            logManager.logError(e);
         }
     }
 

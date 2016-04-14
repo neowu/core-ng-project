@@ -15,6 +15,11 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.4.4 (4/14/2016)
+* httpclient: put error code to httpclientexception
+* rabbitmq: fixed queue listener to report error code on ack
+* thread: try to shutdown thread pool gracefully
+
 ### 4.4.3 (4/13/2016)
 * template: hide templateManager, not needed by application
 * mongo: log Bson filter/projection/sort in json string format

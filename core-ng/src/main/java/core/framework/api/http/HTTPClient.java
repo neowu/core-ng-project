@@ -84,7 +84,7 @@ public final class HTTPClient {
             logResponseText(response);
             return response;
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new HTTPClientException(e.getMessage(), "HTTP_COMMUNICATION_FAILED", e);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("http", elapsedTime);

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
@@ -25,6 +26,11 @@ public final class ExecutorImpl implements Executor {
     public void stop() {
         logger.info("stop executor");
         executor.shutdown();
+        try {
+            executor.awaitTermination(10, TimeUnit.SECONDS);     // wait 10 seconds to finish current tasks
+        } catch (InterruptedException e) {
+            logger.warn("failed to wait all tasks to finish", e);
+        }
     }
 
     @Override
