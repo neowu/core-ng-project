@@ -44,7 +44,7 @@ public class Attributes {
         if ("xmlns:c".equals(name) || "xmlns:m".equals(name)
             || "c:text".equals(name)
             || "c:html".equals(name)
-            || "c:msg".equals(name) || "m:text".equals(name)
+            || "m:text".equals(name)
             || "c:include".equals(name)
             || "c:for".equals(name)
             || "c:if".equals(name))
@@ -55,15 +55,13 @@ public class Attributes {
 
     public boolean containDynamicContent() {
         return attributes.containsKey("c:text")
-            || attributes.containsKey("c:msg") || attributes.containsKey("m:text")
+            || attributes.containsKey("m:text")
             || attributes.containsKey("c:html")
             || attributes.containsKey("c:include");
     }
 
     public Attribute dynamicContentAttribute() {
         Attribute attribute = attributes.get("c:text");
-        if (attribute != null) return attribute;
-        attribute = attributes.get("c:msg");
         if (attribute != null) return attribute;
         attribute = attributes.get("m:text");
         if (attribute != null) return attribute;
@@ -84,8 +82,6 @@ public class Attributes {
         int count = 0;
 
         Attribute attribute = attributes.get("c:text");
-        if (attribute != null) count++;
-        attribute = attributes.get("c:msg");
         if (attribute != null) count++;
         attribute = attributes.get("m:text");
         if (attribute != null) count++;

@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.4.7 (4/15/2016 - )
+* template: remove c:msg, use m:text instead
+
 ### 4.4.6 (4/15/2016)
 * template: support m:text and m:{attr} for message body and attribute
 

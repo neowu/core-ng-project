@@ -1,17 +1,17 @@
-<aside xmlns:c="http://www.w3.org/1999/xhtml" class="aside">
+<aside xmlns:c="http://www.w3.org/1999/xhtml" xmlns:m="http://www.w3.org/1999/xhtml" class="aside">
     <div class="aside-title">Filters</div>
     <div class="list-wrapper category-list">
-        <div class="list-heading" c:msg="plp.filter.category">
+        <div class="list-heading" m:text="plp.filter.category">
             Category
         </div>
         <div class="list-body" c:html="categoryTree()">
         </div>
-        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
-        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+        <div class="show-more" m:text="plp.filter.showMore">Show more</div>
+        <div class="show-less" m:text="plp.filter.showLess">Show less</div>
     </div>
 
     <div class="list-wrapper" c:if="hasVendors()">
-        <div class="list-heading" c:msg="plp.filter.store">
+        <div class="list-heading" m:text="plp.filter.store">
             Store
         </div>
         <div class="list-body">
@@ -29,11 +29,11 @@
                 </li>
             </ul>
         </div>
-        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
-        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+        <div class="show-more" m:text="plp.filter.showMore">Show more</div>
+        <div class="show-less" m:text="plp.filter.showLess">Show less</div>
     </div>
     <div class="list-wrapper" c:if="hasBrands()">
-        <div class="list-heading" c:msg="plp.filter.brand">
+        <div class="list-heading" m:text="plp.filter.brand">
             Brand
         </div>
         <div class="list-body">
@@ -51,11 +51,11 @@
                 </li>
             </ul>
         </div>
-        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
-        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+        <div class="show-more" m:text="plp.filter.showMore">Show more</div>
+        <div class="show-less" m:text="plp.filter.showLess">Show less</div>
     </div>
     <div class="list-wrapper" c:if="hasColors()">
-        <div class="list-heading" c:msg="plp.filter.color">
+        <div class="list-heading" m:text="plp.filter.color">
             Color
         </div>
         <div class="list-body">
@@ -72,11 +72,11 @@
                 </li>
             </ul>
         </div>
-        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
-        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+        <div class="show-more" m:text="plp.filter.showMore">Show more</div>
+        <div class="show-less" m:text="plp.filter.showLess">Show less</div>
     </div>
     <div class="list-wrapper" c:if="hasSizes()">
-        <div class="list-heading" c:msg="plp.filter.size">
+        <div class="list-heading" m:text="plp.filter.size">
             Size
         </div>
         <div class="list-body">
@@ -92,11 +92,11 @@
                 </li>
             </ul>
         </div>
-        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
-        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+        <div class="show-more" m:text="plp.filter.showMore">Show more</div>
+        <div class="show-less" m:text="plp.filter.showLess">Show less</div>
     </div>
     <div class="list-wrapper" c:if="hasPrices()">
-        <div class="list-heading" c:msg="plp.filter.price">
+        <div class="list-heading" m:text="plp.filter.price">
             Price
         </div>
         <div class="list-body">
@@ -114,7 +114,7 @@
                 </li>
             </ul>
         </div>
-        <div class="show-more" c:msg="plp.filter.showMore">Show more</div>
-        <div class="show-less" c:msg="plp.filter.showLess">Show less</div>
+        <div class="show-more" m:text="plp.filter.showMore">Show more</div>
+        <div class="show-less" m:text="plp.filter.showLess">Show less</div>
     </div>
 </aside>

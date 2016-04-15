@@ -116,7 +116,6 @@ public class Attribute {
             case "c:html":
                 parent.add(new HTMLContentFragment(value, context, location));
                 break;
-            case "c:msg":
             case "m:text":
                 String message = context.message.message(value).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
                 parent.addStaticContent(message);
