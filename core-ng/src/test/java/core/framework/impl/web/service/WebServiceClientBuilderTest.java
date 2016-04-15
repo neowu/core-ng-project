@@ -16,11 +16,11 @@ import static org.mockito.Mockito.when;
  * @author neo
  */
 public class WebServiceClientBuilderTest {
-    private WebServiceClient webServiceClient;
+    private WebServiceClientImpl webServiceClient;
 
     @Before
-    public void prepare() {
-        webServiceClient = Mockito.mock(WebServiceClient.class);
+    public void createWebServiceClient() {
+        webServiceClient = Mockito.mock(WebServiceClientImpl.class);
     }
 
     @Test

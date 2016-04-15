@@ -31,8 +31,8 @@ public class WebServiceClientBuilder<T> {
     public T build() {
         DynamicInstanceBuilder<T> builder = new DynamicInstanceBuilder<>(serviceInterface, serviceInterface.getCanonicalName() + "$Client");
 
-        builder.addField(new CodeBuilder().append("final {} client;", WebServiceClient.class.getCanonicalName()).build());
-        builder.constructor(new Class[]{WebServiceClient.class}, "this.client = $1;");
+        builder.addField(new CodeBuilder().append("final {} client;", WebServiceClientImpl.class.getCanonicalName()).build());
+        builder.constructor(new Class[]{WebServiceClientImpl.class}, "this.client = $1;");
 
         for (Method method : serviceInterface.getMethods()) {
             builder.addMethod(buildMethod(method));
@@ -57,7 +57,7 @@ public class WebServiceClientBuilder<T> {
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> paramClass = parameterTypes[i];
-            if (i > 0) builder.append(" ,");
+            if (i > 0) builder.append(", ");
             builder.append("{} param{}", paramClass.getCanonicalName(), i);
 
             PathParam pathParam = pathParam(annotations[i]);

@@ -13,6 +13,7 @@ import core.framework.impl.web.service.ServiceControllerBuilder;
 import core.framework.impl.web.service.ServiceInterfaceValidator;
 import core.framework.impl.web.service.WebServiceClient;
 import core.framework.impl.web.service.WebServiceClientBuilder;
+import core.framework.impl.web.service.WebServiceClientImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,7 @@ public final class APIConfig {
             return new WebServiceClientConfig(context, null);
         } else {
             HTTPClient httpClient = httpClient();
-            WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator, context.logManager);
+            WebServiceClient webServiceClient = new WebServiceClientImpl(serviceURL, httpClient, validator, context.logManager);
             T client = new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
             context.beanFactory.bind(serviceInterface, null, client);
             return new WebServiceClientConfig(context, webServiceClient);
