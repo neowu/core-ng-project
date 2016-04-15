@@ -15,6 +15,10 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.4.5 (4/15/2016)
+* route: fix dynamic path should not match trailing slash
+* error: refactory errorCode support, make webservice client translate
+
 ### 4.4.4 (4/14/2016)
 * httpclient: put error code to httpclientexception
 * rabbitmq: fixed queue listener to report error code on ack

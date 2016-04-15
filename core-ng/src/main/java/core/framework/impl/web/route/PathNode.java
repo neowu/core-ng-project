@@ -63,7 +63,7 @@ class PathNode {
         }
     }
 
-    DynamicNode getOrCreateDynamicNode(String pathPattern, String paramName, String paramPattern) {
+    private DynamicNode getOrCreateDynamicNode(String pathPattern, String paramName, String paramPattern) {
         for (DynamicNode dynamicNode : dynamicNodes) {
             if ((paramPattern == null && dynamicNode.pattern == null)
                 || (paramPattern != null && paramPattern.equals(dynamicNode.pattern.pattern()))) {
@@ -93,6 +93,20 @@ class PathNode {
             if (handler != null) return handler;
         }
 
+        if (!"/".equals(nextPath.value)) {  // dynamic node should not match trailing slash
+            URLHandler handler = findDynamic(nextPath, pathParams);
+            if (handler != null) return handler;
+        }
+
+        if (wildcardNode != null) {
+            pathParams.put(wildcardNode.param, nextPath.subPath());
+            return wildcardNode.handler;
+        }
+
+        return null;
+    }
+
+    private URLHandler findDynamic(Path nextPath, PathParams pathParams) {
         for (DynamicNode dynamicNode : dynamicNodes) {
             if (dynamicNode.match(nextPath.value)) {
                 URLHandler handler = dynamicNode.find(nextPath, pathParams);
@@ -102,12 +116,6 @@ class PathNode {
                 }
             }
         }
-
-        if (wildcardNode != null) {
-            pathParams.put(wildcardNode.param, nextPath.subPath());
-            return wildcardNode.handler;
-        }
-
         return null;
     }
 

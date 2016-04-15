@@ -46,7 +46,7 @@ public class WebServiceClient {
         this.logManager = logManager;
     }
 
-    public String serviceURL(String pathPattern, Map<String, Object> pathParams) {
+    String serviceURL(String pathPattern, Map<String, Object> pathParams) {
         StringBuilder builder = new StringBuilder(serviceURL);
         Path path = Path.parse(pathPattern).next; // skip the first '/'
         while (path != null) {
@@ -156,10 +156,10 @@ public class WebServiceClient {
             throw exception;
         } catch (RemoteServiceException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             String responseText = response.text();
             logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, responseText, e);
-            throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), status, "REMOTE_ERROR", e);
+            throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), status, "REMOTE_SERVICE_ERROR", e);
         }
     }
 }

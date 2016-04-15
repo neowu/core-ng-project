@@ -1,15 +1,16 @@
 package core.framework.api.web.exception;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.api.log.ErrorCode;
 
 /**
  * @author neo
  */
-public final class RemoteServiceException extends RuntimeException {
+public final class RemoteServiceException extends RuntimeException implements ErrorCode {
     private static final long serialVersionUID = 6935063785656278927L;
 
     public final HTTPStatus status;
-    public final String errorCode;
+    private final String errorCode;
 
     public String id;
 
@@ -23,5 +24,10 @@ public final class RemoteServiceException extends RuntimeException {
         super(message, cause);
         this.status = status;
         this.errorCode = errorCode;
+    }
+
+    @Override
+    public String errorCode() {
+        return errorCode;
     }
 }

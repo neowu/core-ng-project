@@ -49,6 +49,16 @@ public class PathNodeTest {
     }
 
     @Test
+    public void dynamicPathPatternNotMatchTrailingSlash() {
+        PathNode root = new PathNode();
+        root.register("/path1/:var1");
+
+        PathParams pathParams = new PathParams();
+        URLHandler foundHandler = root.find("/path1/", pathParams);
+        Assert.assertNull(foundHandler);
+    }
+
+    @Test
     public void dynamicRegexPathPatterns() {
         PathNode root = new PathNode();
 
