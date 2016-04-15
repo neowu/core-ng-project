@@ -1,19 +1,19 @@
 package core.framework.impl.template.fragment;
 
-import core.framework.api.util.Lists;
 import core.framework.impl.template.TemplateContext;
 
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * @author neo
  */
 public abstract class ContainerFragment implements Fragment {
-    private final List<Fragment> children = Lists.newArrayList();
+    private final Deque<Fragment> children = new ArrayDeque<>();
 
     public void addStaticContent(String content) {
         if (!children.isEmpty()) {
-            Fragment lastFragment = children.get(children.size() - 1);
+            Fragment lastFragment = children.getLast();
             if (lastFragment instanceof StaticFragment) {
                 ((StaticFragment) lastFragment).append(content);
                 return;

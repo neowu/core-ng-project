@@ -6,13 +6,17 @@ import core.framework.impl.template.source.TemplateSource;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Optional;
+
 /**
  * @author neo
  */
 public class HTMLTemplateTest {
     @Test
     public void process() {
-        HTMLTemplate template = new HTMLTemplateBuilder(new TestTemplateSource("template-test/template.html"), TestModel.class).build();
+        HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new TestTemplateSource("template-test/template.html"), TestModel.class);
+        builder.message = key -> Optional.of(key + "_value");
+        HTMLTemplate template = builder.build();
 
         TestModel model = new TestModel();
         model.stringField = "string<";

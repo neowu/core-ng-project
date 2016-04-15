@@ -1,5 +1,5 @@
 <!doctype html>
-<html xmlns:c="http://www.w3.org/1999/xhtml">
+<html xmlns:c="http://www.w3.org/1999/xhtml" xmlns:m="http://www.w3.org/1999/xhtml">
 <head>
     <title>template test</title>
     <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
@@ -37,6 +37,12 @@
 <div>
     <p>html tag</p>
     <a c:href="url()">test</a>
+</div>
+
+<div>
+    <p>message</p>
+    <input m:placeholder="placeholder">
+    <p m:text="message"></p>
 </div>
 
 <div c:include="footer.html"></div>

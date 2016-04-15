@@ -30,6 +30,8 @@ public class Attributes {
             } else if (attribute.isDynamic()) {
                 if (attribute.isDynamicBooleanAttribute()) attribute.addBooleanAttribute(parent, context);
                 else attribute.addValueAttribute(parent, context);
+            } else if (attribute.isMessage()) {
+                attribute.addMessageAttribute(parent, context);
             } else {
                 attribute.addStaticContent(parent);
             }
@@ -39,21 +41,21 @@ public class Attributes {
     private boolean skip(Attribute attribute) {
         String name = attribute.name;
 
-        if ("xmlns:c".equals(name)
+        if ("xmlns:c".equals(name) || "xmlns:m".equals(name)
             || "c:text".equals(name)
             || "c:html".equals(name)
-            || "c:msg".equals(name)
+            || "c:msg".equals(name) || "m:text".equals(name)
             || "c:include".equals(name)
             || "c:for".equals(name)
             || "c:if".equals(name))
             return true;
 
-        return !attribute.isDynamic() && attributes.containsKey("c:" + name);   // there is dynamic attribute to overwrite
+        return !attribute.isDynamic() && (attributes.containsKey("c:" + name) || attributes.containsKey("m:" + name));   // there is dynamic attribute to overwrite
     }
 
     public boolean containDynamicContent() {
         return attributes.containsKey("c:text")
-            || attributes.containsKey("c:msg")
+            || attributes.containsKey("c:msg") || attributes.containsKey("m:text")
             || attributes.containsKey("c:html")
             || attributes.containsKey("c:include");
     }
@@ -62,6 +64,8 @@ public class Attributes {
         Attribute attribute = attributes.get("c:text");
         if (attribute != null) return attribute;
         attribute = attributes.get("c:msg");
+        if (attribute != null) return attribute;
+        attribute = attributes.get("m:text");
         if (attribute != null) return attribute;
         attribute = attributes.get("c:html");
         if (attribute != null) return attribute;
@@ -82,6 +86,8 @@ public class Attributes {
         Attribute attribute = attributes.get("c:text");
         if (attribute != null) count++;
         attribute = attributes.get("c:msg");
+        if (attribute != null) count++;
+        attribute = attributes.get("m:text");
         if (attribute != null) count++;
         attribute = attributes.get("c:html");
         if (attribute != null) count++;

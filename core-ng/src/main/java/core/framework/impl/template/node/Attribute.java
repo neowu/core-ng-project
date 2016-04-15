@@ -27,8 +27,12 @@ public class Attribute {
         this.location = location;
     }
 
-    public boolean isDynamic() {
+    boolean isDynamic() {
         return name.startsWith("c:");
+    }
+
+    boolean isMessage() {
+        return name.startsWith("m:");
     }
 
     void addStaticContent(ContainerFragment parent) {
@@ -95,6 +99,15 @@ public class Attribute {
         }
     }
 
+    void addMessageAttribute(ContainerFragment parent, TemplateMetaContext context) {
+        String message = context.message.message(value).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
+        parent.addStaticContent(" ");
+        parent.addStaticContent(name.substring(2));
+        parent.addStaticContent("=\"");
+        parent.addStaticContent(message);
+        parent.addStaticContent("\"");
+    }
+
     void addDynamicContent(ContainerFragment parent, TemplateMetaContext context, TemplateSource source) {
         switch (name) {
             case "c:text":
@@ -104,6 +117,7 @@ public class Attribute {
                 parent.add(new HTMLContentFragment(value, context, location));
                 break;
             case "c:msg":
+            case "m:text":
                 String message = context.message.message(value).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
                 parent.addStaticContent(message);
                 break;

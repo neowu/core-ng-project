@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.4.6 (4/15/2016)
+* template: support m:text and m:{attr} for message body and attribute
+
 ### 4.4.5 (4/15/2016)
 * route: fix dynamic path should not match trailing slash
 * error: refactory errorCode support, make webservice client translate
