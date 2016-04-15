@@ -46,7 +46,8 @@ public class WebServiceClient {
         this.logManager = logManager;
     }
 
-    String serviceURL(String pathPattern, Map<String, Object> pathParams) {
+    // this is used by generated client, must be public
+    public String serviceURL(String pathPattern, Map<String, Object> pathParams) {
         StringBuilder builder = new StringBuilder(serviceURL);
         Path path = Path.parse(pathPattern).next; // skip the first '/'
         while (path != null) {
