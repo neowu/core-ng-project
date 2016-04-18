@@ -12,6 +12,9 @@ public class ErrorResponse {
     @XmlElement(name = "id")
     public String id;
 
+    @XmlElement(name = "severity")
+    public String severity;
+
     @XmlElement(name = "error_code")
     public String errorCode;
 

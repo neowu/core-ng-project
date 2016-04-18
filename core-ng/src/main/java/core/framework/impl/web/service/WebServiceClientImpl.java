@@ -6,6 +6,7 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.http.HTTPResponse;
 import core.framework.api.http.HTTPStatus;
+import core.framework.api.log.Severity;
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.JSON;
@@ -157,16 +158,19 @@ public class WebServiceClientImpl implements WebServiceClient {
         byte[] responseBody = response.body();
         try {
             ErrorResponse error = JSONMapper.fromJSON(ErrorResponse.class, responseBody);
-            logger.debug("failed to call remote service, id={}, errorCode={}, remoteStackTrace={}", error.id, error.errorCode, error.stackTrace);
-            RemoteServiceException exception = new RemoteServiceException(error.message, status, error.errorCode);
-            exception.id = error.id;
-            throw exception;
+            logger.debug("failed to call remote service, id={}, severity={}, errorCode={}, remoteStackTrace={}", error.id, error.severity, error.errorCode, error.stackTrace);
+            throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode);
         } catch (RemoteServiceException e) {
             throw e;
         } catch (Throwable e) {
             String responseText = response.text();
             logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, responseText, e);
-            throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), status, "REMOTE_SERVICE_ERROR", e);
+            throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), Severity.ERROR, "REMOTE_SERVICE_ERROR", e);
         }
+    }
+
+    private Severity parseSeverity(String severity) {
+        if (severity == null) return null;
+        return Severity.valueOf(severity);
     }
 }

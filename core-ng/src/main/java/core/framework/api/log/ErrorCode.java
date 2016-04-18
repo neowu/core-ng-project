@@ -5,4 +5,8 @@ package core.framework.api.log;
  */
 public interface ErrorCode {
     String errorCode();
+
+    default Severity severity() {
+        return Severity.ERROR;
+    }
 }

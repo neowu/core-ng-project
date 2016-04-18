@@ -1,12 +1,11 @@
 package core.framework.api.web.exception;
 
 import core.framework.api.log.ErrorCode;
-import core.framework.api.log.Warning;
+import core.framework.api.log.Severity;
 
 /**
  * @author neo
  */
-@Warning
 public final class NotFoundException extends RuntimeException implements ErrorCode {
     public static final String DEFAULT_ERROR_CODE = "NOT_FOUND";
 
@@ -27,6 +26,11 @@ public final class NotFoundException extends RuntimeException implements ErrorCo
     public NotFoundException(String message, String errorCode, Throwable cause) {
         super(message, cause);
         this.errorCode = errorCode;
+    }
+
+    @Override
+    public Severity severity() {
+        return Severity.WARN;
     }
 
     @Override

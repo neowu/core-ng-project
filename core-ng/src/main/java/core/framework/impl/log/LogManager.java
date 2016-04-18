@@ -3,7 +3,7 @@ package core.framework.impl.log;
 import core.framework.api.log.ErrorCode;
 import core.framework.api.log.Markers;
 import core.framework.api.log.MessageFilter;
-import core.framework.api.log.Warning;
+import core.framework.api.log.Severity;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -60,7 +60,7 @@ public final class LogManager {
         String errorMessage = e.getMessage();
         String errorCode = e instanceof ErrorCode ? ((ErrorCode) e).errorCode() : e.getClass().getCanonicalName();
         Marker marker = Markers.errorCode(errorCode);
-        if (e.getClass().isAnnotationPresent(Warning.class)) {
+        if (e instanceof ErrorCode && ((ErrorCode) e).severity() == Severity.WARN) {
             logger.warn(marker, errorMessage, e);
         } else {
             logger.error(marker, errorMessage, e);
