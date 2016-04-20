@@ -118,6 +118,13 @@ public final class RequestImpl implements Request {
     }
 
     @Override
+    public Map<String, String> queryParams() {
+        Map<String, String> params = Maps.newHashMap();
+        exchange.getQueryParameters().forEach((name, values) -> params.put(name, values.getFirst()));
+        return params;
+    }
+
+    @Override
     public Optional<String> formParam(String name) {
         FormData.FormValue value = formValue(name);
         if (value == null) return Optional.empty();

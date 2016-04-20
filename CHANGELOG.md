@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.4.8 (4/20/2016)
+* http: add Map<String, String) queryParams();
+
 ### 4.4.7 (4/15/2016 - 4/18/2016)
 * template: remove c:msg, use m:text instead
 * exception: removed @Warning, use programmable severity (to simplify webservice exception handling and error report)

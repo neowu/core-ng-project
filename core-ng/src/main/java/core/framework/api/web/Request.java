@@ -3,6 +3,7 @@ package core.framework.api.web;
 import core.framework.api.http.HTTPMethod;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -24,6 +25,8 @@ public interface Request {
     <T> T pathParam(String name, Class<T> valueClass);
 
     <T> Optional<T> queryParam(String name, Class<T> valueClass);
+
+    Map<String, String> queryParams();
 
     Optional<String> formParam(String name);
 
