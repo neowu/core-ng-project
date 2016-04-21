@@ -7,11 +7,11 @@ import core.framework.impl.web.service.WebServiceClient;
 /**
  * @author neo
  */
-final class WebServiceClientConfig {
+public final class WebServiceClientConfig {     // returned from APIConfig, must be public to be called
     private final ModuleContext context;
     private final WebServiceClient client;
 
-    WebServiceClientConfig(ModuleContext context, WebServiceClient client) {
+    public WebServiceClientConfig(ModuleContext context, WebServiceClient client) {
         this.context = context;
         this.client = client;
     }
