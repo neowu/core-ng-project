@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.4.9 (4/27/2016)
+* http: fixed pass errorCode.severity
+
 ### 4.4.8 (4/20/2016)
 * http: add Map<String, String) queryParams();
 

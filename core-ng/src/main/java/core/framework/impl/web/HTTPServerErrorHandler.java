@@ -108,8 +108,13 @@ public class HTTPServerErrorHandler {
         response.id = ActionLogContext.id();
         response.message = e.getMessage();
         response.stackTrace = Exceptions.stackTrace(e);
-        if (e instanceof ErrorCode) response.errorCode = ((ErrorCode) e).errorCode();
-        else response.errorCode = "INTERNAL_ERROR";
+        if (e instanceof ErrorCode) {
+            ErrorCode errorCode = (ErrorCode) e;
+            response.errorCode = errorCode.errorCode();
+            response.severity = errorCode.severity().name();
+        } else {
+            response.errorCode = "INTERNAL_ERROR";
+        }
         return response;
     }
 }
