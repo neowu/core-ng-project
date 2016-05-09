@@ -5,6 +5,7 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
+import core.framework.api.util.Strings;
 import core.framework.api.web.CookieSpec;
 import core.framework.api.web.MultipartFile;
 import core.framework.api.web.Request;
@@ -126,18 +127,41 @@ public final class RequestImpl implements Request {
 
     @Override
     public Optional<String> formParam(String name) {
-        FormData.FormValue value = formValue(name);
+        FormData.FormValue value = formData().getFirst(name);
         if (value == null) return Optional.empty();
         return Optional.ofNullable(value.getValue());
     }
 
     @Override
+    public Map<String, String> formParams() {
+        FormData formData = formData();
+        Map<String, String> form = Maps.newHashMap();
+        for (String name : formData) {
+            FormData.FormValue value = formData.getFirst(name);
+            if (!value.isFile()) form.put(name, value.getValue());
+        }
+        return form;
+    }
+
+    @Override
     public Optional<MultipartFile> file(String name) {
-        FormData.FormValue value = formValue(name);
+        FormData.FormValue value = formData().getFirst(name);
         if (value == null) return Optional.empty();
-        if (!value.isFile())
-            throw new BadRequestException("form body must be multipart, method=" + method + ", contentType=" + contentType);
+        if (!value.isFile()) throw new BadRequestException("form body must be multipart, method=" + method + ", contentType=" + contentType);
+        if (Strings.isEmpty(value.getFileName())) return Optional.empty();  // browser passes empty file name if not choose file in form
         return Optional.of(new MultipartFile(value.getPath(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
+    }
+
+    @Override
+    public Map<String, MultipartFile> files() {
+        FormData formData = formData();
+        Map<String, MultipartFile> files = Maps.newHashMap();
+        for (String name : formData) {
+            FormData.FormValue value = formData.getFirst(name);
+            if (value.isFile() && !Strings.isEmpty(value.getFileName()))
+                files.put(name, new MultipartFile(value.getPath(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
+        }
+        return files;
     }
 
     @Override
@@ -145,10 +169,9 @@ public final class RequestImpl implements Request {
         return Optional.ofNullable(body);
     }
 
-    private FormData.FormValue formValue(String name) {
-        if (formData == null)
-            throw new BadRequestException("form body is required, method=" + method + ", contentType=" + contentType);
-        return formData.getFirst(name);
+    private FormData formData() {
+        if (formData == null) throw new BadRequestException("form body is required, method=" + method + ", contentType=" + contentType);
+        return formData;
     }
 
     @Override
@@ -168,11 +191,7 @@ public final class RequestImpl implements Request {
             return JSONMapper.fromMapValue(instanceType, params);
         } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
             if (formData != null) {
-                Map<String, String> form = Maps.newHashMap();
-                for (String name : formData) {
-                    form.put(name, formData.getFirst(name).getValue());
-                }
-                return JSONMapper.fromMapValue(instanceType, form);
+                return JSONMapper.fromMapValue(instanceType, formParams());
             } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
                 return JSONMapper.fromJSON(instanceType, body);
             }

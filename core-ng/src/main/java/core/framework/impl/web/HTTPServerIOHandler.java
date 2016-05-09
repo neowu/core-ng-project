@@ -26,17 +26,13 @@ class HTTPServerIOHandler implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        // parse form body early, not process until body is read (e.g. for chunked), so to save one blocking thread during read
-        HttpString method = exchange.getRequestMethod();
-        if (Methods.POST.equals(method)) {
+        if (hasBody(exchange)) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read
             FormDataParser parser = formParserFactory.createParser(exchange);
             if (parser != null) {
                 parser.parse(handler);
                 return;
             }
-        }
 
-        if (hasBody(exchange)) {
             RequestBodyReader reader = new RequestBodyReader(exchange, handler);
             StreamSourceChannel channel = exchange.getRequestChannel();
             reader.read(channel);  // channel will be null if getRequestChannel() is already called, but here should not be that case

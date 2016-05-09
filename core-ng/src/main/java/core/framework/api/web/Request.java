@@ -30,7 +30,11 @@ public interface Request {
 
     Optional<String> formParam(String name);
 
+    Map<String, String> formParams();
+
     Optional<MultipartFile> file(String name);
+
+    Map<String, MultipartFile> files();
 
     Optional<byte[]> body();
 

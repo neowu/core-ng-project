@@ -15,6 +15,11 @@
 * faster synchronous rpc
 
 ## Change log
+
+### 4.5.0 (5/9/2016)
+* web: support return all values for file upload and form post
+* web: support PUT for file uploading
+
 ### 4.4.9 (4/27/2016)
 * http: fixed pass errorCode.severity
 
