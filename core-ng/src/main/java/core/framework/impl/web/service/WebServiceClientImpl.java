@@ -170,7 +170,7 @@ public class WebServiceClientImpl implements WebServiceClient {
     }
 
     private Severity parseSeverity(String severity) {
-        if (severity == null) return null;
+        if (severity == null) return Severity.ERROR;
         return Severity.valueOf(severity);
     }
 }

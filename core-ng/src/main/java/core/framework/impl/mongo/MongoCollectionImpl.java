@@ -2,6 +2,7 @@ package core.framework.impl.mongo;
 
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MapReduceIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.CountOptions;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -181,21 +183,36 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         StopWatch watch = new StopWatch();
         try {
             List<V> results = Lists.newArrayList();
-            AggregateIterable<V> query = collection().aggregate(Lists.newArrayList(pipeline), resultClass)
-                .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
+            AggregateIterable<V> query = collection().aggregate(Lists.newArrayList(pipeline), resultClass);
             fetch(query, results);
             checkTooManyRowsReturned(results.size());
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
-            logger.debug("aggregate, collection={}, pipeline={}, elapsedTime={}", collectionName, pipeline, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            logger.debug("aggregate, collection={}, pipeline={}, elapsedTime={}", collectionName, Arrays.stream(pipeline).map(stage -> new BsonParam(stage, mongo.registry)).toArray(), elapsedTime);
         }
     }
 
-    private <V> void fetch(MongoIterable<V> query, List<V> results) {
-        try (MongoCursor<V> cursor = query.iterator()) {
+    @Override
+    public <V> List<V> mapReduce(Class<V> resultClass, String mapFunction, String reduceFunction, Bson filter) {
+        StopWatch watch = new StopWatch();
+        try {
+            List<V> results = Lists.newArrayList();
+            MapReduceIterable<V> query = collection().mapReduce(mapFunction, reduceFunction, resultClass);
+            if (filter != null) query.filter(filter);
+            fetch(query, results);
+            checkTooManyRowsReturned(results.size());
+            return results;
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("mongoDB", elapsedTime);
+            logger.debug("mapReduce, collection={}, map={}, reduce={}, filter={}, elapsedTime={}", collectionName, mapFunction, reduceFunction, new BsonParam(filter, mongo.registry), elapsedTime);
+        }
+    }
+
+    private <V> void fetch(MongoIterable<V> iterable, List<V> results) {
+        try (MongoCursor<V> cursor = iterable.iterator()) {
             while (cursor.hasNext()) {
                 results.add(cursor.next());
             }

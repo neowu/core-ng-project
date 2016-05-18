@@ -102,7 +102,7 @@ public class TypeValidator {
 
         if (allowedValueClass.apply(valueClass)) return;
 
-        if (valueClass.getPackage().getName().startsWith("java")) {
+        if (valueClass.getPackage() != null && valueClass.getPackage().getName().startsWith("java")) {
             throw Exceptions.error("field class is not supported, please contract arch team, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
         }
 

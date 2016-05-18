@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.5.1 (5/18/2016)
+* error: fix errorCode.severity handling by remoteServiceException
+* mongo: support mapReduce
 
 ### 4.5.0 (5/9/2016)
 * web: support return all values for file upload and form post

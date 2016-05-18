@@ -4,6 +4,7 @@ import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.ErrorCode;
+import core.framework.api.log.Severity;
 import core.framework.api.util.Exceptions;
 import core.framework.api.validate.ValidationException;
 import core.framework.api.web.ErrorHandler;
@@ -114,6 +115,7 @@ public class HTTPServerErrorHandler {
             response.severity = errorCode.severity().name();
         } else {
             response.errorCode = "INTERNAL_ERROR";
+            response.severity = Severity.ERROR.name();
         }
         return response;
     }
