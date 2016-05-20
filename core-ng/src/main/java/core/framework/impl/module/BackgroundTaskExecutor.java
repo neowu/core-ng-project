@@ -24,7 +24,7 @@ public class BackgroundTaskExecutor {
     public void start() {
         for (BackgroundTask task : tasks) {
             Duration delay = Duration.ofMillis((long) Randoms.number(8000, 15000)); // delay 8s to 15s
-            scheduler.scheduleWithFixedDelay(task.command, delay.toMillis(), task.rate.toMillis(), TimeUnit.MILLISECONDS);
+            scheduler.scheduleWithFixedDelay(task, delay.toMillis(), task.rate.toMillis(), TimeUnit.MILLISECONDS);
         }
         tasks.clear();
         logger.info("background task executor started");
@@ -49,13 +49,23 @@ public class BackgroundTaskExecutor {
         }
     }
 
-    private static class BackgroundTask {
-        final Runnable command;
-        final Duration rate;
+    private static class BackgroundTask implements Runnable {
+        private final Logger logger = LoggerFactory.getLogger(BackgroundTask.class);
+        private final Runnable command;
+        private final Duration rate;
 
         BackgroundTask(Runnable command, Duration rate) {
             this.command = command;
             this.rate = rate;
+        }
+
+        @Override
+        public void run() {
+            try {
+                command.run();
+            } catch (Throwable e) {
+                logger.warn("failed to run background task, error=" + e.getMessage(), e);
+            }
         }
     }
 }

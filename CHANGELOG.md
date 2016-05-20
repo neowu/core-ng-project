@@ -15,6 +15,10 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.5.2 (5/20/2016)
+* mongo: count() supports null filter
+* background-task: fix task can be broken if exception occurred
+
 ### 4.5.1 (5/18/2016)
 * error: fix errorCode.severity handling by remoteServiceException
 * mongo: support mapReduce

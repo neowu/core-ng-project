@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '4.5.1'
+    version = '4.5.2'
 }
 
 def mongoVersion = '3.2.2'
@@ -19,7 +19,7 @@ project(':core-ng') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         provided(
-                'redis.clients:jedis:2.8.0@jar',
+                'redis.clients:jedis:2.8.1@jar',
                 "org.elasticsearch:elasticsearch:${elasticVersion}@jar",
                 'com.carrotsearch:hppc:0.7.1@jar',  // used by elasticsearch
                 "org.mongodb:mongo-java-driver:${mongoVersion}",

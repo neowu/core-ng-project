@@ -53,7 +53,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     public long count(Bson filter) {
         StopWatch watch = new StopWatch();
         try {
-            return collection().count(filter, new CountOptions().maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS));
+            return collection().count(filter == null ? new BsonDocument() : filter, new CountOptions().maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS));
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
