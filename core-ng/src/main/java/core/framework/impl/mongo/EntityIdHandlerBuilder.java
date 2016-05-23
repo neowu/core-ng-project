@@ -4,6 +4,7 @@ import core.framework.api.mongo.Id;
 import core.framework.api.util.Exceptions;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.reflect.Classes;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
@@ -17,7 +18,7 @@ final class EntityIdHandlerBuilder<T> {
 
     public EntityIdHandlerBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
-        idField = getIdField();
+        idField = idField();
     }
 
     public EntityIdHandler<T> build() {
@@ -28,9 +29,8 @@ final class EntityIdHandlerBuilder<T> {
         return builder.build();
     }
 
-    private Field getIdField() {
-        Field[] fields = entityClass.getDeclaredFields();
-        for (Field field : fields) {
+    private Field idField() {
+        for (Field field : Classes.instanceFields(entityClass)) {
             if (field.isAnnotationPresent(Id.class)) return field;
         }
         throw Exceptions.error("can not find id field, class={}", entityClass.getCanonicalName());

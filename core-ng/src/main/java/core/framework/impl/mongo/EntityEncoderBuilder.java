@@ -6,6 +6,7 @@ import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
 import org.bson.types.ObjectId;
 
@@ -55,7 +56,7 @@ final class EntityEncoderBuilder<T> {
 
         CodeBuilder builder = new CodeBuilder().append("private void {}(org.bson.BsonWriter writer, {} entity) {\n", methodName, entityClassName);
         builder.indent(1).append("writer.writeStartDocument();\n");
-        for (Field field : entityClass.getFields()) {
+        for (Field field : Classes.instanceFields(entityClass)) {
             Type fieldType = field.getGenericType();
             String fieldVariable = "entity." + field.getName();
 

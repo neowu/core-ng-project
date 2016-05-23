@@ -2,7 +2,8 @@ package core.framework.impl.validate;
 
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
-import core.framework.api.validate.ValueNotEmpty;
+import core.framework.api.validate.NotNull;
+import core.framework.api.validate.Size;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -17,30 +18,32 @@ import static org.junit.Assert.assertThat;
 /**
  * @author neo
  */
-public class ValueNotEmptyValidatorTest {
-    static class Bean {
-        @ValueNotEmpty(message = "field1 must not contain empty")
-        public List<String> field1;
-
-        @ValueNotEmpty(message = "field2 must not contain empty")
-        public Map<String, String> field2;
-    }
-
-
+public class SizeValidatorTest {
     @Test
     public void validate() {
         Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
 
         Bean bean = new Bean();
-        bean.field1 = Lists.newArrayList("", "");
-        bean.field2 = Maps.newHashMap("key", "");
+        bean.stringList = Lists.newArrayList("1", "2", "3", "4");
+        bean.stringMap = Maps.newHashMap();
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
         Assert.assertTrue(errors.hasError());
         assertEquals(2, errors.errors.size());
-        assertThat(errors.errors.get("field1"), containsString("field1"));
-        assertThat(errors.errors.get("field2"), containsString("field2"));
+        assertThat(errors.errors.get("stringList"), containsString("stringList"));
+        assertThat(errors.errors.get("stringMap"), containsString("stringMap"));
+    }
+
+    static class Bean {
+        @NotNull
+        @Size(max = 3, message = "stringList must not have more than 3 items")
+        public List<String> stringList;
+
+        @NotNull
+        @Size(min = 1, message = "stringMap must have at least 1 item")
+        public Map<String, String> stringMap;
+
     }
 }

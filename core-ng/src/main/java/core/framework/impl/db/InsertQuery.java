@@ -6,6 +6,7 @@ import core.framework.api.db.Table;
 import core.framework.api.util.Lists;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.reflect.Classes;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -26,7 +27,7 @@ final class InsertQuery<T> {
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");
 
-        Field[] fields = entityClass.getFields();
+        List<Field> fields = Classes.instanceFields(entityClass);
         int index = 0;
         for (Field field : fields) {
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);

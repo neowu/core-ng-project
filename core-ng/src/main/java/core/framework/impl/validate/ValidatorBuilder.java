@@ -9,9 +9,8 @@ import core.framework.api.validate.Min;
 import core.framework.api.validate.NotEmpty;
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Pattern;
-import core.framework.api.validate.ValueNotEmpty;
-import core.framework.api.validate.ValueNotNull;
-import core.framework.api.validate.ValuePattern;
+import core.framework.api.validate.Size;
+import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.reflect.GenericTypes;
 
@@ -23,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -41,33 +41,36 @@ public class ValidatorBuilder {
         Class<?> targetClass;
         if (GenericTypes.isList(instanceType)) { // type validator ensured list can only be generic type in advance
             targetClass = GenericTypes.listValueClass(instanceType);
-            if (isValueClass(targetClass)) {
-                return new Validator(null); // not validate top level value List since no place to put annotation
-            }
+        } else if (GenericTypes.isOptional(instanceType)) {
+            targetClass = GenericTypes.optionalValueClass(instanceType);
         } else {
             targetClass = GenericTypes.rawClass(instanceType);
         }
 
-        ObjectValidator objectValidator = createObjectValidator(targetClass, null);
-        if (objectValidator == null) {
-            return new Validator(null);
-        }
-        if (GenericTypes.isList(instanceType)) {
-            return new Validator(new ListValidator(Lists.newArrayList(objectValidator)));
+        if (isValueClass(targetClass)) return new Validator(null); // not validate top level value, since no place to put annotation
+
+        Optional<ObjectValidator> objectValidator = createObjectValidator(targetClass, null);
+        if (objectValidator.isPresent()) {
+            if (GenericTypes.isList(instanceType)) {
+                return new Validator(new ListValidator(Lists.newArrayList(objectValidator.get())));
+            } else if (GenericTypes.isOptional(instanceType)) {
+                return new Validator(new OptionalValidator(Lists.newArrayList(objectValidator.get())));
+            } else {
+                return new Validator(objectValidator.get());
+            }
         }
 
-        return new Validator(objectValidator);
+        return new Validator(null);
     }
 
-    private ObjectValidator createObjectValidator(Class<?> instanceClass, String parentPath) {
+    private Optional<ObjectValidator> createObjectValidator(Class<?> instanceClass, String parentPath) {
         Map<Field, List<FieldValidator>> validators = Maps.newLinkedHashMap();
-        for (Field field : instanceClass.getFields()) {
-            List<FieldValidator> fieldValidators = Lists.newArrayList();
-            createValidators(fieldValidators, field, parentPath);
-            if (!fieldValidators.isEmpty()) validators.put(field, fieldValidators);
+        for (Field field : Classes.instanceFields(instanceClass)) {
+            createValidators(field, parentPath)
+                .ifPresent(fieldValidators -> validators.put(field, fieldValidators));
         }
-        if (validators.isEmpty()) return null;
-        return new ObjectValidator(validators);
+        if (validators.isEmpty()) return Optional.empty();
+        return Optional.of(new ObjectValidator(validators));
     }
 
     private String fieldPath(String parentPath, Field field) {
@@ -76,148 +79,110 @@ public class ValidatorBuilder {
         return parentPath + "." + fieldName;
     }
 
-    private void createValidators(List<FieldValidator> validators, Field field, String parentPath) {
-        createNotNullValidator(validators, field, parentPath);
-        createNotEmptyValidator(validators, field, parentPath);
-        createPatternValidator(validators, field, parentPath);
-        createLengthValidator(validators, field, parentPath);
-        createMinValidator(validators, field, parentPath);
-        createMaxValidator(validators, field, parentPath);
+    private Optional<List<FieldValidator>> createValidators(Field field, String parentPath) {
+        List<FieldValidator> validators = Lists.newArrayList();
 
-        Class<?> fieldClass = field.getType();
-        if (List.class.equals(fieldClass) || Map.class.equals(fieldClass)) {
-            FieldValidator collectionValidator = createCollectionValidator(field, parentPath);
-            if (collectionValidator != null) validators.add(collectionValidator);
-        } else if (!isValueClass(fieldClass)) {
-            FieldValidator objectValidator = createObjectValidator(fieldClass, fieldPath(parentPath, field));
-            if (objectValidator != null) validators.add(objectValidator);
-        }
-    }
-
-    private FieldValidator createCollectionValidator(Field field, String parentPath) {
         Type fieldType = field.getGenericType();
-        boolean isList = GenericTypes.isList(fieldType);
 
-        Class<?> targetClass = isList ? GenericTypes.listValueClass(fieldType) : GenericTypes.mapValueClass(fieldType);
+        createNotNullValidator(field, parentPath).ifPresent(validators::add);
+        createSizeValidator(field, parentPath, fieldType).ifPresent(validators::add);
 
-        List<FieldValidator> valueValidators = Lists.newArrayList();
-
-        createValueNotNullValidator(valueValidators, parentPath, field);
-        createValueNotEmptyValidator(valueValidators, parentPath, field);
-        createValuePatternValidator(valueValidators, parentPath, field);
-
-        if (!isValueClass(targetClass)) {
-            ObjectValidator objectValidator = createObjectValidator(targetClass, fieldPath(parentPath, field));
-            if (objectValidator != null) valueValidators.add(objectValidator);
+        if (GenericTypes.isList(fieldType)) {
+            List<FieldValidator> valueValidators = Lists.newArrayList();
+            addValidators(field, parentPath, GenericTypes.listValueClass(fieldType), valueValidators);
+            if (!valueValidators.isEmpty()) validators.add(new ListValidator(valueValidators));
+        } else if (GenericTypes.isMap(fieldType)) {
+            List<FieldValidator> valueValidators = Lists.newArrayList();
+            addValidators(field, parentPath, GenericTypes.mapValueClass(fieldType), valueValidators);
+            if (!valueValidators.isEmpty()) validators.add(new MapValidator(valueValidators));
+        } else if (GenericTypes.isOptional(fieldType)) {
+            List<FieldValidator> valueValidators = Lists.newArrayList();
+            addValidators(field, parentPath, GenericTypes.optionalValueClass(fieldType), valueValidators);
+            if (!valueValidators.isEmpty()) validators.add(new OptionalValidator(valueValidators));
+        } else {
+            Class<?> fieldClass = GenericTypes.rawClass(fieldType);
+            addValidators(field, parentPath, fieldClass, validators);
         }
 
-        if (valueValidators.isEmpty()) return null;
-
-        if (isList) return new ListValidator(valueValidators);
-        else return new MapValidator(valueValidators);
+        if (validators.isEmpty()) return Optional.empty();
+        return Optional.of(validators);
     }
 
-    private void createMaxValidator(List<FieldValidator> validators, Field field, String parentPath) {
-        Class<?> fieldClass = field.getType();
-        Max max = field.getDeclaredAnnotation(Max.class);
-        if (max != null) {
-            if (!Number.class.isAssignableFrom(fieldClass)) {
-                throw Exceptions.error("@Max must on numeric field, field={}, fieldClass={}", field, fieldClass.getCanonicalName());
-            }
-            validators.add(new MaxValidator(fieldPath(parentPath, field), max));
-        }
+    private void addValidators(Field field, String parentPath, Class<?> targetClass, List<FieldValidator> validators) {
+        createNotEmptyValidator(field, parentPath, targetClass).ifPresent(validators::add);
+        createPatternValidator(field, parentPath, targetClass).ifPresent(validators::add);
+        createLengthValidator(field, parentPath, targetClass).ifPresent(validators::add);
+        createMinValidator(field, parentPath, targetClass).ifPresent(validators::add);
+        createMaxValidator(field, parentPath, targetClass).ifPresent(validators::add);
+
+        if (!isValueClass(targetClass))
+            createObjectValidator(targetClass, fieldPath(parentPath, field)).ifPresent(validators::add);
     }
 
-    private void createMinValidator(List<FieldValidator> validators, Field field, String parentPath) {
-        Class<?> fieldClass = field.getType();
-        Min min = field.getDeclaredAnnotation(Min.class);
-        if (min != null) {
-            if (!Number.class.isAssignableFrom(fieldClass)) {
-                throw Exceptions.error("@Min must on numeric field, field={}, fieldClass={}", field, fieldClass.getCanonicalName());
-            }
-            validators.add(new MinValidator(fieldPath(parentPath, field), min));
-        }
+    private Optional<NotNullValidator> createNotNullValidator(Field field, String parentPath) {
+        NotNull notNull = field.getDeclaredAnnotation(NotNull.class);
+        if (notNull != null) return Optional.of(new NotNullValidator(fieldPath(parentPath, field), notNull.message()));
+        return Optional.empty();
     }
 
-    private void createLengthValidator(List<FieldValidator> validators, Field field, String parentPath) {
-        Class<?> fieldClass = field.getType();
-        Length length = field.getDeclaredAnnotation(Length.class);
-        if (length != null) {
-            if (!String.class.equals(fieldClass) && !List.class.equals(fieldClass) && !Map.class.equals(fieldClass)) {
-                throw Exceptions.error("@Length must on String, List<T> or Map<String, T>, field={}, fieldClass={}", field, fieldClass.getCanonicalName());
-            }
-            validators.add(new LengthValidator(fieldPath(parentPath, field), length));
-        }
-    }
-
-    private void createNotEmptyValidator(List<FieldValidator> validators, Field field, String parentPath) {
-        Class<?> fieldClass = field.getType();
+    private Optional<NotEmptyValidator> createNotEmptyValidator(Field field, String parentPath, Class<?> targetClass) {
         NotEmpty notEmpty = field.getDeclaredAnnotation(NotEmpty.class);
         if (notEmpty != null) {
-            if (!String.class.equals(fieldClass)) {
-                throw Exceptions.error("@NotEmpty must on String, field={}, fieldClass={}", Fields.path(field), fieldClass.getCanonicalName());
-            }
-            validators.add(new NotEmptyValidator(fieldPath(parentPath, field), notEmpty.message()));
+            if (!String.class.equals(targetClass))
+                throw Exceptions.error("@NotEmpty must on String, Optional<String>, List<String> or Map<String, String>, field={}, fieldClass={}", Fields.path(field), targetClass.getCanonicalName());
+            return Optional.of(new NotEmptyValidator(fieldPath(parentPath, field), notEmpty.message()));
         }
+        return Optional.empty();
     }
 
-    private void createPatternValidator(List<FieldValidator> validators, Field field, String parentPath) {
-        Class<?> fieldClass = field.getType();
+    private Optional<PatternValidator> createPatternValidator(Field field, String parentPath, Class<?> targetClass) {
         Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
         if (pattern != null) {
-            if (!String.class.equals(fieldClass)) {
-                throw Exceptions.error("@Pattern must on String, field={}, fieldClass={}", Fields.path(field), fieldClass.getCanonicalName());
-            }
-            validators.add(new PatternValidator(pattern.value(), fieldPath(parentPath, field), pattern.message()));
+            if (!String.class.equals(targetClass))
+                throw Exceptions.error("@Pattern must on String, Optional<String>, List<String> or Map<String, String>, field={}, fieldClass={}", Fields.path(field), targetClass.getCanonicalName());
+            return Optional.of(new PatternValidator(pattern.value(), fieldPath(parentPath, field), pattern.message()));
         }
+        return Optional.empty();
     }
 
-    private void createNotNullValidator(List<FieldValidator> validators, Field field, String parentPath) {
-        NotNull notNull = field.getDeclaredAnnotation(NotNull.class);
-        if (notNull != null) {
-            validators.add(new NotNullValidator(fieldPath(parentPath, field), notNull.message(), true));
+    private Optional<LengthValidator> createLengthValidator(Field field, String parentPath, Class<?> targetClass) {
+        Length length = field.getDeclaredAnnotation(Length.class);
+        if (length != null) {
+            if (!String.class.equals(targetClass))
+                throw Exceptions.error("@Length must on String, Optional<String>, List<String> or Map<String, String>, field={}, fieldClass={}", Fields.path(field), targetClass.getCanonicalName());
+            return Optional.of(new LengthValidator(fieldPath(parentPath, field), length));
         }
+        return Optional.empty();
     }
 
-    private void createValueNotEmptyValidator(List<FieldValidator> valueValidators, String parentPath, Field field) {
-        ValueNotEmpty valueNotEmpty = field.getDeclaredAnnotation(ValueNotEmpty.class);
-        if (valueNotEmpty != null) {
-            Type fieldType = field.getGenericType();
-            Class<?> fieldClass = field.getType();
-            boolean isStringListOrStringMap = (List.class.equals(fieldClass) && String.class.equals(GenericTypes.listValueClass(fieldType)))
-                || (Map.class.equals(fieldClass) && String.class.equals(GenericTypes.mapValueClass(fieldType)));
-            if (!isStringListOrStringMap) {
-                throw Exceptions.error("@ValueNotEmpty must on List<String> or Map<String, String>, field={}, fieldType={}", field, fieldType.getTypeName());
-            }
-
-            valueValidators.add(new NotEmptyValidator(fieldPath(parentPath, field), valueNotEmpty.message()));
+    private Optional<SizeValidator> createSizeValidator(Field field, String parentPath, Type fieldType) {
+        Size size = field.getDeclaredAnnotation(Size.class);
+        if (size != null) {
+            if (!GenericTypes.isList(fieldType) && !GenericTypes.isMap(fieldType))
+                throw Exceptions.error("@Size must on List<?> or Map<String, ?>, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName());
+            return Optional.of(new SizeValidator(fieldPath(parentPath, field), size));
         }
+        return Optional.empty();
     }
 
-    private void createValuePatternValidator(List<FieldValidator> valueValidators, String parentPath, Field field) {
-        ValuePattern valuePattern = field.getDeclaredAnnotation(ValuePattern.class);
-        if (valuePattern != null) {
-            Type fieldType = field.getGenericType();
-            Class<?> fieldClass = field.getType();
-            boolean isStringListOrStringMap = (List.class.equals(fieldClass) && String.class.equals(GenericTypes.listValueClass(fieldType)))
-                || (Map.class.equals(fieldClass) && String.class.equals(GenericTypes.mapValueClass(fieldType)));
-            if (!isStringListOrStringMap) {
-                throw Exceptions.error("@ValuePattern must on List<String> or Map<String, String>, field={}, fieldType={}", field, fieldType.getTypeName());
-            }
-
-            valueValidators.add(new PatternValidator(valuePattern.value(), fieldPath(parentPath, field), valuePattern.message()));
+    private Optional<MaxValidator> createMaxValidator(Field field, String parentPath, Class<?> targetClass) {
+        Max max = field.getDeclaredAnnotation(Max.class);
+        if (max != null) {
+            if (!Number.class.isAssignableFrom(targetClass))
+                throw Exceptions.error("@Max must on numeric field, field={}, fieldClass={}", field, targetClass.getCanonicalName());
+            return Optional.of(new MaxValidator(fieldPath(parentPath, field), max));
         }
+        return Optional.empty();
     }
 
-    private void createValueNotNullValidator(List<FieldValidator> valueValidators, String parentPath, Field field) {
-        ValueNotNull valueNotNull = field.getDeclaredAnnotation(ValueNotNull.class);
-        if (valueNotNull != null) {
-            Class<?> fieldClass = field.getType();
-            if (!(List.class.equals(fieldClass) || Map.class.equals(fieldClass))) {
-                throw Exceptions.error("@ValueNotNull must on List<T> or Map<String, T>, field={}, fieldClass={}", field, fieldClass.getCanonicalName());
-            }
-            valueValidators.add(new NotNullValidator(fieldPath(parentPath, field), valueNotNull.message(), false));
+    private Optional<MinValidator> createMinValidator(Field field, String parentPath, Class<?> targetClass) {
+        Min min = field.getDeclaredAnnotation(Min.class);
+        if (min != null) {
+            if (!Number.class.isAssignableFrom(targetClass))
+                throw Exceptions.error("@Min must on numeric field, field={}, fieldClass={}", field, targetClass.getCanonicalName());
+            return Optional.of(new MinValidator(fieldPath(parentPath, field), min));
         }
+        return Optional.empty();
     }
 
     private boolean isValueClass(Class<?> fieldClass) {

@@ -5,9 +5,11 @@ import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Query;
 import core.framework.api.db.Table;
 import core.framework.api.util.Exceptions;
+import core.framework.impl.reflect.Classes;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author neo
@@ -18,7 +20,7 @@ final class SelectQuery {
 
     SelectQuery(Class<?> entityClass) {
         StringBuilder builder = new StringBuilder("SELECT ");
-        Field[] fields = entityClass.getFields();
+        List<Field> fields = Classes.instanceFields(entityClass);
         int index = 0;
         for (Field field : fields) {
             Column column = field.getDeclaredAnnotation(Column.class);

@@ -10,10 +10,6 @@ import java.lang.reflect.Field;
  * @author neo
  */
 public class ValidatorBuilderTest {
-    public static class Bean {
-        public String stringField;
-    }
-
     @Test
     public void withoutValidationAnnotation() {
         Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
@@ -24,5 +20,12 @@ public class ValidatorBuilderTest {
 
         validator = new ValidatorBuilder(Types.list(String.class), Field::getName).build();
         Assert.assertNull(validator.validator);
+
+        validator = new ValidatorBuilder(Types.optional(Bean.class), Field::getName).build();
+        Assert.assertNull(validator.validator);
+    }
+
+    public static class Bean {
+        public String stringField;
     }
 }

@@ -1,10 +1,6 @@
 package core.framework.impl.validate;
 
-import core.framework.api.util.Exceptions;
 import core.framework.api.validate.Length;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author neo
@@ -22,16 +18,7 @@ class LengthValidator implements FieldValidator {
     public void validate(Object value, ValidationErrors errors, boolean partial) {
         if (value == null) return;
 
-        int length;
-        if (value instanceof String) {
-            length = ((String) value).length();
-        } else if (value instanceof List) {
-            length = ((List) value).size();
-        } else if (value instanceof Map) {
-            length = ((Map) value).size();
-        } else {
-            throw Exceptions.error("unexpected value type, valueClass={}", value);
-        }
+        int length = ((String) value).length();
 
         if (this.length.min() > -1 && length < this.length.min()
             || this.length.max() > -1 && length > this.length.max()) {

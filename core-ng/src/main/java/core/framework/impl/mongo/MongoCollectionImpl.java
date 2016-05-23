@@ -268,7 +268,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     public long delete(Bson filter) {
         StopWatch watch = new StopWatch();
         try {
-            DeleteResult result = collection().deleteMany(filter);
+            DeleteResult result = collection().deleteMany(filter == null ? new BsonDocument() : filter);
             return result.getDeletedCount();
         } finally {
             long elapsedTime = watch.elapsedTime();

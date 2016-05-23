@@ -9,6 +9,7 @@ import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
+import core.framework.impl.reflect.Classes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public final class EntitySchemaGenerator {
         builder.append(table.name()).append(" (");
 
         List<String> primaryKeys = Lists.newArrayList();
-        for (Field field : entityClass.getFields()) {
+        for (Field field : Classes.instanceFields(entityClass)) {
             Column column = field.getDeclaredAnnotation(Column.class);
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
 

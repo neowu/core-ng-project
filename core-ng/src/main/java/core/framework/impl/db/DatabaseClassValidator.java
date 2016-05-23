@@ -7,7 +7,7 @@ import core.framework.api.db.Table;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
 import core.framework.impl.reflect.Fields;
-import core.framework.impl.validate.type.TypeValidator;
+import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -21,13 +21,13 @@ import java.util.Set;
  * @author neo
  */
 final class DatabaseClassValidator implements TypeVisitor {
-    private final TypeValidator validator;
+    private final DataTypeValidator validator;
     private final Set<String> columns = Sets.newHashSet();
     private boolean foundPK;
     private boolean validateView;
 
     DatabaseClassValidator(Class<?> entityClass) {
-        validator = new TypeValidator(entityClass);
+        validator = new DataTypeValidator(entityClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.visitor = this;
     }

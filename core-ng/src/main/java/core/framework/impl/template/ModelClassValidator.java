@@ -1,7 +1,7 @@
 package core.framework.impl.template;
 
 import core.framework.api.util.Exceptions;
-import core.framework.impl.validate.type.TypeValidator;
+import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
 import java.lang.reflect.Field;
@@ -16,10 +16,10 @@ import java.time.LocalDateTime;
  * @author neo
  */
 public class ModelClassValidator implements TypeVisitor {
-    private final TypeValidator validator;
+    private final DataTypeValidator validator;
 
     public ModelClassValidator(Class<?> modelClass) {
-        validator = new TypeValidator(modelClass);
+        validator = new DataTypeValidator(modelClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;

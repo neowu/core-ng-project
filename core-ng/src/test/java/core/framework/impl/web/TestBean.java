@@ -50,6 +50,6 @@ public class TestBean {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Child {
         @XmlElement(name = "boolean_field")
-        public String booleanField;
+        public Boolean booleanField;
     }
 }

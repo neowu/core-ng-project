@@ -3,6 +3,7 @@ package core.framework.impl.db;
 import core.framework.api.db.Column;
 import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Table;
+import core.framework.impl.reflect.Classes;
 
 import java.lang.reflect.Field;
 
@@ -15,9 +16,8 @@ final class DeleteQueryBuilder {
         StringBuilder builder = new StringBuilder("DELETE FROM ")
             .append(table.name())
             .append(" WHERE ");
-        Field[] fields = entityClass.getFields();
         int index = 0;
-        for (Field field : fields) {
+        for (Field field : Classes.instanceFields(entityClass)) {
             if (field.isAnnotationPresent(PrimaryKey.class)) {
                 Column column = field.getDeclaredAnnotation(Column.class);
                 if (index > 0) builder.append(" AND ");

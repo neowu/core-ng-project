@@ -14,10 +14,12 @@ import java.util.Map;
  */
 @Collection(name = "test_entity")
 public class TestEntity {
+    public static final String INT_FIELD = "int_field";
+
     @Id
     public ObjectId id;
 
-    @Field(name = "int_field")
+    @Field(name = INT_FIELD)
     public Integer intField;
 
     @Field(name = "double_field")

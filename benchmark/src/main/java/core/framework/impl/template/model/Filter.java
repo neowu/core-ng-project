@@ -1,7 +1,7 @@
 package core.framework.impl.template.model;
 
 import core.framework.api.validate.Length;
-import core.framework.api.validate.ValueNotNull;
+import core.framework.api.validate.NotEmpty;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -18,7 +18,6 @@ public class Filter {
     public String countryCode;
 
     @Length(min = 1)
-    @ValueNotNull
     @XmlElementWrapper(name = "vendor_numbers")
     @XmlElement(name = "vendor_number")
     public List<String> vendorNumbers;
@@ -30,19 +29,19 @@ public class Filter {
     public String categoryId;
 
     @Length(min = 1)
-    @ValueNotNull
+    @NotEmpty
     @XmlElementWrapper(name = "brands")
     @XmlElement(name = "brand")
     public List<String> brands;
 
     @Length(min = 1)
-    @ValueNotNull
+    @NotEmpty
     @XmlElementWrapper(name = "colors")
     @XmlElement(name = "color")
     public List<String> colors;
 
     @Length(min = 1)
-    @ValueNotNull
+    @NotEmpty
     @XmlElementWrapper(name = "sizes")
     @XmlElement(name = "size")
     public List<String> sizes;

@@ -17,7 +17,7 @@ import java.util.function.Function;
 /**
  * @author neo
  */
-public class TypeValidator {
+public class DataTypeValidator {
     public final Type type;
     private final Set<Class<?>> visitedClasses = Sets.newHashSet();
     public boolean allowTopLevelList;
@@ -28,7 +28,7 @@ public class TypeValidator {
     public Function<Class, Boolean> allowedValueClass;
     public TypeVisitor visitor;
 
-    public TypeValidator(Type type) {
+    public DataTypeValidator(Type type) {
         this.type = type;
     }
 
@@ -68,6 +68,8 @@ public class TypeValidator {
         Field[] fields = objectClass.getDeclaredFields();
         for (Field field : fields) {
             if (field.getName().startsWith("$")) continue;  // ignore dynamic/generated field, e.g. jacoco
+            if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) continue;  // ignore all static final field
+
             validateField(field);
             if (visitor != null) visitor.visitField(field, path);
 
@@ -137,13 +139,18 @@ public class TypeValidator {
     }
 
     private void validateField(Field field) {
-        if (!Modifier.isPublic(field.getModifiers()))
+        int modifiers = field.getModifiers();
+
+        if (!Modifier.isPublic(modifiers))
             throw Exceptions.error("field must be public, field={}", Fields.path(field));
 
-        if (Modifier.isTransient(field.getModifiers()))
+        if (Modifier.isTransient(modifiers))
             throw Exceptions.error("field must not be transient, field={}", Fields.path(field));
 
-        if (Modifier.isFinal(field.getModifiers())) {
+        if (Modifier.isStatic(modifiers))
+            throw Exceptions.error("field must not be static, field={}", Fields.path(field));
+
+        if (Modifier.isFinal(modifiers)) {
             throw Exceptions.error("field must not be final, field={}", Fields.path(field));
         }
     }

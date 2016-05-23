@@ -41,11 +41,11 @@ public class JAXBTypeValidator implements TypeVisitor {
         }
     }
 
-    protected final TypeValidator validator;
+    protected final DataTypeValidator validator;
     private final Map<String, Set<String>> elements = Maps.newHashMap();
 
     protected JAXBTypeValidator(Type instanceType) {
-        validator = new TypeValidator(instanceType);
+        validator = new DataTypeValidator(instanceType);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;

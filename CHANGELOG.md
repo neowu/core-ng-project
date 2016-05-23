@@ -15,6 +15,10 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.5.3 (5/23/2016)
+* validate: support Optional<T>
+* validate: removed @ValueNotNull/@ValueNotEmpty/@ValuePattern, use @NotNull/@NotEmpty/@Pattern to simplify
+
 ### 4.5.2 (5/20/2016)
 * mongo: count() supports null filter
 * background-task: fix task can be broken if exception occurred

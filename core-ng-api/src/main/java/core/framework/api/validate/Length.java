@@ -7,7 +7,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Length can be used on String, List and Map fields.
+ * Length is used on String.
  *
  * @author neo
  */

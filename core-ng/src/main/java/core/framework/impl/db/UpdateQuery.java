@@ -6,6 +6,7 @@ import core.framework.api.db.Table;
 import core.framework.api.util.Lists;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.reflect.Classes;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -20,7 +21,7 @@ final class UpdateQuery<T> {
     UpdateQuery(Class<T> entityClass) {
         List<Field> primaryKeyFields = Lists.newArrayList();
         List<Field> columnFields = Lists.newArrayList();
-        for (Field field : entityClass.getDeclaredFields()) {
+        for (Field field : Classes.instanceFields(entityClass)) {
             if (field.isAnnotationPresent(PrimaryKey.class)) {
                 primaryKeyFields.add(field);
             } else if (field.isAnnotationPresent(Column.class)) {

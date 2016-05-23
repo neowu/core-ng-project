@@ -7,12 +7,16 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
+ * Size is used on List and Map.
+ *
  * @author neo
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface ValuePattern {
-    String value();
+public @interface Size {
+    int min() default -1;
 
-    String message() default "value must match pattern";
+    int max() default -1;
+
+    String message() default "size must be between min and max";
 }

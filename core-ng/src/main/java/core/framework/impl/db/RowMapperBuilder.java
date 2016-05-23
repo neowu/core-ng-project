@@ -5,6 +5,7 @@ import core.framework.api.util.Lists;
 import core.framework.api.util.Strings;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.reflect.Classes;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -31,7 +32,7 @@ final class RowMapperBuilder<T> {
         CodeBuilder builder = new CodeBuilder().append("public Object map({} resultSet) {\n", ResultSetWrapper.class.getCanonicalName());
         builder.indent(1).append("{} entity = new {}();\n", entityClassName, entityClassName);
 
-        for (Field field : entityClass.getFields()) {
+        for (Field field : Classes.instanceFields(entityClass)) {
             String fieldName = field.getName();
             Class<?> fieldClass = field.getType();
             String column = field.getAnnotation(Column.class).name();

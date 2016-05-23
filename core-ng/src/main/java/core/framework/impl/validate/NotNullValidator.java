@@ -6,17 +6,15 @@ package core.framework.impl.validate;
 class NotNullValidator implements FieldValidator {
     private final String fieldPath;
     private final String errorMessage;
-    private final boolean enablePartial;
 
-    NotNullValidator(String fieldPath, String errorMessage, boolean enablePartial) {
+    NotNullValidator(String fieldPath, String errorMessage) {
         this.fieldPath = fieldPath;
         this.errorMessage = errorMessage;
-        this.enablePartial = enablePartial;
     }
 
     @Override
     public void validate(Object value, ValidationErrors errors, boolean partial) {
-        if (partial && enablePartial) return;
+        if (partial) return;
         if (value == null) errors.add(fieldPath, errorMessage);
     }
 }

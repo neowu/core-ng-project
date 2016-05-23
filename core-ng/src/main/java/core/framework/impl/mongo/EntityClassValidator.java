@@ -7,7 +7,7 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
 import core.framework.impl.reflect.Fields;
-import core.framework.impl.validate.type.TypeValidator;
+import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 import org.bson.types.ObjectId;
 
@@ -21,13 +21,13 @@ import java.util.Set;
  * @author neo
  */
 public final class EntityClassValidator implements TypeVisitor {
-    private final TypeValidator validator;
+    private final DataTypeValidator validator;
     private final Map<String, Set<String>> fields = Maps.newHashMap();
     private boolean validateView;
     private Field id;
 
     public EntityClassValidator(Class<?> entityClass) {
-        validator = new TypeValidator(entityClass);
+        validator = new DataTypeValidator(entityClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
         validator.allowChildObject = true;

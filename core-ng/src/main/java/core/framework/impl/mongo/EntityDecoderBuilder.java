@@ -6,6 +6,7 @@ import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -78,7 +79,7 @@ final class EntityDecoderBuilder<T> {
             .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n")
             .indent(2).append("currentType = reader.getCurrentBsonType();\n");
 
-        for (Field field : entityClass.getFields()) {
+        for (Field field : Classes.instanceFields(entityClass)) {
             decodeEntityField(builder, field);
         }
 
