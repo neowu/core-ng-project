@@ -42,6 +42,6 @@ public class HTMLTemplateBenchmark {
 
     @Benchmark
     public void current() {
-        template.process(new TemplateContext(model));
+        template.process(new TemplateContext(model, new CDNManager()));
     }
 }
