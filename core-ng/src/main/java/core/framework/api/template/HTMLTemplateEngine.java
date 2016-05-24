@@ -3,6 +3,7 @@ package core.framework.api.template;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
+import core.framework.impl.template.CDNManager;
 import core.framework.impl.template.HTMLTemplate;
 import core.framework.impl.template.HTMLTemplateBuilder;
 import core.framework.impl.template.TemplateContext;
@@ -18,13 +19,15 @@ import java.util.Map;
 public final class HTMLTemplateEngine {
     private final Logger logger = LoggerFactory.getLogger(HTMLTemplateEngine.class);
     private final Map<String, HTMLTemplate> templates = Maps.newConcurrentHashMap();
+    private final CDNManager cdnManager = new CDNManager();
 
     public String process(String name, Object model) {
         StopWatch watch = new StopWatch();
         try {
             HTMLTemplate template = templates.get(name);
             if (template == null) throw Exceptions.error("template not found, name={}", name);
-            return template.process(new TemplateContext(model));
+            TemplateContext context = new TemplateContext(model, cdnManager);
+            return template.process(context);
         } finally {
             logger.debug("process, name={}, elapsedTime={}", name, watch.elapsedTime());
         }

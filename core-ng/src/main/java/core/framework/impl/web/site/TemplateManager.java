@@ -36,8 +36,7 @@ public class TemplateManager {
         StopWatch watch = new StopWatch();
         try {
             HTMLTemplate template = get(templatePath, model.getClass(), language);
-            TemplateContext context = new TemplateContext(model);
-            context.cdn = cdnManager;
+            TemplateContext context = new TemplateContext(model, cdnManager);
             return template.process(context);
         } finally {
             logger.debug("process, templatePath={}, elapsedTime={}", templatePath, watch.elapsedTime());

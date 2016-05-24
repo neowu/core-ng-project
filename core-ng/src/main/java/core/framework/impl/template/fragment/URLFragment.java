@@ -109,6 +109,6 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
             logger.warn(Markers.errorCode("ILLEGAL_URL"), "illegal url detected, url={}, location={}", url, location);
             return "\"\"";
         }
-        return cdn ? context.cdn.url(url) : url;
+        return cdn ? context.cdnManager.url(url) : url;
     }
 }

@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.5.4 (5/24/2016)
+* template: fix template engine with c:src in String template
+
 ### 4.5.3 (5/23/2016)
 * validate: support Optional<T>
 * validate: removed @ValueNotNull/@ValueNotEmpty/@ValuePattern, use @NotNull/@NotEmpty/@Pattern to simplify
