@@ -26,7 +26,7 @@ public class HTMLTemplateTest {
         model.children.add(child("child2", 2.0, false));
         model.htmlField = "<pre>html</pre>";
 
-        String result = template.process(new TemplateContext(model));
+        String result = template.process(new TemplateContext(model, new CDNManager()));
 
         Assert.assertEquals(ClasspathResources.text("template-test/template-result.html").replaceAll("\r\n", "\n"), result);
     }
