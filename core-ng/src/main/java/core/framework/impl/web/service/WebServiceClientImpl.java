@@ -154,7 +154,7 @@ public class WebServiceClientImpl implements WebServiceClient {
 
     private void validateResponse(HTTPResponse response) {
         HTTPStatus status = response.status();
-        if (status.code >= HTTPStatus.OK.code && status.code <= 300) return;
+        if (status.code >= 200 && status.code < 300) return;
         byte[] responseBody = response.body();
         try {
             ErrorResponse error = JSONMapper.fromJSON(ErrorResponse.class, responseBody);

@@ -3,7 +3,6 @@ package core.framework.api.http;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
 import core.framework.api.util.Charsets;
-import core.framework.api.util.Exceptions;
 import core.framework.api.util.InputStreams;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
@@ -43,7 +42,7 @@ public final class HTTPClient {
 
     static HTTPStatus parseHTTPStatus(int statusCode) {
         HTTPStatus status = HTTP_STATUSES.get(statusCode);
-        if (status == null) throw Exceptions.error("unsupported http status code, code={}", statusCode);
+        if (status == null) throw new HTTPClientException("unsupported http status code, code=" + statusCode, "UNKNOWN_HTTP_STATUS_CODE");
         return status;
     }
 

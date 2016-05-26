@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.5.5 (5/25/2016)
+* httpclient: throw HTTPClientException when status code is not supported
+
 ### 4.5.4 (5/24/2016)
 * template: fix template engine with c:src in String template
 
