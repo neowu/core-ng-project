@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.5.6 (6/3/2016)
+* session: remove key
+
 ### 4.5.5 (5/25/2016)
 * httpclient: throw HTTPClientException when status code is not supported
 

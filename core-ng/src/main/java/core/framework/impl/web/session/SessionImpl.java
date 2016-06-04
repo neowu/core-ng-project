@@ -12,9 +12,8 @@ import java.util.Optional;
  */
 public class SessionImpl implements Session {
     private static final int MAX_VALUE_LENGTH = 500;
-
-    String id;
     final Map<String, String> data = Maps.newHashMap();
+    String id;
     boolean changed;
     boolean invalidated;
 
@@ -29,6 +28,11 @@ public class SessionImpl implements Session {
             throw Exceptions.error("the length value must not be larger than {}, length={}", MAX_VALUE_LENGTH, value.length());
         data.put(key, value);
         changed = true;
+    }
+
+    @Override
+    public void remove(String key) {
+        data.remove(key);
     }
 
     @Override

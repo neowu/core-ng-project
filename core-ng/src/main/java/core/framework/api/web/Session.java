@@ -10,5 +10,7 @@ public interface Session {
 
     void set(String key, String value);
 
+    void remove(String key);
+
     void invalidate();
 }
