@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.5.7 (6/7/2016)
+* template: support classpath template (for include)
+
 ### 4.5.6 (6/3/2016)
 * session: remove key
 

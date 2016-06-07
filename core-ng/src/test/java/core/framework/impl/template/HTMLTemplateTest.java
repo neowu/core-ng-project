@@ -2,7 +2,7 @@ package core.framework.impl.template;
 
 import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.Lists;
-import core.framework.impl.template.source.TemplateSource;
+import core.framework.impl.template.source.ClasspathTemplateSource;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import java.util.Optional;
 public class HTMLTemplateTest {
     @Test
     public void process() {
-        HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new TestTemplateSource("template-test/template.html"), TestModel.class);
+        HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new ClasspathTemplateSource("template-test/template.html"), TestModel.class);
         builder.message = key -> Optional.of(key + "_value");
         HTMLTemplate template = builder.build();
 
@@ -37,30 +37,5 @@ public class HTMLTemplateTest {
         child.doubleField = doubleField;
         child.booleanField = booleanField;
         return child;
-    }
-
-    static class TestTemplateSource implements TemplateSource {
-        private final String path;
-
-        TestTemplateSource(String path) {
-            this.path = path;
-        }
-
-        @Override
-        public String content() {
-            return ClasspathResources.text(path);
-        }
-
-        @Override
-        public TemplateSource resolve(String path) {
-            if ("footer.html".equals(path)) return new TestTemplateSource("template-test/footer.html");
-            Assert.fail("unknown path, path=" + path);
-            return null;
-        }
-
-        @Override
-        public String name() {
-            return path;
-        }
     }
 }
