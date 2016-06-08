@@ -124,10 +124,11 @@ public final class RabbitMQListener implements MessageHandlerConfig {
 
     private <T> void handle(QueueingConsumer.Delivery delivery) throws Exception {
         ActionLog actionLog = logManager.currentActionLog();
-        actionLog.action("queue/" + queue);
 
         AMQP.BasicProperties properties = delivery.getProperties();
         String messageType = properties.getType();
+
+        actionLog.action(action(messageType));
         actionLog.context("messageType", messageType);
 
         byte[] body = delivery.getBody();
@@ -165,5 +166,12 @@ public final class RabbitMQListener implements MessageHandlerConfig {
         actionLog.context("handler", handler.getClass().getCanonicalName());
 
         handler.handle(message);
+    }
+
+    String action(String messageType) {
+        StringBuilder builder = new StringBuilder("queue/");
+        builder.append(queue);
+        if (!Strings.isEmpty(messageType)) builder.append('/').append(messageType);
+        return builder.toString();
     }
 }

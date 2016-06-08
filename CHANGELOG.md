@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.5.8 (6/8/2016)
+* queue: update queue handling action to be queue/{queue}/{message_type}, to make it easier to manage and analyze
+
 ### 4.5.7 (6/7/2016)
 * template: support classpath template (for include)
 

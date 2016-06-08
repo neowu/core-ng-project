@@ -80,7 +80,7 @@ public final class Scheduler {
         submitJob(trigger, true);
     }
 
-    void submitJob(Trigger trigger, boolean trace) {
+    private void submitJob(Trigger trigger, boolean trace) {
         jobExecutor.submit(() -> {
             try {
                 logManager.begin("=== job execution begin ===");
