@@ -14,11 +14,14 @@ import java.time.Duration;
 public final class MongoConfig {
     private final ModuleContext context;
     private final MongoImpl mongo;
+    private final String name;
 
-    public MongoConfig(ModuleContext context) {
+    public MongoConfig(ModuleContext context, String name) {
         this.context = context;
-        if (context.beanFactory.registered(Mongo.class, null)) {
-            mongo = context.beanFactory.bean(Mongo.class, null);
+        this.name = name;
+
+        if (context.beanFactory.registered(Mongo.class, name)) {
+            mongo = context.beanFactory.bean(Mongo.class, name);
         } else {
             if (context.isTest()) {
                 mongo = context.mockFactory.create(MongoImpl.class);
@@ -27,7 +30,7 @@ public final class MongoConfig {
                 context.startupHook.add(mongo::initialize);
                 context.shutdownHook.add(mongo::close);
             }
-            context.beanFactory.bind(Mongo.class, null, mongo);
+            context.beanFactory.bind(Mongo.class, name, mongo);
         }
     }
 
@@ -60,7 +63,7 @@ public final class MongoConfig {
     }
 
     public <T> void collection(Class<T> entityClass) {
-        context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), null, mongo.collection(entityClass));
+        context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, mongo.collection(entityClass));
     }
 
     public <T> void view(Class<T> viewClass) {

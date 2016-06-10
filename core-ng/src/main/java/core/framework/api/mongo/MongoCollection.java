@@ -28,9 +28,9 @@ public interface MongoCollection<T> {
 
     void forEach(Query query, Consumer<T> consumer);    // mongo driver fetches results in batch
 
-    <V> List<V> aggregate(Class<V> resultClass, Bson... pipeline);      // refer to com.mongodb.client.model.Aggregates
+    <V> List<V> aggregate(Aggregate<V> aggregate);
 
-    <V> List<V> mapReduce(Class<V> resultClass, String mapFunction, String reduceFunction, Bson query);
+    <V> List<V> mapReduce(MapReduce<V> mapReduce);
 
     void replace(T entity);
 

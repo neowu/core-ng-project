@@ -1,5 +1,6 @@
 package core.framework.impl.mongo;
 
+import com.mongodb.ReadPreference;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MapReduceIterable;
@@ -12,12 +13,15 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
+import core.framework.api.mongo.Aggregate;
 import core.framework.api.mongo.Collection;
+import core.framework.api.mongo.MapReduce;
 import core.framework.api.mongo.MongoCollection;
 import core.framework.api.mongo.Query;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 import core.framework.api.util.StopWatch;
+import core.framework.api.util.Strings;
 import org.bson.BsonDocument;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
@@ -25,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -179,35 +182,55 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     }
 
     @Override
-    public <V> List<V> aggregate(Class<V> resultClass, Bson... pipeline) {
+    public <V> List<V> aggregate(Aggregate<V> aggregate) {
+        if (aggregate.pipeline == null || aggregate.pipeline.isEmpty()) throw new Error("aggregate.pipeline must not be empty");
+        if (aggregate.resultClass == null) throw new Error("aggregate.resultClass must not be null");
+
         StopWatch watch = new StopWatch();
         try {
             List<V> results = Lists.newArrayList();
-            AggregateIterable<V> query = collection().aggregate(Lists.newArrayList(pipeline), resultClass);
+            AggregateIterable<V> query = collection(aggregate.readPreference)
+                .aggregate(aggregate.pipeline, aggregate.resultClass)
+                .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
             fetch(query, results);
             checkTooManyRowsReturned(results.size());
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
-            logger.debug("aggregate, collection={}, pipeline={}, elapsedTime={}", collectionName, Arrays.stream(pipeline).map(stage -> new BsonParam(stage, mongo.registry)).toArray(), elapsedTime);
+            logger.debug("aggregate, collection={}, pipeline={}, elapsedTime={}",
+                collectionName,
+                aggregate.pipeline.stream().map(stage -> new BsonParam(stage, mongo.registry)).toArray(),
+                elapsedTime);
         }
     }
 
     @Override
-    public <V> List<V> mapReduce(Class<V> resultClass, String mapFunction, String reduceFunction, Bson filter) {
+    public <V> List<V> mapReduce(MapReduce<V> mapReduce) {
+        if (Strings.isEmpty(mapReduce.mapFunction)) throw new Error("mapReduce.mapFunction must not be empty");
+        if (Strings.isEmpty(mapReduce.reduceFunction)) throw new Error("mapReduce.reduceFunction must not be empty");
+        if (mapReduce.resultClass == null) throw new Error("mapReduce.resultClass must not be null");
+
         StopWatch watch = new StopWatch();
         try {
             List<V> results = Lists.newArrayList();
-            MapReduceIterable<V> query = collection().mapReduce(mapFunction, reduceFunction, resultClass);
-            if (filter != null) query.filter(filter);
+            MapReduceIterable<V> query = collection(mapReduce.readPreference)
+                .mapReduce(mapReduce.mapFunction, mapReduce.reduceFunction, mapReduce.resultClass)
+                .maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS);
+            if (mapReduce.filter != null) query.filter(mapReduce.filter);
             fetch(query, results);
             checkTooManyRowsReturned(results.size());
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
-            logger.debug("mapReduce, collection={}, map={}, reduce={}, filter={}, elapsedTime={}", collectionName, mapFunction, reduceFunction, new BsonParam(filter, mongo.registry), elapsedTime);
+            logger.debug("mapReduce, collection={}, map={}, reduce={}, filter={}, readPreference={}, elapsedTime={}",
+                collectionName,
+                mapReduce.mapFunction,
+                mapReduce.reduceFunction,
+                new BsonParam(mapReduce.filter, mongo.registry),
+                mapReduce.readPreference == null ? null : mapReduce.readPreference.getName(),
+                elapsedTime);
         }
     }
 
@@ -288,6 +311,12 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         if (size > mongo.tooManyRowsReturnedThreshold) {
             logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }
+    }
+
+    private com.mongodb.client.MongoCollection<T> collection(ReadPreference readPreference) {
+        if (readPreference != null)
+            return collection().withReadPreference(readPreference);
+        return collection();
     }
 
     private com.mongodb.client.MongoCollection<T> collection() {

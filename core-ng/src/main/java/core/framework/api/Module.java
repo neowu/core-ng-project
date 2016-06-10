@@ -134,7 +134,11 @@ public abstract class Module {
     }
 
     public MongoConfig mongo() {
-        return new MongoConfig(context);
+        return mongo(null);
+    }
+
+    public MongoConfig mongo(String name) {
+        return new MongoConfig(context, name);
     }
 
     protected abstract void initialize();

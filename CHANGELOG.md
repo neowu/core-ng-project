@@ -15,6 +15,10 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.5.9 (6/10/2016)
+* mongo: support connect to multiple mongo with name
+* mongo: support MapReduce/Aggregate with readPreference
+
 ### 4.5.8 (6/8/2016)
 * queue: update queue handling action to be queue/{queue}/{message_type}, to make it easier to manage and analyze
 
