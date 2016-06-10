@@ -82,7 +82,7 @@ public final class HTTPClient {
             HTTPResponse response = new HTTPResponse(parseHTTPStatus(statusCode), headers, body);
             logResponseText(response);
             return response;
-        } catch (IOException e) {
+        } catch (IOException | UncheckedIOException e) {
             throw new HTTPClientException(e.getMessage(), "HTTP_COMMUNICATION_FAILED", e);
         } finally {
             long elapsedTime = watch.elapsedTime();
