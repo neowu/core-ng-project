@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 /**
  * @author neo
  */
-// used by generated encoder and decoder
-public final class EntityCodecHelper {
+public final class EntityCodecHelper {      // used by generated entity encoder and decoder
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityCodecHelper.class);
 
     public static void writeObjectId(BsonWriter writer, ObjectId value) {
@@ -50,85 +49,91 @@ public final class EntityCodecHelper {
         LocalDateTimeCodec.write(writer, value);
     }
 
-    public static Integer readInteger(BsonReader reader, BsonType currentType, String field) {
+    public static Integer readInteger(BsonReader reader, String field) {
+        BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
             reader.readNull();
             return null;
         } else if (currentType == BsonType.INT32) {
             return reader.readInt32();
         } else {
-            LOGGER.warn("field returned from mongo is ignored, field={}", field);
+            LOGGER.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();
             return null;
         }
     }
 
-    public static ObjectId readObjectId(BsonReader reader, BsonType currentType, String field) {
+    public static ObjectId readObjectId(BsonReader reader, String field) {
+        BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
             reader.readNull();
             return null;
         } else if (currentType == BsonType.OBJECT_ID) {
             return reader.readObjectId();
         } else {
-            LOGGER.warn("field returned from mongo is ignored, field={}", field);
+            LOGGER.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();
             return null;
         }
     }
 
-    public static Long readLong(BsonReader reader, BsonType currentType, String field) {
+    public static Long readLong(BsonReader reader, String field) {
+        BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
             reader.readNull();
             return null;
         } else if (currentType == BsonType.INT64) {
             return reader.readInt64();
         } else {
-            LOGGER.warn("field returned from mongo is ignored, field={}", field);
+            LOGGER.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();
             return null;
         }
     }
 
-    public static String readString(BsonReader reader, BsonType currentType, String field) {
+    public static String readString(BsonReader reader, String field) {
+        BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
             reader.readNull();
             return null;
         } else if (currentType == BsonType.STRING) {
             return reader.readString();
         } else {
-            LOGGER.warn("field returned from mongo is ignored, field={}", field);
+            LOGGER.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();
             return null;
         }
     }
 
-    public static Double readDouble(BsonReader reader, BsonType currentType, String field) {
+    public static Double readDouble(BsonReader reader, String field) {
+        BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
             reader.readNull();
             return null;
         } else if (currentType == BsonType.DOUBLE) {
             return reader.readDouble();
         } else {
-            LOGGER.warn("field returned from mongo is ignored, field={}", field);
+            LOGGER.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();
             return null;
         }
     }
 
-    public static Boolean readBoolean(BsonReader reader, BsonType currentType, String field) {
+    public static Boolean readBoolean(BsonReader reader, String field) {
+        BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
             reader.readNull();
             return null;
         } else if (currentType == BsonType.BOOLEAN) {
             return reader.readBoolean();
         } else {
-            LOGGER.warn("field returned from mongo is ignored, field={}", field);
+            LOGGER.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();
             return null;
         }
     }
 
-    public static LocalDateTime readLocalDateTime(BsonReader reader, BsonType currentType, String field) {
-        return LocalDateTimeCodec.read(reader);
+    public static LocalDateTime readLocalDateTime(BsonReader reader, String field) {
+        return LocalDateTimeCodec.read(reader, field);
     }
 }

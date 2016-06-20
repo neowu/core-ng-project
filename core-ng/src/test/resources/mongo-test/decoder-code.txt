@@ -7,15 +7,14 @@ private java.util.List decode_java_util_List_java_lang_String(org.bson.BsonReade
         return null;
     }
     if (currentType != org.bson.BsonType.ARRAY) {
-        logger.warn("field returned from mongo is ignored, field={}", fieldPath);
+        logger.warn("unexpected field type, field={}, type={}", fieldPath, currentType);
         reader.skipValue();
         return null;
     }
     java.util.List list = new java.util.ArrayList();
     reader.readStartArray();
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-        currentType = reader.getCurrentBsonType();
-        list.add(core.framework.impl.mongo.EntityCodecHelper.readString(reader, currentType, fieldPath));
+        list.add(core.framework.impl.mongo.EntityCodecHelper.readString(reader, fieldPath));
     }
     reader.readEndArray();
     return list;
@@ -27,7 +26,7 @@ private java.util.Map decode_java_util_Map_java_lang_String(org.bson.BsonReader 
         return null;
     }
     if (currentType != org.bson.BsonType.DOCUMENT) {
-        logger.warn("field returned from mongo is ignored, field={}", parentField);
+        logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
         reader.skipValue();
         return null;
     }
@@ -36,8 +35,7 @@ private java.util.Map decode_java_util_Map_java_lang_String(org.bson.BsonReader 
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
         String fieldName = reader.readName();
         String fieldPath = parentField + "." + fieldName;
-        currentType = reader.getCurrentBsonType();
-        map.put(fieldName, core.framework.impl.mongo.EntityCodecHelper.readString(reader, currentType, fieldPath));
+        map.put(fieldName, core.framework.impl.mongo.EntityCodecHelper.readString(reader, fieldPath));
     }
     reader.readEndDocument();
     return map;
@@ -49,15 +47,14 @@ private java.util.List decode_java_util_List_core_framework_impl_mongo_TestEntit
         return null;
     }
     if (currentType != org.bson.BsonType.ARRAY) {
-        logger.warn("field returned from mongo is ignored, field={}", fieldPath);
+        logger.warn("unexpected field type, field={}, type={}", fieldPath, currentType);
         reader.skipValue();
         return null;
     }
     java.util.List list = new java.util.ArrayList();
     reader.readStartArray();
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-        currentType = reader.getCurrentBsonType();
-        list.add(core_framework_impl_mongo_TestEntityChild_TestEnumCodec.decode(reader, null));
+        list.add(core_framework_impl_mongo_TestEntityChild_TestEnumCodec.read(reader, fieldPath));
     }
     reader.readEndArray();
     return list;
@@ -69,7 +66,7 @@ public core.framework.impl.mongo.TestEntityChild decode_core_framework_impl_mong
         return null;
     }
     if (currentType != null && currentType != org.bson.BsonType.DOCUMENT) {
-        logger.warn("field returned from mongo is ignored, field={}", parentField);
+        logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
         reader.skipValue();
         return null;
     }
@@ -78,9 +75,8 @@ public core.framework.impl.mongo.TestEntityChild decode_core_framework_impl_mong
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
         String fieldName = reader.readName();
         String fieldPath = parentField + "." + fieldName;
-        currentType = reader.getCurrentBsonType();
         if ("boolean_field".equals(fieldName)) {
-            entity.booleanField = core.framework.impl.mongo.EntityCodecHelper.readBoolean(reader, currentType, fieldPath);
+            entity.booleanField = core.framework.impl.mongo.EntityCodecHelper.readBoolean(reader, fieldPath);
             continue;
         }
         if ("enum_field".equals(fieldName)) {
@@ -92,10 +88,10 @@ public core.framework.impl.mongo.TestEntityChild decode_core_framework_impl_mong
             continue;
         }
         if ("ref_id_field".equals(fieldName)) {
-            entity.refId = core.framework.impl.mongo.EntityCodecHelper.readObjectId(reader, currentType, fieldPath);
+            entity.refId = core.framework.impl.mongo.EntityCodecHelper.readObjectId(reader, fieldPath);
             continue;
         }
-        logger.warn("field returned from mongo is ignored, field={}", fieldPath);
+        logger.warn("undefined field, field={}, type={}", fieldPath, reader.getCurrentBsonType());
         reader.skipValue();
     }
     reader.readEndDocument();
@@ -108,14 +104,13 @@ private java.util.List decode_java_util_List_core_framework_impl_mongo_TestEntit
         return null;
     }
     if (currentType != org.bson.BsonType.ARRAY) {
-        logger.warn("field returned from mongo is ignored, field={}", fieldPath);
+        logger.warn("unexpected field type, field={}, type={}", fieldPath, currentType);
         reader.skipValue();
         return null;
     }
     java.util.List list = new java.util.ArrayList();
     reader.readStartArray();
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-        currentType = reader.getCurrentBsonType();
         list.add(decode_core_framework_impl_mongo_TestEntityChild(reader, fieldPath));
     }
     reader.readEndArray();
@@ -128,7 +123,7 @@ private java.util.Map decode_java_util_Map_core_framework_impl_mongo_TestEntityC
         return null;
     }
     if (currentType != org.bson.BsonType.DOCUMENT) {
-        logger.warn("field returned from mongo is ignored, field={}", parentField);
+        logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
         reader.skipValue();
         return null;
     }
@@ -137,7 +132,6 @@ private java.util.Map decode_java_util_Map_core_framework_impl_mongo_TestEntityC
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
         String fieldName = reader.readName();
         String fieldPath = parentField + "." + fieldName;
-        currentType = reader.getCurrentBsonType();
         map.put(fieldName, decode_core_framework_impl_mongo_TestEntityChild(reader, fieldPath));
     }
     reader.readEndDocument();
@@ -150,7 +144,7 @@ public core.framework.impl.mongo.TestEntity decode_core_framework_impl_mongo_Tes
         return null;
     }
     if (currentType != null && currentType != org.bson.BsonType.DOCUMENT) {
-        logger.warn("field returned from mongo is ignored, field={}", parentField);
+        logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
         reader.skipValue();
         return null;
     }
@@ -159,25 +153,24 @@ public core.framework.impl.mongo.TestEntity decode_core_framework_impl_mongo_Tes
     while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
         String fieldName = reader.readName();
         String fieldPath = parentField + "." + fieldName;
-        currentType = reader.getCurrentBsonType();
         if ("_id".equals(fieldName)) {
-            entity.id = core.framework.impl.mongo.EntityCodecHelper.readObjectId(reader, currentType, fieldPath);
+            entity.id = core.framework.impl.mongo.EntityCodecHelper.readObjectId(reader, fieldPath);
             continue;
         }
         if ("int_field".equals(fieldName)) {
-            entity.intField = core.framework.impl.mongo.EntityCodecHelper.readInteger(reader, currentType, fieldPath);
+            entity.intField = core.framework.impl.mongo.EntityCodecHelper.readInteger(reader, fieldPath);
             continue;
         }
         if ("double_field".equals(fieldName)) {
-            entity.doubleField = core.framework.impl.mongo.EntityCodecHelper.readDouble(reader, currentType, fieldPath);
+            entity.doubleField = core.framework.impl.mongo.EntityCodecHelper.readDouble(reader, fieldPath);
             continue;
         }
         if ("date_field".equals(fieldName)) {
-            entity.dateField = core.framework.impl.mongo.EntityCodecHelper.readLocalDateTime(reader, currentType, fieldPath);
+            entity.dateField = core.framework.impl.mongo.EntityCodecHelper.readLocalDateTime(reader, fieldPath);
             continue;
         }
         if ("string_field".equals(fieldName)) {
-            entity.stringField = core.framework.impl.mongo.EntityCodecHelper.readString(reader, currentType, fieldPath);
+            entity.stringField = core.framework.impl.mongo.EntityCodecHelper.readString(reader, fieldPath);
             continue;
         }
         if ("list_field".equals(fieldName)) {
@@ -204,7 +197,7 @@ public core.framework.impl.mongo.TestEntity decode_core_framework_impl_mongo_Tes
             entity.nullChild = decode_core_framework_impl_mongo_TestEntityChild(reader, fieldPath);
             continue;
         }
-        logger.warn("field returned from mongo is ignored, field={}", fieldPath);
+        logger.warn("undefined field, field={}, type={}", fieldPath, reader.getCurrentBsonType());
         reader.skipValue();
     }
     reader.readEndDocument();

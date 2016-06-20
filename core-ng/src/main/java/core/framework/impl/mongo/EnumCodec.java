@@ -52,8 +52,8 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
         }
     }
 
-    @Override
-    public T decode(BsonReader reader, DecoderContext context) {
+    // used by EntityDecoder
+    public T read(BsonReader reader, String field) {
         BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
             reader.readNull();
@@ -64,10 +64,15 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
             if (value == null) throw Exceptions.error("can not decode value to enum, enumClass={}, value={}", enumClass.getCanonicalName(), enumValue);
             return value;
         } else {
-            logger.warn("field returned from mongo is ignored, field={}, type={}", reader.getCurrentName(), currentType);
+            logger.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();
             return null;
         }
+    }
+
+    @Override
+    public T decode(BsonReader reader, DecoderContext context) {
+        return read(reader, reader.getCurrentName());
     }
 
     @Override

@@ -66,7 +66,7 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("}\n");
 
         builder.indent(1).append("if (currentType != null && currentType != org.bson.BsonType.DOCUMENT) {\n");
-        builder.indent(2).append("logger.warn(\"field returned from mongo is ignored, field={}\", parentField);\n");
+        builder.indent(2).append("logger.warn(\"unexpected field type, field={}, type={}\", parentField, currentType);\n");
         builder.indent(2).append("reader.skipValue();\n");
         builder.indent(2).append("return null;\n");
         builder.indent(1).append("}\n");
@@ -76,14 +76,13 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("reader.readStartDocument();\n")
             .indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n")
             .indent(2).append("String fieldName = reader.readName();\n")
-            .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n")
-            .indent(2).append("currentType = reader.getCurrentBsonType();\n");
+            .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
 
         for (Field field : Classes.instanceFields(entityClass)) {
             decodeEntityField(builder, field);
         }
 
-        builder.indent(2).append("logger.warn(\"field returned from mongo is ignored, field={}\", fieldPath);\n");
+        builder.indent(2).append("logger.warn(\"undefined field, field={}, type={}\", fieldPath, reader.getCurrentBsonType());\n");
         builder.indent(2).append("reader.skipValue();\n");
         builder.indent(1).append("}\n");
 
@@ -107,22 +106,22 @@ final class EntityDecoderBuilder<T> {
         builder.indent(2).append("if (\"{}\".equals(fieldName)) {\n", mongoFieldName);
 
         if (Integer.class.equals(fieldClass)) {
-            builder.indent(3).append("{} = {}.readInteger(reader, currentType, fieldPath);\n", fieldVariable, helper);
+            builder.indent(3).append("{} = {}.readInteger(reader, fieldPath);\n", fieldVariable, helper);
         } else if (String.class.equals(fieldClass)) {
-            builder.indent(3).append("{} = {}.readString(reader, currentType, fieldPath);\n", fieldVariable, helper);
+            builder.indent(3).append("{} = {}.readString(reader, fieldPath);\n", fieldVariable, helper);
         } else if (Long.class.equals(fieldClass)) {
-            builder.indent(3).append("{} = {}.readLong(reader, currentType, fieldPath);\n", fieldVariable, helper);
+            builder.indent(3).append("{} = {}.readLong(reader, fieldPath);\n", fieldVariable, helper);
         } else if (LocalDateTime.class.equals(fieldClass)) {
-            builder.indent(3).append("{} = {}.readLocalDateTime(reader, currentType, fieldPath);\n", fieldVariable, helper);
+            builder.indent(3).append("{} = {}.readLocalDateTime(reader, fieldPath);\n", fieldVariable, helper);
         } else if (Enum.class.isAssignableFrom(fieldClass)) {
             String enumCodecVariable = registerEnumCodec(fieldClass);
             builder.indent(3).append("{} = ({}) {}.decode(reader, null);\n", fieldVariable, fieldClass.getCanonicalName(), enumCodecVariable);
         } else if (Double.class.equals(fieldClass)) {
-            builder.indent(3).append("{} = {}.readDouble(reader, currentType, fieldPath);\n", fieldVariable, helper);
+            builder.indent(3).append("{} = {}.readDouble(reader, fieldPath);\n", fieldVariable, helper);
         } else if (ObjectId.class.equals(fieldClass)) {
-            builder.indent(3).append("{} = {}.readObjectId(reader, currentType, fieldPath);\n", fieldVariable, helper);
+            builder.indent(3).append("{} = {}.readObjectId(reader, fieldPath);\n", fieldVariable, helper);
         } else if (Boolean.class.equals(fieldClass)) {
-            builder.indent(3).append("{} = {}.readBoolean(reader, currentType, fieldPath);\n", fieldVariable, helper);
+            builder.indent(3).append("{} = {}.readBoolean(reader, fieldPath);\n", fieldVariable, helper);
         } else if (GenericTypes.isGenericList(fieldType)) {
             String method = decodeListMethod(GenericTypes.listValueClass(fieldType));
             builder.indent(3).append("{} = {}(reader, fieldPath);\n", fieldVariable, method);
@@ -153,7 +152,7 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("}\n");
 
         builder.indent(1).append("if (currentType != org.bson.BsonType.DOCUMENT) {\n");
-        builder.indent(2).append("logger.warn(\"field returned from mongo is ignored, field={}\", parentField);\n");
+        builder.indent(2).append("logger.warn(\"unexpected field type, field={}, type={}\", parentField, currentType);\n");
         builder.indent(2).append("reader.skipValue();\n");
         builder.indent(2).append("return null;\n");
         builder.indent(1).append("}\n");
@@ -164,25 +163,24 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n");
         builder.indent(2).append("String fieldName = reader.readName();\n");
         builder.indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
-        builder.indent(2).append("currentType = reader.getCurrentBsonType();\n");
 
         if (Integer.class.equals(valueClass)) {
-            builder.indent(2).append("map.put(fieldName, {}.readInteger(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("map.put(fieldName, {}.readInteger(reader, fieldPath));\n", helper);
         } else if (String.class.equals(valueClass)) {
-            builder.indent(2).append("map.put(fieldName, {}.readString(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("map.put(fieldName, {}.readString(reader, fieldPath));\n", helper);
         } else if (Long.class.equals(valueClass)) {
-            builder.indent(2).append("map.put(fieldName, {}.readLong(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("map.put(fieldName, {}.readLong(reader, fieldPath));\n", helper);
         } else if (LocalDateTime.class.equals(valueClass)) {
-            builder.indent(2).append("map.put(fieldName, {}.readLocalDateTime(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("map.put(fieldName, {}.readLocalDateTime(reader, fieldPath));\n", helper);
         } else if (Enum.class.isAssignableFrom(valueClass)) {
             String enumCodecVariable = registerEnumCodec(valueClass);
-            builder.indent(2).append("map.put(fieldName, {}.decode(reader, null));\n", enumCodecVariable);
+            builder.indent(2).append("map.put(fieldName, {}.read(reader, fieldPath));\n", enumCodecVariable);
         } else if (Double.class.equals(valueClass)) {
-            builder.indent(2).append("map.put(fieldName, {}.readDouble(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("map.put(fieldName, {}.readDouble(reader, fieldPath));\n", helper);
         } else if (ObjectId.class.equals(valueClass)) {
-            builder.indent(2).append("map.put(fieldName, {}.readObjectId(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("map.put(fieldName, {}.readObjectId(reader, fieldPath));\n", helper);
         } else if (Boolean.class.equals(valueClass)) {
-            builder.indent(2).append("map.put(fieldName, {}.readBoolean(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("map.put(fieldName, {}.readBoolean(reader, fieldPath));\n", helper);
         } else {
             String method = decodeEntityMethod(valueClass);
             builder.indent(2).append("map.put(fieldName, {}(reader, fieldPath));\n", method);
@@ -213,7 +211,7 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("}\n");
 
         builder.indent(1).append("if (currentType != org.bson.BsonType.ARRAY) {\n");
-        builder.indent(2).append("logger.warn(\"field returned from mongo is ignored, field={}\", fieldPath);\n");
+        builder.indent(2).append("logger.warn(\"unexpected field type, field={}, type={}\", fieldPath, currentType);\n");
         builder.indent(2).append("reader.skipValue();\n");
         builder.indent(2).append("return null;\n");
         builder.indent(1).append("}\n");
@@ -221,25 +219,24 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("java.util.List list = new java.util.ArrayList();\n");
         builder.indent(1).append("reader.readStartArray();\n");
         builder.indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n");
-        builder.indent(2).append("currentType = reader.getCurrentBsonType();\n");
 
         if (Integer.class.equals(valueClass)) {
-            builder.indent(2).append("list.add({}.readInteger(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("list.add({}.readInteger(reader, fieldPath));\n", helper);
         } else if (String.class.equals(valueClass)) {
-            builder.indent(2).append("list.add({}.readString(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("list.add({}.readString(reader, fieldPath));\n", helper);
         } else if (Long.class.equals(valueClass)) {
-            builder.indent(2).append("list.add({}.readLong(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("list.add({}.readLong(reader, fieldPath));\n", helper);
         } else if (LocalDateTime.class.equals(valueClass)) {
-            builder.indent(2).append("list.add({}.readLocalDateTime(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("list.add({}.readLocalDateTime(reader, fieldPath));\n", helper);
         } else if (Enum.class.isAssignableFrom(valueClass)) {
             String enumCodecVariable = registerEnumCodec(valueClass);
-            builder.indent(2).append("list.add({}.decode(reader, null));\n", enumCodecVariable, valueClassName);
+            builder.indent(2).append("list.add({}.read(reader, fieldPath));\n", enumCodecVariable, valueClassName);
         } else if (Double.class.equals(valueClass)) {
-            builder.indent(2).append("list.add({}.readDouble(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("list.add({}.readDouble(reader, fieldPath));\n", helper);
         } else if (ObjectId.class.equals(valueClass)) {
-            builder.indent(2).append("list.add({}.readObjectId(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("list.add({}.readObjectId(reader, fieldPath));\n", helper);
         } else if (Boolean.class.equals(valueClass)) {
-            builder.indent(2).append("list.add({}.readBoolean(reader, currentType, fieldPath));\n", helper);
+            builder.indent(2).append("list.add({}.readBoolean(reader, fieldPath));\n", helper);
         } else {
             String method = decodeEntityMethod(valueClass);
             builder.indent(2).append("list.add({}(reader, fieldPath));\n", method);

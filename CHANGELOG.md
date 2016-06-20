@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.6.0 (6/20/2016 - ongoing)
+* mongo: refine mongo decoding logic and error message
+
 ### 4.5.9 (6/10/2016)
 * mongo: support connect to multiple mongo with name
 * mongo: support MapReduce/Aggregate with readPreference

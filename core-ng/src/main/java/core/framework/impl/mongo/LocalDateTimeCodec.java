@@ -24,7 +24,7 @@ public class LocalDateTimeCodec implements Codec<LocalDateTime> {
         else writer.writeDateTime(value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
     }
 
-    static LocalDateTime read(BsonReader reader) {
+    static LocalDateTime read(BsonReader reader, String field) {
         BsonType currentType = reader.getCurrentBsonType();
         if (currentType == BsonType.NULL) {
             reader.readNull();
@@ -32,7 +32,7 @@ public class LocalDateTimeCodec implements Codec<LocalDateTime> {
         } else if (currentType == BsonType.DATE_TIME) {
             return LocalDateTime.ofInstant(Instant.ofEpochMilli(reader.readDateTime()), ZoneId.systemDefault());
         } else {
-            LOGGER.warn("field returned from mongo is ignored, field={}, type={}", reader.getCurrentName(), currentType);
+            LOGGER.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();
             return null;
         }
@@ -45,7 +45,7 @@ public class LocalDateTimeCodec implements Codec<LocalDateTime> {
 
     @Override
     public LocalDateTime decode(BsonReader reader, DecoderContext context) {
-        return read(reader);
+        return read(reader, reader.getCurrentName());
     }
 
     @Override
