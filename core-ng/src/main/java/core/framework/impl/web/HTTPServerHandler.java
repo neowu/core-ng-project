@@ -54,6 +54,8 @@ public class HTTPServerHandler implements HttpHandler {
         logManager.begin("=== http transaction begin ===");
         RequestImpl request = new RequestImpl(exchange, validator);
         try {
+            webContext.initialize(request);     // initialize webContext at beginning, the customerErrorHandler in errorHandler may use it if any exception
+
             ActionLog actionLog = logManager.currentActionLog();
             requestParser.parse(request, exchange, actionLog);
             request.session = sessionManager.load(request);
@@ -75,7 +77,6 @@ public class HTTPServerHandler implements HttpHandler {
                 actionLog.trace = true;
             }
 
-            webContext.initialize(request);
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
             sessionManager.save(request, exchange);
             responseHandler.handle((ResponseImpl) response, exchange, request);

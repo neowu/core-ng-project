@@ -15,8 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
-### 4.6.0 (6/20/2016 - ongoing)
+### 4.6.0 (6/20/2016 - 6/21/2016)
 * mongo: refine mongo decoding logic and error message
+* http: fix webContext should init at beginning, to make it available in 404 error handler
 
 ### 4.5.9 (6/10/2016)
 * mongo: support connect to multiple mongo with name
