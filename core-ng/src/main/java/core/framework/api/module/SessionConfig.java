@@ -21,7 +21,11 @@ public final class SessionConfig {
     }
 
     public void timeout(Duration timeout) {
-        context.httpServer.siteManager.sessionManager.sessionTimeout(timeout);
+        context.httpServer.siteManager.sessionManager.timeout(timeout);
+    }
+
+    public void cookieDomain(String cookieDomain) {
+        context.httpServer.siteManager.sessionManager.cookieDomain = cookieDomain;
     }
 
     public void local() {

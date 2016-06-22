@@ -33,6 +33,7 @@ public class SessionImpl implements Session {
     @Override
     public void remove(String key) {
         data.remove(key);
+        changed = true;
     }
 
     @Override
