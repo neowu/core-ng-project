@@ -50,11 +50,10 @@ project(':core-ng-test') {
     dependencies {
         provided(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                'com.github.fakemongo:fongo:2.0.6',
+                'com.github.fakemongo:fongo:2.0.7',
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
                 'org.hsqldb:hsqldb:2.3.3',
-                "org.elasticsearch:elasticsearch:${elasticVersion}",
-                'org.codehaus.groovy:groovy-all:2.4.4'  // for elasticsearch groovy script support
+                "org.elasticsearch:elasticsearch:${elasticVersion}"
         )
         compile(
                 project(":core-ng"),
@@ -102,9 +101,6 @@ project(':log-processor') {
         )
         testCompile(
                 project(':core-ng-test')
-        )
-        testRuntime(
-                'org.codehaus.groovy:groovy-all:2.4.4',  // for elastic search script test
         )
     }
 }
