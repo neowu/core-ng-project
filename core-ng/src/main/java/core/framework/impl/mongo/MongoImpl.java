@@ -126,16 +126,26 @@ public class MongoImpl implements Mongo {
     }
 
     public <T> MongoCollection<T> collection(Class<T> entityClass) {
-        if (database != null) throw new Error("collection() must be called before initialize");
-        new EntityClassValidator(entityClass).validateEntityClass();
-        codecs.registerEntity(entityClass);
-        return new MongoCollectionImpl<>(this, entityClass);
+        StopWatch watch = new StopWatch();
+        try {
+            if (database != null) throw new Error("collection() must be called before initialize");
+            new EntityClassValidator(entityClass).validateEntityClass();
+            codecs.registerEntity(entityClass);
+            return new MongoCollectionImpl<>(this, entityClass);
+        } finally {
+            logger.info("register mongo entity, entityClass={}, elapsedTime={}", entityClass.getCanonicalName(), watch.elapsedTime());
+        }
     }
 
     public <T> void view(Class<T> viewClass) {
-        if (database != null) throw new Error("view() must be called before initialize");
-        new EntityClassValidator(viewClass).validateViewClass();
-        codecs.registerView(viewClass);
+        StopWatch watch = new StopWatch();
+        try {
+            if (database != null) throw new Error("view() must be called before initialize");
+            new EntityClassValidator(viewClass).validateViewClass();
+            codecs.registerView(viewClass);
+        } finally {
+            logger.info("register mongo view, viewClass={}, elapsedTime={}", viewClass.getCanonicalName(), watch.elapsedTime());
+        }
     }
 
     public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {

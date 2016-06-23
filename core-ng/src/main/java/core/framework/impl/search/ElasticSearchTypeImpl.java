@@ -6,6 +6,7 @@ import core.framework.api.search.AnalyzeRequest;
 import core.framework.api.search.BulkIndexRequest;
 import core.framework.api.search.DeleteRequest;
 import core.framework.api.search.ElasticSearchType;
+import core.framework.api.search.ForEach;
 import core.framework.api.search.GetRequest;
 import core.framework.api.search.Index;
 import core.framework.api.search.IndexRequest;
@@ -24,9 +25,11 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,6 +199,50 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("analyze, index={}, analyzer={}, elapsedTime={}", index, request.analyzer, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public void forEach(ForEach<T> forEach) {
+        if (forEach.consumer == null) throw new Error("forEach.consumer must not be null");
+        if (forEach.query == null) throw new Error("forEach.query must not be null");
+        if (forEach.scrollTimeout == null) throw new Error("forEach.scrollTimeout must not be null");
+        if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null and greater than 0");
+
+        StopWatch watch = new StopWatch();
+        TimeValue keepAlive = TimeValue.timeValueMillis(forEach.scrollTimeout.toMillis());
+        long esTookTime = 0;
+        String index = forEach.index == null ? this.index : forEach.index;
+        try {
+            SearchRequestBuilder builder = client.prepareSearch(index)
+                .setQuery(forEach.query)
+                .addSort(SortBuilders.fieldSort("_doc"))
+                .setScroll(keepAlive)
+                .setSize(forEach.limit);
+            logger.debug("foreach, index={}, type={}, request={}", index, type, builder);
+            org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
+
+            while (true) {
+                esTookTime += searchResponse.getTookInMillis();
+                if (searchResponse.getFailedShards() > 0) logger.warn("some shard failed, response={}", searchResponse);
+
+                SearchHit[] hits = searchResponse.getHits().hits();
+                if (hits.length == 0) break;
+
+                for (SearchHit hit : hits) {
+                    forEach.consumer.accept(reader.fromJSON(hit.source()));
+                }
+
+                String scrollId = searchResponse.getScrollId();
+                searchResponse = client.prepareSearchScroll(scrollId).setScroll(keepAlive).get();
+            }
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("elasticsearch", elapsedTime);
+            logger.debug("foreach, esTookTime={}, elapsedTime={}", esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

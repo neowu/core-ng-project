@@ -55,8 +55,13 @@ public class ElasticSearchImpl implements ElasticSearch {
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
-        new DocumentClassValidator(documentClass).validate();
-        return new ElasticSearchTypeImpl<>(client(), documentClass, slowOperationThreshold);
+        StopWatch watch = new StopWatch();
+        try {
+            new DocumentClassValidator(documentClass).validate();
+            return new ElasticSearchTypeImpl<>(client(), documentClass, slowOperationThreshold);
+        } finally {
+            logger.info("register elasticsearch type, documentClass={}, elapsedTime={}", documentClass.getCanonicalName(), watch.elapsedTime());
+        }
     }
 
     public void close() {

@@ -51,4 +51,6 @@ public interface ElasticSearchType<T> {
         request.text = text;
         return analyze(request);
     }
+
+    void forEach(ForEach<T> forEach);
 }

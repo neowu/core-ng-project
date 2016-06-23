@@ -116,8 +116,13 @@ public final class DatabaseImpl implements Database {
     }
 
     public <T> void view(Class<T> viewClass) {
-        new DatabaseClassValidator(viewClass).validateViewClass();
-        registerViewClass(viewClass);
+        StopWatch watch = new StopWatch();
+        try {
+            new DatabaseClassValidator(viewClass).validateViewClass();
+            registerViewClass(viewClass);
+        } finally {
+            logger.info("register db view, viewClass={}, elapsedTime={}", viewClass.getCanonicalName(), watch.elapsedTime());
+        }
     }
 
     public <T> Repository<T> repository(Class<T> entityClass) {
@@ -127,7 +132,7 @@ public final class DatabaseImpl implements Database {
             RowMapper<T> mapper = registerViewClass(entityClass);
             return new RepositoryImpl<>(this, entityClass, mapper);
         } finally {
-            logger.info("create db repository, entityClass={}, elapsedTime={}", entityClass.getCanonicalName(), watch.elapsedTime());
+            logger.info("register db entity, entityClass={}, elapsedTime={}", entityClass.getCanonicalName(), watch.elapsedTime());
         }
     }
 

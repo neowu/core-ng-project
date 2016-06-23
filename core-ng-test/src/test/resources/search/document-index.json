@@ -1,0 +1,17 @@
+{
+  "settings": {
+  },
+  "mappings": {
+    "document": {
+      "_all": {
+        "enabled": false
+      },
+      "properties": {
+        "string_field": {
+          "type": "string",
+          "analyzer": "standard"
+        }
+      }
+    }
+  }
+}
