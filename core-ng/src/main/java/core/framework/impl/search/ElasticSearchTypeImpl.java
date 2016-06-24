@@ -243,7 +243,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("foreach, esTookTime={}, elapsedTime={}", esTookTime, elapsedTime);
-            checkSlowOperation(elapsedTime);
         }
     }
 
