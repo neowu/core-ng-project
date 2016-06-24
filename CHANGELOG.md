@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.6.3 (6/24/2016 - )
+* hash: added SHA1 SHA256 support
+
 ### 4.6.2 (6/22/2016 - 6/23/2016)
 * elasticsearch: remove groovy test support, actually script query is never useful, not plan to use anymore
 * mock: mockRedis supports all operations
