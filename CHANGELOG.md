@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.6.4 (6/28/2016)
+* search: support search type in ES
+
 ### 4.6.3 (6/24/2016)
 * hash: added SHA1 SHA256 support
 

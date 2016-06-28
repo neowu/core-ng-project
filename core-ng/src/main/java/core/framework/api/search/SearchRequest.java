@@ -1,6 +1,7 @@
 package core.framework.api.search;
 
 import core.framework.api.util.Lists;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -15,6 +16,7 @@ public class SearchRequest {
     public final List<SortBuilder> sorts = Lists.newArrayList();
     public String index;
     public QueryBuilder query;
+    public SearchType type;
     public Integer skip;
     public Integer limit;
 }

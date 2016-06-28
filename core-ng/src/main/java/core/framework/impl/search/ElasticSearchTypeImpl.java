@@ -73,6 +73,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         try {
             SearchRequestBuilder builder = client.prepareSearch(index)
                 .setQuery(request.query);
+            if (request.type != null) builder.setSearchType(request.type);
             request.aggregations.forEach(builder::addAggregation);
             request.sorts.forEach(builder::addSort);
             if (request.skip != null) builder.setFrom(request.skip);
