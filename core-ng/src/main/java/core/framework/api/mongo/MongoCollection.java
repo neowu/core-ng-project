@@ -10,13 +10,31 @@ import java.util.function.Consumer;
  * @author neo
  */
 public interface MongoCollection<T> {
-    long count(Bson filter);
+    long count(Count count);
+
+    default long count(Bson filter) {
+        Count count = new Count();
+        count.filter = filter;
+        return count(count);
+    }
 
     void insert(T entity);
 
-    Optional<T> get(Object id);
+    Optional<T> get(Get get);
 
-    Optional<T> findOne(Bson filter);
+    default Optional<T> get(Object id) {
+        Get get = new Get();
+        get.id = id;
+        return get(get);
+    }
+
+    Optional<T> findOne(FindOne findOne);
+
+    default Optional<T> findOne(Bson filter) {
+        FindOne findOne = new FindOne();
+        findOne.filter = filter;
+        return findOne(findOne);
+    }
 
     List<T> find(Query query);
 

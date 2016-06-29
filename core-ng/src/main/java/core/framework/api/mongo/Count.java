@@ -6,11 +6,7 @@ import org.bson.conversions.Bson;
 /**
  * @author neo
  */
-public final class Query {
+public class Count {
     public Bson filter;
-    public Bson projection;
-    public Bson sort;
-    public Integer skip;
-    public Integer limit;
     public ReadPreference readPreference;
 }

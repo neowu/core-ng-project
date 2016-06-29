@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.6.5 (6/29/2016)
+* mongo: support readPreference in all operation
+
 ### 4.6.4 (6/28/2016)
 * search: support search type in ES
 

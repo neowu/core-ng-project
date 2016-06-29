@@ -66,6 +66,7 @@
     <rule ref="rulesets/java/design.xml/UseCollectionIsEmpty"/>
     <rule ref="rulesets/java/design.xml/ClassWithOnlyPrivateConstructorsShouldBeFinal"/>
     <rule ref="rulesets/java/design.xml/SingularField"/>
+    <rule ref="rulesets/java/design.xml/ConstantsInInterface"/>
 
     <rule ref="rulesets/java/finalizers.xml/AvoidCallingFinalize"/>
 
