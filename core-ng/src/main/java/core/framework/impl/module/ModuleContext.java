@@ -33,7 +33,6 @@ public final class ModuleContext {
     public final Properties properties = new Properties();
 
     public final HTTPServer httpServer;
-    public final ExecutorImpl executor;
     public final QueueManager queueManager = new QueueManager();
     public final LogManager logManager;
     public final MockFactory mockFactory;
@@ -58,9 +57,14 @@ public final class ModuleContext {
             startupHook.add(httpServer::start);
             shutdownHook.add(httpServer::stop);
         }
-        executor = new ExecutorImpl(logManager);
-        shutdownHook.add(executor::stop);
 
+        Executor executor;
+        if (!isTest()) {
+            executor = new ExecutorImpl(logManager);
+            shutdownHook.add(((ExecutorImpl) executor)::stop);
+        } else {
+            executor = mockFactory.create(Executor.class);
+        }
         beanFactory.bind(Executor.class, null, executor);
 
         if (!isTest()) {

@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.6.6 (7/1/2016)
+* bind: use mock executor in integration test
+
 ### 4.6.5 (6/29/2016)
 * mongo: support readPreference in all operation
 
