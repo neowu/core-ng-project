@@ -7,6 +7,7 @@ import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * @author neo
@@ -30,4 +31,7 @@ public class AssignedIdEntity {
 
     @Column(name = "big_decimal_field")
     public BigDecimal bigDecimalField;
+
+    @Column(name = "date_field")
+    public LocalDate dateField;
 }

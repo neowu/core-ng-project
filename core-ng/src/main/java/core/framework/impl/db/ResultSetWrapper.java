@@ -5,11 +5,13 @@ import core.framework.api.util.ASCII;
 import core.framework.api.util.Maps;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
@@ -133,5 +135,17 @@ final class ResultSetWrapper {
         if (timestamp == null) return null;
         Instant instant = timestamp.toInstant();
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+    }
+
+    LocalDate getLocalDate(String column) throws SQLException {
+        Integer index = index(column);
+        if (index == null) return null;
+        return getLocalDate(index);
+    }
+
+    LocalDate getLocalDate(int index) throws SQLException {
+        Date date = resultSet.getDate(index);
+        if (date == null) return null;
+        return date.toLocalDate();
     }
 }

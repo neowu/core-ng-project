@@ -129,7 +129,7 @@ public class MongoImpl implements Mongo {
         StopWatch watch = new StopWatch();
         try {
             if (database != null) throw new Error("collection() must be called before initialize");
-            new EntityClassValidator(entityClass).validateEntityClass();
+            new MongoClassValidator(entityClass).validateEntityClass();
             codecs.registerEntity(entityClass);
             return new MongoCollectionImpl<>(this, entityClass);
         } finally {
@@ -141,7 +141,7 @@ public class MongoImpl implements Mongo {
         StopWatch watch = new StopWatch();
         try {
             if (database != null) throw new Error("view() must be called before initialize");
-            new EntityClassValidator(viewClass).validateViewClass();
+            new MongoClassValidator(viewClass).validateViewClass();
             codecs.registerView(viewClass);
         } finally {
             logger.info("register mongo view, viewClass={}, elapsedTime={}", viewClass.getCanonicalName(), watch.elapsedTime());

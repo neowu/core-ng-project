@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlEnumValue;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,9 @@ import java.util.Optional;
 public class TestBean {
     @XmlElement(name = "date_time_field")
     public LocalDateTime dateTimeField;
+
+    @XmlElement(name = "date_field")
+    public LocalDate dateField;
 
     @XmlElement(name = "string_field")
     public String stringField;
@@ -37,6 +41,7 @@ public class TestBean {
 
     @XmlElement(name = "children_field")
     public List<Child> childrenField;
+
     @XmlElement(name = "enum_field")
     public TestEnum enumField;
 

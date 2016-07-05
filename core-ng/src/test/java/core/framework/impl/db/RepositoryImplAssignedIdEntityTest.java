@@ -9,6 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,7 +25,7 @@ public class RepositoryImplAssignedIdEntityTest {
     public static void createDatabase() {
         database = new DatabaseImpl();
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
-        database.execute("CREATE TABLE assigned_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), int_field INT, big_decimal_field DECIMAL(10,2))");
+        database.execute("CREATE TABLE assigned_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), int_field INT, big_decimal_field DECIMAL(10,2), date_field DATE)");
 
         repository = database.repository(AssignedIdEntity.class);
     }
@@ -45,6 +47,7 @@ public class RepositoryImplAssignedIdEntityTest {
         entity.stringField = "string";
         entity.intField = 12;
         entity.bigDecimalField = new BigDecimal("86.99");
+        entity.dateField = LocalDate.of(2016, Month.JULY, 5);
 
         Optional<Long> id = repository.insert(entity);
         Assert.assertFalse(id.isPresent());
@@ -55,6 +58,7 @@ public class RepositoryImplAssignedIdEntityTest {
         Assert.assertEquals(entity.stringField, selectedEntity.stringField);
         Assert.assertEquals(entity.intField, selectedEntity.intField);
         Assert.assertEquals(entity.bigDecimalField, selectedEntity.bigDecimalField);
+        Assert.assertEquals(entity.dateField, selectedEntity.dateField);
     }
 
     @Test
@@ -68,11 +72,13 @@ public class RepositoryImplAssignedIdEntityTest {
         AssignedIdEntity updatedEntity = new AssignedIdEntity();
         updatedEntity.id = entity.id;
         updatedEntity.stringField = "updated";
+        updatedEntity.dateField = LocalDate.of(2016, Month.JULY, 5);
         repository.update(updatedEntity);
 
         AssignedIdEntity selectedEntity = repository.get(entity.id).get();
         Assert.assertEquals(updatedEntity.stringField, selectedEntity.stringField);
         Assert.assertEquals(entity.intField, selectedEntity.intField);
+        Assert.assertEquals(updatedEntity.dateField, selectedEntity.dateField);
     }
 
     @Test

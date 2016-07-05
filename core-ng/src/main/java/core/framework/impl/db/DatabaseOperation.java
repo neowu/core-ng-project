@@ -8,14 +8,14 @@ import core.framework.impl.resource.PoolItem;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -170,9 +170,7 @@ public class DatabaseOperation {
         } else if (param instanceof Enum) {
             statement.setString(index, enumMapper.getDBValue((Enum) param));
         } else if (param instanceof LocalDateTime) {
-            Instant instant = ((LocalDateTime) param).atZone(ZoneId.systemDefault()).toInstant();
-            Timestamp value = Timestamp.from(instant);
-            statement.setTimestamp(index, value);
+            statement.setTimestamp(index, Timestamp.valueOf((LocalDateTime) param));
         } else if (param instanceof Boolean) {
             statement.setBoolean(index, (Boolean) param);
         } else if (param instanceof Long) {
@@ -181,6 +179,8 @@ public class DatabaseOperation {
             statement.setDouble(index, (Double) param);
         } else if (param instanceof BigDecimal) {
             statement.setBigDecimal(index, (BigDecimal) param);
+        } else if (param instanceof LocalDate) {
+            statement.setDate(index, Date.valueOf((LocalDate) param));
         } else if (param == null) {
             statement.setObject(index, null);
         } else {

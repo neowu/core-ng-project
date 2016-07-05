@@ -20,13 +20,13 @@ import java.util.Set;
 /**
  * @author neo
  */
-public final class EntityClassValidator implements TypeVisitor {
+public final class MongoClassValidator implements TypeVisitor {
     private final DataTypeValidator validator;
     private final Map<String, Set<String>> fields = Maps.newHashMap();
     private boolean validateView;
     private Field id;
 
-    public EntityClassValidator(Class<?> entityClass) {
+    public MongoClassValidator(Class<?> entityClass) {
         validator = new DataTypeValidator(entityClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;
