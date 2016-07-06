@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.6.8 (7/6/2016)
+* test: EntitySchemaGenerator support LocalDate
+
 ### 4.6.7 (7/5/2016)
 * db: support LocalDate type as column
 

@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class MongoIntegrationTest extends IntegrationTest {
     @Inject
-    MongoCollection<TestEntity> testEntityCollection;
+    MongoCollection<TestMongoEntity> testEntityCollection;
     @Inject
     Mongo mongo;
 
@@ -32,25 +32,25 @@ public class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     public void insert() {
-        TestEntity entity = new TestEntity();
+        TestMongoEntity entity = new TestMongoEntity();
         entity.stringField = "string";
         testEntityCollection.insert(entity);
 
         assertNotNull(entity.id);
 
-        Optional<TestEntity> loadedEntity = testEntityCollection.get(entity.id);
+        Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entity.id);
         assertTrue(loadedEntity.isPresent());
         assertEquals(entity.stringField, loadedEntity.get().stringField);
     }
 
     @Test
     public void replace() {
-        TestEntity entity = new TestEntity();
+        TestMongoEntity entity = new TestMongoEntity();
         entity.id = new ObjectId();
         entity.stringField = "value1";
         testEntityCollection.replace(entity);
 
-        TestEntity loadedEntity = testEntityCollection.get(entity.id).get();
+        TestMongoEntity loadedEntity = testEntityCollection.get(entity.id).get();
         assertEquals(entity.stringField, loadedEntity.stringField);
 
         entity.stringField = "value2";
@@ -62,12 +62,12 @@ public class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     public void search() {
-        TestEntity entity = new TestEntity();
+        TestMongoEntity entity = new TestMongoEntity();
         entity.id = new ObjectId();
         entity.stringField = "value";
         testEntityCollection.insert(entity);
 
-        List<TestEntity> entities = testEntityCollection.find(Filters.eq("string_field", "value"));
+        List<TestMongoEntity> entities = testEntityCollection.find(Filters.eq("string_field", "value"));
         assertEquals(1, entities.size());
         assertEquals(entity.id, entities.get(0).id);
         assertEquals(entity.stringField, entities.get(0).stringField);
@@ -75,13 +75,13 @@ public class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     public void searchByEnum() {
-        TestEntity entity = new TestEntity();
+        TestMongoEntity entity = new TestMongoEntity();
         entity.id = new ObjectId();
         entity.stringField = "value";
-        entity.enumField = TestEntity.TestEnum.VALUE1;
+        entity.enumField = TestMongoEntity.TestEnum.VALUE1;
         testEntityCollection.insert(entity);
 
-        List<TestEntity> entities = testEntityCollection.find(Filters.eq("enum_field", TestEntity.TestEnum.VALUE1));
+        List<TestMongoEntity> entities = testEntityCollection.find(Filters.eq("enum_field", TestMongoEntity.TestEnum.VALUE1));
         assertEquals(1, entities.size());
         assertEquals(entity.id, entities.get(0).id);
         assertEquals(entity.stringField, entities.get(0).stringField);

@@ -10,7 +10,7 @@ import org.bson.types.ObjectId;
  * @author neo
  */
 @Collection(name = "entity")
-public class TestEntity {
+public class TestMongoEntity {
     @Id
     public ObjectId id;
 
