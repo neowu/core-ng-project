@@ -16,10 +16,9 @@ public class HTTPServer {
         System.setProperty("org.jboss.logging.provider", "slf4j");
     }
 
-    private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
-
     public final SiteManager siteManager = new SiteManager();
     public final HTTPServerHandler handler;
+    private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
     public int port = 8080;
     private Undertow server;
 
@@ -36,7 +35,7 @@ public class HTTPServer {
                 .build();
             server.start();
         } finally {
-            logger.info("http server started, elapsedTime={}", watch.elapsedTime());
+            logger.info("http server started, port={}, elapsedTime={}", port, watch.elapsedTime());
         }
     }
 
