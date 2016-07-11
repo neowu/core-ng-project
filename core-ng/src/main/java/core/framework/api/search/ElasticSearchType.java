@@ -45,7 +45,7 @@ public interface ElasticSearchType<T> {
 
     void bulkDelete(BulkDeleteRequest request);
 
-    default void bulkIndex(List<String> ids) {
+    default void bulkDelete(List<String> ids) {
         BulkDeleteRequest request = new BulkDeleteRequest();
         request.ids = ids;
         bulkDelete(request);
