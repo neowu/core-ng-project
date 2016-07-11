@@ -43,6 +43,14 @@ public interface ElasticSearchType<T> {
         return delete(request);
     }
 
+    void bulkDelete(BulkDeleteRequest request);
+
+    default void bulkIndex(List<String> ids) {
+        BulkDeleteRequest request = new BulkDeleteRequest();
+        request.ids = ids;
+        bulkDelete(request);
+    }
+
     List<String> analyze(AnalyzeRequest request);
 
     default List<String> analyze(String analyzer, String text) {

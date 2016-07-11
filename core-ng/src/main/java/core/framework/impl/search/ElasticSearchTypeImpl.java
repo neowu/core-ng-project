@@ -3,6 +3,7 @@ package core.framework.impl.search;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
 import core.framework.api.search.AnalyzeRequest;
+import core.framework.api.search.BulkDeleteRequest;
 import core.framework.api.search.BulkIndexRequest;
 import core.framework.api.search.DeleteRequest;
 import core.framework.api.search.ElasticSearchType;
@@ -183,6 +184,29 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("delete, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public void bulkDelete(BulkDeleteRequest request) {
+        StopWatch watch = new StopWatch();
+        String index = request.index == null ? this.index : request.index;
+        BulkRequestBuilder builder = client.prepareBulk();
+        for (String id : request.ids) {
+            builder.add(client.prepareDelete(index, type, id));
+        }
+        long esTookTime = 0;
+        try {
+            BulkResponse response = builder.get();
+            esTookTime = response.getTookInMillis();
+            if (response.hasFailures()) throw new SearchException(response.buildFailureMessage());
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("elasticsearch", elapsedTime);
+            logger.debug("bulkDelete, index={}, type={}, size={}, esTookTime={}, elapsedTime={}", index, type, request.ids.size(), esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
