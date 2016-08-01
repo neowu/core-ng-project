@@ -83,6 +83,14 @@ public final class MockRedis implements Redis {
     }
 
     @Override
+    public String hget(String key, String field) {
+        Value value = store.get(key);
+        if (value == null) return null;
+        if (value.type != ValueType.HASH) throw Exceptions.error("invalid type, key={}, type={}", key, value.type);
+        return value.hash.get(field);
+    }
+
+    @Override
     public void hmset(String key, Map<String, String> values) {
         Map<String, String> hash = hgetAll(key);
         hash.putAll(values);

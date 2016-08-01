@@ -15,8 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
-### 4.6.9 (7/11/2016 - )
+### 4.6.9 (7/11/2016 - 8/1/2016)
 * elasticsearch: support bulkDelete
+* redis: support hget
 
 ### 4.6.8 (7/6/2016)
 * test: EntitySchemaGenerator support LocalDate

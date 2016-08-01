@@ -45,6 +45,7 @@ public class MockRedisTest {
         Map<String, String> hash = redis.hgetAll("key4");
         assertEquals(1, hash.size());
         assertEquals("value1", hash.get("field1"));
+        assertEquals("value1", redis.hget("key4", "field1"));
 
         redis.hmset("key4", Maps.newHashMap("field2", "value2"));
         hash = redis.hgetAll("key4");

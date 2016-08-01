@@ -294,6 +294,24 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
+    public String hget(String key, String field) {
+        StopWatch watch = new StopWatch();
+        PoolItem<BinaryJedis> item = pool.borrowItem();
+        try {
+            return decode(item.resource.hget(encode(key), encode(field)));
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("hget, key={}, field={}, elapsedTime={}", key, field, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
     public void hmset(String key, Map<String, String> values) {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
