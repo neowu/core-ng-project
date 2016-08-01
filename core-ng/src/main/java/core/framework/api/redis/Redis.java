@@ -25,7 +25,9 @@ public interface Redis {
 
     Map<String, String> hgetAll(String key);
 
+    void hmset(String key, Map<String, String> values);
+
     String hget(String key, String field);
 
-    void hmset(String key, Map<String, String> values);
+    void hset(String key, String field, String value);
 }
