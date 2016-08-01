@@ -23,11 +23,11 @@ public interface Redis {
 
     void mset(Map<String, String> values);
 
-    Map<String, String> hgetAll(String key);
-
-    void hmset(String key, Map<String, String> values);
-
     String hget(String key, String field);
 
+    Map<String, String> hgetAll(String key);
+
     void hset(String key, String field, String value);
+
+    void hmset(String key, Map<String, String> values);
 }

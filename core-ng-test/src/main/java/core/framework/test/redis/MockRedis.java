@@ -99,7 +99,9 @@ public final class MockRedis implements Redis {
 
     @Override
     public void hmset(String key, Map<String, String> values) {
-        store.put(key, new Value(values));
+        Value hashValue = store.computeIfAbsent(key, k -> new Value(Maps.newHashMap()));
+        if (hashValue.type != ValueType.HASH) throw Exceptions.error("invalid type, key={}, type={}", key, hashValue.type);
+        hashValue.hash.putAll(values);
     }
 
     enum ValueType {

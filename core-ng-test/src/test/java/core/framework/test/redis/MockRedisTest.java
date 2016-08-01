@@ -40,7 +40,7 @@ public class MockRedisTest {
     }
 
     @Test
-    public void hget() {
+    public void hset() {
         redis.hset("key4", "field1", "value1");
         assertEquals("value1", redis.hget("key4", "field1"));
 
@@ -55,11 +55,11 @@ public class MockRedisTest {
         Map<String, String> hash = redis.hgetAll("key5");
         assertEquals(1, hash.size());
         assertEquals("value1", hash.get("field1"));
-        assertEquals("value1", redis.hget("key5", "field1"));
 
         redis.hmset("key5", Maps.newHashMap("field2", "value2"));
         hash = redis.hgetAll("key5");
-        assertEquals(1, hash.size());
+        assertEquals(2, hash.size());
+        assertEquals("value1", hash.get("field1"));
         assertEquals("value2", hash.get("field2"));
     }
 }
