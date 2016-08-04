@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var sourcemaps = require('gulp-sourcemaps');
-var rename = require("gulp-rename");
 var md5 = require("gulp-md5-plus");
 var merge = require('merge2');
 
