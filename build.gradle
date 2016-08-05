@@ -135,18 +135,18 @@ project(':demo-service') {
 project(':demo-site') {
     apply from: file("${rootDir}/gradle/app.gradle")
 
-    task gulp {
+    task node {
         doLast {
             exec {
                 commandLine 'npm', 'install'
             }
             exec {
-                commandLine 'gulp'
+                commandLine 'npm', 'run', 'build'
             }
         }
     }
 
-    processResources.dependsOn gulp
+    processResources.dependsOn node
 
     dependencies {
         compile(

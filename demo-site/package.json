@@ -2,7 +2,9 @@
   "name": "demo-site",
   "version": "1.0.0",
   "description": "demo-site",
-  "main": "index.js",
+  "scripts": {
+    "build": "gulp"
+  },
   "license": "Apache-2.0",
   "devDependencies": {
     "del": "^2.2.1",
