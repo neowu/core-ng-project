@@ -1,14 +1,18 @@
 {
   "extends": "eslint:recommended",
   "rules": {
-    "no-alert": 0,
-    "no-bitwise": 0,
-    "camelcase": 1,
-    "curly": 1,
-    "eqeqeq": 0,
-    "no-eq-null": 0,
-    "guard-for-in": 1,
-    "no-empty": 1
+    "no-extra-parens": "error",
+    "no-alert": "error",
+    "no-bitwise": "error",
+    "camelcase": "error",
+    "curly": "error",
+    "eqeqeq": [
+      "error",
+      "smart"
+    ],
+    "guard-for-in": "error",
+    "no-empty": "error",
+    "brace-style": "error"
   },
   "globals": {
     "$": false
