@@ -9,7 +9,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('html', function() {
-    return gulp.src('src/main/template/**/*.html')
+    return gulp.src('src/main/web/template/**/*.html')
         .pipe(gulp.dest('src/main/dist/web/template'))
 })
 
@@ -33,14 +33,14 @@ gulp.task("css", ["html"], function() {
         cssnano()
     ];
 
-    var appCSS = gulp.src(['src/main/css/**/*.css', '!src/main/css/vendor{,/**/*}'])
+    var appCSS = gulp.src(['src/main/web/static/css/**/*.css', '!src/main/web/static/css/vendor{,/**/*.css}'])
         .pipe(sourcemaps.init())
         .pipe(postcss(processors))
         .pipe(md5(10, 'src/main/dist/web/template/**/*.html'))
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('src/main/dist/web/static/css'));
 
-    var vendorCSS = gulp.src(['src/main/css/vendor/**/*.css'])
+    var vendorCSS = gulp.src(['src/main/web/static/css/vendor{,/**/*.css}'])
         .pipe(md5(10, 'src/main/dist/web/template/**/*.html'))
         .pipe(gulp.dest('src/main/dist/web/static/css/vendor'));
 
@@ -51,7 +51,7 @@ gulp.task('js', ["html"], function(cb) {
     var uglify = require('gulp-uglify');
     var eslint = require('gulp-eslint');
 
-    var appJS = gulp.src(['src/main/js/**/*.js', '!src/main/js/vendor{,/**/*}'])
+    var appJS = gulp.src(['src/main/web/static/js/**/*.js', '!src/main/web/static/js/vendor{,/**/*.js}'])
         .pipe(eslint({
             configFile: 'eslint.json'
         }))
@@ -63,7 +63,7 @@ gulp.task('js', ["html"], function(cb) {
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('src/main/dist/web/static/js'));
 
-    var vendorJS = gulp.src(['src/main/js/vendor/**/*.js'])
+    var vendorJS = gulp.src(['src/main/web/static/js/vendor/**/*.js'])
         .pipe(md5(10, 'src/main/dist/web/template/**/*.html'))
         .pipe(gulp.dest('src/main/dist/web/static/js/vendor'));
 
@@ -75,5 +75,5 @@ gulp.task('default', ['clean'], function() {
 })
 
 gulp.task('watch', function() {
-    gulp.watch(['src/main/css/**/*.css', 'src/main/js/**/*.js', 'src/main/template/**/*.html'], ['js', 'css']);
+    gulp.watch(['src/main/web/static/css/**/*.css', 'src/main/web/static/js/**/*.js', 'src/main/web/template/**/*.html'], ['js', 'css']);
 });
