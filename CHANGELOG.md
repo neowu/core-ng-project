@@ -15,8 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
-### 4.7.0 (8/4/2016 - ongoing)
+### 4.7.0 (8/4/2016 - 8/5/2016)
 * http: update undertow to 1.4.0
+* test: support MockExecutor
 
 ### 4.6.9 (7/11/2016 - 8/1/2016)
 * elasticsearch: support bulkDelete

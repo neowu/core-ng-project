@@ -1,10 +1,12 @@
 package core.framework.test.module;
 
+import core.framework.api.async.Executor;
 import core.framework.api.redis.Redis;
 import core.framework.impl.module.MockFactory;
 import core.framework.impl.mongo.MongoImpl;
 import core.framework.impl.queue.RabbitMQ;
 import core.framework.impl.search.ElasticSearchImpl;
+import core.framework.test.async.MockExecutor;
 import core.framework.test.mongo.MockMongo;
 import core.framework.test.queue.MockRabbitMQ;
 import core.framework.test.redis.MockRedis;
@@ -24,6 +26,7 @@ public final class MockFactoryImpl implements MockFactory {
         if (RabbitMQ.class.equals(instanceClass)) return (T) new MockRabbitMQ();
         if (MongoImpl.class.equals(instanceClass)) return (T) new MockMongo();
         if (ElasticSearchImpl.class.equals(instanceClass)) return (T) new MockElasticSearch((Path) params[0]);
+        if (Executor.class.equals(instanceClass)) return (T) new MockExecutor();
         return Mockito.mock(instanceClass);
     }
 }
