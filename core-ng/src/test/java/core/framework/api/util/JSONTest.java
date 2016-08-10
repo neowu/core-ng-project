@@ -41,7 +41,7 @@ public class JSONTest {
         assertNull(JSON.fromJSON(BeanWithOptionalField.class, JSON.toJSON(bean)).optionalString);
 
         bean.optionalString = Optional.of("value");
-        assertEquals("value", JSON.fromJSON(BeanWithOptionalField.class, JSON.toJSON(bean)).optionalString.get());
+        assertEquals("value", JSON.fromJSON(BeanWithOptionalField.class, JSON.toJSON(bean)).optionalString.orElse(null));
     }
 
     @Test
