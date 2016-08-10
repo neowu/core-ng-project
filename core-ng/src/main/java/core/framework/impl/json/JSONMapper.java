@@ -65,8 +65,7 @@ public final class JSONMapper {
 
     // jackson detects encoding and default to utf-8, works with our scenario, so there not to specify charset
     public static <T> T fromJSON(Type instanceType, byte[] json) {
-        ObjectMapper objectMapper = OBJECT_MAPPER;
-        JavaType type = objectMapper.getTypeFactory().constructType(instanceType);
+        JavaType type = OBJECT_MAPPER.getTypeFactory().constructType(instanceType);
         try {
             return OBJECT_MAPPER.readValue(json, type);
         } catch (IOException e) {
@@ -82,7 +81,7 @@ public final class JSONMapper {
         }
     }
 
-    static class JAXBAnnotationIntrospector extends JaxbAnnotationIntrospector {
+    private static class JAXBAnnotationIntrospector extends JaxbAnnotationIntrospector {
         private static final long serialVersionUID = 9089203444578006521L;
 
         JAXBAnnotationIntrospector() {
