@@ -19,6 +19,16 @@ import java.util.concurrent.TimeUnit;
  * @author neo
  */
 public class CollectStatTask implements Runnable {
+    static String garbageCollectorName(String name) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < name.length(); i++) {
+            char ch = name.charAt(i);
+            if (ch == ' ') builder.append('_');
+            else builder.append(ASCII.toLowerCase(ch));
+        }
+        return builder.toString();
+    }
+
     private final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
@@ -53,16 +63,6 @@ public class CollectStatTask implements Runnable {
         }
 
         logForwarder.forwardStats(stats);
-    }
-
-    String garbageCollectorName(String name) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < name.length(); i++) {
-            char ch = name.charAt(i);
-            if (ch == ' ') builder.append("_");
-            else builder.append(ASCII.toLowerCase(ch));
-        }
-        return builder.toString();
     }
 
     static class GCStat {

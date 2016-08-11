@@ -1,23 +1,16 @@
 package core.framework.impl.log.stat;
 
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author neo
  */
 public class CollectStatTaskTest {
-    CollectStatTask task;
-
-    @Before
-    public void createCollectStatTask() {
-        task = new CollectStatTask(null);
-    }
-
     @Test
     public void garbageCollectorName() {
-        Assert.assertEquals("G1YoungGeneration", task.garbageCollectorName("G1 Young Generation"));
-        Assert.assertEquals("G1OldGeneration", task.garbageCollectorName("G1 Old Generation"));
+        assertEquals("g1_young_generation", CollectStatTask.garbageCollectorName("G1 Young Generation"));
+        assertEquals("g1_old_generation", CollectStatTask.garbageCollectorName("G1 Old Generation"));
     }
 }
