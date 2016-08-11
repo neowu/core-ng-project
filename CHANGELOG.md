@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.7.1 (8/11/2016)
+* monitor: collect gc stats in CollectStatTask
+
 ### 4.7.0 (8/4/2016 - 8/5/2016)
 * http: update undertow to 1.4.0
 * test: support MockExecutor
