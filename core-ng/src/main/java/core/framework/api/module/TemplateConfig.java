@@ -20,14 +20,16 @@ public final class TemplateConfig {
     }
 
     public void message(String path) {
-        if (!context.httpServer.siteManager.templateManager.templates.isEmpty())
+        if (!context.httpServer.siteManager.templateManager.templates.isEmpty()) {
             throw new Error("site().template().message() must be called before site().template().add()");
+        }
         context.httpServer.siteManager.templateManager.messageManager.load(path);
     }
 
     public void languages(String... languages) {
-        if (!context.httpServer.siteManager.templateManager.templates.isEmpty())
+        if (!context.httpServer.siteManager.templateManager.templates.isEmpty()) {
             throw new Error("site().template().languages() must be called before site().template().add()");
+        }
         if (languages.length == 0) throw new Error("languages must not be empty");
         context.httpServer.siteManager.templateManager.messageManager.languages = languages;
     }

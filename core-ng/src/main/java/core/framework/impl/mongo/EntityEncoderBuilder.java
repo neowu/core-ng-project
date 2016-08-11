@@ -28,7 +28,7 @@ final class EntityEncoderBuilder<T> {
     private final Class<T> entityClass;
     private final String helper = EntityCodecHelper.class.getCanonicalName();
 
-    public EntityEncoderBuilder(Class<T> entityClass) {
+    EntityEncoderBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 

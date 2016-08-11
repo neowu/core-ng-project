@@ -31,7 +31,7 @@ final class LoggerImpl extends AbstractLogger {
     private final LogLevel traceLevel;
     private final String logger;
 
-    public LoggerImpl(String name, LogManager logManager, LogLevel traceLevel) {
+    LoggerImpl(String name, LogManager logManager, LogLevel traceLevel) {
         super(name);
         this.logger = abbreviateLoggerName(name);
         this.logManager = logManager;

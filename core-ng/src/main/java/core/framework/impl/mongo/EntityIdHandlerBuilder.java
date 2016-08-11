@@ -16,7 +16,7 @@ final class EntityIdHandlerBuilder<T> {
     private final Class<T> entityClass;
     private final Field idField;
 
-    public EntityIdHandlerBuilder(Class<T> entityClass) {
+    EntityIdHandlerBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
         idField = idField();
     }

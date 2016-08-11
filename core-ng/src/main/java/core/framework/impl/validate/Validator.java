@@ -16,10 +16,6 @@ public class Validator {
         validate(instance, false);
     }
 
-    public void partialValidate(Object instance) {
-        validate(instance, true);
-    }
-
     private void validate(Object instance, boolean partial) {
         ValidationErrors errors = new ValidationErrors();
         validate(instance, errors, partial);
@@ -33,5 +29,9 @@ public class Validator {
         } else if (validator != null) { // validator can be null if no validation annotation presents
             validator.validate(instance, errors, partial);
         }
+    }
+
+    public void partialValidate(Object instance) {
+        validate(instance, true);
     }
 }

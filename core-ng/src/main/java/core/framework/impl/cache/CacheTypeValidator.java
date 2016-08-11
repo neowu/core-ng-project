@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 class CacheTypeValidator {
     private final DataTypeValidator validator;
 
-    public CacheTypeValidator(Type instanceType) {
+    CacheTypeValidator(Type instanceType) {
         validator = new DataTypeValidator(instanceType);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChildListAndMap = true;

@@ -37,11 +37,11 @@ public class MessageManager {
             throw Exceptions.error("site().template().language() must be called before site().template().add() if language specific message loaded");
 
         messages.keySet().stream()
-            .filter(effectiveLanguage -> !DEFAULT_LANGUAGE.equals(effectiveLanguage)
-                && Arrays.stream(languages).noneMatch(language -> language.startsWith(effectiveLanguage)))
-            .forEach(effectiveLanguage -> {
-                throw Exceptions.error("message loaded by site().template().message() but not used in enabled languages, language={}", effectiveLanguage);
-            });
+                .filter(effectiveLanguage -> !DEFAULT_LANGUAGE.equals(effectiveLanguage)
+                    && Arrays.stream(languages).noneMatch(language -> language.startsWith(effectiveLanguage)))
+                .forEach(effectiveLanguage -> {
+                    throw Exceptions.error("message loaded by site().template().message() but not used in enabled languages, language={}", effectiveLanguage);
+                });
     }
 
     String language(String path) {

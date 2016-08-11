@@ -30,7 +30,7 @@ final class EntityDecoderBuilder<T> {
     private final Set<Class<? extends Enum<?>>> enumClasses = Sets.newHashSet();
     private final String helper = EntityCodecHelper.class.getCanonicalName();
 
-    public EntityDecoderBuilder(Class<T> entityClass) {
+    EntityDecoderBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 
@@ -45,7 +45,8 @@ final class EntityDecoderBuilder<T> {
 
     private void buildMethods() {
         String methodName = decodeEntityMethod(entityClass);
-        CodeBuilder builder = new CodeBuilder().append("public Object decode(org.bson.BsonReader reader) {\n")
+        CodeBuilder builder = new CodeBuilder()
+            .append("public Object decode(org.bson.BsonReader reader) {\n")
             .indent(1).append("return {}(reader, \"\");\n", methodName)
             .append("}");
 
@@ -74,9 +75,9 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("{} entity = new {}();\n", entityClassName, entityClassName);
 
         builder.indent(1).append("reader.readStartDocument();\n")
-            .indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n")
-            .indent(2).append("String fieldName = reader.readName();\n")
-            .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
+               .indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n")
+               .indent(2).append("String fieldName = reader.readName();\n")
+               .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
 
         for (Field field : Classes.instanceFields(entityClass)) {
             decodeEntityField(builder, field);

@@ -15,17 +15,6 @@ import static org.junit.Assert.assertThat;
  * @author neo
  */
 public class LengthValidatorTest {
-    static class Bean {
-        @NotNull
-        @Length(max = 5, message = "field1 must not be longer than 5")
-        public String field1;
-        @NotNull
-        @Length(min = 5, message = "field2 must be longer than 5")
-        public String field2;
-        @Length(min = 5, message = "optionalField1 must be longer than 5")
-        public String optionalField1;
-    }
-
     @Test
     public void validate() {
         Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
@@ -56,5 +45,16 @@ public class LengthValidatorTest {
         Assert.assertTrue(errors.hasError());
         assertEquals(1, errors.errors.size());
         assertThat(errors.errors.get("field1"), containsString("field1"));
+    }
+
+    static class Bean {
+        @NotNull
+        @Length(max = 5, message = "field1 must not be longer than 5")
+        public String field1;
+        @NotNull
+        @Length(min = 5, message = "field2 must be longer than 5")
+        public String field2;
+        @Length(min = 5, message = "optionalField1 must be longer than 5")
+        public String optionalField1;
     }
 }

@@ -28,8 +28,9 @@ public final class ClasspathResources {
             throw new UncheckedIOException(e);
         }
 
-        if (length <= 0)
+        if (length <= 0) {
             throw Exceptions.error("unexpected length of classpath resource, path={}, length={}", path, length);
+        }
 
         try (InputStream stream = connection.getInputStream()) {
             return InputStreams.bytesWithExpectedLength(stream, length);

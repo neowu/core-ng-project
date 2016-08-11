@@ -35,7 +35,7 @@ final class UpdateQuery<T> {
     private Function<T, Query> queryBuilder(Class<T> entityClass, List<Field> primaryKeyFields, List<Field> columnFields) {
         CodeBuilder builder = new CodeBuilder();
         builder.append("public Object apply(Object value) {\n")
-            .indent(1).append("{} entity = ({}) value;\n", entityClass.getCanonicalName(), entityClass.getCanonicalName());
+               .indent(1).append("{} entity = ({}) value;\n", entityClass.getCanonicalName(), entityClass.getCanonicalName());
 
         for (Field primaryKeyField : primaryKeyFields) {
             builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", primaryKeyField.getName(), primaryKeyField.getName());
@@ -45,12 +45,12 @@ final class UpdateQuery<T> {
         builder.indent(1).append("int index = 0;\n");
 
         for (Field field : columnFields) {
-            builder.indent(1).append("if (entity.{} != null) {\n", field.getName());
-            builder.indent(2).append("if (index > 0) sql.append(\", \");\n");
-            builder.indent(2).append("sql.append(\"{} = ?\");\n", field.getDeclaredAnnotation(Column.class).name());
-            builder.indent(2).append("params.add(entity.{});\n", field.getName());
-            builder.indent(2).append("index++;\n");
-            builder.indent(1).append("}\n");
+            builder.indent(1).append("if (entity.{} != null) {\n", field.getName())
+                   .indent(2).append("if (index > 0) sql.append(\", \");\n")
+                   .indent(2).append("sql.append(\"{} = ?\");\n", field.getDeclaredAnnotation(Column.class).name())
+                   .indent(2).append("params.add(entity.{});\n", field.getName())
+                   .indent(2).append("index++;\n")
+                   .indent(1).append("}\n");
         }
 
         builder.indent(1).append("sql.append(\"");
@@ -71,7 +71,7 @@ final class UpdateQuery<T> {
         }
 
         builder.indent(1).append("return new {}(sql.toString(), params.toArray());\n", Query.class.getCanonicalName())
-            .append("}");
+               .append("}");
 
         return new DynamicInstanceBuilder<Function<T, Query>>(Function.class, UpdateQuery.class.getCanonicalName() + "$" + entityClass.getSimpleName() + "$UpdateQueryBuilder")
             .addMethod(builder.build())

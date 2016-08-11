@@ -24,6 +24,11 @@ public final class ASCII {
         return text;
     }
 
+    public static char toUpperCase(char ch) {
+        if (isLowerCase(ch)) return (char) (ch & 0x5F);
+        return ch;
+    }
+
     public static String toLowerCase(String text) {
         if (text == null) return null;
         int length = text.length();
@@ -44,11 +49,6 @@ public final class ASCII {
 
     public static char toLowerCase(char ch) {
         if (isUpperCase(ch)) return (char) (ch ^ 0x20);
-        return ch;
-    }
-
-    public static char toUpperCase(char ch) {
-        if (isLowerCase(ch)) return (char) (ch & 0x5F);
         return ch;
     }
 

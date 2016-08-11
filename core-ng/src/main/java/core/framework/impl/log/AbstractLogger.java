@@ -52,6 +52,11 @@ abstract class AbstractLogger implements Logger {
     }
 
     @Override
+    public boolean isTraceEnabled(Marker marker) {
+        return false;
+    }
+
+    @Override
     public void trace(String msg) {
     }
 
@@ -69,11 +74,6 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public void trace(String msg, Throwable t) {
-    }
-
-    @Override
-    public boolean isTraceEnabled(Marker marker) {
-        return false;
     }
 
     @Override
@@ -102,6 +102,11 @@ abstract class AbstractLogger implements Logger {
     }
 
     @Override
+    public boolean isDebugEnabled(Marker marker) {
+        return true;
+    }
+
+    @Override
     public void debug(String msg) {
         log(null, LogLevel.DEBUG, msg, null, null);
     }
@@ -124,11 +129,6 @@ abstract class AbstractLogger implements Logger {
     @Override
     public void debug(String msg, Throwable t) {
         log(null, LogLevel.DEBUG, msg, null, t);
-    }
-
-    @Override
-    public boolean isDebugEnabled(Marker marker) {
-        return true;
     }
 
     @Override
@@ -162,6 +162,11 @@ abstract class AbstractLogger implements Logger {
     }
 
     @Override
+    public boolean isInfoEnabled(Marker marker) {
+        return true;
+    }
+
+    @Override
     public void info(String msg) {
         log(null, LogLevel.INFO, msg, null, null);
     }
@@ -184,11 +189,6 @@ abstract class AbstractLogger implements Logger {
     @Override
     public void info(String msg, Throwable t) {
         log(null, LogLevel.INFO, msg, null, t);
-    }
-
-    @Override
-    public boolean isInfoEnabled(Marker marker) {
-        return true;
     }
 
     @Override
@@ -222,6 +222,11 @@ abstract class AbstractLogger implements Logger {
     }
 
     @Override
+    public boolean isWarnEnabled(Marker marker) {
+        return true;
+    }
+
+    @Override
     public void warn(String msg) {
         log(null, LogLevel.WARN, msg, null, null);
     }
@@ -244,11 +249,6 @@ abstract class AbstractLogger implements Logger {
     @Override
     public void warn(String msg, Throwable t) {
         log(null, LogLevel.WARN, msg, null, t);
-    }
-
-    @Override
-    public boolean isWarnEnabled(Marker marker) {
-        return true;
     }
 
     @Override
@@ -282,6 +282,11 @@ abstract class AbstractLogger implements Logger {
     }
 
     @Override
+    public boolean isErrorEnabled(Marker marker) {
+        return true;
+    }
+
+    @Override
     public void error(String msg) {
         log(null, LogLevel.ERROR, msg, null, null);
     }
@@ -304,11 +309,6 @@ abstract class AbstractLogger implements Logger {
     @Override
     public void error(String msg, Throwable t) {
         log(null, LogLevel.ERROR, msg, null, t);
-    }
-
-    @Override
-    public boolean isErrorEnabled(Marker marker) {
-        return true;
     }
 
     @Override

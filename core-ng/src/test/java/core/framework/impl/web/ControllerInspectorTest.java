@@ -10,19 +10,6 @@ import org.junit.Test;
  * @author neo
  */
 public class ControllerInspectorTest {
-    public static class TestController implements Controller {
-        @Override
-        public Response execute(Request request) throws Exception {
-            return null;
-        }
-    }
-
-    public static class TestControllers {
-        public Response get(Request request) {
-            return null;
-        }
-    }
-
     @Test
     public void methodReference() throws NoSuchMethodException {
         ControllerInspector inspector = new ControllerInspector(new TestControllers()::get);
@@ -45,5 +32,18 @@ public class ControllerInspectorTest {
         Assert.assertEquals(TestController.class.getCanonicalName(), inspector.targetClassName);
         Assert.assertEquals("execute", inspector.targetMethodName);
         Assert.assertEquals(TestController.class.getMethod("execute", Request.class), inspector.targetMethod);
+    }
+
+    public static class TestController implements Controller {
+        @Override
+        public Response execute(Request request) throws Exception {
+            return null;
+        }
+    }
+
+    public static class TestControllers {
+        public Response get(Request request) {
+            return null;
+        }
     }
 }

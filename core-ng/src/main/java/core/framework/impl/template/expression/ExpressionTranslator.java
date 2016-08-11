@@ -9,7 +9,7 @@ class ExpressionTranslator {
     private final Token expression;
     private final TemplateMetaContext context;
 
-    public ExpressionTranslator(Token expression, TemplateMetaContext context) {
+    ExpressionTranslator(Token expression, TemplateMetaContext context) {
         this.expression = expression;
         this.context = context;
     }

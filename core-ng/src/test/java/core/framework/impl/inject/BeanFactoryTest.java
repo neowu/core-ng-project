@@ -59,7 +59,7 @@ public class BeanFactoryTest {
         Dependency2 dependency2;
 
         @Inject
-        public Bean(Dependency3 dependency3) {
+        Bean(Dependency3 dependency3) {
             this.dependency3 = dependency3;
         }
 

@@ -111,7 +111,8 @@ public final class HTTPClient {
         ContentType contentType = response.contentType;
         if (contentType == null) return;
         String mediaType = contentType.mediaType();
-        if (mediaType.contains("text") || mediaType.contains("json"))
+        if (mediaType.contains("text") || mediaType.contains("json")) {
             logger.debug("[response] body={}", LogParam.of(response.body(), contentType.charset().orElse(Charsets.UTF_8)));
+        }
     }
 }

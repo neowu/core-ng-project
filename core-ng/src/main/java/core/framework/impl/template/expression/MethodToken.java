@@ -12,7 +12,7 @@ class MethodToken implements Token {
     final List<Token> params = Lists.newArrayList();
     Token next;
 
-    public MethodToken(String name) {
+    MethodToken(String name) {
         this.name = name;
     }
 }

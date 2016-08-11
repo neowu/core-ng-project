@@ -7,7 +7,7 @@ class FieldToken implements Token {
     final String name;
     Token next;
 
-    public FieldToken(String name) {
+    FieldToken(String name) {
         this.name = name;
     }
 }

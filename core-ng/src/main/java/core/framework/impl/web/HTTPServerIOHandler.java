@@ -17,7 +17,7 @@ class HTTPServerIOHandler implements HttpHandler {
     private final FormParserFactory formParserFactory;
     private final HTTPServerHandler handler;
 
-    public HTTPServerIOHandler(HTTPServerHandler handler) {
+    HTTPServerIOHandler(HTTPServerHandler handler) {
         this.handler = handler;
         FormParserFactory.Builder builder = FormParserFactory.builder();
         builder.setDefaultCharset(Charsets.UTF_8.name());

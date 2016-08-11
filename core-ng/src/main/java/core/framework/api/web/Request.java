@@ -24,7 +24,15 @@ public interface Request {
 
     <T> T pathParam(String name, Class<T> valueClass);
 
+    default String pathParam(String name) {
+        return pathParam(name, String.class);
+    }
+
     <T> Optional<T> queryParam(String name, Class<T> valueClass);
+
+    default Optional<String> queryParam(String name) {
+        return queryParam(name, String.class);
+    }
 
     Map<String, String> queryParams();
 
@@ -45,12 +53,4 @@ public interface Request {
     Optional<String> cookie(CookieSpec spec);
 
     Session session();
-
-    default String pathParam(String name) {
-        return pathParam(name, String.class);
-    }
-
-    default Optional<String> queryParam(String name) {
-        return queryParam(name, String.class);
-    }
 }

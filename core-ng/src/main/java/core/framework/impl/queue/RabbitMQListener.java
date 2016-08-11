@@ -53,7 +53,7 @@ public final class RabbitMQListener implements MessageHandlerConfig {
                 try (RabbitMQConsumer consumer = rabbitMQ.consumer(queue, poolSize * 2)) { // prefetch one more for each handler to improve throughput
                     while (!stop.get()) {
                         QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-                        handlerExecutor.submit(() -> handle(consumer, delivery));
+                        handlerExecutor.submit(() -> handleDelivery(consumer, delivery));
                     }
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
@@ -100,10 +100,18 @@ public final class RabbitMQListener implements MessageHandlerConfig {
         }
     }
 
-    private Void handle(RabbitMQConsumer consumer, QueueingConsumer.Delivery delivery) throws Exception {
+    private void acknowledge(RabbitMQConsumer consumer, QueueingConsumer.Delivery delivery) {
+        try {
+            consumer.acknowledge(delivery.getEnvelope().getDeliveryTag());
+        } catch (Throwable e) {
+            logManager.logError(e);
+        }
+    }
+
+    private Void handleDelivery(RabbitMQConsumer consumer, QueueingConsumer.Delivery delivery) throws Exception {
         try {
             logManager.begin("=== message handling begin ===");
-            handle(delivery);
+            handleDelivery(delivery);
             return null;
         } catch (Throwable e) {
             logManager.logError(e);
@@ -114,15 +122,7 @@ public final class RabbitMQListener implements MessageHandlerConfig {
         }
     }
 
-    private void acknowledge(RabbitMQConsumer consumer, QueueingConsumer.Delivery delivery) {
-        try {
-            consumer.acknowledge(delivery.getEnvelope().getDeliveryTag());
-        } catch (Throwable e) {
-            logManager.logError(e);
-        }
-    }
-
-    private <T> void handle(QueueingConsumer.Delivery delivery) throws Exception {
+    private <T> void handleDelivery(QueueingConsumer.Delivery delivery) throws Exception {
         ActionLog actionLog = logManager.currentActionLog();
 
         AMQP.BasicProperties properties = delivery.getProperties();

@@ -44,9 +44,6 @@ public class WebServiceClientBuilder<T> {
     private String buildMethod(Method method) {
         CodeBuilder builder = new CodeBuilder();
 
-        String path = method.getDeclaredAnnotation(Path.class).value();
-        HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
-
         Type returnType = method.getGenericReturnType();
 
         Map<String, Integer> pathParamIndexes = Maps.newHashMap();
@@ -79,8 +76,10 @@ public class WebServiceClientBuilder<T> {
 
         String returnTypeLiteral = returnType == void.class ? Void.class.getCanonicalName() : GenericTypes.rawClass(returnType).getCanonicalName();
 
+        String path = method.getDeclaredAnnotation(Path.class).value();
         builder.indent(1).append("String serviceURL = client.serviceURL(\"{}\", pathParams);\n", path); // to pass path as string literal, the escaped char will not be transferred, like \\, currently not convert is because only type regex may contain special char
 
+        HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
         builder.indent(1).append("{} response = ({}) client.execute({}, serviceURL, requestType, requestBean, {});\n",
             returnTypeLiteral,
             returnTypeLiteral,

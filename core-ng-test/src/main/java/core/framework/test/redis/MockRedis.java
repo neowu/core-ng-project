@@ -119,7 +119,7 @@ public final class MockRedis implements Redis {
             this.value = value;
         }
 
-        public Value(Map<String, String> hash) {
+        Value(Map<String, String> hash) {
             type = ValueType.HASH;
             this.hash = hash;
         }

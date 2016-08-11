@@ -46,6 +46,12 @@ public class CacheImpl<T> implements Cache<T> {
         return reader.fromJSON(cacheValue);
     }
 
+    public Optional<String> get(String key) {
+        byte[] result = cacheStore.get(cacheKey(key));
+        if (result == null) return Optional.empty();
+        return Optional.of(new String(result, Charsets.UTF_8));
+    }
+
     @Override
     public Map<String, T> getAll(List<String> keys, Function<String, T> loader) {
         int size = keys.size();
@@ -83,12 +89,6 @@ public class CacheImpl<T> implements Cache<T> {
     @Override
     public void evict(String key) {
         cacheStore.delete(cacheKey(key));
-    }
-
-    public Optional<String> get(String key) {
-        byte[] result = cacheStore.get(cacheKey(key));
-        if (result == null) return Optional.empty();
-        return Optional.of(new String(result, Charsets.UTF_8));
     }
 
     private String cacheKey(String key) {

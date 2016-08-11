@@ -7,15 +7,6 @@ import org.junit.Test;
  * @author neo
  */
 public class PoolTest {
-    static class TestResource implements AutoCloseable {
-        boolean closed;
-
-        @Override
-        public void close() throws Exception {
-            closed = true;
-        }
-    }
-
     @Test
     public void borrowAndReturn() {
         Pool<TestResource> pool = new Pool<>(TestResource::new, TestResource::close);
@@ -37,5 +28,14 @@ public class PoolTest {
 
         pool.close();
         Assert.assertTrue(item.resource.closed);
+    }
+
+    static class TestResource implements AutoCloseable {
+        boolean closed;
+
+        @Override
+        public void close() throws Exception {
+            closed = true;
+        }
     }
 }

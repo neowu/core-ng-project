@@ -15,7 +15,7 @@ class HTMLLexer {
     private int currentLine = 1;
     private int currentColumn = 1;
 
-    public HTMLLexer(String name, String html) {
+    HTMLLexer(String name, String html) {
         this.name = name;
         this.html = html;
     }

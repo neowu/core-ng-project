@@ -41,8 +41,9 @@ public final class SiteConfig {
         logger.info("add static content path, path={}", path);
         Path contentPath = context.httpServer.siteManager.webDirectory.path(path);
 
-        if (!Files.exists(contentPath, LinkOption.NOFOLLOW_LINKS))
+        if (!Files.exists(contentPath, LinkOption.NOFOLLOW_LINKS)) {
             throw Exceptions.error("path does not exist, path={}", path);
+        }
 
         if (Files.isDirectory(contentPath)) {
             context.httpServer.handler.route.add(HTTPMethod.GET, path + "/:path(*)", new ControllerHolder(new StaticDirectoryController(contentPath), true));
