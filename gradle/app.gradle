@@ -1,5 +1,3 @@
-import org.apache.tools.ant.filters.ExpandProperties
-
 // use gradlew -Penv=${env} to pass
 def environment = hasProperty('env') ? env : null
 
@@ -16,19 +14,6 @@ afterEvaluate {
             windowsScript.text = windowsScript.text.replaceFirst('set DEFAULT_JVM_OPTS=', "set DEFAULT_JVM_OPTS=\"-Dcore.webPath=%~dp0../web -Dcore.appName=${project.name}\"")
             unixScript.text = unixScript.text.replaceFirst('DEFAULT_JVM_OPTS=""', "DEFAULT_JVM_OPTS='-Dcore.webPath=\\\$APP_HOME/web -Dcore.appName=${project.name}'")
         }
-    }
-}
-
-processResources {
-    // ant.properties requires baseDir of project
-    projectDir.mkdirs()
-
-    project.ext.properties.each { key, value ->
-        ant.properties[key] = value
-    }
-
-    filesMatching('**/*.properties') {
-        filter ExpandProperties, project: project.ant.project
     }
 }
 

@@ -17,6 +17,7 @@
 ## Change log
 ### 4.7.2 (8/15/2016 - )
 * site: expose messages interface for i18n messages
+* gradle: remove properties process, use node/gulp asset pipeline instead
 
 ### 4.7.1 (8/11/2016)
 * monitor: collect gc stats in CollectStatTask
