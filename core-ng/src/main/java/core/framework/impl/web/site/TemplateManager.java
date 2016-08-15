@@ -21,15 +21,16 @@ import java.util.Map;
  * @author neo
  */
 public class TemplateManager {
-    public final MessageManager messageManager = new MessageManager();
     public final CDNManager cdnManager = new CDNManager();
     public final Map<String, Templates> templates = Maps.newConcurrentHashMap();
+    private final MessageManager messageManager;
     private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
 
-    public TemplateManager(WebDirectory webDirectory) {
+    public TemplateManager(WebDirectory webDirectory, MessageManager messageManager) {
         this.webDirectory = webDirectory;
+        this.messageManager = messageManager;
     }
 
     public String process(String templatePath, Object model, String language) {
@@ -78,15 +79,9 @@ public class TemplateManager {
         HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass);
         builder.cdn = cdnManager;
         Templates templates = new Templates();
-        Map<String, HTMLTemplate> effectiveTemplates = Maps.newHashMap();
         for (String language : messageManager.languages) {
-            String effectiveLanguage = messageManager.effectiveLanguage(language);
-            HTMLTemplate htmlTemplate = effectiveTemplates.get(effectiveLanguage);
-            if (htmlTemplate == null) {
-                builder.message = messageManager.messageProvider(effectiveLanguage);
-                htmlTemplate = builder.build();
-                effectiveTemplates.put(effectiveLanguage, htmlTemplate);
-            }
+            builder.message = key -> messageManager.get(key, language);
+            HTMLTemplate htmlTemplate = builder.build();
             templates.add(language, htmlTemplate);
         }
         return templates;

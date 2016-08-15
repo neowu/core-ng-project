@@ -2,11 +2,10 @@ package app.web;
 
 import app.web.interceptor.Protected;
 import core.framework.api.http.ContentType;
-import core.framework.api.util.Files;
 import core.framework.api.web.Request;
 import core.framework.api.web.Response;
 import core.framework.api.web.Session;
-import core.framework.api.web.site.WebDirectory;
+import core.framework.api.web.site.Message;
 
 import javax.inject.Inject;
 
@@ -15,14 +14,14 @@ import javax.inject.Inject;
  */
 public class IndexController {
     @Inject
-    WebDirectory webDirectory;
+    Message message;
     @Inject
     LanguageManager languageManager;
 
     @Protected(operation = "index")
     public Response index(Request request) {
         IndexPage model = new IndexPage();
-        model.name = "world";
+        model.name = message.get("key.name", languageManager.language()).orElse("world not found");
 
         Session session = request.session();
 //        Optional<String> hello = session.get("hello");
@@ -31,13 +30,6 @@ public class IndexController {
         response.cookie(Cookies.TEST, "1+2");
 //        response.cookie(CookieConstraints.TEST1, null);
         return response;
-    }
-
-    // just simple demo for non-html template, real project needs sophisticated impl
-    public Response css(Request request) {
-        String cssTemplate = Files.text(webDirectory.path("/template/css/main.css"));
-        String css = cssTemplate.replaceAll("$\\{backgroundColor\\}", "gainsboro");
-        return Response.text(css, ContentType.TEXT_CSS);
     }
 
     public Response submit(Request request) {

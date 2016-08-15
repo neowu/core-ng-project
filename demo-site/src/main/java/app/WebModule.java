@@ -11,7 +11,10 @@ import app.web.interceptor.TestInterceptor;
 import core.framework.api.Module;
 import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
+import core.framework.api.util.Lists;
 import core.framework.api.web.Response;
+
+import java.util.List;
 
 /**
  * @author neo
@@ -29,19 +32,17 @@ public class WebModule extends Module {
         site().staticContent("/static");
         site().staticContent("/favicon.ico");
         site().staticContent("/robots.txt");
-        site().template().message("messages/main.properties");
-        site().template().message("messages/main_en.properties");
-        site().template().message("messages/main_en_CA.properties");
-        site().template().languages("en_US", "en_CA");
 
-        site().template().add("/template/index.html", IndexPage.class);
-        site().template().add("/template/upload.html", UploadPage.class);
+        List<String> messages = Lists.newArrayList("messages/main.properties", "messages/main_en.properties", "messages/main_en_CA.properties");
+        site().message(messages, "en_US", "en_CA");
+
+        site().template("/template/index.html", IndexPage.class);
+        site().template("/template/upload.html", UploadPage.class);
 
         bind(LanguageManager.class);
 
         IndexController index = bind(IndexController.class);
         route().get("/", index::index);
-        route().get("/css/main.css", index::css);
         route().post("/submit", index::submit);
 
         UploadController upload = bind(UploadController.class);

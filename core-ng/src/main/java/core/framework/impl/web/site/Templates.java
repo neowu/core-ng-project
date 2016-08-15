@@ -19,6 +19,6 @@ class Templates {
     public HTMLTemplate get(String language) {
         HTMLTemplate template = languageTemplates.get(language);
         if (template != null) return template;
-        throw Exceptions.error("template language is not defined, please check site().message().languages(), language={}", language);
+        throw Exceptions.error("language is not defined, please check site().message(), language={}", language);
     }
 }

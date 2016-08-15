@@ -1,7 +1,10 @@
 package core.framework.impl.web.site;
 
+import core.framework.api.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,9 +17,8 @@ public class MessageManagerTest {
     @Before
     public void createMessageManager() {
         messageManager = new MessageManager();
-        messageManager.load("message-test/messages.properties");
-        messageManager.load("message-test/messages_en.properties");
-        messageManager.load("message-test/messages_en_US.properties");
+        List<String> properties = Lists.newArrayList("message-test/messages.properties", "message-test/messages_en.properties", "message-test/messages_en_US.properties");
+        messageManager.load(properties, "en", "en_US", "zh");
     }
 
     @Test
@@ -28,29 +30,17 @@ public class MessageManagerTest {
     }
 
     @Test
-    public void effectiveLanguage() {
-        assertEquals(MessageManager.DEFAULT_LANGUAGE, messageManager.effectiveLanguage("zh"));
-        assertEquals("en_US", messageManager.effectiveLanguage("en_US"));
-        assertEquals("en", messageManager.effectiveLanguage("en"));
-        assertEquals("en", messageManager.effectiveLanguage("en_CA"));
-    }
-
-    @Test
     public void message() {
-        assertEquals("value1", message("zh", "key1"));
-        assertEquals("value1", message("en", "key1"));
-        assertEquals("value1", message("en_US", "key1"));
+        assertEquals("value1", messageManager.get("key1", "zh").orElse(null));
+        assertEquals("value1", messageManager.get("key1", "en").orElse(null));
+        assertEquals("value1", messageManager.get("key1", "en_US").orElse(null));
 
-        assertEquals("value2", message("zh", "key2"));
-        assertEquals("en_value2", message("en", "key2"));
-        assertEquals("en_value2", message("en_US", "key2"));
+        assertEquals("value2", messageManager.get("key2", "zh").orElse(null));
+        assertEquals("en_value2", messageManager.get("key2", "en").orElse(null));
+        assertEquals("en_value2", messageManager.get("key2", "en_US").orElse(null));
 
-        assertEquals("value3", message("zh", "key3"));
-        assertEquals("en_value3", message("en", "key3"));
-        assertEquals("en_US_value3", message("en_US", "key3"));
-    }
-
-    private String message(String language, String key) {
-        return messageManager.messageProvider(messageManager.effectiveLanguage(language)).message(key).get();
+        assertEquals("value3", messageManager.get("key3", "zh").orElse(null));
+        assertEquals("en_value3", messageManager.get("key3", "en").orElse(null));
+        assertEquals("en_US_value3", messageManager.get("key3", "en_US").orElse(null));
     }
 }

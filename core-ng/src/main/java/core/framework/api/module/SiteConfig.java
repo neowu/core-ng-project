@@ -2,6 +2,8 @@ package core.framework.api.module;
 
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Lists;
+import core.framework.api.web.site.Message;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.site.StaticDirectoryController;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * @author neo
@@ -33,8 +36,19 @@ public final class SiteConfig {
         return new CDNConfig(context);
     }
 
-    public TemplateConfig template() {
-        return new TemplateConfig(context);
+    public void message(List<String> paths, String... languages) {
+        if (!context.beanFactory.registered(Message.class, null)) {
+            context.beanFactory.bind(Message.class, null, context.httpServer.siteManager.messageManager);
+        }
+
+        context.httpServer.siteManager.messageManager.load(paths, languages);
+    }
+
+    public void template(String path, Class<?> modelClass) {
+        if (context.httpServer.siteManager.messageManager.messages == null) {
+            context.httpServer.siteManager.messageManager.load(Lists.newArrayList());  // load empty message if no message properties was loaded
+        }
+        context.httpServer.siteManager.templateManager.add(path, modelClass);
     }
 
     public void staticContent(String path) {
