@@ -3,6 +3,8 @@ package core.framework.impl.redis;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.log.Markers;
 import core.framework.api.redis.Redis;
+import core.framework.api.redis.RedisHash;
+import core.framework.api.redis.RedisSet;
 import core.framework.api.util.Charsets;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
@@ -31,6 +33,8 @@ public final class RedisImpl implements Redis {
     private static final byte[] EX = Strings.bytes("EX");
     public final Pool<BinaryJedis> pool;
     private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
+    private final RedisSet redisSet = new RedisSetImpl(this);
+    private final RedisHash redisHash = new RedisHashImpl(this);
     private String host;
     private long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
     private Duration timeout;
@@ -131,6 +135,11 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
+    public RedisSet set() {
+        return redisSet;
+    }
+
+    @Override
     public boolean setIfAbsent(String key, String value, Duration expiration) {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
@@ -186,8 +195,8 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
-    public Map<String, String> mget(String... keys) {
-        Map<String, byte[]> values = mgetBytes(keys);
+    public Map<String, String> multiGet(String... keys) {
+        Map<String, byte[]> values = multiGetBytes(keys);
         Map<String, String> result = Maps.newHashMapWithExpectedSize(values.size());
         for (Map.Entry<String, byte[]> entry : values.entrySet()) {
             result.put(entry.getKey(), decode(entry.getValue()));
@@ -195,7 +204,7 @@ public final class RedisImpl implements Redis {
         return result;
     }
 
-    public Map<String, byte[]> mgetBytes(String... keys) {
+    public Map<String, byte[]> multiGetBytes(String... keys) {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
         try {
@@ -221,7 +230,7 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
-    public void mset(Map<String, String> values) {
+    public void multiSet(Map<String, String> values) {
         StopWatch watch = new StopWatch();
         PoolItem<BinaryJedis> item = pool.borrowItem();
         try {
@@ -247,7 +256,7 @@ public final class RedisImpl implements Redis {
         }
     }
 
-    public void mset(Map<String, byte[]> values, Duration expiration) {
+    public void multiSet(Map<String, byte[]> values, Duration expiration) {
         StopWatch watch = new StopWatch();
         int expirationInSeconds = (int) expiration.getSeconds();
         PoolItem<BinaryJedis> item = pool.borrowItem();
@@ -271,105 +280,29 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
-    public Map<String, String> hgetAll(String key) {
-        StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = pool.borrowItem();
-        try {
-            Map<byte[], byte[]> redisValues = item.resource.hgetAll(encode(key));
-            Map<String, String> values = Maps.newHashMapWithExpectedSize(redisValues.size());
-            for (Map.Entry<byte[], byte[]> entry : redisValues.entrySet()) {
-                values.put(decode(entry.getKey()), decode(entry.getValue()));
-            }
-            return values;
-        } catch (JedisConnectionException e) {
-            item.broken = true;
-            throw e;
-        } finally {
-            pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
-            logger.debug("hgetAll, key={}, elapsedTime={}", key, elapsedTime);
-            checkSlowOperation(elapsedTime);
-        }
+    public RedisHash hash() {
+        return redisHash;
     }
 
-    @Override
-    public String hget(String key, String field) {
-        StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = pool.borrowItem();
-        try {
-            return decode(item.resource.hget(encode(key), encode(field)));
-        } catch (JedisConnectionException e) {
-            item.broken = true;
-            throw e;
-        } finally {
-            pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
-            logger.debug("hget, key={}, field={}, elapsedTime={}", key, field, elapsedTime);
-            checkSlowOperation(elapsedTime);
-        }
-    }
-
-    @Override
-    public void hset(String key, String field, String value) {
-        StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = pool.borrowItem();
-        try {
-            item.resource.hset(encode(key), encode(field), encode(value));
-        } catch (JedisConnectionException e) {
-            item.broken = true;
-            throw e;
-        } finally {
-            pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
-            logger.debug("hset, key={}, field={}, value={}, elapsedTime={}", key, field, value, elapsedTime);
-            checkSlowOperation(elapsedTime);
-        }
-    }
-
-    @Override
-    public void hmset(String key, Map<String, String> values) {
-        StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = pool.borrowItem();
-        try {
-            Map<byte[], byte[]> redisValues = Maps.newHashMapWithExpectedSize(values.size());
-            for (Map.Entry<String, String> entry : values.entrySet()) {
-                redisValues.put(encode(entry.getKey()), encode(entry.getValue()));
-            }
-            item.resource.hmset(encode(key), redisValues);
-        } catch (JedisConnectionException e) {
-            item.broken = true;
-            throw e;
-        } finally {
-            pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
-            logger.debug("hmset, key={}, values={}, elapsedTime={}", key, values, elapsedTime);
-            checkSlowOperation(elapsedTime);
-        }
-    }
-
-    private byte[] encode(String value) {
+    byte[] encode(String value) {
         return Strings.bytes(value);
     }
 
-    private byte[][] encode(String[] keys) {
-        int size = keys.length;
-        byte[][] redisKeys = new byte[size][];
+    byte[][] encode(String[] values) {
+        int size = values.length;
+        byte[][] redisValues = new byte[size][];
         for (int i = 0; i < size; i++) {
-            redisKeys[i] = encode(keys[i]);
+            redisValues[i] = encode(values[i]);
         }
-        return redisKeys;
+        return redisValues;
     }
 
-    private String decode(byte[] value) {
+    String decode(byte[] value) {
         if (value == null) return null;
         return new String(value, Charsets.UTF_8);
     }
 
-    private void checkSlowOperation(long elapsedTime) {
+    void checkSlowOperation(long elapsedTime) {
         if (elapsedTime > slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_REDIS"), "slow redis operation, elapsedTime={}", elapsedTime);
         }

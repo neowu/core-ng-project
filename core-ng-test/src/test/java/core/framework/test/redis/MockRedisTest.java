@@ -1,13 +1,17 @@
 package core.framework.test.redis;
 
 import core.framework.api.util.Maps;
+import core.framework.api.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author neo
@@ -33,33 +37,43 @@ public class MockRedisTest {
         redis.set("key2", "value2");
         redis.set("key3", "value3");
 
-        Map<String, String> values = redis.mget("key1", "key3", "key2");
+        Map<String, String> values = redis.multiGet("key1", "key3", "key2");
         assertEquals("value2", values.get("key2"));
         assertEquals("value3", values.get("key3"));
         assertNull(values.get("key1"));
     }
 
     @Test
-    public void hset() {
-        redis.hset("key4", "field1", "value1");
-        assertEquals("value1", redis.hget("key4", "field1"));
+    public void hash() {
+        redis.hash().set("key4", "field1", "value1");
+        assertEquals("value1", redis.hash().get("key4", "field1"));
 
-        redis.hset("key4", "field2", "value2");
-        assertEquals("value1", redis.hget("key4", "field1"));
-        assertEquals("value2", redis.hget("key4", "field2"));
+        redis.hash().set("key4", "field2", "value2");
+        assertEquals("value1", redis.hash().get("key4", "field1"));
+        assertEquals("value2", redis.hash().get("key4", "field2"));
     }
 
     @Test
-    public void hmset() {
-        redis.hmset("key5", Maps.newHashMap("field1", "value1"));
-        Map<String, String> hash = redis.hgetAll("key5");
+    public void hashMulti() {
+        redis.hash().multiSet("key5", Maps.newHashMap("field1", "value1"));
+        Map<String, String> hash = redis.hash().getAll("key5");
         assertEquals(1, hash.size());
         assertEquals("value1", hash.get("field1"));
 
-        redis.hmset("key5", Maps.newHashMap("field2", "value2"));
-        hash = redis.hgetAll("key5");
+        redis.hash().multiSet("key5", Maps.newHashMap("field2", "value2"));
+        hash = redis.hash().getAll("key5");
         assertEquals(2, hash.size());
         assertEquals("value1", hash.get("field1"));
         assertEquals("value2", hash.get("field2"));
+    }
+
+    @Test
+    public void set() {
+        redis.set().add("key6", "value1");
+        assertTrue(redis.set().isMember("key6", "value1"));
+        assertFalse(redis.set().isMember("key6", "value2"));
+
+        Set<String> values = redis.set().members("key6");
+        assertEquals(Sets.newHashSet("value1"), values);
     }
 }

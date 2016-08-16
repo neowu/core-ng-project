@@ -1,18 +1,24 @@
 package core.framework.test.redis;
 
 import core.framework.api.redis.Redis;
+import core.framework.api.redis.RedisHash;
+import core.framework.api.redis.RedisSet;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
+import core.framework.api.util.Sets;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author neo
  */
 public final class MockRedis implements Redis {
-    private final Map<String, Value> store = Maps.newConcurrentHashMap();
+    final Map<String, Value> store = Maps.newConcurrentHashMap();
+
+    private final MockRedisHash redisHash = new MockRedisHash(this);
+    private final MockRedisSet redisSet = new MockRedisSet(this);
 
     @Override
     public String get(String key) {
@@ -28,19 +34,24 @@ public final class MockRedis implements Redis {
 
     @Override
     public void set(String key, String value) {
-        store.put(key, new Value(value));
+        store.put(key, Value.value(value));
     }
 
     @Override
     public void set(String key, String value, Duration expiration) {
-        Value redisValue = new Value(value);
+        Value redisValue = Value.value(value);
         redisValue.expirationTime = System.currentTimeMillis() + expiration.toMillis();
         store.put(key, redisValue);
     }
 
     @Override
+    public RedisSet set() {
+        return redisSet;
+    }
+
+    @Override
     public boolean setIfAbsent(String key, String value, Duration expiration) {
-        Value redisValue = new Value(value);
+        Value redisValue = Value.value(value);
         redisValue.expirationTime = System.currentTimeMillis() + expiration.toMillis();
         Object previous = store.putIfAbsent(key, redisValue);
         return previous == null;
@@ -60,7 +71,7 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public Map<String, String> mget(String... keys) {
+    public Map<String, String> multiGet(String... keys) {
         Map<String, String> results = Maps.newHashMapWithExpectedSize(keys.length);
         for (String key : keys) {
             String value = get(key);
@@ -70,59 +81,46 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public void mset(Map<String, String> values) {
+    public void multiSet(Map<String, String> values) {
         values.forEach(this::set);
     }
 
     @Override
-    public Map<String, String> hgetAll(String key) {
-        Value value = store.get(key);
-        if (value == null) return Maps.newHashMap();
-        if (value.type != ValueType.HASH) throw Exceptions.error("invalid type, key={}, type={}", key, value.type);
-        return new HashMap<>(value.hash);
-    }
-
-    @Override
-    public String hget(String key, String field) {
-        Value value = store.get(key);
-        if (value == null) return null;
-        if (value.type != ValueType.HASH) throw Exceptions.error("invalid type, key={}, type={}", key, value.type);
-        return value.hash.get(field);
-    }
-
-    @Override
-    public void hset(String key, String field, String value) {
-        Value hashValue = store.computeIfAbsent(key, k -> new Value(Maps.newHashMap()));
-        if (hashValue.type != ValueType.HASH) throw Exceptions.error("invalid type, key={}, type={}", key, hashValue.type);
-        hashValue.hash.put(field, value);
-    }
-
-    @Override
-    public void hmset(String key, Map<String, String> values) {
-        Value hashValue = store.computeIfAbsent(key, k -> new Value(Maps.newHashMap()));
-        if (hashValue.type != ValueType.HASH) throw Exceptions.error("invalid type, key={}, type={}", key, hashValue.type);
-        hashValue.hash.putAll(values);
+    public RedisHash hash() {
+        return redisHash;
     }
 
     enum ValueType {
-        VALUE, HASH
+        VALUE, HASH, SET
     }
 
     static class Value {
+        static Value value(String value) {
+            Value result = new Value();
+            result.type = ValueType.VALUE;
+            result.value = value;
+            return result;
+        }
+
+        static Value hashValue() {
+            Value result = new Value();
+            result.type = ValueType.HASH;
+            result.hash = Maps.newHashMap();
+            return result;
+        }
+
+        static Value setValue() {
+            Value result = new Value();
+            result.type = ValueType.SET;
+            result.set = Sets.newHashSet();
+            return result;
+        }
+
         ValueType type;
         String value;
         Map<String, String> hash;
+        Set<String> set;
         Long expirationTime;
-
-        Value(String value) {
-            type = ValueType.VALUE;
-            this.value = value;
-        }
-
-        Value(Map<String, String> hash) {
-            type = ValueType.HASH;
-            this.hash = hash;
-        }
 
         boolean expired(long now) {
             return expirationTime != null && now >= expirationTime;

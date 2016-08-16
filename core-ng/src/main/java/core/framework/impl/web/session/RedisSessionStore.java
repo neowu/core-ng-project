@@ -18,7 +18,7 @@ public class RedisSessionStore implements SessionStore {
     @Override
     public Map<String, String> getAndRefresh(String sessionId, Duration sessionTimeout) {
         String key = sessionKey(sessionId);
-        Map<String, String> data = redis.hgetAll(key);
+        Map<String, String> data = redis.hash().getAll(key);
         if (data.isEmpty()) return null;
 
         redis.expire(key, Duration.ofSeconds(sessionTimeout.getSeconds()));
@@ -28,7 +28,7 @@ public class RedisSessionStore implements SessionStore {
     @Override
     public void save(String sessionId, Map<String, String> sessionData, Duration sessionTimeout) {
         String key = sessionKey(sessionId);
-        redis.hmset(key, sessionData);
+        redis.hash().multiSet(key, sessionData);
         redis.expire(key, Duration.ofSeconds(sessionTimeout.getSeconds()));
     }
 

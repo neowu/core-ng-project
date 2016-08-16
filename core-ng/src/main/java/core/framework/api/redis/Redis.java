@@ -13,21 +13,17 @@ public interface Redis {
 
     void set(String key, String value, Duration expiration);
 
+    RedisSet set();
+
     boolean setIfAbsent(String key, String value, Duration expiration);
 
     void expire(String key, Duration duration);
 
     void del(String key);
 
-    Map<String, String> mget(String... keys);
+    Map<String, String> multiGet(String... keys);
 
-    void mset(Map<String, String> values);
+    void multiSet(Map<String, String> values);
 
-    String hget(String key, String field);
-
-    Map<String, String> hgetAll(String key);
-
-    void hset(String key, String field, String value);
-
-    void hmset(String key, Map<String, String> values);
+    RedisHash hash();
 }

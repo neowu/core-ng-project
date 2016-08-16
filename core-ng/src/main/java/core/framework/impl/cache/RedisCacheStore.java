@@ -34,7 +34,7 @@ public class RedisCacheStore implements CacheStore {
     @Override
     public Map<String, byte[]> getAll(String[] keys) {
         try {
-            return redis.mgetBytes(keys);
+            return redis.multiGetBytes(keys);
         } catch (JedisConnectionException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
             return Maps.newHashMap();
@@ -53,7 +53,7 @@ public class RedisCacheStore implements CacheStore {
     @Override
     public void putAll(Map<String, byte[]> values, Duration expiration) {
         try {
-            redis.mset(values, expiration);
+            redis.multiSet(values, expiration);
         } catch (JedisConnectionException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
         }
