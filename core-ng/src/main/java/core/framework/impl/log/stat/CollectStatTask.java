@@ -87,7 +87,7 @@ public class CollectStatTask implements Runnable {
             long previous = previousElapsedTime;
             long current = bean.getCollectionTime();
             previousElapsedTime = current;
-            return TimeUnit.MILLISECONDS.convert(current - previous, TimeUnit.NANOSECONDS);
+            return TimeUnit.NANOSECONDS.convert(current - previous, TimeUnit.MILLISECONDS);
         }
     }
 }
