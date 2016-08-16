@@ -4,15 +4,18 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Properties;
+import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
 import core.framework.api.web.site.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,46 +26,51 @@ public class MessageManager implements Message {
     static final String DEFAULT_LANGUAGE = "_default";
     private static final Pattern MESSAGE_PROPERTY_PATH_PATTERN = Pattern.compile("[^_]+((_[a-zA-Z0-9]{2,4})*)\\.properties");
     private final Logger logger = LoggerFactory.getLogger(MessageManager.class);
-    public Map<String, List<Properties>> messages;
     String[] languages = new String[]{DEFAULT_LANGUAGE};
+    private Map<String, List<Properties>> messages;
 
     public void load(List<String> paths, String... languages) {
         if (messages != null) throw Exceptions.error("site().message() can only be called once and must before site().template(), please check config");
 
         messages = Maps.newHashMap();
         if (languages != null) this.languages = languages;
-        Map<String, Properties> languageProperties = Maps.newHashMap();
+        Map<String, Properties> properties = Maps.newHashMap();
 
         for (String path : paths) {
-            String language = language(path);
             logger.info("load message properties, path={}", path);
-            validate(path, language);
-            Properties properties = languageProperties.computeIfAbsent(language, key -> new Properties());
-            properties.load(path);
+            String language = language(path);
+            validateLanguage(path, language);
+            properties.computeIfAbsent(language, key -> new Properties())
+                      .load(path);
         }
 
         for (String language : this.languages) {
-            List<Properties> messages = languageProperties(languageProperties, language);
+            List<Properties> messages = languageProperties(properties, language);
             this.messages.put(language, messages);
         }
+
+        validateMessageKeys();
     }
 
-    private List<Properties> languageProperties(Map<String, Properties> languageProperties, String language) {
-        List<Properties> messageProperties = Lists.newArrayList();
-        String currentLanguage = language;
-        while (true) {
-            Properties properties = languageProperties.get(currentLanguage);
-            if (properties != null) messageProperties.add(properties);
-            int index = currentLanguage.lastIndexOf('_');
-            if (index < 0) break;
-            currentLanguage = currentLanguage.substring(0, index);
-        }
-        Properties properties = languageProperties.get(DEFAULT_LANGUAGE);
-        if (properties != null) messageProperties.add(properties);
-        return messageProperties;
+    private void validateMessageKeys() {
+        Map<String, Set<String>> allLanguageKeys = Maps.newHashMap();
+        Set<String> allKeys = Sets.newHashSet();
+        messages.forEach((language, languageProperties) -> {
+            Set<String> languageKeys = Sets.newHashSet();
+            languageProperties.forEach(properties -> languageKeys.addAll(properties.keys()));
+            allKeys.addAll(languageKeys);
+            allLanguageKeys.put(language, languageKeys);
+        });
+        allLanguageKeys.forEach((language, keys) -> {
+            if (!allKeys.equals(keys)) {
+                Set<String> missingKeys = new HashSet<>(allKeys);
+                missingKeys.removeAll(keys);
+                throw Exceptions.error("message keys are missing for language, language={}, keys={}", language, missingKeys);
+            }
+        });
     }
 
-    private void validate(String path, String language) {
+    private void validateLanguage(String path, String language) {
         if (DEFAULT_LANGUAGE.equals(language)) return;
 
         if (languages.length == 1 && languages[0].equals(DEFAULT_LANGUAGE)) {
@@ -74,6 +82,21 @@ public class MessageManager implements Message {
         }
     }
 
+    private List<Properties> languageProperties(Map<String, Properties> languageProperties, String language) {
+        List<Properties> messages = Lists.newArrayList();
+        String currentLanguage = language;
+        while (true) {
+            Properties properties = languageProperties.get(currentLanguage);
+            if (properties != null) messages.add(properties);
+            int index = currentLanguage.lastIndexOf('_');
+            if (index < 0) break;
+            currentLanguage = currentLanguage.substring(0, index);
+        }
+        Properties properties = languageProperties.get(DEFAULT_LANGUAGE);
+        if (properties != null) messages.add(properties);
+        return messages;
+    }
+
     String language(String path) {
         Matcher matcher = MESSAGE_PROPERTY_PATH_PATTERN.matcher(path);
         if (!matcher.matches())
@@ -83,10 +106,15 @@ public class MessageManager implements Message {
         return languagePostfix.substring(1);
     }
 
+    public void freeze() {
+        if (messages == null) messages = Maps.newHashMap();
+    }
+
     @Override
     public Optional<String> get(String key, String language) {
-        List<Properties> properties = messages.get(language == null ? DEFAULT_LANGUAGE : language);
-        if (properties == null) throw Exceptions.error("language is not defined, please check site().message(), language={}", language);
+        String targetLanguage = language == null ? DEFAULT_LANGUAGE : language;
+        List<Properties> properties = messages.get(targetLanguage);
+        if (properties == null) throw Exceptions.error("language is not defined, please check site().message(), language={}", targetLanguage);
         for (Properties property : properties) {
             Optional<String> message = property.get(key);
             if (message.isPresent()) return message;

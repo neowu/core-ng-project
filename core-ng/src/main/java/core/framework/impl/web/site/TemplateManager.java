@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class TemplateManager {
     public final CDNManager cdnManager = new CDNManager();
-    public final Map<String, Templates> templates = Maps.newConcurrentHashMap();
+    public final Map<String, Map<String, HTMLTemplate>> templates = Maps.newConcurrentHashMap();    // path->language->template
     private final MessageManager messageManager;
     private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
@@ -47,8 +47,8 @@ public class TemplateManager {
     public void add(String templatePath, Class<?> modelClass) {
         StopWatch watch = new StopWatch();
         try {
-            Templates previous = templates.putIfAbsent(templatePath, load(templatePath, modelClass));
-            if (previous != null) throw Exceptions.error("template path is registered, templatePath={}", templatePath);
+            Map<String, HTMLTemplate> previous = templates.putIfAbsent(templatePath, load(templatePath, modelClass));
+            if (previous != null) throw Exceptions.error("template was registered, templatePath={}", templatePath);
             if (webDirectory.localEnv) {
                 Path path = webDirectory.path(templatePath);
                 templateLastModifiedTimes.put(templatePath, Files.lastModified(path));
@@ -59,7 +59,7 @@ public class TemplateManager {
     }
 
     private HTMLTemplate get(String templatePath, Class<?> modelClass, String language) {
-        Templates templates = this.templates.get(templatePath);
+        Map<String, HTMLTemplate> templates = this.templates.get(templatePath);
         if (templates == null)
             throw Exceptions.error("template is not registered, please use site().template() to add template, templatePath={}", templatePath);
 
@@ -72,17 +72,20 @@ public class TemplateManager {
             }
         }
 
-        return templates.get(language == null ? MessageManager.DEFAULT_LANGUAGE : language);
+        String targetLanguage = language == null ? MessageManager.DEFAULT_LANGUAGE : language;
+        HTMLTemplate template = templates.get(targetLanguage);
+        if (template == null) throw Exceptions.error("language is not defined, please check site().message(), language={}", targetLanguage);
+        return template;
     }
 
-    private Templates load(String templatePath, Class<?> modelClass) {
+    private Map<String, HTMLTemplate> load(String templatePath, Class<?> modelClass) {
         HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass);
         builder.cdn = cdnManager;
-        Templates templates = new Templates();
+        Map<String, HTMLTemplate> templates = Maps.newHashMap();
         for (String language : messageManager.languages) {
             builder.message = key -> messageManager.get(key, language);
             HTMLTemplate htmlTemplate = builder.build();
-            templates.add(language, htmlTemplate);
+            templates.put(language, htmlTemplate);
         }
         return templates;
     }

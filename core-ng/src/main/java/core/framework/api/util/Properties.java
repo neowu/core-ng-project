@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author neo
@@ -36,5 +37,9 @@ public final class Properties {
             return Optional.of(value);
         }
         return Optional.empty();
+    }
+
+    public Set<String> keys() {
+        return properties.keySet();
     }
 }
