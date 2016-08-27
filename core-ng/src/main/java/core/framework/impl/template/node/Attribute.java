@@ -48,12 +48,12 @@ public class Attribute {
 
     boolean isDynamicBooleanAttribute() {
         return "c:checked".equals(name)
-            || "c:selected".equals(name)
-            || "c:disabled".equals(name)
-            || "c:readonly".equals(name)
-            || "c:multiple".equals(name)
-            || "c:ismap".equals(name)
-            || "c:defer".equals(name);
+                || "c:selected".equals(name)
+                || "c:disabled".equals(name)
+                || "c:readonly".equals(name)
+                || "c:multiple".equals(name)
+                || "c:ismap".equals(name)
+                || "c:defer".equals(name);
     }
 
     void addBooleanAttribute(ContainerFragment parent, TemplateMetaContext context) {
@@ -88,10 +88,14 @@ public class Attribute {
 
     void addValueAttribute(ContainerFragment parent, TemplateMetaContext context) {
         parent.addStaticContent(" ");
-        parent.addStaticContent(name.substring(2));
+        parent.addStaticContent(name.substring(name.lastIndexOf(':') + 1));
         if ("c:href".equals(name)) {
             parent.addStaticContent("=");
             parent.add(new URLFragment(value, context, false, location));
+        } else if ("c:html:".equals(name.substring(0, 7))) {
+            parent.addStaticContent("=\"");
+            parent.add(new HTMLContentFragment(value, context, location));
+            parent.addStaticContent("\"");
         } else {
             parent.addStaticContent("=\"");
             parent.add(new TextContentFragment(value, context, location));
