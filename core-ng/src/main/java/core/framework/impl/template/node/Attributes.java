@@ -4,6 +4,7 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.fragment.ContainerFragment;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,6 @@ public class Attributes {
                 attribute.addCDNAttribute(parent, context);
             } else if (attribute.isDynamic()) {
                 if (attribute.isDynamicBooleanAttribute()) attribute.addBooleanAttribute(parent, context);
-                else if (attribute.isDynamicMetaAttribute()) attribute.addMetaAttribute(parent, context);
                 else attribute.addValueAttribute(parent, context);
             } else if (attribute.isMessage()) {
                 attribute.addMessageAttribute(parent, context);
@@ -42,12 +42,12 @@ public class Attributes {
         String name = attribute.name;
 
         if ("xmlns:c".equals(name) || "xmlns:m".equals(name)
-                || "c:text".equals(name)
-                || "c:html".equals(name)
-                || "m:text".equals(name)
-                || "c:include".equals(name)
-                || "c:for".equals(name)
-                || "c:if".equals(name))
+            || "c:text".equals(name)
+            || "c:html".equals(name)
+            || "m:text".equals(name)
+            || "c:include".equals(name)
+            || "c:for".equals(name)
+            || "c:if".equals(name))
             return true;
 
         return !attribute.isDynamic() && (attributes.containsKey("c:" + name) || attributes.containsKey("m:" + name));   // there is dynamic attribute to overwrite
@@ -55,9 +55,9 @@ public class Attributes {
 
     public boolean containDynamicContent() {
         return attributes.containsKey("c:text")
-                || attributes.containsKey("m:text")
-                || attributes.containsKey("c:html")
-                || attributes.containsKey("c:include");
+            || attributes.containsKey("m:text")
+            || attributes.containsKey("c:html")
+            || attributes.containsKey("c:include");
     }
 
     public Attribute dynamicContentAttribute() {
@@ -88,8 +88,6 @@ public class Attributes {
         attribute = attributes.get("c:html");
         if (attribute != null) count++;
         attribute = attributes.get("c:include");
-        if (attribute != null) count++;
-        attribute = attributes.get("c:content");
         if (attribute != null) count++;
 
         if (count > 1 && attribute != null)
