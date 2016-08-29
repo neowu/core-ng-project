@@ -22,6 +22,7 @@ public class IndexController {
     public Response index(Request request) {
         IndexPage model = new IndexPage();
         model.name = message.get("key.name", languageManager.language()).orElse("world not found");
+        model.imageURL = "https://image.com/image123.jpg";
 
         Session session = request.session();
 //        Optional<String> hello = session.get("hello");

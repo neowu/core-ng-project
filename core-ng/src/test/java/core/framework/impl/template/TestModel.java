@@ -29,4 +29,8 @@ public class TestModel {
     public String url() {
         return "/test";
     }
+
+    public String unescapedContent() {
+        return "https://www.url.com";
+    }
 }

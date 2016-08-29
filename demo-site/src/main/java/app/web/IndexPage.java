@@ -10,6 +10,7 @@ import java.util.List;
 public class IndexPage {
     public String name;
     public String backgroundColor;
+    public String imageURL;
 
     public String welcomeMessage() {
         return "hello " + name;
