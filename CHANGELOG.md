@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.7.3 (8/29/2016)
+* template: support c:html:attribute for attribute not be escaped (thanks gabo)
+
 ### 4.7.2 (8/15/2016 - 8/16/2016)
 * site: expose messages interface for i18n messages
 * gradle: remove properties process, use node/gulp asset pipeline instead

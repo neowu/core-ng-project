@@ -30,7 +30,7 @@ public class TestModel {
         return "/test";
     }
 
-    public String unescapedContent() {
-        return "https://www.url.com";
+    public String urlContent() {
+        return "https://url";
     }
 }
