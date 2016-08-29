@@ -56,6 +56,11 @@ public class Attribute {
             || "c:defer".equals(name);
     }
 
+    boolean isDynamicMetaAttribute() {
+        return "meta".equals(tagName) && ("c:content".equals(name) || "content".equals(name))
+                || "meta".equals(tagName) && ("c:href".equals(name) || "href".equals(name));
+    }
+
     void addBooleanAttribute(ContainerFragment parent, TemplateMetaContext context) {
         parent.add(new BooleanAttributeFragment(name.substring(2), value, context, location));
     }
@@ -83,6 +88,21 @@ public class Attribute {
             } else {
                 addStaticContent(parent);
             }
+        }
+    }
+
+    void addMetaAttribute(ContainerFragment parent, TemplateMetaContext context) {
+        parent.addStaticContent(" ");
+
+        if ("c:href".equals(name)) { // intended to put an url, replace name with content so it works
+            parent.addStaticContent("content");
+            parent.addStaticContent("=");
+            parent.add(new URLFragment(value, context, false, location));
+        } else {
+            parent.addStaticContent(name.substring(2));
+            parent.addStaticContent("=\"");
+            parent.add(new TextContentFragment(value, context, location));
+            parent.addStaticContent("\"");
         }
     }
 
