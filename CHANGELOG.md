@@ -15,6 +15,9 @@
 * faster synchronous rpc
 
 ## Change log
+### 4.7.4 (8/31/2016 - ongoing)
+* mongo: updated driver to 3.3.0
+
 ### 4.7.3 (8/29/2016)
 * template: support c:html:attribute for attribute not be escaped (thanks gabo)
 
