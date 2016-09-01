@@ -6,6 +6,10 @@ import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -25,6 +29,7 @@ public class EntityDecoderBuilderTest {
 
         assertEquals(new ObjectId("5627b47d54b92d03adb9e9cf"), entity.id);
         assertEquals("string", entity.stringField);
+        assertEquals(ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("America/New_York")).toInstant(), entity.zonedDateTimeField.toInstant());
         assertEquals(TestEntityChild.TestEnum.ITEM1, entity.child.enumField);
         assertEquals(2, entity.listField.size());
         assertEquals("V1", entity.listField.get(0));

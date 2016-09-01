@@ -4,7 +4,9 @@ import core.framework.api.util.Exceptions;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author neo
@@ -63,6 +65,22 @@ interface RowMapper<T> {
         public LocalDateTime map(ResultSetWrapper resultSet) throws SQLException {
             checkColumnCount(resultSet);
             return resultSet.getLocalDateTime(1);
+        }
+    }
+
+    class LocalDateRowMapper implements RowMapper<LocalDate> {
+        @Override
+        public LocalDate map(ResultSetWrapper resultSet) throws SQLException {
+            checkColumnCount(resultSet);
+            return resultSet.getLocalDate(1);
+        }
+    }
+
+    class ZonedDateTimeRowMapper implements RowMapper<ZonedDateTime> {
+        @Override
+        public ZonedDateTime map(ResultSetWrapper resultSet) throws SQLException {
+            checkColumnCount(resultSet);
+            return resultSet.getZonedDateTime(1);
         }
     }
 

@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -49,6 +50,8 @@ final class RowMapperBuilder<T> {
                 builder.indent(1).append("entity.{} = resultSet.getLocalDateTime(\"{}\");\n", fieldName, column);
             } else if (LocalDate.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getLocalDate(\"{}\");\n", fieldName, column);
+            } else if (ZonedDateTime.class.equals(fieldClass)) {
+                builder.indent(1).append("entity.{} = resultSet.getZonedDateTime(\"{}\");\n", fieldName, column);
             } else if (Enum.class.isAssignableFrom(fieldClass)) {
                 registerEnumClass(fieldClass);
                 enumMapperFields.add(Strings.format("private final {} {}Mappings = new {}({}.class);", DBEnumMapper.class.getCanonicalName(), fieldName, DBEnumMapper.class.getCanonicalName(), fieldClass.getCanonicalName()));

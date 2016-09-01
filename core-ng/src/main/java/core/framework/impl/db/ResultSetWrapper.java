@@ -10,10 +10,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 /**
@@ -133,8 +133,7 @@ final class ResultSetWrapper {
     LocalDateTime getLocalDateTime(int index) throws SQLException {
         Timestamp timestamp = resultSet.getTimestamp(index);
         if (timestamp == null) return null;
-        Instant instant = timestamp.toInstant();
-        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
     }
 
     LocalDate getLocalDate(String column) throws SQLException {
@@ -147,5 +146,17 @@ final class ResultSetWrapper {
         Date date = resultSet.getDate(index);
         if (date == null) return null;
         return date.toLocalDate();
+    }
+
+    ZonedDateTime getZonedDateTime(String column) throws SQLException {
+        Integer index = index(column);
+        if (index == null) return null;
+        return getZonedDateTime(index);
+    }
+
+    ZonedDateTime getZonedDateTime(int index) throws SQLException {
+        Timestamp timestamp = resultSet.getTimestamp(index);
+        if (timestamp == null) return null;
+        return ZonedDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault());
     }
 }

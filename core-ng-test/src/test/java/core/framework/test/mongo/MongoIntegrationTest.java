@@ -9,6 +9,9 @@ import org.junit.After;
 import org.junit.Test;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +37,7 @@ public class MongoIntegrationTest extends IntegrationTest {
     public void insert() {
         TestMongoEntity entity = new TestMongoEntity();
         entity.stringField = "string";
+        entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("UTC"));
         testEntityCollection.insert(entity);
 
         assertNotNull(entity.id);
@@ -41,6 +45,7 @@ public class MongoIntegrationTest extends IntegrationTest {
         Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entity.id);
         assertTrue(loadedEntity.isPresent());
         assertEquals(entity.stringField, loadedEntity.get().stringField);
+        assertEquals(entity.zonedDateTimeField.toInstant(), loadedEntity.get().zonedDateTimeField.toInstant());
     }
 
     @Test
@@ -50,13 +55,13 @@ public class MongoIntegrationTest extends IntegrationTest {
         entity.stringField = "value1";
         testEntityCollection.replace(entity);
 
-        TestMongoEntity loadedEntity = testEntityCollection.get(entity.id).get();
+        TestMongoEntity loadedEntity = testEntityCollection.get(entity.id).orElseThrow(() -> new Error("not found"));
         assertEquals(entity.stringField, loadedEntity.stringField);
 
         entity.stringField = "value2";
         testEntityCollection.replace(entity);
 
-        loadedEntity = testEntityCollection.get(entity.id).get();
+        loadedEntity = testEntityCollection.get(entity.id).orElseThrow(() -> new Error("not found"));
         assertEquals(entity.stringField, loadedEntity.stringField);
     }
 

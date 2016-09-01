@@ -6,6 +6,8 @@ import core.framework.api.mongo.Id;
 import core.framework.api.mongo.MongoEnumValue;
 import org.bson.types.ObjectId;
 
+import java.time.ZonedDateTime;
+
 /**
  * @author neo
  */
@@ -19,6 +21,9 @@ public class TestMongoEntity {
 
     @Field(name = "enum_field")
     public TestEnum enumField;
+
+    @Field(name = "zoned_date_time_field")
+    public ZonedDateTime zonedDateTimeField;
 
     public enum TestEnum {
         @MongoEnumValue("VALUE1")

@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 /**
@@ -54,6 +55,7 @@ final class DatabaseClassValidator implements TypeVisitor {
             || BigDecimal.class.equals(valueClass)
             || LocalDate.class.equals(valueClass)
             || LocalDateTime.class.equals(valueClass)
+            || ZonedDateTime.class.equals(valueClass)
             || Enum.class.isAssignableFrom(valueClass);
     }
 

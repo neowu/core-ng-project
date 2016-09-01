@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -194,6 +195,7 @@ public class ValidatorBuilder {
             || BigDecimal.class.equals(fieldClass)
             || LocalDate.class.equals(fieldClass)
             || LocalDateTime.class.equals(fieldClass)
+            || ZonedDateTime.class.equals(fieldClass)
             || Instant.class.equals(fieldClass)
             || Enum.class.isAssignableFrom(fieldClass)
             || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver

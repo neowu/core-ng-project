@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,9 @@ public class MessageClassValidatorTest {
     @Message(name = "test_message")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class TestMessage {
+        @XmlElement(name = "zoned_date_time_field")
+        public ZonedDateTime zonedDateTimeField;
+
         @XmlElement(name = "date_time_field")
         public LocalDateTime dateTimeField;
 

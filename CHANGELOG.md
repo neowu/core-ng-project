@@ -3,7 +3,7 @@
 * web: get/form post, validate bean class and code generation for param serialization?
 * general retry and throttling?
 * webservice: client retry on network issue?
-* website static content security check, (in server env, this is handled by nginx directly)
+* website static content security check? (in server env, this is handled by nginx directly)
 * validator: annotation for website, like @HTMLSafeString?
 * cm: config management, dynamic update properties?
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
@@ -13,10 +13,12 @@
 * framework error, queue listener, background task error notification?
 * extend i18n message to validator/format/called by code directly
 * faster synchronous rpc
+* mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 
 ## Change log
-### 4.7.4 (8/31/2016 - ongoing)
+### 4.7.4 (8/31/2016 - 9/1/2016)
 * mongo: updated driver to 3.3.0
+* convert: support ZonedDateTime in mongo/db/json conversion
 
 ### 4.7.3 (8/29/2016)
 * template: support c:html:attribute for attribute not be escaped (thanks gabo)

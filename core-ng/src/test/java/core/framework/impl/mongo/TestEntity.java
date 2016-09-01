@@ -6,6 +6,7 @@ import core.framework.api.mongo.Id;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,9 @@ public class TestEntity {
 
     @Field(name = "date_field")
     public LocalDateTime dateField;
+
+    @Field(name = "zoned_date_time_field")
+    public ZonedDateTime zonedDateTimeField;
 
     @Field(name = "string_field")
     public String stringField;

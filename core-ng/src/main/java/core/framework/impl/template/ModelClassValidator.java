@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author neo
@@ -40,6 +41,7 @@ public class ModelClassValidator implements TypeVisitor {
             || BigDecimal.class.equals(valueClass)
             || LocalDate.class.equals(valueClass)
             || LocalDateTime.class.equals(valueClass)
+            || ZonedDateTime.class.equals(valueClass)
             || Instant.class.equals(valueClass)
             || Enum.class.isAssignableFrom(valueClass)
             || "org.bson.types.ObjectId".equals(valueClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver;

@@ -70,6 +70,8 @@ private void encode_core_framework_impl_mongo_TestEntity(org.bson.BsonWriter wri
     core.framework.impl.mongo.EntityCodecHelper.writeDouble(writer, entity.doubleField);
     writer.writeName("date_field");
     core.framework.impl.mongo.EntityCodecHelper.writeLocalDateTime(writer, entity.dateField);
+    writer.writeName("zoned_date_time_field");
+    core.framework.impl.mongo.EntityCodecHelper.writeZonedDateTime(writer, entity.zonedDateTimeField);
     writer.writeName("string_field");
     core.framework.impl.mongo.EntityCodecHelper.writeString(writer, entity.stringField);
     writer.writeName("list_field");

@@ -11,6 +11,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
 
 import javax.inject.Inject;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,11 +32,13 @@ public class ElasticSearchIntegrationTest extends IntegrationTest {
     public void index() {
         TestDocument document = new TestDocument();
         document.stringField = "value";
+        document.zonedDateTimeField = ZonedDateTime.now(ZoneId.of("America/New_York"));
         documentType.index("1", document);
 
         Optional<TestDocument> returnedDocument = documentType.get("1");
         assertTrue(returnedDocument.isPresent());
-        assertEquals("value", returnedDocument.get().stringField);
+        assertEquals(document.stringField, returnedDocument.get().stringField);
+        assertEquals(document.zonedDateTimeField.toInstant(), returnedDocument.get().zonedDateTimeField.toInstant());
     }
 
     @Test

@@ -169,6 +169,10 @@ public core.framework.impl.mongo.TestEntity decode_core_framework_impl_mongo_Tes
             entity.dateField = core.framework.impl.mongo.EntityCodecHelper.readLocalDateTime(reader, fieldPath);
             continue;
         }
+        if ("zoned_date_time_field".equals(fieldName)) {
+            entity.zonedDateTimeField = core.framework.impl.mongo.EntityCodecHelper.readZonedDateTime(reader, fieldPath);
+            continue;
+        }
         if ("string_field".equals(fieldName)) {
             entity.stringField = core.framework.impl.mongo.EntityCodecHelper.readString(reader, fieldPath);
             continue;

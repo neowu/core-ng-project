@@ -5,6 +5,9 @@
   "int_field": null,
   "double_field": null,
   "date_field": null,
+  "zoned_date_time_field": {
+    "$date": 1472742000000
+  },
   "string_field": "string",
   "list_field": [
     "V1",

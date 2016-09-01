@@ -48,7 +48,7 @@ public class RepositoryImplAutoIncrementIdEntityTest {
         Optional<Long> id = repository.insert(entity);
         Assert.assertTrue(id.isPresent());
 
-        AutoIncrementIdEntity selectedEntity = repository.get(id.get()).get();
+        AutoIncrementIdEntity selectedEntity = repository.get(id.get()).orElseThrow(() -> new Error("not found"));
 
         Assert.assertEquals((long) id.get(), (long) selectedEntity.id);
         Assert.assertEquals(entity.stringField, selectedEntity.stringField);
@@ -64,7 +64,7 @@ public class RepositoryImplAutoIncrementIdEntityTest {
         Optional<Long> id = repository.insert(entity);
         Assert.assertTrue(id.isPresent());
 
-        AutoIncrementIdEntity selectedEntity = repository.selectOne("string_field = ?", entity.stringField).get();
+        AutoIncrementIdEntity selectedEntity = repository.selectOne("string_field = ?", entity.stringField).orElseThrow(() -> new Error("not found"));
 
         Assert.assertEquals((long) id.get(), (long) selectedEntity.id);
         Assert.assertEquals(entity.stringField, selectedEntity.stringField);

@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import javax.xml.bind.annotation.XmlEnumValue;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,6 +56,7 @@ public final class MongoClassValidator implements TypeVisitor {
             || Long.class.equals(valueClass)
             || Double.class.equals(valueClass)
             || LocalDateTime.class.equals(valueClass)
+            || ZonedDateTime.class.equals(valueClass)
             || Enum.class.isAssignableFrom(valueClass);
     }
 

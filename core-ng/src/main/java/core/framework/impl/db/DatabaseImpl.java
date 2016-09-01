@@ -18,7 +18,9 @@ import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,13 +44,7 @@ public final class DatabaseImpl implements Database {
     private String url;
 
     public DatabaseImpl() {
-        rowMappers.put(String.class, new RowMapper.StringRowMapper());
-        rowMappers.put(Integer.class, new RowMapper.IntegerRowMapper());
-        rowMappers.put(Long.class, new RowMapper.LongRowMapper());
-        rowMappers.put(Double.class, new RowMapper.DoubleRowMapper());
-        rowMappers.put(BigDecimal.class, new RowMapper.BigDecimalRowMapper());
-        rowMappers.put(Boolean.class, new RowMapper.BooleanRowMapper());
-        rowMappers.put(LocalDateTime.class, new RowMapper.LocalDateTimeRowMapper());
+        initializeRowMappers();
 
         pool = new Pool<>(this::createConnection, Connection::close);
         pool.name("db");
@@ -57,6 +53,18 @@ public final class DatabaseImpl implements Database {
 
         operation = new DatabaseOperation(pool);
         timeout(Duration.ofSeconds(15));
+    }
+
+    private void initializeRowMappers() {
+        rowMappers.put(String.class, new RowMapper.StringRowMapper());
+        rowMappers.put(Integer.class, new RowMapper.IntegerRowMapper());
+        rowMappers.put(Long.class, new RowMapper.LongRowMapper());
+        rowMappers.put(Double.class, new RowMapper.DoubleRowMapper());
+        rowMappers.put(BigDecimal.class, new RowMapper.BigDecimalRowMapper());
+        rowMappers.put(Boolean.class, new RowMapper.BooleanRowMapper());
+        rowMappers.put(LocalDateTime.class, new RowMapper.LocalDateTimeRowMapper());
+        rowMappers.put(LocalDate.class, new RowMapper.LocalDateRowMapper());
+        rowMappers.put(ZonedDateTime.class, new RowMapper.ZonedDateTimeRowMapper());
     }
 
     private Connection createConnection() {

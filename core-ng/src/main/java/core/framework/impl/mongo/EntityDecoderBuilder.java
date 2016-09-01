@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,8 @@ final class EntityDecoderBuilder<T> {
             builder.indent(3).append("{} = {}.readLong(reader, fieldPath);\n", fieldVariable, helper);
         } else if (LocalDateTime.class.equals(fieldClass)) {
             builder.indent(3).append("{} = {}.readLocalDateTime(reader, fieldPath);\n", fieldVariable, helper);
+        } else if (ZonedDateTime.class.equals(fieldClass)) {
+            builder.indent(3).append("{} = {}.readZonedDateTime(reader, fieldPath);\n", fieldVariable, helper);
         } else if (Enum.class.isAssignableFrom(fieldClass)) {
             String enumCodecVariable = registerEnumCodec(fieldClass);
             builder.indent(3).append("{} = ({}) {}.decode(reader, null);\n", fieldVariable, fieldClass.getCanonicalName(), enumCodecVariable);
@@ -173,6 +176,8 @@ final class EntityDecoderBuilder<T> {
             builder.indent(2).append("map.put(fieldName, {}.readLong(reader, fieldPath));\n", helper);
         } else if (LocalDateTime.class.equals(valueClass)) {
             builder.indent(2).append("map.put(fieldName, {}.readLocalDateTime(reader, fieldPath));\n", helper);
+        } else if (ZonedDateTime.class.equals(valueClass)) {
+            builder.indent(2).append("map.put(fieldName, {}.readZonedDateTime(reader, fieldPath));\n", helper);
         } else if (Enum.class.isAssignableFrom(valueClass)) {
             String enumCodecVariable = registerEnumCodec(valueClass);
             builder.indent(2).append("map.put(fieldName, {}.read(reader, fieldPath));\n", enumCodecVariable);
@@ -229,6 +234,8 @@ final class EntityDecoderBuilder<T> {
             builder.indent(2).append("list.add({}.readLong(reader, fieldPath));\n", helper);
         } else if (LocalDateTime.class.equals(valueClass)) {
             builder.indent(2).append("list.add({}.readLocalDateTime(reader, fieldPath));\n", helper);
+        } else if (ZonedDateTime.class.equals(valueClass)) {
+            builder.indent(2).append("list.add({}.readZonedDateTime(reader, fieldPath));\n", helper);
         } else if (Enum.class.isAssignableFrom(valueClass)) {
             String enumCodecVariable = registerEnumCodec(valueClass);
             builder.indent(2).append("list.add({}.read(reader, fieldPath));\n", enumCodecVariable, valueClassName);

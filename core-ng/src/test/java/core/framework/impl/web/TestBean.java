@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlEnumValue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -15,6 +16,9 @@ import java.util.Optional;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TestBean {
+    @XmlElement(name = "zoned_date_time_field")
+    public ZonedDateTime zonedDateTimeField;
+
     @XmlElement(name = "date_time_field")
     public LocalDateTime dateTimeField;
 

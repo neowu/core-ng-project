@@ -50,6 +50,7 @@ public final class EntityCodecs {
     CodecRegistry codecRegistry() {
         List<Codec<?>> codecs = new ArrayList<>(this.codecs.values());
         codecs.add(new LocalDateTimeCodec());
+        codecs.add(new ZonedDateTimeCodec());
         enumClasses.forEach(enumClass -> codecs.add(new EnumCodec(enumClass)));
         return CodecRegistries.fromCodecs(codecs);
     }

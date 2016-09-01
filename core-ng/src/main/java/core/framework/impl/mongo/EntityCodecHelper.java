@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author neo
@@ -47,6 +48,10 @@ public final class EntityCodecHelper {      // used by generated entity encoder 
 
     public static void writeLocalDateTime(BsonWriter writer, LocalDateTime value) {
         LocalDateTimeCodec.write(writer, value);
+    }
+
+    public static void writeZonedDateTime(BsonWriter writer, ZonedDateTime value) {
+        ZonedDateTimeCodec.write(writer, value);
     }
 
     public static Integer readInteger(BsonReader reader, String field) {
@@ -135,5 +140,9 @@ public final class EntityCodecHelper {      // used by generated entity encoder 
 
     public static LocalDateTime readLocalDateTime(BsonReader reader, String field) {
         return LocalDateTimeCodec.read(reader, field);
+    }
+
+    public static ZonedDateTime readZonedDateTime(BsonReader reader, String field) {
+        return ZonedDateTimeCodec.read(reader, field);
     }
 }

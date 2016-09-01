@@ -10,6 +10,9 @@
         "string_field": {
           "type": "string",
           "analyzer": "standard"
+        },
+        "zoned_date_time_field": {
+          "type": "date"
         }
       }
     }

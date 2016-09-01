@@ -2,13 +2,16 @@ package core.framework.impl.db;
 
 import core.framework.api.db.Transaction;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author neo
@@ -41,8 +44,8 @@ public class DatabaseImplTest {
 
         EntityView view = database.selectOne("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?", EntityView.class, 1).get();
 
-        Assert.assertEquals("string", view.stringField);
-        Assert.assertEquals(TestEnum.V1, view.enumField);
+        assertEquals("string", view.stringField);
+        assertEquals(TestEnum.V1, view.enumField);
     }
 
     @Test
@@ -52,28 +55,29 @@ public class DatabaseImplTest {
 
         List<EntityView> views = database.select("SELECT string_field as string_label, enum_field as enum_label FROM database_test", EntityView.class);
 
-        Assert.assertEquals(2, views.size());
-        Assert.assertEquals(TestEnum.V1, views.get(0).enumField);
-        Assert.assertEquals(TestEnum.V2, views.get(1).enumField);
+        assertEquals(2, views.size());
+        assertEquals(TestEnum.V1, views.get(0).enumField);
+        assertEquals(TestEnum.V2, views.get(1).enumField);
     }
 
     @Test
     public void selectEmptyWithView() {
         List<EntityView> views = database.select("SELECT string_field, enum_field FROM database_test where id = -1", EntityView.class);
 
-        Assert.assertTrue(views.isEmpty());
+        assertTrue(views.isEmpty());
     }
 
     @Test
     public void selectNullInt() {
         Optional<Integer> result = database.selectOne("SELECT max(id) FROM database_test", Integer.class);
-        Assert.assertFalse(result.isPresent());
+        assertFalse(result.isPresent());
     }
 
     @Test
     public void selectInt() {
         Optional<Integer> result = database.selectOne("SELECT count(id) FROM database_test", Integer.class);
-        Assert.assertEquals(0, result.get().intValue());
+        assertTrue(result.isPresent());
+        assertEquals(0, result.get().intValue());
     }
 
     @Test
@@ -84,7 +88,7 @@ public class DatabaseImplTest {
         }
 
         Optional<EntityView> result = database.selectOne("SELECT string_field, enum_field FROM database_test where id = ?", EntityView.class, 1);
-        Assert.assertTrue(result.isPresent());
+        assertTrue(result.isPresent());
     }
 
     @Test
@@ -95,6 +99,6 @@ public class DatabaseImplTest {
         }
 
         Optional<EntityView> result = database.selectOne("SELECT string_field, enum_field FROM database_test where id = ?", EntityView.class, 1);
-        Assert.assertFalse(result.isPresent());
+        assertFalse(result.isPresent());
     }
 }
