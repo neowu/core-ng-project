@@ -149,18 +149,12 @@ final class EntityDecoderBuilder<T> {
         CodeBuilder builder = new CodeBuilder();
         builder.append("private java.util.Map {}(org.bson.BsonReader reader, String parentField) {\n", methodName);
         builder.indent(1).append("org.bson.BsonType currentType = reader.getCurrentBsonType();\n");
-
-        builder.indent(1).append("if (currentType == org.bson.BsonType.NULL) {\n");
-        builder.indent(2).append("reader.readNull();\n");
-        builder.indent(2).append("return null;\n");
-        builder.indent(1).append("}\n");
-
+        builder.indent(1).append("if (currentType == org.bson.BsonType.NULL) { reader.readNull(); return null; }\n");
         builder.indent(1).append("if (currentType != org.bson.BsonType.DOCUMENT) {\n");
         builder.indent(2).append("logger.warn(\"unexpected field type, field={}, type={}\", parentField, currentType);\n");
         builder.indent(2).append("reader.skipValue();\n");
         builder.indent(2).append("return null;\n");
         builder.indent(1).append("}\n");
-
 
         builder.indent(1).append("java.util.Map map = new java.util.LinkedHashMap();\n");
         builder.indent(1).append("reader.readStartDocument();\n");

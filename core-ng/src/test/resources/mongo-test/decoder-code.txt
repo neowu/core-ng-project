@@ -21,10 +21,7 @@ private java.util.List decode_java_util_List_java_lang_String(org.bson.BsonReade
 }
 private java.util.Map decode_java_util_Map_java_lang_String(org.bson.BsonReader reader, String parentField) {
     org.bson.BsonType currentType = reader.getCurrentBsonType();
-    if (currentType == org.bson.BsonType.NULL) {
-        reader.readNull();
-        return null;
-    }
+    if (currentType == org.bson.BsonType.NULL) { reader.readNull(); return null; }
     if (currentType != org.bson.BsonType.DOCUMENT) {
         logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
         reader.skipValue();
@@ -118,10 +115,7 @@ private java.util.List decode_java_util_List_core_framework_impl_mongo_TestEntit
 }
 private java.util.Map decode_java_util_Map_core_framework_impl_mongo_TestEntityChild(org.bson.BsonReader reader, String parentField) {
     org.bson.BsonType currentType = reader.getCurrentBsonType();
-    if (currentType == org.bson.BsonType.NULL) {
-        reader.readNull();
-        return null;
-    }
+    if (currentType == org.bson.BsonType.NULL) { reader.readNull(); return null; }
     if (currentType != org.bson.BsonType.DOCUMENT) {
         logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
         reader.skipValue();
