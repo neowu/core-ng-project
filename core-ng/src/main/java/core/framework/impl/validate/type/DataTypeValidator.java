@@ -32,23 +32,22 @@ public class DataTypeValidator {
     }
 
     public void validate() {
-        Type type = extractOptionalType(this.type, "");
+        Type type = extractTopLevelOptional(this.type);
 
         if (GenericTypes.isList(type)) {
             if (!allowTopLevelList) throw Exceptions.error("top level list is not allowed, type={}", type.getTypeName());
             visitList(type, null, null);
         } else {
             if (allowTopLevelValue && allowedValueClass.apply(GenericTypes.rawClass(type))) return;
-
             visitObject(GenericTypes.rawClass(type), null, null);
         }
     }
 
-    private Type extractOptionalType(Type type, String fieldPath) {
+    private Type extractTopLevelOptional(Type type) {
         if (GenericTypes.isOptional(type)) {
-            if (!allowTopLevelOptional) throw Exceptions.error("optional is not allowed, type={}, field={}", type.getTypeName(), fieldPath);
+            if (!allowTopLevelOptional) throw Exceptions.error("top level optional is not allowed, type={}", type.getTypeName());
             if (!GenericTypes.isGenericOptional(type))
-                throw Exceptions.error("optional must be Optional<T> and T must be class, type={}, field={}", type.getTypeName(), fieldPath);
+                throw Exceptions.error("top level optional must be Optional<T> and T must be class");
             return GenericTypes.optionalValueClass(type);
         }
         return type;
