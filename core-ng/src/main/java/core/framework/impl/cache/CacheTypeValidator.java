@@ -18,8 +18,7 @@ class CacheTypeValidator {
     CacheTypeValidator(Type instanceType) {
         validator = new DataTypeValidator(instanceType);
         validator.allowedValueClass = this::allowedValueClass;
-        validator.allowChildListAndMap = true;
-        validator.allowChildObject = true;
+        validator.allowChild = true;
         validator.allowTopLevelList = true;
         validator.allowTopLevelValue = true;
     }

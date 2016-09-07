@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author neo
@@ -28,9 +27,6 @@ public class TestBean {
     @XmlElement(name = "string_field")
     public String stringField;
 
-    @XmlElement(name = "optional_string_field")
-    public Optional<String> optionalStringField;
-
     @XmlElement(name = "list_field")
     public List<String> listField;
 
@@ -39,9 +35,6 @@ public class TestBean {
 
     @XmlElement(name = "child_field")
     public Child childField;
-
-    @XmlElement(name = "optional_child_field")
-    public Optional<Child> optionalChildField;
 
     @XmlElement(name = "children_field")
     public List<Child> childrenField;

@@ -48,9 +48,8 @@ public class JAXBTypeValidator implements TypeVisitor {
     protected JAXBTypeValidator(Type instanceType) {
         validator = new DataTypeValidator(instanceType);
         validator.allowedValueClass = this::allowedValueClass;
-        validator.allowChildListAndMap = true;
-        validator.allowChildObject = true;
-        validator.allowOptional = true;
+        validator.allowChild = true;
+        validator.allowTopLevelOptional = true;
         validator.visitor = this;
     }
 

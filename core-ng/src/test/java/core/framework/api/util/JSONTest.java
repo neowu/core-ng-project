@@ -10,20 +10,53 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author neo
  */
 public class JSONTest {
     @Test
-    public void fromJSONArray() {
+    public void mapField() {
+        Bean bean = new Bean();
+        bean.attributes.put("key1", "value1");
+        bean.attributes.put("key2", "value2");
+        String json = JSON.toJSON(bean);
+        assertThat(json, containsString("\"attributes\":{\"key1\":\"value1\",\"key2\":\"value2\"}"));
+
+        Bean parsedBean = JSON.fromJSON(Bean.class, json);
+        assertEquals("value1", parsedBean.attributes.get("key1"));
+        assertEquals("value2", parsedBean.attributes.get("key2"));
+    }
+
+    @Test
+    public void dateField() {
+        Bean bean = new Bean();
+        bean.instant = Instant.now();
+        bean.dateTime = LocalDateTime.ofInstant(bean.instant, ZoneId.systemDefault());
+        bean.date = bean.dateTime.toLocalDate();
+        bean.zonedDateTime = ZonedDateTime.ofInstant(bean.instant, ZoneId.systemDefault());
+        String json = JSON.toJSON(bean);
+
+        Bean parsedBean = JSON.fromJSON(Bean.class, json);
+        assertEquals(bean.instant, parsedBean.instant);
+        assertEquals(bean.date, parsedBean.date);
+        assertEquals(bean.dateTime, parsedBean.dateTime);
+        assertEquals(bean.zonedDateTime.toInstant(), parsedBean.zonedDateTime.toInstant());
+    }
+
+    @Test
+    public void listObject() {
         List<Bean> beans = JSON.fromJSON(Types.list(Bean.class), "[{\"name\":\"n1\"},{\"name\":\"n2\"}]");
 
         assertEquals(2, beans.size());
@@ -32,43 +65,18 @@ public class JSONTest {
     }
 
     @Test
-    public void optionalField() {
-        BeanWithOptionalField bean = new BeanWithOptionalField();
-        bean.optionalString = Optional.empty();
-        assertFalse(JSON.fromJSON(BeanWithOptionalField.class, JSON.toJSON(bean)).optionalString.isPresent());
+    public void optionalObject() {
+        Optional<Bean> parsedBean = JSON.fromJSON(Types.optional(Bean.class), JSON.toJSON(Optional.empty()));
+        assertFalse(parsedBean.isPresent());
 
-        bean.optionalString = null;
-        assertNull(JSON.fromJSON(BeanWithOptionalField.class, JSON.toJSON(bean)).optionalString);
+        parsedBean = JSON.fromJSON(Types.optional(Bean.class), JSON.toJSON(null));
+        assertFalse(parsedBean.isPresent());
 
-        bean.optionalString = Optional.of("value");
-        assertEquals("value", JSON.fromJSON(BeanWithOptionalField.class, JSON.toJSON(bean)).optionalString.orElse(null));
-    }
-
-    @Test
-    public void mapField() {
-        BeanWithMapField bean = new BeanWithMapField();
-        bean.attributes.put("key1", "value1");
-        bean.attributes.put("key2", "value2");
-        String json = JSON.toJSON(bean);
-        assertEquals("{\"attributes\":{\"key1\":\"value1\",\"key2\":\"value2\"}}", json);
-
-        BeanWithMapField parsedBean = JSON.fromJSON(BeanWithMapField.class, json);
-        assertEquals("value1", parsedBean.attributes.get("key1"));
-        assertEquals("value2", parsedBean.attributes.get("key2"));
-    }
-
-    @Test
-    public void dateField() {
-        BeanWithDateField bean = new BeanWithDateField();
-        bean.instant = Instant.now();
-        bean.dateTime = LocalDateTime.ofInstant(bean.instant, ZoneId.systemDefault());
-        bean.date = bean.dateTime.toLocalDate();
-        String json = JSON.toJSON(bean);
-
-        BeanWithDateField parsedBean = JSON.fromJSON(BeanWithDateField.class, json);
-        assertEquals(bean.instant, parsedBean.instant);
-        assertEquals(bean.date, parsedBean.date);
-        assertEquals(bean.dateTime, parsedBean.dateTime);
+        Bean bean = new Bean();
+        bean.name = "name";
+        parsedBean = JSON.fromJSON(Types.optional(Bean.class), JSON.toJSON(Optional.of(bean)));
+        assertTrue(parsedBean.isPresent());
+        assertEquals(bean.name, parsedBean.get().name);
     }
 
     @Test
@@ -94,32 +102,22 @@ public class JSONTest {
 
     @XmlAccessorType(XmlAccessType.FIELD)
     static class Bean {
-        @XmlElement(name = "name")
-        public String name;
-    }
-
-    @XmlAccessorType(XmlAccessType.FIELD)
-    static class BeanWithMapField {
         @XmlElement(name = "attributes")
         public final Map<String, String> attributes = Maps.newHashMap();
-    }
 
-    @XmlAccessorType(XmlAccessType.FIELD)
-    static class BeanWithDateField {
+        @XmlElement(name = "name")
+        public String name;
+
         @XmlElement(name = "date")
         public LocalDate date;
 
-        @XmlElement(name = "dateTime")
+        @XmlElement(name = "date_time")
         public LocalDateTime dateTime;
 
         @XmlElement(name = "instant")
         public Instant instant;
-    }
 
-    @XmlAccessorType(XmlAccessType.FIELD)
-    static class BeanWithOptionalField {
-        @XmlElement(name = "optional_string")
-        public Optional<String> optionalString;
+        @XmlElement(name = "zoned_date_time")
+        public ZonedDateTime zonedDateTime;
     }
-
 }

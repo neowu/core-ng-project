@@ -30,8 +30,7 @@ public final class MongoClassValidator implements TypeVisitor {
     public MongoClassValidator(Class<?> entityClass) {
         validator = new DataTypeValidator(entityClass);
         validator.allowedValueClass = this::allowedValueClass;
-        validator.allowChildListAndMap = true;
-        validator.allowChildObject = true;
+        validator.allowChild = true;
         validator.visitor = this;
     }
 

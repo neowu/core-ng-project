@@ -22,9 +22,8 @@ public class DataTypeValidator {
     private final Set<Class<?>> visitedClasses = Sets.newHashSet();
     public boolean allowTopLevelList;
     public boolean allowTopLevelValue;
-    public boolean allowChildObject;
-    public boolean allowChildListAndMap;
-    public boolean allowOptional;
+    public boolean allowTopLevelOptional;
+    public boolean allowChild;
     public Function<Class, Boolean> allowedValueClass;
     public TypeVisitor visitor;
 
@@ -47,7 +46,7 @@ public class DataTypeValidator {
 
     private Type extractOptionalType(Type type, String fieldPath) {
         if (GenericTypes.isOptional(type)) {
-            if (!allowOptional) throw Exceptions.error("optional is not allowed, type={}, field={}", type.getTypeName(), fieldPath);
+            if (!allowTopLevelOptional) throw Exceptions.error("optional is not allowed, type={}, field={}", type.getTypeName(), fieldPath);
             if (!GenericTypes.isGenericOptional(type))
                 throw Exceptions.error("optional must be Optional<T> and T must be class, type={}, field={}", type.getTypeName(), fieldPath);
             return GenericTypes.optionalValueClass(type);
@@ -74,13 +73,13 @@ public class DataTypeValidator {
             if (visitor != null) visitor.visitField(field, path);
 
             String fieldPath = path(path, field.getName());
-            Type fieldType = extractOptionalType(field.getGenericType(), Fields.path(field));
+            Type fieldType = field.getGenericType();
             if (GenericTypes.isList(fieldType)) {
-                if (!allowChildListAndMap)
+                if (!allowChild)
                     throw Exceptions.error("list field is not allowed, field={}", Fields.path(field));
                 visitList(fieldType, field, fieldPath);
             } else if (GenericTypes.isMap(fieldType)) {
-                if (!allowChildListAndMap)
+                if (!allowChild)
                     throw Exceptions.error("map field is not allowed, field={}", Fields.path(field));
                 if (!GenericTypes.isGenericStringMap(fieldType)) {
                     throw Exceptions.error("map must be Map<String,T> and T must be class, type={}, field={}", type.getTypeName(), Fields.path(field));
@@ -108,7 +107,7 @@ public class DataTypeValidator {
             throw Exceptions.error("field class is not supported, please contract arch team, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
         }
 
-        if (owner != null && !allowChildObject) {
+        if (owner != null && !allowChild) {
             throw Exceptions.error("child object is not allowed, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
         }
 

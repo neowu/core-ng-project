@@ -2,7 +2,7 @@
 * template, use ByteBuffer[] for performance tuning?
 * web: get/form post, validate bean class and code generation for param serialization?
 * general retry and throttling?
-* webservice: client retry on network issue?
+* webservice/redis/mongo client: client retry on network issue?
 * website static content security check? (in server env, this is handled by nginx directly)
 * validator: annotation for website, like @HTMLSafeString?
 * cm: config management, dynamic update properties?
@@ -16,6 +16,10 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 
 ## Change log
+### 4.7.5 (9/7/2016 - ongoing)
+* es: update jackson lib and es lib to match latest
+* json: remove optional field support, which is not useful, only support Optional<T> as return object
+
 ### 4.7.4 (8/31/2016 - 9/1/2016)
 * mongo: updated driver to 3.3.0
 * convert: support ZonedDateTime in mongo/db/json conversion

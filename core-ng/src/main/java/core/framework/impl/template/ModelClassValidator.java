@@ -22,8 +22,7 @@ public class ModelClassValidator implements TypeVisitor {
     public ModelClassValidator(Class<?> modelClass) {
         validator = new DataTypeValidator(modelClass);
         validator.allowedValueClass = this::allowedValueClass;
-        validator.allowChildListAndMap = true;
-        validator.allowChildObject = true;
+        validator.allowChild = true;
         validator.allowTopLevelList = false;
         validator.visitor = this;
     }
