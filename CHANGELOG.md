@@ -16,7 +16,7 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 
 ## Change log
-### 4.7.5 (9/7/2016 - ongoing)
+### 4.7.5 (9/7/2016 - 9/8/2016)
 * es: update jackson lib and es lib to match latest
 * json: remove optional field support, which is not useful, only support Optional<T> as return object
 
