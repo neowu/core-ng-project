@@ -42,6 +42,12 @@ public final class SearchConfig {
         }
     }
 
+    public void sniff(boolean sniff) {
+        if (!context.isTest()) {
+            search.sniff(sniff);
+        }
+    }
+
     public void slowOperationThreshold(Duration threshold) {
         if (!context.isTest()) {
             search.slowOperationThreshold(threshold);

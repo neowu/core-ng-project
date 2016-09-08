@@ -37,6 +37,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     Client client;
     private Duration timeout = Duration.ofSeconds(10);
     private Duration slowOperationThreshold = Duration.ofSeconds(5);
+    private boolean sniff;      // if enabled, es client will use all nodes in cluster and only use "publish address" to connect
 
     public void host(String host) {
         addresses.add(new InetSocketTransportAddress(new InetSocketAddress(host, 9300)));
@@ -48,6 +49,10 @@ public class ElasticSearchImpl implements ElasticSearch {
 
     public void timeout(Duration timeout) {
         this.timeout = timeout;
+    }
+
+    public void sniff(boolean sniff) {
+        this.sniff = sniff;
     }
 
     public void initialize() {
@@ -162,11 +167,13 @@ public class ElasticSearchImpl implements ElasticSearch {
         if (addresses.isEmpty()) throw new Error("addresses must not be empty, please check config");
         StopWatch watch = new StopWatch();
         try {
-            Settings.Builder settings = Settings.settingsBuilder()
-                                                .put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT, new TimeValue(timeout.toMillis()))
-                                                .put("client.transport.sniff", true)                      // allow to discover dynamic nodes in cluster
-                                                .put("client.transport.ping_timeout", new TimeValue(timeout.toMillis()))
-                                                .put("client.transport.ignore_cluster_name", "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
+            Settings.Builder settings = Settings.settingsBuilder();
+            settings.put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT, new TimeValue(timeout.toMillis()))
+                    .put("client.transport.ping_timeout", new TimeValue(timeout.toMillis()))
+                    .put("client.transport.ignore_cluster_name", "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
+            if (sniff) {
+                settings.put("client.transport.sniff", true);
+            }
             TransportClient client = TransportClient.builder().settings(settings).build();
             addresses.forEach(client::addTransportAddress);
             return client;
