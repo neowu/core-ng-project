@@ -75,7 +75,7 @@ public class MongoImpl implements Mongo {
     public void dropCollection(String collection) {
         StopWatch watch = new StopWatch();
         try {
-            database.getCollection(collection).drop();
+            database().getCollection(collection).drop();
         } finally {
             logger.info("dropCollection, collection={}, elapsedTime={}", collection, watch.elapsedTime());
         }
@@ -103,7 +103,7 @@ public class MongoImpl implements Mongo {
             }
             command.put("args", evalArguments);
             command.put("nolock", BsonBoolean.TRUE);
-            return database.runCommand(command);
+            return database().runCommand(command);
         } finally {
             logger.info("eval, function={}, args={}, elapsedTime={}", function, arguments, watch.elapsedTime());
         }
