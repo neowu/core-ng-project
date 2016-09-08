@@ -8,8 +8,6 @@ import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
 import core.framework.impl.db.DatabaseImpl;
 import core.framework.impl.module.ModuleContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
@@ -18,7 +16,6 @@ import java.time.Duration;
  */
 public final class DBConfig {
     final DatabaseImpl database;
-    private final Logger logger = LoggerFactory.getLogger(DBConfig.class);
     private final ModuleContext context;
     private final String name;
 
@@ -31,10 +28,11 @@ public final class DBConfig {
         } else {
             database = new DatabaseImpl();
             database.pool.name("db" + (name == null ? "" : "-" + name));
-
             context.shutdownHook.add(database::close);
 
-            if (!context.isTest()) {
+            if (context.isTest()) {
+                database.url(Strings.format("jdbc:hsqldb:mem:{};sql.syntax_mys=true", name == null ? "." : name));
+            } else {
                 context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(30));
             }
 
@@ -43,10 +41,7 @@ public final class DBConfig {
     }
 
     public void url(String url) {
-        if (context.isTest()) {
-            logger.info("use hsqldb during test");
-            database.url(Strings.format("jdbc:hsqldb:mem:{};sql.syntax_mys=true", name == null ? "." : name));
-        } else {
+        if (!context.isTest()) {
             database.url(url);
         }
     }

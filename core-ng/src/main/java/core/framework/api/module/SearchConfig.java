@@ -25,9 +25,11 @@ public final class SearchConfig {
             if (context.isTest()) {
                 Path dataPath = Files.tempDir();
                 search = context.mockFactory.create(ElasticSearchImpl.class, dataPath);
+                search.initialize();    // elasticserch client can be initialized immediately for unit test env
                 context.shutdownHook.add(() -> Files.deleteDir(dataPath));
             } else {
                 search = new ElasticSearchImpl();
+                context.startupHook.add(search::initialize);
             }
             context.shutdownHook.add(search::close);
             context.beanFactory.bind(ElasticSearch.class, null, search);

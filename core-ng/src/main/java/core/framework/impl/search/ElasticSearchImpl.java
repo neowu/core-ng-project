@@ -34,31 +34,31 @@ import java.util.List;
 public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
     private final List<TransportAddress> addresses = Lists.newArrayList();
+    Client client;
     private Duration timeout = Duration.ofSeconds(10);
     private Duration slowOperationThreshold = Duration.ofSeconds(5);
 
-    private Client client;
-
     public void host(String host) {
-        if (client != null) throw new Error("host() must be called before creating client");
         addresses.add(new InetSocketTransportAddress(new InetSocketAddress(host, 9300)));
     }
 
     public void slowOperationThreshold(Duration slowOperationThreshold) {
-        if (client != null) throw new Error("slowOperationThreshold() must be called before creating client");
         this.slowOperationThreshold = slowOperationThreshold;
     }
 
     public void timeout(Duration timeout) {
-        if (client != null) throw new Error("timeout() must be called before creating client");
         this.timeout = timeout;
+    }
+
+    public void initialize() {
+        client = createClient();
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
         StopWatch watch = new StopWatch();
         try {
             new DocumentClassValidator(documentClass).validate();
-            return new ElasticSearchTypeImpl<>(client(), documentClass, slowOperationThreshold);
+            return new ElasticSearchTypeImpl<>(this, documentClass, slowOperationThreshold);
         } finally {
             logger.info("register elasticsearch type, documentClass={}, elapsedTime={}", documentClass.getCanonicalName(), watch.elapsedTime());
         }
@@ -67,7 +67,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void close() {
         if (client == null) return;
 
-        logger.info("close elastic search client");
+        logger.info("close elasticsearch client");
         try {
             client.close();
         } catch (ElasticsearchException e) {
@@ -79,7 +79,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndex(String index, String source) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin().indices().prepareCreate(index).setSource(source).get();
+            client.admin().indices().prepareCreate(index).setSource(source).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -91,7 +91,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndexTemplate(String name, String source) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin().indices().preparePutTemplate(name).setSource(source).get();
+            client.admin().indices().preparePutTemplate(name).setSource(source).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -103,7 +103,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void flush(String index) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin().indices().prepareFlush(index).get();
+            client.admin().indices().prepareFlush(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -115,7 +115,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void closeIndex(String index) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin().indices().prepareClose(index).get();
+            client.admin().indices().prepareClose(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -127,7 +127,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void deleteIndex(String index) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin().indices().prepareDelete(index).get();
+            client.admin().indices().prepareDelete(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -139,7 +139,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public List<ElasticSearchIndex> indices() {
         StopWatch watch = new StopWatch();
         try {
-            AdminClient adminClient = client().admin();
+            AdminClient adminClient = client.admin();
             ClusterStateResponse response = adminClient.cluster().state(new ClusterStateRequest().clear().metaData(true)).actionGet();
             ImmutableOpenMap<String, IndexMetaData> indices = response.getState().getMetaData().indices();
             List<ElasticSearchIndex> results = new ArrayList<>(indices.size());
@@ -158,21 +158,14 @@ public class ElasticSearchImpl implements ElasticSearch {
         }
     }
 
-    private Client client() {
-        if (client == null) {
-            client = createClient();
-        }
-        return client;
-    }
-
     protected Client createClient() {
         if (addresses.isEmpty()) throw new Error("addresses must not be empty, please check config");
         StopWatch watch = new StopWatch();
         try {
             Settings.Builder settings = Settings.settingsBuilder()
-                .put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT, new TimeValue(timeout.toMillis()))
-                .put("client.transport.ping_timeout", new TimeValue(timeout.toMillis()))
-                .put("client.transport.ignore_cluster_name", "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
+                                                .put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT, new TimeValue(timeout.toMillis()))
+                                                .put("client.transport.ping_timeout", new TimeValue(timeout.toMillis()))
+                                                .put("client.transport.ignore_cluster_name", "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
             TransportClient client = TransportClient.builder().settings(settings).build();
             addresses.forEach(client::addTransportAddress);
             return client;
