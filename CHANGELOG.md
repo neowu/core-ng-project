@@ -19,6 +19,7 @@
 ### 4.7.5 (9/7/2016 - 9/8/2016)
 * es: update jackson lib and es lib to match latest
 * json: remove optional field support, which is not useful, only support Optional<T> as return object
+* es: update client to enable sniff
 
 ### 4.7.4 (8/31/2016 - 9/1/2016)
 * mongo: updated driver to 3.3.0

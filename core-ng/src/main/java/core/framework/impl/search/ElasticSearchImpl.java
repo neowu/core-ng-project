@@ -164,6 +164,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         try {
             Settings.Builder settings = Settings.settingsBuilder()
                                                 .put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT, new TimeValue(timeout.toMillis()))
+                                                .put("client.transport.sniff", true)                      // allow to discover dynamic nodes in cluster
                                                 .put("client.transport.ping_timeout", new TimeValue(timeout.toMillis()))
                                                 .put("client.transport.ignore_cluster_name", "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
             TransportClient client = TransportClient.builder().settings(settings).build();
