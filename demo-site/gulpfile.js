@@ -35,10 +35,10 @@ gulp.task("css", ["html"], function() {
         .pipe(md5(10, "src/main/dist/web/template/**/*.html"))
         .pipe(gulp.dest("src/main/dist/web/static/css/lib"));
 
-    var fonts = gulp.src(["src/main/web/static/css/fonts/*"])
-        .pipe(gulp.dest("src/main/dist/web/static/css/fonts"));
+    var resources = gulp.src(["src/main/web/static/css/**/*.*", "!src/main/web/static/css/**/*.css"])
+        .pipe(gulp.dest("src/main/dist/web/static/css"));
 
-    return merge(appCSS, libCSS, fonts);
+    return merge(appCSS, libCSS, resources);
 });
 
 gulp.task("js", ["html"], function(cb) {
