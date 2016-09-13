@@ -11,5 +11,5 @@ interface SessionStore {
 
     void save(String sessionId, Map<String, String> sessionData, Duration sessionTimeout);
 
-    void clear(String sessionId);
+    void invalidate(String sessionId);
 }

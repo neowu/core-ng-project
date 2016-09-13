@@ -39,7 +39,6 @@ public final class SessionConfig {
 
     public void redis(String host) {
         if (context.isTest()) {
-            logger.info("use local session during test");
             local();
         } else {
             logger.info("create redis session provider, host={}", host);

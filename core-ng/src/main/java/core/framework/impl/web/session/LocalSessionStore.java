@@ -37,7 +37,7 @@ public class LocalSessionStore implements SessionStore {
     }
 
     @Override
-    public void clear(String sessionId) {
+    public void invalidate(String sessionId) {
         values.remove(sessionId);
     }
 

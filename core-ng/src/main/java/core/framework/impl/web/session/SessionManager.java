@@ -42,14 +42,15 @@ public class SessionManager {
         SessionImpl session = (SessionImpl) request.session;
         if (session == null) return;
 
-        logger.debug("save http session");
         if (session.invalidated && session.id != null) {
-            store.clear(session.id);
+            logger.debug("invalidate http session");
+            store.invalidate(session.id);
             CookieImpl cookie = sessionCookie(request.scheme());
             cookie.setMaxAge(0);
             cookie.setValue("");
             exchange.setResponseCookie(cookie);
         } else if (session.changed) {
+            logger.debug("save http session");
             if (session.id == null) {
                 session.id = UUID.randomUUID().toString();
                 CookieImpl cookie = sessionCookie(request.scheme());

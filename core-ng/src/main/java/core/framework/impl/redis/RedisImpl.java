@@ -284,7 +284,7 @@ public final class RedisImpl implements Redis {
         return redisHash;
     }
 
-    byte[] encode(String value) {
+    byte[] encode(String value) {   // redis does not accept null
         return Strings.bytes(value);
     }
 
