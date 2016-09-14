@@ -3,6 +3,8 @@ package core.framework.impl.web.session;
 import core.framework.api.redis.Redis;
 import core.framework.api.util.JSON;
 import core.framework.api.util.Types;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Map;
@@ -11,6 +13,8 @@ import java.util.Map;
  * @author neo
  */
 public class RedisSessionStore implements SessionStore {
+    private final Logger logger = LoggerFactory.getLogger(RedisSessionStore.class);
+
     private final Redis redis;
 
     public RedisSessionStore(Redis redis) {
@@ -20,10 +24,15 @@ public class RedisSessionStore implements SessionStore {
     @Override
     public Map<String, String> getAndRefresh(String sessionId, Duration sessionTimeout) {
         String key = sessionKey(sessionId);
-        String value = redis.get(key);
-        if (value == null) return null;
-        redis.expire(key, sessionTimeout);
-        return decode(value);
+        try {
+            String value = redis.get(key);
+            if (value == null) return null;
+            redis.expire(key, sessionTimeout);
+            return decode(value);
+        } catch (Exception e) {    // gracefully handle invalid data in redis, either legacy old format value, or invalid value inserted manually
+            logger.warn("failed to decode redis session value", e);
+            return null;
+        }
     }
 
     @Override
