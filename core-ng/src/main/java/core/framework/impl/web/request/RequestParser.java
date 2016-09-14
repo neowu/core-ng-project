@@ -5,6 +5,7 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.log.Markers;
 import core.framework.api.util.Files;
 import core.framework.api.util.Strings;
+import core.framework.api.web.exception.MethodNotAllowedException;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogParam;
 import io.undertow.server.HttpServerExchange;
@@ -25,18 +26,14 @@ public final class RequestParser {
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
-        request.method = HTTPMethod.valueOf(exchange.getRequestMethod().toString());
-        actionLog.context("method", request.method());
-
         HeaderMap headers = exchange.getRequestHeaders();
 
         String xForwardedFor = headers.getFirst(Headers.X_FORWARDED_FOR);
         String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
         logger.debug("[request] remoteAddress={}", remoteAddress);
 
-        String clientIP = clientIP(remoteAddress, xForwardedFor);
-        request.clientIP = clientIP;
-        actionLog.context("clientIP", clientIP);
+        request.clientIP = clientIP(remoteAddress, xForwardedFor);
+        actionLog.context("clientIP", request.clientIP);
 
         String xForwardedProto = headers.getFirst(Headers.X_FORWARDED_PROTO);
         String requestScheme = exchange.getRequestScheme();
@@ -60,10 +57,21 @@ public final class RequestParser {
         String userAgent = headers.getFirst(Headers.USER_AGENT);
         if (userAgent != null) actionLog.context("userAgent", userAgent);
 
+        request.method = parseHTTPMethod(exchange.getRequestMethod().toString());
+        actionLog.context("method", request.method());
+
         if (request.method == HTTPMethod.POST || request.method == HTTPMethod.PUT) {
             String contentType = headers.getFirst(Headers.CONTENT_TYPE);
             request.contentType = contentType == null ? null : ContentType.parse(contentType);
             parseBody(request, exchange);
+        }
+    }
+
+    HTTPMethod parseHTTPMethod(String method) {
+        try {
+            return HTTPMethod.valueOf(method);
+        } catch (IllegalArgumentException e) {
+            throw new MethodNotAllowedException("method is not allowed, method=" + method);
         }
     }
 
@@ -131,8 +139,8 @@ public final class RequestParser {
             int port = request.port;
 
             builder.append(scheme)
-                .append("://")
-                .append(exchange.getHostName());
+                   .append("://")
+                   .append(exchange.getHostName());
 
             if (!(("http".equals(scheme) && port == 80)
                 || ("https".equals(scheme) && port == 443))) {

@@ -29,7 +29,7 @@ class URLHandler {
     ControllerHolder get(HTTPMethod method) {
         ControllerHolder controller = controllers.get(method);
         if (controller == null) {
-            throw new MethodNotAllowedException(method);
+            throw new MethodNotAllowedException("method not allowed, method=" + method);
         }
         return controller;
     }

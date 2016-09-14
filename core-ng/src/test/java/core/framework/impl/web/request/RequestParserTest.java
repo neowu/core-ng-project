@@ -1,8 +1,11 @@
 package core.framework.impl.web.request;
 
+import core.framework.api.web.exception.MethodNotAllowedException;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,6 +13,9 @@ import static org.junit.Assert.assertEquals;
  * @author neo
  */
 public class RequestParserTest {
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
     private RequestParser parser;
 
     @Before
@@ -30,5 +36,13 @@ public class RequestParserTest {
         Assert.assertEquals(80, parser.port(80, null));
         Assert.assertEquals(443, parser.port(80, "443"));
         Assert.assertEquals(443, parser.port(80, "443, 80"));
+    }
+
+    @Test
+    public void parseHTTPMethod() {
+        exception.expect(MethodNotAllowedException.class);
+        exception.expectMessage("method=TRACK");
+
+        parser.parseHTTPMethod("TRACK");
     }
 }
