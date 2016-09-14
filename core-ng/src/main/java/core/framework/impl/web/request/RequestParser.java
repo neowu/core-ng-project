@@ -71,7 +71,7 @@ public final class RequestParser {
         try {
             return HTTPMethod.valueOf(method);
         } catch (IllegalArgumentException e) {
-            throw new MethodNotAllowedException("method is not allowed, method=" + method);
+            throw new MethodNotAllowedException("method is not allowed, method=" + method, e);
         }
     }
 

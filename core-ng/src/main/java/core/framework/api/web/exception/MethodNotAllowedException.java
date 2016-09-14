@@ -13,6 +13,10 @@ public final class MethodNotAllowedException extends RuntimeException implements
         super(message);
     }
 
+    public MethodNotAllowedException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     @Override
     public Severity severity() {
         return Severity.WARN;
