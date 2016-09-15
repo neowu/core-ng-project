@@ -24,8 +24,8 @@ public final class SessionConfig {
         context.httpServer.siteManager.sessionManager.timeout(timeout);
     }
 
-    public void cookieDomain(String cookieDomain) {
-        context.httpServer.siteManager.sessionManager.cookieDomain = cookieDomain;
+    public void cookie(String name, String domain) {
+        context.httpServer.siteManager.sessionManager.cookie(name, domain);
     }
 
     public void local() {

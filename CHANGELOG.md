@@ -16,9 +16,10 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 
 ## Change log
-### 4.7.7 (9/14/2016)
+### 4.7.7 (9/14/2016 - 9/15/2016)
 * http: throw methodNotAllowedException for unknown http method
 * session: ignore all errors on decoding redis session value
+* session: allow configure session cookie name
 
 ### 4.7.6 (9/13/2016)
 * session: change session data encoding to JSON

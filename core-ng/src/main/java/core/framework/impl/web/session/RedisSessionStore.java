@@ -27,10 +27,11 @@ public class RedisSessionStore implements SessionStore {
         try {
             String value = redis.get(key);
             if (value == null) return null;
+            logger.debug("[session] value={}", value);
             redis.expire(key, sessionTimeout);
             return decode(value);
         } catch (Exception e) {    // gracefully handle invalid data in redis, either legacy old format value, or invalid value inserted manually
-            logger.warn("failed to decode redis session value", e);
+            logger.warn("failed to get redis session", e);
             return null;
         }
     }

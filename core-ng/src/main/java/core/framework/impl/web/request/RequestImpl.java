@@ -90,7 +90,7 @@ public final class RequestImpl implements Request {
     @Override
     public Session session() {
         if (session == null)
-            throw new Error("session store is not configured, please use site() to configure in module");
+            throw new Error("session store is not configured, please use site().session() to configure in module");
         return session;
     }
 

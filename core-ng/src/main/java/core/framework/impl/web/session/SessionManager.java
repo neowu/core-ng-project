@@ -17,7 +17,8 @@ import java.util.UUID;
  */
 public class SessionManager {
     private final Logger logger = LoggerFactory.getLogger(SessionManager.class);
-    public String cookieDomain;     // default to be null, which will be current host
+    private String cookieName = "SessionId";
+    private String cookieDomain;     // default to be null, which will be current host
     private Duration timeout = Duration.ofMinutes(20);
     private SessionStore store;
 
@@ -27,7 +28,7 @@ public class SessionManager {
         logger.debug("load http session");
         SessionImpl session = new SessionImpl();
 
-        request.cookie("SessionId").ifPresent(sessionId -> {
+        request.cookie(cookieName).ifPresent(sessionId -> {
             Map<String, String> sessionData = store.getAndRefresh(sessionId, timeout);
             if (sessionData != null) {
                 session.id = sessionId;
@@ -62,10 +63,9 @@ public class SessionManager {
         }
     }
 
-    public void sessionStore(SessionStore sessionStore) {
-        if (this.store != null)
-            throw Exceptions.error("session store is already configured, previous={}", this.store);
-        this.store = sessionStore;
+    public void sessionStore(SessionStore store) {
+        if (this.store != null) throw Exceptions.error("session store is already configured, previous={}", this.store);
+        this.store = store;
     }
 
     public void timeout(Duration timeout) {
@@ -73,8 +73,14 @@ public class SessionManager {
         this.timeout = timeout;
     }
 
+    public void cookie(String name, String domain) {
+        if (name == null) throw Exceptions.error("name must not be null");
+        cookieName = name;
+        cookieDomain = domain;
+    }
+
     private CookieImpl sessionCookie(String scheme) {
-        CookieImpl cookie = new CookieImpl("SessionId");
+        CookieImpl cookie = new CookieImpl(cookieName);
         cookie.setDomain(cookieDomain);
         cookie.setPath("/");
         cookie.setSecure("https".equals(scheme));
