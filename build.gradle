@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '4.7.7'
+    version = '4.7.8'
 }
 
 def mongoVersion = '3.3.0'
@@ -35,7 +35,7 @@ project(':core-ng') {
                 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.2',
                 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.2',
                 'org.apache.httpcomponents:httpclient:4.5.2',
-                'io.undertow:undertow-core:1.4.0.Final'
+                'io.undertow:undertow-core:1.4.2.Final'
         )
         testCompile(
                 'junit:junit:4.12',
@@ -79,12 +79,7 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
 
         repositories {
             maven {
-                // put following values in gradle.properties, e.g. systemProp.core-ng.repo.s3.url = s3://xxx
-                url System.properties['core-ng.repo.s3.url']
-                credentials(AwsCredentials) {
-                    accessKey System.properties['core-ng.repo.s3.accessKey']
-                    secretKey System.properties['core-ng.repo.s3.secretKey']
-                }
+                url System.properties['maven.repo']     // set in gradle.properties, e.g. systemProp.maven.repo=/path
             }
         }
     }
