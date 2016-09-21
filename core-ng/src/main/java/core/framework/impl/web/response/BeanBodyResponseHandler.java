@@ -41,6 +41,8 @@ class BeanBodyResponseHandler implements BodyHandler {
     void validateBeanType(Object bean) {
         Type instanceType;
 
+        if (bean == null) throw new Error("bean must not be null");
+
         if (bean instanceof List) {
             List<?> list = (List<?>) bean;
             if (list.isEmpty()) return; // no type info can be used
