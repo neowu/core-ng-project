@@ -2,7 +2,7 @@ package core.framework.api.module;
 
 import core.framework.api.log.MessageFilter;
 import core.framework.impl.log.ActionLogger;
-import core.framework.impl.log.LogForwarder;
+import core.framework.impl.log.KafkaLogForwarder;
 import core.framework.impl.log.TraceLogger;
 import core.framework.impl.log.stat.CollectStatTask;
 import core.framework.impl.module.ModuleContext;
@@ -60,7 +60,7 @@ public final class LogConfig {
         if (context.isTest()) {
             logger.info("disable log forwarding during test");
         } else {
-            context.logManager.logForwarder = new LogForwarder(host, context.logManager.appName);
+            context.logManager.logForwarder = new KafkaLogForwarder(host, context.logManager.appName);
             context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(context.logManager.logForwarder), Duration.ofSeconds(10));
         }
     }

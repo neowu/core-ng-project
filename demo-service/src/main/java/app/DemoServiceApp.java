@@ -10,7 +10,7 @@ public class DemoServiceApp extends App {
     @Override
     protected void initialize() {
         load(new SystemModule("sys.properties"));
-
+        http().port(8081);
         load(new ProductModule());
         load(new JobModule());
     }

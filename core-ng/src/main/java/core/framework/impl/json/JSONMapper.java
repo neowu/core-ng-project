@@ -63,11 +63,15 @@ public final class JSONMapper {
         }
     }
 
-    // jackson detects encoding and default to utf-8, works with our scenario, so there not to specify charset
     public static <T> T fromJSON(Type instanceType, byte[] json) {
+        return fromJSON(instanceType, json, 0, json.length);
+    }
+
+    // jackson detects encoding and default to utf-8, works with our scenario, so there not to specify charset
+    public static <T> T fromJSON(Type instanceType, byte[] json, int offset, int length) {
         JavaType type = OBJECT_MAPPER.getTypeFactory().constructType(instanceType);
         try {
-            return OBJECT_MAPPER.readValue(json, type);
+            return OBJECT_MAPPER.readValue(json, offset, length, type);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

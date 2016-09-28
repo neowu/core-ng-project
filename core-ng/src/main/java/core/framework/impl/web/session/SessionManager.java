@@ -25,17 +25,15 @@ public class SessionManager {
     public Session load(RequestImpl request) {
         if (store == null) return null;  // session store is not initialized
 
-        logger.debug("load http session");
         SessionImpl session = new SessionImpl();
-
         request.cookie(cookieName).ifPresent(sessionId -> {
+            logger.debug("load http session");
             Map<String, String> sessionData = store.getAndRefresh(sessionId, timeout);
             if (sessionData != null) {
                 session.id = sessionId;
                 session.data.putAll(sessionData);
             }
         });
-
         return session;
     }
 

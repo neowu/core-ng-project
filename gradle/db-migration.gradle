@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'mysql:mysql-connector-java:5.1.38'
+        classpath 'mysql:mysql-connector-java:5.1.39'
         classpath 'org.flywaydb:flyway-gradle-plugin:4.0.3'
     }
 }

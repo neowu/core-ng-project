@@ -14,10 +14,10 @@ public final class LogManager {
     public final String appName;
 
     private final ThreadLocal<ActionLog> actionLog = new ThreadLocal<>();
-    private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.DEBUG);
+    private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.INFO, LogLevel.DEBUG);
     public ActionLogger actionLogger;
     public TraceLogger traceLogger;
-    public LogForwarder logForwarder;
+    public KafkaLogForwarder logForwarder;
     public MessageFilter filter;
 
     public LogManager() {

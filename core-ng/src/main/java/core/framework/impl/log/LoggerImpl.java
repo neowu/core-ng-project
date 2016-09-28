@@ -28,13 +28,15 @@ final class LoggerImpl extends AbstractLogger {
 
     private final PrintStream output = System.out;
     private final LogManager logManager;
+    private final LogLevel infoLevel;
     private final LogLevel traceLevel;
     private final String logger;
 
-    LoggerImpl(String name, LogManager logManager, LogLevel traceLevel) {
+    LoggerImpl(String name, LogManager logManager, LogLevel infoLevel, LogLevel traceLevel) {
         super(name);
         this.logger = abbreviateLoggerName(name);
         this.logManager = logManager;
+        this.infoLevel = infoLevel;
         this.traceLevel = traceLevel;
     }
 
@@ -45,7 +47,7 @@ final class LoggerImpl extends AbstractLogger {
             event.filter = logManager.filter;
             logManager.process(event);
 
-            if (level.value >= LogLevel.INFO.value) {
+            if (level.value >= infoLevel.value) {
                 output.print(event.logMessage());
             }
         }

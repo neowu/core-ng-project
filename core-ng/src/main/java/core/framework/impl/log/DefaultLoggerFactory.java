@@ -19,7 +19,14 @@ public final class DefaultLoggerFactory implements ILoggerFactory {
     }
 
     private Logger createLogger(String name) {
-        return new LoggerImpl(name, logManager, traceLevel(name));
+        return new LoggerImpl(name, logManager, infoLevel(name), traceLevel(name));
+    }
+
+    private LogLevel infoLevel(String name) {
+        if (name.startsWith("org.apache.kafka")) {
+            return LogLevel.WARN;
+        }
+        return LogLevel.INFO;
     }
 
     private LogLevel traceLevel(String name) {

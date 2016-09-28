@@ -10,6 +10,7 @@ subprojects {
 def mongoVersion = '3.3.0'
 def elasticVersion = '2.4.0'
 def rabbitVersion = '3.6.5'
+def kafkaVersion = '0.10.0.1'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -23,19 +24,20 @@ project(':core-ng') {
                 "org.elasticsearch:elasticsearch:${elasticVersion}@jar",
                 'com.carrotsearch:hppc:0.7.1@jar',  // used by elasticsearch
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "com.rabbitmq:amqp-client:${rabbitVersion}"
+                "com.rabbitmq:amqp-client:${rabbitVersion}",
+                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         )
         compile(
                 project(":core-ng-api"),
                 'javax.inject:javax.inject:1',
                 'org.javassist:javassist:3.20.0-GA',
-                'org.slf4j:slf4j-api:1.7.12',
+                'org.slf4j:slf4j-api:1.7.21',
                 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.2',
                 'com.fasterxml.jackson.module:jackson-module-afterburner:2.8.2',
                 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.2',
                 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.2',
                 'org.apache.httpcomponents:httpclient:4.5.2',
-                'io.undertow:undertow-core:1.4.2.Final'
+                'io.undertow:undertow-core:1.4.3.Final'
         )
         testCompile(
                 'junit:junit:4.12',
@@ -92,7 +94,7 @@ project(':log-processor') {
         compile(
                 project(':core-ng'),
                 "org.elasticsearch:elasticsearch:${elasticVersion}",
-                "com.rabbitmq:amqp-client:${rabbitVersion}"
+                "org.apache.kafka:kafka-clients:${kafkaVersion}"
         )
         testCompile(
                 project(':core-ng-test')
@@ -119,7 +121,8 @@ project(':demo-service') {
                 "org.mongodb:mongo-java-driver:${mongoVersion}"
         )
         runtime(
-                "com.rabbitmq:amqp-client:${rabbitVersion}"
+                "com.rabbitmq:amqp-client:${rabbitVersion}",
+                "org.apache.kafka:kafka-clients:${kafkaVersion}"
         )
         testCompile(
                 project(':core-ng-test')

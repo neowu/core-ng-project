@@ -1,0 +1,35 @@
+version: "2"
+services:
+  es:
+    build: ./log-es
+    image: log-es
+    command: -Des.node.name="log-es-1" -Des.cluster.name="log-es"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      - ES_HEAP_SIZE=1g
+  kibana:
+    image: kibana
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_URL=http://es:9200
+    depends_on:
+      - es
+  zookeeper:
+    image: zookeeper
+    ports:
+      - 2181
+  kafka:
+    build: ./log-kafka
+    image: log-kafka
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper
+  log-processor:
+    build: ./log-processor
+    image: log-processor
+    depends_on:
+      - kafka
