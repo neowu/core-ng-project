@@ -19,6 +19,7 @@
 ### 4.7.8 (9/15/2016 - ongoing)
 * lib: update undertow to 1.4.2
 * queue: start supporting kafka
+* http: url param supports boolean
 
 ### 4.7.7 (9/14/2016 - 9/15/2016)
 * http: throw methodNotAllowedException for unknown http method
