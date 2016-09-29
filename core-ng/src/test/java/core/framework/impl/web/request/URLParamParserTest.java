@@ -8,6 +8,7 @@ import org.junit.rules.ExpectedException;
 import javax.xml.bind.annotation.XmlEnumValue;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author neo
@@ -22,6 +23,11 @@ public class URLParamParserTest {
         exception.expectMessage("failed to parse");
 
         URLParamParser.parse("V2", TestEnum.class);
+    }
+
+    @Test
+    public void parseBoolean() {
+        assertTrue(URLParamParser.parse("true", Boolean.class));
     }
 
     @Test
