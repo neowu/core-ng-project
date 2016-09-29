@@ -18,7 +18,7 @@
 ## Change log
 ### 4.7.8 (9/15/2016 - ongoing)
 * lib: update undertow to 1.4.3
-* queue: start supporting kafka
+* http: url param supports boolean
 * es: update esTookTime to nano seconds
 * mockito: update mockito to 2.1
 * queue: start supporting kafka
