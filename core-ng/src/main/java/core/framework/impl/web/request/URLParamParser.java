@@ -17,6 +17,8 @@ public class URLParamParser {    // parse query param and path param
             return (T) toInt(param);
         } else if (Long.class.equals(valueClass)) {
             return (T) toLong(param);
+        } else if (Boolean.class.equals(valueClass)) {
+            return (T) toBoolean(param);
         } else if (Enum.class.isAssignableFrom(valueClass)) {
             return (T) toEnum(param, (Class<? extends Enum>) valueClass);
         }
@@ -44,6 +46,14 @@ public class URLParamParser {    // parse query param and path param
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             throw new BadRequestException(Strings.format("failed to parse int, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
+        }
+    }
+
+    private static Boolean toBoolean(String value) {
+        try {
+            return Boolean.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new BadRequestException(Strings.format("failed to parse boolean, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
         }
     }
 }
