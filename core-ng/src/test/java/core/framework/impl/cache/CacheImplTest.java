@@ -4,16 +4,15 @@ import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +55,6 @@ public class CacheImplTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void getAll() {
         Map<String, byte[]> values = Maps.newHashMap();
         values.put("name:key1", Strings.bytes("1"));
@@ -69,8 +67,6 @@ public class CacheImplTest {
         assertEquals(2, results.get("key2").intValue());
         assertEquals(3, results.get("key3").intValue());
 
-        ArgumentCaptor<Map> argument = ArgumentCaptor.forClass(Map.class);
-        verify(cacheStore).putAll(argument.capture(), eq(Duration.ofHours(1)));
-        assertArrayEquals(Strings.bytes("2"), (byte[]) argument.getValue().get("name:key2"));
+        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && Arrays.equals(argument.get("name:key2"), Strings.bytes("2"))), eq(Duration.ofHours(1)));
     }
 }

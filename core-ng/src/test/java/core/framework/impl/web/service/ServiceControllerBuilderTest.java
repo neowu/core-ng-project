@@ -40,6 +40,7 @@ public class ServiceControllerBuilderTest {
             .build();
 
         Response response = controller.execute(request);
+
         assertEquals(HTTPStatus.OK, response.status());
         assertEquals(2, (int) ((TestWebService.TestResponse) ((BeanBody) ((ResponseImpl) response).body).bean).intField);
     }

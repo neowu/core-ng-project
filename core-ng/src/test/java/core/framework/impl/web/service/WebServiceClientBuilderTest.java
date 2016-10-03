@@ -7,8 +7,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.assertSame;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.startsWith;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
