@@ -28,18 +28,18 @@ project(':core-ng') {
         compile(
                 project(":core-ng-api"),
                 'javax.inject:javax.inject:1',
-                'org.javassist:javassist:3.20.0-GA',
-                'org.slf4j:slf4j-api:1.7.12',
+                'org.javassist:javassist:3.21.0-GA',
+                'org.slf4j:slf4j-api:1.7.21',
                 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.2',
                 'com.fasterxml.jackson.module:jackson-module-afterburner:2.8.2',
                 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.2',
                 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.2',
                 'org.apache.httpcomponents:httpclient:4.5.2',
-                'io.undertow:undertow-core:1.4.2.Final'
+                'io.undertow:undertow-core:1.4.3.Final'
         )
         testCompile(
                 'junit:junit:4.12',
-                'org.mockito:mockito-core:1.10.19',
+                'org.mockito:mockito-core:2.1.0',
                 'org.hsqldb:hsqldb:2.3.3'
         )
     }
@@ -58,7 +58,7 @@ project(':core-ng-test') {
         compile(
                 project(":core-ng"),
                 'junit:junit:4.12',
-                'org.mockito:mockito-core:1.10.19'
+                'org.mockito:mockito-core:2.1.0'
         )
     }
 }

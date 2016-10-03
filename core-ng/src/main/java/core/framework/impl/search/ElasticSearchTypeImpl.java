@@ -80,7 +80,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             if (request.limit != null) builder.setSize(request.limit);
             logger.debug("search, index={}, type={}, request={}", index, type, builder);
             org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
-            esTookTime = searchResponse.getTookInMillis();
+            esTookTime = searchResponse.getTook().nanos();
             if (searchResponse.getFailedShards() > 0) logger.warn("some shard failed, response={}", searchResponse);
             return searchResponse(searchResponse);
         } catch (ElasticsearchException e) {
