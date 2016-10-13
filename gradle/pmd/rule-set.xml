@@ -13,6 +13,7 @@
         <exclude name="AvoidStringBufferField"/>
         <exclude name="InsufficientStringBufferDeclaration"/>
         <exclude name="ConsecutiveAppendsShouldReuse"/>
+        <exclude name="ConsecutiveLiteralAppends"/> <!--has bug, does not work with lambda-->
     </rule>
 
     <rule ref="rulesets/java/unusedcode.xml/UnusedLocalVariable"/>

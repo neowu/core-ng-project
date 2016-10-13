@@ -22,7 +22,7 @@
 * es: update esTookTime to nano seconds
 * mockito: update mockito to 2.1
 * queue: start supporting kafka
-* http: url param supports boolean
+* mongo: removed eval() support
 
 ### 4.7.7 (9/14/2016 - 9/15/2016)
 * http: throw methodNotAllowedException for unknown http method
