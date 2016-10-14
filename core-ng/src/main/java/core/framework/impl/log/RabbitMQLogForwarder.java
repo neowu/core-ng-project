@@ -27,10 +27,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author neo
  */
-public final class LogForwarder {
+public final class RabbitMQLogForwarder {
     private static final int MAX_TRACE_LENGTH = 1000000; // 1M
 
-    private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
+    private final Logger logger = LoggerFactory.getLogger(RabbitMQLogForwarder.class);
     private final String appName;
 
     private final AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder().build();
@@ -44,7 +44,7 @@ public final class LogForwarder {
     private final JSONWriter<StatMessage> statWriter = JSONWriter.of(StatMessage.class);
     private int retryAttempts;
 
-    public LogForwarder(String host, String appName) {
+    public RabbitMQLogForwarder(String host, String appName) {
         this.appName = appName;
         rabbitMQ.hosts(host);
 
