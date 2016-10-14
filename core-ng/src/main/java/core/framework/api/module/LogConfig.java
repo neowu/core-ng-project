@@ -3,6 +3,7 @@ package core.framework.api.module;
 import core.framework.api.log.MessageFilter;
 import core.framework.impl.log.ActionLogger;
 import core.framework.impl.log.KafkaLogForwarder;
+import core.framework.impl.log.RabbitMQLogForwarder;
 import core.framework.impl.log.TraceLogger;
 import core.framework.impl.log.stat.CollectStatTask;
 import core.framework.impl.module.ModuleContext;
@@ -56,7 +57,16 @@ public final class LogConfig {
         }
     }
 
-    public void forwardLogToRemote(String host) {
+    public void forwardLogToRabbitMQ(String host) {
+        if (context.isTest()) {
+            logger.info("disable log forwarding during test");
+        } else {
+            context.logManager.logForwarder = new RabbitMQLogForwarder(host, context.logManager.appName);
+            context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(context.logManager.logForwarder), Duration.ofSeconds(10));
+        }
+    }
+
+    public void forwardLogToKafka(String host) {
         if (context.isTest()) {
             logger.info("disable log forwarding during test");
         } else {

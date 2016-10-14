@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author neo
  */
-public final class RabbitMQLogForwarder {
+public final class RabbitMQLogForwarder implements LogForwarder {
     private static final int MAX_TRACE_LENGTH = 1000000; // 1M
 
     private final Logger logger = LoggerFactory.getLogger(RabbitMQLogForwarder.class);
@@ -69,11 +69,13 @@ public final class RabbitMQLogForwarder {
         logForwarderThread.setPriority(Thread.NORM_PRIORITY - 1);
     }
 
-    void start() {
+    @Override
+    public void start() {
         logForwarderThread.start();
     }
 
-    void stop() {
+    @Override
+    public void stop() {
         logger.info("stop log forwarder");
         stop.set(true);
         logForwarderThread.interrupt();
@@ -109,7 +111,8 @@ public final class RabbitMQLogForwarder {
         }
     }
 
-    void forwardLog(ActionLog log) {
+    @Override
+    public void forwardLog(ActionLog log) {
         ActionLogMessage message = new ActionLogMessage();
         message.app = appName;
         message.serverIP = Network.localHostAddress();
@@ -147,6 +150,7 @@ public final class RabbitMQLogForwarder {
         queue.add(message);
     }
 
+    @Override
     public void forwardStats(Map<String, Double> stats) {
         StatMessage message = new StatMessage();
         message.id = UUID.randomUUID().toString();

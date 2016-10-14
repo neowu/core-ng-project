@@ -17,7 +17,7 @@ public final class LogManager {
     private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.INFO, LogLevel.DEBUG);
     public ActionLogger actionLogger;
     public TraceLogger traceLogger;
-    public KafkaLogForwarder logForwarder;
+    public LogForwarder logForwarder;
     public MessageFilter filter;
 
     public LogManager() {

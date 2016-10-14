@@ -3,7 +3,7 @@ package core.framework.impl.log.stat;
 import core.framework.api.util.ASCII;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
-import core.framework.impl.log.KafkaLogForwarder;
+import core.framework.impl.log.LogForwarder;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
@@ -33,9 +33,9 @@ public class CollectStatTask implements Runnable {
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats;
-    private final KafkaLogForwarder logForwarder;
+    private final LogForwarder logForwarder;
 
-    public CollectStatTask(KafkaLogForwarder logForwarder) {
+    public CollectStatTask(LogForwarder logForwarder) {
         this.logForwarder = logForwarder;
 
         gcStats = Lists.newArrayList();
