@@ -27,12 +27,8 @@ public final class JSONReader<T> {
     }
 
     public T fromJSON(byte[] json) {
-        return fromJSON(json, 0, json.length);
-    }
-
-    public T fromJSON(byte[] json, int offset, int length) {
         try {
-            return reader.readValue(json, offset, length);
+            return reader.readValue(json);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
