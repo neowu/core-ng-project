@@ -98,12 +98,12 @@ abstract class AbstractLogger implements Logger {
 
     @Override
     public boolean isDebugEnabled() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isDebugEnabled(Marker marker) {
-        return true;
+        return false;
     }
 
     @Override

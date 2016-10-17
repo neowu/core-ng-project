@@ -23,6 +23,7 @@
 * mockito: update mockito to 2.1
 * queue: start supporting kafka
 * mongo: removed eval() support
+* log: make logger.isDebugEnabled() to return false, to disable 3rd party log gracefully
 
 ### 4.7.7 (9/14/2016 - 9/15/2016)
 * http: throw methodNotAllowedException for unknown http method
