@@ -16,7 +16,7 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 
 ## Change log
-### 4.7.8 (9/15/2016 - ongoing)
+### 4.7.8 (9/15/2016 - 10/17/2016)
 * lib: update undertow to 1.4.3
 * http: url param supports boolean
 * es: update esTookTime to nano seconds
