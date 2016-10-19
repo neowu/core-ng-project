@@ -39,7 +39,7 @@ gulp.task("css", ["html"], function() {
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(`${root}/dist/web/static/css`));
 
-    var libCSS = gulp.src(`${root}/web/static/css/lib/*.css`)
+    var libCSS = gulp.src(`${root}/web/static/css/lib/**/*.css`)
         .pipe(md5(10, `${root}/dist/web/template/**/*.html`))
         .pipe(gulp.dest(`${root}/dist/web/static/css/lib`));
 
