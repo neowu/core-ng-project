@@ -13,7 +13,7 @@
     "gulp-cssnano": "^2.1.2",
     "gulp-eslint": "^3.0.1",
     "gulp-md5-plus": "^0.2.5",
-    "gulp-sourcemaps": "^1.6.0",
+    "gulp-sourcemaps": "^2.1.1",
     "gulp-stylelint": "^3.2.0",
     "gulp-uglify": "^2.0.0",
     "merge2": "^1.0.2",

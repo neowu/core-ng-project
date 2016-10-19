@@ -9,7 +9,7 @@ clean {
         doLast {
             exec {
                 workingDir '../gradle/node'
-                commandLine 'npm', 'install'
+                commandLine 'npm', 'install';
                 commandLine 'npm', 'run', 'clean', '--', '--root', project.file('.')
             }
         }
@@ -26,7 +26,7 @@ processResources {
         doLast {
             exec {
                 workingDir '../gradle/node'
-                commandLine 'npm', 'install'
+                commandLine 'npm', 'install';
                 commandLine 'npm', 'run', 'build', '--', '--root', project.file('.')
             }
         }
