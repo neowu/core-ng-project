@@ -11,17 +11,12 @@ gulp.task("clean", function() {
     return del(`${root}/dist/web`, {force: true});
 });
 
-gulp.task("html", function() {
-    return gulp.src(`${root}/web/template/**/*.html`)
-        .pipe(gulp.dest(`${root}/dist/web/template`))
-});
-
 gulp.task("resource", function() {
-    return gulp.src([`${root}/web/**/*.*`, `!${root}/web/static/css/**/*.css`, `!${root}/web/static/js/**/*.js`, `!${root}/web/template/**/*.*`])
+    return gulp.src([`${root}/web/**/*.*`, `!${root}/web/static/css/**/*.css`, `!${root}/web/static/js/**/*.js`])
         .pipe(gulp.dest(`${root}/dist/web`));
 });
 
-gulp.task("css", ["html"], function() {
+gulp.task("css", ["resource"], function() {
     const stylelint = require("gulp-stylelint");
     const cssnano = require("gulp-cssnano");
 
@@ -46,7 +41,7 @@ gulp.task("css", ["html"], function() {
     return merge(appCSS, libCSS);
 });
 
-gulp.task("js", ["html"], function(cb) {
+gulp.task("js", ["resource"], function(cb) {
     const uglify = require("gulp-uglify");
     const eslint = require("gulp-eslint");
 
@@ -70,5 +65,5 @@ gulp.task("js", ["html"], function(cb) {
 });
 
 gulp.task("build", [], function() {
-    gulp.start("resource", "html", "css", "js");
+    gulp.start("resource", "css", "js");
 });
