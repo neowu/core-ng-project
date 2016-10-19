@@ -1,9 +1,10 @@
 {
-  "name": "demo-site",
+  "name": "node",
   "version": "1.0.0",
-  "description": "demo-site",
+  "description": "node asset pipeline",
   "scripts": {
-    "build": "gulp"
+    "build": "gulp build",
+    "clean": "gulp clean"
   },
   "license": "Apache-2.0",
   "devDependencies": {
@@ -15,6 +16,7 @@
     "gulp-sourcemaps": "^1.6.0",
     "gulp-stylelint": "^3.2.0",
     "gulp-uglify": "^2.0.0",
-    "merge2": "^1.0.2"
+    "merge2": "^1.0.2",
+    "yargs": "^6.2.0"
   }
 }

@@ -4,18 +4,45 @@ def environment = hasProperty('env') ? env : null
 apply plugin: 'application'
 mainClassName = 'Main'
 
-afterEvaluate {
-    distTar {
-        archiveName "${baseName}.${extension}"
-    }
-
-    startScripts {
-        defaultJvmOpts = ["-Dcore.webPath=APP_HOME_VAR/web", "-Dcore.appName=${project.name}"]
-
+clean {
+    if (project.file("src/main/web").exists()) {
         doLast {
-            windowsScript.text = windowsScript.text.replaceFirst('APP_HOME_VAR', '%APP_HOME%')
-            unixScript.text = unixScript.text.replaceFirst('APP_HOME_VAR', '\\$APP_HOME')
+            exec {
+                workingDir '../gradle/node'
+                commandLine 'npm', 'install'
+                commandLine 'npm', 'run', 'clean', '--', '--root', project.file('.')
+            }
         }
+    }
+}
+
+processResources {
+    if (environment != null) {
+        def envProperties = "conf/${environment}/resources"
+        assert project.file(envProperties).exists()
+        from envProperties
+    }
+    if (project.file("src/main/web").exists()) {
+        doLast {
+            exec {
+                workingDir '../gradle/node'
+                commandLine 'npm', 'install'
+                commandLine 'npm', 'run', 'build', '--', '--root', project.file('.')
+            }
+        }
+    }
+}
+
+distTar {
+    archiveName "${baseName}.${extension}"
+}
+
+startScripts {
+    defaultJvmOpts = ["-Dcore.webPath=APP_HOME_VAR/web", "-Dcore.appName=${project.name}"]
+
+    doLast {
+        windowsScript.text = windowsScript.text.replaceFirst('APP_HOME_VAR', '%APP_HOME%')
+        unixScript.text = unixScript.text.replaceFirst('APP_HOME_VAR', '\\$APP_HOME')
     }
 }
 
@@ -24,8 +51,6 @@ distributions {
         if (environment != null) {
             def envProperties = "conf/${environment}/resources"
             assert project.file(envProperties).exists()
-            sourceSets.main.resources.srcDirs envProperties
-
             contents {
                 from("conf/${environment}/web") {
                     into "web"
