@@ -152,7 +152,6 @@
     "prefer-reflect": "error",
     "prefer-rest-params": "error",
     "prefer-spread": "error",
-    "prefer-template": "error",
     "quotes": "error",
     "radix": "error",
     "rest-spread-spacing": "error",

@@ -12,13 +12,7 @@ public final class CDNConfig {
         this.context = context;
     }
 
-    public void hosts(String... hosts) {
-        context.httpServer.siteManager.templateManager.cdnManager.hosts(hosts);
-    }
-
-    public void version(String version) {
-        String cdnVersion = version;
-        if (version.startsWith("${")) cdnVersion = "local";
-        context.httpServer.siteManager.templateManager.cdnManager.version(cdnVersion);
+    public void host(String host) {
+        context.httpServer.siteManager.templateManager.cdnManager.host(host);
     }
 }

@@ -13,20 +13,19 @@ public class CDNManagerTest {
     @Before
     public void createCDNManager() {
         manager = new CDNManager();
-        manager.hosts("host1", "host2");
-        manager.version("100");
+        manager.host("cdn");
     }
 
     @Test
     public void url() {
         String url = manager.url("/image/image2.png");
-        Assert.assertEquals("//host2/image/image2.png?v=100", url);
+        Assert.assertEquals("//cdn/image/image2.png", url);
 
         url = manager.url("/image/image3.png");
-        Assert.assertEquals("//host1/image/image3.png?v=100", url);
+        Assert.assertEquals("//cdn/image/image3.png", url);
 
         url = manager.url("/image/image3.png?param=value");
-        Assert.assertEquals("//host1/image/image3.png?param=value&v=100", url);
+        Assert.assertEquals("//cdn/image/image3.png?param=value", url);
     }
 
     @Test
