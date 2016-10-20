@@ -6,6 +6,7 @@
     "build": "gulp build",
     "clean": "gulp clean"
   },
+  "private": true,
   "license": "Apache-2.0",
   "devDependencies": {
     "del": "^2.2.2",

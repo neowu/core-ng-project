@@ -6,12 +6,14 @@ def environment = hasProperty('env') ? env : null
 apply plugin: 'application'
 mainClassName = 'Main'
 
+def isWindows = OperatingSystem.current().isWindows();
+
 clean {
     if (project.file("src/main/web").exists()) {
         doLast {
             exec {
                 workingDir "${rootDir}/gradle/node"
-                if (!OperatingSystem.current().isWindows()) {
+                if (!isWindows) {
                     commandLine 'npm', 'install'
                 } else {
                     commandLine 'cmd', '/c', 'npm', 'install'
@@ -19,7 +21,7 @@ clean {
             }
             exec {
                 workingDir "${rootDir}/gradle/node"
-                if (!OperatingSystem.current().isWindows()) {
+                if (!isWindows) {
                     commandLine 'npm', 'run', 'clean', '--', '--root', project.file('.')
                 } else {
                     commandLine 'cmd', '/c', 'npm', 'run', 'clean', '--', '--root', project.file('.')
@@ -39,7 +41,7 @@ processResources {
         doLast {
             exec {
                 workingDir "${rootDir}/gradle/node"
-                if (!OperatingSystem.current().isWindows()) {
+                if (!isWindows) {
                     commandLine 'npm', 'install'
                 } else {
                     commandLine 'cmd', '/c', 'npm', 'install'
@@ -47,7 +49,7 @@ processResources {
             }
             exec {
                 workingDir "${rootDir}/gradle/node"
-                if (!OperatingSystem.current().isWindows()) {
+                if (!isWindows) {
                     commandLine 'npm', 'run', 'build', '--', '--root', project.file('.')
                 } else {
                     commandLine 'cmd', '/c', 'npm', 'run', 'build', '--', '--root', project.file('.')
