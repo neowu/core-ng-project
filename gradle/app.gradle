@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem;
+
 // use gradlew -Penv=${env} to pass
 def environment = hasProperty('env') ? env : null
 
@@ -9,8 +11,13 @@ clean {
         doLast {
             exec {
                 workingDir "${rootDir}/gradle/node"
-                commandLine 'npm', 'install'
-                commandLine 'npm', 'run', 'clean', '--', '--root', project.file('.')
+                if (!OperatingSystem.current().isWindows()) {
+                    commandLine 'npm', 'install'
+                    commandLine 'npm', 'run', 'clean', '--', '--root', project.file('.')
+                } else {
+                    commandLine 'cmd', '/c', 'npm', 'install'
+                    commandLine 'cmd', '/c', 'npm', 'run', 'clean', '--', '--root', project.file('.')
+                }
             }
         }
     }
@@ -26,8 +33,13 @@ processResources {
         doLast {
             exec {
                 workingDir "${rootDir}/gradle/node"
-                commandLine 'npm', 'install'
-                commandLine 'npm', 'run', 'build', '--', '--root', project.file('.')
+                if (!OperatingSystem.current().isWindows()) {
+                    commandLine 'npm', 'install'
+                    commandLine 'npm', 'run', 'build', '--', '--root', project.file('.')
+                } else {
+                    commandLine 'cmd', '/c', 'npm', 'install'
+                    commandLine 'cmd', '/c', 'npm', 'run', 'build', '--', '--root', project.file('.')
+                }
             }
         }
     }
