@@ -32,8 +32,8 @@ public final class WebDirectory {
                 return path;
             }
         } else {
-            Path path = Paths.get("./src/main/dist/web");
-            if (Files.isDirectory(path)) {
+            Path path = findLocalRootDirectory();
+            if (path != null) {
                 logger.warn("found local web directory, this should only happen in local dev env or test, path={}", path);
                 localEnv = true;
                 try {
@@ -44,6 +44,14 @@ public final class WebDirectory {
             }
         }
         logger.info("can not locate web directory");
+        return null;
+    }
+
+    private Path findLocalRootDirectory() {
+        Path path = Paths.get("./src/main/web");
+        if (Files.isDirectory(path)) return path;
+        path = Paths.get("./src/main/dist/web");
+        if (Files.isDirectory(path)) return path;
         return null;
     }
 

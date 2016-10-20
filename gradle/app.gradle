@@ -8,8 +8,8 @@ clean {
     if (project.file("src/main/web").exists()) {
         doLast {
             exec {
-                workingDir '../gradle/node'
-                commandLine 'npm', 'install';
+                workingDir "${rootDir}/gradle/node"
+                commandLine 'npm', 'install'
                 commandLine 'npm', 'run', 'clean', '--', '--root', project.file('.')
             }
         }
@@ -25,8 +25,8 @@ processResources {
     if (project.file("src/main/web").exists()) {
         doLast {
             exec {
-                workingDir '../gradle/node'
-                commandLine 'npm', 'install';
+                workingDir "${rootDir}/gradle/node"
+                commandLine 'npm', 'install'
                 commandLine 'npm', 'run', 'build', '--', '--root', project.file('.')
             }
         }

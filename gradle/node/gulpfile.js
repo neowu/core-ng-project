@@ -3,8 +3,8 @@ const sourcemaps = require("gulp-sourcemaps");
 const md5 = require("gulp-md5-plus");
 const merge = require("merge2");
 
-var argv = require('yargs').argv;
-var root = `${argv.root}/src/main`;
+const argv = require('yargs').argv;
+const root = `${argv.root}/src/main`;
 
 gulp.task("clean", function() {
     const del = require("del");
@@ -30,12 +30,12 @@ gulp.task("css", ["resource"], function() {
             }]
         }))
         .pipe(cssnano())
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {dirLevel: 2}))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(`${root}/dist/web/static/css`));
 
     var libCSS = gulp.src(`${root}/web/static/css/lib/**/*.css`)
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {dirLevel: 2}))
         .pipe(gulp.dest(`${root}/dist/web/static/css/lib`));
 
     return merge(appCSS, libCSS);
@@ -53,12 +53,12 @@ gulp.task("js", ["resource"], function(cb) {
         .pipe(eslint.failAfterError())
         .pipe(sourcemaps.init())
         .pipe(uglify())
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {dirLevel: 2}))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(`${root}/dist/web/static/js`));
 
     var libJS = gulp.src([`${root}/web/static/js/lib/**/*.js`])
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {dirLevel: 2}))
         .pipe(gulp.dest(`${root}/dist/web/static/js/lib`));
 
     return merge(appJS, libJS);

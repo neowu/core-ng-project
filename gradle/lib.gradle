@@ -19,19 +19,3 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 artifacts {
     archives sourcesJar
 }
-
-afterEvaluate {
-    // configurations.runtime requires to be after dependency definition
-    task standaloneJar(type: Jar, dependsOn: jar) {
-        classifier = 'standalone'
-
-        from files(sourceSets.main.output.classesDir)
-        from files(sourceSets.main.output.resourcesDir)
-        from configurations.runtime.asFileTree.files.collect { zipTree(it) }
-
-        manifest {
-            attributes 'Main-Class': 'Main'
-            from project.jar.manifest
-        }
-    }
-}

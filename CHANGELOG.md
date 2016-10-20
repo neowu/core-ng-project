@@ -18,6 +18,7 @@
 ## Change log
 ### 4.7.9 (10/20/2016 - )
 * cdn: removed version support, use node pipeline instead
+* web: use ./src/main/web as web directory if node is used
 
 ### 4.7.8 (9/15/2016 - 10/17/2016)
 * lib: update undertow to 1.4.3
