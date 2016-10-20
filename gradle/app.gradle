@@ -13,9 +13,15 @@ clean {
                 workingDir "${rootDir}/gradle/node"
                 if (!OperatingSystem.current().isWindows()) {
                     commandLine 'npm', 'install'
-                    commandLine 'npm', 'run', 'clean', '--', '--root', project.file('.')
                 } else {
                     commandLine 'cmd', '/c', 'npm', 'install'
+                }
+            }
+            exec {
+                workingDir "${rootDir}/gradle/node"
+                if (!OperatingSystem.current().isWindows()) {
+                    commandLine 'npm', 'run', 'clean', '--', '--root', project.file('.')
+                } else {
                     commandLine 'cmd', '/c', 'npm', 'run', 'clean', '--', '--root', project.file('.')
                 }
             }
@@ -35,9 +41,15 @@ processResources {
                 workingDir "${rootDir}/gradle/node"
                 if (!OperatingSystem.current().isWindows()) {
                     commandLine 'npm', 'install'
-                    commandLine 'npm', 'run', 'build', '--', '--root', project.file('.')
                 } else {
                     commandLine 'cmd', '/c', 'npm', 'install'
+                }
+            }
+            exec {
+                workingDir "${rootDir}/gradle/node"
+                if (!OperatingSystem.current().isWindows()) {
+                    commandLine 'npm', 'run', 'build', '--', '--root', project.file('.')
+                } else {
                     commandLine 'cmd', '/c', 'npm', 'run', 'build', '--', '--root', project.file('.')
                 }
             }
