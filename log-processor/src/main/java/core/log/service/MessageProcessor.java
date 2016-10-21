@@ -45,7 +45,7 @@ public class MessageProcessor {
         Map<String, Object> config = Maps.newHashMap();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "log-processor");
-        config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 3000);    // our regular action logs are about 1.5M per 2000 messages
+        config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         kafkaConsumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
 
@@ -78,7 +78,7 @@ public class MessageProcessor {
 
     private void process(KafkaConsumer<String, byte[]> kafkaConsumer) {
         while (!stop.get()) {
-            ConsumerRecords<String, byte[]> records = kafkaConsumer.poll(4000);
+            ConsumerRecords<String, byte[]> records = kafkaConsumer.poll(Long.MAX_VALUE);
             consume(TOPIC_ACTION_LOG, records, actionLogMessageReader, actionManager::index);
             consume(TOPIC_STAT, records, statMessageReader, statManager::index);
             kafkaConsumer.commitAsync();
