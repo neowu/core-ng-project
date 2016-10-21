@@ -16,6 +16,10 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 
 ## Change log
+### 4.8.0 (10/20/2016 - )
+* kafka: update to 0.10.1.0
+* test: fix EnvWebValidator to support node
+
 ### 4.7.9 (10/19/2016 - 10/20/2016)
 * cdn: removed version support, use node pipeline instead
 * web: use ./src/main/web as web directory if node is used
