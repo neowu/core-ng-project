@@ -41,6 +41,7 @@ public class EncodingsTest {
         assertEquals("a%3Fb", Encodings.uriComponent("a?b"));
         assertEquals("a%2Fb", Encodings.uriComponent("a/b"));
         assertEquals("a%26b", Encodings.uriComponent("a&b"));
+        assertEquals("a%25b", Encodings.uriComponent("a%b"));
     }
 
     @Test
@@ -52,5 +53,6 @@ public class EncodingsTest {
         assertEquals("a?b", Encodings.decodeURIComponent("a%3Fb"));
         assertEquals("a/b", Encodings.decodeURIComponent("a%2Fb"));
         assertEquals("a&b", Encodings.decodeURIComponent("a&b"));
+        assertEquals("a%b", Encodings.decodeURIComponent("a%25b"));
     }
 }

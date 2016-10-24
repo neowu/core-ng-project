@@ -36,7 +36,12 @@ public class Element extends ContainerNode {
         }
 
         currentParent.addStaticContent("<");
-        currentParent.addStaticContent(name);
+
+        if ("template".equals(name)) {
+            currentParent.addStaticContent("script type=\"text/template\"");
+        } else {
+            currentParent.addStaticContent(name);
+        }
 
         attributes.buildTemplate(currentParent, context);
 
@@ -68,7 +73,11 @@ public class Element extends ContainerNode {
 
     private void addEndTag(ContainerFragment parent) {
         parent.addStaticContent("</");
-        parent.addStaticContent(name);
+        if ("template".equals(name)) {
+            parent.addStaticContent("script");
+        } else {
+            parent.addStaticContent(name);
+        }
         parent.addStaticContent(">");
     }
 }
