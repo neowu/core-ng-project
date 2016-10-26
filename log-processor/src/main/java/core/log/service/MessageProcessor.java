@@ -39,18 +39,18 @@ public class MessageProcessor {
     private final ActionManager actionManager;
     private final StatManager statManager;
 
-    public MessageProcessor(String kafkaHost, ActionManager actionManager, StatManager statManager) {
+    public MessageProcessor(String kafkaURI, ActionManager actionManager, StatManager statManager) {
         this.actionManager = actionManager;
         this.statManager = statManager;
         Map<String, Object> config = Maps.newHashMap();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaURI);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "log-processor");
         config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         kafkaConsumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
 
         processorThread = new Thread(() -> {
-            logger.info("message processor thread started, kafkaHost={}", kafkaHost);
+            logger.info("message processor thread started, kafkaURI={}", kafkaURI);
             while (!stop.get()) {
                 try {
                     kafkaConsumer.subscribe(Lists.newArrayList(TOPIC_ACTION_LOG, TOPIC_STAT));

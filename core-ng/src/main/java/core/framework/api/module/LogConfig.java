@@ -66,11 +66,11 @@ public final class LogConfig {
         }
     }
 
-    public void forwardLogToKafka(String host) {
+    public void forwardLogToKafka(String uri) {
         if (context.isTest()) {
             logger.info("disable log forwarding during test");
         } else {
-            context.logManager.logForwarder = new KafkaLogForwarder(host, context.logManager.appName);
+            context.logManager.logForwarder = new KafkaLogForwarder(uri, context.logManager.appName);
             context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(context.logManager.logForwarder), Duration.ofSeconds(10));
         }
     }

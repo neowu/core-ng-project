@@ -27,7 +27,7 @@ public class LogProcessorApp extends App {
         ActionManager actionManager = bind(ActionManager.class);
         StatManager statManager = bind(StatManager.class);
 
-        MessageProcessor processor = new MessageProcessor(requiredProperty("sys.kafka.host"), actionManager, statManager);
+        MessageProcessor processor = new MessageProcessor(requiredProperty("sys.kafka.uri"), actionManager, statManager);
         onStartup(processor::start);
         onShutdown(processor::stop);
 

@@ -48,10 +48,10 @@ public final class KafkaLogForwarder implements LogForwarder {
         }
     };
 
-    public KafkaLogForwarder(String host, String appName) {
+    public KafkaLogForwarder(String uri, String appName) {
         this.appName = appName;
         Map<String, Object> config = Maps.newHashMap();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, host);
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
         config.put(ProducerConfig.ACKS_CONFIG, "0");    // no acknowledge to maximize performance
         config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
         kafkaProducer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());

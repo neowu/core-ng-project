@@ -16,6 +16,9 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 
 ## Change log
+### 4.8.2 (10/26/2016)
+* log: rename kafkaHost to kafkaURI
+
 ### 4.8.1 (10/26/2016)
 * http: fix decode path param bug
 
