@@ -1,6 +1,7 @@
 package core.framework.impl.web.session;
 
 import core.framework.api.util.Exceptions;
+import core.framework.api.web.CookieSpec;
 import core.framework.api.web.Session;
 import core.framework.impl.web.request.RequestImpl;
 import io.undertow.server.HttpServerExchange;
@@ -17,8 +18,7 @@ import java.util.UUID;
  */
 public class SessionManager {
     private final Logger logger = LoggerFactory.getLogger(SessionManager.class);
-    private String cookieName = "SessionId";
-    private String cookieDomain;     // default to be null, which will be current host
+    private CookieSpec sessionId = new CookieSpec("SessionId");  // default domain is null, which is current host
     private Duration timeout = Duration.ofMinutes(20);
     private SessionStore store;
 
@@ -26,7 +26,7 @@ public class SessionManager {
         if (store == null) return null;  // session store is not initialized
 
         SessionImpl session = new SessionImpl();
-        request.cookie(cookieName).ifPresent(sessionId -> {
+        request.cookie(sessionId).ifPresent(sessionId -> {
             logger.debug("load http session");
             Map<String, String> sessionData = store.getAndRefresh(sessionId, timeout);
             if (sessionData != null) {
@@ -73,13 +73,12 @@ public class SessionManager {
 
     public void cookie(String name, String domain) {
         if (name == null) throw Exceptions.error("name must not be null");
-        cookieName = name;
-        cookieDomain = domain;
+        sessionId = new CookieSpec(name).domain(domain);
     }
 
     private CookieImpl sessionCookie(String scheme) {
-        CookieImpl cookie = new CookieImpl(cookieName);
-        cookie.setDomain(cookieDomain);
+        CookieImpl cookie = new CookieImpl(sessionId.name);
+        cookie.setDomain(sessionId.domain);
         cookie.setPath("/");
         cookie.setSecure("https".equals(scheme));
         cookie.setHttpOnly(true);

@@ -1,6 +1,5 @@
 package core.framework.impl.web.request;
 
-import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.BadRequestException;
@@ -16,7 +15,7 @@ public final class PathParams {
     public void put(String name, String value) {
         if (value.length() == 0) throw new BadRequestException("path param must not be empty, name=" + name + ", value=" + value);
         try {
-            params.put(name, Encodings.decodeURIComponent(value));
+            params.put(name, value);    // value here is already decoded
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
         }

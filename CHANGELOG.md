@@ -16,6 +16,9 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 
 ## Change log
+### 4.8.1 (10/26/2016)
+* http: fix decode path param bug
+
 ### 4.8.0 (10/20/2016 - 10/24/2016)
 * kafka: update to 0.10.1.0
 * test: fix EnvWebValidator to support node

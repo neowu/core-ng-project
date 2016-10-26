@@ -62,7 +62,7 @@ public final class RequestImpl implements Request {
     }
 
     @Override
-    public String path() {
+    public String path() {  // exchange returns decoded path
         return exchange.getRequestPath();
     }
 
@@ -73,12 +73,7 @@ public final class RequestImpl implements Request {
 
     @Override
     public Optional<String> cookie(CookieSpec spec) {
-        return cookie(spec.name);
-    }
-
-    //TODO: inline this, let session manager handle SessionId/SecureSessionId, use CookieSpec
-    public Optional<String> cookie(String name) {
-        Cookie cookie = exchange.getRequestCookies().get(name);
+        Cookie cookie = exchange.getRequestCookies().get(spec.name);
         if (cookie == null) return Optional.empty();
         try {
             return Optional.of(Encodings.decodeURIComponent(cookie.getValue()));
