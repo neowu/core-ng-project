@@ -2,7 +2,11 @@
   "template": "stat-*",
   "order": 1,
   "settings": {
-    "number_of_shards": 1
+    "number_of_shards": 1,
+    "refresh_interval": "5s",
+    "index.search.slowlog.threshold.query.warn": "10s",
+    "index.search.slowlog.threshold.fetch.warn": "1s",
+    "index.indexing.slowlog.threshold.index.warn": "10s"
   },
   "mappings": {
     "stat": {

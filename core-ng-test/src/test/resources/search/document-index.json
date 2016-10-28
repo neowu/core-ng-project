@@ -8,7 +8,7 @@
       },
       "properties": {
         "string_field": {
-          "type": "string",
+          "type": "text",
           "analyzer": "standard"
         },
         "zoned_date_time_field": {
