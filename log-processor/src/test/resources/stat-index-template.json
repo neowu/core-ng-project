@@ -14,12 +14,10 @@
           "type": "date"
         },
         "id": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "app": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "server_ip": {
           "type": "ip"

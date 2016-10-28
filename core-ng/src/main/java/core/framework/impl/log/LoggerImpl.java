@@ -8,7 +8,7 @@ import java.io.PrintStream;
 /**
  * @author neo
  */
-final class LoggerImpl extends AbstractLogger {
+public final class LoggerImpl extends AbstractLogger {
     static String abbreviateLoggerName(String name) {
         String[] tokens = Strings.split(name, '.');
         StringBuilder builder = new StringBuilder();
@@ -41,7 +41,7 @@ final class LoggerImpl extends AbstractLogger {
     }
 
     @Override
-    void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
+    public void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
         if (level.value >= traceLevel.value) {
             LogEvent event = new LogEvent(logger, marker, level, message, arguments, exception);
             event.filter = logManager.filter;

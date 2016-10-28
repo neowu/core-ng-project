@@ -19,6 +19,7 @@ import core.framework.api.util.StopWatch;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.json.JSONWriter;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -176,7 +177,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         try {
             DeleteResponse response = elasticSearch.client.prepareDelete(index, type, request.id).get();
-            return response.isFound();
+            return response.getResult() == DocWriteResponse.Result.DELETED;
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {

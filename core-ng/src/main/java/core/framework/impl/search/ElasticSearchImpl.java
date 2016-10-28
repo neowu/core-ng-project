@@ -13,6 +13,7 @@ import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.client.transport.TransportClientNodesService;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.network.NetworkService;
@@ -20,6 +21,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,7 +153,7 @@ public class ElasticSearchImpl implements ElasticSearch {
             for (ObjectObjectCursor<String, IndexMetaData> cursor : indices) {
                 IndexMetaData metaData = cursor.value;
                 ElasticSearchIndex index = new ElasticSearchIndex();
-                index.index = metaData.getIndex();
+                index.index = metaData.getIndex().getName();
                 index.state = metaData.getState();
                 results.add(index);
             }
@@ -167,14 +169,14 @@ public class ElasticSearchImpl implements ElasticSearch {
         if (addresses.isEmpty()) throw new Error("addresses must not be empty, please check config");
         StopWatch watch = new StopWatch();
         try {
-            Settings.Builder settings = Settings.settingsBuilder();
-            settings.put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT, new TimeValue(timeout.toMillis()))
-                    .put("client.transport.ping_timeout", new TimeValue(timeout.toMillis()))
-                    .put("client.transport.ignore_cluster_name", "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
+            Settings.Builder settings = Settings.builder();
+            settings.put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
+                    .put(TransportClientNodesService.CLIENT_TRANSPORT_PING_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
+                    .put(TransportClientNodesService.CLIENT_TRANSPORT_IGNORE_CLUSTER_NAME.getKey(), "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
             if (sniff) {
-                settings.put("client.transport.sniff", true);
+                settings.put(TransportClientNodesService.CLIENT_TRANSPORT_SNIFF.getKey(), true);
             }
-            TransportClient client = TransportClient.builder().settings(settings).build();
+            TransportClient client = new PreBuiltTransportClient(settings.build());
             addresses.forEach(client::addTransportAddress);
             return client;
         } finally {

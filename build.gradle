@@ -4,11 +4,11 @@ subprojects {
     apply from: file("${rootDir}/gradle/quality.gradle")
 
     group = 'core.framework'
-    version = '4.8.2'
+    version = '4.8.3'
 }
 
 def mongoVersion = '3.3.0'
-def elasticVersion = '2.4.0'
+def elasticVersion = '5.0.0'
 def rabbitVersion = '3.6.5'
 def kafkaVersion = '0.10.1.0'
 
@@ -21,21 +21,21 @@ project(':core-ng') {
     dependencies {
         provided(
                 'redis.clients:jedis:2.8.1@jar',
-                "org.elasticsearch:elasticsearch:${elasticVersion}@jar",
-                'com.carrotsearch:hppc:0.7.1@jar',  // used by elasticsearch
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
-                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
+                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
+                "org.elasticsearch.client:transport:${elasticVersion}",
+                'org.apache.logging.log4j:log4j-api:2.7'   // used by elasticsearch
         )
         compile(
                 project(":core-ng-api"),
                 'javax.inject:javax.inject:1',
                 'org.javassist:javassist:3.21.0-GA',
                 'org.slf4j:slf4j-api:1.7.21',
-                'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.2',
-                'com.fasterxml.jackson.module:jackson-module-afterburner:2.8.2',
-                'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.2',
-                'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.2',
+                'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.4',
+                'com.fasterxml.jackson.module:jackson-module-afterburner:2.8.4',
+                'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.4',
+                'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.4',
                 'org.apache.httpcomponents:httpclient:4.5.2',
                 'io.undertow:undertow-core:1.4.3.Final'
         )
@@ -55,7 +55,8 @@ project(':core-ng-test') {
                 'com.github.fakemongo:fongo:2.0.7',
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
                 'org.hsqldb:hsqldb:2.3.3',
-                "org.elasticsearch:elasticsearch:${elasticVersion}"
+                "org.elasticsearch.client:transport:${elasticVersion}",
+                'org.apache.logging.log4j:log4j-core:2.7'       // used by elasticsearch
         )
         compile(
                 project(":core-ng"),
@@ -93,11 +94,15 @@ project(':log-processor') {
     dependencies {
         compile(
                 project(':core-ng'),
-                "org.elasticsearch:elasticsearch:${elasticVersion}",
+                "org.elasticsearch.client:transport:${elasticVersion}",
                 "org.apache.kafka:kafka-clients:${kafkaVersion}"
         )
+        runtime(
+                'org.apache.logging.log4j:log4j-api:2.7'       // used by elasticsearch
+        )
         testCompile(
-                project(':core-ng-test')
+                project(':core-ng-test'),
+                'org.apache.logging.log4j:log4j-core:2.7'       // used by elasticsearch
         )
     }
 }

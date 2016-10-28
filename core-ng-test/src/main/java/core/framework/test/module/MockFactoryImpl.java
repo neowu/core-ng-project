@@ -10,6 +10,7 @@ import core.framework.test.async.MockExecutor;
 import core.framework.test.mongo.MockMongo;
 import core.framework.test.queue.MockRabbitMQ;
 import core.framework.test.redis.MockRedis;
+import core.framework.test.search.ESLoggerConfigFactory;
 import core.framework.test.search.MockElasticSearch;
 import org.mockito.Mockito;
 
@@ -25,7 +26,15 @@ public final class MockFactoryImpl implements MockFactory {
         if (Redis.class.equals(instanceClass)) return (T) new MockRedis();
         if (RabbitMQ.class.equals(instanceClass)) return (T) new MockRabbitMQ();
         if (MongoImpl.class.equals(instanceClass)) return (T) new MockMongo();
-        if (ElasticSearchImpl.class.equals(instanceClass)) return (T) new MockElasticSearch((Path) params[0]);
+        if (ElasticSearchImpl.class.equals(instanceClass)) {
+            // es doesn't impl log4j/slf4j right in org.elasticsearch.node.Node, it refer to log4j.core class directly, this is to bridge es log to coreng logger
+            // log4j-to-slf4j works if only transport client is used, but our integration test uses Node.
+            System.setProperty("es.log4j.shutdownEnabled", "false");
+            System.setProperty("log4j2.disable.jmx", "true");
+            System.setProperty("log4j.configurationFactory", ESLoggerConfigFactory.class.getName());
+            ESLoggerConfigFactory.bindLogger();
+            return (T) new MockElasticSearch((Path) params[0]);
+        }
         if (Executor.class.equals(instanceClass)) return (T) new MockExecutor();
         return Mockito.mock(instanceClass);
     }

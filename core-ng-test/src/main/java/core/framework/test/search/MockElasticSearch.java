@@ -3,8 +3,11 @@ package core.framework.test.search;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.search.ElasticSearchImpl;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.network.NetworkModule;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.env.Environment;
 import org.elasticsearch.node.Node;
+import org.elasticsearch.node.NodeValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,14 +28,15 @@ public class MockElasticSearch extends ElasticSearchImpl {
     protected Client createClient() {
         StopWatch watch = new StopWatch();
         try {
-            Settings settings = Settings.settingsBuilder()
-                .put("node.local", "true")          // refer to org.elasticsearch.node.NodeBuilder.local()
-                .put("http.enabled", "false")       // refer to org.elasticsearch.node.Node.start()
-                .put("path.home", dataPath)         // refer to org.elasticsearch.env.Environment.Environment()
-                .build();
-            Node node = new Node(settings);
+            Settings.Builder settings = Settings.builder();
+            settings.put(NetworkModule.TRANSPORT_TYPE_SETTING.getKey(), NetworkModule.LOCAL_TRANSPORT)
+                    .put(NetworkModule.HTTP_ENABLED.getKey(), false)
+                    .put(Environment.PATH_HOME_SETTING.getKey(), dataPath);
+            Node node = new Node(settings.build());
             node.start();
             return node.client();
+        } catch (NodeValidationException e) {
+            throw new Error(e);
         } finally {
             logger.info("create local elasticsearch node, dataPath={}, elapsedTime={}", dataPath, watch.elapsedTime());
         }

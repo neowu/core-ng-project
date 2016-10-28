@@ -14,28 +14,23 @@
           "type": "date"
         },
         "id": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "app": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "result": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "action": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "error_code": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "content": {
-          "type": "string",
-          "index": "no"
+          "type": "text",
+          "index": "false"
         }
       }
     }

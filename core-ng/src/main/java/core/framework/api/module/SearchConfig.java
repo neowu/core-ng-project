@@ -6,6 +6,7 @@ import core.framework.api.util.Files;
 import core.framework.api.util.Types;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.search.ElasticSearchImpl;
+import core.framework.impl.search.log.ESLoggerContextFactory;
 
 import java.nio.file.Path;
 import java.time.Duration;
@@ -28,6 +29,7 @@ public final class SearchConfig {
                 search.initialize();    // elasticserch client can be initialized immediately for unit test env
                 context.shutdownHook.add(() -> Files.deleteDir(dataPath));
             } else {
+                System.setProperty("log4j2.loggerContextFactory", ESLoggerContextFactory.class.getName());
                 search = new ElasticSearchImpl();
                 context.startupHook.add(search::initialize);
             }

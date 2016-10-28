@@ -16,6 +16,9 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 
 ## Change log
+### 4.8.3 (10/27/2016 - )
+* es: update es to 5.0.0
+
 ### 4.8.2 (10/26/2016)
 * log: rename kafkaHost to kafkaURI
 

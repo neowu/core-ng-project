@@ -3,4 +3,5 @@
         "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 <suppressions>
     <suppress files="Main.java" checks="UncommentedMain"/>
+    <suppress files="core/framework/impl/search/log/ESLogger.java" checks="ParameterNumber"/>
 </suppressions>

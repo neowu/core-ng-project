@@ -16,4 +16,10 @@
         <!--PZLA: PZLA_PREFER_ZERO_LENGTH_ARRAYS: Consider returning a zero length array rather than null-->
         <Bug code="RV,EI,EI2,Dm,CN,SIC,UrF,UwF,NP,BC,SQL,UuF,PZLA"/>
     </Match>
+
+    <Match>
+        <!--SE_BAD_FIELD: Non-transient non-serializable instance field in serializable class-->
+        <Class name="core.framework.impl.search.log.ESLogger"/>
+        <Bug pattern="SE_BAD_FIELD"/>
+    </Match>
 </FindBugsFilter>
