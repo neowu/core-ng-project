@@ -114,9 +114,6 @@ public class ESLogger extends AbstractLogger {
 
     private LogLevel logLevel(Level level) {
         switch (level.getStandardLevel()) {
-            case DEBUG:
-            case TRACE:
-                return LogLevel.DEBUG;
             case INFO:
                 return LogLevel.INFO;
             case WARN:
