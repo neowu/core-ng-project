@@ -27,15 +27,21 @@ public final class MockFactoryImpl implements MockFactory {
         if (RabbitMQ.class.equals(instanceClass)) return (T) new MockRabbitMQ();
         if (MongoImpl.class.equals(instanceClass)) return (T) new MockMongo();
         if (ElasticSearchImpl.class.equals(instanceClass)) {
-            // es doesn't impl log4j/slf4j right in org.elasticsearch.node.Node, it refer to log4j.core class directly, this is to bridge es log to coreng logger
-            // log4j-to-slf4j works if only transport client is used, but our integration test uses Node.
-            System.setProperty("es.log4j.shutdownEnabled", "false");
-            System.setProperty("log4j2.disable.jmx", "true");
-            System.setProperty("log4j.configurationFactory", ESLoggerConfigFactory.class.getName());
-            ESLoggerConfigFactory.bindLogger();
+            bindESLogger();
             return (T) new MockElasticSearch((Path) params[0]);
         }
         if (Executor.class.equals(instanceClass)) return (T) new MockExecutor();
         return Mockito.mock(instanceClass);
+    }
+
+    // es doesn't impl log4j/slf4j right in org.elasticsearch.node.Node, it refer to log4j.core class directly, this is to bridge es log to coreng logger
+    // log4j-to-slf4j works if only transport client is used, but our integration test uses Node.
+    private void bindESLogger() {
+        if (System.getProperty("log4j.configurationFactory") != null) return;
+
+        System.setProperty("es.log4j.shutdownEnabled", "false");
+        System.setProperty("log4j2.disable.jmx", "true");
+        System.setProperty("log4j.configurationFactory", ESLoggerConfigFactory.class.getName());
+        ESLoggerConfigFactory.bindLogger();
     }
 }
