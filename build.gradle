@@ -32,6 +32,7 @@ project(':core-ng') {
                 'javax.inject:javax.inject:1',
                 'org.javassist:javassist:3.21.0-GA',
                 'org.slf4j:slf4j-api:1.7.21',
+                'com.fasterxml.jackson.core:jackson-annotations:2.8.4',
                 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.4',
                 'com.fasterxml.jackson.module:jackson-module-afterburner:2.8.4',
                 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.4',

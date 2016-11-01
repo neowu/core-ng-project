@@ -4,6 +4,8 @@ import core.framework.api.search.BulkIndexRequest;
 import core.framework.api.search.ElasticSearch;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.search.ForEach;
+import core.framework.api.search.SearchRequest;
+import core.framework.api.search.SearchResponse;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.test.IntegrationTest;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -63,5 +66,14 @@ public class ElasticSearchIntegrationTest extends IntegrationTest {
         documentType.forEach(forEach);
 
         assertEquals(30, results.size());
+    }
+
+    @Test
+    public void search() {
+        SearchRequest request = new SearchRequest();
+        request.query = QueryBuilders.matchAllQuery();
+        SearchResponse<TestDocument> response = documentType.search(request);
+
+        assertNotNull(response);
     }
 }

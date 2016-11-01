@@ -68,12 +68,14 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     @Override
     public SearchResponse<T> search(SearchRequest request) {
+        validate(request);
+
         StopWatch watch = new StopWatch();
         long esTookTime = 0;
         String index = request.index == null ? this.index : request.index;
         try {
             SearchRequestBuilder builder = elasticSearch.client.prepareSearch(index)
-                                                               .setQuery(request.query);
+                .setQuery(request.query);
             if (request.type != null) builder.setSearchType(request.type);
             request.aggregations.forEach(builder::addAggregation);
             request.sorts.forEach(builder::addSort);
@@ -92,6 +94,13 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             logger.debug("search, esTookTime={}, elapsedTime={}", esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
+    }
+
+    private void validate(SearchRequest request) {
+        int skip = request.skip == null ? 0 : request.skip;
+        int limit = request.limit == null ? 0 : request.limit;
+        if (skip + limit > 10000)
+            throw new SearchException("result window is too large, skip + limit must be less than or equal to 10000, skip=" + request.skip + ", limit=" + request.limit);
     }
 
     private SearchResponse<T> searchResponse(org.elasticsearch.action.search.SearchResponse response) {
@@ -131,8 +140,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         byte[] document = writer.toJSON(request.source);
         try {
             elasticSearch.client.prepareIndex(index, type, request.id)
-                                .setSource(document)
-                                .get();
+                .setSource(document)
+                .get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -154,7 +163,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             validator.validate(source);
             byte[] document = writer.toJSON(source);
             builder.add(elasticSearch.client.prepareIndex(index, type, id)
-                                            .setSource(document));
+                .setSource(document));
         }
         long esTookTime = 0;
         try {
@@ -241,10 +250,10 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = forEach.index == null ? this.index : forEach.index;
         try {
             SearchRequestBuilder builder = elasticSearch.client.prepareSearch(index)
-                                                               .setQuery(forEach.query)
-                                                               .addSort(SortBuilders.fieldSort("_doc"))
-                                                               .setScroll(keepAlive)
-                                                               .setSize(forEach.limit);
+                .setQuery(forEach.query)
+                .addSort(SortBuilders.fieldSort("_doc"))
+                .setScroll(keepAlive)
+                .setSize(forEach.limit);
             logger.debug("foreach, index={}, type={}, request={}", index, type, builder);
             org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
 
