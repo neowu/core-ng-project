@@ -124,11 +124,10 @@ project(':demo-service') {
         compile(
                 project(':core-ng'),
                 'redis.clients:jedis:2.8.1@jar',
-                "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "org.apache.kafka:kafka-clients:${kafkaVersion}"
+                "org.mongodb:mongo-java-driver:${mongoVersion}"
         )
         runtime(
-                "com.rabbitmq:amqp-client:${rabbitVersion}"
+                "org.apache.kafka:kafka-clients:${kafkaVersion}"
         )
         testCompile(
                 project(':core-ng-test')
@@ -144,7 +143,7 @@ project(':demo-site') {
                 project(':core-ng')
         )
         runtime(
-                "com.rabbitmq:amqp-client:${rabbitVersion}"
+                "org.apache.kafka:kafka-clients:${kafkaVersion}"
         )
         testCompile(
                 project(':core-ng-test')
