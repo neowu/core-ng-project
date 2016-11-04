@@ -10,15 +10,15 @@
 * template security check, escaping and etc
 * http: make http session https only?
 * think about /test//b, and /:path(\*)
-* framework error, queue listener, background task error notification?
-* extend i18n message to validator/format/called by code directly
 * faster synchronous rpc
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
+* framework error, queue listener, background task error forward to kafka?
 
 ## Change log
 ### 4.8.3 (10/27/2016 - )
 * es: update es to 5.0.0
 * log: removed rabbitmq log forward support
+* session: replace redis impl with HASH, to make it easier to manage and share between multiple apps
 
 ### 4.8.2 (10/26/2016)
 * log: rename kafkaHost to kafkaURI

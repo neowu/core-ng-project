@@ -53,7 +53,7 @@ project(':core-ng-test') {
     dependencies {
         provided(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                'com.github.fakemongo:fongo:2.0.7',
+                'com.github.fakemongo:fongo:2.0.9',
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
                 'org.hsqldb:hsqldb:2.3.3',
                 "org.elasticsearch.client:transport:${elasticVersion}",
@@ -122,9 +122,7 @@ project(':demo-service') {
 
     dependencies {
         compile(
-                project(':core-ng'),
-                'redis.clients:jedis:2.8.1@jar',
-                "org.mongodb:mongo-java-driver:${mongoVersion}"
+                project(':core-ng')
         )
         runtime(
                 "org.apache.kafka:kafka-clients:${kafkaVersion}"
@@ -143,7 +141,8 @@ project(':demo-site') {
                 project(':core-ng')
         )
         runtime(
-                "org.apache.kafka:kafka-clients:${kafkaVersion}"
+                "org.apache.kafka:kafka-clients:${kafkaVersion}",
+                'redis.clients:jedis:2.8.1'
         )
         testCompile(
                 project(':core-ng-test')

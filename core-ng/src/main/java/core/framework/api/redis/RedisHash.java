@@ -13,4 +13,6 @@ public interface RedisHash {
     void set(String key, String field, String value);
 
     void multiSet(String key, Map<String, String> values);
+
+    void del(String key, String... fields);
 }

@@ -28,10 +28,11 @@ public class SessionManager {
         SessionImpl session = new SessionImpl();
         request.cookie(sessionId).ifPresent(sessionId -> {
             logger.debug("load http session");
-            Map<String, String> sessionData = store.getAndRefresh(sessionId, timeout);
-            if (sessionData != null) {
+            Map<String, String> values = store.getAndRefresh(sessionId, timeout);
+            if (values != null) {
+                logger.debug("[session] values={}", values);
                 session.id = sessionId;
-                session.data.putAll(sessionData);
+                session.values.putAll(values);
             }
         });
         return session;
@@ -48,7 +49,7 @@ public class SessionManager {
             cookie.setMaxAge(0);
             cookie.setValue("");
             exchange.setResponseCookie(cookie);
-        } else if (session.changed) {
+        } else if (session.changed()) {
             logger.debug("save http session");
             if (session.id == null) {
                 session.id = UUID.randomUUID().toString();
@@ -57,7 +58,7 @@ public class SessionManager {
                 cookie.setValue(session.id);
                 exchange.setResponseCookie(cookie);
             }
-            store.save(session.id, session.data, timeout);
+            store.save(session.id, session.values, session.changedFields, timeout);
         }
     }
 

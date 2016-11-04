@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author neo
@@ -26,14 +27,18 @@ public class LocalSessionStore implements SessionStore {
             return null;
         }
 
-        Map<String, String> data = sessionValue.data;
-        values.put(sessionId, new SessionValue(expirationTime(sessionTimeout), data));
-        return data;
+        Map<String, String> sessionValues = sessionValue.values;
+        values.put(sessionId, new SessionValue(expirationTime(sessionTimeout), sessionValues));
+        return sessionValues;
     }
 
     @Override
-    public void save(String sessionId, Map<String, String> sessionData, Duration sessionTimeout) {
-        values.put(sessionId, new SessionValue(expirationTime(sessionTimeout), sessionData));
+    public void save(String sessionId, Map<String, String> values, Set<String> changedFields, Duration sessionTimeout) {
+        Map<String, String> updatedValues = Maps.newHashMapWithExpectedSize(values.size());
+        values.forEach((field, value) -> {
+            if (value != null) updatedValues.put(field, value);
+        });
+        this.values.put(sessionId, new SessionValue(expirationTime(sessionTimeout), updatedValues));
     }
 
     @Override
@@ -55,13 +60,13 @@ public class LocalSessionStore implements SessionStore {
         });
     }
 
-    static class SessionValue {
+    private static class SessionValue {
         final Instant expiredTime;
-        final Map<String, String> data;
+        final Map<String, String> values;
 
-        SessionValue(Instant expiredTime, Map<String, String> data) {
+        SessionValue(Instant expiredTime, Map<String, String> values) {
             this.expiredTime = expiredTime;
-            this.data = data;
+            this.values = values;
         }
     }
 }

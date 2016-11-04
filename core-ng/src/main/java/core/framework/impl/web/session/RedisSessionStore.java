@@ -1,13 +1,15 @@
 package core.framework.impl.web.session;
 
 import core.framework.api.redis.Redis;
-import core.framework.api.util.JSON;
-import core.framework.api.util.Types;
+import core.framework.api.util.Lists;
+import core.framework.api.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author neo
@@ -25,11 +27,10 @@ public class RedisSessionStore implements SessionStore {
     public Map<String, String> getAndRefresh(String sessionId, Duration sessionTimeout) {
         String key = sessionKey(sessionId);
         try {
-            String value = redis.get(key);
-            if (value == null) return null;
-            logger.debug("[session] value={}", value);
+            Map<String, String> sessionValues = redis.hash().getAll(key);
+            if (sessionValues.isEmpty()) return null;
             redis.expire(key, sessionTimeout);
-            return decode(value);
+            return sessionValues;
         } catch (Exception e) {    // gracefully handle invalid data in redis, either legacy old format value, or invalid value inserted manually
             logger.warn("failed to get redis session", e);
             return null;
@@ -37,17 +38,19 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void save(String sessionId, Map<String, String> sessionData, Duration sessionTimeout) {
+    public void save(String sessionId, Map<String, String> values, Set<String> changedFields, Duration sessionTimeout) {
         String key = sessionKey(sessionId);
-        redis.set(key, encode(sessionData), sessionTimeout);
-    }
 
-    Map<String, String> decode(String value) {
-        return JSON.fromJSON(Types.map(String.class, String.class), value);
-    }
-
-    String encode(Map<String, String> sessionData) {
-        return JSON.toJSON(sessionData);
+        List<String> deletedFields = Lists.newArrayList();
+        Map<String, String> updatedValues = Maps.newHashMap();
+        for (String changedSessionField : changedFields) {
+            String value = values.get(changedSessionField);
+            if (value == null) deletedFields.add(changedSessionField);
+            else updatedValues.put(changedSessionField, value);
+        }
+        if (!deletedFields.isEmpty()) redis.hash().del(key, deletedFields.toArray(new String[deletedFields.size()]));
+        if (!updatedValues.isEmpty()) redis.hash().multiSet(key, updatedValues);
+        redis.expire(key, sessionTimeout);
     }
 
     @Override
@@ -57,6 +60,6 @@ public class RedisSessionStore implements SessionStore {
     }
 
     private String sessionKey(String sessionId) {
-        return "session:" + sessionId;
+        return "session2:" + sessionId;
     }
 }

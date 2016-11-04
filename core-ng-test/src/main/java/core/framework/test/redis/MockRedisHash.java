@@ -47,6 +47,15 @@ public final class MockRedisHash implements RedisHash {
         hashValue.hash.putAll(values);
     }
 
+    @Override
+    public void del(String key, String... fields) {
+        MockRedis.Value hashValue = redis.store.computeIfAbsent(key, k -> MockRedis.Value.hashValue());
+        validate(key, hashValue);
+        for (String field : fields) {
+            hashValue.hash.remove(field);
+        }
+    }
+
     private void validate(String key, MockRedis.Value value) {
         if (value.type != MockRedis.ValueType.HASH) throw Exceptions.error("invalid type, key={}, type={}", key, value.type);
     }

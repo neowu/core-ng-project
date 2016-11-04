@@ -103,4 +103,22 @@ public final class RedisHashImpl implements RedisHash {
             redis.checkSlowOperation(elapsedTime);
         }
     }
+
+    @Override
+    public void del(String key, String... fields) {
+        StopWatch watch = new StopWatch();
+        PoolItem<BinaryJedis> item = redis.pool.borrowItem();
+        try {
+            item.resource.hdel(redis.encode(key), redis.encode(fields));
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("hdel, key={}, fields={}, elapsedTime={}", key, fields, elapsedTime);
+            redis.checkSlowOperation(elapsedTime);
+        }
+    }
 }

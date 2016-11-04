@@ -1,39 +1,41 @@
 package core.framework.impl.web.session;
 
 import core.framework.api.util.Maps;
+import core.framework.api.util.Sets;
 import core.framework.api.web.Session;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author neo
  */
 public class SessionImpl implements Session {
-    final Map<String, String> data = Maps.newHashMap();
+    final Map<String, String> values = Maps.newHashMap();
+    final Set<String> changedFields = Sets.newHashSet();
     String id;
-    boolean changed;
     boolean invalidated;
 
     @Override
     public Optional<String> get(String key) {
-        return Optional.ofNullable(data.get(key));
+        return Optional.ofNullable(values.get(key));
     }
 
     @Override
     public void set(String key, String value) {
-        if (value == null) {
-            data.remove(key);
-        } else {
-            data.put(key, value);
-        }
-        changed = true;
+        values.put(key, value);
+        changedFields.add(key);
     }
 
     @Override
     public void remove(String key) {
-        data.remove(key);
-        changed = true;
+        values.put(key, null);
+        changedFields.add(key);
+    }
+
+    boolean changed() {
+        return !changedFields.isEmpty();
     }
 
     @Override
