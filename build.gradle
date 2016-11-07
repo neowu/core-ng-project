@@ -11,6 +11,7 @@ def mongoVersion = '3.3.0'
 def elasticVersion = '5.0.0'
 def rabbitVersion = '3.6.5'
 def kafkaVersion = '0.10.1.0'
+def jacksonVersion = '2.8.4'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -32,11 +33,11 @@ project(':core-ng') {
                 'javax.inject:javax.inject:1',
                 'org.javassist:javassist:3.21.0-GA',
                 'org.slf4j:slf4j-api:1.7.21',
-                'com.fasterxml.jackson.core:jackson-annotations:2.8.4',
-                'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.8.4',
-                'com.fasterxml.jackson.module:jackson-module-afterburner:2.8.4',
-                'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.4',
-                'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.4',
+                "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+                "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
+                "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}",
                 'org.apache.httpcomponents:httpclient:4.5.2',
                 'io.undertow:undertow-core:1.4.4.Final'
         )
@@ -51,9 +52,11 @@ project(':core-ng') {
 project(':core-ng-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
+        provided('com.github.fakemongo:fongo:2.0.9') {
+            exclude group: 'de.grundid.opendatalab', module: 'geojson-jackson'  // it has conflicted jackson lib version, exclude since we don't use geo
+        }
         provided(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                'com.github.fakemongo:fongo:2.0.9',
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
                 'org.hsqldb:hsqldb:2.3.3',
                 "org.elasticsearch.client:transport:${elasticVersion}",
