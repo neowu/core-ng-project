@@ -13,6 +13,7 @@
 * faster synchronous rpc
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 * framework error, queue listener, background task error forward to kafka?
+* JAXBValidator support Map<String, List<T>>?
 
 ## Change log
 ### 4.8.3 (10/27/2016 - )

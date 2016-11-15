@@ -98,7 +98,12 @@
     "block-spacing": "error",
     "brace-style": "error",
     "callback-return": "error",
-    "camelcase": "error",
+    "camelcase": [
+      "error",
+      {
+        "properties": "never"
+      }
+    ],
     "comma-dangle": "error",
     "comma-spacing": "error",
     "comma-style": "error",
@@ -149,7 +154,6 @@
     "operator-assignment": "error",
     "operator-linebreak": "error",
     "prefer-const": "error",
-    "prefer-reflect": "error",
     "prefer-rest-params": "error",
     "prefer-spread": "error",
     "quotes": "error",

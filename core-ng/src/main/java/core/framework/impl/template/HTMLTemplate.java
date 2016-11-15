@@ -9,7 +9,7 @@ import core.framework.impl.template.fragment.ContainerFragment;
 public class HTMLTemplate extends ContainerFragment {
     private final Class<?> modelClass;
 
-    public HTMLTemplate(Class<?> modelClass) {
+    HTMLTemplate(Class<?> modelClass) {
         this.modelClass = modelClass;
     }
 

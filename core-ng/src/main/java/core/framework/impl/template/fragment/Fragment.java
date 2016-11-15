@@ -5,6 +5,6 @@ import core.framework.impl.template.TemplateContext;
 /**
  * @author neo
  */
-public interface Fragment {
+interface Fragment {
     void process(StringBuilder builder, TemplateContext context);
 }
