@@ -16,10 +16,11 @@
 * JAXBValidator support Map<String, List<T>>?
 
 ## Change log
-### 4.8.3 (10/27/2016 - )
+### 4.8.3 (10/27/2016 - 11/16/2016)
 * es: update es to 5.0.0
 * log: removed rabbitmq log forward support
 * session: replace redis impl with HASH, to make it easier to manage and share between multiple apps
+* web: fix path param to decode %2F to '/', (disabled undertow decodeURL completely)
 
 ### 4.8.2 (10/26/2016)
 * log: rename kafkaHost to kafkaURI

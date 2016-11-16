@@ -1,5 +1,6 @@
 package core.framework.impl.web.request;
 
+import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.exception.BadRequestException;
@@ -15,7 +16,7 @@ public final class PathParams {
     public void put(String name, String value) {
         if (value.length() == 0) throw new BadRequestException("path param must not be empty, name=" + name + ", value=" + value);
         try {
-            params.put(name, value);    // value here is already decoded
+            params.put(name, Encodings.decodeURIComponent(value));  // value here is not decoded, see io.undertow.UndertowOptions.DECODE_URL and core.framework.impl.web.HTTPServer
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
         }
@@ -23,7 +24,7 @@ public final class PathParams {
 
     public String get(String name) {
         String value = params.get(name);
-        if (value == null) throw Exceptions.error("path variable not found, name={}", name);
+        if (value == null) throw Exceptions.error("path param not found, name={}", name);
         return value;
     }
 }

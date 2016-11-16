@@ -4,6 +4,7 @@ import core.framework.api.util.StopWatch;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.site.SiteManager;
 import io.undertow.Undertow;
+import io.undertow.UndertowOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +31,10 @@ public class HTTPServer {
         StopWatch watch = new StopWatch();
         try {
             server = Undertow.builder()
-                .addHttpListener(port, "0.0.0.0")
-                .setHandler(new HTTPServerIOHandler(handler))
-                .build();
+                             .addHttpListener(port, "0.0.0.0")
+                             .setHandler(new HTTPServerIOHandler(handler))
+                             .setServerOption(UndertowOptions.DECODE_URL, false)
+                             .build();
             server.start();
         } finally {
             logger.info("http server started, port={}, elapsedTime={}", port, watch.elapsedTime());

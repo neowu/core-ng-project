@@ -5,6 +5,7 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.log.Markers;
 import core.framework.api.util.Files;
 import core.framework.api.util.Strings;
+import core.framework.api.web.MultipartFile;
 import core.framework.api.web.exception.MethodNotAllowedException;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogParam;
@@ -17,7 +18,10 @@ import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Deque;
+import java.util.Map;
 
 /**
  * @author neo
@@ -45,8 +49,6 @@ public final class RequestParser {
         logger.debug("[request] hostPort={}", hostPort);
         request.port = port(hostPort, xForwardedPort);
 
-        actionLog.context("path", request.path());
-
         request.requestURL = requestURL(request, exchange);
         logger.debug("[request] requestURL={}", request.requestURL);
 
@@ -54,16 +56,37 @@ public final class RequestParser {
             logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
         }
 
+        actionLog.context("path", request.path());
+
         String userAgent = headers.getFirst(Headers.USER_AGENT);
         if (userAgent != null) actionLog.context("userAgent", userAgent);
 
         request.method = parseHTTPMethod(exchange.getRequestMethod().toString());
         actionLog.context("method", request.method());
 
+        parseQueryParams(request, exchange);
+
         if (request.method == HTTPMethod.POST || request.method == HTTPMethod.PUT) {
             String contentType = headers.getFirst(Headers.CONTENT_TYPE);
             request.contentType = contentType == null ? null : ContentType.parse(contentType);
             parseBody(request, exchange);
+        }
+    }
+
+    private void parseQueryParams(RequestImpl request, HttpServerExchange exchange) {
+        for (Map.Entry<String, Deque<String>> entry : exchange.getQueryParameters().entrySet()) {
+            String name = decodeQueryParam(entry.getKey());
+            String value = decodeQueryParam(entry.getValue().getFirst());
+            logger.debug("[request:query] {}={}", name, value);
+            request.queryParams.put(name, value);
+        }
+    }
+
+    private String decodeQueryParam(String value) {
+        try {
+            return URLDecoder.decode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new Error(e);
         }
     }
 
@@ -94,17 +117,18 @@ public final class RequestParser {
 
     private void parseForm(RequestImpl request, HttpServerExchange exchange) {
         FormData formData = exchange.getAttachment(FormDataParser.FORM_DATA);
-        if (formData != null) {
-            request.formData = formData;
-            for (String name : request.formData) {
-                Deque<FormData.FormValue> values = request.formData.get(name);
-                for (FormData.FormValue value : values) {
-                    if (value.isFile()) {
-                        logger.debug("[request:file] {}={}, size={}", name, value.getFileName(), Files.size(value.getPath()));
-                    } else {
-                        logger.debug("[request:form] {}={}", name, value.getValue());
-                    }
+        if (formData == null) return;
+
+        for (String name : formData) {
+            FormData.FormValue value = formData.getFirst(name);
+            if (value.isFile()) {
+                if (!Strings.isEmpty(value.getFileName())) {    // browser passes empty file name if not choose file in form
+                    logger.debug("[request:file] {}={}, size={}", name, value.getFileName(), Files.size(value.getPath()));
+                    request.files.put(name, new MultipartFile(value.getPath(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
                 }
+            } else {
+                logger.debug("[request:form] {}={}", name, value.getValue());
+                request.formParams.put(name, value.getValue());
             }
         }
     }
