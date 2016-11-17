@@ -36,7 +36,7 @@ subprojects {
         }
     }
 
-    task mkdirs << {
+    task mkdirs {
         description = 'create project folder skeleton.'
         sourceSets*.java.srcDirs*.each { it.mkdirs() }
         sourceSets*.resources.srcDirs*.each { it.mkdirs() }
