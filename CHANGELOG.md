@@ -16,6 +16,9 @@
 * JAXBValidator support Map<String, List<T>>?
 
 ## Change log
+### 4.8.4 (11/16/2016 - )
+* es: update es to 5.0.1
+
 ### 4.8.3 (10/27/2016 - 11/16/2016)
 * es: update es to 5.0.0
 * log: removed rabbitmq log forward support
