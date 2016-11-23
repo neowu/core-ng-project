@@ -1,0 +1,16 @@
+version: '2'
+services:
+  web:
+    build: ./web
+    image: neowu/nginx
+    networks: [web]
+    ports:
+      - "80:80"
+  app:
+    build: ./app
+    image: neowu/demo-site
+    networks: [web]
+
+networks:
+  web:
+
