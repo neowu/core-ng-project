@@ -13,7 +13,6 @@ import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.client.transport.TransportClientNodesService;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.network.NetworkService;
@@ -171,10 +170,10 @@ public class ElasticSearchImpl implements ElasticSearch {
         try {
             Settings.Builder settings = Settings.builder();
             settings.put(NetworkService.TcpSettings.TCP_CONNECT_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
-                    .put(TransportClientNodesService.CLIENT_TRANSPORT_PING_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
-                    .put(TransportClientNodesService.CLIENT_TRANSPORT_IGNORE_CLUSTER_NAME.getKey(), "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
+                    .put(TransportClient.CLIENT_TRANSPORT_PING_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
+                    .put(TransportClient.CLIENT_TRANSPORT_IGNORE_CLUSTER_NAME.getKey(), "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
             if (sniff) {
-                settings.put(TransportClientNodesService.CLIENT_TRANSPORT_SNIFF.getKey(), true);
+                settings.put(TransportClient.CLIENT_TRANSPORT_SNIFF.getKey(), true);
             }
             TransportClient client = new PreBuiltTransportClient(settings.build());
             addresses.forEach(client::addTransportAddress);

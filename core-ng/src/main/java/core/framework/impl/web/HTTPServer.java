@@ -20,7 +20,8 @@ public class HTTPServer {
     public final SiteManager siteManager = new SiteManager();
     public final HTTPServerHandler handler;
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
-    public int port = 8080;
+    public Integer httpPort;
+    public Integer httpsPort;
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
@@ -28,16 +29,21 @@ public class HTTPServer {
     }
 
     public void start() {
+        if (httpPort == null && httpsPort == null) {
+            httpPort = 8080;    // by default start http
+        }
+
         StopWatch watch = new StopWatch();
         try {
-            server = Undertow.builder()
-                             .addHttpListener(port, "0.0.0.0")
-                             .setHandler(new HTTPServerIOHandler(handler))
-                             .setServerOption(UndertowOptions.DECODE_URL, false)
-                             .build();
+            Undertow.Builder builder = Undertow.builder();
+            if (httpPort != null) builder.addHttpListener(httpPort, "0.0.0.0");
+            if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
+            builder.setHandler(new HTTPServerIOHandler(handler))
+                   .setServerOption(UndertowOptions.DECODE_URL, false);
+            server = builder.build();
             server.start();
         } finally {
-            logger.info("http server started, port={}, elapsedTime={}", port, watch.elapsedTime());
+            logger.info("http server started, httpPort={}, httpsPort={}, elapsedTime={}", httpPort, httpsPort, watch.elapsedTime());
         }
     }
 

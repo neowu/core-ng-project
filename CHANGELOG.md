@@ -15,8 +15,9 @@
 * framework error, queue listener, background task error forward to kafka?
 
 ## Change log
-### 4.8.4 (11/16/2016 - )
-* es: update es to 5.0.1
+### 4.8.4 (11/16/2016 - 12/1/2016)
+* es: update es to 5.0.2
+* http: added https with self signed cert support, make http/https port configurable
 
 ### 4.8.3 (10/27/2016 - 11/16/2016)
 * es: update es to 5.0.0

@@ -14,8 +14,12 @@ public final class HTTPConfig {
         this.context = context;
     }
 
-    public void port(int port) {
-        context.httpServer.port = port;
+    public void httpPort(int port) {
+        context.httpServer.httpPort = port;
+    }
+
+    public void httpsPort(int port) {
+        context.httpServer.httpsPort = port;
     }
 
     public void intercept(Interceptor interceptor) {

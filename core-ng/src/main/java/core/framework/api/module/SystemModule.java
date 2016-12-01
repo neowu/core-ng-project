@@ -18,8 +18,8 @@ public final class SystemModule extends Module {
     @Override
     protected void initialize() {
         loadProperties(propertyFileName);
-
-        property("sys.http.port").ifPresent(port -> http().port(Integer.parseInt(port)));
+        property("sys.http.port").ifPresent(port -> http().httpPort(Integer.parseInt(port)));   // for local dev, allow developer start multiple apps in different port
+        property("sys.https.port").ifPresent(port -> http().httpsPort(Integer.parseInt(port)));
 
         property("sys.cache.host").ifPresent(host -> {
             if ("local".equals(host)) {
