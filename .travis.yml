@@ -6,4 +6,5 @@ before_install:
 cache:
   directories:
     - $HOME/.gradle
+    - gradle/node/node_modules
 script: ./gradlew clean build
