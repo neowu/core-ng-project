@@ -5,6 +5,7 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.web.site.Message;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.ControllerHolder;
+import core.framework.impl.web.site.HTTPSOnlyInterceptor;
 import core.framework.impl.web.site.StaticDirectoryController;
 import core.framework.impl.web.site.StaticFileController;
 import org.slf4j.Logger;
@@ -58,5 +59,9 @@ public final class SiteConfig {
         } else {
             context.httpServer.handler.route.add(HTTPMethod.GET, path, new ControllerHolder(new StaticFileController(contentPath), true));
         }
+    }
+
+    public void httpsOnly() {
+        context.httpServer.handler.interceptors.add(new HTTPSOnlyInterceptor());
     }
 }

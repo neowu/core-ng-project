@@ -39,10 +39,10 @@ public class RequestParserTest {
     }
 
     @Test
-    public void parseHTTPMethod() {
+    public void httpMethod() {
         exception.expect(MethodNotAllowedException.class);
         exception.expectMessage("method=TRACK");
 
-        parser.parseHTTPMethod("TRACK");
+        parser.httpMethod("TRACK");
     }
 }

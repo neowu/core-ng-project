@@ -39,7 +39,6 @@ public class HTTPServerHandler implements HttpHandler {
     public HTTPServerHandler(LogManager logManager, SiteManager siteManager) {
         this.logManager = logManager;
         sessionManager = siteManager.sessionManager;
-
         responseHandler = new ResponseHandler(validator, siteManager.templateManager);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
     }

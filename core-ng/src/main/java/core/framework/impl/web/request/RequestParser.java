@@ -61,7 +61,7 @@ public final class RequestParser {
         String userAgent = headers.getFirst(Headers.USER_AGENT);
         if (userAgent != null) actionLog.context("userAgent", userAgent);
 
-        request.method = parseHTTPMethod(exchange.getRequestMethod().toString());
+        request.method = httpMethod(exchange.getRequestMethod().toString());
         actionLog.context("method", request.method());
 
         parseQueryParams(request, exchange);
@@ -90,7 +90,7 @@ public final class RequestParser {
         }
     }
 
-    HTTPMethod parseHTTPMethod(String method) {
+    HTTPMethod httpMethod(String method) {
         try {
             return HTTPMethod.valueOf(method);
         } catch (IllegalArgumentException e) {
