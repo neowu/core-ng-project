@@ -18,7 +18,7 @@ public class HTTPSOnlyInterceptor implements Interceptor {
     public Response intercept(Invocation invocation) throws Exception {
         Request request = invocation.context().request();
         if (!"https".equals(request.scheme())) {
-            return Response.redirect(redirectURL(request), HTTPStatus.PERMANENT_REDIRECT);
+            return Response.redirect(redirectURL(request), HTTPStatus.MOVED_PERMANENTLY);
         } else {
             Response response = invocation.proceed();
             response.header("Strict-Transport-Security", "max-age=31536000");
