@@ -15,7 +15,7 @@
 * framework error, queue listener, background task error forward to kafka?
 
 ## Change log
-### 4.8.6 (12/6/2016 - )
+### 4.8.6 (12/6/2016)
 * http: change https redirection to 301 instead of 308
 
 ### 4.8.5 (12/5/2016 - 12/6/2016)
