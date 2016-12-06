@@ -26,7 +26,7 @@ public class HTTPSOnlyInterceptor implements Interceptor {
         }
     }
 
-    private String redirectURL(Request request) {
+    private String redirectURL(Request request) {   // always assume https site is published on 443 port
         StringBuilder builder = new StringBuilder("https://").append(request.hostName()).append(request.path());
 
         Map<String, String> queryParams = request.queryParams();
