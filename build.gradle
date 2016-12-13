@@ -8,7 +8,7 @@ subprojects {
 }
 
 def mongoVersion = '3.3.0'
-def elasticVersion = '5.0.2'
+def elasticVersion = '5.1.1'
 def rabbitVersion = '3.6.5'
 def kafkaVersion = '0.10.1.0'
 def jacksonVersion = '2.8.4'
