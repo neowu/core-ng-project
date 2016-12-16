@@ -4,6 +4,7 @@ import core.framework.api.module.APIConfig;
 import core.framework.api.module.CacheConfig;
 import core.framework.api.module.DBConfig;
 import core.framework.api.module.HTTPConfig;
+import core.framework.api.module.KafkaConfig;
 import core.framework.api.module.LogConfig;
 import core.framework.api.module.MongoConfig;
 import core.framework.api.module.QueueConfig;
@@ -139,6 +140,14 @@ public abstract class Module {
 
     public MongoConfig mongo(String name) {
         return new MongoConfig(context, name);
+    }
+
+    public KafkaConfig kafka() {
+        return kafka(null);
+    }
+
+    public KafkaConfig kafka(String name) {
+        return new KafkaConfig(context, name);
     }
 
     protected abstract void initialize();

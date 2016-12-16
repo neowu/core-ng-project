@@ -58,6 +58,7 @@ project(':core-ng-test') {
         provided(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
+                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
                 'org.hsqldb:hsqldb:2.3.3',
                 "org.elasticsearch.client:transport:${elasticVersion}",
                 'org.apache.logging.log4j:log4j-core:2.7'       // used by elasticsearch
@@ -125,7 +126,8 @@ project(':demo-service') {
 
     dependencies {
         compile(
-                project(':core-ng')
+                project(':core-ng'),
+                "org.apache.kafka:kafka-clients:${kafkaVersion}"
         )
         runtime(
                 "org.apache.kafka:kafka-clients:${kafkaVersion}"

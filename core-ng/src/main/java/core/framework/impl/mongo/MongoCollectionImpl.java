@@ -8,6 +8,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -83,6 +84,22 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("insert, collection={}, elapsedTime={}", collectionName, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public void bulkInsert(List<T> entities) {
+        StopWatch watch = new StopWatch();
+        for (T entity : entities) {
+            validator.validate(entity);
+        }
+        try {
+            collection().insertMany(entities, new InsertManyOptions().ordered(false));
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("mongoDB", elapsedTime);
+            logger.debug("bulkInsert, collection={}, size={}, elapsedTime={}", collectionName, entities.size(), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

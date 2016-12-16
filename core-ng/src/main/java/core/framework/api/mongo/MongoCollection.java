@@ -20,6 +20,8 @@ public interface MongoCollection<T> {
 
     void insert(T entity);
 
+    void bulkInsert(List<T> entities);
+
     Optional<T> get(Get get);
 
     default Optional<T> get(Object id) {

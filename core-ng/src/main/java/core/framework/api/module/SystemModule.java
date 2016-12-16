@@ -55,6 +55,8 @@ public final class SystemModule extends Module {
         });
         property("sys.log.kafkaURI").ifPresent(uri -> log().forwardLog(uri));
 
+        property("sys.kafka.uri").ifPresent(uri -> kafka().uri(uri));
+
         property("sys.rabbitMQ.host").ifPresent(hosts -> queue().hosts(Strings.split(hosts, ',')));
         property("sys.rabbitMQ.user").ifPresent(user -> queue().user(user));
         property("sys.rabbitMQ.password").ifPresent(password -> queue().password(password));

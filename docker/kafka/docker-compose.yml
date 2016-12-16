@@ -1,0 +1,13 @@
+version: "2"
+services:
+  zookeeper:
+    image: zookeeper
+    ports:
+      - 2181:2181
+  kafka:
+    build: ./kafka
+    image: kafka
+    ports:
+      - 9092:9092
+    depends_on:
+      - zookeeper

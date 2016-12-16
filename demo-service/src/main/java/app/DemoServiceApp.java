@@ -11,6 +11,7 @@ public class DemoServiceApp extends App {
     protected void initialize() {
         load(new SystemModule("sys.properties"));
         load(new ProductModule());
-        load(new JobModule());
+//        load(new JobModule());
+        load(new QueueModule());
     }
 }

@@ -17,6 +17,8 @@
 ## Change log
 ### 4.8.7 (12/12/2016 - )
 * es: update es to 5.1.1
+* mongo: support bulk insert
+* kafka: add kafka support in order to replace rabbitMQ
 
 ### 4.8.6 (12/6/2016)
 * http: change https redirection to 301 instead of 308

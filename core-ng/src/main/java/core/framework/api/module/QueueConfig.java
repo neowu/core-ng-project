@@ -49,7 +49,7 @@ public final class QueueConfig {
     public <T> void publish(String exchange, String routingKey, Class<T> messageClass) {
         MessageValidator validator = context.queueManager.validator();
         validator.register(messageClass);
-        MessagePublisher<T> publisher = new RabbitMQPublisher<>(rabbitMQ, exchange, routingKey, messageClass, context.queueManager.validator(), context.logManager);
+        MessagePublisher<T> publisher = new RabbitMQPublisher<>(rabbitMQ, exchange, routingKey, messageClass, validator, context.logManager);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), null, publisher);
     }
 
