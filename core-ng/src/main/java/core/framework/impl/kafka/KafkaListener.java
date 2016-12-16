@@ -40,7 +40,7 @@ public class KafkaListener {
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final LogManager logManager;
     public int poolSize = Runtime.getRuntime().availableProcessors() * 2;
-    private List<Thread> listenerThreads;
+    private Thread[] listenerThreads;
 
     public KafkaListener(Kafka kafka, String name, LogManager logManager) {
         this.kafka = kafka;
@@ -57,9 +57,9 @@ public class KafkaListener {
     }
 
     public void start() {
-        listenerThreads = new ArrayList<>(poolSize);
+        listenerThreads = new Thread[poolSize];
         for (int i = 0; i < poolSize; i++) {
-            listenerThreads.add(new Thread(() -> {
+            listenerThreads[i] = new Thread(() -> {
                 logger.info("kafka listener thread started, topics={}", topics);
                 while (!stop.get()) {
                     String group = logManager.appName == null ? "local" : logManager.appName;
@@ -75,7 +75,7 @@ public class KafkaListener {
                         }
                     }
                 }
-            }, "kafka-listener-" + (name == null ? "" : name + "-") + i));
+            }, "kafka-listener-" + (name == null ? "" : name + "-") + i);
         }
         for (Thread thread : listenerThreads) {
             thread.start();
@@ -120,12 +120,12 @@ public class KafkaListener {
 
                 KafkaMessage<T> kafkaMessage = reader.fromJSON(record.value());
 
-                actionLog.refId(kafkaMessage.headers.get("refId"));
-                String clientIP = kafkaMessage.headers.get("clientIP");
+                actionLog.refId(kafkaMessage.headers.get(KafkaMessage.HEADER_REF_ID));
+                String client = kafkaMessage.headers.get(KafkaMessage.HEADER_CLIENT);
+                if (client != null) actionLog.context("client", client);
+                String clientIP = kafkaMessage.headers.get(KafkaMessage.HEADER_CLIENT_IP);
                 if (clientIP != null) actionLog.context("clientIP", clientIP);
-                String app = kafkaMessage.headers.get("app");
-                if (app != null) actionLog.context("client", app);
-                if ("true".equals(kafkaMessage.headers.get("trace"))) actionLog.trace = true;
+                if ("true".equals(kafkaMessage.headers.get(KafkaMessage.HEADER_TRACE))) actionLog.trace = true;
 
                 kafka.validator.validate(kafkaMessage.value);
 
@@ -150,13 +150,10 @@ public class KafkaListener {
 
             List<Message<T>> messages = new ArrayList<>(records.size());
             for (ConsumerRecord<String, byte[]> record : records) {
-                KafkaMessage<T> kafkaMessage = reader.fromJSON(record.value());
-                validate(kafkaMessage.value, record.value());
-                Message<T> message = new Message<>();
-                message.key = record.key();
-                message.value = kafkaMessage.value;
-                messages.add(message);
-                if ("true".equals(kafkaMessage.headers.get("trace"))) { // trigger trace if any message is trace
+                KafkaMessage<T> message = reader.fromJSON(record.value());
+                validate(message.value, record.value());
+                messages.add(new Message<>(record.key(), message.value));
+                if ("true".equals(message.headers.get(KafkaMessage.HEADER_TRACE))) { // trigger trace if any message is trace
                     actionLog.trace = true;
                 }
             }
@@ -168,9 +165,9 @@ public class KafkaListener {
         }
     }
 
-    private <T> void validate(T body, byte[] recordBytes) {
+    private <T> void validate(T value, byte[] recordBytes) {
         try {
-            kafka.validator.validate(body);
+            kafka.validator.validate(value);
         } catch (Exception e) {
             logger.warn("failed to validate message, message={}", LogParam.of(recordBytes), e);
             throw e;

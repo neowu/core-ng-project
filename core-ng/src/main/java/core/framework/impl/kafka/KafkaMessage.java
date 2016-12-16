@@ -10,6 +10,11 @@ import java.util.Map;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class KafkaMessage<T> {
+    static final String HEADER_REF_ID = "refId";
+    static final String HEADER_CLIENT = "client";
+    static final String HEADER_CLIENT_IP = "clientIP";
+    static final String HEADER_TRACE = "trace";
+
     @XmlElement(name = "headers")
     public Map<String, String> headers;
     @XmlElement(name = "value")

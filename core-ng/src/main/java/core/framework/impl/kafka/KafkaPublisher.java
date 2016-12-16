@@ -41,8 +41,8 @@ public class KafkaPublisher<T> implements MessagePublisher<T> {
 
         KafkaMessage<T> kafkaMessage = new KafkaMessage<>();
         Map<String, String> headers = Maps.newHashMap();
-        headers.put("clientIP", Network.localHostAddress());
-        headers.put("app", logManager.appName);
+        headers.put(KafkaMessage.HEADER_CLIENT_IP, Network.localHostAddress());
+        headers.put(KafkaMessage.HEADER_CLIENT, logManager.appName);
         linkContext(headers);
         kafkaMessage.headers = headers;
         kafkaMessage.value = value;
@@ -55,7 +55,7 @@ public class KafkaPublisher<T> implements MessagePublisher<T> {
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog == null) return;
 
-        headers.put("refId", actionLog.refId());
-        if (actionLog.trace) headers.put("trace", "true");
+        headers.put(KafkaMessage.HEADER_REF_ID, actionLog.refId());
+        if (actionLog.trace) headers.put(KafkaMessage.HEADER_TRACE, "true");
     }
 }
