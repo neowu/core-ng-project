@@ -12,6 +12,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 public class MockKafka extends Kafka {
     @Override
     public Producer<String, byte[]> producer() {
-        return new MockProducer<String, byte[]>(true, new StringSerializer(), new ByteArraySerializer());
+        return new MockProducer<>(true, new StringSerializer(), new ByteArraySerializer());
     }
 }
