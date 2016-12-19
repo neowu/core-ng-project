@@ -20,6 +20,7 @@
 * es: update es to 5.1.1
 * mongo: support bulk insert
 * kafka: add kafka support in order to replace rabbitMQ
+* properties: add _sys property controller for troubleshooting
 
 ### 4.8.6 (12/6/2016)
 * http: change https redirection to 301 instead of 308

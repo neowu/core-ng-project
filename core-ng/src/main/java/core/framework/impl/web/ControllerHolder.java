@@ -9,10 +9,10 @@ import java.lang.reflect.Method;
  */
 public class ControllerHolder {
     public final Controller controller;
-    public final Method targetMethod;
-    public final String controllerInfo;
+    final Method targetMethod;
+    final String controllerInfo;
 
-    public final boolean skipInterceptor;
+    final boolean skipInterceptor;
     public String action;
 
     public ControllerHolder(Controller controller) {

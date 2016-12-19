@@ -17,6 +17,7 @@ import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.HTTPServer;
 import core.framework.impl.web.management.HealthCheckController;
 import core.framework.impl.web.management.MemoryUsageController;
+import core.framework.impl.web.management.PropertyController;
 import core.framework.impl.web.management.SchedulerController;
 import core.framework.impl.web.management.ThreadInfoController;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,9 @@ public final class ModuleContext {
             ThreadInfoController threadInfoController = new ThreadInfoController();
             httpServer.handler.route.add(HTTPMethod.GET, "/_sys/thread", new ControllerHolder(threadInfoController::threadUsage, true));
             httpServer.handler.route.add(HTTPMethod.GET, "/_sys/thread-dump", new ControllerHolder(threadInfoController::threadDump, true));
+
+            PropertyController propertyController = new PropertyController(properties);
+            httpServer.handler.route.add(HTTPMethod.GET, "/_sys/property", new ControllerHolder(propertyController, true));
         }
     }
 
