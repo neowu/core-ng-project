@@ -29,8 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author neo
  */
-public class KafkaListener {
-    private final Logger logger = LoggerFactory.getLogger(KafkaListener.class);
+public class KafkaMessageListener {
+    private final Logger logger = LoggerFactory.getLogger(KafkaMessageListener.class);
     private final Set<String> topics = Sets.newHashSet();
     private final Map<String, MessageHandler> handlers = Maps.newHashMap();
     private final Map<String, BulkMessageHandler> bulkHandlers = Maps.newHashMap();
@@ -42,7 +42,7 @@ public class KafkaListener {
     public int poolSize = Runtime.getRuntime().availableProcessors() * 2;
     private Thread[] listenerThreads;
 
-    public KafkaListener(Kafka kafka, String name, LogManager logManager) {
+    public KafkaMessageListener(Kafka kafka, String name, LogManager logManager) {
         this.kafka = kafka;
         this.name = name;
         this.logManager = logManager;
@@ -60,7 +60,7 @@ public class KafkaListener {
         listenerThreads = new Thread[poolSize];
         for (int i = 0; i < poolSize; i++) {
             listenerThreads[i] = new Thread(() -> {
-                logger.info("kafka listener thread started, topics={}", topics);
+                logger.info("kafka listener thread started, uri={}, topics={}", kafka.uri, topics);
                 while (!stop.get()) {
                     String group = logManager.appName == null ? "local" : logManager.appName;
                     try (Consumer<String, byte[]> consumer = kafka.consumer(group, topics)) {
@@ -175,7 +175,7 @@ public class KafkaListener {
     }
 
     public void stop() {
-        logger.info("stop kafka listener threads, topics={}", topics);
+        logger.info("stop kafka listener threads, uri={}, topics={}", kafka.uri, topics);
         stop.set(true);
         for (Thread thread : listenerThreads) {
             thread.interrupt();

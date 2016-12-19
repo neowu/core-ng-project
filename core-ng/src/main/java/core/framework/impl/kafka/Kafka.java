@@ -1,6 +1,7 @@
 package core.framework.impl.kafka;
 
 import core.framework.api.util.Maps;
+import core.framework.impl.log.LogManager;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -23,10 +24,17 @@ import java.util.Set;
  */
 public class Kafka {
     private final Logger logger = LoggerFactory.getLogger(Kafka.class);
+    private final String name;
+    private final LogManager logManager;
     public String uri;
     public MessageValidator validator = new MessageValidator();
-    public KafkaListener listener;
+    private KafkaMessageListener listener;
     private Producer<String, byte[]> producer;
+
+    public Kafka(String name, LogManager logManager) {
+        this.name = name;
+        this.logManager = logManager;
+    }
 
     public Producer<String, byte[]> producer() {
         if (producer == null) {
@@ -50,6 +58,13 @@ public class Kafka {
         Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
         consumer.subscribe(topics);
         return consumer;
+    }
+
+    public KafkaMessageListener listener() {
+        if (listener == null) {
+            listener = new KafkaMessageListener(this, name, logManager);
+        }
+        return listener;
     }
 
     public void close() {

@@ -2,6 +2,7 @@ package core.framework.test;
 
 import core.framework.api.AbstractTestModule;
 import core.framework.test.db.TestDBEntity;
+import core.framework.test.kafka.TestMessage;
 import core.framework.test.mongo.TestMongoEntity;
 import core.framework.test.search.TestDocument;
 
@@ -18,5 +19,7 @@ public class TestModule extends AbstractTestModule {
 
         search().type(TestDocument.class);
         initSearch().createIndex("document", "search/document-index.json");
+
+        kafka().publish("topic", TestMessage.class);
     }
 }
