@@ -39,7 +39,7 @@ project(':core-ng') {
                 "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
                 "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}",
                 'org.apache.httpcomponents:httpclient:4.5.2',
-                'io.undertow:undertow-core:1.4.6.Final'
+                'io.undertow:undertow-core:1.4.7.Final'
         )
         testCompile(
                 'junit:junit:4.12',
