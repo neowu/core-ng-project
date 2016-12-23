@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -71,6 +72,11 @@ public abstract class Module {
 
     public <T> T bean(Class<T> instanceType) {
         return bean(instanceType, null);
+    }
+
+    public void loadProperties(Path path) {
+        logger.info("load properties, path={}", path);
+        context.properties.load(path);
     }
 
     public void loadProperties(String path) {
