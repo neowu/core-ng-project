@@ -16,7 +16,7 @@
 * expose kafka metrics to /_sys and collectStatTask
 
 ## Change log
-### 4.8.7 (12/12/2016 - )
+### 4.8.7 (12/12/2016 - 1/3/2017)
 * es: update es to 5.1.1
 * mongo: support bulk insert
 * kafka: add kafka support in order to replace rabbitMQ

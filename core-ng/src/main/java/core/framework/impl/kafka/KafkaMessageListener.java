@@ -42,7 +42,7 @@ public class KafkaMessageListener {
     public int poolSize = Runtime.getRuntime().availableProcessors() * 2;
     private Thread[] listenerThreads;
 
-    public KafkaMessageListener(Kafka kafka, String name, LogManager logManager) {
+    KafkaMessageListener(Kafka kafka, String name, LogManager logManager) {
         this.kafka = kafka;
         this.name = name;
         this.logManager = logManager;
