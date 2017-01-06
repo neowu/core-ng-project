@@ -15,8 +15,8 @@ checkstyle {
     }
 
     dependencies {
-        checkstyle 'com.puppycrawl.tools:checkstyle:7.3'
-        checkstyle 'com.github.sevntu.checkstyle:sevntu-checks:1.22.0'
+        checkstyle 'com.puppycrawl.tools:checkstyle:7.4'
+        checkstyle 'com.github.sevntu.checkstyle:sevntu-checks:1.23.0'
     }
 
     configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
