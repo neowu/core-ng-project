@@ -7,8 +7,11 @@ import core.framework.api.util.Types;
 import core.framework.impl.json.JSONWriter;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
+import core.framework.impl.log.LogParam;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -16,6 +19,8 @@ import java.util.Map;
  * @author neo
  */
 public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
+    private final Logger logger = LoggerFactory.getLogger(KafkaMessagePublisher.class);
+
     private final Producer<String, byte[]> producer;
     private final MessageValidator validator;
     private final String topic;
@@ -46,9 +51,10 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
         linkContext(headers);
         kafkaMessage.headers = headers;
         kafkaMessage.value = value;
-        byte[] bytes = writer.toJSON(kafkaMessage);
+        byte[] message = writer.toJSON(kafkaMessage);
 
-        producer.send(new ProducerRecord<>(topic, key, bytes));
+        logger.debug("publish, topic={}, key={}, message={}", topic, key, LogParam.of(message));
+        producer.send(new ProducerRecord<>(topic, key, message));
     }
 
     private void linkContext(Map<String, String> headers) {
