@@ -16,6 +16,9 @@
 * expose kafka metrics to /_sys and collectStatTask
 
 ## Change log
+### 4.8.9 (1/12/2017 - )
+* kafka: bulk message listener log messageCount in action context
+
 ### 4.8.8 (1/9/2017 - 1/12/2017)
 * kafka: update to 0.10.1.1
 * mongo: support bulk replace, update driver to 3.4.1

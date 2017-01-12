@@ -147,6 +147,7 @@ public class KafkaMessageListener {
             actionLog.action("topic/" + topic);
             actionLog.context("topic", topic);
             actionLog.context("handler", bulkHandler.getClass().getCanonicalName());
+            actionLog.context("messageCount", records.size());
 
             List<Message<T>> messages = new ArrayList<>(records.size());
             for (ConsumerRecord<String, byte[]> record : records) {
