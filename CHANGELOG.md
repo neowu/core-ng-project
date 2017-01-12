@@ -16,8 +16,9 @@
 * expose kafka metrics to /_sys and collectStatTask
 
 ## Change log
-### 4.8.8 (1/9/2017 - )
+### 4.8.8 (1/9/2017 - 1/12/2017)
 * kafka: update to 0.10.1.1
+* mongo: support bulk replace, update driver to 3.4.1
 
 ### 4.8.7 (12/12/2016 - 1/3/2017)
 * es: update es to 5.1.1

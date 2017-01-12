@@ -6,9 +6,11 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MapReduceIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoIterable;
+import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.InsertManyOptions;
+import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -293,6 +295,28 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("replace, collection={}, id={}, elapsedTime={}", collectionName, id, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public void bulkReplace(List<T> entities) {
+        StopWatch watch = new StopWatch();
+        for (T entity : entities) {
+            validator.validate(entity);
+        }
+        try {
+            List<ReplaceOneModel<T>> models = new ArrayList<>(entities.size());
+            for (T entity : entities) {
+                Object id = mongo.codecs.id(entity);
+                if (id == null) throw Exceptions.error("entity must have id, entityClass={}", entityClass.getCanonicalName());
+                models.add(new ReplaceOneModel<>(Filters.eq("_id", id), entity));
+            }
+            collection().bulkWrite(models, new BulkWriteOptions().ordered(false));
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("mongoDB", elapsedTime);
+            logger.debug("bulkReplace, collection={}, size={}, elapsedTime={}", collectionName, entities.size(), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

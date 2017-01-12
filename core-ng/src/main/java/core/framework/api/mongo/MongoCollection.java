@@ -54,6 +54,8 @@ public interface MongoCollection<T> {
 
     void replace(T entity);
 
+    void bulkReplace(List<T> entities);
+
     long update(Bson filter, Bson update);
 
     long delete(Object id);

@@ -3,6 +3,7 @@ package core.framework.test.mongo;
 import com.mongodb.client.model.Filters;
 import core.framework.api.mongo.Mongo;
 import core.framework.api.mongo.MongoCollection;
+import core.framework.api.util.Lists;
 import core.framework.test.IntegrationTest;
 import org.bson.types.ObjectId;
 import org.junit.After;
@@ -91,5 +92,30 @@ public class MongoIntegrationTest extends IntegrationTest {
         assertEquals(entity.id, entities.get(0).id);
         assertEquals(entity.stringField, entities.get(0).stringField);
         assertEquals(entity.enumField, entities.get(0).enumField);
+    }
+
+    @Test
+    public void bulk() {
+        List<TestMongoEntity> entities = Lists.newArrayList();
+        TestMongoEntity entity1 = new TestMongoEntity();
+        entity1.stringField = "string1";
+        entities.add(entity1);
+        TestMongoEntity entity2 = new TestMongoEntity();
+        entity2.stringField = "string2";
+        entities.add(entity2);
+        testEntityCollection.bulkInsert(entities);
+
+        for (TestMongoEntity entity : entities) {
+            assertNotNull(entity.id);
+        }
+
+        entity1.stringField = "string1-updated";
+        entity2.stringField = "string2-updated";
+
+        testEntityCollection.bulkReplace(entities);
+
+        Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entity1.id);
+        assertTrue(loadedEntity.isPresent());
+        assertEquals(entity1.stringField, loadedEntity.get().stringField);
     }
 }
