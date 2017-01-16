@@ -93,6 +93,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public void bulkInsert(List<T> entities) {
         StopWatch watch = new StopWatch();
+        if (entities == null || entities.isEmpty()) throw Exceptions.error("entities must not be empty");
         for (T entity : entities) {
             validator.validate(entity);
         }
@@ -302,6 +303,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public void bulkReplace(List<T> entities) {
         StopWatch watch = new StopWatch();
+        if (entities == null || entities.isEmpty()) throw Exceptions.error("entities must not be empty");
         for (T entity : entities) {
             validator.validate(entity);
         }
