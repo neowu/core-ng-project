@@ -7,11 +7,15 @@ import core.framework.api.util.Types;
 import core.framework.impl.kafka.Kafka;
 import core.framework.impl.kafka.KafkaMessagePublisher;
 import core.framework.impl.module.ModuleContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author neo
  */
 public final class KafkaConfig {
+    private final Logger logger = LoggerFactory.getLogger(KafkaConfig.class);
+
     private final ModuleContext context;
     private final Kafka kafka;
     private final String name;
@@ -35,6 +39,7 @@ public final class KafkaConfig {
     }
 
     public <T> void publish(String topic, Class<T> messageClass) {
+        logger.info("create message publisher, topic={}, messageClass={}, beanName={}", topic, messageClass.getTypeName(), name);
         kafka.validator.register(messageClass);
         MessagePublisher<T> publisher = new KafkaMessagePublisher<>(kafka.producer(), kafka.validator, topic, messageClass, context.logManager);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);

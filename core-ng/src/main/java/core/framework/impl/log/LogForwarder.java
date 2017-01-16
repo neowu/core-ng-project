@@ -57,7 +57,7 @@ public final class LogForwarder {
         kafkaProducer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
 
         logForwarderThread = new Thread(() -> {
-            logger.info("log forwarder thread started");
+            logger.info("log forwarder thread started, uri={}", uri);
             while (!stop.get()) {
                 try {
                     Object message = queue.take();
