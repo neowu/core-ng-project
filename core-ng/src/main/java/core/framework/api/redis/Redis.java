@@ -2,6 +2,7 @@ package core.framework.api.redis;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author neo
@@ -26,4 +27,6 @@ public interface Redis {
     void multiSet(Map<String, String> values);
 
     RedisHash hash();
+
+    void forEach(String pattern, Consumer<String> consumer);
 }

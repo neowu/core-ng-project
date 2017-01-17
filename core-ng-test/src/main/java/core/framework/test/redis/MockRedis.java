@@ -10,6 +10,8 @@ import core.framework.api.util.Sets;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
 /**
  * @author neo
@@ -88,6 +90,16 @@ public final class MockRedis implements Redis {
     @Override
     public RedisHash hash() {
         return redisHash;
+    }
+
+    @Override
+    public void forEach(String pattern, Consumer<String> consumer) {
+        Pattern keyPattern = Pattern.compile(pattern.replaceAll("\\*", "\\.\\*"));
+        for (String key : store.keySet()) {
+            if (keyPattern.matcher(key).matches()) {
+                consumer.accept(key);
+            }
+        }
     }
 
     enum ValueType {

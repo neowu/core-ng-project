@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Protocol;
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.io.IOException;
@@ -24,6 +26,7 @@ import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author neo
@@ -282,6 +285,34 @@ public final class RedisImpl implements Redis {
     @Override
     public RedisHash hash() {
         return redisHash;
+    }
+
+    @Override
+    public void forEach(String pattern, Consumer<String> consumer) {
+        StopWatch watch = new StopWatch();
+        PoolItem<BinaryJedis> item = pool.borrowItem();
+        int count = 0;
+        try {
+            ScanParams params = new ScanParams().match(pattern).count(500); // use 500 as batch
+            String cursor = "0";
+            do {
+                ScanResult<byte[]> result = item.resource.scan(encode(cursor), params);
+                cursor = decode(result.getCursorAsBytes());
+                List<byte[]> keys = result.getResult();
+                for (byte[] key : keys) {
+                    count++;
+                    consumer.accept(decode(key));
+                }
+            } while (!"0".equals(cursor));
+        } catch (JedisConnectionException e) {
+            item.broken = true;
+            throw e;
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("forEach, pattern={}, count={}, elapsedTime={}", pattern, count, elapsedTime);
+        }
     }
 
     byte[] encode(String value) {   // redis does not accept null
