@@ -17,7 +17,7 @@
 
 ## Change log
 ### 4.8.9 (1/12/2017 - )
-* kafka: bulk message listener log messageCount in action context
+* kafka: update logging to expose more info
 * mongo: check entities must not be empty in bulk operations
 
 ### 4.8.8 (1/9/2017 - 1/12/2017)

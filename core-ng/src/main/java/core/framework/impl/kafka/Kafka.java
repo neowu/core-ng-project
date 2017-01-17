@@ -1,6 +1,7 @@
 package core.framework.impl.kafka;
 
 import core.framework.api.util.Maps;
+import core.framework.api.util.StopWatch;
 import core.framework.impl.log.LogManager;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -38,26 +39,36 @@ public class Kafka {
 
     public Producer<String, byte[]> producer() {
         if (producer == null) {
-            if (uri == null) throw new Error("uri is required, please configure kafka.uri() first");
-            Map<String, Object> config = Maps.newHashMap();
-            config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-            config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
-            producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
+            StopWatch watch = new StopWatch();
+            try {
+                if (uri == null) throw new Error("uri is required, please configure kafka.uri() first");
+                Map<String, Object> config = Maps.newHashMap();
+                config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
+                config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
+                producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
+            } finally {
+                logger.info("create kafka producer, uri={}, name={}, elapsedTime={}", uri, name, watch.elapsedTime());
+            }
         }
         return producer;
     }
 
     public Consumer<String, byte[]> consumer(String group, Set<String> topics) {
-        if (uri == null) throw new Error("uri is required, please configure kafka.uri() first");
-        Map<String, Object> config = Maps.newHashMap();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
-        config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
-        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
-        consumer.subscribe(topics);
-        return consumer;
+        StopWatch watch = new StopWatch();
+        try {
+            if (uri == null) throw new Error("uri is required, please configure kafka.uri() first");
+            Map<String, Object> config = Maps.newHashMap();
+            config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
+            config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
+            config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
+            config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+            config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+            Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
+            consumer.subscribe(topics);
+            return consumer;
+        } finally {
+            logger.info("create kafka consumer, uri={}, name={}, topics={}, elapsedTime={}", uri, name, topics, watch.elapsedTime());
+        }
     }
 
     public KafkaMessageListener listener() {
