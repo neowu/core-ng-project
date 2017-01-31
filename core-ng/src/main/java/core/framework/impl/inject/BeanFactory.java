@@ -2,6 +2,7 @@ package core.framework.impl.inject;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
+import core.framework.api.util.Types;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -118,19 +119,26 @@ public class BeanFactory {
 
     private Object lookupValue(Field field) {
         Named name = field.getDeclaredAnnotation(Named.class);
-        return bean(field.getGenericType(), name == null ? null : name.value());
+        Type fieldType = stripOutOwnerType(field.getGenericType());
+        return bean(fieldType, name == null ? null : name.value());
     }
 
     private Object[] lookupParams(Executable method) {
-        Class<?>[] paramTypes = method.getParameterTypes();
+        Type[] paramTypes = method.getGenericParameterTypes();
         Annotation[][] paramAnnotations = method.getParameterAnnotations();
         Object[] params = new Object[paramTypes.length];
         for (int i = 0; i < paramTypes.length; i++) {
-            Type paramType = paramTypes[i];
+            Type paramType = stripOutOwnerType(paramTypes[i]);
             String name = name(paramAnnotations[i]);
             params[i] = bean(paramType, name);
         }
         return params;
+    }
+
+    private Type stripOutOwnerType(Type paramType) {    // type from field/method params could has owner type, which is not used in bind/key
+        if (paramType instanceof ParameterizedType)
+            return Types.generic((Class<?>) ((ParameterizedType) paramType).getRawType(), ((ParameterizedType) paramType).getActualTypeArguments());
+        return paramType;
     }
 
     private void makeAccessible(Field field) {

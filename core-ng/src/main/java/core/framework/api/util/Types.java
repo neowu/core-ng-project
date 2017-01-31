@@ -5,7 +5,6 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -14,7 +13,7 @@ import java.util.function.Supplier;
  */
 public final class Types {
     public static Type generic(Class<?> rawType, Type... arguments) {
-        return new ParameterizedTypeImpl(rawType, arguments, null);
+        return new ParameterizedTypeImpl(rawType, arguments);
     }
 
     public static Type optional(Type valueType) {
@@ -36,12 +35,10 @@ public final class Types {
     static final class ParameterizedTypeImpl implements ParameterizedType {
         private final Type rawType;
         private final Type[] arguments;
-        private final Type ownerType;
 
-        ParameterizedTypeImpl(Class<?> rawType, Type[] arguments, Type ownerType) {
+        ParameterizedTypeImpl(Class<?> rawType, Type[] arguments) {
             this.rawType = rawType;
             this.arguments = arguments;
-            this.ownerType = ownerType;
         }
 
         @Override
@@ -56,14 +53,12 @@ public final class Types {
 
         @Override
         public Type getOwnerType() {
-            return ownerType;
+            return null;
         }
 
         @Override
         public int hashCode() {
-            return (ownerType == null ? 0 : ownerType.hashCode())
-                ^ Arrays.hashCode(arguments)
-                ^ rawType.hashCode();
+            return Arrays.hashCode(arguments) ^ rawType.hashCode();
         }
 
         @Override
@@ -73,17 +68,13 @@ public final class Types {
             }
             ParameterizedType that = (ParameterizedType) other;
             return rawType.equals(that.getRawType())
-                && Objects.equals(ownerType, that.getOwnerType())
+                && that.getOwnerType() == null
                 && Arrays.equals(arguments, that.getActualTypeArguments());
         }
 
         @Override
         public String toString() {
-            StringBuilder builder = new StringBuilder();
-            if (ownerType != null) {
-                builder.append(ownerType.getTypeName()).append('.');
-            }
-            builder.append(rawType.getTypeName())
+            StringBuilder builder = new StringBuilder(rawType.getTypeName())
                 .append('<');
 
             int i = 0;
@@ -97,5 +88,4 @@ public final class Types {
             return builder.toString();
         }
     }
-
 }

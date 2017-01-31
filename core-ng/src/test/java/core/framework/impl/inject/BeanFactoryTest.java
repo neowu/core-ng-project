@@ -24,7 +24,7 @@ public class BeanFactoryTest {
     @Test
     public void create() {
         beanFactory.beans.put(new Key(Dependency1.class, null), new Dependency1());
-        beanFactory.beans.put(new Key(Dependency2.class, "dep2"), new Dependency2());
+        beanFactory.beans.put(new Key(Types.generic(Dependency2.class, String.class), "dep2"), new Dependency2<String>());
         beanFactory.beans.put(new Key(Dependency3.class, null), new Dependency3());
 
         Bean bean = beanFactory.create(Bean.class);
@@ -44,7 +44,7 @@ public class BeanFactoryTest {
 
     }
 
-    static class Dependency2 {
+    static class Dependency2<T> {
 
     }
 
@@ -56,7 +56,7 @@ public class BeanFactoryTest {
         final Dependency3 dependency3;
         @Inject
         Dependency1 dependency1;
-        Dependency2 dependency2;
+        Dependency2<String> dependency2;
 
         @Inject
         Bean(Dependency3 dependency3) {
@@ -64,7 +64,7 @@ public class BeanFactoryTest {
         }
 
         @Inject
-        public void setDependency2(@Named("dep2") Dependency2 dependency2) {
+        public void setDependency2(@Named("dep2") Dependency2<String> dependency2) {
             this.dependency2 = dependency2;
         }
     }
