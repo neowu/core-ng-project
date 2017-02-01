@@ -16,9 +16,10 @@
 * expose kafka metrics to /_sys and collectStatTask
 
 ## Change log
-### 4.9.0 (1/25/2017 - )
+### 4.9.0 (1/25/2017 - 2/1/2017)
 * undertow: update to 1.4.8
 * inject: fix beanFactory inject method parameter to support generic type
+* search: update ES to 5.2.0
 
 ### 4.8.9 (1/12/2017 - 1/17/2017)
 * kafka: update logging to expose more info

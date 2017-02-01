@@ -8,10 +8,10 @@ subprojects {
 }
 
 def mongoVersion = '3.4.1'
-def elasticVersion = '5.1.2'
+def elasticVersion = '5.2.0'
 def rabbitVersion = '3.6.5'
 def kafkaVersion = '0.10.1.1'
-def jacksonVersion = '2.8.4'
+def jacksonVersion = '2.8.6'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
