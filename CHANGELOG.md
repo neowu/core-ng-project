@@ -16,6 +16,9 @@
 * expose kafka metrics to /_sys and collectStatTask
 
 ## Change log
+### 4.10.0 (2/1/2017 - )
+* kafka: track publish
+
 ### 4.9.0 (1/25/2017 - 2/1/2017)
 * undertow: update to 1.4.8
 * inject: fix beanFactory inject method parameter to support generic type

@@ -1,8 +1,10 @@
 package core.framework.impl.kafka;
 
 import core.framework.api.kafka.MessagePublisher;
+import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Network;
+import core.framework.api.util.StopWatch;
 import core.framework.api.util.Types;
 import core.framework.impl.json.JSONWriter;
 import core.framework.impl.log.ActionLog;
@@ -44,17 +46,24 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
     public void publish(String topic, String key, T value) {
         validator.validate(value);
 
-        KafkaMessage<T> kafkaMessage = new KafkaMessage<>();
-        Map<String, String> headers = Maps.newHashMap();
-        headers.put(KafkaMessage.HEADER_CLIENT_IP, Network.localHostAddress());
-        headers.put(KafkaMessage.HEADER_CLIENT, logManager.appName);
-        linkContext(headers);
-        kafkaMessage.headers = headers;
-        kafkaMessage.value = value;
-        byte[] message = writer.toJSON(kafkaMessage);
+        StopWatch watch = new StopWatch();
+        try {
+            KafkaMessage<T> kafkaMessage = new KafkaMessage<>();
+            Map<String, String> headers = Maps.newHashMap();
+            headers.put(KafkaMessage.HEADER_CLIENT_IP, Network.localHostAddress());
+            headers.put(KafkaMessage.HEADER_CLIENT, logManager.appName);
+            linkContext(headers);
+            kafkaMessage.headers = headers;
+            kafkaMessage.value = value;
+            byte[] message = writer.toJSON(kafkaMessage);
 
-        logger.debug("publish, topic={}, key={}, message={}", topic, key, LogParam.of(message));
-        producer.send(new ProducerRecord<>(topic, key, message));
+            logger.debug("publish, topic={}, key={}, message={}", topic, key, LogParam.of(message));
+            producer.send(new ProducerRecord<>(topic, key, message));
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("kafka", elapsedTime);
+            logger.debug("publish, topic={}, key={}, elapsedTime={}", topic, key, elapsedTime);
+        }
     }
 
     private void linkContext(Map<String, String> headers) {
