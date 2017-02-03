@@ -4,6 +4,8 @@ import core.framework.api.util.ASCII;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.impl.log.LogForwarder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
@@ -18,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author neo
  */
-public class CollectStatTask implements Runnable {
+public class CollectStatsTask implements Runnable {
     static String garbageCollectorName(String name) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < name.length(); i++) {
@@ -29,14 +31,17 @@ public class CollectStatTask implements Runnable {
         return builder.toString();
     }
 
+    private final Logger logger = LoggerFactory.getLogger(CollectStatsTask.class);
     private final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats;
     private final LogForwarder logForwarder;
+    private final List<StatsCollector> statsCollectors;
 
-    public CollectStatTask(LogForwarder logForwarder) {
+    public CollectStatsTask(LogForwarder logForwarder, List<StatsCollector> statsCollectors) {
         this.logForwarder = logForwarder;
+        this.statsCollectors = statsCollectors;
 
         gcStats = Lists.newArrayList();
         List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
@@ -62,7 +67,19 @@ public class CollectStatTask implements Runnable {
             stats.put("jvm_gc_" + gcStat.name + "_total_elapsed", (double) elapsedTime);
         }
 
+        collectCustomStats(stats);
+
         logForwarder.forwardStats(stats);
+    }
+
+    private void collectCustomStats(Map<String, Double> stats) {
+        for (StatsCollector collector : statsCollectors) {
+            try {
+                collector.collect(stats);
+            } catch (Throwable e) {
+                logger.warn("failed to collect stats, collector={}, error={}", collector.getClass().getCanonicalName(), e.getMessage(), e);
+            }
+        }
     }
 
     static class GCStat {

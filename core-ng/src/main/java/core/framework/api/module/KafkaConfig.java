@@ -4,8 +4,10 @@ import core.framework.api.kafka.BulkMessageHandler;
 import core.framework.api.kafka.MessageHandler;
 import core.framework.api.kafka.MessagePublisher;
 import core.framework.api.util.Types;
+import core.framework.impl.kafka.ConsumerMetrics;
 import core.framework.impl.kafka.Kafka;
 import core.framework.impl.kafka.KafkaMessagePublisher;
+import core.framework.impl.kafka.ProducerMetrics;
 import core.framework.impl.module.ModuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +31,11 @@ public final class KafkaConfig {
             if (context.isTest()) {
                 kafka = context.mockFactory.create(Kafka.class);
             } else {
-                Kafka kafka = new Kafka(name, context.logManager);
+                ProducerMetrics producerMetrics = new ProducerMetrics(name);
+                ConsumerMetrics consumerMetrics = new ConsumerMetrics(name);
+                context.statsCollectors.add(producerMetrics);
+                context.statsCollectors.add(consumerMetrics);
+                Kafka kafka = new Kafka(name, context.logManager, producerMetrics, consumerMetrics);
                 context.startupHook.add(kafka::initialize);
                 context.shutdownHook.add(kafka::close);
                 this.kafka = kafka;

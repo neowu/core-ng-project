@@ -16,8 +16,8 @@
 * expose kafka metrics to /_sys and collectStatTask
 
 ## Change log
-### 4.10.0 (2/1/2017 - )
-* kafka: track publish
+### 4.10.0 (2/1/2017 - 2/3/2017)
+* kafka: track publish, collect kafka producer and consumer stats
 
 ### 4.9.0 (1/25/2017 - 2/1/2017)
 * undertow: update to 1.4.8

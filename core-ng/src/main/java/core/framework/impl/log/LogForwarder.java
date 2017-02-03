@@ -54,6 +54,7 @@ public final class LogForwarder {
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
         config.put(ProducerConfig.ACKS_CONFIG, "0");    // no acknowledge to maximize performance
         config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
+        config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");
         kafkaProducer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
 
         logForwarderThread = new Thread(() -> {

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author neo
@@ -27,14 +28,19 @@ public class Kafka {
     private final Logger logger = LoggerFactory.getLogger(Kafka.class);
     private final String name;
     private final LogManager logManager;
+    private final AtomicInteger consumerClientIdSequence = new AtomicInteger(1);
+    private final ProducerMetrics producerMetrics;
+    private final ConsumerMetrics consumerMetrics;
     public String uri;
     public MessageValidator validator = new MessageValidator();
     private KafkaMessageListener listener;
     private Producer<String, byte[]> producer;
 
-    public Kafka(String name, LogManager logManager) {
+    public Kafka(String name, LogManager logManager, ProducerMetrics producerMetrics, ConsumerMetrics consumerMetrics) {
         this.name = name;
         this.logManager = logManager;
+        this.producerMetrics = producerMetrics;
+        this.consumerMetrics = consumerMetrics;
     }
 
     public Producer<String, byte[]> producer() {
@@ -45,7 +51,9 @@ public class Kafka {
                 Map<String, Object> config = Maps.newHashMap();
                 config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
                 config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
+                config.put(ProducerConfig.CLIENT_ID_CONFIG, producerClientId());
                 producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
+                producerMetrics.setMetrics(producer.metrics());
             } finally {
                 logger.info("create kafka producer, uri={}, name={}, elapsedTime={}", uri, name, watch.elapsedTime());
             }
@@ -63,12 +71,35 @@ public class Kafka {
             config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
             config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
             config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-            Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
+            String clientId = consumerClientId();
+            config.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
+            Consumer<String, byte[]> consumer = new KafkaConsumer<String, byte[]>(config, new StringDeserializer(), new ByteArrayDeserializer()) {
+                @Override
+                public void close() {
+                    super.close();
+                    consumerMetrics.removeMetrics(clientId);
+                }
+            };
             consumer.subscribe(topics);
+            consumerMetrics.addMetrics(clientId, consumer.metrics());
             return consumer;
         } finally {
             logger.info("create kafka consumer, uri={}, name={}, topics={}, elapsedTime={}", uri, name, topics, watch.elapsedTime());
         }
+    }
+
+    private String producerClientId() {
+        StringBuilder clientId = new StringBuilder("kafka-producer");
+        if (name != null) clientId.append('-').append(name);
+        clientId.append("-1");
+        return clientId.toString();
+    }
+
+    private String consumerClientId() {
+        StringBuilder clientId = new StringBuilder("kafka-consumer");
+        if (name != null) clientId.append('-').append(name);
+        clientId.append('-').append(consumerClientIdSequence.getAndIncrement());
+        return clientId.toString();
     }
 
     public KafkaMessageListener listener() {

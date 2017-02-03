@@ -61,7 +61,7 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
             producer.send(new ProducerRecord<>(topic, key, message));
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("kafka", elapsedTime);
+            ActionLogContext.track("kafka", elapsedTime);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
             logger.debug("publish, topic={}, key={}, elapsedTime={}", topic, key, elapsedTime);
         }
     }
