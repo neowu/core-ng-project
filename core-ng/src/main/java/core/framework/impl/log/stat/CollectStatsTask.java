@@ -67,17 +67,17 @@ public class CollectStatsTask implements Runnable {
             stats.put("jvm_gc_" + gcStat.name + "_total_elapsed", (double) elapsedTime);
         }
 
-        collectMetricsStats(stats);
+        collectMetrics(stats);
 
         logForwarder.forwardStats(stats);
     }
 
-    private void collectMetricsStats(Map<String, Double> stats) {
-        for (Metrics metrics : metrics) {
+    private void collectMetrics(Map<String, Double> stats) {
+        for (Metrics customMetrics : metrics) {
             try {
-                metrics.collect(stats);
+                customMetrics.collect(stats);
             } catch (Throwable e) {
-                logger.warn("failed to collect metrics stats, metrics={}, error={}", metrics.getClass().getCanonicalName(), e.getMessage(), e);
+                logger.warn("failed to collect metrics, metrics={}, error={}", customMetrics.getClass().getCanonicalName(), e.getMessage(), e);
             }
         }
     }
