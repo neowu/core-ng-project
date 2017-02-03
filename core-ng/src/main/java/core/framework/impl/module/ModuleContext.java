@@ -12,7 +12,7 @@ import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.log.stat.StatsCollector;
+import core.framework.impl.log.stat.Metrics;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.HTTPServer;
@@ -38,7 +38,7 @@ public final class ModuleContext {
     public final QueueManager queueManager = new QueueManager();
     public final LogManager logManager;
     public final MockFactory mockFactory;
-    public final List<StatsCollector> statsCollectors = Lists.newArrayList();
+    public final List<Metrics> metrics = Lists.newArrayList();
     public CacheManager cacheManager;
     private Scheduler scheduler;
     private BackgroundTaskExecutor backgroundTask;

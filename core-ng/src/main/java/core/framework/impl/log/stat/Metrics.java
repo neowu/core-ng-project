@@ -5,6 +5,6 @@ import java.util.Map;
 /**
  * @author neo
  */
-public interface StatsCollector {
+public interface Metrics {
     void collect(Map<String, Double> stats);
 }

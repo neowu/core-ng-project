@@ -1,6 +1,6 @@
 package core.framework.impl.kafka;
 
-import core.framework.impl.log.stat.StatsCollector;
+import core.framework.impl.log.stat.Metrics;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class ProducerMetrics implements StatsCollector {
+public class ProducerMetrics implements Metrics {
     private final String name;
     private Metric requestRate;
     private Metric outgoingByteRate;
@@ -18,7 +18,7 @@ public class ProducerMetrics implements StatsCollector {
         this.name = name;
     }
 
-    void setMetrics(Map<MetricName, ? extends Metric> kafkaMetrics) {
+    public void setMetrics(Map<MetricName, ? extends Metric> kafkaMetrics) {
         for (Map.Entry<MetricName, ? extends Metric> entry : kafkaMetrics.entrySet()) {
             MetricName name = entry.getKey();
             if ("producer-metrics".equals(name.group())) {

@@ -37,11 +37,11 @@ public class CollectStatsTask implements Runnable {
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats;
     private final LogForwarder logForwarder;
-    private final List<StatsCollector> statsCollectors;
+    private final List<Metrics> metrics;
 
-    public CollectStatsTask(LogForwarder logForwarder, List<StatsCollector> statsCollectors) {
+    public CollectStatsTask(LogForwarder logForwarder, List<Metrics> metrics) {
         this.logForwarder = logForwarder;
-        this.statsCollectors = statsCollectors;
+        this.metrics = metrics;
 
         gcStats = Lists.newArrayList();
         List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
@@ -67,17 +67,17 @@ public class CollectStatsTask implements Runnable {
             stats.put("jvm_gc_" + gcStat.name + "_total_elapsed", (double) elapsedTime);
         }
 
-        collectCustomStats(stats);
+        collectMetricsStats(stats);
 
         logForwarder.forwardStats(stats);
     }
 
-    private void collectCustomStats(Map<String, Double> stats) {
-        for (StatsCollector collector : statsCollectors) {
+    private void collectMetricsStats(Map<String, Double> stats) {
+        for (Metrics metrics : metrics) {
             try {
-                collector.collect(stats);
+                metrics.collect(stats);
             } catch (Throwable e) {
-                logger.warn("failed to collect stats, collector={}, error={}", collector.getClass().getCanonicalName(), e.getMessage(), e);
+                logger.warn("failed to collect metrics stats, metrics={}, error={}", metrics.getClass().getCanonicalName(), e.getMessage(), e);
             }
         }
     }

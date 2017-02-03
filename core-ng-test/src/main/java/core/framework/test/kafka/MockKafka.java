@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class MockKafka extends Kafka {
     public MockKafka() {
-        super(null, null, null, null);
+        super(null, null);
     }
 
     @Override

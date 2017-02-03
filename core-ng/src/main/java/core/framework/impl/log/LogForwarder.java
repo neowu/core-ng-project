@@ -4,6 +4,7 @@ import core.framework.api.util.Maps;
 import core.framework.api.util.Network;
 import core.framework.api.util.Threads;
 import core.framework.impl.json.JSONWriter;
+import core.framework.impl.kafka.ProducerMetrics;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.framework.impl.log.queue.PerformanceStatMessage;
 import core.framework.impl.log.queue.StatMessage;
@@ -30,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class LogForwarder {
     private static final int MAX_TRACE_LENGTH = 1000000; // 1M
-
+    public final ProducerMetrics producerMetrics;
     private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
     private final String appName;
 
@@ -56,6 +57,9 @@ public final class LogForwarder {
         config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
         config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");
         kafkaProducer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
+
+        producerMetrics = new ProducerMetrics("log-forwarder");
+        producerMetrics.setMetrics(kafkaProducer.metrics());
 
         logForwarderThread = new Thread(() -> {
             logger.info("log forwarder thread started, uri={}", uri);

@@ -25,22 +25,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author neo
  */
 public class Kafka {
+    public final ProducerMetrics producerMetrics;
+    public final ConsumerMetrics consumerMetrics;
     private final Logger logger = LoggerFactory.getLogger(Kafka.class);
     private final String name;
     private final LogManager logManager;
     private final AtomicInteger consumerClientIdSequence = new AtomicInteger(1);
-    private final ProducerMetrics producerMetrics;
-    private final ConsumerMetrics consumerMetrics;
     public String uri;
     public MessageValidator validator = new MessageValidator();
     private KafkaMessageListener listener;
     private Producer<String, byte[]> producer;
 
-    public Kafka(String name, LogManager logManager, ProducerMetrics producerMetrics, ConsumerMetrics consumerMetrics) {
+    public Kafka(String name, LogManager logManager) {
         this.name = name;
         this.logManager = logManager;
-        this.producerMetrics = producerMetrics;
-        this.consumerMetrics = consumerMetrics;
+        this.producerMetrics = new ProducerMetrics(name);
+        this.consumerMetrics = new ConsumerMetrics(name);
     }
 
     public Producer<String, byte[]> producer() {

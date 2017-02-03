@@ -1,7 +1,7 @@
 package core.framework.impl.kafka;
 
 import core.framework.api.util.Maps;
-import core.framework.impl.log.stat.StatsCollector;
+import core.framework.impl.log.stat.Metrics;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class ConsumerMetrics implements StatsCollector {
+public class ConsumerMetrics implements Metrics {
     private final String name;
     private final Map<String, Metric> recordsLagMax = Maps.newConcurrentHashMap();
     private final Map<String, Metric> recordsConsumedRate = Maps.newConcurrentHashMap();
@@ -23,10 +23,12 @@ public class ConsumerMetrics implements StatsCollector {
 
     @Override
     public void collect(Map<String, Double> stats) {
-        stats.put(statName("records_max_lag"), sum(recordsLagMax));
-        stats.put(statName("records_consumed_rate"), sum(recordsConsumedRate));
-        stats.put(statName("bytes_consumed_rate"), sum(bytesConsumedRate));
-        stats.put(statName("fetch_rate"), sum(fetchRate));
+        if (!recordsLagMax.isEmpty()) {
+            stats.put(statName("records_max_lag"), sum(recordsLagMax));
+            stats.put(statName("records_consumed_rate"), sum(recordsConsumedRate));
+            stats.put(statName("bytes_consumed_rate"), sum(bytesConsumedRate));
+            stats.put(statName("fetch_rate"), sum(fetchRate));
+        }
     }
 
     void addMetrics(String clientId, Map<MetricName, ? extends Metric> kafkaMetrics) {
@@ -52,7 +54,7 @@ public class ConsumerMetrics implements StatsCollector {
         return metrics.values().stream().mapToDouble(Metric::value).filter(Double::isFinite).sum();
     }
 
-    private String statName(String statName) {
+    String statName(String statName) {
         StringBuilder builder = new StringBuilder("kafka_consumer");
         if (name != null) builder.append('_').append(name);
         builder.append('_').append(statName);
