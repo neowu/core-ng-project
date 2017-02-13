@@ -33,6 +33,7 @@ public class Kafka {
     private final AtomicInteger consumerClientIdSequence = new AtomicInteger(1);
     public String uri;
     public MessageValidator validator = new MessageValidator();
+    public Duration maxProcessTime;
     private KafkaMessageListener listener;
     private Producer<String, byte[]> producer;
 
@@ -71,6 +72,10 @@ public class Kafka {
             config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
             config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
             config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+            if (maxProcessTime != null) {
+                config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxProcessTime.toMillis());
+                config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, maxProcessTime.plusSeconds(5).toMillis());
+            }
             String clientId = consumerClientId();
             config.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
             Consumer<String, byte[]> consumer = new KafkaConsumer<String, byte[]>(config, new StringDeserializer(), new ByteArrayDeserializer()) {

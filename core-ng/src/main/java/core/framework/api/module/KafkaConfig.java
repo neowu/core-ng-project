@@ -10,6 +10,8 @@ import core.framework.impl.module.ModuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+
 /**
  * @author neo
  */
@@ -67,5 +69,9 @@ public final class KafkaConfig {
         if (!context.isTest()) {
             kafka.uri = uri;
         }
+    }
+
+    public void maxProcessTime(Duration timeout) {
+        kafka.maxProcessTime = timeout;
     }
 }

@@ -13,9 +13,11 @@
 * faster synchronous rpc
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 * framework error, queue listener, background task error forward to kafka?
-* expose kafka metrics to /_sys and collectStatTask
 
 ## Change log
+### 4.10.2 (2/13/2017)
+* kafka: support max process time for long process
+
 ### 4.10.1 (2/3/2017)
 * kafka: tweak kafka producer and consumer stats
 
