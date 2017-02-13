@@ -73,8 +73,8 @@ public class Kafka {
             config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
             config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             if (maxProcessTime != null) {
-                config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, maxProcessTime.toMillis());
-                config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, maxProcessTime.plusSeconds(5).toMillis());
+                config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
+                config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
             }
             String clientId = consumerClientId();
             config.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
