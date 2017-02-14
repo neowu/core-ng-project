@@ -15,6 +15,9 @@
 * framework error, queue listener, background task error forward to kafka?
 
 ## Change log
+### 4.10.4 (2/14/2017 - )
+* kafka: set default max process time to 15 mins
+
 ### 4.10.3 (2/13/2017)
 * kafka: support max process time for long process
 
