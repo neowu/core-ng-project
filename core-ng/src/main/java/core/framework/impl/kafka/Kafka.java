@@ -6,6 +6,7 @@ import core.framework.impl.log.LogManager;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -46,32 +47,37 @@ public class Kafka {
 
     public Producer<String, byte[]> producer() {
         if (producer == null) {
-            StopWatch watch = new StopWatch();
-            try {
-                if (uri == null) throw new Error("uri is required, please configure kafka.uri() first");
-                Map<String, Object> config = Maps.newHashMap();
-                config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-                config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
-                config.put(ProducerConfig.CLIENT_ID_CONFIG, producerClientId());
-                producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
-                producerMetrics.setMetrics(producer.metrics());
-            } finally {
-                logger.info("create kafka producer, uri={}, name={}, elapsedTime={}", uri, name, watch.elapsedTime());
-            }
+            if (uri == null) throw new Error("kafka.uri must not be null, please check config");
+            producer = createProducer();
         }
         return producer;
     }
 
-    public Consumer<String, byte[]> consumer(String group, Set<String> topics) {
+    protected Producer<String, byte[]> createProducer() {
         StopWatch watch = new StopWatch();
         try {
-            if (uri == null) throw new Error("uri is required, please configure kafka.uri() first");
+            Map<String, Object> config = Maps.newHashMap();
+            config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
+            config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
+            config.put(ProducerConfig.CLIENT_ID_CONFIG, producerClientId());
+            Producer<String, byte[]> producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
+            producerMetrics.setMetrics(producer.metrics());
+            return producer;
+        } finally {
+            logger.info("create kafka producer, uri={}, name={}, elapsedTime={}", uri, name, watch.elapsedTime());
+        }
+    }
+
+    public Consumer<String, byte[]> consumer(String group, Set<String> topics) {
+        if (uri == null) throw new Error("kafka.uri must not be null, please check config");
+        StopWatch watch = new StopWatch();
+        try {
             Map<String, Object> config = Maps.newHashMap();
             config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
             config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
             config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
             config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-            config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+            config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, OffsetResetStrategy.EARLIEST);
             config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
             config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
             String clientId = consumerClientId();
@@ -112,6 +118,10 @@ public class Kafka {
         return listener;
     }
 
+    public void initialize() {
+        if (listener != null) listener.start();
+    }
+
     public void close() {
         if (listener != null) listener.stop();
         if (producer != null) {
@@ -119,9 +129,5 @@ public class Kafka {
             producer.flush();
             producer.close();
         }
-    }
-
-    public void initialize() {
-        if (listener != null) listener.start();
     }
 }

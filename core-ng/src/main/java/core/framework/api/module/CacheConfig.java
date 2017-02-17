@@ -33,7 +33,7 @@ public final class CacheConfig {
 
     public void local() {
         if (context.cacheManager != null) {
-            throw new Error("cache store is configured, please only configure cache store once at beginning of application");
+            throw new Error("cache store is already configured, please only configure cache store once");
         }
 
         logger.info("create local cache store");
@@ -46,7 +46,7 @@ public final class CacheConfig {
 
     public void redis(String host) {
         if (context.cacheManager != null) {
-            throw new Error("cache store is configured, please only configure cache store once at beginning of application");
+            throw new Error("cache store is already configured, please only configure cache store once");
         }
 
         if (context.isTest()) {
@@ -80,7 +80,7 @@ public final class CacheConfig {
 
     public void add(String name, Type valueType, Duration duration) {
         if (context.cacheManager == null) {
-            throw Exceptions.error("cache store is not configured, please configure cache store at beginning of application");
+            throw Exceptions.error("cache store is not configured, please check config");
         }
 
         String cacheName = cacheName(name, valueType);

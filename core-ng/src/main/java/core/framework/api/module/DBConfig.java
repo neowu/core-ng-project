@@ -30,9 +30,7 @@ public final class DBConfig {
             database.pool.name("db" + (name == null ? "" : "-" + name));
             context.shutdownHook.add(database::close);
 
-            if (context.isTest()) {
-                database.url(Strings.format("jdbc:hsqldb:mem:{};sql.syntax_mys=true", name == null ? "." : name));
-            } else {
+            if (!context.isTest()) {
                 context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(30));
             }
 
@@ -43,6 +41,8 @@ public final class DBConfig {
     public void url(String url) {
         if (!context.isTest()) {
             database.url(url);
+        } else {
+            database.url(Strings.format("jdbc:hsqldb:mem:{};sql.syntax_mys=true", name == null ? "." : name));
         }
     }
 

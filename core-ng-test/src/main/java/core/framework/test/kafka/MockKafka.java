@@ -20,7 +20,7 @@ public class MockKafka extends Kafka {
     }
 
     @Override
-    public Producer<String, byte[]> producer() {
+    protected Producer<String, byte[]> createProducer() {
         return new MockProducer<>(true, new StringSerializer(), new ByteArraySerializer());
     }
 

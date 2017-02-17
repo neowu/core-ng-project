@@ -26,6 +26,7 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -74,8 +75,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         long esTookTime = 0;
         String index = request.index == null ? this.index : request.index;
         try {
-            SearchRequestBuilder builder = elasticSearch.client.prepareSearch(index)
-                .setQuery(request.query);
+            SearchRequestBuilder builder = client().prepareSearch(index).setQuery(request.query);
             if (request.type != null) builder.setSearchType(request.type);
             request.aggregations.forEach(builder::addAggregation);
             request.sorts.forEach(builder::addSort);
@@ -119,7 +119,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         try {
-            GetResponse response = elasticSearch.client.prepareGet(index, type, request.id).get();
+            GetResponse response = client().prepareGet(index, type, request.id).get();
             if (!response.isExists()) return Optional.empty();
             return Optional.of(reader.fromJSON(response.getSourceAsBytes()));
         } catch (ElasticsearchException e) {
@@ -139,9 +139,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         validator.validate(request.source);
         byte[] document = writer.toJSON(request.source);
         try {
-            elasticSearch.client.prepareIndex(index, type, request.id)
-                .setSource(document)
-                .get();
+            client().prepareIndex(index, type, request.id)
+                    .setSource(document)
+                    .get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -156,14 +156,13 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     public void bulkIndex(BulkIndexRequest<T> request) {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
-        BulkRequestBuilder builder = elasticSearch.client.prepareBulk();
+        BulkRequestBuilder builder = client().prepareBulk();
         for (Map.Entry<String, T> entry : request.sources.entrySet()) {
             String id = entry.getKey();
             T source = entry.getValue();
             validator.validate(source);
             byte[] document = writer.toJSON(source);
-            builder.add(elasticSearch.client.prepareIndex(index, type, id)
-                .setSource(document));
+            builder.add(client().prepareIndex(index, type, id).setSource(document));
         }
         long esTookTime = 0;
         try {
@@ -185,7 +184,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         try {
-            DeleteResponse response = elasticSearch.client.prepareDelete(index, type, request.id).get();
+            DeleteResponse response = client().prepareDelete(index, type, request.id).get();
             return response.getResult() == DocWriteResponse.Result.DELETED;
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
@@ -201,9 +200,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     public void bulkDelete(BulkDeleteRequest request) {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
-        BulkRequestBuilder builder = elasticSearch.client.prepareBulk();
+        BulkRequestBuilder builder = client().prepareBulk();
         for (String id : request.ids) {
-            builder.add(elasticSearch.client.prepareDelete(index, type, id));
+            builder.add(client().prepareDelete(index, type, id));
         }
         long esTookTime = 0;
         try {
@@ -225,7 +224,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         try {
-            AnalyzeResponse response = elasticSearch.client.admin().indices().prepareAnalyze(index, request.text).setAnalyzer(request.analyzer).get();
+            AnalyzeResponse response = client().admin().indices().prepareAnalyze(index, request.text).setAnalyzer(request.analyzer).get();
             return response.getTokens().stream().map(AnalyzeResponse.AnalyzeToken::getTerm).collect(Collectors.toList());
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
@@ -249,11 +248,11 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         long esTookTime = 0;
         String index = forEach.index == null ? this.index : forEach.index;
         try {
-            SearchRequestBuilder builder = elasticSearch.client.prepareSearch(index)
-                .setQuery(forEach.query)
-                .addSort(SortBuilders.fieldSort("_doc"))
-                .setScroll(keepAlive)
-                .setSize(forEach.limit);
+            SearchRequestBuilder builder = client().prepareSearch(index)
+                                                   .setQuery(forEach.query)
+                                                   .addSort(SortBuilders.fieldSort("_doc"))
+                                                   .setScroll(keepAlive)
+                                                   .setSize(forEach.limit);
             logger.debug("foreach, index={}, type={}, request={}", index, type, builder);
             org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
 
@@ -269,7 +268,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                 }
 
                 String scrollId = searchResponse.getScrollId();
-                searchResponse = elasticSearch.client.prepareSearchScroll(scrollId).setScroll(keepAlive).get();
+                searchResponse = client().prepareSearchScroll(scrollId).setScroll(keepAlive).get();
             }
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
@@ -278,6 +277,10 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("foreach, esTookTime={}, elapsedTime={}", esTookTime, elapsedTime);
         }
+    }
+
+    private Client client() {
+        return elasticSearch.client();
     }
 
     private void checkSlowOperation(long elapsedTime) {

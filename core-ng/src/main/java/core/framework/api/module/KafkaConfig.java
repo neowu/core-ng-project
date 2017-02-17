@@ -66,9 +66,7 @@ public final class KafkaConfig {
     }
 
     public void uri(String uri) {
-        if (!context.isTest()) {
-            kafka.uri = uri;
-        }
+        kafka.uri = uri;
     }
 
     public void maxProcessTime(Duration timeout) {

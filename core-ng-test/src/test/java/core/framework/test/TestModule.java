@@ -12,14 +12,18 @@ import core.framework.test.search.TestDocument;
 public class TestModule extends AbstractTestModule {
     @Override
     protected void initialize() {
+        db().url("jdbc:mysql://localhost:3306/test");
         db().repository(TestDBEntity.class);
         initDB().createSchema();
 
+        mongo().uri("mongodb://localhost:27017/test");
         mongo().collection(TestMongoEntity.class);
 
+        search().host("localhost");
         search().type(TestDocument.class);
         initSearch().createIndex("document", "search/document-index.json");
 
+        kafka().uri("localhost:9092");
         kafka().publish("topic", TestMessage.class);
     }
 }

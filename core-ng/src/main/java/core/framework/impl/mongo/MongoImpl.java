@@ -36,12 +36,12 @@ public class MongoImpl implements Mongo {
     private MongoDatabase database;
 
     public void initialize() {
+        if (uri == null) throw new Error("mongo.uri must not be null, please check config");
         registry = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), codecs.codecRegistry());
         database = createDatabase(registry);
     }
 
     protected MongoDatabase createDatabase(CodecRegistry registry) {
-        if (uri == null) throw new Error("uri must not be null, please check config");
         StopWatch watch = new StopWatch();
         try {
             builder.connectTimeout(timeoutInMs);
@@ -57,7 +57,7 @@ public class MongoImpl implements Mongo {
     }
 
     public void close() {
-        if (mongoClient != null) {  // if app didn't call createDatabase, then mongoClient will be null
+        if (mongoClient != null) {  // if app didn't call createDatabase, e.g. failed on previous startup hook, then mongoClient will be null
             logger.info("close mongodb client, uri={}", uri);
             mongoClient.close();
         }
@@ -122,7 +122,7 @@ public class MongoImpl implements Mongo {
     }
 
     private MongoDatabase database() {
-        if (database == null) initialize(); // lazy init for dev test, initialize will be called in startup hook on server env
+        if (database == null) initialize(); // lazy init for dev/test, initialize will be called in startup hook on server env
         return database;
     }
 }

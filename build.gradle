@@ -43,7 +43,7 @@ project(':core-ng') {
         )
         testCompile(
                 'junit:junit:4.12',
-                'org.mockito:mockito-core:2.1.0',
+                'org.mockito:mockito-core:2.7.8',
                 'org.hsqldb:hsqldb:2.3.3'
         )
     }
@@ -66,7 +66,7 @@ project(':core-ng-test') {
         compile(
                 project(":core-ng"),
                 'junit:junit:4.12',
-                'org.mockito:mockito-core:2.1.0'
+                'org.mockito:mockito-core:2.7.8'
         )
     }
 }

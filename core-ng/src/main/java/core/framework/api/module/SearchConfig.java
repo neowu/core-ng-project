@@ -26,7 +26,6 @@ public final class SearchConfig {
             if (context.isTest()) {
                 Path dataPath = Files.tempDir();
                 search = context.mockFactory.create(ElasticSearchImpl.class, dataPath);
-                search.initialize();    // elasticserch client can be initialized immediately for unit test env
                 context.shutdownHook.add(() -> Files.deleteDir(dataPath));
             } else {
                 System.setProperty("log4j2.loggerContextFactory", ESLoggerContextFactory.class.getName());
@@ -39,9 +38,7 @@ public final class SearchConfig {
     }
 
     public void host(String host) {
-        if (!context.isTest()) {
-            search.host(host);
-        }
+        search.host(host);
     }
 
     public void sniff(boolean sniff) {

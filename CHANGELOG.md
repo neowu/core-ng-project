@@ -18,6 +18,7 @@
 ### 4.10.4 (2/14/2017 - )
 * kafka: set default max process time to 15 mins
 * lib: update undertow to 1.4.10, es to 5.2.1
+* config: better validate kafka/mongo/es uri property presents
 
 ### 4.10.3 (2/13/2017)
 * kafka: support max process time for long process

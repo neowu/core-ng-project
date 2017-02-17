@@ -35,7 +35,7 @@ import java.util.List;
 public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
     private final List<TransportAddress> addresses = Lists.newArrayList();
-    Client client;
+    private Client client;
     private Duration timeout = Duration.ofSeconds(10);
     private Duration slowOperationThreshold = Duration.ofSeconds(5);
     private boolean sniff;      // if enabled, es client will use all nodes in cluster and only use "publish address" to connect
@@ -57,6 +57,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     }
 
     public void initialize() {
+        if (addresses.isEmpty()) throw new Error("elasticsearch.addresses must not be empty, please check config");
         client = createClient();
     }
 
@@ -85,7 +86,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndex(String index, String source) {
         StopWatch watch = new StopWatch();
         try {
-            client.admin().indices().prepareCreate(index).setSource(source).get();
+            client().admin().indices().prepareCreate(index).setSource(source).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -97,7 +98,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndexTemplate(String name, String source) {
         StopWatch watch = new StopWatch();
         try {
-            client.admin().indices().preparePutTemplate(name).setSource(source).get();
+            client().admin().indices().preparePutTemplate(name).setSource(source).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -109,7 +110,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void flush(String index) {
         StopWatch watch = new StopWatch();
         try {
-            client.admin().indices().prepareFlush(index).get();
+            client().admin().indices().prepareFlush(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -121,7 +122,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void closeIndex(String index) {
         StopWatch watch = new StopWatch();
         try {
-            client.admin().indices().prepareClose(index).get();
+            client().admin().indices().prepareClose(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -133,7 +134,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void deleteIndex(String index) {
         StopWatch watch = new StopWatch();
         try {
-            client.admin().indices().prepareDelete(index).get();
+            client().admin().indices().prepareDelete(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -145,7 +146,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public List<ElasticSearchIndex> indices() {
         StopWatch watch = new StopWatch();
         try {
-            AdminClient adminClient = client.admin();
+            AdminClient adminClient = client().admin();
             ClusterStateResponse response = adminClient.cluster().state(new ClusterStateRequest().clear().metaData(true)).actionGet();
             ImmutableOpenMap<String, IndexMetaData> indices = response.getState().getMetaData().indices();
             List<ElasticSearchIndex> results = new ArrayList<>(indices.size());
@@ -165,7 +166,6 @@ public class ElasticSearchImpl implements ElasticSearch {
     }
 
     protected Client createClient() {
-        if (addresses.isEmpty()) throw new Error("addresses must not be empty, please check config");
         StopWatch watch = new StopWatch();
         try {
             Settings.Builder settings = Settings.builder();
@@ -181,5 +181,10 @@ public class ElasticSearchImpl implements ElasticSearch {
         } finally {
             logger.info("create elasticsearch client, addresses={}, elapsedTime={}", addresses, watch.elapsedTime());
         }
+    }
+
+    Client client() {
+        if (client == null) initialize();
+        return client;
     }
 }

@@ -68,7 +68,7 @@ public final class DatabaseImpl implements Database {
     }
 
     private Connection createConnection() {
-        if (url == null) throw new Error("url must not be null");
+        if (url == null) throw new Error("database.url must not be null, please check config");
         try {
             return driver.connect(url, driverProperties);
         } catch (SQLException e) {
@@ -212,7 +212,6 @@ public final class DatabaseImpl implements Database {
             logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }
     }
-
 
     private void checkSlowOperation(long elapsedTime) {
         if (elapsedTime > slowOperationThresholdInNanos) {
