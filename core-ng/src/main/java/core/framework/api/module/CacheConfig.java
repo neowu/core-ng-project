@@ -24,6 +24,23 @@ import java.time.Duration;
  * @author neo
  */
 public final class CacheConfig {
+    static String cacheName(String name, Type valueType) {
+        if (name != null) return name;
+        if (valueType instanceof Class) {
+            return ASCII.toLowerCase(((Class<?>) valueType).getSimpleName());
+        } else if (valueType instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) valueType;
+            StringBuilder builder = new StringBuilder();
+            builder.append(ASCII.toLowerCase(((Class<?>) parameterizedType.getRawType()).getSimpleName()));
+            Type[] arguments = parameterizedType.getActualTypeArguments();
+            for (Type argument : arguments) {
+                builder.append('-').append(ASCII.toLowerCase(((Class<?>) argument).getSimpleName()));
+            }
+            return builder.toString();
+        }
+        return ASCII.toLowerCase(valueType.getTypeName());
+    }
+
     private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
     private final ModuleContext context;
 
@@ -96,22 +113,5 @@ public final class CacheConfig {
 
     public void add(Type valueType, Duration duration) {
         add(null, valueType, duration);
-    }
-
-    String cacheName(String name, Type valueType) {
-        if (name != null) return name;
-        if (valueType instanceof Class) {
-            return ASCII.toLowerCase(((Class<?>) valueType).getSimpleName());
-        } else if (valueType instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) valueType;
-            StringBuilder builder = new StringBuilder();
-            builder.append(ASCII.toLowerCase(((Class<?>) parameterizedType.getRawType()).getSimpleName()));
-            Type[] arguments = parameterizedType.getActualTypeArguments();
-            for (Type argument : arguments) {
-                builder.append('-').append(ASCII.toLowerCase(((Class<?>) argument).getSimpleName()));
-            }
-            return builder.toString();
-        }
-        return ASCII.toLowerCase(valueType.getTypeName());
     }
 }
