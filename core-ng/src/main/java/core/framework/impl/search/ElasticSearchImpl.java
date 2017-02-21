@@ -33,8 +33,8 @@ import java.util.List;
  * @author neo
  */
 public class ElasticSearchImpl implements ElasticSearch {
+    public final List<TransportAddress> addresses = Lists.newArrayList();
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
-    private final List<TransportAddress> addresses = Lists.newArrayList();
     private Client client;
     private Duration timeout = Duration.ofSeconds(10);
     private Duration slowOperationThreshold = Duration.ofSeconds(5);
@@ -57,7 +57,6 @@ public class ElasticSearchImpl implements ElasticSearch {
     }
 
     public void initialize() {
-        if (addresses.isEmpty()) throw new Error("elasticsearch.addresses must not be empty, please check config");
         client = createClient();
     }
 
@@ -166,6 +165,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     }
 
     protected Client createClient() {
+        if (addresses.isEmpty()) throw new Error("addresses must not be empty");
         StopWatch watch = new StopWatch();
         try {
             Settings.Builder settings = Settings.builder();

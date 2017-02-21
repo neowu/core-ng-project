@@ -31,6 +31,7 @@ import java.util.List;
 public final class ModuleContext {
     public final BeanFactory beanFactory;
     public final List<Runnable> startupHook = Lists.newArrayList();
+    public final List<Runnable> validators = Lists.newArrayList();
     public final ShutdownHook shutdownHook = new ShutdownHook();
     public final Properties properties = new Properties();
 

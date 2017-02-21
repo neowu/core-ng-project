@@ -6,7 +6,6 @@ import core.framework.impl.log.LogManager;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -35,8 +34,8 @@ public class Kafka {
     public String uri;
     public MessageValidator validator = new MessageValidator();
     public Duration maxProcessTime = Duration.ofMinutes(15);
-    private KafkaMessageListener listener;
-    private Producer<String, byte[]> producer;
+    public KafkaMessageListener listener;
+    public Producer<String, byte[]> producer;
 
     public Kafka(String name, LogManager logManager) {
         this.name = name;
@@ -47,13 +46,13 @@ public class Kafka {
 
     public Producer<String, byte[]> producer() {
         if (producer == null) {
-            if (uri == null) throw new Error("kafka.uri must not be null, please check config");
             producer = createProducer();
         }
         return producer;
     }
 
     protected Producer<String, byte[]> createProducer() {
+        if (uri == null) throw new Error("uri must not be null");
         StopWatch watch = new StopWatch();
         try {
             Map<String, Object> config = Maps.newHashMap();
@@ -69,7 +68,7 @@ public class Kafka {
     }
 
     public Consumer<String, byte[]> consumer(String group, Set<String> topics) {
-        if (uri == null) throw new Error("kafka.uri must not be null, please check config");
+        if (uri == null) throw new Error("uri must not be null");
         StopWatch watch = new StopWatch();
         try {
             Map<String, Object> config = Maps.newHashMap();
@@ -77,7 +76,7 @@ public class Kafka {
             config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
             config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
             config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-            config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, OffsetResetStrategy.EARLIEST);
+            config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
             config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
             String clientId = consumerClientId();

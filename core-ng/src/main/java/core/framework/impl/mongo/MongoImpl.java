@@ -26,22 +26,21 @@ public class MongoImpl implements Mongo {
                                                                          .maxConnectionIdleTime((int) Duration.ofMinutes(30).toMillis())
                                                                          .socketKeepAlive(true)
                                                                          .cursorFinalizerEnabled(false); // framework always close db cursor
+    public MongoClientURI uri;
     int timeoutInMs = (int) Duration.ofSeconds(15).toMillis();
     int tooManyRowsReturnedThreshold = 2000;
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     CodecRegistry registry;
-
-    private MongoClientURI uri;
     private MongoClient mongoClient;
     private MongoDatabase database;
 
     public void initialize() {
-        if (uri == null) throw new Error("mongo.uri must not be null, please check config");
         registry = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), codecs.codecRegistry());
         database = createDatabase(registry);
     }
 
     protected MongoDatabase createDatabase(CodecRegistry registry) {
+        if (uri == null) throw new Error("uri must not be null");
         StopWatch watch = new StopWatch();
         try {
             builder.connectTimeout(timeoutInMs);
@@ -57,10 +56,11 @@ public class MongoImpl implements Mongo {
     }
 
     public void close() {
-        if (mongoClient != null) {  // if app didn't call createDatabase, e.g. failed on previous startup hook, then mongoClient will be null
-            logger.info("close mongodb client, uri={}", uri);
-            mongoClient.close();
-        }
+        if (mongoClient == null)
+            return;   // if app didn't call createDatabase, e.g. failed on previous startup hook, or unit test, then mongoClient will be null
+
+        logger.info("close mongodb client, uri={}", uri);
+        mongoClient.close();
     }
 
     @Override

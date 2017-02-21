@@ -3,6 +3,7 @@ package core.framework.api.module;
 import core.framework.api.kafka.BulkMessageHandler;
 import core.framework.api.kafka.MessageHandler;
 import core.framework.api.kafka.MessagePublisher;
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Types;
 import core.framework.impl.kafka.Kafka;
 import core.framework.impl.kafka.KafkaMessagePublisher;
@@ -39,6 +40,11 @@ public final class KafkaConfig {
                 this.kafka = kafka;
             }
             context.beanFactory.bind(Kafka.class, name, kafka);
+            context.validators.add(() -> {
+                if (kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured", name == null ? "" : name);
+                if (kafka.producer == null && kafka.listener == null)
+                    throw Exceptions.error("kafka({}) is configured, but no producer or consumer added, please remove unnecessary config", name == null ? "" : name);
+            });
         }
     }
 

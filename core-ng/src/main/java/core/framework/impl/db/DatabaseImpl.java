@@ -38,10 +38,10 @@ public final class DatabaseImpl implements Database {
     private final Properties driverProperties = new Properties();
 
     public int tooManyRowsReturnedThreshold = 1000;
+    public String url;
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     private Duration timeout;
     private Driver driver;
-    private String url;
 
     public DatabaseImpl() {
         initializeRowMappers();
@@ -68,7 +68,7 @@ public final class DatabaseImpl implements Database {
     }
 
     private Connection createConnection() {
-        if (url == null) throw new Error("database.url must not be null, please check config");
+        if (url == null) throw new Error("url must not be null");
         try {
             return driver.connect(url, driverProperties);
         } catch (SQLException e) {

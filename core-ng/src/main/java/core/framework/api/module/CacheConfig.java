@@ -29,11 +29,16 @@ public final class CacheConfig {
 
     public CacheConfig(ModuleContext context) {
         this.context = context;
+        context.validators.add(() -> {
+            if (context.cacheManager.caches().isEmpty()) {
+                throw new Error("cache() is configured but no cache added, please remove unnecessary config");
+            }
+        });
     }
 
     public void local() {
         if (context.cacheManager != null) {
-            throw new Error("cache store is already configured, please only configure cache store once");
+            throw new Error("cache() is already configured, please configure cache store only once");
         }
 
         logger.info("create local cache store");
@@ -46,7 +51,7 @@ public final class CacheConfig {
 
     public void redis(String host) {
         if (context.cacheManager != null) {
-            throw new Error("cache store is already configured, please only configure cache store once");
+            throw new Error("cache() is already configured, please configure cache store only once");
         }
 
         if (context.isTest()) {

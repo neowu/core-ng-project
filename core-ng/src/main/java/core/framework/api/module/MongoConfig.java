@@ -2,6 +2,7 @@ package core.framework.api.module;
 
 import core.framework.api.mongo.Mongo;
 import core.framework.api.mongo.MongoCollection;
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Types;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.mongo.MongoImpl;
@@ -31,6 +32,9 @@ public final class MongoConfig {
                 context.shutdownHook.add(mongo::close);
             }
             context.beanFactory.bind(Mongo.class, name, mongo);
+            context.validators.add(() -> {
+                if (mongo.uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
+            });
         }
     }
 

@@ -29,5 +29,6 @@ public abstract class App extends Module {
 
         logger.info("initialize application");
         initialize();
+        context.validators.forEach(java.lang.Runnable::run);
     }
 }

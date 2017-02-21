@@ -4,6 +4,7 @@ import core.framework.api.crypto.Password;
 import core.framework.api.db.Database;
 import core.framework.api.db.IsolationLevel;
 import core.framework.api.db.Repository;
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
 import core.framework.impl.db.DatabaseImpl;
@@ -29,12 +30,13 @@ public final class DBConfig {
             database = new DatabaseImpl();
             database.pool.name("db" + (name == null ? "" : "-" + name));
             context.shutdownHook.add(database::close);
-
             if (!context.isTest()) {
                 context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(30));
             }
-
             context.beanFactory.bind(Database.class, name, database);
+            context.validators.add(() -> {
+                if (database.url == null) throw Exceptions.error("db({}).url() must be configured", name == null ? "" : name);
+            });
         }
     }
 

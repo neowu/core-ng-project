@@ -34,6 +34,9 @@ public final class SearchConfig {
             }
             context.shutdownHook.add(search::close);
             context.beanFactory.bind(ElasticSearch.class, null, search);
+            context.validators.add(() -> {
+                if (search.addresses.isEmpty()) throw new Error("search().host() must be configured");
+            });
         }
     }
 
