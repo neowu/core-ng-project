@@ -15,6 +15,9 @@
 * framework error, queue listener, background task error forward to kafka?
 
 ## Change log
+### 4.10.5 (2/22/2017 - )
+* config: refactory module/config
+
 ### 4.10.4 (2/14/2017 - 2/21/2017)
 * kafka: set default max process time to 15 mins
 * lib: update undertow to 1.4.10, es to 5.2.1

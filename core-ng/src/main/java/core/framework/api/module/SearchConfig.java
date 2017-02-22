@@ -17,6 +17,7 @@ import java.time.Duration;
 public final class SearchConfig {
     private final ModuleContext context;
     private final ElasticSearchImpl search;
+    private final SearchConfigState state;
 
     public SearchConfig(ModuleContext context) {
         this.context = context;
@@ -34,36 +35,37 @@ public final class SearchConfig {
             }
             context.shutdownHook.add(search::close);
             context.beanFactory.bind(ElasticSearch.class, null, search);
-            context.validators.add(() -> {
-                if (search.addresses.isEmpty()) throw new Error("search().host() must be configured");
-            });
         }
+        state = context.config.search();
     }
 
     public void host(String host) {
         search.host(host);
+        state.host = host;
     }
 
     public void sniff(boolean sniff) {
-        if (!context.isTest()) {
-            search.sniff(sniff);
-        }
+        search.sniff(sniff);
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        if (!context.isTest()) {
-            search.slowOperationThreshold(threshold);
-        }
+        search.slowOperationThreshold(threshold);
     }
 
     public void timeout(Duration timeout) {
-        if (!context.isTest()) {
-            search.timeout(timeout);
-        }
+        search.timeout(timeout);
     }
 
     public <T> void type(Class<T> documentClass) {
         ElasticSearchType<T> searchType = search.type(documentClass);
         context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), null, searchType);
+    }
+
+    public static class SearchConfigState {
+        String host;
+
+        public void validate() {
+            if (host == null) throw new Error("search().host() must be configured");
+        }
     }
 }

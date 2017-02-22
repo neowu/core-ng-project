@@ -34,8 +34,8 @@ public class Kafka {
     public String uri;
     public MessageValidator validator = new MessageValidator();
     public Duration maxProcessTime = Duration.ofMinutes(15);
-    public KafkaMessageListener listener;
-    public Producer<String, byte[]> producer;
+    private Producer<String, byte[]> producer;
+    private KafkaMessageListener listener;
 
     public Kafka(String name, LogManager logManager) {
         this.name = name;

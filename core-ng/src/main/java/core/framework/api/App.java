@@ -14,7 +14,6 @@ public abstract class App extends Module {
     public final void start() {
         try {
             configure();
-
             logger.info("execute startup methods");
             context.startupHook.forEach(java.lang.Runnable::run);
         } catch (Throwable e) {
@@ -26,9 +25,8 @@ public abstract class App extends Module {
     public final void configure() {
         logger.info("initialize framework");
         context = new ModuleContext(new BeanFactory(), null);
-
         logger.info("initialize application");
         initialize();
-        context.validators.forEach(java.lang.Runnable::run);
+        context.config.validate();
     }
 }

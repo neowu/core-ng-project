@@ -22,7 +22,7 @@ public abstract class AbstractTestModule extends Module {
 
         logger.info("initialize application");
         initialize();
-        context.validators.forEach(java.lang.Runnable::run);
+        context.config.validate();
     }
 
     public <T> T overrideBinding(Class<? super T> type, T instance) {

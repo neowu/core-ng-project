@@ -19,11 +19,11 @@ public final class DBConfig {
     final DatabaseImpl database;
     private final ModuleContext context;
     private final String name;
+    private final DBConfigState state;
 
     public DBConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-
         if (context.beanFactory.registered(Database.class, name)) {
             database = context.beanFactory.bean(Database.class, name);
         } else {
@@ -34,10 +34,8 @@ public final class DBConfig {
                 context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(30));
             }
             context.beanFactory.bind(Database.class, name, database);
-            context.validators.add(() -> {
-                if (database.url == null) throw Exceptions.error("db({}).url() must be configured", name == null ? "" : name);
-            });
         }
+        state = context.config.db(name);
     }
 
     public void url(String url) {
@@ -46,6 +44,7 @@ public final class DBConfig {
         } else {
             database.url(Strings.format("jdbc:hsqldb:mem:{};sql.syntax_mys=true", name == null ? "." : name));
         }
+        state.url = url;
     }
 
     public void user(String user) {
@@ -95,5 +94,18 @@ public final class DBConfig {
 
     public <T> void repository(Class<T> entityClass) {
         context.beanFactory.bind(Types.generic(Repository.class, entityClass), name, database.repository(entityClass));
+    }
+
+    public static class DBConfigState {
+        final String name;
+        String url;
+
+        public DBConfigState(String name) {
+            this.name = name;
+        }
+
+        public void validate() {
+            if (url == null) throw Exceptions.error("db({}).url() must be configured", name == null ? "" : name);
+        }
     }
 }

@@ -16,6 +16,7 @@ public final class MongoConfig {
     private final ModuleContext context;
     private final MongoImpl mongo;
     private final String name;
+    private final MongoConfigState state;
 
     public MongoConfig(ModuleContext context, String name) {
         this.context = context;
@@ -32,38 +33,30 @@ public final class MongoConfig {
                 context.shutdownHook.add(mongo::close);
             }
             context.beanFactory.bind(Mongo.class, name, mongo);
-            context.validators.add(() -> {
-                if (mongo.uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
-            });
         }
+
+        state = context.config.mongo(name);
     }
 
     public void uri(String uri) {
         mongo.uri(uri);
+        state.uri = uri;
     }
 
     public void poolSize(int minSize, int maxSize) {
-        if (!context.isTest()) {
-            mongo.poolSize(minSize, maxSize);
-        }
+        mongo.poolSize(minSize, maxSize);
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        if (!context.isTest()) {
-            mongo.slowOperationThreshold(threshold);
-        }
+        mongo.slowOperationThreshold(threshold);
     }
 
     public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
-        if (!context.isTest()) {
-            mongo.tooManyRowsReturnedThreshold(tooManyRowsReturnedThreshold);
-        }
+        mongo.tooManyRowsReturnedThreshold(tooManyRowsReturnedThreshold);
     }
 
     public void timeout(Duration timeout) {
-        if (!context.isTest()) {
-            mongo.timeout(timeout);
-        }
+        mongo.timeout(timeout);
     }
 
     public <T> void collection(Class<T> entityClass) {
@@ -72,5 +65,18 @@ public final class MongoConfig {
 
     public <T> void view(Class<T> viewClass) {
         mongo.view(viewClass);
+    }
+
+    public static class MongoConfigState {
+        final String name;
+        String uri;
+
+        public MongoConfigState(String name) {
+            this.name = name;
+        }
+
+        public void validate() {
+            if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
+        }
     }
 }

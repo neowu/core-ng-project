@@ -17,7 +17,6 @@ import java.time.Duration;
  */
 public final class LogConfig {
     private final Logger logger = LoggerFactory.getLogger(LogConfig.class);
-
     private final ModuleContext context;
 
     public LogConfig(ModuleContext context) {

@@ -11,7 +11,7 @@ public final class WebServiceClientConfig {     // returned from APIConfig, must
     private final ModuleContext context;
     private final WebServiceClient client;
 
-    public WebServiceClientConfig(ModuleContext context, WebServiceClient client) {
+    WebServiceClientConfig(ModuleContext context, WebServiceClient client) {
         this.context = context;
         this.client = client;
     }

@@ -12,6 +12,7 @@ import java.time.Duration;
 public final class RedisConfig {
     private final ModuleContext context;
     private final Redis redis;
+    private final RedisConfigState state;
 
     public RedisConfig(ModuleContext context) {
         this.context = context;
@@ -29,12 +30,15 @@ public final class RedisConfig {
             }
             context.beanFactory.bind(Redis.class, null, redis);
         }
+
+        state = context.config.redis();
     }
 
     public void host(String host) {
         if (!context.isTest()) {
             ((RedisImpl) redis).host(host);
         }
+        state.host = host;
     }
 
     public void poolSize(int minSize, int maxSize) {
@@ -52,6 +56,14 @@ public final class RedisConfig {
     public void timeout(Duration timeout) {
         if (!context.isTest()) {
             ((RedisImpl) redis).timeout(timeout);
+        }
+    }
+
+    public static class RedisConfigState {
+        String host;
+
+        public void validate() {
+            if (host == null) throw new Error("redis().host() must be configured");
         }
     }
 }
