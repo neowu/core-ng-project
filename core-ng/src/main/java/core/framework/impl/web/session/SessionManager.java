@@ -2,10 +2,9 @@ package core.framework.impl.web.session;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.web.CookieSpec;
+import core.framework.api.web.Response;
 import core.framework.api.web.Session;
 import core.framework.impl.web.request.RequestImpl;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.CookieImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +15,15 @@ import java.util.UUID;
 /**
  * @author neo
  */
-public class SessionManager {
+public final class SessionManager {
     private final Logger logger = LoggerFactory.getLogger(SessionManager.class);
-    private CookieSpec sessionId = new CookieSpec("SessionId");  // default domain is null, which is current host
+    private CookieSpec sessionId;
     private Duration timeout = Duration.ofMinutes(20);
     private SessionStore store;
+
+    public SessionManager() {
+        cookie("SessionId", null);  // default domain is null, which is current host
+    }
 
     public Session load(RequestImpl request) {
         if (store == null) return null;  // session store is not initialized
@@ -28,7 +31,7 @@ public class SessionManager {
 
         SessionImpl session = new SessionImpl();
         request.cookie(sessionId).ifPresent(sessionId -> {
-            logger.debug("load http session");
+            logger.debug("load session");
             Map<String, String> values = store.getAndRefresh(sessionId, timeout);
             if (values != null) {
                 logger.debug("[session] values={}", values);
@@ -39,25 +42,19 @@ public class SessionManager {
         return session;
     }
 
-    public void save(RequestImpl request, HttpServerExchange exchange) {
+    public void save(RequestImpl request, Response response) {
         SessionImpl session = (SessionImpl) request.session;
         if (session == null) return;
 
         if (session.invalidated && session.id != null) {
-            logger.debug("invalidate http session");
+            logger.debug("invalidate session");
             store.invalidate(session.id);
-            CookieImpl cookie = sessionCookie(request.scheme());
-            cookie.setMaxAge(0);
-            cookie.setValue("");
-            exchange.setResponseCookie(cookie);
+            response.cookie(sessionId, null);
         } else if (session.changed()) {
-            logger.debug("save http session");
+            logger.debug("save session");
             if (session.id == null) {
                 session.id = UUID.randomUUID().toString();
-                CookieImpl cookie = sessionCookie(request.scheme());
-                cookie.setMaxAge(-1);
-                cookie.setValue(session.id);
-                exchange.setResponseCookie(cookie);
+                response.cookie(sessionId, session.id);
             }
             store.save(session.id, session.values, session.changedFields, timeout);
         }
@@ -75,15 +72,6 @@ public class SessionManager {
 
     public void cookie(String name, String domain) {
         if (name == null) throw Exceptions.error("name must not be null");
-        sessionId = new CookieSpec(name).domain(domain);
-    }
-
-    private CookieImpl sessionCookie(String scheme) {
-        CookieImpl cookie = new CookieImpl(sessionId.name);
-        cookie.setDomain(sessionId.domain);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        return cookie;
+        sessionId = new CookieSpec(name).domain(domain).path("/").sessionScope().httpOnly().secure();
     }
 }

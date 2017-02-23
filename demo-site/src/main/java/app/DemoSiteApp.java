@@ -10,6 +10,8 @@ public class DemoSiteApp extends App {
     @Override
     protected void initialize() {
         load(new SystemModule("sys.properties"));
+        http().httpsPort(8443);
+        site().httpsOnly();
         load(new WebModule());
     }
 }

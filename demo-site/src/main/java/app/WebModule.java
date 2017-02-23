@@ -44,6 +44,7 @@ public class WebModule extends Module {
         IndexController index = bind(IndexController.class);
         route().get("/", index::index);
         route().post("/submit", index::submit);
+        route().get("/logout", index::logout);
 
         UploadController upload = bind(UploadController.class);
         route().get("/upload", upload::get);

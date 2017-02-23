@@ -77,7 +77,7 @@ public class HTTPServerHandler implements HttpHandler {
             }
 
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
-            sessionManager.save(request, exchange);
+            sessionManager.save(request, response);
             responseHandler.handle((ResponseImpl) response, exchange, request);
         } catch (Throwable e) {
             logManager.logError(e);

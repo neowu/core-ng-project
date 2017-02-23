@@ -36,4 +36,9 @@ public class IndexController {
     public Response submit(Request request) {
         return Response.text("hello " + request.formParam("name").get(), ContentType.TEXT_PLAIN);
     }
+
+    public Response logout(Request request) {
+        request.session().invalidate();
+        return Response.text("logout", ContentType.TEXT_PLAIN);
+    }
 }
