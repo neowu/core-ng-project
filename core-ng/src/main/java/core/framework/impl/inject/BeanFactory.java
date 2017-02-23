@@ -19,19 +19,12 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * @author neo
  */
 public class BeanFactory {
     final Map<Key, Object> beans = Maps.newHashMap();
-
-    public <T> T bindSupplier(Type type, String name, Supplier<T> supplier) {
-        T instance = supplier.get();
-        bind(type, name, instance);
-        return instance;
-    }
 
     public void bind(Type type, String name, Object instance) {
         if (instance == null) throw new Error("instance is null");

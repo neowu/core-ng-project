@@ -1,5 +1,6 @@
 package core.framework.test.inject;
 
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.Key;
@@ -8,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * @author neo
@@ -16,14 +16,18 @@ import java.util.function.Supplier;
 public final class TestBeanFactory extends BeanFactory {
     private final Logger logger = LoggerFactory.getLogger(TestBeanFactory.class);
     private final Set<Key> overrideBindings = Sets.newHashSet();
+    private final Set<Key> skippedBindings = Sets.newHashSet();     // track overridden beans to detect duplicate binding
 
     @Override
-    public <T> T bindSupplier(Type type, String name, Supplier<T> supplier) {
-        if (overrideBindings.contains(new Key(type, name))) {
+    public void bind(Type type, String name, Object instance) {
+        Key key = new Key(type, name);
+
+        if (overrideBindings.contains(key)) {
+            if (skippedBindings.contains(key)) throw Exceptions.error("duplicated bean found, type={}, name={}", type.getTypeName(), name);
+            skippedBindings.add(key);
             logger.info("skip bean binding, bean is overridden in test context, type={}, name={}", type.getTypeName(), name);
-            return bean(type, name);
         } else {
-            return super.bindSupplier(type, name, supplier);
+            super.bind(type, name, instance);
         }
     }
 
