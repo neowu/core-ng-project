@@ -60,16 +60,21 @@ public final class MongoConfig {
     }
 
     public <T> void collection(Class<T> entityClass) {
+        if (state.uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
         context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, mongo.collection(entityClass));
+        state.entityAdded = true;
     }
 
     public <T> void view(Class<T> viewClass) {
+        if (state.uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
         mongo.view(viewClass);
+        state.entityAdded = true;
     }
 
     public static class MongoConfigState {
         final String name;
         String uri;
+        boolean entityAdded;
 
         public MongoConfigState(String name) {
             this.name = name;
@@ -77,6 +82,8 @@ public final class MongoConfig {
 
         public void validate() {
             if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
+            if (!entityAdded)
+                throw Exceptions.error("mongo({}) is configured but no collection/view added, please remove unnecessary config", name == null ? "" : name);
         }
     }
 }

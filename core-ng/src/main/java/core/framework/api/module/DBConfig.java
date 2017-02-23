@@ -89,16 +89,21 @@ public final class DBConfig {
     }
 
     public void view(Class<?> viewClass) {
+        if (state.url == null) throw Exceptions.error("db({}).url() must be configured first", name == null ? "" : name);
         database.view(viewClass);
+        state.entityAdded = true;
     }
 
     public <T> void repository(Class<T> entityClass) {
+        if (state.url == null) throw Exceptions.error("db({}).url() must be configured first", name == null ? "" : name);
         context.beanFactory.bind(Types.generic(Repository.class, entityClass), name, database.repository(entityClass));
+        state.entityAdded = true;
     }
 
     public static class DBConfigState {
         final String name;
         String url;
+        boolean entityAdded;
 
         public DBConfigState(String name) {
             this.name = name;
@@ -106,6 +111,8 @@ public final class DBConfig {
 
         public void validate() {
             if (url == null) throw Exceptions.error("db({}).url() must be configured", name == null ? "" : name);
+            if (!entityAdded)
+                throw Exceptions.error("db({}) is configured but no repository/view added, please remove unnecessary config", name == null ? "" : name);
         }
     }
 }
