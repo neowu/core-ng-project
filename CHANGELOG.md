@@ -7,9 +7,6 @@
 * validator: annotation for website, like @HTMLSafeString?
 * cm: config management, dynamic update properties?
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
-* template security check, escaping and etc
-* http: make http session https only?
-* think about /test//b, and /:path(\*)
 * faster synchronous rpc
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 * framework error, queue listener, background task error forward to kafka?
@@ -19,6 +16,7 @@
 * config: refactory module/config
 * bind: removed bindSupplier, not used anymore
 * queue: deprecate rabbitMQ
+* session: make session only supports https, with modern standard, https should be by default
 
 ### 4.10.4 (2/14/2017 - 2/21/2017)
 * kafka: set default max process time to 15 mins

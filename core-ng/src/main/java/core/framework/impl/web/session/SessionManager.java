@@ -24,6 +24,7 @@ public class SessionManager {
 
     public Session load(RequestImpl request) {
         if (store == null) return null;  // session store is not initialized
+        if (!"https".equals(request.scheme())) return null;  // only load session under https
 
         SessionImpl session = new SessionImpl();
         request.cookie(sessionId).ifPresent(sessionId -> {
@@ -81,7 +82,7 @@ public class SessionManager {
         CookieImpl cookie = new CookieImpl(sessionId.name);
         cookie.setDomain(sessionId.domain);
         cookie.setPath("/");
-        cookie.setSecure("https".equals(scheme));
+        cookie.setSecure(true);
         cookie.setHttpOnly(true);
         return cookie;
     }
