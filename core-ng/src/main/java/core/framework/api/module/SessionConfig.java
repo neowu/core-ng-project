@@ -16,7 +16,7 @@ public final class SessionConfig {
     private final Logger logger = LoggerFactory.getLogger(SessionConfig.class);
     private final ModuleContext context;
 
-    public SessionConfig(ModuleContext context) {
+    SessionConfig(ModuleContext context) {
         this.context = context;
     }
 

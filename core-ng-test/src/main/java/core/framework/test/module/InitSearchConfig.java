@@ -17,9 +17,8 @@ public final class InitSearchConfig {
     public InitSearchConfig(ModuleContext context) {
         this.context = context;
         if (!context.beanFactory.registered(ElasticSearch.class, null)) {
-            throw new Error("search is not configured, please use search() to configure");
+            throw new Error("search() is not configured");
         }
-
         search = context.beanFactory.bean(ElasticSearch.class, null);
     }
 

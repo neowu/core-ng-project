@@ -5,12 +5,14 @@ import core.framework.api.db.Database;
 import core.framework.api.db.IsolationLevel;
 import core.framework.api.db.Repository;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Lists;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
 import core.framework.impl.db.DatabaseImpl;
 import core.framework.impl.module.ModuleContext;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * @author neo
@@ -99,9 +101,11 @@ public final class DBConfig {
         if (state.url == null) throw Exceptions.error("db({}).url() must be configured first", name == null ? "" : name);
         context.beanFactory.bind(Types.generic(Repository.class, entityClass), name, database.repository(entityClass));
         state.entityAdded = true;
+        state.entityClasses.add(entityClass);
     }
 
     public static class DBConfigState {
+        public final List<Class<?>> entityClasses = Lists.newArrayList();
         final String name;
         String url;
         boolean entityAdded;

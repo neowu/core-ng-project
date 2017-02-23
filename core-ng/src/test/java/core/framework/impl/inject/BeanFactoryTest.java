@@ -1,7 +1,6 @@
 package core.framework.impl.inject;
 
 import core.framework.api.util.Types;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,6 +8,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.function.Supplier;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author neo
@@ -28,9 +29,9 @@ public class BeanFactoryTest {
         beanFactory.beans.put(new Key(Dependency3.class, null), new Dependency3());
 
         Bean bean = beanFactory.create(Bean.class);
-        Assert.assertNotNull(bean.dependency1);
-        Assert.assertNotNull(bean.dependency2);
-        Assert.assertNotNull(bean.dependency3);
+        assertNotNull(bean.dependency1);
+        assertNotNull(bean.dependency2);
+        assertNotNull(bean.dependency3);
     }
 
     @Test

@@ -18,7 +18,6 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author neo
@@ -37,10 +36,6 @@ public class BeanFactory {
             throw Exceptions.error("duplicated bean found, type={}, name={}, previous={}", type.getTypeName(), name, previous);
     }
 
-    public Set<Key> keys() {
-        return beans.keySet();
-    }
-
     public boolean registered(Type type, String name) {
         return beans.containsKey(new Key(type, name));
     }
@@ -49,20 +44,20 @@ public class BeanFactory {
         Key key = new Key(type, name);
         @SuppressWarnings("unchecked")
         T bean = (T) beans.get(key);
-        if (bean == null) throw new Error("can not find bean, type=" + type + ", name=" + name);
+        if (bean == null) throw Exceptions.error("can not find bean, type={}, name={}", type, name);
         return bean;
     }
 
     public <T> T create(Class<T> instanceClass) {
         if (instanceClass.isInterface() || Modifier.isAbstract(instanceClass.getModifiers()))
-            throw new Error("instance class must be concrete, class=" + instanceClass.getCanonicalName());
+            throw Exceptions.error("instance class must be concrete, class={}", instanceClass.getCanonicalName());
 
         try {
             T instance = construct(instanceClass);
             inject(instance);
             return instance;
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException | RuntimeException e) {
-            throw new Error("failed to build bean, instanceClass=" + instanceClass + ", error=" + e.getMessage(), e);
+            throw Exceptions.error("failed to create bean, instanceClass={}, error={}", instanceClass, e.getMessage(), e);
         }
     }
 
@@ -93,7 +88,6 @@ public class BeanFactory {
             for (Field field : visitorType.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Inject.class)) {
                     makeAccessible(field);
-
                     field.set(instance, lookupValue(field));
                 }
             }
@@ -101,7 +95,6 @@ public class BeanFactory {
             for (Method method : visitorType.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(Inject.class)) {
                     makeAccessible(method);
-
                     Object[] params = lookupParams(method);
                     method.invoke(instance, params);
                 }
