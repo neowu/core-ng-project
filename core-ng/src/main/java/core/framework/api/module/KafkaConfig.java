@@ -29,38 +29,45 @@ public final class KafkaConfig {
         state = context.config.kafka(name);
 
         if (state.kafka == null) {
-            if (context.isTest()) {
-                state.kafka = context.mockFactory.create(Kafka.class);
-            } else {
-                Kafka kafka = new Kafka(name, context.logManager);
-                context.metrics.add(kafka.producerMetrics);
-                context.metrics.add(kafka.consumerMetrics);
-                context.startupHook.add(kafka::initialize);
-                context.shutdownHook.add(kafka::close);
-                state.kafka = kafka;
-            }
+            state.kafka = createKafka(context, name);
+        }
+    }
+
+    private Kafka createKafka(ModuleContext context, String name) {
+        if (context.isTest()) {
+            return context.mockFactory.create(Kafka.class);
+        } else {
+            Kafka kafka = new Kafka(name, context.logManager);
+            context.metrics.add(kafka.producerMetrics);
+            context.metrics.add(kafka.consumerMetrics);
+            context.startupHook.add(kafka::initialize);
+            context.shutdownHook.add(kafka::close);
+            return kafka;
         }
     }
 
     public <T> void publish(String topic, Class<T> messageClass) {
+        if (state.kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
         logger.info("create message publisher, topic={}, messageClass={}, beanName={}", topic, messageClass.getTypeName(), name);
         state.kafka.validator.register(messageClass);
         MessagePublisher<T> publisher = new KafkaMessagePublisher<>(state.kafka.producer(), state.kafka.validator, topic, messageClass, context.logManager);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
-        state.producerAdded = true;
+        state.handlerAdded = true;
     }
 
     public <T> KafkaConfig subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler) {
-        state.kafka.validator.register(messageClass);
-        state.kafka.listener().subscribe(topic, messageClass, handler, null);
-        state.consumerAdded = true;
-        return this;
+        return subscribe(topic, messageClass, handler, null);
     }
 
     public <T> KafkaConfig subscribe(String topic, Class<T> messageClass, BulkMessageHandler<T> handler) {
+        return subscribe(topic, messageClass, null, handler);
+    }
+
+    private <T> KafkaConfig subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
+        if (state.kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
         state.kafka.validator.register(messageClass);
-        state.kafka.listener().subscribe(topic, messageClass, null, handler);
-        state.consumerAdded = true;
+        state.kafka.listener().subscribe(topic, messageClass, handler, bulkHandler);
+        state.handlerAdded = true;
         return this;
     }
 
@@ -69,8 +76,9 @@ public final class KafkaConfig {
     }
 
     public void uri(String uri) {
+        if (state.kafka.uri != null)
+            throw Exceptions.error("kafka({}).uri() is already configured, uri={}, previous={}", name == null ? "" : name, uri, state.kafka.uri);
         state.kafka.uri = uri;
-        state.uri = uri;
     }
 
     public void maxProcessTime(Duration timeout) {
@@ -80,18 +88,16 @@ public final class KafkaConfig {
     public static class KafkaConfigState {
         final String name;
         Kafka kafka;
-        String uri;
-        boolean producerAdded;
-        boolean consumerAdded;
+        boolean handlerAdded;
 
         public KafkaConfigState(String name) {
             this.name = name;
         }
 
         public void validate() {
-            if (uri == null) throw Exceptions.error("kafka({}).uri() must be configured", name == null ? "" : name);
-            if (!producerAdded && !consumerAdded)
-                throw Exceptions.error("kafka({}) is configured, but no producer or consumer added, please remove unnecessary config", name == null ? "" : name);
+            if (kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured", name == null ? "" : name);
+            if (!handlerAdded)
+                throw Exceptions.error("kafka({}) is configured, but no producer/consumer added, please remove unnecessary config", name == null ? "" : name);
         }
     }
 }
