@@ -51,15 +51,10 @@ public class TextContentFragment implements Fragment {
             char ch = text.charAt(index);
             switch (ch) {
                 case '<':
-                    return index;
                 case '>':
-                    return index;
                 case '"':
-                    return index;
                 case '&':
-                    return index;
                 case '\'':
-                    return index;
                 case '/':
                     return index;
                 default:
