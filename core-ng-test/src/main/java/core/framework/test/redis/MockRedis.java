@@ -11,7 +11,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 /**
  * @author neo
@@ -94,9 +93,9 @@ public final class MockRedis implements Redis {
 
     @Override
     public void forEach(String pattern, Consumer<String> consumer) {
-        Pattern keyPattern = Pattern.compile(pattern.replaceAll("\\*", "\\.\\*"));
+        KeyMatcher matcher = new KeyMatcher(pattern);
         for (String key : store.keySet()) {
-            if (keyPattern.matcher(key).matches()) {
+            if (matcher.matches(key)) {
                 consumer.accept(key);
             }
         }
