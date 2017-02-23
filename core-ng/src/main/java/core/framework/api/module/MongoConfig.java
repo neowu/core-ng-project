@@ -39,6 +39,7 @@ public final class MongoConfig {
     }
 
     public void uri(String uri) {
+        if (state.uri != null) throw Exceptions.error("mongo({}).uri() is already configured, uri={}, previous={}", name == null ? "" : name, uri, state.uri);
         mongo.uri(uri);
         state.uri = uri;
     }

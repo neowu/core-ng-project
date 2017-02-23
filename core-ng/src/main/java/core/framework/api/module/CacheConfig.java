@@ -51,9 +51,7 @@ public final class CacheConfig {
     }
 
     public void local() {
-        if (state.cacheManager != null) {
-            throw new Error("cache() is already configured, please configure cache store only once");
-        }
+        if (state.cacheManager != null) throw new Error("cache() is already configured, please configure cache store only once");
 
         logger.info("create local cache store");
         LocalCacheStore cacheStore = new LocalCacheStore();
@@ -64,9 +62,7 @@ public final class CacheConfig {
     }
 
     public void redis(String host) {
-        if (state.cacheManager != null) {
-            throw new Error("cache() is already configured, please configure cache store only once");
-        }
+        if (state.cacheManager != null) throw new Error("cache() is already configured, please configure cache store only once");
 
         if (context.isTest()) {
             logger.info("use local cache during test");
@@ -95,9 +91,7 @@ public final class CacheConfig {
     }
 
     public void add(String name, Type valueType, Duration duration) {
-        if (state.cacheManager == null) {
-            throw Exceptions.error("cache store is not configured");
-        }
+        if (state.cacheManager == null) throw Exceptions.error("cache() is not configured");
 
         String cacheName = cacheName(name, valueType);
         logger.info("add cache, cacheName={}, valueType={}, beanName={}", cacheName, valueType.getTypeName(), name);

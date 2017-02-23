@@ -39,6 +39,7 @@ public final class DBConfig {
     }
 
     public void url(String url) {
+        if (state.url != null) throw Exceptions.error("db({}).url() is already configured, url={}, previous={}", name == null ? "" : name, url, state.url);
         if (!context.isTest()) {
             database.url(url);
         } else {
