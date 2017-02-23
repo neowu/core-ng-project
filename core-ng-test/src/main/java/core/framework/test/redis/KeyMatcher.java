@@ -10,6 +10,7 @@ class KeyMatcher {
         this.pattern = pattern;
     }
 
+    // only support '*' and '?', refer to https://redis.io/commands/keys
     boolean matches(String key) {
         boolean state[][] = new boolean[key.length() + 1][pattern.length() + 1];
         state[0][0] = true;
