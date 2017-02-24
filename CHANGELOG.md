@@ -1,22 +1,10 @@
-## TODO
-* template, use ByteBuffer[] for performance tuning?
-* web: get/form post, validate bean class and code generation for param serialization?
-* general retry and throttling?
-* webservice/redis/mongo client: client retry on network issue?
-* website static content security check? (in server env, this is handled by nginx directly)
-* validator: annotation for website, like @HTMLSafeString?
-* cm: config management, dynamic update properties?
-* cache: advanced feature: local/remote 2 level, async get on expiration, pre warm?
-* faster synchronous rpc
-* mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
-* framework error, queue listener, background task error forward to kafka?
-
 ## Change log
 ### 4.10.5 (2/22/2017 - )
 * config: refactory module/config
 * bind: removed bindSupplier, not used anymore
 * queue: deprecate rabbitMQ
 * session: make session only supports https, with modern standard, https should be by default
+* http: StaticDirectoryController checks requested file must under directory
 
 ### 4.10.4 (2/14/2017 - 2/21/2017)
 * kafka: set default max process time to 15 mins

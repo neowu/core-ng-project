@@ -30,7 +30,7 @@ public final class StaticDirectoryController implements Controller {
         Path filePath = contentDirectory.resolve(path);
         logger.debug("requestFile={}", filePath);
 
-        if (!Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS))
+        if (!Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS) || !filePath.startsWith(contentDirectory))
             throw new NotFoundException("not found, path=" + request.path());
 
         File file = filePath.toFile();
