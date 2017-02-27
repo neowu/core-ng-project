@@ -7,6 +7,7 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
+import core.framework.api.util.StopWatch;
 import core.framework.api.util.Threads;
 import core.framework.api.util.Types;
 import core.framework.impl.json.JSONReader;
@@ -83,10 +84,15 @@ public class KafkaMessageListener {
     }
 
     private void process(Consumer<String, byte[]> consumer, ConsumerRecords<String, byte[]> records) {
+        StopWatch watch = new StopWatch();
+        int count = 0;
+        int size = 0;
         try {
             Map<String, List<ConsumerRecord<String, byte[]>>> messages = Maps.newLinkedHashMap();
             for (ConsumerRecord<String, byte[]> record : records) {
                 messages.computeIfAbsent(record.topic(), key -> Lists.newArrayList()).add(record);
+                count++;
+                size += record.value().length;
             }
             for (Map.Entry<String, List<ConsumerRecord<String, byte[]>>> entry : messages.entrySet()) {
                 String topic = entry.getKey();
@@ -102,6 +108,7 @@ public class KafkaMessageListener {
             }
         } finally {
             consumer.commitAsync();
+            logger.info("process kafka records, name={}, count={}, size={}, elapsedTime={}", name, count, size, watch.elapsedTime());
         }
     }
 

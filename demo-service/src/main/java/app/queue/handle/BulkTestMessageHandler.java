@@ -16,7 +16,6 @@ public class BulkTestMessageHandler implements BulkMessageHandler<TestMessage> {
 
     @Override
     public void handle(List<Message<TestMessage>> messages) throws Exception {
-        logger.warn("debug, message.size={}", messages.size());
         for (Message<TestMessage> message : messages) {
             logger.debug(message.key + " " + message.value.name);
         }

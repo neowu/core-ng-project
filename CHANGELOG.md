@@ -1,4 +1,7 @@
 ## Change log
+### 4.10.7 (2/27/2017 - )
+* kafka: log info on message poll
+
 ### 4.10.6 (2/27/2017)
 * kafka: support max poll records
 
