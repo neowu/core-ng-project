@@ -34,6 +34,7 @@ public class Kafka {
     public String uri;
     public MessageValidator validator = new MessageValidator();
     public Duration maxProcessTime = Duration.ofMinutes(15);
+    public int maxPollRecords = 500;    // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
     private Producer<String, byte[]> producer;
     private KafkaMessageListener listener;
 
@@ -79,6 +80,7 @@ public class Kafka {
             config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
             config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
+            config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
             String clientId = consumerClientId();
             config.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
             Consumer<String, byte[]> consumer = new KafkaConsumer<String, byte[]>(config, new StringDeserializer(), new ByteArrayDeserializer()) {

@@ -81,8 +81,13 @@ public final class KafkaConfig {
         state.kafka.uri = uri;
     }
 
-    public void maxProcessTime(Duration timeout) {
-        state.kafka.maxProcessTime = timeout;
+    public void maxProcessTime(Duration maxProcessTime) {
+        state.kafka.maxProcessTime = maxProcessTime;
+    }
+
+    public void maxPollRecords(int maxPollRecords) {
+        if (maxPollRecords <= 0) throw Exceptions.error("max poll records must be greater than 0, value={}", maxPollRecords);
+        state.kafka.maxPollRecords = maxPollRecords;
     }
 
     public static class KafkaConfigState {
