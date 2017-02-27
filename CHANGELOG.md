@@ -1,5 +1,5 @@
 ## Change log
-### 4.10.5 (2/22/2017 - )
+### 4.10.5 (2/22/2017 - 2/27/2017)
 * config: refactory module/config
 * bind: removed bindSupplier, not used anymore
 * queue: deprecate rabbitMQ
