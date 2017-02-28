@@ -41,9 +41,8 @@ public class ConsumerMetrics implements Metrics {
                 else if ("records-consumed-rate".equals(name.name())) recordsConsumedRate.put(clientId, entry.getValue());
                 else if ("bytes-consumed-rate".equals(name.name())) bytesConsumedRate.put(clientId, entry.getValue());
                 else if ("fetch-rate".equals(name.name())) fetchRate.put(clientId, entry.getValue());
-            } else if ("consumer-coordinator-metrics".equals(name.group())) {
-                if ("commit-latency-max".equals(name.name())) commitLatencyMax.put(clientId, entry.getValue());
-            }
+            } else if ("consumer-coordinator-metrics".equals(name.group()) && "commit-latency-max".equals(name.name()))
+                commitLatencyMax.put(clientId, entry.getValue());
         }
     }
 
