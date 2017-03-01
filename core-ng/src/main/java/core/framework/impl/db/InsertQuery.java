@@ -55,8 +55,8 @@ final class InsertQuery<T> {
     private Function<T, Object[]> paramBuilder(Class<T> entityClass, List<Field> paramFields) {
         CodeBuilder builder = new CodeBuilder();
         builder.append("public Object apply(Object value) {\n")
-            .indent(1).append("{} entity = ({}) value;", entityClass.getCanonicalName(), entityClass.getCanonicalName())
-            .indent(1).append("Object[] params = new Object[{}];\n", paramFields.size());
+               .indent(1).append("{} entity = ({}) value;", entityClass.getCanonicalName(), entityClass.getCanonicalName())
+               .indent(1).append("Object[] params = new Object[{}];\n", paramFields.size());
 
         int index = 0;
         for (Field paramField : paramFields) {
@@ -65,11 +65,11 @@ final class InsertQuery<T> {
         }
 
         builder.append("return params;\n")
-            .append("}");
+               .append("}");
 
-        return new DynamicInstanceBuilder<Function<T, Object[]>>(Function.class, InsertQuery.class.getCanonicalName() + "$" + entityClass.getSimpleName() + "$InsertQueryParamBuilder")
-            .addMethod(builder.build())
-            .build();
+        DynamicInstanceBuilder<Function<T, Object[]>> dynamicInstanceBuilder = new DynamicInstanceBuilder<>(Function.class, InsertQuery.class.getCanonicalName() + "$" + entityClass.getSimpleName() + "$InsertQueryParamBuilder");
+        dynamicInstanceBuilder.addMethod(builder.build());
+        return dynamicInstanceBuilder.build();
     }
 
     Object[] params(T entity) {

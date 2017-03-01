@@ -41,7 +41,7 @@ public class DynamicInstanceBuilder<T> {
         }
     }
 
-    public DynamicInstanceBuilder<T> constructor(Class[] constructorParamClasses, String body) {
+    public void constructor(Class[] constructorParamClasses, String body) {
         if (this.constructorParamClasses != null)
             throw new Error("dynamic class must have no more than one custom constructor");
 
@@ -55,26 +55,23 @@ public class DynamicInstanceBuilder<T> {
             CtConstructor constructor = new CtConstructor(params, classBuilder);
             constructor.setBody(body);
             classBuilder.addConstructor(constructor);
-            return this;
         } catch (CannotCompileException | NotFoundException e) {
             throw new CodeCompileException(e);
         }
     }
 
-    public DynamicInstanceBuilder<T> addMethod(String method) {
+    public void addMethod(String method) {
         try {
             classBuilder.addMethod(CtMethod.make(method, classBuilder));
-            return this;
         } catch (CannotCompileException e) {
             logger.error("method failed to compile:\n{}", method);
             throw new CodeCompileException(e);
         }
     }
 
-    public DynamicInstanceBuilder<T> addField(String field) {
+    public void addField(String field) {
         try {
             classBuilder.addField(CtField.make(field, classBuilder));
-            return this;
         } catch (CannotCompileException e) {
             logger.error("field failed to compile:\n{}", field);
             throw new CodeCompileException(e);

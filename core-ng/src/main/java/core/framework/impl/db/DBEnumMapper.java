@@ -21,8 +21,7 @@ final class DBEnumMapper<T extends Enum<T>> {
 
     public T getEnum(String value) {
         if (value == null) return null;
-        @SuppressWarnings("unchecked")
-        T enumValue = (T) mappings.get(value);
+        T enumValue = mappings.get(value);
         if (enumValue == null)
             throw Exceptions.error("can not parse value to enum, enumClass={}, value={}", enumClass.getCanonicalName(), value);
         return enumValue;

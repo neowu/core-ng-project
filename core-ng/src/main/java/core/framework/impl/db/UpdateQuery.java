@@ -73,9 +73,9 @@ final class UpdateQuery<T> {
         builder.indent(1).append("return new {}(sql.toString(), params.toArray());\n", Query.class.getCanonicalName())
                .append("}");
 
-        return new DynamicInstanceBuilder<Function<T, Query>>(Function.class, UpdateQuery.class.getCanonicalName() + "$" + entityClass.getSimpleName() + "$UpdateQueryBuilder")
-            .addMethod(builder.build())
-            .build();
+        DynamicInstanceBuilder<Function<T, Query>> dynamicInstanceBuilder = new DynamicInstanceBuilder<>(Function.class, UpdateQuery.class.getCanonicalName() + "$" + entityClass.getSimpleName() + "$UpdateQueryBuilder");
+        dynamicInstanceBuilder.addMethod(builder.build());
+        return dynamicInstanceBuilder.build();
     }
 
     Query query(T entity) {

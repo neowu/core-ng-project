@@ -38,11 +38,7 @@ class PathNode {
             String pattern = matcher.group(3);
             return registerDynamicNode(pathPattern, currentPath, name, pattern);
         } else {
-            PathNode staticNode = staticNodes.get(currentPath.value);
-            if (staticNode == null) {
-                staticNode = new PathNode();
-                staticNodes.put(currentPath.value, staticNode);
-            }
+            PathNode staticNode = staticNodes.computeIfAbsent(currentPath.value, key -> new PathNode());
             return staticNode.register(pathPattern, currentPath.next);
         }
     }
@@ -68,8 +64,7 @@ class PathNode {
             if ((paramPattern == null && dynamicNode.pattern == null)
                 || (paramPattern != null && paramPattern.equals(dynamicNode.pattern.pattern()))) {
                 if (!Strings.equals(dynamicNode.param, paramName))
-                    throw Exceptions.error("conflict dynamic pattern found, path={}, param={}, conflictedParam={}",
-                        pathPattern, paramName, dynamicNode.param);
+                    throw Exceptions.error("conflict dynamic pattern found, path={}, param={}, conflictedParam={}", pathPattern, paramName, dynamicNode.param);
                 return dynamicNode;
             }
         }

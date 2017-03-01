@@ -30,11 +30,7 @@ public final class Route {
         if (path.contains("/:")) {
             handler = dynamicRoot.register(path);
         } else {
-            handler = staticHandlers.get(path);
-            if (handler == null) {
-                handler = new URLHandler(path);
-                staticHandlers.put(path, handler);
-            }
+            handler = staticHandlers.computeIfAbsent(path, k -> new URLHandler(path));
         }
         handler.put(method, controller);
     }
