@@ -27,16 +27,20 @@ public class WebServiceImplValidator<T> {
             Class<?>[] parameterTypes = method.getParameterTypes();
             try {
                 Method serviceMethod = serviceClass.getMethod(method.getName(), parameterTypes);
-                Annotation[][] parameterAnnotations = serviceMethod.getParameterAnnotations();
-                for (Annotation[] parameterAnnotation : parameterAnnotations) {
-                    for (Annotation annotation : parameterAnnotation) {
-                        if (PathParam.class.equals(annotation.annotationType())) {
-                            throw Exceptions.error("service impl must not have @PathParam, method={}", serviceMethod);
-                        }
-                    }
-                }
+                validateMethod(serviceMethod);
             } catch (NoSuchMethodException e) {
                 throw new Error("failed to find impl method", e);
+            }
+        }
+    }
+
+    private void validateMethod(Method serviceMethod) {
+        Annotation[][] parameterAnnotations = serviceMethod.getParameterAnnotations();
+        for (Annotation[] parameterAnnotation : parameterAnnotations) {
+            for (Annotation annotation : parameterAnnotation) {
+                if (PathParam.class.equals(annotation.annotationType())) {
+                    throw Exceptions.error("service impl must not have @PathParam, method={}", serviceMethod);
+                }
             }
         }
     }
