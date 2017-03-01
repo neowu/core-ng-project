@@ -9,11 +9,12 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.BeanValidator;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.service.HTTPMethodHelper;
-import core.framework.impl.web.service.ServiceControllerBuilder;
-import core.framework.impl.web.service.ServiceInterfaceValidator;
 import core.framework.impl.web.service.WebServiceClient;
 import core.framework.impl.web.service.WebServiceClientBuilder;
 import core.framework.impl.web.service.WebServiceClientImpl;
+import core.framework.impl.web.service.WebServiceControllerBuilder;
+import core.framework.impl.web.service.WebServiceImplValidator;
+import core.framework.impl.web.service.WebServiceInterfaceValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +34,14 @@ public final class APIConfig {
     public <T> void service(Class<T> serviceInterface, T service) {
         logger.info("create api service, interface={}", serviceInterface.getCanonicalName());
         BeanValidator validator = context.httpServer.handler.validator;
-        new ServiceInterfaceValidator(serviceInterface, validator).validate();
+        new WebServiceInterfaceValidator(serviceInterface, validator).validate();
+        new WebServiceImplValidator<>(serviceInterface, service).validate();
 
         Method[] methods = serviceInterface.getDeclaredMethods();
         for (Method method : methods) {
             HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
             String path = method.getDeclaredAnnotation(Path.class).value();
-            Controller controller = new ServiceControllerBuilder<>(serviceInterface, service, method).build();
+            Controller controller = new WebServiceControllerBuilder<>(serviceInterface, service, method).build();
             try {
                 Class<?>[] parameterTypes = method.getParameterTypes();
                 Method targetMethod = service.getClass().getMethod(method.getName(), parameterTypes);
@@ -53,7 +55,7 @@ public final class APIConfig {
     public <T> WebServiceClientConfig client(Class<T> serviceInterface, String serviceURL) {
         logger.info("create api service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         BeanValidator validator = context.httpServer.handler.validator;
-        new ServiceInterfaceValidator(serviceInterface, validator).validate();
+        new WebServiceInterfaceValidator(serviceInterface, validator).validate();
 
         if (context.isTest()) {
             context.beanFactory.bind(serviceInterface, null, context.mockFactory.create(serviceInterface));

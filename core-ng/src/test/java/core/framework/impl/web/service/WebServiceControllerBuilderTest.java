@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
-public class ServiceControllerBuilderTest {
+public class WebServiceControllerBuilderTest {
     private Request request;
     private TestWebServiceImpl serviceImpl;
 
@@ -34,7 +34,7 @@ public class ServiceControllerBuilderTest {
     public void get() throws Exception {
         when(request.pathParam("id", Integer.class)).thenReturn(1);
 
-        Controller controller = new ServiceControllerBuilder<>(TestWebService.class,
+        Controller controller = new WebServiceControllerBuilder<>(TestWebService.class,
             serviceImpl,
             TestWebService.class.getDeclaredMethod("get", Integer.class))
             .build();
@@ -53,7 +53,7 @@ public class ServiceControllerBuilderTest {
         when(request.pathParam("id", Integer.class)).thenReturn(1);
         when(request.bean(TestWebService.TestRequest.class)).thenReturn(requestBean);
 
-        Controller controller = new ServiceControllerBuilder<>(TestWebService.class,
+        Controller controller = new WebServiceControllerBuilder<>(TestWebService.class,
             serviceImpl,
             TestWebService.class.getDeclaredMethod("create", Integer.class, TestWebService.TestRequest.class))
             .build();
@@ -68,7 +68,7 @@ public class ServiceControllerBuilderTest {
 
         when(request.bean(Types.list(TestWebService.TestRequest.class))).thenReturn(Lists.newArrayList(requestBean));
 
-        Controller controller = new ServiceControllerBuilder<>(TestWebService.class,
+        Controller controller = new WebServiceControllerBuilder<>(TestWebService.class,
             serviceImpl,
             TestWebService.class.getDeclaredMethod("batch", List.class))
             .build();

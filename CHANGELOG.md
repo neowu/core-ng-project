@@ -1,6 +1,6 @@
 ## Change log
 ### 4.10.8 (2/28/2017 - )
-
+* api: validate webservice impl method should not have @PathParam()
 
 ### 4.10.7 (2/27/2017 - 2/28/2017)
 * kafka: log info on message poll

@@ -20,11 +20,11 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class ServiceInterfaceValidator {
+public class WebServiceInterfaceValidator {
     private final Class<?> serviceInterface;
     private final BeanValidator validator;
 
-    public ServiceInterfaceValidator(Class<?> serviceInterface, BeanValidator validator) {
+    public WebServiceInterfaceValidator(Class<?> serviceInterface, BeanValidator validator) {
         this.serviceInterface = serviceInterface;
         this.validator = validator;
     }

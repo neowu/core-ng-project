@@ -6,9 +6,9 @@ import org.junit.Test;
 /**
  * @author neo
  */
-public class ServiceInterfaceValidatorTest {
+public class WebServiceInterfaceValidatorTest {
     @Test
     public void validate() {
-        new ServiceInterfaceValidator(TestWebService.class, new BeanValidator()).validate();
+        new WebServiceInterfaceValidator(TestWebService.class, new BeanValidator()).validate();
     }
 }
