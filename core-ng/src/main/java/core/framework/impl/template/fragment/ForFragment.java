@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * @author neo
  */
 public class ForFragment extends ContainerFragment {
-    private static final Pattern STATEMENT_PATTERN = Pattern.compile("([a-zA-Z1-9]+):([#a-zA-Z1-9\\.\\(\\)]+)");
+    private static final Pattern STATEMENT_PATTERN = Pattern.compile("([a-zA-Z0-9]+):([#a-zA-Z0-9\\.\\(\\)]+)");
     public final String variable;
     public final Class<?> valueClass;
     private final ExpressionHolder expression;
