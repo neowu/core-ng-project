@@ -1,10 +1,11 @@
 package core.framework.impl.kafka;
 
-import core.framework.api.util.Maps;
+import core.framework.api.util.Lists;
 import core.framework.impl.log.stat.Metrics;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,11 +13,11 @@ import java.util.Map;
  */
 public class ConsumerMetrics implements Metrics {
     private final String name;
-    private final Map<String, Metric> recordsLagMax = Maps.newConcurrentHashMap();
-    private final Map<String, Metric> recordsConsumedRate = Maps.newConcurrentHashMap();
-    private final Map<String, Metric> bytesConsumedRate = Maps.newConcurrentHashMap();
-    private final Map<String, Metric> fetchRate = Maps.newConcurrentHashMap();
-    private final Map<String, Metric> commitLatencyMax = Maps.newConcurrentHashMap();
+    private final List<Metric> recordsLagMax = Lists.newArrayList();
+    private final List<Metric> recordsConsumedRate = Lists.newArrayList();
+    private final List<Metric> bytesConsumedRate = Lists.newArrayList();
+    private final List<Metric> fetchRate = Lists.newArrayList();
+    private final List<Metric> commitLatencyMax = Lists.newArrayList();
 
     ConsumerMetrics(String name) {
         this.name = name;
@@ -33,33 +34,25 @@ public class ConsumerMetrics implements Metrics {
         }
     }
 
-    void addMetrics(String clientId, Map<MetricName, ? extends Metric> kafkaMetrics) {
+    void addMetrics(Map<MetricName, ? extends Metric> kafkaMetrics) {
         for (Map.Entry<MetricName, ? extends Metric> entry : kafkaMetrics.entrySet()) {
             MetricName name = entry.getKey();
             if ("consumer-fetch-manager-metrics".equals(name.group())) {
-                if ("records-lag-max".equals(name.name())) recordsLagMax.put(clientId, entry.getValue());
-                else if ("records-consumed-rate".equals(name.name())) recordsConsumedRate.put(clientId, entry.getValue());
-                else if ("bytes-consumed-rate".equals(name.name())) bytesConsumedRate.put(clientId, entry.getValue());
-                else if ("fetch-rate".equals(name.name())) fetchRate.put(clientId, entry.getValue());
+                if ("records-lag-max".equals(name.name())) recordsLagMax.add(entry.getValue());
+                else if ("records-consumed-rate".equals(name.name())) recordsConsumedRate.add(entry.getValue());
+                else if ("bytes-consumed-rate".equals(name.name())) bytesConsumedRate.add(entry.getValue());
+                else if ("fetch-rate".equals(name.name())) fetchRate.add(entry.getValue());
             } else if ("consumer-coordinator-metrics".equals(name.group()) && "commit-latency-max".equals(name.name()))
-                commitLatencyMax.put(clientId, entry.getValue());
+                commitLatencyMax.add(entry.getValue());
         }
     }
 
-    void removeMetrics(String clientId) {
-        recordsLagMax.remove(clientId);
-        recordsConsumedRate.remove(clientId);
-        bytesConsumedRate.remove(clientId);
-        fetchRate.remove(clientId);
-        commitLatencyMax.remove(clientId);
+    private double sum(List<Metric> metrics) {
+        return metrics.stream().mapToDouble(Metric::value).filter(Double::isFinite).sum();
     }
 
-    private double sum(Map<String, Metric> metrics) {
-        return metrics.values().stream().mapToDouble(Metric::value).filter(Double::isFinite).sum();
-    }
-
-    private double max(Map<String, Metric> metrics) {
-        return metrics.values().stream().mapToDouble(Metric::value).filter(Double::isFinite).max().orElse(0);
+    private double max(List<Metric> metrics) {
+        return metrics.stream().mapToDouble(Metric::value).filter(Double::isFinite).max().orElse(0);
     }
 
     String statName(String statName) {

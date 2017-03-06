@@ -126,8 +126,7 @@ project(':demo-service') {
 
     dependencies {
         compile(
-                project(':core-ng'),
-                "org.apache.kafka:kafka-clients:${kafkaVersion}"
+                project(':core-ng')
         )
         runtime(
                 "org.apache.kafka:kafka-clients:${kafkaVersion}"

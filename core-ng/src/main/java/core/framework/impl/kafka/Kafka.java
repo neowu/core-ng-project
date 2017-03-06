@@ -33,7 +33,7 @@ public class Kafka {
     private final AtomicInteger consumerClientIdSequence = new AtomicInteger(1);
     public String uri;
     public MessageValidator validator = new MessageValidator();
-    public Duration maxProcessTime = Duration.ofMinutes(15);
+    public Duration maxProcessTime = Duration.ofMinutes(30);
     public int maxPollRecords = 500;    // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
     private Producer<String, byte[]> producer;
     private KafkaMessageListener listener;
@@ -83,15 +83,9 @@ public class Kafka {
             config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
             String clientId = consumerClientId();
             config.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
-            Consumer<String, byte[]> consumer = new KafkaConsumer<String, byte[]>(config, new StringDeserializer(), new ByteArrayDeserializer()) {
-                @Override
-                public void close() {
-                    super.close();
-                    consumerMetrics.removeMetrics(clientId);
-                }
-            };
+            Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
             consumer.subscribe(topics);
-            consumerMetrics.addMetrics(clientId, consumer.metrics());
+            consumerMetrics.addMetrics(consumer.metrics());
             return consumer;
         } finally {
             logger.info("create kafka consumer, uri={}, name={}, topics={}, elapsedTime={}", uri, name, topics, watch.elapsedTime());
@@ -126,7 +120,7 @@ public class Kafka {
     public void close() {
         if (listener != null) listener.stop();
         if (producer != null) {
-            logger.info("close kafka producer, uri={}", uri);
+            logger.info("close kafka producer, name={}, uri={}", name, uri);
             producer.flush();
             producer.close();
         }
