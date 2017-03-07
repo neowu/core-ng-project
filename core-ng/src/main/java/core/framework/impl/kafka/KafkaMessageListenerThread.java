@@ -105,9 +105,8 @@ class KafkaMessageListenerThread extends Thread {
         JSONReader<KafkaMessage<T>> reader = readers.get(topic);
         for (ConsumerRecord<String, byte[]> record : records) {
             logManager.begin("=== message handling begin ===");
-            StopWatch watch = new StopWatch();
+            ActionLog actionLog = logManager.currentActionLog();
             try {
-                ActionLog actionLog = logManager.currentActionLog();
                 actionLog.action("topic/" + topic);
                 actionLog.context("topic", topic);
                 actionLog.context("handler", handler.getClass().getCanonicalName());
@@ -128,7 +127,7 @@ class KafkaMessageListenerThread extends Thread {
             } catch (Throwable e) {
                 logManager.logError(e);
             } finally {
-                long elapsedTime = watch.elapsedTime();
+                long elapsedTime = actionLog.elapsedTime();
                 if (elapsedTime > tooLongToProcessInNanoThreshold) {
                     logger.warn(Markers.errorCode("TOO_LONG_TO_PROCESS"), "took too long to consume message, elapsedTime={}", elapsedTime);
                 }
@@ -139,11 +138,10 @@ class KafkaMessageListenerThread extends Thread {
 
     private <T> void handle(String topic, BulkMessageHandler<T> bulkHandler, List<ConsumerRecord<String, byte[]>> records, double tooLongToProcessInNanoThreshold) {
         logManager.begin("=== message handling begin ===");
-        StopWatch watch = new StopWatch();
+        ActionLog actionLog = logManager.currentActionLog();
         try {
             @SuppressWarnings("unchecked")
             JSONReader<KafkaMessage<T>> reader = readers.get(topic);
-            ActionLog actionLog = logManager.currentActionLog();
             actionLog.action("topic/" + topic);
             actionLog.context("topic", topic);
             actionLog.context("handler", bulkHandler.getClass().getCanonicalName());
@@ -162,7 +160,7 @@ class KafkaMessageListenerThread extends Thread {
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
-            long elapsedTime = watch.elapsedTime();
+            long elapsedTime = actionLog.elapsedTime();
             if (elapsedTime > tooLongToProcessInNanoThreshold) {
                 logger.warn(Markers.errorCode("TOO_LONG_TO_PROCESS"), "took too long to consume message, elapsedTime={}", elapsedTime);
             }

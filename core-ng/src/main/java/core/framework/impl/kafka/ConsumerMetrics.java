@@ -17,7 +17,6 @@ public class ConsumerMetrics implements Metrics {
     private final List<Metric> recordsConsumedRate = Lists.newArrayList();
     private final List<Metric> bytesConsumedRate = Lists.newArrayList();
     private final List<Metric> fetchRate = Lists.newArrayList();
-    private final List<Metric> commitLatencyMax = Lists.newArrayList();
 
     ConsumerMetrics(String name) {
         this.name = name;
@@ -30,7 +29,6 @@ public class ConsumerMetrics implements Metrics {
             stats.put(statName("records_consumed_rate"), sum(recordsConsumedRate));
             stats.put(statName("bytes_consumed_rate"), sum(bytesConsumedRate));
             stats.put(statName("fetch_rate"), sum(fetchRate));
-            stats.put(statName("commit_max_latency"), max(commitLatencyMax));
         }
     }
 
@@ -42,17 +40,12 @@ public class ConsumerMetrics implements Metrics {
                 else if ("records-consumed-rate".equals(name.name())) recordsConsumedRate.add(entry.getValue());
                 else if ("bytes-consumed-rate".equals(name.name())) bytesConsumedRate.add(entry.getValue());
                 else if ("fetch-rate".equals(name.name())) fetchRate.add(entry.getValue());
-            } else if ("consumer-coordinator-metrics".equals(name.group()) && "commit-latency-max".equals(name.name()))
-                commitLatencyMax.add(entry.getValue());
+            }
         }
     }
 
     private double sum(List<Metric> metrics) {
         return metrics.stream().mapToDouble(Metric::value).filter(Double::isFinite).sum();
-    }
-
-    private double max(List<Metric> metrics) {
-        return metrics.stream().mapToDouble(Metric::value).filter(Double::isFinite).max().orElse(0);
     }
 
     String statName(String statName) {

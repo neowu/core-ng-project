@@ -51,9 +51,13 @@ public final class ActionLog {
 
     void end(String message) {
         cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
-        elapsed = System.nanoTime() - startElapsed;
+        elapsed = elapsedTime();
         log("[context] elapsed={}", elapsed);
         log(message);
+    }
+
+    public long elapsedTime() {
+        return System.nanoTime() - startElapsed;
     }
 
     void process(LogEvent event) {
