@@ -1,5 +1,5 @@
 ## Change log
-### 4.10.9 (3/3/2017 - )
+### 4.10.9 (3/3/2017 - 3/7/2017)
 * lib: update kafka to 0.10.2.0, es to 5.2.2
 * kafka: simplify listener, warn if took too long to consume message
 
