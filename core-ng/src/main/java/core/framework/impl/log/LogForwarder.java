@@ -78,8 +78,7 @@ public final class LogForwarder {
                     }
                 }
             }
-        });
-        logForwarderThread.setName("log-forwarder");
+        }, "log-forwarder");
         logForwarderThread.setPriority(Thread.NORM_PRIORITY - 1);
     }
 

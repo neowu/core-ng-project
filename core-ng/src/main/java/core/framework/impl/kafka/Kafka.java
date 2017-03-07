@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author neo
@@ -30,7 +29,6 @@ public class Kafka {
     private final Logger logger = LoggerFactory.getLogger(Kafka.class);
     private final String name;
     private final LogManager logManager;
-    private final AtomicInteger consumerClientIdSequence = new AtomicInteger(1);
     public String uri;
     public MessageValidator validator = new MessageValidator();
     public Duration maxProcessTime = Duration.ofMinutes(30);
@@ -59,7 +57,6 @@ public class Kafka {
             Map<String, Object> config = Maps.newHashMap();
             config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
             config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
-            config.put(ProducerConfig.CLIENT_ID_CONFIG, producerClientId());
             Producer<String, byte[]> producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
             producerMetrics.setMetrics(producer.metrics());
             return producer;
@@ -81,8 +78,6 @@ public class Kafka {
             config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
             config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
             config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
-            String clientId = consumerClientId();
-            config.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);
             Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
             consumer.subscribe(topics);
             consumerMetrics.addMetrics(consumer.metrics());
@@ -90,20 +85,6 @@ public class Kafka {
         } finally {
             logger.info("create kafka consumer, uri={}, name={}, topics={}, elapsedTime={}", uri, name, topics, watch.elapsedTime());
         }
-    }
-
-    private String producerClientId() {
-        StringBuilder clientId = new StringBuilder("kafka-producer");
-        if (name != null) clientId.append('-').append(name);
-        clientId.append("-1");
-        return clientId.toString();
-    }
-
-    private String consumerClientId() {
-        StringBuilder clientId = new StringBuilder("kafka-consumer");
-        if (name != null) clientId.append('-').append(name);
-        clientId.append('-').append(consumerClientIdSequence.getAndIncrement());
-        return clientId.toString();
     }
 
     public KafkaMessageListener listener() {
