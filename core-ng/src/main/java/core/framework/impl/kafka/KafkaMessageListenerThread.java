@@ -36,7 +36,7 @@ class KafkaMessageListenerThread extends Thread {
     private final Map<String, JSONReader> readers;
     private final MessageValidator validator;
     private final LogManager logManager;
-    private final double tooLongToProcessInNanoThreshold;
+    private final double longProcessThresholdInNano;
 
     KafkaMessageListenerThread(String name, Consumer<String, byte[]> consumer, KafkaMessageListener listener) {
         super(name);
@@ -46,7 +46,7 @@ class KafkaMessageListenerThread extends Thread {
         readers = listener.readers;
         validator = listener.kafka.validator;
         logManager = listener.logManager;
-        tooLongToProcessInNanoThreshold = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time to max
+        longProcessThresholdInNano = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time to max
     }
 
     @Override
@@ -86,12 +86,12 @@ class KafkaMessageListenerThread extends Thread {
                 List<ConsumerRecord<String, byte[]>> records = entry.getValue();
                 BulkMessageHandler<?> bulkHandler = bulkHandlers.get(topic);
                 if (bulkHandler != null) {
-                    handle(topic, bulkHandler, records, tooLongToProcessInNanoThreshold * records.size() / size);
+                    handle(topic, bulkHandler, records, longProcessThresholdInNano * records.size() / size);
                     continue;
                 }
                 MessageHandler<?> handler = handlers.get(topic);
                 if (handler != null) {
-                    handle(topic, handler, records, tooLongToProcessInNanoThreshold / size);
+                    handle(topic, handler, records, longProcessThresholdInNano / size);
                 }
             }
         } finally {
@@ -129,14 +129,14 @@ class KafkaMessageListenerThread extends Thread {
             } finally {
                 long elapsedTime = actionLog.elapsedTime();
                 if (elapsedTime > tooLongToProcessInNanoThreshold) {
-                    logger.warn(Markers.errorCode("TOO_LONG_TO_PROCESS"), "took too long to consume message, elapsedTime={}", elapsedTime);
+                    logger.warn(Markers.errorCode("LONG_PROCESS"), "took too long to process message, elapsedTime={}", elapsedTime);
                 }
                 logManager.end("=== message handling end ===");
             }
         }
     }
 
-    private <T> void handle(String topic, BulkMessageHandler<T> bulkHandler, List<ConsumerRecord<String, byte[]>> records, double tooLongToProcessInNanoThreshold) {
+    private <T> void handle(String topic, BulkMessageHandler<T> bulkHandler, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
         logManager.begin("=== message handling begin ===");
         ActionLog actionLog = logManager.currentActionLog();
         try {
@@ -161,8 +161,8 @@ class KafkaMessageListenerThread extends Thread {
             logManager.logError(e);
         } finally {
             long elapsedTime = actionLog.elapsedTime();
-            if (elapsedTime > tooLongToProcessInNanoThreshold) {
-                logger.warn(Markers.errorCode("TOO_LONG_TO_PROCESS"), "took too long to consume message, elapsedTime={}", elapsedTime);
+            if (elapsedTime > longProcessThresholdInNano) {
+                logger.warn(Markers.errorCode("LONG_PROCESS"), "took too long to process message, elapsedTime={}", elapsedTime);
             }
             logManager.end("=== message handling end ===");
         }
