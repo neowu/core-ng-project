@@ -11,7 +11,7 @@ import core.framework.api.Module;
 public class QueueModule extends Module {
     @Override
     protected void initialize() {
-        kafka("trace").uri("localhost:9092");
+        kafka("trace").uri("kafka:9092");
         kafka("trace").publish("k-test-1", TestMessage.class);
 
         kafka("trace").subscribe("k-test-1", TestMessage.class, bind(BulkTestMessageHandler.class))

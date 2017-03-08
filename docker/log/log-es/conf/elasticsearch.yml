@@ -1,8 +1,0 @@
-network.bind_host: 0.0.0.0
-network.publish_host: _site_
-index.search.slowlog.threshold.query.warn: 10s
-index.search.slowlog.threshold.fetch.warn: 1s
-index.indexing.slowlog.threshold.index.warn: 10s
-# https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html
-# https://www.elastic.co/guide/en/elasticsearch/guide/current/indexing-performance.html
-index.refresh_interval: 5s

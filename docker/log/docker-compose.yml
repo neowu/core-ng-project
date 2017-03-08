@@ -1,29 +1,32 @@
-version: "2"
+version: "3"
 services:
-  es:
-    build: ./log-es
-    image: log-es
-    command: -Des.node.name="log-es-1" -Des.cluster.name="log-es"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.2.2
     ports:
       - 9200:9200
       - 9300:9300
     environment:
-      - ES_HEAP_SIZE=1g
+      - cluster.name=log
+      - http.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
   kibana:
-    image: kibana
+    image: docker.elastic.co/kibana/kibana:5.2.2
     ports:
       - 5601:5601
     environment:
-      - ELASTICSEARCH_URL=http://es:9200
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - xpack.security.enabled=false
     depends_on:
-      - es
+      - elasticsearch
   zookeeper:
     image: zookeeper
     ports:
       - 2181
   kafka:
-    build: ./log-kafka
-    image: log-kafka
+    build: ./kafka
+    image: kafka
     ports:
       - 9092:9092
     depends_on:
@@ -33,3 +36,4 @@ services:
     image: log-processor
     depends_on:
       - kafka
+      - elasticsearch

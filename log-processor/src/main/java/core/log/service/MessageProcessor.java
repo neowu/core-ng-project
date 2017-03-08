@@ -36,25 +36,24 @@ public class MessageProcessor {
     private final JSONReader<ActionLogMessage> actionLogMessageReader = JSONReader.of(ActionLogMessage.class);
     private final JSONReader<StatMessage> statMessageReader = JSONReader.of(StatMessage.class);
     private final KafkaConsumer<String, byte[]> kafkaConsumer;
-    private final ActionManager actionManager;
-    private final StatManager statManager;
 
     public MessageProcessor(String kafkaURI, ActionManager actionManager, StatManager statManager) {
-        this.actionManager = actionManager;
-        this.statManager = statManager;
         Map<String, Object> config = Maps.newHashMap();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaURI);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "log-processor");
         config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         kafkaConsumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
+        kafkaConsumer.subscribe(Lists.newArrayList(TOPIC_ACTION_LOG, TOPIC_STAT));
 
         processorThread = new Thread(() -> {
-            logger.info("message processor thread started, kafkaURI={}", kafkaURI);
+            logger.info("message processor started, kafkaURI={}", kafkaURI);
             while (!stop.get()) {
                 try {
-                    kafkaConsumer.subscribe(Lists.newArrayList(TOPIC_ACTION_LOG, TOPIC_STAT));
-                    process(kafkaConsumer);
+                    ConsumerRecords<String, byte[]> records = kafkaConsumer.poll(Long.MAX_VALUE);
+                    consume(TOPIC_ACTION_LOG, records, actionLogMessageReader, actionManager::index);
+                    consume(TOPIC_STAT, records, statMessageReader, statManager::index);
+                    kafkaConsumer.commitAsync();
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
                         logger.error("failed to process message, retry in 30 seconds", e);
@@ -63,7 +62,7 @@ public class MessageProcessor {
                 }
             }
             kafkaConsumer.close();
-            logger.info("message processor thread stopped");
+            logger.info("message processor stopped");
         }, "message-processor");
     }
 
@@ -74,15 +73,6 @@ public class MessageProcessor {
     public void stop() {
         stop.set(true);
         kafkaConsumer.wakeup();
-    }
-
-    private void process(KafkaConsumer<String, byte[]> kafkaConsumer) {
-        while (!stop.get()) {
-            ConsumerRecords<String, byte[]> records = kafkaConsumer.poll(Long.MAX_VALUE);
-            consume(TOPIC_ACTION_LOG, records, actionLogMessageReader, actionManager::index);
-            consume(TOPIC_STAT, records, statMessageReader, statManager::index);
-            kafkaConsumer.commitAsync();
-        }
     }
 
     private <T> void consume(String topic, ConsumerRecords<String, byte[]> records, JSONReader<T> reader, Consumer<List<T>> consumer) {
@@ -100,7 +90,7 @@ public class MessageProcessor {
             consumer.accept(messages);
         } finally {
             long elapsedTime = watch.elapsedTime();
-            logger.info("consume messages, topic={}, size={}, messageSize={}, elapsedTime={}", topic, messages.size(), messageSize, elapsedTime);
+            logger.info("consume messages, topic={}, count={}, size={}, elapsedTime={}", topic, messages.size(), messageSize, elapsedTime);
         }
     }
 }

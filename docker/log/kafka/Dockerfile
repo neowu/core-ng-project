@@ -1,8 +1,7 @@
 FROM        openjdk:jre
 MAINTAINER  neo
-ENV         KAFKA_VERSION=0.10.0.1 SCALA_VERSION=2.11
+ENV         KAFKA_VERSION=0.10.2.0 SCALA_VERSION=2.12
 ADD         http://www.us.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz /tmp/
-# COPY         kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz /tmp/
 RUN         mkdir -p /opt \
                 && tar xfz /tmp/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz -C /opt \
                 && rm /tmp/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz \
