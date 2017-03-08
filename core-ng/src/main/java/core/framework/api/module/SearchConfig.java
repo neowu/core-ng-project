@@ -40,7 +40,9 @@ public final class SearchConfig {
     }
 
     public void host(String host) {
-        search.host(host);
+        if (!context.isTest()) {
+            search.host(host);      // es requires host must be resolved, skip for unit test
+        }
         state.host = host;
     }
 
