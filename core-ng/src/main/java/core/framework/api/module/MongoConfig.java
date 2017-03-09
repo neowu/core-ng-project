@@ -14,66 +14,69 @@ import java.time.Duration;
  */
 public final class MongoConfig {
     private final ModuleContext context;
-    private final MongoImpl mongo;
     private final String name;
     private final MongoConfigState state;
 
     public MongoConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-
-        if (context.beanFactory.registered(Mongo.class, name)) {
-            mongo = context.beanFactory.bean(Mongo.class, name);
-        } else {
-            if (context.isTest()) {
-                mongo = context.mockFactory.create(MongoImpl.class);
-            } else {
-                mongo = new MongoImpl();
-                context.startupHook.add(mongo::initialize);
-                context.shutdownHook.add(mongo::close);
-            }
-            context.beanFactory.bind(Mongo.class, name, mongo);
-        }
-
         state = context.config.mongo(name);
+
+        if (state.mongo == null) {
+            state.mongo = createMongo();
+        }
+    }
+
+    private MongoImpl createMongo() {
+        MongoImpl mongo;
+        if (context.isTest()) {
+            mongo = context.mockFactory.create(MongoImpl.class);
+        } else {
+            mongo = new MongoImpl();
+            context.startupHook.add(mongo::initialize);
+            context.shutdownHook.add(mongo::close);
+        }
+        context.beanFactory.bind(Mongo.class, name, mongo);
+        return mongo;
     }
 
     public void uri(String uri) {
         if (state.uri != null) throw Exceptions.error("mongo({}).uri() is already configured, uri={}, previous={}", name == null ? "" : name, uri, state.uri);
-        mongo.uri(uri);
+        state.mongo.uri(uri);
         state.uri = uri;
     }
 
     public void poolSize(int minSize, int maxSize) {
-        mongo.poolSize(minSize, maxSize);
+        state.mongo.poolSize(minSize, maxSize);
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        mongo.slowOperationThreshold(threshold);
+        state.mongo.slowOperationThreshold(threshold);
     }
 
     public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
-        mongo.tooManyRowsReturnedThreshold(tooManyRowsReturnedThreshold);
+        state.mongo.tooManyRowsReturnedThreshold(tooManyRowsReturnedThreshold);
     }
 
     public void timeout(Duration timeout) {
-        mongo.timeout(timeout);
+        state.mongo.timeout(timeout);
     }
 
     public <T> void collection(Class<T> entityClass) {
         if (state.uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
-        context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, mongo.collection(entityClass));
+        context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, state.mongo.collection(entityClass));
         state.entityAdded = true;
     }
 
     public <T> void view(Class<T> viewClass) {
         if (state.uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
-        mongo.view(viewClass);
+        state.mongo.view(viewClass);
         state.entityAdded = true;
     }
 
     public static class MongoConfigState {
         final String name;
+        MongoImpl mongo;
         String uri;
         boolean entityAdded;
 

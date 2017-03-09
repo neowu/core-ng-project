@@ -16,11 +16,11 @@ public class DBConfigTest {
         ModuleContext context = new ModuleContext(new BeanFactory(), null);
         DBConfig defaultDB1 = new DBConfig(context, null);
         DBConfig otherDB1 = new DBConfig(context, "other");
-        assertNotSame(defaultDB1.database, otherDB1.database);
+        assertNotSame(defaultDB1.state.database, otherDB1.state.database);
 
         DBConfig defaultDB2 = new DBConfig(context, null);
         DBConfig otherDB2 = new DBConfig(context, "other");
-        assertSame(defaultDB1.database, defaultDB2.database);
-        assertSame(otherDB1.database, otherDB2.database);
+        assertSame(defaultDB1.state.database, defaultDB2.state.database);
+        assertSame(otherDB1.state.database, otherDB2.state.database);
     }
 }

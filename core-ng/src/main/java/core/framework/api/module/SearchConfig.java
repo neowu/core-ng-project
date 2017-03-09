@@ -23,18 +23,24 @@ public final class SearchConfig {
         state = context.config.search();
 
         if (state.search == null) {
-            if (context.isTest()) {
-                Path dataPath = Files.tempDir();
-                state.search = context.mockFactory.create(ElasticSearchImpl.class, dataPath);
-                context.shutdownHook.add(() -> Files.deleteDir(dataPath));
-            } else {
-                System.setProperty("log4j2.loggerContextFactory", ESLoggerContextFactory.class.getName());
-                state.search = new ElasticSearchImpl();
-                context.startupHook.add(state.search::initialize);
-            }
-            context.shutdownHook.add(state.search::close);
-            context.beanFactory.bind(ElasticSearch.class, null, state.search);
+            state.search = createElasticSearch(context);
         }
+    }
+
+    private ElasticSearchImpl createElasticSearch(ModuleContext context) {
+        ElasticSearchImpl search;
+        if (context.isTest()) {
+            Path dataPath = Files.tempDir();
+            search = context.mockFactory.create(ElasticSearchImpl.class, dataPath);
+            context.shutdownHook.add(() -> Files.deleteDir(dataPath));
+        } else {
+            System.setProperty("log4j2.loggerContextFactory", ESLoggerContextFactory.class.getName());
+            search = new ElasticSearchImpl();
+            context.startupHook.add(search::initialize);
+        }
+        context.shutdownHook.add(search::close);
+        context.beanFactory.bind(ElasticSearch.class, null, search);
+        return search;
     }
 
     public void host(String host) {
