@@ -1,4 +1,7 @@
 ## Change log
+### 4.10.10 (3/9/2017 - )
+* mongo: tweak bulkDelete param type
+
 ### 4.10.10 (3/7/2017 - 3/9/2017)
 * utils: make Exceptions.error be aware of last Throwable argument, keep it consistent as logger
 * mongo: add bulkDelete

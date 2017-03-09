@@ -368,7 +368,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     }
 
     @Override
-    public long bulkDelete(List<Object> ids) {
+    public long bulkDelete(List<?> ids) {
         StopWatch watch = new StopWatch();
         try {
             List<DeleteOneModel<T>> models = new ArrayList<>(ids.size());
