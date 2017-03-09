@@ -56,9 +56,10 @@ public class BeanFactory {
             T instance = construct(instanceClass);
             inject(instance);
             return instance;
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | RuntimeException e) {
-            String errorMessage = e instanceof InvocationTargetException ? ((InvocationTargetException) e).getTargetException().getMessage() : e.getMessage();
-            throw Exceptions.error("failed to create bean, instanceClass={}, error={}", instanceClass, errorMessage, e);
+        } catch (IllegalAccessException | InstantiationException | RuntimeException e) {
+            throw Exceptions.error("failed to create bean, instanceClass={}, error={}", instanceClass, e.getMessage(), e);
+        } catch (InvocationTargetException e) {
+            throw Exceptions.error("failed to create bean, instanceClass={}, error={}", instanceClass, e.getTargetException().getMessage(), e);
         }
     }
 
