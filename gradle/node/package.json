@@ -16,8 +16,8 @@
     "gulp-md5-plus": "^0.2.5",
     "gulp-sourcemaps": "^2.4.1",
     "gulp-stylelint": "^3.9.0",
-    "gulp-uglify": "^2.0.1",
+    "gulp-uglify": "^2.1.0",
     "merge2": "^1.0.3",
-    "yargs": "^6.6.0"
+    "yargs": "^7.0.1"
   }
 }

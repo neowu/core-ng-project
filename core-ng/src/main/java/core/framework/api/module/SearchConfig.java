@@ -16,54 +16,53 @@ import java.time.Duration;
  */
 public final class SearchConfig {
     private final ModuleContext context;
-    private final ElasticSearchImpl search;
     private final SearchConfigState state;
 
     public SearchConfig(ModuleContext context) {
         this.context = context;
-        if (context.beanFactory.registered(ElasticSearch.class, null)) {
-            search = context.beanFactory.bean(ElasticSearch.class, null);
-        } else {
+        state = context.config.search();
+
+        if (state.search == null) {
             if (context.isTest()) {
                 Path dataPath = Files.tempDir();
-                search = context.mockFactory.create(ElasticSearchImpl.class, dataPath);
+                state.search = context.mockFactory.create(ElasticSearchImpl.class, dataPath);
                 context.shutdownHook.add(() -> Files.deleteDir(dataPath));
             } else {
                 System.setProperty("log4j2.loggerContextFactory", ESLoggerContextFactory.class.getName());
-                search = new ElasticSearchImpl();
-                context.startupHook.add(search::initialize);
+                state.search = new ElasticSearchImpl();
+                context.startupHook.add(state.search::initialize);
             }
-            context.shutdownHook.add(search::close);
-            context.beanFactory.bind(ElasticSearch.class, null, search);
+            context.shutdownHook.add(state.search::close);
+            context.beanFactory.bind(ElasticSearch.class, null, state.search);
         }
-        state = context.config.search();
     }
 
     public void host(String host) {
         if (!context.isTest()) {
-            search.host(host);      // es requires host must be resolved, skip for unit test
+            state.search.host(host);      // es requires host must be resolved, skip for unit test
         }
         state.host = host;
     }
 
     public void sniff(boolean sniff) {
-        search.sniff(sniff);
+        state.search.sniff(sniff);
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        search.slowOperationThreshold(threshold);
+        state.search.slowOperationThreshold(threshold);
     }
 
     public void timeout(Duration timeout) {
-        search.timeout(timeout);
+        state.search.timeout(timeout);
     }
 
     public <T> void type(Class<T> documentClass) {
-        ElasticSearchType<T> searchType = search.type(documentClass);
+        ElasticSearchType<T> searchType = state.search.type(documentClass);
         context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), null, searchType);
     }
 
     public static class SearchConfigState {
+        ElasticSearchImpl search;
         String host;
 
         public void validate() {

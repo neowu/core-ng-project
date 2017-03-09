@@ -1,27 +1,22 @@
 package core.log.service;
 
 import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.api.util.Threads;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.framework.impl.log.queue.StatMessage;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.serialization.ByteArrayDeserializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 /**
  * @author neo
@@ -35,25 +30,21 @@ public class MessageProcessor {
     private final Thread processorThread;
     private final JSONReader<ActionLogMessage> actionLogMessageReader = JSONReader.of(ActionLogMessage.class);
     private final JSONReader<StatMessage> statMessageReader = JSONReader.of(StatMessage.class);
-    private final KafkaConsumer<String, byte[]> kafkaConsumer;
+    private final Consumer<String, byte[]> consumer;
 
-    public MessageProcessor(String kafkaURI, ActionManager actionManager, StatManager statManager) {
-        Map<String, Object> config = Maps.newHashMap();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaURI);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, "log-processor");
-        config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
-        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-        kafkaConsumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
-        kafkaConsumer.subscribe(Lists.newArrayList(TOPIC_ACTION_LOG, TOPIC_STAT));
+    @Inject
+    public MessageProcessor(KafkaConsumerFactory consumerFactory, ActionManager actionManager, StatManager statManager) {
+        consumer = consumerFactory.create();
+        consumer.subscribe(Lists.newArrayList(TOPIC_ACTION_LOG, TOPIC_STAT));
 
         processorThread = new Thread(() -> {
-            logger.info("message processor started, kafkaURI={}", kafkaURI);
+            logger.info("message processor started, kafkaURI={}", consumerFactory.uri);
             while (!stop.get()) {
                 try {
-                    ConsumerRecords<String, byte[]> records = kafkaConsumer.poll(Long.MAX_VALUE);
+                    ConsumerRecords<String, byte[]> records = consumer.poll(Long.MAX_VALUE);
                     consume(TOPIC_ACTION_LOG, records, actionLogMessageReader, actionManager::index);
                     consume(TOPIC_STAT, records, statMessageReader, statManager::index);
-                    kafkaConsumer.commitAsync();
+                    consumer.commitAsync();
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
                         logger.error("failed to process message, retry in 30 seconds", e);
@@ -61,7 +52,7 @@ public class MessageProcessor {
                     }
                 }
             }
-            kafkaConsumer.close();
+            consumer.close();
             logger.info("message processor stopped");
         }, "message-processor");
     }
@@ -72,10 +63,10 @@ public class MessageProcessor {
 
     public void stop() {
         stop.set(true);
-        kafkaConsumer.wakeup();
+        consumer.wakeup();
     }
 
-    private <T> void consume(String topic, ConsumerRecords<String, byte[]> records, JSONReader<T> reader, Consumer<List<T>> consumer) {
+    private <T> void consume(String topic, ConsumerRecords<String, byte[]> records, JSONReader<T> reader, java.util.function.Consumer<List<T>> consumer) {
         int messageSize = 0;
         List<T> messages = new ArrayList<>();
         for (ConsumerRecord<String, byte[]> record : records.records(topic)) {

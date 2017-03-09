@@ -33,8 +33,8 @@ import java.util.List;
  * @author neo
  */
 public class ElasticSearchImpl implements ElasticSearch {
-    public final List<TransportAddress> addresses = Lists.newArrayList();
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
+    private final List<TransportAddress> addresses = Lists.newArrayList();
     private Client client;
     private Duration timeout = Duration.ofSeconds(10);
     private Duration slowOperationThreshold = Duration.ofSeconds(5);

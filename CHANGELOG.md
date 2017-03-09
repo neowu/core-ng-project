@@ -1,5 +1,6 @@
 ## Change log
 ### 4.10.10 (3/7/2017 - )
+* utils: make Exceptions.error be aware of last Throwable argument, keep it consistent as logger
 
 ### 4.10.9 (3/3/2017 - 3/7/2017)
 * lib: update kafka to 0.10.2.0, es to 5.2.2
