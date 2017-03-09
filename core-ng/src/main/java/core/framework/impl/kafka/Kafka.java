@@ -74,7 +74,7 @@ public class Kafka {
             config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
             config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
             config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-            config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+            config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
             config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
             config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
             config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
