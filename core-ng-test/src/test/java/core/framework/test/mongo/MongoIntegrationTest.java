@@ -15,8 +15,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -111,11 +113,16 @@ public class MongoIntegrationTest extends IntegrationTest {
 
         entity1.stringField = "string1-updated";
         entity2.stringField = "string2-updated";
-
         testEntityCollection.bulkReplace(entities);
 
         Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entity1.id);
         assertTrue(loadedEntity.isPresent());
         assertEquals(entity1.stringField, loadedEntity.get().stringField);
+
+        long deletedCount = testEntityCollection.bulkDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
+        assertEquals(2, deletedCount);
+
+        loadedEntity = testEntityCollection.get(entity1.id);
+        assertFalse(loadedEntity.isPresent());
     }
 }

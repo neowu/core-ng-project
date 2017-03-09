@@ -1,6 +1,7 @@
 package core.framework.impl.mongo;
 
 import com.mongodb.ReadPreference;
+import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MapReduceIterable;
@@ -8,6 +9,7 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.CountOptions;
+import com.mongodb.client.model.DeleteOneModel;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.model.ReplaceOneModel;
@@ -361,6 +363,24 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime);
             logger.debug("delete, collection={}, filter={}, elapsedTime={}", collectionName, new BsonParam(filter, mongo.registry), elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public long bulkDelete(List<Object> ids) {
+        StopWatch watch = new StopWatch();
+        try {
+            List<DeleteOneModel<T>> models = new ArrayList<>(ids.size());
+            for (Object id : ids) {
+                models.add(new DeleteOneModel<>(Filters.eq("_id", id)));
+            }
+            BulkWriteResult result = collection().bulkWrite(models, new BulkWriteOptions().ordered(false));
+            return result.getDeletedCount();
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("mongoDB", elapsedTime);
+            logger.debug("bulkDelete, collection={}, ids={}, elapsedTime={}", collectionName, ids, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

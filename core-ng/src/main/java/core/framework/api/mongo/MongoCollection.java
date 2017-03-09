@@ -61,4 +61,6 @@ public interface MongoCollection<T> {
     long delete(Object id);
 
     long delete(Bson filter);
+
+    long bulkDelete(List<Object> ids);
 }

@@ -14,6 +14,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
+@Deprecated
 public final class QueueConfig {
     private final ModuleContext context;
     private final RabbitMQ rabbitMQ;
