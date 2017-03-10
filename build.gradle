@@ -46,7 +46,9 @@ project(':core-ng') {
         testImplementation(
                 'junit:junit:4.12',
                 'org.mockito:mockito-core:2.7.13',
-                "org.mongodb:mongo-java-driver:${mongoVersion}",
+                "org.mongodb:mongo-java-driver:${mongoVersion}"
+        )
+        testRuntimeOnly(
                 'org.hsqldb:hsqldb:2.3.3'
         )
     }
@@ -55,7 +57,6 @@ project(':core-ng') {
 project(':core-ng-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     def lib = ["org.mongodb:mongo-java-driver:${mongoVersion}",
-               'com.vividsolutions:jts:1.13',                   // used by fongo
                "com.github.fakemongo:fongo:2.0.12@jar",
                "com.rabbitmq:amqp-client:${rabbitVersion}",
                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
@@ -70,7 +71,8 @@ project(':core-ng-test') {
         compileOnly lib
         testImplementation lib
         testRuntimeOnly(
-                'org.hsqldb:hsqldb:2.3.3'
+                'org.hsqldb:hsqldb:2.3.3',
+                'com.vividsolutions:jts:1.13'                  // used by fongo
         )
     }
 }
