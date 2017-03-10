@@ -28,6 +28,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author neo
  */
 class KafkaMessageListenerThread extends Thread {
+    static double longProcessThreshold(double batchLongProcessThreshold, int recordCount, int totalCount) {
+        return batchLongProcessThreshold * recordCount / totalCount;
+    }
+
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListenerThread.class);
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Consumer<String, byte[]> consumer;
@@ -36,7 +40,7 @@ class KafkaMessageListenerThread extends Thread {
     private final Map<String, JSONReader> readers;
     private final MessageValidator validator;
     private final LogManager logManager;
-    private final double longProcessThresholdInNano;
+    private final double batchLongProcessThresholdInNano;
 
     KafkaMessageListenerThread(String name, Consumer<String, byte[]> consumer, KafkaMessageListener listener) {
         super(name);
@@ -46,7 +50,7 @@ class KafkaMessageListenerThread extends Thread {
         readers = listener.readers;
         validator = listener.kafka.validator;
         logManager = listener.logManager;
-        longProcessThresholdInNano = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time to max
+        batchLongProcessThresholdInNano = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time to max
     }
 
     @Override
@@ -86,12 +90,12 @@ class KafkaMessageListenerThread extends Thread {
                 List<ConsumerRecord<String, byte[]>> records = entry.getValue();
                 BulkMessageHandler<?> bulkHandler = bulkHandlers.get(topic);
                 if (bulkHandler != null) {
-                    handle(topic, bulkHandler, records, longProcessThresholdInNano * records.size() / size);
+                    handle(topic, bulkHandler, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
                     continue;
                 }
                 MessageHandler<?> handler = handlers.get(topic);
                 if (handler != null) {
-                    handle(topic, handler, records, longProcessThresholdInNano / size);
+                    handle(topic, handler, records, longProcessThreshold(batchLongProcessThresholdInNano, 1, count));
                 }
             }
         } finally {
@@ -100,7 +104,7 @@ class KafkaMessageListenerThread extends Thread {
         }
     }
 
-    private <T> void handle(String topic, MessageHandler<T> handler, List<ConsumerRecord<String, byte[]>> records, double tooLongToProcessInNanoThreshold) {
+    private <T> void handle(String topic, MessageHandler<T> handler, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
         @SuppressWarnings("unchecked")
         JSONReader<KafkaMessage<T>> reader = readers.get(topic);
         for (ConsumerRecord<String, byte[]> record : records) {
@@ -128,7 +132,7 @@ class KafkaMessageListenerThread extends Thread {
                 logManager.logError(e);
             } finally {
                 long elapsedTime = actionLog.elapsedTime();
-                if (elapsedTime > tooLongToProcessInNanoThreshold) {
+                if (elapsedTime > longProcessThresholdInNano) {
                     logger.warn(Markers.errorCode("LONG_PROCESS"), "took too long to process message, elapsedTime={}", elapsedTime);
                 }
                 logManager.end("=== message handling end ===");

@@ -1,4 +1,7 @@
 ## Change log
+### 4.10.12 (3/10/2017)
+* kafka: fix LONG_PROCESS threshold calculation
+
 ### 4.10.11 (3/9/2017)
 * mongo: tweak bulkDelete param type
 * kafka: update default consumer behavior to auto reset to latest
