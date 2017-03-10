@@ -1,15 +1,4 @@
-configurations {
-    provided
-}
-
-sourceSets {
-    main.compileClasspath += configurations.provided
-    test.compileClasspath += configurations.provided
-    test.runtimeClasspath += configurations.provided
-}
-
-apply plugin: 'idea'
-idea.module.scopes.PROVIDED.plus += [configurations.provided]
+apply plugin: 'java-library'
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource

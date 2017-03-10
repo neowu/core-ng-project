@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/check.gradle")
 
     group = 'core.framework'
-    version = '4.10.12'
+    version = '4.10.13'
 }
 
 def mongoVersion = '3.4.2'
@@ -20,19 +20,13 @@ project(':core-ng-api') {
 project(':core-ng') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
-        provided(
-                'redis.clients:jedis:2.9.0@jar',
-                "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "com.rabbitmq:amqp-client:${rabbitVersion}",
-                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
-                "org.elasticsearch.client:transport:${elasticVersion}",
-                'org.apache.logging.log4j:log4j-api:2.7'   // used by elasticsearch
-        )
-        compile(
+        api(
                 project(":core-ng-api"),
                 'javax.inject:javax.inject:1',
-                'org.javassist:javassist:3.21.0-GA',
                 'org.slf4j:slf4j-api:1.7.21',
+        )
+        implementation(
+                'org.javassist:javassist:3.21.0-GA',
                 "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
                 "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}",
@@ -41,9 +35,18 @@ project(':core-ng') {
                 'org.apache.httpcomponents:httpclient:4.5.2',
                 'io.undertow:undertow-core:1.4.11.Final'
         )
-        testCompile(
+        compileOnly(
+                'redis.clients:jedis:2.9.0@jar',
+                "org.mongodb:mongo-java-driver:${mongoVersion}",
+                "com.rabbitmq:amqp-client:${rabbitVersion}",
+                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
+                "org.elasticsearch.client:transport:${elasticVersion}",
+                'org.apache.logging.log4j:log4j-api:2.7'   // used by elasticsearch
+        )
+        testImplementation(
                 'junit:junit:4.12',
                 'org.mockito:mockito-core:2.7.13',
+                "org.mongodb:mongo-java-driver:${mongoVersion}",
                 'org.hsqldb:hsqldb:2.3.3'
         )
     }
@@ -51,29 +54,29 @@ project(':core-ng') {
 
 project(':core-ng-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
+    def lib = ["org.mongodb:mongo-java-driver:${mongoVersion}",
+               'com.vividsolutions:jts:1.13',                   // used by fongo
+               "com.github.fakemongo:fongo:2.0.12@jar",
+               "com.rabbitmq:amqp-client:${rabbitVersion}",
+               "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
+               "org.elasticsearch.client:transport:${elasticVersion}",
+               'org.apache.logging.log4j:log4j-core:2.7']       // used by elasticsearch
     dependencies {
-        provided('com.github.fakemongo:fongo:2.0.12') {
-            exclude group: 'de.grundid.opendatalab', module: 'geojson-jackson'  // it has conflicted jackson lib version, exclude since we don't use geo
-        }
-        provided(
-                "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "com.rabbitmq:amqp-client:${rabbitVersion}",
-                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
-                'org.hsqldb:hsqldb:2.3.3',
-                "org.elasticsearch.client:transport:${elasticVersion}",
-                'org.apache.logging.log4j:log4j-core:2.7'       // used by elasticsearch
-        )
-        compile(
+        api(
                 project(":core-ng"),
                 'junit:junit:4.12',
                 'org.mockito:mockito-core:2.7.13'
+        )
+        compileOnly lib
+        testImplementation lib
+        testRuntimeOnly(
+                'org.hsqldb:hsqldb:2.3.3'
         )
     }
 }
 
 configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
     apply plugin: 'maven-publish'
-
     publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -84,7 +87,6 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
                 }
             }
         }
-
         repositories {
             maven {
                 url System.properties['maven.repo']     // set in gradle.properties, e.g. systemProp.maven.repo=/path
@@ -95,7 +97,6 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
 
 project(':log-processor') {
     apply from: file("${rootDir}/gradle/app.gradle")
-
     dependencies {
         compile(
                 project(':core-ng'),
@@ -116,14 +117,18 @@ project(':benchmark') {
     dependencies {
         compile(
                 project(':core-ng'),
-                'org.openjdk.jmh:jmh-generator-annprocess:1.11.3'
+                'org.openjdk.jmh:jmh-generator-annprocess:1.11.3',
+                "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
+                "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
+                "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
         )
     }
 }
 
 project(':demo-service') {
     apply from: file("${rootDir}/gradle/app.gradle")
-
     dependencies {
         compile(
                 project(':core-ng')
@@ -139,7 +144,6 @@ project(':demo-service') {
 
 project(':demo-site') {
     apply from: file("${rootDir}/gradle/app.gradle")
-
     dependencies {
         compile(
                 project(':core-ng')

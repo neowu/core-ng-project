@@ -1,4 +1,7 @@
 ## Change log
+### 4.10.13 (3/10/2017 - )
+* gradle: update to 3.4.1, updated lib.gradle
+
 ### 4.10.12 (3/10/2017)
 * kafka: fix LONG_PROCESS threshold calculation
 
