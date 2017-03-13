@@ -29,7 +29,7 @@ gulp.task("css", ["resource"], function() {
                 console: true
             }]
         }))
-        .pipe(cssnano())
+        .pipe(cssnano({zindex: false}))
         .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {dirLevel: 2}))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(`${root}/dist/web/static/css`));
