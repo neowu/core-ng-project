@@ -1,4 +1,7 @@
 ## Change log
+### 4.10.14 (3/14/2017)
+* mongo: fix bulkReplace to set upsert
+
 ### 4.10.13 (3/10/2017 - 3/14/2017)
 * gradle: update to 3.4.1, updated lib.gradle
 * template: support to use html tag contains '-'

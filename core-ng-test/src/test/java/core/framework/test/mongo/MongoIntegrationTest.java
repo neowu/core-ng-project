@@ -97,7 +97,49 @@ public class MongoIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    public void bulk() {
+    public void bulkInsert() {
+        List<TestMongoEntity> entities = testEntities();
+        testEntityCollection.bulkInsert(entities);
+
+        for (TestMongoEntity entity : entities) {
+            assertNotNull(entity.id);
+        }
+
+        Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entities.get(0).id);
+        assertTrue(loadedEntity.isPresent());
+        assertEquals(entities.get(0).stringField, loadedEntity.get().stringField);
+    }
+
+    @Test
+    public void bulkReplace() {
+        List<TestMongoEntity> entities = testEntities();
+        entities.forEach(entity -> entity.id = new ObjectId());
+        testEntityCollection.bulkReplace(entities);
+
+        Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entities.get(0).id);
+        assertTrue(loadedEntity.isPresent());
+        assertEquals(entities.get(0).stringField, loadedEntity.get().stringField);
+
+        entities.get(0).stringField = "string1-updated";
+        entities.get(1).stringField = "string2-updated";
+        testEntityCollection.bulkReplace(entities);
+
+        loadedEntity = testEntityCollection.get(entities.get(0).id);
+        assertTrue(loadedEntity.isPresent());
+        assertEquals(entities.get(0).stringField, loadedEntity.get().stringField);
+    }
+
+    @Test
+    public void bulkDelete() {
+        List<TestMongoEntity> entities = testEntities();
+        testEntityCollection.bulkInsert(entities);
+
+        long deletedCount = testEntityCollection.bulkDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
+        assertEquals(2, deletedCount);
+        assertFalse(testEntityCollection.get(entities.get(0).id).isPresent());
+    }
+
+    private List<TestMongoEntity> testEntities() {
         List<TestMongoEntity> entities = Lists.newArrayList();
         TestMongoEntity entity1 = new TestMongoEntity();
         entity1.stringField = "string1";
@@ -105,24 +147,6 @@ public class MongoIntegrationTest extends IntegrationTest {
         TestMongoEntity entity2 = new TestMongoEntity();
         entity2.stringField = "string2";
         entities.add(entity2);
-        testEntityCollection.bulkInsert(entities);
-
-        for (TestMongoEntity entity : entities) {
-            assertNotNull(entity.id);
-        }
-
-        entity1.stringField = "string1-updated";
-        entity2.stringField = "string2-updated";
-        testEntityCollection.bulkReplace(entities);
-
-        Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entity1.id);
-        assertTrue(loadedEntity.isPresent());
-        assertEquals(entity1.stringField, loadedEntity.get().stringField);
-
-        long deletedCount = testEntityCollection.bulkDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
-        assertEquals(2, deletedCount);
-
-        loadedEntity = testEntityCollection.get(entity1.id);
-        assertFalse(loadedEntity.isPresent());
+        return entities;
     }
 }

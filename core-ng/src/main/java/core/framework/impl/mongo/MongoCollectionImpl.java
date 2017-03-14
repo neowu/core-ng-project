@@ -314,7 +314,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             for (T entity : entities) {
                 Object id = mongo.codecs.id(entity);
                 if (id == null) throw Exceptions.error("entity must have id, entityClass={}", entityClass.getCanonicalName());
-                models.add(new ReplaceOneModel<>(Filters.eq("_id", id), entity));
+                models.add(new ReplaceOneModel<>(Filters.eq("_id", id), entity, new UpdateOptions().upsert(true)));
             }
             collection().bulkWrite(models, new BulkWriteOptions().ordered(false));
         } finally {
