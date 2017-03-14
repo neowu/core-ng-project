@@ -1,5 +1,10 @@
 apply plugin: 'java-library'
 
+sourceSets {    // add compileOnly to test scope to make simplify test dependency config
+    test.compileClasspath += configurations.compileOnly
+    test.runtimeClasspath += configurations.compileOnly
+}
+
 task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
     classifier 'sources'

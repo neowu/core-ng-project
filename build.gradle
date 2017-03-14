@@ -45,8 +45,7 @@ project(':core-ng') {
         )
         testImplementation(
                 'junit:junit:4.12',
-                'org.mockito:mockito-core:2.7.13',
-                "org.mongodb:mongo-java-driver:${mongoVersion}"
+                'org.mockito:mockito-core:2.7.13'
         )
         testRuntimeOnly(
                 'org.hsqldb:hsqldb:2.3.3'
@@ -56,20 +55,21 @@ project(':core-ng') {
 
 project(':core-ng-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
-    def lib = ["org.mongodb:mongo-java-driver:${mongoVersion}",
-               "com.github.fakemongo:fongo:2.0.12@jar",
-               "com.rabbitmq:amqp-client:${rabbitVersion}",
-               "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
-               "org.elasticsearch.client:transport:${elasticVersion}",
-               'org.apache.logging.log4j:log4j-core:2.7']       // used by elasticsearch
+
     dependencies {
         api(
                 project(":core-ng"),
                 'junit:junit:4.12',
                 'org.mockito:mockito-core:2.7.13'
         )
-        compileOnly lib
-        testImplementation lib
+        compileOnly(
+                "org.mongodb:mongo-java-driver:${mongoVersion}",
+                "com.github.fakemongo:fongo:2.0.12@jar",
+                "com.rabbitmq:amqp-client:${rabbitVersion}",
+                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
+                "org.elasticsearch.client:transport:${elasticVersion}",
+                'org.apache.logging.log4j:log4j-core:2.7'       // used by elasticsearch
+        )
         testRuntimeOnly(
                 'org.hsqldb:hsqldb:2.3.3',
                 'com.vividsolutions:jts:1.13'                  // used by fongo
