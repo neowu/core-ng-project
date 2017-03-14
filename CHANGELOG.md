@@ -1,6 +1,7 @@
 ## Change log
-### 4.10.13 (3/10/2017 - )
+### 4.10.13 (3/10/2017 - 3/14/2017)
 * gradle: update to 3.4.1, updated lib.gradle
+* template: support to use html tag contains '-'
 
 ### 4.10.12 (3/10/2017)
 * kafka: fix LONG_PROCESS threshold calculation

@@ -1,6 +1,5 @@
 package core.framework.impl.template.parser;
 
-import core.framework.api.util.ASCII;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
 import core.framework.impl.template.node.Attribute;
@@ -14,11 +13,14 @@ import core.framework.impl.template.source.TemplateSource;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * @author neo
  */
 public class HTMLParser {
+    private final Pattern tagNamePattern = Pattern.compile("[a-z]+[a-z0-9\\-]*");
+
     private final Set<String> voidElements = Sets.newHashSet("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
 
     // loose checking to cover common cases, precise checking will be like e.g. checked attribute on input tag can be boolean attribute
@@ -124,11 +126,8 @@ public class HTMLParser {
     }
 
     private String validateTagName(String name) {
-        for (int i = 0; i < name.length(); i++) {
-            char ch = name.charAt(i);
-            if (!ASCII.isLowerCase(ch) && !ASCII.isDigit(ch))
-                throw Exceptions.error("tag name must only contain lower case letter or digit, name={}, location={}", name, lexer.currentLocation());
-        }
+        if (!tagNamePattern.matcher(name).matches())
+            throw Exceptions.error("tag name must match {}, name={}, location={}", tagNamePattern.pattern(), name, lexer.currentLocation());
         return name;
     }
 
