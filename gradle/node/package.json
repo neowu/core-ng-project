@@ -18,6 +18,6 @@
     "gulp-stylelint": "^3.9.0",
     "gulp-uglify": "^2.1.0",
     "merge2": "^1.0.3",
-    "yargs": "^7.0.1"
+    "yargs": "^7.0.2"
   }
 }

@@ -54,7 +54,15 @@
     ],
     "declaration-bang-space-after": "never",
     "declaration-bang-space-before": "always",
-    "declaration-block-no-ignored-properties": true,
+    "declaration-block-no-duplicate-properties": [
+      true,
+      {
+        "ignore": [
+          "consecutive-duplicates-with-different-values"
+        ]
+      }
+    ],
+    "declaration-block-no-redundant-longhand-properties": true,
     "declaration-block-no-shorthand-property-overrides": true,
     "declaration-block-semicolon-newline-after": "always-multi-line",
     "declaration-block-semicolon-space-after": "always-single-line",
@@ -77,6 +85,7 @@
         ]
       }
     ],
+    "font-family-no-duplicate-names": true,
     "function-calc-no-unspaced-operator": true,
     "function-comma-newline-after": "always-multi-line",
     "function-comma-space-after": "always-single-line",
@@ -94,7 +103,7 @@
     "media-feature-colon-space-after": "always",
     "media-feature-colon-space-before": "never",
     "media-feature-name-case": "lower",
-    "media-feature-no-missing-punctuation": true,
+    "media-feature-name-no-unknown": true,
     "media-feature-parentheses-space-inside": "never",
     "media-feature-range-operator-space-after": "always",
     "media-feature-range-operator-space-before": "always",
@@ -109,7 +118,8 @@
     "number-leading-zero": "always",
     "number-no-trailing-zeros": true,
     "property-case": "lower",
-    "rule-nested-empty-line-before": [
+    "property-no-unknown": true,
+    "rule-empty-line-before": [
       "always-multi-line",
       {
         "except": [
@@ -120,19 +130,12 @@
         ]
       }
     ],
-    "rule-non-nested-empty-line-before": [
-      "always-multi-line",
-      {
-        "ignore": [
-          "after-comment"
-        ]
-      }
-    ],
     "selector-attribute-brackets-space-inside": "never",
     "selector-attribute-operator-space-after": "never",
     "selector-attribute-operator-space-before": "never",
     "selector-combinator-space-after": "always",
     "selector-combinator-space-before": "always",
+    "selector-descendant-combinator-no-non-space": true,
     "selector-list-comma-newline-after": "always",
     "selector-list-comma-space-before": "never",
     "selector-max-empty-lines": 0,
@@ -150,6 +153,7 @@
     "unit-no-unknown": true,
     "value-list-comma-newline-after": "always-multi-line",
     "value-list-comma-space-after": "always-single-line",
-    "value-list-comma-space-before": "never"
+    "value-list-comma-space-before": "never",
+    "value-list-max-empty-lines": 0
   }
 }

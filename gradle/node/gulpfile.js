@@ -23,7 +23,7 @@ gulp.task("css", ["resource"], function() {
     var appCSS = gulp.src([`${root}/web/static/css/**/*.css`, `!${root}/web/static/css/lib{,/**/*.css}`])
         .pipe(sourcemaps.init())
         .pipe(stylelint({
-            configFile: "stylelint.json",
+            configFile: "stylelint.json",   // see https://github.com/stylelint/stylelint-config-standard/blob/master/index.js
             reporters: [{
                 formatter: "string",
                 console: true

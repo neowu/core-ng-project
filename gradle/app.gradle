@@ -38,6 +38,7 @@ processResources {
         from envProperties
     }
     if (project.file("src/main/web").exists()) {
+        inputs.file project.file("src/main/web")
         doLast {
             exec {
                 workingDir "${rootDir}/gradle/node"
