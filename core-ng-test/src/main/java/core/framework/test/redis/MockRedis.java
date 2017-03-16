@@ -107,31 +107,29 @@ public final class MockRedis implements Redis {
 
     static class Value {
         static Value value(String value) {
-            Value result = new Value();
-            result.type = ValueType.VALUE;
-            result.value = value;
-            return result;
+            return new Value(ValueType.VALUE, value, null, null);
         }
 
         static Value hashValue() {
-            Value result = new Value();
-            result.type = ValueType.HASH;
-            result.hash = Maps.newHashMap();
-            return result;
+            return new Value(ValueType.HASH, null, Maps.newHashMap(), null);
         }
 
         static Value setValue() {
-            Value result = new Value();
-            result.type = ValueType.SET;
-            result.set = Sets.newHashSet();
-            return result;
+            return new Value(ValueType.SET, null, null, Sets.newHashSet());
         }
 
-        ValueType type;
-        String value;
-        Map<String, String> hash;
-        Set<String> set;
+        final ValueType type;
+        final String value;
+        final Map<String, String> hash;
+        final Set<String> set;
         Long expirationTime;
+
+        private Value(ValueType type, String value, Map<String, String> hash, Set<String> set) {
+            this.type = type;
+            this.value = value;
+            this.hash = hash;
+            this.set = set;
+        }
 
         boolean expired(long now) {
             return expirationTime != null && now >= expirationTime;

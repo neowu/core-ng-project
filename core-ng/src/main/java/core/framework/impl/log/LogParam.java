@@ -16,7 +16,7 @@ public final class LogParam {  // used to hold bytes in log message, only eval o
     }
 
     public static Object of(byte[] bytes, Charset charset) {
-        return new StringParam(bytes, charset);
+        return new BytesParam(bytes, charset);
     }
 
     public static Object of(Map<?, ?> map) {
@@ -24,7 +24,7 @@ public final class LogParam {  // used to hold bytes in log message, only eval o
     }
 
     static String toString(byte[] bytes, Charset charset, int maxSize) {
-        if (bytes == null) return null;
+        if (bytes == null) return "null";
         if (bytes.length <= maxSize) return new String(bytes, charset);
         StringBuilder builder = new StringBuilder(maxSize + 14);
         String value = new String(bytes, 0, maxSize, charset);
@@ -33,11 +33,11 @@ public final class LogParam {  // used to hold bytes in log message, only eval o
         return builder.toString();
     }
 
-    private static class StringParam {
+    private static class BytesParam {
         private final byte[] bytes;
         private final Charset charset;
 
-        StringParam(byte[] bytes, Charset charset) {
+        BytesParam(byte[] bytes, Charset charset) {
             this.bytes = bytes;
             this.charset = charset;
         }
@@ -58,7 +58,7 @@ public final class LogParam {  // used to hold bytes in log message, only eval o
         // replicate AbstractMap.toString with encoding
         @Override
         public String toString() {
-            if (map == null) return null;
+            if (map == null) return "null";
             StringBuilder builder = new StringBuilder();
             int index = 0;
             builder.append('{');

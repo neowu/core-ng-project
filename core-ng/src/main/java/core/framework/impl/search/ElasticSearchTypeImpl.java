@@ -14,6 +14,7 @@ import core.framework.api.search.IndexRequest;
 import core.framework.api.search.SearchException;
 import core.framework.api.search.SearchRequest;
 import core.framework.api.search.SearchResponse;
+import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.impl.json.JSONReader;
@@ -100,7 +101,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         int skip = request.skip == null ? 0 : request.skip;
         int limit = request.limit == null ? 0 : request.limit;
         if (skip + limit > 10000)
-            throw new SearchException("result window is too large, skip + limit must be less than or equal to 10000, skip=" + request.skip + ", limit=" + request.limit);
+            throw Exceptions.error("result window is too large, skip + limit must be less than or equal to 10000, skip={}, limit={}", request.skip, request.limit);
     }
 
     private SearchResponse<T> searchResponse(org.elasticsearch.action.search.SearchResponse response) {
@@ -154,6 +155,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     @Override
     public void bulkIndex(BulkIndexRequest<T> request) {
+        if (request.sources == null || request.sources.isEmpty()) throw Exceptions.error("request.sources must not be empty");
+
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         BulkRequestBuilder builder = client().prepareBulk();
@@ -198,6 +201,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     @Override
     public void bulkDelete(BulkDeleteRequest request) {
+        if (request.ids == null || request.ids.isEmpty()) throw Exceptions.error("request.ids must not be empty");
+
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         BulkRequestBuilder builder = client().prepareBulk();

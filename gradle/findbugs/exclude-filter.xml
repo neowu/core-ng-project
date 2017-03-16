@@ -1,25 +1,45 @@
 <FindBugsFilter>
     <!--refer to http://findbugs.sourceforge.net/bugDescriptions.html for all Bug code-->
     <Match>
-        <!--RV: Method ignores return value, is this OK? (RV_RETURN_VALUE_IGNORED_INFERRED)-->
+        <!--CN: group for clone-->
+        <!--SQL: group for sql-->
+        <!--Se: group for serializable-->
+
+        <!--RV_RETURN_VALUE_IGNORED: Method ignores return value-->
+        <!--RV_RETURN_VALUE_IGNORED_BAD_PRACTICE: Method ignores exceptional return value-->
+        <!--RV_CHECK_FOR_POSITIVE_INDEXOF: Method checks to see if result of String.indexOf is positive-->
         <!--EI: May expose internal representation by returning reference to mutable object (EI_EXPOSE_REP)-->
         <!--EI2: May expose internal representation by incorporating reference to mutable object (EI_EXPOSE_REP2)-->
-        <!--Dm: DM_CONVERT_CASE: Consider using Locale parameterized version of invoked method -->
-        <!--CN: Class implements Cloneable but does not define or use clone method-->
-        <!--SIC: Deadly embrace of non-static inner class and thread local (SIC_THREADLOCAL_DEADLY_EMBRACE)-->
         <!--UrF: Unread public/protected field (URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD)-->
-        <!--UwF: UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR: Field not initialized in constructor but dereferenced without null check-->
-        <!--NP: NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE: Parameter must be nonnull but is marked as nullable-->
+        <!--UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD: Unwritten public or protected field-->
+        <!--UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR: Field not initialized in constructor but dereferenced without null check-->
+        <!--NP_BOOLEAN_RETURN_NULL: Method with Boolean return type returns explicit null-->
+        <!--NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE: Possible null pointer dereference due to return value of called method-->
+        <!--NP_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD: Read of unwritten public or protected field-->
         <!--BC: BC_UNCONFIRMED_CAST: Unchecked/unconfirmed cast-->
-        <!--SQL: SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING-->
         <!--UuF: UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD: Unused public or protected field (TemplateModel uses public field in template)-->
         <!--PZLA: PZLA_PREFER_ZERO_LENGTH_ARRAYS: Consider returning a zero length array rather than null-->
-        <Bug code="RV,EI,EI2,Dm,CN,SIC,UrF,UwF,NP,BC,SQL,UuF,PZLA"/>
+        <!--DM_CONVERT_CASE: Consider using Locale parameterized version of invoked method-->
+        <Bug code="CN,SQL,Se"
+             pattern="RV_RETURN_VALUE_IGNORED,
+                RV_RETURN_VALUE_IGNORED_BAD_PRACTICE,
+                RV_CHECK_FOR_POSITIVE_INDEXOF,
+                EI_EXPOSE_REP,EI_EXPOSE_REP2,
+                URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD,
+                UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD,
+                UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,
+                NP_BOOLEAN_RETURN_NULL,
+                NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE,
+                NP_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD,
+                BC_UNCONFIRMED_CAST,
+                UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD,
+                PZLA_PREFER_ZERO_LENGTH_ARRAYS,
+                DM_CONVERT_CASE"/>
     </Match>
 
     <Match>
-        <!--SE_BAD_FIELD: Non-transient non-serializable instance field in serializable class-->
-        <Class name="core.framework.impl.search.log.ESLogger"/>
-        <Bug pattern="SE_BAD_FIELD"/>
+        <!--DM_EXIT: Method invokes System.exit(...)-->
+        <Class name="core.framework.api.App"/>
+        <Bug pattern="DM_EXIT"/>
     </Match>
 </FindBugsFilter>

@@ -1,7 +1,7 @@
 include 'core-ng-api',
         'core-ng',
         'core-ng-test',
-        'benchmark',
+//        'benchmark',
         'log-processor',
         'demo-service',
         'demo-site'

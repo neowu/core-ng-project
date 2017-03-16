@@ -22,22 +22,30 @@ class FileBodyResponseHandler implements BodyHandler {
         File file = ((FileBody) response.body).file;
         try {
             final FileChannel channel = new FileInputStream(file).getChannel();
-            sender.transferFrom(channel, new IoCallback() {
-                @Override
-                public void onComplete(HttpServerExchange exchange, Sender sender) {
-                    IoUtils.safeClose(channel);
-                    END_EXCHANGE.onComplete(exchange, sender);
-                }
-
-                @Override
-                public void onException(HttpServerExchange exchange, Sender sender, IOException exception) {
-                    IoUtils.safeClose(channel);
-                    END_EXCHANGE.onException(exchange, sender, exception);
-                    throw new UncheckedIOException(exception);
-                }
-            });
+            sender.transferFrom(channel, new FileBodyCallback(channel));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    private static class FileBodyCallback implements IoCallback {
+        private final FileChannel channel;
+
+        FileBodyCallback(FileChannel channel) {
+            this.channel = channel;
+        }
+
+        @Override
+        public void onComplete(HttpServerExchange exchange, Sender sender) {
+            IoUtils.safeClose(channel);
+            END_EXCHANGE.onComplete(exchange, sender);
+        }
+
+        @Override
+        public void onException(HttpServerExchange exchange, Sender sender, IOException exception) {
+            IoUtils.safeClose(channel);
+            END_EXCHANGE.onException(exchange, sender, exception);
+            throw new UncheckedIOException(exception);
         }
     }
 }

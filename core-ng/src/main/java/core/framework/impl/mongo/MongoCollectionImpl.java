@@ -94,8 +94,9 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
 
     @Override
     public void bulkInsert(List<T> entities) {
-        StopWatch watch = new StopWatch();
         if (entities == null || entities.isEmpty()) throw Exceptions.error("entities must not be empty");
+
+        StopWatch watch = new StopWatch();
         for (T entity : entities) {
             validator.validate(entity);
         }
@@ -112,6 +113,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public Optional<T> get(Get get) {
         if (get.id == null) throw new Error("get.id must not be null");
+
         StopWatch watch = new StopWatch();
         try {
             T result = collection(get.readPreference).find(Filters.eq("_id", get.id)).first();
@@ -421,7 +423,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
 
         @Override
         public String toString() {
-            if (bson == null) return null;
+            if (bson == null) return "null";
             return bson.toBsonDocument(null, registry).toJson();
         }
     }
