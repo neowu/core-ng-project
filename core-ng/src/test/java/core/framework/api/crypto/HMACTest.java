@@ -10,14 +10,14 @@ import org.junit.Test;
 public class HMACTest {
     @Test
     public void digestByMD5() {
-        HMAC hmac = new HMAC("4VPDEtyUE".getBytes(), HMAC.Hash.MD5);
+        HMAC hmac = new HMAC(Strings.bytes("4VPDEtyUE"), HMAC.Hash.MD5);
         byte[] bytes = hmac.digest(Strings.bytes("hello"));
         Assert.assertNotNull(bytes);
     }
 
     @Test
     public void digestBySHA512() {
-        HMAC hmac = new HMAC("4VPDEtyUE".getBytes(), HMAC.Hash.SHA512);
+        HMAC hmac = new HMAC(Strings.bytes("4VPDEtyUE"), HMAC.Hash.SHA512);
         byte[] bytes = hmac.digest(Strings.bytes("hello"));
         Assert.assertNotNull(bytes);
     }

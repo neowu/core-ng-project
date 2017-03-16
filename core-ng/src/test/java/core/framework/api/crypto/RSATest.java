@@ -1,6 +1,7 @@
 package core.framework.api.crypto;
 
 import core.framework.api.util.Charsets;
+import core.framework.api.util.Strings;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,7 +20,7 @@ public class RSATest {
         rsa.publicKey(keyPair.getPublic().getEncoded());
 
         String message = "test message";
-        byte[] encryptedMessage = rsa.encrypt(message.getBytes());
+        byte[] encryptedMessage = rsa.encrypt(Strings.bytes(message));
         byte[] decryptedMessage = rsa.decrypt(encryptedMessage);
         Assert.assertEquals(message, new String(decryptedMessage, Charsets.UTF_8));
     }

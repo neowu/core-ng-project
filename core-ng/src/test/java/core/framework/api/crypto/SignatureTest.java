@@ -1,6 +1,7 @@
 package core.framework.api.crypto;
 
 import core.framework.api.util.ClasspathResources;
+import core.framework.api.util.Strings;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -18,8 +19,8 @@ public class SignatureTest {
         signature.publicKey(keyPair.getPublic().getEncoded());
 
         String message = "test message";
-        byte[] sign = signature.sign(message.getBytes());
-        boolean valid = signature.verify(message.getBytes(), sign);
+        byte[] sign = signature.sign(Strings.bytes(message));
+        boolean valid = signature.verify(Strings.bytes(message), sign);
 
         Assert.assertTrue(valid);
     }
@@ -34,9 +35,9 @@ public class SignatureTest {
         signature.certificate(cert);
         String message = "test message";
 
-        byte[] sign = signature.sign(message.getBytes());
+        byte[] sign = signature.sign(Strings.bytes(message));
 
-        boolean valid = signature.verify(message.getBytes(), sign);
+        boolean valid = signature.verify(Strings.bytes(message), sign);
         Assert.assertTrue(valid);
     }
 
@@ -50,8 +51,8 @@ public class SignatureTest {
         signature.certificate(cert);
         String message = "test message";
 
-        byte[] sign = signature.sign(message.getBytes());
-        boolean valid = signature.verify(message.getBytes(), sign);
+        byte[] sign = signature.sign(Strings.bytes(message));
+        boolean valid = signature.verify(Strings.bytes(message), sign);
         Assert.assertFalse(valid);
     }
 }
