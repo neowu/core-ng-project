@@ -105,7 +105,7 @@ public final class MockRedis implements Redis {
         VALUE, HASH, SET
     }
 
-    static class Value {
+    static final class Value {
         static Value value(String value) {
             return new Value(ValueType.VALUE, value, null, null);
         }
