@@ -68,7 +68,7 @@ public class JAXBTypeValidator implements TypeVisitor {
             || LocalDateTime.class.equals(valueClass)
             || ZonedDateTime.class.equals(valueClass)
             || Instant.class.equals(valueClass)
-            || Enum.class.isAssignableFrom(valueClass);
+            || valueClass.isEnum();
     }
 
     @Override
@@ -99,9 +99,10 @@ public class JAXBTypeValidator implements TypeVisitor {
         }
         elements.add(name);
 
-        if (Enum.class.isAssignableFrom(field.getType())) {
+        Class<?> fieldClass = field.getType();
+        if (fieldClass.isEnum()) {
             @SuppressWarnings("unchecked")
-            Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) field.getType();
+            Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
             validateEnumClass(enumClass);
         }
     }

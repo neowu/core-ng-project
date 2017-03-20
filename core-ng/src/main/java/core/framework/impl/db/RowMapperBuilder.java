@@ -52,7 +52,7 @@ final class RowMapperBuilder<T> {
                 builder.indent(1).append("entity.{} = resultSet.getLocalDate(\"{}\");\n", fieldName, column);
             } else if (ZonedDateTime.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getZonedDateTime(\"{}\");\n", fieldName, column);
-            } else if (Enum.class.isAssignableFrom(fieldClass)) {
+            } else if (fieldClass.isEnum()) {
                 registerEnumClass(fieldClass);
                 enumMapperFields.add(Strings.format("private final {} {}Mappings = new {}({}.class);", DBEnumMapper.class.getCanonicalName(), fieldName, DBEnumMapper.class.getCanonicalName(), fieldClass.getCanonicalName()));
                 builder.indent(1).append("entity.{} = ({}){}Mappings.getEnum(resultSet.getString(\"{}\"));\n", fieldName, fieldClass.getCanonicalName(), fieldName, column);

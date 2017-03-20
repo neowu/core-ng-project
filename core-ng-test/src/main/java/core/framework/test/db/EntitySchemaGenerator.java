@@ -91,7 +91,7 @@ public final class EntitySchemaGenerator {
             if (lengthAnnotation != null && lengthAnnotation.max() > 0) length = lengthAnnotation.max();
             return "VARCHAR(" + length + ")";
         }
-        if (Enum.class.isAssignableFrom(fieldClass)) {
+        if (fieldClass.isEnum()) {
             return "VARCHAR(100)";
         }
         if (Boolean.class.equals(fieldClass)) {

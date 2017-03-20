@@ -56,7 +56,7 @@ final class DatabaseClassValidator implements TypeVisitor {
             || LocalDate.class.equals(valueClass)
             || LocalDateTime.class.equals(valueClass)
             || ZonedDateTime.class.equals(valueClass)
-            || Enum.class.isAssignableFrom(valueClass);
+            || valueClass.isEnum();
     }
 
     @Override
@@ -87,7 +87,7 @@ final class DatabaseClassValidator implements TypeVisitor {
             columns.add(column.name());
         }
 
-        if (Enum.class.isAssignableFrom(fieldClass)) {
+        if (fieldClass.isEnum()) {
             validateEnumClass(fieldClass, field);
         }
 

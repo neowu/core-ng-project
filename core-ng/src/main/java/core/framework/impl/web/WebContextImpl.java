@@ -13,8 +13,8 @@ public class WebContextImpl implements WebContext {
     private final ThreadLocal<Map<String, Object>> context = new ThreadLocal<>();
     private final ThreadLocal<Request> request = new ThreadLocal<>();
 
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     public <T> T get(String key) {
         return (T) context.get().get(key);
     }

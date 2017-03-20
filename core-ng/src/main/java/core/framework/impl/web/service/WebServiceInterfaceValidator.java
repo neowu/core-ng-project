@@ -105,7 +105,7 @@ public class WebServiceInterfaceValidator {
         if (Integer.class.equals(paramClass)) return;
         if (Long.class.equals(paramClass)) return;
         if (String.class.equals(paramClass)) return;
-        if (Enum.class.isAssignableFrom(paramClass)) {
+        if (paramClass.isEnum()) {
             @SuppressWarnings("unchecked")
             Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) paramClass;
             JAXBTypeValidator.validateEnumClass(enumClass);

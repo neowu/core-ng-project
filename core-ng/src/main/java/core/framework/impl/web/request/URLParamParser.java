@@ -19,7 +19,7 @@ public class URLParamParser {    // parse query param and path param
             return (T) toLong(param);
         } else if (Boolean.class.equals(valueClass)) {
             return (T) toBoolean(param);
-        } else if (Enum.class.isAssignableFrom(valueClass)) {
+        } else if (valueClass.isEnum()) {
             return (T) toEnum(param, (Class<? extends Enum<?>>) valueClass);
         }
         throw Exceptions.error("not supported path param type, please contact arch team, type={}", valueClass.getCanonicalName());

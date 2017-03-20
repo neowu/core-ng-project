@@ -18,7 +18,7 @@ class MapValidator implements FieldValidator {
         if (value == null) return;
         @SuppressWarnings("unchecked")
         Map<String, ?> map = (Map<String, ?>) value;
-        for (Map.Entry<String, ?> entry : ((Map<String, ?>) map).entrySet()) {
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
             for (FieldValidator valueValidator : valueValidators) {
                 valueValidator.validate(entry.getValue(), errors, partial);
             }

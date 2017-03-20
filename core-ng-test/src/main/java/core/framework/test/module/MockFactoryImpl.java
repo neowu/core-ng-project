@@ -22,8 +22,8 @@ import java.nio.file.Path;
  * @author neo
  */
 public final class MockFactoryImpl implements MockFactory {
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     public <T> T create(Class<T> instanceClass, Object... params) {
         if (Redis.class.equals(instanceClass)) return (T) new MockRedis();
         if (RabbitMQ.class.equals(instanceClass)) return (T) new MockRabbitMQ();

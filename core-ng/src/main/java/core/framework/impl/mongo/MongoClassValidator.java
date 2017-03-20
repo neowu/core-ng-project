@@ -56,7 +56,7 @@ public final class MongoClassValidator implements TypeVisitor {
             || Double.class.equals(valueClass)
             || LocalDateTime.class.equals(valueClass)
             || ZonedDateTime.class.equals(valueClass)
-            || Enum.class.isAssignableFrom(valueClass);
+            || valueClass.isEnum();
     }
 
     @Override
@@ -82,7 +82,7 @@ public final class MongoClassValidator implements TypeVisitor {
             fields.add(mongoFieldName);
 
             Class<?> fieldClass = field.getType();
-            if (Enum.class.isAssignableFrom(fieldClass)) {
+            if (fieldClass.isEnum()) {
                 @SuppressWarnings("unchecked")
                 Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
                 validateEnumClass(enumClass, field);

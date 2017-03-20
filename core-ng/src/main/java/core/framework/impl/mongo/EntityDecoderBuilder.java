@@ -117,7 +117,7 @@ final class EntityDecoderBuilder<T> {
             builder.indent(3).append("{} = {}.readLocalDateTime(reader, fieldPath);\n", fieldVariable, helper);
         } else if (ZonedDateTime.class.equals(fieldClass)) {
             builder.indent(3).append("{} = {}.readZonedDateTime(reader, fieldPath);\n", fieldVariable, helper);
-        } else if (Enum.class.isAssignableFrom(fieldClass)) {
+        } else if (fieldClass.isEnum()) {
             String enumCodecVariable = registerEnumCodec(fieldClass);
             builder.indent(3).append("{} = ({}) {}.decode(reader, null);\n", fieldVariable, fieldClass.getCanonicalName(), enumCodecVariable);
         } else if (Double.class.equals(fieldClass)) {
@@ -172,7 +172,7 @@ final class EntityDecoderBuilder<T> {
             builder.indent(2).append("map.put(fieldName, {}.readLocalDateTime(reader, fieldPath));\n", helper);
         } else if (ZonedDateTime.class.equals(valueClass)) {
             builder.indent(2).append("map.put(fieldName, {}.readZonedDateTime(reader, fieldPath));\n", helper);
-        } else if (Enum.class.isAssignableFrom(valueClass)) {
+        } else if (valueClass.isEnum()) {
             String enumCodecVariable = registerEnumCodec(valueClass);
             builder.indent(2).append("map.put(fieldName, {}.read(reader, fieldPath));\n", enumCodecVariable);
         } else if (Double.class.equals(valueClass)) {
@@ -230,7 +230,7 @@ final class EntityDecoderBuilder<T> {
             builder.indent(2).append("list.add({}.readLocalDateTime(reader, fieldPath));\n", helper);
         } else if (ZonedDateTime.class.equals(valueClass)) {
             builder.indent(2).append("list.add({}.readZonedDateTime(reader, fieldPath));\n", helper);
-        } else if (Enum.class.isAssignableFrom(valueClass)) {
+        } else if (valueClass.isEnum()) {
             String enumCodecVariable = registerEnumCodec(valueClass);
             builder.indent(2).append("list.add({}.read(reader, fieldPath));\n", enumCodecVariable, valueClassName);
         } else if (Double.class.equals(valueClass)) {
@@ -253,8 +253,8 @@ final class EntityDecoderBuilder<T> {
         return methodName;
     }
 
-    @SuppressWarnings("unchecked")
     private String registerEnumCodec(Class<?> fieldClass) {
+        @SuppressWarnings("unchecked")
         boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
         String fieldVariable = fieldClass.getCanonicalName().replaceAll("\\.", "_") + "Codec";
         if (added) {

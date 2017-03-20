@@ -197,7 +197,7 @@ public class ValidatorBuilder {
             || LocalDateTime.class.equals(fieldClass)
             || ZonedDateTime.class.equals(fieldClass)
             || Instant.class.equals(fieldClass)
-            || Enum.class.isAssignableFrom(fieldClass)
+            || fieldClass.isEnum()
             || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
     }
 }

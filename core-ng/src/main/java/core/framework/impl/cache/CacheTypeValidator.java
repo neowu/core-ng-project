@@ -38,7 +38,7 @@ class CacheTypeValidator {
             || LocalDateTime.class.equals(valueClass)
             || ZonedDateTime.class.equals(valueClass)
             || Instant.class.equals(valueClass)
-            || Enum.class.isAssignableFrom(valueClass)
+            || valueClass.isEnum()
             || "org.bson.types.ObjectId".equals(valueClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver;
     }
 }

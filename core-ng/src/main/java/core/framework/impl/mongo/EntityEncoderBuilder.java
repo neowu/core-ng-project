@@ -133,7 +133,7 @@ final class EntityEncoderBuilder<T> {
             builder.indent(indent).append("{}.writeLocalDateTime(writer, {});\n", helper, fieldVariable);
         } else if (ZonedDateTime.class.equals(fieldClass)) {
             builder.indent(indent).append("{}.writeZonedDateTime(writer, {});\n", helper, fieldVariable);
-        } else if (Enum.class.isAssignableFrom(fieldClass)) {
+        } else if (fieldClass.isEnum()) {
             String enumCodecVariable = registerEnumCodec(fieldClass);
             builder.indent(indent).append("{}.encode(writer, {}, null);\n", enumCodecVariable, fieldVariable);
         } else if (Double.class.equals(fieldClass)) {
@@ -157,8 +157,8 @@ final class EntityEncoderBuilder<T> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private String registerEnumCodec(Class<?> fieldClass) {
+        @SuppressWarnings("unchecked")
         boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
         String fieldVariable = fieldClass.getCanonicalName().replaceAll("\\.", "_") + "Codec";
         if (added) {
