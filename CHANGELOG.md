@@ -1,5 +1,6 @@
 ## Change log
 ### 4.10.15 (3/16/2017 - )
+* kafka: kafka().publish() return publisher instance for convenience
 
 ### 4.10.14 (3/14/2017)
 * mongo: fix bulkReplace to set upsert
