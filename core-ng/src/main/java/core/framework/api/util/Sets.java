@@ -13,7 +13,7 @@ public final class Sets {
 
     @SafeVarargs
     public static <T> Set<T> newHashSet(T... values) {
-        HashSet<T> set = new HashSet<>();
+        Set<T> set = new HashSet<>();
         for (T value : values) {
             set.add(value);
         }

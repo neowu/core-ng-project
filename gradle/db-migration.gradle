@@ -28,7 +28,7 @@ tasks.findAll { task -> task.name.startsWith('flyway') }.forEach { flywayTask ->
 
         assert project.file(flywayProperties).exists()
 
-        def Properties properties = new Properties()
+        Properties properties = new Properties()
         project.file(flywayProperties).withInputStream {
             properties.load(it)
         }

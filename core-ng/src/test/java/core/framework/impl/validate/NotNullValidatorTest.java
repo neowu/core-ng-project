@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -24,17 +23,15 @@ public class NotNullValidatorTest {
         Bean bean = new Bean();
         bean.child = new ChildBean();
         bean.children = Lists.newArrayList(bean.child);
-        bean.optionalChild = Optional.of(new ChildBean());
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
         Assert.assertTrue(errors.hasError());
-        assertEquals(5, errors.errors.size());
+        assertEquals(4, errors.errors.size());
         assertThat(errors.errors.get("stringField"), containsString("stringField"));
         assertThat(errors.errors.get("booleanField"), containsString("booleanField"));
         assertThat(errors.errors.get("child.intField"), containsString("intField"));
-        assertThat(errors.errors.get("optionalChild.intField"), containsString("intField"));
         assertThat(errors.errors.get("children.intField"), containsString("intField"));
     }
 
@@ -59,8 +56,6 @@ public class NotNullValidatorTest {
         @NotNull
         public ChildBean child;
         public List<ChildBean> children;
-        @NotNull
-        public Optional<ChildBean> optionalChild;
     }
 
     static class ChildBean {

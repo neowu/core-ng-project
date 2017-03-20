@@ -32,7 +32,7 @@ public class IndexController {
     }
 
     public Response submit(Request request) {
-        return Response.text("hello " + request.formParam("name").get(), ContentType.TEXT_PLAIN);
+        return Response.text("hello " + request.formParam("name").orElse("nobody"), ContentType.TEXT_PLAIN);
     }
 
     public Response logout(Request request) {

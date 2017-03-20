@@ -10,7 +10,6 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
@@ -28,17 +27,15 @@ public class NotEmptyValidatorTest {
         bean.stringField1 = "";
         bean.stringList = Lists.newArrayList("");
         bean.stringMap = Maps.newHashMap("key", "");
-        bean.optionalString = Optional.of("");
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
         Assert.assertTrue(errors.hasError());
-        assertEquals(4, errors.errors.size());
+        assertEquals(3, errors.errors.size());
         assertThat(errors.errors.get("stringField1"), containsString("stringField1"));
         assertThat(errors.errors.get("stringList"), containsString("stringList"));
         assertThat(errors.errors.get("stringMap"), containsString("stringMap"));
-        assertThat(errors.errors.get("optionalString"), containsString("optionalString"));
     }
 
     static class Bean {
@@ -54,8 +51,5 @@ public class NotEmptyValidatorTest {
 
         @NotEmpty(message = "stringMap must not contain empty")
         public Map<String, String> stringMap;
-
-        @NotEmpty(message = "optionalString must not be empty")
-        public Optional<String> optionalString;
     }
 }

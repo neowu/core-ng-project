@@ -2,7 +2,7 @@ apply plugin: 'build-dashboard'
 
 defaultTasks 'clean', 'build'
 
-def buildTime = new Date();
+def buildTime = new Date()
 
 subprojects {
     apply plugin: 'java'

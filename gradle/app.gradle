@@ -1,4 +1,4 @@
-import org.gradle.internal.os.OperatingSystem;
+import org.gradle.internal.os.OperatingSystem
 
 // use gradlew -Penv=${env} to pass
 def environment = hasProperty('env') ? env : null
@@ -6,7 +6,7 @@ def environment = hasProperty('env') ? env : null
 apply plugin: 'application'
 mainClassName = 'Main'
 
-def isWindows = OperatingSystem.current().isWindows();
+def isWindows = OperatingSystem.current().isWindows()
 
 clean {
     if (project.file("src/main/web").exists()) {
