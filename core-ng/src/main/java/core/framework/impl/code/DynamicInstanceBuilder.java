@@ -22,7 +22,7 @@ public class DynamicInstanceBuilder<T> {
     private final Logger logger = LoggerFactory.getLogger(DynamicInstanceBuilder.class);
     private final CtClass classBuilder;
     private final ClassPool classPool;
-    private Class[] constructorParamClasses;
+    private Class<?>[] constructorParamClasses;
 
     public DynamicInstanceBuilder(Class<?> interfaceClass, String className) {
         if (!interfaceClass.isInterface())
@@ -41,7 +41,7 @@ public class DynamicInstanceBuilder<T> {
         }
     }
 
-    public void constructor(Class[] constructorParamClasses, String body) {
+    public void constructor(Class<?>[] constructorParamClasses, String body) {
         if (this.constructorParamClasses != null)
             throw new Error("dynamic class must have no more than one custom constructor");
 

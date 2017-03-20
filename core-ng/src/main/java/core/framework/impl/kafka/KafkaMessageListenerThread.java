@@ -35,9 +35,9 @@ class KafkaMessageListenerThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListenerThread.class);
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Consumer<String, byte[]> consumer;
-    private final Map<String, MessageHandler> handlers;
-    private final Map<String, BulkMessageHandler> bulkHandlers;
-    private final Map<String, JSONReader> readers;
+    private final Map<String, MessageHandler<?>> handlers;
+    private final Map<String, BulkMessageHandler<?>> bulkHandlers;
+    private final Map<String, JSONReader<?>> readers;
     private final MessageValidator validator;
     private final LogManager logManager;
     private final double batchLongProcessThresholdInNano;
@@ -106,7 +106,7 @@ class KafkaMessageListenerThread extends Thread {
 
     private <T> void handle(String topic, MessageHandler<T> handler, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
         @SuppressWarnings("unchecked")
-        JSONReader<KafkaMessage<T>> reader = readers.get(topic);
+        JSONReader<KafkaMessage<T>> reader = (JSONReader<KafkaMessage<T>>) readers.get(topic);
         for (ConsumerRecord<String, byte[]> record : records) {
             logManager.begin("=== message handling begin ===");
             ActionLog actionLog = logManager.currentActionLog();
@@ -145,7 +145,7 @@ class KafkaMessageListenerThread extends Thread {
         ActionLog actionLog = logManager.currentActionLog();
         try {
             @SuppressWarnings("unchecked")
-            JSONReader<KafkaMessage<T>> reader = readers.get(topic);
+            JSONReader<KafkaMessage<T>> reader = (JSONReader<KafkaMessage<T>>) readers.get(topic);
             actionLog.action("topic/" + topic);
             actionLog.context("topic", topic);
             actionLog.context("handler", bulkHandler.getClass().getCanonicalName());

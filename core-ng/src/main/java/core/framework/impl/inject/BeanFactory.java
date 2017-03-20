@@ -85,7 +85,7 @@ public class BeanFactory {
     }
 
     private <T> void inject(T instance) throws IllegalAccessException, InvocationTargetException {
-        Class visitorType = instance.getClass();
+        Class<?> visitorType = instance.getClass();
         while (!visitorType.equals(Object.class)) {
             for (Field field : visitorType.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Inject.class)) {

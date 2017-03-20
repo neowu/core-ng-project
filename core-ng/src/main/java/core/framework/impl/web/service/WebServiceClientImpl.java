@@ -81,7 +81,7 @@ public class WebServiceClientImpl implements WebServiceClient {
         } else if (param instanceof Number) {
             return String.valueOf(param);
         } else if (param instanceof Enum) {
-            return JSON.toEnumValue((Enum) param);
+            return JSON.toEnumValue((Enum<?>) param);
         } else {
             throw Exceptions.error("not supported path param type, please contact arch team, type={}", param.getClass().getCanonicalName());
         }

@@ -34,7 +34,7 @@ public class PoolTest {
         boolean closed;
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             closed = true;
         }
     }

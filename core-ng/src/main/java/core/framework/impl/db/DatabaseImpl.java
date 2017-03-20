@@ -34,7 +34,7 @@ public final class DatabaseImpl implements Database {
     public final DatabaseOperation operation;
 
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
-    private final Map<Class, RowMapper> rowMappers = Maps.newHashMap();
+    private final Map<Class<?>, RowMapper<?>> rowMappers = Maps.newHashMap();
     private final Properties driverProperties = new Properties();
 
     public int tooManyRowsReturnedThreshold = 1000;
@@ -192,7 +192,7 @@ public final class DatabaseImpl implements Database {
 
     private <T> RowMapper<T> rowMapper(Class<T> viewClass) {
         @SuppressWarnings("unchecked")
-        RowMapper<T> mapper = rowMappers.get(viewClass);
+        RowMapper<T> mapper = (RowMapper<T>) rowMappers.get(viewClass);
         if (mapper == null)
             throw Exceptions.error("view class is not registered, please register in module by db().view(), viewClass={}", viewClass.getCanonicalName());
         return mapper;
@@ -207,7 +207,7 @@ public final class DatabaseImpl implements Database {
         return mapper;
     }
 
-    private <T> void checkTooManyRowsReturned(int size) {
+    private void checkTooManyRowsReturned(int size) {
         if (size > tooManyRowsReturnedThreshold) {
             logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }

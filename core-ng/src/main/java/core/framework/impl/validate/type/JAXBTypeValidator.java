@@ -25,12 +25,12 @@ import java.util.Set;
  * @author neo
  */
 public class JAXBTypeValidator implements TypeVisitor {
-    public static void validateEnumClass(Class<? extends Enum> enumClass) {
+    public static <T extends Enum<?>> void validateEnumClass(Class<T> enumClass) {
         if (enumClass.isAnnotationPresent(XmlEnum.class))
             throw Exceptions.error("enum class must not have @XmlEnum, enumClass={}", enumClass.getCanonicalName());
 
-        Enum[] constants = enumClass.getEnumConstants();
-        for (Enum constant : constants) {
+        T[] constants = enumClass.getEnumConstants();
+        for (T constant : constants) {
             try {
                 Field enumField = enumClass.getField(constant.name());
                 if (!enumField.isAnnotationPresent(XmlEnumValue.class)) {
@@ -101,7 +101,7 @@ public class JAXBTypeValidator implements TypeVisitor {
 
         if (Enum.class.isAssignableFrom(field.getType())) {
             @SuppressWarnings("unchecked")
-            Class<? extends Enum> enumClass = (Class<? extends Enum>) field.getType();
+            Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) field.getType();
             validateEnumClass(enumClass);
         }
     }

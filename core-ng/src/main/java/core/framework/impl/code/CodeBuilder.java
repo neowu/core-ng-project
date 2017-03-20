@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
  * @author neo
  */
 public class CodeBuilder {
-    public static String enumVariableLiteral(Enum value) {
+    public static String enumVariableLiteral(Enum<?> value) {
         return value.getDeclaringClass().getCanonicalName() + "." + value.name();
     }
 

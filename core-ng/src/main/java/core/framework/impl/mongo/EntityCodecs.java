@@ -47,11 +47,11 @@ public final class EntityCodecs {
     }
 
     @SuppressWarnings("unchecked")
-    CodecRegistry codecRegistry() {
+    <T extends Enum<T>> CodecRegistry codecRegistry() {
         List<Codec<?>> codecs = new ArrayList<>(this.codecs.values());
         codecs.add(new LocalDateTimeCodec());
         codecs.add(new ZonedDateTimeCodec());
-        enumClasses.forEach(enumClass -> codecs.add(new EnumCodec(enumClass)));
+        enumClasses.forEach(((Class<? extends Enum<?>> enumClass) -> codecs.add(new EnumCodec<T>((Class<T>) enumClass))));
         return CodecRegistries.fromCodecs(codecs);
     }
 }

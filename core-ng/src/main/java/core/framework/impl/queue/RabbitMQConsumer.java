@@ -156,7 +156,7 @@ public class RabbitMQConsumer implements Consumer, AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         try {
             channel.close();
         } catch (ShutdownSignalException e) {

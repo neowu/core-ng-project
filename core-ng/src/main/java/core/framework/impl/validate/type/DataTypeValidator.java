@@ -24,7 +24,7 @@ public class DataTypeValidator {
     public boolean allowTopLevelValue;
     public boolean allowTopLevelOptional;
     public boolean allowChild;
-    public Function<Class, Boolean> allowedValueClass;
+    public Function<Class<?>, Boolean> allowedValueClass;
     public TypeVisitor visitor;
 
     public DataTypeValidator(Type type) {
@@ -130,7 +130,7 @@ public class DataTypeValidator {
         if (!Object.class.equals(objectClass.getSuperclass())) {
             throw Exceptions.error("class must not have super class, class={}", objectClass.getCanonicalName());
         }
-        Constructor[] constructors = objectClass.getDeclaredConstructors();
+        Constructor<?>[] constructors = objectClass.getDeclaredConstructors();
         if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
             throw Exceptions.error("class must contain only one public default constructor, class={}, constructors={}", objectClass.getCanonicalName(), Arrays.toString(constructors));
         }

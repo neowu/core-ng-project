@@ -19,9 +19,9 @@ import java.util.Set;
  * @author neo
  */
 public class KafkaMessageListener {
-    final Map<String, MessageHandler> handlers = Maps.newHashMap();
-    final Map<String, BulkMessageHandler> bulkHandlers = Maps.newHashMap();
-    final Map<String, JSONReader> readers = Maps.newHashMap();
+    final Map<String, MessageHandler<?>> handlers = Maps.newHashMap();
+    final Map<String, BulkMessageHandler<?>> bulkHandlers = Maps.newHashMap();
+    final Map<String, JSONReader<?>> readers = Maps.newHashMap();
     final Kafka kafka;
     final LogManager logManager;
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListener.class);

@@ -1,5 +1,7 @@
 ## Change log
-### 4.10.15 (3/16/2017 - )
+### 4.10.16 (3/20/2017 - )
+
+### 4.10.15 (3/16/2017 - 3/20/2017)
 * kafka: kafka().publish() return publisher instance for convenience
 * kafka: add default publish method to use UUID as key
 

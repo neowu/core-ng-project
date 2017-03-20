@@ -32,7 +32,7 @@ public class WebServiceClientBuilder<T> {
         DynamicInstanceBuilder<T> builder = new DynamicInstanceBuilder<>(serviceInterface, serviceInterface.getCanonicalName() + "$Client");
 
         builder.addField(new CodeBuilder().append("final {} client;", WebServiceClientImpl.class.getCanonicalName()).build());
-        builder.constructor(new Class[]{WebServiceClientImpl.class}, "this.client = $1;");
+        builder.constructor(new Class<?>[]{WebServiceClientImpl.class}, "this.client = $1;");
 
         for (Method method : serviceInterface.getMethods()) {
             builder.addMethod(buildMethod(method));

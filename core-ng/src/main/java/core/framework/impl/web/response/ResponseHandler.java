@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
-    private final Map<Class, BodyHandler> handlers = Maps.newHashMap();
+    private final Map<Class<? extends Body>, BodyHandler> handlers = Maps.newHashMap();
 
     public ResponseHandler(BeanValidator validator, TemplateManager templateManager) {
         handlers.put(BeanBody.class, new BeanBodyResponseHandler(validator));

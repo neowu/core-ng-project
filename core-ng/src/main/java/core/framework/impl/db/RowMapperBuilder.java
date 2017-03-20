@@ -71,9 +71,9 @@ final class RowMapperBuilder<T> {
         return instanceBuilder.build();
     }
 
-    @SuppressWarnings("unchecked")
     private void registerEnumClass(Class<?> fieldClass) {
-        Class<? extends Enum> enumClass = (Class<? extends Enum>) fieldClass;
+        @SuppressWarnings("unchecked")
+        Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
         enumDBMapper.registerEnumClass(enumClass);
     }
 }

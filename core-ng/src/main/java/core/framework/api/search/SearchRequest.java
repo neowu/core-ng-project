@@ -12,8 +12,8 @@ import java.util.List;
  * @author neo
  */
 public class SearchRequest {
-    public final List<AbstractAggregationBuilder> aggregations = Lists.newArrayList();
-    public final List<SortBuilder> sorts = Lists.newArrayList();
+    public final List<AbstractAggregationBuilder<?>> aggregations = Lists.newArrayList();
+    public final List<SortBuilder<?>> sorts = Lists.newArrayList();
     public String index;
     public QueryBuilder query;
     public SearchType type;

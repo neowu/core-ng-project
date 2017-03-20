@@ -50,7 +50,7 @@ final class EntityEncoderBuilder<T> {
         methods.put("encode", builder.build());
     }
 
-    private String encodeEntityMethod(Class entityClass) {
+    private String encodeEntityMethod(Class<?> entityClass) {
         String entityClassName = entityClass.getCanonicalName();
         String methodName = "encode_" + entityClassName.replaceAll("\\.", "_");
         if (methods.containsKey(methodName)) return methodName;
@@ -75,7 +75,7 @@ final class EntityEncoderBuilder<T> {
         return methodName;
     }
 
-    private String encodeListMethod(Class valueClass) {
+    private String encodeListMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
         String methodName = ("encode_" + List.class.getCanonicalName() + "_" + valueClassName).replaceAll("\\.", "_");
         if (methods.containsKey(methodName)) return methodName;
@@ -96,7 +96,7 @@ final class EntityEncoderBuilder<T> {
         return methodName;
     }
 
-    private String encodeMapMethod(Class valueClass) {
+    private String encodeMapMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
         String methodName = ("encode_" + Map.class.getCanonicalName() + "_" + valueClassName).replaceAll("\\.", "_");
         if (methods.containsKey(methodName)) return methodName;

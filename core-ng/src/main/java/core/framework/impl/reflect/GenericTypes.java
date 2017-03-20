@@ -64,7 +64,7 @@ public final class GenericTypes {
         if (type instanceof ParameterizedType) {
             Type keyType = ((ParameterizedType) type).getActualTypeArguments()[0];
             if (!(keyType instanceof Class)) return false;
-            Class keyClass = (Class) keyType;
+            Class<?> keyClass = (Class<?>) keyType;
             return String.class.equals(keyClass)
                 && ((ParameterizedType) type).getActualTypeArguments()[1] instanceof Class;
         }

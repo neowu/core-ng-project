@@ -168,7 +168,7 @@ public class DatabaseOperation {
         } else if (param instanceof Integer) {
             statement.setInt(index, (Integer) param);
         } else if (param instanceof Enum) {
-            statement.setString(index, enumMapper.getDBValue((Enum) param));
+            statement.setString(index, enumMapper.getDBValue((Enum<?>) param));
         } else if (param instanceof LocalDateTime) {
             statement.setTimestamp(index, Timestamp.valueOf((LocalDateTime) param));
         } else if (param instanceof Boolean) {

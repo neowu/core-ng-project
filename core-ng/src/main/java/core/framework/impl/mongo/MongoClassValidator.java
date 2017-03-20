@@ -83,15 +83,17 @@ public final class MongoClassValidator implements TypeVisitor {
 
             Class<?> fieldClass = field.getType();
             if (Enum.class.isAssignableFrom(fieldClass)) {
-                validateEnumClass(fieldClass, field);
+                @SuppressWarnings("unchecked")
+                Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
+                validateEnumClass(enumClass, field);
             }
         }
     }
 
-    private void validateEnumClass(Class<?> enumClass, Field field) {
-        Enum[] constants = (Enum[]) enumClass.getEnumConstants();
+    private <T extends Enum<?>> void validateEnumClass(Class<T> enumClass, Field field) {
+        T[] constants = enumClass.getEnumConstants();
         Set<String> enumValues = Sets.newHashSet();
-        for (Enum constant : constants) {
+        for (T constant : constants) {
             try {
                 Field enumField = enumClass.getDeclaredField(constant.name());
                 MongoEnumValue enumValue = enumField.getDeclaredAnnotation(MongoEnumValue.class);

@@ -54,7 +54,7 @@ final class EntityDecoderBuilder<T> {
         methods.put("decode", builder.build());
     }
 
-    private String decodeEntityMethod(Class entityClass) {
+    private String decodeEntityMethod(Class<?> entityClass) {
         String entityClassName = entityClass.getCanonicalName();
         String methodName = "decode_" + entityClassName.replaceAll("\\.", "_");
         if (methods.containsKey(methodName)) return methodName;
@@ -98,7 +98,7 @@ final class EntityDecoderBuilder<T> {
 
     private void decodeEntityField(CodeBuilder builder, Field field) {
         String fieldVariable = "entity." + field.getName();
-        Class fieldClass = field.getType();
+        Class<?> fieldClass = field.getType();
         Type fieldType = field.getGenericType();
 
         String mongoFieldName;
@@ -196,7 +196,7 @@ final class EntityDecoderBuilder<T> {
         return methodName;
     }
 
-    private String decodeListMethod(Class valueClass) {
+    private String decodeListMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
         String methodName = ("decode_" + List.class.getCanonicalName() + "_" + valueClassName).replaceAll("\\.", "_");
         if (methods.containsKey(methodName)) return methodName;

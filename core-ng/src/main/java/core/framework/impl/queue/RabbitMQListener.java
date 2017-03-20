@@ -37,8 +37,8 @@ public final class RabbitMQListener implements MessageHandlerConfig {
     private final String queue;
     private final LogManager logManager;
     private final MessageValidator validator;
-    private final Map<String, MessageHandler> handlers = Maps.newHashMap();
-    private final Map<String, JSONReader> readers = Maps.newHashMap();
+    private final Map<String, MessageHandler<?>> handlers = Maps.newHashMap();
+    private final Map<String, JSONReader<?>> readers = Maps.newHashMap();
     private int poolSize = Runtime.getRuntime().availableProcessors() * 2;
     private ExecutorService handlerExecutor;
 
@@ -156,13 +156,13 @@ public final class RabbitMQListener implements MessageHandlerConfig {
         }
 
         @SuppressWarnings("unchecked")
-        JSONReader<T> reader = readers.get(messageType);
+        JSONReader<T> reader = (JSONReader<T>) readers.get(messageType);
         if (reader == null) throw Exceptions.error("unknown message type, messageType={}", messageType);
         T message = reader.fromJSON(body);
         validator.validate(message);
 
         @SuppressWarnings("unchecked")
-        MessageHandler<T> handler = handlers.get(messageType);
+        MessageHandler<T> handler = (MessageHandler<T>) handlers.get(messageType);
         actionLog.context("handler", handler.getClass().getCanonicalName());
 
         handler.handle(message);

@@ -36,11 +36,11 @@ public final class JSON {
         }
     }
 
-    public static <T extends Enum> T fromEnumValue(Class<T> valueType, String jsonValue) {
+    public static <T extends Enum<?>> T fromEnumValue(Class<T> valueType, String jsonValue) {
         return JSONMapper.OBJECT_MAPPER.convertValue(jsonValue, valueType);
     }
 
-    public static <T extends Enum> String toEnumValue(T value) {
+    public static <T extends Enum<?>> String toEnumValue(T value) {
         return JSONMapper.OBJECT_MAPPER.convertValue(value, String.class);
     }
 }

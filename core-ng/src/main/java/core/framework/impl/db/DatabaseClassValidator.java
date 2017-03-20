@@ -101,9 +101,9 @@ final class DatabaseClassValidator implements TypeVisitor {
     }
 
     private void validateEnumClass(Class<?> enumClass, Field field) {
-        Enum[] constants = (Enum[]) enumClass.getEnumConstants();
+        Enum<?>[] constants = (Enum<?>[]) enumClass.getEnumConstants();
         Set<String> enumValues = Sets.newHashSet();
-        for (Enum constant : constants) {
+        for (Enum<?> constant : constants) {
             try {
                 Field enumField = enumClass.getDeclaredField(constant.name());
                 DBEnumValue enumValue = enumField.getDeclaredAnnotation(DBEnumValue.class);

@@ -1,6 +1,5 @@
 package core.framework.api.util;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +14,9 @@ public final class Sets {
     @SafeVarargs
     public static <T> Set<T> newHashSet(T... values) {
         HashSet<T> set = new HashSet<>();
-        Collections.addAll(set, values);
+        for (T value : values) {
+            set.add(value);
+        }
         return set;
     }
 }
