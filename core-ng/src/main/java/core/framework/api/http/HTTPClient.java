@@ -50,7 +50,7 @@ public final class HTTPClient {
     private final CloseableHttpClient client;
     private final long slowOperationThresholdInNanos;
 
-    public HTTPClient(CloseableHttpClient client, Duration slowOperationThreshold) {
+    HTTPClient(CloseableHttpClient client, Duration slowOperationThreshold) {
         this.client = client;
         slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
     }
