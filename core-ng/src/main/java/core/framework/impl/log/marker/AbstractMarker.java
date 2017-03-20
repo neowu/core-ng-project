@@ -19,8 +19,8 @@ public abstract class AbstractMarker implements Marker {
         return false;
     }
 
-    @Override
     @SuppressWarnings("deprecation")
+    @Override
     public boolean hasChildren() {
         return false;
     }
