@@ -1,6 +1,7 @@
 ## Change log
 ### 4.10.15 (3/16/2017 - )
 * kafka: kafka().publish() return publisher instance for convenience
+* kafka: add default publish method to use UUID as key
 
 ### 4.10.14 (3/14/2017)
 * mongo: fix bulkReplace to set upsert
