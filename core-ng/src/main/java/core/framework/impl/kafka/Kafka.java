@@ -33,6 +33,9 @@ public class Kafka {
     public MessageValidator validator = new MessageValidator();
     public Duration maxProcessTime = Duration.ofMinutes(30);
     public int maxPollRecords = 500;    // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
+    public int maxPollBytes = 3 * 1024 * 1024;  // get 3M bytes message at max
+    public int minPollBytes = 1;    // default kafka setting
+    public Duration minPollMaxWaitTime = Duration.ofMillis(500);
     private Producer<String, byte[]> producer;
     private KafkaMessageListener listener;
 
@@ -72,12 +75,14 @@ public class Kafka {
             Map<String, Object> config = Maps.newHashMap();
             config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
             config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
-            config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
             config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
             config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
             config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
             config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
             config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
+            config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
+            config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
+            config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
             Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
             consumer.subscribe(topics);
             consumerMetrics.addMetrics(consumer.metrics());

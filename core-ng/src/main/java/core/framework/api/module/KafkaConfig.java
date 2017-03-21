@@ -86,9 +86,18 @@ public final class KafkaConfig {
         state.kafka.maxProcessTime = maxProcessTime;
     }
 
-    public void maxPollRecords(int maxPollRecords) {
-        if (maxPollRecords <= 0) throw Exceptions.error("max poll records must be greater than 0, value={}", maxPollRecords);
-        state.kafka.maxPollRecords = maxPollRecords;
+    public void maxPoll(int maxRecords, int maxBytes) {
+        if (maxRecords <= 0) throw Exceptions.error("max poll records must be greater than 0, value={}", maxRecords);
+        if (maxBytes <= 0) throw Exceptions.error("max poll bytes must be greater than 0, value={}", maxBytes);
+        state.kafka.maxPollRecords = maxRecords;
+        state.kafka.maxPollBytes = maxBytes;
+    }
+
+    public void minPoll(int minBytes, Duration maxWaitTime) {
+        if (minBytes <= 0) throw Exceptions.error("max poll records must be greater than 0, value={}", minBytes);
+        if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw Exceptions.error("max wait time must be greater than 0, value={}", maxWaitTime);
+        state.kafka.minPollBytes = minBytes;
+        state.kafka.minPollMaxWaitTime = maxWaitTime;
     }
 
     public static class KafkaConfigState {
