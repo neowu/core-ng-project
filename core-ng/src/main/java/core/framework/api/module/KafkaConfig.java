@@ -94,7 +94,7 @@ public final class KafkaConfig {
     }
 
     public void minPoll(int minBytes, Duration maxWaitTime) {
-        if (minBytes <= 0) throw Exceptions.error("max poll records must be greater than 0, value={}", minBytes);
+        if (minBytes <= 0) throw Exceptions.error("min poll bytes must be greater than 0, value={}", minBytes);
         if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw Exceptions.error("max wait time must be greater than 0, value={}", maxWaitTime);
         state.kafka.minPollBytes = minBytes;
         state.kafka.minPollMaxWaitTime = maxWaitTime;
