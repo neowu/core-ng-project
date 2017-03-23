@@ -19,13 +19,7 @@ dependencies {
 flyway {
     placeholderReplacement = false
 
-    def flywayProperties = "src/main/resources/flyway.properties"
-    if (environment != null) {
-        def envResources = "conf/${environment}/resources"
-        assert project.file(envResources).exists()
-        sourceSets.main.resources.srcDirs envResources
-        flywayProperties = "${envResources}/flyway.properties"
-    }
+    def flywayProperties = environment == null ? "src/main/resources/flyway.properties" : "conf/${environment}/resources/flyway.properties"
     assert project.file(flywayProperties).exists()
 
     Properties properties = new Properties()
@@ -33,6 +27,6 @@ flyway {
         properties.load(it)
     }
     properties.each { key, value ->
-        project.ext[key] = value
+        project.ext[key as String] = value
     }
 }
