@@ -3,39 +3,36 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'mysql:mysql-connector-java:5.1.40'
-        classpath 'org.flywaydb:flyway-gradle-plugin:4.0.3'
+        classpath 'org.flywaydb:flyway-gradle-plugin:4.1.2'
     }
 }
-
-apply plugin: org.flywaydb.gradle.FlywayPlugin
-flyway.placeholderReplacement = false
 
 // use gradlew -Penv=${env} to pass
 def environment = hasProperty('env') ? env : null
 
-tasks.findAll { task -> task.name.startsWith('flyway') }.forEach { flywayTask ->
-    flywayTask.dependsOn {
-        def flywayProperties = "src/main/resources/flyway.properties"
+apply plugin: org.flywaydb.gradle.FlywayPlugin
 
-        if (environment != null) {
-            def envResources = "conf/${environment}/resources"
-            assert project.file(envResources).exists()
-            sourceSets.main.resources.srcDirs envResources
+dependencies {
+    runtime 'mysql:mysql-connector-java:6.0.6'
+}
 
-            flywayProperties = "${envResources}/flyway.properties"
-        }
+flyway {
+    placeholderReplacement = false
 
-        assert project.file(flywayProperties).exists()
+    def flywayProperties = "src/main/resources/flyway.properties"
+    if (environment != null) {
+        def envResources = "conf/${environment}/resources"
+        assert project.file(envResources).exists()
+        sourceSets.main.resources.srcDirs envResources
+        flywayProperties = "${envResources}/flyway.properties"
+    }
+    assert project.file(flywayProperties).exists()
 
-        Properties properties = new Properties()
-        project.file(flywayProperties).withInputStream {
-            properties.load(it)
-        }
-        properties.each { key, value ->
-            project.ext[key] = value
-        }
-
-        logger.info("loading flyway properties, file=${project.file(flywayProperties)}")
+    Properties properties = new Properties()
+    project.file(flywayProperties).withInputStream {
+        properties.load(it)
+    }
+    properties.each { key, value ->
+        project.ext[key] = value
     }
 }
