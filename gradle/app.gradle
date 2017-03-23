@@ -6,27 +6,21 @@ def environment = hasProperty('env') ? env : null
 apply plugin: 'application'
 mainClassName = 'Main'
 
-def isWindows = OperatingSystem.current().isWindows()
+def npm(String... params) {
+    def isWindows = OperatingSystem.current().isWindows()
+    return {
+        workingDir "${rootDir}/gradle/node"
+        def command = isWindows ? ['cmd', '/c', 'npm'] : ['npm']
+        command.addAll(params)
+        commandLine command
+    }
+}
 
 clean {
     if (project.file("src/main/web").exists()) {
         doLast {
-            exec {
-                workingDir "${rootDir}/gradle/node"
-                if (!isWindows) {
-                    commandLine 'npm', 'install'
-                } else {
-                    commandLine 'cmd', '/c', 'npm', 'install'
-                }
-            }
-            exec {
-                workingDir "${rootDir}/gradle/node"
-                if (!isWindows) {
-                    commandLine 'npm', 'run', 'clean', '--', '--root', project.file('.')
-                } else {
-                    commandLine 'cmd', '/c', 'npm', 'run', 'clean', '--', '--root', project.file('.')
-                }
-            }
+            exec npm('install')
+            exec npm('run', 'clean', '--', '--root', project.file('.') as String)
         }
     }
 }
@@ -40,22 +34,8 @@ processResources {
     if (project.file("src/main/web").exists()) {
         inputs.file project.file("src/main/web")
         doLast {
-            exec {
-                workingDir "${rootDir}/gradle/node"
-                if (!isWindows) {
-                    commandLine 'npm', 'install'
-                } else {
-                    commandLine 'cmd', '/c', 'npm', 'install'
-                }
-            }
-            exec {
-                workingDir "${rootDir}/gradle/node"
-                if (!isWindows) {
-                    commandLine 'npm', 'run', 'build', '--', '--root', project.file('.')
-                } else {
-                    commandLine 'cmd', '/c', 'npm', 'run', 'build', '--', '--root', project.file('.')
-                }
-            }
+            exec npm('install')
+            exec npm('run', 'build', '--', '--root', project.file('.') as String)
         }
     }
 }
