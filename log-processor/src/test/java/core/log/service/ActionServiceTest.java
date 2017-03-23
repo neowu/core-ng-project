@@ -21,9 +21,9 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author neo
  */
-public class ActionManagerTest extends IntegrationTest {
+public class ActionServiceTest extends IntegrationTest {
     @Inject
-    ActionManager actionManager;
+    ActionService actionService;
 
     @Inject
     ElasticSearchType<ActionDocument> actionType;
@@ -49,7 +49,7 @@ public class ActionManagerTest extends IntegrationTest {
         message2.traceLog = "trace";
 
         LocalDate now = LocalDate.of(2016, Month.JANUARY, 15);
-        actionManager.index(Lists.newArrayList(message1, message2), now);
+        actionService.index(Lists.newArrayList(message1, message2), now);
 
         GetRequest request = new GetRequest();
         request.index = IndexName.name("action", now);

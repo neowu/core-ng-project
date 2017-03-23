@@ -1,6 +1,7 @@
 package core.log;
 
 import core.framework.api.AbstractTestModule;
+import core.log.service.IndexService;
 import core.log.service.KafkaConsumerFactory;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.MockConsumer;
@@ -16,9 +17,7 @@ public class TestModule extends AbstractTestModule {
 
         load(new LogProcessorApp());
 
-        initSearch().createIndexTemplate("action", "action-index-template.json");
-        initSearch().createIndexTemplate("trace", "trace-index-template.json");
-        initSearch().createIndexTemplate("stat", "stat-index-template.json");
+        bean(IndexService.class).createIndexTemplates();
     }
 
     private static class MockKafkaConsumerFactory extends KafkaConsumerFactory {

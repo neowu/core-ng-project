@@ -23,8 +23,11 @@ public class KafkaConsumerFactory {
         Map<String, Object> config = Maps.newHashMap();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "log-processor");
-        config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
+        config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 1024 * 1024); // try to get at least 1M message
+        config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 500);       // pause 500ms if not enable data to process
+
         return new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
     }
 }

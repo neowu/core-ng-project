@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class ActionManager {
+public class ActionService {
     @Inject
     ElasticSearchType<ActionDocument> actionType;
     @Inject

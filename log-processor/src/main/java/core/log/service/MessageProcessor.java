@@ -33,17 +33,18 @@ public class MessageProcessor {
     private final Consumer<String, byte[]> consumer;
 
     @Inject
-    public MessageProcessor(KafkaConsumerFactory consumerFactory, ActionManager actionManager, StatManager statManager) {
+    public MessageProcessor(KafkaConsumerFactory consumerFactory, ActionService actionService, StatService statService, IndexService indexService) {
         consumer = consumerFactory.create();
         consumer.subscribe(Lists.newArrayList(TOPIC_ACTION_LOG, TOPIC_STAT));
 
         processorThread = new Thread(() -> {
             logger.info("message processor started, kafkaURI={}", consumerFactory.uri);
+            createIndexTemplates(indexService);
             while (!stop.get()) {
                 try {
                     ConsumerRecords<String, byte[]> records = consumer.poll(Long.MAX_VALUE);
-                    consume(TOPIC_ACTION_LOG, records, actionLogMessageReader, actionManager::index);
-                    consume(TOPIC_STAT, records, statMessageReader, statManager::index);
+                    consume(TOPIC_ACTION_LOG, records, actionLogMessageReader, actionService::index);
+                    consume(TOPIC_STAT, records, statMessageReader, statService::index);
                     consumer.commitAsync();
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
@@ -55,6 +56,20 @@ public class MessageProcessor {
             consumer.close();
             logger.info("message processor stopped");
         }, "message-processor");
+    }
+
+    private void createIndexTemplates(IndexService indexService) {
+        while (!stop.get()) {
+            try {
+                indexService.createIndexTemplates();
+                break;
+            } catch (Throwable e) {
+                if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
+                    logger.error("failed to create index templates, retry in 30 seconds", e);
+                    Threads.sleepRoughly(Duration.ofSeconds(30));
+                }
+            }
+        }
     }
 
     public void start() {

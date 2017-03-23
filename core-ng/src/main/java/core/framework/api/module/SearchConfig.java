@@ -68,7 +68,7 @@ public final class SearchConfig {
     }
 
     public static class SearchConfigState {
-        ElasticSearchImpl search;
+        public ElasticSearchImpl search;
         String host;
 
         public void validate() {

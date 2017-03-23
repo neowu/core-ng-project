@@ -16,10 +16,10 @@ public final class InitSearchConfig {
 
     public InitSearchConfig(ModuleContext context) {
         this.context = context;
-        if (!context.beanFactory.registered(ElasticSearch.class, null)) {
+        if (context.config.search().search == null) {
             throw new Error("search() is not configured");
         }
-        search = context.beanFactory.bean(ElasticSearch.class, null);
+        search = context.config.search().search;
     }
 
     public void createIndex(String index, String sourcePath) {

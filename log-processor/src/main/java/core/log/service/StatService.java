@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class StatManager {
+public class StatService {
     @Inject
     ElasticSearchType<StatDocument> statType;
 
