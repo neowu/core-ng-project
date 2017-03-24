@@ -10,10 +10,6 @@ checkstyle {
         }
     }
 
-    configurations {
-        checkstyle
-    }
-
     dependencies {
         checkstyle 'com.puppycrawl.tools:checkstyle:7.6'
         checkstyle 'com.github.sevntu.checkstyle:sevntu-checks:1.23.1'
