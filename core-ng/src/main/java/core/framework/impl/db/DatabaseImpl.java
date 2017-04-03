@@ -106,7 +106,7 @@ public final class DatabaseImpl implements Database {
         logger.info("set database connection url, url={}", url);
         this.url = url;
         try {
-            if (url.startsWith("jdbc:mysql://")) {
+            if (url.startsWith("jdbc:mysql:")) {
                 driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
                 timeout(timeout);
             } else if (url.startsWith("jdbc:hsqldb:")) {
@@ -200,7 +200,7 @@ public final class DatabaseImpl implements Database {
 
     private <T> RowMapper<T> registerViewClass(Class<T> viewClass) {
         if (rowMappers.containsKey(viewClass)) {
-            throw Exceptions.error("duplicated view class found, viewClass={}", viewClass.getCanonicalName());
+            throw Exceptions.error("found duplicated view class, viewClass={}", viewClass.getCanonicalName());
         }
         RowMapper<T> mapper = new RowMapperBuilder<>(viewClass, operation.enumMapper).build();
         rowMappers.put(viewClass, mapper);

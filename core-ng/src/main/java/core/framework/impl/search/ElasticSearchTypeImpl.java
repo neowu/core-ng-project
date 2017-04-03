@@ -29,6 +29,7 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
@@ -140,9 +141,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         validator.validate(request.source);
         byte[] document = writer.toJSON(request.source);
         try {
-            client().prepareIndex(index, type, request.id)
-                    .setSource(document)
-                    .get();
+            client().prepareIndex(index, type, request.id).setSource(document, XContentType.JSON).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -165,7 +164,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             T source = entry.getValue();
             validator.validate(source);
             byte[] document = writer.toJSON(source);
-            builder.add(client().prepareIndex(index, type, id).setSource(document));
+            builder.add(client().prepareIndex(index, type, id).setSource(document, XContentType.JSON));
         }
         long esTookTime = 0;
         try {

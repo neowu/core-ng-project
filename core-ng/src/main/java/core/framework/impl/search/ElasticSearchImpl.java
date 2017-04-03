@@ -14,12 +14,14 @@ import org.elasticsearch.client.AdminClient;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +87,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndex(String index, String source) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin().indices().prepareCreate(index).setSource(source).get();
+            client().admin().indices().prepareCreate(index).setSource(new BytesArray(source), XContentType.JSON).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
@@ -97,7 +99,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndexTemplate(String name, String source) {
         StopWatch watch = new StopWatch();
         try {
-            client().admin().indices().preparePutTemplate(name).setSource(source).get();
+            client().admin().indices().preparePutTemplate(name).setSource(new BytesArray(source), XContentType.JSON).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
