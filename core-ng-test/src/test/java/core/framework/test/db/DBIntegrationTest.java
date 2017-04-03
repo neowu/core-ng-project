@@ -7,6 +7,7 @@ import org.junit.Test;
 import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -24,10 +25,12 @@ public class DBIntegrationTest extends IntegrationTest {
         entity.id = UUID.randomUUID().toString();
         entity.dateTimeField = LocalDateTime.now();
         entity.dateField = LocalDate.now();
+        entity.zonedDateTimeField = ZonedDateTime.now();
         entityRepository.insert(entity);
 
         TestDBEntity selectedEntity = entityRepository.get(entity.id).get();
         assertEquals(entity.dateField, selectedEntity.dateField);
         assertEquals(entity.dateTimeField, selectedEntity.dateTimeField);
+        assertEquals(entity.zonedDateTimeField, selectedEntity.zonedDateTimeField);
     }
 }

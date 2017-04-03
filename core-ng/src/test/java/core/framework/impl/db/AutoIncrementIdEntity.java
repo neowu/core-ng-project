@@ -6,6 +6,7 @@ import core.framework.api.db.Table;
 import core.framework.api.validate.Length;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author neo
@@ -28,4 +29,7 @@ public class AutoIncrementIdEntity {
 
     @Column(name = "date_time_field")
     public LocalDateTime dateTimeField;
+
+    @Column(name = "zoned_date_time_field")
+    public ZonedDateTime zonedDateTimeField;
 }

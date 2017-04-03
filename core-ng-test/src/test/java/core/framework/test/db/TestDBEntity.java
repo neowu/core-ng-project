@@ -7,6 +7,7 @@ import core.framework.api.db.Table;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author chi
@@ -28,6 +29,9 @@ public class TestDBEntity {
 
     @Column(name = "date_field")
     public LocalDate dateField;
+
+    @Column(name = "zoned_date_time_field")
+    public ZonedDateTime zonedDateTimeField;
 
     @Column(name = "double_field")
     public Double doubleField;

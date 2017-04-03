@@ -16,6 +16,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -171,6 +172,8 @@ public class DatabaseOperation {
             statement.setString(index, enumMapper.getDBValue((Enum<?>) param));
         } else if (param instanceof LocalDateTime) {
             statement.setTimestamp(index, Timestamp.valueOf((LocalDateTime) param));
+        } else if (param instanceof ZonedDateTime) {
+            statement.setTimestamp(index, new Timestamp(((ZonedDateTime) param).toInstant().toEpochMilli()));
         } else if (param instanceof Boolean) {
             statement.setBoolean(index, (Boolean) param);
         } else if (param instanceof Long) {

@@ -9,6 +9,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +26,7 @@ public class RepositoryImplAutoIncrementIdEntityTest {
     public static void createDatabase() {
         database = new DatabaseImpl();
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
-        database.execute("CREATE TABLE auto_increment_id_entity (id INT AUTO_INCREMENT PRIMARY KEY, string_field VARCHAR(20), double_field DOUBLE, enum_field VARCHAR(10), date_time_field TIMESTAMP)");
+        database.execute("CREATE TABLE auto_increment_id_entity (id INT AUTO_INCREMENT PRIMARY KEY, string_field VARCHAR(20), double_field DOUBLE, enum_field VARCHAR(10), date_time_field TIMESTAMP, zoned_date_time_field TIMESTAMP)");
 
         repository = database.repository(AutoIncrementIdEntity.class);
     }
@@ -44,6 +47,7 @@ public class RepositoryImplAutoIncrementIdEntityTest {
         entity.stringField = "string";
         entity.doubleField = 3.25;
         entity.dateTimeField = LocalDateTime.now();
+        entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2017, Month.APRIL, 3, 12, 0), ZoneId.of("UTC"));
 
         Optional<Long> id = repository.insert(entity);
         Assert.assertTrue(id.isPresent());
@@ -54,6 +58,7 @@ public class RepositoryImplAutoIncrementIdEntityTest {
         Assert.assertEquals(entity.stringField, selectedEntity.stringField);
         Assert.assertEquals(entity.doubleField, selectedEntity.doubleField);
         Assert.assertEquals(entity.dateTimeField, selectedEntity.dateTimeField);
+        Assert.assertEquals(entity.zonedDateTimeField.toInstant(), selectedEntity.zonedDateTimeField.toInstant());
     }
 
     @Test
