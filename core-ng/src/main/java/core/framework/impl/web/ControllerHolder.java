@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
  * @author neo
  */
 public class ControllerHolder {
-    public final Controller controller;
+    final Controller controller;
     final Method targetMethod;
     final String controllerInfo;
 

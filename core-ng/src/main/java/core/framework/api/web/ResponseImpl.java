@@ -8,6 +8,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -17,6 +18,7 @@ public final class ResponseImpl implements Response {
     public final Body body;
     public Map<CookieSpec, String> cookies;
     private HTTPStatus status = HTTPStatus.OK;
+    private ContentType contentType;
 
     ResponseImpl(Body body) {
         this.body = body;
@@ -40,6 +42,11 @@ public final class ResponseImpl implements Response {
     }
 
     @Override
+    public Optional<ContentType> contentType() {
+        return Optional.ofNullable(contentType);
+    }
+
+    @Override
     public Response cookie(CookieSpec spec, String value) {
         if (cookies == null) cookies = Maps.newHashMap();
         cookies.put(spec, value);
@@ -48,8 +55,10 @@ public final class ResponseImpl implements Response {
 
     @Override
     public Response contentType(ContentType contentType) {
-        if (contentType != null)
+        if (contentType != null) {
+            this.contentType = contentType;
             headers.put(Headers.CONTENT_TYPE, contentType.toString());
+        }
         return this;
     }
 }

@@ -10,6 +10,7 @@ import core.framework.impl.web.response.FileBody;
 import core.framework.impl.web.response.TemplateBody;
 
 import java.io.File;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -88,6 +89,8 @@ public interface Response {
     Response status(HTTPStatus status);
 
     Response header(String name, Object value);
+
+    Optional<ContentType> contentType();
 
     Response contentType(ContentType contentType);
 

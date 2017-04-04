@@ -1,5 +1,6 @@
 package core.framework.impl.web.site;
 
+import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.web.Interceptor;
 import core.framework.api.web.Invocation;
@@ -13,7 +14,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class HTTPSOnlyInterceptor implements Interceptor {
+public class WebSecurityInterceptor implements Interceptor {
     @Override
     public Response intercept(Invocation invocation) throws Exception {
         Request request = invocation.context().request();
@@ -22,6 +23,13 @@ public class HTTPSOnlyInterceptor implements Interceptor {
         } else {
             Response response = invocation.proceed();
             response.header("Strict-Transport-Security", "max-age=31536000");
+            response.contentType().ifPresent(contentType -> {
+                if (ContentType.TEXT_HTML.mediaType().equals(contentType.mediaType())) {
+                    response.header("X-Frame-Options", "DENY");
+                    response.header("X-XSS-Protection", "1; mode=block");
+                }
+                response.header("X-Content-Type-Options", "nosniff");
+            });
             return response;
         }
     }

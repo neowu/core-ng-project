@@ -1,7 +1,8 @@
 ## Change log
-### 4.11.2 (4/3/2017 - )
+### 4.11.2 (4/3/2017 - 4/4/2017)
 * es: update to 5.3.0
 * db: fix to support ZonedDateTime
+* site: enable security headers, X-Frame-Options, X-XSS-Protection, X-Content-Type-Options
 
 ### 4.11.1 (3/20/2017 - 3/21/2017)
 * kafka: updated maxPoll and minPoll config

@@ -14,7 +14,7 @@ public class Interceptors {
 
     public void add(Interceptor interceptor) {
         if (interceptor.getClass().isSynthetic())
-            throw Exceptions.error("interceptor class must not be anonymous class or lambda, please create static class, interceptorClass={}", interceptor.getClass().getCanonicalName());
+            throw Exceptions.error("interceptor class must not be anonymous class or lambda, please use static class, interceptorClass={}", interceptor.getClass().getCanonicalName());
 
         interceptors.add(interceptor);
     }

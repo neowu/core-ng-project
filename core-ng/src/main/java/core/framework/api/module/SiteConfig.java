@@ -5,9 +5,9 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.web.site.Message;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.ControllerHolder;
-import core.framework.impl.web.site.HTTPSOnlyInterceptor;
 import core.framework.impl.web.site.StaticDirectoryController;
 import core.framework.impl.web.site.StaticFileController;
+import core.framework.impl.web.site.WebSecurityInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,13 +55,13 @@ public final class SiteConfig {
             throw Exceptions.error("path does not exist, path={}", path);
         }
         if (Files.isDirectory(contentPath)) {
-            context.httpServer.handler.route.add(HTTPMethod.GET, path + "/:path(*)", new ControllerHolder(new StaticDirectoryController(contentPath), true));
+            context.httpServer.handler.route.add(HTTPMethod.GET, path + "/:path(*)", new ControllerHolder(new StaticDirectoryController(contentPath)));
         } else {
-            context.httpServer.handler.route.add(HTTPMethod.GET, path, new ControllerHolder(new StaticFileController(contentPath), true));
+            context.httpServer.handler.route.add(HTTPMethod.GET, path, new ControllerHolder(new StaticFileController(contentPath)));
         }
     }
 
-    public void httpsOnly() {
-        context.httpServer.handler.interceptors.add(new HTTPSOnlyInterceptor());
+    public void enableWebSecurity() {
+        context.httpServer.handler.interceptors.add(new WebSecurityInterceptor());
     }
 }
