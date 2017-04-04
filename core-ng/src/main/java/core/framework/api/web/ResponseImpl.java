@@ -47,18 +47,18 @@ public final class ResponseImpl implements Response {
     }
 
     @Override
-    public Response cookie(CookieSpec spec, String value) {
-        if (cookies == null) cookies = Maps.newHashMap();
-        cookies.put(spec, value);
-        return this;
-    }
-
-    @Override
     public Response contentType(ContentType contentType) {
         if (contentType != null) {
             this.contentType = contentType;
             headers.put(Headers.CONTENT_TYPE, contentType.toString());
         }
+        return this;
+    }
+
+    @Override
+    public Response cookie(CookieSpec spec, String value) {
+        if (cookies == null) cookies = Maps.newHashMap();
+        cookies.put(spec, value);
         return this;
     }
 }
