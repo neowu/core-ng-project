@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/check.gradle")
 
     group = 'core.framework'
-    version = '4.11.2'
+    version = '4.11.3'
 }
 
 def mongoVersion = '3.4.2'
@@ -110,51 +110,6 @@ project(':log-processor') {
         testCompile(
                 project(':core-ng-test'),
                 'org.apache.logging.log4j:log4j-core:2.7'       // used by elasticsearch
-        )
-    }
-}
-
-//project(':benchmark') {
-//    dependencies {
-//        compile(
-//                project(':core-ng'),
-//                'org.openjdk.jmh:jmh-generator-annprocess:1.11.3',
-//                "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
-//                "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
-//                "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}",
-//                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
-//                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
-//        )
-//    }
-//}
-
-project(':demo-service') {
-    apply from: file("${rootDir}/gradle/app.gradle")
-    dependencies {
-        compile(
-                project(':core-ng')
-        )
-        runtime(
-                "org.apache.kafka:kafka-clients:${kafkaVersion}"
-        )
-        testCompile(
-                project(':core-ng-test')
-        )
-    }
-}
-
-project(':demo-site') {
-    apply from: file("${rootDir}/gradle/app.gradle")
-    dependencies {
-        compile(
-                project(':core-ng')
-        )
-        runtime(
-                "org.apache.kafka:kafka-clients:${kafkaVersion}",
-                'redis.clients:jedis:2.9.0@jar'
-        )
-        testCompile(
-                project(':core-ng-test')
         )
     }
 }

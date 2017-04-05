@@ -35,11 +35,12 @@ public final class DatabaseImpl implements Database {
 
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = Maps.newHashMap();
-    private final Properties driverProperties = new Properties();
-
     public int tooManyRowsReturnedThreshold = 1000;
     public String url;
+    public String user;
+    public String password;
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
+    private Properties driverProperties;
     private Duration timeout;
     private Driver driver;
 
@@ -69,6 +70,11 @@ public final class DatabaseImpl implements Database {
 
     private Connection createConnection() {
         if (url == null) throw new Error("url must not be null");
+        Properties driverProperties = this.driverProperties;
+        if (driverProperties == null) {
+            driverProperties = driverProperties();
+            this.driverProperties = driverProperties;
+        }
         try {
             return driver.connect(url, driverProperties);
         } catch (SQLException e) {
@@ -76,41 +82,47 @@ public final class DatabaseImpl implements Database {
         }
     }
 
+    private Properties driverProperties() {
+        Properties properties = new Properties();
+        properties.put("user", user);
+        properties.put("password", password);
+        String timeoutValue = String.valueOf(timeout.toMillis());
+        if (url.startsWith("jdbc:mysql:")) {
+            properties.put("connectTimeout", timeoutValue);
+            properties.put("socketTimeout", timeoutValue);
+        } else if (url.startsWith("jdbc:oracle:")) {
+            properties.put("oracle.net.CONNECT_TIMEOUT", timeoutValue);
+            properties.put("oracle.jdbc.ReadTimeout", timeoutValue);
+        }
+        return properties;
+    }
+
     public void close() {
         logger.info("close database client, url={}", url);
         pool.close();
-    }
-
-    public void user(String user) {
-        driverProperties.put("user", user);
-    }
-
-    public void password(String password) {
-        driverProperties.put("password", password);
     }
 
     public void timeout(Duration timeout) {
         this.timeout = timeout;
         operation.queryTimeoutInSeconds = (int) timeout.getSeconds();
         pool.checkoutTimeout(timeout);
-
-        if (url != null && url.startsWith("jdbc:mysql:")) {
-            driverProperties.put("connectTimeout", String.valueOf(timeout.toMillis()));
-            driverProperties.put("socketTimeout", String.valueOf(timeout.toMillis()));
-        }
     }
 
     public void url(String url) {
         if (!url.startsWith("jdbc:")) throw Exceptions.error("jdbc url must start with \"jdbc:\", url={}", url);
-
         logger.info("set database connection url, url={}", url);
         this.url = url;
+        driver = driver(url);
+    }
+
+    private Driver driver(String url) {
         try {
             if (url.startsWith("jdbc:mysql:")) {
-                driver = (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
-                timeout(timeout);
+                return (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
             } else if (url.startsWith("jdbc:hsqldb:")) {
-                driver = (Driver) Class.forName("org.hsqldb.jdbc.JDBCDriver").newInstance();
+                return (Driver) Class.forName("org.hsqldb.jdbc.JDBCDriver").newInstance();
+            } else if (url.startsWith("jdbc:oracle:")) {
+                return (Driver) Class.forName("oracle.jdbc.OracleDriver").newInstance();
             } else {
                 throw Exceptions.error("not supported database, please contact arch team, url={}", url);
             }

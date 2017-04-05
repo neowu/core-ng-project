@@ -55,13 +55,13 @@ public final class DBConfig {
 
     public void user(String user) {
         if (!context.isTest()) {
-            state.database.user(user);
+            state.database.user = user;
         }
     }
 
     public void password(String password) {
         if (!context.isTest()) {
-            state.database.password(password);
+            state.database.password = password;
         }
     }
 
