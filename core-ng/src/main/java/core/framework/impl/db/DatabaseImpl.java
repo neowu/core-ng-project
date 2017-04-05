@@ -84,8 +84,8 @@ public final class DatabaseImpl implements Database {
 
     private Properties driverProperties() {
         Properties properties = new Properties();
-        properties.put("user", user);
-        properties.put("password", password);
+        if (user != null) properties.put("user", user);
+        if (password != null) properties.put("password", password);
         String timeoutValue = String.valueOf(timeout.toMillis());
         if (url.startsWith("jdbc:mysql:")) {
             properties.put("connectTimeout", timeoutValue);
