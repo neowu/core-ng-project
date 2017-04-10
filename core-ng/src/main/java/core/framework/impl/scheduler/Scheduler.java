@@ -64,11 +64,11 @@ public final class Scheduler {
     void schedule(DynamicTrigger trigger, ZonedDateTime next) {
         ZonedDateTime now = ZonedDateTime.now();
         Duration delay = Duration.between(now, next);
-        scheduler.schedule(new DynamicJob(this, trigger, next), delay.toNanos(), TimeUnit.NANOSECONDS);
+        scheduler.schedule(new DynamicTriggerJob(this, trigger, next), delay.toNanos(), TimeUnit.NANOSECONDS);
     }
 
     void schedule(Trigger trigger, Duration delay, Duration rate) {
-        scheduler.scheduleAtFixedRate(() -> submitJob(trigger, false), delay.toNanos(), rate.toNanos(), TimeUnit.NANOSECONDS);
+        scheduler.scheduleAtFixedRate(new FixedRateTriggerJob(this, trigger), delay.toNanos(), rate.toNanos(), TimeUnit.NANOSECONDS);
     }
 
     public void triggerNow(String name) {
@@ -87,7 +87,6 @@ public final class Scheduler {
                 if (trace) {
                     actionLog.trace = true;
                 }
-                logger.info("execute scheduled job, job={}", name);
                 Job job = trigger.job();
                 actionLog.context("job", name);
                 actionLog.context("jobClass", job.getClass().getCanonicalName());
@@ -102,12 +101,30 @@ public final class Scheduler {
         });
     }
 
-    static class DynamicJob implements Runnable {
+    static class FixedRateTriggerJob implements Runnable {
+        final Scheduler scheduler;
+        final Trigger trigger;
+        private final Logger logger = LoggerFactory.getLogger(FixedRateTriggerJob.class);
+
+        FixedRateTriggerJob(Scheduler scheduler, Trigger trigger) {
+            this.scheduler = scheduler;
+            this.trigger = trigger;
+        }
+
+        @Override
+        public void run() {
+            logger.info("execute scheduled job, job={}", trigger.name());
+            scheduler.submitJob(trigger, false);
+        }
+    }
+
+    static class DynamicTriggerJob implements Runnable {
         final Scheduler scheduler;
         final DynamicTrigger trigger;
         final ZonedDateTime now;
+        private final Logger logger = LoggerFactory.getLogger(DynamicTriggerJob.class);
 
-        DynamicJob(Scheduler scheduler, DynamicTrigger trigger, ZonedDateTime now) {
+        DynamicTriggerJob(Scheduler scheduler, DynamicTrigger trigger, ZonedDateTime now) {
             this.scheduler = scheduler;
             this.trigger = trigger;
             this.now = now;
@@ -117,6 +134,7 @@ public final class Scheduler {
         public void run() {
             ZonedDateTime next = trigger.next(now);
             scheduler.schedule(trigger, next);
+            logger.info("execute scheduled job, job={}, now={}, next={}", trigger.name(), now, next);
             scheduler.submitJob(trigger, false);
         }
     }

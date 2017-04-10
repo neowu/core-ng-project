@@ -29,32 +29,30 @@ public final class SchedulerConfig {
         }
     }
 
+    public void timeZone(ZoneId zoneId) {
+        if (state.triggerAdded) throw new Error("schedule().timeZone() must configure before adding trigger");
+        if (zoneId == null) throw new Error("zoneId must not be null");
+        state.zoneId = zoneId;
+    }
+
     public void fixedRate(String name, Job job, Duration rate) {
         state.scheduler.addTrigger(new FixedRateTrigger(name, job, rate));
+        state.triggerAdded = true;
     }
 
     public void dailyAt(String name, Job job, LocalTime time) {
-        dailyAt(name, job, time, ZoneId.systemDefault());
-    }
-
-    public void dailyAt(String name, Job job, LocalTime time, ZoneId zoneId) {
-        state.scheduler.addTrigger(new DailyTrigger(name, job, time, zoneId));
+        state.scheduler.addTrigger(new DailyTrigger(name, job, time, state.zoneId));
+        state.triggerAdded = true;
     }
 
     public void weeklyAt(String name, Job job, DayOfWeek dayOfWeek, LocalTime time) {
-        weeklyAt(name, job, dayOfWeek, time, ZoneId.systemDefault());
-    }
-
-    public void weeklyAt(String name, Job job, DayOfWeek dayOfWeek, LocalTime time, ZoneId zoneId) {
-        state.scheduler.addTrigger(new WeeklyTrigger(name, job, dayOfWeek, time, zoneId));
+        state.scheduler.addTrigger(new WeeklyTrigger(name, job, dayOfWeek, time, state.zoneId));
+        state.triggerAdded = true;
     }
 
     public void monthlyAt(String name, Job job, int dayOfMonth, LocalTime time) {
-        monthlyAt(name, job, dayOfMonth, time, ZoneId.systemDefault());
-    }
-
-    public void monthlyAt(String name, Job job, int dayOfMonth, LocalTime time, ZoneId zoneId) {
-        state.scheduler.addTrigger(new MonthlyTrigger(name, job, dayOfMonth, time, zoneId));
+        state.scheduler.addTrigger(new MonthlyTrigger(name, job, dayOfMonth, time, state.zoneId));
+        state.triggerAdded = true;
     }
 
     private Scheduler createScheduler(ModuleContext context) {
@@ -71,5 +69,7 @@ public final class SchedulerConfig {
 
     public static class SchedulerConfigState {
         Scheduler scheduler;
+        boolean triggerAdded;
+        ZoneId zoneId = ZoneId.systemDefault();
     }
 }
