@@ -1,11 +1,10 @@
 package core.framework.impl.scheduler;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author neo
  */
 public interface DynamicTrigger extends Trigger {
-    Duration nextDelay(LocalDateTime now);
+    ZonedDateTime next(ZonedDateTime now);
 }

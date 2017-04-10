@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -61,17 +61,14 @@ public final class Scheduler {
             throw Exceptions.error("duplicated job found, name={}, previousJobClass={}", name, previous.job().getClass().getCanonicalName());
     }
 
-    void schedule(DynamicTrigger trigger, Duration delay) {
-        scheduler.schedule(() -> {
-            LocalDateTime now = LocalDateTime.now();
-            Duration nextDelay = trigger.nextDelay(now);
-            schedule(trigger, nextDelay);
-            submitJob(trigger, false);
-        }, delay.toMillis(), TimeUnit.MILLISECONDS);
+    void schedule(DynamicTrigger trigger, ZonedDateTime next) {
+        ZonedDateTime now = ZonedDateTime.now();
+        Duration delay = Duration.between(now, next);
+        scheduler.schedule(new DynamicJob(this, trigger, next), delay.toNanos(), TimeUnit.NANOSECONDS);
     }
 
     void schedule(Trigger trigger, Duration delay, Duration rate) {
-        scheduler.scheduleAtFixedRate(() -> submitJob(trigger, false), delay.toMillis(), rate.toMillis(), TimeUnit.MILLISECONDS);
+        scheduler.scheduleAtFixedRate(() -> submitJob(trigger, false), delay.toNanos(), rate.toNanos(), TimeUnit.NANOSECONDS);
     }
 
     public void triggerNow(String name) {
@@ -103,5 +100,24 @@ public final class Scheduler {
                 logManager.end("=== job execution end ===");
             }
         });
+    }
+
+    static class DynamicJob implements Runnable {
+        final Scheduler scheduler;
+        final DynamicTrigger trigger;
+        final ZonedDateTime now;
+
+        DynamicJob(Scheduler scheduler, DynamicTrigger trigger, ZonedDateTime now) {
+            this.scheduler = scheduler;
+            this.trigger = trigger;
+            this.now = now;
+        }
+
+        @Override
+        public void run() {
+            ZonedDateTime next = trigger.next(now);
+            scheduler.schedule(trigger, next);
+            scheduler.submitJob(trigger, false);
+        }
     }
 }

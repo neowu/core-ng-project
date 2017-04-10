@@ -2,22 +2,24 @@ package core.framework.impl.scheduler;
 
 import core.framework.api.scheduler.Job;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * @author neo
  */
-public final class DailyTrigger implements Trigger {
+public final class DailyTrigger implements DynamicTrigger {
     private final String name;
     private final Job job;
     private final LocalTime time;
+    private final ZoneId zoneId;
 
-    public DailyTrigger(String name, Job job, LocalTime time) {
+    public DailyTrigger(String name, Job job, LocalTime time, ZoneId zoneId) {
         this.name = name;
         this.job = job;
         this.time = time;
+        this.zoneId = zoneId;
     }
 
     @Override
@@ -32,8 +34,8 @@ public final class DailyTrigger implements Trigger {
 
     @Override
     public void schedule(Scheduler scheduler) {
-        Duration delay = nextDelay(LocalDateTime.now());
-        scheduler.schedule(this, delay, Duration.ofDays(1));
+        ZonedDateTime next = next(ZonedDateTime.now());
+        scheduler.schedule(this, next);
     }
 
     @Override
@@ -41,11 +43,13 @@ public final class DailyTrigger implements Trigger {
         return "daily@" + time;
     }
 
-    Duration nextDelay(LocalDateTime now) {
-        Duration delay = Duration.between(now.toLocalTime(), time);
-        if (delay.isNegative()) {
-            return delay.plusDays(1);
+    @Override
+    public ZonedDateTime next(ZonedDateTime now) {
+        ZonedDateTime targetZonedDateTime = now.withZoneSameInstant(zoneId);
+        ZonedDateTime next = targetZonedDateTime.with(time);
+        if (!next.isAfter(now)) {
+            next = next.plusDays(1).with(time);     // reset time in case the current day is daylight saving start date
         }
-        return delay;
+        return next;
     }
 }

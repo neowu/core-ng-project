@@ -3,19 +3,37 @@ package core.framework.impl.scheduler;
 import org.junit.Test;
 
 import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
+import static java.time.LocalDateTime.parse;
+import static java.time.ZonedDateTime.of;
 import static org.junit.Assert.assertEquals;
 
 public class WeeklyTriggerTest {
-    @Test
-    public void nextDelay() {
-        WeeklyTrigger trigger = new WeeklyTrigger(null, null, DayOfWeek.WEDNESDAY, LocalTime.of(2, 0, 0));  // @MondayT2:00 every week
+    private static final ZoneId US = ZoneId.of("America/Los_Angeles");
 
-        assertEquals(Duration.ofHours(1), trigger.nextDelay(LocalDateTime.of(2016, Month.JANUARY, 13, 1, 0, 0)));   // 2016-1-13 is Wednesday
-        assertEquals("wait 7 days and -1 hour to next week", Duration.ofHours(7 * 24 - 1), trigger.nextDelay(LocalDateTime.of(2016, Month.JANUARY, 13, 3, 0, 0)));
+    @Test
+    public void next() {
+        WeeklyTrigger trigger = new WeeklyTrigger(null, null, DayOfWeek.WEDNESDAY, LocalTime.of(2, 0, 0), US);  // @MondayT2:00 every week
+
+        ZonedDateTime next = trigger.next(of(parse("2016-01-13T01:00:00"), US));            // 2016-1-13 is Wednesday
+        assertEquals("next should be 2016-01-13T02:00:00", of(parse("2016-01-13T02:00:00"), US).toInstant(), next.toInstant());
+
+        next = trigger.next(of(parse("2016-01-13T01:00:00"), US).withZoneSameInstant(ZoneId.of("UTC")));
+        assertEquals("next should be 2016-01-13T02:00:00", of(parse("2016-01-13T02:00:00"), US).toInstant(), next.toInstant());
+
+        next = trigger.next(of(parse("2016-01-13T02:00:00"), US));
+        assertEquals("next should be 2016-01-20T02:00:00", of(parse("2016-01-20T02:00:00"), US).toInstant(), next.toInstant());
+
+        next = trigger.next(of(parse("2016-01-13T02:30:00"), US));
+        assertEquals("next should be 2016-01-20T02:00:00", of(parse("2016-01-20T02:00:00"), US).toInstant(), next.toInstant());
+
+        next = trigger.next(of(parse("2016-01-12T01:00:00"), US));            // 2016-1-12 is Tuesday
+        assertEquals("next should be 2016-01-13T02:00:00", of(parse("2016-01-13T02:00:00"), US).toInstant(), next.toInstant());
+
+        next = trigger.next(of(parse("2016-01-19T01:00:00"), US));            // 2016-1-19 is Thursday
+        assertEquals("next should be 2016-01-20T02:00:00", of(parse("2016-01-20T02:00:00"), US).toInstant(), next.toInstant());
     }
 }

@@ -2,19 +2,31 @@ package core.framework.impl.scheduler;
 
 import org.junit.Test;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
+import static java.time.LocalDateTime.parse;
+import static java.time.ZonedDateTime.of;
 import static org.junit.Assert.assertEquals;
 
 public class MonthlyTriggerTest {
-    @Test
-    public void nextDelay() {
-        MonthlyTrigger trigger = new MonthlyTrigger(null, null, 2, LocalTime.of(3, 0, 0));  // @2T3:00 every month
+    private static final ZoneId US = ZoneId.of("America/New_York");
 
-        assertEquals(Duration.ofHours(1), trigger.nextDelay(LocalDateTime.of(2016, Month.JANUARY, 2, 2, 0, 0)));
-        assertEquals("wait 2 days and 1 hour to next month", Duration.ofHours(2 * 24 + 1), trigger.nextDelay(LocalDateTime.of(2016, Month.JANUARY, 31, 2, 0, 0)));
+    @Test
+    public void next() {
+        MonthlyTrigger trigger = new MonthlyTrigger(null, null, 2, LocalTime.of(3, 0), US);   // @2T3:00 every month
+
+        ZonedDateTime next = trigger.next(of(parse("2017-04-02T02:00:00"), US));
+        assertEquals("next should be 2017-04-02T03:00:00", of(parse("2017-04-02T03:00:00"), US).toInstant(), next.toInstant());
+
+        next = trigger.next(of(parse("2017-04-02T02:00:00"), US).withZoneSameInstant(ZoneId.of("UTC")));
+        assertEquals("next should be 2017-04-02T03:00:00", of(parse("2017-04-02T03:00:00"), US).toInstant(), next.toInstant());
+
+        next = trigger.next(of(parse("2017-04-02T03:00:00"), US));
+        assertEquals("next should be 2017-05-02T03:00:00", of(parse("2017-05-02T03:00:00"), US).toInstant(), next.toInstant());
+
+        next = trigger.next(of(parse("2017-04-02T03:30:00"), US));
+        assertEquals("next should be 2017-05-02T03:00:00", of(parse("2017-05-02T03:00:00"), US).toInstant(), next.toInstant());
     }
 }

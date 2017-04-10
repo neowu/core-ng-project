@@ -14,6 +14,7 @@ import core.framework.impl.web.management.SchedulerController;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 /**
  * @author neo
@@ -33,15 +34,27 @@ public final class SchedulerConfig {
     }
 
     public void dailyAt(String name, Job job, LocalTime time) {
-        state.scheduler.addTrigger(new DailyTrigger(name, job, time));
+        dailyAt(name, job, time, ZoneId.systemDefault());
+    }
+
+    public void dailyAt(String name, Job job, LocalTime time, ZoneId zoneId) {
+        state.scheduler.addTrigger(new DailyTrigger(name, job, time, zoneId));
     }
 
     public void weeklyAt(String name, Job job, DayOfWeek dayOfWeek, LocalTime time) {
-        state.scheduler.addTrigger(new WeeklyTrigger(name, job, dayOfWeek, time));
+        weeklyAt(name, job, dayOfWeek, time, ZoneId.systemDefault());
+    }
+
+    public void weeklyAt(String name, Job job, DayOfWeek dayOfWeek, LocalTime time, ZoneId zoneId) {
+        state.scheduler.addTrigger(new WeeklyTrigger(name, job, dayOfWeek, time, zoneId));
     }
 
     public void monthlyAt(String name, Job job, int dayOfMonth, LocalTime time) {
-        state.scheduler.addTrigger(new MonthlyTrigger(name, job, dayOfMonth, time));
+        monthlyAt(name, job, dayOfMonth, time, ZoneId.systemDefault());
+    }
+
+    public void monthlyAt(String name, Job job, int dayOfMonth, LocalTime time, ZoneId zoneId) {
+        state.scheduler.addTrigger(new MonthlyTrigger(name, job, dayOfMonth, time, zoneId));
     }
 
     private Scheduler createScheduler(ModuleContext context) {

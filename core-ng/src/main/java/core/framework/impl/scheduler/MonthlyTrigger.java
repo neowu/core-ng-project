@@ -3,24 +3,26 @@ package core.framework.impl.scheduler;
 import core.framework.api.scheduler.Job;
 import core.framework.api.util.Exceptions;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
- * @author tminglei
+ * @author tminglei, neo
  */
 public final class MonthlyTrigger implements DynamicTrigger {
     private final String name;
     private final Job job;
     private final int dayOfMonth;
     private final LocalTime time;
+    private final ZoneId zoneId;
 
-    public MonthlyTrigger(String name, Job job, int dayOfMonth, LocalTime time) {
+    public MonthlyTrigger(String name, Job job, int dayOfMonth, LocalTime time, ZoneId zoneId) {
         this.name = name;
         this.job = job;
         this.dayOfMonth = dayOfMonth;
         this.time = time;
+        this.zoneId = zoneId;
 
         if (dayOfMonth < 1 || dayOfMonth > 28) {
             throw Exceptions.error("unsupported dayOfMonth, please use 1-28, dayOfMonth={}", dayOfMonth);
@@ -39,23 +41,22 @@ public final class MonthlyTrigger implements DynamicTrigger {
 
     @Override
     public void schedule(Scheduler scheduler) {
-        Duration delay = nextDelay(LocalDateTime.now());
-        scheduler.schedule(this, delay);
+        ZonedDateTime next = next(ZonedDateTime.now());
+        scheduler.schedule(this, next);
+    }
+
+    @Override
+    public ZonedDateTime next(ZonedDateTime now) {
+        ZonedDateTime targetZonedDateTime = now.withZoneSameInstant(zoneId);
+        ZonedDateTime next = targetZonedDateTime.withDayOfMonth(dayOfMonth).with(time);
+        if (!next.isAfter(now)) {
+            next = next.plusMonths(1).with(time);     // reset time in case the current day is daylight saving start date
+        }
+        return next;
     }
 
     @Override
     public String frequency() {
         return "monthly@" + dayOfMonth + "/" + time;
-    }
-
-    @Override
-    public Duration nextDelay(LocalDateTime now) {
-        LocalDateTime target = LocalDateTime.of(now.toLocalDate(), time).withDayOfMonth(dayOfMonth);
-        Duration delay = Duration.between(now, target);
-        if (delay.isZero() || delay.isNegative()) { // make sure delay is positive
-            target = target.plusMonths(1);
-            return Duration.between(now, target);
-        }
-        return delay;
     }
 }
