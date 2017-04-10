@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/check.gradle")
 
     group = 'core.framework'
-    version = '4.11.3'
+    version = '4.11.4'
 }
 
 def mongoVersion = '3.4.2'
@@ -32,7 +32,7 @@ project(':core-ng') {
                 "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}",
                 "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
                 "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}",
-                'org.apache.httpcomponents:httpclient:4.5.2',
+                'org.apache.httpcomponents:httpclient:4.5.3',
                 'io.undertow:undertow-core:1.4.12.Final'
         )
         compileOnly(
@@ -45,7 +45,7 @@ project(':core-ng') {
         )
         testImplementation(
                 'junit:junit:4.12',
-                'org.mockito:mockito-core:2.7.13'
+                'org.mockito:mockito-core:2.7.22'
         )
         testRuntimeOnly(
                 'org.hsqldb:hsqldb:2.3.3'
