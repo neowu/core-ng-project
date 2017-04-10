@@ -1,6 +1,7 @@
 package core.framework.impl.scheduler;
 
 import core.framework.api.scheduler.Job;
+import core.framework.api.util.Strings;
 
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -40,7 +41,7 @@ public final class DailyTrigger implements DynamicTrigger {
 
     @Override
     public String frequency() {
-        return "daily@" + time;
+        return Strings.format("daily@{}[{}]", time, zoneId.getId());
     }
 
     @Override

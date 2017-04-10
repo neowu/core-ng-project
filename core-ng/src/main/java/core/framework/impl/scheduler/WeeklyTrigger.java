@@ -1,6 +1,7 @@
 package core.framework.impl.scheduler;
 
 import core.framework.api.scheduler.Job;
+import core.framework.api.util.Strings;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -43,7 +44,7 @@ public final class WeeklyTrigger implements DynamicTrigger {
 
     @Override
     public String frequency() {
-        return "weekly@" + dayOfWeek + "/" + time;
+        return Strings.format("weekly@{}/{}[{}]", dayOfWeek, time, zoneId.getId());
     }
 
     @Override

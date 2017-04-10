@@ -2,6 +2,7 @@ package core.framework.impl.scheduler;
 
 import core.framework.api.scheduler.Job;
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Strings;
 
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -46,16 +47,16 @@ public final class MonthlyTrigger implements DynamicTrigger {
     }
 
     @Override
+    public String frequency() {
+        return Strings.format("monthly@{}/{}[{}]", dayOfMonth, time, zoneId.getId());
+    }
+
+    @Override
     public ZonedDateTime next(ZonedDateTime now) {
         ZonedDateTime next = now.withZoneSameInstant(zoneId).withDayOfMonth(dayOfMonth).with(time);
         if (!next.isAfter(now)) {
             next = next.plusMonths(1).with(time);     // reset time in case the current day is daylight saving start date
         }
         return next;
-    }
-
-    @Override
-    public String frequency() {
-        return "monthly@" + dayOfMonth + "/" + time;
     }
 }
