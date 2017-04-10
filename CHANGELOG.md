@@ -1,5 +1,5 @@
 ## Change log
-### 4.11.3 (4/4/2017 - )
+### 4.11.3 (4/4/2017 - 4/10/2017)
 * scheduler: daily/weekly/monthly supports timezone
 
 ### 4.11.2 (4/3/2017 - 4/4/2017)

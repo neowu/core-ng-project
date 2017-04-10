@@ -48,8 +48,7 @@ public final class WeeklyTrigger implements DynamicTrigger {
 
     @Override
     public ZonedDateTime next(ZonedDateTime now) {
-        ZonedDateTime targetZonedDateTime = now.withZoneSameInstant(zoneId);
-        ZonedDateTime next = targetZonedDateTime.plusDays(dayOfWeek.getValue() - now.getDayOfWeek().getValue()).with(time);
+        ZonedDateTime next = now.withZoneSameInstant(zoneId).plusDays(dayOfWeek.getValue() - now.getDayOfWeek().getValue()).with(time);
         if (!next.isAfter(now)) {
             next = next.plusWeeks(1).with(time);     // reset time in case the current day is daylight saving start date
         }

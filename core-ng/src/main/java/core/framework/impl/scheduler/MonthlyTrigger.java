@@ -47,8 +47,7 @@ public final class MonthlyTrigger implements DynamicTrigger {
 
     @Override
     public ZonedDateTime next(ZonedDateTime now) {
-        ZonedDateTime targetZonedDateTime = now.withZoneSameInstant(zoneId);
-        ZonedDateTime next = targetZonedDateTime.withDayOfMonth(dayOfMonth).with(time);
+        ZonedDateTime next = now.withZoneSameInstant(zoneId).withDayOfMonth(dayOfMonth).with(time);
         if (!next.isAfter(now)) {
             next = next.plusMonths(1).with(time);     // reset time in case the current day is daylight saving start date
         }
