@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class WebSecurityInterceptor implements Interceptor {
+public class WebSecurityInterceptor implements Interceptor {    // refer to https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
     @Override
     public Response intercept(Invocation invocation) throws Exception {
         Request request = invocation.context().request();

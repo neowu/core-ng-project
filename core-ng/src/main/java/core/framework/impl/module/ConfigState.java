@@ -7,6 +7,7 @@ import core.framework.api.module.MongoConfig;
 import core.framework.api.module.RedisConfig;
 import core.framework.api.module.SchedulerConfig;
 import core.framework.api.module.SearchConfig;
+import core.framework.api.module.SiteConfig;
 import core.framework.api.util.Maps;
 
 import java.util.Map;
@@ -22,6 +23,7 @@ public class ConfigState {
     private CacheConfig.CacheConfigState cache;
     private SearchConfig.SearchConfigState search;
     private SchedulerConfig.SchedulerConfigState scheduler;
+    private SiteConfig.SiteConfigState site;
 
     public void validate() {
         if (redis != null) redis.validate();
@@ -65,5 +67,10 @@ public class ConfigState {
     public SchedulerConfig.SchedulerConfigState scheduler() {
         if (scheduler == null) scheduler = new SchedulerConfig.SchedulerConfigState();
         return scheduler;
+    }
+
+    public SiteConfig.SiteConfigState site() {
+        if (site == null) site = new SiteConfig.SiteConfigState();
+        return site;
     }
 }

@@ -23,14 +23,14 @@ import java.util.Map;
 public class TemplateManager {
     public final CDNManager cdnManager = new CDNManager();
     public final Map<String, Map<String, HTMLTemplate>> templates = Maps.newConcurrentHashMap();    // path->language->template
-    private final MessageManager messageManager;
+    private final MessageImpl message;
     private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
 
-    public TemplateManager(WebDirectory webDirectory, MessageManager messageManager) {
+    public TemplateManager(WebDirectory webDirectory, MessageImpl message) {
         this.webDirectory = webDirectory;
-        this.messageManager = messageManager;
+        this.message = message;
     }
 
     public String process(String templatePath, Object model, String language) {
@@ -72,7 +72,7 @@ public class TemplateManager {
             }
         }
 
-        String targetLanguage = language == null ? MessageManager.DEFAULT_LANGUAGE : language;
+        String targetLanguage = language == null ? MessageImpl.DEFAULT_LANGUAGE : language;
         HTMLTemplate template = templates.get(targetLanguage);
         if (template == null) throw Exceptions.error("language is not defined, please check site().message(), language={}", targetLanguage);
         return template;
@@ -82,8 +82,8 @@ public class TemplateManager {
         HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass);
         builder.cdn = cdnManager;
         Map<String, HTMLTemplate> templates = Maps.newHashMap();
-        for (String language : messageManager.languages) {
-            builder.message = key -> messageManager.get(key, language);
+        for (String language : message.languages) {
+            builder.message = key -> message.get(key, language);
             HTMLTemplate htmlTemplate = builder.build();
             templates.put(language, htmlTemplate);
         }

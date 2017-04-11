@@ -23,9 +23,11 @@ public final class SiteConfig {
     private final Logger logger = LoggerFactory.getLogger(SiteConfig.class);
 
     private final ModuleContext context;
+    private final SiteConfig.SiteConfigState state;
 
     public SiteConfig(ModuleContext context) {
         this.context = context;
+        state = context.config.site();
     }
 
     public SessionConfig session() {
@@ -37,14 +39,16 @@ public final class SiteConfig {
     }
 
     public void message(List<String> paths, String... languages) {
-        if (!context.beanFactory.registered(Message.class, null)) {
-            context.beanFactory.bind(Message.class, null, context.httpServer.siteManager.messageManager);
+        if (state.messageConfigured) {
+            throw Exceptions.error("site().message() can only be configured once and must before site().template()");
         }
-        context.httpServer.siteManager.messageManager.load(paths, languages);
+        state.messageConfigured = true;
+        context.beanFactory.bind(Message.class, null, context.httpServer.siteManager.message);
+        context.httpServer.siteManager.message.load(paths, languages);
     }
 
     public void template(String path, Class<?> modelClass) {
-        context.httpServer.siteManager.messageManager.freeze(); // can not configure message() after adding template
+        state.messageConfigured = true; // can not configure message() after adding template
         context.httpServer.siteManager.templateManager.add(path, modelClass);
     }
 
@@ -63,5 +67,9 @@ public final class SiteConfig {
 
     public void enableWebSecurity() {
         context.httpServer.handler.interceptors.add(new WebSecurityInterceptor());
+    }
+
+    public static class SiteConfigState {
+        boolean messageConfigured;
     }
 }

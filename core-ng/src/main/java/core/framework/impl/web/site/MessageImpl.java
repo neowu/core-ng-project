@@ -22,18 +22,17 @@ import java.util.regex.Pattern;
 /**
  * @author neo
  */
-public class MessageManager implements Message {
+public class MessageImpl implements Message {
     static final String DEFAULT_LANGUAGE = "_default";
     private static final Pattern MESSAGE_PROPERTY_PATH_PATTERN = Pattern.compile("[^_]+((_[a-zA-Z0-9]{2,4})*)\\.properties");
-    private final Logger logger = LoggerFactory.getLogger(MessageManager.class);
+    private final Logger logger = LoggerFactory.getLogger(MessageImpl.class);
+    private final Map<String, List<Properties>> messages = Maps.newHashMap();
     String[] languages = new String[]{DEFAULT_LANGUAGE};
-    private Map<String, List<Properties>> messages;
 
     public void load(List<String> paths, String... languages) {
-        if (messages != null) throw Exceptions.error("site().message() can only be called once and must before site().template(), please check config");
+        if (!messages.isEmpty()) throw new Error("messages must be empty");
 
-        messages = Maps.newHashMap();
-        if (languages != null) this.languages = languages;
+        if (languages.length > 0) this.languages = languages;
         Map<String, Properties> properties = Maps.newHashMap();
 
         for (String path : paths) {
@@ -104,10 +103,6 @@ public class MessageManager implements Message {
         String languagePostfix = matcher.group(1);
         if (Strings.isEmpty(languagePostfix)) return DEFAULT_LANGUAGE;
         return languagePostfix.substring(1);
-    }
-
-    public void freeze() {
-        if (messages == null) messages = Maps.newHashMap();
     }
 
     @Override
