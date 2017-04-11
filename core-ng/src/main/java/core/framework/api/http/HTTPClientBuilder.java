@@ -38,19 +38,19 @@ public final class HTTPClientBuilder {
             builder.setKeepAliveStrategy((response, context) -> keepAliveTimeout.toMillis());
 
             builder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                .setSSLContext(new SSLContextBuilder().loadTrustMaterial(TrustSelfSignedStrategy.INSTANCE).build());
+                   .setSSLContext(new SSLContextBuilder().loadTrustMaterial(TrustSelfSignedStrategy.INSTANCE).build());
 
             // builder use PoolingHttpClientConnectionManager by default, and connTimeToLive will be set by keepAlive value
 
             builder.setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(true).build());
 
             builder.setDefaultRequestConfig(RequestConfig.custom()
-                .setSocketTimeout((int) timeout.toMillis())
-                .setConnectionRequestTimeout((int) timeout.toMillis())
-                .setConnectTimeout((int) timeout.toMillis()).build());
+                                                         .setSocketTimeout((int) timeout.toMillis())
+                                                         .setConnectionRequestTimeout((int) timeout.toMillis())
+                                                         .setConnectTimeout((int) timeout.toMillis()).build());
 
             builder.setMaxConnPerRoute(maxConnections)
-                .setMaxConnTotal(maxConnections);
+                   .setMaxConnTotal(maxConnections);
 
             builder.disableAuthCaching();
             builder.disableConnectionState();

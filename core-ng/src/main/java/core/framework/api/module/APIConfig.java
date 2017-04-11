@@ -11,7 +11,6 @@ import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.service.HTTPMethodHelper;
 import core.framework.impl.web.service.WebServiceClient;
 import core.framework.impl.web.service.WebServiceClientBuilder;
-import core.framework.impl.web.service.WebServiceClientImpl;
 import core.framework.impl.web.service.WebServiceControllerBuilder;
 import core.framework.impl.web.service.WebServiceImplValidator;
 import core.framework.impl.web.service.WebServiceInterfaceValidator;
@@ -62,7 +61,7 @@ public final class APIConfig {
             return new WebServiceClientConfig(context, null);
         } else {
             HTTPClient httpClient = httpClient();
-            WebServiceClient webServiceClient = new WebServiceClientImpl(serviceURL, httpClient, validator, context.logManager);
+            WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator, context.logManager);
             T client = new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
             context.beanFactory.bind(serviceInterface, null, client);
             return new WebServiceClientConfig(context, webServiceClient);

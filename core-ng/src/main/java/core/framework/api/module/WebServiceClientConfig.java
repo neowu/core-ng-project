@@ -1,6 +1,6 @@
 package core.framework.api.module;
 
-import core.framework.api.web.service.WebServiceRequestSigner;
+import core.framework.api.web.service.WebServiceRequestInterceptor;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.service.WebServiceClient;
 
@@ -16,9 +16,9 @@ public final class WebServiceClientConfig {     // returned from APIConfig, must
         this.client = client;
     }
 
-    public void signBy(WebServiceRequestSigner signer) {
+    public void intercept(WebServiceRequestInterceptor interceptor) {
         if (!context.isTest()) {
-            client.signBy(signer);
+            client.intercept(interceptor);
         }
     }
 }

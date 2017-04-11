@@ -23,12 +23,12 @@ public class WebServiceClientTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private WebServiceClientImpl webServiceClient;
+    private WebServiceClient webServiceClient;
     private HTTPRequest request;
 
     @Before
     public void prepare() {
-        webServiceClient = new WebServiceClientImpl("http://localhost", null, null, null);
+        webServiceClient = new WebServiceClient("http://localhost", null, null, null);
         request = Mockito.mock(HTTPRequest.class);
     }
 
