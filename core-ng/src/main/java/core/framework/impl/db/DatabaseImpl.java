@@ -212,7 +212,7 @@ public final class DatabaseImpl implements Database {
 
     private <T> RowMapper<T> registerViewClass(Class<T> viewClass) {
         if (rowMappers.containsKey(viewClass)) {
-            throw Exceptions.error("found duplicated view class, viewClass={}", viewClass.getCanonicalName());
+            throw Exceptions.error("found duplicate view class, viewClass={}", viewClass.getCanonicalName());
         }
         RowMapper<T> mapper = new RowMapperBuilder<>(viewClass, operation.enumMapper).build();
         rowMappers.put(viewClass, mapper);

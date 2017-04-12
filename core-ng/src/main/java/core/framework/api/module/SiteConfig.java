@@ -23,7 +23,7 @@ public final class SiteConfig {
     private final Logger logger = LoggerFactory.getLogger(SiteConfig.class);
 
     private final ModuleContext context;
-    private final SiteConfig.SiteConfigState state;
+    private final State state;
 
     public SiteConfig(ModuleContext context) {
         this.context = context;
@@ -69,7 +69,7 @@ public final class SiteConfig {
         context.httpServer.handler.interceptors.add(new WebSecurityInterceptor());
     }
 
-    public static class SiteConfigState {
+    public static class State {
         boolean messageConfigured;
     }
 }

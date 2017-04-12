@@ -77,7 +77,7 @@ public final class MongoClassValidator implements TypeVisitor {
 
             Set<String> fields = this.fields.computeIfAbsent(parentPath, key -> Sets.newHashSet());
             if (fields.contains(mongoFieldName)) {
-                throw Exceptions.error("duplicated field found, field={}, mongoField={}", Fields.path(field), mongoFieldName);
+                throw Exceptions.error("found duplicate field, field={}, mongoField={}", Fields.path(field), mongoFieldName);
             }
             fields.add(mongoFieldName);
 

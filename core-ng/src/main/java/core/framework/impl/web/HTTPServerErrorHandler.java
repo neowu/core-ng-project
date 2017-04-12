@@ -15,6 +15,7 @@ import core.framework.api.web.exception.ConflictException;
 import core.framework.api.web.exception.ForbiddenException;
 import core.framework.api.web.exception.MethodNotAllowedException;
 import core.framework.api.web.exception.NotFoundException;
+import core.framework.api.web.exception.TooManyRequestsException;
 import core.framework.api.web.exception.UnauthorizedException;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.request.RequestImpl;
@@ -34,11 +35,11 @@ public class HTTPServerErrorHandler {
     private final ResponseHandler responseHandler;
     public ErrorHandler customErrorHandler;
 
-    public HTTPServerErrorHandler(ResponseHandler responseHandler) {
+    HTTPServerErrorHandler(ResponseHandler responseHandler) {
         this.responseHandler = responseHandler;
     }
 
-    public void handleError(Throwable e, HttpServerExchange exchange, RequestImpl request) {
+    void handleError(Throwable e, HttpServerExchange exchange, RequestImpl request) {
         if (exchange.isResponseStarted()) {
             logger.error("response was sent, discard the current http transaction");
             return;
@@ -72,16 +73,18 @@ public class HTTPServerErrorHandler {
 
         if (e instanceof BadRequestException || e instanceof ValidationException) {
             status = HTTPStatus.BAD_REQUEST;
-        } else if (e instanceof MethodNotAllowedException) {
-            status = HTTPStatus.METHOD_NOT_ALLOWED;
         } else if (e instanceof NotFoundException) {
             status = HTTPStatus.NOT_FOUND;
         } else if (e instanceof UnauthorizedException) {
             status = HTTPStatus.UNAUTHORIZED;
         } else if (e instanceof ForbiddenException) {
             status = HTTPStatus.FORBIDDEN;
+        } else if (e instanceof MethodNotAllowedException) {
+            status = HTTPStatus.METHOD_NOT_ALLOWED;
         } else if (e instanceof ConflictException) {
             status = HTTPStatus.CONFLICT;
+        } else if (e instanceof TooManyRequestsException) {
+            status = HTTPStatus.TOO_MANY_REQUESTS;
         } else {
             status = HTTPStatus.INTERNAL_SERVER_ERROR;
         }

@@ -22,7 +22,7 @@ public class PathPatternValidatorTest {
     @Test
     public void duplicatedVariable() {
         exception.expect(Error.class);
-        exception.expectMessage("duplicated");
+        exception.expectMessage("duplicate");
 
         validator.validate("/:name/path/:name");
     }

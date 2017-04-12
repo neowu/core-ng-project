@@ -11,7 +11,7 @@ import java.time.Duration;
  */
 public final class RedisConfig {
     private final ModuleContext context;
-    private final RedisConfigState state;
+    private final State state;
 
     public RedisConfig(ModuleContext context) {
         this.context = context;
@@ -60,7 +60,7 @@ public final class RedisConfig {
         }
     }
 
-    public static class RedisConfigState {
+    public static class State {
         String host;
         Redis redis;
 

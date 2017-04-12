@@ -2,6 +2,7 @@ package core.framework.impl.module;
 
 import core.framework.api.module.CacheConfig;
 import core.framework.api.module.DBConfig;
+import core.framework.api.module.HTTPConfig;
 import core.framework.api.module.KafkaConfig;
 import core.framework.api.module.MongoConfig;
 import core.framework.api.module.RedisConfig;
@@ -16,61 +17,67 @@ import java.util.Map;
  * @author neo
  */
 public class ConfigState {
-    private RedisConfig.RedisConfigState redis;
-    private Map<String, MongoConfig.MongoConfigState> mongo;
-    private Map<String, KafkaConfig.KafkaConfigState> kafka;
-    private Map<String, DBConfig.DBConfigState> db;
-    private CacheConfig.CacheConfigState cache;
-    private SearchConfig.SearchConfigState search;
-    private SchedulerConfig.SchedulerConfigState scheduler;
-    private SiteConfig.SiteConfigState site;
+    private RedisConfig.State redis;
+    private Map<String, MongoConfig.State> mongo;
+    private Map<String, KafkaConfig.State> kafka;
+    private Map<String, DBConfig.State> db;
+    private CacheConfig.State cache;
+    private SearchConfig.State search;
+    private SchedulerConfig.State scheduler;
+    private SiteConfig.State site;
+    private HTTPConfig.State http;
 
     public void validate() {
         if (redis != null) redis.validate();
-        if (mongo != null) mongo.values().forEach(MongoConfig.MongoConfigState::validate);
-        if (kafka != null) kafka.values().forEach(KafkaConfig.KafkaConfigState::validate);
-        if (db != null) db.values().forEach(DBConfig.DBConfigState::validate);
+        if (mongo != null) mongo.values().forEach(MongoConfig.State::validate);
+        if (kafka != null) kafka.values().forEach(KafkaConfig.State::validate);
+        if (db != null) db.values().forEach(DBConfig.State::validate);
         if (cache != null) cache.validate();
         if (search != null) search.validate();
     }
 
-    public MongoConfig.MongoConfigState mongo(String name) {
+    public MongoConfig.State mongo(String name) {
         if (mongo == null) mongo = Maps.newHashMap();
-        return mongo.computeIfAbsent(name, MongoConfig.MongoConfigState::new);
+        return mongo.computeIfAbsent(name, MongoConfig.State::new);
     }
 
-    public RedisConfig.RedisConfigState redis() {
-        if (redis == null) redis = new RedisConfig.RedisConfigState();
+    public RedisConfig.State redis() {
+        if (redis == null) redis = new RedisConfig.State();
         return redis;
     }
 
-    public KafkaConfig.KafkaConfigState kafka(String name) {
+    public KafkaConfig.State kafka(String name) {
         if (kafka == null) kafka = Maps.newHashMap();
-        return kafka.computeIfAbsent(name, KafkaConfig.KafkaConfigState::new);
+        return kafka.computeIfAbsent(name, KafkaConfig.State::new);
     }
 
-    public DBConfig.DBConfigState db(String name) {
+    public DBConfig.State db(String name) {
         if (db == null) db = Maps.newHashMap();
-        return db.computeIfAbsent(name, DBConfig.DBConfigState::new);
+        return db.computeIfAbsent(name, DBConfig.State::new);
     }
 
-    public CacheConfig.CacheConfigState cache() {
-        if (cache == null) cache = new CacheConfig.CacheConfigState();
+    public CacheConfig.State cache() {
+        if (cache == null) cache = new CacheConfig.State();
         return cache;
     }
 
-    public SearchConfig.SearchConfigState search() {
-        if (search == null) search = new SearchConfig.SearchConfigState();
+    public SearchConfig.State search() {
+        if (search == null) search = new SearchConfig.State();
         return search;
     }
 
-    public SchedulerConfig.SchedulerConfigState scheduler() {
-        if (scheduler == null) scheduler = new SchedulerConfig.SchedulerConfigState();
+    public SchedulerConfig.State scheduler() {
+        if (scheduler == null) scheduler = new SchedulerConfig.State();
         return scheduler;
     }
 
-    public SiteConfig.SiteConfigState site() {
-        if (site == null) site = new SiteConfig.SiteConfigState();
+    public SiteConfig.State site() {
+        if (site == null) site = new SiteConfig.State();
         return site;
+    }
+
+    public HTTPConfig.State http() {
+        if (http == null) http = new HTTPConfig.State();
+        return http;
     }
 }

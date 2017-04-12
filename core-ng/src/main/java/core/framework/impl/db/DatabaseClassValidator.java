@@ -82,7 +82,7 @@ final class DatabaseClassValidator implements TypeVisitor {
             throw Exceptions.error("db entity field must have @Column, field={}", Fields.path(field));
 
         if (columns.contains(column.name())) {
-            throw Exceptions.error("duplicated column found, field={}, column={}", Fields.path(field), column.name());
+            throw Exceptions.error("found duplicate column, field={}, column={}", Fields.path(field), column.name());
         } else {
             columns.add(column.name());
         }

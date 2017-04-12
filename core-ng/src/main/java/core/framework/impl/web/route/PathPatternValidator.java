@@ -26,9 +26,9 @@ class PathPatternValidator {
                 int endIndex = paramIndex > 0 ? paramIndex : token.length();
                 String variable = token.substring(1, endIndex);
                 validateVariable(variable, pathPattern);
-                boolean notDuplicated = variables.add(variable);
-                if (!notDuplicated)
-                    throw Exceptions.error("path must not have duplicated param name, path={}", pathPattern);
+                boolean isNew = variables.add(variable);
+                if (!isNew)
+                    throw Exceptions.error("found duplicate param name, path={}", pathPattern);
             } else {
                 validatePathSegment(token, pathPattern);
             }

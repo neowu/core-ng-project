@@ -20,7 +20,7 @@ import java.time.ZoneId;
  * @author neo
  */
 public final class SchedulerConfig {
-    private final SchedulerConfigState state;
+    private final State state;
 
     public SchedulerConfig(ModuleContext context) {
         state = context.config.scheduler();
@@ -67,7 +67,7 @@ public final class SchedulerConfig {
         return scheduler;
     }
 
-    public static class SchedulerConfigState {
+    public static class State {
         Scheduler scheduler;
         boolean triggerAdded;
         ZoneId zoneId = ZoneId.systemDefault();

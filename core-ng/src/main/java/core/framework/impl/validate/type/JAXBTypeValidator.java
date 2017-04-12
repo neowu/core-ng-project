@@ -95,7 +95,7 @@ public class JAXBTypeValidator implements TypeVisitor {
 
         Set<String> elements = this.elements.computeIfAbsent(parentPath, key -> Sets.newHashSet());
         if (elements.contains(name)) {
-            throw Exceptions.error("element is duplicated, field={}, name={}", Fields.path(field), name);
+            throw Exceptions.error("found duplicate element, field={}, name={}", Fields.path(field), name);
         }
         elements.add(name);
 

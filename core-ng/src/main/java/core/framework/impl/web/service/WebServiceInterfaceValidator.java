@@ -79,8 +79,8 @@ public class WebServiceInterfaceValidator {
             if (token.startsWith(":")) {
                 int paramIndex = token.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : token.length();
-                boolean notDuplicated = names.add(token.substring(1, endIndex));
-                if (!notDuplicated) throw Exceptions.error("path must not have duplicated param name, path={}", path);
+                boolean isNew = names.add(token.substring(1, endIndex));
+                if (!isNew) throw Exceptions.error("path must not have duplicate param name, path={}", path);
             }
         }
         return names;

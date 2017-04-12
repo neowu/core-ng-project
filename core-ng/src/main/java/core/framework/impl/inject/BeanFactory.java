@@ -33,7 +33,7 @@ public class BeanFactory {
 
         Object previous = beans.put(new Key(type, name), instance);
         if (previous != null)
-            throw Exceptions.error("duplicated bean found, type={}, name={}, previous={}", type.getTypeName(), name, previous);
+            throw Exceptions.error("found duplicate bean, type={}, name={}, previous={}", type.getTypeName(), name, previous);
     }
 
     public boolean registered(Type type, String name) {

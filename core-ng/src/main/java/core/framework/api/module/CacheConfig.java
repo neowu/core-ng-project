@@ -43,7 +43,7 @@ public final class CacheConfig {
 
     private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
     private final ModuleContext context;
-    private final CacheConfigState state;
+    private final State state;
 
     public CacheConfig(ModuleContext context) {
         this.context = context;
@@ -103,7 +103,7 @@ public final class CacheConfig {
         add(null, valueType, duration);
     }
 
-    public static class CacheConfigState {
+    public static class State {
         CacheManager cacheManager;
 
         public void validate() {

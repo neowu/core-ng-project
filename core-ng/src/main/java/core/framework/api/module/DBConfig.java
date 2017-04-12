@@ -18,7 +18,7 @@ import java.util.List;
  * @author neo
  */
 public final class DBConfig {
-    final DBConfigState state;
+    final State state;
     private final ModuleContext context;
     private final String name;
 
@@ -107,14 +107,14 @@ public final class DBConfig {
         state.entityClasses.add(entityClass);
     }
 
-    public static class DBConfigState {
+    public static class State {
         public final List<Class<?>> entityClasses = Lists.newArrayList();
         final String name;
         DatabaseImpl database;
         String url;
         boolean entityAdded;
 
-        public DBConfigState(String name) {
+        public State(String name) {
             this.name = name;
         }
 

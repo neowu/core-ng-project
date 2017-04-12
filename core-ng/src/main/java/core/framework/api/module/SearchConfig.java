@@ -16,7 +16,7 @@ import java.time.Duration;
  */
 public final class SearchConfig {
     private final ModuleContext context;
-    private final SearchConfigState state;
+    private final State state;
 
     public SearchConfig(ModuleContext context) {
         this.context = context;
@@ -67,7 +67,7 @@ public final class SearchConfig {
         context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), null, searchType);
     }
 
-    public static class SearchConfigState {
+    public static class State {
         public ElasticSearchImpl search;
         String host;
 

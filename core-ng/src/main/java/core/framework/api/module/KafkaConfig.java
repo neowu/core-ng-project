@@ -21,7 +21,7 @@ public final class KafkaConfig {
 
     private final ModuleContext context;
     private final String name;
-    private final KafkaConfigState state;
+    private final State state;
 
     public KafkaConfig(ModuleContext context, String name) {
         this.context = context;
@@ -100,12 +100,12 @@ public final class KafkaConfig {
         state.kafka.minPollMaxWaitTime = maxWaitTime;
     }
 
-    public static class KafkaConfigState {
+    public static class State {
         final String name;
         Kafka kafka;
         boolean handlerAdded;
 
-        public KafkaConfigState(String name) {
+        public State(String name) {
             this.name = name;
         }
 

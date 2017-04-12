@@ -23,7 +23,7 @@ public final class TestBeanFactory extends BeanFactory {
         Key key = new Key(type, name);
 
         if (overrideBindings.contains(key)) {
-            if (skippedBindings.contains(key)) throw Exceptions.error("duplicated bean found, type={}, name={}", type.getTypeName(), name);
+            if (skippedBindings.contains(key)) throw Exceptions.error("found duplicate bean, type={}, name={}", type.getTypeName(), name);
             skippedBindings.add(key);
             logger.info("skip bean binding, bean is overridden in test context, type={}, name={}", type.getTypeName(), name);
         } else {

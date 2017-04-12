@@ -27,7 +27,7 @@ public class CacheManager {
 
         CacheImpl<T> cache = new CacheImpl<>(name, valueType, duration, cacheStore);
         CacheImpl<?> previous = caches.putIfAbsent(name, cache);
-        if (previous != null) throw Exceptions.error("duplicated cache name found, name={}", name);
+        if (previous != null) throw Exceptions.error("found duplicate cache name, name={}", name);
         return cache;
     }
 

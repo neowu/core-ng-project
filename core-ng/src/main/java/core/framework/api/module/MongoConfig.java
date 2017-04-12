@@ -15,7 +15,7 @@ import java.time.Duration;
 public final class MongoConfig {
     private final ModuleContext context;
     private final String name;
-    private final MongoConfigState state;
+    private final State state;
 
     public MongoConfig(ModuleContext context, String name) {
         this.context = context;
@@ -74,13 +74,13 @@ public final class MongoConfig {
         state.entityAdded = true;
     }
 
-    public static class MongoConfigState {
+    public static class State {
         final String name;
         MongoImpl mongo;
         String uri;
         boolean entityAdded;
 
-        public MongoConfigState(String name) {
+        public State(String name) {
             this.name = name;
         }
 

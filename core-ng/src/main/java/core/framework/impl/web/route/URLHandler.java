@@ -22,7 +22,7 @@ class URLHandler {
     void put(HTTPMethod method, ControllerHolder controller) {
         ControllerHolder previous = controllers.putIfAbsent(method, controller);
         if (previous != null) {
-            throw Exceptions.error("conflicted controller found, path={}, method={}", pathPattern, method);
+            throw Exceptions.error("found duplicate controller, path={}, method={}", pathPattern, method);
         }
     }
 
