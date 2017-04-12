@@ -34,6 +34,7 @@ public class ConfigState {
         if (db != null) db.values().forEach(DBConfig.State::validate);
         if (cache != null) cache.validate();
         if (search != null) search.validate();
+        if (http != null) http.validate();
     }
 
     public MongoConfig.State mongo(String name) {

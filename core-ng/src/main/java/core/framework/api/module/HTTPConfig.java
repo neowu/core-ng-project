@@ -38,10 +38,17 @@ public final class HTTPConfig {
             state.limitRateInterceptor = new LimitRateInterceptor();
             intercept(state.limitRateInterceptor);
         }
-        return new LimitRateConfig(state.limitRateInterceptor);
+        return new LimitRateConfig(state);
     }
 
     public static class State {
         LimitRateInterceptor limitRateInterceptor;
+        boolean limitRateGroupAdded;
+
+        public void validate() {
+            if (limitRateInterceptor != null && !limitRateGroupAdded) {
+                throw new Error("limitRate() is configured but no group added, please remove unnecessary config");
+            }
+        }
     }
 }
