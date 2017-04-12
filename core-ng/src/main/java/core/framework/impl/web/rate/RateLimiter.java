@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class RateLimiter {
     private final Logger logger = LoggerFactory.getLogger(RateLimiter.class);
-
     private final Map<String, RateConfig> config = Maps.newHashMap();
     private final LRUMap<String, Rate> rates;
 
@@ -21,10 +20,14 @@ public class RateLimiter {
         rates = new LRUMap<>(maxEntries);
     }
 
-    public void config(String group, int maxPermits, int fillRatePerSecond) {
-        double fillRatePerNano = fillRatePerSecond / (double) TimeUnit.SECONDS.toNanos(fillRatePerSecond);
+    public void config(String group, int maxPermits, int fillRate, TimeUnit unit) {
+        double fillRatePerNano = ratePerNano(fillRate, unit);
         RateConfig previous = config.put(group, new RateConfig(maxPermits, fillRatePerNano));
         if (previous != null) throw Exceptions.error("found duplicate group, group={}", group);
+    }
+
+    double ratePerNano(int rate, TimeUnit unit) {
+        return rate / (double) unit.toNanos(1);
     }
 
     public boolean acquire(String group, String clientIP) {

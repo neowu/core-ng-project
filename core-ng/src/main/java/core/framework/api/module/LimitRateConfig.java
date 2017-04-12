@@ -1,5 +1,7 @@
 package core.framework.api.module;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author neo
  */
@@ -10,8 +12,8 @@ public final class LimitRateConfig {
         this.state = state;
     }
 
-    public void add(String group, int maxPermits, int fillRatePerSecond) {
-        state.limitRateInterceptor.config(group, maxPermits, fillRatePerSecond);
+    public void add(String group, int maxPermits, int fillRate, TimeUnit unit) {
+        state.limitRateInterceptor.config(group, maxPermits, fillRate, unit);
         state.limitRateGroupAdded = true;
     }
 }

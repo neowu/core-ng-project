@@ -8,6 +8,8 @@ import core.framework.api.web.rate.LimitRate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author neo
  */
@@ -30,7 +32,7 @@ public class LimitRateInterceptor implements Interceptor {
         return invocation.proceed();
     }
 
-    public void config(String group, int maxPermits, int fillRatePerSecond) {
-        rateLimiter.config(group, maxPermits, fillRatePerSecond);
+    public void config(String group, int maxPermits, int fillRate, TimeUnit unit) {
+        rateLimiter.config(group, maxPermits, fillRate, unit);
     }
 }
