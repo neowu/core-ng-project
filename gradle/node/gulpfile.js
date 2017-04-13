@@ -6,46 +6,54 @@ const merge = require("merge2");
 const argv = require('yargs').argv;
 const root = `${argv.root}/src/main`;
 
-gulp.task("clean", function() {
+gulp.task("clean", () => {
     const del = require("del");
-    return del(`${root}/dist/web`, {force: true});
+    return del(`${root}/dist/web`, {
+        force: true
+    });
 });
 
-gulp.task("resource", function() {
+gulp.task("resource", () => {
     return gulp.src([`${root}/web/**/*.*`, `!${root}/web/static/css/**/*.css`, `!${root}/web/static/js/**/*.js`])
         .pipe(gulp.dest(`${root}/dist/web`));
 });
 
-gulp.task("css", ["resource"], function() {
+gulp.task("css", ["resource"], () => {
     const stylelint = require("gulp-stylelint");
     const cssnano = require("gulp-cssnano");
 
-    var appCSS = gulp.src([`${root}/web/static/css/**/*.css`, `!${root}/web/static/css/lib{,/**/*.css}`])
+    const appCSS = gulp.src([`${root}/web/static/css/**/*.css`, `!${root}/web/static/css/lib{,/**/*.css}`])
         .pipe(sourcemaps.init())
         .pipe(stylelint({
-            configFile: "stylelint.json",   // see https://github.com/stylelint/stylelint-config-standard/blob/master/index.js
+            configFile: "stylelint.json", // see https://github.com/stylelint/stylelint-config-standard/blob/master/index.js
             reporters: [{
                 formatter: "string",
                 console: true
             }]
         }))
-        .pipe(cssnano({zindex: false}))
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {dirLevel: 2}))
+        .pipe(cssnano({
+            zindex: false
+        }))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {
+            dirLevel: 2
+        }))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(`${root}/dist/web/static/css`));
 
-    var libCSS = gulp.src(`${root}/web/static/css/lib/**/*.css`)
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {dirLevel: 2}))
+    const libCSS = gulp.src(`${root}/web/static/css/lib/**/*.css`)
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {
+            dirLevel: 2
+        }))
         .pipe(gulp.dest(`${root}/dist/web/static/css/lib`));
 
     return merge(appCSS, libCSS);
 });
 
-gulp.task("js", ["resource"], function(cb) {
+gulp.task("js", ["resource"], cb => {
     const uglify = require("gulp-uglify");
     const eslint = require("gulp-eslint");
 
-    var appJS = gulp.src([`${root}/web/static/js/**/*.js`, `!${root}/web/static/js/lib{,/**/*.js}`])
+    const appJS = gulp.src([`${root}/web/static/js/**/*.js`, `!${root}/web/static/js/lib{,/**/*.js}`])
         .pipe(eslint({
             configFile: "eslint.json"
         }))
@@ -53,17 +61,21 @@ gulp.task("js", ["resource"], function(cb) {
         .pipe(eslint.failAfterError())
         .pipe(sourcemaps.init())
         .pipe(uglify())
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {dirLevel: 2}))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {
+            dirLevel: 2
+        }))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(`${root}/dist/web/static/js`));
 
-    var libJS = gulp.src([`${root}/web/static/js/lib/**/*.js`])
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {dirLevel: 2}))
+    const libJS = gulp.src([`${root}/web/static/js/lib/**/*.js`])
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {
+            dirLevel: 2
+        }))
         .pipe(gulp.dest(`${root}/dist/web/static/js/lib`));
 
     return merge(appJS, libJS);
 });
 
-gulp.task("build", [], function() {
+gulp.task("build", [], () => {
     gulp.start("resource", "css", "js");
 });
