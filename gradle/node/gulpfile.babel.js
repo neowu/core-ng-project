@@ -29,19 +29,13 @@ gulp.task("css", ["resource"], () => {
                 console: true
             }]
         }))
-        .pipe(cssnano({
-            zindex: false
-        }))
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {
-            dirLevel: 2
-        }))
+        .pipe(cssnano({ zindex: false }))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, { dirLevel: 2 }))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(`${root}/dist/web/static/css`));
 
     const libCSS = gulp.src(`${root}/web/static/css/lib/**/*.css`)
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {
-            dirLevel: 2
-        }))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, { dirLevel: 2 }))
         .pipe(gulp.dest(`${root}/dist/web/static/css/lib`));
 
     return merge(appCSS, libCSS);
@@ -51,9 +45,7 @@ gulp.task("js", ["resource"], () => {
     const appJS = gulp.src([`${root}/web/static/js/**/*.js`, `!${root}/web/static/js/lib{,/**/*.js}`])
         .pipe(eslint({
             configFile: "eslint.json",
-            parserOptions: {
-                "ecmaVersion": 2015
-            }
+            parserOptions: { "ecmaVersion": 2015 }
         }))
         .pipe(eslint.format())
         .pipe(eslint.failAfterError())
@@ -62,19 +54,15 @@ gulp.task("js", ["resource"], () => {
             presets: ["babel-preset-es2015"].map(require.resolve)
         }))
         .pipe(uglify())
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {
-            dirLevel: 2
-        }))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, { dirLevel: 2 }))
         .pipe(sourcemaps.write("."))
         .pipe(gulp.dest(`${root}/dist/web/static/js`));
 
     const libJS = gulp.src([`${root}/web/static/js/lib/**/*.js`])
-        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {
-            dirLevel: 2
-        }))
+        .pipe(md5(10, `${root}/dist/web/template/**/*.html`, { dirLevel: 2 }))
         .pipe(gulp.dest(`${root}/dist/web/static/js/lib`));
 
     return merge(appJS, libJS);
 });
 
-gulp.task("build", [], () => gulp.start("resource", "css", "js"));
+gulp.task("build", () => gulp.start("resource", "css", "js"));
