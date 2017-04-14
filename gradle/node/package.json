@@ -9,15 +9,18 @@
   "private": true,
   "license": "Apache-2.0",
   "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
     "gulp-cssnano": "^2.1.2",
     "gulp-eslint": "^3.0.1",
-    "gulp-md5-plus": "^0.2.5",
-    "gulp-sourcemaps": "^2.4.1",
+    "gulp-md5-plus": "^1.0.2",
+    "gulp-sourcemaps": "^2.6.0",
     "gulp-stylelint": "^3.9.0",
     "gulp-uglify": "^2.1.2",
+    "jsonfile": "^2.4.0",
     "merge2": "^1.0.3",
-    "yargs": "^7.0.2"
+    "yargs": "^7.1.0"
   }
 }

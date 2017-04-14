@@ -1,17 +1,18 @@
-const gulp = require("gulp");
-const sourcemaps = require("gulp-sourcemaps");
-const md5 = require("gulp-md5-plus");
-const merge = require("merge2");
+import gulp from "gulp";
+import md5 from "gulp-md5-plus";
+import stylelint from "gulp-stylelint";
+import cssnano from "gulp-cssnano";
+import eslint from "gulp-eslint";
+import sourcemaps from "gulp-sourcemaps";
+import babel from "gulp-babel";
+import uglify from "gulp-uglify";
+import merge from "merge2";
+import del from "del";
+import { argv } from 'yargs';
 
-const argv = require('yargs').argv;
 const root = `${argv.root}/src/main`;
 
-gulp.task("clean", () => {
-    const del = require("del");
-    return del(`${root}/dist/web`, {
-        force: true
-    });
-});
+gulp.task("clean", () => del(`${root}/dist/web`, { force: true }));
 
 gulp.task("resource", () => {
     return gulp.src([`${root}/web/**/*.*`, `!${root}/web/static/css/**/*.css`, `!${root}/web/static/js/**/*.js`])
@@ -19,9 +20,6 @@ gulp.task("resource", () => {
 });
 
 gulp.task("css", ["resource"], () => {
-    const stylelint = require("gulp-stylelint");
-    const cssnano = require("gulp-cssnano");
-
     const appCSS = gulp.src([`${root}/web/static/css/**/*.css`, `!${root}/web/static/css/lib{,/**/*.css}`])
         .pipe(sourcemaps.init())
         .pipe(stylelint({
@@ -49,17 +47,20 @@ gulp.task("css", ["resource"], () => {
     return merge(appCSS, libCSS);
 });
 
-gulp.task("js", ["resource"], cb => {
-    const uglify = require("gulp-uglify");
-    const eslint = require("gulp-eslint");
-
+gulp.task("js", ["resource"], () => {
     const appJS = gulp.src([`${root}/web/static/js/**/*.js`, `!${root}/web/static/js/lib{,/**/*.js}`])
         .pipe(eslint({
-            configFile: "eslint.json"
+            configFile: "eslint.json",
+            parserOptions: {
+                "ecmaVersion": 2015
+            }
         }))
         .pipe(eslint.format())
         .pipe(eslint.failAfterError())
         .pipe(sourcemaps.init())
+        .pipe(babel({
+            presets: ["babel-preset-es2015"].map(require.resolve)
+        }))
         .pipe(uglify())
         .pipe(md5(10, `${root}/dist/web/template/**/*.html`, {
             dirLevel: 2
@@ -76,6 +77,4 @@ gulp.task("js", ["resource"], cb => {
     return merge(appJS, libJS);
 });
 
-gulp.task("build", [], () => {
-    gulp.start("resource", "css", "js");
-});
+gulp.task("build", [], () => gulp.start("resource", "css", "js"));
