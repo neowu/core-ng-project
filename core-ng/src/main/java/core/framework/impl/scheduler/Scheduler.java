@@ -58,7 +58,7 @@ public final class Scheduler {
         String name = trigger.name();
         Trigger previous = triggers.putIfAbsent(name, trigger);
         if (previous != null)
-            throw Exceptions.error("found duplicate job, name={}, previousJobClass={}", name, previous.job().getClass().getCanonicalName());
+            throw Exceptions.error("found duplicate job, name={}, previous={}", name, previous.job().getClass().getCanonicalName());
     }
 
     void schedule(DynamicTrigger trigger, ZonedDateTime next) {

@@ -108,11 +108,11 @@ public final class HTTPClient {
     }
 
     private void logResponseText(HTTPResponse response) {
-        ContentType contentType = response.contentType;
-        if (contentType == null) return;
-        String mediaType = contentType.mediaType();
-        if (mediaType.contains("text") || mediaType.contains("json")) {
-            logger.debug("[response] body={}", LogParam.of(response.body(), contentType.charset().orElse(Charsets.UTF_8)));
-        }
+        response.contentType().ifPresent(contentType -> {
+            String mediaType = contentType.mediaType();
+            if (mediaType.contains("text") || mediaType.contains("json")) {
+                logger.debug("[response] body={}", LogParam.of(response.body(), contentType.charset().orElse(Charsets.UTF_8)));
+            }
+        });
     }
 }

@@ -14,7 +14,7 @@ import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.validate.ValidationException;
 import core.framework.api.web.exception.RemoteServiceException;
-import core.framework.api.web.service.WebServiceRequestInterceptor;
+import core.framework.api.web.service.WebServiceClientInterceptor;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
@@ -38,7 +38,7 @@ public class WebServiceClient {
     private final HTTPClient httpClient;
     private final BeanValidator validator;
     private final LogManager logManager;
-    private WebServiceRequestInterceptor interceptor;
+    private WebServiceClientInterceptor interceptor;
 
     public WebServiceClient(String serviceURL, HTTPClient httpClient, BeanValidator validator, LogManager logManager) {
         this.serviceURL = serviceURL;
@@ -120,8 +120,8 @@ public class WebServiceClient {
         }
 
         HTTPResponse response = httpClient.execute(request);
-        validateResponse(response);
 
+        validateResponse(response);
         if (void.class != responseType) {
             return JSONMapper.fromJSON(responseType, response.body());
         } else {
@@ -129,7 +129,8 @@ public class WebServiceClient {
         }
     }
 
-    public void intercept(WebServiceRequestInterceptor interceptor) {
+    public void intercept(WebServiceClientInterceptor interceptor) {
+        if (this.interceptor != null) throw Exceptions.error("found duplicate interceptor, previous={}", this.interceptor.getClass().getCanonicalName());
         this.interceptor = interceptor;
     }
 

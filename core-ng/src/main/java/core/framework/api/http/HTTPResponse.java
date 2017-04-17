@@ -10,12 +10,12 @@ import java.util.Optional;
  * @author neo
  */
 public final class HTTPResponse {
-    final ContentType contentType;
+    private final ContentType contentType;
     private final HTTPStatus status;
     private final Map<String, String> headers;
     private final byte[] body;
 
-    public HTTPResponse(HTTPStatus status, Map<String, String> headers, byte[] body) {
+    HTTPResponse(HTTPStatus status, Map<String, String> headers, byte[] body) {
         this.status = status;
         this.headers = headers;
         this.body = body;

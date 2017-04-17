@@ -5,6 +5,6 @@ import core.framework.api.http.HTTPRequest;
 /**
  * @author neo
  */
-public interface WebServiceRequestInterceptor {
+public interface WebServiceClientInterceptor {
     void intercept(HTTPRequest request);
 }
