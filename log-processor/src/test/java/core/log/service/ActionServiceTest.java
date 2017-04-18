@@ -38,10 +38,12 @@ public class ActionServiceTest extends IntegrationTest {
         message1.date = Instant.now();
         message1.result = "OK";
         message1.context = Maps.newHashMap("key", "value");
+        message1.stats = Maps.newHashMap("count", 1d);
         PerformanceStatMessage stat = new PerformanceStatMessage();
         stat.count = 1;
         stat.totalElapsed = 10L;
         message1.performanceStats = Maps.newHashMap("redis", stat);
+
         ActionLogMessage message2 = new ActionLogMessage();
         message2.id = "2";
         message2.date = Instant.now();
@@ -54,13 +56,13 @@ public class ActionServiceTest extends IntegrationTest {
         GetRequest request = new GetRequest();
         request.index = IndexName.name("action", now);
         request.id = message1.id;
-        ActionDocument action = actionType.get(request).get();
+        ActionDocument action = actionType.get(request).orElseThrow(() -> new Error("not found"));
         assertEquals(message1.result, action.result);
 
         request = new GetRequest();
         request.index = IndexName.name("trace", now);
         request.id = message2.id;
-        TraceDocument trace = traceType.get(request).get();
+        TraceDocument trace = traceType.get(request).orElseThrow(() -> new Error("not found"));
         assertEquals(message2.id, trace.id);
         assertEquals(message2.traceLog, trace.content);
     }

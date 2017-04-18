@@ -24,6 +24,7 @@ public final class ActionLog {
     public final String id;
     final Instant date;
     final Map<String, String> context;
+    final Map<String, Double> stats;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
     private final long startCPUTime;
@@ -42,8 +43,9 @@ public final class ActionLog {
         startCPUTime = THREAD.getCurrentThreadCpuTime();
         date = Instant.now();
         events = new LinkedList<>();
-        performanceStats = Maps.newHashMap();
         context = Maps.newLinkedHashMap();
+        stats = Maps.newLinkedHashMap();
+        performanceStats = Maps.newHashMap();
         id = UUID.randomUUID().toString();
         log(message);
         log("[context] id={}", id);
@@ -116,10 +118,17 @@ public final class ActionLog {
         log("[context] {}={}", key, value);
     }
 
+    public void stats(String key, Number value) {
+        Double previous = stats.put(key, value.doubleValue());
+        if (previous != null) throw Exceptions.error("stats key must only be set once, key={}, value={}, previous={}", key, value, previous);
+        log("[stats] {}={}", key, value);
+    }
+
     public void track(String action, long elapsedTime) {
         PerformanceStat tracking = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
         tracking.count++;
         tracking.totalElapsed += elapsedTime;
+        log("[perf_stats] {}={}", action, elapsedTime);
     }
 
     public String refId() {

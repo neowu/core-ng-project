@@ -107,6 +107,7 @@ public class ActionService {
         actionLog.elapsed = message.elapsed;
         actionLog.cpuTime = message.cpuTime;
         actionLog.context = message.context;
+        actionLog.stats = message.stats;
         actionLog.performanceStats = message.performanceStats;
         return actionLog;
     }

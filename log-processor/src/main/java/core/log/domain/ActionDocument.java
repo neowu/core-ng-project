@@ -39,6 +39,8 @@ public class ActionDocument {
     public Long cpuTime;
     @XmlElement(name = "context")
     public Map<String, String> context;
+    @XmlElement(name = "stats")
+    public Map<String, Double> stats;
     @XmlElement(name = "perf_stats")
     public Map<String, PerformanceStatMessage> performanceStats;
 }

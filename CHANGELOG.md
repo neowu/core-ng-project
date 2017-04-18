@@ -1,7 +1,8 @@
 ## Change log
-### 4.12.1 (4/10/2017 - )
+### 4.12.1 (4/10/2017 - 4/18/2017)
 * api: rename WebServiceRequestSigner to WebServiceRequestInterceptor
 * rate: added rate limiter support for API and site
+* log: add actionLogContext.stat() to support numeric context field, for analytics thru kibana
 
 ### 4.11.3 (4/4/2017 - 4/10/2017)
 * scheduler: daily/weekly/monthly supports timezone

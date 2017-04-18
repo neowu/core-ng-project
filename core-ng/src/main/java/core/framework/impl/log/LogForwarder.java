@@ -107,6 +107,7 @@ public final class LogForwarder {
         message.errorCode = log.errorCode();
         message.errorMessage = log.errorMessage;
         message.context = log.context;
+        message.stats = log.stats;
         Map<String, PerformanceStatMessage> performanceStats = Maps.newLinkedHashMap();
         log.performanceStats.forEach((key, stat) -> {
             PerformanceStatMessage statMessage = new PerformanceStatMessage();

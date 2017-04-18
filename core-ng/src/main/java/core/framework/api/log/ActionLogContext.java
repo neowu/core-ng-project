@@ -33,6 +33,14 @@ public final class ActionLogContext {
         }
     }
 
+    public static void stat(String key, Number value) {
+        LogManager logManager = logManager();
+        ActionLog actionLog = logManager.currentActionLog();
+        if (actionLog != null) {
+            actionLog.stats(key, value);
+        }
+    }
+
     public static void track(String action, long elapsedTime) {
         LogManager logManager = logManager();
         ActionLog actionLog = logManager.currentActionLog();
