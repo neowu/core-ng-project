@@ -29,6 +29,8 @@ services:
     image: kafka
     ports:
       - 9092:9092
+    environment:
+      - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092
     depends_on:
       - zookeeper
   log-processor:

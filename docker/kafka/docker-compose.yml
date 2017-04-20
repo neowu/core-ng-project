@@ -9,5 +9,7 @@ services:
     image: kafka
     ports:
       - 9092:9092
+    environment:
+      - KAFKA_ARGS=--override listeners=PLAINTEXT://:9092 --override advertised.listeners=PLAINTEXT://localhost:9092
     depends_on:
       - zookeeper
