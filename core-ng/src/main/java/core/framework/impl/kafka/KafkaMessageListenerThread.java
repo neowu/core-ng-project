@@ -50,7 +50,7 @@ class KafkaMessageListenerThread extends Thread {
         readers = listener.readers;
         validator = listener.kafka.validator;
         logManager = listener.logManager;
-        batchLongProcessThresholdInNano = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time to max
+        batchLongProcessThresholdInNano = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time of max
     }
 
     @Override

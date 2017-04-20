@@ -1,4 +1,6 @@
 ## Change log
+### 4.12.2 (4/19/2017 - )
+
 ### 4.12.1 (4/10/2017 - 4/18/2017)
 * api: rename WebServiceRequestSigner to WebServiceRequestInterceptor
 * rate: added rate limiter support for API and site
