@@ -1,10 +1,9 @@
 .idea/
-.gradle/
-build/
+/.gradle/
+/build/
 *.iml
-classes/
+/classes/
 gradle.properties
 */src/dev/java/
-*/src/main/dev/
 .DS_Store
 node_modules/

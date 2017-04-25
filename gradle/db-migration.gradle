@@ -12,10 +12,6 @@ def environment = hasProperty('env') ? env : null
 
 apply plugin: org.flywaydb.gradle.FlywayPlugin
 
-dependencies {
-    runtime 'mysql:mysql-connector-java:6.0.6'
-}
-
 flyway {
     placeholderReplacement = false
 
