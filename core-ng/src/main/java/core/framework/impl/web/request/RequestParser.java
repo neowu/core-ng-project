@@ -50,13 +50,13 @@ public final class RequestParser {
         request.port = port(hostPort, xForwardedPort);
 
         request.requestURL = requestURL(request, exchange);
-        logger.debug("[request] requestURL={}", request.requestURL);
+        actionLog.context("requestURL", request.requestURL);
 
         for (HeaderValues header : headers) {
             logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
         }
 
-        actionLog.context("path", request.path());
+        logger.debug("[request] path={}", request.path());
 
         String userAgent = headers.getFirst(Headers.USER_AGENT);
         if (userAgent != null) actionLog.context("userAgent", userAgent);
