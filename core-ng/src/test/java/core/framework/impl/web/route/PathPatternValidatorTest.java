@@ -20,7 +20,7 @@ public class PathPatternValidatorTest {
     }
 
     @Test
-    public void duplicatedVariable() {
+    public void duplicateVariable() {
         exception.expect(Error.class);
         exception.expectMessage("duplicate");
 
@@ -36,5 +36,13 @@ public class PathPatternValidatorTest {
 
         validator.validate("/user/:id/name");
         validator.validate("/v2/user/:id");
+    }
+
+    @Test
+    public void invalidVariable() {
+        exception.expect(Error.class);
+        exception.expectMessage(":name(");
+
+        validator.validate("/path/:name(");
     }
 }

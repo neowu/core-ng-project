@@ -25,12 +25,13 @@ public class PathNodeTest {
     }
 
     @Test
-    public void dynamicPathPatterns() {
+    public void dynamicPathPattern() {
         PathNode root = new PathNode();
 
         URLHandler handler1 = root.register("/:var1");
         URLHandler handler2 = root.register("/path1/:var1");
         URLHandler handler3 = root.register("/path1/:var1/path2");
+        URLHandler handler4 = root.register("/path1/:var1/:var2");
 
         PathParams pathParams = new PathParams();
         URLHandler found = root.find("/value", pathParams);
@@ -46,6 +47,12 @@ public class PathNodeTest {
         found = root.find("/path1/value/path2", pathParams);
         Assert.assertSame(handler3, found);
         Assert.assertEquals("value", pathParams.get("var1"));
+
+        pathParams = new PathParams();
+        found = root.find("/path1/value1/value2", pathParams);
+        Assert.assertSame(handler4, found);
+        Assert.assertEquals("value1", pathParams.get("var1"));
+        Assert.assertEquals("value2", pathParams.get("var2"));
     }
 
     @Test
@@ -59,26 +66,7 @@ public class PathNodeTest {
     }
 
     @Test
-    public void dynamicRegexPathPatterns() {
-        PathNode root = new PathNode();
-
-        root.register("/:var1");
-        URLHandler handler2 = root.register("/path1/:var1(\\d+)/path2");
-        URLHandler handler3 = root.register("/path1/:var1(\\D+)/path2");
-
-        PathParams pathParams = new PathParams();
-        URLHandler found = root.find(Path.parse("/path1/100/path2"), pathParams);
-        Assert.assertSame(handler2, found);
-        Assert.assertEquals("100", pathParams.get("var1"));
-
-        pathParams = new PathParams();
-        found = root.find(Path.parse("/path1/value/path2"), pathParams);
-        Assert.assertSame(handler3, found);
-        Assert.assertEquals("value", pathParams.get("var1"));
-    }
-
-    @Test
-    public void dynamicRegexPathPatternsWithTrailingSlash() {
+    public void dynamicPathPatternsWithTrailingSlash() {
         PathNode root = new PathNode();
 
         URLHandler handler1 = root.register("/path1/:var");
@@ -100,7 +88,7 @@ public class PathNodeTest {
         PathNode root = new PathNode();
 
         root.register("/:var1");
-        root.register("/path1/path2/path3/:var1(\\d+)");
+        root.register("/path1/path2/path3/path4/:var1");
         URLHandler handler = root.register("/path1/path2/:url(*)");
 
         PathParams pathParams = new PathParams();
@@ -115,7 +103,7 @@ public class PathNodeTest {
     }
 
     @Test
-    public void conflictDynamicRegexPathPatterns() {
+    public void conflictDynamicPathPattern() {
         exception.expect(Error.class);
         exception.expectMessage("var1");
         exception.expectMessage("var2");
@@ -127,14 +115,13 @@ public class PathNodeTest {
     }
 
     @Test
-    public void conflictWildcardPathPatterns() {
+    public void conflictWildcardPathPattern() {
         exception.expect(Error.class);
-        exception.expectMessage("path1");
-        exception.expectMessage("path2");
+        exception.expectMessage("var1");
+        exception.expectMessage("var2");
 
         PathNode root = new PathNode();
-
-        root.register("/path/:path1(*)");
-        root.register("/path/:path2(*)");
+        root.register("/path/:var1(*)");
+        root.register("/path/:var2(*)");
     }
 }

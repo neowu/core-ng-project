@@ -2,10 +2,10 @@ package core.framework.impl.web.route;
 
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
 import core.framework.api.web.exception.MethodNotAllowedException;
 import core.framework.impl.web.ControllerHolder;
 
+import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -13,7 +13,7 @@ import java.util.Map;
  */
 class URLHandler {
     final String pathPattern;
-    private final Map<HTTPMethod, ControllerHolder> controllers = Maps.newHashMap();
+    private final Map<HTTPMethod, ControllerHolder> controllers = new EnumMap<>(HTTPMethod.class);
 
     URLHandler(String pathPattern) {
         this.pathPattern = pathPattern;

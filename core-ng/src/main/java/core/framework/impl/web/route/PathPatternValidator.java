@@ -22,15 +22,30 @@ class PathPatternValidator {
         String[] tokens = Strings.split(pathPattern, '/');
         for (String token : tokens) {
             if (token.startsWith(":")) {
-                int paramIndex = token.indexOf('(');
-                int endIndex = paramIndex > 0 ? paramIndex : token.length();
-                String variable = token.substring(1, endIndex);
-                validateVariable(variable, pathPattern);
-                boolean isNew = variables.add(variable);
-                if (!isNew)
-                    throw Exceptions.error("found duplicate param name, path={}", pathPattern);
+                validateVariable(token, pathPattern, variables);
             } else {
                 validatePathSegment(token, pathPattern);
+            }
+        }
+    }
+
+    private void validateVariable(String token, String pathPattern, Set<String> variables) {
+        int variablePatternIndex = token.indexOf('(');
+        int endIndex = variablePatternIndex > 0 ? variablePatternIndex : token.length();
+
+        String variable = token.substring(1, endIndex);
+        for (int i = 0; i < variable.length(); i++) {
+            char ch = variable.charAt(i);
+            if (!ASCII.isLetter(ch)) throw Exceptions.error("path variable must be letter, variable={}, pathPattern={}", variable, pathPattern);
+        }
+
+        boolean isNew = variables.add(variable);
+        if (!isNew) throw Exceptions.error("found duplicate param name, path={}", pathPattern);
+
+        if (variablePatternIndex > 0) {
+            String variablePattern = token.substring(variablePatternIndex);
+            if (!"(*)".equals(variablePattern)) {
+                throw Exceptions.error("path variable must be :name or :name(*), variable={}, pathPattern={}", token, pathPattern);
             }
         }
     }
@@ -46,13 +61,6 @@ class PathPatternValidator {
             if (!ASCII.isLetter(ch) && !ASCII.isDigit(ch) && ch != '_' && ch != '-' && ch != '.') {
                 throw Exceptions.error("path segment must only contain (letter / digit / _ / - / .), segment={}, pathPattern={}", segment, pathPattern);
             }
-        }
-    }
-
-    private void validateVariable(String variable, String pathPattern) {
-        for (int i = 0; i < variable.length(); i++) {
-            char ch = variable.charAt(i);
-            if (!ASCII.isLetter(ch)) throw Exceptions.error("path variable must be letter, variable={}, pathPattern={}", variable, pathPattern);
         }
     }
 }
