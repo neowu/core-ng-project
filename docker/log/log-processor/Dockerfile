@@ -1,6 +1,5 @@
-FROM        openjdk
+FROM        openjdk:jre-alpine
 MAINTAINER  neo
 EXPOSE      8080
-ENV         JAVA_OPTS="-XX:+UseG1GC -Xms256m -Xmx2048m -Xss256k -Djava.awt.headless=true"
 ADD         file/log-processor.tar    /opt
-ENTRYPOINT  ["/bin/bash", "-c", "/opt/log-processor/bin/log-processor"]
+ENTRYPOINT  ["/bin/sh", "-c", "/opt/log-processor/bin/log-processor"]
