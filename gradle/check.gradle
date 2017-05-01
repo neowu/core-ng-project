@@ -11,7 +11,7 @@ checkstyle {
     }
 
     dependencies {
-        checkstyle 'com.puppycrawl.tools:checkstyle:7.6.1'
+        checkstyle 'com.puppycrawl.tools:checkstyle:7.7'
         checkstyle 'com.github.sevntu.checkstyle:sevntu-checks:1.23.1'
     }
 
@@ -22,7 +22,7 @@ checkstyle {
 pmd {
     ruleSets = []
     ruleSetFiles = rootProject.files('gradle/pmd/rule-set.xml')
-    toolVersion = '5.5.5'
+    toolVersion = '5.6.1'
     consoleOutput = true
 }
 

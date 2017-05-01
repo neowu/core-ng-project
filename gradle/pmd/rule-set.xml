@@ -16,9 +16,9 @@
         <exclude name="ConsecutiveLiteralAppends"/> <!--has bug, does not work with lambda-->
     </rule>
 
+    <rule ref="rulesets/java/unusedcode.xml/UnusedPrivateField"/>
     <rule ref="rulesets/java/unusedcode.xml/UnusedLocalVariable"/>
     <rule ref="rulesets/java/unusedcode.xml/UnusedFormalParameter"/>
-    <rule ref="rulesets/java/unusedcode.xml/UnusedModifier"/>
     <rule ref="rulesets/java/unusedcode.xml/UnusedPrivateField"/>
 
     <rule ref="rulesets/java/imports.xml/DuplicateImports"/>
@@ -61,7 +61,6 @@
     <rule ref="rulesets/java/design.xml/SimplifyConditional"/>
     <rule ref="rulesets/java/design.xml/CompareObjectsWithEquals"/>
     <rule ref="rulesets/java/design.xml/PositionLiteralsFirstInComparisons"/>
-    <rule ref="rulesets/java/design.xml/AvoidConstantsInterface"/>
     <rule ref="rulesets/java/design.xml/UnsynchronizedStaticDateFormatter"/>
     <rule ref="rulesets/java/design.xml/PreserveStackTrace"/>
     <rule ref="rulesets/java/design.xml/UseCollectionIsEmpty"/>
@@ -86,11 +85,13 @@
     <rule ref="rulesets/java/logging-java.xml/SystemPrintln"/>
     <rule ref="rulesets/java/logging-java.xml/AvoidPrintStackTrace"/>
 
-    <rule ref="rulesets/java/unnecessary.xml/UnusedNullCheckInEquals"/>
+    <rule ref="rulesets/java/unnecessary.xml/UnnecessaryConversionTemporary"/>
+    <rule ref="rulesets/java/unnecessary.xml/UnnecessaryReturn"/>
+    <rule ref="rulesets/java/unnecessary.xml/UnnecessaryFinalModifier"/>
+    <rule ref="rulesets/java/unnecessary.xml/UselessOverridingMethod"/>
     <rule ref="rulesets/java/unnecessary.xml/UselessOperationOnImmutable"/>
+    <rule ref="rulesets/java/unnecessary.xml/UnusedNullCheckInEquals"/>
     <rule ref="rulesets/java/unnecessary.xml/UselessOverridingMethod"/>
     <rule ref="rulesets/java/unnecessary.xml/UselessQualifiedThis"/>
-    <rule ref="rulesets/java/unnecessary.xml/UnnecessaryFinalModifier"/>
-    <rule ref="rulesets/java/unnecessary.xml/UnnecessaryReturn"/>
-    <rule ref="rulesets/java/unnecessary.xml/UnnecessaryConversionTemporary"/>
+    <rule ref="rulesets/java/unnecessary.xml/UnnecessaryModifier"/>
 </ruleset>
