@@ -10,6 +10,7 @@ import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.test.IntegrationTest;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.junit.After;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -30,6 +30,11 @@ public class ElasticSearchIntegrationTest extends IntegrationTest {
     ElasticSearch elasticSearch;
     @Inject
     ElasticSearchType<TestDocument> documentType;
+
+    @After
+    public void cleanup() {
+        elasticSearch.deleteIndex("document");
+    }
 
     @Test
     public void index() {
@@ -70,10 +75,17 @@ public class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     public void search() {
+        TestDocument document = new TestDocument();
+        document.stringField = "value";
+        documentType.index("1", document);
+        elasticSearch.flush("document");
+
         SearchRequest request = new SearchRequest();
-        request.query = QueryBuilders.matchAllQuery();
+        request.query = QueryBuilders.matchQuery("string_field", document.stringField);
         SearchResponse<TestDocument> response = documentType.search(request);
 
-        assertNotNull(response);
+        assertEquals(1, response.totalHits);
+        TestDocument returnedDocument = response.hits.get(0);
+        assertEquals(document.stringField, returnedDocument.stringField);
     }
 }

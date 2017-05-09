@@ -28,6 +28,7 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.SearchHit;
@@ -106,14 +107,14 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     }
 
     private SearchResponse<T> searchResponse(org.elasticsearch.action.search.SearchResponse response) {
-        SearchHit[] hits = response.getHits().hits();
+        SearchHit[] hits = response.getHits().getHits();
         List<T> items = new ArrayList<>(hits.length);
         for (SearchHit hit : hits) {
-            items.add(reader.fromJSON(hit.source()));
+            items.add(reader.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
         }
         Aggregations aggregationResponse = response.getAggregations();
         Map<String, Aggregation> aggregations = aggregationResponse == null ? Maps.newHashMap() : aggregationResponse.asMap();
-        return new SearchResponse<>(items, response.getHits().totalHits(), aggregations);
+        return new SearchResponse<>(items, response.getHits().getTotalHits(), aggregations);
     }
 
     @Override
@@ -264,11 +265,11 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                 esTookTime += searchResponse.getTookInMillis();
                 if (searchResponse.getFailedShards() > 0) logger.warn("some shard failed, response={}", searchResponse);
 
-                SearchHit[] hits = searchResponse.getHits().hits();
+                SearchHit[] hits = searchResponse.getHits().getHits();
                 if (hits.length == 0) break;
 
                 for (SearchHit hit : hits) {
-                    forEach.consumer.accept(reader.fromJSON(hit.source()));
+                    forEach.consumer.accept(reader.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
                 }
 
                 String scrollId = searchResponse.getScrollId();

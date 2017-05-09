@@ -1,4 +1,7 @@
 ## Change log
+### 4.12.3 (5/9/2017 - )
+* es: update to 5.4.0
+
 ### 4.12.2 (4/19/2017 - 5/1/2017)
 * web: action log uses context.requestURL instead of context.path
 * route: remove regex path variable support, not used anymore
