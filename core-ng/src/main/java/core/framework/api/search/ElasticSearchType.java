@@ -1,5 +1,7 @@
 package core.framework.api.search;
 
+import org.elasticsearch.index.query.QueryBuilder;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,6 +51,14 @@ public interface ElasticSearchType<T> {
         BulkDeleteRequest request = new BulkDeleteRequest();
         request.ids = ids;
         bulkDelete(request);
+    }
+
+    long deleteByQuery(DeleteByQueryRequest request);
+
+    default long deleteByQuery(QueryBuilder query) {
+        DeleteByQueryRequest request = new DeleteByQueryRequest();
+        request.query = query;
+        return deleteByQuery(request);
     }
 
     List<String> analyze(AnalyzeRequest request);

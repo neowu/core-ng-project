@@ -6,7 +6,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.network.NetworkModule;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
-import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ public class MockElasticSearch extends ElasticSearchImpl {
             settings.put(NetworkModule.TRANSPORT_TYPE_SETTING.getKey(), NetworkModule.LOCAL_TRANSPORT)
                     .put(NetworkModule.HTTP_ENABLED.getKey(), false)
                     .put(Environment.PATH_HOME_SETTING.getKey(), dataPath);
-            Node node = new Node(settings.build());
+            MockNode node = new MockNode(settings.build());
             node.start();
             return node.client();
         } catch (NodeValidationException e) {

@@ -33,15 +33,17 @@ public class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @After
     public void cleanup() {
-        elasticSearch.deleteIndex("document");
+        documentType.deleteByQuery(QueryBuilders.matchAllQuery());
+        elasticSearch.flush("document");
     }
 
     @Test
     public void index() {
         TestDocument document = new TestDocument();
+        document.id = "1";
         document.stringField = "value";
         document.zonedDateTimeField = ZonedDateTime.now(ZoneId.of("America/New_York"));
-        documentType.index("1", document);
+        documentType.index(document.id, document);
 
         Optional<TestDocument> returnedDocument = documentType.get("1");
         assertTrue(returnedDocument.isPresent());
@@ -55,8 +57,9 @@ public class ElasticSearchIntegrationTest extends IntegrationTest {
         request.sources = Maps.newHashMap();
         for (int i = 0; i < 30; i++) {
             TestDocument document = new TestDocument();
+            document.id = String.valueOf(i);
             document.stringField = String.valueOf(i);
-            request.sources.put(String.valueOf(i), document);
+            request.sources.put(document.id, document);
         }
         documentType.bulkIndex(request);
         elasticSearch.flush("document");
@@ -76,8 +79,9 @@ public class ElasticSearchIntegrationTest extends IntegrationTest {
     @Test
     public void search() {
         TestDocument document = new TestDocument();
+        document.id = "1";
         document.stringField = "value";
-        documentType.index("1", document);
+        documentType.index(document.id, document);
         elasticSearch.flush("document");
 
         SearchRequest request = new SearchRequest();

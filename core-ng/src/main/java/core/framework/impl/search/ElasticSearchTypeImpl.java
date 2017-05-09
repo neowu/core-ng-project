@@ -5,6 +5,7 @@ import core.framework.api.log.Markers;
 import core.framework.api.search.AnalyzeRequest;
 import core.framework.api.search.BulkDeleteRequest;
 import core.framework.api.search.BulkIndexRequest;
+import core.framework.api.search.DeleteByQueryRequest;
 import core.framework.api.search.DeleteRequest;
 import core.framework.api.search.ElasticSearchType;
 import core.framework.api.search.ForEach;
@@ -24,6 +25,7 @@ import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.bulk.byscroll.BulkByScrollResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -31,6 +33,8 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.reindex.DeleteByQueryAction;
+import org.elasticsearch.index.reindex.DeleteByQueryRequestBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
@@ -170,7 +174,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         long esTookTime = 0;
         try {
             BulkResponse response = builder.get();
-            esTookTime = response.getTookInMillis();
+            esTookTime = response.getTook().nanos();
             if (response.hasFailures()) throw new SearchException(response.buildFailureMessage());
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
@@ -212,7 +216,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         long esTookTime = 0;
         try {
             BulkResponse response = builder.get();
-            esTookTime = response.getTookInMillis();
+            esTookTime = response.getTook().nanos();
             if (response.hasFailures()) throw new SearchException(response.buildFailureMessage());
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
@@ -220,6 +224,32 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime);
             logger.debug("bulkDelete, index={}, type={}, size={}, esTookTime={}, elapsedTime={}", index, type, request.ids.size(), esTookTime, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public long deleteByQuery(DeleteByQueryRequest request) {
+        if (request.query == null) throw Exceptions.error("request.query must not be null");
+
+        StopWatch watch = new StopWatch();
+        String index = request.index == null ? this.index : request.index;
+        long esTookTime = 0;
+        long deleted = 0;
+        try {
+            DeleteByQueryRequestBuilder builder = DeleteByQueryAction.INSTANCE.newRequestBuilder(client());
+            BulkByScrollResponse response = builder.filter(request.query)
+                                                   .source(index)
+                                                   .get();
+            esTookTime = response.getTook().nanos();
+            deleted = response.getDeleted();
+            return deleted;
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("elasticsearch", elapsedTime);
+            logger.debug("deleteByQuery, index={}, type={}, deleted={}, esTookTime={}, elapsedTime={}", index, type, deleted, esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -249,7 +279,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null and greater than 0");
 
         StopWatch watch = new StopWatch();
-        TimeValue keepAlive = TimeValue.timeValueMillis(forEach.scrollTimeout.toMillis());
+        TimeValue keepAlive = TimeValue.timeValueNanos(forEach.scrollTimeout.toNanos());
         long esTookTime = 0;
         String index = forEach.index == null ? this.index : forEach.index;
         try {
@@ -262,7 +292,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
 
             while (true) {
-                esTookTime += searchResponse.getTookInMillis();
+                esTookTime += searchResponse.getTook().nanos();
                 if (searchResponse.getFailedShards() > 0) logger.warn("some shard failed, response={}", searchResponse);
 
                 SearchHit[] hits = searchResponse.getHits().getHits();

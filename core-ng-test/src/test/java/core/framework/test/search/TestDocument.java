@@ -13,6 +13,9 @@ import java.time.ZonedDateTime;
 @Index(index = "document", type = "document")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TestDocument {
+    @XmlElement(name = "id")
+    public String id;
+
     @XmlElement(name = "string_field")
     public String stringField;
 
