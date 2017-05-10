@@ -28,12 +28,14 @@ public final class HTTPClientBuilder {
     private Duration keepAliveTimeout = Duration.ofSeconds(60);
     private Duration slowOperationThreshold = Duration.ofSeconds(30);
     private boolean enableCookie = false;
+    private boolean enableRedirect = false;
+    private String userAgent = "HTTPClient";
 
     public HTTPClient build() {
         StopWatch watch = new StopWatch();
         try {
             HttpClientBuilder builder = HttpClients.custom();
-            builder.setUserAgent("HTTPClient");
+            builder.setUserAgent(userAgent);
 
             builder.setKeepAliveStrategy((response, context) -> keepAliveTimeout.toMillis());
 
@@ -55,7 +57,7 @@ public final class HTTPClientBuilder {
             builder.disableAuthCaching();
             builder.disableConnectionState();
             builder.disableAutomaticRetries();  // retry should be handled in framework level with better trace log
-
+            if (!enableRedirect) builder.disableRedirectHandling();
             if (!enableCookie) builder.disableCookieManagement();
 
             CloseableHttpClient httpClient = builder.build();
@@ -87,8 +89,18 @@ public final class HTTPClientBuilder {
         return this;
     }
 
+    public HTTPClientBuilder userAgent(String userAgent) {
+        this.userAgent = userAgent;
+        return this;
+    }
+
     public HTTPClientBuilder enableCookie() {
         enableCookie = true;
+        return this;
+    }
+
+    public HTTPClientBuilder enableRedirect() {
+        enableRedirect = true;
         return this;
     }
 }
