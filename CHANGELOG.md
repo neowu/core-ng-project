@@ -2,6 +2,7 @@
 ### 4.12.3 (5/9/2017 - 5/10/2017)
 * es: update to 5.4.0, delete by query support
 * httpclient: changed to disable redirect by default, support to enable redirect handling
+* httpclient: added 302 Found status
 
 ### 4.12.2 (4/19/2017 - 5/1/2017)
 * web: action log uses context.requestURL instead of context.path

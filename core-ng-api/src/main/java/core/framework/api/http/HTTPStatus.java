@@ -9,6 +9,7 @@ public enum HTTPStatus {
     ACCEPTED(202),
     NO_CONTENT(204),
     MOVED_PERMANENTLY(301),
+    FOUND(302),     // 302 Moved Temporarily, sometimes Found
     SEE_OTHER(303),
     NOT_MODIFIED(304),
     TEMPORARY_REDIRECT(307),
