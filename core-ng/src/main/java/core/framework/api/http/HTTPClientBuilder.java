@@ -61,7 +61,7 @@ public final class HTTPClientBuilder {
             if (!enableCookie) builder.disableCookieManagement();
 
             CloseableHttpClient httpClient = builder.build();
-            return new HTTPClient(httpClient, slowOperationThreshold);
+            return new HTTPClient(httpClient, userAgent, slowOperationThreshold);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
         } finally {

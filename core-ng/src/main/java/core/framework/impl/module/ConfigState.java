@@ -1,5 +1,6 @@
 package core.framework.impl.module;
 
+import core.framework.api.module.APIConfig;
 import core.framework.api.module.CacheConfig;
 import core.framework.api.module.DBConfig;
 import core.framework.api.module.HTTPConfig;
@@ -26,6 +27,7 @@ public class ConfigState {
     private SchedulerConfig.State scheduler;
     private SiteConfig.State site;
     private HTTPConfig.State http;
+    private APIConfig.State api;
 
     public void validate() {
         if (redis != null) redis.validate();
@@ -80,5 +82,10 @@ public class ConfigState {
     public HTTPConfig.State http() {
         if (http == null) http = new HTTPConfig.State();
         return http;
+    }
+
+    public APIConfig.State api() {
+        if (api == null) api = new APIConfig.State();
+        return api;
     }
 }

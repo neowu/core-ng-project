@@ -25,9 +25,11 @@ import java.lang.reflect.Method;
 public final class APIConfig {
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private final ModuleContext context;
+    private final State state;
 
     public APIConfig(ModuleContext context) {
         this.context = context;
+        state = context.config.api();
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {
@@ -51,7 +53,7 @@ public final class APIConfig {
         }
     }
 
-    public <T> WebServiceClientConfig client(Class<T> serviceInterface, String serviceURL) {
+    public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
         logger.info("create api service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         BeanValidator validator = context.httpServer.handler.validator;
         new WebServiceInterfaceValidator(serviceInterface, validator).validate();
@@ -60,7 +62,7 @@ public final class APIConfig {
         WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator, context.logManager);
         T client = createWebServiceClient(serviceInterface, webServiceClient);
         context.beanFactory.bind(serviceInterface, null, client);
-        return new WebServiceClientConfig(webServiceClient);
+        return new APIClientConfig(webServiceClient);
     }
 
     private <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {
@@ -72,12 +74,15 @@ public final class APIConfig {
     }
 
     private HTTPClient httpClient() {
-        if (context.beanFactory.registered(HTTPClient.class, null)) {
-            return context.beanFactory.bean(HTTPClient.class, null);
+        if (state.httpClient == null) {
+            HTTPClient httpClient = new HTTPClientBuilder().userAgent("APIClient").build();
+            context.shutdownHook.add(httpClient::close);
+            state.httpClient = httpClient;
         }
-        HTTPClient httpClient = new HTTPClientBuilder().build();
-        context.beanFactory.bind(HTTPClient.class, null, httpClient);
-        context.shutdownHook.add(httpClient::close);
-        return httpClient;
+        return state.httpClient;
+    }
+
+    public static class State {
+        HTTPClient httpClient;
     }
 }

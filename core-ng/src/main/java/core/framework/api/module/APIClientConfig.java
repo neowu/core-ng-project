@@ -6,10 +6,10 @@ import core.framework.impl.web.service.WebServiceClient;
 /**
  * @author neo
  */
-public final class WebServiceClientConfig {     // returned from APIConfig, must be public to be called
+public final class APIClientConfig {     // returned from APIConfig, must be public to be called
     private final WebServiceClient client;
 
-    WebServiceClientConfig(WebServiceClient client) {
+    APIClientConfig(WebServiceClient client) {
         this.client = client;
     }
 

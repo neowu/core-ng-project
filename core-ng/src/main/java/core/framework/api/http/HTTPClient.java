@@ -46,17 +46,32 @@ public final class HTTPClient {
         return status;
     }
 
+    static byte[] responseBody(HttpEntity entity) throws IOException {
+        if (entity == null) return new byte[0];  // for HEAD request, 204/304/205, http client will not create entity
+
+        try (InputStream stream = entity.getContent()) {
+            int length = (int) entity.getContentLength();
+            if (length >= 0) {
+                return InputStreams.bytesWithExpectedLength(stream, length);
+            } else {
+                return InputStreams.bytes(stream, 4096);
+            }
+        }
+    }
+
     private final Logger logger = LoggerFactory.getLogger(HTTPClient.class);
     private final CloseableHttpClient client;
+    private final String userAgent;
     private final long slowOperationThresholdInNanos;
 
-    HTTPClient(CloseableHttpClient client, Duration slowOperationThreshold) {
+    HTTPClient(CloseableHttpClient client, String userAgent, Duration slowOperationThreshold) {
         this.client = client;
+        this.userAgent = userAgent;
         slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
     }
 
     public void close() {
-        logger.info("close http client");
+        logger.info("close http client, userAgent={}", userAgent);
         try {
             client.close();
         } catch (IOException e) {
@@ -90,19 +105,6 @@ public final class HTTPClient {
             logger.debug("execute, elapsedTime={}", elapsedTime);
             if (elapsedTime > slowOperationThresholdInNanos) {
                 logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http operation, elapsedTime={}", elapsedTime);
-            }
-        }
-    }
-
-    byte[] responseBody(HttpEntity entity) throws IOException {
-        if (entity == null) return new byte[0];  // for HEAD request, 204/304/205, http client will not create entity
-
-        try (InputStream stream = entity.getContent()) {
-            int length = (int) entity.getContentLength();
-            if (length >= 0) {
-                return InputStreams.bytesWithExpectedLength(stream, length);
-            } else {
-                return InputStreams.bytes(stream, 4096);
             }
         }
     }
