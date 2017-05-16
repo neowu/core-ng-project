@@ -19,7 +19,7 @@ public final class Threads {
         try {
             Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
-            LOGGER.debug("sleep is interrupted");
+            LOGGER.debug("sleep is interrupted", e);
         }
     }
 }
