@@ -1,6 +1,6 @@
 ## Change log
 ### 4.12.4 (5/15/2017 - )
-
+* test: validate override binding in integration test
 
 ### 4.12.3 (5/9/2017 - 5/10/2017)
 * es: update to 5.4.0, delete by query support
