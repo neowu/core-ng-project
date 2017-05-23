@@ -64,7 +64,7 @@ public final class RedisImpl implements Redis {
     }
 
     private BinaryJedis createClient() {
-        if (host == null) throw new Error("redis.host must not be null, please check config");
+        if (host == null) throw new Error("redis.host must not be null");
         BinaryJedis client = new BinaryJedis(host, Protocol.DEFAULT_PORT, (int) timeout.toMillis());
         client.connect();
         return client;

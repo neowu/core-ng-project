@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -35,5 +36,12 @@ public final class TestBeanFactory extends BeanFactory {
         bind(type, name, instance);
         overrideBindings.add(new Key(type, name));
         return instance;
+    }
+
+    public void validateOverrideBindings() {
+        Set<Key> notAppliedBindings = new HashSet<>(overrideBindings);
+        notAppliedBindings.removeAll(skippedBindings);
+        if (!notAppliedBindings.isEmpty())
+            throw Exceptions.error("found not applied override binding, please check test module, bindings={}", notAppliedBindings);
     }
 }

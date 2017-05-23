@@ -23,6 +23,7 @@ public abstract class AbstractTestModule extends Module {
         logger.info("initialize application");
         initialize();
         context.config.validate();
+        ((TestBeanFactory) context.beanFactory).validateOverrideBindings();
     }
 
     public <T> T overrideBinding(Class<? super T> type, T instance) {
