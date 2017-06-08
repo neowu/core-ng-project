@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static core.framework.impl.log.LogLevel.DEBUG;
+import static core.framework.impl.log.LogLevel.WARN;
+
 /**
  * @author neo
  */
@@ -19,6 +22,7 @@ public final class ActionLog {
     private static final ThreadMXBean THREAD = ManagementFactory.getThreadMXBean();
 
     private static final int MAX_TRACE_HOLD_SIZE = 3000;    // normal trace 3000 lines is about 350k
+    private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
     private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
 
     public final String id;
@@ -68,19 +72,19 @@ public final class ActionLog {
             errorCode = event.errorCode(); // only update error type/message if level raised, so error type will be first WARN or first ERROR
             errorMessage = errorMessage(event);
         }
-        if (events.size() < MAX_TRACE_HOLD_SIZE || event.level.value >= LogLevel.WARN.value) {  // after reach max holding lines, only add warning/error events
+        if (events.size() < MAX_TRACE_HOLD_SIZE || event.level.value >= WARN.value) {  // after reach max holding lines, only add warning/error events
             add(event);
         }
     }
 
-    private void log(String message, Object... argument) {  // add log event directly, so internal message and won't be suspended
-        add(new LogEvent(LOGGER, null, LogLevel.DEBUG, message, argument, null));
+    private void log(String message, Object... argument) {  // add log event directly, so internal message won't be suspended
+        add(new LogEvent(LOGGER, null, DEBUG, message, argument, null));
     }
 
     private void add(LogEvent event) {
         events.add(event);
         if (events.size() == MAX_TRACE_HOLD_SIZE) {
-            events.add(new LogEvent(LOGGER, null, LogLevel.DEBUG, "reached max trace log holding size, only collect critical log event from now on", null, null));
+            events.add(new LogEvent(LOGGER, null, DEBUG, "reached max trace log holding size, only collect critical log event from now on", null, null));
         }
     }
 
@@ -98,12 +102,12 @@ public final class ActionLog {
     }
 
     boolean flushTraceLog() {
-        return trace || result.value >= LogLevel.WARN.value;
+        return trace || result.value >= WARN.value;
     }
 
     String errorCode() {
         if (errorCode != null) return errorCode;
-        if (result.value >= LogLevel.WARN.value) return "UNASSIGNED";
+        if (result.value >= WARN.value) return "UNASSIGNED";
         return null;
     }
 
@@ -112,22 +116,26 @@ public final class ActionLog {
     }
 
     public void context(String key, Object value) {
-        String previous = context.put(key, String.valueOf(value));
+        String contextValue = String.valueOf(value);
+        if (contextValue.length() > MAX_CONTEXT_VALUE_LENGTH) { // prevent application code from putting large blob as context, e.g. xml or json response
+            throw Exceptions.error("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_CONTEXT_VALUE_LENGTH));
+        }
+        String previous = context.put(key, contextValue);
         // put context can be called by application code, check duplication to avoid producing huge trace log by accident
-        if (previous != null) throw Exceptions.error("context key must only be set once, key={}, value={}, previous={}", key, value, previous);
-        log("[context] {}={}", key, value);
+        if (previous != null) throw Exceptions.error("found duplicate context key, key={}, value={}, previous={}", key, contextValue, previous);
+        log("[context] {}={}", key, contextValue);
     }
 
     public void stats(String key, Number value) {
         Double previous = stats.put(key, value.doubleValue());
-        if (previous != null) throw Exceptions.error("stats key must only be set once, key={}, value={}, previous={}", key, value, previous);
+        if (previous != null) throw Exceptions.error("found duplicate stats key, key={}, value={}, previous={}", key, value, previous);
         log("[stats] {}={}", key, value);
     }
 
     public void track(String action, long elapsedTime) {
-        PerformanceStat tracking = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
-        tracking.count++;
-        tracking.totalElapsed += elapsedTime;
+        PerformanceStat stat = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
+        stat.count++;
+        stat.totalElapsed += elapsedTime;
         log("[perf_stats] {}={}", action, elapsedTime);
     }
 
