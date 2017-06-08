@@ -31,7 +31,7 @@ public class ActionLogTest {
     private String longString(int length) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            builder.append("x");
+            builder.append('x');
         }
         return builder.toString();
     }
