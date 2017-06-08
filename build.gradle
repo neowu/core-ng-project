@@ -8,7 +8,7 @@ subprojects {
 }
 
 def mongoVersion = '3.4.2'
-def elasticVersion = '5.4.0'
+def elasticVersion = '5.4.1'
 def rabbitVersion = '3.6.5'
 def kafkaVersion = '0.10.2.0'
 def jacksonVersion = '2.8.7'
@@ -64,7 +64,7 @@ project(':core-ng-test') {
         )
         compileOnly(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "com.github.fakemongo:fongo:2.0.12@jar",
+                "com.github.fakemongo:fongo:2.1.0@jar",
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
                 "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
                 "org.elasticsearch.client:transport:${elasticVersion}",
