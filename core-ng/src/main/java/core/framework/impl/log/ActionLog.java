@@ -136,7 +136,7 @@ public final class ActionLog {
         PerformanceStat stat = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
         stat.count++;
         stat.totalElapsed += elapsedTime;
-        log("[perf_stats] {}={}", action, elapsedTime);
+        log("[track] {}={}", action, elapsedTime);
     }
 
     public String refId() {
