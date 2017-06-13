@@ -58,14 +58,13 @@ public class ControllerInspector {
                 String[] methodRefInfo = (String[]) getMemberRefInfoAt.invoke(constantPool, methodRefIndex(size));
                 Class<?> targetClass = Class.forName(methodRefInfo[0].replaceAll("/", "."));
                 String targetMethodName = methodRefInfo[1];
+                controllerInfo = targetClass.getCanonicalName() + "." + targetMethodName;
                 if (targetMethodName.contains("$")) {   // for lambda
                     this.targetClass = controllerClass;
                     targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
-                    controllerInfo = targetClass.getCanonicalName() + "." + targetMethodName;
                 } else {    // for method reference
                     this.targetClass = targetClass;
                     targetMethod = targetClass.getMethod(targetMethodName, CONTROLLER_METHOD.getParameterTypes());
-                    controllerInfo = targetClass.getCanonicalName() + "." + targetMethodName;
                 }
             }
         } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
