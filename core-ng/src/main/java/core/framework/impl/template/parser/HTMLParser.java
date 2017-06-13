@@ -133,7 +133,7 @@ public class HTMLParser {
 
     private void validateSelfCloseTag(String tagName) {
         if (voidElements.contains(tagName))
-            throw Exceptions.error("we recommend not closing void element, tag={}, location={}", tagName, lexer.currentLocation());
+            throw Exceptions.error("it is recommended not to close void element, tag={}, location={}", tagName, lexer.currentLocation());
         else
             throw Exceptions.error("non void element must not be self-closed, tag={}, location={}", tagName, lexer.currentLocation());
     }
@@ -143,7 +143,7 @@ public class HTMLParser {
         if (!isBooleanAttribute && attribute.value == null)
             throw Exceptions.error("non boolean attribute must have value, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location);
         if (isBooleanAttribute && attribute.value != null)
-            throw Exceptions.error("we recommend not putting value for boolean attribute, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location);
+            throw Exceptions.error("it is recommended to put value for boolean attribute, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location);
 
         if (("link".equals(attribute.tagName) && "href".equals(attribute.name))
             || ("script".equals(attribute.tagName) && "src".equals(attribute.name))

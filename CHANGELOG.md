@@ -1,8 +1,9 @@
 ## Change log
-### 4.12.4 (5/15/2017 - )
+### 4.12.4 (5/15/2017 - 6/13/2017)
 * test: validate override binding in integration test
 * lib: update es to 5.4.1, fongo to 2.1.0
 * web: forbidden inherited controller 
+* html: recommend to use double quote to delimit attribute value
 
 ### 4.12.3 (5/9/2017 - 5/10/2017)
 * es: update to 5.4.0, delete by query support
