@@ -4,7 +4,6 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Exceptions;
 import core.framework.api.web.site.Message;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.site.StaticDirectoryController;
 import core.framework.impl.web.site.StaticFileController;
 import core.framework.impl.web.site.WebSecurityInterceptor;
@@ -59,9 +58,9 @@ public final class SiteConfig {
             throw Exceptions.error("path does not exist, path={}", path);
         }
         if (Files.isDirectory(contentPath)) {
-            context.httpServer.handler.route.add(HTTPMethod.GET, path + "/:path(*)", new ControllerHolder(new StaticDirectoryController(contentPath), true));
+            context.addSystemController(HTTPMethod.GET, path + "/:path(*)", new StaticDirectoryController(contentPath));
         } else {
-            context.httpServer.handler.route.add(HTTPMethod.GET, path, new ControllerHolder(new StaticFileController(contentPath), true));
+            context.addSystemController(HTTPMethod.GET, path, new StaticFileController(contentPath));
         }
     }
 

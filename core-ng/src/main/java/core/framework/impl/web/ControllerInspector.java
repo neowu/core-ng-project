@@ -15,7 +15,7 @@ import java.security.PrivilegedAction;
  *
  * @author neo
  */
-class ControllerInspector {
+public class ControllerInspector {
     private static final Method GET_CONSTANT_POOL;
     private static final Method CONTROLLER_METHOD;
     private static final int JDK_8_MINOR_VERSION;
@@ -38,18 +38,18 @@ class ControllerInspector {
         JDK_8_MINOR_VERSION = Integer.parseInt(jdkVersion.substring(6));
     }
 
-    final String targetClassName;
-    final String targetMethodName;
-    final Method targetMethod;
+    public final Class<?> targetClass;
+    public final Method targetMethod;
+    public final String controllerInfo;
 
-    ControllerInspector(Controller controller) {
+    public ControllerInspector(Controller controller) {
         Class<?> controllerClass = controller.getClass();
 
         try {
             if (!controllerClass.isSynthetic()) {
+                targetClass = controllerClass;
                 targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
-                targetClassName = controllerClass.getCanonicalName();
-                targetMethodName = CONTROLLER_METHOD.getName();
+                controllerInfo = controllerClass.getCanonicalName() + "." + CONTROLLER_METHOD.getName();
             } else {
                 Object constantPool = GET_CONSTANT_POOL.invoke(controllerClass); // constantPool is sun.reflect.ConstantPool, it can be changed in future JDK
                 Method getSize = constantPool.getClass().getMethod("getSize");
@@ -57,16 +57,19 @@ class ControllerInspector {
                 Method getMemberRefInfoAt = constantPool.getClass().getMethod("getMemberRefInfoAt", int.class);
                 String[] methodRefInfo = (String[]) getMemberRefInfoAt.invoke(constantPool, methodRefIndex(size));
                 Class<?> targetClass = Class.forName(methodRefInfo[0].replaceAll("/", "."));
-                targetClassName = targetClass.getCanonicalName();
-                targetMethodName = methodRefInfo[1];
-                if (targetMethodName.contains("$")) {
+                String targetMethodName = methodRefInfo[1];
+                if (targetMethodName.contains("$")) {   // for lambda
+                    this.targetClass = controllerClass;
                     targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
-                } else {
+                    controllerInfo = targetClass.getCanonicalName() + "." + targetMethodName;
+                } else {    // for method reference
+                    this.targetClass = targetClass;
                     targetMethod = targetClass.getMethod(targetMethodName, CONTROLLER_METHOD.getParameterTypes());
+                    controllerInfo = targetClass.getCanonicalName() + "." + targetMethodName;
                 }
             }
         } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
-            throw new Error("failed to inspect controller, please contact arch team", e);
+            throw new Error("failed to inspect controller", e);
         }
     }
 

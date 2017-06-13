@@ -45,8 +45,10 @@ public final class APIConfig {
             Controller controller = new WebServiceControllerBuilder<>(serviceInterface, service, method).build();
             try {
                 Class<?>[] parameterTypes = method.getParameterTypes();
-                Method targetMethod = service.getClass().getMethod(method.getName(), parameterTypes);
-                context.httpServer.handler.route.add(httpMethod, path, new ControllerHolder(controller, targetMethod));
+                Class<?> serviceClass = service.getClass();
+                Method targetMethod = serviceClass.getMethod(method.getName(), parameterTypes);
+                String controllerInfo = serviceClass.getCanonicalName() + "." + targetMethod.getName();
+                context.httpServer.handler.route.add(httpMethod, path, new ControllerHolder(controller, targetMethod, controllerInfo, false));
             } catch (NoSuchMethodException e) {
                 throw new Error("failed to find impl method", e);
             }

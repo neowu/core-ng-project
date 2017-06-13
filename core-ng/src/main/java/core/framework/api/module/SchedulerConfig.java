@@ -8,7 +8,6 @@ import core.framework.impl.scheduler.FixedRateTrigger;
 import core.framework.impl.scheduler.MonthlyTrigger;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.scheduler.WeeklyTrigger;
-import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.management.SchedulerController;
 
 import java.time.DayOfWeek;
@@ -61,8 +60,8 @@ public final class SchedulerConfig {
             context.startupHook.add(scheduler::start);
             context.shutdownHook.add(scheduler::stop);
             SchedulerController schedulerController = new SchedulerController(scheduler);
-            context.httpServer.handler.route.add(HTTPMethod.GET, "/_sys/job", new ControllerHolder(schedulerController::listJobs, true));
-            context.httpServer.handler.route.add(HTTPMethod.POST, "/_sys/job/:job", new ControllerHolder(schedulerController::triggerJob, true));
+            context.addSystemController(HTTPMethod.GET, "/_sys/job", schedulerController::listJobs);
+            context.addSystemController(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob);
         }
         return scheduler;
     }

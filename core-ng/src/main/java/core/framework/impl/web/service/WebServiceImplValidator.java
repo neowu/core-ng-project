@@ -23,6 +23,11 @@ public class WebServiceImplValidator<T> {
             throw Exceptions.error("service must impl service interface, serviceInterface={}", serviceInterface.getCanonicalName(), service);
 
         Class<?> serviceClass = service.getClass();
+
+        if (!Object.class.equals(serviceClass.getSuperclass())) {
+            throw Exceptions.error("service impl class must not have super class, class={}", serviceClass.getCanonicalName());
+        }
+
         for (Method method : serviceInterface.getDeclaredMethods()) {
             Class<?>[] parameterTypes = method.getParameterTypes();
             try {

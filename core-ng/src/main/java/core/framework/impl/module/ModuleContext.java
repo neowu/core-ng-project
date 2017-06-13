@@ -4,6 +4,7 @@ import core.framework.api.async.Executor;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Properties;
+import core.framework.api.web.Controller;
 import core.framework.api.web.WebContext;
 import core.framework.api.web.site.WebDirectory;
 import core.framework.impl.async.ExecutorImpl;
@@ -13,6 +14,7 @@ import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.stat.Metrics;
 import core.framework.impl.web.ControllerHolder;
+import core.framework.impl.web.ControllerInspector;
 import core.framework.impl.web.HTTPServer;
 import core.framework.impl.web.management.HealthCheckController;
 import core.framework.impl.web.management.MemoryUsageController;
@@ -66,13 +68,13 @@ public final class ModuleContext {
         beanFactory.bind(Executor.class, null, executor);
 
         if (!isTest()) {
-            httpServer.handler.route.add(HTTPMethod.GET, "/health-check", new ControllerHolder(new HealthCheckController(), true));
-            httpServer.handler.route.add(HTTPMethod.GET, "/_sys/memory", new ControllerHolder(new MemoryUsageController(), true));
+            addSystemController(HTTPMethod.GET, "/health-check", new HealthCheckController());
+            addSystemController(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController());
             ThreadInfoController threadInfoController = new ThreadInfoController();
-            httpServer.handler.route.add(HTTPMethod.GET, "/_sys/thread", new ControllerHolder(threadInfoController::threadUsage, true));
-            httpServer.handler.route.add(HTTPMethod.GET, "/_sys/thread-dump", new ControllerHolder(threadInfoController::threadDump, true));
+            addSystemController(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage);
+            addSystemController(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump);
             PropertyController propertyController = new PropertyController(properties);
-            httpServer.handler.route.add(HTTPMethod.GET, "/_sys/property", new ControllerHolder(propertyController, true));
+            addSystemController(HTTPMethod.GET, "/_sys/property", propertyController);
         }
     }
 
@@ -85,6 +87,11 @@ public final class ModuleContext {
             }
         }
         return backgroundTask;
+    }
+
+    public void addSystemController(HTTPMethod method, String path, Controller controller) {
+        ControllerInspector inspector = new ControllerInspector(controller);
+        httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, true));
     }
 
     public boolean isTest() {

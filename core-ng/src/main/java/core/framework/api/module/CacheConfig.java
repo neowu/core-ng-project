@@ -11,7 +11,6 @@ import core.framework.impl.cache.LocalCacheStore;
 import core.framework.impl.cache.RedisCacheStore;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
-import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.management.CacheController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,15 @@ import java.time.Duration;
  * @author neo
  */
 public final class CacheConfig {
+    private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
+    private final ModuleContext context;
+    private final State state;
+
+    public CacheConfig(ModuleContext context) {
+        this.context = context;
+        state = context.config.cache();
+    }
+
     static String cacheName(String name, Type valueType) {
         if (name != null) return name;
         if (valueType instanceof Class) {
@@ -41,17 +49,9 @@ public final class CacheConfig {
         return ASCII.toLowerCase(valueType.getTypeName());
     }
 
-    private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
-    private final ModuleContext context;
-    private final State state;
-
-    public CacheConfig(ModuleContext context) {
-        this.context = context;
-        state = context.config.cache();
-    }
-
     public void local() {
-        if (state.cacheManager != null) throw new Error("cache() is already configured, please configure cache store only once");
+        if (state.cacheManager != null)
+            throw new Error("cache() is already configured, please configure cache store only once");
 
         logger.info("create local cache store");
         LocalCacheStore cacheStore = new LocalCacheStore();
@@ -62,7 +62,8 @@ public final class CacheConfig {
     }
 
     public void redis(String host) {
-        if (state.cacheManager != null) throw new Error("cache() is already configured, please configure cache store only once");
+        if (state.cacheManager != null)
+            throw new Error("cache() is already configured, please configure cache store only once");
 
         if (context.isTest()) {
             logger.info("use local cache during test");
@@ -84,9 +85,9 @@ public final class CacheConfig {
         state.cacheManager = new CacheManager(cacheStore);
         if (!context.isTest()) {
             CacheController controller = new CacheController(state.cacheManager);
-            context.httpServer.handler.route.add(HTTPMethod.GET, "/_sys/cache", new ControllerHolder(controller::list, true));
-            context.httpServer.handler.route.add(HTTPMethod.GET, "/_sys/cache/:name/:key", new ControllerHolder(controller::get, true));
-            context.httpServer.handler.route.add(HTTPMethod.DELETE, "/_sys/cache/:name/:key", new ControllerHolder(controller::delete, true));
+            context.addSystemController(HTTPMethod.GET, "/_sys/cache", controller::list);
+            context.addSystemController(HTTPMethod.GET, "/_sys/cache/:name/:key", controller::get);
+            context.addSystemController(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete);
         }
     }
 
