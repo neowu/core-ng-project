@@ -13,6 +13,8 @@ import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.stat.Metrics;
+import core.framework.impl.web.ControllerActionBuilder;
+import core.framework.impl.web.ControllerClassValidator;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.ControllerInspector;
 import core.framework.impl.web.HTTPServer;
@@ -20,6 +22,7 @@ import core.framework.impl.web.management.HealthCheckController;
 import core.framework.impl.web.management.MemoryUsageController;
 import core.framework.impl.web.management.PropertyController;
 import core.framework.impl.web.management.ThreadInfoController;
+import core.framework.impl.web.route.PathPatternValidator;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
@@ -68,13 +71,13 @@ public final class ModuleContext {
         beanFactory.bind(Executor.class, null, executor);
 
         if (!isTest()) {
-            addSystemController(HTTPMethod.GET, "/health-check", new HealthCheckController());
-            addSystemController(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController());
+            route(HTTPMethod.GET, "/health-check", new HealthCheckController(), true);
+            route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
             ThreadInfoController threadInfoController = new ThreadInfoController();
-            addSystemController(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage);
-            addSystemController(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump);
+            route(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage, true);
+            route(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump, true);
             PropertyController propertyController = new PropertyController(properties);
-            addSystemController(HTTPMethod.GET, "/_sys/property", propertyController);
+            route(HTTPMethod.GET, "/_sys/property", propertyController, true);
         }
     }
 
@@ -89,9 +92,12 @@ public final class ModuleContext {
         return backgroundTask;
     }
 
-    public void addSystemController(HTTPMethod method, String path, Controller controller) {
+    public void route(HTTPMethod method, String path, Controller controller, boolean skipInterceptor) {
+        new PathPatternValidator(path).validate();
         ControllerInspector inspector = new ControllerInspector(controller);
-        httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, true));
+        new ControllerClassValidator(inspector.targetClass).validate();
+        String action = new ControllerActionBuilder(method, path).build();
+        httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
     }
 
     public boolean isTest() {

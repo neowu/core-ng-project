@@ -18,11 +18,11 @@ import java.util.List;
  */
 public interface TestWebService {
     @GET
-    @Path("/test/:id(\\d+)")
+    @Path("/test/:id")
     TestResponse get(@PathParam("id") Integer id);
 
     @PUT
-    @Path("/test/:id(\\d+)")
+    @Path("/test/:id")
     @ResponseStatus(HTTPStatus.CREATED)
     void create(@PathParam("id") Integer id, TestRequest request);
 

@@ -1,6 +1,5 @@
 package core.framework.impl.web.route;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -12,30 +11,23 @@ public class PathPatternValidatorTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private PathPatternValidator validator;
-
-    @Before
-    public void createPathPatternValidator() {
-        validator = new PathPatternValidator();
-    }
-
     @Test
     public void duplicateVariable() {
         exception.expect(Error.class);
         exception.expectMessage("duplicate");
 
-        validator.validate("/:name/path/:name");
+        new PathPatternValidator("/:name/path/:name").validate();
     }
 
     @Test
     public void validate() {
-        validator.validate("/robot.txt");
-        validator.validate("/images");
+        new PathPatternValidator("/robot.txt").validate();
+        new PathPatternValidator("/images").validate();
 
-        validator.validate("/path-with-trailing-slash/");
+        new PathPatternValidator("/path-with-trailing-slash/").validate();
 
-        validator.validate("/user/:id/name");
-        validator.validate("/v2/user/:id");
+        new PathPatternValidator("/user/:id/name").validate();
+        new PathPatternValidator("/v2/user/:id").validate();
     }
 
     @Test
@@ -43,6 +35,6 @@ public class PathPatternValidatorTest {
         exception.expect(Error.class);
         exception.expectMessage(":name(");
 
-        validator.validate("/path/:name(");
+        new PathPatternValidator("/path/:name(").validate();
     }
 }

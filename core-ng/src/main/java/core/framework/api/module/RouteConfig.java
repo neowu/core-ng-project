@@ -3,9 +3,6 @@ package core.framework.api.module;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.web.Controller;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.ControllerClassValidator;
-import core.framework.impl.web.ControllerHolder;
-import core.framework.impl.web.ControllerInspector;
 
 /**
  * @author neo
@@ -34,8 +31,6 @@ public final class RouteConfig {
     }
 
     public void add(HTTPMethod method, String path, Controller controller) {
-        ControllerInspector inspector = new ControllerInspector(controller);
-        new ControllerClassValidator(inspector.targetClass).validate();
-        context.httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, false));
+        context.route(method, path, controller, false);
     }
 }

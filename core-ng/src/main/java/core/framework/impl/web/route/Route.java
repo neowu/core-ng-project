@@ -16,21 +16,18 @@ import java.util.Map;
  */
 public final class Route {
     private final Logger logger = LoggerFactory.getLogger(Route.class);
-    private final PathPatternValidator validator = new PathPatternValidator();
 
     private final Map<String, URLHandler> staticHandlers = Maps.newHashMap();
     private final PathNode dynamicRoot = new PathNode();
 
     public void add(HTTPMethod method, String path, ControllerHolder controller) {
-        logger.info("route, {} {}", method, path);
-        validator.validate(path);
-        controller.action = new ActionInfo(method, path).action();
+        logger.info("add, route={} {}, controller={}", method, path, controller.controllerInfo);
 
         URLHandler handler;
         if (path.contains("/:")) {
             handler = dynamicRoot.register(path);
         } else {
-            handler = staticHandlers.computeIfAbsent(path, k -> new URLHandler(path));
+            handler = staticHandlers.computeIfAbsent(path, URLHandler::new);
         }
         handler.put(method, controller);
     }

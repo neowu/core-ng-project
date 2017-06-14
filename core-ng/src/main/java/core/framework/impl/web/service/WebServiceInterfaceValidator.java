@@ -11,6 +11,7 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.validate.type.JAXBTypeValidator;
 import core.framework.impl.web.BeanValidator;
+import core.framework.impl.web.route.PathPatternValidator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -43,6 +44,7 @@ public class WebServiceInterfaceValidator {
         Path path = method.getDeclaredAnnotation(Path.class);
         if (path == null)
             throw Exceptions.error("method must have @Path, method={}", method);
+        new PathPatternValidator(path.value()).validate();
 
         validateReturnType(method.getGenericReturnType());
 

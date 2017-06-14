@@ -1,4 +1,4 @@
-package core.framework.impl.web.route;
+package core.framework.impl.web;
 
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.ASCII;
@@ -7,16 +7,16 @@ import core.framework.api.util.Strings;
 /**
  * @author neo
  */
-class ActionInfo {
+public class ControllerActionBuilder {
     private final HTTPMethod method;
     private final String pathPattern;
 
-    ActionInfo(HTTPMethod method, String pathPattern) {
+    public ControllerActionBuilder(HTTPMethod method, String pathPattern) {
         this.method = method;
         this.pathPattern = pathPattern;
     }
 
-    String action() {
+    public String build() {
         return "web/" + ASCII.toLowerCase(method.name()) + "-" + transformPathPattern();
     }
 

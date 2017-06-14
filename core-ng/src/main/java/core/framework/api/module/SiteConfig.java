@@ -58,9 +58,9 @@ public final class SiteConfig {
             throw Exceptions.error("path does not exist, path={}", path);
         }
         if (Files.isDirectory(contentPath)) {
-            context.addSystemController(HTTPMethod.GET, path + "/:path(*)", new StaticDirectoryController(contentPath));
+            context.route(HTTPMethod.GET, path + "/:path(*)", new StaticDirectoryController(contentPath), true);
         } else {
-            context.addSystemController(HTTPMethod.GET, path, new StaticFileController(contentPath));
+            context.route(HTTPMethod.GET, path, new StaticFileController(contentPath), true);
         }
     }
 

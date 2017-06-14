@@ -85,9 +85,9 @@ public final class CacheConfig {
         state.cacheManager = new CacheManager(cacheStore);
         if (!context.isTest()) {
             CacheController controller = new CacheController(state.cacheManager);
-            context.addSystemController(HTTPMethod.GET, "/_sys/cache", controller::list);
-            context.addSystemController(HTTPMethod.GET, "/_sys/cache/:name/:key", controller::get);
-            context.addSystemController(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete);
+            context.route(HTTPMethod.GET, "/_sys/cache", controller::list, true);
+            context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", controller::get, true);
+            context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete, true);
         }
     }
 
