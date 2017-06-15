@@ -6,13 +6,13 @@ checkstyle {
     repositories {
         mavenCentral()
         maven {
-            url "http://sevntu-checkstyle.github.com/sevntu.checkstyle/maven2"
+            url "http://sevntu-checkstyle.github.io/sevntu.checkstyle/maven2"
         }
     }
 
     dependencies {
-        checkstyle 'com.puppycrawl.tools:checkstyle:7.7'
-        checkstyle 'com.github.sevntu.checkstyle:sevntu-checks:1.23.1'
+        checkstyle 'com.puppycrawl.tools:checkstyle:7.8.1'
+        checkstyle 'com.github.sevntu.checkstyle:sevntu-checks:1.23.1'  // 1.24.0 doesn't work with checkstyle 7.8.1
     }
 
     configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
@@ -22,7 +22,7 @@ checkstyle {
 pmd {
     ruleSets = []
     ruleSetFiles = rootProject.files('gradle/pmd/rule-set.xml')
-    toolVersion = '5.6.1'
+    toolVersion = '5.7.0'
     consoleOutput = true
 }
 

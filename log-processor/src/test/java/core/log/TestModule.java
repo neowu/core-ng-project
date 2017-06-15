@@ -22,7 +22,7 @@ public class TestModule extends AbstractTestModule {
 
     private static class MockKafkaConsumerFactory extends KafkaConsumerFactory {
         MockKafkaConsumerFactory() {
-            super("localhost:9092");
+            super(null);
         }
 
         @Override
