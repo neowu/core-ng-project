@@ -3,16 +3,9 @@ apply plugin: 'pmd'
 apply plugin: 'findbugs'
 
 checkstyle {
-    repositories {
-        mavenCentral()
-        maven {
-            url "http://sevntu-checkstyle.github.io/sevntu.checkstyle/maven2"
-        }
-    }
-
     dependencies {
         checkstyle 'com.puppycrawl.tools:checkstyle:7.8.1'
-        checkstyle 'com.github.sevntu.checkstyle:sevntu-checks:1.23.1'  // 1.24.0 doesn't work with checkstyle 7.8.1
+        checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.24.0'
     }
 
     configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
