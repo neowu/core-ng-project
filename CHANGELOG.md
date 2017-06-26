@@ -1,5 +1,6 @@
 ## Change log
 ### 4.12.5 (6/13/2017 - )
+* lib: update es to 5.4.2
 
 ### 4.12.4 (5/15/2017 - 6/13/2017)
 * test: validate override binding in integration test
