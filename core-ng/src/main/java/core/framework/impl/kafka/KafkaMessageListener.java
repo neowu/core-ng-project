@@ -5,7 +5,6 @@ import core.framework.api.kafka.MessageHandler;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
-import core.framework.api.util.Types;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.LogManager;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -41,7 +40,7 @@ public class KafkaMessageListener {
         topics.add(topic);
         if (handler != null) handlers.put(topic, handler);
         if (bulkHandler != null) bulkHandlers.put(topic, bulkHandler);
-        readers.put(topic, JSONReader.of(Types.generic(KafkaMessage.class, messageClass)));
+        readers.put(topic, JSONReader.of(messageClass));
     }
 
     public void start() {

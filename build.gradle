@@ -10,7 +10,7 @@ subprojects {
 def mongoVersion = '3.4.2'
 def elasticVersion = '5.4.2'
 def rabbitVersion = '3.6.5'
-def kafkaVersion = '0.10.2.0'
+def kafkaVersion = '0.11.0.0'
 def jacksonVersion = '2.8.7'
 
 project(':core-ng-api') {

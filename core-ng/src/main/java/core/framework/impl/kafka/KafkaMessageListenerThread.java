@@ -4,6 +4,7 @@ import core.framework.api.kafka.BulkMessageHandler;
 import core.framework.api.kafka.Message;
 import core.framework.api.kafka.MessageHandler;
 import core.framework.api.log.Markers;
+import core.framework.api.util.Charsets;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
@@ -15,6 +16,8 @@ import core.framework.impl.log.LogParam;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author neo
  */
 class KafkaMessageListenerThread extends Thread {
-    static double longProcessThreshold(double batchLongProcessThreshold, int recordCount, int totalCount) {
-        return batchLongProcessThreshold * recordCount / totalCount;
-    }
-
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListenerThread.class);
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Consumer<String, byte[]> consumer;
@@ -51,6 +50,10 @@ class KafkaMessageListenerThread extends Thread {
         validator = listener.kafka.validator;
         logManager = listener.logManager;
         batchLongProcessThresholdInNano = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time of max
+    }
+
+    static double longProcessThreshold(double batchLongProcessThreshold, int recordCount, int totalCount) {
+        return batchLongProcessThreshold * recordCount / totalCount;
     }
 
     @Override
@@ -106,7 +109,7 @@ class KafkaMessageListenerThread extends Thread {
 
     private <T> void handle(String topic, MessageHandler<T> handler, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
         @SuppressWarnings("unchecked")
-        JSONReader<KafkaMessage<T>> reader = (JSONReader<KafkaMessage<T>>) readers.get(topic);
+        JSONReader<T> reader = (JSONReader<T>) readers.get(topic);
         for (ConsumerRecord<String, byte[]> record : records) {
             logManager.begin("=== message handling begin ===");
             ActionLog actionLog = logManager.currentActionLog();
@@ -114,20 +117,24 @@ class KafkaMessageListenerThread extends Thread {
                 actionLog.action("topic/" + topic);
                 actionLog.context("topic", topic);
                 actionLog.context("handler", handler.getClass().getCanonicalName());
+                actionLog.context("key", record.key());
                 logger.debug("message={}", LogParam.of(record.value()));
 
-                KafkaMessage<T> kafkaMessage = reader.fromJSON(record.value());
+                T message = reader.fromJSON(record.value());
 
-                actionLog.refId(kafkaMessage.headers.get(KafkaMessage.HEADER_REF_ID));
-                String client = kafkaMessage.headers.get(KafkaMessage.HEADER_CLIENT);
+                Headers headers = record.headers();
+                actionLog.refId(header(headers, KafkaHeaders.HEADER_REF_ID));
+                String client = header(headers, KafkaHeaders.HEADER_CLIENT);
                 if (client != null) actionLog.context("client", client);
-                String clientIP = kafkaMessage.headers.get(KafkaMessage.HEADER_CLIENT_IP);
+                String clientIP = header(headers, KafkaHeaders.HEADER_CLIENT_IP);
                 if (clientIP != null) actionLog.context("clientIP", clientIP);
-                if ("true".equals(kafkaMessage.headers.get(KafkaMessage.HEADER_TRACE))) actionLog.trace = true;
+                if ("true".equals(header(headers, KafkaHeaders.HEADER_TRACE))) {
+                    actionLog.trace = true;
+                }
 
-                validator.validate(kafkaMessage.value);
+                validator.validate(message);
 
-                handler.handle(record.key(), kafkaMessage.value);
+                handler.handle(record.key(), message);
             } catch (Throwable e) {
                 logManager.logError(e);
             } finally {
@@ -145,7 +152,7 @@ class KafkaMessageListenerThread extends Thread {
         ActionLog actionLog = logManager.currentActionLog();
         try {
             @SuppressWarnings("unchecked")
-            JSONReader<KafkaMessage<T>> reader = (JSONReader<KafkaMessage<T>>) readers.get(topic);
+            JSONReader<T> reader = (JSONReader<T>) readers.get(topic);
             actionLog.action("topic/" + topic);
             actionLog.context("topic", topic);
             actionLog.context("handler", bulkHandler.getClass().getCanonicalName());
@@ -153,10 +160,10 @@ class KafkaMessageListenerThread extends Thread {
 
             List<Message<T>> messages = new ArrayList<>(records.size());
             for (ConsumerRecord<String, byte[]> record : records) {
-                KafkaMessage<T> message = reader.fromJSON(record.value());
-                validate(message.value, record.value());
-                messages.add(new Message<>(record.key(), message.value));
-                if ("true".equals(message.headers.get(KafkaMessage.HEADER_TRACE))) { // trigger trace if any message is trace
+                T message = reader.fromJSON(record.value());
+                validate(message, record);
+                messages.add(new Message<>(record.key(), message));
+                if ("true".equals(header(record.headers(), KafkaHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
                     actionLog.trace = true;
                 }
             }
@@ -172,11 +179,22 @@ class KafkaMessageListenerThread extends Thread {
         }
     }
 
-    private <T> void validate(T value, byte[] recordBytes) {
+    private String header(Headers headers, String key) {
+        Header header = headers.lastHeader(key);
+        if (header == null) return null;
+        return new String(header.value(), Charsets.UTF_8);
+    }
+
+    private <T> void validate(T value, ConsumerRecord<String, byte[]> record) {
         try {
             validator.validate(value);
         } catch (Exception e) {
-            logger.warn("failed to validate message, message={}", LogParam.of(recordBytes), e);
+            Header[] recordHeaders = record.headers().toArray();
+            Map<String, String> headers = Maps.newHashMapWithExpectedSize(recordHeaders.length);
+            for (Header recordHeader : recordHeaders) {
+                headers.put(recordHeader.key(), new String(recordHeader.value(), Charsets.UTF_8));
+            }
+            logger.warn("failed to validate message, key={}, headers={}, message={}", record.key(), LogParam.of(headers), LogParam.of(record.value()), e);
             throw e;
         }
     }

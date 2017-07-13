@@ -1,6 +1,7 @@
 ## Change log
 ### 4.12.5 (6/13/2017 - )
 * lib: update es to 5.4.2
+* kafka: update to 0.11.0.0, use built-in headers for meta data
 
 ### 4.12.4 (5/15/2017 - 6/13/2017)
 * test: validate override binding in integration test
