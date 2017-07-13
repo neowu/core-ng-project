@@ -8,7 +8,7 @@ subprojects {
 }
 
 def mongoVersion = '3.4.2'
-def elasticVersion = '5.4.2'
+def elasticVersion = '5.5.0'
 def rabbitVersion = '3.6.5'
 def kafkaVersion = '0.11.0.0'
 def jacksonVersion = '2.8.7'
@@ -41,11 +41,11 @@ project(':core-ng') {
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
                 "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
                 "org.elasticsearch.client:transport:${elasticVersion}",
-                'org.apache.logging.log4j:log4j-api:2.7'   // used by elasticsearch
+                'org.apache.logging.log4j:log4j-api:2.8.2'   // used by elasticsearch
         )
         testImplementation(
                 'junit:junit:4.12',
-                'org.mockito:mockito-core:2.7.22'
+                'org.mockito:mockito-core:2.8.47'
         )
         testRuntimeOnly(
                 'org.hsqldb:hsqldb:2.3.3'
@@ -60,7 +60,7 @@ project(':core-ng-test') {
         api(
                 project(":core-ng"),
                 'junit:junit:4.12',
-                'org.mockito:mockito-core:2.7.13'
+                'org.mockito:mockito-core:2.8.47'
         )
         compileOnly(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
@@ -68,7 +68,7 @@ project(':core-ng-test') {
                 "com.rabbitmq:amqp-client:${rabbitVersion}",
                 "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
                 "org.elasticsearch.client:transport:${elasticVersion}",
-                'org.apache.logging.log4j:log4j-core:2.7'       // used by elasticsearch
+                'org.apache.logging.log4j:log4j-core:2.8.2'       // used by elasticsearch
         )
         testRuntimeOnly(
                 'org.hsqldb:hsqldb:2.3.3',
@@ -105,11 +105,11 @@ project(':log-processor') {
                 "org.apache.kafka:kafka-clients:${kafkaVersion}"
         )
         runtime(
-                'org.apache.logging.log4j:log4j-api:2.7'       // used by elasticsearch
+                'org.apache.logging.log4j:log4j-api:2.8.2'       // used by elasticsearch
         )
         testCompile(
                 project(':core-ng-test'),
-                'org.apache.logging.log4j:log4j-core:2.7'       // used by elasticsearch
+                'org.apache.logging.log4j:log4j-core:2.8.2'       // used by elasticsearch
         )
     }
 }

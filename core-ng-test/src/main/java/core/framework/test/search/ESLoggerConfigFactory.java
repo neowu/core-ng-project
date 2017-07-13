@@ -9,13 +9,11 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
-import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
@@ -30,8 +28,7 @@ public class ESLoggerConfigFactory extends ConfigurationFactory {  // due to ela
         Configuration config = context.getConfiguration();
 
         Map<String, ESLogger> loggers = Maps.newConcurrentHashMap();
-        PatternLayout layout = PatternLayout.createLayout(PatternLayout.SIMPLE_CONVERSION_PATTERN, null, config, null, null, true, true, null, null);
-        Appender appender = new AbstractAppender("", null, layout) {
+        Appender appender = new AbstractAppender("", null, null) {
             @Override
             public void append(LogEvent event) {
                 String name = event.getLoggerName();
@@ -42,7 +39,7 @@ public class ESLoggerConfigFactory extends ConfigurationFactory {  // due to ela
         appender.start();
         config.addAppender(appender);
 
-        LoggerConfig loggerConfig = LoggerConfig.createLogger(false, Level.ALL, "", "true", new AppenderRef[0], null, config, null);
+        LoggerConfig loggerConfig = new LoggerConfig("", Level.ALL, false);
         loggerConfig.addAppender(appender, null, null);
         config.addLogger("", loggerConfig);
         context.updateLoggers();
