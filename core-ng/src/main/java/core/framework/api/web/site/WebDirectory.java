@@ -28,7 +28,7 @@ public final class WebDirectory {
         if (value != null) {
             Path path = Paths.get(value).toAbsolutePath();
             if (Files.isDirectory(path)) {
-                logger.info("found -Dcore.webPath, use it as web directory, path={}", path);
+                logger.info("found -Dcore.webPath as web directory, path={}", path);
                 return path;
             }
         } else {
