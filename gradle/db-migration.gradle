@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.flywaydb:flyway-gradle-plugin:4.1.2'
+        classpath 'org.flywaydb:flyway-gradle-plugin:4.2.0'
     }
 }
 
