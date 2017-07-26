@@ -1,5 +1,5 @@
 ## Change log
-### 4.12.5 (6/13/2017 - )
+### 4.12.5 (6/13/2017 - 7/26/2017)
 * search: update es to 5.5.0
 * kafka: update to 0.11.0.0, use built-in headers for meta data
 
