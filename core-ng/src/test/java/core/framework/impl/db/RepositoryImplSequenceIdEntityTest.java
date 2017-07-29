@@ -19,9 +19,9 @@ public class RepositoryImplSequenceIdEntityTest {
     @BeforeClass
     public static void createDatabase() {
         database = new DatabaseImpl();
-        database.url("jdbc:hsqldb:mem:oracle;sql.syntax_ora=true");
+        database.url("jdbc:hsqldb:mem:seq;sql.syntax_ora=true");
         database.execute("CREATE TABLE sequence_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20))");
-        database.execute("CREATE SEQUENCE seq_id");
+        database.execute("CREATE SEQUENCE seq");
 
         repository = database.repository(SequenceIdEntity.class);
     }
@@ -29,7 +29,7 @@ public class RepositoryImplSequenceIdEntityTest {
     @AfterClass
     public static void cleanupDatabase() {
         database.execute("DROP TABLE sequence_id_entity");
-        database.execute("DROP SEQUENCE seq_id");
+        database.execute("DROP SEQUENCE seq");
     }
 
     @Before

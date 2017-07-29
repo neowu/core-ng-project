@@ -10,7 +10,7 @@ import core.framework.api.validate.Length;
  */
 @Table(name = "sequence_id_entity")
 public class SequenceIdEntity {
-    @PrimaryKey(sequence = "seq_id")
+    @PrimaryKey(sequence = "seq")
     @Column(name = "id")
     public Integer id;
 
