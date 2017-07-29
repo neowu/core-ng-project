@@ -6,6 +6,7 @@ import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Table;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
+import core.framework.api.util.Strings;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
@@ -25,7 +26,9 @@ import java.util.Set;
 final class DatabaseClassValidator implements TypeVisitor {
     private final DataTypeValidator validator;
     private final Set<String> columns = Sets.newHashSet();
-    private boolean foundPK;
+    private boolean foundPrimaryKey;
+    private boolean foundAutoIncrementalPrimaryKey;
+    private boolean foundSequencePrimaryKey;
     private boolean validateView;
 
     DatabaseClassValidator(Class<?> entityClass) {
@@ -34,29 +37,29 @@ final class DatabaseClassValidator implements TypeVisitor {
         validator.visitor = this;
     }
 
-    public void validateEntityClass() {
+    void validateEntityClass() {
         validator.validate();
 
-        if (!foundPK)
+        if (!foundPrimaryKey)
             throw Exceptions.error("db entity class must have @PrimaryKey, class={}", validator.type.getTypeName());
     }
 
-    public void validateViewClass() {
+    void validateViewClass() {
         validateView = true;
         validator.validate();
     }
 
     private boolean allowedValueClass(Class<?> valueClass) {
         return String.class.equals(valueClass)
-            || Integer.class.equals(valueClass)
-            || Boolean.class.equals(valueClass)
-            || Long.class.equals(valueClass)
-            || Double.class.equals(valueClass)
-            || BigDecimal.class.equals(valueClass)
-            || LocalDate.class.equals(valueClass)
-            || LocalDateTime.class.equals(valueClass)
-            || ZonedDateTime.class.equals(valueClass)
-            || valueClass.isEnum();
+                || Integer.class.equals(valueClass)
+                || Boolean.class.equals(valueClass)
+                || Long.class.equals(valueClass)
+                || Double.class.equals(valueClass)
+                || BigDecimal.class.equals(valueClass)
+                || LocalDate.class.equals(valueClass)
+                || LocalDateTime.class.equals(valueClass)
+                || ZonedDateTime.class.equals(valueClass)
+                || valueClass.isEnum();
     }
 
     @Override
@@ -93,11 +96,37 @@ final class DatabaseClassValidator implements TypeVisitor {
 
         PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
         if (primaryKey != null) {
-            foundPK = true;
-            if (primaryKey.autoIncrement() && !(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
+            foundPrimaryKey = true;
+
+            validatePrimaryKey(primaryKey, fieldClass, field);
+        }
+    }
+
+    private void validatePrimaryKey(PrimaryKey primaryKey, Class<?> fieldClass, Field field) {
+        if (primaryKey.autoIncrement()) {
+            if (foundAutoIncrementalPrimaryKey) throw Exceptions.error("db entity must not have more than one auto incremental primary key, field={}", Fields.path(field));
+            foundAutoIncrementalPrimaryKey = true;
+
+            if (!(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
                 throw Exceptions.error("auto increment primary key must be Integer or Long, field={}", Fields.path(field));
             }
         }
+
+        if (!Strings.isEmpty(primaryKey.sequence())) {
+            if (foundSequencePrimaryKey) throw Exceptions.error("db entity must not have more than one sequence primary key, field={}", Fields.path(field));
+            foundSequencePrimaryKey = true;
+
+            if (!(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
+                throw Exceptions.error("sequence primary key must be Integer or Long, field={}", Fields.path(field));
+            }
+
+            if (primaryKey.autoIncrement()) {
+                throw Exceptions.error("primary key must be either auto increment or sequence, field={}", Fields.path(field));
+            }
+        }
+
+        if (foundAutoIncrementalPrimaryKey && foundSequencePrimaryKey)
+            throw Exceptions.error("db entity must not have both auto incremental and sequence primary key, field={}", Fields.path(field));
     }
 
     private void validateEnumClass(Class<?> enumClass, Field field) {

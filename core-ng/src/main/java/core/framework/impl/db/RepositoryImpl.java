@@ -90,7 +90,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         String sql = insertQuery.sql;
         Object[] params = insertQuery.params(entity);
         try {
-            return database.operation.insert(sql, params);
+            return database.operation.insert(sql, params, insertQuery.sequencePrimaryKey);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);

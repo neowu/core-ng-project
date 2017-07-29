@@ -97,9 +97,9 @@ public class DatabaseOperation {
         }
     }
 
-    Optional<Long> insert(String sql, Object[] params) {
+    Optional<Long> insert(String sql, Object[] params, String sequencePrimaryKey) {
         PoolItem<Connection> connection = transactionManager.getConnection();
-        try (PreparedStatement statement = connection.resource.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = insertStatement(connection.resource, sql, sequencePrimaryKey)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
             setParams(statement, params);
             statement.executeUpdate();
@@ -110,6 +110,11 @@ public class DatabaseOperation {
         } finally {
             transactionManager.releaseConnection(connection);
         }
+    }
+
+    private PreparedStatement insertStatement(Connection connection, String sql, String sequencePrimaryKey) throws SQLException {
+        if (sequencePrimaryKey == null) return connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        return connection.prepareStatement(sql, new String[]{sequencePrimaryKey});
     }
 
     private void validateSelectSQL(String sql) {

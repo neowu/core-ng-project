@@ -14,4 +14,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface PrimaryKey {
     // only allow auto increment on primary key, not regular column
     boolean autoIncrement() default false;
+
+    String sequence() default "";
 }

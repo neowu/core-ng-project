@@ -4,6 +4,7 @@ import core.framework.api.db.Column;
 import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Table;
 import core.framework.api.util.Lists;
+import core.framework.api.util.Strings;
 import core.framework.impl.code.CodeBuilder;
 import core.framework.impl.code.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
@@ -11,45 +12,64 @@ import core.framework.impl.reflect.Classes;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
  */
 final class InsertQuery<T> {
-    public final String sql;
+    final String sql;
+    final String sequencePrimaryKey;
     private final Function<T, Object[]> paramBuilder;
 
     InsertQuery(Class<T> entityClass) {
-        List<Field> paramFields = Lists.newArrayList();
+        List<ParamField> paramFields = Lists.newArrayList();
 
         StringBuilder builder = new StringBuilder("INSERT INTO ");
 
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");
 
+        String sequencePrimaryKey = null;
+
         List<Field> fields = Classes.instanceFields(entityClass);
         int index = 0;
         for (Field field : fields) {
+            String sequence = null;
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
-            if (primaryKey != null && primaryKey.autoIncrement()) continue;
+            if (primaryKey != null) {
+                if (primaryKey.autoIncrement()) continue;
+                if (!Strings.isEmpty(primaryKey.sequence())) sequence = primaryKey.sequence();
+            }
 
             Column column = field.getDeclaredAnnotation(Column.class);
             if (index > 0) builder.append(", ");
             builder.append(column.name());
-            paramFields.add(field);
+            if (sequence != null) sequencePrimaryKey = column.name();
+            paramFields.add(new ParamField(field, sequence));
             index++;
         }
 
         builder.append(") VALUES (");
-        for (int i = 0; i < paramFields.size(); i++) {
-            if (i > 0) builder.append(", ");
-            builder.append('?');
+
+        index = 0;
+        for (ParamField paramField : paramFields) {
+            if (index > 0) builder.append(", ");
+            if (paramField.sequence != null) builder.append(paramField.sequence).append(".NEXTVAL");
+            else builder.append('?');
+            index++;
         }
         builder.append(')');
 
         sql = builder.toString();
 
-        paramBuilder = paramBuilder(entityClass, paramFields);
+        this.sequencePrimaryKey = sequencePrimaryKey;
+
+        List<Field> params = paramFields.stream()
+                                        .filter(field -> field.sequence == null)
+                                        .map(field -> field.field)
+                                        .collect(Collectors.toList());
+        paramBuilder = paramBuilder(entityClass, params);
     }
 
     private Function<T, Object[]> paramBuilder(Class<T> entityClass, List<Field> paramFields) {
@@ -74,5 +94,15 @@ final class InsertQuery<T> {
 
     Object[] params(T entity) {
         return paramBuilder.apply(entity);
+    }
+
+    private static class ParamField {
+        final Field field;
+        final String sequence;
+
+        ParamField(Field field, String sequence) {
+            this.field = field;
+            this.sequence = sequence;
+        }
     }
 }

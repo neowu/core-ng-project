@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/check.gradle")
 
     group = 'core.framework'
-    version = '4.12.5'
+    version = '4.12.6'
 }
 
 def mongoVersion = '3.4.2'
@@ -48,7 +48,7 @@ project(':core-ng') {
                 'org.mockito:mockito-core:2.8.47'
         )
         testRuntimeOnly(
-                'org.hsqldb:hsqldb:2.3.3'
+                'org.hsqldb:hsqldb:2.4.0'
         )
     }
 }
@@ -71,7 +71,7 @@ project(':core-ng-test') {
                 'org.apache.logging.log4j:log4j-core:2.8.2'       // used by elasticsearch
         )
         testRuntimeOnly(
-                'org.hsqldb:hsqldb:2.3.3',
+                'org.hsqldb:hsqldb:2.4.0',
                 'com.vividsolutions:jts:1.13'                  // used by fongo
         )
     }

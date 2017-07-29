@@ -48,7 +48,13 @@ public final class DBConfig {
         if (!context.isTest()) {
             state.database.url(url);
         } else {
-            state.database.url(Strings.format("jdbc:hsqldb:mem:{};sql.syntax_mys=true", name == null ? "." : name));
+            String syntaxParam = "";
+            if (url.startsWith("jdbc:oracle:")) {
+                syntaxParam = "sql.syntax_ora=true";
+            } else if (url.startsWith("jdbc:mysql:")) {
+                syntaxParam = "sql.syntax_mys=true";
+            }
+            state.database.url(Strings.format("jdbc:hsqldb:mem:{};{}", name == null ? "." : name, syntaxParam));
         }
         state.url = url;
     }
