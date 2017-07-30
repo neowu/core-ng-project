@@ -1,5 +1,5 @@
 ## Change log
-### 4.12.6 (7/26/2017 - )
+### 4.12.6 (7/26/2017 - 7/30/2017)
 * db: support oracle db insert with sequence
 
 ### 4.12.5 (6/13/2017 - 7/26/2017)
