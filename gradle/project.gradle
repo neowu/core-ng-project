@@ -38,6 +38,17 @@ subprojects {
     }
 }
 
+allprojects {
+    apply plugin: 'idea'
+
+    idea {
+        module {
+            outputDir file("${buildDir}/classes/main")
+            testOutputDir file("${buildDir}/classes/test")
+        }
+    }
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '4.0.1'
 }
