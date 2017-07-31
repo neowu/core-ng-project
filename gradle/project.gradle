@@ -40,13 +40,7 @@ subprojects {
 
 allprojects {
     apply plugin: 'idea'
-
-    idea {
-        module {
-            outputDir file("${buildDir}/classes/main")
-            testOutputDir file("${buildDir}/classes/test")
-        }
-    }
+    idea.module.inheritOutputDirs = true
 }
 
 task wrapper(type: Wrapper) {
