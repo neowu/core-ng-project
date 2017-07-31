@@ -12,6 +12,9 @@ repositories {
 }
 ```
 
+## Wiki
+[https://github.com/neowu/core-ng-project/wiki](https://github.com/neowu/core-ng-project/wiki)
+
 ## Change log
 please check [CHANGELOG.md](CHANGELOG.md)
 
