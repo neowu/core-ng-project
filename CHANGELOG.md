@@ -1,5 +1,5 @@
 ## Change log
-### 4.12.7 (8/1/2017 - )
+### 4.12.7 (8/1/2017 - 8/3/2017)
 * es: update to 5.5.1
 * db: update insertQuery to use prepareStatement(String sql, String columnNames[]), to adapt to both mysql, oracle and potentially postgreSQL
 

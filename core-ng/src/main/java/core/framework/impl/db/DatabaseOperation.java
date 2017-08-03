@@ -27,7 +27,7 @@ public class DatabaseOperation {
     final EnumDBMapper enumMapper = new EnumDBMapper();
     int queryTimeoutInSeconds;
 
-    public DatabaseOperation(Pool<Connection> pool) {
+    DatabaseOperation(Pool<Connection> pool) {
         transactionManager = new TransactionManager(pool);
     }
 
