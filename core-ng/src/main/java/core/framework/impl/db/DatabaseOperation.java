@@ -102,6 +102,7 @@ public class DatabaseOperation {
             statement.setQueryTimeout(queryTimeoutInSeconds);
             setParams(statement, params);
             statement.executeUpdate();
+            if (generatedColumn == null) return Optional.empty();
             return fetchGeneratedKey(statement);
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
