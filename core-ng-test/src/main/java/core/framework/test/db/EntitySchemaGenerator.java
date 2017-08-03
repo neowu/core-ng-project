@@ -55,7 +55,7 @@ public final class EntitySchemaGenerator {
         builder.append(table.name()).append(" (");
 
         List<String> primaryKeys = Lists.newArrayList();
-        String sequence = null;
+
         for (Field field : Classes.instanceFields(entityClass)) {
             Column column = field.getDeclaredAnnotation(Column.class);
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
@@ -65,7 +65,9 @@ public final class EntitySchemaGenerator {
 
             if (primaryKey != null) {
                 if (primaryKey.autoIncrement()) builder.append(" AUTO_INCREMENT");
-                if (!Strings.isEmpty(primaryKey.sequence())) sequence = primaryKey.sequence();
+                if (!Strings.isEmpty(primaryKey.sequence())) {
+                    statements.add("CREATE SEQUENCE IF NOT EXISTS " + primaryKey.sequence());
+                }
                 primaryKeys.add(column.name());
             }
 
@@ -88,10 +90,6 @@ public final class EntitySchemaGenerator {
         builder.append("))");
 
         statements.add(builder.toString());
-
-        if (sequence != null) {
-            statements.add("CREATE SEQUENCE IF NOT EXISTS " + sequence);
-        }
 
         return statements;
     }

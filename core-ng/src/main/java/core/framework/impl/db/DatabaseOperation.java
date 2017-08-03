@@ -12,7 +12,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -97,9 +96,9 @@ public class DatabaseOperation {
         }
     }
 
-    Optional<Long> insert(String sql, Object[] params, String sequencePrimaryKey) {
+    Optional<Long> insert(String sql, Object[] params, String generatedColumn) {
         PoolItem<Connection> connection = transactionManager.getConnection();
-        try (PreparedStatement statement = insertStatement(connection.resource, sql, sequencePrimaryKey)) {
+        try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
             setParams(statement, params);
             statement.executeUpdate();
@@ -112,9 +111,9 @@ public class DatabaseOperation {
         }
     }
 
-    private PreparedStatement insertStatement(Connection connection, String sql, String sequencePrimaryKey) throws SQLException {
-        if (sequencePrimaryKey == null) return connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-        return connection.prepareStatement(sql, new String[]{sequencePrimaryKey});
+    private PreparedStatement insertStatement(Connection connection, String sql, String generatedColumn) throws SQLException {
+        if (generatedColumn == null) return connection.prepareStatement(sql);
+        return connection.prepareStatement(sql, new String[]{generatedColumn});
     }
 
     private void validateSelectSQL(String sql) {

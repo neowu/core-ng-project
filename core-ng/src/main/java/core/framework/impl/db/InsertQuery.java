@@ -12,64 +12,63 @@ import core.framework.impl.reflect.Classes;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author neo
  */
 final class InsertQuery<T> {
     final String sql;
-    final String sequencePrimaryKey;
+    final String generatedColumn;
     private final Function<T, Object[]> paramBuilder;
 
     InsertQuery(Class<T> entityClass) {
-        List<ParamField> paramFields = Lists.newArrayList();
+        List<Field> paramFields = Lists.newArrayList();
 
         StringBuilder builder = new StringBuilder("INSERT INTO ");
+        StringBuilder valueClause = new StringBuilder();
 
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");
 
-        String sequencePrimaryKey = null;
-
+        String generatedColumn = null;
         List<Field> fields = Classes.instanceFields(entityClass);
-        int index = 0;
+        int startLength = builder.length();
         for (Field field : fields) {
-            String sequence = null;
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
+            Column column = field.getDeclaredAnnotation(Column.class);
             if (primaryKey != null) {
-                if (primaryKey.autoIncrement()) continue;
-                if (!Strings.isEmpty(primaryKey.sequence())) sequence = primaryKey.sequence();
+                if (primaryKey.autoIncrement()) {
+                    generatedColumn = column.name();
+                    continue;
+                } else if (!Strings.isEmpty(primaryKey.sequence())) {
+                    generatedColumn = column.name();
+                    addColumn(builder, startLength, column.name());
+                    addValue(valueClause, primaryKey.sequence() + ".NEXTVAL");
+                    continue;
+                }
             }
 
-            Column column = field.getDeclaredAnnotation(Column.class);
-            if (index > 0) builder.append(", ");
-            builder.append(column.name());
-            if (sequence != null) sequencePrimaryKey = column.name();
-            paramFields.add(new ParamField(field, sequence));
-            index++;
+            addColumn(builder, startLength, column.name());
+            addValue(valueClause, "?");
+            paramFields.add(field);
         }
-
-        builder.append(") VALUES (");
-
-        index = 0;
-        for (ParamField paramField : paramFields) {
-            if (index > 0) builder.append(", ");
-            if (paramField.sequence != null) builder.append(paramField.sequence).append(".NEXTVAL");
-            else builder.append('?');
-            index++;
-        }
-        builder.append(')');
+        builder.append(") VALUES (").append(valueClause).append(')');
 
         sql = builder.toString();
 
-        this.sequencePrimaryKey = sequencePrimaryKey;
+        this.generatedColumn = generatedColumn;
 
-        List<Field> params = paramFields.stream()
-                                        .filter(field -> field.sequence == null)
-                                        .map(field -> field.field)
-                                        .collect(Collectors.toList());
-        paramBuilder = paramBuilder(entityClass, params);
+        paramBuilder = paramBuilder(entityClass, paramFields);
+    }
+
+    private void addColumn(StringBuilder builder, int startLength, String name) {
+        if (builder.length() > startLength) builder.append(", ");
+        builder.append(name);
+    }
+
+    private void addValue(StringBuilder valueClause, String value) {
+        if (valueClause.length() > 0) valueClause.append(", ");
+        valueClause.append(value);
     }
 
     private Function<T, Object[]> paramBuilder(Class<T> entityClass, List<Field> paramFields) {
@@ -94,15 +93,5 @@ final class InsertQuery<T> {
 
     Object[] params(T entity) {
         return paramBuilder.apply(entity);
-    }
-
-    private static class ParamField {
-        final Field field;
-        final String sequence;
-
-        ParamField(Field field, String sequence) {
-            this.field = field;
-            this.sequence = sequence;
-        }
     }
 }
