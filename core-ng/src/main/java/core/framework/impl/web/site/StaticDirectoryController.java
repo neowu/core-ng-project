@@ -8,7 +8,6 @@ import core.framework.api.web.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -33,9 +32,8 @@ public final class StaticDirectoryController implements Controller {
         if (!Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS) || !filePath.startsWith(contentDirectory))
             throw new NotFoundException("not found, path=" + request.path());
 
-        File file = filePath.toFile();
-        Response response = Response.file(file);
-        ContentType contentType = MimeTypes.get(file.getName());
+        Response response = Response.file(filePath);
+        ContentType contentType = MimeTypes.get(filePath.getFileName().toString());
         if (contentType != null) response.contentType(contentType);
         return response;
     }

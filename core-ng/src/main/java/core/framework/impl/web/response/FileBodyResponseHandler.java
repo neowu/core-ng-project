@@ -7,11 +7,11 @@ import io.undertow.io.Sender;
 import io.undertow.server.HttpServerExchange;
 import org.xnio.IoUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 /**
  * @author neo
@@ -19,9 +19,9 @@ import java.nio.channels.FileChannel;
 class FileBodyResponseHandler implements BodyHandler {
     @Override
     public void handle(ResponseImpl response, Sender sender, RequestImpl request) {
-        File file = ((FileBody) response.body).file;
+        Path path = ((FileBody) response.body).path;
         try {
-            final FileChannel channel = new FileInputStream(file).getChannel();
+            FileChannel channel = FileChannel.open(path, StandardOpenOption.READ);
             sender.transferFrom(channel, new FileBodyCallback(channel));
         } catch (IOException e) {
             throw new UncheckedIOException(e);

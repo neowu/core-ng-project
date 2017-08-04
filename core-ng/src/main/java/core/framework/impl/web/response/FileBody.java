@@ -1,14 +1,14 @@
 package core.framework.impl.web.response;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * @author neo
  */
 public class FileBody implements Body {
-    final File file;
+    final Path path;
 
-    public FileBody(File file) {
-        this.file = file;
+    public FileBody(Path path) {
+        this.path = path;
     }
 }

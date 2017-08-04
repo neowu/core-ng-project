@@ -9,7 +9,7 @@ import core.framework.impl.web.response.ByteArrayBody;
 import core.framework.impl.web.response.FileBody;
 import core.framework.impl.web.response.TemplateBody;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -61,8 +61,8 @@ public interface Response {
             .contentType(contentType);
     }
 
-    static Response file(File file) {
-        return new ResponseImpl(new FileBody(file))
+    static Response file(Path path) {
+        return new ResponseImpl(new FileBody(path))
             .status(HTTPStatus.OK);
     }
 

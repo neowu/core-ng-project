@@ -7,7 +7,6 @@ import core.framework.api.web.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.nio.file.Path;
 
 /**
@@ -27,8 +26,7 @@ public final class StaticFileController implements Controller {
     public Response execute(Request request) throws Exception {
         logger.debug("requestFile={}", contentFile);
 
-        File file = contentFile.toFile();
-        Response response = Response.file(file);
+        Response response = Response.file(contentFile);
         if (contentType != null) response.contentType(contentType);
         return response;
     }
