@@ -11,7 +11,7 @@ def mongoVersion = '3.4.2'
 def elasticVersion = '5.5.1'
 def rabbitVersion = '3.6.5'
 def kafkaVersion = '0.11.0.0'
-def jacksonVersion = '2.8.7'
+def jacksonVersion = '2.9.0'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -27,13 +27,12 @@ project(':core-ng') {
         )
         implementation(
                 'org.javassist:javassist:3.21.0-GA',
-                "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
                 "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}",
                 "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
                 "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}",
                 'org.apache.httpcomponents:httpclient:4.5.3',
-                'io.undertow:undertow-core:1.4.16.Final'
+                'io.undertow:undertow-core:1.4.18.Final'
         )
         compileOnly(
                 'redis.clients:jedis:2.9.0@jar',

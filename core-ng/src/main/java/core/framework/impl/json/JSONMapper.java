@@ -4,22 +4,17 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.cfg.MapperConfig;
-import com.fasterxml.jackson.databind.introspect.AnnotatedMember;
-import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 import com.fasterxml.jackson.databind.type.MapType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * used internally, performance is top priority in design
@@ -33,9 +28,9 @@ public final class JSONMapper {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
         mapper.registerModule(new JavaTimeModule());
+        mapper.registerModule(new JaxbAnnotationModule());
         mapper.registerModule(new AfterburnerModule());
-        mapper.setDateFormat(new ISO8601DateFormat());
-        mapper.setAnnotationIntrospector(new JAXBAnnotationIntrospector());
+        mapper.setDateFormat(new StdDateFormat());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(MapperFeature.USE_WRAPPER_NAME_AS_PROPERTY_NAME, true);
         return mapper;
@@ -82,22 +77,6 @@ public final class JSONMapper {
             return OBJECT_MAPPER.writeValueAsBytes(instance);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
-        }
-    }
-
-    private static class JAXBAnnotationIntrospector extends JaxbAnnotationIntrospector {
-        private static final long serialVersionUID = 9089203444578006521L;
-
-        JAXBAnnotationIntrospector() {
-            super(TypeFactory.defaultInstance());
-        }
-
-        @Override
-        public TypeResolverBuilder<?> findPropertyContentTypeResolver(MapperConfig<?> config, AnnotatedMember am, JavaType containerType) {
-            if (!containerType.hasRawClass(Optional.class) && !containerType.isContainerType()) {
-                throw new IllegalArgumentException("expect container type (got " + containerType + ")");
-            }
-            return _typeResolverFromXmlElements(am);
         }
     }
 }
