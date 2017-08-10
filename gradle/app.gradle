@@ -54,6 +54,7 @@ startScripts {
 }
 
 distributions {
+    distZip.enabled = false
     main {
         if (environment != null) {
             def envProperties = "conf/${environment}/resources"
