@@ -9,13 +9,12 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
-import java.net.UnknownHostException;
 
 /**
  * @author neo
  */
 public class ThreadInfoController {
-    public Response threadUsage(Request request) throws UnknownHostException {
+    public Response threadUsage(Request request) {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
         ThreadUsage usage = new ThreadUsage();
@@ -26,7 +25,7 @@ public class ThreadInfoController {
         return Response.bean(usage);
     }
 
-    public Response threadDump(Request request) throws UnknownHostException {
+    public Response threadDump(Request request) {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
         StringBuilder builder = new StringBuilder();
@@ -39,8 +38,9 @@ public class ThreadInfoController {
 
     // port from ThreadInfo.toString, to print all stack frames (ThreadInfo.toString() only print 8 frames)
     private String toString(ThreadInfo threadInfo) {
-        StringBuilder builder = new StringBuilder()
-            .append('\"').append(threadInfo.getThreadName()).append('\"').append(" Id=").append(threadInfo.getThreadId()).append(' ').append(threadInfo.getThreadState());
+        StringBuilder builder = new StringBuilder();
+        builder.append('\"').append(threadInfo.getThreadName()).append('\"')
+               .append(" Id=").append(threadInfo.getThreadId()).append(' ').append(threadInfo.getThreadState());
         if (threadInfo.getLockName() != null) {
             builder.append(" on ").append(threadInfo.getLockName());
         }

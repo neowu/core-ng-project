@@ -32,7 +32,7 @@ public final class FixedRateTrigger implements Trigger {
 
     @Override
     public void schedule(Scheduler scheduler) {
-        Duration delay = Duration.ofMillis((long) Randoms.number(8000, 15000)); // delay 8s to 15s
+        Duration delay = Duration.ofMillis((long) Randoms.number(1000, 3000)); // delay 1s to 3s
         scheduler.schedule(this, delay, rate);
     }
 

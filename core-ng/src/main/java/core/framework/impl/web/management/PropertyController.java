@@ -20,7 +20,7 @@ public class PropertyController implements Controller {
     }
 
     @Override
-    public Response execute(Request request) throws Exception {
+    public Response execute(Request request) {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
         StringBuilder builder = new StringBuilder();

@@ -23,7 +23,7 @@ public class BackgroundTaskExecutor {
 
     public void start() {
         for (BackgroundTask task : tasks) {
-            Duration delay = Duration.ofMillis((long) Randoms.number(8000, 15000)); // delay 8s to 15s
+            Duration delay = Duration.ofMillis((long) Randoms.number(5000, 10000)); // delay 5s to 10s
             scheduler.scheduleWithFixedDelay(task, delay.toMillis(), task.rate.toMillis(), TimeUnit.MILLISECONDS);
         }
         logger.info("background task executor started");

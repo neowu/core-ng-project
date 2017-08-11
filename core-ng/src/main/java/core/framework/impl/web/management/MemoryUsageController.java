@@ -12,7 +12,7 @@ import java.lang.management.MemoryMXBean;
  */
 public class MemoryUsageController implements Controller {
     @Override
-    public Response execute(Request request) throws Exception {
+    public Response execute(Request request) {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
         return Response.bean(memoryUsage());
     }
