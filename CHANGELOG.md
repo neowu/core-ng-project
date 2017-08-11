@@ -2,6 +2,7 @@
 ### 4.13.0 (8/4/2017 - )
 * web: Response.file(File) changed to Response.file(Path) to be consistent with entire api design, (to return path via WebDirectory)  
 * json: update jackson to 2.9.0, simplified configuration
+* scheduler: add secondly trigger, to support precisely scheduling to align with clock time 
 
 ### 4.12.7 (8/1/2017 - 8/3/2017)
 * es: update to 5.5.1

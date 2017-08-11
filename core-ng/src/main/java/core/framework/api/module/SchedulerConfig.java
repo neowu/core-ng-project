@@ -7,6 +7,7 @@ import core.framework.impl.scheduler.DailyTrigger;
 import core.framework.impl.scheduler.FixedRateTrigger;
 import core.framework.impl.scheduler.MonthlyTrigger;
 import core.framework.impl.scheduler.Scheduler;
+import core.framework.impl.scheduler.SecondlyTrigger;
 import core.framework.impl.scheduler.WeeklyTrigger;
 import core.framework.impl.web.management.SchedulerController;
 
@@ -36,6 +37,12 @@ public final class SchedulerConfig {
 
     public void fixedRate(String name, Job job, Duration rate) {
         state.scheduler.addTrigger(new FixedRateTrigger(name, job, rate));
+        state.triggerAdded = true;
+    }
+
+    // run every X seconds and align with the closest exact start of minute
+    public void secondly(String name, Job job, int rateInSeconds) {
+        state.scheduler.addTrigger(new SecondlyTrigger(name, job, rateInSeconds));
         state.triggerAdded = true;
     }
 
