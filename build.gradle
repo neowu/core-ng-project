@@ -4,10 +4,10 @@ subprojects {
     apply from: file("${rootDir}/gradle/check.gradle")
 
     group = 'core.framework'
-    version = '4.13.0'
+    version = '4.13.1'
 }
 
-def mongoVersion = '3.4.2'
+def mongoVersion = '3.5.0'
 def elasticVersion = '5.5.1'
 def rabbitVersion = '3.6.5'
 def kafkaVersion = '0.11.0.0'

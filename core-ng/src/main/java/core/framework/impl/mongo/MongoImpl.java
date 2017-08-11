@@ -24,7 +24,6 @@ public class MongoImpl implements Mongo {
     private final Logger logger = LoggerFactory.getLogger(MongoImpl.class);
     private final MongoClientOptions.Builder builder = MongoClientOptions.builder()
                                                                          .maxConnectionIdleTime((int) Duration.ofMinutes(30).toMillis())
-                                                                         .socketKeepAlive(true)
                                                                          .cursorFinalizerEnabled(false); // framework always close db cursor
     public MongoClientURI uri;
     int timeoutInMs = (int) Duration.ofSeconds(15).toMillis();

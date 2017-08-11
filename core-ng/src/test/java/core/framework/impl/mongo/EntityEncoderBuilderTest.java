@@ -46,7 +46,7 @@ public class EntityEncoderBuilderTest {
         entity.mapField.put("K1", "V1");
         entity.mapField.put("K2", "V2");
 
-        encoder.encode(new JsonWriter(writer, new JsonWriterSettings(true)), entity);
+        encoder.encode(new JsonWriter(writer, JsonWriterSettings.builder().indent(true).build()), entity);
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode expectedEntityNode = mapper.readTree(ClasspathResources.text("mongo-test/entity.json"));

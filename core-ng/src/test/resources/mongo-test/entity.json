@@ -6,7 +6,7 @@
   "double_field": null,
   "date_field": null,
   "zoned_date_time_field": {
-    "$date": 1472742000000
+    "$date": "2016-09-01T15:00:00Z"
   },
   "string_field": "string",
   "list_field": [
