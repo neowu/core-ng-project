@@ -10,7 +10,9 @@ public interface Repository<T> {
     Query<T> select();
 
     default List<T> select(String where, Object... params) {
-        return select().where(where, params).fetch();
+        Query<T> query = select();
+        if (where != null) query.where(where, params);
+        return query.fetch();
     }
 
     int count(String where, Object... params);
