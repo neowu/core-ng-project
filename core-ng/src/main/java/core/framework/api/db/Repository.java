@@ -9,7 +9,11 @@ import java.util.Optional;
 public interface Repository<T> {
     Query<T> select();
 
-    List<T> select(String where, Object... params);
+    default List<T> select(String where, Object... params) {
+        return select().where(where, params).fetch();
+    }
+
+    int count(String where, Object... params);
 
     Optional<T> selectOne(String where, Object... params);
 

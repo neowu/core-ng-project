@@ -15,9 +15,9 @@ public class MySQLDialect implements Dialect {
     }
 
     @Override
-    public String fetchSQL(StringBuilder whereClause, String sort, Integer skip, Integer limit) {
+    public String fetchSQL(String where, String sort, Integer skip, Integer limit) {
         StringBuilder builder = new StringBuilder("SELECT ").append(columns).append(" FROM ").append(table);
-        if (whereClause.length() > 0) builder.append(" WHERE ").append(whereClause.toString());
+        if (where != null) builder.append(" WHERE ").append(where);
         if (sort != null) builder.append(" ORDER BY ").append(sort);
         if (skip != null || limit != null) builder.append(" LIMIT ?,?");
         return builder.toString();

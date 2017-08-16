@@ -6,7 +6,7 @@ import java.util.List;
  * @author neo
  */
 public interface Dialect {
-    String fetchSQL(StringBuilder whereClause, String sort, Integer skip, Integer limit);
+    String fetchSQL(String where, String sort, Integer skip, Integer limit);
 
     Object[] fetchParams(List<Object> params, Integer skip, Integer limit);
 }

@@ -15,10 +15,10 @@ public class OracleDialect implements Dialect {
     }
 
     @Override
-    public String fetchSQL(StringBuilder whereClause, String sort, Integer skip, Integer limit) {
+    public String fetchSQL(String where, String sort, Integer skip, Integer limit) {
         if (skip == null && limit == null) {
             StringBuilder builder = new StringBuilder("SELECT ").append(columns).append(" FROM ").append(table);
-            if (whereClause.length() > 0) builder.append(" WHERE ").append(whereClause.toString());
+            if (where != null) builder.append(" WHERE ").append(where);
             if (sort != null) builder.append(" ORDER BY ").append(sort);
             return builder.toString();
         }
@@ -26,13 +26,13 @@ public class OracleDialect implements Dialect {
         if (sort == null) {
             StringBuilder builder = new StringBuilder("SELECT ").append(columns).append(" FROM (SELECT ROWNUM AS row_num, ").append(columns)
                                                                 .append(" FROM ").append(table).append(" WHERE ");
-            if (whereClause.length() > 0) builder.append(whereClause.toString()).append(" AND ");
+            if (where != null) builder.append(where).append(" AND ");
             builder.append(" ROWNUM <= ?) WHERE row_num >= ?");
             return builder.toString();
         } else {
             StringBuilder builder = new StringBuilder("SELECT ").append(columns).append(" FROM (SELECT ROWNUM AS row_num, ").append(columns)
                                                                 .append(" FROM (SELECT ").append(columns).append(" FROM ").append(table);
-            if (whereClause.length() > 0) builder.append(" WHERE ").append(whereClause.toString());
+            if (where != null) builder.append(" WHERE ").append(where);
             builder.append(" ORDER BY ").append(sort).append(") WHERE ROWNUM <= ?) WHERE row_num >= ?");
             return builder.toString();
         }

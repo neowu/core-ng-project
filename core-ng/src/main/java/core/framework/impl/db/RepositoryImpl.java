@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
  * @author neo
  */
 public final class RepositoryImpl<T> implements Repository<T> {
-    final DatabaseImpl database;
-    final RowMapper<T> rowMapper;
-    final SelectQuery<T> selectQuery;
-
     private final Logger logger = LoggerFactory.getLogger(RepositoryImpl.class);
+
+    private final DatabaseImpl database;
     private final RepositoryEntityValidator<T> validator;
+    private final SelectQuery<T> selectQuery;
     private final InsertQuery<T> insertQuery;
     private final UpdateQuery<T> updateQuery;
     private final String deleteSQL;
+    private final RowMapper<T> rowMapper;
 
     RepositoryImpl(DatabaseImpl database, Class<T> entityClass, RowMapper<T> rowMapper) {
         this.database = database;
@@ -43,10 +43,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
         return new QueryImpl<>(this, selectQuery.dialect);
     }
 
-    @Override
-    public List<T> select(String where, Object... params) {
+    List<T> fetch(String sql, Object... params) {
         StopWatch watch = new StopWatch();
-        String sql = selectQuery.selectSQL(where);
         try {
             List<T> results = database.operation.select(sql, rowMapper, params);
             checkTooManyRowsReturned(results.size());
@@ -54,7 +52,21 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);
-            logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
+            logger.debug("fetch, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public int count(String where, Object... params) {
+        StopWatch watch = new StopWatch();
+        String sql = selectQuery.countSQL(where);
+        try {
+            return database.operation.selectOne(sql, new RowMapper.IntegerRowMapper(), params).orElseThrow(() -> new Error("unexpected count result"));
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime);
+            logger.debug("count, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -178,13 +190,13 @@ public final class RepositoryImpl<T> implements Repository<T> {
         }
     }
 
-    void checkTooManyRowsReturned(int size) {
+    private void checkTooManyRowsReturned(int size) {
         if (size > database.tooManyRowsReturnedThreshold) {
             logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }
     }
 
-    void checkSlowOperation(long elapsedTime) {
+    private void checkSlowOperation(long elapsedTime) {
         if (elapsedTime > database.slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsedTime={}", elapsedTime);
         }

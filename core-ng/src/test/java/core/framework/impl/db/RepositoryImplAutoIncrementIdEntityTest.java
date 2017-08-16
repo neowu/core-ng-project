@@ -78,7 +78,7 @@ public class RepositoryImplAutoIncrementIdEntityTest {
 
     @Test
     public void selectAll() {
-        List<AutoIncrementIdEntity> entities = repository.select(null);
+        List<AutoIncrementIdEntity> entities = repository.select().fetch();
         Assert.assertTrue(entities.isEmpty());
     }
 
