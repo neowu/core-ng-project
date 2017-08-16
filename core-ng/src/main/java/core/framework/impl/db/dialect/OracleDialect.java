@@ -1,0 +1,51 @@
+package core.framework.impl.db.dialect;
+
+import java.util.List;
+
+/**
+ * @author neo
+ */
+public class OracleDialect implements Dialect {
+    private final String table;
+    private final String columns;
+
+    public OracleDialect(String table, String columns) {
+        this.table = table;
+        this.columns = columns;
+    }
+
+    @Override
+    public String fetchSQL(StringBuilder whereClause, String sort, Integer skip, Integer limit) {
+        if (skip == null && limit == null) {
+            StringBuilder builder = new StringBuilder("SELECT ").append(columns).append(" FROM ").append(table);
+            if (whereClause.length() > 0) builder.append(" WHERE ").append(whereClause.toString());
+            if (sort != null) builder.append(" ORDER BY ").append(sort);
+            return builder.toString();
+        }
+
+        if (sort == null) {
+            StringBuilder builder = new StringBuilder("SELECT ").append(columns).append(" FROM (SELECT ROWNUM AS row_num, ").append(columns)
+                                                                .append(" FROM ").append(table).append(" WHERE ");
+            if (whereClause.length() > 0) builder.append(whereClause.toString()).append(" AND ");
+            builder.append(" ROWNUM <= ?) WHERE row_num >= ?");
+            return builder.toString();
+        } else {
+            StringBuilder builder = new StringBuilder("SELECT ").append(columns).append(" FROM (SELECT ROWNUM AS row_num, ").append(columns)
+                                                                .append(" FROM (SELECT ").append(columns).append(" FROM ").append(table);
+            if (whereClause.length() > 0) builder.append(" WHERE ").append(whereClause.toString());
+            builder.append(" ORDER BY ").append(sort).append(") WHERE ROWNUM <= ?) WHERE row_num >= ?");
+            return builder.toString();
+        }
+    }
+
+    @Override
+    public Object[] fetchParams(List<Object> params, Integer skip, Integer limit) {
+        int skipValue = skip == null ? 0 : skip;
+        if (params.isEmpty()) return new Object[]{skipValue + limit, skipValue};
+        int length = params.size();
+        Object[] results = params.toArray(new Object[params.size() + 2]);
+        results[length] = skipValue + limit;
+        results[length + 1] = skipValue + 1;
+        return results;
+    }
+}

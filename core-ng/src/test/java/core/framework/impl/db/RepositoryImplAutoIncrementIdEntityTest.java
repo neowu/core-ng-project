@@ -26,6 +26,7 @@ public class RepositoryImplAutoIncrementIdEntityTest {
     public static void createDatabase() {
         database = new DatabaseImpl();
         database.url("jdbc:hsqldb:mem:mysql;sql.syntax_mys=true");
+        database.vendor = Vendor.MYSQL;
         database.execute("CREATE TABLE auto_increment_id_entity (id INT AUTO_INCREMENT PRIMARY KEY, string_field VARCHAR(20), double_field DOUBLE, enum_field VARCHAR(10), date_time_field TIMESTAMP, zoned_date_time_field TIMESTAMP)");
 
         repository = database.repository(AutoIncrementIdEntity.class);
@@ -77,21 +78,18 @@ public class RepositoryImplAutoIncrementIdEntityTest {
 
     @Test
     public void selectAll() {
-        List<AutoIncrementIdEntity> entities = repository.select(new Query());
+        List<AutoIncrementIdEntity> entities = repository.select(null);
         Assert.assertTrue(entities.isEmpty());
     }
 
     @Test
     public void selectWithLimit() {
-        Query query = new Query();
-        query.skip = 0;
-        query.limit = 1000;
-        List<AutoIncrementIdEntity> entities = repository.select(query);
+        Query<AutoIncrementIdEntity> query = repository.select().limit(1000);
+        List<AutoIncrementIdEntity> entities = query.fetch();
         Assert.assertTrue(entities.isEmpty());
 
-        query.where = "string_field = ?";
-        query.params = new Object[]{"value"};
-        entities = repository.select(query);
+        query.where("string_field = ?", "value");
+        entities = query.fetch();
         Assert.assertTrue(entities.isEmpty());
     }
 

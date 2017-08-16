@@ -1,6 +1,7 @@
 ## Change log
-### 4.13.1 (8/11/2017 - )
+### 4.14.0 (8/11/2017 - 8/16/2017)
 * mongo: update driver to 3.5, and its new builtin POJO impl should be slower than coreng due to reflection, so we still keep EntityCodec
+* db: replaced repository.select(Query) with Query repository.select() to support dynamic query with pagination
 
 ### 4.13.0 (8/4/2017 - 8/11/2017)
 * web: Response.file(File) changed to Response.file(Path) to be consistent with entire api design, (to return path via WebDirectory)  

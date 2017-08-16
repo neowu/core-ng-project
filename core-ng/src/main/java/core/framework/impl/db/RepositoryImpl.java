@@ -18,31 +18,35 @@ import java.util.stream.Collectors;
  * @author neo
  */
 public final class RepositoryImpl<T> implements Repository<T> {
-    private final Logger logger = LoggerFactory.getLogger(RepositoryImpl.class);
+    final DatabaseImpl database;
+    final RowMapper<T> rowMapper;
+    final SelectQuery<T> selectQuery;
 
-    private final DatabaseImpl database;
+    private final Logger logger = LoggerFactory.getLogger(RepositoryImpl.class);
     private final RepositoryEntityValidator<T> validator;
-    private final SelectQuery selectQuery;
     private final InsertQuery<T> insertQuery;
     private final UpdateQuery<T> updateQuery;
     private final String deleteSQL;
-    private final RowMapper<T> rowMapper;
 
     RepositoryImpl(DatabaseImpl database, Class<T> entityClass, RowMapper<T> rowMapper) {
         this.database = database;
         validator = new RepositoryEntityValidator<>(entityClass);
         insertQuery = new InsertQuery<>(entityClass);
-        selectQuery = new SelectQuery(entityClass);
+        selectQuery = new SelectQuery<>(entityClass, database.vendor);
         updateQuery = new UpdateQuery<>(entityClass);
         deleteSQL = DeleteQueryBuilder.build(entityClass);
         this.rowMapper = rowMapper;
     }
 
     @Override
-    public List<T> select(Query query) {
+    public Query<T> select() {
+        return new QueryImpl<>(this, selectQuery.dialect);
+    }
+
+    @Override
+    public List<T> select(String where, Object... params) {
         StopWatch watch = new StopWatch();
-        String sql = selectQuery.sql(query.where, query.skip, query.limit);
-        Object[] params = selectQuery.params(query);
+        String sql = selectQuery.selectSQL(where);
         try {
             List<T> results = database.operation.select(sql, rowMapper, params);
             checkTooManyRowsReturned(results.size());
@@ -58,7 +62,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public Optional<T> selectOne(String where, Object... params) {
         StopWatch watch = new StopWatch();
-        String sql = selectQuery.sql(where, null, null);
+        String sql = selectQuery.selectSQL(where);
         try {
             return database.operation.selectOne(sql, rowMapper, params);
         } finally {
@@ -72,7 +76,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public Optional<T> get(Object... primaryKeys) {
         StopWatch watch = new StopWatch();
-        String sql = selectQuery.selectByPrimaryKeys;
+        String sql = selectQuery.getSQL;
         try {
             return database.operation.selectOne(sql, rowMapper, primaryKeys);
         } finally {
@@ -136,9 +140,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         StopWatch watch = new StopWatch();
         entities.forEach(validator::validate);
         String sql = insertQuery.sql;
-        List<Object[]> params = entities.stream()
-            .map(insertQuery::params)
-            .collect(Collectors.toList());
+        List<Object[]> params = entities.stream().map(insertQuery::params).collect(Collectors.toList());
         try {
             database.operation.batchUpdate(sql, params);
         } finally {
@@ -176,13 +178,13 @@ public final class RepositoryImpl<T> implements Repository<T> {
         }
     }
 
-    private void checkTooManyRowsReturned(int size) {
+    void checkTooManyRowsReturned(int size) {
         if (size > database.tooManyRowsReturnedThreshold) {
             logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }
     }
 
-    private void checkSlowOperation(long elapsedTime) {
+    void checkSlowOperation(long elapsedTime) {
         if (elapsedTime > database.slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsedTime={}", elapsedTime);
         }

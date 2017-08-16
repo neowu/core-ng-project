@@ -25,6 +25,7 @@ public class RepositoryImplAssignedIdEntityTest {
     public static void createDatabase() {
         database = new DatabaseImpl();
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
+        database.vendor = Vendor.MYSQL;
         database.execute("CREATE TABLE assigned_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), int_field INT, big_decimal_field DECIMAL(10,2), date_field DATE)");
 
         repository = database.repository(AssignedIdEntity.class);

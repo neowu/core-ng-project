@@ -1,11 +1,20 @@
 package core.framework.api.db;
 
+import java.util.List;
+
 /**
  * @author neo
  */
-public final class Query {
-    public String where;
-    public Object[] params;
-    public Integer skip;
-    public Integer limit;
+public interface Query<T> {
+    Query<T> where(String condition, Object... params);
+
+    Query<T> orderBy(String sort);
+
+    Query<T> skip(int skip);
+
+    Query<T> limit(int limit);
+
+    List<T> fetch();
+
+    int count();
 }

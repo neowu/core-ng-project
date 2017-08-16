@@ -9,6 +9,7 @@ import core.framework.api.util.Lists;
 import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
 import core.framework.impl.db.DatabaseImpl;
+import core.framework.impl.db.Vendor;
 import core.framework.impl.module.ModuleContext;
 
 import java.time.Duration;
@@ -45,18 +46,34 @@ public final class DBConfig {
 
     public void url(String url) {
         if (state.url != null) throw Exceptions.error("db({}).url() is already configured, url={}, previous={}", name == null ? "" : name, url, state.url);
+        state.database.vendor = vendor(url);
         if (!context.isTest()) {
             state.database.url(url);
         } else {
-            String syntaxParam = "";
-            if (url.startsWith("jdbc:oracle:")) {
-                syntaxParam = "sql.syntax_ora=true";
-            } else if (url.startsWith("jdbc:mysql:")) {
-                syntaxParam = "sql.syntax_mys=true";
-            }
+            String syntaxParam = hsqldbSyntaxParam();
             state.database.url(Strings.format("jdbc:hsqldb:mem:{};{}", name == null ? "." : name, syntaxParam));
         }
         state.url = url;
+    }
+
+    private String hsqldbSyntaxParam() {
+        switch (state.database.vendor) {
+            case ORACLE:
+                return "sql.syntax_ora=true";
+            case MYSQL:
+                return "sql.syntax_mys=true";
+            default:
+                return "";
+        }
+    }
+
+    private Vendor vendor(String url) {
+        if (url.startsWith("jdbc:mysql:")) {
+            return Vendor.MYSQL;
+        } else if (url.startsWith("jdbc:oracle:")) {
+            return Vendor.ORACLE;
+        }
+        throw Exceptions.error("not supported database vendor, url={}", url);
     }
 
     public void user(String user) {

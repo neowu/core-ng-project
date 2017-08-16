@@ -17,9 +17,9 @@ public class TestModule extends AbstractTestModule {
         db().repository(TestDBEntity.class);
         initDB().createSchema();
 
-        db("seq").url("jdbc:oracle:thin:@localhost:1521/test");
-        db("seq").repository(TestSequenceIdDBEntity.class);
-        initDB("seq").createSchema();
+        db("oracle").url("jdbc:oracle:thin:@localhost:1521/test");
+        db("oracle").repository(TestSequenceIdDBEntity.class);
+        initDB("oracle").createSchema();
 
         mongo().uri("mongodb://localhost:27017/test");
         mongo().collection(TestMongoEntity.class);

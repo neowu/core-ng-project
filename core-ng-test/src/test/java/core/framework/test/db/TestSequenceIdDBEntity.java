@@ -15,4 +15,7 @@ public class TestSequenceIdDBEntity {
 
     @Column(name = "int_field")
     public Integer intField;
+
+    @Column(name = "string_field")
+    public String stringField;
 }

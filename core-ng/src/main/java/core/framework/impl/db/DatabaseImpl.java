@@ -36,10 +36,11 @@ public final class DatabaseImpl implements Database {
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = Maps.newHashMap();
     public int tooManyRowsReturnedThreshold = 1000;
-    public String url;
     public String user;
     public String password;
+    public Vendor vendor;
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
+    private String url;
     private Properties driverProperties;
     private Duration timeout;
     private Driver driver;
@@ -124,7 +125,7 @@ public final class DatabaseImpl implements Database {
             } else if (url.startsWith("jdbc:oracle:")) {
                 return (Driver) Class.forName("oracle.jdbc.OracleDriver").newInstance();
             } else {
-                throw Exceptions.error("not supported database, please contact arch team, url={}", url);
+                throw Exceptions.error("not supported database, url={}", url);
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             throw new Error(e);

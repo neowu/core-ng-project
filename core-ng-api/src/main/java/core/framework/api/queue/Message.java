@@ -9,6 +9,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * @author neo
  */
+@Deprecated // with kafka, it doesn't need this annotation anymore
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Message {
