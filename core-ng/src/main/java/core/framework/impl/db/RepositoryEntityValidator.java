@@ -14,11 +14,11 @@ final class RepositoryEntityValidator<T> {
         validator = new ValidatorBuilder(entityClass, field -> field.getDeclaredAnnotation(Column.class).name()).build();
     }
 
-    public void validate(T entity) {
+    void validate(T entity) {
         validator.validate(entity);
     }
 
-    public void partialValidate(T entity) {
+    void partialValidate(T entity) {
         validator.partialValidate(entity);
     }
 }

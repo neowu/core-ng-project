@@ -17,7 +17,7 @@ final class EnumDBMapper {
     <T extends Enum<?>> void registerEnumClass(Class<T> enumClass) {
         if (!mappings.containsKey(enumClass)) {
             T[] constants = enumClass.getEnumConstants();
-            @SuppressWarnings({"unchecked"})
+            @SuppressWarnings({"unchecked", "rawtypes"})
             Map<Enum<?>, String> mapping = new EnumMap(enumClass);
             for (T constant : constants) {
                 try {
@@ -32,10 +32,10 @@ final class EnumDBMapper {
         }
     }
 
-    String getDBValue(Enum<? extends Enum<?>> value) {
+    String getDBValue(Enum<?> value) {
         @SuppressWarnings("unchecked")
         Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) value.getClass();
-        Map<?, String> mapping = mappings.get(enumClass);
+        Map<Enum<?>, String> mapping = mappings.get(enumClass);
         if (mapping == null)
             throw Exceptions.error("enum class is not registered, register in module by db().view() or db().repository(), enumClass={}", enumClass.getCanonicalName());
         return mapping.get(value);  // this won't return null since all fields of enum are registered
