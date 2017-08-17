@@ -30,6 +30,8 @@ import java.util.Properties;
  * @author neo
  */
 public final class DatabaseImpl implements Database {
+    static final RowMapper.IntegerRowMapper ROW_MAPPER_INTEGER = new RowMapper.IntegerRowMapper();
+
     public final Pool<Connection> pool;
     public final DatabaseOperation operation;
 
@@ -59,7 +61,7 @@ public final class DatabaseImpl implements Database {
 
     private void initializeRowMappers() {
         rowMappers.put(String.class, new RowMapper.StringRowMapper());
-        rowMappers.put(Integer.class, new RowMapper.IntegerRowMapper());
+        rowMappers.put(Integer.class, ROW_MAPPER_INTEGER);
         rowMappers.put(Long.class, new RowMapper.LongRowMapper());
         rowMappers.put(Double.class, new RowMapper.DoubleRowMapper());
         rowMappers.put(BigDecimal.class, new RowMapper.BigDecimalRowMapper());

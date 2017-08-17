@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
  */
 public final class RepositoryImpl<T> implements Repository<T> {
     private final Logger logger = LoggerFactory.getLogger(RepositoryImpl.class);
-
     private final DatabaseImpl database;
     private final RepositoryEntityValidator<T> validator;
     private final SelectQuery<T> selectQuery;
@@ -62,7 +61,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         StopWatch watch = new StopWatch();
         String sql = selectQuery.countSQL(where);
         try {
-            return database.operation.selectOne(sql, new RowMapper.IntegerRowMapper(), params).orElseThrow(() -> new Error("unexpected count result"));
+            return database.operation.selectOne(sql, DatabaseImpl.ROW_MAPPER_INTEGER, params).orElseThrow(() -> new Error("unexpected result"));
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime);

@@ -31,8 +31,8 @@ public class DatabaseOperation {
         transactionManager = new TransactionManager(pool);
     }
 
-    // for the boilerplate code, it is mainly for performance and clear purpose, as framework code, it's more important than DRY
-    // make a lot of lambda and template pattern will make it harder to read and trace, also impact the mem usage and GC
+    // as for the boilerplate code, it is mainly for performance and maintainability purpose, as framework code it's more important to keep straightforward than DRY
+    // it's harder to trace and read if creating a lot of lambda or template pattern, also impact the mem usage and GC
     int update(String sql, Object[] params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
