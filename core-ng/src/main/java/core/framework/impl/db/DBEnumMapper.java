@@ -19,6 +19,7 @@ final class DBEnumMapper<T extends Enum<T>> {
         mappings = mappings(enumClass);
     }
 
+    // used by generated code, must be public
     public T getEnum(String value) {
         if (value == null) return null;
         T enumValue = mappings.get(value);

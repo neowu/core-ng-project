@@ -8,7 +8,7 @@ import core.framework.api.web.exception.BadRequestException;
 /**
  * @author neo
  */
-public class URLParamParser {    // parse query param and path param
+class URLParamParser {    // parse query param and path param
     @SuppressWarnings("unchecked")
     static <T> T parse(String param, Class<T> valueClass) {
         if (String.class.equals(valueClass)) {
