@@ -1,6 +1,7 @@
 ## Change log
 ### 4.15.0 (8/17/2017 - )
 * queue: removed rabbitMQ support, make kafak only queue implementation
+* search: update es to 5.5.2
 
 ### 4.14.0 (8/11/2017 - 8/16/2017)
 * mongo: update driver to 3.5, and its new builtin POJO impl should be slower than coreng due to reflection, so we still keep EntityCodec
@@ -12,7 +13,7 @@
 * scheduler: add secondly trigger, to support precisely scheduling to align with clock time 
 
 ### 4.12.7 (8/1/2017 - 8/3/2017)
-* es: update to 5.5.1
+* search: update es to 5.5.1
 * db: update insertQuery to use prepareStatement(String sql, String columnNames[]), to adapt to both mysql, oracle and potentially postgreSQL
 
 ### 4.12.6 (7/26/2017 - 7/30/2017)
@@ -29,7 +30,7 @@
 * html: recommend to use double quote to delimit attribute value
 
 ### 4.12.3 (5/9/2017 - 5/10/2017)
-* es: update to 5.4.0, delete by query support
+* search: update es to 5.4.0, delete by query support
 * httpclient: changed to disable redirect by default, support to enable redirect handling
 * httpclient: added 302 Found status
 
@@ -46,7 +47,7 @@
 * scheduler: daily/weekly/monthly supports timezone
 
 ### 4.11.2 (4/3/2017 - 4/4/2017)
-* es: update to 5.3.0
+* search: update es to 5.3.0
 * db: fix to support ZonedDateTime
 * site: enable security headers, X-Frame-Options, X-XSS-Protection, X-Content-Type-Options
 
@@ -126,7 +127,7 @@
 * mongo: support bulk replace, update driver to 3.4.1
 
 ### 4.8.7 (12/12/2016 - 1/3/2017)
-* es: update es to 5.1.1
+* search: update es to 5.1.1
 * mongo: support bulk insert
 * kafka: add kafka support in order to replace rabbitMQ
 * properties: add _sys property controller for troubleshooting
@@ -140,11 +141,11 @@
 * redis: update jedis to 2.9.0
 
 ### 4.8.4 (11/16/2016 - 12/1/2016)
-* es: update es to 5.0.2
+* search: update es to 5.0.2
 * http: added https with self signed cert support, make http/https port configurable
 
 ### 4.8.3 (10/27/2016 - 11/16/2016)
-* es: update es to 5.0.0
+* search: update es to 5.0.0
 * log: removed rabbitmq log forward support
 * session: replace redis impl with HASH, to make it easier to manage and share between multiple apps
 * web: fix path param to decode %2F to '/', (disabled undertow decodeURL completely)
@@ -167,7 +168,7 @@
 ### 4.7.8 (9/15/2016 - 10/17/2016)
 * lib: update undertow to 1.4.3
 * http: url param supports boolean
-* es: update esTookTime to nano seconds
+* search: update esTookTime to nano seconds
 * mockito: update mockito to 2.1
 * queue: start supporting kafka
 * mongo: removed eval() support
@@ -182,9 +183,9 @@
 * session: change session data encoding to JSON
 
 ### 4.7.5 (9/7/2016 - 9/8/2016)
-* es: update jackson lib and es lib to match latest
+* search: update jackson lib and es lib to match latest
 * json: remove optional field support, which is not useful, only support Optional<T> as return object
-* es: update client to enable sniff
+* search: update client to enable sniff
 
 ### 4.7.4 (8/31/2016 - 9/1/2016)
 * mongo: updated driver to 3.3.0
@@ -206,7 +207,7 @@
 * test: support MockExecutor
 
 ### 4.6.9 (7/11/2016 - 8/1/2016)
-* elasticsearch: support bulkDelete
+* search: support bulkDelete
 * redis: support hget
 
 ### 4.6.8 (7/6/2016)
@@ -228,9 +229,9 @@
 * hash: added SHA1 SHA256 support
 
 ### 4.6.2 (6/22/2016 - 6/23/2016)
-* elasticsearch: remove groovy test support, actually script query is never useful, not plan to use anymore
+* search: remove groovy test support, actually script query is never useful, not plan to use anymore
 * mock: mockRedis supports all operations
-* elasticsearch: support foreach for reindex support
+* search: support foreach for reindex support
 
 ### 4.6.1 (6/22/2016)
 * httpclient: ContentType.parse supports to ignore illegal charset
@@ -307,7 +308,7 @@
 
 ### 4.4.1 (4/8/2016)
 * http: update httpclient request to accept ContentType
-* es: update to 2.3.1
+* search: update es to 2.3.1
 * httpclient: throw HTTPClientException for invalid url
 
 ### 4.4.0 (4/7/2016)
@@ -320,7 +321,7 @@
 
 ### 4.3.8 (3/31/2016)
 * hmac: changed input from String to bytes
-* es: update to 2.3.0
+* search: update es to 2.3.0
 
 ### 4.3.7 (3/30/2016)
 * validate: add @ValuePattern
@@ -335,7 +336,7 @@
 * log: actionLogContext.put checks duplication to avoid huge trace log
 
 ### 4.3.3 (3/23/2016 - 3/25/2016)
-* es: update es to 2.2.1
+* search: update es to 2.2.1
 * web: for file response, close exchange when end
 
 ### 4.3.2 (3/18/2016)
@@ -437,7 +438,7 @@
 
 ### 4.1.0 (2/4/2016)
 * template: invalid url attr will write src="", container will write empty if content is null
-* elasticsearch: support 2.2.0, load groovy plugin in test context
+* search: support 2.2.0, load groovy plugin in test context
 
 ### 4.0.9 (2/3/2016)
 * redis: loose slow_redis warning threshold and timeout, on busy server due to CPU context switch, it's relative easy to hit it
@@ -455,7 +456,7 @@
 
 ### 4.0.5 (1/22/2016)
 * log: make 3rd party log level to info, (e.g. ES log sampler error by INFO level in separated thread)
-* elasticsearch: set ping timeout, support dynamic index name (for alias or time serial index name)
+* search: set ping timeout, support dynamic index name (for alias or time serial index name)
 
 ### 4.0.4 (1/21/2016)
 * fix: typo in @NotEmpty/@ValueNotEmpty
@@ -483,7 +484,7 @@
 * httpclient: fix NPE with HttpEntity is null on 204
 
 ### 3.9.10 (1/5/2016)
-* elasticsearch: ignore cluster name for transport client
+* search: ignore cluster name for transport client
 
 ### 3.9.9 (12/31/2015)
 * url: encode '+' for path segment to keep compatible with other impl, e.g. undertow, AWS S3
@@ -504,7 +505,7 @@
 * log: moved ErrorCode to core.framework.api.log.ErrorCode
 
 ### 3.9.4 (12/10/2015 - 12/14/2015)
-* elasticsearch: update to 2.1.0
+* search: update ES to 2.1.0
 * log: restructure trace/warning log, for prod log aggregation
 
 ### 3.9.3 (12/9/2015)
@@ -754,7 +755,7 @@
 * log: update log-processor ES mappings
 
 ### 3.3.9 (8/13/2015)
-* ES: API changed to provide more flexibility to operate index and type
+* search: API changed to provide more flexibility to operate index and type
 * log: draft of trace log forwarding
 * http: fix put/post without content-type
 

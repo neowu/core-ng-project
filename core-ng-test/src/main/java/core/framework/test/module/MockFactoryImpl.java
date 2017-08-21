@@ -36,6 +36,7 @@ public final class MockFactoryImpl implements MockFactory {
 
     // es refers to log4j core directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger
     // log4j-to-slf4j works if only transport client is used, but our integration test uses Node.
+    // refer to org.elasticsearch.index.IndexModule(), in org.elasticsearch.index.SearchSlowLog(), setLevel calls log4j.core api
     private void bindESLogger() {
         if (System.getProperty("log4j.configurationFactory") != null) return;
         System.setProperty("log4j.configurationFactory", ESLoggerConfigFactory.class.getName());
