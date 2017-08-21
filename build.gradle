@@ -86,7 +86,7 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
         }
         repositories {
             maven {
-                url System.properties['maven.repo']     // set in gradle.properties, e.g. systemProp.maven.repo=/path
+                url System.properties['maven.url']     // set in gradle.properties, e.g. systemProp.maven.url=/path
             }
         }
     }

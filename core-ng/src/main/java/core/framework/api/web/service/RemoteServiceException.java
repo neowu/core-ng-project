@@ -1,4 +1,4 @@
-package core.framework.api.web.exception;
+package core.framework.api.web.service;
 
 import core.framework.api.log.ErrorCode;
 import core.framework.api.log.Severity;

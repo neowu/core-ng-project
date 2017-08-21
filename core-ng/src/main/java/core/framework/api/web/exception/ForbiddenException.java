@@ -1,10 +1,13 @@
 package core.framework.api.web.exception;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.api.log.ErrorCode;
+import core.framework.api.web.service.ResponseStatus;
 
 /**
  * @author neo
  */
+@ResponseStatus(HTTPStatus.FORBIDDEN)
 public final class ForbiddenException extends RuntimeException implements ErrorCode {
     public static final String DEFAULT_ERROR_CODE = "FORBIDDEN";
 

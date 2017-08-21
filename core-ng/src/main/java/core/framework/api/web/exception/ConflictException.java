@@ -1,11 +1,14 @@
 package core.framework.api.web.exception;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.api.log.ErrorCode;
 import core.framework.api.log.Severity;
+import core.framework.api.web.service.ResponseStatus;
 
 /**
  * @author neo
  */
+@ResponseStatus(HTTPStatus.CONFLICT)
 public final class ConflictException extends RuntimeException implements ErrorCode {
     public static final String DEFAULT_ERROR_CODE = "CONFLICT";
 

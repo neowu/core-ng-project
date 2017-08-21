@@ -13,7 +13,7 @@ import core.framework.api.util.JSON;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
 import core.framework.api.validate.ValidationException;
-import core.framework.api.web.exception.RemoteServiceException;
+import core.framework.api.web.service.RemoteServiceException;
 import core.framework.api.web.service.WebServiceClientInterceptor;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.ActionLog;

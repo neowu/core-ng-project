@@ -1,11 +1,14 @@
 package core.framework.api.web.exception;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.api.log.ErrorCode;
 import core.framework.api.log.Severity;
+import core.framework.api.web.service.ResponseStatus;
 
 /**
  * @author neo
  */
+@ResponseStatus(HTTPStatus.METHOD_NOT_ALLOWED)
 public final class MethodNotAllowedException extends RuntimeException implements ErrorCode {
     private static final long serialVersionUID = 2349080664326196294L;
 
