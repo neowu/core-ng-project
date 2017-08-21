@@ -1,5 +1,6 @@
 ## Change log
-### 4.14.1 (8/17/2017 - )
+### 4.15.0 (8/17/2017 - )
+* queue: removed rabbitMQ support, make kafak only queue implementation
 
 ### 4.14.0 (8/11/2017 - 8/16/2017)
 * mongo: update driver to 3.5, and its new builtin POJO impl should be slower than coreng due to reflection, so we still keep EntityCodec

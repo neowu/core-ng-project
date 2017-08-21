@@ -1,7 +1,6 @@
 package core.framework.api.module;
 
 import core.framework.api.Module;
-import core.framework.api.util.Strings;
 
 import java.nio.file.Paths;
 
@@ -57,10 +56,6 @@ public final class SystemModule extends Module {
         property("sys.log.kafkaURI").ifPresent(uri -> log().forwardLog(uri));
 
         property("sys.kafka.uri").ifPresent(uri -> kafka().uri(uri));
-
-        property("sys.rabbitMQ.host").ifPresent(hosts -> queue().hosts(Strings.split(hosts, ',')));
-        property("sys.rabbitMQ.user").ifPresent(user -> queue().user(user));
-        property("sys.rabbitMQ.password").ifPresent(password -> queue().password(password));
 
         property("sys.jdbc.url").ifPresent(url -> db().url(url));
         property("sys.jdbc.user").ifPresent(user -> db().user(user));

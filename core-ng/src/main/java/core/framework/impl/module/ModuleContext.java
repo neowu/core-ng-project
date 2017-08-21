@@ -36,7 +36,6 @@ public final class ModuleContext {
     public final ShutdownHook shutdownHook = new ShutdownHook();
     public final Properties properties = new Properties();
     public final HTTPServer httpServer;
-    public final QueueManager queueManager = new QueueManager();
     public final LogManager logManager;
     public final MockFactory mockFactory;
     public final List<Metrics> metrics = Lists.newArrayList();

@@ -4,12 +4,11 @@ subprojects {
     apply from: file("${rootDir}/gradle/check.gradle")
 
     group = 'core.framework'
-    version = '4.14.1'
+    version = '4.15.0'
 }
 
 def mongoVersion = '3.5.0'
 def elasticVersion = '5.5.1'
-def rabbitVersion = '3.6.5'
 def kafkaVersion = '0.11.0.0'
 def jacksonVersion = '2.9.0'
 
@@ -37,7 +36,6 @@ project(':core-ng') {
         compileOnly(
                 'redis.clients:jedis:2.9.0@jar',
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "com.rabbitmq:amqp-client:${rabbitVersion}",
                 "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
                 "org.elasticsearch.client:transport:${elasticVersion}",
                 'org.apache.logging.log4j:log4j-api:2.8.2'   // used by elasticsearch
@@ -64,7 +62,6 @@ project(':core-ng-test') {
         compileOnly(
                 "org.mongodb:mongo-java-driver:${mongoVersion}",
                 "com.github.fakemongo:fongo:2.1.0@jar",
-                "com.rabbitmq:amqp-client:${rabbitVersion}",
                 "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
                 "org.elasticsearch.client:transport:${elasticVersion}",
                 'org.apache.logging.log4j:log4j-core:2.8.2'       // used by elasticsearch

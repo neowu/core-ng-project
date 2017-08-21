@@ -7,7 +7,6 @@ import core.framework.api.module.HTTPConfig;
 import core.framework.api.module.KafkaConfig;
 import core.framework.api.module.LogConfig;
 import core.framework.api.module.MongoConfig;
-import core.framework.api.module.QueueConfig;
 import core.framework.api.module.RedisConfig;
 import core.framework.api.module.RouteConfig;
 import core.framework.api.module.SchedulerConfig;
@@ -106,11 +105,6 @@ public abstract class Module {
 
     public CacheConfig cache() {
         return new CacheConfig(context);
-    }
-
-    @Deprecated
-    public QueueConfig queue() {
-        return new QueueConfig(context);
     }
 
     public SchedulerConfig schedule() {
