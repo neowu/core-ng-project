@@ -1,7 +1,6 @@
 package core.framework.impl.web.request;
 
 import core.framework.api.web.exception.MethodNotAllowedException;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,9 +32,15 @@ public class RequestParserTest {
 
     @Test
     public void port() {
-        Assert.assertEquals(80, parser.port(80, null));
-        Assert.assertEquals(443, parser.port(80, "443"));
-        Assert.assertEquals(443, parser.port(80, "443, 80"));
+        assertEquals(80, parser.port(80, null));
+        assertEquals(443, parser.port(80, "443"));
+        assertEquals(443, parser.port(80, "443, 80"));
+    }
+
+    @Test
+    public void requestPort() {
+        assertEquals(443, parser.requestPort("127.0.0.1", "https", null));
+        assertEquals(8080, parser.requestPort("127.0.0.1:8080", "http", null));
     }
 
     @Test

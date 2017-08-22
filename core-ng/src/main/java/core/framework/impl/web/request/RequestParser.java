@@ -31,30 +31,26 @@ public final class RequestParser {
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
         HeaderMap headers = exchange.getRequestHeaders();
-
-        String xForwardedFor = headers.getFirst(Headers.X_FORWARDED_FOR);
-        String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
-        logger.debug("[request] remoteAddress={}", remoteAddress);
-
-        request.clientIP = clientIP(remoteAddress, xForwardedFor);
-        actionLog.context("clientIP", request.clientIP);
-
-        String xForwardedProto = headers.getFirst(Headers.X_FORWARDED_PROTO);
-        String requestScheme = exchange.getRequestScheme();
-        logger.debug("[request] requestScheme={}", requestScheme);
-        request.scheme = xForwardedProto != null ? xForwardedProto : requestScheme;
-
-        String xForwardedPort = headers.getFirst(Headers.X_FORWARDED_PORT);
-        int hostPort = exchange.getHostPort();
-        logger.debug("[request] hostPort={}", hostPort);
-        request.port = port(hostPort, xForwardedPort);
-
-        request.requestURL = requestURL(request, exchange);
-        actionLog.context("requestURL", request.requestURL);
-
         for (HeaderValues header : headers) {
             logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
         }
+
+        String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
+        logger.debug("[request] remoteAddress={}", remoteAddress);
+
+        request.clientIP = clientIP(remoteAddress, headers.getFirst(Headers.X_FORWARDED_FOR));
+        actionLog.context("clientIP", request.clientIP);
+
+        String requestScheme = exchange.getRequestScheme();
+        logger.debug("[request] requestScheme={}", requestScheme);
+        String xForwardedProto = headers.getFirst(Headers.X_FORWARDED_PROTO);
+        request.scheme = xForwardedProto != null ? xForwardedProto : requestScheme;
+
+        int requestPort = requestPort(exchange.getRequestHeaders().getFirst(Headers.HOST), request.scheme, exchange);
+        request.port = port(requestPort, headers.getFirst(Headers.X_FORWARDED_PORT));
+
+        request.requestURL = requestURL(request, exchange);
+        actionLog.context("requestURL", request.requestURL);
 
         logger.debug("[request] path={}", request.path());
 
@@ -142,7 +138,7 @@ public final class RequestParser {
         return xForwardedFor;
     }
 
-    int port(int hostPort, String xForwardedPort) {
+    int port(int requestPort, String xForwardedPort) {
         if (xForwardedPort != null) {
             int index = xForwardedPort.indexOf(',');
             if (index > 0)
@@ -150,7 +146,25 @@ public final class RequestParser {
             else
                 return Integer.parseInt(xForwardedPort);
         }
-        return hostPort;
+        return requestPort;
+    }
+
+    // due to google cloud LB does not forward x-forwarded-port, here is to use x-forwarded-proto to determine port if any
+    int requestPort(String host, String scheme, HttpServerExchange exchange) {    // refer to io.undertow.server.HttpServerExchange.getHostPort(), use x-forwarded-proto as request scheme
+        if (host != null) {
+            int colonIndex;
+            if (host.startsWith("[")) { //for ipv6 addresses we make sure we take out the first part, which can have multiple occurrences of :
+                colonIndex = host.indexOf(':', host.indexOf(']'));
+            } else {
+                colonIndex = host.indexOf(':');
+            }
+            if (colonIndex != -1) return Integer.parseInt(host.substring(colonIndex + 1));
+
+            // return default port according to scheme
+            if ("https".equals(scheme)) return 443;
+            if ("http".equals(scheme)) return 80;
+        }
+        return exchange.getDestinationAddress().getPort();
     }
 
     private String requestURL(RequestImpl request, HttpServerExchange exchange) {
@@ -166,8 +180,7 @@ public final class RequestParser {
                    .append("://")
                    .append(exchange.getHostName());
 
-            if (!(("http".equals(scheme) && port == 80)
-                || ("https".equals(scheme) && port == 443))) {
+            if (!("http".equals(scheme) && port == 80) && !("https".equals(scheme) && port == 443)) {
                 builder.append(':').append(port);
             }
 
