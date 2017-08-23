@@ -7,6 +7,11 @@ import java.util.List;
  */
 public class TestWebServiceImpl implements TestWebService {
     @Override
+    public TestResponse search(TestSearchRequest request) {
+        return null;
+    }
+
+    @Override
     public TestResponse get(Integer id) {
         return null;
     }

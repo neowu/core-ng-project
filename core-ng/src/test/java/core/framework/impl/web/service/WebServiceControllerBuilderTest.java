@@ -78,6 +78,11 @@ public class WebServiceControllerBuilderTest {
 
     public static class TestWebServiceImpl implements TestWebService {
         @Override
+        public TestResponse search(TestSearchRequest request) {
+            return null;
+        }
+
+        @Override
         public TestResponse get(Integer id) {
             assertEquals(1, (int) id);
 

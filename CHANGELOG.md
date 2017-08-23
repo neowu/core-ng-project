@@ -1,4 +1,7 @@
 ## Change log
+### 4.15.1 (8/23/2017 - )
+* api: add validation for GET/DELETE body type
+
 ### 4.15.0 (8/17/2017 - 8/22/2017)
 * queue: removed rabbitMQ support, make kafak only queue implementation
 * search: update es to 5.5.2

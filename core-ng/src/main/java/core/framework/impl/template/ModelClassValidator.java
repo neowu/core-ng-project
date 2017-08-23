@@ -16,34 +16,33 @@ import java.time.ZonedDateTime;
 /**
  * @author neo
  */
-public class ModelClassValidator implements TypeVisitor {
+class ModelClassValidator implements TypeVisitor {
     private final DataTypeValidator validator;
 
-    public ModelClassValidator(Class<?> modelClass) {
+    ModelClassValidator(Class<?> modelClass) {
         validator = new DataTypeValidator(modelClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChild = true;
-        validator.allowTopLevelList = false;
         validator.visitor = this;
     }
 
-    public void validate() {
+    void validate() {
         validator.validate();
     }
 
     private boolean allowedValueClass(Class<?> valueClass) {
         return String.class.equals(valueClass)
-            || Integer.class.equals(valueClass)
-            || Boolean.class.equals(valueClass)
-            || Long.class.equals(valueClass)
-            || Double.class.equals(valueClass)
-            || BigDecimal.class.equals(valueClass)
-            || LocalDate.class.equals(valueClass)
-            || LocalDateTime.class.equals(valueClass)
-            || ZonedDateTime.class.equals(valueClass)
-            || Instant.class.equals(valueClass)
-            || valueClass.isEnum()
-            || "org.bson.types.ObjectId".equals(valueClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver;
+                || Integer.class.equals(valueClass)
+                || Boolean.class.equals(valueClass)
+                || Long.class.equals(valueClass)
+                || Double.class.equals(valueClass)
+                || BigDecimal.class.equals(valueClass)
+                || LocalDate.class.equals(valueClass)
+                || LocalDateTime.class.equals(valueClass)
+                || ZonedDateTime.class.equals(valueClass)
+                || Instant.class.equals(valueClass)
+                || valueClass.isEnum()
+                || "org.bson.types.ObjectId".equals(valueClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver;
     }
 
     @Override

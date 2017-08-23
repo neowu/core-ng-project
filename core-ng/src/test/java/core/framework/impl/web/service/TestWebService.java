@@ -18,6 +18,10 @@ import java.util.List;
  */
 public interface TestWebService {
     @GET
+    @Path("/test")
+    TestResponse search(TestSearchRequest request);
+
+    @GET
     @Path("/test/:id")
     TestResponse get(@PathParam("id") Integer id);
 
@@ -38,6 +42,12 @@ public interface TestWebService {
     class TestRequest {
         @XmlElement(name = "string_field")
         public String stringField;
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    class TestSearchRequest {
+        @XmlElement(name = "int_field")
+        public Integer intField;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

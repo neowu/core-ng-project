@@ -27,6 +27,9 @@ public class TestBean {
     @XmlElement(name = "string_field")
     public String stringField;
 
+    @XmlElement(name = "int_field")
+    public Integer intField;
+
     @XmlElement(name = "list_field")
     public List<String> listField;
 

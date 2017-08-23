@@ -39,7 +39,7 @@ class BeanBodyResponseHandler implements BodyHandler {
 
     // to validate response bean, since it can not get declaration type from instance, try to construct original type as much as it can.
     void validateBeanType(Object bean) {
-        Type instanceType;
+        Type beanType;
 
         if (bean == null) throw new Error("bean must not be null");
 
@@ -48,15 +48,15 @@ class BeanBodyResponseHandler implements BodyHandler {
             if (list.isEmpty()) return; // no type info can be used
             Object item = ((List) bean).get(0);
             if (item == null) throw Exceptions.error("response bean must not be list with null item, list={}", bean);
-            instanceType = Types.list(item.getClass());
+            beanType = Types.list(item.getClass());
         } else if (bean instanceof Optional) {
             Optional<?> optional = (Optional) bean;
             if (!optional.isPresent()) return;
-            instanceType = Types.generic(Optional.class, optional.get().getClass());
+            beanType = Types.generic(Optional.class, optional.get().getClass());
         } else {
-            instanceType = bean.getClass();
+            beanType = bean.getClass();
         }
 
-        validator.register(instanceType);
+        validator.register(beanType);
     }
 }

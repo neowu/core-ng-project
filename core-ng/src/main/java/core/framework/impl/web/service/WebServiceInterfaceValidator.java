@@ -1,5 +1,6 @@
 package core.framework.impl.web.service;
 
+import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
@@ -41,9 +42,11 @@ public class WebServiceInterfaceValidator {
 
     private void validate(Method method) {
         validateHTTPMethod(method);
+
+        HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
+
         Path path = method.getDeclaredAnnotation(Path.class);
-        if (path == null)
-            throw Exceptions.error("method must have @Path, method={}", method);
+        if (path == null) throw Exceptions.error("method must have @Path, method={}", method);
         new PathPatternValidator(path.value()).validate();
 
         validateReturnType(method.getGenericReturnType());
@@ -64,9 +67,12 @@ public class WebServiceInterfaceValidator {
             } else {
                 if (requestBeanType != null)
                     throw Exceptions.error("service method must not have more than one bean param, previous={}, current={}", requestBeanType.getTypeName(), paramType.getTypeName());
-
                 requestBeanType = paramType;
-                validator.register(paramType);
+
+                validator.register(requestBeanType);
+                if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
+                    new QueryParamBeanTypeValidator(requestBeanType).validate();
+                }
             }
         }
 
@@ -122,10 +128,12 @@ public class WebServiceInterfaceValidator {
     }
 
     private void validateHTTPMethod(Method method) {
-        if (method.isAnnotationPresent(GET.class)) return;
-        if (method.isAnnotationPresent(POST.class)) return;
-        if (method.isAnnotationPresent(PUT.class)) return;
-        if (method.isAnnotationPresent(DELETE.class)) return;
-        throw Exceptions.error("method must have http method annotation, method={}", method);
+        int count = 0;
+        if (method.isAnnotationPresent(GET.class)) count++;
+        if (method.isAnnotationPresent(POST.class)) count++;
+        if (method.isAnnotationPresent(PUT.class)) count++;
+        if (method.isAnnotationPresent(DELETE.class)) count++;
+        if (count != 1)
+            throw Exceptions.error("method must have exact one http method annotation, method={}", method);
     }
 }
