@@ -12,10 +12,6 @@ public final class Sets {
         return new HashSet<>();
     }
 
-    public static <T> Set<T> newConcurrentHashSet() {
-        return ConcurrentHashMap.newKeySet();
-    }
-
     @SafeVarargs
     public static <T> Set<T> newHashSet(T... values) {
         Set<T> set = new HashSet<>();
@@ -23,5 +19,9 @@ public final class Sets {
             set.add(value);
         }
         return set;
+    }
+
+    public static <T> Set<T> newConcurrentHashSet() {
+        return ConcurrentHashMap.newKeySet();
     }
 }

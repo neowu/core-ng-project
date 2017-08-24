@@ -10,13 +10,13 @@ import java.util.Optional;
  * @author neo
  */
 public interface Request {
-    String requestURL();  //original request url without decoding
+    String requestURL();  // original request url without decoding
 
     String scheme();
 
     String hostName();
 
-    String path();  //requestPath decoded by server
+    String path();
 
     HTTPMethod method();
 
@@ -46,7 +46,7 @@ public interface Request {
 
     Optional<byte[]> body();
 
-    <T> T bean(Type instanceType);
+    <T> T bean(Type beanType);
 
     String clientIP();
 

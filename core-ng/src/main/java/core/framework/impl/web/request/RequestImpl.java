@@ -62,7 +62,7 @@ public final class RequestImpl implements Request {
     }
 
     @Override
-    public String path() {  // exchange returns decoded path
+    public String path() {
         return exchange.getRequestPath();
     }
 
@@ -143,27 +143,32 @@ public final class RequestImpl implements Request {
     }
 
     @Override
-    public <T> T bean(Type instanceType) {
+    public <T> T bean(Type beanType) {
         try {
-            T bean = parseBean(instanceType);
-            return validator.validateRequestBean(instanceType, bean);
+            if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
+                return parseQueryParamBean(beanType, queryParams);
+            } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
+                if (!formParams.isEmpty()) {
+                    return parseQueryParamBean(beanType, formParams);
+                } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
+                    return parseRequestBean(beanType);
+                }
+                throw new BadRequestException("body is missing or unsupported content type, method=" + method + ", contentType=" + contentType);
+            } else {
+                throw Exceptions.error("not supported method, method={}", method);
+            }
         } catch (UncheckedIOException e) {
             throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
         }
     }
 
-    private <T> T parseBean(Type instanceType) {
-        if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-            return JSONMapper.fromMapValue(instanceType, queryParams);
-        } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
-            if (!formParams.isEmpty()) {
-                return JSONMapper.fromMapValue(instanceType, formParams);
-            } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
-                return JSONMapper.fromJSON(instanceType, body);
-            }
-            throw new BadRequestException("body is missing or unsupported content type, method=" + method + ", contentType=" + contentType);
-        } else {
-            throw Exceptions.error("not supported method, method={}", method);
-        }
+    private <T> T parseRequestBean(Type instanceType) {
+        T bean = JSONMapper.fromJSON(instanceType, body);
+        return validator.validateRequestBean(instanceType, bean);
+    }
+
+    private <T> T parseQueryParamBean(Type instanceType, Map<String, String> params) {
+        T bean = JSONMapper.fromMapValue(instanceType, params);
+        return validator.validateQueryParamBean(instanceType, bean);
     }
 }

@@ -14,18 +14,32 @@ import java.util.Set;
  * @author neo
  */
 public class BeanValidator {
-    private final Map<Type, Validator> validators = Maps.newConcurrentHashMap();
+    private final Map<Type, Validator> requestBeanValidators = Maps.newConcurrentHashMap();
+    private final Map<Type, Validator> queryParamBeanValidators = Maps.newConcurrentHashMap();
     private final Set<Type> validatedResponseBeanTypes = Sets.newConcurrentHashSet();
 
-    public Validator registerRequestBeanType(Type instanceType) {
-        return validators.computeIfAbsent(instanceType, type -> {
-            new RequestBeanTypeValidator(instanceType).validate();
-            return new ValidatorBuilder(instanceType, field -> field.getDeclaredAnnotation(XmlElement.class).name()).build();
+    public Validator registerRequestBeanType(Type beanType) {
+        return requestBeanValidators.computeIfAbsent(beanType, type -> {
+            new RequestBeanTypeValidator(beanType).validate();
+            return new ValidatorBuilder(beanType, field -> field.getDeclaredAnnotation(XmlElement.class).name()).build();
         });
     }
 
     public <T> T validateRequestBean(Type beanType, T bean) {
         Validator validator = registerRequestBeanType(beanType);
+        validator.validate(bean);
+        return bean;
+    }
+
+    public Validator registerQueryParamBeanType(Type beanType) {
+        return queryParamBeanValidators.computeIfAbsent(beanType, type -> {
+            new QueryParamBeanTypeValidator(beanType).validate();
+            return new ValidatorBuilder(beanType, field -> field.getDeclaredAnnotation(XmlElement.class).name()).build();
+        });
+    }
+
+    public <T> T validateQueryParamBean(Type beanType, T bean) {
+        Validator validator = registerQueryParamBeanType(beanType);
         validator.validate(bean);
         return bean;
     }

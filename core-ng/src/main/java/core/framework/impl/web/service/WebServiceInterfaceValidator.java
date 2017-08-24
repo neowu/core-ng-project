@@ -69,9 +69,10 @@ public class WebServiceInterfaceValidator {
                     throw Exceptions.error("service method must not have more than one bean param, previous={}, current={}", requestBeanType.getTypeName(), paramType.getTypeName());
                 requestBeanType = paramType;
 
-                validator.registerRequestBeanType(requestBeanType);
                 if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
-                    new QueryParamBeanTypeValidator(requestBeanType).validate();
+                    validator.registerQueryParamBeanType(requestBeanType);
+                } else {
+                    validator.registerRequestBeanType(requestBeanType);
                 }
             }
         }
