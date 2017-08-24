@@ -11,7 +11,7 @@ import core.framework.api.web.Request;
 import core.framework.api.web.Session;
 import core.framework.api.web.exception.BadRequestException;
 import core.framework.impl.json.JSONMapper;
-import core.framework.impl.web.BeanValidator;
+import core.framework.impl.web.validate.BeanValidator;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 
@@ -146,7 +146,7 @@ public final class RequestImpl implements Request {
     public <T> T bean(Type instanceType) {
         try {
             T bean = parseBean(instanceType);
-            return validator.validate(instanceType, bean);
+            return validator.validateRequestBean(instanceType, bean);
         } catch (UncheckedIOException e) {
             throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
         }

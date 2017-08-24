@@ -10,6 +10,7 @@ import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
 import core.framework.impl.web.site.SiteManager;
+import core.framework.impl.web.validate.BeanValidator;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;

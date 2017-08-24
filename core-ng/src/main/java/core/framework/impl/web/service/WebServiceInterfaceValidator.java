@@ -11,8 +11,8 @@ import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.validate.type.JAXBTypeValidator;
-import core.framework.impl.web.BeanValidator;
 import core.framework.impl.web.route.PathPatternValidator;
+import core.framework.impl.web.validate.BeanValidator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -49,7 +49,7 @@ public class WebServiceInterfaceValidator {
         if (path == null) throw Exceptions.error("method must have @Path, method={}", method);
         new PathPatternValidator(path.value()).validate();
 
-        validateReturnType(method.getGenericReturnType());
+        validateResponseBeanType(method.getGenericReturnType());
 
         Set<String> pathVariables = pathVariables(path.value());
         Type requestBeanType = null;
@@ -69,7 +69,7 @@ public class WebServiceInterfaceValidator {
                     throw Exceptions.error("service method must not have more than one bean param, previous={}, current={}", requestBeanType.getTypeName(), paramType.getTypeName());
                 requestBeanType = paramType;
 
-                validator.register(requestBeanType);
+                validator.registerRequestBeanType(requestBeanType);
                 if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
                     new QueryParamBeanTypeValidator(requestBeanType).validate();
                 }
@@ -122,9 +122,9 @@ public class WebServiceInterfaceValidator {
         throw Exceptions.error("path param class is not supported, paramClass={}", paramClass);
     }
 
-    private void validateReturnType(Type returnType) {
-        if (void.class == returnType) return;
-        validator.register(returnType);
+    private void validateResponseBeanType(Type responseBeanType) {
+        if (void.class == responseBeanType) return;
+        validator.validateResponseBeanType(responseBeanType);
     }
 
     private void validateHTTPMethod(Method method) {

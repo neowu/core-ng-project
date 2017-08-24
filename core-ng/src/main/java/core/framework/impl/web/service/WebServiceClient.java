@@ -18,10 +18,10 @@ import core.framework.api.web.service.WebServiceClientInterceptor;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.web.BeanValidator;
 import core.framework.impl.web.HTTPServerHandler;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.route.Path;
+import core.framework.impl.web.validate.BeanValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +90,7 @@ public class WebServiceClient {
     // used by generated code, must be public
     public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {
         if (requestType != null) {
-            validator.validate(requestType, requestBean);
+            validator.validateRequestBean(requestType, requestBean);
         }
 
         HTTPRequest request = new HTTPRequest(method, serviceURL);

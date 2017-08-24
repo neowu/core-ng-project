@@ -1,6 +1,6 @@
 package core.framework.impl.web.service;
 
-import core.framework.impl.web.BeanValidator;
+import core.framework.impl.web.validate.BeanValidator;
 import org.junit.Test;
 
 /**

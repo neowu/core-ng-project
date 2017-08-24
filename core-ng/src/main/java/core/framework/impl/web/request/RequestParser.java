@@ -158,8 +158,9 @@ public final class RequestParser {
             } else {
                 colonIndex = host.indexOf(':');
             }
-            if (colonIndex != -1) return Integer.parseInt(host.substring(colonIndex + 1));
-
+            if (colonIndex > 0 && colonIndex + 1 < host.length()) { // parse port only if ':' is in middle of string
+                return Integer.parseInt(host.substring(colonIndex + 1));
+            }
             // return default port according to scheme
             if ("https".equals(scheme)) return 443;
             if ("http".equals(scheme)) return 80;
