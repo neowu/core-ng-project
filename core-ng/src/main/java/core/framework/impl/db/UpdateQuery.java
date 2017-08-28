@@ -4,13 +4,15 @@ import core.framework.api.db.Column;
 import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Table;
 import core.framework.api.util.Lists;
-import core.framework.impl.code.CodeBuilder;
-import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.asm.CodeBuilder;
+import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Function;
+
+import static core.framework.impl.asm.Literal.type;
 
 /**
  * @author neo
@@ -34,8 +36,9 @@ final class UpdateQuery<T> {
 
     private Function<T, Query> queryBuilder(Class<T> entityClass, List<Field> primaryKeyFields, List<Field> columnFields) {
         CodeBuilder builder = new CodeBuilder();
+        String entityClassLiteral = type(entityClass);
         builder.append("public Object apply(Object value) {\n")
-               .indent(1).append("{} entity = ({}) value;\n", entityClass.getCanonicalName(), entityClass.getCanonicalName());
+               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
 
         for (Field primaryKeyField : primaryKeyFields) {
             builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", primaryKeyField.getName(), primaryKeyField.getName());
@@ -70,7 +73,7 @@ final class UpdateQuery<T> {
             builder.indent(1).append("params.add(entity.{});\n", primaryKeyField.getName());
         }
 
-        builder.indent(1).append("return new {}(sql.toString(), params.toArray());\n", Query.class.getCanonicalName())
+        builder.indent(1).append("return new {}(sql.toString(), params.toArray());\n", type(Query.class))
                .append("}");
 
         DynamicInstanceBuilder<Function<T, Query>> dynamicInstanceBuilder = new DynamicInstanceBuilder<>(Function.class, UpdateQuery.class.getCanonicalName() + "$" + entityClass.getSimpleName() + "$UpdateQueryBuilder");

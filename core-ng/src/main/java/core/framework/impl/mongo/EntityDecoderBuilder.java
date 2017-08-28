@@ -4,8 +4,8 @@ import core.framework.api.mongo.Id;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
-import core.framework.impl.code.CodeBuilder;
-import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.asm.CodeBuilder;
+import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
 import org.bson.types.ObjectId;
@@ -20,6 +20,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static core.framework.impl.asm.Literal.type;
+import static core.framework.impl.asm.Literal.variable;
 
 /**
  * @author neo
@@ -47,16 +50,16 @@ final class EntityDecoderBuilder<T> {
     private void buildMethods() {
         String methodName = decodeEntityMethod(entityClass);
         CodeBuilder builder = new CodeBuilder()
-            .append("public Object decode(org.bson.BsonReader reader) {\n")
-            .indent(1).append("return {}(reader, \"\");\n", methodName)
-            .append("}");
+                .append("public Object decode(org.bson.BsonReader reader) {\n")
+                .indent(1).append("return {}(reader, \"\");\n", methodName)
+                .append("}");
 
         methods.put("decode", builder.build());
     }
 
     private String decodeEntityMethod(Class<?> entityClass) {
         String entityClassName = entityClass.getCanonicalName();
-        String methodName = "decode_" + entityClassName.replaceAll("\\.", "_");
+        String methodName = "decode_" + entityClassName.replace('.', '_');
         if (methods.containsKey(methodName)) return methodName;
 
         CodeBuilder builder = new CodeBuilder().append("public {} {}(org.bson.BsonReader reader, String parentField) {\n", entityClassName, methodName);
@@ -119,7 +122,7 @@ final class EntityDecoderBuilder<T> {
             builder.indent(3).append("{} = {}.readZonedDateTime(reader, fieldPath);\n", fieldVariable, helper);
         } else if (fieldClass.isEnum()) {
             String enumCodecVariable = registerEnumCodec(fieldClass);
-            builder.indent(3).append("{} = ({}) {}.decode(reader, null);\n", fieldVariable, fieldClass.getCanonicalName(), enumCodecVariable);
+            builder.indent(3).append("{} = ({}) {}.decode(reader, null);\n", fieldVariable, type(fieldClass), enumCodecVariable);
         } else if (Double.class.equals(fieldClass)) {
             builder.indent(3).append("{} = {}.readDouble(reader, fieldPath);\n", fieldVariable, helper);
         } else if (ObjectId.class.equals(fieldClass)) {
@@ -143,7 +146,7 @@ final class EntityDecoderBuilder<T> {
 
     private String decodeMapMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("decode_" + Map.class.getCanonicalName() + "_" + valueClassName).replaceAll("\\.", "_");
+        String methodName = ("decode_" + Map.class.getCanonicalName() + "_" + valueClassName).replace('.', '_');
         if (methods.containsKey(methodName)) return methodName;
 
         CodeBuilder builder = new CodeBuilder();
@@ -198,7 +201,7 @@ final class EntityDecoderBuilder<T> {
 
     private String decodeListMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("decode_" + List.class.getCanonicalName() + "_" + valueClassName).replaceAll("\\.", "_");
+        String methodName = ("decode_" + List.class.getCanonicalName() + "_" + valueClassName).replace('.', '_');
         if (methods.containsKey(methodName)) return methodName;
 
         CodeBuilder builder = new CodeBuilder();
@@ -256,13 +259,14 @@ final class EntityDecoderBuilder<T> {
     private String registerEnumCodec(Class<?> fieldClass) {
         @SuppressWarnings("unchecked")
         boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
-        String fieldVariable = fieldClass.getCanonicalName().replaceAll("\\.", "_") + "Codec";
+        String fieldVariable = fieldClass.getCanonicalName().replace('.', '_') + "Codec";
         if (added) {
-            String field = Strings.format("private final {} {} = new {}({}.class);\n",
-                EnumCodec.class.getCanonicalName(),
-                fieldVariable,
-                EnumCodec.class.getCanonicalName(),
-                fieldClass.getCanonicalName());
+            String enumCodecTypeLiteral = type(EnumCodec.class);
+            String field = Strings.format("private final {} {} = new {}({});\n",
+                    enumCodecTypeLiteral,
+                    fieldVariable,
+                    enumCodecTypeLiteral,
+                    variable(fieldClass));
             fields.add(field);
         }
         return fieldVariable;

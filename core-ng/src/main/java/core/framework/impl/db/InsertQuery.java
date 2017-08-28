@@ -5,13 +5,15 @@ import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Table;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Strings;
-import core.framework.impl.code.CodeBuilder;
-import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.asm.CodeBuilder;
+import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Function;
+
+import static core.framework.impl.asm.Literal.type;
 
 /**
  * @author neo
@@ -73,8 +75,10 @@ final class InsertQuery<T> {
 
     private Function<T, Object[]> paramBuilder(Class<T> entityClass, List<Field> paramFields) {
         CodeBuilder builder = new CodeBuilder();
+
+        String entityClassLiteral = type(entityClass);
         builder.append("public Object apply(Object value) {\n")
-               .indent(1).append("{} entity = ({}) value;", entityClass.getCanonicalName(), entityClass.getCanonicalName())
+               .indent(1).append("{} entity = ({}) value;", entityClassLiteral, entityClassLiteral)
                .indent(1).append("Object[] params = new Object[{}];\n", paramFields.size());
 
         int index = 0;

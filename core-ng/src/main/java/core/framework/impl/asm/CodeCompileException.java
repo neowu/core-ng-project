@@ -1,4 +1,4 @@
-package core.framework.impl.code;
+package core.framework.impl.asm;
 
 /**
  * @author neo

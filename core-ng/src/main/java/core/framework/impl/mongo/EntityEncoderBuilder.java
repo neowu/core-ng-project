@@ -4,8 +4,8 @@ import core.framework.api.mongo.Id;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
-import core.framework.impl.code.CodeBuilder;
-import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.asm.CodeBuilder;
+import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
 import org.bson.types.ObjectId;
@@ -52,7 +52,7 @@ final class EntityEncoderBuilder<T> {
 
     private String encodeEntityMethod(Class<?> entityClass) {
         String entityClassName = entityClass.getCanonicalName();
-        String methodName = "encode_" + entityClassName.replaceAll("\\.", "_");
+        String methodName = "encode_" + entityClassName.replace('.', '_');
         if (methods.containsKey(methodName)) return methodName;
 
         CodeBuilder builder = new CodeBuilder().append("private void {}(org.bson.BsonWriter writer, {} entity) {\n", methodName, entityClassName);
@@ -77,7 +77,7 @@ final class EntityEncoderBuilder<T> {
 
     private String encodeListMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("encode_" + List.class.getCanonicalName() + "_" + valueClassName).replaceAll("\\.", "_");
+        String methodName = ("encode_" + List.class.getCanonicalName() + "_" + valueClassName).replace('.', '_');
         if (methods.containsKey(methodName)) return methodName;
 
         CodeBuilder builder = new CodeBuilder();
@@ -98,7 +98,7 @@ final class EntityEncoderBuilder<T> {
 
     private String encodeMapMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("encode_" + Map.class.getCanonicalName() + "_" + valueClassName).replaceAll("\\.", "_");
+        String methodName = ("encode_" + Map.class.getCanonicalName() + "_" + valueClassName).replace('.', '_');
         if (methods.containsKey(methodName)) return methodName;
 
         CodeBuilder builder = new CodeBuilder();
@@ -160,7 +160,7 @@ final class EntityEncoderBuilder<T> {
     private String registerEnumCodec(Class<?> fieldClass) {
         @SuppressWarnings("unchecked")
         boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
-        String fieldVariable = fieldClass.getCanonicalName().replaceAll("\\.", "_") + "Codec";
+        String fieldVariable = fieldClass.getCanonicalName().replace('.', '_') + "Codec";
         if (added) {
             String field = Strings.format("private final {} {} = new {}({}.class);\n",
                 EnumCodec.class.getCanonicalName(),

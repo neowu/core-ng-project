@@ -1,4 +1,4 @@
-package core.framework.impl.code;
+package core.framework.impl.asm;
 
 import core.framework.api.util.Exceptions;
 import javassist.CannotCompileException;

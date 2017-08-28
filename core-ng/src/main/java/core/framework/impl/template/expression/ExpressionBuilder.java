@@ -2,15 +2,17 @@ package core.framework.impl.template.expression;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Strings;
-import core.framework.impl.code.CodeBuilder;
-import core.framework.impl.code.CodeCompileException;
-import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.asm.CodeBuilder;
+import core.framework.impl.asm.CodeCompileException;
+import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+
+import static core.framework.impl.asm.Literal.type;
 
 /**
  * @author neo
@@ -46,11 +48,13 @@ public class ExpressionBuilder {
 
     private String buildEval() {
         CodeBuilder builder = new CodeBuilder();
-        builder.append("public Object eval({} context) {\n", TemplateContext.class.getCanonicalName());
-        builder.indent(1).append("{} $root = ({})context.root;\n", context.rootClass.getCanonicalName(), context.rootClass.getCanonicalName());
-        context.paramClasses.forEach((name, paramClass) -> builder.indent(1).append("{} {} = ({})context.context(\"{}\");\n",
-            paramClass.getCanonicalName(), name, paramClass.getCanonicalName(), name));
-
+        builder.append("public Object eval({} context) {\n", type(TemplateContext.class));
+        String rootClassLiteral = type(context.rootClass);
+        builder.indent(1).append("{} $root = ({})context.root;\n", rootClassLiteral, rootClassLiteral);
+        context.paramClasses.forEach((name, paramClass) -> {
+            String paramClassLiteral = type(paramClass);
+            builder.indent(1).append("{} {} = ({})context.context(\"{}\");\n", paramClassLiteral, name, paramClassLiteral, name);
+        });
         String translatedExpression = new ExpressionTranslator(token, context).translate();
         builder.indent(1).append("return {};\n", translatedExpression);
 
@@ -84,7 +88,7 @@ public class ExpressionBuilder {
             return modelClass.getField(fieldName).getGenericType();
         } catch (NoSuchFieldException e) {
             throw new Error(Strings.format("can not find field, class={}, field={}, expression={}, location={}",
-                modelClass, fieldName, expressionSource, location), e);
+                    modelClass, fieldName, expressionSource, location), e);
         }
     }
 
@@ -94,6 +98,6 @@ public class ExpressionBuilder {
             if (method.getName().equals(methodName)) return method.getGenericReturnType();
         }
         throw Exceptions.error("can not find method, class={}, method={}, expression={}, location={}",
-            modelClass, methodName, expressionSource, location);
+                modelClass, methodName, expressionSource, location);
     }
 }

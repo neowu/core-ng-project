@@ -2,12 +2,14 @@ package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
 import core.framework.api.util.Exceptions;
-import core.framework.impl.code.CodeBuilder;
-import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.asm.CodeBuilder;
+import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
+
+import static core.framework.impl.asm.Literal.type;
 
 /**
  * @author neo
@@ -39,26 +41,28 @@ final class EntityIdHandlerBuilder<T> {
     private String generateIdIfAbsentMethod() {
         CodeBuilder builder = new CodeBuilder();
         builder.append("public boolean generateIdIfAbsent() {\n")
-            .indent(1).append("return {};", ObjectId.class.equals(idField.getType()) ? "true" : "false")
-            .append("}");
+               .indent(1).append("return {};", ObjectId.class.equals(idField.getType()) ? "true" : "false")
+               .append("}");
         return builder.build();
     }
 
     private String getMethod() {
         CodeBuilder builder = new CodeBuilder();
+        String entityClassLiteral = type(entityClass);
         builder.append("public Object get(Object value) {\n")
-            .indent(1).append("{} entity = ({}) value;\n", entityClass.getCanonicalName(), entityClass.getCanonicalName())
-            .indent(1).append("return entity.{};\n", idField.getName())
-            .append("}");
+               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral)
+               .indent(1).append("return entity.{};\n", idField.getName())
+               .append("}");
         return builder.build();
     }
 
     private String setMethod() {
         CodeBuilder builder = new CodeBuilder();
+        String entityClassLiteral = type(entityClass);
         builder.append("public void set(Object value, Object id) {\n")
-            .indent(1).append("{} entity = ({}) value;\n", entityClass.getCanonicalName(), entityClass.getCanonicalName())
-            .indent(1).append("entity.{} = ({}) id;\n", idField.getName(), idField.getType().getCanonicalName())
-            .append("}");
+               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral)
+               .indent(1).append("entity.{} = ({}) id;\n", idField.getName(), idField.getType().getCanonicalName())
+               .append("}");
         return builder.build();
     }
 }

@@ -3,8 +3,8 @@ package core.framework.impl.db;
 import core.framework.api.db.Column;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Strings;
-import core.framework.impl.code.CodeBuilder;
-import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.asm.CodeBuilder;
+import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 
 import java.lang.reflect.Field;
@@ -13,6 +13,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+
+import static core.framework.impl.asm.Literal.type;
+import static core.framework.impl.asm.Literal.variable;
 
 /**
  * @author neo
@@ -29,10 +32,9 @@ final class RowMapperBuilder<T> {
     RowMapper<T> build() {
         List<String> enumMapperFields = Lists.newArrayList();
 
-        String entityClassName = entityClass.getCanonicalName();
-
-        CodeBuilder builder = new CodeBuilder().append("public Object map({} resultSet) {\n", ResultSetWrapper.class.getCanonicalName());
-        builder.indent(1).append("{} entity = new {}();\n", entityClassName, entityClassName);
+        CodeBuilder builder = new CodeBuilder().append("public Object map({} resultSet) {\n", type(ResultSetWrapper.class));
+        String entityClassLiteral = type(entityClass);
+        builder.indent(1).append("{} entity = new {}();\n", entityClassLiteral, entityClassLiteral);
 
         for (Field field : Classes.instanceFields(entityClass)) {
             String fieldName = field.getName();
@@ -54,8 +56,8 @@ final class RowMapperBuilder<T> {
                 builder.indent(1).append("entity.{} = resultSet.getZonedDateTime(\"{}\");\n", fieldName, column);
             } else if (fieldClass.isEnum()) {
                 registerEnumClass(fieldClass);
-                enumMapperFields.add(Strings.format("private final {} {}Mappings = new {}({}.class);", DBEnumMapper.class.getCanonicalName(), fieldName, DBEnumMapper.class.getCanonicalName(), fieldClass.getCanonicalName()));
-                builder.indent(1).append("entity.{} = ({}){}Mappings.getEnum(resultSet.getString(\"{}\"));\n", fieldName, fieldClass.getCanonicalName(), fieldName, column);
+                enumMapperFields.add(Strings.format("private final {} {}Mappings = new {}({});", type(DBEnumMapper.class), fieldName, type(DBEnumMapper.class), variable(fieldClass)));
+                builder.indent(1).append("entity.{} = ({}){}Mappings.getEnum(resultSet.getString(\"{}\"));\n", fieldName, type(fieldClass), fieldName, column);
             } else if (Double.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getDouble(\"{}\");\n", fieldName, column);
             } else if (BigDecimal.class.equals(fieldClass)) {

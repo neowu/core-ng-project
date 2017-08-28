@@ -4,8 +4,8 @@ import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Maps;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.impl.code.CodeBuilder;
-import core.framework.impl.code.DynamicInstanceBuilder;
+import core.framework.impl.asm.CodeBuilder;
+import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.GenericTypes;
 
 import java.lang.annotation.Annotation;
@@ -13,8 +13,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import static core.framework.impl.code.CodeBuilder.enumVariableLiteral;
-import static core.framework.impl.code.CodeBuilder.typeVariableLiteral;
+import static core.framework.impl.asm.Literal.type;
+import static core.framework.impl.asm.Literal.variable;
 
 /**
  * @author neo
@@ -67,24 +67,24 @@ public class WebServiceClientBuilder<T> {
         }
         builder.append(") {\n");
 
-        builder.indent(1).append("java.lang.reflect.Type requestType = {};\n", requestBeanType == null ? "null" : typeVariableLiteral(requestBeanType));
+        builder.indent(1).append("java.lang.reflect.Type requestType = {};\n", requestBeanType == null ? "null" : variable(requestBeanType));
         builder.indent(1).append("Object requestBean = {};\n", requestBeanIndex == null ? "null" : "param" + requestBeanIndex);
 
         builder.indent(1).append("java.util.Map pathParams = new java.util.HashMap();\n");
         pathParamIndexes.forEach((name, index) ->
-            builder.indent(1).append("pathParams.put(\"{}\", param{});\n", name, index));
+                builder.indent(1).append("pathParams.put(\"{}\", param{});\n", name, index));
 
-        String returnTypeLiteral = returnType == void.class ? Void.class.getCanonicalName() : GenericTypes.rawClass(returnType).getCanonicalName();
+        String returnTypeLiteral = returnType == void.class ? type(Void.class) : type(returnType);
 
         String path = method.getDeclaredAnnotation(Path.class).value();
         builder.indent(1).append("String serviceURL = client.serviceURL(\"{}\", pathParams);\n", path); // to pass path as string literal, the escaped char will not be transferred, like \\, currently not convert is because only type regex may contain special char
 
         HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
         builder.indent(1).append("{} response = ({}) client.execute({}, serviceURL, requestType, requestBean, {});\n",
-            returnTypeLiteral,
-            returnTypeLiteral,
-            enumVariableLiteral(httpMethod),
-            typeVariableLiteral(returnType));
+                returnTypeLiteral,
+                returnTypeLiteral,
+                variable(httpMethod),
+                variable(returnType));
 
         if (returnType != void.class) builder.indent(1).append("return response;\n");
 

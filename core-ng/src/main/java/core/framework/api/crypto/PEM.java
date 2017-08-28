@@ -14,8 +14,8 @@ import java.io.UncheckedIOException;
 public final class PEM {
     public static String toPEM(String type, byte[] content) {
         StringBuilder builder = new StringBuilder("-----BEGIN ")
-            .append(type)
-            .append("-----");
+                .append(type)
+                .append("-----");
         String encodedContent = Encodings.base64(content);
         for (int i = 0; i < encodedContent.length(); i++) {
             if (i % 64 == 0) builder.append('\n');

@@ -56,7 +56,7 @@ public class ControllerInspector {
                 int size = (int) getSize.invoke(constantPool);
                 Method getMemberRefInfoAt = constantPool.getClass().getMethod("getMemberRefInfoAt", int.class);
                 String[] methodRefInfo = (String[]) getMemberRefInfoAt.invoke(constantPool, methodRefIndex(size));
-                Class<?> targetClass = Class.forName(methodRefInfo[0].replaceAll("/", "."));
+                Class<?> targetClass = Class.forName(methodRefInfo[0].replace('/', '.'));
                 String targetMethodName = methodRefInfo[1];
                 controllerInfo = targetClass.getCanonicalName() + "." + targetMethodName;
                 if (targetMethodName.contains("$")) {   // for lambda
