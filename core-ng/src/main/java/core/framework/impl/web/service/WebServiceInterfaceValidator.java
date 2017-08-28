@@ -12,6 +12,7 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.validate.type.JAXBTypeValidator;
 import core.framework.impl.web.bean.BeanValidator;
+import core.framework.impl.web.bean.QueryParamBeanMappers;
 import core.framework.impl.web.route.PathPatternValidator;
 
 import java.lang.annotation.Annotation;
@@ -25,10 +26,12 @@ import java.util.Set;
 public class WebServiceInterfaceValidator {
     private final Class<?> serviceInterface;
     private final BeanValidator validator;
+    private final QueryParamBeanMappers queryParamBeanMappers;
 
-    public WebServiceInterfaceValidator(Class<?> serviceInterface, BeanValidator validator) {
+    public WebServiceInterfaceValidator(Class<?> serviceInterface, BeanValidator validator, QueryParamBeanMappers queryParamBeanMappers) {
         this.serviceInterface = serviceInterface;
         this.validator = validator;
+        this.queryParamBeanMappers = queryParamBeanMappers;
     }
 
     public void validate() {
@@ -71,6 +74,7 @@ public class WebServiceInterfaceValidator {
 
                 if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
                     validator.registerQueryParamBeanType(requestBeanType);
+                    queryParamBeanMappers.registerBeanType(requestBeanType);
                 } else {
                     validator.registerRequestBeanType(requestBeanType);
                 }

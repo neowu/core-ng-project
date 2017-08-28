@@ -58,16 +58,16 @@ public class JAXBTypeValidator implements TypeVisitor {
 
     private boolean allowedValueClass(Class<?> valueClass) {
         return String.class.equals(valueClass)
-            || Integer.class.equals(valueClass)
-            || Boolean.class.equals(valueClass)
-            || Long.class.equals(valueClass)
-            || Double.class.equals(valueClass)
-            || BigDecimal.class.equals(valueClass)
-            || LocalDate.class.equals(valueClass)
-            || LocalDateTime.class.equals(valueClass)
-            || ZonedDateTime.class.equals(valueClass)
-            || Instant.class.equals(valueClass)
-            || valueClass.isEnum();
+                || Integer.class.equals(valueClass)
+                || Boolean.class.equals(valueClass)
+                || Long.class.equals(valueClass)
+                || Double.class.equals(valueClass)
+                || BigDecimal.class.equals(valueClass)
+                || LocalDate.class.equals(valueClass)
+                || LocalDateTime.class.equals(valueClass)
+                || ZonedDateTime.class.equals(valueClass)
+                || Instant.class.equals(valueClass)
+                || valueClass.isEnum();
     }
 
     @Override

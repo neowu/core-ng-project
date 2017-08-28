@@ -1,11 +1,13 @@
 package core.framework.impl.web.service;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.api.validate.NotNull;
 import core.framework.api.web.service.DELETE;
 import core.framework.api.web.service.GET;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
+import core.framework.api.web.service.QueryParam;
 import core.framework.api.web.service.ResponseStatus;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -40,13 +42,14 @@ public interface TestWebService {
 
     @XmlAccessorType(XmlAccessType.FIELD)
     class TestRequest {
+        @NotNull
         @XmlElement(name = "string_field")
         public String stringField;
     }
 
-    @XmlAccessorType(XmlAccessType.FIELD)
     class TestSearchRequest {
-        @XmlElement(name = "int_field")
+        @NotNull
+        @QueryParam(name = "int_field")
         public Integer intField;
     }
 

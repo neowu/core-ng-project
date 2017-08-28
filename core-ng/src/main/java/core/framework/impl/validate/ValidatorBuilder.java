@@ -68,7 +68,7 @@ public class ValidatorBuilder {
         Map<Field, List<FieldValidator>> validators = Maps.newLinkedHashMap();
         for (Field field : Classes.instanceFields(instanceClass)) {
             createValidators(field, parentPath)
-                .ifPresent(fieldValidators -> validators.put(field, fieldValidators));
+                    .ifPresent(fieldValidators -> validators.put(field, fieldValidators));
         }
         if (validators.isEmpty()) return Optional.empty();
         return Optional.of(new ObjectValidator(validators));
@@ -188,16 +188,16 @@ public class ValidatorBuilder {
 
     private boolean isValueClass(Class<?> fieldClass) {
         return String.class.equals(fieldClass)
-            || Integer.class.equals(fieldClass)
-            || Boolean.class.equals(fieldClass)
-            || Long.class.equals(fieldClass)
-            || Double.class.equals(fieldClass)
-            || BigDecimal.class.equals(fieldClass)
-            || LocalDate.class.equals(fieldClass)
-            || LocalDateTime.class.equals(fieldClass)
-            || ZonedDateTime.class.equals(fieldClass)
-            || Instant.class.equals(fieldClass)
-            || fieldClass.isEnum()
-            || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
+                || Integer.class.equals(fieldClass)
+                || Boolean.class.equals(fieldClass)
+                || Long.class.equals(fieldClass)
+                || Double.class.equals(fieldClass)
+                || BigDecimal.class.equals(fieldClass)
+                || LocalDate.class.equals(fieldClass)
+                || LocalDateTime.class.equals(fieldClass)
+                || ZonedDateTime.class.equals(fieldClass)
+                || Instant.class.equals(fieldClass)
+                || fieldClass.isEnum()
+                || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
     }
 }

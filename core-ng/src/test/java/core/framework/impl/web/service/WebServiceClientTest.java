@@ -28,7 +28,7 @@ public class WebServiceClientTest {
 
     @Before
     public void prepare() {
-        webServiceClient = new WebServiceClient("http://localhost", null, null, null);
+        webServiceClient = new WebServiceClient("http://localhost", null, null, null, null);
         request = Mockito.mock(HTTPRequest.class);
     }
 

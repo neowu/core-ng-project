@@ -2,6 +2,7 @@ package core.framework.impl.web.bean;
 
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
+import core.framework.api.web.service.QueryParam;
 import core.framework.impl.validate.Validator;
 import core.framework.impl.validate.ValidatorBuilder;
 
@@ -28,7 +29,7 @@ public class BeanValidator {
     public Validator registerQueryParamBeanType(Type beanType) {
         return queryParamBeanValidators.computeIfAbsent(beanType, type -> {
             new QueryParamBeanTypeValidator(beanType).validate();
-            return new ValidatorBuilder(beanType, field -> field.getDeclaredAnnotation(XmlElement.class).name()).build();
+            return new ValidatorBuilder(beanType, field -> field.getDeclaredAnnotation(QueryParam.class).name()).build();
         });
     }
 

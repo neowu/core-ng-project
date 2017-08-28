@@ -5,6 +5,7 @@ import core.framework.api.web.ResponseImpl;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.bean.BeanValidator;
+import core.framework.impl.web.bean.QueryParamBeanMappers;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.request.RequestParser;
 import core.framework.impl.web.response.ResponseHandler;
@@ -26,6 +27,7 @@ public class HTTPServerHandler implements HttpHandler {
     public static final String HEADER_CLIENT = "client";
 
     public final BeanValidator validator = new BeanValidator();
+    public final QueryParamBeanMappers queryParamBeanMappers = new QueryParamBeanMappers();
     public final Route route = new Route();
     public final Interceptors interceptors = new Interceptors();
     public final WebContextImpl webContext = new WebContextImpl();
@@ -52,7 +54,7 @@ public class HTTPServerHandler implements HttpHandler {
         }
 
         logManager.begin("=== http transaction begin ===");
-        RequestImpl request = new RequestImpl(exchange, validator);
+        RequestImpl request = new RequestImpl(exchange, validator, queryParamBeanMappers);
         try {
             webContext.initialize(request);     // initialize webContext at beginning, the customerErrorHandler in errorHandler may use it if any exception
 
