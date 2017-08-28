@@ -11,6 +11,7 @@ import core.framework.api.web.Request;
 import core.framework.api.web.Session;
 import core.framework.api.web.exception.BadRequestException;
 import core.framework.impl.json.JSONMapper;
+import core.framework.impl.validate.Validator;
 import core.framework.impl.web.validate.BeanValidator;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
@@ -163,12 +164,16 @@ public final class RequestImpl implements Request {
     }
 
     private <T> T parseRequestBean(Type instanceType) {
+        Validator validator = this.validator.registerRequestBeanType(instanceType);
         T bean = JSONMapper.fromJSON(instanceType, body);
-        return validator.validateRequestBean(instanceType, bean);
+        validator.validate(bean);
+        return bean;
     }
 
     private <T> T parseQueryParamBean(Type instanceType, Map<String, String> params) {
+        Validator validator = this.validator.registerQueryParamBeanType(instanceType);
         T bean = JSONMapper.fromMapValue(instanceType, params);
-        return validator.validateQueryParamBean(instanceType, bean);
+        validator.validate(bean);
+        return bean;
     }
 }

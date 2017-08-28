@@ -25,23 +25,11 @@ public class BeanValidator {
         });
     }
 
-    public <T> T validateRequestBean(Type beanType, T bean) {
-        Validator validator = registerRequestBeanType(beanType);
-        validator.validate(bean);
-        return bean;
-    }
-
     public Validator registerQueryParamBeanType(Type beanType) {
         return queryParamBeanValidators.computeIfAbsent(beanType, type -> {
             new QueryParamBeanTypeValidator(beanType).validate();
             return new ValidatorBuilder(beanType, field -> field.getDeclaredAnnotation(XmlElement.class).name()).build();
         });
-    }
-
-    public <T> T validateQueryParamBean(Type beanType, T bean) {
-        Validator validator = registerQueryParamBeanType(beanType);
-        validator.validate(bean);
-        return bean;
     }
 
     public void validateResponseBeanType(Type beanType) {

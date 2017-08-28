@@ -18,6 +18,7 @@ import core.framework.api.web.service.WebServiceClientInterceptor;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
+import core.framework.impl.validate.Validator;
 import core.framework.impl.web.HTTPServerHandler;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.route.Path;
@@ -90,7 +91,8 @@ public class WebServiceClient {
     // used by generated code, must be public
     public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {
         if (requestType != null) {
-            validator.validateRequestBean(requestType, requestBean);
+            Validator validator = this.validator.registerRequestBeanType(requestType);
+            validator.validate(requestBean);
         }
 
         HTTPRequest request = new HTTPRequest(method, serviceURL);
