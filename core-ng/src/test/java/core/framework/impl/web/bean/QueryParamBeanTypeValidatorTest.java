@@ -1,4 +1,4 @@
-package core.framework.impl.web.validate;
+package core.framework.impl.web.bean;
 
 import org.junit.Test;
 

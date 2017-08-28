@@ -12,7 +12,7 @@ import core.framework.api.web.Session;
 import core.framework.api.web.exception.BadRequestException;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.validate.Validator;
-import core.framework.impl.web.validate.BeanValidator;
+import core.framework.impl.web.bean.BeanValidator;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 

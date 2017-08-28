@@ -1,7 +1,6 @@
-package core.framework.impl.web.validate;
+package core.framework.impl.web.bean;
 
 import core.framework.api.util.Types;
-import core.framework.impl.web.TestBean;
 import org.junit.Test;
 
 /**

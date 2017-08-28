@@ -11,8 +11,8 @@ import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.validate.type.JAXBTypeValidator;
+import core.framework.impl.web.bean.BeanValidator;
 import core.framework.impl.web.route.PathPatternValidator;
-import core.framework.impl.web.validate.BeanValidator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

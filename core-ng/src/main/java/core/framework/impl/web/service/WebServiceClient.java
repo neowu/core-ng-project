@@ -20,9 +20,9 @@ import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.validate.Validator;
 import core.framework.impl.web.HTTPServerHandler;
+import core.framework.impl.web.bean.BeanValidator;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.route.Path;
-import core.framework.impl.web.validate.BeanValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,11 +90,6 @@ public class WebServiceClient {
 
     // used by generated code, must be public
     public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {
-        if (requestType != null) {
-            Validator validator = this.validator.registerRequestBeanType(requestType);
-            validator.validate(requestBean);
-        }
-
         HTTPRequest request = new HTTPRequest(method, serviceURL);
         request.accept(ContentType.APPLICATION_JSON);
 
@@ -106,9 +101,13 @@ public class WebServiceClient {
 
         if (requestBean != null) {
             if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
+                Validator validator = this.validator.registerQueryParamBeanType(requestType);
+                validator.validate(requestBean);
                 Map<String, String> queryParams = JSONMapper.toMapValue(requestBean);
                 addQueryParams(request, queryParams);
             } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
+                Validator validator = this.validator.registerRequestBeanType(requestType);
+                validator.validate(requestBean);
                 byte[] json = JSONMapper.toJSON(requestBean);
                 request.body(json, ContentType.APPLICATION_JSON);
             } else {

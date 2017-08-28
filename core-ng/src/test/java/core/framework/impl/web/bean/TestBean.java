@@ -1,4 +1,4 @@
-package core.framework.impl.web;
+package core.framework.impl.web.bean;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

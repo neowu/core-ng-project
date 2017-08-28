@@ -4,13 +4,13 @@ import core.framework.api.web.Response;
 import core.framework.api.web.ResponseImpl;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
+import core.framework.impl.web.bean.BeanValidator;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.request.RequestParser;
 import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
 import core.framework.impl.web.site.SiteManager;
-import core.framework.impl.web.validate.BeanValidator;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
@@ -37,7 +37,7 @@ public class HTTPServerHandler implements HttpHandler {
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
 
-    public HTTPServerHandler(LogManager logManager, SiteManager siteManager) {
+    HTTPServerHandler(LogManager logManager, SiteManager siteManager) {
         this.logManager = logManager;
         sessionManager = siteManager.sessionManager;
         responseHandler = new ResponseHandler(validator, siteManager.templateManager);
