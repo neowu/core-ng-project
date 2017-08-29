@@ -1,7 +1,7 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.util.Lists;
-import core.framework.impl.web.bean.BeanValidator;
+import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.bean.TestBean;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +17,7 @@ public class BeanBodyResponseHandlerTest {
 
     @Before
     public void createBeanBodyResponseHandler() {
-        handler = new BeanBodyResponseHandler(new BeanValidator());
+        handler = new BeanBodyResponseHandler(new ResponseBeanTypeValidator());
     }
 
     @Test

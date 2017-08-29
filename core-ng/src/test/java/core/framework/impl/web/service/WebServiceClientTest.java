@@ -6,7 +6,6 @@ import core.framework.api.http.HTTPRequest;
 import core.framework.api.util.Maps;
 import core.framework.api.validate.ValidationException;
 import core.framework.impl.json.JSONMapper;
-import core.framework.impl.web.bean.BeanValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,7 +32,7 @@ public class WebServiceClientTest {
 
     @Before
     public void prepare() {
-        webServiceClient = new WebServiceClient("http://localhost", null, new BeanValidator(), new RequestBeanMapper(), null);
+        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(), null);
         request = Mockito.mock(HTTPRequest.class);
     }
 

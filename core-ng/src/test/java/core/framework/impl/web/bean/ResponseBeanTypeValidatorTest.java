@@ -1,25 +1,33 @@
 package core.framework.impl.web.bean;
 
 import core.framework.api.util.Types;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author neo
  */
 public class ResponseBeanTypeValidatorTest {
+    private ResponseBeanTypeValidator validator;
+
+    @Before
+    public void createResponseBeanTypeValidator() {
+        validator = new ResponseBeanTypeValidator();
+    }
+
     @Test
     public void listType() {
-        new ResponseBeanTypeValidator(Types.list(String.class)).validate();
-        new ResponseBeanTypeValidator(Types.list(TestBean.class)).validate();
+        validator.validate(Types.list(String.class));
+        validator.validate(Types.list(TestBean.class));
     }
 
     @Test
     public void optionalType() {
-        new ResponseBeanTypeValidator(Types.optional(TestBean.class)).validate();
+        validator.validate(Types.optional(TestBean.class));
     }
 
     @Test
     public void beanType() {
-        new ResponseBeanTypeValidator(TestBean.class).validate();
+        validator.validate(TestBean.class);
     }
 }

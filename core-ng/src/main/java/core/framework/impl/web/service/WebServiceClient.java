@@ -18,9 +18,7 @@ import core.framework.api.web.service.WebServiceClientInterceptor;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.validate.Validator;
 import core.framework.impl.web.HTTPServerHandler;
-import core.framework.impl.web.bean.BeanValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.route.Path;
@@ -38,15 +36,13 @@ public class WebServiceClient {
 
     private final String serviceURL;
     private final HTTPClient httpClient;
-    private final BeanValidator validator;
     private final RequestBeanMapper mapper;
     private final LogManager logManager;
     private WebServiceClientInterceptor interceptor;
 
-    public WebServiceClient(String serviceURL, HTTPClient httpClient, BeanValidator validator, RequestBeanMapper mapper, LogManager logManager) {
+    public WebServiceClient(String serviceURL, HTTPClient httpClient, RequestBeanMapper mapper, LogManager logManager) {
         this.serviceURL = serviceURL;
         this.httpClient = httpClient;
-        this.validator = validator;
         this.mapper = mapper;
         this.logManager = logManager;
     }
@@ -118,14 +114,10 @@ public class WebServiceClient {
 
     void addRequestBean(HTTPRequest request, HTTPMethod method, Type requestType, Object requestBean) {
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-            Validator validator = this.validator.registerQueryParamBeanType(requestType);
-            validator.validate(requestBean);
-            Map<String, String> queryParams = mapper.toParams(requestBean);
+            Map<String, String> queryParams = mapper.toParams(requestType, requestBean);
             addQueryParams(request, queryParams);
         } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
-            Validator validator = this.validator.registerRequestBeanType(requestType);
-            validator.validate(requestBean);
-            byte[] json = JSONMapper.toJSON(requestBean);
+            byte[] json = mapper.toJSON(requestType, requestBean);
             request.body(json, ContentType.APPLICATION_JSON);
         } else {
             throw Exceptions.error("not supported method, method={}", method);

@@ -3,7 +3,6 @@ package core.framework.impl.web.request;
 import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPMethod;
 import core.framework.api.util.Strings;
-import core.framework.impl.web.bean.BeanValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.impl.web.bean.TestQueryParamBean;
@@ -22,7 +21,7 @@ public class RequestImplTest {
 
     @Before
     public void createRequest() {
-        request = new RequestImpl(null, new BeanValidator(), new RequestBeanMapper());
+        request = new RequestImpl(null, new RequestBeanMapper());
     }
 
     @Test

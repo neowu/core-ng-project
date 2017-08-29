@@ -10,9 +10,6 @@ import core.framework.api.web.MultipartFile;
 import core.framework.api.web.Request;
 import core.framework.api.web.Session;
 import core.framework.api.web.exception.BadRequestException;
-import core.framework.impl.json.JSONMapper;
-import core.framework.impl.validate.Validator;
-import core.framework.impl.web.bean.BeanValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
@@ -33,7 +30,6 @@ public final class RequestImpl implements Request {
     final Map<String, MultipartFile> files = Maps.newHashMap();
 
     private final HttpServerExchange exchange;
-    private final BeanValidator validator;
     private final RequestBeanMapper mapper;
     public Session session;
     HTTPMethod method;
@@ -44,9 +40,8 @@ public final class RequestImpl implements Request {
     ContentType contentType;
     byte[] body;
 
-    public RequestImpl(HttpServerExchange exchange, BeanValidator validator, RequestBeanMapper mapper) {
+    public RequestImpl(HttpServerExchange exchange, RequestBeanMapper mapper) {
         this.exchange = exchange;
-        this.validator = validator;
         this.mapper = mapper;
     }
 
@@ -150,12 +145,12 @@ public final class RequestImpl implements Request {
     public <T> T bean(Type beanType) {
         try {
             if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-                return parseQueryParamBean(beanType, queryParams);
+                return mapper.fromParams(beanType, queryParams);
             } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
                 if (!formParams.isEmpty()) {
-                    return parseQueryParamBean(beanType, formParams);
+                    return mapper.fromParams(beanType, formParams);
                 } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
-                    return parseRequestBean(beanType);
+                    return mapper.fromJSON(beanType, body);
                 }
                 throw new BadRequestException("body is missing or unsupported content type, method=" + method + ", contentType=" + contentType);
             } else {
@@ -164,19 +159,5 @@ public final class RequestImpl implements Request {
         } catch (UncheckedIOException e) {
             throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
         }
-    }
-
-    private <T> T parseRequestBean(Type instanceType) {
-        Validator validator = this.validator.registerRequestBeanType(instanceType);
-        T bean = JSONMapper.fromJSON(instanceType, body);
-        validator.validate(bean);
-        return bean;
-    }
-
-    private <T> T parseQueryParamBean(Type instanceType, Map<String, String> params) {
-        Validator validator = this.validator.registerQueryParamBeanType(instanceType);
-        T bean = mapper.fromParams(instanceType, params);
-        validator.validate(bean);
-        return bean;
     }
 }

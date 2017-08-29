@@ -5,7 +5,7 @@ import core.framework.api.util.Types;
 import core.framework.api.web.ResponseImpl;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.LogParam;
-import core.framework.impl.web.bean.BeanValidator;
+import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.request.RequestImpl;
 import io.undertow.io.Sender;
 import org.slf4j.Logger;
@@ -22,9 +22,9 @@ import java.util.Optional;
 class BeanBodyResponseHandler implements BodyHandler {
     private final Logger logger = LoggerFactory.getLogger(BeanBodyResponseHandler.class);
 
-    private final BeanValidator validator;
+    private final ResponseBeanTypeValidator validator;
 
-    BeanBodyResponseHandler(BeanValidator validator) {
+    BeanBodyResponseHandler(ResponseBeanTypeValidator validator) {
         this.validator = validator;
     }
 
@@ -57,6 +57,6 @@ class BeanBodyResponseHandler implements BodyHandler {
             beanType = bean.getClass();
         }
 
-        validator.validateResponseBeanType(beanType);
+        validator.validate(beanType);
     }
 }

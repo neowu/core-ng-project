@@ -4,8 +4,8 @@ import core.framework.api.web.Response;
 import core.framework.api.web.ResponseImpl;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.web.bean.BeanValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.request.RequestParser;
 import core.framework.impl.web.response.ResponseHandler;
@@ -26,8 +26,8 @@ public class HTTPServerHandler implements HttpHandler {
     public static final String HEADER_TRACE = "trace";
     public static final String HEADER_CLIENT = "client";
 
-    public final BeanValidator validator = new BeanValidator();
-    public final RequestBeanMapper mapper = new RequestBeanMapper();
+    public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper();
+    public final ResponseBeanTypeValidator responseBeanTypeValidator = new ResponseBeanTypeValidator();
     public final Route route = new Route();
     public final Interceptors interceptors = new Interceptors();
     public final WebContextImpl webContext = new WebContextImpl();
@@ -42,7 +42,7 @@ public class HTTPServerHandler implements HttpHandler {
     HTTPServerHandler(LogManager logManager, SiteManager siteManager) {
         this.logManager = logManager;
         sessionManager = siteManager.sessionManager;
-        responseHandler = new ResponseHandler(validator, siteManager.templateManager);
+        responseHandler = new ResponseHandler(responseBeanTypeValidator, siteManager.templateManager);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
     }
 
@@ -54,7 +54,7 @@ public class HTTPServerHandler implements HttpHandler {
         }
 
         logManager.begin("=== http transaction begin ===");
-        RequestImpl request = new RequestImpl(exchange, validator, mapper);
+        RequestImpl request = new RequestImpl(exchange, requestBeanMapper);
         try {
             webContext.initialize(request);     // initialize webContext at beginning, the customerErrorHandler in errorHandler may use it if any exception
 

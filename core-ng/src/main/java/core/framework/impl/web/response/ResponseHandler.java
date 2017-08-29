@@ -7,7 +7,7 @@ import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.CookieSpec;
 import core.framework.api.web.ResponseImpl;
-import core.framework.impl.web.bean.BeanValidator;
+import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.site.TemplateManager;
 import io.undertow.server.HttpServerExchange;
@@ -26,7 +26,7 @@ public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
     private final Map<Class<? extends Body>, BodyHandler> handlers = Maps.newHashMap();
 
-    public ResponseHandler(BeanValidator validator, TemplateManager templateManager) {
+    public ResponseHandler(ResponseBeanTypeValidator validator, TemplateManager templateManager) {
         handlers.put(BeanBody.class, new BeanBodyResponseHandler(validator));
         handlers.put(TemplateBody.class, new TemplateBodyResponseHandler(templateManager));
         handlers.put(ByteArrayBody.class, new ByteArrayBodyResponseHandler());

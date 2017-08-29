@@ -11,8 +11,8 @@ import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.validate.type.JAXBTypeValidator;
-import core.framework.impl.web.bean.BeanValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.route.PathPatternValidator;
 
 import java.lang.annotation.Annotation;
@@ -25,13 +25,13 @@ import java.util.Set;
  */
 public class WebServiceInterfaceValidator {
     private final Class<?> serviceInterface;
-    private final BeanValidator validator;
-    private final RequestBeanMapper mapper;
+    private final RequestBeanMapper requestBeanMapper;
+    private final ResponseBeanTypeValidator responseBeanTypeValidator;
 
-    public WebServiceInterfaceValidator(Class<?> serviceInterface, BeanValidator validator, RequestBeanMapper mapper) {
+    public WebServiceInterfaceValidator(Class<?> serviceInterface, RequestBeanMapper requestBeanMapper, ResponseBeanTypeValidator responseBeanTypeValidator) {
         this.serviceInterface = serviceInterface;
-        this.validator = validator;
-        this.mapper = mapper;
+        this.requestBeanMapper = requestBeanMapper;
+        this.responseBeanTypeValidator = responseBeanTypeValidator;
     }
 
     public void validate() {
@@ -73,10 +73,9 @@ public class WebServiceInterfaceValidator {
                 requestBeanType = paramType;
 
                 if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
-                    validator.registerQueryParamBeanType(requestBeanType);
-                    mapper.registerQueryParamBeanType(requestBeanType);
+                    requestBeanMapper.registerQueryParamBean(requestBeanType);
                 } else {
-                    validator.registerRequestBeanType(requestBeanType);
+                    requestBeanMapper.registerRequestBean(requestBeanType);
                 }
             }
         }
@@ -129,7 +128,7 @@ public class WebServiceInterfaceValidator {
 
     private void validateResponseBeanType(Type responseBeanType) {
         if (void.class == responseBeanType) return;
-        validator.validateResponseBeanType(responseBeanType);
+        responseBeanTypeValidator.validate(responseBeanType);
     }
 
     private void validateHTTPMethod(Method method) {
