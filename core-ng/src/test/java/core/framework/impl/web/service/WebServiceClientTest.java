@@ -1,8 +1,13 @@
 package core.framework.impl.web.service;
 
+import core.framework.api.http.ContentType;
+import core.framework.api.http.HTTPMethod;
 import core.framework.api.http.HTTPRequest;
 import core.framework.api.util.Maps;
 import core.framework.api.validate.ValidationException;
+import core.framework.impl.json.JSONMapper;
+import core.framework.impl.web.bean.BeanValidator;
+import core.framework.impl.web.bean.QueryParamBeanMappers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,7 +33,7 @@ public class WebServiceClientTest {
 
     @Before
     public void prepare() {
-        webServiceClient = new WebServiceClient("http://localhost", null, null, null, null);
+        webServiceClient = new WebServiceClient("http://localhost", null, new BeanValidator(), new QueryParamBeanMappers(), null);
         request = Mockito.mock(HTTPRequest.class);
     }
 
@@ -63,5 +68,23 @@ public class WebServiceClientTest {
         exception.expectMessage("name=id");
 
         webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", ""));
+    }
+
+    @Test
+    public void addRequestBeanWithGet() {
+        TestWebService.TestSearchRequest requestBean = new TestWebService.TestSearchRequest();
+        requestBean.intField = 23;
+        webServiceClient.addRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
+
+        verify(request).addParam("int_field", "23");
+    }
+
+    @Test
+    public void addRequestBeanWithPost() {
+        TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
+        requestBean.stringField = "value";
+        webServiceClient.addRequestBean(request, HTTPMethod.POST, TestWebService.TestRequest.class, requestBean);
+
+        verify(request).body(JSONMapper.toJSON(requestBean), ContentType.APPLICATION_JSON);
     }
 }

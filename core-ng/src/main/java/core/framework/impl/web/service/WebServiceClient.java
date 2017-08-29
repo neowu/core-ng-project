@@ -95,27 +95,11 @@ public class WebServiceClient {
     public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {
         HTTPRequest request = new HTTPRequest(method, serviceURL);
         request.accept(ContentType.APPLICATION_JSON);
-
-        if (logManager.appName != null) {
-            request.header(HTTPServerHandler.HEADER_CLIENT, logManager.appName);
-        }
-
+        if (logManager.appName != null) request.header(HTTPServerHandler.HEADER_CLIENT, logManager.appName);
         linkContext(request);
 
         if (requestType != null) {
-            if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-                Validator validator = this.validator.registerQueryParamBeanType(requestType);
-                validator.validate(requestBean);
-                Map<String, String> queryParams = queryParamBeanMappers.toParams(requestBean);
-                addQueryParams(request, queryParams);
-            } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
-                Validator validator = this.validator.registerRequestBeanType(requestType);
-                validator.validate(requestBean);
-                byte[] json = JSONMapper.toJSON(requestBean);
-                request.body(json, ContentType.APPLICATION_JSON);
-            } else {
-                throw Exceptions.error("not supported method, method={}", method);
-            }
+            addRequestBean(request, method, requestType, requestBean);
         }
 
         if (interceptor != null) {
@@ -124,12 +108,27 @@ public class WebServiceClient {
         }
 
         HTTPResponse response = httpClient.execute(request);
-
         validateResponse(response);
         if (void.class != responseType) {
             return JSONMapper.fromJSON(responseType, response.body());
         } else {
             return null;
+        }
+    }
+
+    void addRequestBean(HTTPRequest request, HTTPMethod method, Type requestType, Object requestBean) {
+        if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
+            Validator validator = this.validator.registerQueryParamBeanType(requestType);
+            validator.validate(requestBean);
+            Map<String, String> queryParams = queryParamBeanMappers.toParams(requestBean);
+            addQueryParams(request, queryParams);
+        } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
+            Validator validator = this.validator.registerRequestBeanType(requestType);
+            validator.validate(requestBean);
+            byte[] json = JSONMapper.toJSON(requestBean);
+            request.body(json, ContentType.APPLICATION_JSON);
+        } else {
+            throw Exceptions.error("not supported method, method={}", method);
         }
     }
 

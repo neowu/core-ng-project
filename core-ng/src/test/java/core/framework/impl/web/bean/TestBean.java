@@ -4,6 +4,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlEnumValue;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -29,6 +30,9 @@ public class TestBean {
 
     @XmlElement(name = "int_field")
     public Integer intField;
+
+    @XmlElement(name = "big_decimal_field")
+    public BigDecimal bigDecimalField;
 
     @XmlElement(name = "list_field")
     public List<String> listField;
