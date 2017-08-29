@@ -17,16 +17,16 @@ import static core.framework.impl.asm.Literal.variable;
 /**
  * @author neo
  */
-class QueryParamBeanMapperBuilder<T> {
-    private final String helper = QueryParamBeanMapperHelper.class.getCanonicalName();
+class QueryParamMapperBuilder<T> {
+    private final String helper = QueryParamMapperHelper.class.getCanonicalName();
     private final Class<T> beanClass;
 
-    QueryParamBeanMapperBuilder(Class<T> beanClass) {
+    QueryParamMapperBuilder(Class<T> beanClass) {
         this.beanClass = beanClass;
     }
 
-    public QueryParamBeanMapper<T> build() {
-        DynamicInstanceBuilder<QueryParamBeanMapper<T>> builder = new DynamicInstanceBuilder<>(QueryParamBeanMapper.class, QueryParamBeanMapper.class.getCanonicalName() + "$" + beanClass.getSimpleName());
+    public QueryParamMapper<T> build() {
+        DynamicInstanceBuilder<QueryParamMapper<T>> builder = new DynamicInstanceBuilder<>(QueryParamMapper.class, QueryParamMapper.class.getCanonicalName() + "$" + beanClass.getSimpleName());
         builder.addMethod(toParamsMethod());
         builder.addMethod(toBeanMethod());
         return builder.build();

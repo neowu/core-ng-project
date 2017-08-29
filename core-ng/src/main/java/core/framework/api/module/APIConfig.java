@@ -9,7 +9,7 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.ControllerActionBuilder;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.bean.BeanValidator;
-import core.framework.impl.web.bean.QueryParamBeanMappers;
+import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.service.HTTPMethodHelper;
 import core.framework.impl.web.service.WebServiceClient;
 import core.framework.impl.web.service.WebServiceClientBuilder;
@@ -37,8 +37,8 @@ public final class APIConfig {
     public <T> void service(Class<T> serviceInterface, T service) {
         logger.info("create api service, interface={}", serviceInterface.getCanonicalName());
         BeanValidator validator = context.httpServer.handler.validator;
-        QueryParamBeanMappers queryParamBeanMappers = context.httpServer.handler.queryParamBeanMappers;
-        new WebServiceInterfaceValidator(serviceInterface, validator, queryParamBeanMappers).validate();
+        RequestBeanMapper mapper = context.httpServer.handler.mapper;
+        new WebServiceInterfaceValidator(serviceInterface, validator, mapper).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
 
         Method[] methods = serviceInterface.getDeclaredMethods();
@@ -62,11 +62,11 @@ public final class APIConfig {
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
         logger.info("create api service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         BeanValidator validator = context.httpServer.handler.validator;
-        QueryParamBeanMappers queryParamBeanMappers = context.httpServer.handler.queryParamBeanMappers;
-        new WebServiceInterfaceValidator(serviceInterface, validator, queryParamBeanMappers).validate();
+        RequestBeanMapper mapper = context.httpServer.handler.mapper;
+        new WebServiceInterfaceValidator(serviceInterface, validator, mapper).validate();
 
         HTTPClient httpClient = httpClient();
-        WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator, context.httpServer.handler.queryParamBeanMappers, context.logManager);
+        WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, validator, context.httpServer.handler.mapper, context.logManager);
         T client = createWebServiceClient(serviceInterface, webServiceClient);
         context.beanFactory.bind(serviceInterface, null, client);
         return new APIClientConfig(webServiceClient);

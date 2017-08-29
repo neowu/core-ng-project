@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-interface QueryParamBeanMapper<T> {
+interface QueryParamMapper<T> {
     Map<String, String> toParams(T bean);
 
     T fromParams(Map<String, String> params);

@@ -15,12 +15,12 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author neo
  */
-public class QueryParamBeanMapperTest {
-    QueryParamBeanMapper<TestQueryParamBean> mapper;
+public class QueryParamMapperTest {
+    QueryParamMapper<TestQueryParamBean> mapper;
 
     @Before
-    public void createQueryParamBeanMapper() {
-        mapper = new QueryParamBeanMapperBuilder<>(TestQueryParamBean.class).build();
+    public void createMapper() {
+        mapper = new QueryParamMapperBuilder<>(TestQueryParamBean.class).build();
     }
 
     @Test

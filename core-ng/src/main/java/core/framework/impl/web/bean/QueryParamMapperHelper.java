@@ -15,7 +15,7 @@ import java.time.format.DateTimeParseException;
 /**
  * @author neo
  */
-public class QueryParamBeanMapperHelper {   // used by generated QueryParamBeanMapper
+final class QueryParamMapperHelper {   // used by generated QueryParamMapper
     public static String toString(Number value) {
         if (value == null) return null;
         return value.toString();

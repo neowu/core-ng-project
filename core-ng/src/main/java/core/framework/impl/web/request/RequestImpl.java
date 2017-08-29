@@ -13,7 +13,7 @@ import core.framework.api.web.exception.BadRequestException;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.validate.Validator;
 import core.framework.impl.web.bean.BeanValidator;
-import core.framework.impl.web.bean.QueryParamBeanMappers;
+import core.framework.impl.web.bean.RequestBeanMapper;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 
@@ -34,7 +34,7 @@ public final class RequestImpl implements Request {
 
     private final HttpServerExchange exchange;
     private final BeanValidator validator;
-    private final QueryParamBeanMappers queryParamBeanMappers;
+    private final RequestBeanMapper mapper;
     public Session session;
     HTTPMethod method;
     String clientIP;
@@ -44,10 +44,10 @@ public final class RequestImpl implements Request {
     ContentType contentType;
     byte[] body;
 
-    public RequestImpl(HttpServerExchange exchange, BeanValidator validator, QueryParamBeanMappers queryParamBeanMappers) {
+    public RequestImpl(HttpServerExchange exchange, BeanValidator validator, RequestBeanMapper mapper) {
         this.exchange = exchange;
         this.validator = validator;
-        this.queryParamBeanMappers = queryParamBeanMappers;
+        this.mapper = mapper;
     }
 
     @Override
@@ -175,7 +175,7 @@ public final class RequestImpl implements Request {
 
     private <T> T parseQueryParamBean(Type instanceType, Map<String, String> params) {
         Validator validator = this.validator.registerQueryParamBeanType(instanceType);
-        T bean = queryParamBeanMappers.fromParams(instanceType, params);
+        T bean = mapper.fromParams(instanceType, params);
         validator.validate(bean);
         return bean;
     }
