@@ -1,7 +1,8 @@
 ## Change log
-### 4.16.1 (8/29/2017 - )
+### 4.16.1 (8/29/2017 - 9/1/2017)
 * validate: replace validation impl with dynamic code generation
 * kafka: combine json reader/validator into handler, since one topic can only have one message class and there is no rabbitMQ anymore
+* test: added EnumConversionValidator to facilitate verifying view enum to domain enum conversion
 
 ### 4.16.0 (8/23/2017 - 8/29/2017)
 * api: add validation for GET/DELETE body type
