@@ -22,16 +22,16 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
     private final Logger logger = LoggerFactory.getLogger(KafkaMessagePublisher.class);
 
     private final Producer<String, byte[]> producer;
-    private final MessageValidator validator;
+    private final MessageValidator<T> validator;
     private final String topic;
     private final LogManager logManager;
     private final JSONWriter<T> writer;
 
-    public KafkaMessagePublisher(Producer<String, byte[]> producer, MessageValidator validator, String topic, Class<T> messageClass, LogManager logManager) {
+    public KafkaMessagePublisher(Producer<String, byte[]> producer, String topic, Class<T> messageClass, LogManager logManager) {
         this.producer = producer;
-        this.validator = validator;
         this.topic = topic;
         this.logManager = logManager;
+        this.validator = new MessageValidator<>(messageClass);
         writer = JSONWriter.of(messageClass);
     }
 

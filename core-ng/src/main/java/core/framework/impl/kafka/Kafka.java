@@ -30,7 +30,6 @@ public class Kafka {
     private final String name;
     private final LogManager logManager;
     public String uri;
-    public MessageValidator validator = new MessageValidator();
     public Duration maxProcessTime = Duration.ofMinutes(30);
     public int maxPollRecords = 500;    // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
     public int maxPollBytes = 3 * 1024 * 1024;  // get 3M bytes message at max

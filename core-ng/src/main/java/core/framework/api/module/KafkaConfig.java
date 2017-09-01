@@ -49,8 +49,7 @@ public final class KafkaConfig {
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
         if (state.kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
         logger.info("create message publisher, topic={}, messageClass={}, beanName={}", topic, messageClass.getTypeName(), name);
-        state.kafka.validator.register(messageClass);
-        MessagePublisher<T> publisher = new KafkaMessagePublisher<>(state.kafka.producer(), state.kafka.validator, topic, messageClass, context.logManager);
+        MessagePublisher<T> publisher = new KafkaMessagePublisher<>(state.kafka.producer(), topic, messageClass, context.logManager);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
         state.handlerAdded = true;
         return publisher;
@@ -66,7 +65,6 @@ public final class KafkaConfig {
 
     private <T> KafkaConfig subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
         if (state.kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
-        state.kafka.validator.register(messageClass);
         state.kafka.listener().subscribe(topic, messageClass, handler, bulkHandler);
         state.handlerAdded = true;
         return this;

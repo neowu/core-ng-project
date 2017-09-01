@@ -1,15 +1,12 @@
 package core.framework.impl.kafka;
 
-import core.framework.api.kafka.BulkMessageHandler;
 import core.framework.api.kafka.Message;
-import core.framework.api.kafka.MessageHandler;
 import core.framework.api.log.Markers;
 import core.framework.api.util.Charsets;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.StopWatch;
 import core.framework.api.util.Threads;
-import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.LogParam;
@@ -31,29 +28,25 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author neo
  */
 class KafkaMessageListenerThread extends Thread {
+    static double longProcessThreshold(double batchLongProcessThreshold, int recordCount, int totalCount) {
+        return batchLongProcessThreshold * recordCount / totalCount;
+    }
+
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListenerThread.class);
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Consumer<String, byte[]> consumer;
-    private final Map<String, MessageHandler<?>> handlers;
-    private final Map<String, BulkMessageHandler<?>> bulkHandlers;
-    private final Map<String, JSONReader<?>> readers;
-    private final MessageValidator validator;
+    private final Map<String, KafkaMessageListener.MessageHandlerHolder<?>> handlerHolders;
+    private final Map<String, KafkaMessageListener.BulkMessageHandlerHolder<?>> bulkHandlerHolders;
     private final LogManager logManager;
     private final double batchLongProcessThresholdInNano;
 
     KafkaMessageListenerThread(String name, Consumer<String, byte[]> consumer, KafkaMessageListener listener) {
         super(name);
         this.consumer = consumer;
-        handlers = listener.handlers;
-        bulkHandlers = listener.bulkHandlers;
-        readers = listener.readers;
-        validator = listener.kafka.validator;
+        handlerHolders = listener.handlerHolders;
+        bulkHandlerHolders = listener.bulkHandlerHolders;
         logManager = listener.logManager;
         batchLongProcessThresholdInNano = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time of max
-    }
-
-    static double longProcessThreshold(double batchLongProcessThreshold, int recordCount, int totalCount) {
-        return batchLongProcessThreshold * recordCount / totalCount;
     }
 
     @Override
@@ -91,14 +84,14 @@ class KafkaMessageListenerThread extends Thread {
             for (Map.Entry<String, List<ConsumerRecord<String, byte[]>>> entry : messages.entrySet()) {
                 String topic = entry.getKey();
                 List<ConsumerRecord<String, byte[]>> records = entry.getValue();
-                BulkMessageHandler<?> bulkHandler = bulkHandlers.get(topic);
-                if (bulkHandler != null) {
-                    handle(topic, bulkHandler, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
-                    continue;
-                }
-                MessageHandler<?> handler = handlers.get(topic);
-                if (handler != null) {
-                    handle(topic, handler, records, longProcessThreshold(batchLongProcessThresholdInNano, 1, count));
+                KafkaMessageListener.BulkMessageHandlerHolder<?> bulkHandlerHolder = bulkHandlerHolders.get(topic);
+                if (bulkHandlerHolder != null) {
+                    handle(topic, bulkHandlerHolder, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
+                } else {
+                    KafkaMessageListener.MessageHandlerHolder<?> handlerHolder = handlerHolders.get(topic);
+                    if (handlerHolder != null) {
+                        handle(topic, handlerHolder, records, longProcessThreshold(batchLongProcessThresholdInNano, 1, count));
+                    }
                 }
             }
         } finally {
@@ -107,20 +100,18 @@ class KafkaMessageListenerThread extends Thread {
         }
     }
 
-    private <T> void handle(String topic, MessageHandler<T> handler, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
-        @SuppressWarnings("unchecked")
-        JSONReader<T> reader = (JSONReader<T>) readers.get(topic);
+    private <T> void handle(String topic, KafkaMessageListener.MessageHandlerHolder<T> holder, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
         for (ConsumerRecord<String, byte[]> record : records) {
             logManager.begin("=== message handling begin ===");
             ActionLog actionLog = logManager.currentActionLog();
             try {
                 actionLog.action("topic/" + topic);
                 actionLog.context("topic", topic);
-                actionLog.context("handler", handler.getClass().getCanonicalName());
+                actionLog.context("handler", holder.handler.getClass().getCanonicalName());
                 actionLog.context("key", record.key());
                 logger.debug("message={}", LogParam.of(record.value()));
 
-                T message = reader.fromJSON(record.value());
+                T message = holder.reader.fromJSON(record.value());
 
                 Headers headers = record.headers();
                 actionLog.refId(header(headers, KafkaHeaders.HEADER_REF_ID));
@@ -132,9 +123,9 @@ class KafkaMessageListenerThread extends Thread {
                     actionLog.trace = true;
                 }
 
-                validator.validate(message);
+                holder.validator.validate(message);
 
-                handler.handle(record.key(), message);
+                holder.handler.handle(record.key(), message);
             } catch (Throwable e) {
                 logManager.logError(e);
             } finally {
@@ -147,27 +138,25 @@ class KafkaMessageListenerThread extends Thread {
         }
     }
 
-    private <T> void handle(String topic, BulkMessageHandler<T> bulkHandler, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
+    private <T> void handle(String topic, KafkaMessageListener.BulkMessageHandlerHolder<T> holder, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
         logManager.begin("=== message handling begin ===");
         ActionLog actionLog = logManager.currentActionLog();
         try {
-            @SuppressWarnings("unchecked")
-            JSONReader<T> reader = (JSONReader<T>) readers.get(topic);
             actionLog.action("topic/" + topic);
             actionLog.context("topic", topic);
-            actionLog.context("handler", bulkHandler.getClass().getCanonicalName());
+            actionLog.context("handler", holder.handler.getClass().getCanonicalName());
             actionLog.stats("messageCount", records.size());
 
             List<Message<T>> messages = new ArrayList<>(records.size());
             for (ConsumerRecord<String, byte[]> record : records) {
-                T message = reader.fromJSON(record.value());
-                validate(message, record);
+                T message = holder.reader.fromJSON(record.value());
+                validate(holder.validator, message, record);
                 messages.add(new Message<>(record.key(), message));
                 if ("true".equals(header(record.headers(), KafkaHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
                     actionLog.trace = true;
                 }
             }
-            bulkHandler.handle(messages);
+            holder.handler.handle(messages);
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
@@ -185,7 +174,7 @@ class KafkaMessageListenerThread extends Thread {
         return new String(header.value(), Charsets.UTF_8);
     }
 
-    private <T> void validate(T value, ConsumerRecord<String, byte[]> record) {
+    private <T> void validate(MessageValidator<T> validator, T value, ConsumerRecord<String, byte[]> record) {
         try {
             validator.validate(value);
         } catch (Exception e) {

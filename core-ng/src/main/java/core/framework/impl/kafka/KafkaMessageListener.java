@@ -18,9 +18,8 @@ import java.util.Set;
  * @author neo
  */
 public class KafkaMessageListener {
-    final Map<String, MessageHandler<?>> handlers = Maps.newHashMap();
-    final Map<String, BulkMessageHandler<?>> bulkHandlers = Maps.newHashMap();
-    final Map<String, JSONReader<?>> readers = Maps.newHashMap();
+    final Map<String, MessageHandlerHolder<?>> handlerHolders = Maps.newHashMap();
+    final Map<String, BulkMessageHandlerHolder<?>> bulkHandlerHolders = Maps.newHashMap();
     final Kafka kafka;
     final LogManager logManager;
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListener.class);
@@ -38,9 +37,10 @@ public class KafkaMessageListener {
     public <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
         if (topics.contains(topic)) throw Exceptions.error("topic is already subscribed, topic={}", topic);
         topics.add(topic);
-        if (handler != null) handlers.put(topic, handler);
-        if (bulkHandler != null) bulkHandlers.put(topic, bulkHandler);
-        readers.put(topic, JSONReader.of(messageClass));
+        MessageValidator<T> validator = new MessageValidator<>(messageClass);
+        JSONReader<T> reader = JSONReader.of(messageClass);
+        if (handler != null) handlerHolders.put(topic, new MessageHandlerHolder<>(handler, reader, validator));
+        if (bulkHandler != null) bulkHandlerHolders.put(topic, new BulkMessageHandlerHolder<>(bulkHandler, reader, validator));
     }
 
     public void start() {
@@ -60,6 +60,30 @@ public class KafkaMessageListener {
         logger.info("stop kafka listener, name={}, uri={}, topics={}", name, kafka.uri, topics);
         for (KafkaMessageListenerThread thread : listenerThreads) {
             thread.shutdown();
+        }
+    }
+
+    static class BulkMessageHandlerHolder<T> {
+        final BulkMessageHandler<T> handler;
+        final MessageValidator<T> validator;
+        final JSONReader<T> reader;
+
+        BulkMessageHandlerHolder(BulkMessageHandler<T> handler, JSONReader<T> reader, MessageValidator<T> validator) {
+            this.handler = handler;
+            this.validator = validator;
+            this.reader = reader;
+        }
+    }
+
+    static class MessageHandlerHolder<T> {
+        final MessageHandler<T> handler;
+        final MessageValidator<T> validator;
+        final JSONReader<T> reader;
+
+        MessageHandlerHolder(MessageHandler<T> handler, JSONReader<T> reader, MessageValidator<T> validator) {
+            this.handler = handler;
+            this.validator = validator;
+            this.reader = reader;
         }
     }
 }
