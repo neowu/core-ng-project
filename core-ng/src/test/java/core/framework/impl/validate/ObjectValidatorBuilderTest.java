@@ -1,4 +1,4 @@
-package core.framework.impl.validate.v2;
+package core.framework.impl.validate;
 
 import core.framework.api.util.Types;
 import org.junit.Test;

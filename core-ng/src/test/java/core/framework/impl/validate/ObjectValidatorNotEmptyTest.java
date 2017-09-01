@@ -1,4 +1,4 @@
-package core.framework.impl.validate.v2;
+package core.framework.impl.validate;
 
 import core.framework.api.validate.NotEmpty;
 import core.framework.api.validate.NotNull;

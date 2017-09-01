@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-class ValidationErrors {
+public class ValidationErrors {
     public Map<String, String> errors;
 
     public void add(String field, String error) {

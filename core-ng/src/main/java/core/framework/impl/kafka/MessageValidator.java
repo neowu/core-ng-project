@@ -3,7 +3,6 @@ package core.framework.impl.kafka;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.impl.validate.Validator;
-import core.framework.impl.validate.ValidatorBuilder;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.Map;
@@ -17,7 +16,7 @@ public class MessageValidator {
     public void register(Class<?> messageClass) {
         validators.computeIfAbsent(messageClass, key -> {
             new MessageClassValidator(messageClass).validate();
-            return new ValidatorBuilder(key, field -> field.getDeclaredAnnotation(XmlElement.class).name()).build();
+            return new Validator(key, field -> field.getDeclaredAnnotation(XmlElement.class).name());
         });
     }
 

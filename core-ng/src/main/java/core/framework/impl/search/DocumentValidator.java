@@ -1,7 +1,6 @@
 package core.framework.impl.search;
 
 import core.framework.impl.validate.Validator;
-import core.framework.impl.validate.ValidatorBuilder;
 
 import javax.xml.bind.annotation.XmlElement;
 
@@ -12,7 +11,7 @@ final class DocumentValidator<T> {
     private final Validator validator;
 
     DocumentValidator(Class<T> documentClass) {
-        validator = new ValidatorBuilder(documentClass, field -> field.getDeclaredAnnotation(XmlElement.class).name()).build();
+        validator = new Validator(documentClass, field -> field.getDeclaredAnnotation(XmlElement.class).name());
     }
 
     public void validate(T document) {

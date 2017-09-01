@@ -1,4 +1,4 @@
-package core.framework.impl.validate.v2;
+package core.framework.impl.validate;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Lists;
@@ -158,7 +158,7 @@ public class ObjectValidatorBuilder {
         Length length = field.getDeclaredAnnotation(Length.class);
         if (length != null) {
             if (length.min() > -1) builder.indent(2).append("if (bean.{}.length() < {}) errors.add({}, {});\n", field.getName(), length.min(), pathLiteral, variable(length.message()));
-            if (length.max() > -1) builder.indent(2).append("if (bean.{}.length() > {}) errors.add({}, {});\n", field.getName(), length.min(), pathLiteral, variable(length.message()));
+            if (length.max() > -1) builder.indent(2).append("if (bean.{}.length() > {}) errors.add({}, {});\n", field.getName(), length.max(), pathLiteral, variable(length.message()));
         }
 
         Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
