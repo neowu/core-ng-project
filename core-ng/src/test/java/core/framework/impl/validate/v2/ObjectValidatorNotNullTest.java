@@ -1,44 +1,53 @@
-package core.framework.impl.validate;
+package core.framework.impl.validate.v2;
 
 import core.framework.api.util.Lists;
+import core.framework.api.util.Maps;
 import core.framework.api.validate.NotNull;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author neo
  */
-public class NotNullValidatorTest {
+public class ObjectValidatorNotNullTest {
+    ObjectValidator validator;
+
+    @Before
+    public void createObjectValidator() {
+        validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
+    }
+
     @Test
     public void validate() {
-        Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
-
         Bean bean = new Bean();
         bean.child = new ChildBean();
         bean.children = Lists.newArrayList(bean.child);
+        bean.childMap = Maps.newHashMap("child1", bean.child);
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
-        Assert.assertTrue(errors.hasError());
-        assertEquals(4, errors.errors.size());
+        assertTrue(errors.hasError());
+        assertEquals(5, errors.errors.size());
         assertThat(errors.errors.get("stringField"), containsString("stringField"));
         assertThat(errors.errors.get("booleanField"), containsString("booleanField"));
         assertThat(errors.errors.get("child.intField"), containsString("intField"));
         assertThat(errors.errors.get("children.intField"), containsString("intField"));
+        assertThat(errors.errors.get("childMap.intField"), containsString("intField"));
     }
 
     @Test
     public void partialValidate() {
-        Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
-
         Bean bean = new Bean();
 
         ValidationErrors errors = new ValidationErrors();
@@ -56,6 +65,8 @@ public class NotNullValidatorTest {
         @NotNull
         public ChildBean child;
         public List<ChildBean> children;
+        @NotNull
+        public Map<String, ChildBean> childMap;
     }
 
     static class ChildBean {

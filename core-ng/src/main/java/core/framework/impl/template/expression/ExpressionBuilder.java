@@ -1,7 +1,6 @@
 package core.framework.impl.template.expression;
 
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.Strings;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.CodeCompileException;
 import core.framework.impl.asm.DynamicInstanceBuilder;
@@ -42,7 +41,7 @@ public class ExpressionBuilder {
             builder.addMethod(buildEval());
             return builder.build();
         } catch (CodeCompileException e) {
-            throw new Error(Strings.format("failed to compile expression, expression={}, location={}", expressionSource, location), e);
+            throw Exceptions.error("failed to compile expression, expression={}, location={}", expressionSource, location, e);
         }
     }
 
@@ -87,8 +86,8 @@ public class ExpressionBuilder {
         try {
             return modelClass.getField(fieldName).getGenericType();
         } catch (NoSuchFieldException e) {
-            throw new Error(Strings.format("can not find field, class={}, field={}, expression={}, location={}",
-                    modelClass, fieldName, expressionSource, location), e);
+            throw Exceptions.error("can not find field, class={}, field={}, expression={}, location={}",
+                    modelClass, fieldName, expressionSource, location, e);
         }
     }
 

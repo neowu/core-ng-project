@@ -26,4 +26,32 @@ public final class Literal {
             return GenericTypes.rawClass(type).getCanonicalName() + ".class";
         }
     }
+
+    public static String variable(String text) {
+        if (text == null) return "null";
+
+        StringBuilder builder = new StringBuilder("\"");
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            switch (ch) {
+                case '\n':
+                    builder.append("\\n");
+                    break;
+                case '\r':
+                    builder.append("\\r");
+                    break;
+                case '"':
+                    builder.append("\\\"");
+                    break;
+                case '\\':
+                    builder.append("\\\\");
+                    break;
+                default:
+                    builder.append(ch);
+                    break;
+            }
+        }
+        builder.append('\"');
+        return builder.toString();
+    }
 }

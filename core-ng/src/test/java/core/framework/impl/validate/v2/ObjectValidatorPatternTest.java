@@ -1,45 +1,45 @@
-package core.framework.impl.validate;
+package core.framework.impl.validate.v2;
 
-import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author neo
  */
-public class PatternValidatorTest {
-    Validator validator;
+public class ObjectValidatorPatternTest {
+    ObjectValidator validator;
 
     @Before
-    public void createValidator() {
-        validator = new ValidatorBuilder(Bean.class, Field::getName).build();
+    public void createObjectValidator() {
+        validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
     }
 
     @Test
     public void valid() {
         Bean bean = new Bean();
         bean.field1 = "abc-def";
-        validator.validate(bean);
+
+        ValidationErrors errors = new ValidationErrors();
+        validator.validate(bean, errors, false);
+        assertFalse(errors.hasError());
     }
 
     @Test
     public void invalid() {
         Bean bean = new Bean();
         bean.field1 = "ABC-DEF";
-        bean.field2 = Lists.newArrayList("a001");
-        bean.field3 = Maps.newHashMap("key", "A001");
+        bean.field2 = "a001";
+        bean.field3 = "A001";
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
@@ -56,9 +56,9 @@ public class PatternValidatorTest {
         public String field1;
 
         @Pattern("[a-z0-9]{0,20}")
-        public List<String> field2;
+        public String field2;
 
         @Pattern(value = "[a-z0-9]+", message = "field3 must be [a-z0-9]+")
-        public Map<String, String> field3;
+        public String field3;
     }
 }

@@ -8,7 +8,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * used for String field, to check string is not empty, be aware of null is not treated as empty,
- * this is to validate if the value is presented, it must not be empty string
+ * this is to validate if the value presents, it must not be empty string
  *
  * @author neo
  */

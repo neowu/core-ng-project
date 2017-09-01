@@ -1,8 +1,8 @@
-package core.framework.impl.validate;
+package core.framework.impl.validate.v2;
 
 import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -10,15 +10,21 @@ import java.lang.reflect.Field;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author neo
  */
-public class LengthValidatorTest {
+public class ObjectValidatorLengthTest {
+    ObjectValidator validator;
+
+    @Before
+    public void createObjectValidator() {
+        validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
+    }
+
     @Test
     public void validate() {
-        Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
-
         Bean bean = new Bean();
         bean.field1 = "123456";
         bean.field2 = "1";
@@ -26,7 +32,7 @@ public class LengthValidatorTest {
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
-        Assert.assertTrue(errors.hasError());
+        assertTrue(errors.hasError());
         assertEquals(2, errors.errors.size());
         assertThat(errors.errors.get("field1"), containsString("field1"));
         assertThat(errors.errors.get("field2"), containsString("field2"));
@@ -34,15 +40,13 @@ public class LengthValidatorTest {
 
     @Test
     public void partialValidate() {
-        Validator validator = new ValidatorBuilder(Bean.class, Field::getName).build();
-
         Bean bean = new Bean();
         bean.field1 = "123456";
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, true);
 
-        Assert.assertTrue(errors.hasError());
+        assertTrue(errors.hasError());
         assertEquals(1, errors.errors.size());
         assertThat(errors.errors.get("field1"), containsString("field1"));
     }
@@ -54,7 +58,7 @@ public class LengthValidatorTest {
         @NotNull
         @Length(min = 5, message = "field2 must be longer than 5")
         public String field2;
-        @Length(min = 5, message = "optionalField1 must be longer than 5")
-        public String optionalField1;
+        @Length(min = 5, message = "field3 must be longer than 5")
+        public String field3;
     }
 }
