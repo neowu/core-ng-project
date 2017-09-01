@@ -1,4 +1,6 @@
 ## Change log
+### 4.16.2 (9/1/2017 - )
+
 ### 4.16.1 (8/29/2017 - 9/1/2017)
 * validate: replace validation impl with dynamic code generation
 * kafka: combine json reader/validator into handler, since one topic can only have one message class and there is no rabbitMQ anymore

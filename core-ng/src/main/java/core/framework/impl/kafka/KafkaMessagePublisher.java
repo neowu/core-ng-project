@@ -45,8 +45,8 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
         validator.validate(value);
 
         StopWatch watch = new StopWatch();
+        byte[] message = writer.toJSON(value);
         try {
-            byte[] message = writer.toJSON(value);
 
             ProducerRecord<String, byte[]> record = new ProducerRecord<>(topic, key, message);
             Headers headers = record.headers();
@@ -54,13 +54,11 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
             if (logManager.appName != null)
                 headers.add(KafkaHeaders.HEADER_CLIENT, Strings.bytes(logManager.appName));
             linkContext(headers);
-
-            logger.debug("publish, topic={}, key={}, message={}", topic, key, LogParam.of(message));
             producer.send(record);
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("kafka", elapsedTime);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
-            logger.debug("publish, topic={}, key={}, elapsedTime={}", topic, key, elapsedTime);
+            logger.debug("publish, topic={}, key={}, message={}, elapsedTime={}", topic, key, LogParam.of(message), elapsedTime);
         }
     }
 
