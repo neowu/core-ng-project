@@ -41,11 +41,13 @@ public class OracleDialect implements Dialect {
     @Override
     public Object[] fetchParams(List<Object> params, Integer skip, Integer limit) {
         int skipValue = skip == null ? 0 : skip;
-        if (params.isEmpty()) return new Object[]{skipValue + limit, skipValue};
+        int fromRowNum = skipValue + 1;
+        int toRowNum = skipValue + limit;
+        if (params.isEmpty()) return new Object[]{toRowNum, fromRowNum};
         int length = params.size();
         Object[] results = params.toArray(new Object[params.size() + 2]);
-        results[length] = skipValue + limit;
-        results[length + 1] = skipValue + 1;
+        results[length] = toRowNum;
+        results[length + 1] = fromRowNum;
         return results;
     }
 }

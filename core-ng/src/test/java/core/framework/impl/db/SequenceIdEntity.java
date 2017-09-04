@@ -17,4 +17,7 @@ public class SequenceIdEntity {
     @Length(max = 20)
     @Column(name = "string_field")
     public String stringField;
+
+    @Column(name = "long_field")
+    public Long longField;
 }
