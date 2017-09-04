@@ -71,7 +71,7 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("}\n");
 
         builder.indent(1).append("if (currentType != null && currentType != org.bson.BsonType.DOCUMENT) {\n");
-        builder.indent(2).append("logger.warn(\"unexpected field type, field={}, type={}\", parentField, currentType);\n");
+        builder.indent(2).append("logger.warn({}, parentField, currentType);\n", variable("unexpected field type, field={}, type={}"));
         builder.indent(2).append("reader.skipValue();\n");
         builder.indent(2).append("return null;\n");
         builder.indent(1).append("}\n");
@@ -87,7 +87,7 @@ final class EntityDecoderBuilder<T> {
             decodeEntityField(builder, field);
         }
 
-        builder.indent(2).append("logger.warn(\"undefined field, field={}, type={}\", fieldPath, reader.getCurrentBsonType());\n");
+        builder.indent(2).append("logger.warn({}, fieldPath, reader.getCurrentBsonType());\n", variable("undefined field, field={}, type={}"));
         builder.indent(2).append("reader.skipValue();\n");
         builder.indent(1).append("}\n");
 
@@ -154,7 +154,7 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("org.bson.BsonType currentType = reader.getCurrentBsonType();\n");
         builder.indent(1).append("if (currentType == org.bson.BsonType.NULL) { reader.readNull(); return null; }\n");
         builder.indent(1).append("if (currentType != org.bson.BsonType.DOCUMENT) {\n");
-        builder.indent(2).append("logger.warn(\"unexpected field type, field={}, type={}\", parentField, currentType);\n");
+        builder.indent(2).append("logger.warn({}, parentField, currentType);\n", variable("unexpected field type, field={}, type={}"));
         builder.indent(2).append("reader.skipValue();\n");
         builder.indent(2).append("return null;\n");
         builder.indent(1).append("}\n");
@@ -214,7 +214,7 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("}\n");
 
         builder.indent(1).append("if (currentType != org.bson.BsonType.ARRAY) {\n");
-        builder.indent(2).append("logger.warn(\"unexpected field type, field={}, type={}\", fieldPath, currentType);\n");
+        builder.indent(2).append("logger.warn({}, fieldPath, currentType);\n", variable("unexpected field type, field={}, type={}"));
         builder.indent(2).append("reader.skipValue();\n");
         builder.indent(2).append("return null;\n");
         builder.indent(1).append("}\n");

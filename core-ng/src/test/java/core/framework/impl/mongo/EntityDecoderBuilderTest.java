@@ -46,6 +46,7 @@ public class EntityDecoderBuilderTest {
         StringBuilder stringBuilder = new StringBuilder();
         builder.fields.forEach(stringBuilder::append);
         builder.methods.values().forEach(stringBuilder::append);
+        stringBuilder.append('\n');
 
         assertEquals(code, stringBuilder.toString());
     }

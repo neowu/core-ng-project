@@ -1,24 +1,24 @@
 private final core.framework.impl.mongo.EnumCodec core_framework_impl_mongo_TestEntityChild_TestEnumCodec = new core.framework.impl.mongo.EnumCodec(core.framework.impl.mongo.TestEntityChild.TestEnum.class);
-private void encode_java_util_List_java_lang_String(org.bson.BsonWriter writer, java.util.List list) {
+private void encode_list_java_lang_String(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.List list) {
     writer.writeStartArray();
     for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
         java.lang.String value = (java.lang.String) iterator.next();
-        core.framework.impl.mongo.EntityCodecHelper.writeString(writer, value);
+        wrapper.write(value);
     }
     writer.writeEndArray();
 }
-private void encode_java_util_Map_java_lang_String(org.bson.BsonWriter writer, java.util.Map map) {
+private void encode_map_java_lang_String(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.Map map) {
     writer.writeStartDocument();
     for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
         java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
         String key = (String) entry.getKey();
         java.lang.String value = (java.lang.String) entry.getValue();
         writer.writeName(key);
-        core.framework.impl.mongo.EntityCodecHelper.writeString(writer, value);
+        wrapper.write(value);
     }
     writer.writeEndDocument();
 }
-private void encode_java_util_List_core_framework_impl_mongo_TestEntityChild_TestEnum(org.bson.BsonWriter writer, java.util.List list) {
+private void encode_list_core_framework_impl_mongo_TestEntityChild_TestEnum(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.List list) {
     writer.writeStartArray();
     for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
         core.framework.impl.mongo.TestEntityChild.TestEnum value = (core.framework.impl.mongo.TestEntityChild.TestEnum) iterator.next();
@@ -26,29 +26,29 @@ private void encode_java_util_List_core_framework_impl_mongo_TestEntityChild_Tes
     }
     writer.writeEndArray();
 }
-private void encode_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWriter writer, core.framework.impl.mongo.TestEntityChild entity) {
+private void encode_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, core.framework.impl.mongo.TestEntityChild entity) {
     writer.writeStartDocument();
     writer.writeName("boolean_field");
-    core.framework.impl.mongo.EntityCodecHelper.writeBoolean(writer, entity.booleanField);
+    wrapper.write(entity.booleanField);
     writer.writeName("enum_field");
     core_framework_impl_mongo_TestEntityChild_TestEnumCodec.encode(writer, entity.enumField, null);
     writer.writeName("enum_list_field");
     if (entity.enumListField == null) writer.writeNull();
-    else encode_java_util_List_core_framework_impl_mongo_TestEntityChild_TestEnum(writer, entity.enumListField);
+    else encode_list_core_framework_impl_mongo_TestEntityChild_TestEnum(writer, wrapper, entity.enumListField);
     writer.writeName("ref_id_field");
-    core.framework.impl.mongo.EntityCodecHelper.writeObjectId(writer, entity.refId);
+    wrapper.write(entity.refId);
     writer.writeEndDocument();
 }
-private void encode_java_util_List_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWriter writer, java.util.List list) {
+private void encode_list_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.List list) {
     writer.writeStartArray();
     for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
         core.framework.impl.mongo.TestEntityChild value = (core.framework.impl.mongo.TestEntityChild) iterator.next();
         if (value == null) writer.writeNull();
-        else encode_core_framework_impl_mongo_TestEntityChild(writer, value);
+        else encode_core_framework_impl_mongo_TestEntityChild(writer, wrapper, value);
     }
     writer.writeEndArray();
 }
-private void encode_java_util_Map_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWriter writer, java.util.Map map) {
+private void encode_map_core_framework_impl_mongo_TestEntityChild(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.Map map) {
     writer.writeStartDocument();
     for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
         java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
@@ -56,44 +56,49 @@ private void encode_java_util_Map_core_framework_impl_mongo_TestEntityChild(org.
         core.framework.impl.mongo.TestEntityChild value = (core.framework.impl.mongo.TestEntityChild) entry.getValue();
         writer.writeName(key);
         if (value == null) writer.writeNull();
-        else encode_core_framework_impl_mongo_TestEntityChild(writer, value);
+        else encode_core_framework_impl_mongo_TestEntityChild(writer, wrapper, value);
     }
     writer.writeEndDocument();
 }
-private void encode_core_framework_impl_mongo_TestEntity(org.bson.BsonWriter writer, core.framework.impl.mongo.TestEntity entity) {
+private void encode_core_framework_impl_mongo_TestEntity(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, core.framework.impl.mongo.TestEntity entity) {
     writer.writeStartDocument();
     writer.writeName("_id");
-    core.framework.impl.mongo.EntityCodecHelper.writeObjectId(writer, entity.id);
+    wrapper.write(entity.id);
     writer.writeName("int_field");
-    core.framework.impl.mongo.EntityCodecHelper.writeInteger(writer, entity.intField);
+    wrapper.write(entity.intField);
     writer.writeName("double_field");
-    core.framework.impl.mongo.EntityCodecHelper.writeDouble(writer, entity.doubleField);
+    wrapper.write(entity.doubleField);
+    writer.writeName("long_field");
+    wrapper.write(entity.longField);
+    writer.writeName("boolean_field");
+    wrapper.write(entity.booleanField);
     writer.writeName("date_field");
-    core.framework.impl.mongo.EntityCodecHelper.writeLocalDateTime(writer, entity.dateField);
+    wrapper.write(entity.dateField);
     writer.writeName("zoned_date_time_field");
-    core.framework.impl.mongo.EntityCodecHelper.writeZonedDateTime(writer, entity.zonedDateTimeField);
+    wrapper.write(entity.zonedDateTimeField);
     writer.writeName("string_field");
-    core.framework.impl.mongo.EntityCodecHelper.writeString(writer, entity.stringField);
+    wrapper.write(entity.stringField);
     writer.writeName("list_field");
     if (entity.listField == null) writer.writeNull();
-    else encode_java_util_List_java_lang_String(writer, entity.listField);
+    else encode_list_java_lang_String(writer, wrapper, entity.listField);
     writer.writeName("map_field");
     if (entity.mapField == null) writer.writeNull();
-    else encode_java_util_Map_java_lang_String(writer, entity.mapField);
+    else encode_map_java_lang_String(writer, wrapper, entity.mapField);
     writer.writeName("child");
     if (entity.child == null) writer.writeNull();
-    else encode_core_framework_impl_mongo_TestEntityChild(writer, entity.child);
+    else encode_core_framework_impl_mongo_TestEntityChild(writer, wrapper, entity.child);
     writer.writeName("children");
     if (entity.children == null) writer.writeNull();
-    else encode_java_util_List_core_framework_impl_mongo_TestEntityChild(writer, entity.children);
+    else encode_list_core_framework_impl_mongo_TestEntityChild(writer, wrapper, entity.children);
     writer.writeName("children_map");
     if (entity.childrenMap == null) writer.writeNull();
-    else encode_java_util_Map_core_framework_impl_mongo_TestEntityChild(writer, entity.childrenMap);
+    else encode_map_core_framework_impl_mongo_TestEntityChild(writer, wrapper, entity.childrenMap);
     writer.writeName("null_child");
     if (entity.nullChild == null) writer.writeNull();
-    else encode_core_framework_impl_mongo_TestEntityChild(writer, entity.nullChild);
+    else encode_core_framework_impl_mongo_TestEntityChild(writer, wrapper, entity.nullChild);
     writer.writeEndDocument();
 }
 public void encode(org.bson.BsonWriter writer, Object entity) {
-    encode_core_framework_impl_mongo_TestEntity(writer, (core.framework.impl.mongo.TestEntity) entity);
+    core.framework.impl.mongo.BsonWriterWrapper wrapper = new core.framework.impl.mongo.BsonWriterWrapper(writer);
+    encode_core_framework_impl_mongo_TestEntity(writer, wrapper, (core.framework.impl.mongo.TestEntity) entity);
 }

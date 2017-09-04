@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static core.framework.impl.asm.Literal.type;
+
 /**
  * @author neo
  */
@@ -27,7 +29,6 @@ final class EntityEncoderBuilder<T> {
     final Set<Class<? extends Enum<?>>> enumClasses = Sets.newHashSet();
     final List<String> fields = Lists.newArrayList();
     private final Class<T> entityClass;
-    private final String helper = EntityCodecHelper.class.getCanonicalName();
 
     EntityEncoderBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -43,9 +44,11 @@ final class EntityEncoderBuilder<T> {
 
     private void buildMethods() {
         String methodName = encodeEntityMethod(entityClass);
-        CodeBuilder builder = new CodeBuilder().append("public void encode(org.bson.BsonWriter writer, Object entity) {\n")
-                                               .indent(1).append("{}(writer, ({}) entity);\n", methodName, entityClass.getCanonicalName())
-                                               .append("}");
+        CodeBuilder builder = new CodeBuilder();
+        builder.append("public void encode(org.bson.BsonWriter writer, Object entity) {\n")
+               .indent(1).append("{} wrapper = new {}(writer);\n", type(BsonWriterWrapper.class), type(BsonWriterWrapper.class))
+               .indent(1).append("{}(writer, wrapper, ({}) entity);\n", methodName, entityClass.getCanonicalName())
+               .append("}");
 
         methods.put("encode", builder.build());
     }
@@ -55,7 +58,8 @@ final class EntityEncoderBuilder<T> {
         String methodName = "encode_" + entityClassName.replace('.', '_');
         if (methods.containsKey(methodName)) return methodName;
 
-        CodeBuilder builder = new CodeBuilder().append("private void {}(org.bson.BsonWriter writer, {} entity) {\n", methodName, entityClassName);
+        CodeBuilder builder = new CodeBuilder();
+        builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, {} entity) {\n", methodName, type(BsonWriterWrapper.class), entityClassName);
         builder.indent(1).append("writer.writeStartDocument();\n");
         for (Field field : Classes.instanceFields(entityClass)) {
             Type fieldType = field.getGenericType();
@@ -77,11 +81,11 @@ final class EntityEncoderBuilder<T> {
 
     private String encodeListMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("encode_" + List.class.getCanonicalName() + "_" + valueClassName).replace('.', '_');
+        String methodName = ("encode_list_" + valueClassName).replace('.', '_');
         if (methods.containsKey(methodName)) return methodName;
 
         CodeBuilder builder = new CodeBuilder();
-        builder.append("private void {}(org.bson.BsonWriter writer, java.util.List list) {\n", methodName);
+        builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, java.util.List list) {\n", methodName, type(BsonWriterWrapper.class));
         builder.indent(1).append("writer.writeStartArray();\n")
                .indent(1).append("for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {\n")
                .indent(2).append("{} value = ({}) iterator.next();\n", valueClassName, valueClassName);
@@ -98,11 +102,11 @@ final class EntityEncoderBuilder<T> {
 
     private String encodeMapMethod(Class<?> valueClass) {
         String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("encode_" + Map.class.getCanonicalName() + "_" + valueClassName).replace('.', '_');
+        String methodName = ("encode_map_" + valueClassName).replace('.', '_');
         if (methods.containsKey(methodName)) return methodName;
 
         CodeBuilder builder = new CodeBuilder();
-        builder.append("private void {}(org.bson.BsonWriter writer, java.util.Map map) {\n", methodName);
+        builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, java.util.Map map) {\n", methodName, type(BsonWriterWrapper.class));
         builder.indent(1).append("writer.writeStartDocument();\n")
                .indent(1).append("for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {\n")
                .indent(2).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
@@ -123,37 +127,28 @@ final class EntityEncoderBuilder<T> {
     private void encodeField(CodeBuilder builder, String fieldVariable, Type fieldType, int indent) {
         Class<?> fieldClass = GenericTypes.rawClass(fieldType);
 
-        if (String.class.equals(fieldClass)) {
-            builder.indent(indent).append("{}.writeString(writer, {});\n", helper, fieldVariable);
-        } else if (Integer.class.equals(fieldClass)) {
-            builder.indent(indent).append("{}.writeInteger(writer, {});\n", helper, fieldVariable);
-        } else if (Long.class.equals(fieldClass)) {
-            builder.indent(indent).append("{}.writeLong(writer, {});\n", helper, fieldVariable);
-        } else if (LocalDateTime.class.equals(fieldClass)) {
-            builder.indent(indent).append("{}.writeLocalDateTime(writer, {});\n", helper, fieldVariable);
-        } else if (ZonedDateTime.class.equals(fieldClass)) {
-            builder.indent(indent).append("{}.writeZonedDateTime(writer, {});\n", helper, fieldVariable);
+        if (String.class.equals(fieldClass)
+                || Number.class.isAssignableFrom(fieldClass)
+                || LocalDateTime.class.equals(fieldClass)
+                || ZonedDateTime.class.equals(fieldClass)
+                || Boolean.class.equals(fieldClass)
+                || ObjectId.class.equals(fieldClass)) {
+            builder.indent(indent).append("wrapper.write({});\n", fieldVariable);
         } else if (fieldClass.isEnum()) {
             String enumCodecVariable = registerEnumCodec(fieldClass);
             builder.indent(indent).append("{}.encode(writer, {}, null);\n", enumCodecVariable, fieldVariable);
-        } else if (Double.class.equals(fieldClass)) {
-            builder.indent(indent).append("{}.writeDouble(writer, {});\n", helper, fieldVariable);
-        } else if (Boolean.class.equals(fieldClass)) {
-            builder.indent(indent).append("{}.writeBoolean(writer, {});\n", helper, fieldVariable);
-        } else if (ObjectId.class.equals(fieldClass)) {
-            builder.indent(indent).append("{}.writeObjectId(writer, {});\n", helper, fieldVariable);
         } else if (GenericTypes.isGenericList(fieldType)) {
             String methodName = encodeListMethod(GenericTypes.listValueClass(fieldType));
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
-            builder.indent(indent).append("else {}(writer, {});\n", methodName, fieldVariable);
+            builder.indent(indent).append("else {}(writer, wrapper, {});\n", methodName, fieldVariable);
         } else if (GenericTypes.isGenericStringMap(fieldType)) {
             String methodName = encodeMapMethod(GenericTypes.mapValueClass(fieldType));
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
-            builder.indent(indent).append("else {}(writer, {});\n", methodName, fieldVariable);
+            builder.indent(indent).append("else {}(writer, wrapper, {});\n", methodName, fieldVariable);
         } else {
             String encodeFieldMethod = encodeEntityMethod(fieldClass);
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
-            builder.indent(indent).append("else {}(writer, {});\n", encodeFieldMethod, fieldVariable);
+            builder.indent(indent).append("else {}(writer, wrapper, {});\n", encodeFieldMethod, fieldVariable);
         }
     }
 
@@ -163,10 +158,10 @@ final class EntityEncoderBuilder<T> {
         String fieldVariable = fieldClass.getCanonicalName().replace('.', '_') + "Codec";
         if (added) {
             String field = Strings.format("private final {} {} = new {}({}.class);\n",
-                EnumCodec.class.getCanonicalName(),
-                fieldVariable,
-                EnumCodec.class.getCanonicalName(),
-                fieldClass.getCanonicalName());
+                    type(EnumCodec.class),
+                    fieldVariable,
+                    type(EnumCodec.class),
+                    fieldClass.getCanonicalName());
             fields.add(field);
         }
         return fieldVariable;

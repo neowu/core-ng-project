@@ -36,6 +36,8 @@ public class EntityEncoderBuilderTest {
         StringWriter writer = new StringWriter();
         TestEntity entity = new TestEntity();
         entity.id = new ObjectId("5627b47d54b92d03adb9e9cf");
+        entity.booleanField = true;
+        entity.longField = 325L;
         entity.stringField = "string";
         entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("America/New_York"));
         entity.child = new TestEntityChild();
@@ -61,6 +63,7 @@ public class EntityEncoderBuilderTest {
         StringBuilder stringBuilder = new StringBuilder();
         builder.fields.forEach(stringBuilder::append);
         builder.methods.values().forEach(stringBuilder::append);
+        stringBuilder.append('\n');
 
         assertEquals(code, stringBuilder.toString());
     }

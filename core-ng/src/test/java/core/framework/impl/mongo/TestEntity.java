@@ -26,6 +26,12 @@ public class TestEntity {
     @Field(name = "double_field")
     public Double doubleField;
 
+    @Field(name = "long_field")
+    public Long longField;
+
+    @Field(name = "boolean_field")
+    public Boolean booleanField;
+
     @Field(name = "date_field")
     public LocalDateTime dateField;
 

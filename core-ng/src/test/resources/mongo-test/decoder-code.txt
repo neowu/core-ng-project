@@ -159,6 +159,14 @@ public core.framework.impl.mongo.TestEntity decode_core_framework_impl_mongo_Tes
             entity.doubleField = core.framework.impl.mongo.EntityCodecHelper.readDouble(reader, fieldPath);
             continue;
         }
+        if ("long_field".equals(fieldName)) {
+            entity.longField = core.framework.impl.mongo.EntityCodecHelper.readLong(reader, fieldPath);
+            continue;
+        }
+        if ("boolean_field".equals(fieldName)) {
+            entity.booleanField = core.framework.impl.mongo.EntityCodecHelper.readBoolean(reader, fieldPath);
+            continue;
+        }
         if ("date_field".equals(fieldName)) {
             entity.dateField = core.framework.impl.mongo.EntityCodecHelper.readLocalDateTime(reader, fieldPath);
             continue;

@@ -4,6 +4,8 @@
   },
   "int_field": null,
   "double_field": null,
+  "long_field": 325,
+  "boolean_field": true,
   "date_field": null,
   "zoned_date_time_field": {
     "$date": "2016-09-01T15:00:00Z"
