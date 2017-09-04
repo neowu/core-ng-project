@@ -77,7 +77,7 @@ public class RepositoryImplSequenceIdEntityTest {
         assertEquals(5, entities.size());
         assertEquals("value1", entities.get(0).stringField);
         assertEquals(Long.valueOf(1), entities.get(0).longField);
-        assertEquals(Long.valueOf(5), entities.get(0).longField);
+        assertEquals(Long.valueOf(5), entities.get(4).longField);
 
         entities = query.skip(5).fetch();
         assertEquals(5, entities.size());
@@ -95,7 +95,7 @@ public class RepositoryImplSequenceIdEntityTest {
         assertEquals(5, entities.size());
         assertEquals("value11", entities.get(0).stringField);
         assertEquals(Long.valueOf(11), entities.get(0).longField);
-        assertEquals(Long.valueOf(15), entities.get(0).longField);
+        assertEquals(Long.valueOf(15), entities.get(4).longField);
 
         entities = query.skip(5).fetch();
         assertEquals(5, entities.size());

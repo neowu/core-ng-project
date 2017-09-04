@@ -26,7 +26,7 @@ public class InsertQueryTest {
     @Test
     public void sequenceId() {
         InsertQuery<SequenceIdEntity> query = new InsertQuery<>(SequenceIdEntity.class);
-        assertEquals("INSERT INTO sequence_id_entity (id, string_field) VALUES (seq.NEXTVAL, ?)", query.sql);
+        assertEquals("INSERT INTO sequence_id_entity (id, string_field, long_field) VALUES (seq.NEXTVAL, ?, ?)", query.sql);
         assertEquals("id", query.generatedColumn);
     }
 }
