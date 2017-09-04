@@ -1,5 +1,5 @@
 ## Change log
-### 4.16.2 (9/1/2017 - )
+### 4.16.2 (9/1/2017 - 9/4/2017)
 * bug: fix oracle pagination query param value
 
 ### 4.16.1 (8/29/2017 - 9/1/2017)
