@@ -57,12 +57,8 @@ public class RepositoryImplSequenceIdEntityTest {
     }
 
     @Test
-    public void select() {
-        for (int i = 0; i < 30; i++) {
-            SequenceIdEntity entity = new SequenceIdEntity();
-            entity.stringField = "value" + i;
-            repository.insert(entity);
-        }
+    public void count() {
+        createEntities();
 
         Query<SequenceIdEntity> query = repository.select();
         assertEquals(30, query.count());
@@ -72,17 +68,10 @@ public class RepositoryImplSequenceIdEntityTest {
     }
 
     @Test
-    public void selectWithPagination() {
-        for (int i = 1; i <= 30; i++) {
-            SequenceIdEntity entity = new SequenceIdEntity();
-            entity.stringField = "value" + i;
-            entity.longField = (long) i;
-            repository.insert(entity);
-        }
+    public void select() {
+        createEntities();
 
-        Query<SequenceIdEntity> query = repository.select();
-
-        query.orderBy("long_field").limit(5);
+        Query<SequenceIdEntity> query = repository.select().orderBy("long_field").limit(5);
 
         List<SequenceIdEntity> entities = query.skip(0).fetch();
         assertEquals(5, entities.size());
@@ -101,6 +90,7 @@ public class RepositoryImplSequenceIdEntityTest {
         assertEquals(Long.valueOf(15), entities.get(4).longField);
 
         query.where("long_field > ?", 10);
+
         entities = query.skip(0).fetch();
         assertEquals(5, entities.size());
         assertEquals("value11", entities.get(0).stringField);
@@ -111,5 +101,14 @@ public class RepositoryImplSequenceIdEntityTest {
         assertEquals(5, entities.size());
         assertEquals(Long.valueOf(16), entities.get(0).longField);
         assertEquals(Long.valueOf(20), entities.get(4).longField);
+    }
+
+    private void createEntities() {
+        for (int i = 1; i <= 30; i++) {
+            SequenceIdEntity entity = new SequenceIdEntity();
+            entity.stringField = "value" + i;
+            entity.longField = (long) i;
+            repository.insert(entity);
+        }
     }
 }

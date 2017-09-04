@@ -1,8 +1,9 @@
 package core.framework.api.crypto;
 
 import core.framework.api.util.Strings;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author neo
@@ -12,14 +13,14 @@ public class HMACTest {
     public void digestByMD5() {
         HMAC hmac = new HMAC(Strings.bytes("4VPDEtyUE"), HMAC.Hash.MD5);
         byte[] bytes = hmac.digest(Strings.bytes("hello"));
-        Assert.assertNotNull(bytes);
+        assertNotNull(bytes);
     }
 
     @Test
     public void digestBySHA512() {
         HMAC hmac = new HMAC(Strings.bytes("4VPDEtyUE"), HMAC.Hash.SHA512);
         byte[] bytes = hmac.digest(Strings.bytes("hello"));
-        Assert.assertNotNull(bytes);
+        assertNotNull(bytes);
     }
 
     @Test
@@ -27,6 +28,6 @@ public class HMACTest {
         byte[] key = HMAC.generateKey(HMAC.Hash.SHA512);
         HMAC hmac = new HMAC(key, HMAC.Hash.SHA512);
         byte[] bytes = hmac.digest(Strings.bytes("hello"));
-        Assert.assertNotNull(bytes);
+        assertNotNull(bytes);
     }
 }

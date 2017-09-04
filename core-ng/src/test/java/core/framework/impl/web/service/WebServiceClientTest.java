@@ -7,7 +7,6 @@ import core.framework.api.util.Maps;
 import core.framework.api.validate.ValidationException;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.web.bean.RequestBeanMapper;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,6 +15,7 @@ import org.mockito.Mockito;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -52,13 +52,13 @@ public class WebServiceClientTest {
 
     @Test
     public void serviceURL() {
-        Assert.assertEquals("http://localhost", webServiceClient.serviceURL("/", Maps.newHashMap()));     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
-        Assert.assertEquals("http://localhost/test", webServiceClient.serviceURL("/test", Maps.newHashMap()));
-        Assert.assertEquals("http://localhost/test/", webServiceClient.serviceURL("/test/", Maps.newHashMap()));
+        assertEquals("http://localhost", webServiceClient.serviceURL("/", Maps.newHashMap()));     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
+        assertEquals("http://localhost/test", webServiceClient.serviceURL("/test", Maps.newHashMap()));
+        assertEquals("http://localhost/test/", webServiceClient.serviceURL("/test/", Maps.newHashMap()));
 
         Map<String, Object> pathParams = Maps.newHashMap("id", "1+2");
-        Assert.assertEquals("http://localhost/test/1%2B2", webServiceClient.serviceURL("/test/:id(\\d+)", pathParams));
-        Assert.assertEquals("http://localhost/test/1%2B2", webServiceClient.serviceURL("/test/:id", pathParams));
+        assertEquals("http://localhost/test/1%2B2", webServiceClient.serviceURL("/test/:id(\\d+)", pathParams));
+        assertEquals("http://localhost/test/1%2B2", webServiceClient.serviceURL("/test/:id", pathParams));
     }
 
     @Test

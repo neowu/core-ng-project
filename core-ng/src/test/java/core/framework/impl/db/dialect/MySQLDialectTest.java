@@ -16,7 +16,7 @@ public class MySQLDialectTest {
 
         assertEquals(3, params.length);
         assertEquals("value", params[0]);
-        assertEquals("default skip is 0", 0, params[1]);
+        assertEquals("default skip should be 0", 0, params[1]);
         assertEquals(100, params[2]);
     }
 }
