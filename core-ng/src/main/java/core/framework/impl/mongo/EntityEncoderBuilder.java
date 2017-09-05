@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static core.framework.impl.asm.Literal.type;
+import static core.framework.impl.asm.Literal.variable;
 
 /**
  * @author neo
@@ -157,11 +158,11 @@ final class EntityEncoderBuilder<T> {
         boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
         String fieldVariable = fieldClass.getCanonicalName().replace('.', '_') + "Codec";
         if (added) {
-            String field = Strings.format("private final {} {} = new {}({}.class);\n",
+            String field = Strings.format("private final {} {} = new {}({});\n",
                     type(EnumCodec.class),
                     fieldVariable,
                     type(EnumCodec.class),
-                    fieldClass.getCanonicalName());
+                    variable(fieldClass));
             fields.add(field);
         }
         return fieldVariable;

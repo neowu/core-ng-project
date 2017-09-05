@@ -22,15 +22,15 @@ import static core.framework.impl.asm.Literal.variable;
 public class WebServiceClientBuilder<T> {
     private final Class<T> serviceInterface;
     private final WebServiceClient client;
+    final DynamicInstanceBuilder<T> builder;
 
     public WebServiceClientBuilder(Class<T> serviceInterface, WebServiceClient client) {
         this.serviceInterface = serviceInterface;
         this.client = client;
+        builder = new DynamicInstanceBuilder<>(serviceInterface, serviceInterface.getCanonicalName() + "$Client");
     }
 
     public T build() {
-        DynamicInstanceBuilder<T> builder = new DynamicInstanceBuilder<>(serviceInterface, serviceInterface.getCanonicalName() + "$Client");
-
         builder.addField(new CodeBuilder().append("final {} client;", WebServiceClient.class.getCanonicalName()).build());
         builder.constructor(new Class<?>[]{WebServiceClient.class}, "this.client = $1;");
 

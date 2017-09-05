@@ -22,11 +22,15 @@ public class DynamicInstanceBuilder<T> {
     private final Logger logger = LoggerFactory.getLogger(DynamicInstanceBuilder.class);
     private final CtClass classBuilder;
     private final ClassPool classPool;
+    private final SourceCode sourceCode = new SourceCode();
     private Class<?>[] constructorParamClasses;
 
     public DynamicInstanceBuilder(Class<?> interfaceClass, String className) {
         if (!interfaceClass.isInterface())
             throw Exceptions.error("interface class must be interface, interfaceClass={}", interfaceClass);
+
+        sourceCode.interfaceClass = interfaceClass;
+        sourceCode.className = className;
 
         classPool = ClassPool.getDefault();
         classBuilder = classPool.makeClass(className + "$" + (INDEX.getAndIncrement()));
@@ -45,6 +49,9 @@ public class DynamicInstanceBuilder<T> {
         if (this.constructorParamClasses != null)
             throw new Error("dynamic class must have no more than one custom constructor");
 
+        sourceCode.constructorParamClasses = constructorParamClasses;
+        sourceCode.constructorBody = body;
+
         try {
             this.constructorParamClasses = constructorParamClasses;
             CtClass[] params = new CtClass[constructorParamClasses.length];
@@ -56,11 +63,13 @@ public class DynamicInstanceBuilder<T> {
             constructor.setBody(body);
             classBuilder.addConstructor(constructor);
         } catch (CannotCompileException | NotFoundException e) {
+            logger.error("constructor body failed to compile:\n{}", body);
             throw new CodeCompileException(e);
         }
     }
 
     public void addMethod(String method) {
+        sourceCode.methods.add(method);
         try {
             classBuilder.addMethod(CtMethod.make(method, classBuilder));
         } catch (CannotCompileException e) {
@@ -70,6 +79,7 @@ public class DynamicInstanceBuilder<T> {
     }
 
     public void addField(String field) {
+        sourceCode.fields.add(field);
         try {
             classBuilder.addField(CtField.make(field, classBuilder));
         } catch (CannotCompileException e) {
@@ -87,5 +97,9 @@ public class DynamicInstanceBuilder<T> {
         } catch (CannotCompileException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new CodeCompileException(e);
         }
+    }
+
+    public String sourceCode() {
+        return sourceCode.build();
     }
 }

@@ -13,6 +13,11 @@ public class CodeBuilder {
         return this;
     }
 
+    public CodeBuilder append(char ch) {
+        builder.append(ch);
+        return this;
+    }
+
     public CodeBuilder append(String pattern, Object... argument) {
         builder.append(Strings.format(pattern, argument));
         return this;

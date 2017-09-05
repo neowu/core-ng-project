@@ -1,4 +1,7 @@
 ## Change log
+### 4.16.3 (9/5/2017 - )
+
+
 ### 4.16.2 (9/1/2017 - 9/4/2017)
 * bug: fix oracle pagination query param value
 
@@ -12,7 +15,7 @@
 * web: added @QueryParam support to replace flat JAXB bean for GET/DELETE
 
 ### 4.15.0 (8/17/2017 - 8/22/2017)
-* queue: removed rabbitMQ support, make kafak only queue implementation
+* queue: removed rabbitMQ support, make kafka only queue implementation
 * search: update es to 5.5.2
 * web: support @ResponseStatus on exception class, to simplify default error response handling
 * web: updated request parser to determine port with x-forwarded-proto aware, (due to google cloud level 7 lb does not forward x-forwarded-port)
