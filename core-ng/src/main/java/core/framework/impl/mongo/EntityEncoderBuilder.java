@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static core.framework.impl.asm.Literal.type;
@@ -25,8 +24,8 @@ import static core.framework.impl.asm.Literal.variable;
 final class EntityEncoderBuilder<T> {
     final Map<Class<? extends Enum<?>>, String> enumCodecFields = Maps.newHashMap();
     final DynamicInstanceBuilder<EntityEncoder<T>> builder;
-    private final Map<Type, String> encodeMethods = new LinkedHashMap<>();
     private final Class<T> entityClass;
+    private final Map<Type, String> encodeMethods = Maps.newHashMap();
     private int index;
 
     EntityEncoderBuilder(Class<T> entityClass) {
@@ -35,11 +34,6 @@ final class EntityEncoderBuilder<T> {
     }
 
     public EntityEncoder<T> build() {
-        buildMethods();
-        return builder.build();
-    }
-
-    private void buildMethods() {
         String methodName = encodeEntityMethod(entityClass);
         CodeBuilder builder = new CodeBuilder();
         builder.append("public void encode(org.bson.BsonWriter writer, Object entity) {\n")
@@ -47,6 +41,7 @@ final class EntityEncoderBuilder<T> {
                .indent(1).append("{}(writer, wrapper, ({}) entity);\n", methodName, entityClass.getCanonicalName())
                .append("}");
         this.builder.addMethod(builder.build());
+        return this.builder.build();
     }
 
     private String encodeEntityMethod(Class<?> entityClass) {
@@ -79,14 +74,12 @@ final class EntityEncoderBuilder<T> {
         String methodName = encodeMethods.get(Types.list(valueClass));
         if (methodName != null) return methodName;
 
-        String valueClassName = valueClass.getCanonicalName();
         methodName = "encodeList" + valueClass.getSimpleName() + (index++);
-
         CodeBuilder builder = new CodeBuilder();
         builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, java.util.List list) {\n", methodName, type(BsonWriterWrapper.class));
         builder.indent(1).append("writer.writeStartArray();\n")
                .indent(1).append("for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {\n")
-               .indent(2).append("{} value = ({}) iterator.next();\n", valueClassName, valueClassName);
+               .indent(2).append("{} value = ({}) iterator.next();\n", type(valueClass), type(valueClass));
 
         encodeField(builder, "value", valueClass, 2);
 
@@ -102,8 +95,8 @@ final class EntityEncoderBuilder<T> {
     private String encodeMapMethod(Class<?> valueClass) {
         String methodName = encodeMethods.get(Types.map(String.class, valueClass));
         if (methodName != null) return methodName;
-        methodName = "encodeMap" + valueClass.getSimpleName() + (index++);
 
+        methodName = "encodeMap" + valueClass.getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder();
         builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, java.util.Map map) {\n", methodName, type(BsonWriterWrapper.class));
         builder.indent(1).append("writer.writeStartDocument();\n")

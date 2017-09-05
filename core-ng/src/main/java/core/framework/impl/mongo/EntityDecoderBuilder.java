@@ -1,7 +1,8 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
-import core.framework.api.util.Sets;
+import core.framework.api.util.Maps;
+import core.framework.api.util.Types;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
@@ -14,10 +15,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static core.framework.impl.asm.Literal.type;
 import static core.framework.impl.asm.Literal.variable;
@@ -27,10 +25,11 @@ import static core.framework.impl.asm.Literal.variable;
  */
 final class EntityDecoderBuilder<T> {
     final DynamicInstanceBuilder<EntityDecoder<T>> builder;
-    final Map<String, String> methods = new LinkedHashMap<>();
     private final Class<T> entityClass;
-    private final Set<Class<? extends Enum<?>>> enumClasses = Sets.newHashSet();
+    private final Map<Class<? extends Enum<?>>, String> enumCodecFields = Maps.newHashMap();
+    private final Map<Type, String> decodeMethods = Maps.newHashMap();
     private final String helper = EntityCodecHelper.class.getCanonicalName();
+    private int index;
 
     EntityDecoderBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -39,27 +38,21 @@ final class EntityDecoderBuilder<T> {
 
     public EntityDecoder<T> build() {
         builder.addField("private final {} logger = {}.getLogger({});", type(Logger.class), type(LoggerFactory.class), variable(EntityDecoder.class));
-        buildMethods();
-        methods.values().forEach(builder::addMethod);
-        return builder.build();
-    }
-
-    private void buildMethods() {
         String methodName = decodeEntityMethod(entityClass);
         CodeBuilder builder = new CodeBuilder()
                 .append("public Object decode(org.bson.BsonReader reader) {\n")
-                .indent(1).append("return {}(reader, \"\");\n", methodName)
+                .indent(1).append("return {}(reader, {});\n", methodName, variable(""))
                 .append("}");
-
-        methods.put("decode", builder.build());
+        this.builder.addMethod(builder.build());
+        return this.builder.build();
     }
 
     private String decodeEntityMethod(Class<?> entityClass) {
-        String entityClassName = entityClass.getCanonicalName();
-        String methodName = "decode_" + entityClassName.replace('.', '_');
-        if (methods.containsKey(methodName)) return methodName;
+        String methodName = decodeMethods.get(entityClass);
+        if (methodName != null) return methodName;
 
-        CodeBuilder builder = new CodeBuilder().append("public {} {}(org.bson.BsonReader reader, String parentField) {\n", entityClassName, methodName);
+        methodName = "decode" + entityClass.getSimpleName() + (index++);
+        CodeBuilder builder = new CodeBuilder().append("public {} {}(org.bson.BsonReader reader, String parentField) {\n", type(entityClass), methodName);
         builder.indent(1).append("org.bson.BsonType currentType = reader.getCurrentBsonType();\n");
 
         builder.indent(1).append("if (currentType != null && currentType == org.bson.BsonType.NULL) {\n");
@@ -73,7 +66,7 @@ final class EntityDecoderBuilder<T> {
         builder.indent(2).append("return null;\n");
         builder.indent(1).append("}\n");
 
-        builder.indent(1).append("{} entity = new {}();\n", entityClassName, entityClassName);
+        builder.indent(1).append("{} entity = new {}();\n", type(entityClass), type(entityClass));
 
         builder.indent(1).append("reader.readStartDocument();\n")
                .indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n")
@@ -91,8 +84,9 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("reader.readEndDocument();\n");
         builder.indent(1).append("return entity;\n");
         builder.append('}');
+        this.builder.addMethod(builder.build());
 
-        methods.put(methodName, builder.build());
+        decodeMethods.put(entityClass, methodName);
         return methodName;
     }
 
@@ -142,17 +136,14 @@ final class EntityDecoderBuilder<T> {
     }
 
     private String decodeMapMethod(Class<?> valueClass) {
-        String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("decode_" + Map.class.getCanonicalName() + "_" + valueClassName).replace('.', '_');
-        if (methods.containsKey(methodName)) return methodName;
+        String methodName = decodeMethods.get(Types.map(String.class, valueClass));
+        if (methodName != null) return methodName;
 
+        methodName = "decodeMap" + valueClass.getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder();
         builder.append("private java.util.Map {}(org.bson.BsonReader reader, String parentField) {\n", methodName);
         builder.indent(1).append("org.bson.BsonType currentType = reader.getCurrentBsonType();\n");
-        builder.indent(1).append("if (currentType == org.bson.BsonType.NULL) {\n")
-               .indent(2).append("reader.readNull();\n")
-               .indent(2).append("return null;\n")
-               .indent(1).append("}\n");
+        builder.indent(1).append("if (currentType == org.bson.BsonType.NULL) {\n        reader.readNull();\n        return null;\n    }\n");
         builder.indent(1).append("if (currentType != org.bson.BsonType.DOCUMENT) {\n");
         builder.indent(2).append("logger.warn({}, parentField, currentType);\n", variable("unexpected field type, field={}, type={}"));
         builder.indent(2).append("reader.skipValue();\n");
@@ -164,7 +155,6 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n");
         builder.indent(2).append("String fieldName = reader.readName();\n");
         builder.indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
-
         if (Integer.class.equals(valueClass)) {
             builder.indent(2).append("map.put(fieldName, {}.readInteger(reader, fieldPath));\n", helper);
         } else if (String.class.equals(valueClass)) {
@@ -188,41 +178,36 @@ final class EntityDecoderBuilder<T> {
             String method = decodeEntityMethod(valueClass);
             builder.indent(2).append("map.put(fieldName, {}(reader, fieldPath));\n", method);
         }
-
         builder.indent(1).append("}\n");
         builder.indent(1).append("reader.readEndDocument();\n");
-
         builder.indent(1).append("return map;\n");
         builder.append('}');
+        this.builder.addMethod(builder.build());
 
-        methods.put(methodName, builder.build());
+        decodeMethods.put(Types.map(String.class, valueClass), methodName);
         return methodName;
     }
 
     private String decodeListMethod(Class<?> valueClass) {
-        String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("decode_" + List.class.getCanonicalName() + "_" + valueClassName).replace('.', '_');
-        if (methods.containsKey(methodName)) return methodName;
+        String methodName = decodeMethods.get(Types.list(valueClass));
+        if (methodName != null) return methodName;
 
+        methodName = "decodeList" + valueClass.getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder();
         builder.append("private java.util.List {}(org.bson.BsonReader reader, String fieldPath) {\n", methodName);
         builder.indent(1).append("org.bson.BsonType currentType = reader.getCurrentBsonType();\n");
-
-        builder.indent(1).append("if (currentType == org.bson.BsonType.NULL) {\n");
-        builder.indent(2).append("reader.readNull();\n");
-        builder.indent(2).append("return null;\n");
-        builder.indent(1).append("}\n");
-
-        builder.indent(1).append("if (currentType != org.bson.BsonType.ARRAY) {\n");
-        builder.indent(2).append("logger.warn({}, fieldPath, currentType);\n", variable("unexpected field type, field={}, type={}"));
-        builder.indent(2).append("reader.skipValue();\n");
-        builder.indent(2).append("return null;\n");
-        builder.indent(1).append("}\n");
-
+        builder.indent(1).append("if (currentType == org.bson.BsonType.NULL) {\n")
+               .indent(2).append("reader.readNull();\n")
+               .indent(2).append("return null;\n")
+               .indent(1).append("}\n");
+        builder.indent(1).append("if (currentType != org.bson.BsonType.ARRAY) {\n")
+               .indent(2).append("logger.warn({}, fieldPath, currentType);\n", variable("unexpected field type, field={}, type={}"))
+               .indent(2).append("reader.skipValue();\n")
+               .indent(2).append("return null;\n")
+               .indent(1).append("}\n");
         builder.indent(1).append("java.util.List list = new java.util.ArrayList();\n");
         builder.indent(1).append("reader.readStartArray();\n");
         builder.indent(1).append("while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {\n");
-
         if (Integer.class.equals(valueClass)) {
             builder.indent(2).append("list.add({}.readInteger(reader, fieldPath));\n", helper);
         } else if (String.class.equals(valueClass)) {
@@ -235,7 +220,7 @@ final class EntityDecoderBuilder<T> {
             builder.indent(2).append("list.add({}.readZonedDateTime(reader, fieldPath));\n", helper);
         } else if (valueClass.isEnum()) {
             String enumCodecVariable = registerEnumCodec(valueClass);
-            builder.indent(2).append("list.add({}.read(reader, fieldPath));\n", enumCodecVariable, valueClassName);
+            builder.indent(2).append("list.add({}.read(reader, fieldPath));\n", enumCodecVariable, type(valueClass));
         } else if (Double.class.equals(valueClass)) {
             builder.indent(2).append("list.add({}.readDouble(reader, fieldPath));\n", helper);
         } else if (ObjectId.class.equals(valueClass)) {
@@ -246,23 +231,23 @@ final class EntityDecoderBuilder<T> {
             String method = decodeEntityMethod(valueClass);
             builder.indent(2).append("list.add({}(reader, fieldPath));\n", method);
         }
-
         builder.indent(1).append("}\n");
         builder.indent(1).append("reader.readEndArray();\n");
         builder.indent(1).append("return list;\n");
         builder.append('}');
+        this.builder.addMethod(builder.build());
 
-        methods.put(methodName, builder.build());
+        decodeMethods.put(Types.list(valueClass), methodName);
         return methodName;
     }
 
     private String registerEnumCodec(Class<?> fieldClass) {
         @SuppressWarnings("unchecked")
-        boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
-        String fieldVariable = fieldClass.getCanonicalName().replace('.', '_') + "Codec";
-        if (added) {
+        Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
+        return enumCodecFields.computeIfAbsent(enumClass, key -> {
+            String fieldVariable = "enumCodec" + fieldClass.getSimpleName() + (index++);
             builder.addField("private final {} {} = new {}({});", type(EnumCodec.class), fieldVariable, type(EnumCodec.class), variable(fieldClass));
-        }
-        return fieldVariable;
+            return fieldVariable;
+        });
     }
 }
