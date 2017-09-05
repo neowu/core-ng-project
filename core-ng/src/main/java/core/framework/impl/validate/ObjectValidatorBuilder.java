@@ -1,7 +1,6 @@
 package core.framework.impl.validate;
 
 import core.framework.api.util.Exceptions;
-import core.framework.api.util.Lists;
 import core.framework.api.util.Strings;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.Max;
@@ -23,7 +22,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
@@ -37,8 +35,7 @@ import static core.framework.impl.asm.Literal.variable;
 public class ObjectValidatorBuilder {
     private final Type instanceType;
     private final Function<Field, String> fieldNameProvider;
-    private final List<String> fields = Lists.newArrayList();
-    private final List<String> methods = Lists.newArrayList();
+    DynamicInstanceBuilder<ObjectValidator> builder;
     private int index = 0;
 
     public ObjectValidatorBuilder(Type instanceType, Function<Field, String> fieldNameProvider) {
@@ -50,12 +47,9 @@ public class ObjectValidatorBuilder {
         Class<?> targetClass = unwrapInstanceType();
         if (Classes.instanceFields(targetClass).stream().noneMatch(this::hasValidationAnnotation)) return Optional.empty();
 
+        builder = new DynamicInstanceBuilder<>(ObjectValidator.class, targetClass.getTypeName() + "$ObjectValidator");
         buildRootMethod(targetClass);
-
-        DynamicInstanceBuilder<ObjectValidator> instanceBuilder = new DynamicInstanceBuilder<>(ObjectValidator.class, targetClass.getTypeName() + "$ObjectValidator");
-        fields.forEach(instanceBuilder::addField);
-        methods.forEach(instanceBuilder::addMethod);
-        return Optional.of(instanceBuilder.build());
+        return Optional.of(builder.build());
     }
 
     private Class<?> unwrapInstanceType() {
@@ -68,16 +62,16 @@ public class ObjectValidatorBuilder {
 
         CodeBuilder builder = new CodeBuilder().append("public void validate(Object instance, {} errors, boolean partial) {\n", type(ValidationErrors.class));
         if (GenericTypes.isList(instanceType)) {
-            builder.indent(1).append("java.util.List list = (java.util.List)instance;\n")
-                   .indent(1).append("for (java.util.Iterator iterator = list.iterator(); iterator.hasNext();) {\n")
+            builder.indent(1).append("java.util.List list = (java.util.List) instance;\n")
+                   .indent(1).append("for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {\n")
                    .indent(2).append("{} value = ({}) iterator.next();\n", type(targetClass), type(targetClass))
                    .indent(2).append("if (value != null) {}(value, errors, partial);\n", method)
                    .indent(1).append("}\n");
         } else {
-            builder.indent(1).append("{}(({})instance, errors, partial);\n", method, type(instanceType));
+            builder.indent(1).append("{}(({}) instance, errors, partial);\n", method, type(instanceType));
         }
-        builder.append("}\n");
-        methods.add(builder.build());
+        builder.append('}');
+        this.builder.addMethod(builder.build());
     }
 
     private String buildValidateMethod(Class<?> beanClass, String parentPath) {
@@ -112,8 +106,8 @@ public class ObjectValidatorBuilder {
 
             builder.indent(1).append("}\n");
         }
-        builder.append("}\n");
-        methods.add(builder.build());
+        builder.append('}');
+        this.builder.addMethod(builder.build());
         return methodName;
     }
 
@@ -130,7 +124,7 @@ public class ObjectValidatorBuilder {
         Class<?> valueClass = GenericTypes.mapValueClass(field.getGenericType());
         if (!isValueClass(valueClass)) {
             String method = buildValidateMethod(valueClass, path(field, parentPath));
-            builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.entrySet().iterator(); iterator.hasNext();) {\n", field.getName())
+            builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.entrySet().iterator(); iterator.hasNext(); ) {\n", field.getName())
                    .indent(3).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
                    .indent(3).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
                    .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
@@ -144,7 +138,7 @@ public class ObjectValidatorBuilder {
         Class<?> valueClass = GenericTypes.listValueClass(field.getGenericType());
         if (!isValueClass(valueClass)) {
             String method = buildValidateMethod(valueClass, path(field, parentPath));
-            builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.iterator(); iterator.hasNext();) {\n", field.getName())
+            builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.iterator(); iterator.hasNext(); ) {\n", field.getName())
                    .indent(3).append("{} value = ({}) iterator.next();\n", type(valueClass), type(valueClass))
                    .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
                    .indent(2).append("}\n");
@@ -164,7 +158,7 @@ public class ObjectValidatorBuilder {
         Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
         if (pattern != null) {
             String patternFieldName = field.getName() + "Pattern" + (index++);
-            fields.add(Strings.format("private final java.util.regex.Pattern {} = java.util.regex.Pattern.compile({});\n", patternFieldName, variable(pattern.value())));
+            this.builder.addField(Strings.format("private final java.util.regex.Pattern {} = java.util.regex.Pattern.compile({});", patternFieldName, variable(pattern.value())));
             builder.indent(2).append("if (!this.{}.matcher(bean.{}).matches()) errors.add({}, {});\n", patternFieldName, field.getName(), pathLiteral, variable(pattern.message()));
         }
     }

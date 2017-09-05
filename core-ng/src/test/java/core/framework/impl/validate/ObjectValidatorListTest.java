@@ -1,5 +1,6 @@
 package core.framework.impl.validate;
 
+import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Types;
@@ -21,11 +22,19 @@ import static org.junit.Assert.assertTrue;
  * @author neo
  */
 public class ObjectValidatorListTest {
+    ObjectValidatorBuilder builder;
     ObjectValidator validator;
 
     @Before
     public void createObjectValidator() {
-        validator = new ObjectValidatorBuilder(Types.list(Bean.class), Field::getName).build().get();
+        builder = new ObjectValidatorBuilder(Types.list(Bean.class), Field::getName);
+        validator = builder.build().get();
+    }
+
+    @Test
+    public void sourceCode() {
+        String sourceCode = builder.builder.sourceCode();
+        assertEquals(ClasspathResources.text("validator-test/validator-list.java"), sourceCode);
     }
 
     @Test

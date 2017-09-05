@@ -1,5 +1,6 @@
 package core.framework.impl.validate;
 
+import core.framework.api.util.ClasspathResources;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
 import org.junit.Before;
@@ -17,11 +18,19 @@ import static org.junit.Assert.assertTrue;
  * @author neo
  */
 public class ObjectValidatorLengthTest {
+    ObjectValidatorBuilder builder;
     ObjectValidator validator;
 
     @Before
     public void createObjectValidator() {
-        validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
+        builder = new ObjectValidatorBuilder(Bean.class, Field::getName);
+        validator = builder.build().get();
+    }
+
+    @Test
+    public void sourceCode() {
+        String sourceCode = builder.builder.sourceCode();
+        assertEquals(ClasspathResources.text("validator-test/validator-length.java"), sourceCode);
     }
 
     @Test
