@@ -1,6 +1,7 @@
 package core.framework.impl.web.service;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.api.util.ClasspathResources;
 import core.framework.api.util.Lists;
 import core.framework.api.util.Types;
 import core.framework.api.web.Controller;
@@ -34,13 +35,13 @@ public class WebServiceControllerBuilderTest {
     public void get() throws Exception {
         when(request.pathParam("id", Integer.class)).thenReturn(1);
 
-        Controller controller = new WebServiceControllerBuilder<>(TestWebService.class,
-            serviceImpl,
-            TestWebService.class.getDeclaredMethod("get", Integer.class))
-            .build();
+        WebServiceControllerBuilder<TestWebService> builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("get", Integer.class));
+        Controller controller = builder.build();
+
+        String sourceCode = builder.builder.sourceCode();
+        assertEquals(ClasspathResources.text("webservice-test/test-webservice-controller-get.java"), sourceCode);
 
         Response response = controller.execute(request);
-
         assertEquals(HTTPStatus.OK, response.status());
         assertEquals(2, (int) ((TestWebService.TestResponse) ((BeanBody) ((ResponseImpl) response).body).bean).intField);
     }
@@ -53,10 +54,12 @@ public class WebServiceControllerBuilderTest {
         when(request.pathParam("id", Integer.class)).thenReturn(1);
         when(request.bean(TestWebService.TestRequest.class)).thenReturn(requestBean);
 
-        Controller controller = new WebServiceControllerBuilder<>(TestWebService.class,
-            serviceImpl,
-            TestWebService.class.getDeclaredMethod("create", Integer.class, TestWebService.TestRequest.class))
-            .build();
+        WebServiceControllerBuilder<TestWebService> builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("create", Integer.class, TestWebService.TestRequest.class));
+        Controller controller = builder.build();
+
+        String sourceCode = builder.builder.sourceCode();
+        assertEquals(ClasspathResources.text("webservice-test/test-webservice-controller-create.java"), sourceCode);
+
         Response response = controller.execute(request);
         assertEquals(HTTPStatus.CREATED, response.status());
     }
@@ -69,9 +72,9 @@ public class WebServiceControllerBuilderTest {
         when(request.bean(Types.list(TestWebService.TestRequest.class))).thenReturn(Lists.newArrayList(requestBean));
 
         Controller controller = new WebServiceControllerBuilder<>(TestWebService.class,
-            serviceImpl,
-            TestWebService.class.getDeclaredMethod("batch", List.class))
-            .build();
+                serviceImpl,
+                TestWebService.class.getDeclaredMethod("batch", List.class))
+                .build();
         Response response = controller.execute(request);
         assertEquals(HTTPStatus.OK, response.status());
     }

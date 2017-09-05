@@ -26,6 +26,7 @@ public class WebServiceControllerBuilder<T> {
     private final T service;
     private final Method method;
     private final HTTPStatus responseStatus;
+    final DynamicInstanceBuilder<Controller> builder;
 
     public WebServiceControllerBuilder(Class<T> serviceInterface, T service, Method method) {
         this.serviceInterface = serviceInterface;
@@ -35,15 +36,14 @@ public class WebServiceControllerBuilder<T> {
         ResponseStatus status = method.getDeclaredAnnotation(ResponseStatus.class);
         if (status != null) responseStatus = status.value();
         else responseStatus = HTTPStatus.OK;
+
+        builder = new DynamicInstanceBuilder<>(Controller.class, service.getClass().getCanonicalName() + "$" + method.getName());
     }
 
     public Controller build() {
-        DynamicInstanceBuilder<Controller> builder = new DynamicInstanceBuilder<>(Controller.class, service.getClass().getCanonicalName() + "$" + method.getName());
-
         builder.addField("private final {} delegate;", type(serviceInterface));
         builder.constructor(new Class<?>[]{serviceInterface}, "this.delegate = $1;");
         builder.addMethod(buildMethod());
-
         return builder.build(service);
     }
 

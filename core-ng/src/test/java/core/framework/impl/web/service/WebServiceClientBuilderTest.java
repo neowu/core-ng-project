@@ -32,7 +32,7 @@ public class WebServiceClientBuilderTest {
     @Test
     public void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("webservice-client-test/test-webservice-client.java"), sourceCode);
+        assertEquals(ClasspathResources.text("webservice-test/test-webservice-client.java"), sourceCode);
     }
 
     @Test
