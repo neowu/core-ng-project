@@ -52,7 +52,7 @@ final class SourceCode {
         for (int i = 0; i < constructorParamClasses.length; i++) {
             Class<?> paramClass = constructorParamClasses[i];
             if (i > 0) builder.append(", ");
-            builder.append("{} ${}", type(paramClass), (i + 1));
+            builder.append("{} ${}", type(paramClass), i + 1);
         }
         builder.append(") {\n");
         builder.indent(2).append(constructorBody).append("\n")

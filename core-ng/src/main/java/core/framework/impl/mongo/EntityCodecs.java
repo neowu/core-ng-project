@@ -38,7 +38,7 @@ public final class EntityCodecs {
     private <T> void register(Class<T> entityClass, EntityIdHandler<T> idHandler) {
         EntityEncoderBuilder<T> builder = new EntityEncoderBuilder<>(entityClass);
         EntityEncoder<T> entityEncoder = builder.build();
-        enumClasses.addAll(builder.enumClasses);
+        enumClasses.addAll(builder.enumCodecFields.keySet());
         EntityDecoder<T> entityDecoder = new EntityDecoderBuilder<>(entityClass).build();
         EntityCodec<T> codec = new EntityCodec<>(entityClass, idHandler, entityEncoder, entityDecoder);
         Codec<?> previous = codecs.putIfAbsent(entityClass, codec);

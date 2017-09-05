@@ -1,9 +1,9 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Sets;
+import core.framework.api.util.Maps;
 import core.framework.api.util.Strings;
+import core.framework.api.util.Types;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
@@ -15,9 +15,7 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static core.framework.impl.asm.Literal.type;
 import static core.framework.impl.asm.Literal.variable;
@@ -26,20 +24,19 @@ import static core.framework.impl.asm.Literal.variable;
  * @author neo
  */
 final class EntityEncoderBuilder<T> {
-    final Map<String, String> methods = new LinkedHashMap<>();
-    final Set<Class<? extends Enum<?>>> enumClasses = Sets.newHashSet();
-    final List<String> fields = Lists.newArrayList();
+    final Map<Class<? extends Enum<?>>, String> enumCodecFields = Maps.newHashMap();
+    final DynamicInstanceBuilder<EntityEncoder<T>> builder;
+    private final Map<Type, String> methods = new LinkedHashMap<>();
     private final Class<T> entityClass;
+    private int index;
 
     EntityEncoderBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
+        builder = new DynamicInstanceBuilder<>(EntityEncoder.class, EntityEncoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
     }
 
     public EntityEncoder<T> build() {
-        DynamicInstanceBuilder<EntityEncoder<T>> builder = new DynamicInstanceBuilder<>(EntityEncoder.class, EntityEncoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
         buildMethods();
-        fields.forEach(builder::addField);
-        methods.values().forEach(builder::addMethod);
         return builder.build();
     }
 
@@ -50,17 +47,16 @@ final class EntityEncoderBuilder<T> {
                .indent(1).append("{} wrapper = new {}(writer);\n", type(BsonWriterWrapper.class), type(BsonWriterWrapper.class))
                .indent(1).append("{}(writer, wrapper, ({}) entity);\n", methodName, entityClass.getCanonicalName())
                .append("}");
-
-        methods.put("encode", builder.build());
+        this.builder.addMethod(builder.build());
     }
 
     private String encodeEntityMethod(Class<?> entityClass) {
-        String entityClassName = entityClass.getCanonicalName();
-        String methodName = "encode_" + entityClassName.replace('.', '_');
-        if (methods.containsKey(methodName)) return methodName;
+        String methodName = methods.get(entityClass);
+        if (methodName != null) return methodName;
 
+        methodName = "encode" + entityClass.getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder();
-        builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, {} entity) {\n", methodName, type(BsonWriterWrapper.class), entityClassName);
+        builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, {} entity) {\n", methodName, type(BsonWriterWrapper.class), type(entityClass));
         builder.indent(1).append("writer.writeStartDocument();\n");
         for (Field field : Classes.instanceFields(entityClass)) {
             Type fieldType = field.getGenericType();
@@ -73,17 +69,19 @@ final class EntityEncoderBuilder<T> {
             encodeField(builder, fieldVariable, fieldType, 1);
         }
         builder.indent(1).append("writer.writeEndDocument();\n");
+        builder.append('}');
+        this.builder.addMethod(builder.build());
 
-        builder.append("}\n");
-
-        methods.put(methodName, builder.build());
+        methods.put(entityClass, methodName);
         return methodName;
     }
 
     private String encodeListMethod(Class<?> valueClass) {
+        String methodName = methods.get(Types.list(valueClass));
+        if (methodName != null) return methodName;
+
         String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("encode_list_" + valueClassName).replace('.', '_');
-        if (methods.containsKey(methodName)) return methodName;
+        methodName = "encodeList" + valueClass.getSimpleName() + (index++);
 
         CodeBuilder builder = new CodeBuilder();
         builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, java.util.List list) {\n", methodName, type(BsonWriterWrapper.class));
@@ -95,16 +93,17 @@ final class EntityEncoderBuilder<T> {
 
         builder.indent(1).append("}\n")
                .indent(1).append("writer.writeEndArray();\n")
-               .append("}\n");
+               .append('}');
+        this.builder.addMethod(builder.build());
 
-        methods.put(methodName, builder.build());
+        methods.put(Types.list(valueClass), methodName);
         return methodName;
     }
 
     private String encodeMapMethod(Class<?> valueClass) {
-        String valueClassName = valueClass.getCanonicalName();
-        String methodName = ("encode_map_" + valueClassName).replace('.', '_');
-        if (methods.containsKey(methodName)) return methodName;
+        String methodName = methods.get(Types.map(String.class, valueClass));
+        if (methodName != null) return methodName;
+        methodName = "encodeMap" + valueClass.getSimpleName() + (index++);
 
         CodeBuilder builder = new CodeBuilder();
         builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, java.util.Map map) {\n", methodName, type(BsonWriterWrapper.class));
@@ -112,16 +111,17 @@ final class EntityEncoderBuilder<T> {
                .indent(1).append("for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {\n")
                .indent(2).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
                .indent(2).append("String key = (String) entry.getKey();\n")
-               .indent(2).append("{} value = ({}) entry.getValue();\n", valueClassName, valueClassName)
+               .indent(2).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
                .indent(2).append("writer.writeName(key);\n");
 
         encodeField(builder, "value", valueClass, 2);
 
         builder.indent(1).append("}\n")
                .indent(1).append("writer.writeEndDocument();\n")
-               .append("}\n");
+               .append('}');
+        this.builder.addMethod(builder.build());
 
-        methods.put(methodName, builder.build());
+        methods.put(Types.map(String.class, valueClass), methodName);
         return methodName;
     }
 
@@ -155,16 +155,16 @@ final class EntityEncoderBuilder<T> {
 
     private String registerEnumCodec(Class<?> fieldClass) {
         @SuppressWarnings("unchecked")
-        boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
-        String fieldVariable = fieldClass.getCanonicalName().replace('.', '_') + "Codec";
-        if (added) {
-            String field = Strings.format("private final {} {} = new {}({});\n",
+        Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
+        return enumCodecFields.computeIfAbsent(enumClass, key -> {
+            String fieldVariable = "enumCodec" + fieldClass.getSimpleName() + (index++);
+            String field = Strings.format("private final {} {} = new {}({});",
                     type(EnumCodec.class),
                     fieldVariable,
                     type(EnumCodec.class),
                     variable(fieldClass));
-            fields.add(field);
-        }
-        return fieldVariable;
+            builder.addField(field);
+            return fieldVariable;
+        });
     }
 }

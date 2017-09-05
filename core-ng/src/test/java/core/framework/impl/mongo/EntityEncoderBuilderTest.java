@@ -26,12 +26,10 @@ public class EntityEncoderBuilderTest {
     @Test
     public void encode() throws IOException {
         EntityEncoderBuilder<TestEntity> builder = new EntityEncoderBuilder<>(TestEntity.class);
-
         EntityEncoder<TestEntity> encoder = builder.build();
 
-        assertEquals(Sets.newHashSet(TestEntityChild.TestEnum.class), builder.enumClasses);
-
-        verifyGeneratedMethods(builder);
+        assertEquals(Sets.newHashSet(TestEntityChild.TestEnum.class), builder.enumCodecFields.keySet());
+        assertEquals(ClasspathResources.text("mongo-test/entity-encoder.java"), builder.builder.sourceCode());
 
         StringWriter writer = new StringWriter();
         TestEntity entity = new TestEntity();
@@ -55,16 +53,5 @@ public class EntityEncoderBuilderTest {
         JsonNode entityNode = mapper.readTree(writer.toString());
 
         assertEquals(expectedEntityNode, entityNode);
-    }
-
-    private void verifyGeneratedMethods(EntityEncoderBuilder<TestEntity> builder) {
-        String code = ClasspathResources.text("mongo-test/encoder-code.txt").replaceAll("\r\n", "\n");
-
-        StringBuilder stringBuilder = new StringBuilder();
-        builder.fields.forEach(stringBuilder::append);
-        builder.methods.values().forEach(stringBuilder::append);
-        stringBuilder.append('\n');
-
-        assertEquals(code, stringBuilder.toString());
     }
 }
