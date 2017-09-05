@@ -30,7 +30,7 @@ public class WebServiceClientBuilder<T> {
     }
 
     public T build() {
-        builder.addField(new CodeBuilder().append("final {} client;", WebServiceClient.class.getCanonicalName()).build());
+        builder.addField("private final {} client;", type(WebServiceClient.class));
         builder.constructor(new Class<?>[]{WebServiceClient.class}, "this.client = $1;");
 
         for (Method method : serviceInterface.getMethods()) {

@@ -1,9 +1,7 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
-import core.framework.api.util.Lists;
 import core.framework.api.util.Sets;
-import core.framework.api.util.Strings;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
@@ -28,21 +26,20 @@ import static core.framework.impl.asm.Literal.variable;
  * @author neo
  */
 final class EntityDecoderBuilder<T> {
+    final DynamicInstanceBuilder<EntityDecoder<T>> builder;
     final Map<String, String> methods = new LinkedHashMap<>();
-    final List<String> fields = Lists.newArrayList();
     private final Class<T> entityClass;
     private final Set<Class<? extends Enum<?>>> enumClasses = Sets.newHashSet();
     private final String helper = EntityCodecHelper.class.getCanonicalName();
 
     EntityDecoderBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
+        builder = new DynamicInstanceBuilder<>(EntityDecoder.class, EntityDecoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
     }
 
     public EntityDecoder<T> build() {
-        DynamicInstanceBuilder<EntityDecoder<T>> builder = new DynamicInstanceBuilder<>(EntityDecoder.class, EntityDecoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
-        fields.add("private final " + Logger.class.getCanonicalName() + " logger = " + LoggerFactory.class.getCanonicalName() + ".getLogger(" + EntityDecoder.class.getCanonicalName() + ".class);\n");
+        builder.addField("private final {} logger = {}.getLogger({});", type(Logger.class), type(LoggerFactory.class), variable(EntityDecoder.class));
         buildMethods();
-        fields.forEach(builder::addField);
         methods.values().forEach(builder::addMethod);
         return builder.build();
     }
@@ -93,7 +90,7 @@ final class EntityDecoderBuilder<T> {
 
         builder.indent(1).append("reader.readEndDocument();\n");
         builder.indent(1).append("return entity;\n");
-        builder.append("}\n");
+        builder.append('}');
 
         methods.put(methodName, builder.build());
         return methodName;
@@ -152,7 +149,10 @@ final class EntityDecoderBuilder<T> {
         CodeBuilder builder = new CodeBuilder();
         builder.append("private java.util.Map {}(org.bson.BsonReader reader, String parentField) {\n", methodName);
         builder.indent(1).append("org.bson.BsonType currentType = reader.getCurrentBsonType();\n");
-        builder.indent(1).append("if (currentType == org.bson.BsonType.NULL) { reader.readNull(); return null; }\n");
+        builder.indent(1).append("if (currentType == org.bson.BsonType.NULL) {\n")
+               .indent(2).append("reader.readNull();\n")
+               .indent(2).append("return null;\n")
+               .indent(1).append("}\n");
         builder.indent(1).append("if (currentType != org.bson.BsonType.DOCUMENT) {\n");
         builder.indent(2).append("logger.warn({}, parentField, currentType);\n", variable("unexpected field type, field={}, type={}"));
         builder.indent(2).append("reader.skipValue();\n");
@@ -193,7 +193,7 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("reader.readEndDocument();\n");
 
         builder.indent(1).append("return map;\n");
-        builder.append("}\n");
+        builder.append('}');
 
         methods.put(methodName, builder.build());
         return methodName;
@@ -250,7 +250,7 @@ final class EntityDecoderBuilder<T> {
         builder.indent(1).append("}\n");
         builder.indent(1).append("reader.readEndArray();\n");
         builder.indent(1).append("return list;\n");
-        builder.append("}\n");
+        builder.append('}');
 
         methods.put(methodName, builder.build());
         return methodName;
@@ -261,13 +261,7 @@ final class EntityDecoderBuilder<T> {
         boolean added = enumClasses.add((Class<? extends Enum<?>>) fieldClass);
         String fieldVariable = fieldClass.getCanonicalName().replace('.', '_') + "Codec";
         if (added) {
-            String enumCodecTypeLiteral = type(EnumCodec.class);
-            String field = Strings.format("private final {} {} = new {}({});\n",
-                    enumCodecTypeLiteral,
-                    fieldVariable,
-                    enumCodecTypeLiteral,
-                    variable(fieldClass));
-            fields.add(field);
+            builder.addField("private final {} {} = new {}({});", type(EnumCodec.class), fieldVariable, type(EnumCodec.class), variable(fieldClass));
         }
         return fieldVariable;
     }

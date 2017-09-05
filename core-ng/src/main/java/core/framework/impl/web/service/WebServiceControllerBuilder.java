@@ -40,7 +40,7 @@ public class WebServiceControllerBuilder<T> {
     public Controller build() {
         DynamicInstanceBuilder<Controller> builder = new DynamicInstanceBuilder<>(Controller.class, service.getClass().getCanonicalName() + "$" + method.getName());
 
-        builder.addField(new CodeBuilder().append("final {} delegate;", serviceInterface.getCanonicalName()).build());
+        builder.addField("private final {} delegate;", type(serviceInterface));
         builder.constructor(new Class<?>[]{serviceInterface}, "this.delegate = $1;");
         builder.addMethod(buildMethod());
 

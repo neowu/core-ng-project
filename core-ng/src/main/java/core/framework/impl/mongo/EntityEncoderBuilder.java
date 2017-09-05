@@ -2,7 +2,6 @@ package core.framework.impl.mongo;
 
 import core.framework.api.mongo.Id;
 import core.framework.api.util.Maps;
-import core.framework.api.util.Strings;
 import core.framework.api.util.Types;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
@@ -158,12 +157,7 @@ final class EntityEncoderBuilder<T> {
         Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
         return enumCodecFields.computeIfAbsent(enumClass, key -> {
             String fieldVariable = "enumCodec" + fieldClass.getSimpleName() + (index++);
-            String field = Strings.format("private final {} {} = new {}({});",
-                    type(EnumCodec.class),
-                    fieldVariable,
-                    type(EnumCodec.class),
-                    variable(fieldClass));
-            builder.addField(field);
+            builder.addField("private final {} {} = new {}({});", type(EnumCodec.class), fieldVariable, type(EnumCodec.class), variable(fieldClass));
             return fieldVariable;
         });
     }

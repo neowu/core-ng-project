@@ -21,7 +21,7 @@ public class EntityDecoderBuilderTest {
         EntityDecoderBuilder<TestEntity> builder = new EntityDecoderBuilder<>(TestEntity.class);
         EntityDecoder<TestEntity> decoder = builder.build();
 
-        verifyGeneratedMethods(builder);
+        assertEquals(ClasspathResources.text("mongo-test/entity-decoder.java"), builder.builder.sourceCode());
 
         String entityJSON = ClasspathResources.text("mongo-test/entity.json");
 
@@ -38,16 +38,5 @@ public class EntityDecoderBuilderTest {
 
         assertEquals("V1", entity.mapField.get("K1"));
         assertEquals("V2", entity.mapField.get("K2"));
-    }
-
-    private void verifyGeneratedMethods(EntityDecoderBuilder<TestEntity> builder) {
-        String code = ClasspathResources.text("mongo-test/decoder-code.txt").replaceAll("\r\n", "\n");
-
-        StringBuilder stringBuilder = new StringBuilder();
-        builder.fields.forEach(stringBuilder::append);
-        builder.methods.values().forEach(stringBuilder::append);
-        stringBuilder.append('\n');
-
-        assertEquals(code, stringBuilder.toString());
     }
 }

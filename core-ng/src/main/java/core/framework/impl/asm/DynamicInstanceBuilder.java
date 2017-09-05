@@ -1,6 +1,7 @@
 package core.framework.impl.asm;
 
 import core.framework.api.util.Exceptions;
+import core.framework.api.util.Strings;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -78,7 +79,8 @@ public class DynamicInstanceBuilder<T> {
         }
     }
 
-    public void addField(String field) {
+    public void addField(String pattern, Object... argument) {
+        String field = Strings.format(pattern, argument);
         sourceCode.fields.add(field);
         try {
             classBuilder.addField(CtField.make(field, classBuilder));

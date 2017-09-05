@@ -1,5 +1,5 @@
 public class TestWebService$Client implements core.framework.impl.web.service.TestWebService {
-    final core.framework.impl.web.service.WebServiceClient client;
+    private final core.framework.impl.web.service.WebServiceClient client;
 
     public TestWebService$Client(core.framework.impl.web.service.WebServiceClient $1) {
         this.client = $1;

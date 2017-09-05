@@ -158,7 +158,7 @@ public class ObjectValidatorBuilder {
         Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
         if (pattern != null) {
             String patternFieldName = field.getName() + "Pattern" + (index++);
-            this.builder.addField(Strings.format("private final java.util.regex.Pattern {} = java.util.regex.Pattern.compile({});", patternFieldName, variable(pattern.value())));
+            this.builder.addField("private final java.util.regex.Pattern {} = java.util.regex.Pattern.compile({});", patternFieldName, variable(pattern.value()));
             builder.indent(2).append("if (!this.{}.matcher(bean.{}).matches()) errors.add({}, {});\n", patternFieldName, field.getName(), pathLiteral, variable(pattern.message()));
         }
     }
