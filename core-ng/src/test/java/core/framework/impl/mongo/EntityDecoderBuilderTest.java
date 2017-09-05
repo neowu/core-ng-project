@@ -3,6 +3,7 @@ package core.framework.impl.mongo;
 import core.framework.api.util.ClasspathResources;
 import org.bson.json.JsonReader;
 import org.bson.types.ObjectId;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
@@ -16,13 +17,23 @@ import static org.junit.Assert.assertNull;
  * @author neo
  */
 public class EntityDecoderBuilderTest {
+    private EntityDecoderBuilder<TestEntity> builder;
+    private EntityDecoder<TestEntity> decoder;
+
+    @Before
+    public void createDecoder() {
+        builder = new EntityDecoderBuilder<>(TestEntity.class);
+        decoder = builder.build();
+    }
+
+    @Test
+    public void sourceCode() {
+        String sourceCode = builder.builder.sourceCode();
+        assertEquals(ClasspathResources.text("mongo-test/entity-decoder.java"), sourceCode);
+    }
+
     @Test
     public void decode() {
-        EntityDecoderBuilder<TestEntity> builder = new EntityDecoderBuilder<>(TestEntity.class);
-        EntityDecoder<TestEntity> decoder = builder.build();
-
-        assertEquals(ClasspathResources.text("mongo-test/entity-decoder.java"), builder.builder.sourceCode());
-
         String entityJSON = ClasspathResources.text("mongo-test/entity.json");
 
         TestEntity entity = decoder.decode(new JsonReader(entityJSON));

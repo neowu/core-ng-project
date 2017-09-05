@@ -18,8 +18,8 @@ import static org.junit.Assert.assertTrue;
  * @author neo
  */
 public class ObjectValidatorLengthTest {
-    ObjectValidatorBuilder builder;
-    ObjectValidator validator;
+    private ObjectValidatorBuilder builder;
+    private ObjectValidator validator;
 
     @Before
     public void createObjectValidator() {

@@ -10,6 +10,8 @@ import core.framework.impl.asm.DynamicInstanceBuilder;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 
 import static core.framework.impl.asm.Literal.type;
@@ -33,7 +35,9 @@ public class WebServiceClientBuilder<T> {
         builder.addField("private final {} client;", type(WebServiceClient.class));
         builder.constructor(new Class<?>[]{WebServiceClient.class}, "this.client = $1;");
 
-        for (Method method : serviceInterface.getMethods()) {
+        Method[] methods = serviceInterface.getMethods();
+        Arrays.sort(methods, Comparator.comparing(Method::getName));    // to make generated code deterministic
+        for (Method method : methods) {
             builder.addMethod(buildMethod(method));
         }
 

@@ -40,7 +40,7 @@ public final class APIConfig {
                 context.httpServer.handler.responseBeanTypeValidator).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
 
-        Method[] methods = serviceInterface.getDeclaredMethods();
+        Method[] methods = serviceInterface.getMethods();
         for (Method method : methods) {
             HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
             String path = method.getDeclaredAnnotation(Path.class).value();

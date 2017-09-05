@@ -10,14 +10,16 @@ public class EntityEncoder$TestEntity implements core.framework.impl.mongo.Entit
         writer.writeEndArray();
     }
 
-    private void encodeListTestEntityChild6(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.List list) {
-        writer.writeStartArray();
-        for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
-            core.framework.impl.mongo.TestEntityChild value = (core.framework.impl.mongo.TestEntityChild) iterator.next();
-            if (value == null) writer.writeNull();
-            else encodeTestEntityChild3(writer, wrapper, value);
+    private void encodeMapString2(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.Map map) {
+        writer.writeStartDocument();
+        for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
+            java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
+            String key = (String) entry.getKey();
+            java.lang.String value = (java.lang.String) entry.getValue();
+            writer.writeName(key);
+            wrapper.write(value);
         }
-        writer.writeEndArray();
+        writer.writeEndDocument();
     }
 
     private void encodeListTestEnum5(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.List list) {
@@ -29,16 +31,28 @@ public class EntityEncoder$TestEntity implements core.framework.impl.mongo.Entit
         writer.writeEndArray();
     }
 
-    private void encodeMapString2(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.Map map) {
+    private void encodeTestEntityChild3(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, core.framework.impl.mongo.TestEntityChild entity) {
         writer.writeStartDocument();
-        for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
-            String key = (String) entry.getKey();
-            java.lang.String value = (java.lang.String) entry.getValue();
-            writer.writeName(key);
-            wrapper.write(value);
-        }
+        writer.writeName("boolean_field");
+        wrapper.write(entity.booleanField);
+        writer.writeName("enum_field");
+        enumCodecTestEnum4.encode(writer, entity.enumField, null);
+        writer.writeName("enum_list_field");
+        if (entity.enumListField == null) writer.writeNull();
+        else encodeListTestEnum5(writer, wrapper, entity.enumListField);
+        writer.writeName("ref_id_field");
+        wrapper.write(entity.refId);
         writer.writeEndDocument();
+    }
+
+    private void encodeListTestEntityChild6(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.List list) {
+        writer.writeStartArray();
+        for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
+            core.framework.impl.mongo.TestEntityChild value = (core.framework.impl.mongo.TestEntityChild) iterator.next();
+            if (value == null) writer.writeNull();
+            else encodeTestEntityChild3(writer, wrapper, value);
+        }
+        writer.writeEndArray();
     }
 
     private void encodeMapTestEntityChild7(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, java.util.Map map) {
@@ -90,20 +104,6 @@ public class EntityEncoder$TestEntity implements core.framework.impl.mongo.Entit
         writer.writeName("null_child");
         if (entity.nullChild == null) writer.writeNull();
         else encodeTestEntityChild3(writer, wrapper, entity.nullChild);
-        writer.writeEndDocument();
-    }
-
-    private void encodeTestEntityChild3(org.bson.BsonWriter writer, core.framework.impl.mongo.BsonWriterWrapper wrapper, core.framework.impl.mongo.TestEntityChild entity) {
-        writer.writeStartDocument();
-        writer.writeName("boolean_field");
-        wrapper.write(entity.booleanField);
-        writer.writeName("enum_field");
-        enumCodecTestEnum4.encode(writer, entity.enumField, null);
-        writer.writeName("enum_list_field");
-        if (entity.enumListField == null) writer.writeNull();
-        else encodeListTestEnum5(writer, wrapper, entity.enumListField);
-        writer.writeName("ref_id_field");
-        wrapper.write(entity.refId);
         writer.writeEndDocument();
     }
 

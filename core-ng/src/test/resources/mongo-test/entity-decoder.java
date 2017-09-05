@@ -1,225 +1,72 @@
 public class EntityDecoder$TestEntity implements core.framework.impl.mongo.EntityDecoder {
     private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(core.framework.impl.mongo.EntityDecoder.class);
 
-    private final core.framework.impl.mongo.EnumCodec enumCodecTestEnum4 = new core.framework.impl.mongo.EnumCodec(core.framework.impl.mongo.TestEntityChild.TestEnum.class);
+    private final core.framework.impl.mongo.EnumCodec enumCodecTestEnum19 = new core.framework.impl.mongo.EnumCodec(core.framework.impl.mongo.TestEntityChild.TestEnum.class);
 
-    private java.util.List decodeListString1(org.bson.BsonReader reader, String fieldPath) {
-        org.bson.BsonType currentType = reader.getCurrentBsonType();
-        if (currentType == org.bson.BsonType.NULL) {
-            reader.readNull();
-            return null;
-        }
-        if (currentType != org.bson.BsonType.ARRAY) {
-            logger.warn("unexpected field type, field={}, type={}", fieldPath, currentType);
-            reader.skipValue();
-            return null;
-        }
-        java.util.List list = new java.util.ArrayList();
+    private java.util.List decodeListString10(org.bson.BsonReader reader, core.framework.impl.mongo.BsonReaderWrapper wrapper, String fieldPath) {
+        java.util.List list = wrapper.startReadList(fieldPath);
+        if (list == null) return null;
         reader.readStartArray();
         while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-            list.add(core.framework.impl.mongo.EntityCodecHelper.readString(reader, fieldPath));
+            java.lang.String $11 = wrapper.readString(fieldPath);
+            list.add($11);
         }
         reader.readEndArray();
         return list;
     }
 
-    private java.util.List decodeListTestEntityChild6(org.bson.BsonReader reader, String fieldPath) {
-        org.bson.BsonType currentType = reader.getCurrentBsonType();
-        if (currentType == org.bson.BsonType.NULL) {
-            reader.readNull();
-            return null;
-        }
-        if (currentType != org.bson.BsonType.ARRAY) {
-            logger.warn("unexpected field type, field={}, type={}", fieldPath, currentType);
-            reader.skipValue();
-            return null;
-        }
-        java.util.List list = new java.util.ArrayList();
-        reader.readStartArray();
-        while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-            list.add(decodeTestEntityChild3(reader, fieldPath));
-        }
-        reader.readEndArray();
-        return list;
-    }
-
-    private java.util.List decodeListTestEnum5(org.bson.BsonReader reader, String fieldPath) {
-        org.bson.BsonType currentType = reader.getCurrentBsonType();
-        if (currentType == org.bson.BsonType.NULL) {
-            reader.readNull();
-            return null;
-        }
-        if (currentType != org.bson.BsonType.ARRAY) {
-            logger.warn("unexpected field type, field={}, type={}", fieldPath, currentType);
-            reader.skipValue();
-            return null;
-        }
-        java.util.List list = new java.util.ArrayList();
-        reader.readStartArray();
-        while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-            list.add(enumCodecTestEnum4.read(reader, fieldPath));
-        }
-        reader.readEndArray();
-        return list;
-    }
-
-    private java.util.Map decodeMapString2(org.bson.BsonReader reader, String parentField) {
-        org.bson.BsonType currentType = reader.getCurrentBsonType();
-        if (currentType == org.bson.BsonType.NULL) {
-            reader.readNull();
-            return null;
-        }
-        if (currentType != org.bson.BsonType.DOCUMENT) {
-            logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
-            reader.skipValue();
-            return null;
-        }
-        java.util.Map map = new java.util.LinkedHashMap();
+    private java.util.Map decodeMapString13(org.bson.BsonReader reader, core.framework.impl.mongo.BsonReaderWrapper wrapper, String parentField) {
+        java.util.Map map = wrapper.startReadMap(parentField);
+        if (map == null) return null;
         reader.readStartDocument();
         while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
             String fieldName = reader.readName();
             String fieldPath = parentField + "." + fieldName;
-            map.put(fieldName, core.framework.impl.mongo.EntityCodecHelper.readString(reader, fieldPath));
+            java.lang.String $14 = wrapper.readString(fieldPath);
+            map.put(fieldName, $14);
         }
         reader.readEndDocument();
         return map;
     }
 
-    private java.util.Map decodeMapTestEntityChild7(org.bson.BsonReader reader, String parentField) {
-        org.bson.BsonType currentType = reader.getCurrentBsonType();
-        if (currentType == org.bson.BsonType.NULL) {
-            reader.readNull();
-            return null;
-        }
-        if (currentType != org.bson.BsonType.DOCUMENT) {
-            logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
-            reader.skipValue();
-            return null;
-        }
-        java.util.Map map = new java.util.LinkedHashMap();
-        reader.readStartDocument();
+    private java.util.List decodeListTestEnum21(org.bson.BsonReader reader, core.framework.impl.mongo.BsonReaderWrapper wrapper, String fieldPath) {
+        java.util.List list = wrapper.startReadList(fieldPath);
+        if (list == null) return null;
+        reader.readStartArray();
         while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-            String fieldName = reader.readName();
-            String fieldPath = parentField + "." + fieldName;
-            map.put(fieldName, decodeTestEntityChild3(reader, fieldPath));
+            core.framework.impl.mongo.TestEntityChild.TestEnum $22 = (core.framework.impl.mongo.TestEntityChild.TestEnum) enumCodecTestEnum19.read(reader, fieldPath);
+            list.add($22);
         }
-        reader.readEndDocument();
-        return map;
+        reader.readEndArray();
+        return list;
     }
 
-    public Object decode(org.bson.BsonReader reader) {
-        return decodeTestEntity0(reader, "");
-    }
-
-    public core.framework.impl.mongo.TestEntity decodeTestEntity0(org.bson.BsonReader reader, String parentField) {
-        org.bson.BsonType currentType = reader.getCurrentBsonType();
-        if (currentType != null && currentType == org.bson.BsonType.NULL) {
-            reader.readNull();
-            return null;
-        }
-        if (currentType != null && currentType != org.bson.BsonType.DOCUMENT) {
-            logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
-            reader.skipValue();
-            return null;
-        }
-        core.framework.impl.mongo.TestEntity entity = new core.framework.impl.mongo.TestEntity();
-        reader.readStartDocument();
-        while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-            String fieldName = reader.readName();
-            String fieldPath = parentField + "." + fieldName;
-            if ("_id".equals(fieldName)) {
-                entity.id = core.framework.impl.mongo.EntityCodecHelper.readObjectId(reader, fieldPath);
-                continue;
-            }
-            if ("int_field".equals(fieldName)) {
-                entity.intField = core.framework.impl.mongo.EntityCodecHelper.readInteger(reader, fieldPath);
-                continue;
-            }
-            if ("double_field".equals(fieldName)) {
-                entity.doubleField = core.framework.impl.mongo.EntityCodecHelper.readDouble(reader, fieldPath);
-                continue;
-            }
-            if ("long_field".equals(fieldName)) {
-                entity.longField = core.framework.impl.mongo.EntityCodecHelper.readLong(reader, fieldPath);
-                continue;
-            }
-            if ("boolean_field".equals(fieldName)) {
-                entity.booleanField = core.framework.impl.mongo.EntityCodecHelper.readBoolean(reader, fieldPath);
-                continue;
-            }
-            if ("date_field".equals(fieldName)) {
-                entity.dateField = core.framework.impl.mongo.EntityCodecHelper.readLocalDateTime(reader, fieldPath);
-                continue;
-            }
-            if ("zoned_date_time_field".equals(fieldName)) {
-                entity.zonedDateTimeField = core.framework.impl.mongo.EntityCodecHelper.readZonedDateTime(reader, fieldPath);
-                continue;
-            }
-            if ("string_field".equals(fieldName)) {
-                entity.stringField = core.framework.impl.mongo.EntityCodecHelper.readString(reader, fieldPath);
-                continue;
-            }
-            if ("list_field".equals(fieldName)) {
-                entity.listField = decodeListString1(reader, fieldPath);
-                continue;
-            }
-            if ("map_field".equals(fieldName)) {
-                entity.mapField = decodeMapString2(reader, fieldPath);
-                continue;
-            }
-            if ("child".equals(fieldName)) {
-                entity.child = decodeTestEntityChild3(reader, fieldPath);
-                continue;
-            }
-            if ("children".equals(fieldName)) {
-                entity.children = decodeListTestEntityChild6(reader, fieldPath);
-                continue;
-            }
-            if ("children_map".equals(fieldName)) {
-                entity.childrenMap = decodeMapTestEntityChild7(reader, fieldPath);
-                continue;
-            }
-            if ("null_child".equals(fieldName)) {
-                entity.nullChild = decodeTestEntityChild3(reader, fieldPath);
-                continue;
-            }
-            logger.warn("undefined field, field={}, type={}", fieldPath, reader.getCurrentBsonType());
-            reader.skipValue();
-        }
-        reader.readEndDocument();
-        return entity;
-    }
-
-    public core.framework.impl.mongo.TestEntityChild decodeTestEntityChild3(org.bson.BsonReader reader, String parentField) {
-        org.bson.BsonType currentType = reader.getCurrentBsonType();
-        if (currentType != null && currentType == org.bson.BsonType.NULL) {
-            reader.readNull();
-            return null;
-        }
-        if (currentType != null && currentType != org.bson.BsonType.DOCUMENT) {
-            logger.warn("unexpected field type, field={}, type={}", parentField, currentType);
-            reader.skipValue();
-            return null;
-        }
+    public core.framework.impl.mongo.TestEntityChild decodeTestEntityChild16(org.bson.BsonReader reader, core.framework.impl.mongo.BsonReaderWrapper wrapper, String parentField) {
+        boolean hasContent = wrapper.startReadEntity(parentField);
+        if (!hasContent) return null;
         core.framework.impl.mongo.TestEntityChild entity = new core.framework.impl.mongo.TestEntityChild();
         reader.readStartDocument();
         while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
             String fieldName = reader.readName();
             String fieldPath = parentField + "." + fieldName;
             if ("boolean_field".equals(fieldName)) {
-                entity.booleanField = core.framework.impl.mongo.EntityCodecHelper.readBoolean(reader, fieldPath);
+                java.lang.Boolean $17 = wrapper.readBoolean(fieldPath);
+                entity.booleanField = $17;
                 continue;
             }
             if ("enum_field".equals(fieldName)) {
-                entity.enumField = (core.framework.impl.mongo.TestEntityChild.TestEnum) enumCodecTestEnum4.read(reader, fieldPath);
+                core.framework.impl.mongo.TestEntityChild.TestEnum $18 = (core.framework.impl.mongo.TestEntityChild.TestEnum) enumCodecTestEnum19.read(reader, fieldPath);
+                entity.enumField = $18;
                 continue;
             }
             if ("enum_list_field".equals(fieldName)) {
-                entity.enumListField = decodeListTestEnum5(reader, fieldPath);
+                java.util.List $20 = decodeListTestEnum21(reader, wrapper, fieldPath);
+                entity.enumListField = $20;
                 continue;
             }
             if ("ref_id_field".equals(fieldName)) {
-                entity.refId = core.framework.impl.mongo.EntityCodecHelper.readObjectId(reader, fieldPath);
+                org.bson.types.ObjectId $23 = wrapper.readObjectId(fieldPath);
+                entity.refId = $23;
                 continue;
             }
             logger.warn("undefined field, field={}, type={}", fieldPath, reader.getCurrentBsonType());
@@ -227,6 +74,122 @@ public class EntityDecoder$TestEntity implements core.framework.impl.mongo.Entit
         }
         reader.readEndDocument();
         return entity;
+    }
+
+    private java.util.List decodeListTestEntityChild25(org.bson.BsonReader reader, core.framework.impl.mongo.BsonReaderWrapper wrapper, String fieldPath) {
+        java.util.List list = wrapper.startReadList(fieldPath);
+        if (list == null) return null;
+        reader.readStartArray();
+        while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
+            core.framework.impl.mongo.TestEntityChild $26 = decodeTestEntityChild16(reader, wrapper, fieldPath);
+            list.add($26);
+        }
+        reader.readEndArray();
+        return list;
+    }
+
+    private java.util.Map decodeMapTestEntityChild28(org.bson.BsonReader reader, core.framework.impl.mongo.BsonReaderWrapper wrapper, String parentField) {
+        java.util.Map map = wrapper.startReadMap(parentField);
+        if (map == null) return null;
+        reader.readStartDocument();
+        while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
+            String fieldName = reader.readName();
+            String fieldPath = parentField + "." + fieldName;
+            core.framework.impl.mongo.TestEntityChild $29 = decodeTestEntityChild16(reader, wrapper, fieldPath);
+            map.put(fieldName, $29);
+        }
+        reader.readEndDocument();
+        return map;
+    }
+
+    public core.framework.impl.mongo.TestEntity decodeTestEntity0(org.bson.BsonReader reader, core.framework.impl.mongo.BsonReaderWrapper wrapper, String parentField) {
+        boolean hasContent = wrapper.startReadEntity(parentField);
+        if (!hasContent) return null;
+        core.framework.impl.mongo.TestEntity entity = new core.framework.impl.mongo.TestEntity();
+        reader.readStartDocument();
+        while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
+            String fieldName = reader.readName();
+            String fieldPath = parentField + "." + fieldName;
+            if ("_id".equals(fieldName)) {
+                org.bson.types.ObjectId $1 = wrapper.readObjectId(fieldPath);
+                entity.id = $1;
+                continue;
+            }
+            if ("int_field".equals(fieldName)) {
+                java.lang.Integer $2 = wrapper.readInteger(fieldPath);
+                entity.intField = $2;
+                continue;
+            }
+            if ("double_field".equals(fieldName)) {
+                java.lang.Double $3 = wrapper.readDouble(fieldPath);
+                entity.doubleField = $3;
+                continue;
+            }
+            if ("long_field".equals(fieldName)) {
+                java.lang.Long $4 = wrapper.readLong(fieldPath);
+                entity.longField = $4;
+                continue;
+            }
+            if ("boolean_field".equals(fieldName)) {
+                java.lang.Boolean $5 = wrapper.readBoolean(fieldPath);
+                entity.booleanField = $5;
+                continue;
+            }
+            if ("date_field".equals(fieldName)) {
+                java.time.LocalDateTime $6 = wrapper.readLocalDateTime(fieldPath);
+                entity.dateField = $6;
+                continue;
+            }
+            if ("zoned_date_time_field".equals(fieldName)) {
+                java.time.ZonedDateTime $7 = wrapper.readZonedDateTime(fieldPath);
+                entity.zonedDateTimeField = $7;
+                continue;
+            }
+            if ("string_field".equals(fieldName)) {
+                java.lang.String $8 = wrapper.readString(fieldPath);
+                entity.stringField = $8;
+                continue;
+            }
+            if ("list_field".equals(fieldName)) {
+                java.util.List $9 = decodeListString10(reader, wrapper, fieldPath);
+                entity.listField = $9;
+                continue;
+            }
+            if ("map_field".equals(fieldName)) {
+                java.util.Map $12 = decodeMapString13(reader, wrapper, fieldPath);
+                entity.mapField = $12;
+                continue;
+            }
+            if ("child".equals(fieldName)) {
+                core.framework.impl.mongo.TestEntityChild $15 = decodeTestEntityChild16(reader, wrapper, fieldPath);
+                entity.child = $15;
+                continue;
+            }
+            if ("children".equals(fieldName)) {
+                java.util.List $24 = decodeListTestEntityChild25(reader, wrapper, fieldPath);
+                entity.children = $24;
+                continue;
+            }
+            if ("children_map".equals(fieldName)) {
+                java.util.Map $27 = decodeMapTestEntityChild28(reader, wrapper, fieldPath);
+                entity.childrenMap = $27;
+                continue;
+            }
+            if ("null_child".equals(fieldName)) {
+                core.framework.impl.mongo.TestEntityChild $30 = decodeTestEntityChild16(reader, wrapper, fieldPath);
+                entity.nullChild = $30;
+                continue;
+            }
+            logger.warn("undefined field, field={}, type={}", fieldPath, reader.getCurrentBsonType());
+            reader.skipValue();
+        }
+        reader.readEndDocument();
+        return entity;
+    }
+
+    public Object decode(org.bson.BsonReader reader) {
+        core.framework.impl.mongo.BsonReaderWrapper wrapper = new core.framework.impl.mongo.BsonReaderWrapper(reader);
+        return decodeTestEntity0(reader, wrapper, "");
     }
 
 }
