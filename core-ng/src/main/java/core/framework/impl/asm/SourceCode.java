@@ -2,6 +2,7 @@ package core.framework.impl.asm;
 
 import core.framework.api.util.Lists;
 
+import java.util.Collections;
 import java.util.List;
 
 import static core.framework.impl.asm.Literal.type;
@@ -29,6 +30,7 @@ final class SourceCode {
             buildConstructor(builder, classSimpleName);
             builder.append("\n\n");
         }
+        Collections.sort(methods);  // to make method order deterministic
         for (String method : methods) {
             addMethod(builder, method);
             builder.append("\n\n");

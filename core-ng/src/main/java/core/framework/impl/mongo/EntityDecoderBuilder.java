@@ -113,7 +113,7 @@ final class EntityDecoderBuilder<T> {
             builder.indent(3).append("{} = {}.readZonedDateTime(reader, fieldPath);\n", fieldVariable, helper);
         } else if (fieldClass.isEnum()) {
             String enumCodecVariable = registerEnumCodec(fieldClass);
-            builder.indent(3).append("{} = ({}) {}.decode(reader, null);\n", fieldVariable, type(fieldClass), enumCodecVariable);
+            builder.indent(3).append("{} = ({}) {}.read(reader, fieldPath);\n", fieldVariable, type(fieldClass), enumCodecVariable);
         } else if (Double.class.equals(fieldClass)) {
             builder.indent(3).append("{} = {}.readDouble(reader, fieldPath);\n", fieldVariable, helper);
         } else if (ObjectId.class.equals(fieldClass)) {

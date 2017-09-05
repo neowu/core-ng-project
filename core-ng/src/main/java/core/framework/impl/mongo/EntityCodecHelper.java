@@ -48,6 +48,8 @@ public final class EntityCodecHelper {      // used by generated entity encoder 
         if (currentType == BsonType.NULL) {
             reader.readNull();
             return null;
+        } else if (currentType == BsonType.INT32) {
+            return (long) reader.readInt32();
         } else if (currentType == BsonType.INT64) {
             return reader.readInt64();
         } else {

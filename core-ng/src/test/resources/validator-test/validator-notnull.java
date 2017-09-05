@@ -1,25 +1,4 @@
 public class ObjectValidatorNotNullTest$Bean$ObjectValidator implements core.framework.impl.validate.ObjectValidator {
-    private void validateChildBean1(core.framework.impl.validate.ObjectValidatorNotNullTest.ChildBean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
-        if (bean.intField == null) {
-            if (!partial) errors.add("child.intField", "intField must not be null");
-        } else {
-        }
-    }
-
-    private void validateChildBean2(core.framework.impl.validate.ObjectValidatorNotNullTest.ChildBean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
-        if (bean.intField == null) {
-            if (!partial) errors.add("children.intField", "intField must not be null");
-        } else {
-        }
-    }
-
-    private void validateChildBean3(core.framework.impl.validate.ObjectValidatorNotNullTest.ChildBean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
-        if (bean.intField == null) {
-            if (!partial) errors.add("childMap.intField", "intField must not be null");
-        } else {
-        }
-    }
-
     private void validateBean0(core.framework.impl.validate.ObjectValidatorNotNullTest.Bean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
         if (bean.stringField == null) {
             if (!partial) errors.add("stringField", "stringField must not be null");
@@ -49,6 +28,27 @@ public class ObjectValidatorNotNullTest$Bean$ObjectValidator implements core.fra
                 core.framework.impl.validate.ObjectValidatorNotNullTest.ChildBean value = (core.framework.impl.validate.ObjectValidatorNotNullTest.ChildBean) entry.getValue();
                 if (value != null) validateChildBean3(value, errors, partial);
             }
+        }
+    }
+
+    private void validateChildBean1(core.framework.impl.validate.ObjectValidatorNotNullTest.ChildBean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
+        if (bean.intField == null) {
+            if (!partial) errors.add("child.intField", "intField must not be null");
+        } else {
+        }
+    }
+
+    private void validateChildBean2(core.framework.impl.validate.ObjectValidatorNotNullTest.ChildBean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
+        if (bean.intField == null) {
+            if (!partial) errors.add("children.intField", "intField must not be null");
+        } else {
+        }
+    }
+
+    private void validateChildBean3(core.framework.impl.validate.ObjectValidatorNotNullTest.ChildBean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
+        if (bean.intField == null) {
+            if (!partial) errors.add("childMap.intField", "intField must not be null");
+        } else {
         }
     }
 
