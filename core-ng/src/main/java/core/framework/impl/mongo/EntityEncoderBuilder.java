@@ -26,7 +26,7 @@ import static core.framework.impl.asm.Literal.variable;
 final class EntityEncoderBuilder<T> {
     final Map<Class<? extends Enum<?>>, String> enumCodecFields = Maps.newHashMap();
     final DynamicInstanceBuilder<EntityEncoder<T>> builder;
-    private final Map<Type, String> methods = new LinkedHashMap<>();
+    private final Map<Type, String> encodeMethods = new LinkedHashMap<>();
     private final Class<T> entityClass;
     private int index;
 
@@ -51,7 +51,7 @@ final class EntityEncoderBuilder<T> {
     }
 
     private String encodeEntityMethod(Class<?> entityClass) {
-        String methodName = methods.get(entityClass);
+        String methodName = encodeMethods.get(entityClass);
         if (methodName != null) return methodName;
 
         methodName = "encode" + entityClass.getSimpleName() + (index++);
@@ -72,12 +72,12 @@ final class EntityEncoderBuilder<T> {
         builder.append('}');
         this.builder.addMethod(builder.build());
 
-        methods.put(entityClass, methodName);
+        encodeMethods.put(entityClass, methodName);
         return methodName;
     }
 
     private String encodeListMethod(Class<?> valueClass) {
-        String methodName = methods.get(Types.list(valueClass));
+        String methodName = encodeMethods.get(Types.list(valueClass));
         if (methodName != null) return methodName;
 
         String valueClassName = valueClass.getCanonicalName();
@@ -96,12 +96,12 @@ final class EntityEncoderBuilder<T> {
                .append('}');
         this.builder.addMethod(builder.build());
 
-        methods.put(Types.list(valueClass), methodName);
+        encodeMethods.put(Types.list(valueClass), methodName);
         return methodName;
     }
 
     private String encodeMapMethod(Class<?> valueClass) {
-        String methodName = methods.get(Types.map(String.class, valueClass));
+        String methodName = encodeMethods.get(Types.map(String.class, valueClass));
         if (methodName != null) return methodName;
         methodName = "encodeMap" + valueClass.getSimpleName() + (index++);
 
@@ -121,7 +121,7 @@ final class EntityEncoderBuilder<T> {
                .append('}');
         this.builder.addMethod(builder.build());
 
-        methods.put(Types.map(String.class, valueClass), methodName);
+        encodeMethods.put(Types.map(String.class, valueClass), methodName);
         return methodName;
     }
 
