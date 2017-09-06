@@ -71,10 +71,7 @@ public class WebServiceControllerBuilderTest {
 
         when(request.bean(Types.list(TestWebService.TestRequest.class))).thenReturn(Lists.newArrayList(requestBean));
 
-        Controller controller = new WebServiceControllerBuilder<>(TestWebService.class,
-                serviceImpl,
-                TestWebService.class.getDeclaredMethod("batch", List.class))
-                .build();
+        Controller controller = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("batch", List.class)).build();
         Response response = controller.execute(request);
         assertEquals(HTTPStatus.OK, response.status());
     }
