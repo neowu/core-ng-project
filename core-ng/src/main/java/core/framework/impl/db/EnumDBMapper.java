@@ -3,8 +3,8 @@ package core.framework.impl.db;
 import core.framework.api.db.DBEnumValue;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
+import core.framework.impl.reflect.Classes;
 
-import java.lang.reflect.Field;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -16,17 +16,12 @@ final class EnumDBMapper {
 
     <T extends Enum<?>> void registerEnumClass(Class<T> enumClass) {
         if (!mappings.containsKey(enumClass)) {
-            T[] constants = enumClass.getEnumConstants();
             @SuppressWarnings({"unchecked", "rawtypes"})
             Map<Enum<?>, String> mapping = new EnumMap(enumClass);
+            T[] constants = enumClass.getEnumConstants();
             for (T constant : constants) {
-                try {
-                    Field field = enumClass.getField(constant.name());
-                    String dbValue = field.getDeclaredAnnotation(DBEnumValue.class).value();
-                    mapping.put(constant, dbValue);
-                } catch (NoSuchFieldException e) {
-                    throw new Error(e);
-                }
+                String dbValue = Classes.enumValueAnnotation(enumClass, constant, DBEnumValue.class).value();
+                mapping.put(constant, dbValue);
             }
             mappings.put(enumClass, mapping);
         }

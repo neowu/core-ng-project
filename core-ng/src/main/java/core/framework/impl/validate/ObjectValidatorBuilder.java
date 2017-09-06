@@ -48,17 +48,7 @@ public class ObjectValidatorBuilder {
         if (Classes.instanceFields(targetClass).stream().noneMatch(this::hasValidationAnnotation)) return Optional.empty();
 
         builder = new DynamicInstanceBuilder<>(ObjectValidator.class, targetClass.getTypeName() + "$ObjectValidator");
-        buildRootMethod(targetClass);
-        return Optional.of(builder.build());
-    }
-
-    private Class<?> unwrapInstanceType() {
-        if (GenericTypes.isList(instanceType)) return GenericTypes.listValueClass(instanceType);
-        return GenericTypes.rawClass(instanceType);
-    }
-
-    private void buildRootMethod(Class<?> targetClass) {
-        String method = buildValidateMethod(targetClass, null);
+        String method = validateObjectMethod(targetClass, null);
 
         CodeBuilder builder = new CodeBuilder().append("public void validate(Object instance, {} errors, boolean partial) {\n", type(ValidationErrors.class));
         if (GenericTypes.isList(instanceType)) {
@@ -72,9 +62,15 @@ public class ObjectValidatorBuilder {
         }
         builder.append('}');
         this.builder.addMethod(builder.build());
+        return Optional.of(this.builder.build());
     }
 
-    private String buildValidateMethod(Class<?> beanClass, String parentPath) {
+    private Class<?> unwrapInstanceType() {
+        if (GenericTypes.isList(instanceType)) return GenericTypes.listValueClass(instanceType);
+        return GenericTypes.rawClass(instanceType);
+    }
+
+    private String validateObjectMethod(Class<?> beanClass, String parentPath) {
         String methodName = "validate" + beanClass.getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder().append("private void {}({} bean, {} errors, boolean partial) {\n", methodName, type(beanClass), type(ValidationErrors.class));
         for (Field field : Classes.instanceFields(beanClass)) {
@@ -100,7 +96,7 @@ public class ObjectValidatorBuilder {
             } else if (Number.class.isAssignableFrom(fieldClass)) {
                 buildNumberValidation(builder, field, pathLiteral);
             } else if (!isValueClass(fieldClass)) {
-                String method = buildValidateMethod(fieldClass, path(field, parentPath));
+                String method = validateObjectMethod(fieldClass, path(field, parentPath));
                 builder.indent(2).append("{}(bean.{}, errors, partial);\n", method, field.getName());
             }
 
@@ -123,7 +119,7 @@ public class ObjectValidatorBuilder {
 
         Class<?> valueClass = GenericTypes.mapValueClass(field.getGenericType());
         if (!isValueClass(valueClass)) {
-            String method = buildValidateMethod(valueClass, path(field, parentPath));
+            String method = validateObjectMethod(valueClass, path(field, parentPath));
             builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.entrySet().iterator(); iterator.hasNext(); ) {\n", field.getName())
                    .indent(3).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
                    .indent(3).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
@@ -137,7 +133,7 @@ public class ObjectValidatorBuilder {
 
         Class<?> valueClass = GenericTypes.listValueClass(field.getGenericType());
         if (!isValueClass(valueClass)) {
-            String method = buildValidateMethod(valueClass, path(field, parentPath));
+            String method = validateObjectMethod(valueClass, path(field, parentPath));
             builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.iterator(); iterator.hasNext(); ) {\n", field.getName())
                    .indent(3).append("{} value = ({}) iterator.next();\n", type(valueClass), type(valueClass))
                    .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)

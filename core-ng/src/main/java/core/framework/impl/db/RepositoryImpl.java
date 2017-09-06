@@ -32,7 +32,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         validator = new RepositoryEntityValidator<>(entityClass);
         insertQuery = new InsertQuery<>(entityClass);
         selectQuery = new SelectQuery<>(entityClass, database.vendor);
-        updateQuery = new UpdateQuery<>(entityClass);
+        updateQuery = new UpdateQueryBuilder<>(entityClass).build();
         deleteSQL = DeleteQueryBuilder.build(entityClass);
         this.rowMapper = rowMapper;
     }
@@ -118,7 +118,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     public void update(T entity) {
         StopWatch watch = new StopWatch();
         validator.partialValidate(entity);
-        UpdateQuery.Query query = updateQuery.query(entity);
+        UpdateQuery.Statement query = updateQuery.update(entity);
         try {
             int updatedRows = database.operation.update(query.sql, query.params);
             if (updatedRows != 1)

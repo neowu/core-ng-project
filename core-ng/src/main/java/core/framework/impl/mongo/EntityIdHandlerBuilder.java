@@ -15,16 +15,17 @@ import static core.framework.impl.asm.Literal.type;
  * @author neo
  */
 final class EntityIdHandlerBuilder<T> {
+    final DynamicInstanceBuilder<EntityIdHandler<T>> builder;
     private final Class<T> entityClass;
     private final Field idField;
 
     EntityIdHandlerBuilder(Class<T> entityClass) {
         this.entityClass = entityClass;
         idField = idField();
+        builder = new DynamicInstanceBuilder<>(EntityIdHandler.class, EntityIdHandler.class.getCanonicalName() + "$" + entityClass.getSimpleName());
     }
 
     public EntityIdHandler<T> build() {
-        DynamicInstanceBuilder<EntityIdHandler<T>> builder = new DynamicInstanceBuilder<>(EntityIdHandler.class, EntityIdHandler.class.getCanonicalName() + "$" + entityClass.getSimpleName());
         builder.addMethod(getMethod());
         builder.addMethod(setMethod());
         builder.addMethod(generateIdIfAbsentMethod());
@@ -41,16 +42,15 @@ final class EntityIdHandlerBuilder<T> {
     private String generateIdIfAbsentMethod() {
         CodeBuilder builder = new CodeBuilder();
         builder.append("public boolean generateIdIfAbsent() {\n")
-               .indent(1).append("return {};", ObjectId.class.equals(idField.getType()) ? "true" : "false")
+               .indent(1).append("return {};\n", ObjectId.class.equals(idField.getType()) ? "true" : "false")
                .append("}");
         return builder.build();
     }
 
     private String getMethod() {
         CodeBuilder builder = new CodeBuilder();
-        String entityClassLiteral = type(entityClass);
         builder.append("public Object get(Object value) {\n")
-               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral)
+               .indent(1).append("{} entity = ({}) value;\n", type(entityClass), type(entityClass))
                .indent(1).append("return entity.{};\n", idField.getName())
                .append("}");
         return builder.build();
@@ -58,10 +58,9 @@ final class EntityIdHandlerBuilder<T> {
 
     private String setMethod() {
         CodeBuilder builder = new CodeBuilder();
-        String entityClassLiteral = type(entityClass);
         builder.append("public void set(Object value, Object id) {\n")
-               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral)
-               .indent(1).append("entity.{} = ({}) id;\n", idField.getName(), idField.getType().getCanonicalName())
+               .indent(1).append("{} entity = ({}) value;\n", type(entityClass), type(entityClass))
+               .indent(1).append("entity.{} = ({}) id;\n", idField.getName(), type(idField.getType()))
                .append("}");
         return builder.build();
     }

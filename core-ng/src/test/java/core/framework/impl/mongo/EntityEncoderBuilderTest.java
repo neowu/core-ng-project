@@ -9,6 +9,7 @@ import core.framework.api.util.Sets;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -23,13 +24,24 @@ import static org.junit.Assert.assertEquals;
  * @author neo
  */
 public class EntityEncoderBuilderTest {
+    private EntityEncoderBuilder<TestEntity> builder;
+    private EntityEncoder<TestEntity> encoder;
+
+    @Before
+    public void createEncoder() {
+        builder = new EntityEncoderBuilder<>(TestEntity.class);
+        encoder = builder.build();
+    }
+
+    @Test
+    public void sourceCode() {
+        String sourceCode = builder.builder.sourceCode();
+        assertEquals(ClasspathResources.text("mongo-test/entity-encoder.java"), sourceCode);
+    }
+
     @Test
     public void encode() throws IOException {
-        EntityEncoderBuilder<TestEntity> builder = new EntityEncoderBuilder<>(TestEntity.class);
-        EntityEncoder<TestEntity> encoder = builder.build();
-
         assertEquals(Sets.newHashSet(TestEntityChild.TestEnum.class), builder.enumCodecFields.keySet());
-        assertEquals(ClasspathResources.text("mongo-test/entity-encoder.java"), builder.builder.sourceCode());
 
         StringWriter writer = new StringWriter();
         TestEntity entity = new TestEntity();

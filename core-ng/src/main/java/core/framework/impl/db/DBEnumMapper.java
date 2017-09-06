@@ -3,8 +3,8 @@ package core.framework.impl.db;
 import core.framework.api.db.DBEnumValue;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
+import core.framework.impl.reflect.Classes;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -32,13 +32,8 @@ final class DBEnumMapper<T extends Enum<T>> {
         T[] constants = enumClass.getEnumConstants();
         Map<String, T> mapping = Maps.newHashMapWithExpectedSize(constants.length);
         for (T constant : constants) {
-            try {
-                Field field = enumClass.getField(constant.name());
-                String dbValue = field.getDeclaredAnnotation(DBEnumValue.class).value();
-                mapping.put(dbValue, constant);
-            } catch (NoSuchFieldException e) {
-                throw new Error(e);
-            }
+            String dbValue = Classes.enumValueAnnotation(enumClass, constant, DBEnumValue.class).value();
+            mapping.put(dbValue, constant);
         }
         return mapping;
     }

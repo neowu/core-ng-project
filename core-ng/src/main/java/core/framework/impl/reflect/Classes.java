@@ -1,6 +1,7 @@
 package core.framework.impl.reflect;
 
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -17,5 +18,14 @@ public final class Classes {
             if (!Modifier.isStatic(field.getModifiers())) instanceFields.add(field);
         }
         return instanceFields;      // even though according to JDK doc, the fields returned is not in particular order, but common JDK impl uses order as source code
+    }
+
+    public static <T extends Enum<?>, A extends Annotation> A enumValueAnnotation(Class<T> enumClass, T constant, Class<A> annotationClass) {
+        try {
+            Field field = enumClass.getField(constant.name());
+            return field.getDeclaredAnnotation(annotationClass);
+        } catch (NoSuchFieldException e) {
+            throw new Error(e);
+        }
     }
 }

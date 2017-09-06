@@ -2,6 +2,7 @@ package core.framework.impl.mongo;
 
 import core.framework.api.mongo.MongoEnumValue;
 import core.framework.api.util.Exceptions;
+import core.framework.impl.reflect.Classes;
 import org.bson.BsonReader;
 import org.bson.BsonType;
 import org.bson.BsonWriter;
@@ -11,7 +12,6 @@ import org.bson.codecs.EncoderContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,14 +32,9 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
         encodingMappings = new EnumMap<>(enumClass);
         decodingMappings = new HashMap<>(constants.length);
         for (T constant : constants) {
-            try {
-                Field field = enumClass.getField(constant.name());
-                String value = field.getDeclaredAnnotation(MongoEnumValue.class).value();
-                encodingMappings.put(constant, value);
-                decodingMappings.put(value, constant);
-            } catch (NoSuchFieldException e) {
-                throw new Error(e);
-            }
+            String value = Classes.enumValueAnnotation(enumClass, constant, MongoEnumValue.class).value();
+            encodingMappings.put(constant, value);
+            decodingMappings.put(value, constant);
         }
     }
 

@@ -29,6 +29,11 @@ final class RowMapperBuilder<T> {
     }
 
     RowMapper<T> build() {
+        builder.addMethod(mapMethod());
+        return builder.build();
+    }
+
+    private String mapMethod() {
         CodeBuilder builder = new CodeBuilder().append("public Object map({} resultSet) {\n", type(ResultSetWrapper.class));
         String entityClassLiteral = type(entityClass);
         builder.indent(1).append("{} entity = new {}();\n", entityClassLiteral, entityClassLiteral);
@@ -64,8 +69,7 @@ final class RowMapperBuilder<T> {
         builder.indent(1).append("return entity;\n");
         builder.append("}");
 
-        this.builder.addMethod(builder.build());
-        return this.builder.build();
+        return builder.build();
     }
 
     private void registerEnumClass(Class<?> fieldClass) {
