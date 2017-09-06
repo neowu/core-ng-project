@@ -1,6 +1,6 @@
 ## Change log
 ### 4.16.3 (9/5/2017 - )
-
+* mongo: tweak mongo encoder and decoder code gen   
 
 ### 4.16.2 (9/1/2017 - 9/4/2017)
 * bug: fix oracle pagination query param value

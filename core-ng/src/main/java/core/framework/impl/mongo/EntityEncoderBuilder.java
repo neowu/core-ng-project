@@ -53,21 +53,21 @@ final class EntityEncoderBuilder<T> {
         builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, {} entity) {\n", methodName, type(BsonWriterWrapper.class), type(entityClass));
         builder.indent(1).append("writer.writeStartDocument();\n");
         for (Field field : Classes.instanceFields(entityClass)) {
-            Type fieldType = field.getGenericType();
             String fieldVariable = "entity." + field.getName();
-
-            String mongoFieldName;
-            if (field.isAnnotationPresent(Id.class)) mongoFieldName = "_id";
-            else mongoFieldName = field.getDeclaredAnnotation(core.framework.api.mongo.Field.class).name();
-            builder.indent(1).append("writer.writeName(\"{}\");\n", mongoFieldName);
-            encodeField(builder, fieldVariable, fieldType, 1);
+            builder.indent(1).append("writer.writeName({});\n", variable(mongoField(field)));
+            encodeField(builder, fieldVariable, field.getGenericType(), 1);
         }
-        builder.indent(1).append("writer.writeEndDocument();\n");
-        builder.append('}');
+        builder.indent(1).append("writer.writeEndDocument();\n")
+               .append('}');
         this.builder.addMethod(builder.build());
 
         encodeMethods.put(entityClass, methodName);
         return methodName;
+    }
+
+    private String mongoField(Field field) {
+        if (field.isAnnotationPresent(Id.class)) return "_id";
+        return field.getDeclaredAnnotation(core.framework.api.mongo.Field.class).name();
     }
 
     private String encodeListMethod(Class<?> valueClass) {

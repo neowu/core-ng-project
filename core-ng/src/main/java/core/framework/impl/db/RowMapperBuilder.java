@@ -18,9 +18,9 @@ import static core.framework.impl.asm.Literal.variable;
  * @author neo
  */
 final class RowMapperBuilder<T> {
+    final DynamicInstanceBuilder<RowMapper<T>> builder;
     private final Class<T> entityClass;
     private final EnumDBMapper enumDBMapper;
-    private final DynamicInstanceBuilder<RowMapper<T>> builder;
 
     RowMapperBuilder(Class<T> entityClass, EnumDBMapper enumDBMapper) {
         this.entityClass = entityClass;

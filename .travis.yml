@@ -5,4 +5,4 @@ cache:
   directories:
     - $HOME/.gradle
     - gradle/node/node_modules
-script: ./gradlew --build-cache --info clean build
+script: ./gradlew --build-cache clean build
