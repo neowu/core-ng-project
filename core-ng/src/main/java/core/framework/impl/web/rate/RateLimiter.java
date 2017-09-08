@@ -43,7 +43,8 @@ public class RateLimiter {
         synchronized (this) {
             rate = this.rates.computeIfAbsent(key, k -> new Rate(config.maxPermits));
         }
-        return rate.acquire(config.maxPermits, config.fillRatePerNano);
+        long currentTime = System.nanoTime();
+        return rate.acquire(currentTime, config.maxPermits, config.fillRatePerNano);
     }
 
     static final class RateConfig {
@@ -57,22 +58,15 @@ public class RateLimiter {
     }
 
     static final class Rate {
-        double currentPermits;
-        long lastUpdateTime;
+        volatile double currentPermits;
+        volatile long lastUpdateTime;
 
         Rate(int currentPermits) {
             this.currentPermits = currentPermits;
             this.lastUpdateTime = System.nanoTime();
         }
 
-        boolean acquire(int maxPermits, double fillRatePerNano) {
-            long currentTime = System.nanoTime();
-            synchronized (this) {
-                return acquire(currentTime, maxPermits, fillRatePerNano);
-            }
-        }
-
-        boolean acquire(long currentTime, int maxPermits, double fillRatePerNano) {
+        synchronized boolean acquire(long currentTime, int maxPermits, double fillRatePerNano) {
             long timeElapsed = currentTime - lastUpdateTime;
             currentPermits = Math.min(maxPermits, currentPermits + fillRatePerNano * timeElapsed);
             lastUpdateTime = currentTime;

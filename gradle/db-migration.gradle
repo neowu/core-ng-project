@@ -12,17 +12,22 @@ def environment = hasProperty('env') ? env : null
 
 apply plugin: org.flywaydb.gradle.FlywayPlugin
 
-flyway {
-    placeholderReplacement = false
+tasks.withType(org.flywaydb.gradle.task.AbstractFlywayTask.class) { task ->
+    task.doFirst {
+        flyway {
+            placeholderReplacement = false
+            assert project.file("src/main/resources/db/migration").exists()
 
-    def flywayProperties = environment == null ? "src/main/resources/flyway.properties" : "conf/${environment}/resources/flyway.properties"
-    assert project.file(flywayProperties).exists()
+            def flywayProperties = environment == null ? "src/main/resources/flyway.properties" : "conf/${environment}/resources/flyway.properties"
+            assert project.file(flywayProperties).exists()
 
-    Properties properties = new Properties()
-    project.file(flywayProperties).withInputStream {
-        properties.load(it)
-    }
-    properties.each { key, value ->
-        project.ext[key as String] = value
+            Properties properties = new Properties()
+            project.file(flywayProperties).withInputStream {
+                properties.load(it)
+            }
+            properties.each { key, value ->
+                project.ext[key as String] = value
+            }
+        }
     }
 }
