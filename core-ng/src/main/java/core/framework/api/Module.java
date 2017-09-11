@@ -74,9 +74,9 @@ public abstract class Module {
         context.properties.load(path);
     }
 
-    public void loadProperties(String path) {
-        logger.info("load properties, path={}", path);
-        context.properties.load(path);
+    public void loadProperties(String classpath) {
+        logger.info("load properties, classpath={}", classpath);
+        context.properties.load(classpath);
     }
 
     public Optional<String> property(String key) {

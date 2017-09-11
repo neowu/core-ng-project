@@ -14,7 +14,6 @@ public final class SystemModule extends Module {
         this.propertyFileName = propertyFileName;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void initialize() {
         loadProperties(propertyFileName);

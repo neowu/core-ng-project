@@ -17,9 +17,9 @@ import java.util.Set;
 public final class Properties {
     final Map<String, String> properties = Maps.newHashMap();
 
-    public void load(String path) {
-        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-        if (stream == null) throw Exceptions.error("can not find property file in classpath, classpath={}", path);
+    public void load(String classpath) {
+        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(classpath);
+        if (stream == null) throw Exceptions.error("can not find property file in classpath, classpath={}", classpath);
         try (Reader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8))) {
             loadProperties(reader);
         } catch (IOException e) {
