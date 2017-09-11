@@ -8,15 +8,16 @@ import java.nio.file.Paths;
  * @author neo
  */
 public final class SystemModule extends Module {
-    private final String propertyFileName;
+    private final String propertyFileClasspath;
 
-    public SystemModule(String propertyFileName) {
-        this.propertyFileName = propertyFileName;
+    public SystemModule(String propertyFileClasspath) {
+        this.propertyFileClasspath = propertyFileClasspath;
     }
 
     @Override
     protected void initialize() {
-        loadProperties(propertyFileName);
+        loadProperties(propertyFileClasspath);
+
         property("sys.http.port").ifPresent(port -> http().httpPort(Integer.parseInt(port)));   // for local dev, allow developer start multiple apps in different port
         property("sys.https.port").ifPresent(port -> http().httpsPort(Integer.parseInt(port)));
 
