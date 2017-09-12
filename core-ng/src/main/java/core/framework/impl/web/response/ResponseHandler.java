@@ -63,7 +63,7 @@ public class ResponseHandler {
             String contentType = response.contentType.toString();
             String previous = response.headers.put(Headers.CONTENT_TYPE, contentType);
             if (previous != null) {
-                logger.warn("content type header is overwritten, values={}, previous={}", contentType, previous);
+                logger.warn("content type header is overwritten, value={}, previous={}", contentType, previous);
             }
         }
 
