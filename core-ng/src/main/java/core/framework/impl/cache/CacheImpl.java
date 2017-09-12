@@ -1,7 +1,6 @@
 package core.framework.impl.cache;
 
 import core.framework.api.cache.Cache;
-import core.framework.api.util.Charsets;
 import core.framework.api.util.Maps;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.json.JSONWriter;
@@ -46,10 +45,10 @@ public class CacheImpl<T> implements Cache<T> {
         return reader.fromJSON(cacheValue);
     }
 
-    public Optional<String> get(String key) {
+    public Optional<byte[]> get(String key) {
         byte[] result = cacheStore.get(cacheKey(key));
         if (result == null) return Optional.empty();
-        return Optional.of(new String(result, Charsets.UTF_8));
+        return Optional.of(result);
     }
 
     @Override

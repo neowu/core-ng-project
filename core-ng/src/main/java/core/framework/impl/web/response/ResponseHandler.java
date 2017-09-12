@@ -6,7 +6,6 @@ import core.framework.api.util.Encodings;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.web.CookieSpec;
-import core.framework.api.web.ResponseImpl;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.site.TemplateManager;

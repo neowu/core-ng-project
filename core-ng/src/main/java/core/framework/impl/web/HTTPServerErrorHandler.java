@@ -8,11 +8,11 @@ import core.framework.api.log.Severity;
 import core.framework.api.util.Exceptions;
 import core.framework.api.web.ErrorHandler;
 import core.framework.api.web.Response;
-import core.framework.api.web.ResponseImpl;
 import core.framework.api.web.service.ResponseStatus;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.response.ResponseHandler;
+import core.framework.impl.web.response.ResponseImpl;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.slf4j.Logger;
@@ -61,9 +61,9 @@ public class HTTPServerErrorHandler {
         HTTPStatus status = httpStatus(e);
 
         if (accept != null && accept.contains(ContentType.APPLICATION_JSON.mediaType())) {
-            return Response.bean(errorResponse(e), status);
+            return Response.bean(errorResponse(e)).status(status);
         } else {
-            return Response.text(errorHTML(e), status, ContentType.TEXT_HTML);
+            return Response.text(errorHTML(e)).status(status).contentType(ContentType.TEXT_HTML);
         }
     }
 

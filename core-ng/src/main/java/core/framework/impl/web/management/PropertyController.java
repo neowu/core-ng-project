@@ -1,6 +1,5 @@
 package core.framework.impl.web.management;
 
-import core.framework.api.http.ContentType;
 import core.framework.api.util.Properties;
 import core.framework.api.web.Controller;
 import core.framework.api.web.Request;
@@ -33,7 +32,7 @@ public class PropertyController implements Controller {
                 builder.append('=').append(properties.get(key).orElse("")).append('\n');
             }
         }
-        return Response.text(builder.toString(), ContentType.TEXT_PLAIN);
+        return Response.text(builder.toString());
     }
 
     private boolean mask(String key) {

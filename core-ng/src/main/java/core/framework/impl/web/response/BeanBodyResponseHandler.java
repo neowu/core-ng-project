@@ -2,7 +2,6 @@ package core.framework.impl.web.response;
 
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Types;
-import core.framework.api.web.ResponseImpl;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.LogParam;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;

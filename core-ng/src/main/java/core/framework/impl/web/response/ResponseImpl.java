@@ -1,9 +1,10 @@
-package core.framework.api.web;
+package core.framework.impl.web.response;
 
 import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.util.Maps;
-import core.framework.impl.web.response.Body;
+import core.framework.api.web.CookieSpec;
+import core.framework.api.web.Response;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 
@@ -16,11 +17,11 @@ import java.util.Optional;
 public final class ResponseImpl implements Response {
     public final Map<HttpString, String> headers = Maps.newHashMap();
     public final Body body;
-    public Map<CookieSpec, String> cookies;
+    Map<CookieSpec, String> cookies;
     private HTTPStatus status = HTTPStatus.OK;
     private ContentType contentType;
 
-    ResponseImpl(Body body) {
+    public ResponseImpl(Body body) {
         this.body = body;
     }
 

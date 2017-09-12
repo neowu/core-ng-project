@@ -1,7 +1,6 @@
 package core.framework.impl.web;
 
 import core.framework.api.web.Response;
-import core.framework.api.web.ResponseImpl;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.bean.RequestBeanMapper;
@@ -9,6 +8,7 @@ import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.request.RequestParser;
 import core.framework.impl.web.response.ResponseHandler;
+import core.framework.impl.web.response.ResponseImpl;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
 import core.framework.impl.web.site.SiteManager;

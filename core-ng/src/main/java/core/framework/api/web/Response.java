@@ -7,6 +7,7 @@ import core.framework.api.util.Strings;
 import core.framework.impl.web.response.BeanBody;
 import core.framework.impl.web.response.ByteArrayBody;
 import core.framework.impl.web.response.FileBody;
+import core.framework.impl.web.response.ResponseImpl;
 import core.framework.impl.web.response.TemplateBody;
 
 import java.nio.file.Path;
@@ -16,24 +17,14 @@ import java.util.Optional;
  * @author neo
  */
 public interface Response {
-    static Response text(String text, HTTPStatus status, ContentType contentType) {
-        return new ResponseImpl(new ByteArrayBody(Strings.bytes(text), contentType))
-            .contentType(contentType)
-            .status(status);
-    }
-
-    static Response text(String text, ContentType contentType) {
-        return text(text, HTTPStatus.OK, contentType);
+    static Response text(String text) {
+        return new ResponseImpl(new ByteArrayBody(Strings.bytes(text)))
+                .contentType(ContentType.TEXT_PLAIN);
     }
 
     static Response bean(Object bean) {
-        return bean(bean, HTTPStatus.OK);
-    }
-
-    static Response bean(Object bean, HTTPStatus status) {
         return new ResponseImpl(new BeanBody(bean))
-            .contentType(ContentType.APPLICATION_JSON)
-            .status(status);
+                .contentType(ContentType.APPLICATION_JSON);
     }
 
     static Response html(String templatePath, Object model) {
@@ -42,46 +33,39 @@ public interface Response {
 
     static Response html(String templatePath, Object model, String language) {
         return new ResponseImpl(new TemplateBody(templatePath, model, language))
-            .status(HTTPStatus.OK)
-            .contentType(ContentType.TEXT_HTML);
+                .contentType(ContentType.TEXT_HTML);
     }
 
     static Response empty() {
-        return new ResponseImpl(new ByteArrayBody(new byte[0], null))
-            .status(HTTPStatus.NO_CONTENT);
+        return new ResponseImpl(new ByteArrayBody(new byte[0]))
+                .status(HTTPStatus.NO_CONTENT);
     }
 
     static Response bytes(byte[] bytes) {
-        return bytes(bytes, ContentType.APPLICATION_OCTET_STREAM);
-    }
-
-    static Response bytes(byte[] bytes, ContentType contentType) {
-        return new ResponseImpl(new ByteArrayBody(bytes, contentType))
-            .status(HTTPStatus.OK)
-            .contentType(contentType);
+        return new ResponseImpl(new ByteArrayBody(bytes))
+                .contentType(ContentType.APPLICATION_OCTET_STREAM);
     }
 
     static Response file(Path path) {
-        return new ResponseImpl(new FileBody(path))
-            .status(HTTPStatus.OK);
+        return new ResponseImpl(new FileBody(path));
     }
 
     static Response redirect(String url) {
-        return new ResponseImpl(new ByteArrayBody(new byte[0], null))
-            .header(HTTPHeaders.LOCATION, url)
-            .status(HTTPStatus.SEE_OTHER);
+        return new ResponseImpl(new ByteArrayBody(new byte[0]))
+                .header(HTTPHeaders.LOCATION, url)
+                .status(HTTPStatus.SEE_OTHER);
     }
 
     static Response redirect(String url, HTTPStatus redirectStatus) {
         if (redirectStatus != HTTPStatus.SEE_OTHER
-            && redirectStatus != HTTPStatus.MOVED_PERMANENTLY
-            && redirectStatus != HTTPStatus.PERMANENT_REDIRECT
-            && redirectStatus != HTTPStatus.TEMPORARY_REDIRECT)
+                && redirectStatus != HTTPStatus.MOVED_PERMANENTLY
+                && redirectStatus != HTTPStatus.PERMANENT_REDIRECT
+                && redirectStatus != HTTPStatus.TEMPORARY_REDIRECT)
             throw new Error("redirect status is not valid, status=" + redirectStatus);
 
-        return new ResponseImpl(new ByteArrayBody(new byte[0], null))
-            .header(HTTPHeaders.LOCATION, url)
-            .status(redirectStatus);
+        return new ResponseImpl(new ByteArrayBody(new byte[0]))
+                .header(HTTPHeaders.LOCATION, url)
+                .status(redirectStatus);
     }
 
     HTTPStatus status();
