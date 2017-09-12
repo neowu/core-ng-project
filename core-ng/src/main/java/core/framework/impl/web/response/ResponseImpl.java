@@ -5,7 +5,6 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.api.util.Maps;
 import core.framework.api.web.CookieSpec;
 import core.framework.api.web.Response;
-import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 
 import java.util.Map;
@@ -15,11 +14,11 @@ import java.util.Optional;
  * @author neo
  */
 public final class ResponseImpl implements Response {
-    public final Map<HttpString, String> headers = Maps.newHashMap();
     public final Body body;
+    final Map<HttpString, String> headers = Maps.newHashMap();
     Map<CookieSpec, String> cookies;
+    ContentType contentType;
     private HTTPStatus status = HTTPStatus.OK;
-    private ContentType contentType;
 
     public ResponseImpl(Body body) {
         this.body = body;
@@ -49,10 +48,7 @@ public final class ResponseImpl implements Response {
 
     @Override
     public Response contentType(ContentType contentType) {
-        if (contentType != null) {
-            this.contentType = contentType;
-            headers.put(Headers.CONTENT_TYPE, contentType.toString());
-        }
+        this.contentType = contentType;
         return this;
     }
 

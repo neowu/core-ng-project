@@ -13,6 +13,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.HeaderMap;
+import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,19 +37,15 @@ public class ResponseHandler {
         HTTPStatus status = response.status();
         exchange.setStatusCode(status.code);
 
-        HeaderMap headers = exchange.getResponseHeaders();
-        response.headers.forEach((header, value) -> {
-            logger.debug("[response:header] {}={}", header, value);
-            headers.put(header, value);
-        });
+        handleHeaders(response, exchange);
 
         if (response.cookies != null) {
-            Map<String, Cookie> responseCookies = exchange.getResponseCookies();
+            Map<String, Cookie> cookies = exchange.getResponseCookies();
             response.cookies.forEach((spec, value) -> {
                 CookieImpl cookie = cookie(spec, value);
                 logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
-                    cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
-                responseCookies.put(spec.name, cookie);
+                        cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
+                cookies.put(spec.name, cookie);
             });
         }
 
@@ -58,7 +55,23 @@ public class ResponseHandler {
         logger.debug("responseHandlerClass={}", handler.getClass().getCanonicalName());
         handler.handle(response, exchange.getResponseSender(), request);
 
-        ActionLogContext.put("responseCode", status.code);  // set response code context at last, to avoid error handle to log same action log key on exception
+        ActionLogContext.put("responseCode", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
+    }
+
+    private void handleHeaders(ResponseImpl response, HttpServerExchange exchange) {
+        if (response.contentType != null) {
+            String contentType = response.contentType.toString();
+            String previous = response.headers.put(Headers.CONTENT_TYPE, contentType);
+            if (previous != null) {
+                logger.warn("content type header is overwritten, values={}, previous={}", contentType, previous);
+            }
+        }
+
+        HeaderMap headers = exchange.getResponseHeaders();
+        response.headers.forEach((header, value) -> {
+            logger.debug("[response:header] {}={}", header, value);
+            headers.put(header, value);
+        });
     }
 
     CookieImpl cookie(CookieSpec spec, String value) {
