@@ -44,9 +44,11 @@ public class HTTPServerErrorHandler {
                 Optional<Response> customErrorResponse = customErrorHandler.handle(request, e);
                 if (customErrorResponse.isPresent()) errorResponse = customErrorResponse.get();
             }
-            String accept = exchange.getRequestHeaders().getFirst(Headers.ACCEPT);
-            if (errorResponse == null) errorResponse = defaultErrorResponse(e, accept);
-            responseHandler.handle((ResponseImpl) errorResponse, exchange, request);
+            if (errorResponse == null) {
+                String accept = exchange.getRequestHeaders().getFirst(Headers.ACCEPT);
+                errorResponse = defaultErrorResponse(e, accept);
+            }
+            responseHandler.render((ResponseImpl) errorResponse, exchange);
         } catch (Throwable error) {
             logger.error(error.getMessage(), e);
             if (exchange.isResponseStarted()) {

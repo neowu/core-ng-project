@@ -25,8 +25,8 @@ public class CacheController {
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
-        byte[] value = cache.get(key).orElseThrow(() -> new NotFoundException("cache key not found, name=" + name + ", key=" + key));
-        return Response.bytes(value).contentType(ContentType.APPLICATION_JSON);
+        String value = cache.get(key).orElseThrow(() -> new NotFoundException("cache key not found, name=" + name + ", key=" + key));
+        return Response.text(value).contentType(ContentType.APPLICATION_JSON);
     }
 
     public Response delete(Request request) {

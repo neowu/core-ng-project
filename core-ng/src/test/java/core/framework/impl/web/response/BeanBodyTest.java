@@ -12,41 +12,46 @@ import java.util.Optional;
 /**
  * @author neo
  */
-public class BeanBodyResponseHandlerTest {
-    private BeanBodyResponseHandler handler;
+public class BeanBodyTest {
+    private ResponseBeanTypeValidator validator;
 
     @Before
-    public void createBeanBodyResponseHandler() {
-        handler = new BeanBodyResponseHandler(new ResponseBeanTypeValidator());
+    public void createResponseBeanTypeValidator() {
+        validator = new ResponseBeanTypeValidator();
     }
 
     @Test
     public void validateList() {
         List<TestBean> list = Lists.newArrayList(new TestBean());
-        handler.validateBeanType(list);
+        BeanBody body = new BeanBody(list);
+        body.validateBeanType(validator);
     }
 
     @Test
     public void validateEmptyList() {
         List<TestBean> list = Lists.newArrayList();
-        handler.validateBeanType(list);
+        BeanBody body = new BeanBody(list);
+        body.validateBeanType(validator);
     }
 
     @Test
     public void validateEmptyOptional() {
         Optional<TestBean> optional = Optional.empty();
-        handler.validateBeanType(optional);
+        BeanBody body = new BeanBody(optional);
+        body.validateBeanType(validator);
     }
 
     @Test
     public void validateBean() {
         TestBean bean = new TestBean();
-        handler.validateBeanType(bean);
+        BeanBody body = new BeanBody(bean);
+        body.validateBeanType(validator);
     }
 
     @Test
     public void validateOptionalBean() {
         Optional<TestBean> optional = Optional.of(new TestBean());
-        handler.validateBeanType(optional);
+        BeanBody body = new BeanBody(optional);
+        body.validateBeanType(validator);
     }
 }

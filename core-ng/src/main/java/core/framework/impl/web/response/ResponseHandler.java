@@ -3,11 +3,8 @@ package core.framework.impl.web.response;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.log.ActionLogContext;
 import core.framework.api.util.Encodings;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
 import core.framework.api.web.CookieSpec;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
-import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.site.TemplateManager;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
@@ -24,21 +21,24 @@ import java.util.Map;
  */
 public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
-    private final Map<Class<? extends Body>, BodyHandler> handlers = Maps.newHashMap();
+    private final ResponseHandlerContext context;
 
     public ResponseHandler(ResponseBeanTypeValidator validator, TemplateManager templateManager) {
-        handlers.put(BeanBody.class, new BeanBodyResponseHandler(validator));
-        handlers.put(TemplateBody.class, new TemplateBodyResponseHandler(templateManager));
-        handlers.put(ByteArrayBody.class, new ByteArrayBodyResponseHandler());
-        handlers.put(FileBody.class, new FileBodyResponseHandler());
+        context = new ResponseHandlerContext(validator, templateManager);
     }
 
-    public void handle(ResponseImpl response, HttpServerExchange exchange, RequestImpl request) {
+    public void render(ResponseImpl response, HttpServerExchange exchange) {
         HTTPStatus status = response.status();
         exchange.setStatusCode(status.code);
 
-        handleHeaders(response, exchange);
+        putHeaders(response, exchange);
+        putCookies(response, exchange);
+        response.body.send(exchange.getResponseSender(), context);
 
+        ActionLogContext.put("responseCode", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
+    }
+
+    private void putCookies(ResponseImpl response, HttpServerExchange exchange) {
         if (response.cookies != null) {
             Map<String, Cookie> cookies = exchange.getResponseCookies();
             response.cookies.forEach((spec, value) -> {
@@ -48,17 +48,9 @@ public class ResponseHandler {
                 cookies.put(spec.name, cookie);
             });
         }
-
-        BodyHandler handler = handlers.get(response.body.getClass());
-        if (handler == null)
-            throw Exceptions.error("unexpected body class, body={}", response.body.getClass().getCanonicalName());
-        logger.debug("responseHandlerClass={}", handler.getClass().getCanonicalName());
-        handler.handle(response, exchange.getResponseSender(), request);
-
-        ActionLogContext.put("responseCode", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
     }
 
-    private void handleHeaders(ResponseImpl response, HttpServerExchange exchange) {
+    private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {
         if (response.contentType != null) {
             String contentType = response.contentType.toString();
             String previous = response.headers.put(Headers.CONTENT_TYPE, contentType);

@@ -3,12 +3,12 @@ package core.framework.api.web;
 import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPHeaders;
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.util.Strings;
 import core.framework.impl.web.response.BeanBody;
 import core.framework.impl.web.response.ByteArrayBody;
 import core.framework.impl.web.response.FileBody;
 import core.framework.impl.web.response.ResponseImpl;
 import core.framework.impl.web.response.TemplateBody;
+import core.framework.impl.web.response.TextBody;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -18,7 +18,7 @@ import java.util.Optional;
  */
 public interface Response {
     static Response text(String text) {
-        return new ResponseImpl(new ByteArrayBody(Strings.bytes(text)))
+        return new ResponseImpl(new TextBody(text))
                 .contentType(ContentType.TEXT_PLAIN);
     }
 

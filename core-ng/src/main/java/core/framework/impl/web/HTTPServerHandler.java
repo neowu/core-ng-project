@@ -15,6 +15,7 @@ import core.framework.impl.web.site.SiteManager;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
+import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +23,9 @@ import org.slf4j.LoggerFactory;
  * @author neo
  */
 public class HTTPServerHandler implements HttpHandler {
-    public static final String HEADER_REF_ID = "ref-id";
-    public static final String HEADER_TRACE = "trace";
-    public static final String HEADER_CLIENT = "client";
+    public static final HttpString HEADER_REF_ID = new HttpString("ref-id");
+    public static final HttpString HEADER_TRACE = new HttpString("trace");
+    public static final HttpString HEADER_CLIENT = new HttpString("client");
 
     public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper();
     public final ResponseBeanTypeValidator responseBeanTypeValidator = new ResponseBeanTypeValidator();
@@ -81,7 +82,7 @@ public class HTTPServerHandler implements HttpHandler {
 
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
             sessionManager.save(request, response);
-            responseHandler.handle((ResponseImpl) response, exchange, request);
+            responseHandler.render((ResponseImpl) response, exchange);
         } catch (Throwable e) {
             logManager.logError(e);
             errorHandler.handleError(e, exchange, request);
