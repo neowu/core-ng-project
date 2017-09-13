@@ -38,18 +38,6 @@ public class ResponseHandler {
         ActionLogContext.put("responseCode", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
     }
 
-    private void putCookies(ResponseImpl response, HttpServerExchange exchange) {
-        if (response.cookies != null) {
-            Map<String, Cookie> cookies = exchange.getResponseCookies();
-            response.cookies.forEach((spec, value) -> {
-                CookieImpl cookie = cookie(spec, value);
-                logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
-                        cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
-                cookies.put(spec.name, cookie);
-            });
-        }
-    }
-
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {
         if (response.contentType != null) {
             String contentType = response.contentType.toString();
@@ -64,6 +52,18 @@ public class ResponseHandler {
             logger.debug("[response:header] {}={}", header, value);
             headers.put(header, value);
         });
+    }
+
+    private void putCookies(ResponseImpl response, HttpServerExchange exchange) {
+        if (response.cookies != null) {
+            Map<String, Cookie> cookies = exchange.getResponseCookies();
+            response.cookies.forEach((spec, value) -> {
+                CookieImpl cookie = cookie(spec, value);
+                logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
+                        cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
+                cookies.put(spec.name, cookie);
+            });
+        }
     }
 
     CookieImpl cookie(CookieSpec spec, String value) {
