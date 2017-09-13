@@ -5,7 +5,7 @@ import java.nio.file.Path;
 /**
  * @author neo
  */
-public class MultipartFile {
+public final class MultipartFile {
     public final Path path;
     public final String fileName;
     public final String contentType;

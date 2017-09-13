@@ -6,7 +6,7 @@ import org.bson.conversions.Bson;
 /**
  * @author neo
  */
-public class Count {
+public final class Count {
     public Bson filter;
     public ReadPreference readPreference;
 }

@@ -6,7 +6,7 @@ import org.bson.conversions.Bson;
 /**
  * @author neo
  */
-public class FindOne {
+public final class FindOne {
     public Bson filter;
     public ReadPreference readPreference;
 }

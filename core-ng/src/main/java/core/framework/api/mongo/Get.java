@@ -5,7 +5,7 @@ import com.mongodb.ReadPreference;
 /**
  * @author neo
  */
-public class Get {
+public final class Get {
     public Object id;
     public ReadPreference readPreference;
 }

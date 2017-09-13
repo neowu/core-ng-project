@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
  * @author rainbow.cai
  */
 public final class ByteArrayBody implements Body {
-    final byte[] bytes;
+    private final byte[] bytes;
 
     public ByteArrayBody(byte[] bytes) {
         this.bytes = bytes;

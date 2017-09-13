@@ -5,7 +5,7 @@ import core.framework.api.log.ErrorCode;
 /**
  * @author neo
  */
-public class HTTPClientException extends RuntimeException implements ErrorCode {
+public final class HTTPClientException extends RuntimeException implements ErrorCode {
     private static final long serialVersionUID = -7577571026619549539L;
 
     private final String errorCode;

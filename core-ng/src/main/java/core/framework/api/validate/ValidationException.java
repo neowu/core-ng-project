@@ -12,7 +12,7 @@ import java.util.Map;
  * @author neo
  */
 @ResponseStatus(HTTPStatus.BAD_REQUEST)
-public class ValidationException extends RuntimeException implements ErrorCode {
+public final class ValidationException extends RuntimeException implements ErrorCode {
     private static final long serialVersionUID = 9215299700445046388L;
     public final Map<String, String> errors;
 
