@@ -19,7 +19,7 @@ public final class TestManager {
     public synchronized void init(Class<?> testClass) {
         if (initialized) {
             if (testContext == null) {
-                throw new Error("text context failed to initialize, please check error message from previous integration test");
+                throw new Error("test context failed to initialize, please check error message from previous integration test");
             }
         } else {
             initialized = true;
