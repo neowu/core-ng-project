@@ -8,7 +8,7 @@ buildscript {
 }
 
 // use gradlew -Penv=${env} to pass
-def environment = hasProperty('env') ? env : null
+def env = hasProperty('env') ? env : null
 
 apply plugin: org.flywaydb.gradle.FlywayPlugin
 
@@ -16,9 +16,9 @@ tasks.withType(org.flywaydb.gradle.task.AbstractFlywayTask.class) { task ->
     task.doFirst {
         flyway {
             placeholderReplacement = false
-            assert project.file("src/main/resources/db/migration").exists()
+            assert project.file('src/main/resources/db/migration').exists()
 
-            def flywayProperties = environment == null ? "src/main/resources/flyway.properties" : "conf/${environment}/resources/flyway.properties"
+            def flywayProperties = env == null ? 'src/main/resources/flyway.properties' : "conf/${env}/resources/flyway.properties"
             assert project.file(flywayProperties).exists()
 
             Properties properties = new Properties()

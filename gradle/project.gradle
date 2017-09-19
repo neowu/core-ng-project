@@ -1,5 +1,3 @@
-apply plugin: 'build-dashboard'
-
 defaultTasks 'clean', 'build'
 
 def buildTime = new Date()

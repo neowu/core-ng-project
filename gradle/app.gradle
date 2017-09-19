@@ -1,7 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
 // use gradlew -Penv=${env} to pass
-def environment = hasProperty('env') ? env : null
+def env = hasProperty('env') ? env : null
 
 apply plugin: 'application'
 mainClassName = 'Main'
@@ -17,7 +17,7 @@ def npm(String... params) {
 }
 
 clean {
-    if (project.file("src/main/web").exists()) {
+    if (project.file('src/main/web').exists()) {
         doLast {
             exec npm('install')
             exec npm('run', 'clean', '--', '--root', project.file('.') as String)
@@ -26,13 +26,13 @@ clean {
 }
 
 processResources {
-    if (environment != null) {
-        def envProperties = "conf/${environment}/resources"
-        assert project.file(envProperties).exists()
-        from envProperties
+    if (env != null) {
+        assert project.file("conf/${env}/resources").exists()
+        inputs.file project.file("conf/${env}/resources")
+        from "conf/${env}/resources"
     }
-    if (project.file("src/main/web").exists()) {
-        inputs.file project.file("src/main/web")
+    if (project.file('src/main/web').exists()) {
+        inputs.file project.file('src/main/web')
         doLast {
             exec npm('install')
             exec npm('run', 'build', '--', '--root', project.file('.') as String)
@@ -45,7 +45,7 @@ distTar {
 }
 
 startScripts {
-    defaultJvmOpts = ["-Dcore.webPath=APP_HOME_VAR/web", "-Dcore.appName=${project.name}"]
+    defaultJvmOpts = ['-Dcore.webPath=APP_HOME_VAR/web', "-Dcore.appName=${project.name}"]
 
     doLast {
         windowsScript.text = windowsScript.text.replaceFirst('APP_HOME_VAR', '%APP_HOME%')
@@ -55,12 +55,10 @@ startScripts {
 
 distributions {
     distZip.enabled = false
-    main {
-        if (environment != null) {
-            def envProperties = "conf/${environment}/resources"
-            assert project.file(envProperties).exists()
+    if (env != null && project.file("conf/${env}/web").exists()) {
+        main {
             contents {
-                from("conf/${environment}/web") {
+                from("conf/${env}/web") {
                     into "web"
                 }
             }
