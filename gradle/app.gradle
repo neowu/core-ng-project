@@ -1,42 +1,14 @@
-import org.gradle.internal.os.OperatingSystem
-
 // use gradlew -Penv=${env} to pass
 def env = hasProperty('env') ? env : null
 
 apply plugin: 'application'
 mainClassName = 'Main'
 
-def npm(String... params) {
-    def isWindows = OperatingSystem.current().isWindows()
-    return {
-        workingDir "${rootDir}/gradle/node"
-        def command = isWindows ? ['cmd', '/c', 'npm'] : ['npm']
-        command.addAll(params)
-        commandLine command
-    }
-}
-
-clean {
-    if (project.file('src/main/web').exists()) {
-        doLast {
-            exec npm('install')
-            exec npm('run', 'clean', '--', '--root', project.file('.') as String)
-        }
-    }
-}
-
 processResources {
     if (env != null) {
         assert project.file("conf/${env}/resources").exists()
         inputs.file project.file("conf/${env}/resources")
         from "conf/${env}/resources"
-    }
-    if (project.file('src/main/web').exists()) {
-        inputs.file project.file('src/main/web')
-        doLast {
-            exec npm('install')
-            exec npm('run', 'build', '--', '--root', project.file('.') as String)
-        }
     }
 }
 
@@ -55,13 +27,4 @@ startScripts {
 
 distributions {
     distZip.enabled = false
-    if (env != null && project.file("conf/${env}/web").exists()) {
-        main {
-            contents {
-                from("conf/${env}/web") {
-                    into "web"
-                }
-            }
-        }
-    }
 }
