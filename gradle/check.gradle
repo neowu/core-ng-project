@@ -4,8 +4,8 @@ apply plugin: 'findbugs'
 
 checkstyle {
     dependencies {
-        checkstyle 'com.puppycrawl.tools:checkstyle:7.8.1'
-        checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.24.0'
+        checkstyle 'com.puppycrawl.tools:checkstyle:8.2'
+        checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.24.2'
     }
 
     configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
@@ -15,7 +15,7 @@ checkstyle {
 pmd {
     ruleSets = []
     ruleSetFiles = rootProject.files('gradle/pmd/rule-set.xml')
-    toolVersion = '5.7.0'
+    toolVersion = '5.8.1'
     consoleOutput = true
 }
 
