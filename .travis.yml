@@ -5,4 +5,8 @@ cache:
   directories:
     - $HOME/.gradle
     - gradle/node/node_modules
-script: ./gradlew --build-cache clean build
+script:
+  - ./gradlew --build-cache clean build
+  - ./gradlew jacocoTestReport
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
