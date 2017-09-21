@@ -2,6 +2,7 @@
 core-ng is a webapp framework, it's designed to support our own projects.
 
 [![Build Status](https://travis-ci.org/neowu/core-ng-project.svg?branch=master)](https://travis-ci.org/neowu/core-ng-project)
+[![Code Coverage](https://codecov.io/gh/neowu/core-ng-project/branch/master/graph/badge.svg)](https://codecov.io/gh/neowu/core-ng-project)
 
 ## Maven repo
 ```
