@@ -2,7 +2,7 @@
 ### 4.16.3 (9/5/2017 - )
 * mongo: tweak mongo encoder and decoder code gen   
 * http: update undertow to 1.4.20, tweak the cookies config
-* search: update es to 5.6 
+* search: update es to 5.6.2
 * web: simplified Response interface, use chained method to set content-type and status going forward
 
 ### 4.16.2 (9/1/2017 - 9/4/2017)
