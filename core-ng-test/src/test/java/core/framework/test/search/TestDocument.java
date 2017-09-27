@@ -19,6 +19,9 @@ public class TestDocument {
     @XmlElement(name = "string_field")
     public String stringField;
 
+    @XmlElement(name = "num_field")
+    public Integer numField;
+
     @XmlElement(name = "zoned_date_time_field")
     public ZonedDateTime zonedDateTimeField;
 }

@@ -65,6 +65,7 @@ project(':core-ng-test') {
                 "com.github.fakemongo:fongo:2.1.0@jar",
                 "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
                 "org.elasticsearch.client:transport:${elasticVersion}",
+                "org.codelibs.elasticsearch.module:lang-painless:5.6.1",
                 "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
         )
         testRuntimeOnly(
