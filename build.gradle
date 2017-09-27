@@ -65,7 +65,7 @@ project(':core-ng-test') {
                 "com.github.fakemongo:fongo:2.1.0@jar",
                 "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
                 "org.elasticsearch.client:transport:${elasticVersion}",
-                "org.codelibs.elasticsearch.module:lang-painless:5.6.1",
+                'org.codelibs.elasticsearch.module:lang-painless:5.6.1',
                 "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
         )
         testRuntimeOnly(
@@ -106,8 +106,11 @@ project(':log-processor') {
                 "org.apache.logging.log4j:log4j-api:${log4jVersion}"       // used by elasticsearch
         )
         testCompile(
-                project(':core-ng-test'),
-                "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
+                project(':core-ng-test')
+        )
+        testRuntime(
+                "org.apache.logging.log4j:log4j-core:${log4jVersion}",       // used by elasticsearch
+                'org.codelibs.elasticsearch.module:lang-painless:5.6.1'
         )
     }
 }
