@@ -3,7 +3,6 @@
 /build/
 *.iml
 /classes/
-gradle.properties
 */src/dev/java/
 .DS_Store
 node_modules/

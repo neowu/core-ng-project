@@ -75,20 +75,26 @@ project(':core-ng-test') {
     }
 }
 
+def mavenURL = hasProperty('mavenURL') ? mavenURL : null
+
 configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
     apply plugin: 'maven-publish'
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-                artifact sourcesJar {
-                    classifier 'sources'
+
+    if (mavenURL != null) {
+        assert project.file(mavenURL).exists()
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    from components.java
+                    artifact sourcesJar {
+                        classifier 'sources'
+                    }
                 }
             }
-        }
-        repositories {
-            maven {
-                url System.properties['maven.url']     // set in gradle.properties, e.g. systemProp.maven.url=/path
+            repositories {
+                maven {
+                    url mavenURL     // used by 'gradlew -PmavenURL=/path clean publish'
+                }
             }
         }
     }
