@@ -20,34 +20,24 @@ project(':core-ng-api') {
 project(':core-ng') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
-        api(
-                project(":core-ng-api"),
-                'javax.inject:javax.inject:1',
-                'org.slf4j:slf4j-api:1.7.25'
-        )
-        implementation(
-                'org.javassist:javassist:3.21.0-GA',
-                "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}",
-                "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}",
-                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}",
-                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}",
-                'org.apache.httpcomponents:httpclient:4.5.3',
-                'io.undertow:undertow-core:1.4.20.Final'
-        )
-        compileOnly(
-                'redis.clients:jedis:2.9.0@jar',
-                "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
-                "org.elasticsearch.client:transport:${elasticVersion}",
-                "org.apache.logging.log4j:log4j-api:${log4jVersion}"   // used by elasticsearch
-        )
-        testImplementation(
-                'junit:junit:4.12',
-                'org.mockito:mockito-core:2.10.0'
-        )
-        testRuntimeOnly(
-                'org.hsqldb:hsqldb:2.4.0'
-        )
+        api project(":core-ng-api")
+        api 'javax.inject:javax.inject:1'
+        api 'org.slf4j:slf4j-api:1.7.25'
+        implementation 'org.javassist:javassist:3.21.0-GA'
+        implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}"
+        implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
+        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+        implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
+        implementation 'org.apache.httpcomponents:httpclient:4.5.3'
+        implementation 'io.undertow:undertow-core:1.4.20.Final'
+        compileOnly 'redis.clients:jedis:2.9.0@jar'
+        compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
+        compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
+        compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
+        compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"   // used by elasticsearch
+        testImplementation 'junit:junit:4.12'
+        testImplementation 'org.mockito:mockito-core:2.10.0'
+        testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
     }
 }
 
@@ -55,27 +45,21 @@ project(':core-ng-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
 
     dependencies {
-        api(
-                project(":core-ng"),
-                'junit:junit:4.12',
-                'org.mockito:mockito-core:2.10.0'
-        )
-        compileOnly(
-                "org.mongodb:mongo-java-driver:${mongoVersion}",
-                "com.github.fakemongo:fongo:2.1.0@jar",
-                "org.apache.kafka:kafka-clients:${kafkaVersion}@jar",
-                "org.elasticsearch.client:transport:${elasticVersion}",
-                "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
-        )
-        testRuntimeOnly(
-                'org.hsqldb:hsqldb:2.4.0',
-                'com.vividsolutions:jts:1.13',                  // used by fongo
-                'org.codelibs.elasticsearch.module:lang-painless:5.6.1'
-        )
+        api project(":core-ng")
+        api 'junit:junit:4.12'
+        api 'org.mockito:mockito-core:2.10.0'
+        compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
+        compileOnly "com.github.fakemongo:fongo:2.1.0@jar"
+        compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
+        compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
+        compileOnly "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
+        testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
+        testRuntimeOnly 'com.vividsolutions:jts:1.13'                           // used by fongo
+        testRuntimeOnly "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
     }
 }
 
-def mavenURL = hasProperty('mavenURL') ? mavenURL : null
+def mavenURL = hasProperty('mavenURL') ? mavenURL : null    // used by 'gradlew -PmavenURL=/path clean publish'
 
 configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
     apply plugin: 'maven-publish'
@@ -86,15 +70,11 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
             publications {
                 mavenJava(MavenPublication) {
                     from components.java
-                    artifact sourcesJar {
-                        classifier 'sources'
-                    }
+                    artifact sourcesJar { classifier 'sources' }
                 }
             }
             repositories {
-                maven {
-                    url mavenURL     // used by 'gradlew -PmavenURL=/path clean publish'
-                }
+                maven { url mavenURL }
             }
         }
     }
@@ -103,19 +83,11 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
 project(':log-processor') {
     apply from: file("${rootDir}/gradle/app.gradle")
     dependencies {
-        compile(
-                project(':core-ng'),
-                "org.elasticsearch.client:transport:${elasticVersion}",
-                "org.apache.kafka:kafka-clients:${kafkaVersion}"
-        )
-        runtime(
-                "org.apache.logging.log4j:log4j-api:${log4jVersion}"       // used by elasticsearch
-        )
-        testCompile(
-                project(':core-ng-test')
-        )
-        testRuntime(
-                "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
-        )
+        compile project(':core-ng')
+        compile "org.elasticsearch.client:transport:${elasticVersion}"
+        compile "org.apache.kafka:kafka-clients:${kafkaVersion}"
+        runtime "org.apache.logging.log4j:log4j-api:${log4jVersion}"       // used by elasticsearch
+        testCompile project(':core-ng-test')
+        testRuntime "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
     }
 }
