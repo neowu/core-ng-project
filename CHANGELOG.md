@@ -1,4 +1,7 @@
 ## Change log
+### 4.16.4 (10/2/2017 - )
+* web: enable http2 support
+
 ### 4.16.3 (9/5/2017 - 9/30/2017)
 * mongo: tweak mongo encoder and decoder code gen   
 * http: update undertow to 1.4.20, tweak the cookies config

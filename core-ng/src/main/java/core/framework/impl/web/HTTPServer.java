@@ -40,6 +40,7 @@ public class HTTPServer {
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
             builder.setHandler(new HTTPServerIOHandler(handler))
                    .setServerOption(UndertowOptions.DECODE_URL, false)
+                   .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, true);
             server = builder.build();
             server.start();
