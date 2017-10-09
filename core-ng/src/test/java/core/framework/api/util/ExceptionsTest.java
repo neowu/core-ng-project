@@ -2,8 +2,10 @@ package core.framework.api.util;
 
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author neo
@@ -35,5 +37,11 @@ public class ExceptionsTest {
         Error error = Exceptions.error("message", new RuntimeException("cause"));
         assertEquals("message", error.getMessage());
         assertEquals("cause", error.getCause().getMessage());
+    }
+
+    @Test
+    public void stackTrace() {
+        String trace = Exceptions.stackTrace(new Error("test-error"));
+        assertThat(trace, containsString("java.lang.Error: test-error"));
     }
 }
