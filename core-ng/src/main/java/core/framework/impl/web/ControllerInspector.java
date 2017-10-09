@@ -17,8 +17,9 @@ import java.security.PrivilegedAction;
  */
 public class ControllerInspector {
     private static final Method GET_CONSTANT_POOL;
+    private static final Method CONSTANT_POOL_GET_SIZE;
+    private static final Method CONSTANT_POOL_GET_MEMBER_REF_INFO_AT;
     private static final Method CONTROLLER_METHOD;
-    private static final int JDK_8_MINOR_VERSION;
 
     static {
         try {
@@ -27,15 +28,26 @@ public class ControllerInspector {
                 GET_CONSTANT_POOL.setAccessible(true);
                 return GET_CONSTANT_POOL;
             });
+            Class<?> constantPoolClass = Class.forName("sun.reflect.ConstantPool"); // for java 8 constantPool is sun.reflect.ConstantPool, java 9 is jdk.internal.reflect.ConstantPool
+            CONSTANT_POOL_GET_SIZE = constantPoolClass.getDeclaredMethod("getSize");
+            CONSTANT_POOL_GET_MEMBER_REF_INFO_AT = constantPoolClass.getDeclaredMethod("getMemberRefInfoAt", int.class);
+
             CONTROLLER_METHOD = Controller.class.getDeclaredMethod("execute", Request.class);
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
             throw new Error("failed to initialize controller inspector, please contact arch team", e);
         }
 
-        String jdkVersion = System.getProperty("java.version");
-        if (!jdkVersion.startsWith("1.8.0_"))
-            throw Exceptions.error("unsupported jdk version, please contact arch team, jdk={}", jdkVersion);
-        JDK_8_MINOR_VERSION = Integer.parseInt(jdkVersion.substring(6));
+        validateJavaVersion();
+    }
+
+    private static void validateJavaVersion() {
+        String javaVersion = System.getProperty("java.version");
+        if (!javaVersion.startsWith("1.8.0_"))
+            throw Exceptions.error("unsupported java version, please use latest jdk 8, jdk={}", javaVersion);
+        int minorVersion = Integer.parseInt(javaVersion.substring(6));
+        if (minorVersion < 60) {
+            throw Exceptions.error("unsupported java 8 version, please use latest jdk 8, jdk={}", javaVersion);
+        }
     }
 
     public final Class<?> targetClass;
@@ -51,11 +63,9 @@ public class ControllerInspector {
                 targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
                 controllerInfo = controllerClass.getCanonicalName() + "." + CONTROLLER_METHOD.getName();
             } else {
-                Object constantPool = GET_CONSTANT_POOL.invoke(controllerClass); // constantPool is sun.reflect.ConstantPool, it can be changed in future JDK
-                Method getSize = constantPool.getClass().getMethod("getSize");
-                int size = (int) getSize.invoke(constantPool);
-                Method getMemberRefInfoAt = constantPool.getClass().getMethod("getMemberRefInfoAt", int.class);
-                String[] methodRefInfo = (String[]) getMemberRefInfoAt.invoke(constantPool, methodRefIndex(size));
+                Object constantPool = GET_CONSTANT_POOL.invoke(controllerClass);
+                int size = (int) CONSTANT_POOL_GET_SIZE.invoke(constantPool);
+                String[] methodRefInfo = (String[]) CONSTANT_POOL_GET_MEMBER_REF_INFO_AT.invoke(constantPool, size - 3);
                 Class<?> targetClass = Class.forName(methodRefInfo[0].replace('/', '.'));
                 String targetMethodName = methodRefInfo[1];
                 controllerInfo = targetClass.getCanonicalName() + "." + targetMethodName;
@@ -70,11 +80,5 @@ public class ControllerInspector {
         } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
             throw new Error("failed to inspect controller", e);
         }
-    }
-
-    private int methodRefIndex(int size) {
-        if (JDK_8_MINOR_VERSION >= 60)
-            return size - 3; // from 1.8.0_60, the index of methodRefInfo is different from previous jdk
-        return size - 2;
     }
 }
