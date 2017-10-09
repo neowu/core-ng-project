@@ -16,23 +16,23 @@ import java.security.PrivilegedAction;
  * @author neo
  */
 public class ControllerInspector {
-    private static final Method GET_CONSTANT_POOL;
+    private static final Method CLASS_GET_CONSTANT_POOL;
     private static final Method CONSTANT_POOL_GET_SIZE;
     private static final Method CONSTANT_POOL_GET_MEMBER_REF_INFO_AT;
-    private static final Method CONTROLLER_METHOD;
+    private static final Method CONTROLLER_EXECUTE;
 
     static {
         try {
-            GET_CONSTANT_POOL = Class.class.getDeclaredMethod("getConstantPool");
+            CLASS_GET_CONSTANT_POOL = Class.class.getDeclaredMethod("getConstantPool");
             AccessController.doPrivileged((PrivilegedAction<Method>) () -> {
-                GET_CONSTANT_POOL.setAccessible(true);
-                return GET_CONSTANT_POOL;
+                CLASS_GET_CONSTANT_POOL.setAccessible(true);
+                return CLASS_GET_CONSTANT_POOL;
             });
             Class<?> constantPoolClass = Class.forName("sun.reflect.ConstantPool"); // for java 8 constantPool is sun.reflect.ConstantPool, java 9 is jdk.internal.reflect.ConstantPool
             CONSTANT_POOL_GET_SIZE = constantPoolClass.getDeclaredMethod("getSize");
             CONSTANT_POOL_GET_MEMBER_REF_INFO_AT = constantPoolClass.getDeclaredMethod("getMemberRefInfoAt", int.class);
 
-            CONTROLLER_METHOD = Controller.class.getDeclaredMethod("execute", Request.class);
+            CONTROLLER_EXECUTE = Controller.class.getDeclaredMethod("execute", Request.class);
         } catch (NoSuchMethodException | ClassNotFoundException e) {
             throw new Error("failed to initialize controller inspector, please contact arch team", e);
         }
@@ -60,10 +60,10 @@ public class ControllerInspector {
         try {
             if (!controllerClass.isSynthetic()) {
                 targetClass = controllerClass;
-                targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
-                controllerInfo = controllerClass.getCanonicalName() + "." + CONTROLLER_METHOD.getName();
+                targetMethod = controllerClass.getMethod(CONTROLLER_EXECUTE.getName(), CONTROLLER_EXECUTE.getParameterTypes());
+                controllerInfo = controllerClass.getCanonicalName() + "." + CONTROLLER_EXECUTE.getName();
             } else {
-                Object constantPool = GET_CONSTANT_POOL.invoke(controllerClass);
+                Object constantPool = CLASS_GET_CONSTANT_POOL.invoke(controllerClass);
                 int size = (int) CONSTANT_POOL_GET_SIZE.invoke(constantPool);
                 String[] methodRefInfo = (String[]) CONSTANT_POOL_GET_MEMBER_REF_INFO_AT.invoke(constantPool, size - 3);
                 Class<?> targetClass = Class.forName(methodRefInfo[0].replace('/', '.'));
@@ -71,10 +71,10 @@ public class ControllerInspector {
                 controllerInfo = targetClass.getCanonicalName() + "." + targetMethodName;
                 if (targetMethodName.contains("$")) {   // for lambda
                     this.targetClass = controllerClass;
-                    targetMethod = controllerClass.getMethod(CONTROLLER_METHOD.getName(), CONTROLLER_METHOD.getParameterTypes());
+                    targetMethod = controllerClass.getMethod(CONTROLLER_EXECUTE.getName(), CONTROLLER_EXECUTE.getParameterTypes());
                 } else {    // for method reference
                     this.targetClass = targetClass;
-                    targetMethod = targetClass.getMethod(targetMethodName, CONTROLLER_METHOD.getParameterTypes());
+                    targetMethod = targetClass.getMethod(targetMethodName, CONTROLLER_EXECUTE.getParameterTypes());
                 }
             }
         } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
