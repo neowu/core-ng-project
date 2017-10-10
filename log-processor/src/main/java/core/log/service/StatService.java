@@ -24,7 +24,7 @@ public class StatService {
         index(messages, now);
     }
 
-    private void index(List<StatMessage> messages, LocalDate now) {
+    void index(List<StatMessage> messages, LocalDate now) {
         if (messages.size() <= 5) { // use single index in quiet time
             for (StatMessage message : messages) {
                 IndexRequest<StatDocument> request = new IndexRequest<>();
