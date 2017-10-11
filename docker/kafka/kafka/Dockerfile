@@ -1,6 +1,6 @@
 FROM        openjdk:jre-alpine
 MAINTAINER  neo
-ARG         KAFKA_VERSION=0.11.0.0
+ARG         KAFKA_VERSION=0.11.0.1
 ARG         SCALA_VERSION=2.12
 ENV         KAFKA_ARGS=
 RUN         apk add --no-cache curl bash \
