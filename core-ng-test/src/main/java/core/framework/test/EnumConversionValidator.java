@@ -1,7 +1,7 @@
 package core.framework.test;
 
-import core.framework.api.util.Sets;
-import core.framework.api.util.Strings;
+import core.framework.util.Sets;
+import core.framework.util.Strings;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,8 +1,8 @@
 package core.framework.impl.web;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Lists;
-import core.framework.api.web.Interceptor;
+import core.framework.util.Exceptions;
+import core.framework.util.Lists;
+import core.framework.web.Interceptor;
 
 import java.util.List;
 

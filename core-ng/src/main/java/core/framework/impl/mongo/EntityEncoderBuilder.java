@@ -1,12 +1,12 @@
 package core.framework.impl.mongo;
 
-import core.framework.api.mongo.Id;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Types;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
+import core.framework.mongo.Id;
+import core.framework.util.Maps;
+import core.framework.util.Types;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
@@ -67,7 +67,7 @@ final class EntityEncoderBuilder<T> {
 
     private String mongoField(Field field) {
         if (field.isAnnotationPresent(Id.class)) return "_id";
-        return field.getDeclaredAnnotation(core.framework.api.mongo.Field.class).name();
+        return field.getDeclaredAnnotation(core.framework.mongo.Field.class).name();
     }
 
     private String encodeListMethod(Class<?> valueClass) {

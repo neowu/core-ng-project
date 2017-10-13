@@ -1,6 +1,6 @@
 package core.framework.test.kafka;
 
-import core.framework.api.kafka.MessagePublisher;
+import core.framework.kafka.MessagePublisher;
 import core.framework.test.IntegrationTest;
 import org.junit.Test;
 

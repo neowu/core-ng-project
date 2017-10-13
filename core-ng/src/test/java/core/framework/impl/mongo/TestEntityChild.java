@@ -1,7 +1,7 @@
 package core.framework.impl.mongo;
 
-import core.framework.api.mongo.Field;
-import core.framework.api.mongo.MongoEnumValue;
+import core.framework.mongo.Field;
+import core.framework.mongo.MongoEnumValue;
 import org.bson.types.ObjectId;
 
 import java.util.List;

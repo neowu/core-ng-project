@@ -2,10 +2,10 @@ package core.framework.impl.mongo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import core.framework.api.util.ClasspathResources;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Sets;
+import core.framework.util.ClasspathResources;
+import core.framework.util.Lists;
+import core.framework.util.Maps;
+import core.framework.util.Sets;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;

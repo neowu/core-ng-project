@@ -1,9 +1,9 @@
 package core.framework.impl.web.management;
 
-import core.framework.api.util.Lists;
-import core.framework.api.web.Request;
-import core.framework.api.web.Response;
 import core.framework.impl.scheduler.Scheduler;
+import core.framework.util.Lists;
+import core.framework.web.Request;
+import core.framework.web.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

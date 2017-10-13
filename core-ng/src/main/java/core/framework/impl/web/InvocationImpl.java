@@ -1,10 +1,10 @@
 package core.framework.impl.web;
 
-import core.framework.api.web.Interceptor;
-import core.framework.api.web.Invocation;
-import core.framework.api.web.Request;
-import core.framework.api.web.Response;
-import core.framework.api.web.WebContext;
+import core.framework.web.Interceptor;
+import core.framework.web.Invocation;
+import core.framework.web.Request;
+import core.framework.web.Response;
+import core.framework.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

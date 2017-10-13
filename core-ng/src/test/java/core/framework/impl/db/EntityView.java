@@ -1,6 +1,6 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Column;
+import core.framework.db.Column;
 
 /**
  * @author neo

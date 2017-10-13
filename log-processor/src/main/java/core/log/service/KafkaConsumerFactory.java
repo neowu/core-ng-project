@@ -1,6 +1,6 @@
 package core.log.service;
 
-import core.framework.api.util.Maps;
+import core.framework.util.Maps;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;

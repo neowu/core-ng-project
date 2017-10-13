@@ -1,11 +1,11 @@
 package core.framework.impl.web.management;
 
-import core.framework.api.http.ContentType;
-import core.framework.api.web.Request;
-import core.framework.api.web.Response;
-import core.framework.api.web.exception.NotFoundException;
+import core.framework.http.ContentType;
 import core.framework.impl.cache.CacheImpl;
 import core.framework.impl.cache.CacheManager;
+import core.framework.web.Request;
+import core.framework.web.Response;
+import core.framework.web.exception.NotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;

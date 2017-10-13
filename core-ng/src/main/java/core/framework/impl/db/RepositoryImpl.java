@@ -1,11 +1,11 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Query;
-import core.framework.api.db.Repository;
-import core.framework.api.log.ActionLogContext;
-import core.framework.api.log.Markers;
-import core.framework.api.util.Lists;
-import core.framework.api.util.StopWatch;
+import core.framework.db.Query;
+import core.framework.db.Repository;
+import core.framework.log.ActionLogContext;
+import core.framework.log.Markers;
+import core.framework.util.Lists;
+import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

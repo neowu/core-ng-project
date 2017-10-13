@@ -1,10 +1,10 @@
 package core.framework.impl.web.rate;
 
-import core.framework.api.web.Interceptor;
-import core.framework.api.web.Invocation;
-import core.framework.api.web.Response;
-import core.framework.api.web.exception.TooManyRequestsException;
-import core.framework.api.web.rate.LimitRate;
+import core.framework.web.Interceptor;
+import core.framework.web.Invocation;
+import core.framework.web.Response;
+import core.framework.web.exception.TooManyRequestsException;
+import core.framework.web.rate.LimitRate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

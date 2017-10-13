@@ -1,8 +1,8 @@
 package core.framework.impl.web.session;
 
-import core.framework.api.util.Maps;
-import core.framework.api.util.Sets;
-import core.framework.api.web.Session;
+import core.framework.util.Maps;
+import core.framework.util.Sets;
+import core.framework.web.Session;
 
 import java.util.Map;
 import java.util.Optional;

@@ -1,14 +1,14 @@
 package core.framework.test.search;
 
-import core.framework.api.search.BulkIndexRequest;
-import core.framework.api.search.ElasticSearch;
-import core.framework.api.search.ElasticSearchType;
-import core.framework.api.search.ForEach;
-import core.framework.api.search.SearchRequest;
-import core.framework.api.search.SearchResponse;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
+import core.framework.search.BulkIndexRequest;
+import core.framework.search.ElasticSearch;
+import core.framework.search.ElasticSearchType;
+import core.framework.search.ForEach;
+import core.framework.search.SearchRequest;
+import core.framework.search.SearchResponse;
 import core.framework.test.IntegrationTest;
+import core.framework.util.Lists;
+import core.framework.util.Maps;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.sort.ScriptSortBuilder;

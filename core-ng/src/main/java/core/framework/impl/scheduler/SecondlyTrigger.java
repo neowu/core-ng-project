@@ -1,7 +1,7 @@
 package core.framework.impl.scheduler;
 
 
-import core.framework.api.scheduler.Job;
+import core.framework.scheduler.Job;
 
 import java.time.Duration;
 import java.time.LocalTime;

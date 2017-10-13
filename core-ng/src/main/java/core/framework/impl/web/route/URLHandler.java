@@ -1,9 +1,9 @@
 package core.framework.impl.web.route;
 
-import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.Exceptions;
-import core.framework.api.web.exception.MethodNotAllowedException;
+import core.framework.http.HTTPMethod;
 import core.framework.impl.web.ControllerHolder;
+import core.framework.util.Exceptions;
+import core.framework.web.exception.MethodNotAllowedException;
 
 import java.util.EnumMap;
 import java.util.Map;

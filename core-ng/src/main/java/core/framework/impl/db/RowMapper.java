@@ -1,6 +1,6 @@
 package core.framework.impl.db;
 
-import core.framework.api.util.Exceptions;
+import core.framework.util.Exceptions;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;

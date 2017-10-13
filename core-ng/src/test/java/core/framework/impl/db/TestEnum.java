@@ -1,6 +1,6 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.DBEnumValue;
+import core.framework.db.DBEnumValue;
 
 /**
  * @author neo

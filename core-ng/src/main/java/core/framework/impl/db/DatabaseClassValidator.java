@@ -1,16 +1,16 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Column;
-import core.framework.api.db.DBEnumValue;
-import core.framework.api.db.PrimaryKey;
-import core.framework.api.db.Table;
 import core.framework.api.json.Property;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Sets;
-import core.framework.api.util.Strings;
+import core.framework.db.Column;
+import core.framework.db.DBEnumValue;
+import core.framework.db.PrimaryKey;
+import core.framework.db.Table;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
+import core.framework.util.Exceptions;
+import core.framework.util.Sets;
+import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;

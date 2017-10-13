@@ -1,6 +1,6 @@
 package core.framework.impl.resource;
 
-import core.framework.api.log.ErrorCode;
+import core.framework.log.ErrorCode;
 
 /**
  * @author neo

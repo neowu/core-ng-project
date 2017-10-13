@@ -1,8 +1,8 @@
 package core.framework.test.db;
 
-import core.framework.api.db.Database;
-import core.framework.api.db.Query;
-import core.framework.api.db.Repository;
+import core.framework.db.Database;
+import core.framework.db.Query;
+import core.framework.db.Repository;
 import core.framework.test.IntegrationTest;
 import org.junit.Before;
 import org.junit.Test;

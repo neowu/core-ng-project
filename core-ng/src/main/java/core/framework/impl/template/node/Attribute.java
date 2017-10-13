@@ -1,6 +1,5 @@
 package core.framework.impl.template.node;
 
-import core.framework.api.util.Exceptions;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.fragment.BooleanAttributeFragment;
 import core.framework.impl.template.fragment.ContainerFragment;
@@ -9,6 +8,7 @@ import core.framework.impl.template.fragment.TextContentFragment;
 import core.framework.impl.template.fragment.URLFragment;
 import core.framework.impl.template.parser.HTMLParser;
 import core.framework.impl.template.source.TemplateSource;
+import core.framework.util.Exceptions;
 
 /**
  * @author neo

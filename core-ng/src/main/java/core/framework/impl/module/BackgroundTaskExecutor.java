@@ -1,7 +1,7 @@
 package core.framework.impl.module;
 
-import core.framework.api.util.Lists;
-import core.framework.api.util.Randoms;
+import core.framework.util.Lists;
+import core.framework.util.Randoms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

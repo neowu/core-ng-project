@@ -1,10 +1,10 @@
 package core.framework.impl.web.response;
 
-import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.util.Maps;
-import core.framework.api.web.CookieSpec;
-import core.framework.api.web.Response;
+import core.framework.http.ContentType;
+import core.framework.util.Maps;
+import core.framework.web.CookieSpec;
+import core.framework.web.Response;
 import io.undertow.util.HttpString;
 
 import java.util.Map;

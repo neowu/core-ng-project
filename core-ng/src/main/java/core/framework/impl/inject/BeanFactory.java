@@ -1,8 +1,8 @@
 package core.framework.impl.inject;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Types;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
+import core.framework.util.Types;
 
 import javax.inject.Inject;
 import javax.inject.Named;

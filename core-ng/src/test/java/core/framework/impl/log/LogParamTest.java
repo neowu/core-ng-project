@@ -1,8 +1,8 @@
 package core.framework.impl.log;
 
-import core.framework.api.util.Charsets;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Strings;
+import core.framework.util.Charsets;
+import core.framework.util.Maps;
+import core.framework.util.Strings;
 import org.junit.Test;
 
 import java.util.Map;

@@ -1,13 +1,13 @@
 package core.framework.test.module;
 
-import core.framework.api.db.Database;
-import core.framework.api.db.Repository;
-import core.framework.api.util.ClasspathResources;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Types;
+import core.framework.db.Database;
+import core.framework.db.Repository;
 import core.framework.impl.module.ModuleContext;
 import core.framework.test.db.EntitySchemaGenerator;
 import core.framework.test.db.SQLScriptRunner;
+import core.framework.util.ClasspathResources;
+import core.framework.util.Exceptions;
+import core.framework.util.Types;
 
 import java.util.List;
 

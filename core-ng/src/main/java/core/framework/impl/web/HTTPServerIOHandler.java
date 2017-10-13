@@ -1,7 +1,7 @@
 package core.framework.impl.web;
 
-import core.framework.api.util.Charsets;
 import core.framework.impl.web.request.RequestBodyReader;
+import core.framework.util.Charsets;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormDataParser;

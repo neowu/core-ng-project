@@ -1,6 +1,6 @@
 package core.framework.impl.inject;
 
-import core.framework.api.util.Types;
+import core.framework.util.Types;
 import org.junit.Before;
 import org.junit.Test;
 

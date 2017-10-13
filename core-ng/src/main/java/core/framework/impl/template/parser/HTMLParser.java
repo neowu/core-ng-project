@@ -1,7 +1,5 @@
 package core.framework.impl.template.parser;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Sets;
 import core.framework.impl.template.node.Attribute;
 import core.framework.impl.template.node.Comment;
 import core.framework.impl.template.node.ContainerNode;
@@ -9,6 +7,8 @@ import core.framework.impl.template.node.Document;
 import core.framework.impl.template.node.Element;
 import core.framework.impl.template.node.Text;
 import core.framework.impl.template.source.TemplateSource;
+import core.framework.util.Exceptions;
+import core.framework.util.Sets;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

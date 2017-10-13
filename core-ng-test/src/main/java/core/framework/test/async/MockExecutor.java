@@ -1,6 +1,6 @@
 package core.framework.test.async;
 
-import core.framework.api.async.Executor;
+import core.framework.async.Executor;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;

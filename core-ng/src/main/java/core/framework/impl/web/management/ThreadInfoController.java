@@ -1,7 +1,7 @@
 package core.framework.impl.web.management;
 
-import core.framework.api.web.Request;
-import core.framework.api.web.Response;
+import core.framework.web.Request;
+import core.framework.web.Response;
 
 import java.lang.management.LockInfo;
 import java.lang.management.ManagementFactory;

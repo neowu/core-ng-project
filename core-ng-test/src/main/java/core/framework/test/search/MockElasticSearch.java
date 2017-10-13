@@ -1,7 +1,7 @@
 package core.framework.test.search;
 
-import core.framework.api.util.StopWatch;
 import core.framework.impl.search.ElasticSearchImpl;
+import core.framework.util.StopWatch;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.network.NetworkModule;
 import org.elasticsearch.common.settings.Settings;

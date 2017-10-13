@@ -1,10 +1,10 @@
 package core.framework.impl.web.session;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.web.CookieSpec;
-import core.framework.api.web.Response;
-import core.framework.api.web.Session;
 import core.framework.impl.web.request.RequestImpl;
+import core.framework.util.Exceptions;
+import core.framework.web.CookieSpec;
+import core.framework.web.Response;
+import core.framework.web.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

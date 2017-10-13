@@ -1,6 +1,6 @@
 package core.framework.impl.web.site;
 
-import core.framework.api.util.Lists;
+import core.framework.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 

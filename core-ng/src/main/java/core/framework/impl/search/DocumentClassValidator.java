@@ -1,8 +1,8 @@
 package core.framework.impl.search;
 
-import core.framework.api.search.Index;
-import core.framework.api.util.Exceptions;
 import core.framework.impl.validate.type.JSONTypeValidator;
+import core.framework.search.Index;
+import core.framework.util.Exceptions;
 
 /**
  * @author neo

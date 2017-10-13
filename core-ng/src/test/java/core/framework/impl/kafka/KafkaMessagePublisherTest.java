@@ -1,8 +1,8 @@
 package core.framework.impl.kafka;
 
-import core.framework.api.kafka.MessagePublisher;
-import core.framework.api.util.Strings;
 import core.framework.impl.log.LogManager;
+import core.framework.kafka.MessagePublisher;
+import core.framework.util.Strings;
 import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.ByteArraySerializer;

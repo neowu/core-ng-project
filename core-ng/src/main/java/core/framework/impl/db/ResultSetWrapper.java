@@ -1,8 +1,8 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.UncheckedSQLException;
-import core.framework.api.util.ASCII;
-import core.framework.api.util.Maps;
+import core.framework.db.UncheckedSQLException;
+import core.framework.util.ASCII;
+import core.framework.util.Maps;
 
 import java.math.BigDecimal;
 import java.sql.Date;

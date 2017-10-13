@@ -1,6 +1,6 @@
 package core.framework.impl.log;
 
-import core.framework.api.util.Charsets;
+import core.framework.util.Charsets;
 
 import java.nio.charset.Charset;
 import java.util.Map;

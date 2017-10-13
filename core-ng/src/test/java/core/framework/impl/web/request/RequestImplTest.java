@@ -1,11 +1,11 @@
 package core.framework.impl.web.request;
 
-import core.framework.api.http.ContentType;
-import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.Strings;
+import core.framework.http.ContentType;
+import core.framework.http.HTTPMethod;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.impl.web.bean.TestQueryParamBean;
+import core.framework.util.Strings;
 import org.junit.Before;
 import org.junit.Test;
 

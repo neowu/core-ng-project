@@ -1,11 +1,11 @@
 package core.framework.test.redis;
 
-import core.framework.api.redis.Redis;
-import core.framework.api.redis.RedisHash;
-import core.framework.api.redis.RedisSet;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Sets;
+import core.framework.redis.Redis;
+import core.framework.redis.RedisHash;
+import core.framework.redis.RedisSet;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
+import core.framework.util.Sets;
 
 import java.time.Duration;
 import java.util.Map;

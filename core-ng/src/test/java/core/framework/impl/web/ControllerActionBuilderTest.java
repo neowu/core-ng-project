@@ -1,6 +1,6 @@
 package core.framework.impl.web;
 
-import core.framework.api.http.HTTPMethod;
+import core.framework.http.HTTPMethod;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

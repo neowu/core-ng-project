@@ -1,6 +1,6 @@
 package core.framework.impl.web.request;
 
-import core.framework.api.web.exception.MethodNotAllowedException;
+import core.framework.web.exception.MethodNotAllowedException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

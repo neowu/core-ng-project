@@ -1,11 +1,11 @@
 package core.framework.test.module;
 
-import core.framework.api.async.Executor;
-import core.framework.api.redis.Redis;
+import core.framework.async.Executor;
 import core.framework.impl.kafka.Kafka;
 import core.framework.impl.module.MockFactory;
 import core.framework.impl.mongo.MongoImpl;
 import core.framework.impl.search.ElasticSearchImpl;
+import core.framework.redis.Redis;
 import core.framework.test.async.MockExecutor;
 import core.framework.test.kafka.MockKafka;
 import core.framework.test.mongo.MockMongo;

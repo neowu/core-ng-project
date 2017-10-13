@@ -1,11 +1,11 @@
 package core.framework.impl.validate.type;
 
 import core.framework.api.json.Property;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Sets;
-import core.framework.api.util.Strings;
 import core.framework.impl.reflect.Fields;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
+import core.framework.util.Sets;
+import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

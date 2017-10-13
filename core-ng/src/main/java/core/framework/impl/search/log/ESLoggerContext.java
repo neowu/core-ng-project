@@ -1,7 +1,7 @@
 package core.framework.impl.search.log;
 
-import core.framework.api.util.Maps;
 import core.framework.impl.log.LoggerImpl;
+import core.framework.util.Maps;
 import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.ExtendedLogger;
 import org.apache.logging.log4j.spi.LoggerContext;

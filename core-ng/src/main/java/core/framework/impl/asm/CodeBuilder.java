@@ -1,6 +1,6 @@
 package core.framework.impl.asm;
 
-import core.framework.api.util.Strings;
+import core.framework.util.Strings;
 
 /**
  * @author neo

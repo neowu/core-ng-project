@@ -1,6 +1,6 @@
 package core.framework.impl.template;
 
-import core.framework.api.util.Exceptions;
+import core.framework.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

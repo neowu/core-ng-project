@@ -1,6 +1,6 @@
 package core.framework.impl.scheduler;
 
-import core.framework.api.scheduler.Job;
+import core.framework.scheduler.Job;
 
 /**
  * @author neo

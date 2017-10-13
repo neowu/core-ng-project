@@ -1,6 +1,6 @@
 package core.framework.impl.db;
 
-import core.framework.api.util.ClasspathResources;
+import core.framework.util.ClasspathResources;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

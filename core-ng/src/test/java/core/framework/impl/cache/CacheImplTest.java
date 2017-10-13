@@ -1,7 +1,7 @@
 package core.framework.impl.cache;
 
-import core.framework.api.util.Maps;
-import core.framework.api.util.Strings;
+import core.framework.util.Maps;
+import core.framework.util.Strings;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

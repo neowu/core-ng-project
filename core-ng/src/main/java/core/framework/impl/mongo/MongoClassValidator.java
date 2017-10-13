@@ -1,15 +1,15 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.json.Property;
-import core.framework.api.mongo.Collection;
-import core.framework.api.mongo.Id;
-import core.framework.api.mongo.MongoEnumValue;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Sets;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
+import core.framework.mongo.Collection;
+import core.framework.mongo.Id;
+import core.framework.mongo.MongoEnumValue;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
+import core.framework.util.Sets;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
@@ -70,7 +70,7 @@ public final class MongoClassValidator implements TypeVisitor {
         if (field.isAnnotationPresent(Id.class)) {
             validateId(field, parentPath == null);
         } else {
-            core.framework.api.mongo.Field mongoField = field.getDeclaredAnnotation(core.framework.api.mongo.Field.class);
+            core.framework.mongo.Field mongoField = field.getDeclaredAnnotation(core.framework.mongo.Field.class);
             if (mongoField == null)
                 throw Exceptions.error("mongo entity field must have @Field, field={}", Fields.path(field));
             String mongoFieldName = mongoField.name();

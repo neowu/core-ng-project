@@ -1,11 +1,11 @@
 package core.framework.impl.web.site;
 
-import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.web.Interceptor;
-import core.framework.api.web.Invocation;
-import core.framework.api.web.Request;
-import core.framework.api.web.Response;
+import core.framework.http.ContentType;
+import core.framework.web.Interceptor;
+import core.framework.web.Invocation;
+import core.framework.web.Request;
+import core.framework.web.Response;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

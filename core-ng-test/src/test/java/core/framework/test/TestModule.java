@@ -1,6 +1,6 @@
 package core.framework.test;
 
-import core.framework.api.AbstractTestModule;
+import core.framework.module.AbstractTestModule;
 import core.framework.test.db.TestDBEntity;
 import core.framework.test.db.TestSequenceIdDBEntity;
 import core.framework.test.kafka.TestMessage;

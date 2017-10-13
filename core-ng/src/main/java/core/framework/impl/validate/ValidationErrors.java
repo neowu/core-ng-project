@@ -1,6 +1,6 @@
 package core.framework.impl.validate;
 
-import core.framework.api.util.Maps;
+import core.framework.util.Maps;
 
 import java.util.Map;
 

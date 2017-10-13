@@ -1,8 +1,8 @@
 package core.framework.impl.web;
 
-import core.framework.api.util.Maps;
-import core.framework.api.web.Request;
-import core.framework.api.web.WebContext;
+import core.framework.util.Maps;
+import core.framework.web.Request;
+import core.framework.web.WebContext;
 
 import java.util.Map;
 

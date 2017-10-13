@@ -1,6 +1,6 @@
 package core.framework.impl.web;
 
-import core.framework.api.util.Exceptions;
+import core.framework.util.Exceptions;
 
 /**
  * @author neo

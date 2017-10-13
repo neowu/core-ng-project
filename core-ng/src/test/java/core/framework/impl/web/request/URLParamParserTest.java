@@ -1,7 +1,7 @@
 package core.framework.impl.web.request;
 
 import core.framework.api.json.Property;
-import core.framework.api.web.exception.BadRequestException;
+import core.framework.web.exception.BadRequestException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

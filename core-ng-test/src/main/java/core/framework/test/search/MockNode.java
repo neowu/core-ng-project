@@ -1,6 +1,6 @@
 package core.framework.test.search;
 
-import core.framework.api.util.Lists;
+import core.framework.util.Lists;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.reindex.ReindexPlugin;

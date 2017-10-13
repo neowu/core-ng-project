@@ -1,10 +1,10 @@
 package core.framework.impl.web.bean;
 
 import core.framework.api.json.Property;
-import core.framework.api.util.Maps;
 import core.framework.api.web.service.QueryParam;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.validate.Validator;
+import core.framework.util.Maps;
 
 import java.lang.reflect.Type;
 import java.util.Map;

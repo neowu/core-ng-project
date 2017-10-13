@@ -1,6 +1,6 @@
 package core.framework.impl.web.response;
 
-import core.framework.api.web.CookieSpec;
+import core.framework.web.CookieSpec;
 import io.undertow.server.handlers.CookieImpl;
 import org.junit.Before;
 import org.junit.Test;

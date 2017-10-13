@@ -1,9 +1,9 @@
 package core.framework.impl.web.management;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.web.Controller;
-import core.framework.api.web.Request;
-import core.framework.api.web.Response;
+import core.framework.web.Controller;
+import core.framework.web.Request;
+import core.framework.web.Response;
 
 /**
  * @author neo

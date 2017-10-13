@@ -3,7 +3,7 @@ public class ObjectValidatorListTest$Bean$ObjectValidator implements core.framew
         if (bean.field3 == null) {
             if (!partial) errors.add("child.field3", "field3 must not be null");
         } else {
-            if (core.framework.api.util.Strings.isEmpty(bean.field3)) errors.add("child.field3", "field3 must not be empty");
+            if (core.framework.util.Strings.isEmpty(bean.field3)) errors.add("child.field3", "field3 must not be empty");
         }
     }
 
@@ -11,7 +11,7 @@ public class ObjectValidatorListTest$Bean$ObjectValidator implements core.framew
         if (bean.field3 == null) {
             if (!partial) errors.add("children.field3", "field3 must not be null");
         } else {
-            if (core.framework.api.util.Strings.isEmpty(bean.field3)) errors.add("children.field3", "field3 must not be empty");
+            if (core.framework.util.Strings.isEmpty(bean.field3)) errors.add("children.field3", "field3 must not be empty");
         }
     }
 
@@ -19,7 +19,7 @@ public class ObjectValidatorListTest$Bean$ObjectValidator implements core.framew
         if (bean.field3 == null) {
             if (!partial) errors.add("childMap.field3", "field3 must not be null");
         } else {
-            if (core.framework.api.util.Strings.isEmpty(bean.field3)) errors.add("childMap.field3", "field3 must not be empty");
+            if (core.framework.util.Strings.isEmpty(bean.field3)) errors.add("childMap.field3", "field3 must not be empty");
         }
     }
 
@@ -27,11 +27,11 @@ public class ObjectValidatorListTest$Bean$ObjectValidator implements core.framew
         if (bean.field1 == null) {
             if (!partial) errors.add("field1", "field must not be null");
         } else {
-            if (core.framework.api.util.Strings.isEmpty(bean.field1)) errors.add("field1", "field1 must not be empty");
+            if (core.framework.util.Strings.isEmpty(bean.field1)) errors.add("field1", "field1 must not be empty");
         }
         if (bean.field2 == null) {
         } else {
-            if (core.framework.api.util.Strings.isEmpty(bean.field2)) errors.add("field2", "field2 must not be empty");
+            if (core.framework.util.Strings.isEmpty(bean.field2)) errors.add("field2", "field2 must not be empty");
         }
         if (bean.child == null) {
         } else {

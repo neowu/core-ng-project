@@ -1,9 +1,9 @@
 package core.framework.impl.web.management;
 
-import core.framework.api.util.Properties;
-import core.framework.api.web.Controller;
-import core.framework.api.web.Request;
-import core.framework.api.web.Response;
+import core.framework.util.Properties;
+import core.framework.web.Controller;
+import core.framework.web.Request;
+import core.framework.web.Response;
 
 import java.util.Set;
 import java.util.TreeSet;

@@ -1,8 +1,8 @@
 package core.framework.test.search;
 
-import core.framework.api.util.Maps;
 import core.framework.impl.log.LoggerImpl;
 import core.framework.impl.search.log.ESLogger;
+import core.framework.util.Maps;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;

@@ -1,7 +1,7 @@
 package core.log;
 
-import core.framework.api.App;
-import core.framework.api.util.Strings;
+import core.framework.module.App;
+import core.framework.util.Strings;
 import core.log.domain.ActionDocument;
 import core.log.domain.StatDocument;
 import core.log.domain.TraceDocument;

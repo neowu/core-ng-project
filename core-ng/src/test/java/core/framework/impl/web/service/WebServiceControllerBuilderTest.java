@@ -1,14 +1,14 @@
 package core.framework.impl.web.service;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.util.ClasspathResources;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Types;
-import core.framework.api.web.Controller;
-import core.framework.api.web.Request;
-import core.framework.api.web.Response;
 import core.framework.impl.web.response.BeanBody;
 import core.framework.impl.web.response.ResponseImpl;
+import core.framework.util.ClasspathResources;
+import core.framework.util.Lists;
+import core.framework.util.Types;
+import core.framework.web.Controller;
+import core.framework.web.Request;
+import core.framework.web.Response;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

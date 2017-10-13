@@ -1,6 +1,6 @@
 package core.framework.impl.validate;
 
-import core.framework.api.validate.ValidationException;
+import core.framework.validate.ValidationException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

@@ -1,12 +1,12 @@
 package core.framework.impl.web.service;
 
-import core.framework.api.http.ContentType;
-import core.framework.api.http.HTTPMethod;
-import core.framework.api.http.HTTPRequest;
-import core.framework.api.util.Maps;
-import core.framework.api.validate.ValidationException;
+import core.framework.http.ContentType;
+import core.framework.http.HTTPMethod;
+import core.framework.http.HTTPRequest;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.util.Maps;
+import core.framework.validate.ValidationException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

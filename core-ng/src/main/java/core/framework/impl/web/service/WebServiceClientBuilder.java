@@ -1,11 +1,11 @@
 package core.framework.impl.web.service;
 
-import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.Maps;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
+import core.framework.http.HTTPMethod;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
+import core.framework.util.Maps;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

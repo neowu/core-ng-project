@@ -1,6 +1,6 @@
 package core.framework.test;
 
-import core.framework.api.web.site.WebDirectory;
+import core.framework.web.site.WebDirectory;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,6 +1,6 @@
 package core.framework.impl.validate;
 
-import core.framework.api.util.Types;
+import core.framework.util.Types;
 import org.junit.Test;
 
 import java.lang.reflect.Field;

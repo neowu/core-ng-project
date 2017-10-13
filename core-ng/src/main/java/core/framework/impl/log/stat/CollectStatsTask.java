@@ -1,9 +1,9 @@
 package core.framework.impl.log.stat;
 
-import core.framework.api.util.ASCII;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
 import core.framework.impl.log.LogForwarder;
+import core.framework.util.ASCII;
+import core.framework.util.Lists;
+import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

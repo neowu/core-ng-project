@@ -1,6 +1,6 @@
 package core.framework.impl.web.site;
 
-import core.framework.api.http.ContentType;
+import core.framework.http.ContentType;
 import org.junit.Assert;
 import org.junit.Test;
 

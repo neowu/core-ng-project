@@ -1,8 +1,8 @@
 package core.framework.impl.search;
 
 import core.framework.api.json.Property;
-import core.framework.api.search.Index;
 import core.framework.api.validate.NotNull;
+import core.framework.search.Index;
 
 import java.time.LocalDateTime;
 import java.util.List;

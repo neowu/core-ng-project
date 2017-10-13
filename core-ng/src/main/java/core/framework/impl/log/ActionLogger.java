@@ -1,7 +1,7 @@
 package core.framework.impl.log;
 
-import core.framework.api.util.Charsets;
-import core.framework.api.util.Exceptions;
+import core.framework.util.Charsets;
+import core.framework.util.Exceptions;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

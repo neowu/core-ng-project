@@ -1,9 +1,9 @@
 package core.framework.test.db;
 
-import core.framework.api.db.Column;
-import core.framework.api.db.DBEnumValue;
-import core.framework.api.db.PrimaryKey;
-import core.framework.api.db.Table;
+import core.framework.db.Column;
+import core.framework.db.DBEnumValue;
+import core.framework.db.PrimaryKey;
+import core.framework.db.Table;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

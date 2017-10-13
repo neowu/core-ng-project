@@ -1,6 +1,6 @@
 package core.framework.impl.web;
 
-import core.framework.api.crypto.PEM;
+import core.framework.crypto.PEM;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;

@@ -1,6 +1,6 @@
 package core.framework.impl.async;
 
-import core.framework.api.async.Executor;
+import core.framework.async.Executor;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;

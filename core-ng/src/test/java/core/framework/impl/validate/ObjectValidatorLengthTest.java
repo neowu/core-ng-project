@@ -1,8 +1,8 @@
 package core.framework.impl.validate;
 
-import core.framework.api.util.ClasspathResources;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
+import core.framework.util.ClasspathResources;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,8 +1,8 @@
 package core.framework.impl.web.service;
 
-import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.ClasspathResources;
-import core.framework.api.util.Maps;
+import core.framework.http.HTTPMethod;
+import core.framework.util.ClasspathResources;
+import core.framework.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

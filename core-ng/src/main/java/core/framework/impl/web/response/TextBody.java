@@ -1,7 +1,7 @@
 package core.framework.impl.web.response;
 
-import core.framework.api.util.Strings;
 import core.framework.impl.log.LogParam;
+import core.framework.util.Strings;
 import io.undertow.io.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,9 +1,9 @@
 package core.framework.impl.web;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.log.Severity;
-import core.framework.api.web.exception.NotFoundException;
-import core.framework.api.web.service.RemoteServiceException;
+import core.framework.log.Severity;
+import core.framework.web.exception.NotFoundException;
+import core.framework.web.service.RemoteServiceException;
 import org.junit.Before;
 import org.junit.Test;
 

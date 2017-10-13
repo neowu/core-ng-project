@@ -1,7 +1,7 @@
 package core.framework.test.search;
 
 import core.framework.api.json.Property;
-import core.framework.api.search.Index;
+import core.framework.search.Index;
 
 import java.time.ZonedDateTime;
 

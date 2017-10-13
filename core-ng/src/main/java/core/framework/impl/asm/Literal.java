@@ -1,7 +1,7 @@
 package core.framework.impl.asm;
 
-import core.framework.api.util.Types;
 import core.framework.impl.reflect.GenericTypes;
+import core.framework.util.Types;
 
 import java.lang.reflect.Type;
 

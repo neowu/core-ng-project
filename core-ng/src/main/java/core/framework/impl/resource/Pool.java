@@ -1,6 +1,6 @@
 package core.framework.impl.resource;
 
-import core.framework.api.util.StopWatch;
+import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

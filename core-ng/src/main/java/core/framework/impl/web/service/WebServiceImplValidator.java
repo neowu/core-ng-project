@@ -1,7 +1,7 @@
 package core.framework.impl.web.service;
 
-import core.framework.api.util.Exceptions;
 import core.framework.api.web.service.PathParam;
+import core.framework.util.Exceptions;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

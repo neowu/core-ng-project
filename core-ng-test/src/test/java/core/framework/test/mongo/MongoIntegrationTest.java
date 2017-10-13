@@ -1,10 +1,10 @@
 package core.framework.test.mongo;
 
 import com.mongodb.client.model.Filters;
-import core.framework.api.mongo.Mongo;
-import core.framework.api.mongo.MongoCollection;
-import core.framework.api.util.Lists;
+import core.framework.mongo.Mongo;
+import core.framework.mongo.MongoCollection;
 import core.framework.test.IntegrationTest;
+import core.framework.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Test;

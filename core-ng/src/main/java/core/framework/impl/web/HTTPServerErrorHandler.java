@@ -1,18 +1,18 @@
 package core.framework.impl.web;
 
-import core.framework.api.http.ContentType;
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.log.ActionLogContext;
-import core.framework.api.log.ErrorCode;
-import core.framework.api.log.Severity;
-import core.framework.api.util.Exceptions;
-import core.framework.api.web.ErrorHandler;
-import core.framework.api.web.Response;
 import core.framework.api.web.service.ResponseStatus;
+import core.framework.http.ContentType;
 import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.response.ResponseImpl;
+import core.framework.log.ActionLogContext;
+import core.framework.log.ErrorCode;
+import core.framework.log.Severity;
+import core.framework.util.Exceptions;
+import core.framework.web.ErrorHandler;
+import core.framework.web.Response;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.slf4j.Logger;

@@ -1,6 +1,6 @@
 package core.framework.impl.mongo;
 
-import core.framework.api.util.Exceptions;
+import core.framework.util.Exceptions;
 import org.bson.BsonObjectId;
 import org.bson.BsonReader;
 import org.bson.BsonString;

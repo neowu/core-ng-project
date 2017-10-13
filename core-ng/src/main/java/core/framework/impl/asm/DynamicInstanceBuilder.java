@@ -1,7 +1,7 @@
 package core.framework.impl.asm;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Strings;
+import core.framework.util.Exceptions;
+import core.framework.util.Strings;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;

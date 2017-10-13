@@ -1,6 +1,6 @@
 package core.framework.impl.mongo;
 
-import core.framework.api.util.ClasspathResources;
+import core.framework.util.ClasspathResources;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
 import org.junit.Before;

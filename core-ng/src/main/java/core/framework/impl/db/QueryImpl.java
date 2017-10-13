@@ -1,10 +1,10 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Query;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Strings;
+import core.framework.db.Query;
 import core.framework.impl.db.dialect.Dialect;
+import core.framework.util.Exceptions;
+import core.framework.util.Lists;
+import core.framework.util.Strings;
 
 import java.util.Collections;
 import java.util.List;

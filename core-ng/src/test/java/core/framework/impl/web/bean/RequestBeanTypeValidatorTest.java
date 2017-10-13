@@ -1,6 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.api.util.Types;
+import core.framework.util.Types;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

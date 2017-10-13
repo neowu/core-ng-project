@@ -1,6 +1,6 @@
 package core.framework.impl.web.management;
 
-import core.framework.api.web.exception.ForbiddenException;
+import core.framework.web.exception.ForbiddenException;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

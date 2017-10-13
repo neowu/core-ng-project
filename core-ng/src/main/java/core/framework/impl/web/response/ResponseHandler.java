@@ -1,11 +1,11 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.api.log.ActionLogContext;
-import core.framework.api.util.Encodings;
-import core.framework.api.web.CookieSpec;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.site.TemplateManager;
+import core.framework.log.ActionLogContext;
+import core.framework.util.Encodings;
+import core.framework.web.CookieSpec;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;

@@ -1,9 +1,9 @@
 package core.framework.impl.web.request;
 
-import core.framework.api.util.Encodings;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
-import core.framework.api.web.exception.BadRequestException;
+import core.framework.util.Encodings;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
+import core.framework.web.exception.BadRequestException;
 
 import java.util.Map;
 

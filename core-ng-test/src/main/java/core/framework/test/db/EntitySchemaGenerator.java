@@ -1,16 +1,16 @@
 package core.framework.test.db;
 
-import core.framework.api.db.Column;
-import core.framework.api.db.Database;
-import core.framework.api.db.PrimaryKey;
-import core.framework.api.db.Table;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Lists;
-import core.framework.api.util.StopWatch;
-import core.framework.api.util.Strings;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
+import core.framework.db.Column;
+import core.framework.db.Database;
+import core.framework.db.PrimaryKey;
+import core.framework.db.Table;
 import core.framework.impl.reflect.Classes;
+import core.framework.util.Exceptions;
+import core.framework.util.Lists;
+import core.framework.util.StopWatch;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

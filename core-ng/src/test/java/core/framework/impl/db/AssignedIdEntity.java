@@ -1,10 +1,10 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Column;
-import core.framework.api.db.PrimaryKey;
-import core.framework.api.db.Table;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
+import core.framework.db.Column;
+import core.framework.db.PrimaryKey;
+import core.framework.db.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

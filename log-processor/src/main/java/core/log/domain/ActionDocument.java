@@ -1,8 +1,8 @@
 package core.log.domain;
 
 import core.framework.api.json.Property;
-import core.framework.api.search.Index;
 import core.framework.impl.log.queue.PerformanceStatMessage;
+import core.framework.search.Index;
 
 import java.time.Instant;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package core.framework.impl.log;
 
-import core.framework.api.log.ErrorCode;
-import core.framework.api.log.Markers;
-import core.framework.api.log.MessageFilter;
-import core.framework.api.log.Severity;
+import core.framework.log.ErrorCode;
+import core.framework.log.Markers;
+import core.framework.log.MessageFilter;
+import core.framework.log.Severity;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 

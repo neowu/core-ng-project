@@ -1,13 +1,13 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Column;
-import core.framework.api.db.PrimaryKey;
-import core.framework.api.db.Table;
-import core.framework.api.util.Exceptions;
+import core.framework.db.Column;
+import core.framework.db.PrimaryKey;
+import core.framework.db.Table;
 import core.framework.impl.db.dialect.Dialect;
 import core.framework.impl.db.dialect.MySQLDialect;
 import core.framework.impl.db.dialect.OracleDialect;
 import core.framework.impl.reflect.Classes;
+import core.framework.util.Exceptions;
 
 import java.lang.reflect.Field;
 import java.util.List;

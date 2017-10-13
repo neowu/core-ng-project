@@ -1,9 +1,9 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.DBEnumValue;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
+import core.framework.db.DBEnumValue;
 import core.framework.impl.reflect.Classes;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
 
 import java.util.EnumMap;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package core.log;
 
-import core.framework.api.AbstractTestModule;
+import core.framework.module.AbstractTestModule;
 import core.log.service.IndexService;
 import core.log.service.KafkaConsumerFactory;
 import org.apache.kafka.clients.consumer.Consumer;

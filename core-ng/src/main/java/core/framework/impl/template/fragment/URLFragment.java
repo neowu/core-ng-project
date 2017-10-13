@@ -1,12 +1,12 @@
 package core.framework.impl.template.fragment;
 
-import core.framework.api.log.Markers;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Strings;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionHolder;
+import core.framework.log.Markers;
+import core.framework.util.Exceptions;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,8 +1,8 @@
 package core.framework.impl.log;
 
-import core.framework.api.util.Charsets;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Randoms;
+import core.framework.util.Charsets;
+import core.framework.util.Exceptions;
+import core.framework.util.Randoms;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-import static core.framework.api.util.Files.createDir;
+import static core.framework.util.Files.createDir;
 import static java.nio.file.Files.createFile;
 
 /**

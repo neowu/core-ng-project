@@ -1,9 +1,9 @@
 package core.framework.impl.validate;
 
-import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Size;
+import core.framework.util.Lists;
+import core.framework.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,8 +1,8 @@
 package core.framework.test.db;
 
-import core.framework.api.db.Database;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.StopWatch;
+import core.framework.db.Database;
+import core.framework.util.Exceptions;
+import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

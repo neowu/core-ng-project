@@ -1,8 +1,8 @@
 package core.framework.test.redis;
 
-import core.framework.api.redis.RedisHash;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
+import core.framework.redis.RedisHash;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,9 +1,9 @@
 package core.framework.impl.template.node;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.fragment.ContainerFragment;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
 
 import java.util.ArrayList;
 import java.util.List;

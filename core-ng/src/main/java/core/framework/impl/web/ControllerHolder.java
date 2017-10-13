@@ -1,6 +1,6 @@
 package core.framework.impl.web;
 
-import core.framework.api.web.Controller;
+import core.framework.web.Controller;
 
 import java.lang.reflect.Method;
 

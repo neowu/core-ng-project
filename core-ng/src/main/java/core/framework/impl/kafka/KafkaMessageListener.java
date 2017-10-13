@@ -1,12 +1,12 @@
 package core.framework.impl.kafka;
 
-import core.framework.api.kafka.BulkMessageHandler;
-import core.framework.api.kafka.MessageHandler;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Sets;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.LogManager;
+import core.framework.kafka.BulkMessageHandler;
+import core.framework.kafka.MessageHandler;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
+import core.framework.util.Sets;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

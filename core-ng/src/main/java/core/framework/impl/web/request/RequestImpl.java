@@ -1,16 +1,16 @@
 package core.framework.impl.web.request;
 
-import core.framework.api.http.ContentType;
-import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.Encodings;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
-import core.framework.api.web.CookieSpec;
-import core.framework.api.web.MultipartFile;
-import core.framework.api.web.Request;
-import core.framework.api.web.Session;
-import core.framework.api.web.exception.BadRequestException;
+import core.framework.http.ContentType;
+import core.framework.http.HTTPMethod;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.util.Encodings;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
+import core.framework.web.CookieSpec;
+import core.framework.web.MultipartFile;
+import core.framework.web.Request;
+import core.framework.web.Session;
+import core.framework.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 

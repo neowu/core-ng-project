@@ -1,6 +1,6 @@
 package core.framework.impl.template.source;
 
-import core.framework.api.util.ClasspathResources;
+import core.framework.util.ClasspathResources;
 
 /**
  * @author neo

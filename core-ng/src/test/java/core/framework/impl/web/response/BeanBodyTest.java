@@ -1,8 +1,8 @@
 package core.framework.impl.web.response;
 
-import core.framework.api.util.Lists;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.bean.TestBean;
+import core.framework.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 

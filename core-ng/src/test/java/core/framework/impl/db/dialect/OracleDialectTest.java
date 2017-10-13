@@ -1,6 +1,6 @@
 package core.framework.impl.db.dialect;
 
-import core.framework.api.util.Lists;
+import core.framework.util.Lists;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

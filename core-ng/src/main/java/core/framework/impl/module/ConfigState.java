@@ -1,16 +1,16 @@
 package core.framework.impl.module;
 
-import core.framework.api.module.APIConfig;
-import core.framework.api.module.CacheConfig;
-import core.framework.api.module.DBConfig;
-import core.framework.api.module.HTTPConfig;
-import core.framework.api.module.KafkaConfig;
-import core.framework.api.module.MongoConfig;
-import core.framework.api.module.RedisConfig;
-import core.framework.api.module.SchedulerConfig;
-import core.framework.api.module.SearchConfig;
-import core.framework.api.module.SiteConfig;
-import core.framework.api.util.Maps;
+import core.framework.module.APIConfig;
+import core.framework.module.CacheConfig;
+import core.framework.module.DBConfig;
+import core.framework.module.HTTPConfig;
+import core.framework.module.KafkaConfig;
+import core.framework.module.MongoConfig;
+import core.framework.module.RedisConfig;
+import core.framework.module.SchedulerConfig;
+import core.framework.module.SearchConfig;
+import core.framework.module.SiteConfig;
+import core.framework.util.Maps;
 
 import java.util.Map;
 

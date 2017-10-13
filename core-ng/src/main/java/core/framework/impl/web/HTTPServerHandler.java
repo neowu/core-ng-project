@@ -1,6 +1,5 @@
 package core.framework.impl.web;
 
-import core.framework.api.web.Response;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.bean.RequestBeanMapper;
@@ -12,6 +11,7 @@ import core.framework.impl.web.response.ResponseImpl;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
 import core.framework.impl.web.site.SiteManager;
+import core.framework.web.Response;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;

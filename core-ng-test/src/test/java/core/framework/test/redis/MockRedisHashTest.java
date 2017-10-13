@@ -1,6 +1,6 @@
 package core.framework.test.redis;
 
-import core.framework.api.util.Maps;
+import core.framework.util.Maps;
 import org.junit.Before;
 import org.junit.Test;
 

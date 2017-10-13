@@ -1,8 +1,8 @@
 package core.framework.impl.template;
 
-import core.framework.api.util.ClasspathResources;
-import core.framework.api.util.Lists;
 import core.framework.impl.template.source.ClasspathTemplateSource;
+import core.framework.util.ClasspathResources;
+import core.framework.util.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 

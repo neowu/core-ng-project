@@ -1,8 +1,8 @@
 package core.framework.impl.web;
 
-import core.framework.api.http.HTTPMethod;
-import core.framework.api.util.ASCII;
-import core.framework.api.util.Strings;
+import core.framework.http.HTTPMethod;
+import core.framework.util.ASCII;
+import core.framework.util.Strings;
 
 /**
  * @author neo

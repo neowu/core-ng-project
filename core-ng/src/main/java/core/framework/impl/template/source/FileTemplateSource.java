@@ -1,7 +1,7 @@
 package core.framework.impl.template.source;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Files;
+import core.framework.util.Exceptions;
+import core.framework.util.Files;
 
 import java.nio.file.Path;
 

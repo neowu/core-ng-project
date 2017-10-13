@@ -1,10 +1,10 @@
 package core.log.service;
 
-import core.framework.api.search.BulkIndexRequest;
-import core.framework.api.search.ElasticSearchType;
-import core.framework.api.search.IndexRequest;
-import core.framework.api.util.Maps;
 import core.framework.impl.log.queue.ActionLogMessage;
+import core.framework.search.BulkIndexRequest;
+import core.framework.search.ElasticSearchType;
+import core.framework.search.IndexRequest;
+import core.framework.util.Maps;
 import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;
 

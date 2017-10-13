@@ -1,7 +1,7 @@
 package core.framework.test;
 
-import core.framework.api.AbstractTestModule;
-import core.framework.api.util.Exceptions;
+import core.framework.module.AbstractTestModule;
+import core.framework.util.Exceptions;
 
 /**
  * @author neo

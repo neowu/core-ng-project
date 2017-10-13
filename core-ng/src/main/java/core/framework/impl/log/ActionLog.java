@@ -1,7 +1,7 @@
 package core.framework.impl.log;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;

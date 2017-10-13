@@ -1,6 +1,6 @@
 package core.framework.impl.log;
 
-import core.framework.api.util.Strings;
+import core.framework.util.Strings;
 import org.slf4j.Marker;
 
 import java.io.PrintStream;

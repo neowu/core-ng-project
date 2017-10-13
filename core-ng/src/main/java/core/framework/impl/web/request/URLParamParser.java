@@ -1,9 +1,9 @@
 package core.framework.impl.web.request;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.JSON;
-import core.framework.api.util.Strings;
-import core.framework.api.web.exception.BadRequestException;
+import core.framework.json.JSON;
+import core.framework.util.Exceptions;
+import core.framework.util.Strings;
+import core.framework.web.exception.BadRequestException;
 
 /**
  * @author neo

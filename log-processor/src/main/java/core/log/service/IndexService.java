@@ -1,7 +1,7 @@
 package core.log.service;
 
-import core.framework.api.search.ElasticSearch;
-import core.framework.api.util.ClasspathResources;
+import core.framework.search.ElasticSearch;
+import core.framework.util.ClasspathResources;
 
 import javax.inject.Inject;
 

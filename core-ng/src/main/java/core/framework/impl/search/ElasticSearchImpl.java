@@ -1,12 +1,12 @@
 package core.framework.impl.search;
 
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
-import core.framework.api.search.ElasticSearch;
-import core.framework.api.search.ElasticSearchIndex;
-import core.framework.api.search.ElasticSearchType;
-import core.framework.api.search.SearchException;
-import core.framework.api.util.Lists;
-import core.framework.api.util.StopWatch;
+import core.framework.search.ElasticSearch;
+import core.framework.search.ElasticSearchIndex;
+import core.framework.search.ElasticSearchType;
+import core.framework.search.SearchException;
+import core.framework.util.Lists;
+import core.framework.util.StopWatch;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;

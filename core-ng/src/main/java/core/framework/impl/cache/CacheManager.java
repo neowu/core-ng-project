@@ -1,8 +1,8 @@
 package core.framework.impl.cache;
 
-import core.framework.api.cache.Cache;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Maps;
+import core.framework.cache.Cache;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
 
 import java.lang.reflect.Type;
 import java.time.Duration;

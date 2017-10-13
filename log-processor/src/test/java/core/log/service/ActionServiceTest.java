@@ -1,11 +1,11 @@
 package core.log.service;
 
-import core.framework.api.search.ElasticSearchType;
-import core.framework.api.search.GetRequest;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.framework.impl.log.queue.PerformanceStatMessage;
+import core.framework.search.ElasticSearchType;
+import core.framework.search.GetRequest;
+import core.framework.util.Lists;
+import core.framework.util.Maps;
 import core.log.IntegrationTest;
 import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;

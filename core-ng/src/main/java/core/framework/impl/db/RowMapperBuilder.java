@@ -1,6 +1,6 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Column;
+import core.framework.db.Column;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;

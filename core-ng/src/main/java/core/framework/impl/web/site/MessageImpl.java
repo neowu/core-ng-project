@@ -1,12 +1,12 @@
 package core.framework.impl.web.site;
 
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
-import core.framework.api.util.Properties;
-import core.framework.api.util.Sets;
-import core.framework.api.util.Strings;
-import core.framework.api.web.site.Message;
+import core.framework.util.Exceptions;
+import core.framework.util.Lists;
+import core.framework.util.Maps;
+import core.framework.util.Properties;
+import core.framework.util.Sets;
+import core.framework.util.Strings;
+import core.framework.web.site.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

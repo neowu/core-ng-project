@@ -1,8 +1,8 @@
 package core.framework.test.redis;
 
-import core.framework.api.redis.RedisSet;
-import core.framework.api.util.Exceptions;
-import core.framework.api.util.Sets;
+import core.framework.redis.RedisSet;
+import core.framework.util.Exceptions;
+import core.framework.util.Sets;
 
 import java.util.Arrays;
 import java.util.HashSet;

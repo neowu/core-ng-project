@@ -1,6 +1,6 @@
 package core.framework.impl.reflect;
 
-import core.framework.api.util.Exceptions;
+import core.framework.util.Exceptions;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

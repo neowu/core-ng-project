@@ -1,7 +1,7 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Repository;
-import core.framework.api.util.Lists;
+import core.framework.db.Repository;
+import core.framework.util.Lists;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;

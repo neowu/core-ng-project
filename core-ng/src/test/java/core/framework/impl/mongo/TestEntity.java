@@ -1,8 +1,8 @@
 package core.framework.impl.mongo;
 
-import core.framework.api.mongo.Collection;
-import core.framework.api.mongo.Field;
-import core.framework.api.mongo.Id;
+import core.framework.mongo.Collection;
+import core.framework.mongo.Field;
+import core.framework.mongo.Id;
 import org.bson.types.ObjectId;
 
 import java.time.LocalDateTime;

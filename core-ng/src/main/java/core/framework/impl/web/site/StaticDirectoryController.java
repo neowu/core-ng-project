@@ -1,10 +1,10 @@
 package core.framework.impl.web.site;
 
-import core.framework.api.http.ContentType;
-import core.framework.api.web.Controller;
-import core.framework.api.web.Request;
-import core.framework.api.web.Response;
-import core.framework.api.web.exception.NotFoundException;
+import core.framework.http.ContentType;
+import core.framework.web.Controller;
+import core.framework.web.Request;
+import core.framework.web.Response;
+import core.framework.web.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

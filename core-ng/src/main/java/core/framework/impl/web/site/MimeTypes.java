@@ -1,8 +1,8 @@
 package core.framework.impl.web.site;
 
-import core.framework.api.http.ContentType;
-import core.framework.api.util.ASCII;
-import core.framework.api.util.Maps;
+import core.framework.http.ContentType;
+import core.framework.util.ASCII;
+import core.framework.util.Maps;
 
 import java.util.Map;
 

@@ -1,13 +1,13 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Column;
-import core.framework.api.db.PrimaryKey;
-import core.framework.api.db.Table;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Strings;
+import core.framework.db.Column;
+import core.framework.db.PrimaryKey;
+import core.framework.db.Table;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
+import core.framework.util.Lists;
+import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
 import java.util.List;

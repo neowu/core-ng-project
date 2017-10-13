@@ -1,7 +1,7 @@
 package core.framework.impl.web.session;
 
 
-import core.framework.api.util.Maps;
+import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,6 +1,6 @@
 package core.framework.impl.mongo;
 
-import core.framework.api.util.ClasspathResources;
+import core.framework.util.ClasspathResources;
 import org.bson.json.JsonReader;
 import org.bson.types.ObjectId;
 import org.junit.Before;

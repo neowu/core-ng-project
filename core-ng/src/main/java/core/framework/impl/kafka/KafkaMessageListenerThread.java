@@ -1,15 +1,15 @@
 package core.framework.impl.kafka;
 
-import core.framework.api.kafka.Message;
-import core.framework.api.log.Markers;
-import core.framework.api.util.Charsets;
-import core.framework.api.util.Lists;
-import core.framework.api.util.Maps;
-import core.framework.api.util.StopWatch;
-import core.framework.api.util.Threads;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.LogParam;
+import core.framework.kafka.Message;
+import core.framework.log.Markers;
+import core.framework.util.Charsets;
+import core.framework.util.Lists;
+import core.framework.util.Maps;
+import core.framework.util.StopWatch;
+import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;

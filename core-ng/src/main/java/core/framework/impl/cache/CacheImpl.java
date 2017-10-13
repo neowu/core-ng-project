@@ -1,10 +1,10 @@
 package core.framework.impl.cache;
 
-import core.framework.api.cache.Cache;
-import core.framework.api.util.Charsets;
-import core.framework.api.util.Maps;
+import core.framework.cache.Cache;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.json.JSONWriter;
+import core.framework.util.Charsets;
+import core.framework.util.Maps;
 
 import java.lang.reflect.Type;
 import java.time.Duration;

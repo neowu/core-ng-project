@@ -1,6 +1,6 @@
 package core.framework.impl.db;
 
-import core.framework.api.db.Transaction;
+import core.framework.db.Transaction;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
