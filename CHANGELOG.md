@@ -1,5 +1,5 @@
 ## Change log
-### 4.16.4 (10/2/2017 - )
+### 4.16.4 (10/2/2017 - 10/13/2017)
 * web: enable http2 support
 * web: simplified ControllerInspector, to only support JDK 1.8.0_60 or later
 * lib: update javaassist to 3.22, kafka to 0.11.0.1
