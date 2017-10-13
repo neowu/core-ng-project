@@ -38,6 +38,23 @@ public class JSONTest {
     }
 
     @Test
+    public void childField() {
+        Bean bean = new Bean();
+
+        Child child = new Child();
+        child.booleanField = true;
+        child.longField = 200L;
+        bean.childField = child;
+
+        String json = JSON.toJSON(bean);
+        assertThat(json, containsString("\"child\":{\"boolean\":true,\"long\":200}"));
+
+        Bean parsedBean = JSON.fromJSON(Bean.class, json);
+        assertEquals(bean.childField.booleanField, parsedBean.childField.booleanField);
+        assertEquals(bean.childField.longField, parsedBean.childField.longField);
+    }
+
+    @Test
     public void listField() {
         Bean bean = new Bean();
         bean.listField.add("value1");
@@ -51,7 +68,7 @@ public class JSONTest {
         bean.childrenField.add(child2);
 
         String json = JSON.toJSON(bean);
-        assertThat(json, containsString("\"list\":[\"value1\",\"value2\"],\"children\":[{\"boolean\":true},{\"boolean\":false}]"));
+        assertThat(json, containsString("\"list\":[\"value1\",\"value2\"],\"children\":[{\"boolean\":true,\"long\":null},{\"boolean\":false,\"long\":null}]"));
 
         Bean parsedBean = JSON.fromJSON(Bean.class, json);
         assertEquals(bean.listField, parsedBean.listField);
@@ -67,6 +84,7 @@ public class JSONTest {
         bean.dateTimeField = LocalDateTime.ofInstant(bean.instantField, ZoneId.systemDefault());
         bean.dateField = bean.dateTimeField.toLocalDate();
         bean.zonedDateTimeField = ZonedDateTime.ofInstant(bean.instantField, ZoneId.systemDefault());
+
         String json = JSON.toJSON(bean);
 
         Bean parsedBean = JSON.fromJSON(Bean.class, json);
@@ -122,19 +140,26 @@ public class JSONTest {
     @Test
     public void enumValue() {
         assertEquals(TestEnum.A, JSON.fromEnumValue(TestEnum.class, "A1"));
+        assertEquals(TestEnum.C, JSON.fromEnumValue(TestEnum.class, "C"));
+
         assertEquals("B1", JSON.toEnumValue(TestEnum.B));
+        assertEquals("C", JSON.toEnumValue(TestEnum.C));
     }
 
     enum TestEnum {
         @Property(name = "A1")
         A,
         @Property(name = "B1")
-        B
+        B,
+        C
     }
 
     static class Child {
         @Property(name = "boolean")
         public Boolean booleanField;
+
+        @Property(name = "long")
+        public Long longField;
     }
 
     static class Bean {
@@ -146,6 +171,9 @@ public class JSONTest {
 
         @Property(name = "children")
         public final List<Child> childrenField = Lists.newArrayList();
+
+        @Property(name = "child")
+        public Child childField;
 
         @Property(name = "string")
         public String stringField;
