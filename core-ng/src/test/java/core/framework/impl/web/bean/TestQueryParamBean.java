@@ -1,8 +1,8 @@
 package core.framework.impl.web.bean;
 
+import core.framework.api.json.Property;
 import core.framework.api.web.service.QueryParam;
 
-import javax.xml.bind.annotation.XmlEnumValue;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,9 +43,9 @@ public class TestQueryParamBean {
     public TestEnum enumField;
 
     public enum TestEnum {
-        @XmlEnumValue("V1")
+        @Property(name = "V1")
         VALUE1,
-        @XmlEnumValue("V2")
+        @Property(name = "V2")
         VALUE2
     }
 }

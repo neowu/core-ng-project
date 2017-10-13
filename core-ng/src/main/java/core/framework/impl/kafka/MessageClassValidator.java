@@ -1,11 +1,11 @@
 package core.framework.impl.kafka;
 
-import core.framework.impl.validate.type.JAXBTypeValidator;
+import core.framework.impl.validate.type.JSONTypeValidator;
 
 /**
  * @author neo
  */
-final class MessageClassValidator extends JAXBTypeValidator {
+final class MessageClassValidator extends JSONTypeValidator {
     MessageClassValidator(Class<?> messageClass) {
         super(messageClass);
     }

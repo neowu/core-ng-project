@@ -1,8 +1,8 @@
 package core.framework.impl.kafka;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import core.framework.api.json.Property;
+import core.framework.api.validate.NotNull;
+
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -11,32 +11,31 @@ import java.util.Map;
 /**
  * @author neo
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class TestMessage {
-    @XmlElement(name = "zoned_date_time_field")
+    @Property(name = "zoned_date_time_field")
     public ZonedDateTime zonedDateTimeField;
 
-    @XmlElement(name = "date_time_field")
+    @Property(name = "date_time_field")
     public LocalDateTime dateTimeField;
 
-    @XmlElement(name = "string_field")
+    @NotNull
+    @Property(name = "string_field")
     public String stringField;
 
-    @XmlElement(name = "list_field")
+    @Property(name = "list_field")
     public List<String> listField;
 
-    @XmlElement(name = "map_field")
+    @Property(name = "map_field")
     public Map<String, String> mapField;
 
-    @XmlElement(name = "child_field")
+    @Property(name = "child_field")
     public TestChild childField;
 
-    @XmlElement(name = "children_field")
+    @Property(name = "children_field")
     public List<TestChild> childrenField;
 
-    @XmlAccessorType(XmlAccessType.FIELD)
     public static class TestChild {
-        @XmlElement(name = "boolean_field")
+        @Property(name = "boolean_field")
         public Boolean booleanField;
     }
 }

@@ -1,4 +1,7 @@
 ## Change log
+### 5.0.0 (10/13/2017 - )
+* api: remove jaxb dependency, use our own @Property instead (jaxb will be deprecated by jdk9 and it has unnecessary java.desktop module dependency)
+
 ### 4.16.4 (10/2/2017 - 10/13/2017)
 * web: enable http2 support
 * web: simplified ControllerInspector, to only support JDK 1.8.0_60 or later

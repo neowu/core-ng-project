@@ -10,7 +10,7 @@ import core.framework.api.web.service.POST;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.impl.validate.type.JAXBTypeValidator;
+import core.framework.impl.validate.type.JSONTypeValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.route.PathPatternValidator;
@@ -120,7 +120,7 @@ public class WebServiceInterfaceValidator {
         if (paramClass.isEnum()) {
             @SuppressWarnings("unchecked")
             Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) paramClass;
-            JAXBTypeValidator.validateEnumClass(enumClass);
+            JSONTypeValidator.validateEnumClass(enumClass);
             return;
         }
         throw Exceptions.error("path param class is not supported, paramClass={}", paramClass);

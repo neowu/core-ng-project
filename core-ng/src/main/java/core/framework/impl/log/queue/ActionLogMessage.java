@@ -1,44 +1,42 @@
 package core.framework.impl.log.queue;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import core.framework.api.json.Property;
+
 import java.time.Instant;
 import java.util.Map;
 
 /**
  * @author neo
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class ActionLogMessage {
-    @XmlElement(name = "date")
+    @Property(name = "date")
     public Instant date;
-    @XmlElement(name = "app")
+    @Property(name = "app")
     public String app;
-    @XmlElement(name = "server_ip")
+    @Property(name = "server_ip")
     public String serverIP;
-    @XmlElement(name = "id")
+    @Property(name = "id")
     public String id;
-    @XmlElement(name = "result")
+    @Property(name = "result")
     public String result;
-    @XmlElement(name = "ref_id")
+    @Property(name = "ref_id")
     public String refId;
-    @XmlElement(name = "action")
+    @Property(name = "action")
     public String action;
-    @XmlElement(name = "error_code")
+    @Property(name = "error_code")
     public String errorCode;
-    @XmlElement(name = "error_message")
+    @Property(name = "error_message")
     public String errorMessage;
-    @XmlElement(name = "elapsed")
+    @Property(name = "elapsed")
     public Long elapsed;
-    @XmlElement(name = "cpu_time")
+    @Property(name = "cpu_time")
     public Long cpuTime;
-    @XmlElement(name = "context")
+    @Property(name = "context")
     public Map<String, String> context;
-    @XmlElement(name = "stats")
+    @Property(name = "stats")
     public Map<String, Double> stats;
-    @XmlElement(name = "perf_stats")
+    @Property(name = "perf_stats")
     public Map<String, PerformanceStatMessage> performanceStats;
-    @XmlElement(name = "trace_log")
+    @Property(name = "trace_log")
     public String traceLog;
 }

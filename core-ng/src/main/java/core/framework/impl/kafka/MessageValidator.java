@@ -1,8 +1,7 @@
 package core.framework.impl.kafka;
 
+import core.framework.api.json.Property;
 import core.framework.impl.validate.Validator;
-
-import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author neo
@@ -12,7 +11,7 @@ public class MessageValidator<T> {
 
     MessageValidator(Class<T> messageClass) {
         new MessageClassValidator(messageClass).validate();
-        validator = new Validator(messageClass, field -> field.getDeclaredAnnotation(XmlElement.class).name());
+        validator = new Validator(messageClass, field -> field.getDeclaredAnnotation(Property.class).name());
     }
 
     public void validate(T message) {

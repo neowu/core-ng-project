@@ -1,18 +1,15 @@
 package core.framework.impl.web.management;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import core.framework.api.json.Property;
 
 /**
  * @author neo
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class CacheView {
-    @XmlElement(name = "name")
+    @Property(name = "name")
     public String name;
-    @XmlElement(name = "type")
+    @Property(name = "type")
     public String type;
-    @XmlElement(name = "duration")
+    @Property(name = "duration")
     public Integer duration;
 }

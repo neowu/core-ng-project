@@ -1,18 +1,15 @@
 package core.framework.impl.web.management;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import core.framework.api.json.Property;
 
 /**
  * @author neo
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class JobView {
-    @XmlElement(name = "name")
+    @Property(name = "name")
     public String name;
-    @XmlElement(name = "job_class")
+    @Property(name = "job_class")
     public String jobClass;
-    @XmlElement(name = "frequency")
+    @Property(name = "frequency")
     public String frequency;
 }

@@ -5,10 +5,9 @@ import core.framework.api.util.Sets;
 import core.framework.api.web.service.QueryParam;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
-import core.framework.impl.validate.type.JAXBTypeValidator;
+import core.framework.impl.validate.type.JSONTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
-import javax.xml.bind.annotation.XmlAccessorType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -49,16 +48,13 @@ final class QueryParamBeanTypeValidator implements TypeVisitor {
 
     @Override
     public void visitClass(Class<?> objectClass, String path) {
-        XmlAccessorType accessorType = objectClass.getDeclaredAnnotation(XmlAccessorType.class);
-        if (accessorType != null)
-            throw Exceptions.error("query param bean class must not have @XmlAccessorType, class={}", objectClass.getCanonicalName());
     }
 
     @Override
     public void visitField(Field field, String parentPath) {
         QueryParam queryParam = field.getDeclaredAnnotation(QueryParam.class);
         if (queryParam == null)
-            throw Exceptions.error("field must have @QueryParam(name=), field={}", Fields.path(field));
+            throw Exceptions.error("field must have @QueryParam, field={}", Fields.path(field));
 
         String name = queryParam.name();
 
@@ -71,7 +67,7 @@ final class QueryParamBeanTypeValidator implements TypeVisitor {
         if (fieldClass.isEnum()) {
             @SuppressWarnings("unchecked")
             Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
-            JAXBTypeValidator.validateEnumClass(enumClass);
+            JSONTypeValidator.validateEnumClass(enumClass);
         }
     }
 }

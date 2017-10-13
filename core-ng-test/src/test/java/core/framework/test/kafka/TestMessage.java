@@ -1,14 +1,11 @@
 package core.framework.test.kafka;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import core.framework.api.json.Property;
 
 /**
  * @author neo
  */
-@XmlAccessorType(XmlAccessType.FIELD)
 public class TestMessage {
-    @XmlElement(name = "string_field")
+    @Property(name = "string_field")
     public String stringField;
 }

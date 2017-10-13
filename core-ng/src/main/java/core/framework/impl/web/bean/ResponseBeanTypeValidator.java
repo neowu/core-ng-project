@@ -1,7 +1,7 @@
 package core.framework.impl.web.bean;
 
 import core.framework.api.util.Sets;
-import core.framework.impl.validate.type.JAXBTypeValidator;
+import core.framework.impl.validate.type.JSONTypeValidator;
 
 import java.lang.reflect.Type;
 import java.util.Set;
@@ -19,7 +19,7 @@ public final class ResponseBeanTypeValidator {
         }
     }
 
-    static class TypeValidator extends JAXBTypeValidator {
+    static class TypeValidator extends JSONTypeValidator {
         TypeValidator(Type beanType) {
             super(beanType);
             validator.allowTopLevelOptional = true;

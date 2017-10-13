@@ -1,16 +1,12 @@
 package core.framework.impl.validate.type;
 
+import core.framework.api.json.Property;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Maps;
 import core.framework.api.util.Sets;
+import core.framework.api.util.Strings;
 import core.framework.impl.reflect.Fields;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-import javax.xml.bind.annotation.XmlTransient;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -24,17 +20,14 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class JAXBTypeValidator implements TypeVisitor {
+public class JSONTypeValidator implements TypeVisitor {
     public static <T extends Enum<?>> void validateEnumClass(Class<T> enumClass) {
-        if (enumClass.isAnnotationPresent(XmlEnum.class))
-            throw Exceptions.error("enum class must not have @XmlEnum, enumClass={}", enumClass.getCanonicalName());
-
         T[] constants = enumClass.getEnumConstants();
         for (T constant : constants) {
             try {
                 Field enumField = enumClass.getField(constant.name());
-                if (!enumField.isAnnotationPresent(XmlEnumValue.class)) {
-                    throw Exceptions.error("enum must have @XmlEnumValue, enum={}", Fields.path(enumField));
+                if (!enumField.isAnnotationPresent(Property.class)) {
+                    throw Exceptions.error("enum must have @Property, enum={}", Fields.path(enumField));
                 }
             } catch (NoSuchFieldException e) {
                 throw new Error(e);
@@ -43,9 +36,9 @@ public class JAXBTypeValidator implements TypeVisitor {
     }
 
     protected final DataTypeValidator validator;
-    private final Map<String, Set<String>> elements = Maps.newHashMap();
+    private final Map<String, Set<String>> properties = Maps.newHashMap();
 
-    protected JAXBTypeValidator(Type instanceType) {
+    protected JSONTypeValidator(Type instanceType) {
         validator = new DataTypeValidator(instanceType);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChild = true;
@@ -72,31 +65,26 @@ public class JAXBTypeValidator implements TypeVisitor {
 
     @Override
     public void visitClass(Class<?> objectClass, String path) {
-        XmlAccessorType accessorType = objectClass.getDeclaredAnnotation(XmlAccessorType.class);
-        if (accessorType == null || accessorType.value() != XmlAccessType.FIELD)
-            throw Exceptions.error("class must have @XmlAccessorType(XmlAccessType.FIELD), class={}", objectClass.getCanonicalName());
+
     }
 
     @Override
     public void visitField(Field field, String parentPath) {
-        XmlElement element = field.getDeclaredAnnotation(XmlElement.class);
-        if (element == null)
-            throw Exceptions.error("field must have @XmlElement(name=), field={}", Fields.path(field));
+        Property property = field.getDeclaredAnnotation(Property.class);
+        if (property == null)
+            throw Exceptions.error("field must have @Property, field={}", Fields.path(field));
 
-        if (field.isAnnotationPresent(XmlTransient.class))
-            throw Exceptions.error("field must not have @XmlTransient, field={}", Fields.path(field));
+        String name = property.name();
 
-        String name = element.name();
-
-        if ("##default".equals(name)) {
-            throw Exceptions.error("@XmlElement must have name attribute, field={}", Fields.path(field));
+        if (Strings.isEmpty(name)) {
+            throw Exceptions.error("@Property name attribute must not be empty, field={}", Fields.path(field));
         }
 
-        Set<String> elements = this.elements.computeIfAbsent(parentPath, key -> Sets.newHashSet());
-        if (elements.contains(name)) {
-            throw Exceptions.error("found duplicate element, field={}, name={}", Fields.path(field), name);
+        Set<String> properties = this.properties.computeIfAbsent(parentPath, key -> Sets.newHashSet());
+        if (properties.contains(name)) {
+            throw Exceptions.error("found duplicate property, field={}, name={}", Fields.path(field), name);
         }
-        elements.add(name);
+        properties.add(name);
 
         Class<?> fieldClass = field.getType();
         if (fieldClass.isEnum()) {

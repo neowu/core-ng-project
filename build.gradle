@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/check.gradle")
 
     group = 'core.framework'
-    version = '4.16.4'
+    version = '5.0.0'
 }
 
 def mongoVersion = '3.5.0'
@@ -24,7 +24,6 @@ project(':core-ng') {
         api 'javax.inject:javax.inject:1'
         api 'org.slf4j:slf4j-api:1.7.25'
         implementation 'org.javassist:javassist:3.22.0-GA'
-        implementation "com.fasterxml.jackson.module:jackson-module-jaxb-annotations:${jacksonVersion}"
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"

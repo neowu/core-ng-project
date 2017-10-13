@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -26,11 +25,11 @@ public final class JSONMapper {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
         mapper.registerModule(new JavaTimeModule());
-        mapper.registerModule(new JaxbAnnotationModule());
         mapper.registerModule(new AfterburnerModule());
         mapper.setDateFormat(new StdDateFormat());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(MapperFeature.USE_WRAPPER_NAME_AS_PROPERTY_NAME, true);
+        mapper.setAnnotationIntrospector(new JSONAnnotationIntrospector());
         return mapper;
     }
 

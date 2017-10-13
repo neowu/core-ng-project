@@ -1,5 +1,6 @@
 package core.framework.impl.mongo;
 
+import core.framework.api.json.Property;
 import core.framework.api.mongo.Collection;
 import core.framework.api.mongo.Id;
 import core.framework.api.mongo.MongoEnumValue;
@@ -11,7 +12,6 @@ import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 import org.bson.types.ObjectId;
 
-import javax.xml.bind.annotation.XmlEnumValue;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -49,14 +49,14 @@ public final class MongoClassValidator implements TypeVisitor {
 
     private boolean allowedValueClass(Class<?> valueClass) {
         return String.class.equals(valueClass)
-            || ObjectId.class.equals(valueClass)
-            || Integer.class.equals(valueClass)
-            || Boolean.class.equals(valueClass)
-            || Long.class.equals(valueClass)
-            || Double.class.equals(valueClass)
-            || LocalDateTime.class.equals(valueClass)
-            || ZonedDateTime.class.equals(valueClass)
-            || valueClass.isEnum();
+                || ObjectId.class.equals(valueClass)
+                || Integer.class.equals(valueClass)
+                || Boolean.class.equals(valueClass)
+                || Long.class.equals(valueClass)
+                || Double.class.equals(valueClass)
+                || LocalDateTime.class.equals(valueClass)
+                || ZonedDateTime.class.equals(valueClass)
+                || valueClass.isEnum();
     }
 
     @Override
@@ -104,8 +104,8 @@ public final class MongoClassValidator implements TypeVisitor {
                 if (!added) {
                     throw Exceptions.error("mongo enum value must be unique, enum={}, value={}", enumClass.getCanonicalName() + "." + constant, enumValue.value());
                 }
-                if (enumField.isAnnotationPresent(XmlEnumValue.class)) {
-                    throw Exceptions.error("mongo enum must not have jaxb annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Fields.path(enumField));
+                if (enumField.isAnnotationPresent(Property.class)) {
+                    throw Exceptions.error("mongo enum must not have json annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Fields.path(enumField));
                 }
             } catch (NoSuchFieldException e) {
                 throw new Error(e);

@@ -2,12 +2,12 @@ package core.framework.impl.search;
 
 import core.framework.api.search.Index;
 import core.framework.api.util.Exceptions;
-import core.framework.impl.validate.type.JAXBTypeValidator;
+import core.framework.impl.validate.type.JSONTypeValidator;
 
 /**
  * @author neo
  */
-final class DocumentClassValidator extends JAXBTypeValidator {
+final class DocumentClassValidator extends JSONTypeValidator {
     DocumentClassValidator(Class<?> documentClass) {
         super(documentClass);
     }

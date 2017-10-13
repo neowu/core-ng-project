@@ -4,6 +4,7 @@ import core.framework.api.db.Column;
 import core.framework.api.db.DBEnumValue;
 import core.framework.api.db.PrimaryKey;
 import core.framework.api.db.Table;
+import core.framework.api.json.Property;
 import core.framework.api.util.Exceptions;
 import core.framework.api.util.Sets;
 import core.framework.api.util.Strings;
@@ -11,8 +12,6 @@ import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlEnumValue;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -71,9 +70,6 @@ final class DatabaseClassValidator implements TypeVisitor {
             if (!objectClass.isAnnotationPresent(Table.class))
                 throw Exceptions.error("db entity class must have @Table, class={}", objectClass.getCanonicalName());
         }
-
-        if (objectClass.isAnnotationPresent(XmlAccessorType.class))
-            throw Exceptions.error("db entity class must not have jaxb annotation, please separate view class and entity class, class={}", objectClass.getCanonicalName());
     }
 
     @Override
@@ -143,8 +139,8 @@ final class DatabaseClassValidator implements TypeVisitor {
                 if (!added) {
                     throw Exceptions.error("db enum value must be unique, enum={}, value={}", enumClass.getCanonicalName() + "." + constant, enumValue.value());
                 }
-                if (enumField.isAnnotationPresent(XmlEnumValue.class)) {
-                    throw Exceptions.error("db enum must not have jaxb annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Fields.path(enumField));
+                if (enumField.isAnnotationPresent(Property.class)) {
+                    throw Exceptions.error("db enum must not have json annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Fields.path(enumField));
                 }
             } catch (NoSuchFieldException e) {
                 throw new Error(e);

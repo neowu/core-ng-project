@@ -1,11 +1,10 @@
 package core.framework.impl.web.request;
 
+import core.framework.api.json.Property;
 import core.framework.api.web.exception.BadRequestException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import javax.xml.bind.annotation.XmlEnumValue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -37,7 +36,7 @@ public class URLParamParserTest {
     }
 
     enum TestEnum {
-        @XmlEnumValue("V1")
+        @Property(name = "V1")
         VALUE
     }
 }

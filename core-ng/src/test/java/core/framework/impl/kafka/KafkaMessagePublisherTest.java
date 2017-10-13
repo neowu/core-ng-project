@@ -34,6 +34,7 @@ public class KafkaMessagePublisherTest {
         logManager.begin("begin");
         logManager.currentActionLog().refId("ref-id");
         TestMessage message = new TestMessage();
+        message.stringField = "value";
         messagePublisher.publish(message);
         logManager.end("end");
 

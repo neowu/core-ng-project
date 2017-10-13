@@ -1,11 +1,11 @@
 package core.framework.impl.web.bean;
 
+import core.framework.api.json.Property;
 import core.framework.api.util.Maps;
 import core.framework.api.web.service.QueryParam;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.validate.Validator;
 
-import javax.xml.bind.annotation.XmlElement;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -54,7 +54,7 @@ public final class RequestBeanMapper {
     public Validator registerRequestBean(Type beanType) {
         return requestBeanValidators.computeIfAbsent(beanType, type -> {
             new RequestBeanTypeValidator(beanType).validate();
-            return new Validator(beanType, field -> field.getDeclaredAnnotation(XmlElement.class).name());
+            return new Validator(beanType, field -> field.getDeclaredAnnotation(Property.class).name());
         });
     }
 
