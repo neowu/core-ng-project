@@ -1,4 +1,7 @@
 ## Change log
+### 5.1.0 (10/13/2017 - )
+* test: updated to junit 5
+
 ### 5.0.0 (10/13/2017)
 * api: remove jaxb dependency, use our own @Property instead (jaxb will be deprecated by jdk9 and it has unnecessary java.desktop module dependency)
 * package: move core.framework.api from core-ng lib to core.framework, due to with JDK 9, package must be unique to export across all libs, this is to prepare for JDK 9 modules
