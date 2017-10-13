@@ -47,10 +47,6 @@ final class QueryParamBeanTypeValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> objectClass, String path) {
-    }
-
-    @Override
     public void visitField(Field field, String parentPath) {
         QueryParam queryParam = field.getDeclaredAnnotation(QueryParam.class);
         if (queryParam == null)

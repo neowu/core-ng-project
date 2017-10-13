@@ -64,11 +64,6 @@ public class JSONTypeValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitClass(Class<?> objectClass, String path) {
-
-    }
-
-    @Override
     public void visitField(Field field, String parentPath) {
         Property property = field.getDeclaredAnnotation(Property.class);
         if (property == null)

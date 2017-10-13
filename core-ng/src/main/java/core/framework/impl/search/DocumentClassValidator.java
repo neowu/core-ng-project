@@ -17,6 +17,5 @@ final class DocumentClassValidator extends JSONTypeValidator {
         if (path == null && !objectClass.isAnnotationPresent(Index.class)) {
             throw Exceptions.error("class must have @Index, class={}", objectClass.getCanonicalName());
         }
-        super.visitClass(objectClass, path);
     }
 }

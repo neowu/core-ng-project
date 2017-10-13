@@ -4,7 +4,6 @@ import core.framework.api.util.Exceptions;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
@@ -51,9 +50,5 @@ class ModelClassValidator implements TypeVisitor {
                 throw Exceptions.error("primitive class as return type is not supported, please use object type, returnType={}, method={}", method.getReturnType(), method.getDeclaringClass().getCanonicalName() + "." + method.getName());
             }
         }
-    }
-
-    @Override
-    public void visitField(Field field, String parentPath) {
     }
 }
