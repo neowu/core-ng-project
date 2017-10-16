@@ -1,16 +1,16 @@
 package core.framework.log;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Marker;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class MarkersTest {
+class MarkersTest {
     @Test
-    public void errorCode() {
+    void errorCode() {
         Marker marker = Markers.errorCode("ERROR");
         assertEquals("ERROR", marker.getName());
     }

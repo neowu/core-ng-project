@@ -1,16 +1,13 @@
 package core.framework.impl.db;
 
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author neo
  */
-public class DatabaseClassValidatorTest {
-    public ExpectedException exception = ExpectedException.none();
-
+class DatabaseClassValidatorTest {
     @Test
-    public void validateEntityClass() {
+    void validateEntityClass() {
         new DatabaseClassValidator(AssignedIdEntity.class).validateEntityClass();
         new DatabaseClassValidator(AutoIncrementIdEntity.class).validateEntityClass();
         new DatabaseClassValidator(CompositeKeyEntity.class).validateEntityClass();

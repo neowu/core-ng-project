@@ -7,15 +7,17 @@ import core.framework.impl.json.JSONMapper;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.util.Maps;
 import core.framework.validate.ValidationException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -23,21 +25,20 @@ import static org.mockito.Mockito.verify;
 /**
  * @author neo
  */
-public class WebServiceClientTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
+class WebServiceClientTest {
     private WebServiceClient webServiceClient;
+    @Mock
     private HTTPRequest request;
 
-    @Before
-    public void prepare() {
+    @BeforeEach
+    void createWebServiceClient() {
+        MockitoAnnotations.initMocks(this);
+
         webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(), null);
-        request = Mockito.mock(HTTPRequest.class);
     }
 
     @Test
-    public void addQueryParams() {
+    void addQueryParams() {
         Map<String, String> params = Maps.newLinkedHashMap();
         params.put("p1", "v1");
         params.put("p2", null);
@@ -51,7 +52,7 @@ public class WebServiceClientTest {
     }
 
     @Test
-    public void serviceURL() {
+    void serviceURL() {
         assertEquals("http://localhost", webServiceClient.serviceURL("/", Maps.newHashMap()));     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
         assertEquals("http://localhost/test", webServiceClient.serviceURL("/test", Maps.newHashMap()));
         assertEquals("http://localhost/test/", webServiceClient.serviceURL("/test/", Maps.newHashMap()));
@@ -62,15 +63,13 @@ public class WebServiceClientTest {
     }
 
     @Test
-    public void serviceURLWithEmptyPathParam() {
-        exception.expect(ValidationException.class);
-        exception.expectMessage("name=id");
-
-        webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", ""));
+    void serviceURLWithEmptyPathParam() {
+        ValidationException exception = assertThrows(ValidationException.class, () -> webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", "")));
+        assertThat(exception.getMessage(), containsString("name=id"));
     }
 
     @Test
-    public void addRequestBeanWithGet() {
+    void addRequestBeanWithGet() {
         TestWebService.TestSearchRequest requestBean = new TestWebService.TestSearchRequest();
         requestBean.intField = 23;
         webServiceClient.addRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
@@ -79,7 +78,7 @@ public class WebServiceClientTest {
     }
 
     @Test
-    public void addRequestBeanWithPost() {
+    void addRequestBeanWithPost() {
         TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "value";
         webServiceClient.addRequestBean(request, HTTPMethod.POST, TestWebService.TestRequest.class, requestBean);

@@ -1,15 +1,16 @@
 package core.framework.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author neo
  */
-public class NetworkTest {
+class NetworkTest {
     @Test
-    public void localHostAddress() {
+    void localHostAddress() {
         String hostAddress = Network.localHostAddress();
-        Assert.assertNotNull(hostAddress);
+        assertNotNull(hostAddress);
     }
 }

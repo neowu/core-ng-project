@@ -7,30 +7,30 @@ import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author neo
  */
-public class KafkaMessagePublisherTest {
-    MessagePublisher<TestMessage> messagePublisher;
-    MockProducer<String, byte[]> producer;
-    LogManager logManager;
+class KafkaMessagePublisherTest {
+    private MessagePublisher<TestMessage> messagePublisher;
+    private MockProducer<String, byte[]> producer;
+    private LogManager logManager;
 
-    @Before
-    public void createMessagePublisher() {
+    @BeforeEach
+    void createMessagePublisher() {
         producer = new MockProducer<>(true, new StringSerializer(), new ByteArraySerializer());
         logManager = new LogManager();
         messagePublisher = new KafkaMessagePublisher<>(producer, "topic", TestMessage.class, logManager);
     }
 
     @Test
-    public void publish() {
+    void publish() {
         logManager.begin("begin");
         logManager.currentActionLog().refId("ref-id");
         TestMessage message = new TestMessage();

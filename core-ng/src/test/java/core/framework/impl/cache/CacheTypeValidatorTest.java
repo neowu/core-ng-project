@@ -1,7 +1,7 @@
 package core.framework.impl.cache;
 
 import core.framework.util.Types;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,19 +11,19 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class CacheTypeValidatorTest {
+class CacheTypeValidatorTest {
     @Test
-    public void validate() {
+    void validate() {
         new CacheTypeValidator(CacheItem.class).validate();
     }
 
     @Test
-    public void validateListType() {
+    void validateListType() {
         new CacheTypeValidator(Types.list(CacheItem.class)).validate();
     }
 
     @Test
-    public void validateValueType() {
+    void validateValueType() {
         new CacheTypeValidator(String.class).validate();
     }
 

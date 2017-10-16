@@ -1,19 +1,19 @@
 package core.framework.impl.web.rate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class RateLimiterTest {
+class RateLimiterTest {
     @Test
-    public void acquire() {
+    void acquire() {
         RateLimiter.Rate rate = new RateLimiter.Rate(1);
         rate.lastUpdateTime = 100;
         boolean result = rate.acquire(101, 2, 1);
@@ -33,7 +33,7 @@ public class RateLimiterTest {
     }
 
     @Test
-    public void ratePerNano() {
+    void ratePerNano() {
         RateLimiter limiter = new RateLimiter(1);
         assertEquals(0.1, limiter.ratePerNano(100, TimeUnit.MICROSECONDS), 0.0000000000001);
         assertEquals(0.000000001, limiter.ratePerNano(1, TimeUnit.SECONDS), 0.0000000000001);

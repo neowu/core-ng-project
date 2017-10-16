@@ -1,26 +1,28 @@
 package core.framework.impl.db;
 
 import core.framework.db.Transaction;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class DatabaseImplTest {
-    private static DatabaseImpl database;
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class DatabaseImplTest {
+    private DatabaseImpl database;
 
-    @BeforeClass
-    public static void createDatabase() {
+    @BeforeAll
+    void createDatabase() {
         database = new DatabaseImpl();
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
         database.view(EntityView.class);
@@ -28,18 +30,18 @@ public class DatabaseImplTest {
         database.execute("CREATE TABLE database_test (id INT PRIMARY KEY, string_field VARCHAR(20), enum_field VARCHAR(10))");
     }
 
-    @AfterClass
-    public static void cleanupDatabase() {
+    @AfterAll
+    void cleanupDatabase() {
         database.execute("DROP TABLE database_test");
     }
 
-    @Before
-    public void truncateTable() {
+    @BeforeEach
+    void truncateTable() {
         database.execute("TRUNCATE TABLE database_test");
     }
 
     @Test
-    public void selectOneWithView() {
+    void selectOneWithView() {
         database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 1, "string", TestEnum.V1);
 
         EntityView view = database.selectOne("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?", EntityView.class, 1).get();
@@ -49,7 +51,7 @@ public class DatabaseImplTest {
     }
 
     @Test
-    public void selectWithView() {
+    void selectWithView() {
         database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 1, "string", TestEnum.V1);
         database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 2, "string", TestEnum.V2);
 
@@ -61,27 +63,27 @@ public class DatabaseImplTest {
     }
 
     @Test
-    public void selectEmptyWithView() {
+    void selectEmptyWithView() {
         List<EntityView> views = database.select("SELECT string_field, enum_field FROM database_test where id = -1", EntityView.class);
 
         assertTrue(views.isEmpty());
     }
 
     @Test
-    public void selectNullInt() {
+    void selectNullInt() {
         Optional<Integer> result = database.selectOne("SELECT max(id) FROM database_test", Integer.class);
         assertFalse(result.isPresent());
     }
 
     @Test
-    public void selectInt() {
+    void selectInt() {
         Optional<Integer> result = database.selectOne("SELECT count(id) FROM database_test", Integer.class);
         assertTrue(result.isPresent());
         assertEquals(0, result.get().intValue());
     }
 
     @Test
-    public void commitTransaction() {
+    void commitTransaction() {
         try (Transaction transaction = database.beginTransaction()) {
             database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 1, "string", TestEnum.V1);
             transaction.commit();
@@ -92,7 +94,7 @@ public class DatabaseImplTest {
     }
 
     @Test
-    public void rollbackTransaction() {
+    void rollbackTransaction() {
         try (Transaction transaction = database.beginTransaction()) {
             database.execute("INSERT INTO database_test VALUES (?, ?, ?)", 1, "string", TestEnum.V1);
             transaction.rollback();

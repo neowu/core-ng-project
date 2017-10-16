@@ -1,17 +1,17 @@
 package core.framework.impl.web.rate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class LRUMapTest {
+class LRUMapTest {
     @Test
-    public void removeEldestEntry() {
+    void removeEldestEntry() {
         LRUMap<String, String> map = new LRUMap<>(3);
         map.put("1", "1");
         map.put("2", "2");

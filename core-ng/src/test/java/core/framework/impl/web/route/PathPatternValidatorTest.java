@@ -1,26 +1,23 @@
 package core.framework.impl.web.route;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author neo
  */
-public class PathPatternValidatorTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
+class PathPatternValidatorTest {
     @Test
-    public void duplicateVariable() {
-        exception.expect(Error.class);
-        exception.expectMessage("duplicate");
-
-        new PathPatternValidator("/:name/path/:name").validate();
+    void duplicateVariable() {
+        Error error = assertThrows(Error.class, () -> new PathPatternValidator("/:name/path/:name").validate());
+        assertThat(error.getMessage(), containsString("duplicate"));
     }
 
     @Test
-    public void validate() {
+    void validate() {
         new PathPatternValidator("/robot.txt").validate();
         new PathPatternValidator("/images").validate();
 
@@ -31,10 +28,8 @@ public class PathPatternValidatorTest {
     }
 
     @Test
-    public void invalidVariable() {
-        exception.expect(Error.class);
-        exception.expectMessage(":name(");
-
-        new PathPatternValidator("/path/:name(").validate();
+    void invalidVariable() {
+        Error error = assertThrows(Error.class, () -> new PathPatternValidator("/path/:name(").validate());
+        assertThat(error.getMessage(), containsString(":name("));
     }
 }

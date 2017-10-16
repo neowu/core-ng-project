@@ -1,28 +1,28 @@
 package core.framework.impl.web.site;
 
 import core.framework.util.Lists;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class MessageImplTest {
+class MessageImplTest {
     private MessageImpl message;
 
-    @Before
-    public void createMessage() {
+    @BeforeEach
+    void createMessage() {
         message = new MessageImpl();
         List<String> properties = Lists.newArrayList("message-test/messages.properties", "message-test/messages_en.properties", "message-test/messages_en_US.properties");
         message.load(properties, "en", "en_US", "zh");
     }
 
     @Test
-    public void language() {
+    void language() {
         assertEquals("en_US", message.language("messages_en_US.properties"));
         assertEquals("en", message.language("messages_en.properties"));
 
@@ -30,7 +30,7 @@ public class MessageImplTest {
     }
 
     @Test
-    public void message() {
+    void message() {
         assertEquals("value1", message.get("key1", "zh").orElse(null));
         assertEquals("value1", message.get("key1", "en").orElse(null));
         assertEquals("value1", message.get("key1", "en_US").orElse(null));

@@ -3,18 +3,18 @@ package core.framework.impl.log;
 import core.framework.util.Charsets;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class LogParamTest {
+class LogParamTest {
     @Test
-    public void encodeMap() {
+    void encodeMap() {
         Map<String, byte[]> values = Maps.newHashMap();
         values.put("key1", Strings.bytes("value1"));
         values.put("key2", Strings.bytes("value2"));
@@ -22,7 +22,7 @@ public class LogParamTest {
     }
 
     @Test
-    public void truncateLongString() {
+    void truncateLongString() {
         String message = "1234567890";
         String value = LogParam.toString(Strings.bytes(message), Charsets.UTF_8, 5);
         assertEquals("1234...(truncated)", value);

@@ -1,18 +1,18 @@
 package core.framework.impl.mongo;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author neo
  */
-public class MongoClassValidatorTest {
+class MongoClassValidatorTest {
     @Test
-    public void validateEntityClass() {
+    void validateEntityClass() {
         new MongoClassValidator(TestEntity.class).validateEntityClass();
     }
 
     @Test
-    public void validateViewClass() {
+    void validateViewClass() {
         new MongoClassValidator(TestView.class).validateViewClass();
     }
 }

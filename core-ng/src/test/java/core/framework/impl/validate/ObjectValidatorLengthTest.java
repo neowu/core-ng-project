@@ -3,38 +3,38 @@ package core.framework.impl.validate;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
 import core.framework.util.ClasspathResources;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class ObjectValidatorLengthTest {
+class ObjectValidatorLengthTest {
     private ObjectValidatorBuilder builder;
     private ObjectValidator validator;
 
-    @Before
-    public void createObjectValidator() {
+    @BeforeEach
+    void createObjectValidator() {
         builder = new ObjectValidatorBuilder(Bean.class, Field::getName);
         validator = builder.build().get();
     }
 
     @Test
-    public void sourceCode() {
+    void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
         assertEquals(ClasspathResources.text("validator-test/validator-length.java"), sourceCode);
     }
 
     @Test
-    public void validate() {
+    void validate() {
         Bean bean = new Bean();
         bean.field1 = "123456";
         bean.field2 = "1";
@@ -49,7 +49,7 @@ public class ObjectValidatorLengthTest {
     }
 
     @Test
-    public void partialValidate() {
+    void partialValidate() {
         Bean bean = new Bean();
         bean.field1 = "123456";
 
@@ -62,7 +62,7 @@ public class ObjectValidatorLengthTest {
     }
 
     @Test
-    public void validateWithoutError() {
+    void validateWithoutError() {
         Bean bean = new Bean();
         bean.field1 = "12345";
         bean.field2 = "12345";

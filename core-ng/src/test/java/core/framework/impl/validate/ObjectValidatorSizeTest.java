@@ -4,32 +4,32 @@ import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Size;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class ObjectValidatorSizeTest {
-    ObjectValidator validator;
+class ObjectValidatorSizeTest {
+    private ObjectValidator validator;
 
-    @Before
-    public void createObjectValidator() {
+    @BeforeEach
+    void createObjectValidator() {
         validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
     }
 
     @Test
-    public void validate() {
+    void validate() {
         Bean bean = new Bean();
         bean.stringList = Lists.newArrayList("1", "2", "3", "4");
         bean.stringMap = Maps.newHashMap();
@@ -44,7 +44,7 @@ public class ObjectValidatorSizeTest {
     }
 
     @Test
-    public void validateWithoutError() {
+    void validateWithoutError() {
         Bean bean = new Bean();
         bean.stringList = Lists.newArrayList("1", "2", "3");
         bean.stringMap = Maps.newHashMap("key", "value");

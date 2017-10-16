@@ -2,17 +2,18 @@ package core.framework.crypto;
 
 import core.framework.util.Charsets;
 import core.framework.util.Strings;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class RSATest {
+class RSATest {
     @Test
-    public void encryptAndDecrypt() {
+    void encryptAndDecrypt() {
         KeyPair keyPair = RSA.generateKeyPair();
 
         RSA rsa = new RSA();
@@ -22,6 +23,6 @@ public class RSATest {
         String message = "test message";
         byte[] encryptedMessage = rsa.encrypt(Strings.bytes(message));
         byte[] decryptedMessage = rsa.decrypt(encryptedMessage);
-        Assert.assertEquals(message, new String(decryptedMessage, Charsets.UTF_8));
+        assertEquals(message, new String(decryptedMessage, Charsets.UTF_8));
     }
 }

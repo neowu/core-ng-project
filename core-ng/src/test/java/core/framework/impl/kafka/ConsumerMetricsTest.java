@@ -1,15 +1,15 @@
 package core.framework.impl.kafka;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class ConsumerMetricsTest {
+class ConsumerMetricsTest {
     @Test
-    public void statName() {
+    void statName() {
         ConsumerMetrics metrics = new ConsumerMetrics("log");
         assertEquals("kafka_consumer_log_lag_max", metrics.statName("lag_max"));
 

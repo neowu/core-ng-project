@@ -1,30 +1,30 @@
 package core.framework.impl.web.bean;
 
 import core.framework.util.Maps;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class QueryParamMapperTest {
-    QueryParamMapper<TestQueryParamBean> mapper;
+class QueryParamMapperTest {
+    private QueryParamMapper<TestQueryParamBean> mapper;
 
-    @Before
-    public void createMapper() {
+    @BeforeEach
+    void createMapper() {
         mapper = new QueryParamMapperBuilder<>(TestQueryParamBean.class).build();
     }
 
     @Test
-    public void toParams() {
+    void toParams() {
         TestQueryParamBean bean = new TestQueryParamBean();
         bean.stringField = "value";
         bean.intField = 12;
@@ -42,7 +42,7 @@ public class QueryParamMapperTest {
     }
 
     @Test
-    public void fromParams() {
+    void fromParams() {
         Map<String, String> params = Maps.newHashMap();
         params.put("boolean_field", "true");
         params.put("big_decimal_field", "345.67");

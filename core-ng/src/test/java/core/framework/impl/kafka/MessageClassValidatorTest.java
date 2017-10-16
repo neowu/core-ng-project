@@ -1,13 +1,13 @@
 package core.framework.impl.kafka;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author neo
  */
-public class MessageClassValidatorTest {
+class MessageClassValidatorTest {
     @Test
-    public void validate() {
+    void validate() {
         new MessageClassValidator(TestMessage.class).validate();
     }
 }

@@ -3,19 +3,19 @@ package core.framework.impl.web;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author neo
  */
-public class ControllerInspectorTest {
+class ControllerInspectorTest {
     @Test
-    public void methodReference() throws NoSuchMethodException {
+    void methodReference() throws NoSuchMethodException {
         ControllerInspector inspector = new ControllerInspector(new TestControllers()::get);
         assertEquals(TestControllers.class, inspector.targetClass);
         assertEquals(TestControllers.class.getDeclaredMethod("get", Request.class), inspector.targetMethod);
@@ -23,7 +23,7 @@ public class ControllerInspectorTest {
     }
 
     @Test
-    public void lambdaMethod() {
+    void lambdaMethod() {
         ControllerInspector inspector = new ControllerInspector(request -> null);
         assertThat(inspector.targetClass.getCanonicalName(), startsWith(ControllerInspectorTest.class.getCanonicalName()));
         assertNotNull(inspector.targetMethod);
@@ -31,7 +31,7 @@ public class ControllerInspectorTest {
     }
 
     @Test
-    public void staticClass() throws NoSuchMethodException {
+    void staticClass() throws NoSuchMethodException {
         ControllerInspector inspector = new ControllerInspector(new TestController());
         assertEquals(TestController.class, inspector.targetClass);
         assertEquals(TestController.class.getMethod("execute", Request.class), inspector.targetMethod);

@@ -1,17 +1,17 @@
 package core.framework.http;
 
 import core.framework.util.Charsets;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author neo
  */
-public class ContentTypeTest {
+class ContentTypeTest {
     @Test
-    public void parse() {
+    void parse() {
         ContentType type = ContentType.parse("application/json; charset=utf-8");
         assertEquals("application/json", type.mediaType());
         assertEquals(Charsets.UTF_8, type.charset().get());
@@ -26,13 +26,13 @@ public class ContentTypeTest {
     }
 
     @Test
-    public void value() {
+    void value() {
         assertEquals("application/json; charset=utf-8", ContentType.APPLICATION_JSON.toString());
         assertEquals("application/octet-stream", ContentType.APPLICATION_OCTET_STREAM.toString());
     }
 
     @Test
-    public void ignoreUnsupportedCharset() {
+    void ignoreUnsupportedCharset() {
         ContentType type = ContentType.parse("image/jpeg; charset=binary");
 
         assertEquals("image/jpeg", type.mediaType());

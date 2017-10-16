@@ -1,16 +1,16 @@
 package core.framework.impl.web;
 
 import core.framework.http.HTTPMethod;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class ControllerActionBuilderTest {
+class ControllerActionBuilderTest {
     @Test
-    public void action() {
+    void action() {
         assertEquals("web/get-root", new ControllerActionBuilder(HTTPMethod.GET, "/").build());
         assertEquals("web/get-path", new ControllerActionBuilder(HTTPMethod.GET, "/path").build());
         assertEquals("web/get-path", new ControllerActionBuilder(HTTPMethod.GET, "/path/").build());

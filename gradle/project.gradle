@@ -1,10 +1,20 @@
 defaultTasks 'clean', 'build'
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+    }
+}
+
 def buildTime = new Date()
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven'
+    apply plugin: org.junit.platform.gradle.plugin.JUnitPlatformPlugin
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -20,6 +30,10 @@ subprojects {
     }
 
     buildDir = "${rootDir}/build/${name}"
+
+    dependencies {
+        testRuntime('org.junit.jupiter:junit-jupiter-engine:5.0.1')
+    }
 
     afterEvaluate {
         tasks.withType(Jar) {

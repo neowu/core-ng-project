@@ -1,31 +1,31 @@
 package core.framework.impl.log;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class ActionLogTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
+class ActionLogTest {
     @Test
-    public void contextValueIsTooLong() {
-        exception.expectMessage("context value is too long");
-
+    void contextValueIsTooLong() {
         ActionLog log = new ActionLog("begin");
-        log.context("key", longString(1001));
+        Error error = assertThrows(Error.class, () -> log.context("key", longString(1001)));
+        assertTrue(error.getMessage().startsWith("context value is too long"));
     }
 
     @Test
-    public void duplicateContextKey() {
-        exception.expectMessage("duplicate context key");
-
+    void duplicateContextKey() {
         ActionLog log = new ActionLog("begin");
-        log.context("key", "value1");
-        log.context("key", "value2");
+        Error error = assertThrows(Error.class, () -> {
+            log.context("key", "value1");
+            log.context("key", "value2");
+        });
+        assertThat(error.getMessage(), containsString("found duplicate context key"));
     }
 
     private String longString(int length) {

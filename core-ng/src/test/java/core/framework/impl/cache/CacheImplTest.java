@@ -2,15 +2,15 @@ package core.framework.impl.cache;
 
 import core.framework.util.Maps;
 import core.framework.util.Strings;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -19,18 +19,18 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
-public class CacheImplTest {
+class CacheImplTest {
     private CacheImpl<Integer> cache;
     private CacheStore cacheStore;
 
-    @Before
-    public void prepare() {
+    @BeforeEach
+    void prepare() {
         cacheStore = Mockito.mock(CacheStore.class);
         cache = new CacheImpl<>("name", Integer.class, Duration.ofHours(1), cacheStore);
     }
 
     @Test
-    public void get() {
+    void get() {
         when(cacheStore.get("name:key")).thenReturn(Strings.bytes("1"));
 
         Integer value = cache.get("key", key -> null);
@@ -38,7 +38,7 @@ public class CacheImplTest {
     }
 
     @Test
-    public void getIfMiss() {
+    void getIfMiss() {
         when(cacheStore.get("name:key")).thenReturn(null);
 
         Integer value = cache.get("key", key -> 1);
@@ -48,14 +48,14 @@ public class CacheImplTest {
     }
 
     @Test
-    public void put() {
+    void put() {
         cache.put("key", 1);
 
         verify(cacheStore).put("name:key", Strings.bytes("1"), Duration.ofHours(1));
     }
 
     @Test
-    public void getAll() {
+    void getAll() {
         Map<String, byte[]> values = Maps.newHashMap();
         values.put("name:key1", Strings.bytes("1"));
         values.put("name:key3", Strings.bytes("3"));

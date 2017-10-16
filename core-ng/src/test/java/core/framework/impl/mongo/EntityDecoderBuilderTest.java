@@ -3,37 +3,37 @@ package core.framework.impl.mongo;
 import core.framework.util.ClasspathResources;
 import org.bson.json.JsonReader;
 import org.bson.types.ObjectId;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author neo
  */
-public class EntityDecoderBuilderTest {
+class EntityDecoderBuilderTest {
     private EntityDecoderBuilder<TestEntity> builder;
     private EntityDecoder<TestEntity> decoder;
 
-    @Before
-    public void createDecoder() {
+    @BeforeEach
+    void createDecoder() {
         builder = new EntityDecoderBuilder<>(TestEntity.class);
         decoder = builder.build();
     }
 
     @Test
-    public void sourceCode() {
+    void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
         assertEquals(ClasspathResources.text("mongo-test/entity-decoder.java"), sourceCode);
     }
 
     @Test
-    public void decode() {
+    void decode() {
         String entityJSON = ClasspathResources.text("mongo-test/entity.json");
 
         TestEntity entity = decoder.decode(new JsonReader(entityJSON));

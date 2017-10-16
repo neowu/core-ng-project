@@ -1,37 +1,34 @@
 package core.framework.util;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author neo
  */
-public class PropertiesTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
+class PropertiesTest {
     private Properties properties;
 
-    @Before
-    public void createProperties() {
+    @BeforeEach
+    void createProperties() {
         properties = new Properties();
     }
 
     @Test
-    public void getEmptyValue() {
+    void getEmptyValue() {
         properties.properties.put("key", "");
 
-        Assert.assertFalse(properties.get("key").isPresent());
+        assertFalse(properties.get("key").isPresent());
     }
 
     @Test
-    public void loadNotExistedFile() {
-        exception.expect(Error.class);
-        exception.expectMessage("can not find");
-
-        properties.load("not-existed-property.properties");
+    void loadNotExistedFile() {
+        Error error = assertThrows(Error.class, () -> properties.load("not-existed-property.properties"));
+        assertThat(error.getMessage(), containsString("can not find"));
     }
 }

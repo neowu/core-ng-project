@@ -1,30 +1,27 @@
 package core.framework.impl.web.request;
 
 import core.framework.web.exception.BadRequestException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author neo
  */
-public class PathParamsTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+class PathParamsTest {
+    private PathParams pathParams;
 
-    PathParams pathParams;
-
-    @Before
-    public void createPathParams() {
+    @BeforeEach
+    void createPathParams() {
         pathParams = new PathParams();
     }
 
     @Test
-    public void putEmptyPathParam() {
-        exception.expect(BadRequestException.class);
-        exception.expectMessage("name=id, value=");
-
-        pathParams.put("id", "");
+    void putEmptyPathParam() {
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> pathParams.put("id", ""));
+        assertThat(exception.getMessage(), containsString("name=id, value="));
     }
 }

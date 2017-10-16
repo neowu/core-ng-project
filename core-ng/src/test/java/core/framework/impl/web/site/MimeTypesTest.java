@@ -1,19 +1,22 @@
 package core.framework.impl.web.site;
 
 import core.framework.http.ContentType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author neo
  */
-public class MimeTypesTest {
+class MimeTypesTest {
     @Test
-    public void get() {
-        Assert.assertNull(MimeTypes.get("file"));
+    void get() {
+        assertNull(MimeTypes.get("file"));
 
         ContentType contentType = MimeTypes.get("favicon.ico");
-        Assert.assertNotNull(contentType);
-        Assert.assertEquals("image/x-icon", contentType.mediaType());
+        assertNotNull(contentType);
+        assertEquals("image/x-icon", contentType.mediaType());
     }
 }

@@ -1,16 +1,16 @@
 package core.framework.log;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author neo
  */
-public class ActionLogContextTest {
+class ActionLogContextTest {
     @Test
-    public void withoutCurrentActionLog() {
+    void withoutCurrentActionLog() {
         assertNull(ActionLogContext.id());
 
         ActionLogContext.put("key", "value");

@@ -1,29 +1,29 @@
 package core.framework.impl.inject;
 
 import core.framework.util.Types;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author neo
  */
-public class BeanFactoryTest {
+class BeanFactoryTest {
     private BeanFactory beanFactory;
 
-    @Before
-    public void createBeanFactory() {
+    @BeforeEach
+    void createBeanFactory() {
         beanFactory = new BeanFactory();
     }
 
     @Test
-    public void create() {
+    void create() {
         beanFactory.beans.put(new Key(Dependency1.class, null), new Dependency1());
         beanFactory.beans.put(new Key(Types.generic(Dependency2.class, String.class), "dep2"), new Dependency2<String>());
         beanFactory.beans.put(new Key(Dependency3.class, null), new Dependency3());
@@ -35,7 +35,7 @@ public class BeanFactoryTest {
     }
 
     @Test
-    public void bindGeneric() {
+    void bindGeneric() {
         beanFactory.bind(Types.list(String.class), null, new ArrayList<String>());
 
         beanFactory.bind(Types.supplier(String.class), null, (Supplier<String>) () -> null);

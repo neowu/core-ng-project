@@ -4,7 +4,7 @@ import core.framework.api.json.Property;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.util.Types;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,19 +15,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class JSONTest {
+class JSONTest {
     @Test
-    public void mapField() {
+    void mapField() {
         Bean bean = new Bean();
         bean.mapField.put("key1", "value1");
         bean.mapField.put("key2", "value2");
@@ -41,7 +41,7 @@ public class JSONTest {
     }
 
     @Test
-    public void childField() {
+    void childField() {
         Bean bean = new Bean();
 
         Child child = new Child();
@@ -58,7 +58,7 @@ public class JSONTest {
     }
 
     @Test
-    public void listField() {
+    void listField() {
         Bean bean = new Bean();
         bean.listField.add("value1");
         bean.listField.add("value2");
@@ -81,7 +81,7 @@ public class JSONTest {
     }
 
     @Test
-    public void dateField() {
+    void dateField() {
         Bean bean = new Bean();
         bean.instantField = Instant.now();
         bean.dateTimeField = LocalDateTime.ofInstant(bean.instantField, ZoneId.systemDefault());
@@ -98,7 +98,7 @@ public class JSONTest {
     }
 
     @Test
-    public void listObject() {
+    void listObject() {
         List<Bean> beans = JSON.fromJSON(Types.list(Bean.class), "[{\"string\":\"n1\"},{\"string\":\"n2\"}]");
 
         assertEquals(2, beans.size());
@@ -107,7 +107,7 @@ public class JSONTest {
     }
 
     @Test
-    public void optionalObject() {
+    void optionalObject() {
         Optional<Bean> parsedBean = JSON.fromJSON(Types.optional(Bean.class), JSON.toJSON(Optional.empty()));
         assertFalse(parsedBean.isPresent());
 
@@ -122,7 +122,7 @@ public class JSONTest {
     }
 
     @Test
-    public void nullObject() {
+    void nullObject() {
         String json = JSON.toJSON(null);
         Bean bean = JSON.fromJSON(Bean.class, json);
 
@@ -130,7 +130,7 @@ public class JSONTest {
     }
 
     @Test
-    public void notAnnotatedField() {
+    void notAnnotatedField() {
         Bean bean = new Bean();
         bean.notAnnotatedField = 100;
         String json = JSON.toJSON(bean);
@@ -141,7 +141,7 @@ public class JSONTest {
     }
 
     @Test
-    public void enumValue() {
+    void enumValue() {
         assertEquals(TestEnum.A, JSON.fromEnumValue(TestEnum.class, "A1"));
         assertEquals(TestEnum.C, JSON.fromEnumValue(TestEnum.class, "C"));
 

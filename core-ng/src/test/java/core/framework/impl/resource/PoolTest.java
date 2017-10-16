@@ -1,33 +1,36 @@
 package core.framework.impl.resource;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class PoolTest {
+class PoolTest {
     @Test
-    public void borrowAndReturn() {
+    void borrowAndReturn() {
         Pool<TestResource> pool = new Pool<>(TestResource::new, TestResource::close);
 
         PoolItem<TestResource> item = pool.borrowItem();
-        Assert.assertNotNull(item.resource);
+        assertNotNull(item.resource);
         pool.returnItem(item);
 
-        Assert.assertEquals(1, pool.idleItems.size());
-        Assert.assertNotNull(pool.idleItems.getFirst().returnTime);
+        assertEquals(1, pool.idleItems.size());
+        assertTrue(pool.idleItems.getFirst().returnTime > 0);
     }
 
     @Test
-    public void close() {
+    void close() {
         Pool<TestResource> pool = new Pool<>(TestResource::new, TestResource::close);
 
         PoolItem<TestResource> item = pool.borrowItem();
         pool.returnItem(item);
 
         pool.close();
-        Assert.assertTrue(item.resource.closed);
+        assertTrue(item.resource.closed);
     }
 
     static class TestResource implements AutoCloseable {

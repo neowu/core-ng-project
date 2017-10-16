@@ -1,17 +1,17 @@
 package core.framework.impl.kafka;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class KafkaMessageListenerThreadTest {
+class KafkaMessageListenerThreadTest {
     @Test
-    public void longProcessThreshold() {
+    void longProcessThreshold() {
         assertEquals(5, KafkaMessageListenerThread.longProcessThreshold(Duration.ofNanos(500).toNanos(), 1, 100), 0.000001);
 
         assertEquals(500, KafkaMessageListenerThread.longProcessThreshold(Duration.ofNanos(500).toNanos(), 1, 1), 0.000001);

@@ -2,29 +2,29 @@ package core.framework.impl.validate;
 
 import core.framework.api.validate.NotEmpty;
 import core.framework.api.validate.NotNull;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class ObjectValidatorNotEmptyTest {
-    ObjectValidator validator;
+class ObjectValidatorNotEmptyTest {
+    private ObjectValidator validator;
 
-    @Before
-    public void createObjectValidator() {
+    @BeforeEach
+    void createObjectValidator() {
         validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
     }
 
     @Test
-    public void validate() {
+    void validate() {
         Bean bean = new Bean();
         bean.stringField1 = "";
 
@@ -37,7 +37,7 @@ public class ObjectValidatorNotEmptyTest {
     }
 
     @Test
-    public void partialValidate() {
+    void partialValidate() {
         Bean bean = new Bean();
         bean.stringField2 = "";
 

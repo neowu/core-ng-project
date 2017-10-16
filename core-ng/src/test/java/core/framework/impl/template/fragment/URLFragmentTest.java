@@ -1,16 +1,16 @@
 package core.framework.impl.template.fragment;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class URLFragmentTest {
+class URLFragmentTest {
     @Test
-    public void isValidURL() {
+    void isValidURL() {
         assertTrue(URLFragment.isValidURL("//localhost:8080/path1%20path2/path3?k1=v1%20v2&k2=v1+v2#f1/f2"));
         assertTrue(URLFragment.isValidURL("http://example.com/:@-._~!$&'()*+,=;:@-._~!$&'()*+,=:@-._~!$&'()*+,==?/?:@-._~!$'()*+,;=/?:@-._~!$'()*+,;==#/?:@-._~!$&'()*+,;="));
 

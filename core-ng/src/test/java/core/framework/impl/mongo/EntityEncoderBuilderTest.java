@@ -9,8 +9,8 @@ import core.framework.util.Sets;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -18,29 +18,29 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class EntityEncoderBuilderTest {
+class EntityEncoderBuilderTest {
     private EntityEncoderBuilder<TestEntity> builder;
     private EntityEncoder<TestEntity> encoder;
 
-    @Before
-    public void createEncoder() {
+    @BeforeEach
+    void createEncoder() {
         builder = new EntityEncoderBuilder<>(TestEntity.class);
         encoder = builder.build();
     }
 
     @Test
-    public void sourceCode() {
+    void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
         assertEquals(ClasspathResources.text("mongo-test/entity-encoder.java"), sourceCode);
     }
 
     @Test
-    public void encode() throws IOException {
+    void encode() throws IOException {
         assertEquals(Sets.newHashSet(TestEntityChild.TestEnum.class), builder.enumCodecFields.keySet());
 
         StringWriter writer = new StringWriter();

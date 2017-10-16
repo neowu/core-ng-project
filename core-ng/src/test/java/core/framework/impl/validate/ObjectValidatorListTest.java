@@ -6,39 +6,39 @@ import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.util.Types;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class ObjectValidatorListTest {
+class ObjectValidatorListTest {
     private ObjectValidatorBuilder builder;
     private ObjectValidator validator;
 
-    @Before
-    public void createObjectValidator() {
+    @BeforeEach
+    void createObjectValidator() {
         builder = new ObjectValidatorBuilder(Types.list(Bean.class), Field::getName);
         validator = builder.build().get();
     }
 
     @Test
-    public void sourceCode() {
+    void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
         assertEquals(ClasspathResources.text("validator-test/validator-list.java"), sourceCode);
     }
 
     @Test
-    public void validate() {
+    void validate() {
         Bean bean = new Bean();
         bean.field1 = "";
         bean.child = new ChildBean();

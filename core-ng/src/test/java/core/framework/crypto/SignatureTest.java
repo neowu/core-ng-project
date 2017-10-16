@@ -2,17 +2,19 @@ package core.framework.crypto;
 
 import core.framework.util.ClasspathResources;
 import core.framework.util.Strings;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class SignatureTest {
+class SignatureTest {
     @Test
-    public void signWithJavaGeneratedPrivateKey() {
+    void signWithJavaGeneratedPrivateKey() {
         Signature signature = new Signature();
         KeyPair keyPair = RSA.generateKeyPair();
         signature.privateKey(keyPair.getPrivate().getEncoded());
@@ -21,12 +23,11 @@ public class SignatureTest {
         String message = "test message";
         byte[] sign = signature.sign(Strings.bytes(message));
         boolean valid = signature.verify(Strings.bytes(message), sign);
-
-        Assert.assertTrue(valid);
+        assertTrue(valid);
     }
 
     @Test
-    public void signWithOpenSSLGeneratedCert() {
+    void signWithOpenSSLGeneratedCert() {
         Signature signature = new Signature();
         byte[] cert = ClasspathResources.bytes("crypto-test/signature-cert.der");
         byte[] privateKey = ClasspathResources.bytes("crypto-test/signature-private.der");
@@ -36,13 +37,12 @@ public class SignatureTest {
         String message = "test message";
 
         byte[] sign = signature.sign(Strings.bytes(message));
-
         boolean valid = signature.verify(Strings.bytes(message), sign);
-        Assert.assertTrue(valid);
+        assertTrue(valid);
     }
 
     @Test
-    public void invalidSignature() {
+    void invalidSignature() {
         Signature signature = new Signature();
         byte[] cert = ClasspathResources.bytes("crypto-test/signature-cert-not-match.der");
         byte[] privateKey = ClasspathResources.bytes("crypto-test/signature-private.der");
@@ -53,6 +53,6 @@ public class SignatureTest {
 
         byte[] sign = signature.sign(Strings.bytes(message));
         boolean valid = signature.verify(Strings.bytes(message), sign);
-        Assert.assertFalse(valid);
+        assertFalse(valid);
     }
 }

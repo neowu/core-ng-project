@@ -2,26 +2,28 @@ package core.framework.impl.db;
 
 import core.framework.db.Query;
 import core.framework.db.Repository;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class RepositoryImplSequenceIdEntityTest {
-    private static DatabaseImpl database;
-    private static Repository<SequenceIdEntity> repository;
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class RepositoryImplSequenceIdEntityTest {
+    private DatabaseImpl database;
+    private Repository<SequenceIdEntity> repository;
 
-    @BeforeClass
-    public static void createDatabase() {
+    @BeforeAll
+    void createDatabase() {
         database = new DatabaseImpl();
         database.url("jdbc:hsqldb:mem:seq;sql.syntax_ora=true");
         database.vendor = Vendor.ORACLE;
@@ -31,24 +33,24 @@ public class RepositoryImplSequenceIdEntityTest {
         repository = database.repository(SequenceIdEntity.class);
     }
 
-    @AfterClass
-    public static void cleanupDatabase() {
+    @AfterAll
+    void cleanupDatabase() {
         database.execute("DROP TABLE sequence_id_entity");
         database.execute("DROP SEQUENCE seq");
     }
 
-    @Before
-    public void truncateTable() {
+    @BeforeEach
+    void truncateTable() {
         database.execute("TRUNCATE TABLE sequence_id_entity");
     }
 
     @Test
-    public void insert() {
+    void insert() {
         SequenceIdEntity entity = new SequenceIdEntity();
         entity.stringField = "string";
 
         Optional<Long> id = repository.insert(entity);
-        Assert.assertTrue(id.isPresent());
+        assertTrue(id.isPresent());
 
         SequenceIdEntity selectedEntity = repository.get(id.get()).get();
 
@@ -57,7 +59,7 @@ public class RepositoryImplSequenceIdEntityTest {
     }
 
     @Test
-    public void count() {
+    void count() {
         createEntities();
 
         Query<SequenceIdEntity> query = repository.select();
@@ -68,7 +70,7 @@ public class RepositoryImplSequenceIdEntityTest {
     }
 
     @Test
-    public void select() {
+    void select() {
         createEntities();
 
         Query<SequenceIdEntity> query = repository.select().orderBy("long_field").limit(5);

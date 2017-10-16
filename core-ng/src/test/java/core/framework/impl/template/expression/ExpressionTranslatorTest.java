@@ -1,50 +1,51 @@
 package core.framework.impl.template.expression;
 
 import core.framework.impl.template.TemplateMetaContext;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class ExpressionTranslatorTest {
+class ExpressionTranslatorTest {
     private ExpressionParser parser;
 
-    @Before
-    public void createExpressionParser() {
+    @BeforeEach
+    void createExpressionParser() {
         parser = new ExpressionParser();
     }
 
     @Test
-    public void text() {
+    void text() {
         String expression = new ExpressionTranslator(parser.parse("\"text\""), new TemplateMetaContext(Object.class)).translate();
-        Assert.assertEquals("\"text\"", expression);
+        assertEquals("\"text\"", expression);
     }
 
     @Test
-    public void field() {
+    void field() {
         String expression = new ExpressionTranslator(parser.parse("field"), new TemplateMetaContext(Object.class)).translate();
-        Assert.assertEquals("$root.field", expression);
+        assertEquals("$root.field", expression);
     }
 
     @Test
-    public void method() {
+    void method() {
         String expression = new ExpressionTranslator(parser.parse("method()"), new TemplateMetaContext(Object.class)).translate();
-        Assert.assertEquals("$root.method()", expression);
+        assertEquals("$root.method()", expression);
     }
 
     @Test
-    public void contextVariable() {
+    void contextVariable() {
         TemplateMetaContext stack = new TemplateMetaContext(Object.class);
         stack.paramClasses.put("item", Object.class);
         String expression = new ExpressionTranslator(parser.parse("item"), stack).translate();
-        Assert.assertEquals("item", expression);
+        assertEquals("item", expression);
     }
 
     @Test
-    public void methodWithNumberParam() {
+    void methodWithNumberParam() {
         String expression = new ExpressionTranslator(parser.parse("field.method(1)"), new TemplateMetaContext(Object.class)).translate();
-        Assert.assertEquals("$root.field.method(1)", expression);
+        assertEquals("$root.field.method(1)", expression);
     }
 }

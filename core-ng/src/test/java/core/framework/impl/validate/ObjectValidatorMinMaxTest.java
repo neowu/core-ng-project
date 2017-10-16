@@ -2,31 +2,31 @@ package core.framework.impl.validate;
 
 import core.framework.api.validate.Max;
 import core.framework.api.validate.Min;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class ObjectValidatorMinMaxTest {
-    ObjectValidator validator;
+class ObjectValidatorMinMaxTest {
+    private ObjectValidator validator;
 
-    @Before
-    public void createObjectValidator() {
+    @BeforeEach
+    void createObjectValidator() {
         validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
     }
 
     @Test
-    public void validate() {
+    void validate() {
         Bean bean = new Bean();
         bean.num1 = 0;
         bean.num2 = 11;
@@ -41,7 +41,7 @@ public class ObjectValidatorMinMaxTest {
     }
 
     @Test
-    public void validateWithoutError() {
+    void validateWithoutError() {
         Bean bean = new Bean();
         bean.num1 = 1;
         bean.num2 = 10;

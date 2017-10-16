@@ -2,37 +2,31 @@ package core.framework.http;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.util.Charsets;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author neo
  */
-public class HTTPClientTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
+class HTTPClientTest {
     @Test
-    public void responseBodyWithNoContent() throws IOException {
+    void responseBodyWithNoContent() throws IOException {
         byte[] body = HTTPClient.responseBody(null);   // apache http client return null for HEAD/204/205/304
 
         assertEquals("", new String(body, Charsets.UTF_8));
     }
 
     @Test
-    public void parseHTTPStatus() {
+    void parseHTTPStatus() {
         assertEquals(HTTPStatus.OK, HTTPClient.parseHTTPStatus(200));
     }
 
     @Test
-    public void parseUnsupportedHTTPStatus() {
-        exception.expect(HTTPClientException.class);
-
-        HTTPClient.parseHTTPStatus(525);
+    void parseUnsupportedHTTPStatus() {
+        assertThrows(HTTPClientException.class, () -> HTTPClient.parseHTTPStatus(525));
     }
 }

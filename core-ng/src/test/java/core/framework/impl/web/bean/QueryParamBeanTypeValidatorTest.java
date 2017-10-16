@@ -1,16 +1,16 @@
 package core.framework.impl.web.bean;
 
 import core.framework.api.web.service.QueryParam;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
 /**
  * @author neo
  */
-public class QueryParamBeanTypeValidatorTest {
+class QueryParamBeanTypeValidatorTest {
     @Test
-    public void beanType() {
+    void beanType() {
         new QueryParamBeanTypeValidator(TestQueryParamBean.class).validate();
     }
 

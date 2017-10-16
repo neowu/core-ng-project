@@ -1,19 +1,20 @@
 package core.framework.module;
 
 import core.framework.util.Types;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class CacheConfigTest {
+class CacheConfigTest {
     @Test
-    public void cacheName() {
-        Assert.assertEquals("list-string", CacheConfig.cacheName(null, Types.list(String.class)));
+    void cacheName() {
+        assertEquals("list-string", CacheConfig.cacheName(null, Types.list(String.class)));
 
-        Assert.assertEquals("string", CacheConfig.cacheName(null, String.class));
+        assertEquals("string", CacheConfig.cacheName(null, String.class));
 
-        Assert.assertEquals("name", CacheConfig.cacheName("name", String.class));
+        assertEquals("name", CacheConfig.cacheName("name", String.class));
     }
 }

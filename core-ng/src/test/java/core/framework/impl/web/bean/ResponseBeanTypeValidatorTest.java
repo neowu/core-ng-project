@@ -1,33 +1,33 @@
 package core.framework.impl.web.bean;
 
 import core.framework.util.Types;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author neo
  */
-public class ResponseBeanTypeValidatorTest {
+class ResponseBeanTypeValidatorTest {
     private ResponseBeanTypeValidator validator;
 
-    @Before
-    public void createResponseBeanTypeValidator() {
+    @BeforeEach
+    void createResponseBeanTypeValidator() {
         validator = new ResponseBeanTypeValidator();
     }
 
     @Test
-    public void listType() {
+    void listType() {
         validator.validate(Types.list(String.class));
         validator.validate(Types.list(TestBean.class));
     }
 
     @Test
-    public void optionalType() {
+    void optionalType() {
         validator.validate(Types.optional(TestBean.class));
     }
 
     @Test
-    public void beanType() {
+    void beanType() {
         validator.validate(TestBean.class);
     }
 }

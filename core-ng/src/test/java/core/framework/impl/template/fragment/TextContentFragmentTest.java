@@ -1,16 +1,17 @@
 package core.framework.impl.template.fragment;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class TextContentFragmentTest {
+class TextContentFragmentTest {
     @Test
-    public void escapeHTML() {
-        Assert.assertEquals("text", TextContentFragment.escapeHTML("text"));
-        Assert.assertEquals("before&lt;p&gt;text&lt;&#47;p&gt;after", TextContentFragment.escapeHTML("before<p>text</p>after"));
-        Assert.assertEquals("&lt;html&gt;&lt;&#47;html&gt;", TextContentFragment.escapeHTML("<html></html>"));
+    void escapeHTML() {
+        assertEquals("text", TextContentFragment.escapeHTML("text"));
+        assertEquals("before&lt;p&gt;text&lt;&#47;p&gt;after", TextContentFragment.escapeHTML("before<p>text</p>after"));
+        assertEquals("&lt;html&gt;&lt;&#47;html&gt;", TextContentFragment.escapeHTML("<html></html>"));
     }
 }

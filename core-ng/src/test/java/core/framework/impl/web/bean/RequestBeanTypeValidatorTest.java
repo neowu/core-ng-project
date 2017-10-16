@@ -1,32 +1,29 @@
 package core.framework.impl.web.bean;
 
 import core.framework.util.Types;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class RequestBeanTypeValidatorTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
+class RequestBeanTypeValidatorTest {
     @Test
-    public void listType() {
+    void listType() {
         new RequestBeanTypeValidator(Types.list(String.class)).validate();
         new RequestBeanTypeValidator(Types.list(TestBean.class)).validate();
     }
 
     @Test
-    public void optionalType() {
-        exception.expectMessage("top level optional is not allowed");
-
-        new RequestBeanTypeValidator(Types.optional(TestBean.class)).validate();
+    void optionalType() {
+        Error error = assertThrows(Error.class, () -> new RequestBeanTypeValidator(Types.optional(TestBean.class)).validate());
+        assertTrue(error.getMessage().startsWith("top level optional is not allowed"));
     }
 
     @Test
-    public void beanType() {
+    void beanType() {
         new RequestBeanTypeValidator(TestBean.class).validate();
     }
 }

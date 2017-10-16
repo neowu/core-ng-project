@@ -1,13 +1,13 @@
 package core.framework.impl.template;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author neo
  */
-public class ModelClassValidatorTest {
+class ModelClassValidatorTest {
     @Test
-    public void validate() {
+    void validate() {
         new ModelClassValidator(TestModel.class).validate();
     }
 }

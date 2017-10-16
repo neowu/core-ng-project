@@ -1,32 +1,32 @@
 package core.framework.impl.db;
 
 import core.framework.util.ClasspathResources;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class UpdateQueryBuilderTest {
+class UpdateQueryBuilderTest {
     private UpdateQueryBuilder<AutoIncrementIdEntity> builder;
     private UpdateQuery<AutoIncrementIdEntity> updateQuery;
 
-    @Before
-    public void createUpdateQuery() {
+    @BeforeEach
+    void createUpdateQuery() {
         builder = new UpdateQueryBuilder<>(AutoIncrementIdEntity.class);
         updateQuery = builder.build();
     }
 
     @Test
-    public void sourceCode() {
+    void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
         assertEquals(ClasspathResources.text("db-test/update-query-auto-increment-id.java"), sourceCode);
     }
 
     @Test
-    public void update() {
+    void update() {
         AutoIncrementIdEntity entity = new AutoIncrementIdEntity();
         entity.id = 1;
         entity.stringField = "new_value";

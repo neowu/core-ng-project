@@ -1,29 +1,27 @@
 package core.framework.impl.web.request;
 
 import core.framework.web.exception.MethodNotAllowedException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author neo
  */
-public class RequestParserTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
+class RequestParserTest {
     private RequestParser parser;
 
-    @Before
-    public void createRequestParser() {
+    @BeforeEach
+    void createRequestParser() {
         parser = new RequestParser();
     }
 
     @Test
-    public void clientIP() {
+    void clientIP() {
         assertEquals("127.0.0.1", parser.clientIP("127.0.0.1", null));
         assertEquals("127.0.0.1", parser.clientIP("127.0.0.1", ""));
         assertEquals("108.0.0.1", parser.clientIP("127.0.0.1", "108.0.0.1"));
@@ -31,23 +29,21 @@ public class RequestParserTest {
     }
 
     @Test
-    public void port() {
+    void port() {
         assertEquals(80, parser.port(80, null));
         assertEquals(443, parser.port(80, "443"));
         assertEquals(443, parser.port(80, "443, 80"));
     }
 
     @Test
-    public void requestPort() {
+    void requestPort() {
         assertEquals(443, parser.requestPort("127.0.0.1", "https", null));
         assertEquals(8080, parser.requestPort("127.0.0.1:8080", "http", null));
     }
 
     @Test
-    public void httpMethod() {
-        exception.expect(MethodNotAllowedException.class);
-        exception.expectMessage("method=TRACK");
-
-        parser.httpMethod("TRACK");
+    void httpMethod() {
+        MethodNotAllowedException exception = assertThrows(MethodNotAllowedException.class, () -> parser.httpMethod("TRACK"));
+        assertThat(exception.getMessage(), containsString("method=TRACK"));
     }
 }

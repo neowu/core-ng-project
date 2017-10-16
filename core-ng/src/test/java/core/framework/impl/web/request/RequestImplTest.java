@@ -6,26 +6,26 @@ import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.impl.web.bean.TestQueryParamBean;
 import core.framework.util.Strings;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class RequestImplTest {
-    RequestImpl request;
+class RequestImplTest {
+    private RequestImpl request;
 
-    @Before
-    public void createRequest() {
+    @BeforeEach
+    void createRequest() {
         request = new RequestImpl(null, new RequestBeanMapper());
     }
 
     @Test
-    public void beanWithGet() {
+    void beanWithGet() {
         request.method = HTTPMethod.GET;
         request.queryParams.put("int_field", "1");
 
@@ -34,7 +34,7 @@ public class RequestImplTest {
     }
 
     @Test
-    public void beanWithJsonPost() {
+    void beanWithJsonPost() {
         request.method = HTTPMethod.POST;
         request.contentType = ContentType.APPLICATION_JSON;
         request.body = Strings.bytes("{\"big_decimal_field\": 1}");
@@ -44,7 +44,7 @@ public class RequestImplTest {
     }
 
     @Test
-    public void beanWithFormPost() {
+    void beanWithFormPost() {
         request.method = HTTPMethod.POST;
         request.formParams.put("long_field", "1");
 

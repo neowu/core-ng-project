@@ -2,21 +2,25 @@ package core.framework.impl.db;
 
 import core.framework.db.Repository;
 import core.framework.util.Lists;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author neo
  */
-public class RepositoryImplCompositeKeyEntityTest {
-    private static DatabaseImpl database;
-    private static Repository<CompositeKeyEntity> repository;
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class RepositoryImplCompositeKeyEntityTest {
+    private DatabaseImpl database;
+    private Repository<CompositeKeyEntity> repository;
 
-    @BeforeClass
-    public static void createDatabase() {
+    @BeforeAll
+    void createDatabase() {
         database = new DatabaseImpl();
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
         database.vendor = Vendor.MYSQL;
@@ -25,18 +29,18 @@ public class RepositoryImplCompositeKeyEntityTest {
         repository = database.repository(CompositeKeyEntity.class);
     }
 
-    @AfterClass
-    public static void cleanupDatabase() {
+    @AfterAll
+    void cleanupDatabase() {
         database.execute("DROP TABLE composite_key_entity");
     }
 
-    @Before
-    public void truncateTable() {
+    @BeforeEach
+    void truncateTable() {
         database.execute("TRUNCATE TABLE composite_key_entity");
     }
 
     @Test
-    public void insert() {
+    void insert() {
         CompositeKeyEntity entity = new CompositeKeyEntity();
         entity.id1 = "id1";
         entity.id2 = "id2";
@@ -47,14 +51,14 @@ public class RepositoryImplCompositeKeyEntityTest {
 
         CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).get();
 
-        Assert.assertEquals(entity.id1, selectedEntity.id1);
-        Assert.assertEquals(entity.id2, selectedEntity.id2);
-        Assert.assertEquals(entity.booleanField, selectedEntity.booleanField);
-        Assert.assertEquals(entity.longField, selectedEntity.longField);
+        assertEquals(entity.id1, selectedEntity.id1);
+        assertEquals(entity.id2, selectedEntity.id2);
+        assertEquals(entity.booleanField, selectedEntity.booleanField);
+        assertEquals(entity.longField, selectedEntity.longField);
     }
 
     @Test
-    public void update() {
+    void update() {
         CompositeKeyEntity entity = new CompositeKeyEntity();
         entity.id1 = "id1";
         entity.id2 = "id2";
@@ -66,11 +70,11 @@ public class RepositoryImplCompositeKeyEntityTest {
         repository.update(entity);
 
         CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).get();
-        Assert.assertEquals(entity.longField, selectedEntity.longField);
+        assertEquals(entity.longField, selectedEntity.longField);
     }
 
     @Test
-    public void batchDelete() {
+    void batchDelete() {
         CompositeKeyEntity entity1 = new CompositeKeyEntity();
         entity1.id1 = "1-1";
         entity1.id2 = "1-2";
@@ -83,7 +87,7 @@ public class RepositoryImplCompositeKeyEntityTest {
 
         repository.batchDelete(Lists.newArrayList(new Object[]{entity1.id1, entity1.id2}, new Object[]{entity2.id1, entity2.id2}));
 
-        Assert.assertFalse(repository.get(entity1.id1, entity1.id2).isPresent());
-        Assert.assertFalse(repository.get(entity2.id1, entity2.id2).isPresent());
+        assertFalse(repository.get(entity1.id1, entity1.id2).isPresent());
+        assertFalse(repository.get(entity2.id1, entity2.id2).isPresent());
     }
 }

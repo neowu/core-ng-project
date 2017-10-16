@@ -1,17 +1,18 @@
 package core.framework.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class FilesTest {
+class FilesTest {
     @Test
-    public void tempFile() {
+    void tempFile() {
         Path path = Files.tempFile();
-        Assert.assertTrue(path.toString().endsWith(".tmp"));
+        assertTrue(path.toString().endsWith(".tmp"));
     }
 }

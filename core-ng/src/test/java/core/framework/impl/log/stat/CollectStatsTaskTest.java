@@ -1,15 +1,15 @@
 package core.framework.impl.log.stat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class CollectStatsTaskTest {
+class CollectStatsTaskTest {
     @Test
-    public void garbageCollectorName() {
+    void garbageCollectorName() {
         assertEquals("g1_young_generation", CollectStatsTask.garbageCollectorName("G1 Young Generation"));
         assertEquals("g1_old_generation", CollectStatsTask.garbageCollectorName("G1 Old Generation"));
     }

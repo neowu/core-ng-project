@@ -1,19 +1,19 @@
 package core.framework.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class StringsTest {
+class StringsTest {
     @Test
-    public void equals() {
+    void equals() {
         assertEquals(true, Strings.equals(null, null));
         assertEquals(false, Strings.equals(null, ""));
         assertEquals(false, Strings.equals("", null));
@@ -21,21 +21,21 @@ public class StringsTest {
     }
 
     @Test
-    public void compare() {
+    void compare() {
         assertEquals(-1, Strings.compare(null, ""));
         assertEquals(1, Strings.compare("b", "a"));
         assertEquals(0, Strings.compare(null, null));
     }
 
     @Test
-    public void truncate() {
+    void truncate() {
         assertNull(Strings.truncate(null, 10));
         assertEquals("value", Strings.truncate("value", 10));
         assertEquals("1234567890", Strings.truncate("123456789012345", 10));
     }
 
     @Test
-    public void isEmpty() {
+    void isEmpty() {
         assertTrue(Strings.isEmpty(""));
         assertTrue(Strings.isEmpty(" "));
 
@@ -44,7 +44,7 @@ public class StringsTest {
     }
 
     @Test
-    public void split() {
+    void split() {
         assertArrayEquals(new String[]{""}, Strings.split("", '/'));
         assertArrayEquals(new String[]{"", ""}, Strings.split("/", '/'));
         assertArrayEquals(new String[]{"", "", ""}, Strings.split("//", '/'));

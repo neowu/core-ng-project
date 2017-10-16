@@ -4,40 +4,40 @@ import core.framework.api.validate.NotNull;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class ObjectValidatorNotNullTest {
-    ObjectValidatorBuilder builder;
-    ObjectValidator validator;
+class ObjectValidatorNotNullTest {
+    private ObjectValidatorBuilder builder;
+    private ObjectValidator validator;
 
-    @Before
-    public void createObjectValidator() {
+    @BeforeEach
+    void createObjectValidator() {
         builder = new ObjectValidatorBuilder(Bean.class, Field::getName);
         validator = builder.build().get();
     }
 
     @Test
-    public void sourceCode() {
+    void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
         assertEquals(ClasspathResources.text("validator-test/validator-notnull.java"), sourceCode);
     }
 
     @Test
-    public void validate() {
+    void validate() {
         Bean bean = new Bean();
         bean.child = new ChildBean();
         bean.children = Lists.newArrayList(bean.child);
@@ -56,13 +56,13 @@ public class ObjectValidatorNotNullTest {
     }
 
     @Test
-    public void partialValidate() {
+    void partialValidate() {
         Bean bean = new Bean();
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, true);
 
-        Assert.assertFalse(errors.hasError());
+        assertFalse(errors.hasError());
     }
 
     static class Bean {

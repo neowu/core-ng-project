@@ -9,30 +9,30 @@ import core.framework.util.Types;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
-public class WebServiceControllerBuilderTest {
+class WebServiceControllerBuilderTest {
     private Request request;
     private TestWebServiceImpl serviceImpl;
 
-    @Before
-    public void prepare() {
+    @BeforeEach
+    void prepare() {
         serviceImpl = new TestWebServiceImpl();
         request = Mockito.mock(Request.class);
     }
 
     @Test
-    public void get() throws Exception {
+    void get() throws Exception {
         when(request.pathParam("id", Integer.class)).thenReturn(1);
 
         WebServiceControllerBuilder<TestWebService> builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("get", Integer.class));
@@ -47,7 +47,7 @@ public class WebServiceControllerBuilderTest {
     }
 
     @Test
-    public void create() throws Exception {
+    void create() throws Exception {
         TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "value";
 
@@ -65,7 +65,7 @@ public class WebServiceControllerBuilderTest {
     }
 
     @Test
-    public void batch() throws Exception {
+    void batch() throws Exception {
         TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "value";
 

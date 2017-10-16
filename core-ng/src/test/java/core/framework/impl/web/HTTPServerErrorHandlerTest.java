@@ -4,24 +4,24 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.log.Severity;
 import core.framework.web.exception.NotFoundException;
 import core.framework.web.service.RemoteServiceException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class HTTPServerErrorHandlerTest {
-    HTTPServerErrorHandler httpServerErrorHandler;
+class HTTPServerErrorHandlerTest {
+    private HTTPServerErrorHandler httpServerErrorHandler;
 
-    @Before
-    public void createHTTPServerErrorHandler() {
+    @BeforeEach
+    void createHTTPServerErrorHandler() {
         httpServerErrorHandler = new HTTPServerErrorHandler(null);
     }
 
     @Test
-    public void httpStatus() {
+    void httpStatus() {
         assertEquals(HTTPStatus.INTERNAL_SERVER_ERROR, httpServerErrorHandler.httpStatus(new RemoteServiceException("error", Severity.WARN, "error_code")));
         assertEquals(HTTPStatus.NOT_FOUND, httpServerErrorHandler.httpStatus(new NotFoundException("error")));
 

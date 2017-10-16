@@ -4,18 +4,18 @@ import core.framework.impl.template.node.Document;
 import core.framework.impl.template.node.Element;
 import core.framework.impl.template.node.Text;
 import core.framework.impl.template.source.StringTemplateSource;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class HTMLParserTest {
+class HTMLParserTest {
     @Test
-    public void voidElements() {
+    void voidElements() {
         String content = "<html><div><img src=//img.png>text</div></html>";
 
         Document document = new HTMLParser(new StringTemplateSource("test", content)).parse();
@@ -32,7 +32,7 @@ public class HTMLParserTest {
 
         Element img = (Element) div.nodes.get(0);
         assertEquals("img", img.name);
-        Assert.assertFalse(img.hasEndTag);
+        assertFalse(img.hasEndTag);
         assertEquals("//img.png", img.attributes.attributes.get("src").value);
 
         Text text = (Text) div.nodes.get(1);
@@ -40,7 +40,7 @@ public class HTMLParserTest {
     }
 
     @Test
-    public void emptyScript() {
+    void emptyScript() {
         String content = "<script type=\"text/javascript\"></script>";
 
         Document document = new HTMLParser(new StringTemplateSource("test", content)).parse();

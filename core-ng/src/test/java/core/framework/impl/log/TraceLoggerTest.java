@@ -1,28 +1,28 @@
 package core.framework.impl.log;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.time.Month;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
 
 /**
  * @author neo
  */
-public class TraceLoggerTest {
+class TraceLoggerTest {
     private TraceLogger logger;
 
-    @Before
-    public void createTraceLogger() {
+    @BeforeEach
+    void createTraceLogger() {
         logger = new TraceLogger(null);
     }
 
     @Test
-    public void traceLogFilePath() {
+    void traceLogFilePath() {
         String logFilePath = logger.traceLogFilePath("/log", LocalDateTime.of(2012, Month.OCTOBER, 2, 14, 5), "someController-method", "requestId");
         assertThat(logFilePath, containsString("/log/someController-method/201210021405.requestId."));
         assertThat(logFilePath, endsWith(".log"));

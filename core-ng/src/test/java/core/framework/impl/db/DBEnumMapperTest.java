@@ -1,24 +1,26 @@
 package core.framework.impl.db;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author neo
  */
-public class DBEnumMapperTest {
+class DBEnumMapperTest {
     private DBEnumMapper<TestEnum> mapper;
 
-    @Before
-    public void createDBEnumMapper() {
+    @BeforeEach
+    void createDBEnumMapper() {
         mapper = new DBEnumMapper<>(TestEnum.class);
     }
 
     @Test
-    public void getEnum() {
-        Assert.assertNull(mapper.getEnum(null));
-        Assert.assertEquals(TestEnum.V1, mapper.getEnum("DB_V1"));
-        Assert.assertEquals(TestEnum.V2, mapper.getEnum("DB_V2"));
+    void getEnum() {
+        assertNull(mapper.getEnum(null));
+        assertEquals(TestEnum.V1, mapper.getEnum("DB_V1"));
+        assertEquals(TestEnum.V2, mapper.getEnum("DB_V2"));
     }
 }

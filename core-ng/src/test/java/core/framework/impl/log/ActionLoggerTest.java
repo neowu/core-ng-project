@@ -1,24 +1,25 @@
 package core.framework.impl.log;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class ActionLoggerTest {
+class ActionLoggerTest {
     private ActionLogger actionLogger;
 
-    @Before
-    public void createActionLogger() {
+    @BeforeEach
+    void createActionLogger() {
         actionLogger = ActionLogger.console();
     }
 
     @Test
-    public void filterLineSeparator() {
+    void filterLineSeparator() {
         String message = "line1\nline2";
         String filteredMessage = actionLogger.filterLineSeparator(message);
-        Assert.assertEquals("line1 line2", filteredMessage);
+        assertEquals("line1 line2", filteredMessage);
     }
 }

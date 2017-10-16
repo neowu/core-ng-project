@@ -2,35 +2,31 @@ package core.framework.impl.web.request;
 
 import core.framework.api.json.Property;
 import core.framework.web.exception.BadRequestException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class URLParamParserTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
+class URLParamParserTest {
     @Test
-    public void failedToParseEnum() {
-        exception.expect(BadRequestException.class);
-        exception.expectMessage("failed to parse");
-
-        URLParamParser.parse("V2", TestEnum.class);
+    void failedToParseEnum() {
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> URLParamParser.parse("V2", TestEnum.class));
+        assertThat(exception.getMessage(), containsString("failed to parse"));
     }
 
     @Test
-    public void parseBoolean() {
+    void parseBoolean() {
         assertTrue(URLParamParser.parse("true", Boolean.class));
     }
 
     @Test
-    public void parseEnum() {
+    void parseEnum() {
         TestEnum value = URLParamParser.parse("V1", TestEnum.class);
         assertEquals(TestEnum.VALUE, value);
     }

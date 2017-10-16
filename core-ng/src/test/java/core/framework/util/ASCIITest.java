@@ -1,17 +1,17 @@
 package core.framework.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class ASCIITest {
+class ASCIITest {
     @Test
-    public void isDigit() {
+    void isDigit() {
         assertTrue(ASCII.isDigit('0'));
         assertTrue(ASCII.isDigit('9'));
         assertFalse(ASCII.isDigit('a'));
@@ -21,7 +21,7 @@ public class ASCIITest {
     }
 
     @Test
-    public void isLetter() {
+    void isLetter() {
         assertFalse(ASCII.isLetter('0'));
         assertFalse(ASCII.isLetter('9'));
         assertTrue(ASCII.isLetter('a'));
@@ -31,7 +31,7 @@ public class ASCIITest {
     }
 
     @Test
-    public void toUpperCase() {
+    void toUpperCase() {
         assertEquals("TEXT", ASCII.toUpperCase("text"));
         assertEquals("TEXT", ASCII.toUpperCase("tExt"));
         assertEquals("TEXT", ASCII.toUpperCase("TEXT"));
@@ -39,7 +39,7 @@ public class ASCIITest {
     }
 
     @Test
-    public void toLowerCase() {
+    void toLowerCase() {
         assertEquals("text", ASCII.toLowerCase("text"));
         assertEquals("text", ASCII.toLowerCase("tExt"));
         assertEquals("text", ASCII.toLowerCase("TEXT"));
@@ -47,7 +47,7 @@ public class ASCIITest {
     }
 
     @Test
-    public void toUpperCaseChar() {
+    void toUpperCaseChar() {
         assertEquals('-', ASCII.toUpperCase('-'));
         assertEquals('A', ASCII.toUpperCase('a'));
         assertEquals('Z', ASCII.toUpperCase('z'));
@@ -57,7 +57,7 @@ public class ASCIITest {
     }
 
     @Test
-    public void toLowerCaseChar() {
+    void toLowerCaseChar() {
         assertEquals('-', ASCII.toLowerCase('-'));
         assertEquals('a', ASCII.toLowerCase('A'));
         assertEquals('z', ASCII.toLowerCase('Z'));

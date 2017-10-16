@@ -1,25 +1,25 @@
 package core.framework.impl.cache;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author neo
  */
-public class LocalCacheStoreTest {
+class LocalCacheStoreTest {
     LocalCacheStore cacheStore;
 
-    @Before
-    public void createLocalCacheStore() {
+    @BeforeEach
+    void createLocalCacheStore() {
         cacheStore = new LocalCacheStore();
     }
 
     @Test
-    public void getAll() {
+    void getAll() {
         Map<String, byte[]> values = cacheStore.getAll(new String[]{"key1", "key2"});
         assertNull(values.get("key1"));
         assertNull(values.get("key2"));

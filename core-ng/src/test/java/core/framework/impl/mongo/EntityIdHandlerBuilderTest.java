@@ -2,46 +2,45 @@ package core.framework.impl.mongo;
 
 import core.framework.util.ClasspathResources;
 import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class EntityIdHandlerBuilderTest {
+class EntityIdHandlerBuilderTest {
     private EntityIdHandlerBuilder<TestEntity> builder;
     private EntityIdHandler<TestEntity> handler;
 
-    @Before
-    public void createEntityIdHandler() {
+    @BeforeEach
+    void createEntityIdHandler() {
         builder = new EntityIdHandlerBuilder<>(TestEntity.class);
         handler = builder.build();
     }
 
     @Test
-    public void sourceCode() {
+    void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
         assertEquals(ClasspathResources.text("mongo-test/entity-id-handler.java"), sourceCode);
     }
 
     @Test
-    public void setId() {
+    void setId() {
         ObjectId id = new ObjectId();
         TestEntity entity = new TestEntity();
         handler.set(entity, id);
 
-        Assert.assertEquals(id, entity.id);
+        assertEquals(id, entity.id);
     }
 
     @Test
-    public void getId() {
+    void getId() {
         TestEntity entity = new TestEntity();
         entity.id = new ObjectId();
         ObjectId id = (ObjectId) handler.get(entity);
 
-        Assert.assertEquals(entity.id, id);
+        assertEquals(entity.id, id);
     }
 }

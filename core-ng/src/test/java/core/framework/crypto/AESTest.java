@@ -2,15 +2,16 @@ package core.framework.crypto;
 
 import core.framework.util.Charsets;
 import core.framework.util.Strings;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class AESTest {
+class AESTest {
     @Test
-    public void encryptAndDecrypt() {
+    void encryptAndDecrypt() {
         byte[] key = AES.generateKey(128);
         AES aes = new AES(key);
 
@@ -19,6 +20,6 @@ public class AESTest {
         byte[] plainBytes = aes.decrypt(cipherText);
         String plainText = new String(plainBytes, Charsets.UTF_8);
 
-        Assert.assertEquals(message, plainText);
+        assertEquals(message, plainText);
     }
 }

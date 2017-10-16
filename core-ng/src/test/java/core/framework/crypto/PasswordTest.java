@@ -1,17 +1,18 @@
 package core.framework.crypto;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class PasswordTest {
+class PasswordTest {
     @Test
-    public void encryptAndDecrypt() {
+    void encryptAndDecrypt() {
         String[] keyPair = Password.generateKeyPair();
         String encryptedText = Password.encrypt("test", keyPair[0]);
         String decryptedText = Password.decrypt(encryptedText, keyPair[1]);
-        Assert.assertEquals("test", decryptedText);
+        assertEquals("test", decryptedText);
     }
 }

@@ -3,17 +3,18 @@ package core.framework.impl.template;
 import core.framework.impl.template.source.ClasspathTemplateSource;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class HTMLTemplateTest {
+class HTMLTemplateTest {
     @Test
-    public void process() {
+    void process() {
         HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new ClasspathTemplateSource("template-test/template.html"), TestModel.class);
         builder.message = key -> Optional.of(key + "_value");
         HTMLTemplate template = builder.build();
@@ -28,7 +29,7 @@ public class HTMLTemplateTest {
 
         String result = template.process(new TemplateContext(model, new CDNManager()));
 
-        Assert.assertEquals(ClasspathResources.text("template-test/template-result.html").replaceAll("\r\n", "\n"), result);
+        assertEquals(ClasspathResources.text("template-test/template-result.html").replaceAll("\r\n", "\n"), result);
     }
 
     private TestModelChild child(String stringField, Double doubleField, Boolean booleanField) {

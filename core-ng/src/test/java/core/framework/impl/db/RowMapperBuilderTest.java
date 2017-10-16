@@ -1,17 +1,17 @@
 package core.framework.impl.db;
 
 import core.framework.util.ClasspathResources;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author neo
  */
-public class RowMapperBuilderTest {
+class RowMapperBuilderTest {
     @Test
-    public void sourceCode() {
+    void sourceCode() {
         RowMapperBuilder<AutoIncrementIdEntity> builder = new RowMapperBuilder<>(AutoIncrementIdEntity.class, new EnumDBMapper());
         RowMapper<AutoIncrementIdEntity> mapper = builder.build();
         assertNotNull(mapper);

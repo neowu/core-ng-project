@@ -1,18 +1,18 @@
 package core.framework.impl.validate;
 
 import core.framework.util.Types;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author neo
  */
-public class ObjectValidatorBuilderTest {
+class ObjectValidatorBuilderTest {
     @Test
-    public void withoutValidationAnnotation() {
+    void withoutValidationAnnotation() {
         assertFalse(new ObjectValidatorBuilder(Bean.class, Field::getName).build().isPresent());
         assertFalse(new ObjectValidatorBuilder(Types.list(Bean.class), Field::getName).build().isPresent());
     }

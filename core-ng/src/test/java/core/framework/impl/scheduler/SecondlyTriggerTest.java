@@ -1,17 +1,17 @@
 package core.framework.impl.scheduler;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class SecondlyTriggerTest {
+class SecondlyTriggerTest {
     @Test
-    public void delayInSeconds() {
+    void delayInSeconds() {
         SecondlyTrigger trigger = new SecondlyTrigger(null, null, 5);
         assertEquals(Duration.ZERO, trigger.delay(0, 0));
         assertEquals(Duration.ofNanos(999999500L), trigger.delay(4, 500));

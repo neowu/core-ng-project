@@ -2,30 +2,30 @@ package core.framework.impl.validate;
 
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Pattern;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class ObjectValidatorPatternTest {
-    ObjectValidator validator;
+class ObjectValidatorPatternTest {
+    private ObjectValidator validator;
 
-    @Before
-    public void createObjectValidator() {
+    @BeforeEach
+    void createObjectValidator() {
         validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
     }
 
     @Test
-    public void valid() {
+    void valid() {
         Bean bean = new Bean();
         bean.field1 = "abc-def";
 
@@ -35,7 +35,7 @@ public class ObjectValidatorPatternTest {
     }
 
     @Test
-    public void invalid() {
+    void invalid() {
         Bean bean = new Bean();
         bean.field1 = "ABC-DEF";
         bean.field2 = "a001";

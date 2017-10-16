@@ -1,15 +1,15 @@
 package core.framework.impl.web.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 /**
  * @author neo
  */
-public class WebServiceImplValidatorTest {
+class WebServiceImplValidatorTest {
     @Test
-    public void validate() {
+    void validate() {
         new WebServiceImplValidator<>(TestWebService.class, new TestWebServiceImpl()).validate();
     }
 

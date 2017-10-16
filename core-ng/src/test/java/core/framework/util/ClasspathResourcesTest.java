@@ -1,15 +1,16 @@
 package core.framework.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class ClasspathResourcesTest {
+class ClasspathResourcesTest {
     @Test
-    public void text() {
+    void text() {
         String text = ClasspathResources.text("classpath-resource-test/resource.txt");
-        Assert.assertEquals("value", text);
+        assertEquals("value", text);
     }
 }

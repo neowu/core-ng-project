@@ -1,13 +1,13 @@
 package core.framework.impl.search;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author neo
  */
-public class DocumentValidatorTest {
+class DocumentValidatorTest {
     @Test
-    public void validate() {
+    void validate() {
         DocumentValidator<TestDocument> validator = new DocumentValidator<>(TestDocument.class);
         TestDocument document = new TestDocument();
         document.stringField = "value";

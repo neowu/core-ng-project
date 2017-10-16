@@ -2,17 +2,17 @@ package core.framework.module;
 
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.module.ModuleContext;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author neo
  */
-public class DBConfigTest {
+class DBConfigTest {
     @Test
-    public void multipleDB() {
+    void multipleDB() {
         ModuleContext context = new ModuleContext(new BeanFactory(), null);
         DBConfig defaultDB1 = new DBConfig(context, null);
         DBConfig otherDB1 = new DBConfig(context, "other");

@@ -2,24 +2,24 @@ package core.framework.impl.web.response;
 
 import core.framework.web.CookieSpec;
 import io.undertow.server.handlers.CookieImpl;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class ResponseHandlerTest {
-    ResponseHandler responseHandler;
+class ResponseHandlerTest {
+    private ResponseHandler responseHandler;
 
-    @Before
-    public void createResponseHandler() {
+    @BeforeEach
+    void createResponseHandler() {
         responseHandler = new ResponseHandler(null, null);
     }
 
     @Test
-    public void cookie() {
+    void cookie() {
         CookieImpl cookie = responseHandler.cookie(new CookieSpec("test").secure(), "1=2");
         assertEquals("test", cookie.getName());
         assertEquals("1%3D2", cookie.getValue());
