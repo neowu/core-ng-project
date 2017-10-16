@@ -34,11 +34,23 @@ tasks.withType(FindBugs) {
     }
 }
 
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")
-        html.enabled false
-        csv.enabled false
+project.afterEvaluate {
+    def junitPlatformTestTask = project.tasks.getByName('junitPlatformTest')
+
+    jacoco {
+        toolVersion = '0.7.9'
+        applyTo junitPlatformTestTask
     }
+
+    project.task(type: JacocoReport, 'junitPlatformJacocoReport', {
+        executionData junitPlatformTestTask
+        sourceDirectories = files(sourceSets["main"].allSource.srcDirs)
+        classDirectories = files(sourceSets["main"].output)
+        reports {
+            xml.enabled true
+            xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")
+            html.enabled false
+            csv.enabled false
+        }
+    })
 }

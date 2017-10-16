@@ -7,6 +7,6 @@ cache:
     - gradle/node/node_modules
 script:
   - ./gradlew --build-cache clean build
-  - ./gradlew jacocoTestReport
+  - ./gradlew junitPlatformJacocoReport
 after_success:
   - bash <(curl -s https://codecov.io/bash)
