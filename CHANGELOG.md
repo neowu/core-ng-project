@@ -2,6 +2,7 @@
 ### 5.1.0 (10/13/2017 - )
 * test: updated to junit 5, for old tests before upgrading API, add following dependency 'junit:junit:4.12' 'org.junit.vintage:junit-vintage-engine:4.12.1'
         for integration test use "@ExtendWith(IntegrationExtension.class)" instead of @RunWith
+* search: update es to 5.6.3
 
 ### 5.0.0 (10/13/2017)
 * api: remove jaxb dependency, use our own @Property instead (jaxb will be deprecated by jdk9 and it has unnecessary java.desktop module dependency)
