@@ -32,7 +32,8 @@ subprojects {
     buildDir = "${rootDir}/build/${name}"
 
     dependencies {
-        testRuntime('org.junit.jupiter:junit-jupiter-engine:5.0.1')
+        testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.1'
+        testRuntime 'org.apiguardian:apiguardian-api:1.0.0'  // used by junit
     }
 
     afterEvaluate {

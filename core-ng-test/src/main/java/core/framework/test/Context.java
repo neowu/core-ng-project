@@ -1,6 +1,6 @@
 package core.framework.test;
 
-import core.framework.module.AbstractTestModule;
+import core.framework.test.module.AbstractTestModule;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

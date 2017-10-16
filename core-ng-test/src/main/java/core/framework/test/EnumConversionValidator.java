@@ -6,8 +6,8 @@ import core.framework.util.Strings;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * usually there is need to convert WS interface enum to domain enum and vise versa, this class is to validate 2 enum has consistent enum names
@@ -24,10 +24,10 @@ public class EnumConversionValidator {
         Set<String> values2 = enumValues(enumClass2);
 
         Set<String> diff1 = difference(values1, values2);
-        assertTrue(Strings.format("enum values from {} can not be converted to {}, values={}", enumClass1.getSimpleName(), enumClass2.getSimpleName(), diff1), diff1.isEmpty());
+        assertTrue(diff1.isEmpty(), Strings.format("enum values from {} can not be converted to {}, values={}", enumClass1.getSimpleName(), enumClass2.getSimpleName(), diff1));
 
         Set<String> diff2 = difference(values2, values1);
-        assertTrue(Strings.format("enum values from {} can not be converted to {}, values={}", enumClass2.getSimpleName(), enumClass1.getSimpleName(), diff2), diff2.isEmpty());
+        assertTrue(diff2.isEmpty(), Strings.format("enum values from {} can not be converted to {}, values={}", enumClass2.getSimpleName(), enumClass1.getSimpleName(), diff2));
     }
 
     private Set<String> enumValues(Class<? extends Enum<?>> enumClass1) {

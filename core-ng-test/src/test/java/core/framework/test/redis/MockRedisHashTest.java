@@ -1,26 +1,26 @@
 package core.framework.test.redis;
 
 import core.framework.util.Maps;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class MockRedisHashTest {
+class MockRedisHashTest {
     MockRedis redis;
 
-    @Before
-    public void createMockRedis() {
+    @BeforeEach
+    void createMockRedis() {
         redis = new MockRedis();
     }
 
     @Test
-    public void set() {
+    void set() {
         redis.hash().set("key4", "field1", "value1");
         assertEquals("value1", redis.hash().get("key4", "field1"));
 
@@ -30,7 +30,7 @@ public class MockRedisHashTest {
     }
 
     @Test
-    public void multiSet() {
+    void multiSet() {
         redis.hash().multiSet("key5", Maps.newHashMap("field1", "value1"));
         Map<String, String> hash = redis.hash().getAll("key5");
         assertEquals(1, hash.size());
@@ -44,7 +44,7 @@ public class MockRedisHashTest {
     }
 
     @Test
-    public void del() {
+    void del() {
         redis.hash().set("key1", "field1", "value1");
         redis.hash().set("key1", "field2", "value2");
         redis.hash().del("key1", "field1");

@@ -6,8 +6,8 @@ import core.framework.mongo.MongoCollection;
 import core.framework.test.IntegrationTest;
 import core.framework.util.Lists;
 import org.bson.types.ObjectId;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
@@ -17,27 +17,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class MongoIntegrationTest extends IntegrationTest {
+class MongoIntegrationTest extends IntegrationTest {
     @Inject
     MongoCollection<TestMongoEntity> testEntityCollection;
     @Inject
     Mongo mongo;
 
-    @After
-    public void cleanup() {
+    @AfterEach
+    void cleanup() {
         mongo.dropCollection("entity");
     }
 
     @Test
-    public void insert() {
+    void insert() {
         TestMongoEntity entity = new TestMongoEntity();
         entity.stringField = "string";
         entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("UTC"));
@@ -52,7 +52,7 @@ public class MongoIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    public void replace() {
+    void replace() {
         TestMongoEntity entity = new TestMongoEntity();
         entity.id = new ObjectId();
         entity.stringField = "value1";
@@ -69,7 +69,7 @@ public class MongoIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    public void search() {
+    void search() {
         TestMongoEntity entity = new TestMongoEntity();
         entity.id = new ObjectId();
         entity.stringField = "value";
@@ -82,7 +82,7 @@ public class MongoIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    public void searchByEnum() {
+    void searchByEnum() {
         TestMongoEntity entity = new TestMongoEntity();
         entity.id = new ObjectId();
         entity.stringField = "value";
@@ -97,7 +97,7 @@ public class MongoIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    public void bulkInsert() {
+    void bulkInsert() {
         List<TestMongoEntity> entities = testEntities();
         testEntityCollection.bulkInsert(entities);
 
@@ -111,7 +111,7 @@ public class MongoIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    public void bulkReplace() {
+    void bulkReplace() {
         List<TestMongoEntity> entities = testEntities();
         entities.forEach(entity -> entity.id = new ObjectId());
         testEntityCollection.bulkReplace(entities);
@@ -130,7 +130,7 @@ public class MongoIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    public void bulkDelete() {
+    void bulkDelete() {
         List<TestMongoEntity> entities = testEntities();
         testEntityCollection.bulkInsert(entities);
 

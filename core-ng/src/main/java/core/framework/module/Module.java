@@ -15,7 +15,7 @@ import java.util.Optional;
 public abstract class Module {
     private final Logger logger = LoggerFactory.getLogger(Module.class);
 
-    ModuleContext context;
+    protected ModuleContext context;
 
     protected void load(Module module) {
         logger.info("load module, module={}", module.getClass().getName());

@@ -1,13 +1,13 @@
 package core.framework.test;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author neo
  */
-public class EnumConversionValidatorTest {
+class EnumConversionValidatorTest {
     @Test
-    public void validate() {
+    void validate() {
         new EnumConversionValidator().validate(Enum1.class, Enum2.class);
     }
 

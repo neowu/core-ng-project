@@ -1,10 +1,8 @@
-package core.framework.module;
+package core.framework.test.module;
 
 import core.framework.impl.module.ModuleContext;
+import core.framework.module.Module;
 import core.framework.test.inject.TestBeanFactory;
-import core.framework.test.module.InitDBConfig;
-import core.framework.test.module.InitSearchConfig;
-import core.framework.test.module.MockFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +14,9 @@ import java.lang.reflect.Type;
 public abstract class AbstractTestModule extends Module {
     private final Logger logger = LoggerFactory.getLogger(AbstractTestModule.class);
 
-    public final void configure() {
+    public final void configure(TestBeanFactory beanFactory) {
         logger.info("initialize test context");
-        context = new ModuleContext(new TestBeanFactory(), new MockFactoryImpl());
+        context = new ModuleContext(beanFactory, new MockFactoryImpl());
 
         logger.info("initialize application");
         initialize();
@@ -32,10 +30,6 @@ public abstract class AbstractTestModule extends Module {
 
     public <T> T overrideBinding(Type type, String name, T instance) {
         return ((TestBeanFactory) context.beanFactory).overrideBinding(type, name, instance);
-    }
-
-    public <T> T create(Class<T> instanceClass) {
-        return context.beanFactory.create(instanceClass);
     }
 
     public InitDBConfig initDB() {

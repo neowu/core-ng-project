@@ -1,9 +1,9 @@
 package core.framework.test;
 
-import core.framework.module.AbstractTestModule;
 import core.framework.test.db.TestDBEntity;
 import core.framework.test.db.TestSequenceIdDBEntity;
 import core.framework.test.kafka.TestMessage;
+import core.framework.test.module.AbstractTestModule;
 import core.framework.test.mongo.TestMongoEntity;
 import core.framework.test.search.TestDocument;
 

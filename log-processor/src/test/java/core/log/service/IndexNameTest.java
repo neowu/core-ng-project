@@ -1,18 +1,19 @@
 package core.log.service;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.Month;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class IndexNameTest {
+class IndexNameTest {
     @Test
-    public void name() {
+    void name() {
         assertEquals("action-2016-01-15", IndexName.name("action", LocalDate.of(2016, Month.JANUARY, 15)));
     }
 }

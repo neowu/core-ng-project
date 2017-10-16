@@ -4,8 +4,8 @@ import core.framework.db.Database;
 import core.framework.db.Query;
 import core.framework.db.Repository;
 import core.framework.test.IntegrationTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
@@ -14,24 +14,24 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class MySQLIntegrationTest extends IntegrationTest {
+class MySQLIntegrationTest extends IntegrationTest {
     @Inject
     Database database;
     @Inject
     Repository<TestDBEntity> repository;
 
-    @Before
-    public void truncateTable() {
+    @BeforeEach
+    void truncateTable() {
         database.execute("TRUNCATE TABLE test_entity");
     }
 
     @Test
-    public void insert() {
+    void insert() {
         TestDBEntity entity = new TestDBEntity();
         entity.id = UUID.randomUUID().toString();
         entity.dateTimeField = LocalDateTime.now();
@@ -46,7 +46,7 @@ public class MySQLIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    public void select() {
+    void select() {
         for (int i = 0; i < 30; i++) {
             TestDBEntity entity = new TestDBEntity();
             entity.id = UUID.randomUUID().toString();

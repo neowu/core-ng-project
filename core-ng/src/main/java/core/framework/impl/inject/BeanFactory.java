@@ -84,7 +84,7 @@ public class BeanFactory {
         return instanceClass.cast(targetConstructor.newInstance(params));
     }
 
-    private <T> void inject(T instance) throws IllegalAccessException, InvocationTargetException {
+    public <T> void inject(T instance) throws IllegalAccessException, InvocationTargetException {
         Class<?> visitorType = instance.getClass();
         while (!visitorType.equals(Object.class)) {
             for (Field field : visitorType.getDeclaredFields()) {

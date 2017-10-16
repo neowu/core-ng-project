@@ -1,54 +1,35 @@
 package core.framework.test;
 
-import core.framework.module.AbstractTestModule;
-import core.framework.util.Exceptions;
+import core.framework.test.inject.TestBeanFactory;
+import core.framework.test.module.AbstractTestModule;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author neo
  */
-public final class TestManager {
-    private static final TestManager INSTANCE = new TestManager();
+final class TestManager {
+    private final TestBeanFactory beanFactory;
 
-    static TestManager get() {
-        return INSTANCE;
+    TestManager(Class<? extends AbstractTestModule> moduleClass) {
+        beanFactory = new TestBeanFactory();
+        initializeTestModule(moduleClass);
     }
 
-    private volatile AbstractTestModule testContext;
-    private volatile boolean initialized;
-
-    public synchronized void init(Class<?> testClass) {
-        if (initialized) {
-            if (testContext == null) {
-                throw new Error("test context failed to initialize, please check error message from previous integration test");
-            }
-        } else {
-            initialized = true;
-            testContext = initializeTestContext(testClass);
+    void injectTest(Object testInstance) {
+        try {
+            beanFactory.inject(testInstance);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new Error(e);
         }
     }
 
-    public Object createTest(Class<?> testClass) {
-        return testContext.create(testClass);
-    }
-
-    private AbstractTestModule initializeTestContext(Class<?> testClass) {
-        Context context = findContext(testClass);
+    private void initializeTestModule(Class<? extends AbstractTestModule> moduleClass) {
         try {
-            AbstractTestModule module = context.module().newInstance();
-            module.configure();
-            return module;
-        } catch (InstantiationException | IllegalAccessException e) {
+            AbstractTestModule module = moduleClass.getConstructor().newInstance();
+            module.configure(beanFactory);
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new Error("failed to create test context", e);
         }
-    }
-
-    private Context findContext(Class<?> testClass) {
-        Class<?> currentClass = testClass;
-        while (!currentClass.equals(Object.class)) {
-            Context context = currentClass.getDeclaredAnnotation(Context.class);
-            if (context != null) return context;
-            currentClass = currentClass.getSuperclass();
-        }
-        throw Exceptions.error("integration test must have @Context(module=), testClass={}", testClass.getCanonicalName());
     }
 }

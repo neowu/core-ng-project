@@ -9,19 +9,19 @@ import core.framework.util.Maps;
 import core.log.IntegrationTest;
 import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
-public class ActionServiceTest extends IntegrationTest {
+class ActionServiceTest extends IntegrationTest {
     @Inject
     ActionService actionService;
 
@@ -32,7 +32,7 @@ public class ActionServiceTest extends IntegrationTest {
     ElasticSearchType<TraceDocument> traceType;
 
     @Test
-    public void index() {
+    void index() {
         ActionLogMessage message1 = new ActionLogMessage();
         message1.id = "1";
         message1.date = Instant.now();

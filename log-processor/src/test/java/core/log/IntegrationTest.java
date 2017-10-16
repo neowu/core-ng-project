@@ -1,13 +1,13 @@
 package core.log;
 
 import core.framework.test.Context;
-import core.framework.test.IntegrationTestRunner;
-import org.junit.runner.RunWith;
+import core.framework.test.IntegrationExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author neo
  */
-@RunWith(IntegrationTestRunner.class)
+@ExtendWith(IntegrationExtension.class)
 @Context(module = TestModule.class)
 public abstract class IntegrationTest {
 

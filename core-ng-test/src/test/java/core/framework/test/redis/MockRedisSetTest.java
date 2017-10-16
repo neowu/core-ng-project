@@ -1,28 +1,28 @@
 package core.framework.test.redis;
 
 import core.framework.util.Sets;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
-public class MockRedisSetTest {
+class MockRedisSetTest {
     MockRedis redis;
 
-    @Before
-    public void createMockRedis() {
+    @BeforeEach
+    void createMockRedis() {
         redis = new MockRedis();
     }
 
     @Test
-    public void isMember() {
+    void isMember() {
         redis.set().add("key6", "value1");
 
         assertTrue(redis.set().isMember("key6", "value1"));
@@ -30,7 +30,7 @@ public class MockRedisSetTest {
     }
 
     @Test
-    public void members() {
+    void members() {
         redis.set().add("key1", "value1");
         redis.set().add("key1", "value2");
 

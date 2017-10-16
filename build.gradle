@@ -47,7 +47,6 @@ project(':core-ng-test') {
 
     dependencies {
         api project(":core-ng")
-        api 'junit:junit:4.12'
         api "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
         api 'org.hamcrest:java-hamcrest:2.0.0.0'
         api 'org.mockito:mockito-core:2.10.0'

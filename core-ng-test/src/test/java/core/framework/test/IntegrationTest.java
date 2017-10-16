@@ -1,11 +1,11 @@
 package core.framework.test;
 
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author neo
  */
-@RunWith(IntegrationTestRunner.class)
+@ExtendWith(IntegrationExtension.class)
 @Context(module = TestModule.class)
 public abstract class IntegrationTest {
 }
