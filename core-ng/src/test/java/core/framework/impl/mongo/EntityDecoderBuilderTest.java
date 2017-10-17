@@ -3,8 +3,9 @@ package core.framework.impl.mongo;
 import core.framework.util.ClasspathResources;
 import org.bson.json.JsonReader;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,11 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * @author neo
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EntityDecoderBuilderTest {
     private EntityDecoderBuilder<TestEntity> builder;
     private EntityDecoder<TestEntity> decoder;
 
-    @BeforeEach
+    @BeforeAll
     void createDecoder() {
         builder = new EntityDecoderBuilder<>(TestEntity.class);
         decoder = builder.build();

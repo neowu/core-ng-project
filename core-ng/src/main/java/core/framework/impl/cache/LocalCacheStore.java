@@ -59,16 +59,16 @@ public class LocalCacheStore implements CacheStore {
         });
     }
 
-    public static class CacheItem {
+    static class CacheItem {
         final byte[] value;
         final long expirationTime;
 
-        public CacheItem(byte[] value, long expirationTime) {
+        CacheItem(byte[] value, long expirationTime) {
             this.value = value;
             this.expirationTime = expirationTime;
         }
 
-        public boolean expired(long now) {
+        boolean expired(long now) {
             return now >= expirationTime;
         }
     }

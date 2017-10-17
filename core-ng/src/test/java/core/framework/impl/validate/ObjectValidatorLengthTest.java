@@ -3,8 +3,9 @@ package core.framework.impl.validate;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
 import core.framework.util.ClasspathResources;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.lang.reflect.Field;
 
@@ -17,11 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author neo
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ObjectValidatorLengthTest {
     private ObjectValidatorBuilder builder;
     private ObjectValidator validator;
 
-    @BeforeEach
+    @BeforeAll
     void createObjectValidator() {
         builder = new ObjectValidatorBuilder(Bean.class, Field::getName);
         validator = builder.build().get();

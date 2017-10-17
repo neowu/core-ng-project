@@ -24,7 +24,7 @@ class CacheImplTest {
     private CacheStore cacheStore;
 
     @BeforeEach
-    void prepare() {
+    void createCache() {
         cacheStore = Mockito.mock(CacheStore.class);
         cache = new CacheImpl<>("name", Integer.class, Duration.ofHours(1), cacheStore);
     }

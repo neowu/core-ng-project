@@ -9,8 +9,9 @@ import core.framework.util.Sets;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -23,11 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author neo
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EntityEncoderBuilderTest {
     private EntityEncoderBuilder<TestEntity> builder;
     private EntityEncoder<TestEntity> encoder;
 
-    @BeforeEach
+    @BeforeAll
     void createEncoder() {
         builder = new EntityEncoderBuilder<>(TestEntity.class);
         encoder = builder.build();

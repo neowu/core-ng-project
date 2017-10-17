@@ -37,7 +37,7 @@ project(':core-ng') {
         compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"   // used by elasticsearch
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
         testImplementation 'org.hamcrest:java-hamcrest:2.0.0.0'
-        testImplementation 'org.mockito:mockito-core:2.10.0'
+        testImplementation 'org.mockito:mockito-core:2.11.0'
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
     }
 }
@@ -49,7 +49,7 @@ project(':core-ng-test') {
         api project(":core-ng")
         api "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
         api 'org.hamcrest:java-hamcrest:2.0.0.0'
-        api 'org.mockito:mockito-core:2.10.0'
+        api 'org.mockito:mockito-core:2.11.0'
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "com.github.fakemongo:fongo:2.1.0@jar"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"

@@ -2,19 +2,21 @@ package core.framework.impl.mongo;
 
 import core.framework.util.ClasspathResources;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EntityIdHandlerBuilderTest {
     private EntityIdHandlerBuilder<TestEntity> builder;
     private EntityIdHandler<TestEntity> handler;
 
-    @BeforeEach
+    @BeforeAll
     void createEntityIdHandler() {
         builder = new EntityIdHandlerBuilder<>(TestEntity.class);
         handler = builder.build();
