@@ -16,14 +16,14 @@ import org.bson.types.ObjectId;
 /**
  * @author neo
  */
-public final class EntityCodec<T> implements CollectibleCodec<T> {
+final class EntityCodec<T> implements CollectibleCodec<T> {
     final EntityIdHandler<T> idHandler;
     private final Class<T> entityClass;
     private final EntityEncoder<T> encoder;
     private final EntityDecoder<T> decoder;
     private final IdGenerator idGenerator = new ObjectIdGenerator();
 
-    public EntityCodec(Class<T> entityClass, EntityIdHandler<T> idHandler, EntityEncoder<T> encoder, EntityDecoder<T> decoder) {
+    EntityCodec(Class<T> entityClass, EntityIdHandler<T> idHandler, EntityEncoder<T> encoder, EntityDecoder<T> decoder) {
         this.entityClass = entityClass;
         this.idHandler = idHandler;
         this.encoder = encoder;

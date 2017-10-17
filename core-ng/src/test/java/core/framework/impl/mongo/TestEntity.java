@@ -1,5 +1,6 @@
 package core.framework.impl.mongo;
 
+import core.framework.api.validate.NotNull;
 import core.framework.mongo.Collection;
 import core.framework.mongo.Field;
 import core.framework.mongo.Id;
@@ -20,6 +21,7 @@ public class TestEntity {
     @Id
     public ObjectId id;
 
+    @NotNull
     @Field(name = INT_FIELD)
     public Integer intField;
 
