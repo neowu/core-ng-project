@@ -1,5 +1,5 @@
 ## Change log
-### 5.1.0 (10/13/2017 - )
+### 5.1.0 (10/13/2017 - 10/16/2017)
 * test: updated to junit 5, for old tests before upgrading API, add following dependency 'junit:junit:4.12' 'org.junit.vintage:junit-vintage-engine:4.12.1'
         for integration test use "@ExtendWith(IntegrationExtension.class)" instead of @RunWith
 * search: update es to 5.6.3
