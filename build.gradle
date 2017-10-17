@@ -4,7 +4,7 @@ subprojects {
     apply from: file("${rootDir}/gradle/check.gradle")
 
     group = 'core.framework'
-    version = '5.1.0'
+    version = '5.1.1'
 }
 
 def mongoVersion = '3.5.0'
@@ -62,7 +62,7 @@ project(':core-ng-test') {
     }
 }
 
-def mavenURL = hasProperty('mavenURL') ? mavenURL : null    // used by 'gradlew -PmavenURL=/path clean publish'
+def mavenURL = hasProperty('mavenURL') ? mavenURL : null    // usage: "gradlew -PmavenURL=/path clean publish"
 
 configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
     apply plugin: 'maven-publish'
@@ -89,7 +89,7 @@ project(':log-processor') {
         compile project(':core-ng')
         compile "org.elasticsearch.client:transport:${elasticVersion}"
         compile "org.apache.kafka:kafka-clients:${kafkaVersion}"
-        runtime "org.apache.logging.log4j:log4j-api:${log4jVersion}"       // used by elasticsearch
+        runtime "org.apache.logging.log4j:log4j-api:${log4jVersion}"            // used by elasticsearch
         testCompile project(':core-ng-test')
         testRuntime "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
     }

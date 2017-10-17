@@ -36,10 +36,6 @@ public class BeanFactory {
             throw Exceptions.error("found duplicate bean, type={}, name={}, previous={}", type.getTypeName(), name, previous);
     }
 
-    public boolean registered(Type type, String name) {
-        return beans.containsKey(new Key(type, name));
-    }
-
     public <T> T bean(Type type, String name) {
         Key key = new Key(type, name);
         @SuppressWarnings("unchecked")

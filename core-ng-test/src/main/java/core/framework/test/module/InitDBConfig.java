@@ -19,11 +19,11 @@ public final class InitDBConfig {
     private final String name;
     private final Database database;
 
-    public InitDBConfig(ModuleContext context, String name) {
+    InitDBConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        if (!context.beanFactory.registered(Database.class, name)) {
-            throw Exceptions.error("db({}) is not configured, name={}", name == null ? "" : name);
+        if (context.config.db(name).database == null) {
+            throw Exceptions.error("db({}) is not configured", name == null ? "" : name);
         }
         database = context.beanFactory.bean(Database.class, name);
     }

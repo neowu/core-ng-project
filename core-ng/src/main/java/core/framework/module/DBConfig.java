@@ -133,7 +133,7 @@ public final class DBConfig {
     public static class State {
         public final List<Class<?>> entityClasses = Lists.newArrayList();
         final String name;
-        DatabaseImpl database;
+        public DatabaseImpl database;
         String url;
         boolean entityAdded;
 

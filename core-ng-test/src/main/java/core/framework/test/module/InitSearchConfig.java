@@ -14,7 +14,7 @@ public final class InitSearchConfig {
     private final ModuleContext context;
     private final ElasticSearch search;
 
-    public InitSearchConfig(ModuleContext context) {
+    InitSearchConfig(ModuleContext context) {
         this.context = context;
         if (context.config.search().search == null) {
             throw new Error("search() is not configured");
