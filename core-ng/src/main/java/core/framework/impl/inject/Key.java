@@ -21,7 +21,7 @@ public final class Key {
         if (object == null || getClass() != object.getClass()) return false;
         Key key = (Key) object;
         return Objects.equals(type, key.type)
-            && Objects.equals(name, key.name);
+                && Objects.equals(name, key.name);
     }
 
     @Override
@@ -31,6 +31,6 @@ public final class Key {
 
     @Override
     public String toString() {
-        return "Key{" + "type=" + type + ", name=" + name + '}';
+        return "Key{type=" + type + ", name=" + name + '}';
     }
 }

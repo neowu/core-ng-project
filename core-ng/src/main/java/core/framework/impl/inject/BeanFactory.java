@@ -23,13 +23,13 @@ import java.util.Map;
  * @author neo
  */
 public class BeanFactory {
-    final Map<Key, Object> beans = Maps.newHashMap();
+    private final Map<Key, Object> beans = Maps.newHashMap();
 
     public void bind(Type type, String name, Object instance) {
-        if (instance == null) throw new Error("instance is null");
+        if (instance == null) throw new Error("instance must not be null");
 
         if (!isTypeOf(instance, type))
-            throw Exceptions.error("instance type doesn't match, type={}, instanceType={}", type, instance.getClass());
+            throw Exceptions.error("instance type doesn't match, type={}, instanceType={}", type.getTypeName(), instance.getClass().getCanonicalName());
 
         Object previous = beans.put(new Key(type, name), instance);
         if (previous != null)
@@ -40,7 +40,7 @@ public class BeanFactory {
         Key key = new Key(type, name);
         @SuppressWarnings("unchecked")
         T bean = (T) beans.get(key);
-        if (bean == null) throw Exceptions.error("can not find bean, type={}, name={}", type, name);
+        if (bean == null) throw Exceptions.error("can not find bean, type={}, name={}", type.getTypeName(), name);
         return bean;
     }
 

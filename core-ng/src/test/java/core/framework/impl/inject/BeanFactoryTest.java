@@ -24,9 +24,9 @@ class BeanFactoryTest {
 
     @Test
     void create() {
-        beanFactory.beans.put(new Key(Dependency1.class, null), new Dependency1());
-        beanFactory.beans.put(new Key(Types.generic(Dependency2.class, String.class), "dep2"), new Dependency2<String>());
-        beanFactory.beans.put(new Key(Dependency3.class, null), new Dependency3());
+        beanFactory.bind(Dependency1.class, null, new Dependency1());
+        beanFactory.bind(Types.generic(Dependency2.class, String.class), "dep2", new Dependency2<String>());
+        beanFactory.bind(Dependency3.class, null, new Dependency3());
 
         Bean bean = beanFactory.create(Bean.class);
         assertNotNull(bean.dependency1);
@@ -42,15 +42,12 @@ class BeanFactoryTest {
     }
 
     static class Dependency1 {
-
     }
 
     static class Dependency2<T> {
-
     }
 
     static class Dependency3 {
-
     }
 
     static class Bean {

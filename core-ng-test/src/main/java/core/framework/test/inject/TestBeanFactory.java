@@ -42,6 +42,6 @@ public final class TestBeanFactory extends BeanFactory {
         Set<Key> notAppliedBindings = new HashSet<>(overrideBindings);
         notAppliedBindings.removeAll(skippedBindings);
         if (!notAppliedBindings.isEmpty())
-            throw Exceptions.error("found not applied override binding, please check test module, bindings={}", notAppliedBindings);
+            throw Exceptions.error("found unnecessary override bindings, please check test module, bindings={}", notAppliedBindings);
     }
 }
