@@ -34,7 +34,7 @@ project(':core-ng') {
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
-        compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"   // used by elasticsearch
+        compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"        // used by elasticsearch
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
         testImplementation 'org.hamcrest:java-hamcrest:2.0.0.0'
         testImplementation 'org.mockito:mockito-core:2.11.0'
@@ -55,7 +55,7 @@ project(':core-ng-test') {
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
         compileOnly "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
-        compileOnly 'org.apiguardian:apiguardian-api:1.0.0'  // used by junit
+        compileOnly 'org.apiguardian:apiguardian-api:1.0.0'                     // used by junit
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
         testRuntimeOnly 'com.vividsolutions:jts:1.13'                           // used by fongo
         testRuntimeOnly "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
