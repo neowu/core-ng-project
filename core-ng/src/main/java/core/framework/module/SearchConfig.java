@@ -18,7 +18,7 @@ public final class SearchConfig {
     private final ModuleContext context;
     private final State state;
 
-    public SearchConfig(ModuleContext context) {
+    SearchConfig(ModuleContext context) {
         this.context = context;
         state = context.config.search();
 

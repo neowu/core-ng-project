@@ -23,21 +23,19 @@ import java.util.function.Supplier;
  *
  * @author neo
  */
-public final class Pool<T> {
+public final class Pool<T extends AutoCloseable> {
     final BlockingDeque<PoolItem<T>> idleItems = new LinkedBlockingDeque<>();
     private final Logger logger = LoggerFactory.getLogger(Pool.class);
     private final AtomicInteger total = new AtomicInteger(0);
     private final Supplier<T> factory;
-    private final ResourceCloseHandler<T> closeHandler;
     private String name;
     private int minSize = 1;
     private int maxSize = 50;
     private Duration maxIdleTime = Duration.ofMinutes(30);
     private long checkoutTimeoutInMs = Duration.ofSeconds(30).toMillis();
 
-    public Pool(Supplier<T> factory, ResourceCloseHandler<T> closeHandler) {
+    public Pool(Supplier<T> factory) {
         this.factory = factory;
-        this.closeHandler = closeHandler;
     }
 
     public void name(String name) {
@@ -144,7 +142,7 @@ public final class Pool<T> {
 
     private void closeResource(T resource) {
         try {
-            closeHandler.close(resource);
+            resource.close();
         } catch (Exception e) {
             logger.warn("failed to close resource, pool={}", name, e);
         }

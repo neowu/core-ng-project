@@ -10,7 +10,7 @@ import core.framework.web.Controller;
 public final class RouteConfig {
     private final ModuleContext context;
 
-    public RouteConfig(ModuleContext context) {
+    RouteConfig(ModuleContext context) {
         this.context = context;
     }
 

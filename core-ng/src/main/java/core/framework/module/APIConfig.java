@@ -28,7 +28,7 @@ public final class APIConfig {
     private final ModuleContext context;
     private final State state;
 
-    public APIConfig(ModuleContext context) {
+    APIConfig(ModuleContext context) {
         this.context = context;
         state = context.config.api();
     }

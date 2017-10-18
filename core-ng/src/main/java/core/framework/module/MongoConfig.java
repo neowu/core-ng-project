@@ -17,7 +17,7 @@ public final class MongoConfig {
     private final String name;
     private final State state;
 
-    public MongoConfig(ModuleContext context, String name) {
+    MongoConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
         state = context.config.mongo(name);

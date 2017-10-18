@@ -24,7 +24,7 @@ public final class SiteConfig {
     private final ModuleContext context;
     private final State state;
 
-    public SiteConfig(ModuleContext context) {
+    SiteConfig(ModuleContext context) {
         this.context = context;
         state = context.config.site();
     }

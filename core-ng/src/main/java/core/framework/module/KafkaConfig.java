@@ -23,7 +23,7 @@ public final class KafkaConfig {
     private final String name;
     private final State state;
 
-    public KafkaConfig(ModuleContext context, String name) {
+    KafkaConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
         state = context.config.kafka(name);

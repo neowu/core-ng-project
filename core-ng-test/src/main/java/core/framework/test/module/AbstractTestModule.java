@@ -17,7 +17,6 @@ public abstract class AbstractTestModule extends Module {
     public final void configure(TestBeanFactory beanFactory) {
         logger.info("initialize test context");
         context = new ModuleContext(beanFactory, new MockFactoryImpl());
-
         logger.info("initialize application");
         initialize();
         context.config.validate();

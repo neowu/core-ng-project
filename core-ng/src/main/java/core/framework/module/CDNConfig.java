@@ -8,7 +8,7 @@ import core.framework.impl.module.ModuleContext;
 public final class CDNConfig {
     private final ModuleContext context;
 
-    public CDNConfig(ModuleContext context) {
+    CDNConfig(ModuleContext context) {
         this.context = context;
     }
 

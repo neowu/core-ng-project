@@ -19,7 +19,7 @@ public final class LogConfig {
     private final Logger logger = LoggerFactory.getLogger(LogConfig.class);
     private final ModuleContext context;
 
-    public LogConfig(ModuleContext context) {
+    LogConfig(ModuleContext context) {
         this.context = context;
     }
 

@@ -1,6 +1,6 @@
 ## Change log
 ### 5.1.1 (10/17/2017 - )
-
+* pool: refactor and simplify resource pool
 
 ### 5.1.0 (10/13/2017 - 10/16/2017)
 * test: updated to junit 5, for old tests before upgrading API, add following dependency 'junit:junit:4.12' 'org.junit.vintage:junit-vintage-engine:4.12.1'

@@ -23,7 +23,7 @@ public final class DBConfig {
     private final ModuleContext context;
     private final String name;
 
-    public DBConfig(ModuleContext context, String name) {
+    DBConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
         state = context.config.db(name);

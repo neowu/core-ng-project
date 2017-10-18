@@ -27,7 +27,7 @@ public final class CacheConfig {
     private final ModuleContext context;
     private final State state;
 
-    public CacheConfig(ModuleContext context) {
+    CacheConfig(ModuleContext context) {
         this.context = context;
         state = context.config.cache();
     }

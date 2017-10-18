@@ -22,7 +22,7 @@ import java.time.ZoneId;
 public final class SchedulerConfig {
     private final State state;
 
-    public SchedulerConfig(ModuleContext context) {
+    SchedulerConfig(ModuleContext context) {
         state = context.config.scheduler();
         if (state.scheduler == null) {
             state.scheduler = createScheduler(context);

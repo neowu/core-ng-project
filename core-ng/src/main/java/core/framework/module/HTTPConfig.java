@@ -12,7 +12,7 @@ public final class HTTPConfig {
     private final ModuleContext context;
     private final State state;
 
-    public HTTPConfig(ModuleContext context) {
+    HTTPConfig(ModuleContext context) {
         this.context = context;
         state = context.config.http();
     }

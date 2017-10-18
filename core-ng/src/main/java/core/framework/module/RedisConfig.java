@@ -13,7 +13,7 @@ public final class RedisConfig {
     private final ModuleContext context;
     private final State state;
 
-    public RedisConfig(ModuleContext context) {
+    RedisConfig(ModuleContext context) {
         this.context = context;
         state = context.config.redis();
 

@@ -43,7 +43,7 @@ public final class RedisImpl implements Redis {
     private Duration timeout;
 
     public RedisImpl() {
-        pool = new Pool<>(this::createClient, BinaryJedis::close);
+        pool = new Pool<>(this::createClient);
         pool.name("redis");
         pool.size(5, 50);
         pool.maxIdleTime(Duration.ofMinutes(30));

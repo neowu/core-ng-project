@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class PoolTest {
     @Test
     void borrowAndReturn() {
-        Pool<TestResource> pool = new Pool<>(TestResource::new, TestResource::close);
+        Pool<TestResource> pool = new Pool<>(TestResource::new);
 
         PoolItem<TestResource> item = pool.borrowItem();
         assertNotNull(item.resource);
@@ -24,7 +24,7 @@ class PoolTest {
 
     @Test
     void close() {
-        Pool<TestResource> pool = new Pool<>(TestResource::new, TestResource::close);
+        Pool<TestResource> pool = new Pool<>(TestResource::new);
 
         PoolItem<TestResource> item = pool.borrowItem();
         pool.returnItem(item);
