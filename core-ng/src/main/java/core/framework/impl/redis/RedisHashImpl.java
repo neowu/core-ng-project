@@ -19,7 +19,7 @@ public final class RedisHashImpl implements RedisHash {
     private final Logger logger = LoggerFactory.getLogger(RedisHashImpl.class);
     private final RedisImpl redis;
 
-    public RedisHashImpl(RedisImpl redis) {
+    RedisHashImpl(RedisImpl redis) {
         this.redis = redis;
     }
 

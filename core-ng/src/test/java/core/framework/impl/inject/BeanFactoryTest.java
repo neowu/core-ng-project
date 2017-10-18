@@ -7,9 +7,13 @@ import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author neo
@@ -32,6 +36,12 @@ class BeanFactoryTest {
         assertNotNull(bean.dependency1);
         assertNotNull(bean.dependency2);
         assertNotNull(bean.dependency3);
+    }
+
+    @Test
+    void bindWithMismatchedType() {
+        Error error = assertThrows(Error.class, () -> beanFactory.bind(List.class, null, "instance"));
+        assertThat(error.getMessage(), containsString("instance type does not match"));
     }
 
     @Test

@@ -28,7 +28,7 @@ public final class TransactionManager {
         this.pool = pool;
     }
 
-    public PoolItem<Connection> getConnection() {
+    PoolItem<Connection> getConnection() {
         PoolItem<Connection> connection = currentConnection.get();
         if (connection != null) {
             TransactionState state = currentTransactionState.get();
@@ -40,25 +40,12 @@ public final class TransactionManager {
         return getConnectionFromPool();
     }
 
-    public void releaseConnection(PoolItem<Connection> connection) {
+    void returnConnection(PoolItem<Connection> connection) {
         if (currentConnection.get() == null)
-            returnConnection(connection);
+            returnConnectionToPool(connection);
     }
 
-    private PoolItem<Connection> getConnectionFromPool() {
-        PoolItem<Connection> connection = pool.borrowItem();
-        try {
-            if (defaultIsolationLevel != null)
-                connection.resource.setTransactionIsolation(defaultIsolationLevel.level);
-            return connection;
-        } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
-            pool.returnItem(connection);
-            throw new UncheckedSQLException(e);
-        }
-    }
-
-    public Transaction beginTransaction() {
+    Transaction beginTransaction() {
         if (currentConnection.get() != null)
             throw new Error("nested transaction is not supported, please contact arch team");
 
@@ -77,7 +64,7 @@ public final class TransactionManager {
         return new TransactionImpl(this, longTransactionThresholdInNanos);
     }
 
-    public void commitTransaction() {
+    void commitTransaction() {
         PoolItem<Connection> connection = currentConnection.get();
         try {
             logger.debug("commit transaction");
@@ -89,7 +76,7 @@ public final class TransactionManager {
         }
     }
 
-    public void rollbackTransaction() {
+    void rollbackTransaction() {
         PoolItem<Connection> connection = currentConnection.get();
         try {
             logger.debug("rollback transaction");
@@ -101,7 +88,7 @@ public final class TransactionManager {
         }
     }
 
-    public void endTransaction() {
+    void endTransaction() {
         PoolItem<Connection> connection = currentConnection.get();
         TransactionState state = currentTransactionState.get();
         // clean up state first, to avoid ending up with unexpected state
@@ -117,11 +104,24 @@ public final class TransactionManager {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
-            returnConnection(connection);
+            returnConnectionToPool(connection);
         }
     }
 
-    private void returnConnection(PoolItem<Connection> connection) {
+    private PoolItem<Connection> getConnectionFromPool() {
+        PoolItem<Connection> connection = pool.borrowItem();
+        try {
+            if (defaultIsolationLevel != null)
+                connection.resource.setTransactionIsolation(defaultIsolationLevel.level);
+            return connection;
+        } catch (SQLException e) {
+            Connections.checkConnectionStatus(connection, e);
+            pool.returnItem(connection);
+            throw new UncheckedSQLException(e);
+        }
+    }
+
+    private void returnConnectionToPool(PoolItem<Connection> connection) {
         try {
             if (!connection.broken)
                 connection.resource.setAutoCommit(true);

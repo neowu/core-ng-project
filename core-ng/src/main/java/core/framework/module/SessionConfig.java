@@ -43,9 +43,8 @@ public final class SessionConfig {
         } else {
             logger.info("create redis session provider, host={}", host);
 
-            RedisImpl redis = new RedisImpl();
+            RedisImpl redis = new RedisImpl("redis-session");
             redis.host(host);
-            redis.pool.name("redis-session");
             context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
 
             context.shutdownHook.add(redis::close);

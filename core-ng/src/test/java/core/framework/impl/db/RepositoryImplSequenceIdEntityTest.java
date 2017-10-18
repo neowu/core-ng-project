@@ -24,7 +24,7 @@ class RepositoryImplSequenceIdEntityTest {
 
     @BeforeAll
     void createDatabase() {
-        database = new DatabaseImpl();
+        database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:seq;sql.syntax_ora=true");
         database.vendor = Vendor.ORACLE;
         database.execute("CREATE TABLE sequence_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), long_field BIGINT)");

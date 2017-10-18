@@ -34,8 +34,7 @@ public final class DBConfig {
     }
 
     private DatabaseImpl createDatabase() {
-        DatabaseImpl database = new DatabaseImpl();
-        database.pool.name("db" + (name == null ? "" : "-" + name));
+        DatabaseImpl database = new DatabaseImpl("db" + (name == null ? "" : "-" + name));
         context.shutdownHook.add(database::close);
         if (!context.isTest()) {
             context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(30));

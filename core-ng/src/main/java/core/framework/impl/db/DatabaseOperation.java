@@ -43,7 +43,7 @@ public class DatabaseOperation {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
-            transactionManager.releaseConnection(connection);
+            transactionManager.returnConnection(connection);
         }
     }
 
@@ -60,7 +60,7 @@ public class DatabaseOperation {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
-            transactionManager.releaseConnection(connection);
+            transactionManager.returnConnection(connection);
         }
     }
 
@@ -76,7 +76,7 @@ public class DatabaseOperation {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
-            transactionManager.releaseConnection(connection);
+            transactionManager.returnConnection(connection);
         }
     }
 
@@ -92,7 +92,7 @@ public class DatabaseOperation {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
-            transactionManager.releaseConnection(connection);
+            transactionManager.returnConnection(connection);
         }
     }
 
@@ -108,7 +108,7 @@ public class DatabaseOperation {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
-            transactionManager.releaseConnection(connection);
+            transactionManager.returnConnection(connection);
         }
     }
 

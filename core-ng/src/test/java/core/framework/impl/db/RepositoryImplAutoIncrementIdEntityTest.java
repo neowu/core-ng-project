@@ -28,7 +28,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
 
     @BeforeAll
     void createDatabase() {
-        database = new DatabaseImpl();
+        database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:mysql;sql.syntax_mys=true");
         database.vendor = Vendor.MYSQL;
         database.execute("CREATE TABLE auto_increment_id_entity (id INT AUTO_INCREMENT PRIMARY KEY, string_field VARCHAR(20), double_field DOUBLE, enum_field VARCHAR(10), date_time_field TIMESTAMP, zoned_date_time_field TIMESTAMP)");

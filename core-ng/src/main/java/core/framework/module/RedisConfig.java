@@ -27,7 +27,7 @@ public final class RedisConfig {
         if (context.isTest()) {
             redis = context.mockFactory.create(Redis.class);
         } else {
-            redis = new RedisImpl();
+            redis = new RedisImpl("redis");
             context.shutdownHook.add(((RedisImpl) redis)::close);
             context.backgroundTask().scheduleWithFixedDelay(((RedisImpl) redis).pool::refresh, Duration.ofMinutes(5));
         }

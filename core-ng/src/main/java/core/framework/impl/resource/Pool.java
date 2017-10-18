@@ -28,17 +28,14 @@ public final class Pool<T extends AutoCloseable> {
     private final Logger logger = LoggerFactory.getLogger(Pool.class);
     private final AtomicInteger total = new AtomicInteger(0);
     private final Supplier<T> factory;
-    private String name;
+    private final String name;
     private int minSize = 1;
     private int maxSize = 50;
     private Duration maxIdleTime = Duration.ofMinutes(30);
     private long checkoutTimeoutInMs = Duration.ofSeconds(30).toMillis();
 
-    public Pool(Supplier<T> factory) {
+    public Pool(Supplier<T> factory, String name) {
         this.factory = factory;
-    }
-
-    public void name(String name) {
         this.name = name;
     }
 

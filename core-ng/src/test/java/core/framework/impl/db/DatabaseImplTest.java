@@ -23,7 +23,7 @@ class DatabaseImplTest {
 
     @BeforeAll
     void createDatabase() {
-        database = new DatabaseImpl();
+        database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
         database.view(EntityView.class);
 

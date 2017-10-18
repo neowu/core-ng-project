@@ -29,7 +29,7 @@ public class BeanFactory {
         if (instance == null) throw new Error("instance must not be null");
 
         if (!isTypeOf(instance, type))
-            throw Exceptions.error("instance type doesn't match, type={}, instanceType={}", type.getTypeName(), instance.getClass().getCanonicalName());
+            throw Exceptions.error("instance type does not match, type={}, instanceType={}", type.getTypeName(), instance.getClass().getCanonicalName());
 
         Object previous = beans.put(new Key(type, name), instance);
         if (previous != null)

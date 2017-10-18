@@ -19,7 +19,7 @@ public final class RedisSetImpl implements RedisSet {
     private final Logger logger = LoggerFactory.getLogger(RedisSetImpl.class);
     private final RedisImpl redis;
 
-    public RedisSetImpl(RedisImpl redis) {
+    RedisSetImpl(RedisImpl redis) {
         this.redis = redis;
     }
 

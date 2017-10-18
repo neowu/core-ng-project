@@ -42,9 +42,8 @@ public final class RedisImpl implements Redis {
     private long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
     private Duration timeout;
 
-    public RedisImpl() {
-        pool = new Pool<>(this::createClient);
-        pool.name("redis");
+    public RedisImpl(String name) {
+        pool = new Pool<>(this::createClient, name);
         pool.size(5, 50);
         pool.maxIdleTime(Duration.ofMinutes(30));
         timeout(Duration.ofSeconds(5));
