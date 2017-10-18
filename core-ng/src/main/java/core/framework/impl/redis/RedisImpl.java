@@ -38,11 +38,13 @@ public final class RedisImpl implements Redis {
     private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
     private final RedisSet redisSet = new RedisSetImpl(this);
     private final RedisHash redisHash = new RedisHashImpl(this);
+    private final String name;
     private String host;
     private long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
     private Duration timeout;
 
     public RedisImpl(String name) {
+        this.name = name;
         pool = new Pool<>(this::createClient, name);
         pool.size(5, 50);
         pool.maxIdleTime(Duration.ofMinutes(30));
@@ -70,7 +72,7 @@ public final class RedisImpl implements Redis {
     }
 
     public void close() {
-        logger.info("close redis client, host={}", host);
+        logger.info("close redis client, name={}, host={}", name, host);
         pool.close();
     }
 
