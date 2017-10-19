@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @author neo
  */
 class LocalCacheStoreTest {
-    LocalCacheStore cacheStore;
+    private LocalCacheStore cacheStore;
 
     @BeforeEach
     void createLocalCacheStore() {
