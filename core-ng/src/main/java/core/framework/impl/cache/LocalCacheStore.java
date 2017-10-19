@@ -11,8 +11,8 @@ import java.util.Map;
  * @author neo
  */
 public class LocalCacheStore implements CacheStore {
+    final Map<String, CacheItem> caches = Maps.newConcurrentHashMap();
     private final Logger logger = LoggerFactory.getLogger(LocalCacheStore.class);
-    private final Map<String, CacheItem> caches = Maps.newConcurrentHashMap();
 
     @Override
     public byte[] get(String key) {

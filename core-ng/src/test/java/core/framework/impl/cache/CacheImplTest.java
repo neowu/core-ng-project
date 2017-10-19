@@ -9,8 +9,10 @@ import org.mockito.Mockito;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -30,7 +32,7 @@ class CacheImplTest {
     }
 
     @Test
-    void get() {
+    void hit() {
         when(cacheStore.get("name:key")).thenReturn(Strings.bytes("1"));
 
         Integer value = cache.get("key", key -> null);
@@ -38,7 +40,7 @@ class CacheImplTest {
     }
 
     @Test
-    void getIfMiss() {
+    void miss() {
         when(cacheStore.get("name:key")).thenReturn(null);
 
         Integer value = cache.get("key", key -> 1);
@@ -48,10 +50,26 @@ class CacheImplTest {
     }
 
     @Test
+    void get() {
+        when(cacheStore.get("name:key")).thenReturn(Strings.bytes("1"));
+
+        Optional<String> value = cache.get("key");
+        assertTrue(value.isPresent());
+        assertEquals("1", value.get());
+    }
+
+    @Test
     void put() {
         cache.put("key", 1);
 
         verify(cacheStore).put("name:key", Strings.bytes("1"), Duration.ofHours(1));
+    }
+
+    @Test
+    void evict() {
+        cache.evict("key");
+
+        verify(cacheStore).delete("name:key");
     }
 
     @Test
