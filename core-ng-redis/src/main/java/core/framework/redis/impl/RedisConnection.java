@@ -3,7 +3,6 @@ package core.framework.redis.impl;
 import core.framework.util.Charsets;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -20,28 +19,23 @@ public class RedisConnection implements AutoCloseable {
     private RedisInputStream inputStream;
     private int pipelinedCommands = 0;
 
-    public RedisConnection(String host, int port, int timeout) {
-        try {
-            socket = new Socket();
-            socket.setReuseAddress(true);
-            socket.setKeepAlive(true);
-            socket.setTcpNoDelay(true); // Socket buffer Whetherclosed, to ensure timely delivery of data
-            socket.setSoLinger(true, 0); // Control calls close () method, the underlying socket is closed immediately
-            socket.connect(new InetSocketAddress(host, port), timeout);
-            socket.setSoTimeout(timeout);
-            outputStream = new RedisOutputStream(socket.getOutputStream());
-            inputStream = new RedisInputStream(socket.getInputStream());
-        } catch (IOException ex) {
-            broken = true;
-            throw new UncheckedIOException(ex);
-        }
+    public RedisConnection(String host, int port, int timeout) throws IOException {
+        socket = new Socket();
+        socket.setReuseAddress(true);
+        socket.setKeepAlive(true);
+        socket.setTcpNoDelay(true); // Socket buffer whether closed, to ensure timely delivery of data
+        socket.setSoLinger(true, 0); // Control calls close () method, the underlying socket is closed immediately
+        socket.connect(new InetSocketAddress(host, port), timeout);
+        socket.setSoTimeout(timeout);
+        outputStream = new RedisOutputStream(socket.getOutputStream());
+        inputStream = new RedisInputStream(socket.getInputStream());
     }
 
-    public void sendCommand(final Protocol.Command cmd) {
+    public void sendCommand(final Protocol.Command cmd) throws IOException {
         sendCommand(cmd, EMPTY_ARGS);
     }
 
-    public void sendCommand(final Protocol.Command cmd, final byte[]... args) {
+    public void sendCommand(final Protocol.Command cmd, final byte[]... args) throws IOException {
         try {
             Protocol.sendCommand(outputStream, cmd, args);
             pipelinedCommands++;
@@ -51,24 +45,20 @@ public class RedisConnection implements AutoCloseable {
                 if (errorMessage != null && errorMessage.length() > 0) {
                     throw new RedisException(errorMessage, ex.getCause());
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
-            broken = true;
-            throw new UncheckedIOException(ex);
+            throw ex;
         }
     }
 
     @Override
     public void close() {
-        if (connected()) {
-            try {
-                outputStream.flush();
-            } catch (IOException ex) {
-                broken = true;
-                throw new RedisException(ex);
-            } finally {
-                closeQuietly(socket);
-            }
+        try {
+            outputStream.flush();
+        } catch (IOException ex) {
+            throw new RedisException(ex);
+        } finally {
+            closeQuietly(socket);
         }
     }
 
@@ -76,10 +66,10 @@ public class RedisConnection implements AutoCloseable {
         return socket.isBound() && !socket.isClosed() && socket.isConnected() && !socket.isInputShutdown() && !socket.isOutputShutdown();
     }
 
-    public String getStatusCodeReply() {
+    public String getStatusCodeReply() throws IOException {
         flush();
         pipelinedCommands--;
-        final byte[] resp = (byte[]) readResponse();
+        final byte[] resp = (byte[]) Protocol.read(inputStream);
         if (null == resp) {
             return null;
         } else {
@@ -87,61 +77,41 @@ public class RedisConnection implements AutoCloseable {
         }
     }
 
-    public String getBulkReply() {
-        final byte[] result = getBinaryBulkReply();
-        if (result != null) {
-            return new String(result, Charsets.UTF_8);
-        } else {
-            return null;
-        }
-    }
-
-    public byte[] getBinaryBulkReply() {
+    public byte[] getBinaryResponse() throws IOException {
         flush();
         pipelinedCommands--;
-        return (byte[]) readResponse();
+        return (byte[]) Protocol.read(inputStream);
     }
 
-    public Long getIntegerReply() {
+    public Long getLongReply() throws IOException {
         flush();
         pipelinedCommands--;
-        return (Long) readResponse();
+        return (Long) Protocol.read(inputStream);
     }
 
-    public List<byte[]> getBinaryMultiBulkReply() {
+    public List<byte[]> getMultiBinaryReply() throws IOException {
         flush();
         pipelinedCommands--;
-        return (List<byte[]>) readResponse();
+        return (List<byte[]>) Protocol.read(inputStream);
     }
 
     @SuppressWarnings("unchecked")
-    public List<Object> getRawObjectMultiBulkReply() {
-        return (List<Object>) readResponse();
-    }
-
-    public List<Object> getObjectMultiBulkReply() {
+    public List<Long> getIntegerMultiBulkReply() throws IOException {
         flush();
         pipelinedCommands--;
-        return getRawObjectMultiBulkReply();
+        return (List<Long>) Protocol.read(inputStream);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Long> getIntegerMultiBulkReply() {
-        flush();
-        pipelinedCommands--;
-        return (List<Long>) readResponse();
-    }
-
-    public List<Object> getAll() {
+    public List<Object> getAll() throws IOException {
         return getAll(0);
     }
 
-    public List<Object> getAll(int except) {
+    public List<Object> getAll(int except) throws IOException {
         List<Object> all = new ArrayList<Object>();
         flush();
         while (pipelinedCommands > except) {
             try {
-                all.add(readResponse());
+                all.add(Protocol.read(inputStream));
             } catch (RedisException e) {
                 all.add(e);
             }
@@ -150,34 +120,14 @@ public class RedisConnection implements AutoCloseable {
         return all;
     }
 
-    public Object getOne() {
+    public Object getOne() throws IOException {
         flush();
         pipelinedCommands--;
-        return readResponse();
+        return Protocol.read(inputStream);
     }
 
-    public boolean isBroken() {
-        return broken;
-    }
-
-    protected void flush() {
-        try {
-            outputStream.flush();
-        } catch (IOException ex) {
-            broken = true;
-            throw new RedisException(ex);
-        }
-    }
-
-    protected Object readResponse() {
-        try {
-            return Protocol.read(inputStream);
-        } catch (RedisException exc) {
-            throw exc;
-        } catch (IOException e) {
-            broken = true;
-            throw new UncheckedIOException(e);
-        }
+    protected void flush() throws IOException {
+        outputStream.flush();
     }
 
     private void closeQuietly(Socket sock) {
