@@ -42,13 +42,6 @@ project(':core-ng') {
     }
 }
 
-project(':core-ng-redis') {
-    apply from: file("${rootDir}/gradle/lib.gradle")
-    dependencies {
-        implementation project(":core-ng")
-    }
-}
-
 project(':core-ng-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
 

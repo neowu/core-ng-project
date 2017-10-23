@@ -7,7 +7,7 @@
  * for the specific language governing permissions and limitations under the License.
  */
 
-package core.framework.redis.impl;
+package core.framework.impl.redis.v2;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;

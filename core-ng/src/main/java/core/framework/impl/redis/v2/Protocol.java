@@ -1,4 +1,4 @@
-package core.framework.redis.impl;
+package core.framework.impl.redis.v2;
 
 import core.framework.util.ASCII;
 import core.framework.util.Strings;

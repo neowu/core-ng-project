@@ -1,77 +1,90 @@
-package core.framework.redis.impl;
+package core.framework.impl.redis.v2;
+
+import core.framework.impl.resource.Pool;
+import core.framework.impl.resource.PoolItem;
+import core.framework.log.ActionLogContext;
+import core.framework.log.Markers;
+import core.framework.util.Charsets;
+import core.framework.util.StopWatch;
+import core.framework.util.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.time.Duration;
 
 /**
  * @author neo
  */
-//public final class RedisImpl implements Redis {
-//    private static final byte[] NX = Strings.bytes("NX");
-//    private static final byte[] EX = Strings.bytes("EX");
-//    public final Pool<RedisConnection> pool;
-//    private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
-//    private final String name;
-//    private String host;
-//    private long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
-//    private Duration timeout;
-//
-//    public RedisImpl(String name) {
-//        this.name = name;
-//        pool = new Pool<>(this::createConnection, name);
-//        pool.size(5, 50);
-//        pool.maxIdleTime(Duration.ofMinutes(30));
-//        timeout(Duration.ofSeconds(5));
-//    }
-//
-//    public void host(String host) {
-//        this.host = host;
-//    }
-//
-//    public void timeout(Duration timeout) {
-//        this.timeout = timeout;
-//        pool.checkoutTimeout(timeout);
-//    }
-//
-//    public void slowOperationThreshold(Duration slowOperationThreshold) {
-//        slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
-//    }
-//
-//    private RedisConnection createConnection() {
-//        if (host == null) throw new Error("redis.host must not be null");
-//        try {
-//            return new RedisConnection(host, Protocol.DEFAULT_PORT, (int) timeout.toMillis());
-//        } catch (IOException e) {
-//            throw new UncheckedIOException(e);
-//        }
-//    }
-//
-//    public void close() {
-//        logger.info("close redis client, name={}, host={}", name, host);
-//        pool.close();
-//    }
-//
-//    @Override
-//    public String get(String key) {
-//        return decode(getBytes(key));
-//    }
-//
-//    public byte[] getBytes(String key) {
-//        StopWatch watch = new StopWatch();
-//        PoolItem<RedisConnection> item = pool.borrowItem();
-//        try {
-//            RedisConnection connection = item.resource;
-//            connection.sendCommand(Protocol.Command.GET, encode(key));
-//            return connection.getBinaryResponse();
-//        } catch (IOException e) {
-//            item.broken = true;
-//            throw e;
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("get, key={}, elapsedTime={}", key, elapsedTime);
-//            checkSlowOperation(elapsedTime);
-//        }
-//    }
-//
+public class RedisImplV2 {
+    private static final byte[] NX = Strings.bytes("NX");
+    private static final byte[] EX = Strings.bytes("EX");
+    public final Pool<RedisConnection> pool;
+    private final Logger logger = LoggerFactory.getLogger(core.framework.impl.redis.RedisImpl.class);
+    private final String name;
+    private String host;
+    private long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
+    private Duration timeout;
+
+    public RedisImplV2(String name) {
+        this.name = name;
+        pool = new Pool<>(this::createConnection, name);
+        pool.size(5, 50);
+        pool.maxIdleTime(Duration.ofMinutes(30));
+        timeout(Duration.ofSeconds(5));
+    }
+
+    public void host(String host) {
+        this.host = host;
+    }
+
+    public void timeout(Duration timeout) {
+        this.timeout = timeout;
+        pool.checkoutTimeout(timeout);
+    }
+
+    public void slowOperationThreshold(Duration slowOperationThreshold) {
+        slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
+    }
+
+    private RedisConnection createConnection() {
+        if (host == null) throw new Error("redis.host must not be null");
+        try {
+            return new RedisConnection(host, Protocol.DEFAULT_PORT, (int) timeout.toMillis());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public void close() {
+        logger.info("close redis client, name={}, host={}", name, host);
+        pool.close();
+    }
+
+    public String get(String key) {
+        return decode(getBytes(key));
+    }
+
+    public byte[] getBytes(String key) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.sendCommand(Protocol.Command.GET, encode(key));
+            return connection.getBinaryResponse();
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("get, key={}, elapsedTime={}", key, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
 //    @Override
 //    public void set(String key, String value) {
 //        StopWatch watch = new StopWatch();
@@ -89,7 +102,7 @@ package core.framework.redis.impl;
 //            checkSlowOperation(elapsedTime);
 //        }
 //    }
-//
+
 //    @Override
 //    public void set(String key, String value, Duration expiration) {
 //        set(key, encode(value), expiration);
@@ -289,28 +302,28 @@ package core.framework.redis.impl;
 //            logger.debug("forEach, pattern={}, count={}, elapsedTime={}", pattern, count, elapsedTime);
 //        }
 //    }
-//
-//    byte[] encode(String value) {   // redis does not accept null
-//        return Strings.bytes(value);
-//    }
-//
-//    byte[][] encode(String[] values) {
-//        int size = values.length;
-//        byte[][] redisValues = new byte[size][];
-//        for (int i = 0; i < size; i++) {
-//            redisValues[i] = encode(values[i]);
-//        }
-//        return redisValues;
-//    }
-//
-//    String decode(byte[] value) {
-//        if (value == null) return null;
-//        return new String(value, Charsets.UTF_8);
-//    }
-//
-//    void checkSlowOperation(long elapsedTime) {
-//        if (elapsedTime > slowOperationThresholdInNanos) {
-//            logger.warn(Markers.errorCode("SLOW_REDIS"), "slow redis operation, elapsedTime={}", elapsedTime);
-//        }
-//    }
-//}
+
+    byte[] encode(String value) {   // redis does not accept null
+        return Strings.bytes(value);
+    }
+
+    byte[][] encode(String[] values) {
+        int size = values.length;
+        byte[][] redisValues = new byte[size][];
+        for (int i = 0; i < size; i++) {
+            redisValues[i] = encode(values[i]);
+        }
+        return redisValues;
+    }
+
+    String decode(byte[] value) {
+        if (value == null) return null;
+        return new String(value, Charsets.UTF_8);
+    }
+
+    void checkSlowOperation(long elapsedTime) {
+        if (elapsedTime > slowOperationThresholdInNanos) {
+            logger.warn(Markers.errorCode("SLOW_REDIS"), "slow redis operation, elapsedTime={}", elapsedTime);
+        }
+    }
+}
