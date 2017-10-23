@@ -2,7 +2,9 @@
 ### 5.1.1 (10/17/2017 - )
 * pool: refactor and simplify resource pool
 * web: @QueryParam bean validation to disallow @Property
-
+* httpClient: changed httpClient to interface, to make it easier to mock/override binding, change HTTPRequest to bean style from builder style
+              you need to update the binding to "bind(HTTPClient.class, new HTTPClientBuilder().build())"
+              
 ### 5.1.0 (10/13/2017 - 10/16/2017)
 * test: updated to junit 5, for old tests before upgrading API, add following dependency 'junit:junit:4.12' 'org.junit.vintage:junit-vintage-engine:4.12.1'
         for integration test use "@ExtendWith(IntegrationExtension.class)" instead of @RunWith

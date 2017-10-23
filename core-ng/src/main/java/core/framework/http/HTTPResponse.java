@@ -16,7 +16,7 @@ public final class HTTPResponse {
     private final Map<String, String> headers;
     private final byte[] body;
 
-    HTTPResponse(HTTPStatus status, Map<String, String> headers, byte[] body) {
+    public HTTPResponse(HTTPStatus status, Map<String, String> headers, byte[] body) {
         this.status = status;
         this.headers = headers;
         this.body = body;

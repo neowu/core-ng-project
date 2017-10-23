@@ -1,11 +1,9 @@
 package core.framework.http;
 
-import core.framework.impl.log.LogParam;
 import core.framework.util.Charsets;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ByteArrayEntity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import core.framework.util.Maps;
+
+import java.util.Map;
 
 /**
  * @author neo
@@ -27,43 +25,61 @@ public final class HTTPRequest {
         return new HTTPRequest(HTTPMethod.DELETE, uri);
     }
 
-    final RequestBuilder builder;
-    private final Logger logger = LoggerFactory.getLogger(HTTPRequest.class);
+    private final String uri;
+    private final HTTPMethod method;
+    private final Map<String, String> headers = Maps.newLinkedHashMap();
+    private final Map<String, String> params = Maps.newLinkedHashMap();
+    private ContentType contentType;
+    private byte[] body;
 
     public HTTPRequest(HTTPMethod method, String uri) {
-        logger.debug("[request] method={}, uri={}", method, uri);
-        try {
-            builder = RequestBuilder.create(method.name()).setUri(uri);
-        } catch (IllegalArgumentException e) {
-            throw new HTTPClientException(e.getMessage(), "INVALID_URL", e);
-        }
+        this.method = method;
+        this.uri = uri;
     }
 
-    public HTTPRequest accept(ContentType contentType) {
-        return header(HTTPHeaders.ACCEPT, contentType.toString());
+    public String uri() {
+        return uri;
     }
 
-    public HTTPRequest header(String name, String value) {
-        logger.debug("[request:header] {}={}", name, value);
-        builder.setHeader(name, value);
-        return this;
+    public HTTPMethod method() {
+        return method;
     }
 
-    public HTTPRequest addParam(String name, String value) {
-        logger.debug("[request:param] {}={}", name, value);
-        builder.addParameter(name, value);
-        return this;
+    public Map<String, String> headers() {
+        return headers;
     }
 
-    public HTTPRequest body(String body, ContentType contentType) {
+    public void accept(ContentType contentType) {
+        header(HTTPHeaders.ACCEPT, contentType.toString());
+    }
+
+    public void header(String name, String value) {
+        headers.put(name, value);
+    }
+
+    public Map<String, String> params() {
+        return params;
+    }
+
+    public void addParam(String name, String value) {
+        params.put(name, value);
+    }
+
+    public byte[] body() {
+        return body;
+    }
+
+    public void body(String body, ContentType contentType) {
         byte[] bytes = body.getBytes(contentType.charset().orElse(Charsets.UTF_8));
-        return body(bytes, contentType);
+        body(bytes, contentType);
     }
 
-    public HTTPRequest body(byte[] body, ContentType contentType) {
-        logger.debug("[request] contentType={}, body={}", contentType, LogParam.of(body));
-        org.apache.http.entity.ContentType type = org.apache.http.entity.ContentType.create(contentType.mediaType(), contentType.charset().orElse(null));
-        builder.setEntity(new ByteArrayEntity(body, type));
-        return this;
+    public void body(byte[] body, ContentType contentType) {
+        this.body = body;
+        this.contentType = contentType;
+    }
+
+    public ContentType contentType() {
+        return contentType;
     }
 }

@@ -9,36 +9,30 @@ import core.framework.util.Maps;
 import core.framework.validate.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 /**
  * @author neo
  */
 class WebServiceClientTest {
     private WebServiceClient webServiceClient;
-    @Mock
-    private HTTPRequest request;
 
     @BeforeEach
     void createWebServiceClient() {
-        MockitoAnnotations.initMocks(this);
-
         webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(), null);
     }
 
     @Test
     void addQueryParams() {
+        HTTPRequest request = new HTTPRequest(HTTPMethod.POST, "/");
+
         Map<String, String> params = Maps.newLinkedHashMap();
         params.put("p1", "v1");
         params.put("p2", null);
@@ -46,9 +40,9 @@ class WebServiceClientTest {
 
         webServiceClient.addQueryParams(request, params);
 
-        verify(request, times(1)).addParam("p1", "v1");
-        verify(request, never()).addParam("p2", null);
-        verify(request, times(1)).addParam("p3", "v3");
+        assertEquals(2, request.params().size());
+        assertEquals("v1", request.params().get("p1"));
+        assertEquals("v3", request.params().get("p3"));
     }
 
     @Test
@@ -70,19 +64,25 @@ class WebServiceClientTest {
 
     @Test
     void addRequestBeanWithGet() {
+        HTTPRequest request = new HTTPRequest(HTTPMethod.POST, "/");
+
         TestWebService.TestSearchRequest requestBean = new TestWebService.TestSearchRequest();
         requestBean.intField = 23;
         webServiceClient.addRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
 
-        verify(request).addParam("int_field", "23");
+        assertEquals(1, request.params().size());
+        assertEquals("23", request.params().get("int_field"));
     }
 
     @Test
     void addRequestBeanWithPost() {
+        HTTPRequest request = new HTTPRequest(HTTPMethod.POST, "/");
+
         TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "value";
         webServiceClient.addRequestBean(request, HTTPMethod.POST, TestWebService.TestRequest.class, requestBean);
 
-        verify(request).body(JSONMapper.toJSON(requestBean), ContentType.APPLICATION_JSON);
+        assertArrayEquals(JSONMapper.toJSON(requestBean), request.body());
+        assertEquals(ContentType.APPLICATION_JSON, request.contentType());
     }
 }
