@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public final class HTTPClient {
+public class HTTPClient {
     private static final Map<Integer, HTTPStatus> HTTP_STATUSES;
 
     static {
