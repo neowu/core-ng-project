@@ -1,5 +1,6 @@
 package core.framework.impl.web.bean;
 
+import core.framework.api.json.Property;
 import core.framework.api.web.service.QueryParam;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
@@ -51,6 +52,10 @@ final class QueryParamBeanTypeValidator implements TypeVisitor {
         QueryParam queryParam = field.getDeclaredAnnotation(QueryParam.class);
         if (queryParam == null)
             throw Exceptions.error("field must have @QueryParam, field={}", Fields.path(field));
+
+        Property property = field.getDeclaredAnnotation(Property.class);
+        if (property != null)
+            throw Exceptions.error("field must not have @Property, field={}", Fields.path(field));
 
         String name = queryParam.name();
 
