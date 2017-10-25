@@ -1,25 +1,21 @@
 package core.framework.impl.redis.v2;
 
-import core.framework.util.Charsets;
-
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author neo
  */
-public class RedisConnection implements AutoCloseable {
+class RedisConnection implements AutoCloseable {
     private static final byte[][] EMPTY_ARGS = new byte[0][];
 
     private final Socket socket;
-    private RedisOutputStream outputStream;
-    private RedisInputStream inputStream;
-    private int pipelinedCommands = 0;
+    private final OutputStream outputStream;
+    private final RedisInputStream inputStream;
 
-    public RedisConnection(String host, int port, int timeout) throws IOException {
+    RedisConnection(String host, int port, int timeout) throws IOException {
         socket = new Socket();
         socket.setReuseAddress(true);
         socket.setKeepAlive(true);
@@ -27,116 +23,56 @@ public class RedisConnection implements AutoCloseable {
         socket.setSoLinger(true, 0); // Control calls close () method, the underlying socket is closed immediately
         socket.connect(new InetSocketAddress(host, port), timeout);
         socket.setSoTimeout(timeout);
-        outputStream = new RedisOutputStream(socket.getOutputStream());
+        outputStream = socket.getOutputStream();
         inputStream = new RedisInputStream(socket.getInputStream());
     }
 
-    public void sendCommand(final Protocol.Command cmd) throws IOException {
-        sendCommand(cmd, EMPTY_ARGS);
+    void sendRequest(Protocol.Command command) throws IOException {
+        sendRequest(command, EMPTY_ARGS);
     }
 
-    public void sendCommand(final Protocol.Command cmd, final byte[]... args) throws IOException {
+    void sendRequest(Protocol.Command command, byte[]... arguments) throws IOException {
         try {
-            Protocol.sendCommand(outputStream, cmd, args);
-            pipelinedCommands++;
-        } catch (IOException ex) {
+            byte[] request = Protocol.request(command, arguments);
+            outputStream.write(request);
+        } catch (IOException e) {
             try {
-                String errorMessage = Protocol.readErrorLineIfPossible(inputStream);
+                String errorMessage = Protocol.readErrorIfPossible(inputStream);
                 if (errorMessage != null && errorMessage.length() > 0) {
-                    throw new RedisException(errorMessage, ex.getCause());
+                    throw new IOException(errorMessage, e);
                 }
             } catch (Exception ignored) {
             }
-            throw ex;
+            throw e;
         }
     }
 
     @Override
-    public void close() {
-        try {
-            outputStream.flush();
-        } catch (IOException ex) {
-            throw new RedisException(ex);
-        } finally {
-            closeQuietly(socket);
-        }
+    public void close() throws IOException {
+        socket.close();
     }
 
-    private boolean connected() {
-        return socket.isBound() && !socket.isClosed() && socket.isConnected() && !socket.isInputShutdown() && !socket.isOutputShutdown();
+    String getSimpleStringResponse() throws IOException {
+        Object response = Protocol.response(inputStream);
+        if (response instanceof Protocol.Error) throw new RedisException(((Protocol.Error) response).message);
+        return (String) response;
     }
 
-    public String getStatusCodeReply() throws IOException {
-        flush();
-        pipelinedCommands--;
-        final byte[] resp = (byte[]) Protocol.read(inputStream);
-        if (null == resp) {
-            return null;
-        } else {
-            return new String(resp, Charsets.UTF_8);
-        }
+    byte[] getBulkStringResponse() throws IOException {
+        Object response = Protocol.response(inputStream);
+        if (response instanceof Protocol.Error) throw new RedisException(((Protocol.Error) response).message);
+        return (byte[]) response;
     }
 
-    public byte[] getBinaryResponse() throws IOException {
-        flush();
-        pipelinedCommands--;
-        return (byte[]) Protocol.read(inputStream);
+    Long getLongResponse() throws IOException {
+        Object response = Protocol.response(inputStream);
+        if (response instanceof Protocol.Error) throw new RedisException(((Protocol.Error) response).message);
+        return (Long) response;
     }
 
-    public Long getLongReply() throws IOException {
-        flush();
-        pipelinedCommands--;
-        return (Long) Protocol.read(inputStream);
-    }
-
-    public List<byte[]> getMultiBinaryReply() throws IOException {
-        flush();
-        pipelinedCommands--;
-        return (List<byte[]>) Protocol.read(inputStream);
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<Long> getIntegerMultiBulkReply() throws IOException {
-        flush();
-        pipelinedCommands--;
-        return (List<Long>) Protocol.read(inputStream);
-    }
-
-    public List<Object> getAll() throws IOException {
-        return getAll(0);
-    }
-
-    public List<Object> getAll(int except) throws IOException {
-        List<Object> all = new ArrayList<Object>();
-        flush();
-        while (pipelinedCommands > except) {
-            try {
-                all.add(Protocol.read(inputStream));
-            } catch (RedisException e) {
-                all.add(e);
-            }
-            pipelinedCommands--;
-        }
-        return all;
-    }
-
-    public Object getOne() throws IOException {
-        flush();
-        pipelinedCommands--;
-        return Protocol.read(inputStream);
-    }
-
-    protected void flush() throws IOException {
-        outputStream.flush();
-    }
-
-    private void closeQuietly(Socket sock) {
-        if (sock != null) {
-            try {
-                sock.close();
-            } catch (IOException e) {
-                // ignored
-            }
-        }
+    Object[] getArrayResponse() throws IOException {
+        Object response = Protocol.response(inputStream);
+        if (response instanceof Protocol.Error) throw new RedisException(((Protocol.Error) response).message);
+        return (Object[]) response;
     }
 }

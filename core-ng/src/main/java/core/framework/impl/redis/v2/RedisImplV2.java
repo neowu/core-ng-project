@@ -1,10 +1,15 @@
 package core.framework.impl.redis.v2;
 
+import core.framework.impl.log.LogParam;
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
+import core.framework.redis.Redis;
+import core.framework.redis.RedisHash;
+import core.framework.redis.RedisSet;
 import core.framework.util.Charsets;
+import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
@@ -13,11 +18,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author neo
  */
-public class RedisImplV2 {
+public class RedisImplV2 implements Redis {
     private static final byte[] NX = Strings.bytes("NX");
     private static final byte[] EX = Strings.bytes("EX");
     public final Pool<RedisConnection> pool;
@@ -62,6 +69,7 @@ public class RedisImplV2 {
         pool.close();
     }
 
+    @Override
     public String get(String key) {
         return decode(getBytes(key));
     }
@@ -71,8 +79,8 @@ public class RedisImplV2 {
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.sendCommand(Protocol.Command.GET, encode(key));
-            return connection.getBinaryResponse();
+            connection.sendRequest(Protocol.Command.GET, encode(key));
+            return connection.getBulkStringResponse();
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -85,223 +93,244 @@ public class RedisImplV2 {
         }
     }
 
-//    @Override
-//    public void set(String key, String value) {
-//        StopWatch watch = new StopWatch();
-//        PoolItem<BinaryJedis> item = pool.borrowItem();
-//        try {
-//            item.resource.set(encode(key), encode(value));
-//        } catch (JedisConnectionException e) {
-//            item.broken = true;
-//            throw e;
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("set, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
-//            checkSlowOperation(elapsedTime);
-//        }
-//    }
+    @Override
+    public void set(String key, String value) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.sendRequest(Protocol.Command.SET, encode(key), encode(value));
+            connection.getSimpleStringResponse();
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("set, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
 
-//    @Override
-//    public void set(String key, String value, Duration expiration) {
-//        set(key, encode(value), expiration);
-//    }
-//
-//    public void set(String key, byte[] value, Duration expiration) {
-//        StopWatch watch = new StopWatch();
-//        PoolItem<BinaryJedis> item = pool.borrowItem();
-//        try {
-//            item.resource.setex(encode(key), (int) expiration.getSeconds(), value);
-//        } catch (JedisConnectionException e) {
-//            item.broken = true;
-//            throw e;
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("set, key={}, value={}, expiration={}, elapsedTime={}", key, LogParam.of(value), expiration, elapsedTime);
-//            checkSlowOperation(elapsedTime);
-//        }
-//    }
-//
-//    @Override
-//    public RedisSet set() {
-//        return redisSet;
-//    }
-//
-//    @Override
-//    public boolean setIfAbsent(String key, String value, Duration expiration) {
-//        StopWatch watch = new StopWatch();
-//        PoolItem<BinaryJedis> item = pool.borrowItem();
-//        try {
-//            String result = item.resource.set(encode(key), encode(value), NX, EX, expiration.getSeconds());
-//            return "OK".equals(result);
-//        } catch (JedisConnectionException e) {
-//            item.broken = true;
-//            throw e;
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("setIfAbsent, key={}, value={}, expiration={}, elapsedTime={}", key, value, expiration, elapsedTime);
-//            checkSlowOperation(elapsedTime);
-//        }
-//    }
-//
-//    @Override
-//    public void expire(String key, Duration duration) {
-//        StopWatch watch = new StopWatch();
-//        PoolItem<BinaryJedis> item = pool.borrowItem();
-//        try {
-//            item.resource.expire(encode(key), (int) duration.getSeconds());
-//        } catch (JedisConnectionException e) {
-//            item.broken = true;
-//            throw e;
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("expire, key={}, duration={}, elapsedTime={}", key, duration, elapsedTime);
-//            checkSlowOperation(elapsedTime);
-//        }
-//    }
-//
-//    @Override
-//    public void del(String key) {
-//        StopWatch watch = new StopWatch();
-//        PoolItem<BinaryJedis> item = pool.borrowItem();
-//        try {
-//            item.resource.del(encode(key));
-//        } catch (JedisConnectionException e) {
-//            item.broken = true;
-//            throw e;
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("del, key={}, elapsedTime={}", key, elapsedTime);
-//            checkSlowOperation(elapsedTime);
-//        }
-//    }
-//
-//    @Override
-//    public Map<String, String> multiGet(String... keys) {
-//        Map<String, byte[]> values = multiGetBytes(keys);
-//        Map<String, String> result = Maps.newHashMapWithExpectedSize(values.size());
-//        for (Map.Entry<String, byte[]> entry : values.entrySet()) {
-//            result.put(entry.getKey(), decode(entry.getValue()));
-//        }
-//        return result;
-//    }
-//
-//    public Map<String, byte[]> multiGetBytes(String... keys) {
-//        StopWatch watch = new StopWatch();
-//        PoolItem<BinaryJedis> item = pool.borrowItem();
-//        try {
-//            byte[][] redisKeys = encode(keys);
-//            Map<String, byte[]> values = Maps.newHashMapWithExpectedSize(keys.length);
-//            List<byte[]> redisValues = item.resource.mget(redisKeys);
-//            int index = 0;
-//            for (byte[] redisValue : redisValues) {
-//                if (redisValue != null) values.put(keys[index], redisValue);
-//                index++;
-//            }
-//            return values;
-//        } catch (JedisConnectionException e) {
-//            item.broken = true;
-//            throw e;
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("mget, keys={}, elapsedTime={}", keys, elapsedTime);
-//            checkSlowOperation(elapsedTime);
-//        }
-//    }
-//
-//    @Override
-//    public void multiSet(Map<String, String> values) {
-//        StopWatch watch = new StopWatch();
-//        PoolItem<BinaryJedis> item = pool.borrowItem();
-//        try {
-//            byte[][] keyValues = new byte[values.size() * 2][];
-//            int i = 0;
-//            for (Map.Entry<String, String> entry : values.entrySet()) {
-//                String key = entry.getKey();
-//                String value = entry.getValue();
-//                keyValues[i] = encode(key);
-//                keyValues[i + 1] = encode(value);
-//                i = i + 2;
-//            }
-//            item.resource.mset(keyValues);
-//        } catch (JedisConnectionException e) {
-//            item.broken = true;
-//            throw e;
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("mset, values={}, elapsedTime={}", values, elapsedTime);
-//            checkSlowOperation(elapsedTime);
-//        }
-//    }
-//
-//    public void multiSet(Map<String, byte[]> values, Duration expiration) {
-//        StopWatch watch = new StopWatch();
-//        int expirationInSeconds = (int) expiration.getSeconds();
-//        PoolItem<BinaryJedis> item = pool.borrowItem();
-//        try (Pipeline pipeline = item.resource.pipelined()) {
-//            for (Map.Entry<String, byte[]> entry : values.entrySet()) {
-//                pipeline.setex(encode(entry.getKey()), expirationInSeconds, entry.getValue());
-//            }
-//        } catch (JedisConnectionException e) {
-//            item.broken = true;
-//            throw e;
-//        } catch (IOException e) {
-//            item.broken = true;
-//            throw new UncheckedIOException(e);
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("mset, values={}, expiration={}, elapsedTime={}", LogParam.of(values), expiration, elapsedTime);
-//            checkSlowOperation(elapsedTime);
-//        }
-//    }
-//
-//    @Override
-//    public RedisHash hash() {
-//        return redisHash;
-//    }
-//
-//    @Override
-//    public void forEach(String pattern, Consumer<String> consumer) {
-//        StopWatch watch = new StopWatch();
-//        PoolItem<BinaryJedis> item = pool.borrowItem();
-//        int count = 0;
-//        try {
-//            ScanParams params = new ScanParams().match(pattern).count(500); // use 500 as batch
-//            String cursor = "0";
-//            do {
-//                ScanResult<byte[]> result = item.resource.scan(encode(cursor), params);
-//                cursor = decode(result.getCursorAsBytes());
-//                List<byte[]> keys = result.getResult();
-//                for (byte[] key : keys) {
-//                    count++;
-//                    consumer.accept(decode(key));
-//                }
-//            } while (!"0".equals(cursor));
-//        } catch (JedisConnectionException e) {
-//            item.broken = true;
-//            throw e;
-//        } finally {
-//            pool.returnItem(item);
-//            long elapsedTime = watch.elapsedTime();
-//            ActionLogContext.track("redis", elapsedTime);
-//            logger.debug("forEach, pattern={}, count={}, elapsedTime={}", pattern, count, elapsedTime);
-//        }
-//    }
+    @Override
+    public void set(String key, String value, Duration expiration) {
+        set(key, encode(value), expiration);
+    }
+
+    public void set(String key, byte[] value, Duration expiration) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.sendRequest(Protocol.Command.SETEX, encode(key), encode(expiration.getSeconds()), value);
+            connection.getSimpleStringResponse();
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("set, key={}, value={}, expiration={}, elapsedTime={}", key, LogParam.of(value), expiration, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public RedisSet set() {
+        return null;
+    }
+
+    @Override
+    public boolean setIfAbsent(String key, String value, Duration expiration) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.sendRequest(Protocol.Command.SET, encode(key), encode(value), NX, EX, encode(expiration.getSeconds()));
+            String result = connection.getSimpleStringResponse();
+            return "OK".equals(result);
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("setIfAbsent, key={}, value={}, expiration={}, elapsedTime={}", key, value, expiration, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public void expire(String key, Duration expiration) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.sendRequest(Protocol.Command.EXPIRE, encode(key), encode(expiration.getSeconds()));
+            connection.getLongResponse();
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("expire, key={}, expiration={}, elapsedTime={}", key, expiration, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public void del(String key) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.sendRequest(Protocol.Command.DEL, encode(key));
+            connection.getLongResponse();
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("del, key={}, elapsedTime={}", key, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public Map<String, String> multiGet(String... keys) {
+        Map<String, byte[]> values = multiGetBytes(keys);
+        Map<String, String> result = Maps.newHashMapWithExpectedSize(values.size());
+        for (Map.Entry<String, byte[]> entry : values.entrySet()) {
+            result.put(entry.getKey(), decode(entry.getValue()));
+        }
+        return result;
+    }
+
+    public Map<String, byte[]> multiGetBytes(String... keys) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            byte[][] redisKeys = encode(keys);
+            Map<String, byte[]> values = Maps.newHashMapWithExpectedSize(keys.length);
+            connection.sendRequest(Protocol.Command.MGET, redisKeys);
+            Object[] redisValues = connection.getArrayResponse();
+            int index = 0;
+            for (Object redisValue : redisValues) {
+                if (redisValue != null) values.put(keys[index], (byte[]) redisValue);
+                index++;
+            }
+            return values;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("mget, keys={}, elapsedTime={}", keys, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public void multiSet(Map<String, String> values) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            byte[][] keyValues = new byte[values.size() * 2][];
+            int i = 0;
+            for (Map.Entry<String, String> entry : values.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                keyValues[i] = encode(key);
+                keyValues[i + 1] = encode(value);
+                i = i + 2;
+            }
+            connection.sendRequest(Protocol.Command.MSET, keyValues);
+            connection.getSimpleStringResponse();
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("mset, values={}, elapsedTime={}", values, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    public void multiSet(Map<String, byte[]> values, Duration expiration) {
+        StopWatch watch = new StopWatch();
+        byte[] expirationValue = encode((int) expiration.getSeconds());
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            for (Map.Entry<String, byte[]> entry : values.entrySet()) {
+                connection.sendRequest(Protocol.Command.SETEX, encode(entry.getKey()), expirationValue, entry.getValue());
+            }
+            for (int i = 0; i < values.size(); i++) {
+                connection.getSimpleStringResponse();
+            }
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("mset, values={}, expiration={}, elapsedTime={}", LogParam.of(values), expiration, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public RedisHash hash() {
+        return null;
+    }
+
+    @Override
+    public void forEach(String pattern, Consumer<String> consumer) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        int count = 0;
+        try {
+            RedisConnection connection = item.resource;
+            byte[] batchSize = encode("500"); // use 500 as batch
+            String cursor = "0";
+            do {
+                connection.sendRequest(Protocol.Command.SCAN, encode(cursor), Protocol.Keyword.MATCH.value, encode(pattern), Protocol.Keyword.COUNT.value, batchSize);
+                Object[] response = connection.getArrayResponse();
+                cursor = decode((byte[]) response[0]);
+                Object[] keys = (Object[]) response[1];
+                for (Object key : keys) {
+                    consumer.accept(decode((byte[]) key));
+                }
+                count += keys.length;
+            } while (!"0".equals(cursor));
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime);
+            logger.debug("forEach, pattern={}, count={}, elapsedTime={}", pattern, count, elapsedTime);
+        }
+    }
+
+    private byte[] encode(long number) {
+        return Strings.bytes(String.valueOf(number));
+    }
 
     byte[] encode(String value) {   // redis does not accept null
         return Strings.bytes(value);

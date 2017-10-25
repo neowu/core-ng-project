@@ -4,101 +4,108 @@ import core.framework.util.ASCII;
 import core.framework.util.Strings;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * refer to https://redis.io/topics/protocol
+ * here it only supports request-response/pipeline model
+ */
 public final class Protocol {
-    public static final int DEFAULT_SENTINEL_PORT = 26379;
     static final int DEFAULT_PORT = 6379;
 
-    private static final byte DOLLAR_BYTE = '$';
-    private static final byte ASTERISK_BYTE = '*';
-    private static final byte PLUS_BYTE = '+';
-    private static final byte MINUS_BYTE = '-';
-    private static final byte COLON_BYTE = ':';
+    private static final byte SIMPLE_STRING_BYTE = '+';
+    private static final byte ERROR_BYTE = '-';
+    private static final byte INTEGER_BYTE = ':';
+    private static final byte BULK_STRING_BYTE = '$';
+    private static final byte ARRAY_BYTE = '*';
 
-    static void sendCommand(final RedisOutputStream outputStream, final Command command, final byte[]... arguments) throws IOException {
-        outputStream.write(ASTERISK_BYTE);
-        outputStream.writeIntCrLf(arguments.length + 1);
-        outputStream.write(DOLLAR_BYTE);
-        outputStream.writeIntCrLf(command.value.length);
-        outputStream.write(command.value);
-        outputStream.writeCrLf();
+    static byte[] request(Command command, byte[]... arguments) {
+        int argumentLength = Encoder.byteArraySize(arguments.length + 1);
+        int commandLength = Encoder.byteArraySize(command.value.length);
 
-        for (final byte[] arg : arguments) {
-            outputStream.write(DOLLAR_BYTE);
-            outputStream.writeIntCrLf(arg.length);
-            outputStream.write(arg);
-            outputStream.writeCrLf();
+        int messageSize = 1 + argumentLength + 2 + 1 + commandLength + 2 + command.value.length + 2;
+        for (byte[] argument : arguments) {
+            messageSize += 1 + Encoder.byteArraySize(argument.length) + 2 + argument.length + 2;
         }
+        int position = 0;
+        byte[] message = new byte[messageSize];
+        message[position++] = ARRAY_BYTE;
+        position += argumentLength;
+        Encoder.fill(arguments.length + 1, position, message);
+        message[position++] = '\r';
+        message[position++] = '\n';
+        message[position++] = BULK_STRING_BYTE;
+        position += commandLength;
+        Encoder.fill(command.value.length, position, message);
+        message[position++] = '\r';
+        message[position++] = '\n';
+        System.arraycopy(command.value, 0, message, position, command.value.length);
+        position += command.value.length;
+        message[position++] = '\r';
+        message[position++] = '\n';
+        for (byte[] argument : arguments) {
+            message[position++] = BULK_STRING_BYTE;
+            position += Encoder.byteArraySize(argument.length);
+            Encoder.fill(argument.length, position, message);
+            message[position++] = '\r';
+            message[position++] = '\n';
+            System.arraycopy(argument, 0, message, position, argument.length);
+            position += argument.length;
+            message[position++] = '\r';
+            message[position++] = '\n';
+        }
+
+        return message;
     }
 
-    public static Object read(final RedisInputStream inputStream) throws IOException {
-        return parseResponse(inputStream);
+    public static Object response(RedisInputStream stream) throws IOException {
+        return parseResponse(stream);
     }
 
-    private static Object parseResponse(RedisInputStream inputStream) throws IOException {
-        byte firstByte = inputStream.readByte();
+    private static Object parseResponse(RedisInputStream stream) throws IOException {
+        byte firstByte = stream.readByte();
         switch (firstByte) {
-            case PLUS_BYTE:
-                return inputStream.readLineBytes();
-            case DOLLAR_BYTE:
-                return processBulkReply(inputStream);
-            case ASTERISK_BYTE:
-                return processMultiBulkReply(inputStream);
-            case COLON_BYTE:
-                return inputStream.readLongCRLF();
-            case MINUS_BYTE:
-                String message = inputStream.readLine();
-                throw new RedisException(message);
+            case SIMPLE_STRING_BYTE:
+                return stream.readSimpleString();
+            case BULK_STRING_BYTE:
+                return parseBulkString(stream);
+            case ARRAY_BYTE:
+                return parseArray(stream);
+            case INTEGER_BYTE:
+                return stream.readLongCRLF();
+            case ERROR_BYTE:
+                String message = stream.readSimpleString();
+                return new Error(message);
             default:
-                throw new RedisException("unknown response, firstByte=" + (char) firstByte);
+                throw new IOException("unknown redis response, firstByte=" + (char) firstByte);
         }
     }
 
-    static String readErrorLineIfPossible(RedisInputStream inputStream) throws IOException {
+    static String readErrorIfPossible(RedisInputStream inputStream) throws IOException {
         final byte firstByte = inputStream.readByte();
-        if (firstByte != MINUS_BYTE) {  // if buffer contains other type of response, just ignore.
+        if (firstByte != ERROR_BYTE) {  // if buffer contains other type of response, just ignore.
             return null;
         }
-        return inputStream.readLine();
+        return inputStream.readSimpleString();
     }
 
-    private static byte[] processBulkReply(final RedisInputStream inputStream) throws IOException {
-        final int len = (int) inputStream.readLongCRLF();
-        if (len == -1) {
+    private static byte[] parseBulkString(RedisInputStream stream) throws IOException {
+        int length = (int) stream.readLongCRLF();
+        if (length == -1) {
             return null;
         }
-
-        final byte[] read = new byte[len];
-        int offset = 0;
-        while (offset < len) {
-            final int size = inputStream.read(read, offset, (len - offset));
-            if (size == -1) throw new RedisException("It seems like server has closed the connection.");
-            offset += size;
-        }
-
-        // read 2 more bytes for the command delimiter
-        inputStream.readByte();
-        inputStream.readByte();
-
-        return read;
+        return stream.readBulkStringCRLF(length);
     }
 
-    private static List<Object> processMultiBulkReply(final RedisInputStream inputStream) throws IOException {
-        final int num = (int) inputStream.readLongCRLF();
-        if (num == -1) {
+    private static Object[] parseArray(RedisInputStream stream) throws IOException {
+        int length = (int) stream.readLongCRLF();
+        if (length == -1) {
             return null;
         }
-        final List<Object> ret = new ArrayList<>(num);
-        for (int i = 0; i < num; i++) {
-            try {
-                ret.add(parseResponse(inputStream));
-            } catch (RedisException e) {
-                ret.add(e);
-            }
+        Object[] array = new Object[length];
+        for (int i = 0; i < length; i++) {
+            array[i] = parseResponse(stream);
         }
-        return ret;
+        return array;
     }
 
     public enum Command {
@@ -118,6 +125,14 @@ public final class Protocol {
 
         Keyword() {
             value = Strings.bytes(ASCII.toLowerCase(name()));
+        }
+    }
+
+    public static class Error {
+        public final String message;
+
+        public Error(String message) {
+            this.message = message;
         }
     }
 }

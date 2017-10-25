@@ -1,185 +1,92 @@
-/*
- * Copyright 2009-2010 MBTE Sweden AB. Licensed under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable
- * law or agreed to in writing, software distributed under the License is distributed on an "AS IS"
- * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
- * for the specific language governing permissions and limitations under the License.
- */
-
 package core.framework.impl.redis.v2;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * This class assumes (to some degree) that we are reading a RESP stream. As such it assumes certain
- * conventions regarding CRLF line termination. It also assumes that if the Protocol layer requires
- * a byte that if that byte is not there it is a stream error.
+ * @author neo
  */
-public class RedisInputStream extends FilterInputStream {
-    private final byte[] buffer;
-    private int count, limit;
+public class RedisInputStream {
+    private final InputStream inputStream;
+    private final byte[] buffer = new byte[8192];
+    private int position, limit;
 
-    public RedisInputStream(InputStream in) {
-        super(in);
-        buffer = new byte[8192];
+    public RedisInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
     public byte readByte() throws IOException {
-        ensureFill();
-        return buffer[count++];
+        fill();
+        return buffer[position++];
     }
 
-    public String readLine() throws IOException {
-        final StringBuilder sb = new StringBuilder();
+    public String readSimpleString() throws IOException {
+        StringBuilder builder = new StringBuilder();
         while (true) {
-            ensureFill();
-
-            byte b = buffer[count++];
-            if (b == '\r') {
-                ensureFill(); // Must be one more byte
-
-                byte c = buffer[count++];
-                if (c == '\n') {
+            fill();
+            byte value1 = buffer[position++];
+            if (value1 == '\r') {
+                fill();
+                byte value2 = buffer[position++];
+                if (value2 == '\n') {
                     break;
                 }
-                sb.append((char) b);
-                sb.append((char) c);
+                builder.append((char) value1);
+                builder.append((char) value2);
             } else {
-                sb.append((char) b);
+                builder.append((char) value1);
             }
         }
 
-        final String reply = sb.toString();
-        if (reply.length() == 0) {
-            throw new RedisException("It seems like server has closed the connection.");
+        String response = builder.toString();
+        if (response.length() == 0) {
+            throw new IOException("simple string must not be empty");
         }
-
-        return reply;
-    }
-
-    public byte[] readLineBytes() throws IOException {
-        /*
-         * This operation should only require one fill. In that typical case we optimize allocation and
-         * copy of the byte array. In the edge case where more than one fill is required then we take a
-         * slower path and expand a byte array output stream as is necessary.
-         */
-        ensureFill();
-
-        int pos = count;
-        final byte[] buf = this.buffer;
-        while (true) {
-            if (pos == limit) {
-                return readLineBytesSlowly();
-            }
-
-            if (buf[pos++] == '\r') {
-                if (pos == limit) {
-                    return readLineBytesSlowly();
-                }
-
-                if (buf[pos++] == '\n') {
-                    break;
-                }
-            }
-        }
-
-        final int N = (pos - count) - 2;
-        final byte[] line = new byte[N];
-        System.arraycopy(buf, count, line, 0, N);
-        count = pos;
-        return line;
-    }
-
-    /**
-     * Slow path in case a line of bytes cannot be read in one #fill() operation. This is still faster
-     * than creating the StrinbBuilder, String, then encoding as byte[] in Protocol, then decoding
-     * back into a String.
-     */
-    private byte[] readLineBytesSlowly() throws IOException {
-        ByteArrayOutputStream bout = null;
-        while (true) {
-            ensureFill();
-
-            byte b = buffer[count++];
-            if (b == '\r') {
-                ensureFill(); // Must be one more byte
-
-                byte c = buffer[count++];
-                if (c == '\n') {
-                    break;
-                }
-
-                if (bout == null) {
-                    bout = new ByteArrayOutputStream(16);
-                }
-
-                bout.write(b);
-                bout.write(c);
-            } else {
-                if (bout == null) {
-                    bout = new ByteArrayOutputStream(16);
-                }
-
-                bout.write(b);
-            }
-        }
-
-        return bout == null ? new byte[0] : bout.toByteArray();
+        return response;
     }
 
     public long readLongCRLF() throws IOException {
-        final byte[] buf = this.buffer;
-
-        ensureFill();
-
-        final boolean isNeg = buf[count] == '-';
-        if (isNeg) {
-            ++count;
+        fill();
+        boolean negative = buffer[position] == '-';
+        if (negative) {
+            position++;
         }
-
         long value = 0;
         while (true) {
-            ensureFill();
-
-            final int b = buf[count++];
-            if (b == '\r') {
-                ensureFill();
-
-                if (buf[count++] != '\n') {
-                    throw new RedisException("Unexpected character!");
-                }
-
+            fill();
+            int byteValue = buffer[position++];
+            if (byteValue == '\r') {
+                fill();
+                if (buffer[position++] != '\n') throw new IOException("unexpected character");
                 break;
             } else {
-                value = value * 10 + b - '0';
+                value = value * 10 + byteValue - '0';
             }
         }
-
-        return (isNeg ? -value : value);
+        return (negative ? -value : value);
     }
 
-    @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        ensureFill();
-
-        final int length = Math.min(limit - count, len);
-        System.arraycopy(buffer, count, b, off, length);
-        count += length;
-        return length;
+    public byte[] readBulkStringCRLF(int length) throws IOException {
+        byte[] response = new byte[length];
+        int offset = 0;
+        while (offset < length) {
+            fill();
+            int readLength = Math.min(limit - position, (length - offset));
+            System.arraycopy(buffer, position, response, offset, readLength);
+            position += readLength;
+            offset += readLength;
+        }
+        byte value = readByte();
+        if (value != '\r') throw new IOException("unexpected character");
+        value = readByte();
+        if (value != '\n') throw new IOException("unexpected character");
+        return response;
     }
 
-    /**
-     * This methods assumes there are required bytes to be read. If we cannot read anymore bytes an
-     * exception is thrown to quickly ascertain that the stream was smaller than expected.
-     */
-    private void ensureFill() throws IOException {
-        if (count >= limit) {
-            limit = in.read(buffer);
-            count = 0;
+    private void fill() throws IOException {
+        if (position >= limit) {
+            limit = inputStream.read(buffer);
+            position = 0;
             if (limit == -1) {
                 throw new IOException("unexpected end of stream");
             }
