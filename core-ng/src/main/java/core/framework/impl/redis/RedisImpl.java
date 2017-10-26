@@ -30,21 +30,21 @@ import static core.framework.impl.redis.RedisEncodings.encode;
  * @author neo
  */
 public final class RedisImpl implements Redis {
-    public final Pool<RedisConnection> pool;
     private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
     private final RedisSet redisSet = new RedisSetImpl(this);
     private final RedisHash redisHash = new RedisHashImpl(this);
     private final String name;
+    public Pool<RedisConnection> pool;
     private String host;
     private long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
-    private Duration timeout;
+    private Duration timeout = Duration.ofSeconds(5);
 
     public RedisImpl(String name) {
         this.name = name;
         pool = new Pool<>(this::createConnection, name);
         pool.size(5, 50);
         pool.maxIdleTime(Duration.ofMinutes(30));
-        timeout(Duration.ofSeconds(5));
+        pool.checkoutTimeout(timeout);
     }
 
     public void host(String host) {
@@ -63,7 +63,9 @@ public final class RedisImpl implements Redis {
     private RedisConnection createConnection() {
         if (host == null) throw new Error("redis.host must not be null");
         try {
-            return new RedisConnection(host, Protocol.DEFAULT_PORT, (int) timeout.toMillis());
+            RedisConnection connection = new RedisConnection(host, timeout);
+            connection.connect();
+            return connection;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

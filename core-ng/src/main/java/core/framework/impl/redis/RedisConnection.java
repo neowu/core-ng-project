@@ -3,23 +3,34 @@ package core.framework.impl.redis;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.time.Duration;
 
 /**
  * @author neo
  */
 class RedisConnection implements AutoCloseable {
-    private final Socket socket;
-    private final RedisOutputStream outputStream;
-    private final RedisInputStream inputStream;
+    private static final int DEFAULT_PORT = 6379;
+    private final String host;
+    private final int timeoutInMs;
 
-    RedisConnection(String host, int port, int timeout) throws IOException {
+    RedisOutputStream outputStream;
+    RedisInputStream inputStream;
+
+    private Socket socket;
+
+    RedisConnection(String host, Duration timeout) {
+        this.host = host;
+        timeoutInMs = (int) timeout.toMillis();
+    }
+
+    void connect() throws IOException {
         socket = new Socket();
         socket.setReuseAddress(true);
         socket.setKeepAlive(true);
         socket.setTcpNoDelay(true); // Socket buffer whether closed, to ensure timely delivery of data
         socket.setSoLinger(true, 0); // Control calls close () method, the underlying socket is closed immediately
-        socket.connect(new InetSocketAddress(host, port), timeout);
-        socket.setSoTimeout(timeout);
+        socket.connect(new InetSocketAddress(host, DEFAULT_PORT), timeoutInMs);
+        socket.setSoTimeout(timeoutInMs);
         outputStream = new RedisOutputStream(socket.getOutputStream());
         inputStream = new RedisInputStream(socket.getInputStream());
     }
@@ -30,7 +41,7 @@ class RedisConnection implements AutoCloseable {
 
     @Override
     public void close() throws IOException {
-        socket.close();
+        if (socket != null) socket.close();
     }
 
     String readSimpleString() throws IOException {

@@ -57,7 +57,14 @@ class ProtocolTest {
     @Test
     void readNullString() throws IOException {
         ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("$-1\r\n"));
-        String response = (String) Protocol.read(new RedisInputStream(stream));
+        byte[] response = (byte[]) Protocol.read(new RedisInputStream(stream));
         assertNull(response);
+    }
+
+    @Test
+    void readEmptyString() throws IOException {
+        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("$0\r\n\r\n"));
+        byte[] response = (byte[]) Protocol.read(new RedisInputStream(stream));
+        assertEquals("", decode(response));
     }
 }

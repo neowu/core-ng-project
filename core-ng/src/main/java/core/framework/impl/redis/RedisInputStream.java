@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * refer to jedis impl, https://github.com/xetorthio/jedis/blob/master/src/main/java/redis/clients/util/RedisInputStream.java
  * @author neo
  */
 class RedisInputStream {

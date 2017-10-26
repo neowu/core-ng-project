@@ -5,11 +5,9 @@ import core.framework.util.Strings;
 import java.io.IOException;
 
 /**
- * refer to https://redis.io/topics/protocol
- * here it only supports request-response/pipeline model
+ * refer to https://redis.io/topics/protocol, this only supports request-response/pipeline model
  */
 final class Protocol {
-    static final int DEFAULT_PORT = 6379;
     private static final byte SIMPLE_STRING_BYTE = '+';
     private static final byte ERROR_BYTE = '-';
     private static final byte INTEGER_BYTE = ':';

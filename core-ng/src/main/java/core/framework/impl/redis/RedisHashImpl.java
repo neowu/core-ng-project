@@ -59,6 +59,7 @@ public final class RedisHashImpl implements RedisHash {
             RedisConnection connection = item.resource;
             connection.write(HGETALL, encode(key));
             Object[] response = connection.readArray();
+            if (response.length % 2 != 0) throw new RedisException("unexpected length of array, length=" + response.length);
             Map<String, String> values = Maps.newHashMapWithExpectedSize(response.length / 2);
             for (int i = 0; i < response.length; i += 2) {
                 values.put(decode((byte[]) response[i]), decode((byte[]) response[i + 1]));
