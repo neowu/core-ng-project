@@ -7,10 +7,18 @@ import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.BinaryJedis;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
+
+import static core.framework.impl.redis.Protocol.Command.HDEL;
+import static core.framework.impl.redis.Protocol.Command.HGET;
+import static core.framework.impl.redis.Protocol.Command.HGETALL;
+import static core.framework.impl.redis.Protocol.Command.HMSET;
+import static core.framework.impl.redis.Protocol.Command.HSET;
+import static core.framework.impl.redis.RedisEncodings.decode;
+import static core.framework.impl.redis.RedisEncodings.encode;
 
 /**
  * @author neo
@@ -26,12 +34,14 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public String get(String key, String field) {
         StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = redis.pool.borrowItem();
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
-            return redis.decode(item.resource.hget(redis.encode(key), redis.encode(field)));
-        } catch (JedisConnectionException e) {
+            RedisConnection connection = item.resource;
+            connection.write(HGET, encode(key), encode(field));
+            return decode(connection.readBulkString());
+        } catch (IOException e) {
             item.broken = true;
-            throw e;
+            throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
@@ -44,17 +54,19 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public Map<String, String> getAll(String key) {
         StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = redis.pool.borrowItem();
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
-            Map<byte[], byte[]> redisValues = item.resource.hgetAll(redis.encode(key));
-            Map<String, String> values = Maps.newHashMapWithExpectedSize(redisValues.size());
-            for (Map.Entry<byte[], byte[]> entry : redisValues.entrySet()) {
-                values.put(redis.decode(entry.getKey()), redis.decode(entry.getValue()));
+            RedisConnection connection = item.resource;
+            connection.write(HGETALL, encode(key));
+            Object[] response = connection.readArray();
+            Map<String, String> values = Maps.newHashMapWithExpectedSize(response.length / 2);
+            for (int i = 0; i < response.length; i += 2) {
+                values.put(decode((byte[]) response[i]), decode((byte[]) response[i + 1]));
             }
             return values;
-        } catch (JedisConnectionException e) {
+        } catch (IOException e) {
             item.broken = true;
-            throw e;
+            throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
@@ -67,12 +79,14 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public void set(String key, String field, String value) {
         StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = redis.pool.borrowItem();
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
-            item.resource.hset(redis.encode(key), redis.encode(field), redis.encode(value));
-        } catch (JedisConnectionException e) {
+            RedisConnection connection = item.resource;
+            connection.write(HSET, encode(key), encode(value));
+            connection.readLong();
+        } catch (IOException e) {
             item.broken = true;
-            throw e;
+            throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
@@ -85,16 +99,21 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public void multiSet(String key, Map<String, String> values) {
         StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = redis.pool.borrowItem();
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
-            Map<byte[], byte[]> redisValues = Maps.newHashMapWithExpectedSize(values.size());
+            RedisConnection connection = item.resource;
+            byte[][] arguments = new byte[values.size() * 2 + 1][];
+            arguments[0] = encode(key);
+            int index = 1;
             for (Map.Entry<String, String> entry : values.entrySet()) {
-                redisValues.put(redis.encode(entry.getKey()), redis.encode(entry.getValue()));
+                arguments[index++] = encode(entry.getKey());
+                arguments[index++] = encode(entry.getValue());
             }
-            item.resource.hmset(redis.encode(key), redisValues);
-        } catch (JedisConnectionException e) {
+            connection.write(HMSET, arguments);
+            connection.readSimpleString();
+        } catch (IOException e) {
             item.broken = true;
-            throw e;
+            throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
@@ -107,12 +126,19 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public void del(String key, String... fields) {
         StopWatch watch = new StopWatch();
-        PoolItem<BinaryJedis> item = redis.pool.borrowItem();
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
-            item.resource.hdel(redis.encode(key), redis.encode(fields));
-        } catch (JedisConnectionException e) {
+            RedisConnection connection = item.resource;
+            byte[][] arguments = new byte[fields.length + 1][];
+            arguments[0] = encode(key);
+            for (int i = 0; i < fields.length; i++) {
+                arguments[i + 1] = encode(fields[i]);
+            }
+            connection.write(HDEL, arguments);
+            connection.readLong();
+        } catch (IOException e) {
             item.broken = true;
-            throw e;
+            throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();

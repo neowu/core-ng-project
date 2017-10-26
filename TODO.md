@@ -4,4 +4,4 @@
 * search: elasticsearch plan to use java high level client to replace current transport client, wait until complete and migrate to "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
 * jdk9: split 3rd party product into modules? (e.g. mongo/es/kafka/db)
 * inject: replace javax.inject.Inject with our own class? 
-* redis: support cluster or port jedis impl since we only need minimal redis client impl?
+* redis: support cluster?

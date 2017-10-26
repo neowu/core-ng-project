@@ -1,4 +1,4 @@
-package core.framework.impl.redis.v2;
+package core.framework.impl.redis;
 
 /**
  * @author neo

@@ -67,8 +67,9 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public void del(String key) {
-        store.remove(key);
+    public boolean del(String key) {
+        Value removed = store.remove(key);
+        return removed != null;
     }
 
     @Override

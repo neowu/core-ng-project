@@ -20,7 +20,7 @@ public interface Redis {
 
     void expire(String key, Duration duration);
 
-    void del(String key);
+    boolean del(String key);
 
     Map<String, String> multiGet(String... keys);
 

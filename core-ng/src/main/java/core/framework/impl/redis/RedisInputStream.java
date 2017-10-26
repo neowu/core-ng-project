@@ -1,4 +1,4 @@
-package core.framework.impl.redis.v2;
+package core.framework.impl.redis;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,21 +6,22 @@ import java.io.InputStream;
 /**
  * @author neo
  */
-public class RedisInputStream {
+class RedisInputStream {
     private final InputStream inputStream;
     private final byte[] buffer = new byte[8192];
-    private int position, limit;
+    private int position;
+    private int limit;
 
-    public RedisInputStream(InputStream inputStream) {
+    RedisInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
     }
 
-    public byte readByte() throws IOException {
+    byte readByte() throws IOException {
         fill();
         return buffer[position++];
     }
 
-    public String readSimpleString() throws IOException {
+    String readSimpleString() throws IOException {
         StringBuilder builder = new StringBuilder();
         while (true) {
             fill();
@@ -45,7 +46,7 @@ public class RedisInputStream {
         return response;
     }
 
-    public long readLongCRLF() throws IOException {
+    long readLongCRLF() throws IOException {
         fill();
         boolean negative = buffer[position] == '-';
         if (negative) {
@@ -57,21 +58,22 @@ public class RedisInputStream {
             int byteValue = buffer[position++];
             if (byteValue == '\r') {
                 fill();
-                if (buffer[position++] != '\n') throw new IOException("unexpected character");
+                byte byteValue2 = buffer[position++];
+                if (byteValue2 != '\n') throw new IOException("unexpected character");
                 break;
             } else {
                 value = value * 10 + byteValue - '0';
             }
         }
-        return (negative ? -value : value);
+        return negative ? -value : value;
     }
 
-    public byte[] readBulkStringCRLF(int length) throws IOException {
+    byte[] readBulkStringCRLF(int length) throws IOException {
         byte[] response = new byte[length];
         int offset = 0;
         while (offset < length) {
             fill();
-            int readLength = Math.min(limit - position, (length - offset));
+            int readLength = Math.min(limit - position, length - offset);
             System.arraycopy(buffer, position, response, offset, readLength);
             position += readLength;
             offset += readLength;
