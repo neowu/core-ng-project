@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import static core.framework.impl.redis.RedisEncodings.decode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -37,5 +38,26 @@ class ProtocolTest {
         assertEquals("1", decode((byte[]) response[0]));
         assertEquals("2", decode((byte[]) response[1]));
         assertEquals("3", decode((byte[]) response[2]));
+    }
+
+    @Test
+    void readSimpleString() throws IOException {
+        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("+OK\r\n"));
+        String response = (String) Protocol.read(new RedisInputStream(stream));
+        assertEquals("OK", response);
+    }
+
+    @Test
+    void readLong() throws IOException {
+        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes(":10\r\n"));
+        long response = (Long) Protocol.read(new RedisInputStream(stream));
+        assertEquals(10, response);
+    }
+
+    @Test
+    void readNullString() throws IOException {
+        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("$-1\r\n"));
+        String response = (String) Protocol.read(new RedisInputStream(stream));
+        assertNull(response);
     }
 }
