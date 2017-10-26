@@ -16,13 +16,13 @@ class MockRedisFactory {
         redis.pool = new Pool<>(() -> {
             RedisConnection connection = new RedisConnection(null, Duration.ZERO);
             connection.outputStream = new RedisOutputStream(requestStream);
-            connection.inputStream = new RedisInputStream(new ByteArrayInputStream(Strings.bytes(response.response)));
+            connection.inputStream = new RedisInputStream(new ByteArrayInputStream(Strings.bytes(response.data)));
             return connection;
         }, null);
         return redis;
     }
 
     static class ResponseHolder {
-        String response;
+        String data;
     }
 }

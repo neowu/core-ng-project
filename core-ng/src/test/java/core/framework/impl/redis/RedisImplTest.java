@@ -25,8 +25,7 @@ class RedisImplTest {
 
     @Test
     void get() {
-        response.response = "$6\r\nfoobar\r\n";
-
+        response.data = "$6\r\nfoobar\r\n";
         String value = redis.get("key");
 
         assertEquals("foobar", value);
@@ -35,8 +34,7 @@ class RedisImplTest {
 
     @Test
     void set() {
-        response.response = "+OK\r\n";
-
+        response.data = "+OK\r\n";
         redis.set("key", "value");
 
         assertEquals("*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n", decode(request.toByteArray()));

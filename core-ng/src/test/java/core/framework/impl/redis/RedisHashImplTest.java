@@ -26,9 +26,17 @@ class RedisHashImplTest {
     }
 
     @Test
-    void set() {
-        response.response = ":1\r\n";
+    void get() {
+        response.data = "$2\r\nv1\r\n";
+        String value = redis.get("key", "f1");
 
+        assertEquals("v1", value);
+        assertEquals("*3\r\n$4\r\nHGET\r\n$3\r\nkey\r\n$2\r\nf1\r\n", decode(request.toByteArray()));
+    }
+
+    @Test
+    void set() {
+        response.data = ":1\r\n";
         redis.set("key", "f1", "v1");
 
         assertEquals("*3\r\n$4\r\nHSET\r\n$3\r\nkey\r\n$2\r\nv1\r\n", decode(request.toByteArray()));
@@ -36,8 +44,7 @@ class RedisHashImplTest {
 
     @Test
     void getAll() {
-        response.response = "*4\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n$1\r\n4\r\n";
-
+        response.data = "*4\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n$1\r\n4\r\n";
         Map<String, String> values = redis.getAll("key");
 
         assertEquals(2, values.size());

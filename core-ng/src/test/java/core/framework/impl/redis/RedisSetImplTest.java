@@ -29,8 +29,7 @@ class RedisSetImplTest {
 
     @Test
     void add() {
-        response.response = ":1\r\n";
-
+        response.data = ":1\r\n";
         boolean added = redis.add("key", "item1");
 
         assertTrue(added);
@@ -39,7 +38,7 @@ class RedisSetImplTest {
 
     @Test
     void members() {
-        response.response = "*3\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n";
+        response.data = "*3\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n";
         Set<String> members = redis.members("key");
 
         assertEquals(Sets.newHashSet("1", "2", "3"), members);
