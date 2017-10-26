@@ -11,14 +11,18 @@ import java.time.Duration;
  * @author neo
  */
 class MockRedisFactory {
-    static RedisImpl create(ByteArrayOutputStream requestStream, String response) {
+    static RedisImpl create(ByteArrayOutputStream requestStream, ResponseHolder response) {
         RedisImpl redis = new RedisImpl(null);
         redis.pool = new Pool<>(() -> {
             RedisConnection connection = new RedisConnection(null, Duration.ZERO);
             connection.outputStream = new RedisOutputStream(requestStream);
-            connection.inputStream = new RedisInputStream(new ByteArrayInputStream(Strings.bytes(response)));
+            connection.inputStream = new RedisInputStream(new ByteArrayInputStream(Strings.bytes(response.response)));
             return connection;
         }, null);
         return redis;
+    }
+
+    static class ResponseHolder {
+        String response;
     }
 }
