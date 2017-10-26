@@ -17,7 +17,7 @@ public class TestModule extends AbstractTestModule {
     @Override
     protected void initialize() {
         overrideBinding(HTTPClient.class, Mockito.mock(HTTPClient.class));  // in test context, override binding is defined before actual binding
-        bind(new HTTPClientBuilder().build());
+        bind(HTTPClient.class, new HTTPClientBuilder().build());
 
         db().url("jdbc:mysql://localhost:3306/test");
         db().repository(TestDBEntity.class);

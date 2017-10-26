@@ -1,5 +1,6 @@
 package core.framework.http;
 
+import core.framework.impl.http.HTTPClientImpl;
 import core.framework.util.StopWatch;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.SocketConfig;
@@ -61,7 +62,7 @@ public final class HTTPClientBuilder {
             if (!enableCookie) builder.disableCookieManagement();
 
             CloseableHttpClient httpClient = builder.build();
-            return new HTTPClient(httpClient, userAgent, slowOperationThreshold);
+            return new HTTPClientImpl(httpClient, userAgent, slowOperationThreshold);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
         } finally {

@@ -2,6 +2,8 @@
 ### 5.1.1 (10/17/2017 - )
 * pool: refactor and simplify resource pool
 * web: @QueryParam bean validation to disallow @Property
+* httpClient: changed httpClient to interface, to make it easier to mock/override binding, change HTTPRequest to bean style from builder style
+              you need to update the binding to "bind(HTTPClient.class, new HTTPClientBuilder().build())"              
 * redis: replaced jedis impl with minimal support
         we only need to support request/response/pipeline model, and due to we manage resource pool, cluster support requires customization anyway
 
