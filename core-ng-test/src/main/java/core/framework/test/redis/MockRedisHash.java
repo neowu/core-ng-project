@@ -48,12 +48,15 @@ public final class MockRedisHash implements RedisHash {
     }
 
     @Override
-    public void del(String key, String... fields) {
+    public boolean del(String key, String... fields) {
         MockRedis.Value hashValue = redis.store.computeIfAbsent(key, k -> MockRedis.Value.hashValue());
         validate(key, hashValue);
+        boolean deleted = false;
         for (String field : fields) {
-            hashValue.hash.remove(field);
+            String previous = hashValue.hash.remove(field);
+            if (previous != null) deleted = true;
         }
+        return deleted;
     }
 
     private void validate(String key, MockRedis.Value value) {

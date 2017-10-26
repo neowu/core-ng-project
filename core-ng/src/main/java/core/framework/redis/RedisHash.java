@@ -14,5 +14,5 @@ public interface RedisHash {
 
     void multiSet(String key, Map<String, String> values);
 
-    void del(String key, String... fields);
+    boolean del(String key, String... fields);
 }

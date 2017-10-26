@@ -37,8 +37,7 @@ public final class RedisSetImpl implements RedisSet {
         try {
             RedisConnection connection = item.resource;
             connection.write(SADD, encode(key), encode(value));
-            Long response = connection.readLong();
-            return response == 1;
+            return connection.readLong() == 1;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -103,14 +102,8 @@ public final class RedisSetImpl implements RedisSet {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            byte[][] arguments = new byte[values.length + 1][];
-            arguments[0] = encode(key);
-            for (int i = 0; i < values.length; i++) {
-                arguments[i + 1] = encode(values[i]);
-            }
-            connection.write(SREM, arguments);
-            Long response = connection.readLong();
-            return response == 1;
+            connection.write(SREM, encode(key, values));
+            return connection.readLong() >= 1;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);

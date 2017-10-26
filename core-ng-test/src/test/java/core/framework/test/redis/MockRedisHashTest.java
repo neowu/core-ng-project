@@ -7,12 +7,13 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
  */
 class MockRedisHashTest {
-    MockRedis redis;
+    private MockRedis redis;
 
     @BeforeEach
     void createMockRedis() {
@@ -47,7 +48,9 @@ class MockRedisHashTest {
     void del() {
         redis.hash().set("key1", "field1", "value1");
         redis.hash().set("key1", "field2", "value2");
-        redis.hash().del("key1", "field1");
+        boolean deleted = redis.hash().del("key1", "field1");
+
+        assertTrue(deleted);
 
         Map<String, String> hash = redis.hash().getAll("key1");
         assertEquals(1, hash.size());

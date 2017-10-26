@@ -256,13 +256,7 @@ public final class RedisImpl implements Redis {
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            byte[][] arguments = new byte[values.size() * 2][];
-            int index = 0;
-            for (Map.Entry<String, String> entry : values.entrySet()) {
-                arguments[index++] = encode(entry.getKey());
-                arguments[index++] = encode(entry.getValue());
-            }
-            connection.write(Protocol.Command.MSET, arguments);
+            connection.write(Protocol.Command.MSET, encode(values));
             connection.readSimpleString();
         } catch (IOException e) {
             item.broken = true;

@@ -33,4 +33,14 @@ class RedisEncodingsTest {
         assertArrayEquals(Strings.bytes("5"), RedisEncodings.encode(5L));
         assertArrayEquals(Strings.bytes("-1234567890123456789"), RedisEncodings.encode(-1234567890123456789L));
     }
+
+    @Test
+    void encodeStringArray() {
+        String[] values = new String[2];
+        values[0] = "v1";
+        values[1] = "v2";
+        byte[][] result = RedisEncodings.encode(values);
+        assertArrayEquals(Strings.bytes(values[0]), result[0]);
+        assertArrayEquals(Strings.bytes(values[1]), result[1]);
+    }
 }

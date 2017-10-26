@@ -6,7 +6,7 @@ package core.framework.impl.redis;
 public class RedisException extends RuntimeException {
     private static final long serialVersionUID = -5459336238321986524L;
 
-    public RedisException(String message) {
+    RedisException(String message) {
         super(message);
     }
 }

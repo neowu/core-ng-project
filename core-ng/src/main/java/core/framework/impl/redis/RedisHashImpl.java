@@ -103,14 +103,7 @@ public final class RedisHashImpl implements RedisHash {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            byte[][] arguments = new byte[values.size() * 2 + 1][];
-            arguments[0] = encode(key);
-            int index = 1;
-            for (Map.Entry<String, String> entry : values.entrySet()) {
-                arguments[index++] = encode(entry.getKey());
-                arguments[index++] = encode(entry.getValue());
-            }
-            connection.write(HMSET, arguments);
+            connection.write(HMSET, encode(key, values));
             connection.readSimpleString();
         } catch (IOException e) {
             item.broken = true;
@@ -125,18 +118,13 @@ public final class RedisHashImpl implements RedisHash {
     }
 
     @Override
-    public void del(String key, String... fields) {
+    public boolean del(String key, String... fields) {
         StopWatch watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            byte[][] arguments = new byte[fields.length + 1][];
-            arguments[0] = encode(key);
-            for (int i = 0; i < fields.length; i++) {
-                arguments[i + 1] = encode(fields[i]);
-            }
-            connection.write(HDEL, arguments);
-            connection.readLong();
+            connection.write(HDEL, encode(key, fields));
+            return connection.readLong() >= 1;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);

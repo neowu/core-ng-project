@@ -3,6 +3,8 @@ package core.framework.impl.redis;
 import core.framework.util.Charsets;
 import core.framework.util.Strings;
 
+import java.util.Map;
+
 /**
  * @author neo
  */
@@ -35,6 +37,46 @@ class RedisEncodings {
         }
         String text = Integer.toString(value);
         return bytes(text);
+    }
+
+    static byte[][] encode(String[] values) {
+        int length = values.length;
+        byte[][] result = new byte[length][];
+        for (int i = 0; i < length; i++) {
+            result[i] = encode(values[i]);
+        }
+        return result;
+    }
+
+    static byte[][] encode(String first, String... rest) {
+        int length = rest.length;
+        byte[][] result = new byte[length + 1][];
+        result[0] = encode(first);
+        for (int i = 0; i < length; i++) {
+            result[i + 1] = encode(rest[i]);
+        }
+        return result;
+    }
+
+    static byte[][] encode(Map<String, String> values) {
+        byte[][] result = new byte[values.size() * 2][];
+        int index = 0;
+        for (Map.Entry<String, String> entry : values.entrySet()) {
+            result[index++] = encode(entry.getKey());
+            result[index++] = encode(entry.getValue());
+        }
+        return result;
+    }
+
+    static byte[][] encode(String first, Map<String, String> rest) {
+        byte[][] result = new byte[rest.size() * 2 + 1][];
+        result[0] = encode(first);
+        int index = 1;
+        for (Map.Entry<String, String> entry : rest.entrySet()) {
+            result[index++] = encode(entry.getKey());
+            result[index++] = encode(entry.getValue());
+        }
+        return result;
     }
 
     static String decode(byte[] value) {
