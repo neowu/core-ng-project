@@ -11,6 +11,7 @@ import java.util.Map;
 import static core.framework.impl.redis.RedisEncodings.decode;
 import static core.framework.impl.redis.RedisEncodings.encode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -45,6 +46,31 @@ class RedisImplTest {
     }
 
     @Test
+    void setWithExpiration() {
+        response.data = "+OK\r\n";
+        redis.set("key", "value", Duration.ofMinutes(1));
+
+        assertEquals("*4\r\n$5\r\nSETEX\r\n$3\r\nkey\r\n$2\r\n60\r\n$5\r\nvalue\r\n", decode(request.toByteArray()));
+    }
+
+    @Test
+    void setIfAbsent() {
+        response.data = "+OK\r\n";
+        boolean result = redis.setIfAbsent("key", "value", Duration.ofMinutes(1));
+
+        assertTrue(result);
+        assertEquals("*6\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nnx\r\n$2\r\nex\r\n$2\r\n60\r\n", decode(request.toByteArray()));
+    }
+
+    @Test
+    void expire() {
+        response.data = ":1\r\n";
+        redis.expire("key", Duration.ofMinutes(1));
+
+        assertEquals("*3\r\n$6\r\nEXPIRE\r\n$3\r\nkey\r\n$2\r\n60\r\n", decode(request.toByteArray()));
+    }
+
+    @Test
     void multiSet() {
         response.data = "+OK\r\n";
         Map<String, String> values = Maps.newLinkedHashMap();
@@ -65,5 +91,10 @@ class RedisImplTest {
 
         assertEquals("*4\r\n$5\r\nSETEX\r\n$2\r\nk1\r\n$2\r\n60\r\n$2\r\nv1\r\n"
                 + "*4\r\n$5\r\nSETEX\r\n$2\r\nk2\r\n$2\r\n60\r\n$2\r\nv2\r\n", decode(request.toByteArray()));
+    }
+
+    @Test
+    void close() {
+        redis.close();
     }
 }

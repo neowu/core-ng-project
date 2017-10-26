@@ -226,14 +226,16 @@ public final class RedisImpl implements Redis {
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            byte[][] redisKeys = encode(keys);
+            byte[][] arguments = new byte[keys.length][];
+            for (int i = 0; i < keys.length; i++) {
+                arguments[i] = encode(keys[i]);
+            }
             Map<String, byte[]> values = Maps.newHashMapWithExpectedSize(keys.length);
-            connection.write(Protocol.Command.MGET, redisKeys);
-            Object[] redisValues = connection.readArray();
-            int index = 0;
-            for (Object redisValue : redisValues) {
-                if (redisValue != null) values.put(keys[index], (byte[]) redisValue);
-                index++;
+            connection.write(Protocol.Command.MGET, arguments);
+            Object[] response = connection.readArray();
+            for (int i = 0; i < response.length; i++) {
+                byte[] value = (byte[]) response[i];
+                if (value != null) values.put(keys[i], value);
             }
             return values;
         } catch (IOException e) {
@@ -254,16 +256,13 @@ public final class RedisImpl implements Redis {
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            byte[][] keyValues = new byte[values.size() * 2][];
-            int i = 0;
+            byte[][] arguments = new byte[values.size() * 2][];
+            int index = 0;
             for (Map.Entry<String, String> entry : values.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                keyValues[i] = encode(key);
-                keyValues[i + 1] = encode(value);
-                i = i + 2;
+                arguments[index++] = encode(entry.getKey());
+                arguments[index++] = encode(entry.getValue());
             }
-            connection.write(Protocol.Command.MSET, keyValues);
+            connection.write(Protocol.Command.MSET, arguments);
             connection.readSimpleString();
         } catch (IOException e) {
             item.broken = true;

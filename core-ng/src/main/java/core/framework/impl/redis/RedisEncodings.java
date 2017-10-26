@@ -37,15 +37,6 @@ class RedisEncodings {
         return bytes(text);
     }
 
-    static byte[][] encode(String[] values) {
-        int size = values.length;
-        byte[][] redisValues = new byte[size][];
-        for (int i = 0; i < size; i++) {
-            redisValues[i] = encode(values[i]);
-        }
-        return redisValues;
-    }
-
     static String decode(byte[] value) {
         if (value == null) return null;
         return new String(value, Charsets.UTF_8);
