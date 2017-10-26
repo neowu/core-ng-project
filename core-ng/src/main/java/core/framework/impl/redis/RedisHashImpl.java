@@ -83,7 +83,7 @@ public final class RedisHashImpl implements RedisHash {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(HSET, encode(key), encode(value));
+            connection.write(HSET, encode(key), encode(field), encode(value));
             connection.readLong();
         } catch (IOException e) {
             item.broken = true;

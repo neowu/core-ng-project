@@ -31,7 +31,7 @@ class RedisConnection implements AutoCloseable {
         socket.setSoLinger(true, 0); // Control calls close () method, the underlying socket is closed immediately
         socket.connect(new InetSocketAddress(host, DEFAULT_PORT), timeoutInMs);
         socket.setSoTimeout(timeoutInMs);
-        outputStream = new RedisOutputStream(socket.getOutputStream());
+        outputStream = new RedisOutputStream(socket.getOutputStream(), 8192);
         inputStream = new RedisInputStream(socket.getInputStream());
     }
 

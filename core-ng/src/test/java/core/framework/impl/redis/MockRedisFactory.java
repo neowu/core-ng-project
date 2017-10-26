@@ -15,7 +15,7 @@ class MockRedisFactory {
         RedisImpl redis = new RedisImpl(null);
         redis.pool = new Pool<>(() -> {
             RedisConnection connection = new RedisConnection(null, Duration.ZERO);
-            connection.outputStream = new RedisOutputStream(requestStream);
+            connection.outputStream = new RedisOutputStream(requestStream, 512);
             connection.inputStream = new RedisInputStream(new ByteArrayInputStream(Strings.bytes(response.data)));
             return connection;
         }, null);

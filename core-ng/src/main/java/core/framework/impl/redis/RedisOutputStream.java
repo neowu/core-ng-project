@@ -9,11 +9,12 @@ import java.io.OutputStream;
  */
 class RedisOutputStream {
     private final OutputStream outputStream;
-    private final byte[] buffer = new byte[8192];
+    private final byte[] buffer;
     private int position;
 
-    RedisOutputStream(OutputStream outputStream) {
+    RedisOutputStream(OutputStream outputStream, int bufferSize) {
         this.outputStream = outputStream;
+        buffer = new byte[bufferSize];
     }
 
     void write(byte value) throws IOException {
@@ -25,11 +26,11 @@ class RedisOutputStream {
 
     void writeBytesCRLF(byte[] bytes) throws IOException {
         int length = bytes.length;
-        if (length >= buffer.length) {
+        if (length > buffer.length) {
             flush();
             outputStream.write(bytes);
         } else {
-            if (length >= buffer.length - length) {
+            if (length > buffer.length - position) {
                 flush();
             }
             System.arraycopy(bytes, 0, buffer, position, length);

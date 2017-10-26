@@ -19,7 +19,7 @@ class ProtocolTest {
     @Test
     void write() throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        Protocol.write(new RedisOutputStream(stream), Protocol.Command.SET, RedisEncodings.encode("k1"), RedisEncodings.encode("v1"));
+        Protocol.write(new RedisOutputStream(stream, 8192), Protocol.Command.SET, RedisEncodings.encode("k1"), RedisEncodings.encode("v1"));
         assertEquals("*3\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n", decode(stream.toByteArray()));
     }
 

@@ -1,11 +1,15 @@
 package core.framework.impl.redis;
 
+import core.framework.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
+import java.util.Map;
 
 import static core.framework.impl.redis.RedisEncodings.decode;
+import static core.framework.impl.redis.RedisEncodings.encode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -38,5 +42,28 @@ class RedisImplTest {
         redis.set("key", "value");
 
         assertEquals("*3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n", decode(request.toByteArray()));
+    }
+
+    @Test
+    void multiSet() {
+        response.data = "+OK\r\n";
+        Map<String, String> values = Maps.newLinkedHashMap();
+        values.put("k1", "v1");
+        values.put("k2", "v2");
+        redis.multiSet(values);
+
+        assertEquals("*5\r\n$4\r\nMSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n$2\r\nk2\r\n$2\r\nv2\r\n", decode(request.toByteArray()));
+    }
+
+    @Test
+    void multiSetWithExpiration() {
+        response.data = "+OK\r\n+OK\r\n";
+        Map<String, byte[]> values = Maps.newLinkedHashMap();
+        values.put("k1", encode("v1"));
+        values.put("k2", encode("v2"));
+        redis.multiSet(values, Duration.ofMinutes(1));
+
+        assertEquals("*4\r\n$5\r\nSETEX\r\n$2\r\nk1\r\n$2\r\n60\r\n$2\r\nv1\r\n"
+                + "*4\r\n$5\r\nSETEX\r\n$2\r\nk2\r\n$2\r\n60\r\n$2\r\nv2\r\n", decode(request.toByteArray()));
     }
 }

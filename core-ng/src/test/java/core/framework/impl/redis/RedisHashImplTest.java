@@ -39,7 +39,7 @@ class RedisHashImplTest {
         response.data = ":1\r\n";
         redis.set("key", "f1", "v1");
 
-        assertEquals("*3\r\n$4\r\nHSET\r\n$3\r\nkey\r\n$2\r\nv1\r\n", decode(request.toByteArray()));
+        assertEquals("*4\r\n$4\r\nHSET\r\n$3\r\nkey\r\n$2\r\nf1\r\n$2\r\nv1\r\n", decode(request.toByteArray()));
     }
 
     @Test
