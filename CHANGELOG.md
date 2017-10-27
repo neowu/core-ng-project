@@ -1,5 +1,5 @@
 ## Change log
-### 5.1.1 (10/17/2017 - )
+### 5.1.1 (10/17/2017 - 10/27/2017)
 * pool: refactor and simplify resource pool
 * web: @QueryParam bean validation to disallow @Property
 * httpClient: changed httpClient to interface, to make it easier to mock/override binding, change HTTPRequest to bean style from builder style
