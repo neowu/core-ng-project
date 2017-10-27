@@ -1,6 +1,17 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.6.0"
+    }
+}
+
 apply plugin: 'checkstyle'
 apply plugin: 'pmd'
-apply plugin: 'findbugs'
+apply plugin: com.github.spotbugs.SpotBugsPlugin
 apply plugin: 'jacoco'
 
 checkstyle {
@@ -20,14 +31,14 @@ pmd {
     consoleOutput = true
 }
 
-findbugs {
+spotbugs {
     effort = 'max'
     reportLevel = 'low'
-    excludeFilter = rootProject.file('gradle/findbugs/exclude-filter.xml')
-    toolVersion = '3.0.1'
+    excludeFilter = rootProject.file('gradle/spotbugs/exclude-filter.xml')
+    toolVersion = '3.1.0'
 }
 
-tasks.withType(FindBugs) {
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
     reports {
         xml.enabled = false
         html.enabled = true

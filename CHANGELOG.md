@@ -6,6 +6,7 @@
               you need to update the binding to "bind(HTTPClient.class, new HTTPClientBuilder().build())"              
 * redis: replaced jedis impl with minimal support
         we only need to support request/response/pipeline model, and due to we manage resource pool, cluster support requires customization anyway
+* check: replace findbugs with spotbugs
 
 ### 5.1.0 (10/13/2017 - 10/16/2017)
 * test: updated to junit 5, for old tests before upgrading API, add following dependency 'junit:junit:4.12' 'org.junit.vintage:junit-vintage-engine:4.12.1'

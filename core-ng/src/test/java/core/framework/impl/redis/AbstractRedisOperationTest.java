@@ -20,9 +20,9 @@ import static org.mockito.Mockito.when;
  * @author neo
  */
 abstract class AbstractRedisOperationTest {
-    ByteArrayOutputStream request;
     RedisImpl redis;
-    PoolItem<RedisConnection> poolItem;
+    private ByteArrayOutputStream request;
+    private PoolItem<RedisConnection> poolItem;
 
     @SuppressWarnings("unchecked")
     @BeforeEach
