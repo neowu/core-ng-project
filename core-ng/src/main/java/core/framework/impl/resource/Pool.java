@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  *
  * @author neo
  */
-public final class Pool<T extends AutoCloseable> {
+public class Pool<T extends AutoCloseable> {
     final BlockingDeque<PoolItem<T>> idleItems = new LinkedBlockingDeque<>();
     private final Logger logger = LoggerFactory.getLogger(Pool.class);
     private final AtomicInteger total = new AtomicInteger(0);

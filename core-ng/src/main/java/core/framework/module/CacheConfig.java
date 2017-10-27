@@ -72,7 +72,7 @@ public final class CacheConfig {
             logger.info("create redis cache manager, host={}", host);
 
             RedisImpl redis = new RedisImpl("redis-cache");
-            redis.host(host);
+            redis.host = host;
             redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
             context.shutdownHook.add(redis::close);
             context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));

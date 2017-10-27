@@ -35,20 +35,16 @@ public final class RedisImpl implements Redis {
     private final RedisHash redisHash = new RedisHashImpl(this);
     private final String name;
     public Pool<RedisConnection> pool;
-    private String host;
-    private long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
-    private Duration timeout = Duration.ofSeconds(5);
+    public String host;
+    long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
+    Duration timeout;
 
     public RedisImpl(String name) {
         this.name = name;
         pool = new Pool<>(this::createConnection, name);
         pool.size(5, 50);
         pool.maxIdleTime(Duration.ofMinutes(30));
-        pool.checkoutTimeout(timeout);
-    }
-
-    public void host(String host) {
-        this.host = host;
+        timeout(Duration.ofSeconds(5));
     }
 
     public void timeout(Duration timeout) {
@@ -197,8 +193,7 @@ public final class RedisImpl implements Redis {
         try {
             RedisConnection connection = item.resource;
             connection.write(Protocol.Command.DEL, encode(key));
-            Long response = connection.readLong();
-            return response == 1;
+            return connection.readLong() == 1;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);

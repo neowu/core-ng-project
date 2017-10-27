@@ -37,7 +37,7 @@ public final class RedisConfig {
 
     public void host(String host) {
         if (!context.isTest()) {
-            ((RedisImpl) state.redis).host(host);
+            ((RedisImpl) state.redis).host = host;
         }
         state.host = host;
     }
