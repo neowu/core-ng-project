@@ -132,7 +132,7 @@ public class DataTypeValidator {
         }
         Constructor<?>[] constructors = objectClass.getDeclaredConstructors();
         if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
-            throw Exceptions.error("class must contain only one public default constructor, class={}, constructors={}", objectClass.getCanonicalName(), Arrays.toString(constructors));
+            throw Exceptions.error("class must have only one public default constructor, class={}, constructors={}", objectClass.getCanonicalName(), Arrays.toString(constructors));
         }
     }
 

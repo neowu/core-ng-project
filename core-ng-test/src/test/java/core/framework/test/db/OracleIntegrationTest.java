@@ -3,12 +3,12 @@ package core.framework.test.db;
 import core.framework.db.Database;
 import core.framework.db.Query;
 import core.framework.db.Repository;
+import core.framework.inject.Inject;
+import core.framework.inject.Named;
 import core.framework.test.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
 import java.util.Optional;
 

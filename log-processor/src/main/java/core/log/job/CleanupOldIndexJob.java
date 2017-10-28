@@ -1,5 +1,6 @@
 package core.log.job;
 
+import core.framework.inject.Inject;
 import core.framework.scheduler.Job;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchIndex;
@@ -8,7 +9,6 @@ import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;

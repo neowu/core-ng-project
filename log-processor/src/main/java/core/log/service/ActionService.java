@@ -1,6 +1,7 @@
 package core.log.service;
 
 import core.framework.impl.log.queue.ActionLogMessage;
+import core.framework.inject.Inject;
 import core.framework.search.BulkIndexRequest;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.IndexRequest;
@@ -8,7 +9,6 @@ import core.framework.util.Maps;
 import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;

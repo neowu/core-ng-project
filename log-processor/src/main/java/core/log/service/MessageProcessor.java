@@ -3,6 +3,7 @@ package core.log.service;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.queue.ActionLogMessage;
 import core.framework.impl.log.queue.StatMessage;
+import core.framework.inject.Inject;
 import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
@@ -12,7 +13,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,19 +27,37 @@ public class MessageProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
     private final AtomicBoolean stop = new AtomicBoolean(false);
-    private final Thread processorThread;
     private final JSONReader<ActionLogMessage> actionLogMessageReader = JSONReader.of(ActionLogMessage.class);
     private final JSONReader<StatMessage> statMessageReader = JSONReader.of(StatMessage.class);
-    private final Consumer<String, byte[]> consumer;
 
     @Inject
-    public MessageProcessor(KafkaConsumerFactory consumerFactory, ActionService actionService, StatService statService, IndexService indexService) {
+    KafkaConsumerFactory consumerFactory;
+    @Inject
+    ActionService actionService;
+    @Inject
+    StatService statService;
+    @Inject
+    IndexService indexService;
+
+    private Thread processorThread;
+    private Consumer<String, byte[]> consumer;
+
+    public void start() {
+        createIndexTemplates();
+        processorThread.start();
+    }
+
+    public void stop() {
+        stop.set(true);
+        consumer.wakeup();
+    }
+
+    public void initialize() {
         consumer = consumerFactory.create();
         consumer.subscribe(Lists.newArrayList(TOPIC_ACTION_LOG, TOPIC_STAT));
 
         processorThread = new Thread(() -> {
             logger.info("message processor started, kafkaURI={}", consumerFactory.uri);
-            createIndexTemplates(indexService);
             while (!stop.get()) {
                 try {
                     ConsumerRecords<String, byte[]> records = consumer.poll(Long.MAX_VALUE);
@@ -58,7 +76,7 @@ public class MessageProcessor {
         }, "message-processor");
     }
 
-    private void createIndexTemplates(IndexService indexService) {
+    private void createIndexTemplates() {
         while (!stop.get()) {
             try {
                 indexService.createIndexTemplates();
@@ -70,15 +88,6 @@ public class MessageProcessor {
                 }
             }
         }
-    }
-
-    public void start() {
-        processorThread.start();
-    }
-
-    public void stop() {
-        stop.set(true);
-        consumer.wakeup();
     }
 
     private <T> void consume(String topic, ConsumerRecords<String, byte[]> records, JSONReader<T> reader, java.util.function.Consumer<List<T>> consumer) {

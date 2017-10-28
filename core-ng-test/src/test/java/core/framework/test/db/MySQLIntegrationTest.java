@@ -3,11 +3,11 @@ package core.framework.test.db;
 import core.framework.db.Database;
 import core.framework.db.Query;
 import core.framework.db.Repository;
+import core.framework.inject.Inject;
 import core.framework.test.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;

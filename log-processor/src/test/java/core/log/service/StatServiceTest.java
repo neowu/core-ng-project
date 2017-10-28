@@ -1,6 +1,7 @@
 package core.log.service;
 
 import core.framework.impl.log.queue.StatMessage;
+import core.framework.inject.Inject;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.GetRequest;
 import core.framework.util.Lists;
@@ -9,7 +10,6 @@ import core.log.IntegrationTest;
 import core.log.domain.StatDocument;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;

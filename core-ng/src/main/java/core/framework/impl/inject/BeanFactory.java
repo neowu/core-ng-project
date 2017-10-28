@@ -1,11 +1,11 @@
 package core.framework.impl.inject;
 
+import core.framework.inject.Inject;
+import core.framework.inject.Named;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.Types;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -17,6 +17,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -52,32 +53,19 @@ public class BeanFactory {
             T instance = construct(instanceClass);
             inject(instance);
             return instance;
-        } catch (IllegalAccessException | InstantiationException | RuntimeException e) {
+        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | RuntimeException e) {
             throw Exceptions.error("failed to create bean, instanceClass={}, error={}", instanceClass, e.getMessage(), e);
         } catch (InvocationTargetException e) {
             throw Exceptions.error("failed to create bean, instanceClass={}, error={}", instanceClass, e.getTargetException().getMessage(), e);
         }
     }
 
-    private <T> T construct(Class<T> instanceClass) throws IllegalAccessException, InvocationTargetException, InstantiationException {
-        Constructor<?> targetConstructor = null;
-
-        for (Constructor<?> constructor : instanceClass.getDeclaredConstructors()) {
-            if (constructor.isAnnotationPresent(Inject.class)) {
-                if (targetConstructor != null)
-                    throw Exceptions.error("only one constructor can have @Inject, previous={}, current={}", targetConstructor, constructor);
-                targetConstructor = constructor;
-            }
+    private <T> T construct(Class<T> instanceClass) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+        Constructor<?>[] constructors = instanceClass.getDeclaredConstructors();
+        if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
+            throw Exceptions.error("instance class must have only one public default constructor, class={}, constructors={}", instanceClass.getCanonicalName(), Arrays.toString(constructors));
         }
-        try {
-            if (targetConstructor == null) targetConstructor = instanceClass.getDeclaredConstructor();
-        } catch (NoSuchMethodException e) {
-            throw Exceptions.error("default constructor is required, class={}", instanceClass, e);
-        }
-
-        Object[] params = lookupParams(targetConstructor);
-
-        return instanceClass.cast(targetConstructor.newInstance(params));
+        return instanceClass.getDeclaredConstructor().newInstance();
     }
 
     public <T> void inject(T instance) throws IllegalAccessException, InvocationTargetException {

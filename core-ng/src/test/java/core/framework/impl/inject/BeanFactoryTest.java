@@ -1,11 +1,11 @@
 package core.framework.impl.inject;
 
+import core.framework.inject.Inject;
+import core.framework.inject.Named;
 import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -30,12 +30,10 @@ class BeanFactoryTest {
     void create() {
         beanFactory.bind(Dependency1.class, null, new Dependency1());
         beanFactory.bind(Types.generic(Dependency2.class, String.class), "dep2", new Dependency2<String>());
-        beanFactory.bind(Dependency3.class, null, new Dependency3());
 
         Bean bean = beanFactory.create(Bean.class);
         assertNotNull(bean.dependency1);
         assertNotNull(bean.dependency2);
-        assertNotNull(bean.dependency3);
     }
 
     @Test
@@ -57,19 +55,10 @@ class BeanFactoryTest {
     static class Dependency2<T> {
     }
 
-    static class Dependency3 {
-    }
-
-    static class Bean {
-        final Dependency3 dependency3;
+    public static class Bean {
         @Inject
         Dependency1 dependency1;
         Dependency2<String> dependency2;
-
-        @Inject
-        Bean(Dependency3 dependency3) {
-            this.dependency3 = dependency3;
-        }
 
         @Inject
         public void setDependency2(@Named("dep2") Dependency2<String> dependency2) {

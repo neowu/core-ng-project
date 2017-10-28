@@ -33,6 +33,7 @@ public class LogProcessorApp extends App {
 
         bind(KafkaConsumerFactory.class, new KafkaConsumerFactory(kafkaURI()));
         MessageProcessor processor = bind(MessageProcessor.class);
+        processor.initialize();
         onStartup(processor::start);
         onShutdown(processor::stop);
 

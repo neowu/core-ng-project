@@ -1,6 +1,7 @@
 package core.framework.test.mongo;
 
 import com.mongodb.client.model.Filters;
+import core.framework.inject.Inject;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
 import core.framework.test.IntegrationTest;
@@ -9,7 +10,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

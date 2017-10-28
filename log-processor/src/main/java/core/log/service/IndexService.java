@@ -1,9 +1,8 @@
 package core.log.service;
 
+import core.framework.inject.Inject;
 import core.framework.search.ElasticSearch;
 import core.framework.util.ClasspathResources;
-
-import javax.inject.Inject;
 
 /**
  * @author neo

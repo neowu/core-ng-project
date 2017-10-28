@@ -1,10 +1,9 @@
 package core.framework.test.kafka;
 
+import core.framework.inject.Inject;
 import core.framework.kafka.MessagePublisher;
 import core.framework.test.IntegrationTest;
 import org.junit.jupiter.api.Test;
-
-import javax.inject.Inject;
 
 /**
  * @author neo

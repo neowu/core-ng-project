@@ -1,5 +1,6 @@
 package core.framework.test.search;
 
+import core.framework.inject.Inject;
 import core.framework.search.BulkIndexRequest;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
@@ -16,7 +17,6 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;

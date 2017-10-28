@@ -1,4 +1,7 @@
 ## Change log
+### 5.2.0 (10/28/2017 - )
+* bean: removed "javax.inject:javax.inject:1", replaced with core.framework.inject, removed constructor injection support (to simplify and prepare for JDK 9) 
+
 ### 5.1.1 (10/17/2017 - 10/27/2017)
 * pool: refactor and simplify resource pool
 * web: @QueryParam bean validation to disallow @Property
