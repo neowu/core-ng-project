@@ -12,7 +12,6 @@ import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -96,7 +95,7 @@ public class DynamicInstanceBuilder<T> {
             Class<T> targetClass = classBuilder.toClass();
             classBuilder.detach();
             return targetClass.getDeclaredConstructor(constructorParamClasses).newInstance(constructorParams);
-        } catch (CannotCompileException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (CannotCompileException | ReflectiveOperationException e) {
             throw new CodeCompileException(e);
         }
     }

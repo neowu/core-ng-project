@@ -4,7 +4,6 @@ import core.framework.util.Exceptions;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -22,6 +21,8 @@ public class ControllerInspector {
     private static final Method CONTROLLER_EXECUTE;
 
     static {
+        validateJavaVersion();
+
         try {
             CLASS_GET_CONSTANT_POOL = Class.class.getDeclaredMethod("getConstantPool");
             AccessController.doPrivileged((PrivilegedAction<Method>) () -> {
@@ -33,11 +34,9 @@ public class ControllerInspector {
             CONSTANT_POOL_GET_MEMBER_REF_INFO_AT = constantPoolClass.getDeclaredMethod("getMemberRefInfoAt", int.class);
 
             CONTROLLER_EXECUTE = Controller.class.getDeclaredMethod("execute", Request.class);
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
+        } catch (ReflectiveOperationException e) {
             throw new Error("failed to initialize controller inspector, please contact arch team", e);
         }
-
-        validateJavaVersion();
     }
 
     private static void validateJavaVersion() {
@@ -77,7 +76,7 @@ public class ControllerInspector {
                     targetMethod = targetClass.getMethod(targetMethodName, CONTROLLER_EXECUTE.getParameterTypes());
                 }
             }
-        } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
+        } catch (ReflectiveOperationException e) {
             throw new Error("failed to inspect controller", e);
         }
     }

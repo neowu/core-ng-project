@@ -118,17 +118,21 @@ public final class DatabaseImpl implements Database {
     }
 
     private Driver driver(String url) {
+        if (url.startsWith("jdbc:mysql:")) {
+            return createDriver("com.mysql.jdbc.Driver");
+        } else if (url.startsWith("jdbc:oracle:")) {
+            return createDriver("oracle.jdbc.OracleDriver");
+        } else if (url.startsWith("jdbc:hsqldb:")) {
+            return createDriver("org.hsqldb.jdbc.JDBCDriver");
+        } else {
+            throw Exceptions.error("not supported database, url={}", url);
+        }
+    }
+
+    private Driver createDriver(String driverClass) {
         try {
-            if (url.startsWith("jdbc:mysql:")) {
-                return (Driver) Class.forName("com.mysql.jdbc.Driver").newInstance();
-            } else if (url.startsWith("jdbc:hsqldb:")) {
-                return (Driver) Class.forName("org.hsqldb.jdbc.JDBCDriver").newInstance();
-            } else if (url.startsWith("jdbc:oracle:")) {
-                return (Driver) Class.forName("oracle.jdbc.OracleDriver").newInstance();
-            } else {
-                throw Exceptions.error("not supported database, url={}", url);
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            return (Driver) Class.forName(driverClass).getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             throw new Error(e);
         }
     }

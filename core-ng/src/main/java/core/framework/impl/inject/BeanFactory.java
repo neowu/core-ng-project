@@ -53,14 +53,14 @@ public class BeanFactory {
             T instance = construct(instanceClass);
             inject(instance);
             return instance;
-        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | RuntimeException e) {
-            throw Exceptions.error("failed to create bean, instanceClass={}, error={}", instanceClass, e.getMessage(), e);
         } catch (InvocationTargetException e) {
             throw Exceptions.error("failed to create bean, instanceClass={}, error={}", instanceClass, e.getTargetException().getMessage(), e);
+        } catch (ReflectiveOperationException e) {
+            throw new Error(e);
         }
     }
 
-    private <T> T construct(Class<T> instanceClass) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+    private <T> T construct(Class<T> instanceClass) throws ReflectiveOperationException {
         Constructor<?>[] constructors = instanceClass.getDeclaredConstructors();
         if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
             throw Exceptions.error("instance class must have only one public default constructor, class={}, constructors={}", instanceClass.getCanonicalName(), Arrays.toString(constructors));
@@ -68,7 +68,7 @@ public class BeanFactory {
         return instanceClass.getDeclaredConstructor().newInstance();
     }
 
-    public <T> void inject(T instance) throws IllegalAccessException, InvocationTargetException {
+    public <T> void inject(T instance) throws ReflectiveOperationException {
         Class<?> visitorType = instance.getClass();
         while (!visitorType.equals(Object.class)) {
             for (Field field : visitorType.getDeclaredFields()) {

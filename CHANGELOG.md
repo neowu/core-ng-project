@@ -1,6 +1,7 @@
 ## Change log
 ### 5.2.0 (10/28/2017 - )
 * bean: removed "javax.inject:javax.inject:1", replaced with core.framework.inject, removed constructor injection support (to simplify and prepare for JDK 9) 
+* jdk: make built target compatible with JDK 9, as first step of java 9 migration (some of toolchain does not support java 9 yet) 
 
 ### 5.1.1 (10/17/2017 - 10/27/2017)
 * pool: refactor and simplify resource pool
