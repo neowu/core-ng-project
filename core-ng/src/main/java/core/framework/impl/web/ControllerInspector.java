@@ -12,7 +12,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
 /**
- * due to Java 8 doesn't provide formal way to reflect lambda method reference, we uses sun internal API for now
+ * due to Java 8/9 doesn't provide formal way to reflect lambda method reference, we uses sun internal API for now
  * and wait for JDK update in future
  *
  * @author neo
@@ -90,7 +90,7 @@ public class ControllerInspector {
                     targetMethod = controllerClass.getMethod(CONTROLLER_EXECUTE.getName(), CONTROLLER_EXECUTE.getParameterTypes());
                 } else {    // for method reference
                     this.targetClass = targetClass;
-                    targetMethod = targetClass.getMethod(targetMethodName, CONTROLLER_EXECUTE.getParameterTypes());
+                    targetMethod = targetClass.getDeclaredMethod(targetMethodName, CONTROLLER_EXECUTE.getParameterTypes());
                 }
             }
         } catch (ReflectiveOperationException e) {

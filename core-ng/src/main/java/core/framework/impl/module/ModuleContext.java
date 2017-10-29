@@ -94,7 +94,7 @@ public final class ModuleContext {
     public void route(HTTPMethod method, String path, Controller controller, boolean skipInterceptor) {
         new PathPatternValidator(path).validate();
         ControllerInspector inspector = new ControllerInspector(controller);
-        new ControllerClassValidator(inspector.targetClass).validate();
+        new ControllerClassValidator(inspector.targetClass, inspector.targetMethod).validate();
         String action = new ControllerActionBuilder(method, path).build();
         httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
     }
