@@ -68,7 +68,7 @@ public class BeanFactory {
         return instanceClass.getDeclaredConstructor().newInstance();
     }
 
-    public <T> void inject(T instance) throws ReflectiveOperationException {
+    public <T> void inject(T instance) throws IllegalAccessException, InvocationTargetException {
         Class<?> visitorType = instance.getClass();
         while (!visitorType.equals(Object.class)) {
             for (Field field : visitorType.getDeclaredFields()) {
@@ -77,7 +77,6 @@ public class BeanFactory {
                     field.set(instance, lookupValue(field));
                 }
             }
-
             for (Method method : visitorType.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(Inject.class)) {
                     makeAccessible(method);

@@ -4,9 +4,12 @@ import core.framework.util.Exceptions;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 /**
  * due to Java 8 doesn't provide formal way to reflect lambda method reference, we uses sun internal API for now
@@ -25,28 +28,42 @@ public class ControllerInspector {
 
         try {
             CLASS_GET_CONSTANT_POOL = Class.class.getDeclaredMethod("getConstantPool");
-            AccessController.doPrivileged((PrivilegedAction<Method>) () -> {
-                CLASS_GET_CONSTANT_POOL.setAccessible(true);
-                return CLASS_GET_CONSTANT_POOL;
-            });
-            Class<?> constantPoolClass = Class.forName("sun.reflect.ConstantPool"); // for java 8 constantPool is sun.reflect.ConstantPool, java 9 is jdk.internal.reflect.ConstantPool
+            overrideAccessible(CLASS_GET_CONSTANT_POOL);
+
+            Class<?> constantPoolClass = Class.forName("9".equals(System.getProperty("java.version")) ? "jdk.internal.reflect.ConstantPool" : "sun.reflect.ConstantPool"); // for java 8 constantPool is sun.reflect.ConstantPool, java 9 is jdk.internal.reflect.ConstantPool
             CONSTANT_POOL_GET_SIZE = constantPoolClass.getDeclaredMethod("getSize");
+            overrideAccessible(CONSTANT_POOL_GET_SIZE);
             CONSTANT_POOL_GET_MEMBER_REF_INFO_AT = constantPoolClass.getDeclaredMethod("getMemberRefInfoAt", int.class);
+            overrideAccessible(CONSTANT_POOL_GET_MEMBER_REF_INFO_AT);
 
             CONTROLLER_EXECUTE = Controller.class.getDeclaredMethod("execute", Request.class);
-        } catch (ReflectiveOperationException e) {
+        } catch (ReflectiveOperationException | PrivilegedActionException e) {
             throw new Error("failed to initialize controller inspector, please contact arch team", e);
         }
     }
 
     private static void validateJavaVersion() {
         String javaVersion = System.getProperty("java.version");
+        if ("9".equals(javaVersion)) return;
+
         if (!javaVersion.startsWith("1.8.0_"))
             throw Exceptions.error("unsupported java version, please use latest jdk 8, jdk={}", javaVersion);
         int minorVersion = Integer.parseInt(javaVersion.substring(6));
         if (minorVersion < 60) {
             throw Exceptions.error("unsupported java 8 version, please use latest jdk 8, jdk={}", javaVersion);
         }
+    }
+
+    private static void overrideAccessible(Method method) throws PrivilegedActionException, ReflectiveOperationException {
+        Field overrideField = AccessibleObject.class.getDeclaredField("override");
+        Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+        Object unsafe = AccessController.doPrivileged((PrivilegedExceptionAction<?>) () -> {
+            Field field = unsafeClass.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            return field.get(null);
+        });
+        long overrideFieldOffset = (long) unsafeClass.getMethod("objectFieldOffset", Field.class).invoke(unsafe, overrideField);
+        unsafeClass.getMethod("putBoolean", Object.class, long.class, boolean.class).invoke(unsafe, method, overrideFieldOffset, true);
     }
 
     public final Class<?> targetClass;

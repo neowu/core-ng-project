@@ -28,7 +28,7 @@ final class TestManager {
         try {
             AbstractTestModule module = moduleClass.getConstructor().newInstance();
             module.configure(beanFactory);
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (ReflectiveOperationException e) {
             throw new Error("failed to create test context", e);
         }
     }
