@@ -51,16 +51,16 @@ class InvocationImplTest {
         }
     }
 
-    private static class Stack {
+    static class Stack {
         int currentStack = 0;
     }
 
-    private static class TestController implements Controller {
+    static final class TestController implements Controller {
         final Stack stack;
         final int expectedStack;
         boolean executed;
 
-        private TestController(Stack stack, int expectedStack) {
+        TestController(Stack stack, int expectedStack) {
             this.stack = stack;
             this.expectedStack = expectedStack;
         }
@@ -73,12 +73,12 @@ class InvocationImplTest {
         }
     }
 
-    private static class TestInterceptor implements Interceptor {
+    static final class TestInterceptor implements Interceptor {
         final Stack stack;
         final int expectedStack;
         boolean executed;
 
-        private TestInterceptor(Stack stack, int expectedStack) {
+        TestInterceptor(Stack stack, int expectedStack) {
             this.stack = stack;
             this.expectedStack = expectedStack;
         }
