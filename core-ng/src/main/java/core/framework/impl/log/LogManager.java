@@ -58,12 +58,16 @@ public final class LogManager {
 
     public void logError(Throwable e) {
         String errorMessage = e.getMessage();
-        String errorCode = e instanceof ErrorCode ? ((ErrorCode) e).errorCode() : e.getClass().getCanonicalName();
+        String errorCode = errorCode(e);
         Marker marker = Markers.errorCode(errorCode);
         if (e instanceof ErrorCode && ((ErrorCode) e).severity() == Severity.WARN) {
             logger.warn(marker, errorMessage, e);
         } else {
             logger.error(marker, errorMessage, e);
         }
+    }
+
+    String errorCode(Throwable e) {
+        return e instanceof ErrorCode ? ((ErrorCode) e).errorCode() : e.getClass().getCanonicalName();
     }
 }

@@ -30,8 +30,8 @@ public class ProducerMetrics implements Metrics {
 
     @Override
     public void collect(Map<String, Double> stats) {
-        if (requestRate != null) stats.put(statName("request_rate"), requestRate.value());
-        if (outgoingByteRate != null) stats.put(statName("outgoing_byte_rate"), outgoingByteRate.value());
+        if (requestRate != null) stats.put(statName("request_rate"), (Double) requestRate.metricValue());
+        if (outgoingByteRate != null) stats.put(statName("outgoing_byte_rate"), (Double) outgoingByteRate.metricValue());
     }
 
     private String statName(String statName) {

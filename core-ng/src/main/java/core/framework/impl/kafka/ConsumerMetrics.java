@@ -45,7 +45,7 @@ public class ConsumerMetrics implements Metrics {
     }
 
     private double sum(List<Metric> metrics) {
-        return metrics.stream().mapToDouble(Metric::value).filter(Double::isFinite).sum();
+        return metrics.stream().mapToDouble(metric -> (double) metric.metricValue()).filter(Double::isFinite).sum();
     }
 
     String statName(String statName) {
