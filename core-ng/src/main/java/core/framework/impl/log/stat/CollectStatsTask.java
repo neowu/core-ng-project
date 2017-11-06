@@ -21,16 +21,6 @@ import java.util.concurrent.TimeUnit;
  * @author neo
  */
 public class CollectStatsTask implements Runnable {
-    static String garbageCollectorName(String name) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < name.length(); i++) {
-            char ch = name.charAt(i);
-            if (ch == ' ') builder.append('_');
-            else builder.append(ASCII.toLowerCase(ch));
-        }
-        return builder.toString();
-    }
-
     private final Logger logger = LoggerFactory.getLogger(CollectStatsTask.class);
     private final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
@@ -54,6 +44,11 @@ public class CollectStatsTask implements Runnable {
     @Override
     public void run() {
         Map<String, Double> stats = Maps.newLinkedHashMap();
+        collect(stats);
+        logForwarder.forwardStats(stats);
+    }
+
+    void collect(Map<String, Double> stats) {
         stats.put("sys_load_avg", os.getSystemLoadAverage());
         stats.put("thread_count", (double) thread.getThreadCount());
         MemoryUsage usage = memory.getHeapMemoryUsage();
@@ -67,19 +62,23 @@ public class CollectStatsTask implements Runnable {
             stats.put("jvm_gc_" + gcStat.name + "_total_elapsed", (double) elapsedTime);
         }
 
-        collectMetrics(stats);
-
-        logForwarder.forwardStats(stats);
-    }
-
-    private void collectMetrics(Map<String, Double> stats) {
-        for (Metrics customMetrics : metrics) {
+        for (Metrics metrics : metrics) {
             try {
-                customMetrics.collect(stats);
+                metrics.collect(stats);
             } catch (Throwable e) {
-                logger.warn("failed to collect metrics, metrics={}, error={}", customMetrics.getClass().getCanonicalName(), e.getMessage(), e);
+                logger.warn("failed to collect metrics, metrics={}, error={}", metrics.getClass().getCanonicalName(), e.getMessage(), e);
             }
         }
+    }
+
+    String garbageCollectorName(String name) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < name.length(); i++) {
+            char ch = name.charAt(i);
+            if (ch == ' ') builder.append('_');
+            else builder.append(ASCII.toLowerCase(ch));
+        }
+        return builder.toString();
     }
 
     static class GCStat {
