@@ -22,6 +22,10 @@ public class PropertyController implements Controller {
     public Response execute(Request request) {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
+        return Response.text(text());
+    }
+
+    String text() {
         StringBuilder builder = new StringBuilder();
         Set<String> keys = new TreeSet<>(properties.keys());    // sort by key
         for (String key : keys) {
@@ -32,7 +36,7 @@ public class PropertyController implements Controller {
                 builder.append('=').append(properties.get(key).orElse("")).append('\n');
             }
         }
-        return Response.text(builder.toString());
+        return builder.toString();
     }
 
     private boolean mask(String key) {

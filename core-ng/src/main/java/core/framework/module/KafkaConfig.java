@@ -1,8 +1,10 @@
 package core.framework.module;
 
+import core.framework.http.HTTPMethod;
 import core.framework.impl.kafka.Kafka;
 import core.framework.impl.kafka.KafkaMessagePublisher;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.web.management.KafkaController;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.kafka.MessagePublisher;
@@ -42,6 +44,10 @@ public final class KafkaConfig {
             context.metrics.add(kafka.consumerMetrics);
             context.startupHook.add(kafka::initialize);
             context.shutdownHook.add(kafka::close);
+
+            KafkaController controller = new KafkaController(kafka);
+            context.route(HTTPMethod.GET, "/_sys/kafka/topic", controller::topics, true);
+
             return kafka;
         }
     }

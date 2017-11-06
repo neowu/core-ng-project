@@ -3,6 +3,8 @@ package core.framework.impl.kafka;
 import core.framework.impl.log.LogManager;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -89,6 +91,14 @@ public class Kafka {
         } finally {
             logger.info("create kafka consumer, uri={}, name={}, topics={}, elapsedTime={}", uri, name, topics, watch.elapsedTime());
         }
+    }
+
+    public AdminClient admin() {
+        if (uri == null) throw new Error("uri must not be null");
+
+        Map<String, Object> config = Maps.newHashMap();
+        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
+        return AdminClient.create(config);
     }
 
     public KafkaMessageListener listener() {

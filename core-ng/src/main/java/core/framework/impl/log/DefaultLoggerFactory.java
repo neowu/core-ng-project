@@ -24,7 +24,8 @@ public final class DefaultLoggerFactory implements ILoggerFactory {
 
     private LogLevel infoLevel(String name) {
         if ("org.apache.kafka.clients.consumer.ConsumerConfig".equals(name)
-            || "org.apache.kafka.clients.producer.ProducerConfig".equals(name)) {
+                || "org.apache.kafka.clients.producer.ProducerConfig".equals(name)
+                || "org.apache.kafka.clients.admin.AdminClientConfig".equals(name)) {
             return LogLevel.WARN;
         }
         return LogLevel.INFO;
@@ -32,9 +33,9 @@ public final class DefaultLoggerFactory implements ILoggerFactory {
 
     private LogLevel traceLevel(String name) {
         if (name.startsWith("org.elasticsearch")
-            || name.startsWith("org.mongodb")
-            || name.startsWith("org.apache")
-            || name.startsWith("org.xnio")) {
+                || name.startsWith("org.mongodb")
+                || name.startsWith("org.apache")
+                || name.startsWith("org.xnio")) {
             return LogLevel.INFO;
         }
         return LogLevel.DEBUG;

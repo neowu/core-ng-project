@@ -67,7 +67,7 @@ public final class SchedulerConfig {
             context.startupHook.add(scheduler::start);
             context.shutdownHook.add(scheduler::stop);
             SchedulerController schedulerController = new SchedulerController(scheduler);
-            context.route(HTTPMethod.GET, "/_sys/job", schedulerController::listJobs, true);
+            context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);
             context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
         }
         return scheduler;

@@ -20,7 +20,7 @@ public class SchedulerController {
         this.scheduler = scheduler;
     }
 
-    public Response listJobs(Request request) {
+    public Response jobs(Request request) {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
         List<JobView> jobs = Lists.newArrayList();
