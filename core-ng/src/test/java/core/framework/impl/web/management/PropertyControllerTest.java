@@ -14,7 +14,6 @@ class PropertyControllerTest {
         Properties properties = new Properties();
         properties.load("property-controller-test/test.properties");
         PropertyController controller = new PropertyController(properties);
-        assertEquals("sys.jdbc.password=(masked)\n" +
-                "sys.jdbc.user=user\n", controller.text());
+        assertEquals("sys.jdbc.password=(masked)\nsys.jdbc.user=user\n", controller.text());
     }
 }
