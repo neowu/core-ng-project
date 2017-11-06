@@ -2,6 +2,7 @@ package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
+import core.framework.impl.resource.PoolMetrics;
 import core.framework.redis.Redis;
 
 import java.time.Duration;
@@ -30,6 +31,7 @@ public final class RedisConfig {
             redis = new RedisImpl("redis");
             context.shutdownHook.add(((RedisImpl) redis)::close);
             context.backgroundTask().scheduleWithFixedDelay(((RedisImpl) redis).pool::refresh, Duration.ofMinutes(5));
+            context.metrics.add(new PoolMetrics(((RedisImpl) redis).pool));
         }
         context.beanFactory.bind(Redis.class, null, redis);
         return redis;

@@ -14,16 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author neo
  */
 class PoolTest {
-    private Pool<TestResource> pool;
+    private Pool<TestPoolResource> pool;
 
     @BeforeEach
     void createPool() {
-        pool = new Pool<>(TestResource::new, "pool");
+        pool = new Pool<>(TestPoolResource::new, "pool");
     }
 
     @Test
     void borrowAndReturn() {
-        PoolItem<TestResource> item = pool.borrowItem();
+        PoolItem<TestPoolResource> item = pool.borrowItem();
         assertNotNull(item.resource);
         pool.returnItem(item);
 
@@ -33,7 +33,7 @@ class PoolTest {
 
     @Test
     void returnBrokenResource() {
-        PoolItem<TestResource> item = pool.borrowItem();
+        PoolItem<TestPoolResource> item = pool.borrowItem();
         assertNotNull(item.resource);
         item.broken = true;
         pool.returnItem(item);
@@ -61,19 +61,11 @@ class PoolTest {
 
     @Test
     void close() {
-        PoolItem<TestResource> item = pool.borrowItem();
+        PoolItem<TestPoolResource> item = pool.borrowItem();
         pool.returnItem(item);
 
         pool.close();
         assertTrue(item.resource.closed);
     }
 
-    static class TestResource implements AutoCloseable {
-        boolean closed;
-
-        @Override
-        public void close() {
-            closed = true;
-        }
-    }
 }

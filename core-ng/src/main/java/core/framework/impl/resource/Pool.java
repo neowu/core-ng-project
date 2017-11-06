@@ -25,10 +25,10 @@ import java.util.function.Supplier;
  */
 public class Pool<T extends AutoCloseable> {
     final BlockingDeque<PoolItem<T>> idleItems = new LinkedBlockingDeque<>();
+    final String name;
     private final Logger logger = LoggerFactory.getLogger(Pool.class);
-    private final AtomicInteger total = new AtomicInteger(0);
+    private final AtomicInteger size = new AtomicInteger(0);
     private final Supplier<T> factory;
-    private final String name;
     private int minSize = 1;
     private int maxSize = 50;
     private Duration maxIdleTime = Duration.ofMinutes(30);
@@ -56,7 +56,7 @@ public class Pool<T extends AutoCloseable> {
         PoolItem<T> item = idleItems.poll();
         if (item != null) return item;
 
-        if (total.get() < maxSize) {
+        if (size.get() < maxSize) {
             return createNewItem();
         } else {
             return waitNextAvailableItem();
@@ -74,11 +74,11 @@ public class Pool<T extends AutoCloseable> {
 
     private void recycleItem(PoolItem<T> item) {
         StopWatch watch = new StopWatch();
-        int total = this.total.decrementAndGet();
+        int size = this.size.decrementAndGet();
         try {
             closeResource(item.resource);
         } finally {
-            logger.debug("recycle resource, pool={}, total={}, elapsed={}", name, total, watch.elapsedTime());
+            logger.debug("recycle resource, pool={}, size={}, elapsed={}", name, size, watch.elapsedTime());
         }
     }
 
@@ -91,20 +91,20 @@ public class Pool<T extends AutoCloseable> {
         } catch (InterruptedException e) {
             throw new Error("interrupted during waiting for next available resource", e);
         } finally {
-            logger.debug("wait for next available resource, pool={}, total={}, elapsed={}", name, total.get(), watch.elapsedTime());
+            logger.debug("wait for next available resource, pool={}, size={}, elapsed={}", name, size.get(), watch.elapsedTime());
         }
     }
 
     private PoolItem<T> createNewItem() {
         StopWatch watch = new StopWatch();
-        total.incrementAndGet();
+        size.incrementAndGet();
         try {
             return new PoolItem<>(factory.get());
         } catch (Throwable e) {
-            total.getAndDecrement();
+            size.getAndDecrement();
             throw e;
         } finally {
-            logger.debug("create new resource, pool={}, total={}, elapsed={}", name, total.get(), watch.elapsedTime());
+            logger.debug("create new resource, pool={}, size={}, elapsed={}", name, size.get(), watch.elapsedTime());
         }
     }
 
@@ -112,6 +112,14 @@ public class Pool<T extends AutoCloseable> {
         logger.info("refresh resource pool, pool={}", name);
         recycleIdleItems();
         replenish();
+    }
+
+    int idleCount() {
+        return idleItems.size();
+    }
+
+    int totalCount() {
+        return size.get();
     }
 
     private void recycleIdleItems() {
@@ -132,7 +140,7 @@ public class Pool<T extends AutoCloseable> {
     }
 
     private void replenish() {
-        while (total.get() < minSize) {
+        while (size.get() < minSize) {
             returnItem(createNewItem());
         }
     }
@@ -146,7 +154,7 @@ public class Pool<T extends AutoCloseable> {
     }
 
     public void close() {
-        total.set(maxSize);   // make sure no more new resource will be created
+        size.set(maxSize);   // make sure no more new resource will be created
         while (true) {
             PoolItem<T> item = idleItems.poll();
             if (item == null) return;

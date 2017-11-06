@@ -7,6 +7,7 @@ import core.framework.db.Repository;
 import core.framework.impl.db.DatabaseImpl;
 import core.framework.impl.db.Vendor;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.resource.PoolMetrics;
 import core.framework.util.Exceptions;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
@@ -38,6 +39,7 @@ public final class DBConfig {
         context.shutdownHook.add(database::close);
         if (!context.isTest()) {
             context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(30));
+            context.metrics.add(new PoolMetrics(database.pool));
         }
         context.beanFactory.bind(Database.class, name, database);
         return database;

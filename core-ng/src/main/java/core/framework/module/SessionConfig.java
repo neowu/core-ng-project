@@ -2,6 +2,7 @@ package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
+import core.framework.impl.resource.PoolMetrics;
 import core.framework.impl.web.session.LocalSessionStore;
 import core.framework.impl.web.session.RedisSessionStore;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ public final class SessionConfig {
             RedisImpl redis = new RedisImpl("redis-session");
             redis.host = host;
             context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
+            context.metrics.add(new PoolMetrics(redis.pool));
 
             context.shutdownHook.add(redis::close);
             context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
