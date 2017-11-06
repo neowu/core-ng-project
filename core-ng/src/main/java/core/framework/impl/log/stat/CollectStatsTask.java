@@ -20,20 +20,19 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author neo
  */
-public class CollectStatsTask implements Runnable {
+public final class CollectStatsTask implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(CollectStatsTask.class);
     private final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
-    private final List<GCStat> gcStats;
-    private final LogForwarder logForwarder;
+    private final List<GCStat> gcStats = Lists.newArrayList();
     private final List<Metrics> metrics;
+    private final LogForwarder logForwarder;
 
     public CollectStatsTask(LogForwarder logForwarder, List<Metrics> metrics) {
         this.logForwarder = logForwarder;
         this.metrics = metrics;
 
-        gcStats = Lists.newArrayList();
         List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean bean : beans) {
             String name = garbageCollectorName(bean.getName());
@@ -62,7 +61,11 @@ public class CollectStatsTask implements Runnable {
             stats.put("jvm_gc_" + gcStat.name + "_total_elapsed", (double) elapsedTime);
         }
 
-        for (Metrics metrics : metrics) {
+        collectMetrics(stats);
+    }
+
+    private void collectMetrics(Map<String, Double> stats) {
+        for (Metrics metrics : this.metrics) {
             try {
                 metrics.collect(stats);
             } catch (Throwable e) {
