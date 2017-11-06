@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 /**
  * @author neo
  */
-public class InvocationImpl implements Invocation {
+final class InvocationImpl implements Invocation {
     private final Logger logger = LoggerFactory.getLogger(InvocationImpl.class);
 
     private final ControllerHolder controller;
@@ -23,7 +23,7 @@ public class InvocationImpl implements Invocation {
     private final WebContextImpl context;
     private int currentStack;
 
-    public InvocationImpl(ControllerHolder controller, Interceptors interceptors, Request request, WebContextImpl context) {
+    InvocationImpl(ControllerHolder controller, Interceptors interceptors, Request request, WebContextImpl context) {
         this.controller = controller;
         this.interceptors = interceptors;
         this.request = request;

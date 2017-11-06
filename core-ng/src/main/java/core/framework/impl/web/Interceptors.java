@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class Interceptors {
+public final class Interceptors {
     final List<Interceptor> interceptors = Lists.newArrayList();
 
     public void add(Interceptor interceptor) {
