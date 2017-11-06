@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author neo
  */
 class KafkaControllerTest {
-    KafkaController controller;
+    private KafkaController controller;
 
     @BeforeEach
     void createKafkaController() {

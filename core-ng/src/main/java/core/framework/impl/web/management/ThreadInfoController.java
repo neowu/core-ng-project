@@ -27,17 +27,20 @@ public class ThreadInfoController {
     public Response threadDump(Request request) {
         ControllerHelper.validateFromLocalNetwork(request.clientIP());
 
+        return Response.text(threadDumpText());
+    }
+
+    String threadDumpText() {
         StringBuilder builder = new StringBuilder();
         ThreadInfo[] threads = ManagementFactory.getThreadMXBean().dumpAllThreads(true, true);
         for (ThreadInfo thread : threads) {
-            builder.append(toString(thread)).append('\n');
+            appendThreadInfo(builder, thread);
         }
-        return Response.text(builder.toString());
+        return builder.toString();
     }
 
     // port from ThreadInfo.toString, to print all stack frames (ThreadInfo.toString() only print 8 frames)
-    private String toString(ThreadInfo threadInfo) {
-        StringBuilder builder = new StringBuilder();
+    private void appendThreadInfo(StringBuilder builder, ThreadInfo threadInfo) {
         builder.append('\"').append(threadInfo.getThreadName()).append('\"')
                .append(" Id=").append(threadInfo.getThreadId()).append(' ').append(threadInfo.getThreadState());
         if (threadInfo.getLockName() != null) {
@@ -53,7 +56,7 @@ public class ThreadInfoController {
             builder.append(" (in native)");
         }
         builder.append('\n');
-        printStackTrace(builder, threadInfo);
+        appendStackTrace(builder, threadInfo);
 
         LockInfo[] locks = threadInfo.getLockedSynchronizers();
         if (locks.length > 0) {
@@ -65,10 +68,9 @@ public class ThreadInfoController {
             }
         }
         builder.append('\n');
-        return builder.toString();
     }
 
-    private void printStackTrace(StringBuilder builder, ThreadInfo threadInfo) {
+    private void appendStackTrace(StringBuilder builder, ThreadInfo threadInfo) {
         StackTraceElement[] stackTrace = threadInfo.getStackTrace();
         for (int i = 0, stackTraceLength = stackTrace.length; i < stackTraceLength; i++) {
             StackTraceElement stack = stackTrace[i];
