@@ -16,7 +16,7 @@ apply plugin: 'jacoco'
 
 checkstyle {
     dependencies {
-        checkstyle 'com.puppycrawl.tools:checkstyle:8.3'
+        checkstyle 'com.puppycrawl.tools:checkstyle:8.4'
         checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.24.2'
     }
 
