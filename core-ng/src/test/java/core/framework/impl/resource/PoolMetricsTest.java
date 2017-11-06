@@ -34,7 +34,7 @@ class PoolMetricsTest {
         Map<String, Double> stats = Maps.newHashMap();
         metrics.collect(stats);
 
-        assertEquals(1, stats.get("pool_test_idle_count").intValue());
+        assertEquals(1, stats.get("pool_test_active_count").intValue());
         assertEquals(2, stats.get("pool_test_total_count").intValue());
     }
 }

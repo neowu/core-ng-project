@@ -114,8 +114,8 @@ public class Pool<T extends AutoCloseable> {
         replenish();
     }
 
-    int idleCount() {
-        return idleItems.size();
+    int activeCount() {
+        return totalCount() - idleItems.size();
     }
 
     int totalCount() {
@@ -129,7 +129,7 @@ public class Pool<T extends AutoCloseable> {
 
         while (iterator.hasNext()) {
             PoolItem<T> item = iterator.next();
-            if (Duration.between(Instant.ofEpochMilli(item.returnTime), now).getSeconds() > maxIdleTimeInSeconds) {
+            if (Duration.between(Instant.ofEpochMilli(item.returnTime), now).getSeconds() >= maxIdleTimeInSeconds) {
                 boolean removed = idleItems.remove(item);
                 if (!removed) return;
                 recycleItem(item);

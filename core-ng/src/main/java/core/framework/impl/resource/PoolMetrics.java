@@ -17,7 +17,7 @@ public class PoolMetrics implements Metrics {
     @Override
     public void collect(Map<String, Double> stats) {
         stats.put(statName("total_count"), (double) pool.totalCount());
-        stats.put(statName("idle_count"), (double) pool.idleCount());
+        stats.put(statName("active_count"), (double) pool.activeCount());
     }
 
     String statName(String statName) {

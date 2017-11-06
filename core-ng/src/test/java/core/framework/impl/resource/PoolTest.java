@@ -1,9 +1,11 @@
 package core.framework.impl.resource;
 
+import core.framework.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,6 +21,8 @@ class PoolTest {
     @BeforeEach
     void createPool() {
         pool = new Pool<>(TestPoolResource::new, "pool");
+        pool.maxIdleTime(Duration.ZERO);
+        pool.checkoutTimeout(Duration.ZERO);
     }
 
     @Test
@@ -44,7 +48,6 @@ class PoolTest {
 
     @Test
     void refresh() {
-        pool.maxIdleTime(Duration.ZERO);
         pool.size(2, 2);
 
         pool.refresh();
@@ -52,9 +55,23 @@ class PoolTest {
     }
 
     @Test
+    void refreshWithRecycle() {
+        pool.size(1, 5);
+
+        List<PoolItem<TestPoolResource>> items = Lists.newArrayList();
+        for (int i = 0; i < 5; i++) {
+            items.add(pool.borrowItem());
+        }
+        items.forEach(pool::returnItem);
+
+        pool.refresh();
+        assertEquals(1, pool.idleItems.size());
+    }
+
+    @Test
     void borrowWithTimeout() {
         pool.size(0, 0);
-        pool.checkoutTimeout(Duration.ZERO);
+
         PoolException exception = assertThrows(PoolException.class, () -> pool.borrowItem());
         assertEquals("POOL_TIME_OUT", exception.errorCode());
     }
@@ -67,5 +84,4 @@ class PoolTest {
         pool.close();
         assertTrue(item.resource.closed);
     }
-
 }

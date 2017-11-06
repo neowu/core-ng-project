@@ -19,10 +19,6 @@ public final class ThreadPools {
         return threadPool;
     }
 
-    public static ExecutorService fixedThreadPool(int poolSize, String prefix) {
-        return Executors.newFixedThreadPool(poolSize, new ThreadFactoryImpl(prefix));
-    }
-
     public static ScheduledExecutorService singleThreadScheduler(String prefix) {
         return Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl(prefix));
     }
