@@ -29,9 +29,9 @@ public class Pool<T extends AutoCloseable> {
     private final Logger logger = LoggerFactory.getLogger(Pool.class);
     private final AtomicInteger size = new AtomicInteger(0);
     private final Supplier<T> factory;
+    public Duration maxIdleTime = Duration.ofMinutes(30);
     private int minSize = 1;
     private int maxSize = 50;
-    private Duration maxIdleTime = Duration.ofMinutes(30);
     private long checkoutTimeoutInMs = Duration.ofSeconds(30).toMillis();
 
     public Pool(Supplier<T> factory, String name) {
@@ -44,12 +44,8 @@ public class Pool<T extends AutoCloseable> {
         this.maxSize = maxSize;
     }
 
-    public void maxIdleTime(Duration maxIdleTime) {
-        this.maxIdleTime = maxIdleTime;
-    }
-
-    public void checkoutTimeout(Duration checkoutTimeout) {
-        checkoutTimeoutInMs = checkoutTimeout.toMillis();
+    public void checkoutTimeout(Duration timeout) {
+        checkoutTimeoutInMs = timeout.toMillis();
     }
 
     public PoolItem<T> borrowItem() {

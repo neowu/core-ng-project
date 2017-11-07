@@ -21,7 +21,7 @@ class PoolTest {
     @BeforeEach
     void createPool() {
         pool = new Pool<>(TestPoolResource::new, "pool");
-        pool.maxIdleTime(Duration.ZERO);
+        pool.maxIdleTime = Duration.ZERO;
         pool.checkoutTimeout(Duration.ZERO);
     }
 

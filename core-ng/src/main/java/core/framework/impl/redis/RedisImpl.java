@@ -43,7 +43,7 @@ public final class RedisImpl implements Redis {
         this.name = name;
         pool = new Pool<>(this::createConnection, name);
         pool.size(5, 50);
-        pool.maxIdleTime(Duration.ofMinutes(30));
+        pool.maxIdleTime = Duration.ofMinutes(30);
         timeout(Duration.ofSeconds(5));
     }
 
