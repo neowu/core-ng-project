@@ -52,8 +52,8 @@ public final class RedisImpl implements Redis {
         pool.checkoutTimeout(timeout);
     }
 
-    public void slowOperationThreshold(Duration slowOperationThreshold) {
-        slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
+    public void slowOperationThreshold(Duration threshold) {
+        slowOperationThresholdInNanos = threshold.toNanos();
     }
 
     private RedisConnection createConnection() {

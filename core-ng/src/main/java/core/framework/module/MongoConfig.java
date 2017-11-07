@@ -54,8 +54,8 @@ public final class MongoConfig {
         state.mongo.slowOperationThreshold(threshold);
     }
 
-    public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
-        state.mongo.tooManyRowsReturnedThreshold(tooManyRowsReturnedThreshold);
+    public void tooManyRowsReturnedThreshold(int threshold) {
+        state.mongo.tooManyRowsReturnedThreshold = threshold;
     }
 
     public void timeout(Duration timeout) {

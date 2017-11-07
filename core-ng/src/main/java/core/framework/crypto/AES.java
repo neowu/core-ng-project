@@ -45,11 +45,7 @@ public final class AES {
         try {
             Cipher cipher = createCipher(ENCRYPT_MODE);
             return cipher.doFinal(plainMessage);
-        } catch (InvalidKeyException
-            | NoSuchAlgorithmException
-            | NoSuchPaddingException
-            | BadPaddingException
-            | IllegalBlockSizeException e) {
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
             throw new Error(e);
         }
     }
@@ -58,11 +54,7 @@ public final class AES {
         try {
             Cipher cipher = createCipher(DECRYPT_MODE);
             return cipher.doFinal(encryptedMessage);
-        } catch (IllegalBlockSizeException
-            | InvalidKeyException
-            | BadPaddingException
-            | NoSuchAlgorithmException
-            | NoSuchPaddingException e) {
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
             throw new Error(e);
         }
     }

@@ -37,25 +37,13 @@ import java.util.List;
 public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
     private final List<TransportAddress> addresses = Lists.newArrayList();
+    public Duration slowOperationThreshold = Duration.ofSeconds(5);
+    public Duration timeout = Duration.ofSeconds(10);
+    public boolean sniff;      // if enabled, es client will use all nodes in cluster and only use "publish address" to connect
     private Client client;
-    private Duration timeout = Duration.ofSeconds(10);
-    private Duration slowOperationThreshold = Duration.ofSeconds(5);
-    private boolean sniff;      // if enabled, es client will use all nodes in cluster and only use "publish address" to connect
 
     public void host(String host) {
         addresses.add(new InetSocketTransportAddress(new InetSocketAddress(host, 9300)));
-    }
-
-    public void slowOperationThreshold(Duration slowOperationThreshold) {
-        this.slowOperationThreshold = slowOperationThreshold;
-    }
-
-    public void timeout(Duration timeout) {
-        this.timeout = timeout;
-    }
-
-    public void sniff(boolean sniff) {
-        this.sniff = sniff;
     }
 
     public void initialize() {

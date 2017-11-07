@@ -87,7 +87,7 @@ public class HTTPServerErrorHandler {
         exchange.getResponseSender().send(errorHTML(e));
     }
 
-    private ErrorResponse errorResponse(Throwable e) {
+    ErrorResponse errorResponse(Throwable e) {
         ErrorResponse response = new ErrorResponse();
         response.id = ActionLogContext.id();
         response.message = e.getMessage();

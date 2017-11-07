@@ -51,15 +51,15 @@ public final class SearchConfig {
     }
 
     public void sniff(boolean sniff) {
-        state.search.sniff(sniff);
+        state.search.sniff = sniff;
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        state.search.slowOperationThreshold(threshold);
+        state.search.slowOperationThreshold = threshold;
     }
 
     public void timeout(Duration timeout) {
-        state.search.timeout(timeout);
+        state.search.timeout = timeout;
     }
 
     public <T> void type(Class<T> documentClass) {

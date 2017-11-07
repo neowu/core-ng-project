@@ -137,8 +137,8 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    public void slowOperationThreshold(Duration slowOperationThreshold) {
-        slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
+    public void slowOperationThreshold(Duration threshold) {
+        slowOperationThresholdInNanos = threshold.toNanos();
     }
 
     public <T> void view(Class<T> viewClass) {

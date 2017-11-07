@@ -26,8 +26,8 @@ public class MongoImpl implements Mongo {
                                                                          .maxConnectionIdleTime((int) Duration.ofMinutes(30).toMillis())
                                                                          .cursorFinalizerEnabled(false); // framework always close db cursor
     public MongoClientURI uri;
+    public int tooManyRowsReturnedThreshold = 2000;
     int timeoutInMs = (int) Duration.ofSeconds(15).toMillis();
-    int tooManyRowsReturnedThreshold = 2000;
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     CodecRegistry registry;
     private MongoClient mongoClient;
@@ -105,10 +105,6 @@ public class MongoImpl implements Mongo {
         } finally {
             logger.info("register mongo view, viewClass={}, elapsedTime={}", viewClass.getCanonicalName(), watch.elapsedTime());
         }
-    }
-
-    public void tooManyRowsReturnedThreshold(int tooManyRowsReturnedThreshold) {
-        this.tooManyRowsReturnedThreshold = tooManyRowsReturnedThreshold;
     }
 
     public void slowOperationThreshold(Duration threshold) {
