@@ -7,7 +7,7 @@ mainClassName = 'Main'
 processResources {
     if (env != null) {
         assert project.file("conf/${env}/resources").exists()
-        inputs.file project.file("conf/${env}/resources")
+        inputs.dir project.file("conf/${env}/resources")
         from "conf/${env}/resources"
     }
 }
