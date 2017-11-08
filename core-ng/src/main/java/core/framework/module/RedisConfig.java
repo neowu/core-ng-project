@@ -31,7 +31,7 @@ public final class RedisConfig {
             redis = new RedisImpl("redis");
             context.shutdownHook.add(((RedisImpl) redis)::close);
             context.backgroundTask().scheduleWithFixedDelay(((RedisImpl) redis).pool::refresh, Duration.ofMinutes(5));
-            context.metrics.add(new PoolMetrics(((RedisImpl) redis).pool));
+            context.stat.metrics.add(new PoolMetrics(((RedisImpl) redis).pool));
         }
         context.beanFactory.bind(Redis.class, null, redis);
         return redis;

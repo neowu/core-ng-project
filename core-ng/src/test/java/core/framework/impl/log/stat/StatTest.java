@@ -1,7 +1,5 @@
 package core.framework.impl.log.stat;
 
-import core.framework.util.Lists;
-import core.framework.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,24 +11,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @author neo
  */
-class CollectStatTaskTest {
-    private CollectStatTask task;
+class StatTest {
+    private Stat stat;
 
     @BeforeEach
-    void createCollectStatsTask() {
-        task = new CollectStatTask(null, Lists.newArrayList());
+    void createStat() {
+        stat = new Stat();
     }
 
     @Test
     void garbageCollectorName() {
-        assertEquals("g1_young_generation", task.garbageCollectorName("G1 Young Generation"));
-        assertEquals("g1_old_generation", task.garbageCollectorName("G1 Old Generation"));
+        assertEquals("g1_young_generation", stat.garbageCollectorName("G1 Young Generation"));
+        assertEquals("g1_old_generation", stat.garbageCollectorName("G1 Old Generation"));
     }
 
     @Test
     void collect() {
-        Map<String, Double> stats = Maps.newLinkedHashMap();
-        task.collect(stats);
+        Map<String, Double> stats = stat.collect();
 
         assertNotNull(stats.get("thread_count"));
         assertNotNull(stats.get("jvm_heap_used"));

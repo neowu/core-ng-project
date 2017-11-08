@@ -1,7 +1,7 @@
 package core.log.domain;
 
 import core.framework.api.json.Property;
-import core.framework.log.message.PerformanceStatMessage;
+import core.framework.impl.log.message.PerformanceStatMessage;
 import core.framework.search.Index;
 
 import java.time.Instant;

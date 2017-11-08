@@ -1,7 +1,7 @@
 package core.log.job;
 
+import core.framework.impl.log.message.StatMessage;
 import core.framework.inject.Inject;
-import core.framework.log.message.StatMessage;
 import core.log.IntegrationTest;
 import org.junit.jupiter.api.Test;
 

@@ -2,9 +2,9 @@ package core.framework.impl.log;
 
 import core.framework.impl.json.JSONWriter;
 import core.framework.impl.kafka.ProducerMetrics;
-import core.framework.log.message.ActionLogMessage;
-import core.framework.log.message.PerformanceStatMessage;
-import core.framework.log.message.StatMessage;
+import core.framework.impl.log.message.ActionLogMessage;
+import core.framework.impl.log.message.PerformanceStatMessage;
+import core.framework.impl.log.message.StatMessage;
 import core.framework.util.Maps;
 import core.framework.util.Network;
 import core.framework.util.Threads;

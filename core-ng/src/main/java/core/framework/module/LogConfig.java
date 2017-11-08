@@ -60,8 +60,8 @@ public final class LogConfig {
             logger.info("disable log forwarding during test");
         } else {
             context.logManager.logForwarder = LogForwarder.create(kafkaURI, context.logManager.appName);
-            context.metrics.add(context.logManager.logForwarder.producerMetrics);
-            context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(context.logManager.logForwarder, context.metrics), Duration.ofSeconds(10));
+            context.stat.metrics.add(context.logManager.logForwarder.producerMetrics);
+            context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(context.logManager.logForwarder, context.stat), Duration.ofSeconds(10));
         }
     }
 

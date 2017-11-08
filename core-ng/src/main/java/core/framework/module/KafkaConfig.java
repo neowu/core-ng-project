@@ -40,8 +40,8 @@ public final class KafkaConfig {
             return context.mockFactory.create(Kafka.class);
         } else {
             Kafka kafka = new Kafka(name, context.logManager);
-            context.metrics.add(kafka.producerMetrics);
-            context.metrics.add(kafka.consumerMetrics);
+            context.stat.metrics.add(kafka.producerMetrics);
+            context.stat.metrics.add(kafka.consumerMetrics);
             context.startupHook.add(kafka::initialize);
             context.shutdownHook.add(kafka::close);
 

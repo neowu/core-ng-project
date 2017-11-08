@@ -39,7 +39,7 @@ public final class DBConfig {
         context.shutdownHook.add(database::close);
         if (!context.isTest()) {
             context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(30));
-            context.metrics.add(new PoolMetrics(database.pool));
+            context.stat.metrics.add(new PoolMetrics(database.pool));
         }
         context.beanFactory.bind(Database.class, name, database);
         return database;

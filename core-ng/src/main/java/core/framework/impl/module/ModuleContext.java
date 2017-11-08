@@ -7,7 +7,7 @@ import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.log.stat.Metrics;
+import core.framework.impl.log.stat.Stat;
 import core.framework.impl.web.ControllerActionBuilder;
 import core.framework.impl.web.ControllerClassValidator;
 import core.framework.impl.web.ControllerHolder;
@@ -38,7 +38,7 @@ public final class ModuleContext {
     public final HTTPServer httpServer;
     public final LogManager logManager;
     public final MockFactory mockFactory;
-    public final List<Metrics> metrics = Lists.newArrayList();
+    public final Stat stat = new Stat();
     public final ConfigState config = new ConfigState();
     private BackgroundTaskExecutor backgroundTask;
 

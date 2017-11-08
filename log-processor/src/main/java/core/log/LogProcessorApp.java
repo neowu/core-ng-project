@@ -1,5 +1,6 @@
 package core.log;
 
+import core.framework.impl.log.stat.Stat;
 import core.framework.module.App;
 import core.framework.util.Strings;
 import core.log.domain.ActionDocument;
@@ -33,9 +34,12 @@ public class LogProcessorApp extends App {
         bind(ActionService.class);
         bind(StatService.class);
 
+        Stat stat = bind(new Stat());
+
         bind(KafkaConsumerFactory.class, new KafkaConsumerFactory(kafkaURI()));
         MessageProcessor processor = bind(MessageProcessor.class);
         processor.initialize();
+        stat.metrics.add(processor.metrics);
         onStartup(processor::start);
         onShutdown(processor::stop);
 

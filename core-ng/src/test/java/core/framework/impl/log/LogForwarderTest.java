@@ -1,7 +1,7 @@
 package core.framework.impl.log;
 
+import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.log.Markers;
-import core.framework.log.message.ActionLogMessage;
 import core.framework.util.Strings;
 import org.apache.kafka.clients.producer.MockProducer;
 import org.junit.jupiter.api.BeforeEach;

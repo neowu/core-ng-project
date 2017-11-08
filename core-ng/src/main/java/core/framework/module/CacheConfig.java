@@ -77,7 +77,7 @@ public final class CacheConfig {
             redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
             context.shutdownHook.add(redis::close);
             context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
-            context.metrics.add(new PoolMetrics(redis.pool));
+            context.stat.metrics.add(new PoolMetrics(redis.pool));
             configureCacheManager(new RedisCacheStore(redis));
         }
     }

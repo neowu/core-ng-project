@@ -1,5 +1,6 @@
 package core.log.service;
 
+import core.framework.impl.log.stat.Metrics;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
@@ -8,12 +9,13 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class ConsumerMetrics {
+public class ConsumerMetrics implements Metrics {
     private Metric recordsLagMax;
     private Metric recordsConsumedRate;
     private Metric bytesConsumedRate;
     private Metric fetchRate;
 
+    @Override
     public void collect(Map<String, Double> stats) {
         if (recordsLagMax != null) stats.put("kafka_consumer_records_max_lag", (Double) recordsLagMax.metricValue());
         if (recordsConsumedRate != null) stats.put("kafka_consumer_records_consumed_rate", (Double) recordsConsumedRate.metricValue());

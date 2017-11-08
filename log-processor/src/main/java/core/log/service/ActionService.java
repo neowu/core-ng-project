@@ -1,7 +1,7 @@
 package core.log.service;
 
+import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.inject.Inject;
-import core.framework.log.message.ActionLogMessage;
 import core.framework.search.BulkIndexRequest;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.IndexRequest;

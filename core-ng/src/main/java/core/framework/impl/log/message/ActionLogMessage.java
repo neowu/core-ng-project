@@ -1,4 +1,4 @@
-package core.framework.log.message;
+package core.framework.impl.log.message;
 
 import core.framework.api.json.Property;
 

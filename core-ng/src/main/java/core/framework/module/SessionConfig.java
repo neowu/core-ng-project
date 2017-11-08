@@ -47,7 +47,7 @@ public final class SessionConfig {
             RedisImpl redis = new RedisImpl("redis-session");
             redis.host = host;
             context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
-            context.metrics.add(new PoolMetrics(redis.pool));
+            context.stat.metrics.add(new PoolMetrics(redis.pool));
 
             context.shutdownHook.add(redis::close);
             context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
