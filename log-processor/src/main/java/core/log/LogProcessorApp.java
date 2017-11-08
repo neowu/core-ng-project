@@ -40,7 +40,7 @@ public class LogProcessorApp extends App {
         onShutdown(processor::stop);
 
         schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
-        schedule().fixedRate("collect-stats-job", bind(CollectStatJob.class), Duration.ofSeconds(10));
+        schedule().fixedRate("collect-stat-job", bind(CollectStatJob.class), Duration.ofSeconds(10));
     }
 
     private String kafkaURI() {
