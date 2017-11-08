@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,18 +29,41 @@ class StatServiceTest extends IntegrationTest {
 
     @Test
     void index() {
-        StatMessage message = new StatMessage();
-        message.id = "1";
-        message.date = Instant.now();
-        message.stats = Maps.newHashMap("thread_count", 10d);
+        StatMessage message = message("1");
 
         LocalDate now = LocalDate.of(2017, Month.OCTOBER, 10);
         statService.index(Lists.newArrayList(message), now);
 
+        StatDocument stat = statDocument(now, message.id);
+        assertEquals(message.stats, stat.stats);
+    }
+
+    @Test
+    void bulkIndex() {
+        List<StatMessage> messages = Lists.newArrayList();
+        for (int i = 0; i < 6; i++) {
+            messages.add(message("bulk-" + i));
+        }
+
+        LocalDate now = LocalDate.of(2017, Month.OCTOBER, 10);
+        statService.index(messages, now);
+
+        StatDocument stat = statDocument(now, messages.get(0).id);
+        assertEquals(messages.get(0).stats, stat.stats);
+    }
+
+    private StatDocument statDocument(LocalDate now, String id) {
         GetRequest request = new GetRequest();
         request.index = IndexName.name("stat", now);
-        request.id = message.id;
-        StatDocument stat = statType.get(request).orElseThrow(() -> new Error("not found"));
-        assertEquals(message.stats, stat.stats);
+        request.id = id;
+        return statType.get(request).orElseThrow(() -> new Error("not found"));
+    }
+
+    private StatMessage message(String id) {
+        StatMessage message = new StatMessage();
+        message.id = id;
+        message.date = Instant.now();
+        message.stats = Maps.newHashMap("thread_count", 10d);
+        return message;
     }
 }

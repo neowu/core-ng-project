@@ -30,6 +30,8 @@ public class MessageProcessor {
     private final JSONReader<ActionLogMessage> actionLogReader = JSONReader.of(ActionLogMessage.class);
     private final JSONReader<StatMessage> statReader = JSONReader.of(StatMessage.class);
 
+    public final ConsumerMetrics metrics = new ConsumerMetrics();
+
     @Inject
     KafkaConsumerFactory consumerFactory;
     @Inject
@@ -55,6 +57,7 @@ public class MessageProcessor {
     public void initialize() {
         consumer = consumerFactory.create();
         consumer.subscribe(Lists.newArrayList(TOPIC_ACTION_LOG, TOPIC_STAT));
+        metrics.set(consumer.metrics());
 
         processorThread = new Thread(() -> {
             logger.info("message processor started, kafkaURI={}", consumerFactory.uri);

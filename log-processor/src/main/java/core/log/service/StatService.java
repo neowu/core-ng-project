@@ -24,14 +24,15 @@ public class StatService {
         index(messages, now);
     }
 
+    public void index(StatMessage message) {
+        LocalDate now = LocalDate.now();
+        index(message, now);
+    }
+
     void index(List<StatMessage> messages, LocalDate now) {
         if (messages.size() <= 5) { // use single index in quiet time
             for (StatMessage message : messages) {
-                IndexRequest<StatDocument> request = new IndexRequest<>();
-                request.index = IndexName.name("stat", now);
-                request.id = message.id;
-                request.source = stat(message);
-                statType.index(request);
+                index(message, now);
             }
         } else {
             Map<String, StatDocument> stats = Maps.newHashMapWithExpectedSize(messages.size());
@@ -43,6 +44,14 @@ public class StatService {
             request.sources = stats;
             statType.bulkIndex(request);
         }
+    }
+
+    private void index(StatMessage message, LocalDate now) {
+        IndexRequest<StatDocument> request = new IndexRequest<>();
+        request.index = IndexName.name("stat", now);
+        request.id = message.id;
+        request.source = stat(message);
+        statType.index(request);
     }
 
     private StatDocument stat(StatMessage message) {

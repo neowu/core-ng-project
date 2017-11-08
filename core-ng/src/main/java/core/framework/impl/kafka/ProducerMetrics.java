@@ -24,7 +24,7 @@ public class ProducerMetrics implements Metrics {
         if (outgoingByteRate != null) stats.put(statName("outgoing_byte_rate"), (Double) outgoingByteRate.metricValue());
     }
 
-    public void setMetrics(Map<MetricName, ? extends Metric> kafkaMetrics) {
+    public void set(Map<MetricName, ? extends Metric> kafkaMetrics) {
         for (Map.Entry<MetricName, ? extends Metric> entry : kafkaMetrics.entrySet()) {
             MetricName name = entry.getKey();
             if ("producer-metrics".equals(name.group())) {

@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class ConsumerMetrics implements Metrics {
     private final String name;
-    private final List<Metric> recordsLagMax = Lists.newArrayList();        // use non-thread-safe list is because addMetrics is initialized by single thread, see core.framework.impl.kafka.KafkaMessageListener.start
+    private final List<Metric> recordsLagMax = Lists.newArrayList();        // use non-thread-safe list because add is initialized by single thread, see core.framework.impl.kafka.KafkaMessageListener.start
     private final List<Metric> recordsConsumedRate = Lists.newArrayList();
     private final List<Metric> bytesConsumedRate = Lists.newArrayList();
     private final List<Metric> fetchRate = Lists.newArrayList();
@@ -32,7 +32,7 @@ public class ConsumerMetrics implements Metrics {
         }
     }
 
-    void addMetrics(Map<MetricName, ? extends Metric> kafkaMetrics) {
+    void add(Map<MetricName, ? extends Metric> kafkaMetrics) {
         for (Map.Entry<MetricName, ? extends Metric> entry : kafkaMetrics.entrySet()) {
             MetricName name = entry.getKey();
             if ("consumer-fetch-manager-metrics".equals(name.group())) {

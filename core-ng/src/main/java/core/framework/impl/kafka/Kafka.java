@@ -62,7 +62,7 @@ public class Kafka {
             config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
             config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
             Producer<String, byte[]> producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
-            producerMetrics.setMetrics(producer.metrics());
+            producerMetrics.set(producer.metrics());
             return producer;
         } finally {
             logger.info("create kafka producer, uri={}, name={}, elapsedTime={}", uri, name, watch.elapsedTime());
@@ -86,7 +86,7 @@ public class Kafka {
             config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
             Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
             consumer.subscribe(topics);
-            consumerMetrics.addMetrics(consumer.metrics());
+            consumerMetrics.add(consumer.metrics());
             return consumer;
         } finally {
             logger.info("create kafka consumer, uri={}, name={}, topics={}, elapsedTime={}", uri, name, topics, watch.elapsedTime());

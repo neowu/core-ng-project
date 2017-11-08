@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * @author neo
  */
-public class IndexName {
+final class IndexName {
     static String name(String type, LocalDate now) {
         return type + "-" + now.format(DateTimeFormatter.ISO_DATE);
     }

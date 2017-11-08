@@ -6,12 +6,14 @@ import core.log.domain.ActionDocument;
 import core.log.domain.StatDocument;
 import core.log.domain.TraceDocument;
 import core.log.job.CleanupOldIndexJob;
+import core.log.job.CollectStatJob;
 import core.log.service.ActionService;
 import core.log.service.IndexService;
 import core.log.service.KafkaConsumerFactory;
 import core.log.service.MessageProcessor;
 import core.log.service.StatService;
 
+import java.time.Duration;
 import java.time.LocalTime;
 
 /**
@@ -38,6 +40,7 @@ public class LogProcessorApp extends App {
         onShutdown(processor::stop);
 
         schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
+        schedule().fixedRate("collect-stats-job", bind(CollectStatJob.class), Duration.ofSeconds(10));
     }
 
     private String kafkaURI() {

@@ -65,7 +65,7 @@ public final class LogForwarder {
         this.producer = producer;
 
         producerMetrics = new ProducerMetrics("log-forwarder");
-        producerMetrics.setMetrics(producer.metrics());
+        producerMetrics.set(producer.metrics());
 
         logForwarderThread = new Thread(() -> {
             logger.info("log forwarder thread started, uri={}", uri);

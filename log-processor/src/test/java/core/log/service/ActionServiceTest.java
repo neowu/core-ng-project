@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,10 +34,7 @@ class ActionServiceTest extends IntegrationTest {
 
     @Test
     void index() {
-        ActionLogMessage message1 = new ActionLogMessage();
-        message1.id = "1";
-        message1.date = Instant.now();
-        message1.result = "OK";
+        ActionLogMessage message1 = message("1", "OK");
         message1.context = Maps.newHashMap("key", "value");
         message1.stats = Maps.newHashMap("count", 1d);
         PerformanceStatMessage stat = new PerformanceStatMessage();
@@ -44,26 +42,55 @@ class ActionServiceTest extends IntegrationTest {
         stat.totalElapsed = 10L;
         message1.performanceStats = Maps.newHashMap("redis", stat);
 
-        ActionLogMessage message2 = new ActionLogMessage();
-        message2.id = "2";
-        message2.date = Instant.now();
-        message2.result = "WARN";
+        ActionLogMessage message2 = message("2", "WARN");
         message2.traceLog = "trace";
 
         LocalDate now = LocalDate.of(2016, Month.JANUARY, 15);
         actionService.index(Lists.newArrayList(message1, message2), now);
 
-        GetRequest request = new GetRequest();
-        request.index = IndexName.name("action", now);
-        request.id = message1.id;
-        ActionDocument action = actionType.get(request).orElseThrow(() -> new Error("not found"));
+        ActionDocument action = actionDocument(now, message1.id);
         assertEquals(message1.result, action.result);
 
-        request = new GetRequest();
-        request.index = IndexName.name("trace", now);
-        request.id = message2.id;
-        TraceDocument trace = traceType.get(request).orElseThrow(() -> new Error("not found"));
+        TraceDocument trace = traceDocument(now, message2.id);
         assertEquals(message2.id, trace.id);
         assertEquals(message2.traceLog, trace.content);
+    }
+
+    @Test
+    void bulkIndex() {
+        List<ActionLogMessage> messages = Lists.newArrayList();
+        for (int i = 0; i < 6; i++) {
+            ActionLogMessage message = message("bulk-" + i, "TRACE");
+            message.traceLog = "trace";
+            messages.add(message);
+        }
+
+        LocalDate now = LocalDate.of(2016, Month.JANUARY, 15);
+        actionService.index(messages, now);
+
+        ActionDocument action = actionDocument(now, messages.get(0).id);
+        assertEquals("TRACE", action.result);
+    }
+
+    private ActionDocument actionDocument(LocalDate now, String id) {
+        GetRequest request = new GetRequest();
+        request.index = IndexName.name("action", now);
+        request.id = id;
+        return actionType.get(request).orElseThrow(() -> new Error("not found"));
+    }
+
+    private TraceDocument traceDocument(LocalDate now, String id) {
+        GetRequest request = new GetRequest();
+        request.index = IndexName.name("trace", now);
+        request.id = id;
+        return traceType.get(request).orElseThrow(() -> new Error("not found"));
+    }
+
+    private ActionLogMessage message(String id, String result) {
+        ActionLogMessage message = new ActionLogMessage();
+        message.id = id;
+        message.date = Instant.now();
+        message.result = result;
+        return message;
     }
 }
