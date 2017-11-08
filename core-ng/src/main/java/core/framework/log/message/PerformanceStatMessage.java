@@ -1,4 +1,4 @@
-package core.framework.impl.log.queue;
+package core.framework.log.message;
 
 import core.framework.api.json.Property;
 

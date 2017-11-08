@@ -13,12 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @author neo
  */
-class CollectStatsTaskTest {
-    private CollectStatsTask task;
+class CollectStatTaskTest {
+    private CollectStatTask task;
 
     @BeforeEach
     void createCollectStatsTask() {
-        task = new CollectStatsTask(null, Lists.newArrayList());
+        task = new CollectStatTask(null, Lists.newArrayList());
     }
 
     @Test

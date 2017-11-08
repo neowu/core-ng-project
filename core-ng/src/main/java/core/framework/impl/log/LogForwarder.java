@@ -2,14 +2,15 @@ package core.framework.impl.log;
 
 import core.framework.impl.json.JSONWriter;
 import core.framework.impl.kafka.ProducerMetrics;
-import core.framework.impl.log.queue.ActionLogMessage;
-import core.framework.impl.log.queue.PerformanceStatMessage;
-import core.framework.impl.log.queue.StatMessage;
+import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.PerformanceStatMessage;
+import core.framework.log.message.StatMessage;
 import core.framework.util.Maps;
 import core.framework.util.Network;
 import core.framework.util.Threads;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
@@ -31,12 +32,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class LogForwarder {
     private static final int MAX_TRACE_LENGTH = 1000000; // 1M
+
+    public static LogForwarder create(String uri, String appName) {
+        Map<String, Object> config = Maps.newHashMap();
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
+        config.put(ProducerConfig.ACKS_CONFIG, "0");    // no acknowledge to maximize performance
+        config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
+        config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");
+        Producer<String, byte[]> producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
+        return new LogForwarder(uri, appName, producer);
+    }
+
     public final ProducerMetrics producerMetrics;
+    final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
     private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
     private final String appName;
-
-    private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
-    private final KafkaProducer<String, byte[]> kafkaProducer;
+    private final Producer<String, byte[]> producer;
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Thread logForwarderThread;
@@ -49,17 +60,12 @@ public final class LogForwarder {
         }
     };
 
-    public LogForwarder(String uri, String appName) {
+    LogForwarder(String uri, String appName, Producer<String, byte[]> producer) {
         this.appName = appName;
-        Map<String, Object> config = Maps.newHashMap();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-        config.put(ProducerConfig.ACKS_CONFIG, "0");    // no acknowledge to maximize performance
-        config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
-        config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");
-        kafkaProducer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
+        this.producer = producer;
 
         producerMetrics = new ProducerMetrics("log-forwarder");
-        producerMetrics.setMetrics(kafkaProducer.metrics());
+        producerMetrics.setMetrics(producer.metrics());
 
         logForwarderThread = new Thread(() -> {
             logger.info("log forwarder thread started, uri={}", uri);
@@ -67,9 +73,9 @@ public final class LogForwarder {
                 try {
                     Object message = queue.take();
                     if (message instanceof ActionLogMessage) {
-                        kafkaProducer.send(new ProducerRecord<>("action-log", actionLogWriter.toJSON((ActionLogMessage) message)), callback);
+                        producer.send(new ProducerRecord<>("action-log", actionLogWriter.toJSON((ActionLogMessage) message)), callback);
                     } else if (message instanceof StatMessage) {
-                        kafkaProducer.send(new ProducerRecord<>("stat", statWriter.toJSON((StatMessage) message)), callback);
+                        producer.send(new ProducerRecord<>("stat", statWriter.toJSON((StatMessage) message)), callback);
                     }
                 } catch (Throwable e) {
                     if (!stop.get()) {
@@ -90,7 +96,7 @@ public final class LogForwarder {
         logger.info("stop log forwarder");
         stop.set(true);
         logForwarderThread.interrupt();
-        kafkaProducer.close(5, TimeUnit.SECONDS);
+        producer.close(5, TimeUnit.SECONDS);
     }
 
     void forwardLog(ActionLog log) {

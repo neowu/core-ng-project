@@ -1,9 +1,9 @@
 package core.log.service;
 
 import core.framework.impl.json.JSONReader;
-import core.framework.impl.log.queue.ActionLogMessage;
-import core.framework.impl.log.queue.StatMessage;
 import core.framework.inject.Inject;
+import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.StatMessage;
 import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
@@ -27,8 +27,8 @@ public class MessageProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
     private final AtomicBoolean stop = new AtomicBoolean(false);
-    private final JSONReader<ActionLogMessage> actionLogMessageReader = JSONReader.of(ActionLogMessage.class);
-    private final JSONReader<StatMessage> statMessageReader = JSONReader.of(StatMessage.class);
+    private final JSONReader<ActionLogMessage> actionLogReader = JSONReader.of(ActionLogMessage.class);
+    private final JSONReader<StatMessage> statReader = JSONReader.of(StatMessage.class);
 
     @Inject
     KafkaConsumerFactory consumerFactory;
@@ -61,8 +61,8 @@ public class MessageProcessor {
             while (!stop.get()) {
                 try {
                     ConsumerRecords<String, byte[]> records = consumer.poll(Long.MAX_VALUE);
-                    consume(TOPIC_ACTION_LOG, records, actionLogMessageReader, actionService::index);
-                    consume(TOPIC_STAT, records, statMessageReader, statService::index);
+                    consume(TOPIC_ACTION_LOG, records, actionLogReader, actionService::index);
+                    consume(TOPIC_STAT, records, statReader, statService::index);
                     consumer.commitAsync();
                 } catch (Throwable e) {
                     if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException

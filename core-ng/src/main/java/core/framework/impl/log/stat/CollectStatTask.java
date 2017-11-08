@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author neo
  */
-public final class CollectStatsTask implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(CollectStatsTask.class);
+public final class CollectStatTask implements Runnable {
+    private final Logger logger = LoggerFactory.getLogger(CollectStatTask.class);
     private final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
@@ -29,7 +29,7 @@ public final class CollectStatsTask implements Runnable {
     private final List<Metrics> metrics;
     private final LogForwarder logForwarder;
 
-    public CollectStatsTask(LogForwarder logForwarder, List<Metrics> metrics) {
+    public CollectStatTask(LogForwarder logForwarder, List<Metrics> metrics) {
         this.logForwarder = logForwarder;
         this.metrics = metrics;
 
