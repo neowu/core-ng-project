@@ -26,8 +26,8 @@ public class KafkaConsumerFactory {
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 2000);
         config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 3 * 1024 * 1024); // get 3M message at max
-        config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 1024 * 1024); // try to get at least 1M message
-        config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 500);       // pause 500ms if not enable data to process
+        config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 1024 * 1024);     // try to get at least 1M message
+        config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 500);           // pause 500ms if not enough data to process
 
         return new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
     }

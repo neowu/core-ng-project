@@ -3,6 +3,7 @@ package core.framework.impl.log;
 import core.framework.impl.json.JSONWriter;
 import core.framework.impl.kafka.ProducerMetrics;
 import core.framework.impl.log.message.ActionLogMessage;
+import core.framework.impl.log.message.LogTopics;
 import core.framework.impl.log.message.PerformanceStatMessage;
 import core.framework.impl.log.message.StatMessage;
 import core.framework.util.Maps;
@@ -73,9 +74,9 @@ public final class LogForwarder {
                 try {
                     Object message = queue.take();
                     if (message instanceof ActionLogMessage) {
-                        producer.send(new ProducerRecord<>("action-log", actionLogWriter.toJSON((ActionLogMessage) message)), callback);
+                        producer.send(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, actionLogWriter.toJSON((ActionLogMessage) message)), callback);
                     } else if (message instanceof StatMessage) {
-                        producer.send(new ProducerRecord<>("stat", statWriter.toJSON((StatMessage) message)), callback);
+                        producer.send(new ProducerRecord<>(LogTopics.TOPIC_STAT, statWriter.toJSON((StatMessage) message)), callback);
                     }
                 } catch (Throwable e) {
                     if (!stop.get()) {

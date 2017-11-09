@@ -18,20 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static core.framework.impl.log.message.LogTopics.TOPIC_ACTION_LOG;
+import static core.framework.impl.log.message.LogTopics.TOPIC_STAT;
+
 /**
  * @author neo
  */
 public class MessageProcessor {
-    private static final String TOPIC_ACTION_LOG = "action-log";
-    private static final String TOPIC_STAT = "stat";
-
+    public final ConsumerMetrics metrics = new ConsumerMetrics();
     private final Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final JSONReader<ActionLogMessage> actionLogReader = JSONReader.of(ActionLogMessage.class);
     private final JSONReader<StatMessage> statReader = JSONReader.of(StatMessage.class);
-
-    public final ConsumerMetrics metrics = new ConsumerMetrics();
-
     @Inject
     KafkaConsumerFactory consumerFactory;
     @Inject
