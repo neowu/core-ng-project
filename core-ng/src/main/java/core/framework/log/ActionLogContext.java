@@ -38,7 +38,7 @@ public final class ActionLogContext {
         LogManager logManager = logManager();
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog != null) {
-            actionLog.stats(key, value);
+            actionLog.stat(key, value);
         }
     }
 

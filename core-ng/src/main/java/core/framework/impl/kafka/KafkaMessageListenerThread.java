@@ -145,7 +145,7 @@ class KafkaMessageListenerThread extends Thread {
             actionLog.action("topic/" + topic);
             actionLog.context("topic", topic);
             actionLog.context("handler", holder.handler.getClass().getCanonicalName());
-            actionLog.stats("messageCount", records.size());
+            actionLog.stat("messageCount", records.size());
 
             List<Message<T>> messages = new ArrayList<>(records.size());
             for (ConsumerRecord<String, byte[]> record : records) {

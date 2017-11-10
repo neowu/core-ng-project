@@ -22,6 +22,7 @@ public final class ActionLog {
     private static final ThreadMXBean THREAD = ManagementFactory.getThreadMXBean();
 
     private static final int MAX_TRACE_HOLD_SIZE = 3000;    // normal trace 3000 lines is about 350k
+    private static final int MAX_ERROR_MESSAGE_LENGTH = 200;
     private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
     private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
 
@@ -90,8 +91,8 @@ public final class ActionLog {
 
     private String errorMessage(LogEvent event) {
         String message = event.message();
-        if (message != null && message.length() > 200)
-            return message.substring(0, 200);    // limit 200 chars in action log
+        if (message != null && message.length() > MAX_ERROR_MESSAGE_LENGTH)
+            return message.substring(0, MAX_ERROR_MESSAGE_LENGTH);    // limit error message length in action log
         return message;
     }
 
@@ -126,10 +127,9 @@ public final class ActionLog {
         log("[context] {}={}", key, contextValue);
     }
 
-    public void stats(String key, Number value) {
-        Double previous = stats.put(key, value.doubleValue());
-        if (previous != null) throw Exceptions.error("found duplicate stats key, key={}, value={}, previous={}", key, value, previous);
-        log("[stats] {}={}", key, value);
+    public void stat(String key, Number value) {
+        stats.compute(key, (k, oldValue) -> (oldValue == null) ? value.doubleValue() : oldValue + value.doubleValue());
+        log("[stat] {}={}", key, value);
     }
 
     public void track(String action, long elapsedTime) {
