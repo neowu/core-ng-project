@@ -170,14 +170,16 @@ public final class DatabaseImpl implements Database {
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
         StopWatch watch = new StopWatch();
+        int returnedRows = 0;
         try {
             List<T> results = operation.select(sql, rowMapper(viewClass), params);
-            checkTooManyRowsReturned(results.size());
+            returnedRows = results.size();
+            checkTooManyRowsReturned(returnedRows);
             return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime);
-            logger.debug("select, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
+            ActionLogContext.track("db", elapsedTime, returnedRows, 0);
+            logger.debug("select, sql={}, params={}, updatedRows={}, elapsedTime={}", sql, params, returnedRows, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -189,7 +191,7 @@ public final class DatabaseImpl implements Database {
             return operation.selectOne(sql, rowMapper(viewClass), params);
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime);
+            ActionLogContext.track("db", elapsedTime, 1, 0);
             logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -198,12 +200,14 @@ public final class DatabaseImpl implements Database {
     @Override
     public int execute(String sql, Object... params) {
         StopWatch watch = new StopWatch();
+        int updatedRows = 0;
         try {
-            return operation.update(sql, params);
+            updatedRows = operation.update(sql, params);
+            return updatedRows;
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime);
-            logger.debug("execute, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
+            ActionLogContext.track("db", elapsedTime, 0, updatedRows);
+            logger.debug("execute, sql={}, params={}, updatedRows={}, elapsedTime={}", sql, params, updatedRows, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

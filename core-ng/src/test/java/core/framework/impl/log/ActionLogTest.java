@@ -84,13 +84,19 @@ class ActionLogTest {
 
     @Test
     void track() {
-        log.track("db", 1000);
-        assertEquals(1, log.performanceStats.get("db").count);
-        assertEquals(1000, log.performanceStats.get("db").totalElapsed);
+        log.track("db", 1000, 1, 0);
+        PerformanceStat stat = log.performanceStats.get("db");
+        assertEquals(1, stat.count);
+        assertEquals(1000, stat.totalElapsed);
+        assertEquals(1, stat.readEntries);
+        assertEquals(0, stat.writeEntries);
 
-        log.track("db", 1000);
-        assertEquals(2, log.performanceStats.get("db").count);
-        assertEquals(2000, log.performanceStats.get("db").totalElapsed);
+        log.track("db", 1000, 1, 1);
+        stat = log.performanceStats.get("db");
+        assertEquals(2, stat.count);
+        assertEquals(2000, stat.totalElapsed);
+        assertEquals(2, stat.readEntries);
+        assertEquals(1, stat.writeEntries);
     }
 
     private String longString(int length) {

@@ -132,10 +132,12 @@ public final class ActionLog {
         log("[stat] {}={}", key, value);
     }
 
-    public void track(String action, long elapsedTime) {
+    public void track(String action, long elapsedTime, int readEntries, int writeEntries) {
         PerformanceStat stat = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
         stat.count++;
         stat.totalElapsed += elapsedTime;
+        stat.readEntries += readEntries;
+        stat.writeEntries += writeEntries;
         log("[track] {}={}", action, elapsedTime);
     }
 

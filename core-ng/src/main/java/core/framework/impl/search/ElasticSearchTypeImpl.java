@@ -81,6 +81,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         StopWatch watch = new StopWatch();
         long esTookTime = 0;
         String index = request.index == null ? this.index : request.index;
+        long hits = 0;
         try {
             SearchRequestBuilder builder = client().prepareSearch(index).setQuery(request.query);
             if (request.type != null) builder.setSearchType(request.type);
@@ -90,6 +91,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             if (request.limit != null) builder.setSize(request.limit);
             logger.debug("search, index={}, type={}, request={}", index, type, builder);
             org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
+            hits = searchResponse.getHits().getTotalHits();
             esTookTime = searchResponse.getTook().nanos();
             if (searchResponse.getFailedShards() > 0) logger.warn("some shard failed, response={}", searchResponse);
             return searchResponse(searchResponse);
@@ -97,8 +99,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("search, esTookTime={}, elapsedTime={}", esTookTime, elapsedTime);
+            ActionLogContext.track("elasticsearch", elapsedTime, (int) hits, 0);
+            logger.debug("search, hits={}, esTookTime={}, elapsedTime={}", hits, esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -125,15 +127,17 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     public Optional<T> get(GetRequest request) {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
+        int hits = 0;
         try {
             GetResponse response = client().prepareGet(index, type, request.id).get();
             if (!response.isExists()) return Optional.empty();
+            hits = 1;
             return Optional.of(reader.fromJSON(response.getSourceAsBytes()));
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime);
+            ActionLogContext.track("elasticsearch", elapsedTime, hits, 0);
             logger.debug("get, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -151,7 +155,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime);
+            ActionLogContext.track("elasticsearch", elapsedTime, 0, 1);
             logger.debug("index, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -180,7 +184,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime);
+            ActionLogContext.track("elasticsearch", elapsedTime, 0, request.sources.size());
             logger.debug("bulkIndex, index={}, type={}, size={}, esTookTime={}, elapsedTime={}", index, type, request.sources.size(), esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -190,14 +194,16 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     public boolean delete(DeleteRequest request) {
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
+        boolean deleted = false;
         try {
             DeleteResponse response = client().prepareDelete(index, type, request.id).get();
-            return response.getResult() == DocWriteResponse.Result.DELETED;
+            deleted = response.getResult() == DocWriteResponse.Result.DELETED;
+            return deleted;
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime);
+            ActionLogContext.track("elasticsearch", elapsedTime, 0, deleted ? 1 : 0);
             logger.debug("delete, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -222,7 +228,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime);
+            ActionLogContext.track("elasticsearch", elapsedTime, 0, request.ids.size());
             logger.debug("bulkDelete, index={}, type={}, size={}, esTookTime={}, elapsedTime={}", index, type, request.ids.size(), esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -248,7 +254,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime);
+            ActionLogContext.track("elasticsearch", elapsedTime, 0, (int) deleted);
             logger.debug("deleteByQuery, index={}, type={}, deleted={}, esTookTime={}, elapsedTime={}", index, type, deleted, esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -282,6 +288,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         TimeValue keepAlive = TimeValue.timeValueNanos(forEach.scrollTimeout.toNanos());
         long esTookTime = 0;
         String index = forEach.index == null ? this.index : forEach.index;
+        int totalHits = 0;
         try {
             SearchRequestBuilder builder = client().prepareSearch(index)
                                                    .setQuery(forEach.query)
@@ -297,6 +304,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
                 SearchHit[] hits = searchResponse.getHits().getHits();
                 if (hits.length == 0) break;
+                totalHits += hits.length;
 
                 for (SearchHit hit : hits) {
                     forEach.consumer.accept(reader.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
@@ -309,8 +317,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("foreach, esTookTime={}, elapsedTime={}", esTookTime, elapsedTime);
+            ActionLogContext.track("elasticsearch", elapsedTime, totalHits, 0);
+            logger.debug("foreach, totalHits={}, esTookTime={}, elapsedTime={}", totalHits, esTookTime, elapsedTime);
         }
     }
 

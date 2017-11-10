@@ -58,7 +58,7 @@ public interface MongoCollection<T> {
 
     long update(Bson filter, Bson update);
 
-    long delete(Object id);
+    boolean delete(Object id);
 
     long delete(Bson filter);
 

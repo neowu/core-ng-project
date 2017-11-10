@@ -43,10 +43,14 @@ public final class ActionLogContext {
     }
 
     public static void track(String action, long elapsedTime) {
+        track(action, elapsedTime, 0, 0);
+    }
+
+    public static void track(String action, long elapsedTime, int readEntries, int writeEntries) {
         LogManager logManager = logManager();
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog != null) {
-            actionLog.track(action, elapsedTime);
+            actionLog.track(action, elapsedTime, readEntries, writeEntries);
         }
     }
 

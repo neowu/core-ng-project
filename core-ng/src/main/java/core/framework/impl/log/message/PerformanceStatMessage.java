@@ -10,4 +10,8 @@ public class PerformanceStatMessage {
     public Long totalElapsed;
     @Property(name = "count")
     public Integer count;
+    @Property(name = "read_entries")
+    public Integer readEntries;
+    @Property(name = "write_entries")
+    public Integer writeEntries;
 }

@@ -5,5 +5,7 @@ package core.framework.impl.log;
  */
 final class PerformanceStat {
     long totalElapsed;
-    int count = 0;
+    int count;
+    int readEntries;
+    int writeEntries;
 }

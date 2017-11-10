@@ -46,6 +46,22 @@
               "type": "long"
             }
           }
+        },
+        {
+          "perf_stats.read_entries": {
+            "path_match": "perf_stats.*.read_entries",
+            "mapping": {
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "perf_stats.write_entries": {
+            "path_match": "perf_stats.*.write_entries",
+            "mapping": {
+              "type": "integer"
+            }
+          }
         }
       ],
       "properties": {
