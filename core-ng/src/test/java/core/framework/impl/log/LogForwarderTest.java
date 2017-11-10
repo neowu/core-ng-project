@@ -1,6 +1,7 @@
 package core.framework.impl.log;
 
 import core.framework.impl.log.message.ActionLogMessage;
+import core.framework.impl.log.message.PerformanceStatMessage;
 import core.framework.log.Markers;
 import core.framework.util.Strings;
 import org.apache.kafka.clients.producer.MockProducer;
@@ -26,6 +27,7 @@ class LogForwarderTest {
         ActionLog log = new ActionLog("begin");
         log.action("action");
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
+        log.track("db", 1000, 1, 2);
 
         logForwarder.forwardLog(log);
         ActionLogMessage message = (ActionLogMessage) logForwarder.queue.poll();
@@ -34,5 +36,10 @@ class LogForwarderTest {
         assertEquals("action", message.action);
         assertEquals("ERROR_CODE", message.errorCode);
         assertFalse(Strings.isEmpty(message.traceLog));
+        PerformanceStatMessage statMessage = message.performanceStats.get("db");
+        assertEquals(1000, (long) statMessage.totalElapsed);
+        assertEquals(1, statMessage.count.intValue());
+        assertEquals(1, statMessage.readEntries.intValue());
+        assertEquals(2, statMessage.writeEntries.intValue());
     }
 }

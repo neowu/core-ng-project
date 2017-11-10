@@ -120,6 +120,8 @@ public final class LogForwarder {
             PerformanceStatMessage statMessage = new PerformanceStatMessage();
             statMessage.count = stat.count;
             statMessage.totalElapsed = stat.totalElapsed;
+            statMessage.readEntries = stat.readEntries;
+            statMessage.writeEntries = stat.writeEntries;
             performanceStats.put(key, statMessage);
         });
         message.performanceStats = performanceStats;

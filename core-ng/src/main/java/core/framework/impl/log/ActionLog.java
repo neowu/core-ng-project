@@ -138,7 +138,7 @@ public final class ActionLog {
         stat.totalElapsed += elapsedTime;
         stat.readEntries += readEntries;
         stat.writeEntries += writeEntries;
-        log("[track] {}={}", action, elapsedTime);
+        log("[track] {}, elapsedTime={}, readEntries={}, writeEntries={}", action, elapsedTime, readEntries, writeEntries);
     }
 
     public String refId() {
