@@ -40,6 +40,8 @@ class ActionServiceTest extends IntegrationTest {
         PerformanceStatMessage stat = new PerformanceStatMessage();
         stat.count = 1;
         stat.totalElapsed = 10L;
+        stat.readEntries = 1;
+        stat.writeEntries = 2;
         message1.performanceStats = Maps.newHashMap("redis", stat);
 
         ActionLogMessage message2 = message("2", "WARN");
@@ -50,6 +52,8 @@ class ActionServiceTest extends IntegrationTest {
 
         ActionDocument action = actionDocument(now, message1.id);
         assertEquals(message1.result, action.result);
+        assertEquals(message1.performanceStats.get("redis").count, action.performanceStats.get("redis").count);
+        assertEquals(message1.performanceStats.get("redis").readEntries, action.performanceStats.get("redis").readEntries);
 
         TraceDocument trace = traceDocument(now, message2.id);
         assertEquals(message2.id, trace.id);
