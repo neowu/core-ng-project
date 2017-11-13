@@ -5,6 +5,7 @@
 * log: ActionLogContext.track() tracks I/O reads and writes for heavy backend db, such as DB/Mongo/ES
 * web: put max forwarded ips config to prevent from x-forwarded-for clientIp spoofing
         http().maxForwardedIPs() 
+* search: update es to 5.6.4        
 
 ### 5.2.0 (10/28/2017 - 11/7/2017)
 * bean: removed "javax.inject:javax.inject:1", replaced with core.framework.inject, removed constructor injection support (to simplify and prepare for JDK 9) 
