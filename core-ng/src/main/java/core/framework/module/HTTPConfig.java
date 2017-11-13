@@ -2,6 +2,7 @@ package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.rate.LimitRateInterceptor;
+import core.framework.util.Exceptions;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
 
@@ -39,6 +40,17 @@ public final class HTTPConfig {
             intercept(state.limitRateInterceptor);
         }
         return new LimitRateConfig(state);
+    }
+
+    /**
+     * Set max x-forwarded-for ips to prevent client ip spoofing, e.g. script clients send custom x-forwarded-for header to bypass rate limiting by ip.
+     * Default is 2 to fit common scenarios, e.g. Google LB(append 2 ips)->kube service, AWS->nginx->webapp
+     *
+     * @param maxIPs the max number for forwarded ips
+     */
+    public void maxForwardedIPs(int maxIPs) {
+        if (maxIPs < 1) throw Exceptions.error("maxIPs must be greater than 1, maxIPs={}", maxIPs);
+        context.httpServer.handler.requestParser.clientIPParser.maxForwardedIPs = maxIPs;
     }
 
     public static class State {

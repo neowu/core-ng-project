@@ -21,14 +21,6 @@ class RequestParserTest {
     }
 
     @Test
-    void clientIP() {
-        assertEquals("127.0.0.1", parser.clientIP("127.0.0.1", null));
-        assertEquals("127.0.0.1", parser.clientIP("127.0.0.1", ""));
-        assertEquals("108.0.0.1", parser.clientIP("127.0.0.1", "108.0.0.1"));
-        assertEquals("108.0.0.1", parser.clientIP("127.0.0.1", "108.0.0.1, 10.10.10.10"));
-    }
-
-    @Test
     void port() {
         assertEquals(80, parser.port(80, null));
         assertEquals(443, parser.port(80, "443"));

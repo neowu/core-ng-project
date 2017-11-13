@@ -27,6 +27,7 @@ public class HTTPServerHandler implements HttpHandler {
     public static final HttpString HEADER_TRACE = new HttpString("trace");
     public static final HttpString HEADER_CLIENT = new HttpString("client");
 
+    public final RequestParser requestParser = new RequestParser();
     public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper();
     public final ResponseBeanTypeValidator responseBeanTypeValidator = new ResponseBeanTypeValidator();
     public final Route route = new Route();
@@ -35,7 +36,6 @@ public class HTTPServerHandler implements HttpHandler {
     public final HTTPServerErrorHandler errorHandler;
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
-    private final RequestParser requestParser = new RequestParser();
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;

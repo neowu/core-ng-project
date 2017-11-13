@@ -28,6 +28,7 @@ import java.util.Map;
  */
 public final class RequestParser {
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
+    public final ClientIPParser clientIPParser = new ClientIPParser();
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
         HeaderMap headers = exchange.getRequestHeaders();
@@ -38,7 +39,7 @@ public final class RequestParser {
         String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
         logger.debug("[request] remoteAddress={}", remoteAddress);
 
-        request.clientIP = clientIP(remoteAddress, headers.getFirst(Headers.X_FORWARDED_FOR));
+        request.clientIP = clientIPParser.parse(remoteAddress, headers.getFirst(Headers.X_FORWARDED_FOR));
         actionLog.context("clientIP", request.clientIP);
 
         String requestScheme = exchange.getRequestScheme();
@@ -127,15 +128,6 @@ public final class RequestParser {
                 request.formParams.put(name, value.getValue());
             }
         }
-    }
-
-    String clientIP(String remoteAddress, String xForwardedFor) {
-        if (Strings.isEmpty(xForwardedFor))
-            return remoteAddress;
-        int index = xForwardedFor.indexOf(',');
-        if (index > 0)
-            return xForwardedFor.substring(0, index);
-        return xForwardedFor;
     }
 
     int port(int requestPort, String xForwardedPort) {
