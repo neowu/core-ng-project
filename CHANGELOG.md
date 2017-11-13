@@ -1,5 +1,5 @@
 ## Change log
-### 5.2.1 (11/8/2017 - )
+### 5.2.1 (11/8/2017 - 11/13/2017)
 * log: log-processor collects its own cpu/heap/kafka stats to index
 * log: ActionLogContext.stat() supports adding up
 * log: ActionLogContext.track() tracks I/O reads and writes for heavy backend db, such as DB/Mongo/ES
