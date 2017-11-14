@@ -1,5 +1,5 @@
 {
-  "template": "stat-*",
+  "index_patterns": "stat-*",
   "order": 1,
   "settings": {
     "number_of_shards": 1,
@@ -10,9 +10,6 @@
   },
   "mappings": {
     "stat": {
-      "_all": {
-        "enabled": false
-      },
       "dynamic_templates": [
         {
           "stats": {

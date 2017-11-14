@@ -3,9 +3,6 @@
   },
   "mappings": {
     "document": {
-      "_all": {
-        "enabled": false
-      },
       "properties": {
         "string_field": {
           "type": "text",

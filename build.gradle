@@ -8,7 +8,7 @@ subprojects {
 }
 
 def mongoVersion = '3.5.0'
-def elasticVersion = '5.6.4'
+def elasticVersion = '6.0.0'
 def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.0.0'
 def jacksonVersion = '2.9.2'
@@ -55,7 +55,7 @@ project(':core-ng-test') {
         compileOnly 'org.apiguardian:apiguardian-api:1.0.0'                     // used by junit
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
         testRuntimeOnly 'com.vividsolutions:jts:1.13'                           // used by fongo
-        testRuntimeOnly "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
+        testRuntimeOnly 'org.codelibs.elasticsearch.module:lang-painless:6.0.0-rc2'
     }
 }
 

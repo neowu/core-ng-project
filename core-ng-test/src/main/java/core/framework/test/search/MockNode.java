@@ -6,6 +6,7 @@ import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.reindex.ReindexPlugin;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.plugins.Plugin;
+import org.elasticsearch.transport.Netty4Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,7 @@ class MockNode extends Node {
     private static List<Class<? extends Plugin>> plugins() {
         List<Class<? extends Plugin>> plugins = Lists.newArrayList();
         plugins.add(ReindexPlugin.class);
+        plugins.add(Netty4Plugin.class);
         addPainlessPlugin(plugins);
         return plugins;
     }

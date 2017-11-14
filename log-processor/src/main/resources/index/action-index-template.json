@@ -1,5 +1,5 @@
 {
-  "template": "action-*",
+  "index_patterns": "action-*",
   "order": 1,
   "settings": {
     "number_of_shards": 1,
@@ -10,9 +10,6 @@
   },
   "mappings": {
     "action": {
-      "_all": {
-        "enabled": false
-      },
       "dynamic_templates": [
         {
           "context": {

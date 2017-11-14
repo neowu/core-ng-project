@@ -28,8 +28,7 @@ public class MockElasticSearch extends ElasticSearchImpl {
         StopWatch watch = new StopWatch();
         try {
             Settings.Builder settings = Settings.builder();
-            settings.put(NetworkModule.TRANSPORT_TYPE_SETTING.getKey(), NetworkModule.LOCAL_TRANSPORT)
-                    .put(NetworkModule.HTTP_ENABLED.getKey(), false)
+            settings.put(NetworkModule.HTTP_ENABLED.getKey(), false)
                     .put(Environment.PATH_HOME_SETTING.getKey(), dataPath);
             MockNode node = new MockNode(settings.build());
             node.start();

@@ -1,5 +1,5 @@
 {
-  "template": "trace-*",
+  "index_patterns": "trace-*",
   "order": 1,
   "settings": {
     "number_of_shards": 1,
@@ -10,9 +10,6 @@
   },
   "mappings": {
     "trace": {
-      "_all": {
-        "enabled": false
-      },
       "properties": {
         "date": {
           "type": "date"
