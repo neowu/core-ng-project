@@ -13,7 +13,7 @@
 * cm: config management, dynamic update properties?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 * framework error, queue listener, background task error forward to kafka?
-* long running thread support?
+* long running thread support or needed?
 
 ### jdk 9 incompatible list
 * flyway: not working
@@ -37,4 +37,6 @@ java.lang.ClassNotFoundException: sun.misc.Cleaner
 	at java.base/java.lang.ref.Finalizer.runFinalizer(Finalizer.java:102)
 	at java.base/java.lang.ref.Finalizer.access$100(Finalizer.java:34)
 	at java.base/java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:217)
-```	
+```
+
+* alpine jdk 9 is not released yet, docker openjdk:jre-alpine image size is much smaller

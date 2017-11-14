@@ -38,6 +38,6 @@ public final class FixedRateTrigger implements Trigger {
 
     @Override
     public String frequency() {
-        return "fixed-rate@" + rate;
+        return "fixedRate@" + rate;
     }
 }

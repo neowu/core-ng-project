@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class SecondlyTriggerTest {
     @Test
-    void delayInSeconds() {
+    void delay() {
         SecondlyTrigger trigger = new SecondlyTrigger(null, null, 5);
         assertEquals(Duration.ZERO, trigger.delay(0, 0));
         assertEquals(Duration.ofNanos(999999500L), trigger.delay(4, 500));
@@ -28,5 +28,12 @@ class SecondlyTriggerTest {
         assertEquals(Duration.ZERO, trigger.delay(0, 0));
         assertEquals(Duration.ofSeconds(115), trigger.delay(5, 0));
         assertEquals(Duration.ofMillis(89500), trigger.delay(30, 500000000));
+    }
+
+    @Test
+    void frequency() {
+        SecondlyTrigger trigger = new SecondlyTrigger(null, null, 10);
+
+        assertEquals("secondly@PT10S", trigger.frequency());
     }
 }

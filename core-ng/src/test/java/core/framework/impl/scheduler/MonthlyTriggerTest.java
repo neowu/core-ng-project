@@ -17,17 +17,17 @@ class MonthlyTriggerTest {
     void next() {
         MonthlyTrigger trigger = new MonthlyTrigger(null, null, 2, LocalTime.of(3, 0), US);   // @2T3:00 every month
 
-        ZonedDateTime next = trigger.next(of(parse("2017-04-02T02:00:00"), US));
-        assertZonedDateTimeEquals("2017-04-02T03:00:00", next);
+        assertZonedDateTimeEquals("2017-04-02T03:00:00", trigger.next(of(parse("2017-04-02T02:00:00"), US)));
+        assertZonedDateTimeEquals("2017-04-02T03:00:00", trigger.next(of(parse("2017-04-02T02:00:00"), US).withZoneSameInstant(ZoneId.of("UTC"))));
+        assertZonedDateTimeEquals("2017-05-02T03:00:00", trigger.next(of(parse("2017-04-02T03:00:00"), US)));
+        assertZonedDateTimeEquals("2017-05-02T03:00:00", trigger.next(of(parse("2017-04-02T03:30:00"), US)));
+    }
 
-        next = trigger.next(of(parse("2017-04-02T02:00:00"), US).withZoneSameInstant(ZoneId.of("UTC")));
-        assertZonedDateTimeEquals("2017-04-02T03:00:00", next);
+    @Test
+    void frequency() {
+        MonthlyTrigger trigger = new MonthlyTrigger(null, null, 5, LocalTime.of(1, 0), US);
 
-        next = trigger.next(of(parse("2017-04-02T03:00:00"), US));
-        assertZonedDateTimeEquals("2017-05-02T03:00:00", next);
-
-        next = trigger.next(of(parse("2017-04-02T03:30:00"), US));
-        assertZonedDateTimeEquals("2017-05-02T03:00:00", next);
+        assertEquals("monthly@5/01:00[America/New_York]", trigger.frequency());
     }
 
     private void assertZonedDateTimeEquals(String expected, ZonedDateTime zonedDateTime) {

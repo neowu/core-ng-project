@@ -77,7 +77,7 @@ public final class Scheduler {
         submitJob(trigger, true);
     }
 
-    private void submitJob(Trigger trigger, boolean trace) {
+    void submitJob(Trigger trigger, boolean trace) {
         jobExecutor.submit(() -> {
             try {
                 logManager.begin("=== job execution begin ===");
@@ -101,41 +101,4 @@ public final class Scheduler {
         });
     }
 
-    static class FixedRateTriggerJob implements Runnable {
-        final Scheduler scheduler;
-        final Trigger trigger;
-        private final Logger logger = LoggerFactory.getLogger(FixedRateTriggerJob.class);
-
-        FixedRateTriggerJob(Scheduler scheduler, Trigger trigger) {
-            this.scheduler = scheduler;
-            this.trigger = trigger;
-        }
-
-        @Override
-        public void run() {
-            logger.info("execute scheduled job, job={}", trigger.name());
-            scheduler.submitJob(trigger, false);
-        }
-    }
-
-    static class DynamicTriggerJob implements Runnable {
-        final Scheduler scheduler;
-        final DynamicTrigger trigger;
-        final ZonedDateTime now;
-        private final Logger logger = LoggerFactory.getLogger(DynamicTriggerJob.class);
-
-        DynamicTriggerJob(Scheduler scheduler, DynamicTrigger trigger, ZonedDateTime now) {
-            this.scheduler = scheduler;
-            this.trigger = trigger;
-            this.now = now;
-        }
-
-        @Override
-        public void run() {
-            ZonedDateTime next = trigger.next(now);
-            scheduler.schedule(trigger, next);
-            logger.info("execute scheduled job, job={}, now={}, next={}", trigger.name(), now, next);
-            scheduler.submitJob(trigger, false);
-        }
-    }
 }
