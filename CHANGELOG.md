@@ -1,5 +1,5 @@
 ## Change log
-### 5.2.2 (11/14/2017 - )
+### 5.2.2 (11/14/2017 - 11/15/2017)
 * log: console logger writes to stderr for WARN/ERROR, this is to help kubernetes logger driver to classify log severity, e.g. stackdriver in gcloud   
 * search: update es to 6.0.0
 

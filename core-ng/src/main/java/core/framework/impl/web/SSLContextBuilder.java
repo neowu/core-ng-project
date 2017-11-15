@@ -39,7 +39,7 @@ class SSLContextBuilder {
         + "2H9+2fvrTrHGAI8L7qHzi+ODImYf\n"
         + "-----END CERTIFICATE-----";
 
-    // use this command to convert openssl cert/privatekey to pkcs8 format, openssl pkcs8 -topk8 -inform PEM -outform PEM -in filename -out filename -nocrypt
+    // convert openssl cert/privatekey to pkcs8 format: openssl pkcs8 -topk8 -inform PEM -outform PEM -in filename -out filename -nocrypt
     private static final String PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----\n"
         + "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMbb02eHbJeYc6V0\n"
         + "dPXnb3W2sjfZEhrH+sx+cHJkHC1go+3ob/5/clnhPif956vBKD4bCqsw8SfnoYeR\n"
@@ -59,14 +59,16 @@ class SSLContextBuilder {
 
     SSLContext build() {
         try {
+            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(PEM.fromPEM(PRIVATE_KEY)));
+            Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(PEM.fromPEM(CERT)));
+
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, null);
-            Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(PEM.fromPEM(CERT)));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PrivateKey privateKey = keyFactory.generatePrivate(new PKCS8EncodedKeySpec(PEM.fromPEM(PRIVATE_KEY)));
             keyStore.setKeyEntry("default", privateKey, new char[0], new Certificate[]{certificate});
+
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(keyStore, new char[0]);
+
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(keyManagerFactory.getKeyManagers(), null, null);
             return context;

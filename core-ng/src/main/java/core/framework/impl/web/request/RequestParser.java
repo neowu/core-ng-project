@@ -27,8 +27,9 @@ import java.util.Map;
  * @author neo
  */
 public final class RequestParser {
-    private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
     public final ClientIPParser clientIPParser = new ClientIPParser();
+
+    private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
         HeaderMap headers = exchange.getRequestHeaders();
@@ -59,9 +60,9 @@ public final class RequestParser {
         if (userAgent != null) actionLog.context("userAgent", userAgent);
 
         request.method = httpMethod(exchange.getRequestMethod().toString());
-        actionLog.context("method", request.method());
+        actionLog.context("method", request.method());      // for public site, there will be sniff requests from various sources. as it throws exception with unsupported method, so to log method at last, we can see details (headers) in trace for those illegal requests
 
-        parseQueryParams(request, exchange);
+        parseQueryParams(request, exchange.getQueryParameters());
 
         if (request.method == HTTPMethod.POST || request.method == HTTPMethod.PUT) {
             String contentType = headers.getFirst(Headers.CONTENT_TYPE);
@@ -70,8 +71,8 @@ public final class RequestParser {
         }
     }
 
-    private void parseQueryParams(RequestImpl request, HttpServerExchange exchange) {
-        for (Map.Entry<String, Deque<String>> entry : exchange.getQueryParameters().entrySet()) {
+    void parseQueryParams(RequestImpl request, Map<String, Deque<String>> params) {
+        for (Map.Entry<String, Deque<String>> entry : params.entrySet()) {
             String name = decodeQueryParam(entry.getKey());
             String value = decodeQueryParam(entry.getValue().getFirst());
             logger.debug("[request:query] {}={}", name, value);

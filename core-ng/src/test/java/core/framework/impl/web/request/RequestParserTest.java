@@ -4,6 +4,13 @@ import core.framework.web.exception.MethodNotAllowedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,5 +44,16 @@ class RequestParserTest {
     void httpMethod() {
         MethodNotAllowedException exception = assertThrows(MethodNotAllowedException.class, () -> parser.httpMethod("TRACK"));
         assertThat(exception.getMessage(), containsString("method=TRACK"));
+    }
+
+    @Test
+    void parseQueryParams() throws UnsupportedEncodingException {
+        RequestImpl request = new RequestImpl(null, null);
+        Map<String, Deque<String>> params = new HashMap<>();
+        params.put("key", new ArrayDeque<>());
+        params.get("key").add(URLEncoder.encode("value1 value2", "UTF-8"));     // undertow url decoding is disabled in core.framework.impl.web.HTTPServer.start, so the parser must decode all query param
+        parser.parseQueryParams(request, params);
+
+        assertEquals("value1 value2", request.queryParam("key").orElse(null));
     }
 }
