@@ -15,22 +15,28 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- * Generate private key:
- * openssl genrsa -out private.pem 1024
- * openssl pkcs8 -topk8 -inform PEM -in private.pem -outform DER -out private.der -nocrypt
- * Generate cert:
- * openssl req -new -x509 -keyform PEM -key private.pem -outform DER -out cert.der
+ * generate private key:
+ * openssl genrsa -out private.pem 2048
+ *
+ * convert private key to der format if needed:
+ * openssl pkcs8 -topk8 -inform pem -in private.pem -outform der -out private.der -nocrypt
+ *
+ * generate cert:
+ * openssl req -new -x509 -keyform pem -key private.pem -outform pem -out cert.pem
+ *
+ * view cert:
+ * openssl x509 -in cert.pem -text -noout
  *
  * @author neo
  */
 public final class Signature {
-    private static final String ALGORITHM_SHA1_WITH_RSA = "SHA1withRSA";
+    private static final String ALGORITHM_SHA256_WITH_RSA = "SHA256withRSA";
     private PublicKey publicKey;
     private PrivateKey privateKey;
 
     public boolean verify(byte[] message, byte[] signatureValue) {
         try {
-            java.security.Signature signature = java.security.Signature.getInstance(ALGORITHM_SHA1_WITH_RSA);
+            java.security.Signature signature = java.security.Signature.getInstance(ALGORITHM_SHA256_WITH_RSA);
             signature.initVerify(publicKey);
             signature.update(message);
             return signature.verify(signatureValue);
@@ -41,7 +47,7 @@ public final class Signature {
 
     public byte[] sign(byte[] message) {
         try {
-            java.security.Signature signature = java.security.Signature.getInstance(ALGORITHM_SHA1_WITH_RSA);
+            java.security.Signature signature = java.security.Signature.getInstance(ALGORITHM_SHA256_WITH_RSA);
             signature.initSign(privateKey);
             signature.update(message);
             return signature.sign();
