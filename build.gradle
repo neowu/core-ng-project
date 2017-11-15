@@ -55,7 +55,7 @@ project(':core-ng-test') {
         compileOnly 'org.apiguardian:apiguardian-api:1.0.0'                     // used by junit
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
         testRuntimeOnly 'com.vividsolutions:jts:1.13'                           // used by fongo
-        testRuntimeOnly 'org.codelibs.elasticsearch.module:lang-painless:6.0.0-rc2'
+        testRuntimeOnly "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
     }
 }
 
