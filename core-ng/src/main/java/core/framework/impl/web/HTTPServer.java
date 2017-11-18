@@ -3,6 +3,7 @@ package core.framework.impl.web;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.site.SiteManager;
 import core.framework.util.StopWatch;
+import core.framework.util.Threads;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
 import org.slf4j.Logger;
@@ -38,10 +39,17 @@ public class HTTPServer {
             Undertow.Builder builder = Undertow.builder();
             if (httpPort != null) builder.addHttpListener(httpPort, "0.0.0.0");
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
+
+            int ioThreads = Math.max(Threads.availableProcessors(), 2); // same logic as io.undertow.Undertow.Builder(), but use overridden availableProcessors value
+            int workerThreads = ioThreads * 8;
+
             builder.setHandler(new HTTPServerIOHandler(handler))
                    .setServerOption(UndertowOptions.DECODE_URL, false)
                    .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
-                   .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, true);
+                   .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, true)
+                   .setIoThreads(ioThreads)
+                   .setWorkerThreads(workerThreads);
+
             server = builder.build();
             server.start();
         } finally {

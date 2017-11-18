@@ -6,6 +6,7 @@ import core.framework.impl.log.LogManager;
 import core.framework.scheduler.Job;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
+import core.framework.util.Threads;
 import core.framework.web.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ public final class Scheduler {
     public final Map<String, Trigger> triggers = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
     private final ScheduledExecutorService scheduler = ThreadPools.singleThreadScheduler("scheduler-");
-    private final ExecutorService jobExecutor = ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 4, "scheduler-job-");
+    private final ExecutorService jobExecutor = ThreadPools.cachedThreadPool(Threads.availableProcessors() * 4, "scheduler-job-");
     private final LogManager logManager;
 
     public Scheduler(LogManager logManager) {

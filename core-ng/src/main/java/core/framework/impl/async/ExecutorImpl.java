@@ -3,6 +3,7 @@ package core.framework.impl.async;
 import core.framework.async.Executor;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
+import core.framework.util.Threads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class ExecutorImpl implements Executor {
     private final Logger logger = LoggerFactory.getLogger(ExecutorImpl.class);
-    private final ExecutorService executor = ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 2, "executor-");
+    private final ExecutorService executor = ThreadPools.cachedThreadPool(Threads.availableProcessors() * 2, "executor-");
     private final LogManager logManager;
 
     public ExecutorImpl(LogManager logManager) {
