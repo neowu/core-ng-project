@@ -5,8 +5,7 @@ services:
     ports:
       - 2181:2181
   kafka:
-    build: ./kafka
-    image: kafka
+    image: neowu/kafka:1.0.0
     ports:
       - 9092:9092
     environment:

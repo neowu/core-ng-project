@@ -25,8 +25,7 @@ services:
     ports:
       - 2181
   kafka:
-    build: ./kafka
-    image: kafka
+    image: neowu/kafka:1.0.0
     ports:
       - 9092:9092
     environment:
@@ -34,8 +33,7 @@ services:
     depends_on:
       - zookeeper
   log-processor:
-    build: ./log-processor
-    image: log-processor
+    image: neowu/log-processor:5.2.4
     environment:
       - ELASTICSEARCH_HOST=elasticsearch
       - KAFKA_URI=kafka:9092
