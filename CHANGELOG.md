@@ -1,7 +1,8 @@
 ## Change log
-### 5.2.3 (11/17/2017 - )
+### 5.2.3 (11/17/2017 - 11/20/2017)
 * sys: added Threads.availableProcessors() to allow use -Dcore.availableProcessors to specify cpu core to be used 
         due to in docker/kubenetes env, Runtime.getRuntime().availableProcessors() always return number of cores from host, not cpu limited by cgroup (-cpus or limit.cpus).
+* json: support empty object
 
 ### 5.2.2 (11/14/2017 - 11/15/2017)
 * log: console logger writes to stderr for WARN/ERROR, this is to help kubernetes logger driver to classify log severity, e.g. stackdriver in gcloud   

@@ -1,24 +1,20 @@
 package core.framework.json;
 
-import core.framework.api.json.Property;
-import core.framework.util.Lists;
-import core.framework.util.Maps;
 import core.framework.util.Types;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -28,23 +24,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class JSONTest {
     @Test
     void mapField() {
-        Bean bean = new Bean();
+        TestBean bean = new TestBean();
         bean.mapField.put("key1", "value1");
         bean.mapField.put("key2", "value2");
 
         String json = JSON.toJSON(bean);
         assertThat(json, containsString("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}"));
 
-        Bean parsedBean = JSON.fromJSON(Bean.class, json);
+        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals("value1", parsedBean.mapField.get("key1"));
         assertEquals("value2", parsedBean.mapField.get("key2"));
     }
 
     @Test
     void childField() {
-        Bean bean = new Bean();
+        TestBean bean = new TestBean();
 
-        Child child = new Child();
+        TestBean.Child child = new TestBean.Child();
         child.booleanField = true;
         child.longField = 200L;
         bean.childField = child;
@@ -52,28 +48,28 @@ class JSONTest {
         String json = JSON.toJSON(bean);
         assertThat(json, containsString("\"child\":{\"boolean\":true,\"long\":200}"));
 
-        Bean parsedBean = JSON.fromJSON(Bean.class, json);
+        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals(bean.childField.booleanField, parsedBean.childField.booleanField);
         assertEquals(bean.childField.longField, parsedBean.childField.longField);
     }
 
     @Test
     void listField() {
-        Bean bean = new Bean();
+        TestBean bean = new TestBean();
         bean.listField.add("value1");
         bean.listField.add("value2");
 
-        Child child1 = new Child();
+        TestBean.Child child1 = new TestBean.Child();
         child1.booleanField = true;
         bean.childrenField.add(child1);
-        Child child2 = new Child();
+        TestBean.Child child2 = new TestBean.Child();
         child2.booleanField = false;
         bean.childrenField.add(child2);
 
         String json = JSON.toJSON(bean);
         assertThat(json, containsString("\"list\":[\"value1\",\"value2\"],\"children\":[{\"boolean\":true,\"long\":null},{\"boolean\":false,\"long\":null}]"));
 
-        Bean parsedBean = JSON.fromJSON(Bean.class, json);
+        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals(bean.listField, parsedBean.listField);
         assertEquals(2, parsedBean.childrenField.size());
         assertEquals(true, parsedBean.childrenField.get(0).booleanField);
@@ -82,7 +78,7 @@ class JSONTest {
 
     @Test
     void dateField() {
-        Bean bean = new Bean();
+        TestBean bean = new TestBean();
         bean.instantField = Instant.now();
         bean.dateTimeField = LocalDateTime.ofInstant(bean.instantField, ZoneId.systemDefault());
         bean.dateField = bean.dateTimeField.toLocalDate();
@@ -90,7 +86,7 @@ class JSONTest {
 
         String json = JSON.toJSON(bean);
 
-        Bean parsedBean = JSON.fromJSON(Bean.class, json);
+        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals(bean.instantField, parsedBean.instantField);
         assertEquals(bean.dateField, parsedBean.dateField);
         assertEquals(bean.dateTimeField, parsedBean.dateTimeField);
@@ -99,7 +95,7 @@ class JSONTest {
 
     @Test
     void listObject() {
-        List<Bean> beans = JSON.fromJSON(Types.list(Bean.class), "[{\"string\":\"n1\"},{\"string\":\"n2\"}]");
+        List<TestBean> beans = JSON.fromJSON(Types.list(TestBean.class), "[{\"string\":\"n1\"},{\"string\":\"n2\"}]");
 
         assertEquals(2, beans.size());
         assertEquals("n1", beans.get(0).stringField);
@@ -108,15 +104,15 @@ class JSONTest {
 
     @Test
     void optionalObject() {
-        Optional<Bean> parsedBean = JSON.fromJSON(Types.optional(Bean.class), JSON.toJSON(Optional.empty()));
+        Optional<TestBean> parsedBean = JSON.fromJSON(Types.optional(TestBean.class), JSON.toJSON(Optional.empty()));
         assertFalse(parsedBean.isPresent());
 
-        parsedBean = JSON.fromJSON(Types.optional(Bean.class), JSON.toJSON(null));
+        parsedBean = JSON.fromJSON(Types.optional(TestBean.class), JSON.toJSON(null));
         assertFalse(parsedBean.isPresent());
 
-        Bean bean = new Bean();
+        TestBean bean = new TestBean();
         bean.stringField = "name";
-        parsedBean = JSON.fromJSON(Types.optional(Bean.class), JSON.toJSON(Optional.of(bean)));
+        parsedBean = JSON.fromJSON(Types.optional(TestBean.class), JSON.toJSON(Optional.of(bean)));
         assertTrue(parsedBean.isPresent());
         assertEquals(bean.stringField, parsedBean.get().stringField);
     }
@@ -124,75 +120,39 @@ class JSONTest {
     @Test
     void nullObject() {
         String json = JSON.toJSON(null);
-        Bean bean = JSON.fromJSON(Bean.class, json);
+        TestBean bean = JSON.fromJSON(TestBean.class, json);
 
         assertNull(bean);
     }
 
     @Test
     void notAnnotatedField() {
-        Bean bean = new Bean();
+        TestBean bean = new TestBean();
         bean.notAnnotatedField = 100;
         String json = JSON.toJSON(bean);
         assertThat(json, containsString("\"notAnnotatedField\":100"));
 
-        Bean parsedBean = JSON.fromJSON(Bean.class, json);
+        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals(bean.notAnnotatedField, parsedBean.notAnnotatedField);
     }
 
     @Test
     void enumValue() {
-        assertEquals(TestEnum.A, JSON.fromEnumValue(TestEnum.class, "A1"));
-        assertEquals(TestEnum.C, JSON.fromEnumValue(TestEnum.class, "C"));
+        assertEquals(TestBean.TestEnum.A, JSON.fromEnumValue(TestBean.TestEnum.class, "A1"));
+        assertEquals(TestBean.TestEnum.C, JSON.fromEnumValue(TestBean.TestEnum.class, "C"));
 
-        assertEquals("B1", JSON.toEnumValue(TestEnum.B));
-        assertEquals("C", JSON.toEnumValue(TestEnum.C));
+        assertEquals("B1", JSON.toEnumValue(TestBean.TestEnum.B));
+        assertEquals("C", JSON.toEnumValue(TestBean.TestEnum.C));
     }
 
-    enum TestEnum {
-        @Property(name = "A1")
-        A,
-        @Property(name = "B1")
-        B,
-        C
-    }
+    @Test
+    void empty() {
+        TestBean bean = new TestBean();
+        bean.empty = new TestBean.Empty();
+        String json = JSON.toJSON(bean);
+        assertThat(json, containsString("\"empty\":{}"));
 
-    static class Child {
-        @Property(name = "boolean")
-        public Boolean booleanField;
-
-        @Property(name = "long")
-        public Long longField;
-    }
-
-    static class Bean {
-        @Property(name = "map")
-        public final Map<String, String> mapField = Maps.newHashMap();
-
-        @Property(name = "list")
-        public final List<String> listField = Lists.newArrayList();
-
-        @Property(name = "children")
-        public final List<Child> childrenField = Lists.newArrayList();
-
-        @Property(name = "child")
-        public Child childField;
-
-        @Property(name = "string")
-        public String stringField;
-
-        @Property(name = "date")
-        public LocalDate dateField;
-
-        @Property(name = "date_time")
-        public LocalDateTime dateTimeField;
-
-        @Property(name = "instant")
-        public Instant instantField;
-
-        @Property(name = "zonedDateTime")
-        public ZonedDateTime zonedDateTimeField;
-
-        public Integer notAnnotatedField;
+        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
+        assertNotNull(parsedBean.empty);
     }
 }
