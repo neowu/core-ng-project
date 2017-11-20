@@ -12,7 +12,10 @@ def elasticVersion = '6.0.0'
 def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.0.0'
 def jacksonVersion = '2.9.2'
-def junitJupiterVersion = '5.0.1'
+
+def testLib = ['org.junit.jupiter:junit-jupiter-api:5.0.2',
+               'org.mockito:mockito-core:2.12.0',
+               'org.hamcrest:java-hamcrest:2.0.0.0']
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -33,9 +36,7 @@ project(':core-ng') {
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
         compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"        // used by elasticsearch
-        testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-        testImplementation 'org.mockito:mockito-core:2.12.0'
-        testImplementation 'org.hamcrest:java-hamcrest:2.0.0.0'
+        testImplementation testLib
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
     }
 }
@@ -44,9 +45,7 @@ project(':core-ng-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-        api 'org.mockito:mockito-core:2.12.0'
-        api 'org.hamcrest:java-hamcrest:2.0.0.0'
+        api testLib
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "com.github.fakemongo:fongo:2.1.0@jar"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
