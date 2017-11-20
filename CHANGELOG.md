@@ -1,6 +1,7 @@
 ## Change log
-### 5.2.4 (11/20/2017 - )
+### 5.2.4 (11/20/2017 - 11/20/2017)
 * test: update junit to 5.0.2
+* bug: fixing elasticsearch client does not need EsExecutors.PROCESSORS_SETTING settings   
 
 ### 5.2.3 (11/17/2017 - 11/20/2017)
 * sys: added Threads.availableProcessors() to allow use -Dcore.availableProcessors to specify cpu core to be used 

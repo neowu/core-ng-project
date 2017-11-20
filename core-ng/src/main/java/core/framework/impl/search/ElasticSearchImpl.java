@@ -7,7 +7,6 @@ import core.framework.search.ElasticSearchType;
 import core.framework.search.SearchException;
 import core.framework.util.Lists;
 import core.framework.util.StopWatch;
-import core.framework.util.Threads;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
@@ -21,7 +20,6 @@ import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.util.concurrent.EsExecutors;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
@@ -162,8 +160,8 @@ public class ElasticSearchImpl implements ElasticSearch {
             Settings.Builder settings = Settings.builder();
             settings.put(NetworkService.TCP_CONNECT_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
                     .put(TransportClient.CLIENT_TRANSPORT_PING_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
-                    .put(TransportClient.CLIENT_TRANSPORT_IGNORE_CLUSTER_NAME.getKey(), "true")     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
-                    .put(EsExecutors.PROCESSORS_SETTING, Threads.availableProcessors());
+                    .put(TransportClient.CLIENT_TRANSPORT_PING_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
+                    .put(TransportClient.CLIENT_TRANSPORT_IGNORE_CLUSTER_NAME.getKey(), "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
             if (sniff) {
                 settings.put(TransportClient.CLIENT_TRANSPORT_SNIFF.getKey(), true);
             }
