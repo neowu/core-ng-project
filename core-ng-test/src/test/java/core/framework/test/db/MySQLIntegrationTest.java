@@ -47,13 +47,7 @@ class MySQLIntegrationTest extends IntegrationTest {
 
     @Test
     void select() {
-        for (int i = 0; i < 30; i++) {
-            TestDBEntity entity = new TestDBEntity();
-            entity.id = UUID.randomUUID().toString();
-            entity.intField = i;
-            entity.stringField = "value-" + i;
-            repository.insert(entity);
-        }
+        createTestEntities();
 
         Query<TestDBEntity> query = repository.select();
         query.where("int_field > ?", 3)
@@ -67,5 +61,24 @@ class MySQLIntegrationTest extends IntegrationTest {
         List<TestDBEntity> entities = query.fetch();
         assertEquals(5, entities.size());
         assertEquals(4, (int) entities.get(0).intField);
+    }
+
+    @Test
+    void selectWithWhere() {
+        createTestEntities();
+
+        List<TestDBEntity> entities = repository.select("string_field = ?", "value-10");
+        assertEquals(1, entities.size());
+        assertEquals(10, (int) entities.get(0).intField);
+    }
+
+    private void createTestEntities() {
+        for (int i = 0; i < 30; i++) {
+            TestDBEntity entity = new TestDBEntity();
+            entity.id = UUID.randomUUID().toString();
+            entity.intField = i;
+            entity.stringField = "value-" + i;
+            repository.insert(entity);
+        }
     }
 }

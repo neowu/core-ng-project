@@ -51,6 +51,8 @@ subprojects {
     }
 }
 
+apply from: file("${rootDir}/gradle/check.gradle")
+
 allprojects {
     apply plugin: 'idea'
     idea.module.inheritOutputDirs = true

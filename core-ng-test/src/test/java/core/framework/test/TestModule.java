@@ -1,5 +1,6 @@
 package core.framework.test;
 
+import core.framework.db.IsolationLevel;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.test.db.TestDBEntity;
@@ -20,10 +21,12 @@ public class TestModule extends AbstractTestModule {
         bind(HTTPClient.class, new HTTPClientBuilder().build());
 
         db().url("jdbc:mysql://localhost:3306/test");
+        db().defaultIsolationLevel(IsolationLevel.READ_UNCOMMITTED);
         db().repository(TestDBEntity.class);
         initDB().createSchema();
 
         db("oracle").url("jdbc:oracle:thin:@localhost:1521/test");
+        db().defaultIsolationLevel(IsolationLevel.READ_COMMITTED);
         db("oracle").repository(TestSequenceIdDBEntity.class);
         initDB("oracle").createSchema();
 
