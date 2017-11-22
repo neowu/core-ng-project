@@ -51,14 +51,14 @@ subprojects {
         applyTo junitPlatformTest
     }
 
-    task junitPlatformJacocoReport(type: JacocoReport) {
-        executionData fileTree(rootDir).include('build/**/jacoco/*.exec')   // refer to execution data from all projects, to generate all cross module report, run gradlew test; gradlew junitPlatformJacocoReport
-        sourceDirectories = files(sourceSets['main'].allSource.srcDirs)
-        classDirectories = files(sourceSets['main'].output)
+    jacocoTestReport {
+        // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport
+        executionData = fileTree(rootDir).include('build/**/jacoco/junitPlatformTest.exec')
+
         reports {
             xml.enabled = true
             xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")
-            html.enabled = false
+            html.enabled = true
             csv.enabled = false
         }
     }
