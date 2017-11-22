@@ -1,10 +1,9 @@
 apply from: file("${rootDir}/gradle/project.gradle")
+apply from: file("${rootDir}/gradle/check.gradle")
 
 subprojects {
-    apply from: file("${rootDir}/gradle/check.gradle")
-
     group = 'core.framework'
-    version = '5.2.4'
+    version = '5.2.5'
 }
 
 def mongoVersion = '3.5.0'
