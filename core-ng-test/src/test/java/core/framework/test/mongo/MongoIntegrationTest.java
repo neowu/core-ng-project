@@ -69,31 +69,41 @@ class MongoIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    void search() {
-        TestMongoEntity entity = new TestMongoEntity();
-        entity.id = new ObjectId();
-        entity.stringField = "value";
-        testEntityCollection.insert(entity);
+    void find() {
+        TestMongoEntity entity = createEntity("value2", TestMongoEntity.TestEnum.VALUE2);
 
-        List<TestMongoEntity> entities = testEntityCollection.find(Filters.eq("string_field", "value"));
+        List<TestMongoEntity> entities = testEntityCollection.find(Filters.eq("string_field", "value2"));
         assertEquals(1, entities.size());
         assertEquals(entity.id, entities.get(0).id);
         assertEquals(entity.stringField, entities.get(0).stringField);
     }
 
     @Test
-    void searchByEnum() {
-        TestMongoEntity entity = new TestMongoEntity();
-        entity.id = new ObjectId();
-        entity.stringField = "value";
-        entity.enumField = TestMongoEntity.TestEnum.VALUE1;
-        testEntityCollection.insert(entity);
+    void findByEnum() {
+        TestMongoEntity entity = createEntity("value1", TestMongoEntity.TestEnum.VALUE1);
 
         List<TestMongoEntity> entities = testEntityCollection.find(Filters.eq("enum_field", TestMongoEntity.TestEnum.VALUE1));
         assertEquals(1, entities.size());
         assertEquals(entity.id, entities.get(0).id);
         assertEquals(entity.stringField, entities.get(0).stringField);
         assertEquals(entity.enumField, entities.get(0).enumField);
+    }
+
+    @Test
+    void findOne() {
+        TestMongoEntity entity = createEntity("value3", TestMongoEntity.TestEnum.VALUE1);
+
+        Optional<TestMongoEntity> result = testEntityCollection.findOne(Filters.eq("string_field", "value3"));
+        assertTrue(result.isPresent());
+        assertEquals(entity.id, result.get().id);
+        assertEquals(entity.stringField, result.get().stringField);
+    }
+
+    @Test
+    void count() {
+        long count = testEntityCollection.count(Filters.eq("string_field", "value"));
+
+        assertEquals(0, count);
     }
 
     @Test
@@ -137,6 +147,15 @@ class MongoIntegrationTest extends IntegrationTest {
         long deletedCount = testEntityCollection.bulkDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
         assertEquals(2, deletedCount);
         assertFalse(testEntityCollection.get(entities.get(0).id).isPresent());
+    }
+
+    private TestMongoEntity createEntity(String stringField, TestMongoEntity.TestEnum enumField) {
+        TestMongoEntity entity = new TestMongoEntity();
+        entity.id = new ObjectId();
+        entity.stringField = stringField;
+        entity.enumField = enumField;
+        testEntityCollection.insert(entity);
+        return entity;
     }
 
     private List<TestMongoEntity> testEntities() {
