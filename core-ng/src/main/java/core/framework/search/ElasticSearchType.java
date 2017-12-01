@@ -61,7 +61,7 @@ public interface ElasticSearchType<T> {
         return deleteByQuery(request);
     }
 
-    List<String> analyze(AnalyzeRequest request);
+    List<String> analyze(AnalyzeRequest request);   // can be used to test customized analyzer
 
     default List<String> analyze(String analyzer, String text) {
         AnalyzeRequest request = new AnalyzeRequest();
