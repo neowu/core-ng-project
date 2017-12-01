@@ -13,7 +13,7 @@ def jacksonVersion = '2.9.2'
 
 def testLib = ['org.junit.jupiter:junit-jupiter-api:5.0.2',
                'org.mockito:mockito-core:2.12.0',
-               'org.hamcrest:java-hamcrest:2.0.0.0']
+               'org.assertj:assertj-core:3.8.0']
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")

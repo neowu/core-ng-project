@@ -2,8 +2,7 @@ package core.framework.util;
 
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -42,6 +41,6 @@ class ExceptionsTest {
     @Test
     void stackTrace() {
         String trace = Exceptions.stackTrace(new Error("test-error"));
-        assertThat(trace, containsString("java.lang.Error: test-error"));
+        assertThat(trace).contains("java.lang.Error: test-error");
     }
 }

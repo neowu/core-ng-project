@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,8 +35,8 @@ class ObjectValidatorMinMaxTest {
 
         assertTrue(errors.hasError());
         assertEquals(2, errors.errors.size());
-        assertThat(errors.errors.get("num1"), containsString("num1"));
-        assertThat(errors.errors.get("num2"), containsString("num2"));
+        assertThat(errors.errors.get("num1")).contains("num1");
+        assertThat(errors.errors.get("num2")).contains("num2");
     }
 
     @Test

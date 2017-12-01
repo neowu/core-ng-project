@@ -37,6 +37,20 @@ public final class SystemModule extends Module {
 
         property("sys.cdn.host").ifPresent(host -> site().cdn().host(host));
 
+        configureLog();
+
+        property("sys.kafka.uri").ifPresent(uri -> kafka().uri(uri));
+
+        configureDB();
+
+        property("sys.redis.host").ifPresent(host -> redis().host(host));
+
+        property("sys.elasticsearch.host").ifPresent(host -> search().host(host));
+
+        property("sys.mongo.uri").ifPresent(uri -> mongo().uri(uri));
+    }
+
+    private void configureLog() {
         property("sys.log.actionLogPath").ifPresent(path -> {
             if ("console".equals(path)) {
                 log().writeActionLogToConsole();
@@ -52,17 +66,11 @@ public final class SystemModule extends Module {
             }
         });
         property("sys.log.kafkaURI").ifPresent(uri -> log().forwardLog(uri));
+    }
 
-        property("sys.kafka.uri").ifPresent(uri -> kafka().uri(uri));
-
+    private void configureDB() {
         property("sys.jdbc.url").ifPresent(url -> db().url(url));
         property("sys.jdbc.user").ifPresent(user -> db().user(user));
         property("sys.jdbc.password").ifPresent(password -> db().password(password));
-
-        property("sys.redis.host").ifPresent(host -> redis().host(host));
-
-        property("sys.elasticsearch.host").ifPresent(host -> search().host(host));
-
-        property("sys.mongo.uri").ifPresent(uri -> mongo().uri(uri));
     }
 }

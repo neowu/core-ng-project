@@ -11,8 +11,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,8 +38,8 @@ class ObjectValidatorSizeTest {
 
         assertTrue(errors.hasError());
         assertEquals(2, errors.errors.size());
-        assertThat(errors.errors.get("stringList"), containsString("stringList"));
-        assertThat(errors.errors.get("stringMap"), containsString("stringMap"));
+        assertThat(errors.errors.get("stringList")).contains("stringList");
+        assertThat(errors.errors.get("stringMap")).contains("stringMap");
     }
 
     @Test

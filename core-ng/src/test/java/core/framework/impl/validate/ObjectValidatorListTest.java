@@ -13,8 +13,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -51,10 +50,10 @@ class ObjectValidatorListTest {
 
         assertTrue(errors.hasError());
         assertEquals(4, errors.errors.size());
-        assertThat(errors.errors.get("field1"), containsString("field1"));
-        assertThat(errors.errors.get("child.field3"), containsString("field3"));
-        assertThat(errors.errors.get("children.field3"), containsString("field3"));
-        assertThat(errors.errors.get("childMap.field3"), containsString("field3"));
+        assertThat(errors.errors.get("field1")).contains("field1");
+        assertThat(errors.errors.get("child.field3")).contains("field3");
+        assertThat(errors.errors.get("children.field3")).contains("field3");
+        assertThat(errors.errors.get("childMap.field3")).contains("field3");
     }
 
     static class Bean {

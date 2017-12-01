@@ -11,8 +11,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -48,11 +47,11 @@ class ObjectValidatorNotNullTest {
 
         assertTrue(errors.hasError());
         assertEquals(5, errors.errors.size());
-        assertThat(errors.errors.get("stringField"), containsString("stringField"));
-        assertThat(errors.errors.get("booleanField"), containsString("booleanField"));
-        assertThat(errors.errors.get("child.intField"), containsString("intField"));
-        assertThat(errors.errors.get("children.intField"), containsString("intField"));
-        assertThat(errors.errors.get("childMap.intField"), containsString("intField"));
+        assertThat(errors.errors.get("stringField")).contains("stringField");
+        assertThat(errors.errors.get("booleanField")).contains("booleanField");
+        assertThat(errors.errors.get("child.intField")).contains("intField");
+        assertThat(errors.errors.get("children.intField")).contains("intField");
+        assertThat(errors.errors.get("childMap.intField")).contains("intField");
     }
 
     @Test

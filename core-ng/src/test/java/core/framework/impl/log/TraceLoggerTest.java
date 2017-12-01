@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.time.Month;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.endsWith;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -24,7 +22,6 @@ class TraceLoggerTest {
     @Test
     void traceLogFilePath() {
         String logFilePath = logger.traceLogFilePath("/log", LocalDateTime.of(2012, Month.OCTOBER, 2, 14, 5), "someController-method", "requestId");
-        assertThat(logFilePath, containsString("/log/someController-method/201210021405.requestId."));
-        assertThat(logFilePath, endsWith(".log"));
+        assertThat(logFilePath).startsWith("/log/someController-method/201210021405.requestId.").endsWith(".log");
     }
 }

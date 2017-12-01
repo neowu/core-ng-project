@@ -12,8 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -59,7 +58,7 @@ class WebServiceClientTest {
     @Test
     void serviceURLWithEmptyPathParam() {
         ValidationException exception = assertThrows(ValidationException.class, () -> webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", "")));
-        assertThat(exception.getMessage(), containsString("name=id"));
+        assertThat(exception.getMessage()).contains("name=id");
     }
 
     @Test

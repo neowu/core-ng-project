@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,8 +45,8 @@ class ObjectValidatorPatternTest {
 
         assertTrue(errors.hasError());
         assertEquals(2, errors.errors.size());
-        assertThat(errors.errors.get("field1"), containsString("field1"));
-        assertThat(errors.errors.get("field3"), containsString("field3"));
+        assertThat(errors.errors.get("field1")).contains("field1");
+        assertThat(errors.errors.get("field3")).contains("field3");
     }
 
     static class Bean {

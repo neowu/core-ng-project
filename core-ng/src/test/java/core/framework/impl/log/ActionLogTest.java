@@ -3,8 +3,7 @@ package core.framework.impl.log;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,7 +32,7 @@ class ActionLogTest {
             log.context("key", "value1");
             log.context("key", "value2");
         });
-        assertThat(error.getMessage(), containsString("found duplicate context key"));
+        assertThat(error.getMessage()).contains("found duplicate context key");
     }
 
     @Test

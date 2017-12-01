@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -39,7 +38,7 @@ class BeanFactoryTest {
     @Test
     void bindWithMismatchedType() {
         Error error = assertThrows(Error.class, () -> beanFactory.bind(List.class, null, "instance"));
-        assertThat(error.getMessage(), containsString("instance type does not match"));
+        assertThat(error.getMessage()).contains("instance type does not match");
     }
 
     @Test

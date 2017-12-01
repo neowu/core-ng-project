@@ -3,8 +3,7 @@ package core.framework.impl.template.expression;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,25 +22,25 @@ class ExpressionParserTest {
     @Test
     void singleValue() {
         Token stringValue = parser.parse("\"text\"");
-        assertThat(stringValue, instanceOf(ValueToken.class));
+        assertThat(stringValue).isInstanceOf(ValueToken.class);
         assertEquals("\"text\"", ((ValueToken) stringValue).value);
 
         Token numberValue = parser.parse("12.00");
-        assertThat(numberValue, instanceOf(ValueToken.class));
+        assertThat(numberValue).isInstanceOf(ValueToken.class);
         assertEquals("12.00", ((ValueToken) numberValue).value);
     }
 
     @Test
     void singleQuoteString() {
         Token stringValue = parser.parse("'text'");
-        assertThat(stringValue, instanceOf(ValueToken.class));
+        assertThat(stringValue).isInstanceOf(ValueToken.class);
         assertEquals("\"text\"", ((ValueToken) stringValue).value);
     }
 
     @Test
     void singleField() {
         Token token = parser.parse("field");
-        assertThat(token, instanceOf(FieldToken.class));
+        assertThat(token).isInstanceOf(FieldToken.class);
         FieldToken fieldToken = (FieldToken) token;
         assertEquals("field", fieldToken.name);
         assertNull(fieldToken.next);
@@ -50,7 +49,7 @@ class ExpressionParserTest {
     @Test
     void singleMethod() {
         Token token = parser.parse("method()");
-        assertThat(token, instanceOf(MethodToken.class));
+        assertThat(token).isInstanceOf(MethodToken.class);
         MethodToken methodToken = (MethodToken) token;
         assertEquals("method", methodToken.name);
         assertTrue(methodToken.params.isEmpty());

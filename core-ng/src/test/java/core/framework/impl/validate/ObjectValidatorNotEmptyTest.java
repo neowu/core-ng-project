@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -33,7 +32,7 @@ class ObjectValidatorNotEmptyTest {
 
         assertTrue(errors.hasError());
         assertEquals(1, errors.errors.size());
-        assertThat(errors.errors.get("stringField1"), containsString("stringField1"));
+        assertThat(errors.errors.get("stringField1")).contains("stringField1");
     }
 
     @Test
@@ -46,7 +45,7 @@ class ObjectValidatorNotEmptyTest {
 
         assertTrue(errors.hasError());
         assertEquals(1, errors.errors.size());
-        assertThat(errors.errors.get("stringField2"), containsString("stringField2"));
+        assertThat(errors.errors.get("stringField2")).contains("stringField2");
     }
 
     static class Bean {

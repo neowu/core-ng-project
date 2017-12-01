@@ -3,9 +3,7 @@ package core.framework.impl.web.route;
 import core.framework.impl.web.request.PathParams;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -111,7 +109,7 @@ class PathNodeTest {
 
         root.register("/path1/:var1/path2");
         Error error = assertThrows(Error.class, () -> root.register("/path1/:var2/path3"));
-        assertThat(error.getMessage(), allOf(containsString("var1"), containsString("var2")));
+        assertThat(error.getMessage()).contains("var1").contains("var2");
     }
 
     @Test
@@ -120,6 +118,6 @@ class PathNodeTest {
         root.register("/path/:var1(*)");
 
         Error error = assertThrows(Error.class, () -> root.register("/path/:var2(*)"));
-        assertThat(error.getMessage(), allOf(containsString("var1"), containsString("var2")));
+        assertThat(error.getMessage()).contains("var1").contains("var2");
     }
 }

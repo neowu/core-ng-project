@@ -4,8 +4,7 @@ import core.framework.api.json.Property;
 import core.framework.web.exception.BadRequestException;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,7 +16,7 @@ class URLParamParserTest {
     @Test
     void failedToParseEnum() {
         BadRequestException exception = assertThrows(BadRequestException.class, () -> URLParamParser.parse("V2", TestEnum.class));
-        assertThat(exception.getMessage(), containsString("failed to parse"));
+        assertThat(exception.getMessage()).contains("failed to parse");
     }
 
     @Test

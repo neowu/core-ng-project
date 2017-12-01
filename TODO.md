@@ -14,6 +14,8 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 * framework error, queue listener, background task error forward to kafka?
 * long running thread support or needed?
+* allow pass httpPort with env?
+* webPath check better error message?
 
 ### jdk 9 incompatible list
 * flyway: not working

@@ -5,8 +5,7 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.startsWith;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -25,9 +24,9 @@ class ControllerInspectorTest {
     @Test
     void lambdaMethod() {
         ControllerInspector inspector = new ControllerInspector(request -> null);
-        assertThat(inspector.targetClass.getCanonicalName(), startsWith(ControllerInspectorTest.class.getCanonicalName()));
+        assertThat(inspector.targetClass.getCanonicalName()).startsWith(ControllerInspectorTest.class.getCanonicalName());
         assertNotNull(inspector.targetMethod);
-        assertThat(inspector.controllerInfo, startsWith(ControllerInspectorTest.class.getCanonicalName() + "."));
+        assertThat(inspector.controllerInfo).startsWith(ControllerInspectorTest.class.getCanonicalName() + ".");
     }
 
     @Test

@@ -11,8 +11,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -43,7 +42,7 @@ class RequestParserTest {
     @Test
     void httpMethod() {
         MethodNotAllowedException exception = assertThrows(MethodNotAllowedException.class, () -> parser.httpMethod("TRACK"));
-        assertThat(exception.getMessage(), containsString("method=TRACK"));
+        assertThat(exception.getMessage()).contains("method=TRACK");
     }
 
     @Test

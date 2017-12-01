@@ -10,8 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,7 +28,7 @@ class JSONTest {
         bean.mapField.put("key2", "value2");
 
         String json = JSON.toJSON(bean);
-        assertThat(json, containsString("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}"));
+        assertThat(json).contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals("value1", parsedBean.mapField.get("key1"));
@@ -46,7 +45,7 @@ class JSONTest {
         bean.childField = child;
 
         String json = JSON.toJSON(bean);
-        assertThat(json, containsString("\"child\":{\"boolean\":true,\"long\":200}"));
+        assertThat(json).contains("\"child\":{\"boolean\":true,\"long\":200}");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals(bean.childField.booleanField, parsedBean.childField.booleanField);
@@ -67,7 +66,7 @@ class JSONTest {
         bean.childrenField.add(child2);
 
         String json = JSON.toJSON(bean);
-        assertThat(json, containsString("\"list\":[\"value1\",\"value2\"],\"children\":[{\"boolean\":true,\"long\":null},{\"boolean\":false,\"long\":null}]"));
+        assertThat(json).contains("\"list\":[\"value1\",\"value2\"],\"children\":[{\"boolean\":true,\"long\":null},{\"boolean\":false,\"long\":null}]");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals(bean.listField, parsedBean.listField);
@@ -130,7 +129,7 @@ class JSONTest {
         TestBean bean = new TestBean();
         bean.notAnnotatedField = 100;
         String json = JSON.toJSON(bean);
-        assertThat(json, containsString("\"notAnnotatedField\":100"));
+        assertThat(json).contains("\"notAnnotatedField\":100");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals(bean.notAnnotatedField, parsedBean.notAnnotatedField);
@@ -150,7 +149,7 @@ class JSONTest {
         TestBean bean = new TestBean();
         bean.empty = new TestBean.Empty();
         String json = JSON.toJSON(bean);
-        assertThat(json, containsString("\"empty\":{}"));
+        assertThat(json).contains("\"empty\":{}");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertNotNull(parsedBean.empty);

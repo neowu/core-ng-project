@@ -1,10 +1,9 @@
 package core.framework.template;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -23,7 +22,7 @@ class HTMLTemplateEngineTest {
         TestModel model = new TestModel();
         model.imageURL = "http://domain/image.png";
         String html = engine.process("test", model);
-        assertThat(html, CoreMatchers.containsString("<img src=http://domain/image.png>"));
+        assertThat(html).contains("<img src=http://domain/image.png>");
     }
 
     public static class TestModel {

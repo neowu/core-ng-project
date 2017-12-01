@@ -1,5 +1,6 @@
 ## Change log
 ### 5.2.5 (11/21/2017 - )
+* test: replace hamcrest with assertj
 
 ### 5.2.4 (11/20/2017 - 11/20/2017)
 * test: update junit to 5.0.2

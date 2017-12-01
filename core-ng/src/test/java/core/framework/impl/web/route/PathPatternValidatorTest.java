@@ -2,8 +2,7 @@ package core.framework.impl.web.route;
 
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -13,7 +12,7 @@ class PathPatternValidatorTest {
     @Test
     void duplicateVariable() {
         Error error = assertThrows(Error.class, () -> new PathPatternValidator("/:name/path/:name").validate());
-        assertThat(error.getMessage(), containsString("duplicate"));
+        assertThat(error.getMessage()).contains("duplicate");
     }
 
     @Test
@@ -30,6 +29,6 @@ class PathPatternValidatorTest {
     @Test
     void invalidVariable() {
         Error error = assertThrows(Error.class, () -> new PathPatternValidator("/path/:name(").validate());
-        assertThat(error.getMessage(), containsString(":name("));
+        assertThat(error.getMessage()).contains(":name(");
     }
 }

@@ -9,8 +9,7 @@ import org.junit.jupiter.api.TestInstance;
 
 import java.lang.reflect.Field;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,8 +45,8 @@ class ObjectValidatorLengthTest {
 
         assertTrue(errors.hasError());
         assertEquals(2, errors.errors.size());
-        assertThat(errors.errors.get("field1"), containsString("field1"));
-        assertThat(errors.errors.get("field2"), containsString("field2"));
+        assertThat(errors.errors.get("field1")).contains("field1");
+        assertThat(errors.errors.get("field2")).contains("field2");
     }
 
     @Test
@@ -60,7 +59,7 @@ class ObjectValidatorLengthTest {
 
         assertTrue(errors.hasError());
         assertEquals(1, errors.errors.size());
-        assertThat(errors.errors.get("field1"), containsString("field1"));
+        assertThat(errors.errors.get("field1")).contains("field1");
     }
 
     @Test
