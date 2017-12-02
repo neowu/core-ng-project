@@ -39,10 +39,7 @@ public final class Properties {
     private void loadProperties(Reader reader) throws IOException {
         java.util.Properties properties = new java.util.Properties();
         properties.load(reader);
-        properties.forEach((key, value) -> {
-            String previous = this.properties.putIfAbsent((String) key, (String) value);
-            if (previous != null) throw Exceptions.error("property already exists, key={}, previous={}, current={}", key, previous, value);
-        });
+        properties.forEach((key, value) -> set((String) key, (String) value));
     }
 
     public Optional<String> get(String key) {
@@ -51,6 +48,11 @@ public final class Properties {
             return Optional.of(value);
         }
         return Optional.empty();
+    }
+
+    public void set(String key, String value) {
+        String previous = this.properties.putIfAbsent(key, value);
+        if (previous != null) throw Exceptions.error("property already exists, key={}, previous={}, current={}", key, previous, value);
     }
 
     public Set<String> keys() {

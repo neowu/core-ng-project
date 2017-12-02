@@ -6,7 +6,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author neo
@@ -45,13 +44,13 @@ public class MockExecutor implements Executor {
         }
 
         @Override
-        public T get() throws InterruptedException, ExecutionException {
+        public T get() throws ExecutionException {
             if (error != null) throw new ExecutionException(error);
             return result;
         }
 
         @Override
-        public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        public T get(long timeout, TimeUnit unit) throws ExecutionException {
             return get();
         }
     }

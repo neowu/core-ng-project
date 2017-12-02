@@ -30,4 +30,13 @@ class PropertiesTest {
         Error error = assertThrows(Error.class, () -> properties.load("not-existed-property.properties"));
         assertThat(error.getMessage()).contains("can not find");
     }
+
+    @Test
+    void setExistedKey() {
+        Error error = assertThrows(Error.class, () -> {
+            properties.set("key1", "value1");
+            properties.set("key1", "value2");
+        });
+        assertThat(error.getMessage()).contains("key=key1, previous=value1, current=value2");
+    }
 }
