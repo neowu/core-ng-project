@@ -29,6 +29,6 @@ distributions {
     distZip.enabled = false
 }
 
-tasks.withType(JavaExec) {
+run {
     systemProperties System.properties  // assign all system properties to application, e.g. ./gradlew -Dkey=value :some-service:run
 }
