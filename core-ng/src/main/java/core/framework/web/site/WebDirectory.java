@@ -62,7 +62,7 @@ public final class WebDirectory {
 
     public Path root() {
         if (root == null)
-            throw new Error("can not find web path, check -Dcore.webPath or set working dir to be module path for local dev env.");
+            throw Exceptions.error("can not find web path, set working dir to module path for local dev env, workingDir={}, or check -Dcore.webPath for server env.", System.getProperty("user.dir"));
         return root;
     }
 }

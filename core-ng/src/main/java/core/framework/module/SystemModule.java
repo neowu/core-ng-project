@@ -1,11 +1,15 @@
 package core.framework.module;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Paths;
 
 /**
  * @author neo
  */
 public final class SystemModule extends Module {
+    private final Logger logger = LoggerFactory.getLogger(SystemModule.class);
     private final String propertyFileClasspath;
 
     public SystemModule(String propertyFileClasspath) {
@@ -16,8 +20,7 @@ public final class SystemModule extends Module {
     protected void initialize() {
         loadProperties(propertyFileClasspath);
 
-        property("sys.http.port").ifPresent(port -> http().httpPort(Integer.parseInt(port)));   // for local dev, allow developer start multiple apps in different port
-        property("sys.https.port").ifPresent(port -> http().httpsPort(Integer.parseInt(port)));
+        configureHTTPPort();
 
         property("sys.cache.host").ifPresent(host -> {
             if ("local".equals(host)) {
@@ -50,6 +53,17 @@ public final class SystemModule extends Module {
         property("sys.mongo.uri").ifPresent(uri -> mongo().uri(uri));
     }
 
+    private void configureHTTPPort() {
+        Integer httpPort = httpPort("sys.http.port");     // for local dev, allow developer start multiple apps in different port
+        if (httpPort != null) {
+            http().httpPort(httpPort);
+        }
+        Integer httpsPort = httpPort("sys.https.port");
+        if (httpsPort != null) {
+            http().httpsPort(httpsPort);
+        }
+    }
+
     private void configureLog() {
         property("sys.log.actionLogPath").ifPresent(path -> {
             if ("console".equals(path)) {
@@ -72,5 +86,16 @@ public final class SystemModule extends Module {
         property("sys.jdbc.url").ifPresent(url -> db().url(url));
         property("sys.jdbc.user").ifPresent(user -> db().user(user));
         property("sys.jdbc.password").ifPresent(password -> db().password(password));
+    }
+
+    Integer httpPort(String property) {
+        String httpPort = System.getProperty(property);     // in local dev env, allow developer to run multiple apps on different port, e.g. -Dsys.http.port=8080
+        if (httpPort != null) {
+            logger.info("found -D{}={} as http(s) port", property, httpPort);
+        } else {
+            httpPort = property(property).orElse(null);
+        }
+        if (httpPort != null) return Integer.parseInt(httpPort);
+        return null;
     }
 }
