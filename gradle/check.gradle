@@ -36,7 +36,7 @@ subprojects {
         effort = 'max'
         reportLevel = 'low'
         excludeFilter = rootProject.file('gradle/spotbugs/exclude-filter.xml')
-        toolVersion = '3.1.0'
+        toolVersion = '3.1.1'
     }
 
     tasks.withType(com.github.spotbugs.SpotBugsTask) {
