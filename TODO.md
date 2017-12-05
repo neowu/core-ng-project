@@ -14,6 +14,8 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 * framework error, queue listener, background task error forward to kafka?
 * long running thread support or needed?
+* missing @PathParam, validation error not clear?
+* generate swagger json for API
 
 ### jdk 9 incompatible list
 * flyway: not working

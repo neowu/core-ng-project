@@ -1,4 +1,6 @@
 ## Change log
+### 5.2.6 (12/05/2017 - )
+
 ### 5.2.5 (11/21/2017 - 12/04/2017)
 * test: replace hamcrest with assertj
 * http: in local dev env, allow developer to run multiple apps on different port, either put -Dsys.http.port=8080 in Intellij Run configuration, or ./gradlew -Dsys.http.port=8080 :some-service:run
