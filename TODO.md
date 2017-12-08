@@ -18,7 +18,6 @@
 * generate swagger json for API
 
 ### jdk 9 incompatible list
-* flyway: not working
 * pmd: not support sourceCompatibility = JavaVersion.VERSION_1_9
 * checkstyle: needs to filter out module-info.java
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
