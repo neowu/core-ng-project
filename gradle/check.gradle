@@ -1,8 +1,6 @@
 buildscript {
     repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
+        gradlePluginPortal()
     }
     dependencies {
         classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.6.0"
