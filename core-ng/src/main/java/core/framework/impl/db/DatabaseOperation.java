@@ -178,7 +178,7 @@ public class DatabaseOperation {
         } else if (param instanceof LocalDateTime) {
             statement.setTimestamp(index, Timestamp.valueOf((LocalDateTime) param));
         } else if (param instanceof ZonedDateTime) {
-            statement.setTimestamp(index, new Timestamp(((ZonedDateTime) param).toInstant().toEpochMilli()));
+            statement.setTimestamp(index, Timestamp.from(((ZonedDateTime) param).toInstant()));
         } else if (param instanceof Boolean) {
             statement.setBoolean(index, (Boolean) param);
         } else if (param instanceof Long) {
