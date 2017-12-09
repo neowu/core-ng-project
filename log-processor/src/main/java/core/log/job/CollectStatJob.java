@@ -21,7 +21,7 @@ public class CollectStatJob implements Job {
     Stat stat;
 
     @Override
-    public void execute() throws Exception {
+    public void execute() {
         StatMessage message = message();
         statService.index(message);
     }
