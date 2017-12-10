@@ -106,7 +106,7 @@ class OpenAPIDocumentBuilder {
 
     private void buildQueryParam(JSONNode operation, Type paramType) {
         Class<?> paramClass = GenericTypes.rawClass(paramType);
-        for (Field field : paramClass.getDeclaredFields()) {
+        for (Field field : paramClass.getFields()) {
             JSONNode parameter = new JSONNode();
             String queryParam = field.getAnnotation(QueryParam.class).name();
             parameter.put("name", queryParam);
@@ -183,7 +183,7 @@ class OpenAPIDocumentBuilder {
 
         JSONNode schema = schemas.get(schemaName);
         schema.put("type", "object");
-        for (Field field : objectClass.getDeclaredFields()) {
+        for (Field field : objectClass.getFields()) {
             String property = field.getAnnotation(Property.class).name();
             if (field.isAnnotationPresent(NotNull.class)) schema.add("required", property);
             JSONNode fieldSchema = buildSchema(field.getGenericType());
@@ -221,7 +221,7 @@ class OpenAPIDocumentBuilder {
     }
 
     private String path(Method method) {
-        String path = method.getDeclaredAnnotation(Path.class).value();
+        String path = method.getAnnotation(Path.class).value();
         String[] tokens = Strings.split(path, '/');
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < tokens.length; i++) {
