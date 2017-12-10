@@ -1,5 +1,6 @@
 package core.framework.impl.inject;
 
+import core.framework.impl.reflect.Params;
 import core.framework.inject.Inject;
 import core.framework.inject.Named;
 import core.framework.util.Exceptions;
@@ -100,7 +101,8 @@ public class BeanFactory {
         Object[] params = new Object[paramTypes.length];
         for (int i = 0; i < paramTypes.length; i++) {
             Type paramType = stripOutOwnerType(paramTypes[i]);
-            String name = name(paramAnnotations[i]);
+            Named named = Params.annotation(paramAnnotations[i], Named.class);
+            String name = named == null ? null : named.value();
             params[i] = bean(paramType, name);
         }
         return params;
@@ -124,15 +126,6 @@ public class BeanFactory {
             method.setAccessible(true);
             return method;
         });
-    }
-
-    private String name(Annotation[] paramAnnotation) {
-        for (Annotation annotation : paramAnnotation) {
-            if (annotation.annotationType().equals(Named.class)) {
-                return ((Named) annotation).value();
-            }
-        }
-        return null;
     }
 
     private boolean isTypeOf(Object instance, Type type) {

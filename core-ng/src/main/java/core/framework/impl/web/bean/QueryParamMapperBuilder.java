@@ -40,7 +40,7 @@ class QueryParamMapperBuilder<T> {
         for (Field field : Classes.instanceFields(beanClass)) {
             String fieldName = field.getName();
             Class<?> fieldClass = field.getType();
-            String name = field.getAnnotation(QueryParam.class).name();
+            String name = field.getDeclaredAnnotation(QueryParam.class).name();
             if (String.class.equals(fieldClass)) {
                 builder.indent(1).append("params.put(\"{}\", bean.{});\n", name, fieldName);
             } else {
@@ -61,7 +61,7 @@ class QueryParamMapperBuilder<T> {
         for (Field field : Classes.instanceFields(beanClass)) {
             String fieldName = field.getName();
             Class<?> fieldClass = field.getType();
-            String name = field.getAnnotation(QueryParam.class).name();
+            String name = field.getDeclaredAnnotation(QueryParam.class).name();
             if (String.class.equals(fieldClass)) {
                 builder.indent(1).append("bean.{} = (String)params.get(\"{}\");\n", fieldName, name);
             } else if (Integer.class.equals(fieldClass)) {

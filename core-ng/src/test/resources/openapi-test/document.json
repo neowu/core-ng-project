@@ -5,93 +5,6 @@
     "title": "local"
   },
   "paths": {
-    "/test/{id}": {
-      "description": "create",
-      "get": {
-        "description": "get",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "description": "id"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestResponse"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "core.framework.impl.web.service.TestWebService"
-        ]
-      },
-      "delete": {
-        "description": "delete",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "id"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "core.framework.impl.web.service.TestWebService"
-        ]
-      },
-      "put": {
-        "description": "create",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "description": "id"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "CREATED"
-          }
-        },
-        "tags": [
-          "core.framework.impl.web.service.TestWebService"
-        ]
-      }
-    },
     "/test": {
       "description": "batch",
       "get": {
@@ -188,6 +101,93 @@
                 }
               }
             }
+          }
+        },
+        "tags": [
+          "core.framework.impl.web.service.TestWebService"
+        ]
+      }
+    },
+    "/test/{id}": {
+      "description": "delete",
+      "get": {
+        "description": "get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "core.framework.impl.web.service.TestWebService"
+        ]
+      },
+      "put": {
+        "description": "create",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "CREATED"
+          }
+        },
+        "tags": [
+          "core.framework.impl.web.service.TestWebService"
+        ]
+      },
+      "delete": {
+        "description": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         },
         "tags": [

@@ -43,7 +43,7 @@ public class JSONAnnotationIntrospector extends AnnotationIntrospector {
         for (Field field : enumType.getDeclaredFields()) {
             if (!field.isEnumConstant()) continue;
 
-            Property enumValue = field.getAnnotation(Property.class);
+            Property enumValue = field.getDeclaredAnnotation(Property.class);
             if (enumValue == null) continue;
 
             String value = enumValue.name();

@@ -70,7 +70,7 @@ public class HTTPServerErrorHandler {
     }
 
     HTTPStatus httpStatus(Throwable e) {
-        ResponseStatus responseStatus = e.getClass().getAnnotation(ResponseStatus.class);
+        ResponseStatus responseStatus = e.getClass().getDeclaredAnnotation(ResponseStatus.class);
         if (responseStatus != null) return responseStatus.value();
 
         return HTTPStatus.INTERNAL_SERVER_ERROR;

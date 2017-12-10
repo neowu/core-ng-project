@@ -5,6 +5,7 @@ import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.ResponseStatus;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
+import core.framework.impl.reflect.Params;
 import core.framework.util.Lists;
 import core.framework.web.Controller;
 import core.framework.web.Request;
@@ -22,11 +23,11 @@ import static core.framework.impl.asm.Literal.variable;
  * @author neo
  */
 public class WebServiceControllerBuilder<T> {
+    final DynamicInstanceBuilder<Controller> builder;
     private final Class<T> serviceInterface;
     private final T service;
     private final Method method;
     private final HTTPStatus responseStatus;
-    final DynamicInstanceBuilder<Controller> builder;
 
     public WebServiceControllerBuilder(Class<T> serviceInterface, T service, Method method) {
         this.serviceInterface = serviceInterface;
@@ -57,7 +58,7 @@ public class WebServiceControllerBuilder<T> {
         for (int i = 0; i < annotations.length; i++) {
             Type paramType = paramTypes[i];
             String paramTypeLiteral = type(paramType);
-            PathParam pathParam = pathParam(annotations[i]);
+            PathParam pathParam = Params.annotation(annotations[i], PathParam.class);
             if (pathParam != null) {
                 params.add(pathParam.value());
                 builder.indent(1).append("{} {} = ({}) request.pathParam(\"{}\", {});\n",
@@ -101,13 +102,5 @@ public class WebServiceControllerBuilder<T> {
 
         builder.append("}");
         return builder.build();
-    }
-
-    private PathParam pathParam(Annotation[] annotations) {
-        if (annotations.length == 0) return null;
-        for (Annotation annotation : annotations) {
-            if (annotation instanceof PathParam) return (PathParam) annotation;
-        }
-        return null;
     }
 }

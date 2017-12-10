@@ -16,7 +16,8 @@ import core.framework.api.web.service.ResponseStatus;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
-import core.framework.impl.web.service.HTTPMethodHelper;
+import core.framework.impl.reflect.Params;
+import core.framework.impl.web.service.HTTPMethods;
 import core.framework.util.ASCII;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
@@ -31,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,8 +53,9 @@ class OpenAPIDocumentBuilder {
 
     void addServiceInterface(Class<?> serviceInterface) {
         Method[] methods = serviceInterface.getMethods();
+        Arrays.sort(methods, Comparator.comparing((Method method) -> method.getDeclaredAnnotation(Path.class).value()).thenComparing(method -> HTTPMethods.httpMethod(method).ordinal()));
         for (Method method : methods) {
-            HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
+            HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
             JSONNode path = document.get("paths").get(path(method));
             path.put("description", method.getName());
             JSONNode operation = buildOperation(method);
@@ -84,14 +87,14 @@ class OpenAPIDocumentBuilder {
     }
 
     private void buildParameters(JSONNode operation, Method method) {
-        HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
+        HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
 
         Annotation[][] annotations = method.getParameterAnnotations();
         Type[] paramTypes = method.getGenericParameterTypes();
 
         for (int i = 0; i < paramTypes.length; i++) {
             Type paramType = paramTypes[i];
-            PathParam pathParam = pathParam(annotations[i]);
+            PathParam pathParam = Params.annotation(annotations[i], PathParam.class);
             if (pathParam != null) {
                 buildPathParam(operation, paramType, pathParam);
             } else {
@@ -108,7 +111,7 @@ class OpenAPIDocumentBuilder {
         Class<?> paramClass = GenericTypes.rawClass(paramType);
         for (Field field : paramClass.getFields()) {
             JSONNode parameter = new JSONNode();
-            String queryParam = field.getAnnotation(QueryParam.class).name();
+            String queryParam = field.getDeclaredAnnotation(QueryParam.class).name();
             parameter.put("name", queryParam);
             parameter.put("in", "query");
             if (field.isAnnotationPresent(NotNull.class)) {
@@ -184,7 +187,7 @@ class OpenAPIDocumentBuilder {
         JSONNode schema = schemas.get(schemaName);
         schema.put("type", "object");
         for (Field field : objectClass.getFields()) {
-            String property = field.getAnnotation(Property.class).name();
+            String property = field.getDeclaredAnnotation(Property.class).name();
             if (field.isAnnotationPresent(NotNull.class)) schema.add("required", property);
             JSONNode fieldSchema = buildSchema(field.getGenericType());
             buildValidation(fieldSchema, field);
@@ -194,20 +197,20 @@ class OpenAPIDocumentBuilder {
     }
 
     private void buildValidation(JSONNode schema, Field field) {
-        Min min = field.getAnnotation(Min.class);
+        Min min = field.getDeclaredAnnotation(Min.class);
         if (min != null) schema.put("minimum", min.value());
-        Max max = field.getAnnotation(Max.class);
+        Max max = field.getDeclaredAnnotation(Max.class);
         if (max != null) schema.put("maximum", max.value());
-        Pattern pattern = field.getAnnotation(Pattern.class);
+        Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
         if (pattern != null) schema.put("pattern", pattern.value());
-        NotEmpty notEmpty = field.getAnnotation(NotEmpty.class);
+        NotEmpty notEmpty = field.getDeclaredAnnotation(NotEmpty.class);
         if (notEmpty != null) schema.put("minLength", 1);   // there is no not empty validation in openapi, here to use closest one
-        Length length = field.getAnnotation(Length.class);
+        Length length = field.getDeclaredAnnotation(Length.class);
         if (length != null) {
             if (length.min() >= 0) schema.put("minLength", length.min());
             if (length.max() >= 0) schema.put("maxLength", length.max());
         }
-        Size size = field.getAnnotation(Size.class);
+        Size size = field.getDeclaredAnnotation(Size.class);
         if (size != null) {
             if (size.min() >= 0) schema.put("minItems", size.min());
             if (size.max() >= 0) schema.put("maxItems", size.max());
@@ -221,7 +224,7 @@ class OpenAPIDocumentBuilder {
     }
 
     private String path(Method method) {
-        String path = method.getAnnotation(Path.class).value();
+        String path = method.getDeclaredAnnotation(Path.class).value();
         String[] tokens = Strings.split(path, '/');
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < tokens.length; i++) {
@@ -237,15 +240,8 @@ class OpenAPIDocumentBuilder {
     }
 
     private HTTPStatus responseStatus(Method method) {
-        ResponseStatus status = method.getAnnotation(ResponseStatus.class);
+        ResponseStatus status = method.getDeclaredAnnotation(ResponseStatus.class);
         if (status == null) return HTTPStatus.OK;
         return status.value();
-    }
-
-    private PathParam pathParam(Annotation[] paramAnnotations) {
-        for (Annotation paramAnnotation : paramAnnotations) {
-            if (paramAnnotation instanceof PathParam) return (PathParam) paramAnnotation;
-        }
-        return null;
     }
 }

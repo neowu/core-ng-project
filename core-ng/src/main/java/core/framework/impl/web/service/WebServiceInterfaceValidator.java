@@ -7,6 +7,7 @@ import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.http.HTTPMethod;
+import core.framework.impl.reflect.Params;
 import core.framework.impl.validate.type.JSONTypeValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
@@ -46,7 +47,7 @@ public class WebServiceInterfaceValidator {
     private void validate(Method method) {
         validateHTTPMethod(method);
 
-        HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
+        HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
 
         Path path = method.getDeclaredAnnotation(Path.class);
         if (path == null) throw Exceptions.error("method must have @Path, method={}", method);
@@ -63,7 +64,7 @@ public class WebServiceInterfaceValidator {
 
         for (int i = 0; i < paramTypes.length; i++) {
             Type paramType = paramTypes[i];
-            PathParam pathParam = pathParam(annotations[i]);
+            PathParam pathParam = Params.annotation(annotations[i], PathParam.class);
             if (pathParam != null) {
                 validatePathParamType(paramType);
                 pathParams.add(pathParam.value());
@@ -96,13 +97,6 @@ public class WebServiceInterfaceValidator {
             }
         }
         return names;
-    }
-
-    private PathParam pathParam(Annotation[] paramAnnotations) {
-        for (Annotation paramAnnotation : paramAnnotations) {
-            if (paramAnnotation instanceof PathParam) return (PathParam) paramAnnotation;
-        }
-        return null;
     }
 
     private void validatePathParamType(Type paramType) {

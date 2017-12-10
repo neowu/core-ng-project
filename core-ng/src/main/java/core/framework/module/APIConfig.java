@@ -10,7 +10,7 @@ import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.api.OpenAPIManager;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.management.OpenAPIController;
-import core.framework.impl.web.service.HTTPMethodHelper;
+import core.framework.impl.web.service.HTTPMethods;
 import core.framework.impl.web.service.WebServiceClient;
 import core.framework.impl.web.service.WebServiceClientBuilder;
 import core.framework.impl.web.service.WebServiceControllerBuilder;
@@ -42,9 +42,8 @@ public final class APIConfig {
                 context.httpServer.handler.responseBeanTypeValidator).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
 
-        Method[] methods = serviceInterface.getMethods();
-        for (Method method : methods) {
-            HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
+        for (Method method : serviceInterface.getMethods()) {
+            HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
             String path = method.getDeclaredAnnotation(Path.class).value();
             Controller controller = new WebServiceControllerBuilder<>(serviceInterface, service, method).build();
             try {

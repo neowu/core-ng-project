@@ -5,6 +5,7 @@ import core.framework.api.web.service.PathParam;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
+import core.framework.impl.reflect.Params;
 import core.framework.util.Maps;
 
 import java.lang.annotation.Annotation;
@@ -60,7 +61,7 @@ public class WebServiceClientBuilder<T> {
             if (i > 0) builder.append(", ");
             builder.append("{} param{}", type(paramClass), i);
 
-            PathParam pathParam = pathParam(annotations[i]);
+            PathParam pathParam = Params.annotation(annotations[i], PathParam.class);
             if (pathParam != null) {
                 pathParamIndexes.put(pathParam.value(), i);
             } else {
@@ -82,7 +83,7 @@ public class WebServiceClientBuilder<T> {
         String path = method.getDeclaredAnnotation(Path.class).value();
         builder.indent(1).append("String serviceURL = client.serviceURL({}, pathParams);\n", variable(path)); // to pass path as string literal, the escaped char will not be transferred, like \\, currently not convert is because only type regex may contain special char
 
-        HTTPMethod httpMethod = HTTPMethodHelper.httpMethod(method);
+        HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
         builder.indent(1).append("{} response = ({}) client.execute({}, serviceURL, requestType, requestBean, {});\n",
                 returnTypeLiteral,
                 returnTypeLiteral,
@@ -93,13 +94,5 @@ public class WebServiceClientBuilder<T> {
 
         builder.append("}");
         return builder.build();
-    }
-
-    private PathParam pathParam(Annotation[] annotations) {
-        if (annotations.length == 0) return null;
-        for (Annotation annotation : annotations) {
-            if (annotation instanceof PathParam) return (PathParam) annotation;
-        }
-        return null;
     }
 }

@@ -41,7 +41,7 @@ final class RowMapperBuilder<T> {
         for (Field field : Classes.instanceFields(entityClass)) {
             String fieldName = field.getName();
             Class<?> fieldClass = field.getType();
-            String column = field.getAnnotation(Column.class).name();
+            String column = field.getDeclaredAnnotation(Column.class).name();
             if (Integer.class.equals(fieldClass)) {
                 builder.indent(1).append("entity.{} = resultSet.getInt(\"{}\");\n", fieldName, column);
             } else if (String.class.equals(fieldClass)) {

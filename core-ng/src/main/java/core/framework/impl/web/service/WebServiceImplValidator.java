@@ -1,6 +1,7 @@
 package core.framework.impl.web.service;
 
 import core.framework.api.web.service.PathParam;
+import core.framework.impl.reflect.Params;
 import core.framework.util.Exceptions;
 
 import java.lang.annotation.Annotation;
@@ -40,12 +41,11 @@ public class WebServiceImplValidator<T> {
     }
 
     private void validateMethod(Method serviceMethod) {
-        Annotation[][] parameterAnnotations = serviceMethod.getParameterAnnotations();
-        for (Annotation[] parameterAnnotation : parameterAnnotations) {
-            for (Annotation annotation : parameterAnnotation) {
-                if (PathParam.class.equals(annotation.annotationType())) {
-                    throw Exceptions.error("service impl must not have @PathParam, method={}", serviceMethod);
-                }
+        Annotation[][] annotations = serviceMethod.getParameterAnnotations();
+        for (Annotation[] parameterAnnotations : annotations) {
+            PathParam pathParam = Params.annotation(parameterAnnotations, PathParam.class);
+            if (pathParam != null) {
+                throw Exceptions.error("service impl must not have @PathParam, method={}", serviceMethod);
             }
         }
     }

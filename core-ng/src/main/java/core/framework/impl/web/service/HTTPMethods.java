@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 /**
  * @author neo
  */
-public class HTTPMethodHelper {
+public class HTTPMethods {
     public static HTTPMethod httpMethod(Method method) {
         if (method.isAnnotationPresent(GET.class)) return HTTPMethod.GET;
         if (method.isAnnotationPresent(POST.class)) return HTTPMethod.POST;
