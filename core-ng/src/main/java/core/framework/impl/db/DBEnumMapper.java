@@ -1,7 +1,7 @@
 package core.framework.impl.db;
 
 import core.framework.db.DBEnumValue;
-import core.framework.impl.reflect.Classes;
+import core.framework.impl.reflect.Enums;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 
@@ -32,7 +32,7 @@ final class DBEnumMapper<T extends Enum<T>> {
         T[] constants = enumClass.getEnumConstants();
         Map<String, T> mapping = Maps.newHashMapWithExpectedSize(constants.length);
         for (T constant : constants) {
-            String dbValue = Classes.enumValueAnnotation(enumClass, constant, DBEnumValue.class).value();
+            String dbValue = Enums.constantAnnotation(constant, DBEnumValue.class).value();
             mapping.put(dbValue, constant);
         }
         return mapping;

@@ -15,6 +15,7 @@ import core.framework.api.web.service.QueryParam;
 import core.framework.api.web.service.ResponseStatus;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.reflect.Classes;
+import core.framework.impl.reflect.Enums;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.reflect.Params;
 import core.framework.impl.web.service.HTTPMethods;
@@ -99,7 +100,7 @@ class OpenAPIDocumentBuilder {
                 buildPathParam(operation, paramType, pathParam);
             } else {
                 if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
-                    buildQueryParam(operation, paramType);
+                    buildQueryParam(operation, GenericTypes.rawClass(paramType));
                 } else {
                     operation.get("requestBody").get("content").get("application/json").put("schema", buildSchema(paramType));
                 }
@@ -107,9 +108,8 @@ class OpenAPIDocumentBuilder {
         }
     }
 
-    private void buildQueryParam(JSONNode operation, Type paramType) {
-        Class<?> paramClass = GenericTypes.rawClass(paramType);
-        for (Field field : paramClass.getFields()) {
+    private void buildQueryParam(JSONNode operation, Class<?> beanClass) {
+        for (Field field : Classes.instanceFields(beanClass)) {
             JSONNode parameter = new JSONNode();
             String queryParam = field.getDeclaredAnnotation(QueryParam.class).name();
             parameter.put("name", queryParam);
@@ -137,56 +137,54 @@ class OpenAPIDocumentBuilder {
 
     private <T extends Enum<T>> JSONNode buildSchema(Type type) {
         if (type == void.class) return null;
-        Class<?> instanceClass = GenericTypes.rawClass(type);
         JSONNode schema = new JSONNode();
         if (GenericTypes.isOptional(type)) {
-            schema.put("$ref", buildObjectSchema(GenericTypes.optionalValueClass(type)));
+            schema.put("$ref", buildBeanSchema(GenericTypes.optionalValueClass(type)));
         } else if (GenericTypes.isList(type)) {
-            Class<?> itemClass = GenericTypes.listValueClass(type);
             schema.put("type", "array");
-            schema.put("items", buildSchema(itemClass));
+            schema.put("items", buildSchema(GenericTypes.listValueClass(type)));
         } else if (GenericTypes.isMap(type)) {
             schema.put("type", "object");
             schema.put("additionalProperties", buildSchema(GenericTypes.mapValueClass(type)));
-        } else if (String.class.equals(instanceClass)) {
+        } else if (String.class.equals(type)) {
             schema.put("type", "string");
-        } else if (Integer.class.equals(instanceClass)) {
+        } else if (Integer.class.equals(type)) {
             schema.put("type", "integer");
             schema.put("format", "int32");
-        } else if (Boolean.class.equals(instanceClass)) {
+        } else if (Boolean.class.equals(type)) {
             schema.put("type", "boolean");
-        } else if (Long.class.equals(instanceClass)) {
+        } else if (Long.class.equals(type)) {
             schema.put("type", "integer");
             schema.put("format", "int64");
-        } else if (Double.class.equals(instanceClass) || BigDecimal.class.equals(instanceClass)) {
+        } else if (Double.class.equals(type) || BigDecimal.class.equals(type)) {
             schema.put("type", "number");
             schema.put("format", "double");
-        } else if (LocalDate.class.equals(instanceClass)) {
+        } else if (LocalDate.class.equals(type)) {
             schema.put("type", "string");
             schema.put("format", "date");
-        } else if (LocalDateTime.class.equals(instanceClass) || ZonedDateTime.class.equals(instanceClass) || Instant.class.equals(instanceClass)) {
+        } else if (LocalDateTime.class.equals(type) || ZonedDateTime.class.equals(type) || Instant.class.equals(type)) {
             schema.put("type", "string");
             schema.put("format", "date-time");
-        } else if (instanceClass.isEnum()) {
+        } else if (GenericTypes.rawClass(type).isEnum()) {
             schema.put("type", "string");
             @SuppressWarnings("unchecked")
-            List<String> enumValues = enumValues((Class<T>) instanceClass);
+            List<String> enumValues = enumValues((Class<T>) type);
             enumValues.forEach(enumValue -> schema.add("enum", enumValue));
         } else {
-            schema.put("$ref", buildObjectSchema(instanceClass));
+            schema.put("$ref", buildBeanSchema((Class<?>) type));
         }
         return schema;
     }
 
-    private String buildObjectSchema(Class<?> objectClass) {
-        String schemaName = objectClass.getCanonicalName();
+    private String buildBeanSchema(Class<?> beanClass) {
+        String schemaName = beanClass.getCanonicalName();
         String ref = "#/components/schemas/" + schemaName;
         JSONNode schemas = document.get("components").get("schemas");
         if (schemas.has(schemaName)) return ref;
 
         JSONNode schema = schemas.get(schemaName);
         schema.put("type", "object");
-        for (Field field : objectClass.getFields()) {
+        for (Field field : Classes.instanceFields(beanClass)) {
             String property = field.getDeclaredAnnotation(Property.class).name();
             if (field.isAnnotationPresent(NotNull.class)) schema.add("required", property);
             JSONNode fieldSchema = buildSchema(field.getGenericType());
@@ -219,7 +217,7 @@ class OpenAPIDocumentBuilder {
 
     private <T extends Enum<T>> List<String> enumValues(Class<T> enumClass) {
         return Arrays.stream(enumClass.getEnumConstants())
-                     .map(constant -> Classes.enumValueAnnotation(enumClass, constant, Property.class).name())
+                     .map(constant -> Enums.constantAnnotation(constant, Property.class).name())
                      .collect(Collectors.toList());
     }
 

@@ -65,7 +65,7 @@ public class DataTypeValidator {
 
         Field[] fields = objectClass.getDeclaredFields();
         for (Field field : fields) {
-            if (field.getName().startsWith("$")) continue;  // ignore dynamic/generated field, e.g. jacoco
+            if (field.isSynthetic()) continue;  // ignore dynamic/generated field, e.g. jacoco
             if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) continue;  // ignore all static final field
 
             validateField(field);
@@ -138,19 +138,14 @@ public class DataTypeValidator {
 
     private void validateField(Field field) {
         int modifiers = field.getModifiers();
-
         if (!Modifier.isPublic(modifiers))
             throw Exceptions.error("field must be public, field={}", Fields.path(field));
-
         if (Modifier.isTransient(modifiers))
             throw Exceptions.error("field must not be transient, field={}", Fields.path(field));
-
         if (Modifier.isStatic(modifiers))
             throw Exceptions.error("field must not be static, field={}", Fields.path(field));
-
-        if (Modifier.isFinal(modifiers)) {
+        if (Modifier.isFinal(modifiers))
             throw Exceptions.error("field must not be final, field={}", Fields.path(field));
-        }
     }
 
     private String path(String parent, String field) {

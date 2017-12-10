@@ -1,6 +1,6 @@
 package core.framework.impl.mongo;
 
-import core.framework.impl.reflect.Classes;
+import core.framework.impl.reflect.Enums;
 import core.framework.mongo.MongoEnumValue;
 import core.framework.util.Exceptions;
 import org.bson.BsonReader;
@@ -32,7 +32,7 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
         encodingMappings = new EnumMap<>(enumClass);
         decodingMappings = new HashMap<>(constants.length);
         for (T constant : constants) {
-            String value = Classes.enumValueAnnotation(enumClass, constant, MongoEnumValue.class).value();
+            String value = Enums.constantAnnotation(constant, MongoEnumValue.class).value();
             encodingMappings.put(constant, value);
             decodingMappings.put(value, constant);
         }
