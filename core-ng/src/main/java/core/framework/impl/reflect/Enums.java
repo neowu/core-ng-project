@@ -15,4 +15,8 @@ public class Enums {
             throw new Error(e);
         }
     }
+
+    public static <T extends Enum<?>> String path(T constant) {
+        return constant.getDeclaringClass().getTypeName() + "." + constant.name();
+    }
 }

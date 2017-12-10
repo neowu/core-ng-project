@@ -1,6 +1,7 @@
 package core.framework.impl.mongo;
 
 import core.framework.api.json.Property;
+import core.framework.impl.reflect.Enums;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
@@ -83,32 +84,26 @@ public final class MongoClassValidator implements TypeVisitor {
 
             Class<?> fieldClass = field.getType();
             if (fieldClass.isEnum()) {
-                @SuppressWarnings("unchecked")
-                Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
-                validateEnumClass(enumClass, field);
+                validateEnumClass(fieldClass, field);
             }
         }
     }
 
-    private <T extends Enum<?>> void validateEnumClass(Class<T> enumClass, Field field) {
-        T[] constants = enumClass.getEnumConstants();
+    private void validateEnumClass(Class<?> enumClass, Field field) {
+        Enum<?>[] constants = (Enum<?>[]) enumClass.getEnumConstants();
         Set<String> enumValues = Sets.newHashSet();
-        for (T constant : constants) {
-            try {
-                Field enumField = enumClass.getDeclaredField(constant.name());
-                MongoEnumValue enumValue = enumField.getDeclaredAnnotation(MongoEnumValue.class);
-                if (enumValue == null) {
-                    throw Exceptions.error("mongo enum must have @MongoEnumValue, field={}, enum={}", Fields.path(field), Fields.path(enumField));
-                }
-                boolean added = enumValues.add(enumValue.value());
-                if (!added) {
-                    throw Exceptions.error("mongo enum value must be unique, enum={}, value={}", enumClass.getCanonicalName() + "." + constant, enumValue.value());
-                }
-                if (enumField.isAnnotationPresent(Property.class)) {
-                    throw Exceptions.error("mongo enum must not have json annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Fields.path(enumField));
-                }
-            } catch (NoSuchFieldException e) {
-                throw new Error(e);
+        for (Enum<?> constant : constants) {
+            MongoEnumValue enumValue = Enums.constantAnnotation(constant, MongoEnumValue.class);
+            if (enumValue == null) {
+                throw Exceptions.error("mongo enum must have @MongoEnumValue, field={}, enum={}", Fields.path(field), Enums.path(constant));
+            }
+            boolean added = enumValues.add(enumValue.value());
+            if (!added) {
+                throw Exceptions.error("mongo enum value must be unique, enum={}, value={}", Enums.path(constant), enumValue.value());
+            }
+            Property property = Enums.constantAnnotation(constant, Property.class);
+            if (property != null) {
+                throw Exceptions.error("mongo enum must not have json annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Enums.path(constant));
             }
         }
     }

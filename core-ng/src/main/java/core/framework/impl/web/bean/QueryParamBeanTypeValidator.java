@@ -66,9 +66,7 @@ final class QueryParamBeanTypeValidator implements TypeVisitor {
 
         Class<?> fieldClass = field.getType();
         if (fieldClass.isEnum()) {
-            @SuppressWarnings("unchecked")
-            Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
-            JSONTypeValidator.validateEnumClass(enumClass);
+            JSONTypeValidator.validateEnumClass(fieldClass);
         }
     }
 }

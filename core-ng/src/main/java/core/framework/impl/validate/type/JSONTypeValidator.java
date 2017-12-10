@@ -1,6 +1,7 @@
 package core.framework.impl.validate.type;
 
 import core.framework.api.json.Property;
+import core.framework.impl.reflect.Enums;
 import core.framework.impl.reflect.Fields;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
@@ -21,16 +22,12 @@ import java.util.Set;
  * @author neo
  */
 public class JSONTypeValidator implements TypeVisitor {
-    public static <T extends Enum<?>> void validateEnumClass(Class<T> enumClass) {
-        T[] constants = enumClass.getEnumConstants();
-        for (T constant : constants) {
-            try {
-                Field enumField = enumClass.getField(constant.name());
-                if (!enumField.isAnnotationPresent(Property.class)) {
-                    throw Exceptions.error("enum must have @Property, enum={}", Fields.path(enumField));
-                }
-            } catch (NoSuchFieldException e) {
-                throw new Error(e);
+    public static void validateEnumClass(Class<?> enumClass) {
+        Enum<?>[] constants = (Enum<?>[]) enumClass.getEnumConstants();
+        for (Enum<?> constant : constants) {
+            Property property = Enums.constantAnnotation(constant, Property.class);
+            if (property == null) {
+                throw Exceptions.error("enum must have @Property, enum={}", Enums.path(constant));
             }
         }
     }
@@ -83,9 +80,7 @@ public class JSONTypeValidator implements TypeVisitor {
 
         Class<?> fieldClass = field.getType();
         if (fieldClass.isEnum()) {
-            @SuppressWarnings("unchecked")
-            Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
-            validateEnumClass(enumClass);
+            validateEnumClass(fieldClass);
         }
     }
 }

@@ -112,9 +112,7 @@ public class WebServiceInterfaceValidator {
         if (Long.class.equals(paramClass)) return;
         if (String.class.equals(paramClass)) return;
         if (paramClass.isEnum()) {
-            @SuppressWarnings("unchecked")
-            Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) paramClass;
-            JSONTypeValidator.validateEnumClass(enumClass);
+            JSONTypeValidator.validateEnumClass(paramClass);
             return;
         }
         throw Exceptions.error("path param class is not supported, paramClass={}", paramClass);
