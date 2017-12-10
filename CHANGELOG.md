@@ -2,6 +2,7 @@
 ### 5.2.6 (12/05/2017 - )
 * db: fixed ZonedDateTime saves to DB with nano precision
 * search: update to 6.0.1
+* api: support /_sys/api, can be used by http://editor.swagger.io/ to generate OpenAPI doc
 
 ### 5.2.5 (11/21/2017 - 12/04/2017)
 * test: replace hamcrest with assertj

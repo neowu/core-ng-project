@@ -3,6 +3,7 @@ package core.framework.impl.web.service;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -20,8 +21,8 @@ class WebServiceImplValidatorTest {
         }
 
         @Override
-        public TestResponse get(Integer id) {
-            return null;
+        public Optional<TestResponse> get(Integer id) {
+            return Optional.empty();
         }
 
         @Override

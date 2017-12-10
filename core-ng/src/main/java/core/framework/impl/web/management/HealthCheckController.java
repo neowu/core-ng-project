@@ -10,7 +10,7 @@ import core.framework.web.Response;
  */
 public class HealthCheckController implements Controller {
     @Override
-    public Response execute(Request request) throws Exception {
+    public Response execute(Request request) {
         return Response.empty().status(HTTPStatus.OK);
     }
 }

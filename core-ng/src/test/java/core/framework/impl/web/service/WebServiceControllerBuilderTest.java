@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
@@ -43,7 +44,9 @@ class WebServiceControllerBuilderTest {
 
         Response response = controller.execute(request);
         assertEquals(HTTPStatus.OK, response.status());
-        assertEquals(2, (int) ((TestWebService.TestResponse) ((BeanBody) ((ResponseImpl) response).body).bean).intField);
+        @SuppressWarnings("unchecked")
+        Optional<TestWebService.TestResponse> bean = (Optional<TestWebService.TestResponse>) ((BeanBody) ((ResponseImpl) response).body).bean;
+        assertEquals(2, (int) bean.get().intField);
     }
 
     @Test
@@ -83,12 +86,12 @@ class WebServiceControllerBuilderTest {
         }
 
         @Override
-        public TestResponse get(Integer id) {
+        public Optional<TestResponse> get(Integer id) {
             assertEquals(1, (int) id);
 
             TestResponse response = new TestResponse();
             response.intField = 2;
-            return response;
+            return Optional.of(response);
         }
 
         @Override

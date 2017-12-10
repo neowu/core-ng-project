@@ -46,7 +46,7 @@ public class KafkaMessageListener {
 
     public void start() {
         listenerThreads = new KafkaMessageListenerThread[poolSize];
-        String group = logManager.appName == null ? "local" : logManager.appName;
+        String group = logManager.appName;
         for (int i = 0; i < poolSize; i++) {
             String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
             Consumer<String, byte[]> consumer = kafka.consumer(group, topics);

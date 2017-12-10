@@ -7,7 +7,7 @@ public class TestWebServiceImpl$get implements core.framework.web.Controller {
 
     public core.framework.web.Response execute(core.framework.web.Request request) throws Exception {
         java.lang.Integer id = (java.lang.Integer) request.pathParam("id", java.lang.Integer.class);
-        core.framework.impl.web.service.TestWebService.TestResponse response = delegate.get(id);
+        java.util.Optional response = delegate.get(id);
         return core.framework.web.Response.bean(response).status(core.framework.api.http.HTTPStatus.OK);
     }
 

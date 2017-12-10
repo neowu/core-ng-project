@@ -1,0 +1,261 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "v1.0",
+    "title": "local"
+  },
+  "paths": {
+    "/test/{id}": {
+      "description": "create",
+      "get": {
+        "description": "get",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "core.framework.impl.web.service.TestWebService"
+        ]
+      },
+      "delete": {
+        "description": "delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "core.framework.impl.web.service.TestWebService"
+        ]
+      },
+      "put": {
+        "description": "create",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "CREATED"
+          }
+        },
+        "tags": [
+          "core.framework.impl.web.service.TestWebService"
+        ]
+      }
+    },
+    "/test": {
+      "description": "batch",
+      "get": {
+        "description": "search",
+        "parameters": [
+          {
+            "name": "int_field",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "intField"
+          },
+          {
+            "name": "boolean_field",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "booleanField"
+          },
+          {
+            "name": "long_field",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "longField"
+          },
+          {
+            "name": "double_field",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1.0,
+              "maximum": 100.0
+            },
+            "description": "doubleField"
+          },
+          {
+            "name": "date_field",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "dateField"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "core.framework.impl.web.service.TestWebService"
+        ]
+      },
+      "put": {
+        "description": "batch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestRequest"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "core.framework.impl.web.service.TestWebService"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "core.framework.impl.web.service.TestWebService.TestResponse": {
+        "type": "object",
+        "properties": {
+          "int_field": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "string_map": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestItem"
+            }
+          }
+        }
+      },
+      "core.framework.impl.web.service.TestWebService.TestItem": {
+        "type": "object",
+        "properties": {
+          "zoned_date_time_field": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "enum_field": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B"
+            ]
+          }
+        }
+      },
+      "core.framework.impl.web.service.TestWebService.TestRequest": {
+        "type": "object",
+        "required": [
+          "string_field"
+        ],
+        "properties": {
+          "string_field": {
+            "type": "string",
+            "pattern": "\\d+.*",
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestItem"
+            }
+          }
+        }
+      }
+    }
+  }
+}

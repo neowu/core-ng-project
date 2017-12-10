@@ -36,6 +36,7 @@ class CleanupOldIndexJobTest {
     void cleanup() {
         List<ElasticSearchIndex> indices = Lists.newArrayList();
         indices.add(index("action-2017-10-01", IndexMetaData.State.OPEN));
+        indices.add(index("action-2017-10-30", IndexMetaData.State.CLOSE));
         indices.add(index("action-2017-11-01", IndexMetaData.State.OPEN));
         when(elasticSearch.indices()).thenReturn(indices);
 

@@ -78,7 +78,7 @@ class WebServiceClientTest {
         HTTPRequest request = new HTTPRequest(HTTPMethod.POST, "/");
 
         TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
-        requestBean.stringField = "value";
+        requestBean.stringField = "123value";
         webServiceClient.addRequestBean(request, HTTPMethod.POST, TestWebService.TestRequest.class, requestBean);
 
         assertArrayEquals(JSONMapper.toJSON(requestBean), request.body());

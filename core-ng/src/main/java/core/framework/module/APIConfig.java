@@ -7,7 +7,9 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.ControllerActionBuilder;
 import core.framework.impl.web.ControllerHolder;
+import core.framework.impl.web.api.OpenAPIManager;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.impl.web.management.OpenAPIController;
 import core.framework.impl.web.service.HTTPMethodHelper;
 import core.framework.impl.web.service.WebServiceClient;
 import core.framework.impl.web.service.WebServiceClientBuilder;
@@ -56,6 +58,8 @@ public final class APIConfig {
                 throw new Error("failed to find impl method", e);
             }
         }
+
+        openAPIManager().serviceInterfaces.add(serviceInterface);
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
@@ -87,7 +91,18 @@ public final class APIConfig {
         return state.httpClient;
     }
 
+    private OpenAPIManager openAPIManager() {
+        if (state.openAPIManager == null) {
+            state.openAPIManager = new OpenAPIManager(context.logManager.appName);
+            if (!context.isTest()) {
+                context.route(HTTPMethod.GET, "/_sys/api", new OpenAPIController(state.openAPIManager), true);
+            }
+        }
+        return state.openAPIManager;
+    }
+
     public static class State {
         HTTPClient httpClient;
+        OpenAPIManager openAPIManager;
     }
 }

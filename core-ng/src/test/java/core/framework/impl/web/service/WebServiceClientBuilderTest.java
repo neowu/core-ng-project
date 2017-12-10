@@ -3,9 +3,12 @@ package core.framework.impl.web.service;
 import core.framework.http.HTTPMethod;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Maps;
+import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -41,10 +44,10 @@ class WebServiceClientBuilderTest {
 
         when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Maps.newHashMap("id", 1))))
                 .thenReturn("http://localhost/test/1");
-        when(webServiceClient.execute(HTTPMethod.GET, "http://localhost/test/1", null, null, TestWebService.TestResponse.class))
-                .thenReturn(expectedResponse);
+        when(webServiceClient.execute(HTTPMethod.GET, "http://localhost/test/1", null, null, Types.optional(TestWebService.TestResponse.class)))
+                .thenReturn(Optional.of(expectedResponse));
 
-        TestWebService.TestResponse response = client.get(1);
+        TestWebService.TestResponse response = client.get(1).get();
         assertSame(expectedResponse, response);
     }
 

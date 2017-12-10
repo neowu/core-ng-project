@@ -32,13 +32,13 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         java.lang.Void response = (java.lang.Void) client.execute(core.framework.http.HTTPMethod.DELETE, serviceURL, requestType, requestBean, void.class);
     }
 
-    public core.framework.impl.web.service.TestWebService.TestResponse get(java.lang.Integer param0) {
+    public java.util.Optional get(java.lang.Integer param0) {
         java.lang.reflect.Type requestType = null;
         Object requestBean = null;
         java.util.Map pathParams = new java.util.HashMap();
         pathParams.put("id", param0);
         String serviceURL = client.serviceURL("/test/:id", pathParams);
-        core.framework.impl.web.service.TestWebService.TestResponse response = (core.framework.impl.web.service.TestWebService.TestResponse) client.execute(core.framework.http.HTTPMethod.GET, serviceURL, requestType, requestBean, core.framework.impl.web.service.TestWebService.TestResponse.class);
+        java.util.Optional response = (java.util.Optional) client.execute(core.framework.http.HTTPMethod.GET, serviceURL, requestType, requestBean, core.framework.util.Types.optional(core.framework.impl.web.service.TestWebService.TestResponse.class));
         return response;
     }
 

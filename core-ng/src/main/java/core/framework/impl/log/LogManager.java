@@ -21,7 +21,12 @@ public final class LogManager {
     public MessageFilter filter;
 
     public LogManager() {
-        this.appName = System.getProperty("core.appName");
+        String appName = System.getProperty("core.appName");
+        if (appName == null) {
+            logger.info("not found -Dcore.appName, this should only happen in local dev env or test, use \"local\" as appName");
+            appName = "local";
+        }
+        this.appName = appName;
     }
 
     public void begin(String message) {
