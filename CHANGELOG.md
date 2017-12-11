@@ -1,4 +1,7 @@
 ## Change log
+### 5.2.7 (12/11/2017 - )
+* property: allow all the properties can be override by system property via -Dkey=value
+
 ### 5.2.6 (12/05/2017 - 12/11/2017)
 * db: fixed ZonedDateTime saves to DB with nano precision
 * search: update to 6.0.1
