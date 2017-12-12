@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -20,7 +21,7 @@ class PropertiesTest {
 
     @Test
     void getEmptyValue() {
-        properties.properties.put("key", "");
+        properties.set("key", "");
 
         assertFalse(properties.get("key").isPresent());
     }
@@ -38,5 +39,12 @@ class PropertiesTest {
             properties.set("key1", "value2");
         });
         assertThat(error.getMessage()).contains("key=key1, previous=value1, current=value2");
+    }
+
+    @Test
+    void containsKey() {
+        properties.properties.put("key", "");
+
+        assertTrue(properties.containsKey("key"));
     }
 }

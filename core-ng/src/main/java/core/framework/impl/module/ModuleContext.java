@@ -19,7 +19,6 @@ import core.framework.impl.web.management.PropertyController;
 import core.framework.impl.web.management.ThreadInfoController;
 import core.framework.impl.web.route.PathPatternValidator;
 import core.framework.util.Lists;
-import core.framework.util.Properties;
 import core.framework.web.Controller;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
@@ -34,7 +33,7 @@ public final class ModuleContext {
     public final BeanFactory beanFactory;
     public final List<Runnable> startupHook = Lists.newArrayList();
     public final ShutdownHook shutdownHook = new ShutdownHook();
-    public final Properties properties = new Properties();
+    public final PropertyManager propertyManager = new PropertyManager();
     public final HTTPServer httpServer;
     public final LogManager logManager;
     public final MockFactory mockFactory;
@@ -75,7 +74,7 @@ public final class ModuleContext {
             ThreadInfoController threadInfoController = new ThreadInfoController();
             route(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage, true);
             route(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump, true);
-            PropertyController propertyController = new PropertyController(properties);
+            PropertyController propertyController = new PropertyController(propertyManager);
             route(HTTPMethod.GET, "/_sys/property", propertyController, true);
         }
     }
