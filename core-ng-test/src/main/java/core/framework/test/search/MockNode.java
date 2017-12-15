@@ -22,17 +22,18 @@ class MockNode extends Node {
         List<Class<? extends Plugin>> plugins = Lists.newArrayList();
         plugins.add(ReindexPlugin.class);
         plugins.add(Netty4Plugin.class);
-        addPainlessPlugin(plugins);
+        addPlugin(plugins, "org.elasticsearch.index.mapper.MapperExtrasPlugin");
+        addPlugin(plugins, "org.elasticsearch.painless.PainlessPlugin");
         return plugins;
     }
 
-    private static void addPainlessPlugin(List<Class<? extends Plugin>> plugins) {
+    private static void addPlugin(List<Class<? extends Plugin>> plugins, String pluginClass) {
         try {
             @SuppressWarnings("unchecked")
-            Class<? extends Plugin> painlessPluginClass = (Class<? extends Plugin>) Class.forName("org.elasticsearch.painless.PainlessPlugin");
+            Class<? extends Plugin> painlessPluginClass = (Class<? extends Plugin>) Class.forName(pluginClass);
             plugins.add(painlessPluginClass);
         } catch (ClassNotFoundException e) {
-            LOGGER.info("not found PainlessPlugin, skipped");
+            LOGGER.info("not found plugin, skipped, class={}", pluginClass);
         }
     }
 

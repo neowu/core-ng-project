@@ -85,5 +85,6 @@ project(':log-processor') {
         runtime "org.apache.logging.log4j:log4j-api:${log4jVersion}"            // used by elasticsearch
         testCompile project(':core-ng-test')
         testRuntime "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
+        testRuntime files("lib/mapper-extras-${elasticVersion}.jar")            // used by elasticsearch scaled_float
     }
 }
