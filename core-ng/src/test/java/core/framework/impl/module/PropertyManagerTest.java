@@ -31,13 +31,13 @@ class PropertyManagerTest {
 
     @Test
     void maskedValue() {
-        PropertyManager.PropertyEntry entry = new PropertyManager.PropertyEntry("sys.jdbc.password", "password", false);
+        PropertyManager.PropertyEntry entry = new PropertyManager.PropertyEntry("sys.jdbc.password", "password", PropertyManager.PropertySource.PROPERTY_FILE);
         assertNotEquals("password", entry.maskedValue());
 
-        entry = new PropertyManager.PropertyEntry("app.key.secret", "secret", false);
+        entry = new PropertyManager.PropertyEntry("app.key.secret", "secret", PropertyManager.PropertySource.PROPERTY_FILE);
         assertNotEquals("secret", entry.maskedValue());
 
-        entry = new PropertyManager.PropertyEntry("sys.jdbc.user", "user", false);
+        entry = new PropertyManager.PropertyEntry("sys.jdbc.user", "user", PropertyManager.PropertySource.PROPERTY_FILE);
         assertEquals("user", entry.maskedValue());
     }
 }

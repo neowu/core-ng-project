@@ -37,6 +37,6 @@ class MockNode extends Node {
     }
 
     MockNode(Settings settings) {
-        super(new Environment(settings), plugins());
+        super(new Environment(settings, null), plugins());
     }
 }

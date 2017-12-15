@@ -20,43 +20,44 @@ public class PropertyManager {
     private final Logger logger = LoggerFactory.getLogger(PropertyManager.class);
 
     public Optional<String> property(String key) {
-        PropertyEntry value = propertyValue(key);
-        if (value.override) {
-            if (!properties.containsKey(key))
-                throw Exceptions.error("-D{}={} must override property file, please add key to property file", key, value.maskedValue());
-            logger.info("found overridden property by -D{}={}", key, value.maskedValue());
+        PropertyEntry entry = entry(key);
+        if (entry.source != PropertySource.PROPERTY_FILE) {
+            if (!properties.containsKey(key)) throw Exceptions.error("key defined in env variable or system property must override property file, please add key to property file, key={}, value={}", key, entry.maskedValue());
+            logger.info("found overridden property, key={}, value={}, source={}", key, entry.maskedValue(), entry.source);
         }
-        return value.value();
+        return entry.value();
     }
 
     public List<PropertyEntry> entries() {
         Set<String> keys = new TreeSet<>(this.properties.keys());   // sort by key
-        return keys.stream().map(this::propertyValue).collect(Collectors.toList());
+        return keys.stream().map(this::entry).collect(Collectors.toList());
     }
 
-    private PropertyEntry propertyValue(String key) {
-        String value = System.getProperty(key);     // allow use system property to overwrite values in property file, e.g. -Dsys.http.port=8080
-        if (!Strings.isEmpty(value)) {
-            return new PropertyEntry(key, value, true);
-        } else {
-            return new PropertyEntry(key, this.properties.get(key).orElse(""), false);
-        }
+    private PropertyEntry entry(String key) {
+        String value = System.getenv(key);  // allow use env variable to overwrite values in property file, e.g. under docker/kubenetes
+        if (!Strings.isEmpty(value)) return new PropertyEntry(key, value, PropertySource.ENV_VAR);
+        value = System.getProperty(key);     // allow use system property to overwrite values in property file, e.g. -Dsys.http.port=8080
+        if (!Strings.isEmpty(value)) return new PropertyEntry(key, value, PropertySource.SYSTEM_PROPERTY);
+        return new PropertyEntry(key, this.properties.get(key).orElse(null), PropertySource.PROPERTY_FILE);
+    }
+
+    public enum PropertySource {
+        ENV_VAR, SYSTEM_PROPERTY, PROPERTY_FILE
     }
 
     public static class PropertyEntry {
         public final String key;
         public final String value;
-        public final boolean override;
+        public final PropertySource source;
 
-        PropertyEntry(String key, String value, boolean override) {
+        PropertyEntry(String key, String value, PropertySource source) {
             this.key = key;
             this.value = value;
-            this.override = override;
+            this.source = source;
         }
 
         Optional<String> value() {
-            if (Strings.isEmpty(value)) return Optional.empty();
-            return Optional.of(value);
+            return Optional.ofNullable(value);
         }
 
         public String maskedValue() {

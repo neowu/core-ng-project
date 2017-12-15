@@ -27,7 +27,7 @@ public class PropertyController implements Controller {
         StringBuilder builder = new StringBuilder();
         List<PropertyManager.PropertyEntry> entries = propertyManager.entries();
         for (PropertyManager.PropertyEntry entry : entries) {
-            if (entry.override) builder.append("# ").append(entry.key).append(" is overridden by system property -D").append(entry.key).append('\n');
+            if (entry.source != PropertyManager.PropertySource.PROPERTY_FILE) builder.append("# ").append(entry.key).append(" is overridden by ").append(entry.source).append('\n');
             builder.append(entry.key).append('=').append(entry.maskedValue()).append('\n');
         }
         return builder.toString();
