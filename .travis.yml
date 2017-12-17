@@ -1,12 +1,11 @@
 language: java
 jdk:
-  - oraclejdk8
+  - oraclejdk9
 cache:
   directories:
     - $HOME/.gradle
-    - gradle/node/node_modules
 script:
-  - ./gradlew --build-cache clean build
+  - ./gradlew clean build
   - ./gradlew jacocoTestReport
 after_success:
   - bash <(curl -s https://codecov.io/bash)
