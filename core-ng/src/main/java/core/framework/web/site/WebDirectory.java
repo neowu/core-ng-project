@@ -1,6 +1,7 @@
 package core.framework.web.site;
 
 import core.framework.util.Exceptions;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ public final class WebDirectory {
     }
 
     public Path path(String path) {
-        if (path.charAt(0) != '/') throw Exceptions.error("path must start with '/', path={}", path);
+        if (!Strings.startsWith(path, '/')) throw Exceptions.error("path must start with '/', path={}", path);
         return root().resolve(path.substring(1)).toAbsolutePath();
     }
 

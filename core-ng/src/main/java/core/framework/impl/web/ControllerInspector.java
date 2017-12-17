@@ -1,6 +1,7 @@
 package core.framework.impl.web;
 
 import core.framework.util.Exceptions;
+import core.framework.util.Strings;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 
@@ -30,7 +31,7 @@ public class ControllerInspector {
             CLASS_GET_CONSTANT_POOL = Class.class.getDeclaredMethod("getConstantPool");
             overrideAccessible(CLASS_GET_CONSTANT_POOL);
 
-            Class<?> constantPoolClass = Class.forName(System.getProperty("java.version").charAt(0) == '9' ? "jdk.internal.reflect.ConstantPool" : "sun.reflect.ConstantPool"); // for java 8 constantPool is sun.reflect.ConstantPool, java 9 is jdk.internal.reflect.ConstantPool
+            Class<?> constantPoolClass = Class.forName(Strings.startsWith(System.getProperty("java.version"), '9') ? "jdk.internal.reflect.ConstantPool" : "sun.reflect.ConstantPool"); // for java 8 constantPool is sun.reflect.ConstantPool, java 9 is jdk.internal.reflect.ConstantPool
             CONSTANT_POOL_GET_SIZE = constantPoolClass.getDeclaredMethod("getSize");
             overrideAccessible(CONSTANT_POOL_GET_SIZE);
             CONSTANT_POOL_GET_MEMBER_REF_INFO_AT = constantPoolClass.getDeclaredMethod("getMemberRefInfoAt", int.class);
@@ -44,7 +45,7 @@ public class ControllerInspector {
 
     private static void validateJavaVersion() {
         String javaVersion = System.getProperty("java.version");
-        if (javaVersion.charAt(0) == '9') return;
+        if (Strings.startsWith(javaVersion, '9')) return;
 
         if (!javaVersion.startsWith("1.8.0_"))
             throw Exceptions.error("unsupported java version, please use latest jdk 8, jdk={}", javaVersion);

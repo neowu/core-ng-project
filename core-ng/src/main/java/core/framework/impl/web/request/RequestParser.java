@@ -146,7 +146,7 @@ public final class RequestParser {
     int requestPort(String host, String scheme, HttpServerExchange exchange) {    // refer to io.undertow.server.HttpServerExchange.getHostPort(), use x-forwarded-proto as request scheme
         if (host != null) {
             int colonIndex;
-            if (host.charAt(0) == '[') { //for ipv6 addresses we make sure we take out the first part, which can have multiple occurrences of :
+            if (Strings.startsWith(host, '[')) { //for ipv6 addresses we make sure we take out the first part, which can have multiple occurrences of :
                 colonIndex = host.indexOf(':', host.indexOf(']'));
             } else {
                 colonIndex = host.indexOf(':');

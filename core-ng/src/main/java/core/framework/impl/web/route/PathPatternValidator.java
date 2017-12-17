@@ -21,13 +21,13 @@ public class PathPatternValidator {
         if (Strings.isEmpty(pattern))
             throw Exceptions.error("path pattern must not be empty, pattern={}", pattern);
 
-        if (pattern.charAt(0) != '/')
+        if (!Strings.startsWith(pattern, '/'))
             throw Exceptions.error("path pattern must start with '/', pattern={}", pattern);
 
         Set<String> variables = Sets.newHashSet();
         String[] tokens = Strings.split(pattern, '/');
         for (String token : tokens) {
-            if (token.charAt(0) == ':') {
+            if (Strings.startsWith(token, ':')) {
                 validateVariable(token, pattern, variables);
             } else {
                 validatePathSegment(token, pattern);

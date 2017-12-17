@@ -24,7 +24,7 @@ class PathNode {
         if (currentPath == null) {
             if (handler == null) handler = new URLHandler(pathPattern);
             return handler;
-        } else if (currentPath.value.charAt(0) == ':') {
+        } else if (Strings.startsWith(currentPath.value, ':')) {
             int paramIndex = currentPath.value.indexOf('(');
             int endIndex = paramIndex > 0 ? paramIndex : currentPath.value.length();
             String name = currentPath.value.substring(1, endIndex);

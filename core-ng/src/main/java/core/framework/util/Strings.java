@@ -47,6 +47,11 @@ public final class Strings {
         return text.trim();
     }
 
+    public static boolean startsWith(String text, char prefix) {
+        if (text.isEmpty()) return false;
+        return text.charAt(0) == prefix;
+    }
+
     public static String[] split(String text, char delimiter) {
         List<String> tokens = Lists.newArrayList();
         int start = 0;

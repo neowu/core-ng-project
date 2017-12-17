@@ -55,7 +55,7 @@ public class WebServiceClient {
             String value = path.value;
             if ("/".equals(value)) {
                 builder.append(value);
-            } else if (value.charAt(0) == ':') {
+            } else if (Strings.startsWith(value, ':')) {
                 int paramIndex = value.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : value.length();
                 String variable = value.substring(1, endIndex);

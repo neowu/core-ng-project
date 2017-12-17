@@ -1,6 +1,7 @@
 package core.framework.impl.template;
 
 import core.framework.util.Exceptions;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,7 @@ public class CDNManager {
 
     public String url(String url) {
         if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//")) return url;
-        if (url.charAt(0) != '/') throw Exceptions.error("url must start with '/', url={}", url);
+        if (!Strings.startsWith(url, '/')) throw Exceptions.error("url must start with '/', url={}", url);
 
         if (host == null) return url;
         return "//" + host + url;

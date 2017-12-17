@@ -9,6 +9,7 @@ import core.framework.impl.template.node.Text;
 import core.framework.impl.template.source.TemplateSource;
 import core.framework.util.Exceptions;
 import core.framework.util.Sets;
+import core.framework.util.Strings;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -156,7 +157,7 @@ public class HTMLParser {
         if (!attribute.value.startsWith("http://")
                 && !attribute.value.startsWith("https://")
                 && !attribute.value.startsWith("//")
-                && attribute.value.charAt(0) != '/')
+                && !Strings.startsWith(attribute.value, '/'))
             throw Exceptions.error("static resource url value must be either absolute or start with '/', attribute={}>{}, value={}, location={}",
                     attribute.tagName, attribute.name, attribute.value, attribute.location);
     }

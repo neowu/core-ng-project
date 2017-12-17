@@ -2,6 +2,7 @@ package core.framework.impl.template.source;
 
 import core.framework.util.Exceptions;
 import core.framework.util.Files;
+import core.framework.util.Strings;
 
 import java.nio.file.Path;
 
@@ -14,7 +15,7 @@ public final class FileTemplateSource implements TemplateSource {
 
     public FileTemplateSource(Path root, String path) {
         this.root = root;
-        if (path.charAt(0) != '/') throw Exceptions.error("path must start with '/', path={}", path);
+        if (!Strings.startsWith(path, '/')) throw Exceptions.error("path must start with '/', path={}", path);
         this.path = root.resolve(path.substring(1));
     }
 

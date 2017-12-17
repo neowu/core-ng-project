@@ -228,7 +228,7 @@ class OpenAPIDocumentBuilder {
         for (int i = 0; i < tokens.length; i++) {
             String token = tokens[i];
             if (token.length() == 0 || i > 1) builder.append('/');
-            if (token.charAt(0) == ':') {
+            if (Strings.startsWith(token, ':')) {
                 builder.append('{').append(token.substring(1)).append('}');
             } else {
                 builder.append(token);
