@@ -63,9 +63,8 @@ final class ResultSetWrapper {
     }
 
     Integer getInt(int index) throws SQLException {
-        int value = resultSet.getInt(index);
         if (resultSet.wasNull()) return null;
-        return value;
+        return resultSet.getInt(index);
     }
 
     Boolean getBoolean(String column) throws SQLException {
@@ -75,9 +74,8 @@ final class ResultSetWrapper {
     }
 
     Boolean getBoolean(int index) throws SQLException {
-        boolean value = resultSet.getBoolean(index);
         if (resultSet.wasNull()) return null;
-        return value;
+        return resultSet.getBoolean(index);
     }
 
     Long getLong(String column) throws SQLException {
@@ -87,9 +85,8 @@ final class ResultSetWrapper {
     }
 
     Long getLong(int index) throws SQLException {
-        long value = resultSet.getLong(index);
         if (resultSet.wasNull()) return null;
-        return value;
+        return resultSet.getLong(index);
     }
 
     Double getDouble(String column) throws SQLException {
@@ -99,9 +96,8 @@ final class ResultSetWrapper {
     }
 
     Double getDouble(int index) throws SQLException {
-        double value = resultSet.getDouble(index);
         if (resultSet.wasNull()) return null;
-        return value;
+        return resultSet.getDouble(index);
     }
 
     String getString(String column) throws SQLException {

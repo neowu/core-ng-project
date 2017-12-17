@@ -70,7 +70,7 @@ public class QueryImpl<T> implements Query<T> {
 
     private Object[] fetchParams() {
         if (skip != null && limit == null) throw Exceptions.error("limit must not be null if skip is not, skip={}", skip);
-        if (skip == null && limit == null) return params.toArray(new Object[params.size()]);
+        if (skip == null && limit == null) return params.toArray();
         return dialect.fetchParams(params, skip, limit);
     }
 }

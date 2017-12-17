@@ -33,7 +33,7 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public Map<String, byte[]> getAll(String[] keys) {
+    public Map<String, byte[]> getAll(String... keys) {
         try {
             return redis.multiGetBytes(keys);
         } catch (UncheckedIOException | RedisException e) {

@@ -9,7 +9,7 @@ import java.util.Map;
 public interface CacheStore {   // all keys here are direct cacheKey, not the key passed to Cache<T>
     byte[] get(String key);
 
-    Map<String, byte[]> getAll(String[] keys);
+    Map<String, byte[]> getAll(String... keys);
 
     void put(String key, byte[] value, Duration expiration);
 

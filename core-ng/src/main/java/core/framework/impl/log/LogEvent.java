@@ -50,9 +50,8 @@ final class LogEvent {
                 builder.append('[').append(marker.getName()).append("] ");
             }
 
-            builder.append(message());
-
-            builder.append(System.lineSeparator());
+            builder.append(message())
+                   .append(System.lineSeparator());
             if (exception != null)
                 builder.append(Exceptions.stackTrace(exception));
 

@@ -29,7 +29,7 @@ public class ControllerActionBuilder {
         for (String token : tokens) {
             if (token.length() == 0) continue;
             if (index > 0) builder.append('-');
-            if (token.startsWith(":")) {
+            if (token.charAt(0) == ':') {
                 int paramIndex = token.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : token.length();
                 builder.append(token.substring(1, endIndex));

@@ -21,7 +21,7 @@ class LogManagerTest {
     @Test
     void errorCode() {
         assertEquals("TEST_ERROR", logManager.errorCode(new TestException()));
-        assertEquals("java.lang.NullPointerException", logManager.errorCode(new NullPointerException()));
+        assertEquals("java.lang.Exception", logManager.errorCode(new Exception()));
     }
 
     private static class TestException extends Exception implements ErrorCode {

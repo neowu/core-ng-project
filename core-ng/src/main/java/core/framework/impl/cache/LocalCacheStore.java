@@ -26,7 +26,7 @@ public class LocalCacheStore implements CacheStore {
     }
 
     @Override
-    public Map<String, byte[]> getAll(String[] keys) {
+    public Map<String, byte[]> getAll(String... keys) {
         Map<String, byte[]> results = Maps.newHashMapWithExpectedSize(keys.length);
         for (String key : keys) {
             byte[] value = get(key);

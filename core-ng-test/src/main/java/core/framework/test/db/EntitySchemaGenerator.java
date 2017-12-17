@@ -50,7 +50,8 @@ public final class EntitySchemaGenerator {
     private List<String> schemeStatements() {
         List<String> statements = Lists.newArrayList();
 
-        StringBuilder builder = new StringBuilder("CREATE TABLE ");
+        StringBuilder builder = new StringBuilder(256)
+                .append("CREATE TABLE ");
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");
 

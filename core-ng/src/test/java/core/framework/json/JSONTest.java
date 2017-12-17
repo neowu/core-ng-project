@@ -71,8 +71,8 @@ class JSONTest {
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertEquals(bean.listField, parsedBean.listField);
         assertEquals(2, parsedBean.childrenField.size());
-        assertEquals(true, parsedBean.childrenField.get(0).booleanField);
-        assertEquals(false, parsedBean.childrenField.get(1).booleanField);
+        assertTrue(parsedBean.childrenField.get(0).booleanField);
+        assertFalse(parsedBean.childrenField.get(1).booleanField);
     }
 
     @Test

@@ -10,7 +10,7 @@ public interface UpdateQuery<T> {
         final String sql;
         final Object[] params;
 
-        Statement(String sql, Object[] params) {
+        Statement(String sql, Object... params) {
             this.sql = sql;
             this.params = params;
         }

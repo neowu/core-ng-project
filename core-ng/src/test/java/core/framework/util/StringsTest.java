@@ -13,11 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class StringsTest {
     @Test
-    void equals() {
-        assertEquals(true, Strings.equals(null, null));
-        assertEquals(false, Strings.equals(null, ""));
-        assertEquals(false, Strings.equals("", null));
-        assertEquals(true, Strings.equals("", ""));
+    void stringEquals() {
+        assertTrue(Strings.equals(null, null));
+        assertFalse(Strings.equals(null, ""));
+        assertFalse(Strings.equals("", null));
+        assertTrue(Strings.equals("", ""));
     }
 
     @Test

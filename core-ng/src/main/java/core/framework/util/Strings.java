@@ -58,6 +58,6 @@ public final class Strings {
         }
         if (start == 0) return new String[]{text};
         else tokens.add(text.substring(start));
-        return tokens.toArray(new String[tokens.size()]);
+        return tokens.toArray(new String[0]);
     }
 }

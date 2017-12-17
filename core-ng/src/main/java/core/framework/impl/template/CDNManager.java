@@ -13,7 +13,7 @@ public class CDNManager {
 
     public String url(String url) {
         if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("//")) return url;
-        if (!url.startsWith("/")) throw Exceptions.error("url must start with '/', url={}", url);
+        if (url.charAt(0) != '/') throw Exceptions.error("url must start with '/', url={}", url);
 
         if (host == null) return url;
         return "//" + host + url;

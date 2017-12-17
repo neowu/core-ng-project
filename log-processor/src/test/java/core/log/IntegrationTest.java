@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
  */
 @ExtendWith(IntegrationExtension.class)
 @Context(module = TestModule.class)
-public abstract class IntegrationTest {
-
+public class IntegrationTest {
+    protected IntegrationTest() {
+    }
 }

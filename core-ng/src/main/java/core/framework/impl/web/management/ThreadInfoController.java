@@ -41,8 +41,9 @@ public class ThreadInfoController {
 
     // port from ThreadInfo.toString, to print all stack frames (ThreadInfo.toString() only print 8 frames)
     private void appendThreadInfo(StringBuilder builder, ThreadInfo threadInfo) {
-        builder.append('\"').append(threadInfo.getThreadName()).append('\"')
-               .append(" Id=").append(threadInfo.getThreadId()).append(' ').append(threadInfo.getThreadState());
+        builder.append('\"').append(threadInfo.getThreadName())
+               .append("\" Id=").append(threadInfo.getThreadId())
+               .append(' ').append(threadInfo.getThreadState());
         if (threadInfo.getLockName() != null) {
             builder.append(" on ").append(threadInfo.getLockName());
         }
@@ -72,7 +73,8 @@ public class ThreadInfoController {
 
     private void appendStackTrace(StringBuilder builder, ThreadInfo threadInfo) {
         StackTraceElement[] stackTrace = threadInfo.getStackTrace();
-        for (int i = 0, stackTraceLength = stackTrace.length; i < stackTraceLength; i++) {
+        int length = stackTrace.length;
+        for (int i = 0; i < length; i++) {
             StackTraceElement stack = stackTrace[i];
             builder.append("\tat ").append(stack);
             builder.append('\n');

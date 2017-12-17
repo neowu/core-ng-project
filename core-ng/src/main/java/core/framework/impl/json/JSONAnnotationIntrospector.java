@@ -54,7 +54,8 @@ public class JSONAnnotationIntrospector extends AnnotationIntrospector {
         }
 
         if (mappings != null) {
-            for (int i = 0, end = enumValues.length; i < end; i++) {
+            int length = enumValues.length;
+            for (int i = 0; i < length; i++) {
                 String name = enumValues[i].name();
                 String value = mappings.get(name);
                 if (value != null) names[i] = value;

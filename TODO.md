@@ -16,7 +16,6 @@
 * missing @PathParam, validation error not clear?
 
 ### jdk 9 incompatible list
-* pmd: not support sourceCompatibility = JavaVersion.VERSION_1_9
 * checkstyle: needs to filter out module-info.java
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
 * undertow

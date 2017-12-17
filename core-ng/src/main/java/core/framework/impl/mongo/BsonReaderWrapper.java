@@ -147,12 +147,12 @@ public final class BsonReaderWrapper {      // used by generated entity decoder
     }
 
     public boolean startReadEntity(String field) {
-        org.bson.BsonType currentType = reader.getCurrentBsonType();
-        if (currentType != null && currentType == org.bson.BsonType.NULL) {
+        BsonType currentType = reader.getCurrentBsonType();
+        if (currentType != null && currentType == BsonType.NULL) {
             reader.readNull();
             return false;
         }
-        if (currentType != null && currentType != org.bson.BsonType.DOCUMENT) {
+        if (currentType != null && currentType != BsonType.DOCUMENT) {
             logger.warn("unexpected field type, field={}, type={}", field, currentType);
             reader.skipValue();
             return false;

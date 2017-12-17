@@ -89,7 +89,7 @@ public class WebServiceInterfaceValidator {
         Set<String> names = Sets.newHashSet();
         String[] tokens = Strings.split(path, '/');
         for (String token : tokens) {
-            if (token.startsWith(":")) {
+            if (token.charAt(0) == ':') {
                 int paramIndex = token.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : token.length();
                 boolean isNew = names.add(token.substring(1, endIndex));

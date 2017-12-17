@@ -49,9 +49,9 @@ public class BackgroundTaskExecutor {
     }
 
     private static class BackgroundTask implements Runnable {
+        final Duration rate;
         private final Logger logger = LoggerFactory.getLogger(BackgroundTask.class);
         private final Runnable command;
-        private final Duration rate;
 
         BackgroundTask(Runnable command, Duration rate) {
             this.command = command;

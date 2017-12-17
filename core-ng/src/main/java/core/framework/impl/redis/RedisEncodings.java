@@ -39,7 +39,7 @@ class RedisEncodings {
         return bytes(text);
     }
 
-    static byte[][] encode(String[] values) {
+    static byte[][] encode(String... values) {
         int length = values.length;
         byte[][] result = new byte[length][];
         for (int i = 0; i < length; i++) {

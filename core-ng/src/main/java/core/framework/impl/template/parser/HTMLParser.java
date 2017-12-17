@@ -145,19 +145,19 @@ public class HTMLParser {
         if (isBooleanAttribute && attribute.value != null)
             throw Exceptions.error("it is recommended to put value for boolean attribute, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location);
 
-        if (("link".equals(attribute.tagName) && "href".equals(attribute.name))
-            || ("script".equals(attribute.tagName) && "src".equals(attribute.name))
-            || ("img".equals(attribute.tagName) && "src".equals(attribute.name))) {
+        if ("link".equals(attribute.tagName) && "href".equals(attribute.name)
+                || "script".equals(attribute.tagName) && "src".equals(attribute.name)
+                || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
             validateStaticResourceURL(attribute);
         }
     }
 
     private void validateStaticResourceURL(Attribute attribute) {
         if (!attribute.value.startsWith("http://")
-            && !attribute.value.startsWith("https://")
-            && !attribute.value.startsWith("//")
-            && !attribute.value.startsWith("/"))
+                && !attribute.value.startsWith("https://")
+                && !attribute.value.startsWith("//")
+                && attribute.value.charAt(0) != '/')
             throw Exceptions.error("static resource url value must be either absolute or start with '/', attribute={}>{}, value={}, location={}",
-                attribute.tagName, attribute.name, attribute.value, attribute.location);
+                    attribute.tagName, attribute.name, attribute.value, attribute.location);
     }
 }

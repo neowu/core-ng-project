@@ -14,7 +14,7 @@ public final class FileTemplateSource implements TemplateSource {
 
     public FileTemplateSource(Path root, String path) {
         this.root = root;
-        if (!path.startsWith("/")) throw Exceptions.error("path must start with '/', path={}", path);
+        if (path.charAt(0) != '/') throw Exceptions.error("path must start with '/', path={}", path);
         this.path = root.resolve(path.substring(1));
     }
 

@@ -36,7 +36,7 @@ public final class Types {
         private final Type rawType;
         private final Type[] arguments;
 
-        ParameterizedTypeImpl(Class<?> rawType, Type[] arguments) {
+        ParameterizedTypeImpl(Class<?> rawType, Type... arguments) {
             this.rawType = rawType;
             this.arguments = arguments;
         }

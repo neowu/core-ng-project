@@ -66,16 +66,18 @@ public class RateLimiter {
             this.lastUpdateTime = System.nanoTime();
         }
 
-        synchronized boolean acquire(long currentTime, int maxPermits, double fillRatePerNano) {
-            long timeElapsed = currentTime - lastUpdateTime;
-            currentPermits = Math.min(maxPermits, currentPermits + fillRatePerNano * timeElapsed);
-            lastUpdateTime = currentTime;
+        boolean acquire(long currentTime, int maxPermits, double fillRatePerNano) {
+            synchronized (this) {
+                long timeElapsed = currentTime - lastUpdateTime;
+                currentPermits = Math.min(maxPermits, currentPermits + fillRatePerNano * timeElapsed);
+                lastUpdateTime = currentTime;
 
-            if (currentPermits >= 1) {
-                currentPermits -= 1;
-                return true;
-            } else {
-                return false;
+                if (currentPermits >= 1) {
+                    currentPermits -= 1;
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
     }

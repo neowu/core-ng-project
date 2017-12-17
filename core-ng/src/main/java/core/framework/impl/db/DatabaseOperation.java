@@ -33,7 +33,7 @@ public class DatabaseOperation {
 
     // as for the boilerplate code, it is mainly for performance and maintainability purpose, as framework code it's more important to keep straightforward than DRY
     // it's harder to trace and read if creating a lot of lambda or template pattern, also impact the mem usage and GC
-    int update(String sql, Object[] params) {
+    int update(String sql, Object... params) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
@@ -64,7 +64,7 @@ public class DatabaseOperation {
         }
     }
 
-    <T> Optional<T> selectOne(String sql, RowMapper<T> mapper, Object[] params) {
+    <T> Optional<T> selectOne(String sql, RowMapper<T> mapper, Object... params) {
         validateSelectSQL(sql);
 
         PoolItem<Connection> connection = transactionManager.getConnection();
@@ -80,7 +80,7 @@ public class DatabaseOperation {
         }
     }
 
-    <T> List<T> select(String sql, RowMapper<T> mapper, Object[] params) {
+    <T> List<T> select(String sql, RowMapper<T> mapper, Object... params) {
         validateSelectSQL(sql);
 
         PoolItem<Connection> connection = transactionManager.getConnection();
@@ -158,7 +158,7 @@ public class DatabaseOperation {
         return Optional.empty();
     }
 
-    private void setParams(PreparedStatement statement, Object[] params) throws SQLException {
+    private void setParams(PreparedStatement statement, Object... params) throws SQLException {
         int index = 1;
         if (params != null) {
             for (Object param : params) {
