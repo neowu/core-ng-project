@@ -4,7 +4,9 @@ import core.framework.impl.search.ElasticSearchImpl;
 import core.framework.util.StopWatch;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.network.NetworkModule;
+import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.discovery.DiscoveryModule;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.node.NodeValidationException;
 import org.slf4j.Logger;
@@ -28,8 +30,10 @@ public class MockElasticSearch extends ElasticSearchImpl {
         StopWatch watch = new StopWatch();
         try {
             Settings.Builder settings = Settings.builder();
-            settings.put(NetworkModule.HTTP_ENABLED.getKey(), false)
-                    .put(Environment.PATH_HOME_SETTING.getKey(), dataPath);
+            settings.put(Environment.PATH_HOME_SETTING.getKey(), dataPath)
+                    .put(NetworkModule.HTTP_ENABLED.getKey(), false)
+                    .put(NetworkService.GLOBAL_NETWORK_BINDHOST_SETTING.getKey(), "_local_")
+                    .put(DiscoveryModule.DISCOVERY_TYPE_SETTING.getKey(), "single-node");
             MockNode node = new MockNode(settings.build());
             node.start();
             return node.client();
