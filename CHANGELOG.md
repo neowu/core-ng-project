@@ -1,7 +1,7 @@
 ## Change log
-### 5.2.7 (12/11/2017 - )
+### 5.2.7 (12/11/2017 - 12/19/2017)
 * property: allow all the properties can be override by env var (mount by kubernetes/docker) or system property (via -Dkey=value)
-* search: update es to 6.1.0
+* search: update es to 6.1.0, disable zen for integration test
 
 ### 5.2.6 (12/05/2017 - 12/11/2017)
 * db: fixed ZonedDateTime saves to DB with nano precision

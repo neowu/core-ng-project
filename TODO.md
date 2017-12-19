@@ -36,5 +36,5 @@ java.lang.ClassNotFoundException: sun.misc.Cleaner
 	at java.base/java.lang.ref.Finalizer.access$100(Finalizer.java:34)
 	at java.base/java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:217)
 ```
-
+* elasticsearch libs has too many duplicated namespaces with module-info.java enabled
 * alpine jdk 9 is not released yet, docker openjdk:jre-alpine image size is much smaller

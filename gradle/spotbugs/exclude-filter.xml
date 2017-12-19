@@ -18,6 +18,7 @@
         <!--BC_UNCONFIRMED_CAST: Unchecked/unconfirmed cast-->
         <!--UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD: Unused public or protected field (TemplateModel uses public field in template)-->
         <!--PZLA_PREFER_ZERO_LENGTH_ARRAYS: Consider returning a zero length array rather than null-->
+        <!--OBL_UNSATISFIED_OBLIGATION: Method may fail to clean up stream or resource (spotbugs bug: https://github.com/spotbugs/spotbugs/issues/432)-->
         <Bug code="CN,SQL,Se"
              pattern="RV_RETURN_VALUE_IGNORED,
                 RV_RETURN_VALUE_IGNORED_BAD_PRACTICE,
@@ -32,7 +33,8 @@
                 NP_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD,
                 BC_UNCONFIRMED_CAST,
                 UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD,
-                PZLA_PREFER_ZERO_LENGTH_ARRAYS"/>
+                PZLA_PREFER_ZERO_LENGTH_ARRAYS,
+                OBL_UNSATISFIED_OBLIGATION"/>
     </Match>
 
     <Match>
