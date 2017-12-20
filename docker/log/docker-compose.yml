@@ -33,11 +33,11 @@ services:
     depends_on:
       - zookeeper
   log-processor:
-    image: neowu/log-processor:5.2.7
+    image: neowu/log-processor:5.2.8
     environment:
-      - sys.kafka.uri=kafka:9092
       - JAVA_OPTS=-XX:+UseG1GC -Xms256m -Xmx2048m -Xss256k -Djava.awt.headless=true
-      - sys.elasticsearch.host=elasticsearch
+      - SYS_KAFKA_URI=kafka:9092
+      - SYS_ELASTICSEARCH_HOST=elasticsearch
     depends_on:
       - kafka
       - elasticsearch
