@@ -30,5 +30,10 @@ distributions {
 }
 
 run {
-    systemProperties System.properties  // assign all system properties to application, e.g. ./gradlew -Dkey=value :some-service:run
+    // assign all system properties to application, e.g. ./gradlew -Dkey=value :some-service:run
+    System.properties.each { key, value ->
+        if (key != "user.dir") {
+            systemProperty key as String, value
+        }
+    }
 }
