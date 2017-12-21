@@ -1,4 +1,7 @@
 ## Change log
+### 5.2.8.1 (12/20/2017)
+* jdk: republish with jdk 8, due to https://github.com/neowu/core-ng-project/issues/8
+
 ### 5.2.8 (12/20/2017)
 * property: when override property with env var, convert key with upper case and replace '.' with '_', e.g. "sys.kafka.uri" to "SYS_KAFKA_URI", 
     due to dot is not supported by POSIX, especially not supported by alpine 3.6, https://bugs.alpinelinux.org/issues/7344 
