@@ -9,7 +9,6 @@
 * general retry and throttling?
 * webservice/redis/mongo client: client retry on network issue?
 * validator: annotation for website, like @HTMLSafeString?
-* cm: config management, dynamic update properties?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
 * framework error, queue listener, background task error forward to kafka?
 * long running thread support or needed?
@@ -18,24 +17,6 @@
 ### jdk 9 incompatible list
 * checkstyle: needs to filter out module-info.java
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
-* undertow
-```
-[Finalizer] ERROR i.undertow - UT005091: Failed to initialize DirectByteBufferDeallocator
-java.lang.ClassNotFoundException: sun.misc.Cleaner
-	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:582)
-	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:185)
-	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:496)
-	at java.base/java.lang.Class.forName0(Native Method)
-	at java.base/java.lang.Class.forName(Class.java:292)
-	at io.undertow.server.DirectByteBufferDeallocator.<clinit>(DirectByteBufferDeallocator.java:23)
-	at io.undertow.server.DefaultByteBufferPool.queueIfUnderMax(DefaultByteBufferPool.java:207)
-	at io.undertow.server.DefaultByteBufferPool.access$500(DefaultByteBufferPool.java:41)
-	at io.undertow.server.DefaultByteBufferPool$ThreadLocalData.finalize(DefaultByteBufferPool.java:300)
-	at java.base/java.lang.System$2.invokeFinalize(System.java:2114)
-	at java.base/java.lang.ref.Finalizer.runFinalizer(Finalizer.java:102)
-	at java.base/java.lang.ref.Finalizer.access$100(Finalizer.java:34)
-	at java.base/java.lang.ref.Finalizer$FinalizerThread.run(Finalizer.java:217)
-```
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
 * alpine jdk 9 is not released yet, docker openjdk:jre-alpine image size is much smaller
 * can't publish with jdk 9 even with target java 8, https://github.com/neowu/core-ng-project/issues/8
