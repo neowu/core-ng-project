@@ -2,11 +2,11 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '5.2.8.1'
+    version = '5.2.9'
 }
 
 def mongoVersion = '3.5.0'
-def elasticVersion = '6.1.0'
+def elasticVersion = '6.1.1'
 def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.0.0'
 def jacksonVersion = '2.9.3'
@@ -14,9 +14,6 @@ def jacksonVersion = '2.9.3'
 def testLib = ['org.junit.jupiter:junit-jupiter-api:5.0.2',
                'org.mockito:mockito-core:2.13.0',
                'org.assertj:assertj-core:3.8.0']
-
-def elasticsearchMapperExtrasModule = fileTree("${rootDir}/lib/elasticsearch/modules/mapper-extras").include('*.jar')
-def elasticsearchLangPainlessModule = fileTree("${rootDir}/lib/elasticsearch/modules/lang-painless").include('*.jar')
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -55,7 +52,7 @@ project(':core-ng-test') {
         compileOnly 'org.apiguardian:apiguardian-api:1.0.0'                     // used by junit
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
         testRuntimeOnly 'com.vividsolutions:jts:1.13'                           // used by fongo
-        testRuntimeOnly elasticsearchLangPainlessModule
+        testRuntimeOnly "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
     }
 }
 
@@ -88,6 +85,6 @@ project(':log-processor') {
         runtime "org.apache.logging.log4j:log4j-api:${log4jVersion}"            // used by elasticsearch
         testCompile project(':core-ng-test')
         testRuntime "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
-        testRuntime elasticsearchMapperExtrasModule                             // used by elasticsearch scaled_float
+        testRuntime "org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}"     // used by elasticsearch scaled_float
     }
 }

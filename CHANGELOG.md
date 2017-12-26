@@ -1,4 +1,7 @@
 ## Change log
+### 5.2.9 (12/26/2017)
+* search: update es to 6.1.1
+
 ### 5.2.8.1 (12/20/2017)
 * jdk: republish with jdk 8, due to https://github.com/neowu/core-ng-project/issues/8
 
