@@ -13,6 +13,7 @@
 * framework error, queue listener, background task error forward to kafka?
 * long running thread support or needed?
 * missing @PathParam, validation error not clear?
+* remove core.framework.test.EnvWebValidator? not needed, think about frontend-backend separation
 
 ### jdk 9 incompatible list
 * checkstyle: needs to filter out module-info.java
