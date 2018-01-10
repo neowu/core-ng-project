@@ -64,7 +64,7 @@ public final class RequestParser {
 
         parseQueryParams(request, exchange.getQueryParameters());
 
-        if (request.method == HTTPMethod.POST || request.method == HTTPMethod.PUT) {
+        if (request.method == HTTPMethod.POST || request.method == HTTPMethod.PUT || request.method == HTTPMethod.PATCH) {
             String contentType = headers.getFirst(Headers.CONTENT_TYPE);
             request.contentType = contentType == null ? null : ContentType.parse(contentType);
             parseBody(request, exchange);

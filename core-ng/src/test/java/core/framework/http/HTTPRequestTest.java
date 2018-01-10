@@ -22,9 +22,18 @@ class HTTPRequestTest {
 
     @Test
     void accept() {
-        HTTPRequest request = HTTPRequest.post("http://localhost/uri");
+        HTTPRequest request = HTTPRequest.patch("http://localhost/uri");
         request.accept(ContentType.APPLICATION_JSON);
 
         assertEquals(ContentType.APPLICATION_JSON.toString(), request.headers().get(HTTPHeaders.ACCEPT));
+    }
+
+    @Test
+    void method() {
+        assertEquals(HTTPMethod.GET, HTTPRequest.get("http://localhost/uri").method());
+        assertEquals(HTTPMethod.POST, HTTPRequest.post("http://localhost/uri").method());
+        assertEquals(HTTPMethod.PUT, HTTPRequest.put("http://localhost/uri").method());
+        assertEquals(HTTPMethod.DELETE, HTTPRequest.delete("http://localhost/uri").method());
+        assertEquals(HTTPMethod.PATCH, HTTPRequest.patch("http://localhost/uri").method());
     }
 }

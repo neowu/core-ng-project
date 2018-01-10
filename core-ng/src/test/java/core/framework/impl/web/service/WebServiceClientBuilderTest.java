@@ -61,4 +61,15 @@ class WebServiceClientBuilderTest {
 
         verify(webServiceClient).execute(HTTPMethod.PUT, "http://localhost/test/1", TestWebService.TestRequest.class, request, void.class);
     }
+
+    @Test
+    void patch() {
+        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Maps.newHashMap("id", 1))))
+                .thenReturn("http://localhost/test/1");
+
+        TestWebService.TestRequest request = new TestWebService.TestRequest();
+        client.patch(1, request);
+
+        verify(webServiceClient).execute(HTTPMethod.PATCH, "http://localhost/test/1", TestWebService.TestRequest.class, request, void.class);
+    }
 }

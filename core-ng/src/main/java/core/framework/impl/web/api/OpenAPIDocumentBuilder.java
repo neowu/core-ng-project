@@ -58,7 +58,6 @@ class OpenAPIDocumentBuilder {
         for (Method method : methods) {
             HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
             JSONNode path = document.get("paths").get(path(method));
-            path.put("description", method.getName());
             JSONNode operation = buildOperation(method);
             operation.put("tags", Lists.newArrayList(serviceInterface.getCanonicalName()));
             path.put(ASCII.toLowerCase(httpMethod.name()), operation);

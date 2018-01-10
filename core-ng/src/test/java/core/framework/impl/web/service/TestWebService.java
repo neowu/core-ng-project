@@ -11,6 +11,7 @@ import core.framework.api.validate.Pattern;
 import core.framework.api.validate.Size;
 import core.framework.api.web.service.DELETE;
 import core.framework.api.web.service.GET;
+import core.framework.api.web.service.PATCH;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
@@ -47,6 +48,10 @@ public interface TestWebService {
     @PUT
     @Path("/test")
     List<TestResponse> batch(List<TestRequest> requests);
+
+    @PATCH
+    @Path("/test/:id")
+    void patch(@PathParam("id") Integer id, TestRequest request);
 
     enum TestEnum {
         @Property(name = "A")

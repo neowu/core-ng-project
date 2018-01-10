@@ -42,6 +42,15 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         return response;
     }
 
+    public void patch(java.lang.Integer param0, core.framework.impl.web.service.TestWebService.TestRequest param1) {
+        java.lang.reflect.Type requestType = core.framework.impl.web.service.TestWebService.TestRequest.class;
+        Object requestBean = param1;
+        java.util.Map pathParams = new java.util.HashMap();
+        pathParams.put("id", param0);
+        String serviceURL = client.serviceURL("/test/:id", pathParams);
+        java.lang.Void response = (java.lang.Void) client.execute(core.framework.http.HTTPMethod.PATCH, serviceURL, requestType, requestBean, void.class);
+    }
+
     public core.framework.impl.web.service.TestWebService.TestResponse search(core.framework.impl.web.service.TestWebService.TestSearchRequest param0) {
         java.lang.reflect.Type requestType = core.framework.impl.web.service.TestWebService.TestSearchRequest.class;
         Object requestBean = param0;

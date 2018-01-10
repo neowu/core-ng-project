@@ -6,7 +6,6 @@
   },
   "paths": {
     "/test": {
-      "description": "batch",
       "get": {
         "description": "search",
         "parameters": [
@@ -109,7 +108,6 @@
       }
     },
     "/test/{id}": {
-      "description": "delete",
       "get": {
         "description": "get",
         "parameters": [
@@ -185,6 +183,38 @@
             "description": "id"
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "core.framework.impl.web.service.TestWebService"
+        ]
+      },
+      "patch": {
+        "description": "patch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/core.framework.impl.web.service.TestWebService.TestRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"

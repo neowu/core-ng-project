@@ -37,5 +37,10 @@ class WebServiceImplValidatorTest {
         public List<TestResponse> batch(List<TestRequest> requests) {
             return null;
         }
+
+        @Override
+        public void patch(Integer id, TestRequest request) {
+
+        }
     }
 }

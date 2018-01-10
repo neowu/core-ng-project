@@ -91,7 +91,7 @@ public class WebServiceClient {
     public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {
         HTTPRequest request = new HTTPRequest(method, serviceURL);
         request.accept(ContentType.APPLICATION_JSON);
-        if (logManager.appName != null) request.header(HTTPServerHandler.HEADER_CLIENT.toString(), logManager.appName);
+        request.header(HTTPServerHandler.HEADER_CLIENT.toString(), logManager.appName);
         linkContext(request);
 
         if (requestType != null) {
@@ -116,7 +116,7 @@ public class WebServiceClient {
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
             Map<String, String> queryParams = mapper.toParams(requestType, requestBean);
             addQueryParams(request, queryParams);
-        } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
+        } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT || method == HTTPMethod.PATCH) {
             byte[] json = mapper.toJSON(requestType, requestBean);
             request.body(json, ContentType.APPLICATION_JSON);
         } else {
@@ -147,7 +147,7 @@ public class WebServiceClient {
         }
     }
 
-    private void validateResponse(HTTPResponse response) {
+    void validateResponse(HTTPResponse response) {
         HTTPStatus status = response.status();
         if (status.code >= 200 && status.code < 300) return;
         byte[] responseBody = response.body();

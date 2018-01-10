@@ -28,6 +28,7 @@ class RouteConfigTest {
         TestController controller = new TestController();
         config.put("/route-test", controller);
         config.delete("/route-test", controller);
+        config.patch("/route-test", controller);
     }
 
     static class TestControllers {

@@ -25,6 +25,10 @@ public final class HTTPRequest {
         return new HTTPRequest(HTTPMethod.DELETE, uri);
     }
 
+    public static HTTPRequest patch(String uri) {
+        return new HTTPRequest(HTTPMethod.PATCH, uri);
+    }
+
     private final String uri;
     private final HTTPMethod method;
     private final Map<String, String> headers = Maps.newLinkedHashMap();

@@ -30,6 +30,10 @@ public final class RouteConfig {
         add(HTTPMethod.DELETE, path, controller);
     }
 
+    public void patch(String path, Controller controller) {
+        add(HTTPMethod.PATCH, path, controller);
+    }
+
     public void add(HTTPMethod method, String path, Controller controller) {
         context.route(method, path, controller, false);
     }

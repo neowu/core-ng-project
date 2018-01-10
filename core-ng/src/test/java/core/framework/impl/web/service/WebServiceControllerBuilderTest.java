@@ -79,6 +79,24 @@ class WebServiceControllerBuilderTest {
         assertEquals(HTTPStatus.OK, response.status());
     }
 
+    @Test
+    void patch() throws Exception {
+        TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
+        requestBean.stringField = "value";
+
+        when(request.pathParam("id", Integer.class)).thenReturn(1);
+        when(request.bean(TestWebService.TestRequest.class)).thenReturn(requestBean);
+
+        WebServiceControllerBuilder<TestWebService> builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("patch", Integer.class, TestWebService.TestRequest.class));
+        Controller controller = builder.build();
+
+        String sourceCode = builder.builder.sourceCode();
+        assertEquals(ClasspathResources.text("webservice-test/test-webservice-controller-patch.java"), sourceCode);
+
+        Response response = controller.execute(request);
+        assertEquals(HTTPStatus.OK, response.status());
+    }
+
     public static class TestWebServiceImpl implements TestWebService {
         @Override
         public TestResponse search(TestSearchRequest request) {
@@ -109,6 +127,12 @@ class WebServiceControllerBuilderTest {
         public List<TestResponse> batch(List<TestRequest> requests) {
             assertEquals(1, requests.size());
             return Lists.newArrayList();
+        }
+
+        @Override
+        public void patch(Integer id, TestRequest request) {
+            assertEquals(1, (int) id);
+            assertEquals("value", request.stringField);
         }
     }
 }

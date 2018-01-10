@@ -2,6 +2,7 @@ package core.framework.impl.web.service;
 
 import core.framework.api.web.service.DELETE;
 import core.framework.api.web.service.GET;
+import core.framework.api.web.service.PATCH;
 import core.framework.api.web.service.POST;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
@@ -129,6 +130,7 @@ public class WebServiceInterfaceValidator {
         if (method.isAnnotationPresent(POST.class)) count++;
         if (method.isAnnotationPresent(PUT.class)) count++;
         if (method.isAnnotationPresent(DELETE.class)) count++;
+        if (method.isAnnotationPresent(PATCH.class)) count++;
         if (count != 1)
             throw Exceptions.error("method must have exact one http method annotation, method={}", method);
     }

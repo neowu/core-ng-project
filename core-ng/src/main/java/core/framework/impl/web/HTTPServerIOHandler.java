@@ -51,6 +51,6 @@ class HTTPServerIOHandler implements HttpHandler {
         if (length == 0) return false;  // if body is empty, skip reading
 
         HttpString method = exchange.getRequestMethod();
-        return Methods.POST.equals(method) || Methods.PUT.equals(method);
+        return Methods.POST.equals(method) || Methods.PUT.equals(method) || Methods.PATCH.equals(method);
     }
 }

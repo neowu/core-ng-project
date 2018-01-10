@@ -146,7 +146,7 @@ public final class RequestImpl implements Request {
         try {
             if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
                 return mapper.fromParams(beanType, queryParams);
-            } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT) {
+            } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT || method == HTTPMethod.PATCH) {
                 if (!formParams.isEmpty()) {
                     return mapper.fromParams(beanType, formParams);
                 } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
