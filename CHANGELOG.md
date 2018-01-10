@@ -1,5 +1,5 @@
 ## Change log
-### 5.2.9 (12/26/2017)
+### 5.2.9 (12/26/2017 - 1/10/2018)
 * search: update es to 6.1.1
 * http: support patch method, for partial update webservice, e.g. update status for one entity
 
