@@ -6,7 +6,9 @@ import core.framework.util.Strings;
  * @author neo
  */
 public class ClientIPParser {
-    public int maxForwardedIPs = 2;     // for common scenarios, e.g. Google LB(append 2 ips)->kube service, AWS->nginx->webapp
+    // for common scenarios, e.g. Google LB(appends 2 ips)->kube service, AWS->nginx->webapp,
+    // for google lb, it appends <immediate client IP>, <global forwarding rule external IP>, refer to https://cloud.google.com/compute/docs/load-balancing/http/ (target proxies section)
+    public int maxForwardedIPs = 2;
 
     String parse(String remoteAddress, String xForwardedFor) {
         if (Strings.isEmpty(xForwardedFor)) return remoteAddress;

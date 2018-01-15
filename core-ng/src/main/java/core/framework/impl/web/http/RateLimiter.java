@@ -1,4 +1,4 @@
-package core.framework.impl.web.rate;
+package core.framework.impl.web.http;
 
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
@@ -11,12 +11,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author neo
  */
-public class RateLimiter {
+class RateLimiter {
     private final Logger logger = LoggerFactory.getLogger(RateLimiter.class);
     private final Map<String, RateConfig> config = Maps.newHashMap();
     private final LRUMap<String, Rate> rates;
 
-    public RateLimiter(int maxEntries) {
+    RateLimiter(int maxEntries) {
         rates = new LRUMap<>(maxEntries);
     }
 

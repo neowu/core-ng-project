@@ -1,4 +1,8 @@
 ## Change log
+### 5.2.10 (1/15/2018 - )
+* http: support ip whitelist(due to gcloud public LB does not support ingress IP restriction), update undertow to 1.4.22
+* db: change mysql jdbc driver to com.mysql.cj.jdbc.Driver (works with mysql:mysql-connector-java:6.0.6), old one is deprecated, https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-api-changes.html
+
 ### 5.2.9 (12/26/2017 - 1/10/2018)
 * search: update es to 6.1.1
 * http: support patch method, for partial update webservice, e.g. update status for one entity

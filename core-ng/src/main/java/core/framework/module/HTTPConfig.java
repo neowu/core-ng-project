@@ -1,10 +1,13 @@
 package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.rate.LimitRateInterceptor;
+import core.framework.impl.web.http.AllowSourceIPInterceptor;
+import core.framework.impl.web.http.LimitRateInterceptor;
 import core.framework.util.Exceptions;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
+
+import java.util.Set;
 
 /**
  * @author neo
@@ -51,6 +54,10 @@ public final class HTTPConfig {
     public void maxForwardedIPs(int maxIPs) {
         if (maxIPs < 1) throw Exceptions.error("maxIPs must be greater than 1, maxIPs={}", maxIPs);
         context.httpServer.handler.requestParser.clientIPParser.maxForwardedIPs = maxIPs;
+    }
+
+    public void allowSourceIPs(Set<String> sourceIPs) {
+        context.httpServer.handler.interceptors.add(new AllowSourceIPInterceptor(sourceIPs));
     }
 
     public static class State {

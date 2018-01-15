@@ -1,4 +1,4 @@
-package core.framework.impl.web.rate;
+package core.framework.impl.web.http;
 
 import org.junit.jupiter.api.Test;
 

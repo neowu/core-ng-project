@@ -11,7 +11,6 @@ import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.HTTPServerHandler;
 import core.framework.impl.web.bean.RequestBeanMapper;
-import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.impl.web.route.Path;
 import core.framework.json.JSON;
 import core.framework.log.Severity;

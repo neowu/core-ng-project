@@ -1,7 +1,7 @@
 package core.framework.impl.web;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.impl.web.exception.ErrorResponse;
+import core.framework.impl.web.service.ErrorResponse;
 import core.framework.log.Severity;
 import core.framework.web.exception.NotFoundException;
 import core.framework.web.service.RemoteServiceException;

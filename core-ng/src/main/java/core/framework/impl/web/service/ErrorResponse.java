@@ -1,4 +1,4 @@
-package core.framework.impl.web.exception;
+package core.framework.impl.web.service;
 
 import core.framework.api.json.Property;
 

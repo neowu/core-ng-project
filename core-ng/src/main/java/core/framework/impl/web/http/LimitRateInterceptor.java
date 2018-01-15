@@ -1,4 +1,4 @@
-package core.framework.impl.web.rate;
+package core.framework.impl.web.http;
 
 import core.framework.web.Interceptor;
 import core.framework.web.Invocation;

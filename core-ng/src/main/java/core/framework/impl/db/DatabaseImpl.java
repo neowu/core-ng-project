@@ -119,7 +119,7 @@ public final class DatabaseImpl implements Database {
 
     private Driver driver(String url) {
         if (url.startsWith("jdbc:mysql:")) {
-            return createDriver("com.mysql.jdbc.Driver");
+            return createDriver("com.mysql.cj.jdbc.Driver");
         } else if (url.startsWith("jdbc:oracle:")) {
             return createDriver("oracle.jdbc.OracleDriver");
         } else if (url.startsWith("jdbc:hsqldb:")) {

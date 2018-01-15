@@ -7,7 +7,6 @@ import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.web.bean.RequestBeanMapper;
-import core.framework.impl.web.exception.ErrorResponse;
 import core.framework.json.JSON;
 import core.framework.log.Severity;
 import core.framework.util.Maps;

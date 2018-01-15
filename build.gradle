@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '5.2.9'
+    version = '5.2.10'
 }
 
 def mongoVersion = '3.5.0'
@@ -29,7 +29,7 @@ project(':core-ng') {
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
         implementation 'org.apache.httpcomponents:httpclient:4.5.4'
-        implementation 'io.undertow:undertow-core:1.4.21.Final'
+        implementation 'io.undertow:undertow-core:1.4.22.Final'
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
