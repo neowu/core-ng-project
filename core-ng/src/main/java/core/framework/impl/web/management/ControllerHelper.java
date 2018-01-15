@@ -1,22 +1,15 @@
 package core.framework.impl.web.management;
 
+import core.framework.util.Network;
 import core.framework.web.exception.ForbiddenException;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * @author neo
  */
 final class ControllerHelper {
-    static void validateFromLocalNetwork(String clientIP) {
-        try {
-            InetAddress address = InetAddress.getByName(clientIP);
-            if (!address.isLoopbackAddress() && !address.isSiteLocalAddress()) {
-                throw new ForbiddenException("access denied, clientIP=" + clientIP);
-            }
-        } catch (UnknownHostException e) {
-            throw new ForbiddenException(e.getMessage(), ForbiddenException.DEFAULT_ERROR_CODE, e);
+    static void assertFromLocalNetwork(String clientIP) {
+        if (!Network.isLocalAddress(clientIP)) {
+            throw new ForbiddenException("access denied, clientIP=" + clientIP);
         }
     }
 }

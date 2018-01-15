@@ -18,7 +18,7 @@ public class OpenAPIController implements Controller {
 
     @Override
     public Response execute(Request request) {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
         return Response.bytes(openAPIManager.document())
                        .contentType(ContentType.APPLICATION_JSON)
                        .header("Access-Control-Allow-Origin", "*");

@@ -20,7 +20,7 @@ public class PropertyController implements Controller {
 
     @Override
     public Response execute(Request request) {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
         return Response.text(text());
     }
 

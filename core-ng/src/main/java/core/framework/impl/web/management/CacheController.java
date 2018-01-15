@@ -21,7 +21,7 @@ public class CacheController {
     }
 
     public Response get(Request request) {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
@@ -30,7 +30,7 @@ public class CacheController {
     }
 
     public Response delete(Request request) {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
@@ -39,7 +39,7 @@ public class CacheController {
     }
 
     public Response list(Request request) {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
         List<CacheView> caches = cacheManager.caches().stream().map(this::view).collect(Collectors.toList());
         return Response.bean(caches);
     }

@@ -14,7 +14,7 @@ import java.lang.management.ThreadMXBean;
  */
 public class ThreadInfoController {
     public Response threadUsage(Request request) {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
 
         ThreadUsage usage = new ThreadUsage();
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
@@ -25,7 +25,7 @@ public class ThreadInfoController {
     }
 
     public Response threadDump(Request request) {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
 
         return Response.text(threadDumpText());
     }

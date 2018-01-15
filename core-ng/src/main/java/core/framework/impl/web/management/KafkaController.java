@@ -27,7 +27,7 @@ public class KafkaController {
     }
 
     public Response topics(Request request) throws ExecutionException, InterruptedException {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
         List<KafkaTopic> views = Lists.newArrayList();
         try (AdminClient admin = kafka.admin()) {
             Set<String> topics = admin.listTopics().names().get();

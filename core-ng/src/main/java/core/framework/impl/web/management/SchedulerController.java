@@ -21,7 +21,7 @@ public class SchedulerController {
     }
 
     public Response jobs(Request request) {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
 
         List<JobView> jobs = Lists.newArrayList();
         scheduler.triggers.forEach((name, trigger) -> {
@@ -35,7 +35,7 @@ public class SchedulerController {
     }
 
     public Response triggerJob(Request request) {
-        ControllerHelper.validateFromLocalNetwork(request.clientIP());
+        ControllerHelper.assertFromLocalNetwork(request.clientIP());
 
         String job = request.pathParam("job");
         logger.info("trigger job, job={}, clientIP={}", job, request.clientIP());

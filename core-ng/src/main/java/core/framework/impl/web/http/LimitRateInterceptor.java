@@ -23,13 +23,17 @@ public class LimitRateInterceptor implements Interceptor {
         if (limitRate != null) {
             String group = limitRate.value();
             String clientIP = invocation.context().request().clientIP();
-            logger.debug("acquire, group={}, clientIP={}", group, clientIP);
-            boolean result = rateLimiter.acquire(group, clientIP);
-            if (!result) {
-                throw new TooManyRequestsException("rate exceeded");
-            }
+            validateRate(group, clientIP);
         }
         return invocation.proceed();
+    }
+
+    void validateRate(String group, String clientIP) {
+        logger.debug("acquire, group={}, clientIP={}", group, clientIP);
+        boolean acquired = rateLimiter.acquire(group, clientIP);
+        if (!acquired) {
+            throw new TooManyRequestsException("rate exceeded");
+        }
     }
 
     public void config(String group, int maxPermits, int fillRate, TimeUnit unit) {
