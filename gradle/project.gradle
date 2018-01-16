@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.3'
     }
 }
 
@@ -32,8 +32,7 @@ subprojects {
     buildDir = "${rootDir}/build/${name}"
 
     dependencies {
-        testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.2'
-        testCompile 'org.apiguardian:apiguardian-api:1.0.0'  // used by junit
+        testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.3'
     }
 
     afterEvaluate {

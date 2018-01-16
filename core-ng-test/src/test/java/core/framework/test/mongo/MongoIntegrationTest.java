@@ -1,6 +1,7 @@
 package core.framework.test.mongo;
 
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import core.framework.inject.Inject;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
@@ -10,24 +11,18 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
  */
 class MongoIntegrationTest extends IntegrationTest {
     @Inject
-    MongoCollection<TestMongoEntity> testEntityCollection;
+    MongoCollection<TestMongoEntity> collection;
     @Inject
     Mongo mongo;
 
@@ -40,15 +35,14 @@ class MongoIntegrationTest extends IntegrationTest {
     void insert() {
         TestMongoEntity entity = new TestMongoEntity();
         entity.stringField = "string";
-        entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("UTC"));
-        testEntityCollection.insert(entity);
+        entity.zonedDateTimeField = ZonedDateTime.parse("2016-09-01T11:00:00Z");
+        collection.insert(entity);
 
-        assertNotNull(entity.id);
-
-        Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entity.id);
-        assertTrue(loadedEntity.isPresent());
-        assertEquals(entity.stringField, loadedEntity.get().stringField);
-        assertEquals(entity.zonedDateTimeField.toInstant(), loadedEntity.get().zonedDateTimeField.toInstant());
+        assertThat(entity.id).isNotNull();
+        assertThat(collection.get(entity.id)).get().satisfies(loadedEntity -> {
+            assertThat(loadedEntity.stringField).isEqualTo(entity.stringField);
+            assertThat(loadedEntity.zonedDateTimeField).isEqualTo("2016-09-01T11:00:00Z");
+        });
     }
 
     @Test
@@ -56,97 +50,90 @@ class MongoIntegrationTest extends IntegrationTest {
         TestMongoEntity entity = new TestMongoEntity();
         entity.id = new ObjectId();
         entity.stringField = "value1";
-        testEntityCollection.replace(entity);
+        collection.replace(entity);
 
-        TestMongoEntity loadedEntity = testEntityCollection.get(entity.id).orElseThrow(() -> new Error("not found"));
-        assertEquals(entity.stringField, loadedEntity.stringField);
+        assertThat(collection.get(entity.id)).get().isEqualToComparingFieldByField(entity);
 
         entity.stringField = "value2";
-        testEntityCollection.replace(entity);
+        collection.replace(entity);
 
-        loadedEntity = testEntityCollection.get(entity.id).orElseThrow(() -> new Error("not found"));
-        assertEquals(entity.stringField, loadedEntity.stringField);
+        assertThat(collection.get(entity.id)).get().isEqualToComparingFieldByField(entity);
     }
 
     @Test
     void find() {
         TestMongoEntity entity = createEntity("value2", TestMongoEntity.TestEnum.VALUE2);
 
-        List<TestMongoEntity> entities = testEntityCollection.find(Filters.eq("string_field", "value2"));
-        assertEquals(1, entities.size());
-        assertEquals(entity.id, entities.get(0).id);
-        assertEquals(entity.stringField, entities.get(0).stringField);
+        List<TestMongoEntity> entities = collection.find(Filters.eq("string_field", "value2"));
+        assertThat(entities).hasSize(1).first().isEqualToComparingFieldByField(entity);
     }
 
     @Test
     void findByEnum() {
         TestMongoEntity entity = createEntity("value1", TestMongoEntity.TestEnum.VALUE1);
 
-        List<TestMongoEntity> entities = testEntityCollection.find(Filters.eq("enum_field", TestMongoEntity.TestEnum.VALUE1));
-        assertEquals(1, entities.size());
-        assertEquals(entity.id, entities.get(0).id);
-        assertEquals(entity.stringField, entities.get(0).stringField);
-        assertEquals(entity.enumField, entities.get(0).enumField);
+        List<TestMongoEntity> entities = collection.find(Filters.eq("enum_field", TestMongoEntity.TestEnum.VALUE1));
+        assertThat(entities).hasSize(1).first().isEqualToComparingFieldByField(entity);
     }
 
     @Test
     void findOne() {
         TestMongoEntity entity = createEntity("value3", TestMongoEntity.TestEnum.VALUE1);
 
-        Optional<TestMongoEntity> result = testEntityCollection.findOne(Filters.eq("string_field", "value3"));
-        assertTrue(result.isPresent());
-        assertEquals(entity.id, result.get().id);
-        assertEquals(entity.stringField, result.get().stringField);
+        assertThat(collection.findOne(Filters.eq("string_field", "value3"))).get().isEqualToComparingFieldByField(entity);
     }
 
     @Test
     void count() {
-        long count = testEntityCollection.count(Filters.eq("string_field", "value"));
+        long count = collection.count(Filters.eq("string_field", "value"));
 
-        assertEquals(0, count);
+        assertThat(count).isZero();
     }
 
     @Test
     void bulkInsert() {
         List<TestMongoEntity> entities = testEntities();
-        testEntityCollection.bulkInsert(entities);
+        collection.bulkInsert(entities);
 
         for (TestMongoEntity entity : entities) {
-            assertNotNull(entity.id);
+            assertThat(entity.id).isNotNull();
+            assertThat(collection.get(entity.id)).get().isEqualToComparingFieldByField(entity);
         }
-
-        Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entities.get(0).id);
-        assertTrue(loadedEntity.isPresent());
-        assertEquals(entities.get(0).stringField, loadedEntity.get().stringField);
     }
 
     @Test
     void bulkReplace() {
         List<TestMongoEntity> entities = testEntities();
         entities.forEach(entity -> entity.id = new ObjectId());
-        testEntityCollection.bulkReplace(entities);
+        collection.bulkReplace(entities);
 
-        Optional<TestMongoEntity> loadedEntity = testEntityCollection.get(entities.get(0).id);
-        assertTrue(loadedEntity.isPresent());
-        assertEquals(entities.get(0).stringField, loadedEntity.get().stringField);
+        entities.forEach(entity -> assertThat(collection.get(entity.id)).get().isEqualToComparingFieldByField(entity));
 
         entities.get(0).stringField = "string1-updated";
         entities.get(1).stringField = "string2-updated";
-        testEntityCollection.bulkReplace(entities);
+        collection.bulkReplace(entities);
 
-        loadedEntity = testEntityCollection.get(entities.get(0).id);
-        assertTrue(loadedEntity.isPresent());
-        assertEquals(entities.get(0).stringField, loadedEntity.get().stringField);
+        entities.forEach(entity -> assertThat(collection.get(entity.id)).get().isEqualToComparingFieldByField(entity));
     }
 
     @Test
     void bulkDelete() {
         List<TestMongoEntity> entities = testEntities();
-        testEntityCollection.bulkInsert(entities);
+        collection.bulkInsert(entities);
 
-        long deletedCount = testEntityCollection.bulkDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
-        assertEquals(2, deletedCount);
-        assertFalse(testEntityCollection.get(entities.get(0).id).isPresent());
+        long deletedCount = collection.bulkDelete(entities.stream().map(entity -> entity.id).collect(Collectors.toList()));
+        assertThat(deletedCount).isEqualTo(2);
+        entities.forEach(entity -> assertThat(collection.get(entity.id)).isEmpty());
+    }
+
+    @Test
+    void update() {
+        List<TestMongoEntity> entities = testEntities();
+        collection.bulkInsert(entities);
+
+        long updatedCount = collection.update(Filters.eq("string_field", entities.get(0).stringField), Updates.set("enum_field", TestMongoEntity.TestEnum.VALUE2));
+        assertThat(updatedCount).isEqualTo(1);
+        assertThat(collection.get(entities.get(0).id)).get().satisfies(loadedEntity -> assertThat(loadedEntity.enumField).isEqualTo(TestMongoEntity.TestEnum.VALUE2));
     }
 
     private TestMongoEntity createEntity(String stringField, TestMongoEntity.TestEnum enumField) {
@@ -154,7 +141,7 @@ class MongoIntegrationTest extends IntegrationTest {
         entity.id = new ObjectId();
         entity.stringField = stringField;
         entity.enumField = enumField;
-        testEntityCollection.insert(entity);
+        collection.insert(entity);
         return entity;
     }
 

@@ -11,9 +11,9 @@ def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.0.0'
 def jacksonVersion = '2.9.3'
 
-def testLib = ['org.junit.jupiter:junit-jupiter-api:5.0.2',
+def testLib = ['org.junit.jupiter:junit-jupiter-api:5.0.3',
                'org.mockito:mockito-core:2.13.0',
-               'org.assertj:assertj-core:3.8.0']
+               'org.assertj:assertj-core:3.9.0']
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -49,7 +49,6 @@ project(':core-ng-test') {
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
         compileOnly "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
-        compileOnly 'org.apiguardian:apiguardian-api:1.0.0'                     // used by junit
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
         testRuntimeOnly 'com.vividsolutions:jts:1.13'                           // used by fongo
         testRuntimeOnly "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
