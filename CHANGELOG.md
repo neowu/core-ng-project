@@ -1,6 +1,7 @@
 ## Change log
 ### 5.3.0 (1/22/2018)
 * http: added gzip support, added cache param for static content 
+* api: update API client with 30s timeout and 15s slow operation threshold
 
 ### 5.2.10 (1/15/2018 - 1/17/2018)
 * http: support ip whitelist(due to gcloud public LB does not support ingress IP restriction), update undertow to 1.4.22
