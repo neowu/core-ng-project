@@ -1,4 +1,7 @@
 ## Change log
+### 5.3.0 (1/22/2018)
+* http: added gzip support, added cache param for static content 
+
 ### 5.2.10 (1/15/2018 - 1/17/2018)
 * http: support ip whitelist(due to gcloud public LB does not support ingress IP restriction), update undertow to 1.4.22
 * db: change mysql jdbc driver to com.mysql.cj.jdbc.Driver (works with mysql:mysql-connector-java:6.0.6), old one is deprecated, https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-api-changes.html

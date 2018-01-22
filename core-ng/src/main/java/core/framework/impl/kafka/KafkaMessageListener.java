@@ -59,8 +59,10 @@ public class KafkaMessageListener {
 
     public void stop() {
         logger.info("stop kafka listener, name={}, uri={}, topics={}", name, kafka.uri, topics);
-        for (KafkaMessageListenerThread thread : listenerThreads) {
-            thread.shutdown();
+        if (listenerThreads != null) {
+            for (KafkaMessageListenerThread thread : listenerThreads) {
+                thread.shutdown();
+            }
         }
     }
 

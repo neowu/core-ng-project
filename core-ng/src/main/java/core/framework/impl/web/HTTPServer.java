@@ -6,6 +6,10 @@ import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
+import io.undertow.server.handlers.encoding.ContentEncodingRepository;
+import io.undertow.server.handlers.encoding.DeflateEncodingProvider;
+import io.undertow.server.handlers.encoding.EncodingHandler;
+import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +47,13 @@ public class HTTPServer {
             int ioThreads = Math.max(Threads.availableProcessors(), 2); // same logic as io.undertow.Undertow.Builder(), but use overridden availableProcessors value
             int workerThreads = ioThreads * 8;
 
-            builder.setHandler(new HTTPServerIOHandler(handler))
+            GZipPredicate predicate = new GZipPredicate();
+            final EncodingHandler encodingHandler = new EncodingHandler(new ContentEncodingRepository()
+                    .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, predicate)
+                    .addEncodingHandler("deflate", new DeflateEncodingProvider(), 10, predicate))
+                    .setNext(new HTTPServerIOHandler(handler));
+
+            builder.setHandler(encodingHandler)
                    .setServerOption(UndertowOptions.DECODE_URL, false)
                    .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, true)

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -51,16 +52,16 @@ public final class SiteConfig {
         context.httpServer.siteManager.templateManager.add(path, modelClass);
     }
 
-    public void staticContent(String path) {
-        logger.info("add static content path, path={}", path);
+    public void staticContent(String path, Duration cacheMaxAge) {
+        logger.info("add static content path, path={}, cache={}", path, cacheMaxAge);
         Path contentPath = context.httpServer.siteManager.webDirectory.path(path);
         if (!Files.exists(contentPath, LinkOption.NOFOLLOW_LINKS)) {
             throw Exceptions.error("path does not exist, path={}", path);
         }
         if (Files.isDirectory(contentPath)) {
-            context.route(HTTPMethod.GET, path + "/:path(*)", new StaticDirectoryController(contentPath), true);
+            context.route(HTTPMethod.GET, path + "/:path(*)", new StaticDirectoryController(contentPath, cacheMaxAge), true);
         } else {
-            context.route(HTTPMethod.GET, path, new StaticFileController(contentPath), true);
+            context.route(HTTPMethod.GET, path, new StaticFileController(contentPath, cacheMaxAge), true);
         }
     }
 
