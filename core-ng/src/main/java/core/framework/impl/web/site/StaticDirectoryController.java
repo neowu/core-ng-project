@@ -2,7 +2,6 @@ package core.framework.impl.web.site;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPHeaders;
-import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import core.framework.web.exception.NotFoundException;
@@ -17,14 +16,13 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public final class StaticDirectoryController implements Controller {
+public final class StaticDirectoryController implements StaticContentController {
     private final Logger logger = LoggerFactory.getLogger(StaticDirectoryController.class);
     private final Path contentDirectory;
-    private String cacheHeader;
+    String cacheHeader;
 
-    public StaticDirectoryController(Path contentDirectory, Duration cacheMaxAge) {
+    public StaticDirectoryController(Path contentDirectory) {
         this.contentDirectory = contentDirectory;
-        if (cacheMaxAge != null && cacheMaxAge.getSeconds() > 0) cacheHeader = "public, max-age=" + cacheMaxAge.getSeconds();
     }
 
     @Override
@@ -41,5 +39,10 @@ public final class StaticDirectoryController implements Controller {
         if (contentType != null) response.contentType(contentType);
         if (cacheHeader != null) response.header(HTTPHeaders.CACHE_CONTROL, cacheHeader);
         return response;
+    }
+
+    @Override
+    public void cache(Duration maxAge) {
+        cacheHeader = "public, max-age=" + maxAge.getSeconds();
     }
 }

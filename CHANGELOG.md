@@ -1,5 +1,5 @@
 ## Change log
-### 5.3.0 (1/22/2018)
+### 5.3.0 (1/22/2018 - )
 * http: added gzip support, added cache param for static content 
 * api: update API client with 30s timeout and 15s slow operation threshold
 

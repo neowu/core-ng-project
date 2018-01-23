@@ -2,6 +2,7 @@ package core.framework.module;
 
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.web.site.StaticContentController;
 import core.framework.impl.web.site.StaticDirectoryController;
 import core.framework.impl.web.site.StaticFileController;
 import core.framework.impl.web.site.WebSecurityInterceptor;
@@ -13,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.List;
 
 /**
@@ -52,17 +52,20 @@ public final class SiteConfig {
         context.httpServer.siteManager.templateManager.add(path, modelClass);
     }
 
-    public void staticContent(String path, Duration cacheMaxAge) {
-        logger.info("add static content path, path={}, cache={}", path, cacheMaxAge);
+    public StaticContentConfig staticContent(String path) {
+        logger.info("add static content path, path={}", path);
         Path contentPath = context.httpServer.siteManager.webDirectory.path(path);
-        if (!Files.exists(contentPath, LinkOption.NOFOLLOW_LINKS)) {
-            throw Exceptions.error("path does not exist, path={}", path);
-        }
+        if (!Files.exists(contentPath, LinkOption.NOFOLLOW_LINKS)) throw Exceptions.error("path does not exist, path={}", path);
+
+        StaticContentController controller;
         if (Files.isDirectory(contentPath)) {
-            context.route(HTTPMethod.GET, path + "/:path(*)", new StaticDirectoryController(contentPath, cacheMaxAge), true);
+            controller = new StaticDirectoryController(contentPath);
+            context.route(HTTPMethod.GET, path + "/:path(*)", controller, true);
         } else {
-            context.route(HTTPMethod.GET, path, new StaticFileController(contentPath, cacheMaxAge), true);
+            controller = new StaticFileController(contentPath);
+            context.route(HTTPMethod.GET, path, controller, true);
         }
+        return new StaticContentConfig(controller);
     }
 
     public void enableWebSecurity() {
