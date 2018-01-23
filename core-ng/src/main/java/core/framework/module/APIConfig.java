@@ -84,7 +84,11 @@ public final class APIConfig {
 
     private HTTPClient httpClient() {
         if (state.httpClient == null) {
-            HTTPClient httpClient = new HTTPClientBuilder().userAgent("APIClient").timeout(Duration.ofSeconds(30)).slowOperationThreshold(Duration.ofSeconds(15)).build();
+            HTTPClient httpClient = new HTTPClientBuilder()
+                    .userAgent("APIClient")
+                    .timeout(Duration.ofSeconds(30))
+                    .slowOperationThreshold(Duration.ofSeconds(15))
+                    .build();
             context.shutdownHook.add(httpClient::close);
             state.httpClient = httpClient;
         }
