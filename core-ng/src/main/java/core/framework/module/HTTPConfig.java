@@ -60,6 +60,10 @@ public final class HTTPConfig {
         context.httpServer.handler.interceptors.add(new AllowSourceIPInterceptor(sourceIPs));
     }
 
+    public void enableGZip() {
+        context.httpServer.gzip = true;
+    }
+
     public static class State {
         LimitRateInterceptor limitRateInterceptor;
         boolean limitRateGroupAdded;

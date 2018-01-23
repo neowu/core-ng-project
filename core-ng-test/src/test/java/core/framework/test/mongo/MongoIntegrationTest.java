@@ -127,6 +127,24 @@ class MongoIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    void delete() {
+        TestMongoEntity entity = createEntity("value1", TestMongoEntity.TestEnum.VALUE1);
+
+        boolean deleted = collection.delete(entity.id);
+        assertThat(deleted).isTrue();
+        assertThat(collection.get(entity.id)).isEmpty();
+    }
+
+    @Test
+    void deleteByFilter() {
+        TestMongoEntity entity = createEntity("value1", TestMongoEntity.TestEnum.VALUE1);
+
+        long deleted = collection.delete(Filters.eq("string_field", "value1"));
+        assertThat(deleted).isEqualTo(1);
+        assertThat(collection.get(entity.id)).isEmpty();
+    }
+
+    @Test
     void update() {
         List<TestMongoEntity> entities = testEntities();
         collection.bulkInsert(entities);

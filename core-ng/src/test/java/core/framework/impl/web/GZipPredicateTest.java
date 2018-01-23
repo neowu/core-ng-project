@@ -21,7 +21,7 @@ class GZipPredicateTest {
     }
 
     @Test
-    void gzip() {
+    void proceed() {
         HeaderMap headers = new HeaderMap();
         headers.put(Headers.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
         headers.put(Headers.CONTENT_LENGTH, 50);
@@ -29,7 +29,7 @@ class GZipPredicateTest {
     }
 
     @Test
-    void gzipWithChunk() {
+    void proceedWithChunk() {  // chunk does not have content-length header
         HeaderMap headers = new HeaderMap();
         headers.put(Headers.CONTENT_TYPE, ContentType.TEXT_CSS.toString());
         assertTrue(predicate.resolve(headers));

@@ -6,6 +6,7 @@ import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
+import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.encoding.ContentEncodingRepository;
 import io.undertow.server.handlers.encoding.DeflateEncodingProvider;
 import io.undertow.server.handlers.encoding.EncodingHandler;
@@ -27,6 +28,7 @@ public class HTTPServer {
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
     public Integer httpPort;
     public Integer httpsPort;
+    public boolean gzip;
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
@@ -47,13 +49,7 @@ public class HTTPServer {
             int ioThreads = Math.max(Threads.availableProcessors(), 2); // same logic as io.undertow.Undertow.Builder(), but use overridden availableProcessors value
             int workerThreads = ioThreads * 8;
 
-            GZipPredicate predicate = new GZipPredicate();
-            final EncodingHandler encodingHandler = new EncodingHandler(new ContentEncodingRepository()
-                    .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, predicate)
-                    .addEncodingHandler("deflate", new DeflateEncodingProvider(), 10, predicate))
-                    .setNext(new HTTPServerIOHandler(handler));
-
-            builder.setHandler(encodingHandler)
+            builder.setHandler(handler())
                    .setServerOption(UndertowOptions.DECODE_URL, false)
                    .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, true)
@@ -63,8 +59,20 @@ public class HTTPServer {
             server = builder.build();
             server.start();
         } finally {
-            logger.info("http server started, httpPort={}, httpsPort={}, elapsedTime={}", httpPort, httpsPort, watch.elapsedTime());
+            logger.info("http server started, httpPort={}, httpsPort={}, gzip={}, elapsedTime={}", httpPort, httpsPort, gzip, watch.elapsedTime());
         }
+    }
+
+    private HttpHandler handler() {
+        HTTPServerIOHandler handler = new HTTPServerIOHandler(this.handler);
+
+        if (!gzip) return handler;
+
+        GZipPredicate predicate = new GZipPredicate();
+        return new EncodingHandler(new ContentEncodingRepository()
+                .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, predicate)
+                .addEncodingHandler("deflate", new DeflateEncodingProvider(), 10, predicate))
+                .setNext(handler);
     }
 
     public void stop() {
