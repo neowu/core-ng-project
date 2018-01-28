@@ -2,11 +2,11 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '5.3.0'
+    version = '5.3.1'
 }
 
 def mongoVersion = '3.5.0'
-def elasticVersion = '6.1.1'
+def elasticVersion = '6.1.2'
 def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.0.0'
 def jacksonVersion = '2.9.3'

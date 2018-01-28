@@ -1,4 +1,7 @@
 ## Change log
+### 5.3.1 (1/28/2018 - )
+* search: update es to 6.1.2
+
 ### 5.3.0 (1/22/2018 - 1/23/2018)
 * http: added gzip support, added cache param for static content 
 * api: update API client with 30s timeout and 15s slow operation threshold
