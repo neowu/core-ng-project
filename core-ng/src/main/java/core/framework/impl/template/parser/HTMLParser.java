@@ -25,7 +25,7 @@ public class HTMLParser {
     private final Set<String> voidElements = Sets.newHashSet("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
 
     // loose checking to cover common cases, precise checking will be like e.g. checked attribute on input tag can be boolean attribute
-    private final Set<String> booleanAttributes = Sets.newHashSet("checked", "selected", "disabled", "readonly", "multiple", "ismap", "defer", "required", "sortable");
+    private final Set<String> booleanAttributes = Sets.newHashSet("checked", "selected", "disabled", "readonly", "multiple", "ismap", "defer", "required", "sortable", "autofocus", "allowfullscreen", "async");
 
     private final HTMLLexer lexer;
     private final Deque<ContainerNode> stack = new ArrayDeque<>();
@@ -147,18 +147,18 @@ public class HTMLParser {
             throw Exceptions.error("it is recommended not to put value for boolean attribute, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location);
 
         if ("link".equals(attribute.tagName) && "href".equals(attribute.name)
-                || "script".equals(attribute.tagName) && "src".equals(attribute.name)
-                || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
+            || "script".equals(attribute.tagName) && "src".equals(attribute.name)
+            || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
             validateStaticResourceURL(attribute);
         }
     }
 
     private void validateStaticResourceURL(Attribute attribute) {
         if (!attribute.value.startsWith("http://")
-                && !attribute.value.startsWith("https://")
-                && !attribute.value.startsWith("//")
-                && !Strings.startsWith(attribute.value, '/'))
+            && !attribute.value.startsWith("https://")
+            && !attribute.value.startsWith("//")
+            && !Strings.startsWith(attribute.value, '/'))
             throw Exceptions.error("static resource url value must be either absolute or start with '/', attribute={}>{}, value={}, location={}",
-                    attribute.tagName, attribute.name, attribute.value, attribute.location);
+                attribute.tagName, attribute.name, attribute.value, attribute.location);
     }
 }
