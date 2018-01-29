@@ -25,7 +25,7 @@ public class HTMLParser {
     private final Set<String> voidElements = Sets.newHashSet("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
 
     // loose checking to cover common cases, precise checking will be like e.g. checked attribute on input tag can be boolean attribute
-    private final Set<String> booleanAttributes = Sets.newHashSet("checked", "selected", "disabled", "readonly", "multiple", "ismap", "defer", "required", "sortable", "autofocus", "allowfullscreen", "async");
+    private final Set<String> booleanAttributes = Sets.newHashSet("checked", "selected", "disabled", "readonly", "multiple", "ismap", "defer", "required", "sortable", "autofocus", "allowfullscreen", "async", "hidden");
 
     private final HTMLLexer lexer;
     private final Deque<ContainerNode> stack = new ArrayDeque<>();
