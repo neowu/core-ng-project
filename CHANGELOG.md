@@ -1,6 +1,7 @@
 ## Change log
 ### 5.3.1 (1/28/2018 - )
 * search: update es to 6.1.2
+* html: added "required", "sortable" to boolean attributes
 
 ### 5.3.0 (1/22/2018 - 1/23/2018)
 * http: added gzip support, added cache param for static content 
