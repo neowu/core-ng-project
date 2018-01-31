@@ -1,6 +1,7 @@
 ## Change log
 ### 5.3.2 (1/29/2018 - )
 * html: added "autofocus", "allowfullscreen", "hidden" & "async" to boolean attributes
+* api: remove openapi impl, not useful in actual development life cycle, we plan to impl tool to generate typescript ajax client from interface directly 
 
 ### 5.3.1 (1/28/2018 - 1/29/2018)
 * search: update es to 6.1.2
