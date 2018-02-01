@@ -30,7 +30,7 @@ public final class SchedulerConfig {
     }
 
     public void timeZone(ZoneId zoneId) {
-        if (state.triggerAdded) throw new Error("schedule().timeZone() must configure before adding trigger");
+        if (state.triggerAdded) throw new Error("schedule().timeZone() must be configured before adding trigger");
         if (zoneId == null) throw new Error("zoneId must not be null");
         state.zoneId = zoneId;
     }

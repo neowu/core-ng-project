@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 
 /**
  * @author neo
@@ -69,6 +70,16 @@ public final class APIConfig {
         return new APIClientConfig(webServiceClient);
     }
 
+    public void timeout(Duration timeout) {
+        if (state.httpClient != null) throw new Error("api().timeout() must be configured before adding client");
+        state.timeout = timeout;
+    }
+
+    public void slowOperationThreshold(Duration slowOperationThreshold) {
+        if (state.httpClient != null) throw new Error("api().slowOperationThreshold() must be configured before adding client");
+        state.slowOperationThreshold = slowOperationThreshold;
+    }
+
     private <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {
         if (context.isTest()) {
             return context.mockFactory.create(serviceInterface);
@@ -81,6 +92,8 @@ public final class APIConfig {
         if (state.httpClient == null) {
             HTTPClient httpClient = new HTTPClientBuilder()
                     .userAgent("APIClient")
+                    .timeout(state.timeout)
+                    .slowOperationThreshold(state.slowOperationThreshold)
                     .build();
             context.shutdownHook.add(httpClient::close);
             state.httpClient = httpClient;
@@ -90,5 +103,7 @@ public final class APIConfig {
 
     public static class State {
         HTTPClient httpClient;
+        Duration timeout = Duration.ofSeconds(30);
+        Duration slowOperationThreshold = Duration.ofSeconds(15);
     }
 }
