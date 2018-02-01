@@ -4,6 +4,8 @@ services:
     image: zookeeper
     ports:
       - 2181:2181
+    environment:
+      - JMXDISABLE=true
   kafka:
     image: neowu/kafka:1.0.0
     ports:
