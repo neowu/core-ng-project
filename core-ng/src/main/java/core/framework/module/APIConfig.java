@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.time.Duration;
 
 /**
  * @author neo
@@ -82,8 +81,6 @@ public final class APIConfig {
         if (state.httpClient == null) {
             HTTPClient httpClient = new HTTPClientBuilder()
                     .userAgent("APIClient")
-                    .timeout(Duration.ofSeconds(30))
-                    .slowOperationThreshold(Duration.ofSeconds(15))
                     .build();
             context.shutdownHook.add(httpClient::close);
             state.httpClient = httpClient;
