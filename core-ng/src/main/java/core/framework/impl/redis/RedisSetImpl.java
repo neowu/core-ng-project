@@ -44,7 +44,7 @@ public final class RedisSetImpl implements RedisSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, 1);
             logger.debug("sadd, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
@@ -54,11 +54,13 @@ public final class RedisSetImpl implements RedisSet {
     public Set<String> members(String key) {
         StopWatch watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        int returnedMembers = 0;
         try {
             RedisConnection connection = item.resource;
             connection.write(SMEMBERS, encode(key));
             Object[] response = connection.readArray();
-            Set<String> members = new HashSet<>(response.length);
+            returnedMembers = response.length;
+            Set<String> members = new HashSet<>(returnedMembers);
             for (Object member : response) {
                 members.add(decode((byte[]) member));
             }
@@ -69,7 +71,7 @@ public final class RedisSetImpl implements RedisSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, returnedMembers, 0);
             logger.debug("smembers, key={}, elapsedTime={}", key, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
@@ -90,7 +92,7 @@ public final class RedisSetImpl implements RedisSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 1, 0);
             logger.debug("sismember, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
@@ -110,7 +112,7 @@ public final class RedisSetImpl implements RedisSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, values.length);
             logger.debug("srem, key={}, values={}, elapsedTime={}", key, values, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }

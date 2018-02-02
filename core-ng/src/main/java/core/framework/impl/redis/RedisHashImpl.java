@@ -45,7 +45,7 @@ public final class RedisHashImpl implements RedisHash {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 1, 0);
             logger.debug("hget, key={}, field={}, elapsedTime={}", key, field, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
@@ -55,12 +55,14 @@ public final class RedisHashImpl implements RedisHash {
     public Map<String, String> getAll(String key) {
         StopWatch watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        int returnedFields = 0;
         try {
             RedisConnection connection = item.resource;
             connection.write(HGETALL, encode(key));
             Object[] response = connection.readArray();
             if (response.length % 2 != 0) throw new RedisException("unexpected length of array, length=" + response.length);
-            Map<String, String> values = Maps.newHashMapWithExpectedSize(response.length / 2);
+            returnedFields = response.length / 2;
+            Map<String, String> values = Maps.newHashMapWithExpectedSize(returnedFields);
             for (int i = 0; i < response.length; i += 2) {
                 values.put(decode((byte[]) response[i]), decode((byte[]) response[i + 1]));
             }
@@ -71,7 +73,7 @@ public final class RedisHashImpl implements RedisHash {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, returnedFields, 0);
             logger.debug("hgetAll, key={}, elapsedTime={}", key, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
@@ -91,7 +93,7 @@ public final class RedisHashImpl implements RedisHash {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, 1);
             logger.debug("hset, key={}, field={}, value={}, elapsedTime={}", key, field, value, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
@@ -111,7 +113,7 @@ public final class RedisHashImpl implements RedisHash {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, values.size());
             logger.debug("hmset, key={}, values={}, elapsedTime={}", key, values, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
@@ -131,7 +133,7 @@ public final class RedisHashImpl implements RedisHash {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, fields.length);
             logger.debug("hdel, key={}, fields={}, elapsedTime={}", key, fields, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }

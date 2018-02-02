@@ -90,7 +90,7 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 1, 0);
             logger.debug("get, key={}, elapsedTime={}", key, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -110,7 +110,7 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, 1);
             logger.debug("set, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -134,7 +134,7 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, 1);
             logger.debug("set, key={}, value={}, expiration={}, elapsedTime={}", key, LogParam.of(value), expiration, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -160,7 +160,7 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, 1);
             logger.debug("setIfAbsent, key={}, value={}, expiration={}, elapsedTime={}", key, value, expiration, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -180,7 +180,7 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, 1);
             logger.debug("expire, key={}, expiration={}, elapsedTime={}", key, expiration, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -200,7 +200,7 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, 1);
             logger.debug("del, key={}, elapsedTime={}", key, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -239,7 +239,7 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, keys.length, 0);
             logger.debug("mget, keys={}, elapsedTime={}", keys, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -259,7 +259,7 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, values.size());
             logger.debug("mset, values={}, elapsedTime={}", values, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -269,19 +269,20 @@ public final class RedisImpl implements Redis {
         StopWatch watch = new StopWatch();
         byte[] expirationValue = encode(expiration.getSeconds());
         PoolItem<RedisConnection> item = pool.borrowItem();
+        int size = values.size();
         try {
             RedisConnection connection = item.resource;
             for (Map.Entry<String, byte[]> entry : values.entrySet()) {
                 connection.write(Protocol.Command.SETEX, encode(entry.getKey()), expirationValue, entry.getValue());
             }
-            connection.readAll(values.size());
+            connection.readAll(size);
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, size);
             logger.debug("mset, values={}, expiration={}, elapsedTime={}", LogParam.of(values), expiration, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
@@ -317,7 +318,7 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, count, 0);
             logger.debug("forEach, pattern={}, count={}, elapsedTime={}", pattern, count, elapsedTime);
         }
     }

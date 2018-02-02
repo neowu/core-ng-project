@@ -87,15 +87,15 @@ class ActionLogTest {
         PerformanceStat stat = log.performanceStats.get("db");
         assertEquals(1, stat.count);
         assertEquals(1000, stat.totalElapsed);
-        assertEquals(1, stat.readEntries);
-        assertEquals(0, stat.writeEntries);
+        assertEquals(1, stat.readEntries.intValue());
+        assertEquals(0, stat.writeEntries.intValue());
 
         log.track("db", 1000, 1, 1);
         stat = log.performanceStats.get("db");
         assertEquals(2, stat.count);
         assertEquals(2000, stat.totalElapsed);
-        assertEquals(2, stat.readEntries);
-        assertEquals(1, stat.writeEntries);
+        assertEquals(2, stat.readEntries.intValue());
+        assertEquals(1, stat.writeEntries.intValue());
     }
 
     private String longString(int length) {

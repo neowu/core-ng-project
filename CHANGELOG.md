@@ -1,6 +1,7 @@
 ## Change log
 ### 5.3.3 (2/1/2018 - )
 * api: support configure api client timeout and slow operation threshold (default is 30s and 15s)
+* log: add redis read/write entries tracking, index read/write entries as null if not set  
 
 ### 5.3.2 (1/29/2018 - 2/1/2018)
 * html: added "autofocus", "allowfullscreen", "hidden" & "async" to boolean attributes
