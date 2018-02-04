@@ -8,6 +8,7 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.ControllerActionBuilder;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.impl.web.management.APIController;
 import core.framework.impl.web.service.HTTPMethods;
 import core.framework.impl.web.service.WebServiceClient;
 import core.framework.impl.web.service.WebServiceClientBuilder;
@@ -56,6 +57,8 @@ public final class APIConfig {
                 throw new Error("failed to find impl method", e);
             }
         }
+
+        apiController().serviceInterfaces.add(serviceInterface);
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
@@ -101,9 +104,20 @@ public final class APIConfig {
         return state.httpClient;
     }
 
+    private APIController apiController() {
+        if (state.apiController == null) {
+            state.apiController = new APIController();
+            if (!context.isTest()) {
+                context.route(HTTPMethod.GET, "/_sys/api", state.apiController, true);
+            }
+        }
+        return state.apiController;
+    }
+
     public static class State {
         HTTPClient httpClient;
         Duration timeout = Duration.ofSeconds(30);
         Duration slowOperationThreshold = Duration.ofSeconds(15);
+        APIController apiController;
     }
 }

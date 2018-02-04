@@ -1,8 +1,9 @@
 ## Change log
-### 5.3.3 (2/1/2018 - )
+### 5.3.3 (2/1/2018 - 2/4/2018)
 * api: support configure api client timeout and slow operation threshold (default is 30s and 15s)
 * log: add redis read/write entries tracking, index read/write entries as null if not set  
 * search: update es to 6.1.3
+* api: add "_sys/api" to return typescript definition, used by frontend
 
 ### 5.3.2 (1/29/2018 - 2/1/2018)
 * html: added "autofocus", "allowfullscreen", "hidden" & "async" to boolean attributes
