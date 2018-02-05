@@ -2,7 +2,6 @@ package core.framework.impl.web.management;
 
 import core.framework.http.ContentType;
 import core.framework.impl.web.api.TypescriptDefinitionBuilder;
-import core.framework.util.Charsets;
 import core.framework.util.Lists;
 import core.framework.web.Controller;
 import core.framework.web.Request;
@@ -24,6 +23,6 @@ public class APIController implements Controller {
         serviceInterfaces.forEach(builder::addServiceInterface);
         String definition = builder.build();
 
-        return Response.text(definition).contentType(ContentType.create("application/x-typescript", Charsets.UTF_8));
+        return Response.text(definition).contentType(ContentType.APPLICATION_JAVASCRIPT);
     }
 }

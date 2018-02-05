@@ -23,7 +23,7 @@ final class MimeTypes {
         MIME_TYPES.put("gif", ContentType.create("image/gif", null));
         MIME_TYPES.put("jpg", ContentType.create("image/jpeg", null));
         MIME_TYPES.put("jpeg", ContentType.create("image/jpeg", null));
-        MIME_TYPES.put("png", ContentType.create("image/png", null));
+        MIME_TYPES.put("png", ContentType.IMAGE_PNG);
         MIME_TYPES.put("tiff", ContentType.create("image/tiff", null));
         MIME_TYPES.put("tif", ContentType.create("image/tiff", null));
         MIME_TYPES.put("ico", ContentType.create("image/x-icon", null));

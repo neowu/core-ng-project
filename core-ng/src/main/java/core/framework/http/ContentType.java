@@ -20,6 +20,7 @@ public final class ContentType {
     public static final ContentType APPLICATION_JSON = create("application/json", Charsets.UTF_8);
     public static final ContentType APPLICATION_JAVASCRIPT = create("application/javascript", Charsets.UTF_8);
     public static final ContentType APPLICATION_OCTET_STREAM = create("application/octet-stream", null);
+    public static final ContentType IMAGE_PNG = ContentType.create("image/png", null);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentType.class);
 
