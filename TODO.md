@@ -13,7 +13,6 @@
 * framework error, queue listener, background task error forward to kafka?
 * long running thread support or needed?
 * missing @PathParam, validation error not clear?
-* remove core.framework.test.EnvWebValidator? not needed, think about frontend-backend separation
 * is openAPI/swagger useful? remove if not, or just generate curl command doc 
 
 ### jdk 9 incompatible list

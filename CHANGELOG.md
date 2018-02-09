@@ -2,6 +2,7 @@
 ### 5.3.4 (2/5/2018 - )
 * http: add ContentType.IMAGE_PNG constant, (e.g. used by captcha controller)
 * api: change returned content type to javascript, make it easier to view by browser
+* test: removed core.framework.test.EnvWebValidator, since all static file/content will be handled in frontend project, copy the impl to your own project if you still need
 
 ### 5.3.3 (2/1/2018 - 2/4/2018)
 * api: support configure api client timeout and slow operation threshold (default is 30s and 15s)
