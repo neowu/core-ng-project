@@ -69,6 +69,5 @@ class RequestParserTest {
         parser.parseBody(request, exchange);
 
         assertThat(request.body()).hasValue(body);
-        assertThat(exchange.getAttachment(RequestBodyReader.REQUEST_BODY)).isNull();
     }
 }
