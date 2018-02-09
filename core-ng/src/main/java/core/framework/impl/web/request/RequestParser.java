@@ -4,7 +4,6 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogParam;
-import core.framework.log.Markers;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
@@ -96,18 +95,15 @@ public final class RequestParser {
         }
     }
 
-    private void parseBody(RequestImpl request, HttpServerExchange exchange) throws Throwable {
+    void parseBody(RequestImpl request, HttpServerExchange exchange) throws Throwable {
         RequestBodyReader.RequestBody body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
         if (body != null) {
-            if (request.contentType == null) return;    // pass if post empty body without content type
-
-            if (ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())) {
-                request.body = body.body();
+            request.body = body.body();
+            if (request.contentType != null
+                    && (ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())
+                    || ContentType.TEXT_XML.mediaType().equals(request.contentType.mediaType()))) {
                 logger.debug("[request] body={}", LogParam.of(request.body));
-            } else {
-                logger.warn(Markers.errorCode("UNSUPPORTED_CONTENT_TYPE"), "unsupported content type, contentType={}", request.contentType);
             }
-            exchange.removeAttachment(RequestBodyReader.REQUEST_BODY);
         } else {
             parseForm(request, exchange);
         }

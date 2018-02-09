@@ -53,6 +53,7 @@ public class HTTPServer {
                    .setServerOption(UndertowOptions.DECODE_URL, false)
                    .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, true)
+                   .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, 10L * 1024 * 1024)  // max post body is 10M
                    .setIoThreads(ioThreads)
                    .setWorkerThreads(workerThreads);
 

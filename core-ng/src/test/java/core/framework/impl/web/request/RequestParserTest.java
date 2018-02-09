@@ -1,6 +1,9 @@
 package core.framework.impl.web.request;
 
+import core.framework.http.ContentType;
+import core.framework.util.Strings;
 import core.framework.web.exception.MethodNotAllowedException;
+import io.undertow.server.HttpServerExchange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,5 +57,18 @@ class RequestParserTest {
         parser.parseQueryParams(request, params);
 
         assertEquals("value1 value2", request.queryParam("key").orElse(null));
+    }
+
+    @Test
+    void parseBody() throws Throwable {
+        RequestImpl request = new RequestImpl(null, null);
+        request.contentType = ContentType.TEXT_XML;
+        HttpServerExchange exchange = new HttpServerExchange(null, -1);
+        byte[] body = Strings.bytes("<xml/>");
+        exchange.putAttachment(RequestBodyReader.REQUEST_BODY, new RequestBodyReader.RequestBody(body, null));
+        parser.parseBody(request, exchange);
+
+        assertThat(request.body()).hasValue(body);
+        assertThat(exchange.getAttachment(RequestBodyReader.REQUEST_BODY)).isNull();
     }
 }
