@@ -1,11 +1,13 @@
 package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.http.AllowSourceIPInterceptor;
+import core.framework.impl.web.http.ClientIPInterceptor;
 import core.framework.impl.web.http.LimitRateInterceptor;
 import core.framework.util.Exceptions;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -13,6 +15,7 @@ import java.util.Set;
  * @author neo
  */
 public final class HTTPConfig {
+    private final Logger logger = LoggerFactory.getLogger(HTTPConfig.class);
     private final ModuleContext context;
     private final State state;
 
@@ -56,8 +59,14 @@ public final class HTTPConfig {
         context.httpServer.handler.requestParser.clientIPParser.maxForwardedIPs = maxIPs;
     }
 
-    public void allowSourceIPs(Set<String> sourceIPs) {
-        context.httpServer.handler.interceptors.add(new AllowSourceIPInterceptor(sourceIPs));
+    /**
+     * Set cidr blocks to filter ingress ip, e.g. 192.168.0.1/24 or 192.168.1.1/32 for single ip
+     *
+     * @param cidrs cidr block
+     */
+    public void allowClientIP(Set<String> cidrs) {
+        logger.info("only allow remote access from {}", cidrs);
+        context.httpServer.handler.interceptors.add(new ClientIPInterceptor(cidrs));
     }
 
     public void enableGZip() {

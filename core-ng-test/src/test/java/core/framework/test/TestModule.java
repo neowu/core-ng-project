@@ -39,7 +39,7 @@ public class TestModule extends AbstractTestModule {
         http().httpPort(8080);
         http().httpsPort(8443);
         http().enableGZip();
-        http().allowSourceIPs(Sets.newHashSet("127.0.0.1"));
+        http().allowClientIP(Sets.newHashSet("0.0.0.0/0"));
         http().maxForwardedIPs(2);
     }
 
