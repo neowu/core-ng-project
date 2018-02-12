@@ -53,6 +53,13 @@ class CIDRTest {
         assertThat(cidr.matches(address("192.168.1.2"))).isTrue();
         assertThat(cidr.matches(address("192.168.1.3"))).isTrue();
         assertThat(cidr.matches(address("192.168.1.4"))).isFalse();
+
+        cidr = new CIDR("119.137.52.0/22");
+
+        assertThat(cidr.matches(address("119.137.52.1"))).isTrue();
+        assertThat(cidr.matches(address("119.137.53.1"))).isTrue();
+        assertThat(cidr.matches(address("119.137.53.254"))).isTrue();
+        assertThat(cidr.matches(address("119.137.54.254"))).isTrue();
     }
 
     @Test
