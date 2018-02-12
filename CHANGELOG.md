@@ -1,6 +1,5 @@
 ## Change log
 ### 5.3.5 (2/12/2018 - )
-* http: added ContentType.APPLICATION_X_WWW_FORM_URLENCODED
 
 ### 5.3.4 (2/5/2018 - 2/11/2018)
 * http: add ContentType.IMAGE_PNG constant, (e.g. used by captcha controller)
