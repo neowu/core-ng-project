@@ -1,6 +1,7 @@
 package core.framework.http;
 
 import core.framework.util.Charsets;
+import core.framework.util.Encodings;
 import core.framework.util.Maps;
 
 import java.util.Map;
@@ -53,12 +54,16 @@ public final class HTTPRequest {
         return headers;
     }
 
+    public void header(String name, String value) {
+        headers.put(name, value);
+    }
+
     public void accept(ContentType contentType) {
         header(HTTPHeaders.ACCEPT, contentType.toString());
     }
 
-    public void header(String name, String value) {
-        headers.put(name, value);
+    public void basicAuth(String user, String password) {
+        header(HTTPHeaders.AUTHORIZATION, "Basic " + Encodings.base64(user + ':' + password));
     }
 
     public Map<String, String> params() {
