@@ -54,10 +54,34 @@ public class BeanFactory {
             T instance = construct(instanceClass);
             inject(instance);
             return instance;
-        } catch (InvocationTargetException e) {
-            throw Exceptions.error("failed to create bean, instanceClass={}, error={}", instanceClass, e.getTargetException().getMessage(), e);
         } catch (ReflectiveOperationException e) {
             throw new Error(e);
+        }
+    }
+
+    public <T> void inject(T instance) {
+        try {
+            Class<?> visitorType = instance.getClass();
+            while (!visitorType.equals(Object.class)) {
+                for (Field field : visitorType.getDeclaredFields()) {
+                    if (field.isAnnotationPresent(Inject.class)) {
+                        makeAccessible(field);
+                        field.set(instance, lookupValue(field));
+                    }
+                }
+                for (Method method : visitorType.getDeclaredMethods()) {
+                    if (method.isAnnotationPresent(Inject.class)) {
+                        makeAccessible(method);
+                        Object[] params = lookupParams(method);
+                        method.invoke(instance, params);
+                    }
+                }
+                visitorType = visitorType.getSuperclass();
+            }
+        } catch (IllegalAccessException e) {
+            throw new Error(e);
+        } catch (InvocationTargetException e) {
+            throw Exceptions.error("failed to inject bean, beanClass={}, error={}", instance.getClass().getCanonicalName(), e.getTargetException().getMessage(), e);
         }
     }
 
@@ -67,26 +91,6 @@ public class BeanFactory {
             throw Exceptions.error("instance class must have only one public default constructor, class={}, constructors={}", instanceClass.getCanonicalName(), Arrays.toString(constructors));
         }
         return instanceClass.getDeclaredConstructor().newInstance();
-    }
-
-    public <T> void inject(T instance) throws IllegalAccessException, InvocationTargetException {
-        Class<?> visitorType = instance.getClass();
-        while (!visitorType.equals(Object.class)) {
-            for (Field field : visitorType.getDeclaredFields()) {
-                if (field.isAnnotationPresent(Inject.class)) {
-                    makeAccessible(field);
-                    field.set(instance, lookupValue(field));
-                }
-            }
-            for (Method method : visitorType.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(Inject.class)) {
-                    makeAccessible(method);
-                    Object[] params = lookupParams(method);
-                    method.invoke(instance, params);
-                }
-            }
-            visitorType = visitorType.getSuperclass();
-        }
     }
 
     private Object lookupValue(Field field) {

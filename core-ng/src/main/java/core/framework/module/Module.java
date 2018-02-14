@@ -33,18 +33,20 @@ public abstract class Module {
 
     public <T> T bind(Class<T> instanceClass) {
         T instance = context.beanFactory.create(instanceClass);
-        return bind(instanceClass, null, instance);
+        context.beanFactory.bind(instanceClass, null, instance);
+        return instance;
     }
 
     public <T> T bind(T instance) {
         return bind(instance.getClass(), null, instance);
     }
 
-    public <T> T bind(Class<? super T> type, T instance) {
-        return bind(type, null, instance);
+    public <T> T bind(Class<? super T> instanceClass, T instance) {
+        return bind(instanceClass, null, instance);
     }
 
     public <T> T bind(Type type, String name, T instance) {
+        context.beanFactory.inject(instance);
         context.beanFactory.bind(type, name, instance);
         return instance;
     }

@@ -1,5 +1,6 @@
 ## Change log
 ### 5.3.5 (2/12/2018 - )
+* inject: bind(object) will inject object, to make it easier to register bean with both manual wired and autowired dependencies
 
 ### 5.3.4 (2/5/2018 - 2/11/2018)
 * http: add ContentType.IMAGE_PNG constant, (e.g. used by captcha controller)

@@ -5,6 +5,7 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.test.db.TestDBEntity;
 import core.framework.test.db.TestSequenceIdDBEntity;
+import core.framework.test.inject.TestBean;
 import core.framework.test.kafka.TestMessage;
 import core.framework.test.module.AbstractTestModule;
 import core.framework.test.mongo.TestMongoEntity;
@@ -18,6 +19,8 @@ import org.mockito.Mockito;
 public class TestModule extends AbstractTestModule {
     @Override
     protected void initialize() {
+        loadProperties("test.properties");
+
         overrideBinding(HTTPClient.class, Mockito.mock(HTTPClient.class));  // in test context, override binding is defined before actual binding
         bind(HTTPClient.class, new HTTPClientBuilder().build());
 
@@ -33,6 +36,8 @@ public class TestModule extends AbstractTestModule {
 
         site().session().redis("localhost");
         configureHTTP();
+
+        bind(new TestBean(requiredProperty("test.inject-test.property")));
     }
 
     private void configureHTTP() {
