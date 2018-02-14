@@ -1,6 +1,7 @@
 ## Change log
 ### 5.3.5 (2/12/2018 - )
 * inject: bind(object) will inject object, to make it easier to register bean with both manual wired and autowired dependencies
+* properties: removed support of loading properties from file path, for kube we will using env/jvm argument overriding
 
 ### 5.3.4 (2/5/2018 - 2/11/2018)
 * http: add ContentType.IMAGE_PNG constant, (e.g. used by captcha controller)
@@ -260,7 +261,7 @@
 * mongo: support bulk insert
 * kafka: add kafka support in order to replace rabbitMQ
 * properties: add _sys property controller for troubleshooting
-* properties/config: allow load properties from file path, for kube/docker support
+* properties: allow load properties from file path, for kube/docker support
 
 ### 4.8.6 (12/6/2016)
 * http: change https redirection to 301 instead of 308
