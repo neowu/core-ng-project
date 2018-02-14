@@ -101,6 +101,15 @@ class RedisOperationTest extends AbstractRedisOperationTest {
     }
 
     @Test
+    void increaseBy() {
+        response(":1\r\n");
+
+        redis.increaseBy("k1", 1);
+
+        assertRequestEquals("*3\r\n$6\r\nINCRBY\r\n$2\r\nk1\r\n$1\r\n1\r\n");
+    }
+
+    @Test
     void forEach() {
         response("*2\r\n$1\r\n0\r\n*2\r\n$2\r\nk1\r\n$2\r\nk2\r\n");
         List<String> keys = Lists.newArrayList();

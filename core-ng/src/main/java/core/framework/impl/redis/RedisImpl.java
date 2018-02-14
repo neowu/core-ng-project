@@ -207,6 +207,26 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
+    public long increaseBy(String key, long increment) {
+        StopWatch watch = new StopWatch();
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.write(Protocol.Command.INCRBY, encode(key), encode(increment));
+            return connection.readLong();
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("redis", elapsedTime, 0, 1);
+            logger.debug("increaseBy, key={}, increment={}, elapsedTime={}", key, increment, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
     public Map<String, String> multiGet(String... keys) {
         Map<String, byte[]> values = multiGetBytes(keys);
         Map<String, String> result = Maps.newHashMapWithExpectedSize(values.size());

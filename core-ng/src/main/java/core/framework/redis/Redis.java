@@ -22,6 +22,8 @@ public interface Redis {
 
     boolean del(String key);
 
+    long increaseBy(String key, long increment);
+
     Map<String, String> multiGet(String... keys);
 
     void multiSet(Map<String, String> values);

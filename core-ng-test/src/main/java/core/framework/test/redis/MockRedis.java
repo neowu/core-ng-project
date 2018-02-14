@@ -23,6 +23,12 @@ public final class MockRedis implements Redis {
 
     @Override
     public String get(String key) {
+        Value value = value(key);
+        if (value == null) return null;
+        return value.value;
+    }
+
+    private Value value(String key) {
         Value value = store.get(key);
         if (value == null) return null;
         if (value.type != ValueType.VALUE) throw Exceptions.error("invalid type, key={}, type={}", key, value.type);
@@ -30,7 +36,7 @@ public final class MockRedis implements Redis {
             store.remove(key);
             return null;
         }
-        return value.value;
+        return value;
     }
 
     @Override
@@ -70,6 +76,18 @@ public final class MockRedis implements Redis {
     public boolean del(String key) {
         Value removed = store.remove(key);
         return removed != null;
+    }
+
+    @Override
+    public long increaseBy(String key, long increment) {
+        Value value = value(key);
+        if (value == null) {
+            value = Value.value("0");   // according to https://redis.io/commands/incrby, set to 0 if key not exists
+            store.put(key, value);
+        }
+        long result = Long.parseLong(value.value) + increment;
+        value.value = String.valueOf(result);
+        return result;
     }
 
     @Override
@@ -120,9 +138,9 @@ public final class MockRedis implements Redis {
         }
 
         final ValueType type;
-        final String value;
         final Map<String, String> hash;
         final Set<String> set;
+        String value;
         Long expirationTime;
 
         private Value(ValueType type, String value, Map<String, String> hash, Set<String> set) {

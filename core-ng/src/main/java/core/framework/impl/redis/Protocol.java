@@ -72,7 +72,7 @@ final class Protocol {
     }
 
     enum Command {
-        GET, SET, SETEX, EXPIRE, DEL, MGET, MSET, SCAN, HGET, HGETALL, HSET, HMSET, HDEL, SADD, SMEMBERS, SISMEMBER, SREM;
+        GET, SET, SETEX, EXPIRE, DEL, INCRBY, MGET, MSET, SCAN, HGET, HGETALL, HSET, HMSET, HDEL, SADD, SMEMBERS, SISMEMBER, SREM;
         final byte[] value;
 
         Command() {

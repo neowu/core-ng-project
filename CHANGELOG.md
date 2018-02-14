@@ -1,4 +1,7 @@
 ## Change log
+### 5.3.6 (2/14/2018 - )
+* redis: support increaseBy
+
 ### 5.3.5 (2/12/2018 - 2/14/2018)
 * inject: bind(object) will inject object, to make it easier to register bean with both manual wired and autowired dependencies
 * properties: removed support of loading properties from file path, for kube we will using env/jvm argument overriding

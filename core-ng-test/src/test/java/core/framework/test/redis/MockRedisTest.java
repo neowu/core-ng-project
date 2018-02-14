@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -58,5 +59,16 @@ class MockRedisTest {
         });
 
         assertEquals(3, count.get());
+    }
+
+    @Test
+    void increaseBy() {
+        long result = redis.increaseBy("counter", 1);
+        assertThat(result).isEqualTo(1);
+        assertThat(redis.get("counter")).isEqualTo("1");
+
+        result = redis.increaseBy("counter", 5);
+        assertThat(result).isEqualTo(6);
+        assertThat(redis.get("counter")).isEqualTo("6");
     }
 }
