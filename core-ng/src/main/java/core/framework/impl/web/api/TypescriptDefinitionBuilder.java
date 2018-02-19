@@ -10,7 +10,6 @@ import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.reflect.Params;
 import core.framework.impl.web.service.HTTPMethods;
-import core.framework.util.ASCII;
 import core.framework.util.Maps;
 
 import java.lang.annotation.Annotation;
@@ -60,7 +59,7 @@ public class TypescriptDefinitionBuilder {
     public String build() {
         CodeBuilder builder = new CodeBuilder();
         namespaces.forEach((name, namespace) -> {
-            builder.append("namespace ").append(name).append(" {\n");
+            builder.append("export namespace ").append(name).append(" {\n");
             buildTypes(builder, namespace.typeDefinitions);
             buildEnums(builder, namespace.enumDefinitions);
             buildServices(builder, namespace.serviceDefinitions);
@@ -71,7 +70,7 @@ public class TypescriptDefinitionBuilder {
 
     private void buildServices(CodeBuilder builder, List<ServiceDefinition> serviceDefinitions) {
         for (ServiceDefinition definition : serviceDefinitions) {
-            builder.indent(1).append("export const ").append(ASCII.toLowerCase(definition.name.charAt(0)) + definition.name.substring(1)).append(" = {\n");
+            builder.indent(1).append("export const ").append(definition.name).append("Meta = {\n");
             for (ServiceDefinition.ServiceMethodDefinition method : definition.methods) {
                 builder.indent(2).append(method.name).append(": { method: \"").append(method.method.name()).append("\", path: \"").append(method.path).append("\" },\n");
             }

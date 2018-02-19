@@ -1,6 +1,7 @@
 ## Change log
 ### 5.3.6 (2/14/2018 - )
 * redis: support increaseBy
+* api: tweak api generation to fit client impl, refer to https://github.com/neowu/frontend-demo-project/blob/master/website-frontend-ts/src/service/user.ts as example
 
 ### 5.3.5 (2/12/2018 - 2/14/2018)
 * inject: bind(object) will inject object, to make it easier to register bean with both manual wired and autowired dependencies

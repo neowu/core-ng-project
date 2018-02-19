@@ -1,4 +1,4 @@
-namespace core.framework.impl.web.service {
+export namespace core.framework.impl.web.service {
     export interface TestWebService$TestSearchRequest {
         int_field: number;
         boolean_field?: boolean;
@@ -27,7 +27,7 @@ namespace core.framework.impl.web.service {
         A, B
     }
 
-    export const testWebService = {
+    export const TestWebServiceMeta = {
         search: {method: "GET", path: "/test"},
         batch: {method: "PUT", path: "/test"},
         get: {method: "GET", path: "/test/:id"},
