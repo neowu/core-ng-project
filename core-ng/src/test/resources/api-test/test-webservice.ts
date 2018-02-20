@@ -27,7 +27,7 @@ export namespace core.framework.impl.web.service {
         A, B
     }
 
-    export const TestWebServiceMeta = {
+    export const TestWebServiceMetadata = {
         search: {method: "GET", path: "/test"},
         batch: {method: "PUT", path: "/test"},
         get: {method: "GET", path: "/test/:id"},

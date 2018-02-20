@@ -16,6 +16,6 @@ class TypescriptDefinitionBuilderTest {
         builder.addServiceInterface(TestWebService.class);
         String definition = builder.build();
 
-        assertThat(definition).isEqualToIgnoringWhitespace(ClasspathResources.text("api-test/test-webservice.d.ts"));
+        assertThat(definition).isEqualToIgnoringWhitespace(ClasspathResources.text("api-test/test-webservice.ts"));
     }
 }

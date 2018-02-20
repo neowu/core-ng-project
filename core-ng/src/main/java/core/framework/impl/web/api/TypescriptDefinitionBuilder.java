@@ -70,7 +70,7 @@ public class TypescriptDefinitionBuilder {
 
     private void buildServices(CodeBuilder builder, List<ServiceDefinition> serviceDefinitions) {
         for (ServiceDefinition definition : serviceDefinitions) {
-            builder.indent(1).append("export const ").append(definition.name).append("Meta = {\n");
+            builder.indent(1).append("export const ").append(definition.name).append("Metadata = {\n");
             for (ServiceDefinition.ServiceMethodDefinition method : definition.methods) {
                 builder.indent(2).append(method.name).append(": { method: \"").append(method.method.name()).append("\", path: \"").append(method.path).append("\" },\n");
             }
