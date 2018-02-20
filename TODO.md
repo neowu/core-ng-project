@@ -13,7 +13,6 @@
 * framework error, queue listener, background task error forward to kafka?
 * long running thread support or needed?
 * missing @PathParam, validation error not clear?
-* is openAPI/swagger useful? remove if not, or just generate curl command doc 
 
 ### jdk 9 incompatible list
 * checkstyle: needs to filter out module-info.java

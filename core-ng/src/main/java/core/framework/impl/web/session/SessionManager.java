@@ -66,12 +66,12 @@ public final class SessionManager {
     }
 
     public void timeout(Duration timeout) {
-        if (timeout == null) throw Exceptions.error("timeout must not be null");
+        if (timeout == null) throw new Error("timeout must not be null");
         this.timeout = timeout;
     }
 
     public void cookie(String name, String domain) {
-        if (name == null) throw Exceptions.error("name must not be null");
+        if (name == null) throw new Error("name must not be null");
         sessionId = new CookieSpec(name).domain(domain).path("/").sessionScope().httpOnly().secure();
     }
 }

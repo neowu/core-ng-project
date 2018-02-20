@@ -14,15 +14,16 @@ import java.util.Set;
  * @author neo
  */
 public class LocalSessionStore implements SessionStore {
+    final Map<String, SessionValue> values = Maps.newConcurrentHashMap();
+
     private final Logger logger = LoggerFactory.getLogger(LocalSessionStore.class);
-    private final Map<String, SessionValue> values = Maps.newConcurrentHashMap();
 
     @Override
     public Map<String, String> getAndRefresh(String sessionId, Duration sessionTimeout) {
         SessionValue sessionValue = values.get(sessionId);
         if (sessionValue == null) return null;
 
-        if (Instant.now().isAfter(sessionValue.expiredTime)) {
+        if (Instant.now().isAfter(sessionValue.expirationTime)) {
             values.remove(sessionId);
             return null;
         }
@@ -54,18 +55,18 @@ public class LocalSessionStore implements SessionStore {
         logger.info("cleanup local session store");
         Instant now = Instant.now();
         values.forEach((id, session) -> {
-            if (now.isAfter(session.expiredTime)) {
+            if (now.isAfter(session.expirationTime)) {
                 values.remove(id);
             }
         });
     }
 
-    private static class SessionValue {
-        final Instant expiredTime;
+    static class SessionValue {
+        final Instant expirationTime;
         final Map<String, String> values;
 
-        SessionValue(Instant expiredTime, Map<String, String> values) {
-            this.expiredTime = expiredTime;
+        SessionValue(Instant expirationTime, Map<String, String> values) {
+            this.expirationTime = expirationTime;
             this.values = values;
         }
     }
