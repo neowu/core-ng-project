@@ -39,6 +39,7 @@ public class HTTPServerHandler implements HttpHandler {
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
+    private final HTTPServerHealthCheckHandler healthCheckHandler = new HTTPServerHealthCheckHandler();
 
     HTTPServerHandler(LogManager logManager, SiteManager siteManager) {
         this.logManager = logManager;
@@ -48,12 +49,22 @@ public class HTTPServerHandler implements HttpHandler {
     }
 
     @Override
-    public void handleRequest(HttpServerExchange exchange) throws Exception {
+    public void handleRequest(HttpServerExchange exchange) {
         if (exchange.isInIoThread()) {
             exchange.dispatch(this);
             return;
         }
 
+        String path = exchange.getRequestPath();
+        if (HTTPServerHealthCheckHandler.PATH.equals(path)) {      // not treat health-check as action
+            healthCheckHandler.handle(exchange.getResponseSender());
+            return;
+        }
+
+        handle(path, exchange);
+    }
+
+    private void handle(String path, HttpServerExchange exchange) {
         logManager.begin("=== http transaction begin ===");
         RequestImpl request = new RequestImpl(exchange, requestBeanMapper);
         try {
@@ -70,7 +81,7 @@ public class HTTPServerHandler implements HttpHandler {
 
             actionLog.refId(headers.getFirst(HTTPServerHandler.HEADER_REF_ID));
 
-            ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams, actionLog);
+            ControllerHolder controller = route.get(path, request.method(), request.pathParams, actionLog);
             actionLog.action(controller.action);
             actionLog.context("controller", controller.controllerInfo);
             logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());
