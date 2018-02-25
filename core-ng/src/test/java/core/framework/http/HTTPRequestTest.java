@@ -31,7 +31,7 @@ class HTTPRequestTest {
     @Test
     void method() {
         assertThat(new HTTPRequest(HTTPMethod.GET, "http://localhost/uri").method()).isEqualTo(HTTPMethod.GET);
-        assertThat(new HTTPRequest(HTTPMethod.POST, "http://localhost/uri")).isEqualTo(HTTPMethod.POST);
+        assertThat(new HTTPRequest(HTTPMethod.POST, "http://localhost/uri").method()).isEqualTo(HTTPMethod.POST);
     }
 
     @Test
