@@ -13,12 +13,10 @@ import core.framework.impl.web.ControllerClassValidator;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.ControllerInspector;
 import core.framework.impl.web.HTTPServer;
-import core.framework.impl.web.HTTPServerHealthCheckHandler;
 import core.framework.impl.web.management.MemoryUsageController;
 import core.framework.impl.web.management.PropertyController;
 import core.framework.impl.web.management.ThreadInfoController;
 import core.framework.impl.web.route.PathPatternValidator;
-import core.framework.util.Exceptions;
 import core.framework.util.Lists;
 import core.framework.web.Controller;
 import core.framework.web.WebContext;
@@ -91,7 +89,6 @@ public final class ModuleContext {
     }
 
     public void route(HTTPMethod method, String path, Controller controller, boolean skipInterceptor) {
-        if (HTTPServerHealthCheckHandler.PATH.equals(path)) throw Exceptions.error("health-check path is reserved by framework, path={}", path);
         new PathPatternValidator(path).validate();
         ControllerInspector inspector = new ControllerInspector(controller);
         new ControllerClassValidator(inspector.targetClass, inspector.targetMethod).validate();

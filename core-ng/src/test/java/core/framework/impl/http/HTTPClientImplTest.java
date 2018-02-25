@@ -4,6 +4,7 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPHeaders;
+import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.util.Charsets;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -46,7 +47,7 @@ class HTTPClientImplTest {
 
     @Test
     void httpRequest() {
-        HTTPRequest request = HTTPRequest.post("http://localhost/uri");
+        HTTPRequest request = new HTTPRequest(HTTPMethod.POST, "http://localhost/uri");
         request.addParam("query", "value");
         request.accept(ContentType.APPLICATION_JSON);
         request.body("text", ContentType.TEXT_PLAIN);

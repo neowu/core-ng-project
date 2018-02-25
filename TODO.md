@@ -20,3 +20,6 @@
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
 * alpine jdk 9 is not released yet, docker openjdk:jre-alpine image size is much smaller
 * can't publish with jdk 9 even with target java 8, https://github.com/neowu/core-ng-project/issues/8
+
+### jdk 10
+* remove core.framework.util.Threads.availableProcessors, check default behavior and -XX:ActiveProcessorCount

@@ -21,7 +21,7 @@ public final class Route {
     private final PathNode dynamicRoot = new PathNode();
 
     public void add(HTTPMethod method, String path, ControllerHolder controller) {
-        logger.info("add, route={} {}, controller={}", method, path, controller.controllerInfo);
+        logger.info("route, method={}, path={}, controller={}", method, path, controller.controllerInfo);
 
         URLHandler handler;
         if (path.contains("/:")) {

@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.entry;
 class HTTPRequestTest {
     @Test
     void body() {
-        HTTPRequest request = HTTPRequest.post("http://localhost/uri");
+        HTTPRequest request = new HTTPRequest(HTTPMethod.POST, "http://localhost/uri");
         request.body("text", ContentType.TEXT_PLAIN);
 
         assertThat(request.method()).isEqualTo(HTTPMethod.POST);
@@ -22,7 +22,7 @@ class HTTPRequestTest {
 
     @Test
     void accept() {
-        HTTPRequest request = HTTPRequest.patch("http://localhost/uri");
+        HTTPRequest request = new HTTPRequest(HTTPMethod.PATCH, "http://localhost/uri");
         request.accept(ContentType.APPLICATION_JSON);
 
         assertThat(request.headers().get(HTTPHeaders.ACCEPT)).isEqualTo(ContentType.APPLICATION_JSON.toString());
@@ -30,16 +30,13 @@ class HTTPRequestTest {
 
     @Test
     void method() {
-        assertThat(HTTPRequest.get("http://localhost/uri").method()).isEqualTo(HTTPMethod.GET);
-        assertThat(HTTPRequest.post("http://localhost/uri").method()).isEqualTo(HTTPMethod.POST);
-        assertThat(HTTPRequest.put("http://localhost/uri").method()).isEqualTo(HTTPMethod.PUT);
-        assertThat(HTTPRequest.delete("http://localhost/uri").method()).isEqualTo(HTTPMethod.DELETE);
-        assertThat(HTTPRequest.patch("http://localhost/uri").method()).isEqualTo(HTTPMethod.PATCH);
+        assertThat(new HTTPRequest(HTTPMethod.GET, "http://localhost/uri").method()).isEqualTo(HTTPMethod.GET);
+        assertThat(new HTTPRequest(HTTPMethod.POST, "http://localhost/uri")).isEqualTo(HTTPMethod.POST);
     }
 
     @Test
     void basicAuth() {  // refer to https://en.wikipedia.org/wiki/Basic_access_authentication
-        HTTPRequest request = HTTPRequest.get("http://localhost/uri");
+        HTTPRequest request = new HTTPRequest(HTTPMethod.GET, "http://localhost/uri");
         request.basicAuth("Aladdin", "OpenSesame");
 
         assertThat(request.headers()).contains(entry(HTTPHeaders.AUTHORIZATION, "Basic QWxhZGRpbjpPcGVuU2VzYW1l"));
