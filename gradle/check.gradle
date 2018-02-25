@@ -26,7 +26,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/pmd/rule-set.xml')
-        toolVersion = '6.0.1'
+        toolVersion = '6.1.0'
         consoleOutput = true
     }
 
@@ -34,7 +34,7 @@ subprojects {
         effort = 'max'
         reportLevel = 'low'
         excludeFilter = rootProject.file('gradle/spotbugs/exclude-filter.xml')
-        toolVersion = '3.1.1'
+        toolVersion = '3.1.2'
     }
 
     tasks.withType(com.github.spotbugs.SpotBugsTask) {
