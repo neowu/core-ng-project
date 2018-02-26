@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.mongo.MongoImpl;
 import core.framework.mongo.Mongo;
@@ -20,7 +21,7 @@ public final class MongoConfig {
     MongoConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        state = context.config.mongo(name);
+        state = context.config.state("mongo:" + name, () -> new State(name));
 
         if (state.mongo == null) {
             state.mongo = createMongo();
@@ -74,7 +75,7 @@ public final class MongoConfig {
         state.entityAdded = true;
     }
 
-    public static class State {
+    public static class State implements Config.State {
         final String name;
         MongoImpl mongo;
         String uri;
@@ -84,6 +85,7 @@ public final class MongoConfig {
             this.name = name;
         }
 
+        @Override
         public void validate() {
             if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
             if (!entityAdded)

@@ -3,6 +3,7 @@ package core.framework.module;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.kafka.Kafka;
 import core.framework.impl.kafka.KafkaMessagePublisher;
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.management.KafkaController;
 import core.framework.kafka.BulkMessageHandler;
@@ -28,7 +29,7 @@ public final class KafkaConfig {
     KafkaConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        state = context.config.kafka(name);
+        state = context.config.state("kafka:" + name, () -> new State(name));
 
         if (state.kafka == null) {
             state.kafka = createKafka(context, name);
@@ -104,7 +105,7 @@ public final class KafkaConfig {
         state.kafka.minPollMaxWaitTime = maxWaitTime;
     }
 
-    public static class State {
+    public static class State implements Config.State {
         final String name;
         Kafka kafka;
         boolean handlerAdded;
@@ -113,6 +114,7 @@ public final class KafkaConfig {
             this.name = name;
         }
 
+        @Override
         public void validate() {
             if (kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured", name == null ? "" : name);
             if (!handlerAdded)

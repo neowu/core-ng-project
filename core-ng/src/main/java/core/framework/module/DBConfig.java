@@ -6,6 +6,7 @@ import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.impl.db.DatabaseImpl;
 import core.framework.impl.db.Vendor;
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.resource.PoolMetrics;
 import core.framework.util.Exceptions;
@@ -27,7 +28,7 @@ public final class DBConfig {
     DBConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        state = context.config.db(name);
+        state = context.config.state("db:" + name, () -> new State(name));
 
         if (state.database == null) {
             state.database = createDatabase();
@@ -131,9 +132,9 @@ public final class DBConfig {
         state.entityClasses.add(entityClass);
     }
 
-    public static class State {
-        public final List<Class<?>> entityClasses = Lists.newArrayList();
+    public static class State implements Config.State {
         final String name;
+        public final List<Class<?>> entityClasses = Lists.newArrayList();
         public DatabaseImpl database;
         String url;
         boolean entityAdded;
@@ -142,6 +143,7 @@ public final class DBConfig {
             this.name = name;
         }
 
+        @Override
         public void validate() {
             if (url == null) throw Exceptions.error("db({}).url() must be configured", name == null ? "" : name);
             if (!entityAdded)

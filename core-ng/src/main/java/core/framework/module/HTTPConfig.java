@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.http.ClientIPInterceptor;
 import core.framework.impl.web.http.LimitRateInterceptor;
@@ -21,7 +22,7 @@ public final class HTTPConfig {
 
     HTTPConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.http();
+        state = context.config.state("http", State::new);
     }
 
     public void httpPort(int port) {
@@ -73,10 +74,11 @@ public final class HTTPConfig {
         context.httpServer.gzip = true;
     }
 
-    public static class State {
+    public static class State implements Config.State {
         LimitRateInterceptor limitRateInterceptor;
         boolean limitRateGroupAdded;
 
+        @Override
         public void validate() {
             if (limitRateInterceptor != null && !limitRateGroupAdded) {
                 throw new Error("limitRate() is configured but no group added, please remove unnecessary config");

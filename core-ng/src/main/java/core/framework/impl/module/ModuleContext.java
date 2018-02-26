@@ -37,7 +37,7 @@ public final class ModuleContext {
     public final LogManager logManager;
     public final MockFactory mockFactory;
     public final Stat stat = new Stat();
-    public final ConfigState config = new ConfigState();
+    public final Config config = new Config();
     private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext(BeanFactory beanFactory, MockFactory mockFactory) {

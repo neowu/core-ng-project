@@ -32,7 +32,7 @@ public final class APIConfig {
 
     APIConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.api();
+        state = context.config.state("api", State::new);
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {

@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
@@ -16,7 +17,7 @@ public final class RedisConfig {
 
     RedisConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.redis();
+        state = context.config.state("redis", State::new);
 
         if (state.redis == null) {
             state.redis = createRedis();
@@ -63,10 +64,11 @@ public final class RedisConfig {
         }
     }
 
-    public static class State {
+    public static class State implements Config.State {
         String host;
         Redis redis;
 
+        @Override
         public void validate() {
             if (host == null) throw new Error("redis().host() must be configured");
         }

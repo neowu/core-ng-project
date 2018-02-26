@@ -23,7 +23,7 @@ public final class SchedulerConfig {
     private final State state;
 
     SchedulerConfig(ModuleContext context) {
-        state = context.config.scheduler();
+        state = context.config.state("scheduler", State::new);
         if (state.scheduler == null) {
             state.scheduler = createScheduler(context);
         }

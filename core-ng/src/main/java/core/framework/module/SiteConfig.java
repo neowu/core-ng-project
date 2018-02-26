@@ -27,7 +27,7 @@ public final class SiteConfig {
 
     SiteConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.site();
+        state = context.config.state("site", State::new);
     }
 
     public SessionConfig session() {

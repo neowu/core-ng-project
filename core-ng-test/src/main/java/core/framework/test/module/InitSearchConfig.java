@@ -2,7 +2,7 @@ package core.framework.test.module;
 
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.search.ElasticSearchTypeImpl;
-import core.framework.search.ElasticSearch;
+import core.framework.module.SearchConfig;
 import core.framework.search.ElasticSearchType;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Types;
@@ -12,22 +12,22 @@ import core.framework.util.Types;
  */
 public final class InitSearchConfig {
     private final ModuleContext context;
-    private final ElasticSearch search;
+    private final SearchConfig.State state;
 
     InitSearchConfig(ModuleContext context) {
         this.context = context;
-        if (context.config.search().search == null) {
+        state = context.config.state("elasticsearch", SearchConfig.State::new);
+        if (state.search == null) {
             throw new Error("search() is not configured");
         }
-        search = context.config.search().search;
     }
 
     public void createIndex(String index, String sourcePath) {
-        search.createIndex(index, ClasspathResources.text(sourcePath));
+        state.search.createIndex(index, ClasspathResources.text(sourcePath));
     }
 
     public void createIndexTemplate(String name, String sourcePath) {
-        search.createIndexTemplate(name, ClasspathResources.text(sourcePath));
+        state.search.createIndexTemplate(name, ClasspathResources.text(sourcePath));
     }
 
     public <T> ElasticSearchTypeImpl<T> type(Class<T> documentClass) {
@@ -35,6 +35,6 @@ public final class InitSearchConfig {
     }
 
     public void flush(String index) {
-        search.flush(index);
+        state.search.flush(index);
     }
 }

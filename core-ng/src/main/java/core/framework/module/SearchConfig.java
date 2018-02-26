@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.search.ElasticSearchImpl;
 import core.framework.impl.search.log.ESLoggerContextFactory;
@@ -20,7 +21,7 @@ public final class SearchConfig {
 
     SearchConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.search();
+        state = context.config.state("elasticsearch", State::new);
 
         if (state.search == null) {
             state.search = createElasticSearch(context);
@@ -67,10 +68,11 @@ public final class SearchConfig {
         context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), null, searchType);
     }
 
-    public static class State {
+    public static class State implements Config.State {
         public ElasticSearchImpl search;
         String host;
 
+        @Override
         public void validate() {
             if (host == null) throw new Error("search().host() must be configured");
         }

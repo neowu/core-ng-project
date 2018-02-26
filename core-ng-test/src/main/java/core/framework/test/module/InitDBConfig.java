@@ -1,8 +1,8 @@
 package core.framework.test.module;
 
-import core.framework.db.Database;
 import core.framework.db.Repository;
 import core.framework.impl.module.ModuleContext;
+import core.framework.module.DBConfig;
 import core.framework.test.db.EntitySchemaGenerator;
 import core.framework.test.db.SQLScriptRunner;
 import core.framework.util.ClasspathResources;
@@ -15,27 +15,27 @@ import java.util.List;
  * @author neo
  */
 public final class InitDBConfig {
+    private final DBConfig.State state;
     private final ModuleContext context;
     private final String name;
-    private final Database database;
 
     InitDBConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        if (context.config.db(name).database == null) {
+        state = context.config.state("db:" + name, () -> new DBConfig.State(name));
+        if (state.database == null) {
             throw Exceptions.error("db({}) is not configured", name == null ? "" : name);
         }
-        database = context.beanFactory.bean(Database.class, name);
     }
 
     public void runScript(String scriptPath) {
-        new SQLScriptRunner(database, ClasspathResources.text(scriptPath)).run();
+        new SQLScriptRunner(state.database, ClasspathResources.text(scriptPath)).run();
     }
 
     public void createSchema() {
-        List<Class<?>> entityClasses = context.config.db(name).entityClasses;
+        List<Class<?>> entityClasses = state.entityClasses;
         for (Class<?> entityClass : entityClasses) {
-            new EntitySchemaGenerator(database, entityClass).generate();
+            new EntitySchemaGenerator(state.database, entityClass).generate();
         }
     }
 

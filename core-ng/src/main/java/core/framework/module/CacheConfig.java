@@ -6,6 +6,7 @@ import core.framework.impl.cache.CacheManager;
 import core.framework.impl.cache.CacheStore;
 import core.framework.impl.cache.LocalCacheStore;
 import core.framework.impl.cache.RedisCacheStore;
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
@@ -47,7 +48,7 @@ public final class CacheConfig {
 
     CacheConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.cache();
+        state = context.config.state("cache", State::new);
     }
 
     public void local() {
@@ -105,9 +106,10 @@ public final class CacheConfig {
         add(null, valueType, duration);
     }
 
-    public static class State {
+    public static class State implements Config.State {
         CacheManager cacheManager;
 
+        @Override
         public void validate() {
             if (cacheManager.caches().isEmpty()) {
                 throw new Error("cache() is configured but no cache added, please remove unnecessary config");
