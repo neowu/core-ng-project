@@ -158,7 +158,7 @@ public class TypescriptDefinitionBuilder {
             definition.constants.addAll(constants);
             return definition;
         });
-        return typeName;
+        return enumClass.getName();
     }
 
     private void parseParams(ServiceDefinition.ServiceMethodDefinition methodDefinition, Method method) {

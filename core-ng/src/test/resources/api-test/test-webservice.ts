@@ -15,7 +15,7 @@ export namespace core.framework.impl.web.service {
 
     export interface TestWebService$TestItem {
         zoned_date_time_field?: Date;
-        enum_field?: TestWebService$TestEnum;
+        enum_field?: core.framework.impl.web.service.TestWebService$TestEnum;
     }
 
     export interface TestWebService$TestRequest {
