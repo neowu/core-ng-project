@@ -107,9 +107,7 @@ public final class APIConfig {
     private APIController apiController() {
         if (state.apiController == null) {
             state.apiController = new APIController();
-            if (!context.isTest()) {
-                context.route(HTTPMethod.GET, "/_sys/api", state.apiController, true);
-            }
+            context.route(HTTPMethod.GET, "/_sys/api", state.apiController, true);
         }
         return state.apiController;
     }

@@ -57,9 +57,8 @@ public final class CacheConfig {
 
         logger.info("create local cache store");
         LocalCacheStore cacheStore = new LocalCacheStore();
-        if (!context.isTest()) {
-            context.backgroundTask().scheduleWithFixedDelay(cacheStore::cleanup, Duration.ofMinutes(30));
-        }
+        context.backgroundTask().scheduleWithFixedDelay(cacheStore::cleanup, Duration.ofMinutes(30));
+
         configureCacheManager(cacheStore);
     }
 
@@ -85,12 +84,11 @@ public final class CacheConfig {
 
     private void configureCacheManager(CacheStore cacheStore) {
         state.cacheManager = new CacheManager(cacheStore);
-        if (!context.isTest()) {
-            CacheController controller = new CacheController(state.cacheManager);
-            context.route(HTTPMethod.GET, "/_sys/cache", controller::list, true);
-            context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", controller::get, true);
-            context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete, true);
-        }
+
+        CacheController controller = new CacheController(state.cacheManager);
+        context.route(HTTPMethod.GET, "/_sys/cache", controller::list, true);
+        context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", controller::get, true);
+        context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete, true);
     }
 
     public void add(String name, Type valueType, Duration duration) {

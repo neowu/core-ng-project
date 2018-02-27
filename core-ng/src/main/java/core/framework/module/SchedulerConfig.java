@@ -63,13 +63,13 @@ public final class SchedulerConfig {
 
     private Scheduler createScheduler(ModuleContext context) {
         Scheduler scheduler = new Scheduler(context.logManager);
-        if (!context.isTest()) {
-            context.startupHook.add(scheduler::start);
-            context.shutdownHook.add(scheduler::stop);
-            SchedulerController schedulerController = new SchedulerController(scheduler);
-            context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);
-            context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
-        }
+        context.startupHook.add(scheduler::start);
+        context.shutdownHook.add(scheduler::stop);
+
+        SchedulerController schedulerController = new SchedulerController(scheduler);
+        context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);
+        context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
+
         return scheduler;
     }
 

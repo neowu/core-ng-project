@@ -45,18 +45,14 @@ public final class ModuleContext {
         this.mockFactory = mockFactory;
 
         this.logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
-        if (!isTest()) {
-            startupHook.add(logManager::start);
-            shutdownHook.add(logManager::stop);
-        }
+        startupHook.add(logManager::start);
+        shutdownHook.add(logManager::stop);
 
         httpServer = new HTTPServer(logManager);
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
-        if (!isTest()) {
-            startupHook.add(httpServer::start);
-            shutdownHook.add(httpServer::stop);
-        }
+        startupHook.add(httpServer::start);
+        shutdownHook.add(httpServer::stop);
 
         Executor executor;
         if (!isTest()) {
@@ -67,23 +63,19 @@ public final class ModuleContext {
         }
         beanFactory.bind(Executor.class, null, executor);
 
-        if (!isTest()) {
-            route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
-            ThreadInfoController threadInfoController = new ThreadInfoController();
-            route(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage, true);
-            route(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump, true);
-            PropertyController propertyController = new PropertyController(propertyManager);
-            route(HTTPMethod.GET, "/_sys/property", propertyController, true);
-        }
+        route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
+        ThreadInfoController threadInfoController = new ThreadInfoController();
+        route(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage, true);
+        route(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump, true);
+        PropertyController propertyController = new PropertyController(propertyManager);
+        route(HTTPMethod.GET, "/_sys/property", propertyController, true);
     }
 
     public BackgroundTaskExecutor backgroundTask() {
         if (backgroundTask == null) {
             backgroundTask = new BackgroundTaskExecutor();
-            if (!isTest()) {
-                startupHook.add(backgroundTask::start);
-                shutdownHook.add(backgroundTask::stop);
-            }
+            startupHook.add(backgroundTask::start);
+            shutdownHook.add(backgroundTask::stop);
         }
         return backgroundTask;
     }

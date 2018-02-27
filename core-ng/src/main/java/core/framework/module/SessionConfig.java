@@ -32,9 +32,7 @@ public final class SessionConfig {
     public void local() {
         logger.info("create local session provider");
         LocalSessionStore sessionStore = new LocalSessionStore();
-        if (!context.isTest()) {
-            context.backgroundTask().scheduleWithFixedDelay(sessionStore::cleanup, Duration.ofMinutes(30));
-        }
+        context.backgroundTask().scheduleWithFixedDelay(sessionStore::cleanup, Duration.ofMinutes(30));
         context.httpServer.siteManager.sessionManager.sessionStore(sessionStore);
     }
 

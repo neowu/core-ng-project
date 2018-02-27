@@ -38,10 +38,8 @@ public final class DBConfig {
     private DatabaseImpl createDatabase() {
         DatabaseImpl database = new DatabaseImpl("db" + (name == null ? "" : "-" + name));
         context.shutdownHook.add(database::close);
-        if (!context.isTest()) {
-            context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(30));
-            context.stat.metrics.add(new PoolMetrics(database.pool));
-        }
+        context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(30));
+        context.stat.metrics.add(new PoolMetrics(database.pool));
         context.beanFactory.bind(Database.class, name, database);
         return database;
     }
@@ -133,8 +131,8 @@ public final class DBConfig {
     }
 
     public static class State implements Config.State {
-        final String name;
         public final List<Class<?>> entityClasses = Lists.newArrayList();
+        final String name;
         public DatabaseImpl database;
         String url;
         boolean entityAdded;
