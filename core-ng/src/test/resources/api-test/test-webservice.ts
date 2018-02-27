@@ -37,11 +37,16 @@ export namespace core.framework.impl.web.service {
     };
 
     export interface TestWebService {
-        search: (request: core.framework.impl.web.service.TestWebService$TestSearchRequest) => Promise<core.framework.impl.web.service.TestWebService$TestResponse>;
-        batch: (request: core.framework.impl.web.service.TestWebService$TestRequest[]) => Promise<core.framework.impl.web.service.TestWebService$TestResponse[]>;
-        get: (id: number) => Promise<core.framework.impl.web.service.TestWebService$TestResponse | null>;
-        create: (id: number, request: core.framework.impl.web.service.TestWebService$TestRequest) => Promise<void>;
-        delete: (id: string) => Promise<void>;
-        patch: (id: number, request: core.framework.impl.web.service.TestWebService$TestRequest) => Promise<void>;
+        search(request: core.framework.impl.web.service.TestWebService$TestSearchRequest): Promise<core.framework.impl.web.service.TestWebService$TestResponse>;
+
+        batch(request: core.framework.impl.web.service.TestWebService$TestRequest[]): Promise<core.framework.impl.web.service.TestWebService$TestResponse[]>;
+
+        get(id: number): Promise<core.framework.impl.web.service.TestWebService$TestResponse | null>;
+
+        create(id: number, request: core.framework.impl.web.service.TestWebService$TestRequest): Promise<void>;
+
+        delete(id: string): Promise<void>;
+
+        patch(id: number, request: core.framework.impl.web.service.TestWebService$TestRequest): Promise<void>;
     }
 }

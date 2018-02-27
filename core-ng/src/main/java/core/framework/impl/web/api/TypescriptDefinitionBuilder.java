@@ -78,9 +78,9 @@ public class TypescriptDefinitionBuilder {
 
             builder.indent(1).append("export interface ").append(definition.name).append(" {\n");
             for (ServiceDefinition.ServiceMethodDefinition method : definition.methods) {
-                builder.indent(2).append(method.name).append(": (");
+                builder.indent(2).append(method.name).append("(");
                 builder.append(String.join(", ", method.params.entrySet().stream().map(entry -> entry.getKey() + ": " + entry.getValue()).collect(Collectors.toList())));
-                builder.append(") => Promise<").append(method.responseType).append(">;\n");
+                builder.append("): Promise<").append(method.responseType).append(">;\n");
             }
             builder.indent(1).append("}\n");
         }
