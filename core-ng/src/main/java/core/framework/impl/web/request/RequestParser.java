@@ -7,6 +7,7 @@ import core.framework.impl.log.LogParam;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
+import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.MethodNotAllowedException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
@@ -26,6 +27,7 @@ import java.util.Map;
  * @author neo
  */
 public final class RequestParser {
+    private static final int MAX_URL_LENGTH = 1000;
     public final ClientIPParser clientIPParser = new ClientIPParser();
 
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
@@ -157,7 +159,7 @@ public final class RequestParser {
         return exchange.getDestinationAddress().getPort();
     }
 
-    private String requestURL(RequestImpl request, HttpServerExchange exchange) {
+    String requestURL(RequestImpl request, HttpServerExchange exchange) {
         StringBuilder builder = new StringBuilder();
 
         if (exchange.isHostIncludedInRequestURI()) {    // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
@@ -180,6 +182,8 @@ public final class RequestParser {
         String queryString = exchange.getQueryString();
         if (!Strings.isEmpty(queryString)) builder.append('?').append(queryString);
 
-        return builder.toString();
+        String requestURL = builder.toString();
+        if (requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(Strings.format("requestURL is too long, requestURL={}...(truncated)", requestURL.substring(0, MAX_URL_LENGTH / 8)));
+        return requestURL;
     }
 }

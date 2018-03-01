@@ -2,8 +2,10 @@ package core.framework.impl.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.util.Strings;
+import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.MethodNotAllowedException;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.Headers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +58,7 @@ class RequestParserTest {
         params.get("key").add(URLEncoder.encode("value1 value2", "UTF-8"));     // undertow url decoding is disabled in core.framework.impl.web.HTTPServer.start, so the parser must decode all query param
         parser.parseQueryParams(request, params);
 
-        assertEquals("value1 value2", request.queryParam("key").orElse(null));
+        assertThat(request.queryParam("key")).hasValue("value1 value2");
     }
 
     @Test
@@ -69,5 +71,38 @@ class RequestParserTest {
         parser.parseBody(request, exchange);
 
         assertThat(request.body()).hasValue(body);
+    }
+
+    @Test
+    void requestURL() {
+        HttpServerExchange exchange = new HttpServerExchange(null, -1);
+        exchange.getRequestHeaders().put(Headers.HOST, "localhost");
+        exchange.setRequestURI("/path");
+        exchange.setQueryString("key=value");
+        RequestImpl request = new RequestImpl(exchange, null);
+        request.scheme = "https";
+        request.port = 443;
+        String requestURL = parser.requestURL(request, exchange);
+
+        assertThat(requestURL).isEqualTo("https://localhost/path?key=value");
+    }
+
+    @Test
+    void requestURLIsTooLong() {
+        HttpServerExchange exchange = new HttpServerExchange(null, -1);
+        exchange.getRequestHeaders().put(Headers.HOST, "localhost");
+        exchange.setRequestURI("/path");
+
+        StringBuilder builder = new StringBuilder(1000);
+        for (int i = 0; i < 100; i++) {
+            builder.append("1234567890");
+        }
+        exchange.setQueryString(builder.toString());
+        RequestImpl request = new RequestImpl(exchange, null);
+        request.scheme = "http";
+        request.port = 80;
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> parser.requestURL(request, exchange));
+
+        assertThat(exception.getMessage()).contains("requestURL is too long");
     }
 }

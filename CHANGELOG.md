@@ -1,4 +1,7 @@
 ## Change log
+### 5.3.8 (2/28/2018 - )
+* http: limit max requestURL length to 1000
+
 ### 5.3.7 (2/24/2018 - 2/27/2018)
 * http: not handling /health-check as action anymore, means /health-check will not be part of action log, to reduce noisy in kube env
 * httpClient: removed HTTPRequest static method shortcut, use new HTTPRequest(method, uri) instead, to enforce consistent api style 
