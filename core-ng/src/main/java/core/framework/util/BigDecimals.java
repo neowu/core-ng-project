@@ -18,15 +18,15 @@ public final class BigDecimals {
         this.decimal = decimal;
     }
 
-    public boolean isGreaterThan(BigDecimal decimal) {
+    public boolean greaterThan(BigDecimal decimal) {
         return this.decimal.compareTo(decimal) > ZERO;
     }
 
-    public boolean isSmallerThan(BigDecimal decimal) {
+    public boolean smallerThan(BigDecimal decimal) {
         return this.decimal.compareTo(decimal) < ZERO;
     }
 
-    public boolean isEqualTo(BigDecimal decimal) {
+    public boolean equalTo(BigDecimal decimal) {
         return this.decimal.compareTo(decimal) == ZERO;
     }
 }
