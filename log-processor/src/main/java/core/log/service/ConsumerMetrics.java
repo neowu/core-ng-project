@@ -17,10 +17,16 @@ public class ConsumerMetrics implements Metrics {
 
     @Override
     public void collect(Map<String, Double> stats) {
-        if (recordsLagMax != null) stats.put("kafka_consumer_records_max_lag", (Double) recordsLagMax.metricValue());
-        if (recordsConsumedRate != null) stats.put("kafka_consumer_records_consumed_rate", (Double) recordsConsumedRate.metricValue());
-        if (bytesConsumedRate != null) stats.put("kafka_consumer_bytes_consumed_rate", (Double) bytesConsumedRate.metricValue());
-        if (fetchRate != null) stats.put("kafka_consumer_fetch_rate", (Double) fetchRate.metricValue());
+        if (recordsLagMax != null) stats.put("kafka_consumer_records_max_lag", stat(recordsLagMax.metricValue()));
+        if (recordsConsumedRate != null) stats.put("kafka_consumer_records_consumed_rate", stat(recordsConsumedRate.metricValue()));
+        if (bytesConsumedRate != null) stats.put("kafka_consumer_bytes_consumed_rate", stat(bytesConsumedRate.metricValue()));
+        if (fetchRate != null) stats.put("kafka_consumer_fetch_rate", stat(fetchRate.metricValue()));
+    }
+
+    Double stat(Object value) {    // elasticsearch scaled_float requires finite value
+        Double stat = (Double) value;
+        if (Double.isFinite(stat)) return stat;
+        return 0d;
     }
 
     void set(Map<MetricName, ? extends Metric> kafkaMetrics) {
