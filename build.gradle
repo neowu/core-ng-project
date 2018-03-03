@@ -10,10 +10,7 @@ def elasticVersion = '6.2.2'
 def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.0.0'
 def jacksonVersion = '2.9.4'
-
-def testLib = ['org.junit.jupiter:junit-jupiter-api:5.0.3',
-               'org.mockito:mockito-core:2.15.0',
-               'org.assertj:assertj-core:3.9.0']
+def junitVersion = '5.1.0'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -34,7 +31,10 @@ project(':core-ng') {
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
         compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"        // used by elasticsearch
-        testImplementation testLib
+        testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+        testImplementation 'org.mockito:mockito-core:2.15.0'
+        testImplementation 'org.assertj:assertj-core:3.9.0'
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
     }
 }
@@ -43,7 +43,10 @@ project(':core-ng-test') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api testLib
+        api "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+        api 'org.mockito:mockito-core:2.15.0'
+        api 'org.assertj:assertj-core:3.9.0'
+        implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "com.github.fakemongo:fongo:2.1.0@jar"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"

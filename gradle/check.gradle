@@ -45,14 +45,10 @@ subprojects {
     }
 
     jacoco {
-        toolVersion = '0.7.9'
-        applyTo junitPlatformTest
+        toolVersion = '0.8.0'
     }
 
     jacocoTestReport {
-        // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport
-        executionData = fileTree(rootDir).include('build/**/jacoco/junitPlatformTest.exec')
-
         reports {
             xml.enabled = true
             xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")

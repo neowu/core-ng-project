@@ -13,6 +13,7 @@
 * framework error, queue listener, background task error forward to kafka?
 * long running thread support or needed?
 * missing @PathParam, validation error not clear?
+* remove log to file function, since now docker/kube is probably THE way to deploy, prefer write to stdout/stderr rather than file 
 
 ### jdk 9 incompatible list
 * checkstyle: needs to filter out module-info.java
