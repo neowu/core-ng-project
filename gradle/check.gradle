@@ -49,6 +49,9 @@ subprojects {
     }
 
     jacocoTestReport {
+        // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport
+        executionData = fileTree(rootDir).include('build/**/jacoco/test.exec')
+
         reports {
             xml.enabled = true
             xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")
