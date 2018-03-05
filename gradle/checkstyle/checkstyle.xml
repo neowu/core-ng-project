@@ -60,7 +60,9 @@
         <!--Miscellaneous:-->
         <module name="Indentation"/>
         <module name="OuterTypeFilename"/>
-        <module name="UncommentedMain"/>        <!--Detects uncommented main methods.-->
+        <module name="UncommentedMain">         <!--Detects uncommented main methods.-->
+            <property name="excludedClasses" value="\.Main$"/>
+        </module>
 
         <!--Modifiers:-->
         <module name="RedundantModifier"/>      <!--Checks for redundant modifiers in interface and annotation definitions, final modifier on methods of final classes, inner interface declarations that are declared as static, non public class constructors and enum constructors, nested enum definitions that are declared as static.-->
@@ -102,11 +104,8 @@
         <module name="EmptyForInitializerPad"/>
         <module name="GenericWhitespace"/>          <!--Checks that the whitespace around the Generic tokens < and > are correct to the typical convention.-->
         <module name="MethodParamPad"/>             <!--Checks the padding between the identifier of a method definition, constructor definition, method call, or constructor invocation; and the left parenthesis of the parameter list. -->
-        <module name="NoWhitespaceAfter">           <!--Checks that there is no whitespace after a token.-->
-            <property name="tokens" value="BNOT, DEC, DOT, INC, LNOT, UNARY_MINUS, UNARY_PLUS"/>
-        </module>
+        <module name="NoWhitespaceAfter"/>          <!--Checks that there is no whitespace after a token.-->
         <module name="NoWhitespaceBefore">          <!--Checks that there is no whitespace before a token.-->
-            <property name="tokens" value="SEMI, DOT, POST_DEC, POST_INC"/>
             <property name="allowLineBreaks" value="true"/>
         </module>
         <module name="OperatorWrap"/>               <!--Checks line wrapping for operators.-->
@@ -122,9 +121,7 @@
         <module name="SingleSpaceSeparator"/>
         <module name="TypecastParenPad"/>
         <module name="WhitespaceAfter"/>            <!--Checks that a token is followed by whitespace, with the exception that it does not check for whitespace after the semicolon of an empty for iterator.-->
-        <module name="WhitespaceAround">            <!--Checks that a token is surrounded by whitespace. Empty constructor and method bodies (blocks) of the form-->
-            <property name="tokens" value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN, EQUAL, GE, GT, LAND, LCURLY, LE, LITERAL_ASSERT, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_RETURN, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION, SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN, STAR, STAR_ASSIGN, TYPE_EXTENSION_AND"/>
-        </module>
+        <module name="WhitespaceAround"/>            <!--Checks that a token is surrounded by whitespace. Empty constructor and method bodies (blocks) of the form-->
     </module>
 
     <!--Size Violations:-->
@@ -134,6 +131,10 @@
 
     <!--Whitespace:-->
     <module name="FileTabCharacter"/>               <!--Checks to see if a file contains a tab character.-->
+
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
 
     <module name="SuppressionFilter">
         <property name="file" value="${configDir}/suppressions.xml"/>

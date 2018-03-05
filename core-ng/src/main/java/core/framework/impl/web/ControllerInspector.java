@@ -1,7 +1,5 @@
 package core.framework.impl.web;
 
-import core.framework.util.Exceptions;
-import core.framework.util.Strings;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 
@@ -13,7 +11,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
 /**
- * due to Java 8/9 doesn't provide formal way to reflect lambda method reference, we uses sun internal API for now
+ * due to Java 9 doesn't provide formal way to reflect lambda method reference, we uses internal API for now
  * and wait for JDK update in future
  *
  * @author neo
@@ -25,13 +23,11 @@ public class ControllerInspector {
     private static final Method CONTROLLER_EXECUTE;
 
     static {
-        validateJavaVersion();
-
         try {
             CLASS_GET_CONSTANT_POOL = Class.class.getDeclaredMethod("getConstantPool");
             overrideAccessible(CLASS_GET_CONSTANT_POOL);
 
-            Class<?> constantPoolClass = Class.forName(Strings.startsWith(System.getProperty("java.version"), '9') ? "jdk.internal.reflect.ConstantPool" : "sun.reflect.ConstantPool"); // for java 8 constantPool is sun.reflect.ConstantPool, java 9 is jdk.internal.reflect.ConstantPool
+            Class<?> constantPoolClass = Class.forName("jdk.internal.reflect.ConstantPool");
             CONSTANT_POOL_GET_SIZE = constantPoolClass.getDeclaredMethod("getSize");
             overrideAccessible(CONSTANT_POOL_GET_SIZE);
             CONSTANT_POOL_GET_MEMBER_REF_INFO_AT = constantPoolClass.getDeclaredMethod("getMemberRefInfoAt", int.class);
@@ -40,18 +36,6 @@ public class ControllerInspector {
             CONTROLLER_EXECUTE = Controller.class.getDeclaredMethod("execute", Request.class);
         } catch (ReflectiveOperationException | PrivilegedActionException e) {
             throw new Error("failed to initialize controller inspector, please contact arch team", e);
-        }
-    }
-
-    private static void validateJavaVersion() {
-        String javaVersion = System.getProperty("java.version");
-        if (Strings.startsWith(javaVersion, '9')) return;
-
-        if (!javaVersion.startsWith("1.8.0_"))
-            throw Exceptions.error("unsupported java version, please use latest jdk 8, jdk={}", javaVersion);
-        int minorVersion = Integer.parseInt(javaVersion.substring(6));
-        if (minorVersion < 60) {
-            throw Exceptions.error("unsupported java 8 version, please use latest jdk 8, jdk={}", javaVersion);
         }
     }
 
