@@ -1,5 +1,5 @@
 ## Change log
-### 5.3.8 (2/28/2018 - )
+### 5.3.8 (2/28/2018 - 3/4/2018)   !!! 5.3.X is last version to support Java 8
 * http: limit max requestURL length to 1000
 * search: update es to 6.2.2
 
