@@ -1,6 +1,6 @@
-defaultTasks 'clean', 'build'
+import java.time.Instant
 
-def buildTime = new Date()
+defaultTasks 'clean', 'build'
 
 subprojects {
     apply plugin: 'java'
@@ -8,7 +8,7 @@ subprojects {
 
     sourceCompatibility = JavaVersion.VERSION_1_9
     targetCompatibility = JavaVersion.VERSION_1_9
-    
+
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
         options.deprecation = true
@@ -36,7 +36,7 @@ subprojects {
                         'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}",
                         'Built-By': System.getProperty('user.name'),
                         'Built-On': "${InetAddress.localHost.hostName}/${InetAddress.localHost.hostAddress}",
-                        'Build-Time': buildTime.format('yyyy/MM/dd HH:mm:ss')
+                        'Build-Time': Instant.now().toString()
             }
         }
     }

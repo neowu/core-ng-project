@@ -38,11 +38,9 @@ class CIDR {
         int oddBits = maskBits % 8;
         int maskBytes = maskBits / 8 + (oddBits == 0 ? 0 : 1);  // 1 byte = 8 bits, so any thing more than 8 bits, add one extra byte
         byte[] mask = new byte[maskBytes];
-        Arrays.fill(mask, 0, oddBits == 0 ? mask.length : mask.length - 1, (byte) 0xFF);    // fill all with 1
+        Arrays.fill(mask, 0, mask.length, (byte) 0xFF);    // fill all with 1
         if (oddBits != 0) {     // generate last mask byte like 11100000 (if oddBits = 3)
-            int finalByte = (1 << oddBits) - 1;
-            finalByte <<= 8 - oddBits;
-            mask[mask.length - 1] = (byte) finalByte;
+            mask[mask.length - 1] = (byte) (((1 << oddBits) - 1) << (8 - oddBits));
         }
         return mask;
     }
