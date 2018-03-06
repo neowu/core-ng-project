@@ -31,8 +31,7 @@ public class TestModule extends AbstractTestModule {
 
         redis().host("localhost");
 
-        log().writeActionLogToConsole();
-        log().writeTraceLogToConsole();
+        log().writeToConsole();
 
         site().session().redis("localhost");
         configureHTTP();

@@ -14,23 +14,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /**
  * @author neo
  */
-class LogForwarderTest {
-    private LogForwarder logForwarder;
+class KafkaAppenderTest {
+    private KafkaAppender kafkaAppender;
 
     @BeforeEach
     void createLogForwarder() {
-        logForwarder = new LogForwarder("url", "app", new MockProducer<>());
+        kafkaAppender = new KafkaAppender("url", "app", new MockProducer<>());
     }
 
     @Test
-    void forwardLog() {
+    void forwardActionLog() {
         ActionLog log = new ActionLog("begin");
         log.action("action");
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
         log.track("db", 1000, 1, 2);
 
-        logForwarder.forwardLog(log);
-        ActionLogMessage message = (ActionLogMessage) logForwarder.queue.poll();
+        kafkaAppender.forwardActionLog(log);
+        ActionLogMessage message = (ActionLogMessage) kafkaAppender.queue.poll();
 
         assertEquals("app", message.app);
         assertEquals("action", message.action);

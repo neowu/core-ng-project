@@ -13,14 +13,11 @@
 * framework error, queue listener, background task error forward to kafka?
 * long running thread support or needed?
 * missing @PathParam, validation error not clear?
-* remove log to file function, since now docker/kube is probably THE way to deploy, prefer write to stdout/stderr rather than file 
 
 ### jdk 9 incompatible list
-* checkstyle: needs to filter out module-info.java
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
 * alpine jdk 9 is not released yet, docker openjdk:jre-alpine image size is much smaller
-* can't publish with jdk 9 even with target java 8, https://github.com/neowu/core-ng-project/issues/8
 
 ### jdk 10
 * remove core.framework.util.Threads.availableProcessors, check default behavior and -XX:ActiveProcessorCount

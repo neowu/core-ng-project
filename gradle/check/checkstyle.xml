@@ -4,9 +4,9 @@
 <module name="Checker">
     <module name="TreeWalker">
         <!--Annotations:-->
-        <module name="AnnotationLocation"/>     <!--Check location of annotation on language elements.-->
-        <module name="AnnotationUseStyle"/>     <!--This check controls the style with the usage of annotations.-->
-        <module name="SuppressWarnings">        <!--Verifies unchecked can only used on variable, parameter and method-->
+        <module name="AnnotationLocation"/>                 <!--Check location of annotation on language elements.-->
+        <module name="AnnotationUseStyle"/>                 <!--This check controls the style with the usage of annotations.-->
+        <module name="SuppressWarnings">                    <!--Verifies unchecked can only used on variable, parameter and method-->
             <property name="format" value="^unchecked$"/>
             <property name="tokens" value="CLASS_DEF,INTERFACE_DEF,ENUM_DEF,ANNOTATION_DEF,ANNOTATION_FIELD_DEF,ENUM_CONSTANT_DEF"/>
         </module>
@@ -16,13 +16,13 @@
         <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock"/>
         <module name="EmptyCatchBlock"/>
-        <module name="LeftCurly"/>      <!--Checks the placement of left curly braces on types, methods and other blocks:-->
-        <module name="RightCurly"/>     <!--Checks the placement of right curly braces.-->
+        <module name="LeftCurly"/>                          <!--Checks the placement of left curly braces on types, methods and other blocks:-->
+        <module name="RightCurly"/>                         <!--Checks the placement of right curly braces.-->
 
         <!--Class Design:-->
-        <module name="FinalClass"/>         <!--Checks that a class which has only private constructors is declared as final. Doesn't check for classes nested in interfaces or annotations, as they are always final there.-->
-        <module name="InnerTypeLast"/>      <!--Check nested (inner) classes/interfaces are declared at the bottom of the class after all method and field declarations.-->
-        <module name="InterfaceIsType"/>    <!--Implements Bloch, Effective Java, Item 17 - Use Interfaces only to define types.-->
+        <module name="FinalClass"/>                         <!--Checks that a class which has only private constructors is declared as final. Doesn't check for classes nested in interfaces or annotations, as they are always final there.-->
+        <module name="InnerTypeLast"/>                      <!--Check nested (inner) classes/interfaces are declared at the bottom of the class after all method and field declarations.-->
+        <module name="InterfaceIsType"/>                    <!--Implements Bloch, Effective Java, Item 17 - Use Interfaces only to define types.-->
         <module name="MutableException"/>
         <module name="OneTopLevelClass"/>
         <module name="PublicReferenceToPrivateTypeCheck"/>  <!--provided by sevntu-checkstyle-->
@@ -54,19 +54,19 @@
         <!--Imports:-->
         <module name="AvoidStarImport"/>
         <module name="IllegalImport"/>
-        <module name="UnusedImports"/>          <!--Checks for unused import statements.-->
-        <module name="RedundantImport"/>        <!--Checks for imports that are redundant.-->
+        <module name="UnusedImports"/>              <!--Checks for unused import statements.-->
+        <module name="RedundantImport"/>            <!--Checks for imports that are redundant.-->
 
         <!--Miscellaneous:-->
         <module name="Indentation"/>
         <module name="OuterTypeFilename"/>
-        <module name="UncommentedMain">         <!--Detects uncommented main methods.-->
+        <module name="UncommentedMain">             <!--Detects uncommented main methods.-->
             <property name="excludedClasses" value="\.Main$"/>
         </module>
 
         <!--Modifiers:-->
-        <module name="RedundantModifier"/>      <!--Checks for redundant modifiers in interface and annotation definitions, final modifier on methods of final classes, inner interface declarations that are declared as static, non public class constructors and enum constructors, nested enum definitions that are declared as static.-->
-        <module name="ModifierOrder"/>          <!--Checks that the order of modifiers conforms to the suggestions in the Java Language specification, sections 8.1.1, 8.3.1 and 8.4.3.-->
+        <module name="RedundantModifier"/>          <!--Checks for redundant modifiers in interface and annotation definitions, final modifier on methods of final classes, inner interface declarations that are declared as static, non public class constructors and enum constructors, nested enum definitions that are declared as static.-->
+        <module name="ModifierOrder"/>              <!--Checks that the order of modifiers conforms to the suggestions in the Java Language specification, sections 8.1.1, 8.3.1 and 8.4.3.-->
 
         <!--Naming Conventions:-->
         <module name="ClassTypeParameterName"/>
@@ -121,7 +121,7 @@
         <module name="SingleSpaceSeparator"/>
         <module name="TypecastParenPad"/>
         <module name="WhitespaceAfter"/>            <!--Checks that a token is followed by whitespace, with the exception that it does not check for whitespace after the semicolon of an empty for iterator.-->
-        <module name="WhitespaceAround"/>            <!--Checks that a token is surrounded by whitespace. Empty constructor and method bodies (blocks) of the form-->
+        <module name="WhitespaceAround"/>           <!--Checks that a token is surrounded by whitespace. Empty constructor and method bodies (blocks) of the form-->
     </module>
 
     <!--Size Violations:-->

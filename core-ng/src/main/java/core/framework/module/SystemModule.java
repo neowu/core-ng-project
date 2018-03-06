@@ -1,7 +1,5 @@
 package core.framework.module;
 
-import java.nio.file.Paths;
-
 /**
  * @author neo
  */
@@ -56,21 +54,13 @@ public final class SystemModule extends Module {
     }
 
     private void configureLog() {
-        property("sys.log.actionLogPath").ifPresent(path -> {
-            if ("console".equals(path)) {
-                log().writeActionLogToConsole();
+        property("sys.log.appender").ifPresent(appender -> {
+            if ("console".equals(appender)) {
+                log().writeToConsole();
             } else {
-                log().writeActionLogToFile(Paths.get(path));
+                log().writeToKafka(appender);
             }
         });
-        property("sys.log.traceLogPath").ifPresent(path -> {
-            if ("console".equals(path)) {
-                log().writeTraceLogToConsole();
-            } else {
-                log().writeTraceLogToFile(Paths.get(path));
-            }
-        });
-        property("sys.log.kafkaURI").ifPresent(uri -> log().forwardLog(uri));
     }
 
     private void configureDB() {

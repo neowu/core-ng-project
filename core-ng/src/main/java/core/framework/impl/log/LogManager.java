@@ -15,9 +15,8 @@ public final class LogManager {
 
     private final ThreadLocal<ActionLog> actionLog = new ThreadLocal<>();
     private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.INFO, LogLevel.DEBUG);
-    public ActionLogger actionLogger;
-    public TraceLogger traceLogger;
-    public LogForwarder logForwarder;
+    public ConsoleAppender consoleAppender;
+    public KafkaAppender kafkaAppender;
     public MessageFilter filter;
 
     public LogManager() {
@@ -38,23 +37,13 @@ public final class LogManager {
         this.actionLog.remove();
         actionLog.end(message);
 
-        if (traceLogger != null) traceLogger.write(actionLog);  // trace log generate logPath context to action log, so make it process first
-        if (actionLogger != null) actionLogger.write(actionLog);
-        if (logForwarder != null) logForwarder.forwardLog(actionLog);
+        if (consoleAppender != null) consoleAppender.write(actionLog);
+        if (kafkaAppender != null) kafkaAppender.forwardActionLog(actionLog);
     }
 
     public void process(LogEvent event) {
         ActionLog actionLog = currentActionLog();
         if (actionLog != null) actionLog.process(event);    // process is called by loggerImpl.log, begin() may not be called before
-    }
-
-    public void start() {
-        if (logForwarder != null) logForwarder.start();
-    }
-
-    public void stop() {
-        if (logForwarder != null) logForwarder.stop();
-        if (actionLogger != null) actionLogger.close();
     }
 
     public ActionLog currentActionLog() {

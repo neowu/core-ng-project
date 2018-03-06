@@ -31,22 +31,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author neo
  */
-public final class LogForwarder {
+public final class KafkaAppender {
     private static final int MAX_TRACE_LENGTH = 1000000; // 1M
 
-    public static LogForwarder create(String uri, String appName) {
+    public static KafkaAppender create(String uri, String appName) {
         Map<String, Object> config = Maps.newHashMap();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
         config.put(ProducerConfig.ACKS_CONFIG, "0");    // no acknowledge to maximize performance
         config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
         config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");
         Producer<String, byte[]> producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
-        return new LogForwarder(uri, appName, producer);
+        return new KafkaAppender(uri, appName, producer);
     }
 
     public final ProducerMetrics producerMetrics;
     final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
-    private final Logger logger = LoggerFactory.getLogger(LogForwarder.class);
+    private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
     private final String appName;
     private final Producer<String, byte[]> producer;
 
@@ -61,7 +61,7 @@ public final class LogForwarder {
         }
     };
 
-    LogForwarder(String uri, String appName, Producer<String, byte[]> producer) {
+    KafkaAppender(String uri, String appName, Producer<String, byte[]> producer) {
         this.appName = appName;
         this.producer = producer;
 
@@ -100,7 +100,7 @@ public final class LogForwarder {
         producer.close(5, TimeUnit.SECONDS);
     }
 
-    void forwardLog(ActionLog log) {
+    void forwardActionLog(ActionLog log) {
         ActionLogMessage message = new ActionLogMessage();
         message.app = appName;
         message.serverIP = Network.localHostAddress();

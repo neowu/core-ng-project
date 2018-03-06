@@ -44,9 +44,7 @@ public final class ModuleContext {
         this.beanFactory = beanFactory;
         this.mockFactory = mockFactory;
 
-        this.logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
-        startupHook.add(logManager::start);
-        shutdownHook.add(logManager::stop);
+        logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
 
         httpServer = new HTTPServer(logManager);
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);

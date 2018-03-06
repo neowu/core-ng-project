@@ -26,8 +26,8 @@ public final class LoggerImpl extends AbstractLogger {
         return builder.toString();
     }
 
-    private final PrintStream output = System.out;
-    private final PrintStream errorOutput = System.err;
+    private final PrintStream stdout = System.out;
+    private final PrintStream stderr = System.err;
     private final LogManager logManager;
     private final LogLevel infoLevel;
     private final LogLevel traceLevel;
@@ -57,8 +57,8 @@ public final class LoggerImpl extends AbstractLogger {
     private void write(LogEvent event) {
         String message = event.logMessage();
         if (event.level.value >= LogLevel.WARN.value)
-            errorOutput.print(message);
+            stderr.print(message);
         else
-            output.print(message);
+            stdout.print(message);
     }
 }
