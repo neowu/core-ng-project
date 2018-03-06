@@ -19,13 +19,13 @@ subprojects {
             checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.27.0'
         }
 
-        configFile = rootProject.file('gradle/checkstyle/checkstyle.xml')
+        configFile = rootProject.file('gradle/check/checkstyle.xml')
         configProperties['configDir'] = configFile.parentFile
     }
 
     pmd {
         ruleSets = []
-        ruleSetFiles = rootProject.files('gradle/pmd/rule-set.xml')
+        ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
         toolVersion = '6.1.0'
         consoleOutput = true
     }
@@ -33,7 +33,7 @@ subprojects {
     spotbugs {
         effort = 'max'
         reportLevel = 'low'
-        excludeFilter = rootProject.file('gradle/spotbugs/exclude-filter.xml')
+        excludeFilter = rootProject.file('gradle/check/spotbugs-filter.xml')
         toolVersion = '3.1.2'
     }
 

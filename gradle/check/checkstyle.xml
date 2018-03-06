@@ -136,7 +136,5 @@
         <property name="fileNamePattern" value="module\-info\.java$"/>
     </module>
 
-    <module name="SuppressionFilter">
-        <property name="file" value="${configDir}/suppressions.xml"/>
-    </module>
+    <module name="SuppressWarningsFilter"/>
 </module>

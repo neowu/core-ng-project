@@ -62,36 +62,43 @@ public class ESLogger extends AbstractLogger {
         return isEnabled(level);
     }
 
+    @SuppressWarnings("ParameterNumber")
     @Override
     public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3) {
         return isEnabled(level);
     }
 
+    @SuppressWarnings("ParameterNumber")
     @Override
     public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4) {
         return isEnabled(level);
     }
 
+    @SuppressWarnings("ParameterNumber")
     @Override
     public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5) {
         return isEnabled(level);
     }
 
+    @SuppressWarnings("ParameterNumber")
     @Override
     public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6) {
         return isEnabled(level);
     }
 
+    @SuppressWarnings("ParameterNumber")
     @Override
     public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7) {
         return isEnabled(level);
     }
 
+    @SuppressWarnings("ParameterNumber")
     @Override
     public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7, Object p8) {
         return isEnabled(level);
     }
 
+    @SuppressWarnings("ParameterNumber")
     @Override
     public boolean isEnabled(Level level, Marker marker, String message, Object p0, Object p1, Object p2, Object p3, Object p4, Object p5, Object p6, Object p7, Object p8, Object p9) {
         return isEnabled(level);
