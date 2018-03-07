@@ -16,10 +16,7 @@ public final class InitSearchConfig {
 
     InitSearchConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.state("elasticsearch", SearchConfig.State::new);
-        if (state.search == null) {
-            throw new Error("search() is not configured");
-        }
+        state = context.config.state("elasticsearch");
     }
 
     public void createIndex(String index, String sourcePath) {

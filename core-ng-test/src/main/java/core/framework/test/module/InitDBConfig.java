@@ -6,7 +6,6 @@ import core.framework.module.DBConfig;
 import core.framework.test.db.EntitySchemaGenerator;
 import core.framework.test.db.SQLScriptRunner;
 import core.framework.util.ClasspathResources;
-import core.framework.util.Exceptions;
 import core.framework.util.Types;
 
 import java.util.List;
@@ -22,10 +21,7 @@ public final class InitDBConfig {
     InitDBConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        state = context.config.state("db:" + name, () -> new DBConfig.State(name));
-        if (state.database == null) {
-            throw Exceptions.error("db({}) is not configured", name == null ? "" : name);
-        }
+        state = context.config.state("db:" + name);
     }
 
     public void runScript(String scriptPath) {
