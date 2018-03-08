@@ -1,4 +1,7 @@
 ## Change log
+### 6.0.1 (3/7/2018 - )
+* kafka: update to 1.0.1
+
 ### 6.0.0 (3/4/2018 - 3/6/2018)     !!! only support Java 9+
 * jdk: drop java 8 support
 * log: removed write action/trace to file, updated sys.properties log key to sys.log.appender

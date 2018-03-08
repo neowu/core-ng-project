@@ -65,7 +65,7 @@
         </module>
 
         <!--Modifiers:-->
-        <module name="RedundantModifier"/>          <!--Checks for redundant modifiers in interface and annotation definitions, final modifier on methods of final classes, inner interface declarations that are declared as static, non public class constructors and enum constructors, nested enum definitions that are declared as static.-->
+        <module name="RedundantModifier"/>          <!--Checks for redundant modifiers in interface and annotation definitions.-->
         <module name="ModifierOrder"/>              <!--Checks that the order of modifiers conforms to the suggestions in the Java Language specification, sections 8.1.1, 8.3.1 and 8.4.3.-->
 
         <!--Naming Conventions:-->

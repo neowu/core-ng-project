@@ -13,6 +13,7 @@
 * framework error, queue listener, background task error forward to kafka?
 * long running thread support or needed?
 * missing @PathParam, validation error not clear?
+* support websocket?
 
 ### jdk 9 incompatible list
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

@@ -48,7 +48,7 @@ public class TestModule extends AbstractTestModule {
     }
 
     private void configureKafka() {
-        kafka().uri("localhost:9092");
+        kafka().uri("kafka://localhost:9092");
         kafka().publish("topic", TestMessage.class);
     }
 
