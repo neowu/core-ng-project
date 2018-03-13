@@ -2,6 +2,7 @@ package core.framework.test.search;
 
 import core.framework.inject.Inject;
 import core.framework.search.ElasticSearch;
+import core.framework.search.ElasticSearchIndex;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.ForEach;
 import core.framework.search.SearchRequest;
@@ -9,6 +10,7 @@ import core.framework.search.SearchResponse;
 import core.framework.test.IntegrationTest;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.sort.ScriptSortBuilder;
@@ -112,6 +114,16 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void analyze() {
         List<String> tokens = documentType.analyze("standard", "word1 word2");
         assertEquals(Lists.newArrayList("word1", "word2"), tokens);
+    }
+
+    @Test
+    void indices() {
+        List<ElasticSearchIndex> indices = elasticSearch.indices();
+
+        assertEquals(1, indices.size());
+        ElasticSearchIndex index = indices.get(0);
+        assertEquals("document", index.index);
+        assertEquals(IndexMetaData.State.OPEN, index.state);
     }
 
     private TestDocument createDocument(String id, String stringField, int numField) {

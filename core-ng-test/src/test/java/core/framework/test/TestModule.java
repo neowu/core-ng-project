@@ -55,7 +55,7 @@ public class TestModule extends AbstractTestModule {
     private void configureSearch() {
         search().host("localhost");
         search().type(TestDocument.class);
-        initSearch().createIndex("document", "search/document-index.json");
+        initSearch().createIndex("document", "search-test/document-index.json");
     }
 
     private void configureDB() {
