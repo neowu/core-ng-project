@@ -11,6 +11,7 @@ def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.0.1'
 def jacksonVersion = '2.9.4'
 def junitVersion = '5.1.0'
+def mockitoVersion = '2.16.0'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -26,13 +27,13 @@ project(':core-ng') {
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
         implementation 'org.apache.httpcomponents:httpclient:4.5.5'
-        implementation 'io.undertow:undertow-core:2.0.1.Final'
+        implementation 'io.undertow:undertow-core:2.0.3.Final'
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
         compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"        // used by elasticsearch
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-        testImplementation 'org.mockito:mockito-core:2.15.0'
+        testImplementation "org.mockito:mockito-core:${mockitoVersion}"
         testImplementation 'org.assertj:assertj-core:3.9.0'
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
@@ -44,7 +45,7 @@ project(':core-ng-test') {
     dependencies {
         api project(":core-ng")
         api "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-        api 'org.mockito:mockito-core:2.15.0'
+        api "org.mockito:mockito-core:${mockitoVersion}"
         api 'org.assertj:assertj-core:3.9.0'
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
