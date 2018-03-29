@@ -3,6 +3,7 @@ package core.framework.test;
 import core.framework.db.IsolationLevel;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
+import core.framework.kafka.Message;
 import core.framework.test.db.TestDBEntity;
 import core.framework.test.db.TestSequenceIdDBEntity;
 import core.framework.test.inject.TestBean;
@@ -12,6 +13,8 @@ import core.framework.test.mongo.TestMongoEntity;
 import core.framework.test.search.TestDocument;
 import core.framework.util.Sets;
 import org.mockito.Mockito;
+
+import java.util.List;
 
 /**
  * @author neo
@@ -50,6 +53,10 @@ public class TestModule extends AbstractTestModule {
     private void configureKafka() {
         kafka().uri("kafka://localhost:9092");
         kafka().publish("topic", TestMessage.class);
+        kafka().subscribe("topic1", TestMessage.class, (List<Message<TestMessage>> messages) -> {
+        });
+        kafka().subscribe("topic2", TestMessage.class, (String key, TestMessage message) -> {
+        });
     }
 
     private void configureSearch() {

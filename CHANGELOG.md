@@ -1,6 +1,6 @@
 ## Change log
 ### 6.0.1 (3/7/2018 - )
-* kafka: update to 1.0.1
+* kafka: update to 1.0.1, add config to register publisher without topic (instead of passing null)
 * http: update undertow to 2.0.3
 
 ### 6.0.0 (3/4/2018 - 3/6/2018)     !!! only support Java 9+

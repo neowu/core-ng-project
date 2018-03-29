@@ -53,6 +53,10 @@ public final class KafkaConfig {
         }
     }
 
+    public <T> MessagePublisher<T> publish(Class<T> messageClass) {
+        return publish(null, messageClass);
+    }
+
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
         if (state.kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
         logger.info("create message publisher, topic={}, messageClass={}, beanName={}", topic, messageClass.getTypeName(), name);
