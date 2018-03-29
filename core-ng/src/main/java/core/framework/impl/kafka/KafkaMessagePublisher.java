@@ -42,6 +42,8 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
 
     @Override
     public void publish(String topic, String key, T value) {
+        if (topic == null) throw new Error("topic must not be null");
+        if (key == null) throw new Error("key must not be null");   // if key is null, kafka will pick random partition which breaks determinacy
         validator.validate(value);
 
         StopWatch watch = new StopWatch();
