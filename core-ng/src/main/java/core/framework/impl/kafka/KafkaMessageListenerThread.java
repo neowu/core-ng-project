@@ -2,7 +2,7 @@ package core.framework.impl.kafka;
 
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.log.LogParam;
+import core.framework.impl.log.param.BytesParam;
 import core.framework.kafka.Message;
 import core.framework.log.Markers;
 import core.framework.util.Charsets;
@@ -109,7 +109,7 @@ class KafkaMessageListenerThread extends Thread {
                 actionLog.context("topic", topic);
                 actionLog.context("handler", holder.handler.getClass().getCanonicalName());
                 actionLog.context("key", record.key());
-                logger.debug("message={}", LogParam.of(record.value()));
+                logger.debug("message={}", new BytesParam(record.value()));
 
                 T message = holder.reader.fromJSON(record.value());
 
@@ -183,7 +183,7 @@ class KafkaMessageListenerThread extends Thread {
             for (Header recordHeader : recordHeaders) {
                 headers.put(recordHeader.key(), new String(recordHeader.value(), Charsets.UTF_8));
             }
-            logger.warn("failed to validate message, key={}, headers={}, message={}", record.key(), LogParam.of(headers), LogParam.of(record.value()), e);
+            logger.warn("failed to validate message, key={}, headers={}, message={}", record.key(), headers, new BytesParam(record.value()), e);
             throw e;
         }
     }

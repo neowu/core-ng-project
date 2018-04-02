@@ -7,7 +7,7 @@ import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.impl.log.LogParam;
+import core.framework.impl.log.param.BytesParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.Charsets;
@@ -131,7 +131,7 @@ public final class HTTPClientImpl implements HTTPClient {
         byte[] body = request.body();
         if (body != null) {
             ContentType contentType = request.contentType();
-            logger.debug("[request] contentType={}, body={}", contentType, LogParam.of(request.body()));
+            logger.debug("[request] contentType={}, body={}", contentType, new BytesParam(request.body()));
             org.apache.http.entity.ContentType type = org.apache.http.entity.ContentType.create(contentType.mediaType(), contentType.charset().orElse(null));
             builder.setEntity(new ByteArrayEntity(request.body(), type));
         }
@@ -156,7 +156,7 @@ public final class HTTPClientImpl implements HTTPClient {
         response.contentType().ifPresent(contentType -> {
             String mediaType = contentType.mediaType();
             if (mediaType.contains("text") || mediaType.contains("json")) {
-                logger.debug("[response] body={}", LogParam.of(response.body(), contentType.charset().orElse(Charsets.UTF_8)));
+                logger.debug("[response] body={}", new BytesParam(response.body(), contentType.charset().orElse(Charsets.UTF_8)));
             }
         });
     }

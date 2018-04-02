@@ -3,7 +3,7 @@ package core.framework.impl.web.request;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.LogParam;
+import core.framework.impl.log.param.BytesParam;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
@@ -104,7 +104,7 @@ public final class RequestParser {
             if (request.contentType != null
                     && (ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())
                     || ContentType.TEXT_XML.mediaType().equals(request.contentType.mediaType()))) {
-                logger.debug("[request] body={}", LogParam.of(request.body));
+                logger.debug("[request] body={}", new BytesParam(request.body));
             }
         } else {
             parseForm(request, exchange);

@@ -2,7 +2,7 @@
 ### 6.1.0 (3/7/2018 - )
 * kafka: update to 1.0.1, add config to register publisher without topic (instead of passing null)
 * http: update undertow to 2.0.3
-* log: log masking redesign, only data from header/form param/body require masking
+* log: log masking redesign, only customer data from form param/json body require masking
        mask sessionId value in cookies log 
 
 ### 6.0.0 (3/4/2018 - 3/6/2018)     !!! only support Java 9+

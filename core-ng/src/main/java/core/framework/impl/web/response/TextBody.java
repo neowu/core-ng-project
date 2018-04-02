@@ -1,6 +1,6 @@
 package core.framework.impl.web.response;
 
-import core.framework.impl.log.LogParam;
+import core.framework.impl.log.param.BytesParam;
 import core.framework.util.Strings;
 import io.undertow.io.Sender;
 import org.slf4j.Logger;
@@ -23,7 +23,7 @@ public final class TextBody implements Body {
     @Override
     public void send(Sender sender, ResponseHandlerContext context) {
         byte[] bytes = Strings.bytes(text);
-        logger.debug("[response] body={}", LogParam.of(bytes));
+        logger.debug("[response] body={}", new BytesParam(bytes));
         sender.send(ByteBuffer.wrap(bytes));
     }
 }

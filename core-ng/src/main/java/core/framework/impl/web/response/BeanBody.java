@@ -1,7 +1,7 @@
 package core.framework.impl.web.response;
 
 import core.framework.impl.json.JSONMapper;
-import core.framework.impl.log.LogParam;
+import core.framework.impl.log.param.BytesParam;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.util.Exceptions;
 import core.framework.util.Types;
@@ -29,7 +29,7 @@ public final class BeanBody implements Body {
     public void send(Sender sender, ResponseHandlerContext context) {
         validateBeanType(context.validator);
         byte[] body = JSONMapper.toJSON(bean);
-        logger.debug("[response] body={}", LogParam.of(body));
+        logger.debug("[response] body={}", new BytesParam(body));
         sender.send(ByteBuffer.wrap(body));
     }
 

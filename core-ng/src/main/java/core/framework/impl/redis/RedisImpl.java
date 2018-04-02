@@ -1,6 +1,7 @@
 package core.framework.impl.redis;
 
-import core.framework.impl.log.LogParam;
+import core.framework.impl.log.param.BytesParam;
+import core.framework.impl.log.param.MapParam;
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
 import core.framework.log.ActionLogContext;
@@ -135,7 +136,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime, 0, 1);
-            logger.debug("set, key={}, value={}, expiration={}, elapsedTime={}", key, LogParam.of(value), expiration, elapsedTime);
+            logger.debug("set, key={}, value={}, expiration={}, elapsedTime={}", key, new BytesParam(value), expiration, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -303,7 +304,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime, 0, size);
-            logger.debug("mset, values={}, expiration={}, elapsedTime={}", LogParam.of(values), expiration, elapsedTime);
+            logger.debug("mset, values={}, expiration={}, elapsedTime={}", new MapParam(values), expiration, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

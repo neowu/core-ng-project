@@ -73,7 +73,7 @@ public class ResponseHandler {
 
     String maskCookieValue(String name, String value) {
         if (name.equals(sessionManager.sessionId.name)) {
-            return "***masked***";
+            return "******";
         }
         return value;
     }

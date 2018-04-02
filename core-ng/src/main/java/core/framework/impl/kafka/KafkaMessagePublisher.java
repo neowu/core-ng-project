@@ -3,7 +3,7 @@ package core.framework.impl.kafka;
 import core.framework.impl.json.JSONWriter;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.log.LogParam;
+import core.framework.impl.log.param.BytesParam;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Network;
@@ -59,7 +59,7 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("kafka", elapsedTime);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
-            logger.debug("publish, topic={}, key={}, message={}, elapsedTime={}", topic, key, LogParam.of(message), elapsedTime);
+            logger.debug("publish, topic={}, key={}, message={}, elapsedTime={}", topic, key, new BytesParam(message), elapsedTime);
         }
     }
 
