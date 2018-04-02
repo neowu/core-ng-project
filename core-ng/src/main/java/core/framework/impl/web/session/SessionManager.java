@@ -17,7 +17,7 @@ import java.util.UUID;
  */
 public final class SessionManager {
     private final Logger logger = LoggerFactory.getLogger(SessionManager.class);
-    private CookieSpec sessionId;
+    public CookieSpec sessionId;
     private Duration timeout = Duration.ofMinutes(20);
     private SessionStore store;
 

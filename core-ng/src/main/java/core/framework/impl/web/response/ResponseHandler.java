@@ -2,6 +2,7 @@ package core.framework.impl.web.response;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
+import core.framework.impl.web.session.SessionManager;
 import core.framework.impl.web.site.TemplateManager;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Encodings;
@@ -22,9 +23,11 @@ import java.util.Map;
 public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
     private final ResponseHandlerContext context;
+    private final SessionManager sessionManager;
 
-    public ResponseHandler(ResponseBeanTypeValidator validator, TemplateManager templateManager) {
+    public ResponseHandler(ResponseBeanTypeValidator validator, TemplateManager templateManager, SessionManager sessionManager) {
         context = new ResponseHandlerContext(validator, templateManager);
+        this.sessionManager = sessionManager;
     }
 
     public void render(ResponseImpl response, HttpServerExchange exchange) {
@@ -59,11 +62,20 @@ public class ResponseHandler {
             Map<String, Cookie> cookies = exchange.getResponseCookies();
             response.cookies.forEach((spec, value) -> {
                 CookieImpl cookie = cookie(spec, value);
+                String name = cookie.getName();
+                String cookieValue = maskCookieValue(name, cookie.getValue());
                 logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
-                        cookie.getName(), cookie.getValue(), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
+                        name, cookieValue, cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
                 cookies.put(spec.name, cookie);
             });
         }
+    }
+
+    String maskCookieValue(String name, String value) {
+        if (name.equals(sessionManager.sessionId.name)) {
+            return "***masked***";
+        }
+        return value;
     }
 
     CookieImpl cookie(CookieSpec spec, String value) {
