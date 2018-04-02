@@ -21,6 +21,6 @@ class LogEventTest {
     void logMessage() {
         LogEvent event = new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message-{}", new Object[]{1}, new Error());
         String message = event.logMessage();
-        assertThat(message).contains("[main] WARN logger - [ERROR_CODE] message-1");
+        assertThat(message).contains("WARN logger - [ERROR_CODE] message-1");
     }
 }
