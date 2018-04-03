@@ -3,6 +3,7 @@ package core.framework.impl.web;
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.web.service.ResponseStatus;
 import core.framework.http.ContentType;
+import core.framework.impl.log.ActionLog;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.response.ResponseImpl;
@@ -32,7 +33,7 @@ public class HTTPServerErrorHandler {
         this.responseHandler = responseHandler;
     }
 
-    void handleError(Throwable e, HttpServerExchange exchange, RequestImpl request) {
+    void handleError(Throwable e, HttpServerExchange exchange, RequestImpl request, ActionLog actionLog) {
         if (exchange.isResponseStarted()) {
             logger.error("response was sent, discard the current http transaction");
             return;
@@ -48,7 +49,7 @@ public class HTTPServerErrorHandler {
                 String accept = exchange.getRequestHeaders().getFirst(Headers.ACCEPT);
                 errorResponse = defaultErrorResponse(e, accept);
             }
-            responseHandler.render((ResponseImpl) errorResponse, exchange);
+            responseHandler.render((ResponseImpl) errorResponse, exchange, actionLog);
         } catch (Throwable error) {
             logger.error(error.getMessage(), e);
             if (exchange.isResponseStarted()) {

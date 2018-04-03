@@ -5,6 +5,7 @@ import core.framework.http.ContentType;
 import core.framework.util.Maps;
 import core.framework.web.CookieSpec;
 import core.framework.web.Response;
+import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ public final class ResponseImpl implements Response {
     public final Body body;
     final Map<HttpString, String> headers = Maps.newHashMap();
     Map<CookieSpec, String> cookies;
-    ContentType contentType;
+    private ContentType contentType;
     private HTTPStatus status = HTTPStatus.OK;
 
     public ResponseImpl(Body body) {
@@ -37,6 +38,7 @@ public final class ResponseImpl implements Response {
 
     @Override
     public Response header(String name, Object value) {
+        if (Headers.CONTENT_TYPE.equalToString(name)) throw new Error("must not use header() to update content type, please use response.contentType()");
         headers.put(new HttpString(name), String.valueOf(value));
         return this;
     }
@@ -49,6 +51,7 @@ public final class ResponseImpl implements Response {
     @Override
     public Response contentType(ContentType contentType) {
         this.contentType = contentType;
+        headers.put(Headers.CONTENT_TYPE, contentType.toString());
         return this;
     }
 

@@ -102,8 +102,7 @@ class KafkaMessageListenerThread extends Thread {
 
     private <T> void handle(String topic, KafkaMessageListener.MessageHandlerHolder<T> holder, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
         for (ConsumerRecord<String, byte[]> record : records) {
-            logManager.begin("=== message handling begin ===");
-            ActionLog actionLog = logManager.currentActionLog();
+            ActionLog actionLog = logManager.begin("=== message handling begin ===");
             try {
                 actionLog.action("topic/" + topic);
                 actionLog.context("topic", topic);
@@ -139,8 +138,7 @@ class KafkaMessageListenerThread extends Thread {
     }
 
     private <T> void handle(String topic, KafkaMessageListener.BulkMessageHandlerHolder<T> holder, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
-        logManager.begin("=== message handling begin ===");
-        ActionLog actionLog = logManager.currentActionLog();
+        ActionLog actionLog = logManager.begin("=== message handling begin ===");
         try {
             actionLog.action("topic/" + topic);
             actionLog.context("topic", topic);

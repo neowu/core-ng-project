@@ -42,8 +42,7 @@ public final class ExecutorImpl implements Executor {
         boolean trace = parentActionLog.trace;
         return executor.submit(() -> {
             try {
-                logManager.begin("=== task execution begin ===");
-                ActionLog actionLog = logManager.currentActionLog();
+                ActionLog actionLog = logManager.begin("=== task execution begin ===");
                 actionLog.refId(refId);
                 actionLog.action(taskAction);
                 if (trace) {

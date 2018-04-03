@@ -1,19 +1,16 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.web.HTTPLogger;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
-import core.framework.impl.web.session.SessionManager;
 import core.framework.impl.web.site.TemplateManager;
-import core.framework.log.ActionLogContext;
 import core.framework.util.Encodings;
 import core.framework.web.CookieSpec;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.HeaderMap;
-import io.undertow.util.Headers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -21,16 +18,15 @@ import java.util.Map;
  * @author neo
  */
 public class ResponseHandler {
-    private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
     private final ResponseHandlerContext context;
-    private final SessionManager sessionManager;
+    private final HTTPLogger logger;
 
-    public ResponseHandler(ResponseBeanTypeValidator validator, TemplateManager templateManager, SessionManager sessionManager) {
+    public ResponseHandler(ResponseBeanTypeValidator validator, TemplateManager templateManager, HTTPLogger logger) {
         context = new ResponseHandlerContext(validator, templateManager);
-        this.sessionManager = sessionManager;
+        this.logger = logger;
     }
 
-    public void render(ResponseImpl response, HttpServerExchange exchange) {
+    public void render(ResponseImpl response, HttpServerExchange exchange, ActionLog actionLog) {
         HTTPStatus status = response.status();
         exchange.setStatusCode(status.code);
 
@@ -38,23 +34,13 @@ public class ResponseHandler {
         putCookies(response, exchange);
         response.body.send(exchange.getResponseSender(), context);
 
-        ActionLogContext.put("responseCode", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
+        actionLog.context("responseCode", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
     }
 
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {
-        if (response.contentType != null) {
-            String contentType = response.contentType.toString();
-            String previous = response.headers.put(Headers.CONTENT_TYPE, contentType);
-            if (previous != null) {
-                logger.warn("content type header is overwritten, value={}, previous={}", contentType, previous);
-            }
-        }
-
         HeaderMap headers = exchange.getResponseHeaders();
-        response.headers.forEach((header, value) -> {
-            logger.debug("[response:header] {}={}", header, value);
-            headers.put(header, value);
-        });
+        response.headers.forEach(headers::put);
+        logger.logResponseHeaders(response.headers);
     }
 
     private void putCookies(ResponseImpl response, HttpServerExchange exchange) {
@@ -62,20 +48,10 @@ public class ResponseHandler {
             Map<String, Cookie> cookies = exchange.getResponseCookies();
             response.cookies.forEach((spec, value) -> {
                 CookieImpl cookie = cookie(spec, value);
-                String name = cookie.getName();
-                String cookieValue = maskCookieValue(name, cookie.getValue());
-                logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
-                        name, cookieValue, cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
                 cookies.put(spec.name, cookie);
             });
+            logger.logResponseCookies(cookies);
         }
-    }
-
-    String maskCookieValue(String name, String value) {
-        if (name.equals(sessionManager.sessionId.name)) {
-            return "******";
-        }
-        return value;
     }
 
     CookieImpl cookie(CookieSpec spec, String value) {

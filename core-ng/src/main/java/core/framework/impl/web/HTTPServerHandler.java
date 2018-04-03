@@ -27,7 +27,7 @@ public class HTTPServerHandler implements HttpHandler {
     public static final HttpString HEADER_TRACE = new HttpString("trace");
     public static final HttpString HEADER_CLIENT = new HttpString("client");
 
-    public final RequestParser requestParser = new RequestParser();
+    public final RequestParser requestParser;
     public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper();
     public final ResponseBeanTypeValidator responseBeanTypeValidator = new ResponseBeanTypeValidator();
     public final Route route = new Route();
@@ -44,7 +44,9 @@ public class HTTPServerHandler implements HttpHandler {
     HTTPServerHandler(LogManager logManager, SiteManager siteManager) {
         this.logManager = logManager;
         sessionManager = siteManager.sessionManager;
-        responseHandler = new ResponseHandler(responseBeanTypeValidator, siteManager.templateManager, sessionManager);
+        HTTPLogger httpLogger = new HTTPLogger(sessionManager);
+        requestParser = new RequestParser(httpLogger);
+        responseHandler = new ResponseHandler(responseBeanTypeValidator, siteManager.templateManager, httpLogger);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
     }
 
@@ -65,12 +67,11 @@ public class HTTPServerHandler implements HttpHandler {
     }
 
     private void handle(String path, HttpServerExchange exchange) {
-        logManager.begin("=== http transaction begin ===");
+        ActionLog actionLog = logManager.begin("=== http transaction begin ===");
         RequestImpl request = new RequestImpl(exchange, requestBeanMapper);
         try {
             webContext.initialize(request);     // initialize webContext at beginning, the customerErrorHandler in errorHandler may use it if any exception
 
-            ActionLog actionLog = logManager.currentActionLog();
             requestParser.parse(request, exchange, actionLog);
             request.session = sessionManager.load(request);
 
@@ -93,10 +94,10 @@ public class HTTPServerHandler implements HttpHandler {
 
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
             sessionManager.save(request, response);
-            responseHandler.render((ResponseImpl) response, exchange);
+            responseHandler.render((ResponseImpl) response, exchange, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
-            errorHandler.handleError(e, exchange, request);
+            errorHandler.handleError(e, exchange, request, actionLog);
         } finally {
             webContext.cleanup();
             logManager.end("=== http transaction end ===");

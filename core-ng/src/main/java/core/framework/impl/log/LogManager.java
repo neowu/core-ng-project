@@ -28,8 +28,10 @@ public final class LogManager {
         this.appName = appName;
     }
 
-    public void begin(String message) {
-        this.actionLog.set(new ActionLog(message));
+    public ActionLog begin(String message) {
+        ActionLog actionLog = new ActionLog(message);
+        this.actionLog.set(actionLog);
+        return actionLog;
     }
 
     public void end(String message) {

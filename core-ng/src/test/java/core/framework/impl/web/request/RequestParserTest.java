@@ -28,7 +28,7 @@ class RequestParserTest {
 
     @BeforeEach
     void createRequestParser() {
-        parser = new RequestParser();
+        parser = new RequestParser(null);
     }
 
     @Test

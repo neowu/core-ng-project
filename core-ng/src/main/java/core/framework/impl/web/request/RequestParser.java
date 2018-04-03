@@ -3,7 +3,7 @@ package core.framework.impl.web.request;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.param.BytesParam;
+import core.framework.impl.web.HTTPLogger;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
@@ -13,7 +13,6 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.util.HeaderMap;
-import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,14 +28,16 @@ import java.util.Map;
 public final class RequestParser {
     private static final int MAX_URL_LENGTH = 1000;
     public final ClientIPParser clientIPParser = new ClientIPParser();
-
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
+    private final HTTPLogger httpLogger;
+
+    public RequestParser(HTTPLogger httpLogger) {
+        this.httpLogger = httpLogger;
+    }
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
         HeaderMap headers = exchange.getRequestHeaders();
-        for (HeaderValues header : headers) {
-            logger.debug("[request:header] {}={}", header.getHeaderName(), header.toArray());
-        }
+        httpLogger.logRequestHeaders(headers, exchange);
 
         String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
         logger.debug("[request] remoteAddress={}", remoteAddress);
@@ -101,11 +102,7 @@ public final class RequestParser {
         RequestBodyReader.RequestBody body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
         if (body != null) {
             request.body = body.body();
-            if (request.contentType != null
-                    && (ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())
-                    || ContentType.TEXT_XML.mediaType().equals(request.contentType.mediaType()))) {
-                logger.debug("[request] body={}", new BytesParam(request.body));
-            }
+            httpLogger.logRequestBody(request.body, request.contentType);
         } else {
             parseForm(request, exchange);
         }
