@@ -21,7 +21,7 @@ public class HTTPLogger {
     private final Logger logger = LoggerFactory.getLogger(HTTPLogger.class);
     private final SessionManager sessionManager;
 
-    HTTPLogger(SessionManager sessionManager) {
+    public HTTPLogger(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
     }
 
