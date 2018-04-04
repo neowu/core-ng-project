@@ -14,7 +14,7 @@ public class LogFilter {
 
     public final Set<String> maskedFields = Sets.newHashSet();
 
-    public String format(String message, Object[] arguments) {
+    public String format(String message, Object... arguments) {
         if (arguments == null) {
             return message;    // log message can be null, e.g. message of NPE
         }
