@@ -1,6 +1,6 @@
 package core.framework.impl.web.response;
 
-import core.framework.impl.log.param.BytesParam;
+import core.framework.impl.log.filter.BytesParam;
 import core.framework.util.Strings;
 import io.undertow.io.Sender;
 import org.slf4j.Logger;

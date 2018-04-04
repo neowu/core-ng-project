@@ -1,7 +1,6 @@
 package core.framework.impl.web.request;
 
 import core.framework.http.ContentType;
-import core.framework.impl.web.HTTPLogger;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.MethodNotAllowedException;
@@ -29,7 +28,7 @@ class RequestParserTest {
 
     @BeforeEach
     void createRequestParser() {
-        parser = new RequestParser(new HTTPLogger(null));
+        parser = new RequestParser();
     }
 
     @Test

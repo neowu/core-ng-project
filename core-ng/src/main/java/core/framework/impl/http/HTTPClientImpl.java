@@ -7,7 +7,8 @@ import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.impl.log.param.BytesParam;
+import core.framework.impl.log.filter.BytesParam;
+import core.framework.impl.log.filter.JSONParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.Charsets;
@@ -131,12 +132,22 @@ public final class HTTPClientImpl implements HTTPClient {
         byte[] body = request.body();
         if (body != null) {
             ContentType contentType = request.contentType();
-            logger.debug("[request] contentType={}, body={}", contentType, new BytesParam(request.body()));
+            logRequestBody(request, contentType);
             org.apache.http.entity.ContentType type = org.apache.http.entity.ContentType.create(contentType.mediaType(), contentType.charset().orElse(null));
             builder.setEntity(new ByteArrayEntity(request.body(), type));
         }
 
         return builder.build();
+    }
+
+    private void logRequestBody(HTTPRequest request, ContentType contentType) {
+        Object bodyParam;
+        if (ContentType.APPLICATION_JSON.equals(contentType)) {
+            bodyParam = new JSONParam(request.body());
+        } else {
+            bodyParam = new BytesParam(request.body());
+        }
+        logger.debug("[request] contentType={}, body={}", contentType, bodyParam);
     }
 
     byte[] responseBody(HttpEntity entity) throws IOException {

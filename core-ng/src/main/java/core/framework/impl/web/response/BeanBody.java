@@ -1,7 +1,7 @@
 package core.framework.impl.web.response;
 
 import core.framework.impl.json.JSONMapper;
-import core.framework.impl.log.param.BytesParam;
+import core.framework.impl.log.filter.BytesParam;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.util.Exceptions;
 import core.framework.util.Types;

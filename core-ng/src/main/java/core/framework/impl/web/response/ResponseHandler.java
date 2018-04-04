@@ -2,7 +2,7 @@ package core.framework.impl.web.response;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.impl.log.ActionLog;
-import core.framework.impl.web.HTTPLogger;
+import core.framework.impl.log.filter.FieldParam;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.site.TemplateManager;
 import core.framework.util.Encodings;
@@ -11,6 +11,8 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.HeaderMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -18,12 +20,11 @@ import java.util.Map;
  * @author neo
  */
 public class ResponseHandler {
+    private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
     private final ResponseHandlerContext context;
-    private final HTTPLogger logger;
 
-    public ResponseHandler(ResponseBeanTypeValidator validator, TemplateManager templateManager, HTTPLogger logger) {
+    public ResponseHandler(ResponseBeanTypeValidator validator, TemplateManager templateManager) {
         context = new ResponseHandlerContext(validator, templateManager);
-        this.logger = logger;
     }
 
     public void render(ResponseImpl response, HttpServerExchange exchange, ActionLog actionLog) {
@@ -39,8 +40,11 @@ public class ResponseHandler {
 
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {
         HeaderMap headers = exchange.getResponseHeaders();
-        response.headers.forEach(headers::put);
-        logger.logResponseHeaders(response.headers);
+        response.headers.forEach((name, value) -> {
+            headers.put(name, value);
+
+            logger.debug("[response:header] {}={}", name, new FieldParam(name, value));
+        });
     }
 
     private void putCookies(ResponseImpl response, HttpServerExchange exchange) {
@@ -49,8 +53,10 @@ public class ResponseHandler {
             response.cookies.forEach((spec, value) -> {
                 CookieImpl cookie = cookie(spec, value);
                 cookies.put(spec.name, cookie);
+
+                logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
+                        spec.name, new FieldParam(spec.name, cookie.getValue()), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
             });
-            logger.logResponseCookies(cookies);
         }
     }
 

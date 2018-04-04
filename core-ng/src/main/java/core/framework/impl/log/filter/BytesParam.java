@@ -1,4 +1,4 @@
-package core.framework.impl.log.param;
+package core.framework.impl.log.filter;
 
 import core.framework.util.Charsets;
 
@@ -22,6 +22,6 @@ public class BytesParam {
 
     @Override
     public String toString() {
-        return LogParamHelper.toString(bytes, charset, LogParamHelper.MAX_LONG_STRING_SIZE);
+        return new String(bytes, charset);
     }
 }

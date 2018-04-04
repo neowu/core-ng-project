@@ -3,7 +3,7 @@ package core.framework.impl.kafka;
 import core.framework.impl.json.JSONWriter;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.log.param.BytesParam;
+import core.framework.impl.log.filter.BytesParam;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Network;

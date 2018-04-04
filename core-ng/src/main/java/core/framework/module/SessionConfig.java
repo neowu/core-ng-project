@@ -19,6 +19,7 @@ public final class SessionConfig {
 
     SessionConfig(ModuleContext context) {
         this.context = context;
+        context.logManager.filter.maskedFields.add(context.httpServer.siteManager.sessionManager.sessionId.name);
     }
 
     public void timeout(Duration timeout) {
@@ -27,6 +28,7 @@ public final class SessionConfig {
 
     public void cookie(String name, String domain) {
         context.httpServer.siteManager.sessionManager.cookie(name, domain);
+        context.logManager.filter.maskedFields.add(name);
     }
 
     public void local() {

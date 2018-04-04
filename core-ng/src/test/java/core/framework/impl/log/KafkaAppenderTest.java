@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.impl.log.message.PerformanceStatMessage;
 import core.framework.log.Markers;
@@ -24,9 +25,10 @@ class KafkaAppenderTest {
 
     @Test
     void forwardActionLog() {
-        ActionLog log = new ActionLog("begin");
+        LogFilter filter = new LogFilter();
+        ActionLog log = new ActionLog("begin", filter);
         log.action("action");
-        log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
+        log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null, filter));
         log.track("db", 1000, 1, 2);
 
         kafkaAppender.forwardActionLog(log);

@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.impl.log.filter.LogFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,11 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author neo
  */
 class ActionLogTest {
+    private LogFilter filter;
     private ActionLog log;
 
     @BeforeEach
     void createActionLog() {
-        log = new ActionLog("begin");
+        filter = new LogFilter();
+        log = new ActionLog("begin", filter);
     }
 
     @Test
@@ -44,7 +47,7 @@ class ActionLogTest {
 
     @Test
     void flushTraceLogWithWarning() {
-        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null, filter));
 
         assertTrue(log.flushTraceLog());
     }
@@ -53,7 +56,7 @@ class ActionLogTest {
     void result() {
         assertEquals("OK", log.result());
 
-        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null, filter));
         assertEquals("WARN", log.result());
     }
 
@@ -61,13 +64,13 @@ class ActionLogTest {
     void errorCode() {
         assertNull(log.errorCode());
 
-        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null, filter));
         assertEquals("UNASSIGNED", log.errorCode());
     }
 
     @Test
     void truncateErrorMessage() {
-        log.process(new LogEvent("logger", null, LogLevel.WARN, longString(300), null, null));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, longString(300), null, null, filter));
 
         assertEquals(200, log.errorMessage.length());
     }

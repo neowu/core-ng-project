@@ -4,9 +4,9 @@ import core.framework.impl.log.ConsoleAppender;
 import core.framework.impl.log.KafkaAppender;
 import core.framework.impl.log.stat.CollectStatTask;
 import core.framework.impl.module.ModuleContext;
-import core.framework.log.MessageFilter;
 
 import java.time.Duration;
+import java.util.Arrays;
 
 /**
  * @author neo
@@ -36,7 +36,7 @@ public final class LogConfig {
         }
     }
 
-    public void filter(MessageFilter filter) {
-        context.logManager.filter = filter;
+    public void maskFields(String... fields) {
+        context.logManager.filter.maskedFields.addAll(Arrays.asList(fields));
     }
 }

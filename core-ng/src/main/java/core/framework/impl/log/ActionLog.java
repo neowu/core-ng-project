@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.impl.log.filter.LogFilter;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 
@@ -25,13 +26,13 @@ public final class ActionLog {
     private static final int MAX_ERROR_MESSAGE_LENGTH = 200;
     private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
     private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
-
     public final String id;
     final Instant date;
     final Map<String, String> context;
     final Map<String, Double> stats;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
+    private final LogFilter filter;
     private final long startCPUTime;
     private final long startElapsed;
     public boolean trace;  // whether flush trace log for all subsequent actions
@@ -43,24 +44,27 @@ public final class ActionLog {
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
-    ActionLog(String message) {
+    ActionLog(String message, LogFilter filter) {
         startElapsed = System.nanoTime();
         startCPUTime = THREAD.getCurrentThreadCpuTime();
         date = Instant.now();
+
+        this.filter = filter;
         events = new LinkedList<>();
         context = Maps.newLinkedHashMap();
         stats = Maps.newLinkedHashMap();
         performanceStats = Maps.newHashMap();
         id = UUID.randomUUID().toString();
-        log(message);
-        log("[context] id={}", id);
+
+        add(event(message));
+        add(event("[context] id={}", id));
     }
 
     void end(String message) {
         cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
         elapsed = elapsedTime();
-        log("[context] elapsed={}", elapsed);
-        log(message);
+        add(event("[context] elapsed={}", elapsed));
+        add(event(message));
     }
 
     public long elapsedTime() {
@@ -78,15 +82,15 @@ public final class ActionLog {
         }
     }
 
-    private void log(String message, Object... argument) {  // add log event directly, so internal message won't be suspended
-        add(new LogEvent(LOGGER, null, DEBUG, message, argument, null));
-    }
-
-    private void add(LogEvent event) {
+    private void add(LogEvent event) {  // log inside action log will call this to add log event directly, so internal message won't be suspended
         events.add(event);
         if (events.size() == MAX_TRACE_HOLD_SIZE) {
-            events.add(new LogEvent(LOGGER, null, DEBUG, "reached max trace log holding size, only collect critical log event from now on", null, null));
+            events.add(event("reached max trace log holding size, only collect critical log event from now on"));
         }
+    }
+
+    private LogEvent event(String message, Object... argument) {
+        return new LogEvent(LOGGER, null, DEBUG, message, argument, null, filter);
     }
 
     private String errorMessage(LogEvent event) {
@@ -124,12 +128,12 @@ public final class ActionLog {
         String previous = context.put(key, contextValue);
         // put context can be called by application code, check duplication to avoid producing huge trace log by accident
         if (previous != null) throw Exceptions.error("found duplicate context key, key={}, value={}, previous={}", key, contextValue, previous);
-        log("[context] {}={}", key, contextValue);
+        add(event("[context] {}={}", key, contextValue));
     }
 
     public void stat(String key, Number value) {
         stats.compute(key, (k, oldValue) -> (oldValue == null) ? value.doubleValue() : oldValue + value.doubleValue());
-        log("[stat] {}={}", key, value);
+        add(event("[stat] {}={}", key, value));
     }
 
     public void track(String action, long elapsedTime, Integer readEntries, Integer writeEntries) {
@@ -138,7 +142,7 @@ public final class ActionLog {
         stat.totalElapsed += elapsedTime;
         stat.increaseReadEntries(readEntries);
         stat.increaseWriteEntries(writeEntries);
-        log("[track] {}, elapsedTime={}, readEntries={}, writeEntries={}", action, elapsedTime, readEntries, writeEntries);
+        add(event("[track] {}, elapsedTime={}, readEntries={}, writeEntries={}", action, elapsedTime, readEntries, writeEntries));
     }
 
     public String refId() {
@@ -148,13 +152,13 @@ public final class ActionLog {
 
     public void refId(String refId) {
         if (refId != null) {
-            log("[context] refId={}", refId);
+            add(event("[context] refId={}", refId));
             this.refId = refId;
         }
     }
 
     public void action(String action) {
-        log("[context] action={}", action);
+        add(event("[context] action={}", action));
         this.action = action;
     }
 }

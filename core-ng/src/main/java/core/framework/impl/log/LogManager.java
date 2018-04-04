@@ -1,8 +1,8 @@
 package core.framework.impl.log;
 
+import core.framework.impl.log.filter.LogFilter;
 import core.framework.log.ErrorCode;
 import core.framework.log.Markers;
-import core.framework.log.MessageFilter;
 import core.framework.log.Severity;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -12,12 +12,11 @@ import org.slf4j.Marker;
  */
 public final class LogManager {
     public final String appName;
-
+    public final LogFilter filter = new LogFilter();
     private final ThreadLocal<ActionLog> actionLog = new ThreadLocal<>();
     private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.INFO, LogLevel.DEBUG);
     public ConsoleAppender consoleAppender;
     public KafkaAppender kafkaAppender;
-    public MessageFilter filter;
 
     public LogManager() {
         String appName = System.getProperty("core.appName");
@@ -29,7 +28,7 @@ public final class LogManager {
     }
 
     public ActionLog begin(String message) {
-        ActionLog actionLog = new ActionLog(message);
+        ActionLog actionLog = new ActionLog(message, filter);
         this.actionLog.set(actionLog);
         return actionLog;
     }

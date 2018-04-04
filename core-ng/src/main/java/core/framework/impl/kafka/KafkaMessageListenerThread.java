@@ -2,7 +2,7 @@ package core.framework.impl.kafka;
 
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.log.param.BytesParam;
+import core.framework.impl.log.filter.BytesParam;
 import core.framework.kafka.Message;
 import core.framework.log.Markers;
 import core.framework.util.Charsets;

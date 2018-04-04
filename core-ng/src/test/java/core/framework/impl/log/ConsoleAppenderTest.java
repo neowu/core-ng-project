@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.impl.log.filter.LogFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ class ConsoleAppenderTest {
 
     @Test
     void message() {
-        ActionLog action = new ActionLog("begin");
+        ActionLog action = new ActionLog("begin", new LogFilter());
         action.action("action");
         action.end("end");
 
