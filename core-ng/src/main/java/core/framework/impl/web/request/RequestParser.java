@@ -6,6 +6,7 @@ import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.filter.BytesParam;
 import core.framework.impl.log.filter.FieldParam;
 import core.framework.impl.log.filter.JSONParam;
+import core.framework.util.Charsets;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
@@ -125,15 +126,16 @@ public final class RequestParser {
     }
 
     private void logRequestBody(RequestImpl request) {
-        if (request.contentType == null) return;
+        ContentType contentType = request.contentType;
+        if (contentType == null) return;
 
         Object bodyParam = null;
-        if (ContentType.APPLICATION_JSON.mediaType().equals(request.contentType.mediaType())) {
-            bodyParam = new JSONParam(request.body);
-        } else if (ContentType.TEXT_XML.mediaType().equals(request.contentType.mediaType())) {
-            bodyParam = new BytesParam(request.body);
+        if (ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
+            bodyParam = new JSONParam(request.body, contentType.charset().orElse(Charsets.UTF_8));
+        } else if (ContentType.TEXT_XML.mediaType().equals(contentType.mediaType())) {
+            bodyParam = new BytesParam(request.body, contentType.charset().orElse(Charsets.UTF_8));
         }
-        if (bodyParam != null) logger.debug("[request] body={}", new JSONParam(request.body));
+        if (bodyParam != null) logger.debug("[request] body={}", bodyParam);
     }
 
     private void parseForm(RequestImpl request, HttpServerExchange exchange) {

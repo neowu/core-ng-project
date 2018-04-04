@@ -8,6 +8,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.impl.log.filter.BytesParam;
+import core.framework.impl.log.filter.FieldParam;
 import core.framework.impl.log.filter.JSONParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
@@ -120,7 +121,7 @@ public final class HTTPClientImpl implements HTTPClient {
         }
 
         request.headers().forEach((name, value) -> {
-            logger.debug("[request:header] {}={}", name, value);
+            logger.debug("[request:header] {}={}", name, new FieldParam(name, value));
             builder.setHeader(name, value);
         });
 
@@ -142,8 +143,8 @@ public final class HTTPClientImpl implements HTTPClient {
 
     private void logRequestBody(HTTPRequest request, ContentType contentType) {
         Object bodyParam;
-        if (ContentType.APPLICATION_JSON.equals(contentType)) {
-            bodyParam = new JSONParam(request.body());
+        if (ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
+            bodyParam = new JSONParam(request.body(), contentType.charset().orElse(Charsets.UTF_8));
         } else {
             bodyParam = new BytesParam(request.body());
         }

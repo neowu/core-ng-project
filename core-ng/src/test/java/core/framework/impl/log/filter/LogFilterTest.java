@@ -17,7 +17,7 @@ class LogFilterTest {
     }
 
     @Test
-    void message() {
+    void format() {
         String message = filter.format("message-{}", new Object[]{1});
         assertThat(message).isEqualTo("message-1");
     }
