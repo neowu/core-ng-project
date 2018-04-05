@@ -11,7 +11,8 @@ def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.0.1'
 def jacksonVersion = '2.9.4'
 def junitVersion = '5.1.0'
-def mockitoVersion = '2.16.0'
+def mockitoVersion = '2.17.0'
+def assertjVersion = '3.9.1'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -34,7 +35,7 @@ project(':core-ng') {
         compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"        // used by elasticsearch
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-        testImplementation 'org.assertj:assertj-core:3.9.0'
+        testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
     }
@@ -46,7 +47,7 @@ project(':core-ng-test') {
         api project(":core-ng")
         api "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         api "org.mockito:mockito-core:${mockitoVersion}"
-        api 'org.assertj:assertj-core:3.9.0'
+        api "org.assertj:assertj-core:${assertjVersion}"
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "com.github.fakemongo:fongo:2.1.0@jar"

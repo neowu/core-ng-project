@@ -31,7 +31,7 @@ class HTTPServerErrorHandlerTest {
 
     @Test
     void errorResponseWithErrorCodeException() {
-        ErrorResponse response = handler.errorResponse(new NotFoundException("test-message", "TEST_ERROR_CODE"));
+        ErrorResponse response = handler.errorResponse(new NotFoundException("test-message", "TEST_ERROR_CODE"), null);
 
         assertEquals("test-message", response.message);
         assertEquals("TEST_ERROR_CODE", response.errorCode);
@@ -40,7 +40,7 @@ class HTTPServerErrorHandlerTest {
 
     @Test
     void errorResponse() {
-        ErrorResponse response = handler.errorResponse(new Error("test-message"));
+        ErrorResponse response = handler.errorResponse(new Error("test-message"), null);
 
         assertEquals("test-message", response.message);
         assertEquals("INTERNAL_ERROR", response.errorCode);

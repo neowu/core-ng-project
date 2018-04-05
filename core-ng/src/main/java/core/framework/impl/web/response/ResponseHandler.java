@@ -42,7 +42,6 @@ public class ResponseHandler {
         HeaderMap headers = exchange.getResponseHeaders();
         response.headers.forEach((name, value) -> {
             headers.put(name, value);
-
             logger.debug("[response:header] {}={}", name, new FieldParam(name, value));
         });
     }
@@ -53,7 +52,6 @@ public class ResponseHandler {
             response.cookies.forEach((spec, value) -> {
                 CookieImpl cookie = cookie(spec, value);
                 cookies.put(spec.name, cookie);
-
                 logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
                         spec.name, new FieldParam(spec.name, cookie.getValue()), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
             });
