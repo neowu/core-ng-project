@@ -1,4 +1,6 @@
 ## Change log
+### 6.1.1 (4/4/2018 - )
+
 ### 6.1.0 (3/7/2018 - 4/4/2018)
 * kafka: update to 1.0.1, add config to register publisher without topic (instead of passing null)
 * http: update undertow to 2.0.3
