@@ -8,7 +8,6 @@ import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.stat.Stat;
-import core.framework.impl.web.ControllerActionBuilder;
 import core.framework.impl.web.ControllerClassValidator;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.ControllerInspector;
@@ -17,6 +16,7 @@ import core.framework.impl.web.management.MemoryUsageController;
 import core.framework.impl.web.management.PropertyController;
 import core.framework.impl.web.management.ThreadInfoController;
 import core.framework.impl.web.route.PathPatternValidator;
+import core.framework.util.ASCII;
 import core.framework.util.Lists;
 import core.framework.web.Controller;
 import core.framework.web.WebContext;
@@ -82,7 +82,7 @@ public final class ModuleContext {
         new PathPatternValidator(path).validate();
         ControllerInspector inspector = new ControllerInspector(controller);
         new ControllerClassValidator(inspector.targetClass, inspector.targetMethod).validate();
-        String action = new ControllerActionBuilder(method, path).build();
+        String action = "http:" + ASCII.toLowerCase(method.name()) + ":" + path;
         httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
     }
 

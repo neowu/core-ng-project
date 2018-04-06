@@ -5,7 +5,6 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.ControllerActionBuilder;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.management.APIController;
@@ -15,6 +14,7 @@ import core.framework.impl.web.service.WebServiceClientBuilder;
 import core.framework.impl.web.service.WebServiceControllerBuilder;
 import core.framework.impl.web.service.WebServiceImplValidator;
 import core.framework.impl.web.service.WebServiceInterfaceValidator;
+import core.framework.util.ASCII;
 import core.framework.web.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public final class APIConfig {
                 Class<?> serviceClass = service.getClass();
                 Method targetMethod = serviceClass.getMethod(method.getName(), parameterTypes);
                 String controllerInfo = serviceClass.getCanonicalName() + "." + targetMethod.getName();
-                String action = new ControllerActionBuilder(httpMethod, path).build();
+                String action = "api:" + ASCII.toLowerCase(httpMethod.name()) + ":" + path;
                 context.httpServer.handler.route.add(httpMethod, path, new ControllerHolder(controller, targetMethod, controllerInfo, action, false));
             } catch (NoSuchMethodException e) {
                 throw new Error("failed to find impl method", e);
