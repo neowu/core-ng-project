@@ -9,7 +9,7 @@ import org.mockito.MockitoAnnotations;
  */
 public final class MockitoExtension implements TestInstancePostProcessor {
     @Override
-    public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
+    public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
         MockitoAnnotations.initMocks(testInstance);
     }
 }
