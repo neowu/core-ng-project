@@ -25,7 +25,7 @@ class LocalCacheStoreTest {
 
     @Test
     void getAll() {
-        Map<String, byte[]> values = cacheStore.getAll(new String[]{"key1", "key2"});
+        Map<String, byte[]> values = cacheStore.getAll("key1", "key2");
         assertNull(values.get("key1"));
         assertNull(values.get("key2"));
     }

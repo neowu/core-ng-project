@@ -8,6 +8,6 @@ import java.util.List;
  * @author neo
  */
 public class EnumDefinition {
+    public final List<String> constants = Lists.newArrayList();
     public String name;
-    public List<String> constants = Lists.newArrayList();
 }

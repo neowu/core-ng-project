@@ -24,7 +24,7 @@ class ProtocolTest {
     }
 
     @Test
-    void readError() throws IOException {
+    void readError() {
         ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("-error-message\r\n"));
         RedisException exception = assertThrows(RedisException.class, () -> Protocol.read(new RedisInputStream(stream)));
         assertEquals("error-message", exception.getMessage());

@@ -100,7 +100,7 @@ public final class KafkaAppender {
         producer.close(5, TimeUnit.SECONDS);
     }
 
-    void forwardActionLog(ActionLog log) {
+    void forward(ActionLog log) {
         ActionLogMessage message = new ActionLogMessage();
         message.app = appName;
         message.serverIP = Network.localHostAddress();
@@ -130,7 +130,7 @@ public final class KafkaAppender {
             for (LogEvent event : log.events) {
                 String traceMessage = event.logMessage();
                 if (builder.length() + traceMessage.length() >= MAX_TRACE_LENGTH) {
-                    builder.append(traceMessage.substring(0, MAX_TRACE_LENGTH - builder.length()));
+                    builder.append(traceMessage, 0, MAX_TRACE_LENGTH - builder.length());
                     builder.append("...(truncated)");
                     break;
                 }
@@ -141,7 +141,7 @@ public final class KafkaAppender {
         queue.add(message);
     }
 
-    public void forwardStats(Map<String, Double> stats) {
+    public void forward(Map<String, Double> stats) {
         StatMessage message = new StatMessage();
         message.id = UUID.randomUUID().toString();
         message.date = Instant.now();

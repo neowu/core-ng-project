@@ -77,7 +77,7 @@ class CacheImplTest {
         Map<String, byte[]> values = Maps.newHashMap();
         values.put("name:key1", Strings.bytes("1"));
         values.put("name:key3", Strings.bytes("3"));
-        when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key3"})).thenReturn(values);
+        when(cacheStore.getAll("name:key1", "name:key2", "name:key3")).thenReturn(values);
 
         Map<String, Integer> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> 2);
         assertEquals(3, results.size());

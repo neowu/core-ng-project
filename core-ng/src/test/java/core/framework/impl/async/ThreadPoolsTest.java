@@ -28,9 +28,7 @@ class ThreadPoolsTest {
 
     @Test
     void threadName() throws ExecutionException, InterruptedException {
-        Future<?> future = threadPool.submit(() -> {
-            assertEquals("test-thread-pool-1", Thread.currentThread().getName());
-        });
+        Future<?> future = threadPool.submit(() -> assertEquals("test-thread-pool-1", Thread.currentThread().getName()));
         future.get();
     }
 }

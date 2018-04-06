@@ -84,9 +84,7 @@ public final class RequestParser {
             }
         }
         if (hasCookies) {
-            exchange.getRequestCookies().forEach((name, cookie) -> {
-                logger.debug("[request:cookie] {}={}", name, new FieldParam(name, cookie.getValue()));
-            });
+            exchange.getRequestCookies().forEach((name, cookie) -> logger.debug("[request:cookie] {}={}", name, new FieldParam(name, cookie.getValue())));
         }
     }
 

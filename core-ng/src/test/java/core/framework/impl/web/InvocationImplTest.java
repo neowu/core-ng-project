@@ -66,7 +66,7 @@ class InvocationImplTest {
         }
 
         @Override
-        public Response execute(Request request) throws Exception {
+        public Response execute(Request request) {
             executed = true;
             assertEquals(expectedStack, stack.currentStack);
             return Response.empty();

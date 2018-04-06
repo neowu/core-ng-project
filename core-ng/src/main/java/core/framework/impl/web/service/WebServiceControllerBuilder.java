@@ -82,13 +82,8 @@ public class WebServiceControllerBuilder<T> {
             builder.indent(1).append("{} response = delegate.{}(", type(method.getReturnType()), method.getName());
         }
 
-        int index = 0;
-        for (String param : params) {
-            if (index > 0) builder.append(", ");
-            builder.append(param);
-            index++;
-        }
-        builder.append(");\n");
+        builder.appendCommaSeparatedValues(params)
+               .append(");\n");
 
         if (void.class.equals(method.getReturnType())) {
             builder.indent(1).append("return {}.empty().status({});\n",

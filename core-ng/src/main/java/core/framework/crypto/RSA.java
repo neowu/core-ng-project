@@ -56,23 +56,21 @@ public final class RSA {
         }
     }
 
-    public RSA privateKey(byte[] privateKeyValue) {
+    public void privateKey(byte[] privateKeyValue) {
         try {
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyValue);
             KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM_RSA);
             privateKey = keyFactory.generatePrivate(keySpec);
-            return this;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new Error(e);
         }
     }
 
-    public RSA publicKey(byte[] publicKeyValue) {
+    public void publicKey(byte[] publicKeyValue) {
         try {
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyValue);
             KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM_RSA);
             publicKey = keyFactory.generatePublic(keySpec);
-            return this;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new Error(e);
         }

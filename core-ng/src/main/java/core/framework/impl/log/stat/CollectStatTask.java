@@ -19,6 +19,6 @@ public final class CollectStatTask implements Runnable {
     @Override
     public void run() {
         Map<String, Double> stats = stat.collect();
-        kafkaAppender.forwardStats(stats);
+        kafkaAppender.forward(stats);
     }
 }

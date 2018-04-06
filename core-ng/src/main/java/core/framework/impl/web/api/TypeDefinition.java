@@ -8,8 +8,8 @@ import java.util.List;
  * @author neo
  */
 public class TypeDefinition {
+    public final List<FieldDefinition> fields = Lists.newArrayList();
     public String name;
-    public List<FieldDefinition> fields = Lists.newArrayList();
 
     public static class FieldDefinition {
         public String name;

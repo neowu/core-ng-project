@@ -54,7 +54,7 @@ public final class Files {
     public static void copyDir(Path source, Path destination) {
         StopWatch watch = new StopWatch();
         try {
-            walkFileTree(source, new SimpleFileVisitor<Path>() {
+            walkFileTree(source, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attributes) throws IOException {
                     Path targetPath = destination.resolve(source.relativize(dir));
@@ -78,7 +78,7 @@ public final class Files {
     public static void deleteDir(Path directory) {
         StopWatch watch = new StopWatch();
         try {
-            walkFileTree(directory, new SimpleFileVisitor<Path>() {
+            walkFileTree(directory, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
                     delete(file);

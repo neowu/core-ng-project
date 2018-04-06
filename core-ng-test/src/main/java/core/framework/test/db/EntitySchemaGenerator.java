@@ -6,6 +6,7 @@ import core.framework.db.Column;
 import core.framework.db.Database;
 import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
+import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.reflect.Classes;
 import core.framework.util.Exceptions;
 import core.framework.util.Lists;
@@ -50,7 +51,7 @@ public final class EntitySchemaGenerator {
     private List<String> schemeStatements() {
         List<String> statements = Lists.newArrayList();
 
-        StringBuilder builder = new StringBuilder(256)
+        CodeBuilder builder = new CodeBuilder()
                 .append("CREATE TABLE ");
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");
@@ -79,18 +80,9 @@ public final class EntitySchemaGenerator {
             builder.append(", ");
         }
 
-        builder.append("PRIMARY KEY(");
+        builder.append("PRIMARY KEY(").appendCommaSeparatedValues(primaryKeys).append("))");
 
-        int index = 0;
-        for (String primaryKey : primaryKeys) {
-            if (index > 0) builder.append(", ");
-            builder.append(primaryKey);
-            index++;
-        }
-
-        builder.append("))");
-
-        statements.add(builder.toString());
+        statements.add(builder.build());
 
         return statements;
     }

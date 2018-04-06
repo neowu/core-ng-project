@@ -17,13 +17,13 @@ import java.security.spec.X509EncodedKeySpec;
 /**
  * generate private key:
  * openssl genrsa -out private.pem 2048
- *
+ * <p>
  * convert private key to der format if needed:
  * openssl pkcs8 -topk8 -inform pem -in private.pem -outform der -out private.der -nocrypt
- *
+ * <p>
  * generate cert:
  * openssl req -new -x509 -keyform pem -key private.pem -outform pem -out cert.pem
- *
+ * <p>
  * view cert:
  * openssl x509 -in cert.pem -text -noout
  *
@@ -56,34 +56,31 @@ public final class Signature {
         }
     }
 
-    public Signature certificate(byte[] certificateValue) {
+    public void certificate(byte[] certificateValue) {
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
             Certificate certificate = certificateFactory.generateCertificate(new ByteArrayInputStream(certificateValue));
             publicKey = certificate.getPublicKey();
-            return this;
         } catch (CertificateException e) {
             throw new Error(e);
         }
     }
 
-    public Signature publicKey(byte[] publicKeyValue) {
+    public void publicKey(byte[] publicKeyValue) {
         try {
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyValue);
             KeyFactory keyFactory = KeyFactory.getInstance(RSA.ALGORITHM_RSA);
             publicKey = keyFactory.generatePublic(keySpec);
-            return this;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new Error(e);
         }
     }
 
-    public Signature privateKey(byte[] privateKeyValue) {
+    public void privateKey(byte[] privateKeyValue) {
         try {
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyValue);
             KeyFactory keyFactory = KeyFactory.getInstance(RSA.ALGORITHM_RSA);
             privateKey = keyFactory.generatePrivate(keySpec);
-            return this;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new Error(e);
         }

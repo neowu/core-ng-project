@@ -22,8 +22,7 @@ class ResponseImplTest {
     @Test
     void useHeaderToUpdateContentType() {
         ResponseImpl response = new ResponseImpl(null);
-        assertThatThrownBy(() -> {
-            response.header("Content-Type", "application/json");
-        }).hasMessageContaining("must not use header()");
+        assertThatThrownBy(() -> response.header("Content-Type", "application/json"))
+                .hasMessageContaining("must not use header()");
     }
 }

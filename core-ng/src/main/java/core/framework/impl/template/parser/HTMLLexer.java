@@ -173,7 +173,7 @@ class HTMLLexer {
         if (currentChar == '\'')
             throw Exceptions.error("it is recommended to use double quote to delimit attribute value, location={}", currentLocation());
 
-        boolean hasDoubleQuote = currentIndex < html.length() && currentChar == '"';
+        boolean hasDoubleQuote = currentChar == '"';
         int i = hasDoubleQuote ? currentIndex + 1 : currentIndex;
         for (; i < html.length(); i++) {
             char ch = html.charAt(i);

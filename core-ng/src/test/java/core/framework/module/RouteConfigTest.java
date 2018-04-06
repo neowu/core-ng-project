@@ -54,7 +54,7 @@ class RouteConfigTest {
 
     static class TestController implements Controller {
         @Override
-        public Response execute(Request request) throws Exception {
+        public Response execute(Request request) {
             return null;
         }
     }

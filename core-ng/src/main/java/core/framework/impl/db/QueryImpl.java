@@ -64,7 +64,7 @@ public class QueryImpl<T> implements Query<T> {
     @Override
     public int count() {
         String where = whereClause.length() > 0 ? whereClause.toString() : null;
-        Object[] params = this.params.toArray(new Object[this.params.size()]);
+        Object[] params = this.params.toArray();
         return repository.count(where, params);
     }
 

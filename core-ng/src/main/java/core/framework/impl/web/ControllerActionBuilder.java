@@ -32,7 +32,7 @@ public class ControllerActionBuilder {
             if (Strings.startsWith(token, ':')) {
                 int paramIndex = token.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : token.length();
-                builder.append(token.substring(1, endIndex));
+                builder.append(token, 1, endIndex);
             } else {
                 builder.append(token);
             }

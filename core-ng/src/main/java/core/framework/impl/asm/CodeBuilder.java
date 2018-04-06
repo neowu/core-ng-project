@@ -2,6 +2,8 @@ package core.framework.impl.asm;
 
 import core.framework.util.Strings;
 
+import java.util.List;
+
 /**
  * @author neo
  */
@@ -20,6 +22,16 @@ public class CodeBuilder {
 
     public CodeBuilder append(String pattern, Object... argument) {
         builder.append(Strings.format(pattern, argument));
+        return this;
+    }
+
+    public CodeBuilder appendCommaSeparatedValues(List<String> values) {
+        int index = 0;
+        for (String value : values) {
+            if (index > 0) builder.append(", ");
+            builder.append(value);
+            index++;
+        }
         return this;
     }
 

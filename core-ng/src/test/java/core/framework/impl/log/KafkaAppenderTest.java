@@ -31,7 +31,7 @@ class KafkaAppenderTest {
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null, filter));
         log.track("db", 1000, 1, 2);
 
-        kafkaAppender.forwardActionLog(log);
+        kafkaAppender.forward(log);
         ActionLogMessage message = (ActionLogMessage) kafkaAppender.queue.poll();
 
         assertEquals("app", message.app);

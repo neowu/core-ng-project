@@ -39,7 +39,7 @@ public final class LogManager {
         actionLog.end(message);
 
         if (consoleAppender != null) consoleAppender.write(actionLog);
-        if (kafkaAppender != null) kafkaAppender.forwardActionLog(actionLog);
+        if (kafkaAppender != null) kafkaAppender.forward(actionLog);
     }
 
     public void process(LogEvent event) {
