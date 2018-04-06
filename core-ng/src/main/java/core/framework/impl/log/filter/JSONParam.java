@@ -18,57 +18,47 @@ public class JSONParam implements FilterParam {
     @Override
     public String filter(Set<String> maskedFields) {
         String value = new String(bytes, charset);
+        if (!needMask(value, maskedFields)) return value;
 
-        int firstMaskIndex = findMaskIndex(value, maskedFields, 0);
-        if (firstMaskIndex == -1) return value;
-
-        int currentIndex = 0;
-        int maskIndex = firstMaskIndex;
-        StringBuilder builder = new StringBuilder();
-        while (true) {
-            builder.append(value, currentIndex, maskIndex);
-            currentIndex = mask(value, builder, maskIndex);
-            maskIndex = findMaskIndex(value, maskedFields, currentIndex);
-            if (maskIndex == -1) {
-                builder.append(value, currentIndex, value.length());
-                break;
+        StringBuilder builder = new StringBuilder(value);
+        for (String maskedField : maskedFields) {
+            int current = -1;
+            while (true) {
+                current = builder.indexOf('\"' + maskedField + '\"', current);
+                if (current < 0) break;
+                int[] range = maskRange(builder, current + maskedField.length() + 2);    // start from last double quote
+                if (range == null) break;
+                builder.replace(range[0], range[1], "******");      // with benchmark, StringBuilder.replace is the fastest way to mask substring
+                current = range[1];
             }
         }
         return builder.toString();
     }
 
-    private int mask(String value, StringBuilder builder, int maskIndex) {
-        boolean masked = false;
+    private int[] maskRange(StringBuilder builder, int start) {  // find first json "string" range from start
         boolean escaped = false;
-        int length = value.length();
-        int index;
-        for (index = maskIndex; index < length; index++) {
-            char ch = value.charAt(index);
+        int maskStart = -1;
+        int length = builder.length();
+        for (int index = start; index < length; index++) {
+            char ch = builder.charAt(index);
             if (ch == '\\') {
                 escaped = true;
-            } else if (!escaped && !masked && ch == '\"') {
-                masked = true;
-                escaped = false;
-                builder.append(ch);
-            } else if (!escaped && masked && ch == '\"') {
-                builder.append("******");
-                break;
+            } else if (!escaped && maskStart < 0 && ch == '\"') {
+                maskStart = index + 1;
+            } else if (!escaped && maskStart >= 0 && ch == '\"') {
+                return new int[]{maskStart, index};
             } else {
                 escaped = false;
-                if (!masked) {
-                    builder.append(ch);
-                }
             }
         }
-        return index;
+        return null;
     }
 
-    private int findMaskIndex(String value, Set<String> maskedFields, int fromIndex) {
-        int maskIndex = -1;
+    private boolean needMask(String value, Set<String> maskedFields) {
         for (String maskedField : maskedFields) {
-            int index = value.indexOf('\"' + maskedField + '\"', fromIndex);
-            if (index >= 0 && (index < maskIndex || maskIndex == -1)) maskIndex = index + maskedField.length() + 2;    // start right after "field"
+            int index = value.indexOf('\"' + maskedField + '\"');
+            if (index >= 0) return true;
         }
-        return maskIndex;
+        return false;
     }
 }

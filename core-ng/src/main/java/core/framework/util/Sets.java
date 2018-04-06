@@ -14,6 +14,7 @@ public final class Sets {
     }
 
     @SafeVarargs
+    @SuppressWarnings("varargs")
     public static <T> Set<T> newHashSet(T... values) {
         Set<T> set = new HashSet<>();
         Collections.addAll(set, values);

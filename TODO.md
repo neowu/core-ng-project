@@ -14,7 +14,6 @@
 * long running thread support or needed?
 * missing @PathParam, validation error not clear?
 * support websocket?
-* log mask, whether impl strong typed way filter, since only json body http header need to be masked potentially?
 
 ### jdk 9 incompatible list
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

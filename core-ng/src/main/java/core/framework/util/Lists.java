@@ -19,6 +19,7 @@ public final class Lists {
     }
 
     @SafeVarargs
+    @SuppressWarnings("varargs")
     public static <T> List<T> newArrayList(T... elements) {
         List<T> list = new ArrayList<>(elements.length);
         Collections.addAll(list, elements);

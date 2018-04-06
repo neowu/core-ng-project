@@ -14,7 +14,7 @@ class JSONParamTest {
     @Test
     void filterWithoutMasking() {
         String value = "{\"field1\": \"value1\"}";
-        JSONParam param = param(value);
+        FilterParam param = param(value);
         String message = param.filter(Sets.newHashSet());
         assertThat(message).isEqualTo(value);
     }
@@ -22,15 +22,15 @@ class JSONParamTest {
     @Test
     void filterWithOneMaskedField() {
         String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"field2\": \"value2\"\n}";
-        JSONParam param = param(value);
+        FilterParam param = param(value);
         String message = param.filter(Sets.newHashSet("password", "passwordConfirm"));
         assertThat(message).isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"field2\": \"value2\"\n}");
     }
 
     @Test
     void filterWithMultipleMaskedFields() {
-        String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass123\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"pass123\",\n    \"passwordConfirm\": \"pass123\"}}";
-        JSONParam param = param(value);
+        String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass123\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"pass\\\"123\",\n    \"passwordConfirm\": \"pass123\"}}";
+        FilterParam param = param(value);
         String message = param.filter(Sets.newHashSet("password", "passwordConfirm"));
         assertThat(message).isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"passwordConfirm\": \"******\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"******\",\n    \"passwordConfirm\": \"******\"}}");
     }
@@ -38,7 +38,7 @@ class JSONParamTest {
     @Test
     void filterWithBrokenJSONMessage() {
         String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass12";
-        JSONParam param = param(value);
+        FilterParam param = param(value);
         String message = param.filter(Sets.newHashSet("password", "passwordConfirm"));
         assertThat(message).doesNotContain("pass123");
 
@@ -48,7 +48,7 @@ class JSONParamTest {
         assertThat(message).doesNotContain("pass123");
     }
 
-    private JSONParam param(String value) {
+    private FilterParam param(String value) {
         return new JSONParam(Strings.bytes(value), Charsets.UTF_8);
     }
 }

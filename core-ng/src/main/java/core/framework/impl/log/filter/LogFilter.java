@@ -35,9 +35,6 @@ public class LogFilter {
 
     String truncate(String value, int maxSize) {
         if (value.length() <= maxSize) return value;
-        StringBuilder builder = new StringBuilder(maxSize + 14);
-        builder.append(value, 0, maxSize)
-               .append("...(truncated)");   // length = 14
-        return builder.toString();
+        return value.substring(0, maxSize) + "...(truncated)";
     }
 }
