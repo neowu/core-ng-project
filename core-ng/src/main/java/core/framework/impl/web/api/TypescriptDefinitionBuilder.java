@@ -89,7 +89,9 @@ public class TypescriptDefinitionBuilder {
     private void buildEnums(CodeBuilder builder, Map<String, EnumDefinition> enumDefinitions) {
         enumDefinitions.forEach((name, definition) -> {
             builder.indent(1).append("export enum ").append(name).append(" {\n");
-            builder.indent(2).appendCommaSeparatedValues(definition.constants).append('\n');
+            for (String constant : definition.constants) {
+                builder.indent(2).append(constant).append(" = \"").append(constant).append("\",\n");
+            }
             builder.indent(1).append("}\n");
         });
     }
@@ -115,7 +117,7 @@ public class TypescriptDefinitionBuilder {
         }
         if (GenericTypes.isMap(type)) {
             String valueType = parseType(GenericTypes.mapValueClass(type));
-            return "{ [key:string]: " + valueType + "; }";
+            return "{[key:string]: " + valueType + ";}";
         }
         if (String.class.equals(type)) return "string";
         if (Integer.class.equals(type) || Long.class.equals(type) || Double.class.equals(type) || BigDecimal.class.equals(type)) return "number";

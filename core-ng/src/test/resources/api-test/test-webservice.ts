@@ -9,8 +9,8 @@ export namespace core.framework.impl.web.service {
 
     export interface TestWebService$TestResponse {
         int_field?: number;
-        string_map?: { [key: string]: string; };
-        items?: { [key: string]: core.framework.impl.web.service.TestWebService$TestItem; };
+        string_map?: {[key: string]: string;};
+        items?: {[key: string]: core.framework.impl.web.service.TestWebService$TestItem;};
     }
 
     export interface TestWebService$TestItem {
@@ -24,7 +24,8 @@ export namespace core.framework.impl.web.service {
     }
 
     export enum TestWebService$TestEnum {
-        A, B
+        A = "A",
+        B = "B",
     }
 
     export const TestWebServiceMetadata = {

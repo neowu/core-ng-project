@@ -2,8 +2,7 @@ package core.framework.log;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -11,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class ActionLogContextTest {
     @Test
     void withoutCurrentActionLog() {
-        assertNull(ActionLogContext.id());
+        assertThat(ActionLogContext.id()).isNull();
 
         ActionLogContext.put("key", "value");
-        assertFalse(ActionLogContext.get("key").isPresent());
+        assertThat(ActionLogContext.get("key")).isNotPresent();
 
         ActionLogContext.stat("stat", 1);
     }
