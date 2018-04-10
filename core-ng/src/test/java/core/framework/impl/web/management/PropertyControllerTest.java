@@ -4,7 +4,7 @@ import core.framework.impl.module.PropertyManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -24,6 +24,8 @@ class PropertyControllerTest {
         propertyManager.properties.set("sys.jdbc.user", "user");
         propertyManager.properties.set("sys.jdbc.password", "password");
 
-        assertEquals("sys.jdbc.password=(masked)\nsys.jdbc.user=user\n", controller.text());
+        assertThat(controller.text())
+                .contains("sys.jdbc.password=******")
+                .contains("sys.jdbc.user=user");
     }
 }
