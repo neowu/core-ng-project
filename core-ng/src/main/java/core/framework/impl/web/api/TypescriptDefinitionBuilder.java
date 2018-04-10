@@ -65,6 +65,7 @@ public class TypescriptDefinitionBuilder {
             buildServices(builder, namespace.serviceDefinitions);
             builder.append("}\n");
         });
+        builder.append('\n');   // append line break at last for tslint rule
         return builder.build();
     }
 

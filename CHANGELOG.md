@@ -1,4 +1,6 @@
 ## Change log
+### 6.1.2 (4/9/2018 - )
+
 ### 6.1.1 (4/4/2018 - 4/9/2018)
 * action: simpliy actionId naming scheme, since actionId doesn't need to be used in path anymore
           examples: action=api:patch:/ajax/product/:id, action=http:get:/, action=topic:some-topic, action=job:some-job  
