@@ -20,13 +20,4 @@ public final class Network {
             }
         return localHostAddress;
     }
-
-    public static boolean isLocalAddress(String clientIP) {
-        try {
-            InetAddress address = InetAddress.getByName(clientIP);
-            return address.isLoopbackAddress() || address.isSiteLocalAddress();
-        } catch (UnknownHostException e) {
-            throw new Error(e);
-        }
-    }
 }

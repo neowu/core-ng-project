@@ -1,4 +1,6 @@
 ## Change log
+### 6.1.3 (4/10/2018 - )
+
 ### 6.1.2 (4/9/2018 - 4/10/2018)
 * http: support allow /_sys/* url by cidr, via sys.http.management.allowCIDR property
 
