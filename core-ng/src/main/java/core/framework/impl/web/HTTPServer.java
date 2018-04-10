@@ -1,6 +1,7 @@
 package core.framework.impl.web;
 
 import core.framework.impl.log.LogManager;
+import core.framework.impl.web.http.IPAccessControl;
 import core.framework.impl.web.site.SiteManager;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
@@ -24,6 +25,7 @@ public class HTTPServer {
     }
 
     public final SiteManager siteManager = new SiteManager();
+    public final IPAccessControl managementAccessControl = new IPAccessControl();
     public final HTTPServerHandler handler;
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
     public Integer httpPort;

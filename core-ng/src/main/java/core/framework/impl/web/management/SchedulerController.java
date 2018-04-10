@@ -1,6 +1,7 @@
 package core.framework.impl.web.management;
 
 import core.framework.impl.scheduler.Scheduler;
+import core.framework.impl.web.http.IPAccessControl;
 import core.framework.util.Lists;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -15,13 +16,15 @@ import java.util.List;
 public class SchedulerController {
     private final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
     private final Scheduler scheduler;
+    private final IPAccessControl accessControl;
 
-    public SchedulerController(Scheduler scheduler) {
+    public SchedulerController(Scheduler scheduler, IPAccessControl accessControl) {
         this.scheduler = scheduler;
+        this.accessControl = accessControl;
     }
 
     public Response jobs(Request request) {
-        ControllerHelper.assertFromLocalNetwork(request.clientIP());
+        accessControl.validateClientIP(request.clientIP());
 
         List<JobView> jobs = Lists.newArrayList();
         scheduler.triggers.forEach((name, trigger) -> {
@@ -35,7 +38,7 @@ public class SchedulerController {
     }
 
     public Response triggerJob(Request request) {
-        ControllerHelper.assertFromLocalNetwork(request.clientIP());
+        accessControl.validateClientIP(request.clientIP());
 
         String job = request.pathParam("job");
         logger.info("trigger job, job={}, clientIP={}", job, request.clientIP());

@@ -3,6 +3,7 @@ package core.framework.impl.web.management;
 import core.framework.http.ContentType;
 import core.framework.impl.cache.CacheImpl;
 import core.framework.impl.cache.CacheManager;
+import core.framework.impl.web.http.IPAccessControl;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import core.framework.web.exception.NotFoundException;
@@ -15,13 +16,15 @@ import java.util.stream.Collectors;
  */
 public class CacheController {
     private final CacheManager cacheManager;
+    private final IPAccessControl accessControl;
 
-    public CacheController(CacheManager cacheManager) {
+    public CacheController(CacheManager cacheManager, IPAccessControl accessControl) {
         this.cacheManager = cacheManager;
+        this.accessControl = accessControl;
     }
 
     public Response get(Request request) {
-        ControllerHelper.assertFromLocalNetwork(request.clientIP());
+        accessControl.validateClientIP(request.clientIP());
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
@@ -30,7 +33,7 @@ public class CacheController {
     }
 
     public Response delete(Request request) {
-        ControllerHelper.assertFromLocalNetwork(request.clientIP());
+        accessControl.validateClientIP(request.clientIP());
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
@@ -39,7 +42,7 @@ public class CacheController {
     }
 
     public Response list(Request request) {
-        ControllerHelper.assertFromLocalNetwork(request.clientIP());
+        accessControl.validateClientIP(request.clientIP());
         List<CacheView> caches = cacheManager.caches().stream().map(this::view).collect(Collectors.toList());
         return Response.bean(caches);
     }

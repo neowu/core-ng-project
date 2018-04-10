@@ -17,7 +17,7 @@ class KafkaControllerTest {
 
     @BeforeEach
     void createKafkaController() {
-        controller = new KafkaController(null);
+        controller = new KafkaController(null, null);
     }
 
     @Test

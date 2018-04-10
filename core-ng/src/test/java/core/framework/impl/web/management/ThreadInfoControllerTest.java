@@ -13,7 +13,7 @@ class ThreadInfoControllerTest {
 
     @BeforeEach
     void createThreadInfoController() {
-        controller = new ThreadInfoController();
+        controller = new ThreadInfoController(null);
     }
 
     @Test

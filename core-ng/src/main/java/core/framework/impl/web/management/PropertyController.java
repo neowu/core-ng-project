@@ -1,6 +1,7 @@
 package core.framework.impl.web.management;
 
 import core.framework.impl.module.PropertyManager;
+import core.framework.impl.web.http.IPAccessControl;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -13,14 +14,16 @@ import java.util.TreeSet;
  */
 public class PropertyController implements Controller {
     private final PropertyManager propertyManager;
+    private final IPAccessControl accessControl;
 
-    public PropertyController(PropertyManager propertyManager) {
+    public PropertyController(PropertyManager propertyManager, IPAccessControl accessControl) {
         this.propertyManager = propertyManager;
+        this.accessControl = accessControl;
     }
 
     @Override
     public Response execute(Request request) {
-        ControllerHelper.assertFromLocalNetwork(request.clientIP());
+        accessControl.validateClientIP(request.clientIP());
         return Response.text(text());
     }
 

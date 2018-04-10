@@ -11,7 +11,6 @@ import core.framework.test.kafka.TestMessage;
 import core.framework.test.module.AbstractTestModule;
 import core.framework.test.mongo.TestMongoEntity;
 import core.framework.test.search.TestDocument;
-import core.framework.util.Sets;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -46,8 +45,9 @@ public class TestModule extends AbstractTestModule {
         http().httpPort(8080);
         http().httpsPort(8443);
         http().enableGZip();
-        http().allowClientIP(Sets.newHashSet("0.0.0.0/0"));
         http().maxForwardedIPs(2);
+        http().allowCIDR("0.0.0.0/0");
+        http().management().allowCIDR("0.0.0.0/0");
     }
 
     private void configureKafka() {

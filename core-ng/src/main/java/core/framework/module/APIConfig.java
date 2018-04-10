@@ -106,7 +106,7 @@ public final class APIConfig {
 
     private APIController apiController() {
         if (state.apiController == null) {
-            state.apiController = new APIController();
+            state.apiController = new APIController(context.httpServer.managementAccessControl);
             context.route(HTTPMethod.GET, "/_sys/api", state.apiController, true);
         }
         return state.apiController;

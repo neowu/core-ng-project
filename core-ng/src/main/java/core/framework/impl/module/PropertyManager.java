@@ -31,7 +31,7 @@ public class PropertyManager {
     }
 
     public String maskValue(String key, String value) {
-        if (key.contains("password") || key.contains("secret")) return "(masked)";
+        if (key.contains("password") || key.contains("secret")) return "******";
         return value;
     }
 

@@ -1,5 +1,7 @@
 package core.framework.module;
 
+import core.framework.util.Strings;
+
 /**
  * @author neo
  */
@@ -51,6 +53,10 @@ public final class SystemModule extends Module {
         property("sys.http.port").ifPresent(port -> http().httpPort(Integer.parseInt(port)));
 
         property("sys.https.port").ifPresent(port -> http().httpsPort(Integer.parseInt(port)));
+
+        property("sys.http.allowCIDR").ifPresent(cidrs -> http().allowCIDR(Strings.split(cidrs, ',')));
+
+        property("sys.http.management.allowCIDR").ifPresent(cidrs -> http().management().allowCIDR(Strings.split(cidrs, ',')));
     }
 
     private void configureLog() {

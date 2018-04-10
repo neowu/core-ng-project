@@ -61,11 +61,11 @@ public final class ModuleContext {
         }
         beanFactory.bind(Executor.class, null, executor);
 
-        route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
-        ThreadInfoController threadInfoController = new ThreadInfoController();
+        route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(httpServer.managementAccessControl), true);
+        ThreadInfoController threadInfoController = new ThreadInfoController(httpServer.managementAccessControl);
         route(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage, true);
         route(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump, true);
-        PropertyController propertyController = new PropertyController(propertyManager);
+        PropertyController propertyController = new PropertyController(propertyManager, httpServer.managementAccessControl);
         route(HTTPMethod.GET, "/_sys/property", propertyController, true);
     }
 

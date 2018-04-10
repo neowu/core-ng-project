@@ -1,6 +1,7 @@
 package core.framework.impl.web.management;
 
 import core.framework.impl.kafka.Kafka;
+import core.framework.impl.web.http.IPAccessControl;
 import core.framework.util.Lists;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -15,19 +16,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
  */
 public class KafkaController {
     private final Kafka kafka;
+    private final IPAccessControl accessControl;
 
-    public KafkaController(Kafka kafka) {
+    public KafkaController(Kafka kafka, IPAccessControl accessControl) {
         this.kafka = kafka;
+        this.accessControl = accessControl;
     }
 
     public Response topics(Request request) throws ExecutionException, InterruptedException {
-        ControllerHelper.assertFromLocalNetwork(request.clientIP());
+        accessControl.validateClientIP(request.clientIP());
         List<KafkaTopic> views = Lists.newArrayList();
         try (AdminClient admin = kafka.admin()) {
             Set<String> topics = admin.listTopics().names().get();
@@ -57,14 +61,7 @@ public class KafkaController {
     }
 
     String nodes(List<Node> nodes) {
-        StringBuilder builder = new StringBuilder();
-        int index = 0;
-        for (Node replica : nodes) {
-            if (index > 0) builder.append(", ");
-            builder.append(node(replica));
-            index++;
-        }
-        return builder.toString();
+        return nodes.stream().map(this::node).collect(Collectors.joining(", "));
     }
 
     private String node(Node node) {
