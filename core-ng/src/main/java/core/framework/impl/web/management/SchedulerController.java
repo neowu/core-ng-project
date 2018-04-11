@@ -15,16 +15,15 @@ import java.util.List;
  */
 public class SchedulerController {
     private final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
+    private final IPAccessControl accessControl = new IPAccessControl();
     private final Scheduler scheduler;
-    private final IPAccessControl accessControl;
 
-    public SchedulerController(Scheduler scheduler, IPAccessControl accessControl) {
+    public SchedulerController(Scheduler scheduler) {
         this.scheduler = scheduler;
-        this.accessControl = accessControl;
     }
 
     public Response jobs(Request request) {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
 
         List<JobView> jobs = Lists.newArrayList();
         scheduler.triggers.forEach((name, trigger) -> {
@@ -38,7 +37,7 @@ public class SchedulerController {
     }
 
     public Response triggerJob(Request request) {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
 
         String job = request.pathParam("job");
         logger.info("trigger job, job={}", job);

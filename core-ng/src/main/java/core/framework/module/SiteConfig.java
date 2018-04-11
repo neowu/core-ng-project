@@ -2,6 +2,8 @@ package core.framework.module;
 
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.web.http.IPAccessControl;
+import core.framework.impl.web.management.APIController;
 import core.framework.impl.web.site.StaticContentController;
 import core.framework.impl.web.site.StaticDirectoryController;
 import core.framework.impl.web.site.StaticFileController;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -70,6 +73,11 @@ public final class SiteConfig {
 
     public void enableWebSecurity() {
         context.httpServer.handler.interceptors.add(new WebSecurityInterceptor());
+    }
+
+    public void publishAPI(String... cidrs) {
+        logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceInterfaces, new IPAccessControl()), true);
     }
 
     public static class State {

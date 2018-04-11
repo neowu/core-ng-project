@@ -46,7 +46,7 @@ public final class KafkaConfig {
             context.startupHook.add(kafka::initialize);
             context.shutdownHook.add(kafka::close);
 
-            KafkaController controller = new KafkaController(kafka, context.httpServer.managementAccessControl);
+            KafkaController controller = new KafkaController(kafka);
             context.route(HTTPMethod.GET, "/_sys/kafka/topic", controller::topics, true);
             context.route(HTTPMethod.PUT, "/_sys/kafka/topic/:topic", controller::updateTopic, true);
             context.route(HTTPMethod.DELETE, "/_sys/kafka/topic/:topic/record", controller::deleteRecords, true);

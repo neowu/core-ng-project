@@ -49,10 +49,6 @@ public final class HTTPConfig {
         return new LimitRateConfig(state);
     }
 
-    public ManagementConfig management() {
-        return new ManagementConfig(context.httpServer);
-    }
-
     /**
      * Set max x-forwarded-for ips to prevent client ip spoofing, e.g. script clients send custom x-forwarded-for header to bypass rate limiting by ip.
      * Default is 2 to fit common scenarios, e.g. Google LB(append 2 ips)->kube service, AWS->nginx->webapp

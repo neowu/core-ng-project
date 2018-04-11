@@ -38,6 +38,7 @@ public final class ModuleContext {
     public final MockFactory mockFactory;
     public final Stat stat = new Stat();
     public final Config config = new Config();
+    public final List<Class<?>> serviceInterfaces = Lists.newArrayList();   // TODO: make Config stateful and move this into APIConfig
     private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext(BeanFactory beanFactory, MockFactory mockFactory) {
@@ -61,11 +62,11 @@ public final class ModuleContext {
         }
         beanFactory.bind(Executor.class, null, executor);
 
-        route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(httpServer.managementAccessControl), true);
-        ThreadInfoController threadInfoController = new ThreadInfoController(httpServer.managementAccessControl);
+        route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
+        ThreadInfoController threadInfoController = new ThreadInfoController();
         route(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage, true);
         route(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump, true);
-        PropertyController propertyController = new PropertyController(propertyManager, httpServer.managementAccessControl);
+        PropertyController propertyController = new PropertyController(propertyManager);
         route(HTTPMethod.GET, "/_sys/property", propertyController, true);
     }
 

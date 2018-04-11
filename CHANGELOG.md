@@ -1,6 +1,6 @@
 ## Change log
 ### 6.1.3 (4/10/2018 - )
-* http: rethink api expose, make it site specific, revert other management controller
+* http: rethink api expose, make it site specific, revert other management controller, changed property to sys.site.publishAPI.allowCIDR
 * kafka: update to 1.1.0, add management controller method to increase partition/delete records 
 * search: update es to 6.2.3
 

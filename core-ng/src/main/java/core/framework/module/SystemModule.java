@@ -47,6 +47,8 @@ public final class SystemModule extends Module {
         property("sys.elasticsearch.host").ifPresent(host -> search().host(host));
 
         property("sys.mongo.uri").ifPresent(uri -> mongo().uri(uri));
+
+        property("sys.site.publishAPI.allowCIDR").ifPresent(cidrs -> site().publishAPI(Strings.split(cidrs, ',')));
     }
 
     void configureHTTP() {
@@ -55,8 +57,6 @@ public final class SystemModule extends Module {
         property("sys.https.port").ifPresent(port -> http().httpsPort(Integer.parseInt(port)));
 
         property("sys.http.allowCIDR").ifPresent(cidrs -> http().allowCIDR(Strings.split(cidrs, ',')));
-
-        property("sys.http.management.allowCIDR").ifPresent(cidrs -> http().management().allowCIDR(Strings.split(cidrs, ',')));
     }
 
     private void configureLog() {

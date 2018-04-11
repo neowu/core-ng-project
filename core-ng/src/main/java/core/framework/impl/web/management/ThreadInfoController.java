@@ -14,14 +14,10 @@ import java.lang.management.ThreadMXBean;
  * @author neo
  */
 public class ThreadInfoController {
-    private final IPAccessControl accessControl;
-
-    public ThreadInfoController(IPAccessControl accessControl) {
-        this.accessControl = accessControl;
-    }
+    private final IPAccessControl accessControl = new IPAccessControl();
 
     public Response threadUsage(Request request) {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
 
         ThreadUsage usage = new ThreadUsage();
         ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
@@ -32,7 +28,7 @@ public class ThreadInfoController {
     }
 
     public Response threadDump(Request request) {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
 
         return Response.text(threadDumpText());
     }

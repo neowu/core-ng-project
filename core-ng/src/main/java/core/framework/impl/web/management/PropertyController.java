@@ -13,17 +13,16 @@ import java.util.TreeSet;
  * @author neo
  */
 public class PropertyController implements Controller {
+    private final IPAccessControl accessControl = new IPAccessControl();
     private final PropertyManager propertyManager;
-    private final IPAccessControl accessControl;
 
-    public PropertyController(PropertyManager propertyManager, IPAccessControl accessControl) {
+    public PropertyController(PropertyManager propertyManager) {
         this.propertyManager = propertyManager;
-        this.accessControl = accessControl;
     }
 
     @Override
     public Response execute(Request request) {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
         return Response.text(text());
     }
 

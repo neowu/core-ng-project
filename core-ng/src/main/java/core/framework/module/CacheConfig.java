@@ -85,7 +85,7 @@ public final class CacheConfig {
     private void configureCacheManager(CacheStore cacheStore) {
         state.cacheManager = new CacheManager(cacheStore);
 
-        CacheController controller = new CacheController(state.cacheManager, context.httpServer.managementAccessControl);
+        CacheController controller = new CacheController(state.cacheManager);
         context.route(HTTPMethod.GET, "/_sys/cache", controller::list, true);
         context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", controller::get, true);
         context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete, true);

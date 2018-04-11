@@ -18,21 +18,20 @@ class IPAccessControlTest {
 
     @BeforeEach
     void createIPAccessControl() {
-        accessControl = new IPAccessControl();
-        accessControl.allowCIDR("100.100.100.100/32");
+        accessControl = new IPAccessControl("100.100.100.100/32");
     }
 
     @Test
-    void validateClientIPWithMatchedIP() {
-        accessControl.validateClientIP("100.100.100.100");
+    void validateWithMatchedIP() {
+        accessControl.validate("100.100.100.100");
     }
 
     @Test
-    void validateClientIPWithLocalIP() {
-        accessControl.validateClientIP("127.0.0.1");
-        accessControl.validateClientIP("192.168.0.1");
-        accessControl.validateClientIP("10.0.0.1");
-        accessControl.validateClientIP("::1");
+    void validateWithLocalIP() {
+        accessControl.validate("127.0.0.1");
+        accessControl.validate("192.168.0.1");
+        accessControl.validate("10.0.0.1");
+        accessControl.validate("::1");
     }
 
     @Test
@@ -46,8 +45,8 @@ class IPAccessControlTest {
     }
 
     @Test
-    void validateClientIP() {
-        assertThatThrownBy(() -> accessControl.validateClientIP("100.100.100.1"))
+    void validateWithNotMatchedIP() {
+        assertThatThrownBy(() -> accessControl.validate("100.100.100.1"))
                 .isInstanceOf(ForbiddenException.class)
                 .hasMessageContaining("denied");
     }

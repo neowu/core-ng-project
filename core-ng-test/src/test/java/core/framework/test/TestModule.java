@@ -35,10 +35,15 @@ public class TestModule extends AbstractTestModule {
 
         log().writeToConsole();
 
-        site().session().redis("localhost");
         configureHTTP();
+        configureSite();
 
         bind(new TestBean(requiredProperty("test.inject-test.property")));
+    }
+
+    private void configureSite() {
+        site().session().redis("localhost");
+        site().publishAPI("0.0.0.0/0");
     }
 
     private void configureHTTP() {
@@ -47,7 +52,6 @@ public class TestModule extends AbstractTestModule {
         http().enableGZip();
         http().maxForwardedIPs(2);
         http().allowCIDR("0.0.0.0/0");
-        http().management().allowCIDR("0.0.0.0/0");
     }
 
     private void configureKafka() {

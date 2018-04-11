@@ -27,7 +27,7 @@ class KafkaControllerTest {
         Kafka kafka = Mockito.mock(Kafka.class);
         adminClient = Mockito.mock(AdminClient.class);
         Mockito.when(kafka.admin()).thenReturn(adminClient);
-        controller = new KafkaController(kafka, null);
+        controller = new KafkaController(kafka);
     }
 
     @Test

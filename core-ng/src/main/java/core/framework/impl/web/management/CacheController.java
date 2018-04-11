@@ -16,15 +16,14 @@ import java.util.stream.Collectors;
  */
 public class CacheController {
     private final CacheManager cacheManager;
-    private final IPAccessControl accessControl;
+    private final IPAccessControl accessControl = new IPAccessControl();
 
-    public CacheController(CacheManager cacheManager, IPAccessControl accessControl) {
+    public CacheController(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
-        this.accessControl = accessControl;
     }
 
     public Response get(Request request) {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
@@ -33,7 +32,7 @@ public class CacheController {
     }
 
     public Response delete(Request request) {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
@@ -42,7 +41,7 @@ public class CacheController {
     }
 
     public Response list(Request request) {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
         List<CacheView> caches = cacheManager.caches().stream().map(this::view).collect(Collectors.toList());
         return Response.bean(caches);
     }

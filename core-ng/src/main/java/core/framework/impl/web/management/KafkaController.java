@@ -31,16 +31,15 @@ import java.util.stream.Collectors;
  */
 public class KafkaController {
     private final Logger logger = LoggerFactory.getLogger(KafkaController.class);
+    private final IPAccessControl accessControl = new IPAccessControl();
     private final Kafka kafka;
-    private final IPAccessControl accessControl;
 
-    public KafkaController(Kafka kafka, IPAccessControl accessControl) {
+    public KafkaController(Kafka kafka) {
         this.kafka = kafka;
-        this.accessControl = accessControl;
     }
 
     public Response topics(Request request) throws ExecutionException, InterruptedException {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
         List<KafkaTopic> views = Lists.newArrayList();
         try (AdminClient admin = kafka.admin()) {
             Set<String> topics = admin.listTopics().names().get();
@@ -56,6 +55,7 @@ public class KafkaController {
     }
 
     public Response updateTopic(Request request) {
+        accessControl.validate(request.clientIP());
         String topic = request.pathParam("topic");
         UpdateTopicRequest updateTopicRequest = request.bean(UpdateTopicRequest.class);
         updateTopic(topic, updateTopicRequest);
@@ -74,6 +74,7 @@ public class KafkaController {
     }
 
     public Response deleteRecords(Request request) {
+        accessControl.validate(request.clientIP());
         String topic = request.pathParam("topic");
         DeleteRecordRequest deleteRecordRequest = request.bean(DeleteRecordRequest.class);
         deleteRecords(topic, deleteRecordRequest);

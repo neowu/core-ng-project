@@ -12,15 +12,11 @@ import java.lang.management.MemoryMXBean;
  * @author neo
  */
 public class MemoryUsageController implements Controller {
-    private final IPAccessControl accessControl;
-
-    public MemoryUsageController(IPAccessControl accessControl) {
-        this.accessControl = accessControl;
-    }
+    private final IPAccessControl accessControl = new IPAccessControl();
 
     @Override
     public Response execute(Request request) {
-        accessControl.validateClientIP(request.clientIP());
+        accessControl.validate(request.clientIP());
         return Response.bean(memoryUsage());
     }
 

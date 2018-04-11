@@ -16,7 +16,7 @@ class PropertyControllerTest {
     @BeforeEach
     void createPropertyController() {
         propertyManager = new PropertyManager();
-        controller = new PropertyController(propertyManager, null);
+        controller = new PropertyController(propertyManager);
     }
 
     @Test

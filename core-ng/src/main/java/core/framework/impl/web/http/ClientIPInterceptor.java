@@ -11,14 +11,13 @@ public class ClientIPInterceptor implements Interceptor {
     private final IPAccessControl accessControl;
 
     public ClientIPInterceptor(String... cidrs) {
-        accessControl = new IPAccessControl();
-        accessControl.allowCIDR(cidrs);
+        accessControl = new IPAccessControl(cidrs);
     }
 
     @Override
     public Response intercept(Invocation invocation) throws Exception {
         String clientIP = invocation.context().request().clientIP();
-        accessControl.validateClientIP(clientIP);
+        accessControl.validate(clientIP);
         return invocation.proceed();
     }
 }
