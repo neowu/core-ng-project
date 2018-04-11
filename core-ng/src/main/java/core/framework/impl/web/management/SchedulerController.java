@@ -41,7 +41,7 @@ public class SchedulerController {
         accessControl.validateClientIP(request.clientIP());
 
         String job = request.pathParam("job");
-        logger.info("trigger job, job={}, clientIP={}", job, request.clientIP());
+        logger.info("trigger job, job={}", job);
         scheduler.triggerNow(job);
         return Response.text("job triggered, job=" + job);
     }

@@ -1,5 +1,8 @@
 ## Change log
 ### 6.1.3 (4/10/2018 - )
+* http: rethink api expose, make it site specific, revert other management controller
+* kafka: update to 1.1.0, add management controller method to increase partition/delete records 
+* search: update es to 6.2.3
 
 ### 6.1.2 (4/9/2018 - 4/10/2018)
 * http: support allow /_sys/* url by cidr, via sys.http.management.allowCIDR property

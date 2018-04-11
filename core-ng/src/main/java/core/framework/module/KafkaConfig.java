@@ -48,6 +48,8 @@ public final class KafkaConfig {
 
             KafkaController controller = new KafkaController(kafka, context.httpServer.managementAccessControl);
             context.route(HTTPMethod.GET, "/_sys/kafka/topic", controller::topics, true);
+            context.route(HTTPMethod.PUT, "/_sys/kafka/topic/:topic", controller::updateTopic, true);
+            context.route(HTTPMethod.DELETE, "/_sys/kafka/topic/:topic/record", controller::deleteRecords, true);
 
             return kafka;
         }
