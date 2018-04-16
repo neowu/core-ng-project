@@ -1,5 +1,5 @@
 ## Change log
-### 6.1.2/6.1.3 (4/9/2018 - )
+### 6.1.2/6.1.3 (4/9/2018 - 4/16/2018)
 * site: added publishAPI() / sys.site.publishAPI.allowCIDR to allow access /sys/_api from trusted network 
 * kafka: update to 1.1.0, add management controller method to increase partition/delete records 
 * search: update es to 6.2.3
