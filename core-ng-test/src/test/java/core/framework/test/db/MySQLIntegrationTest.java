@@ -12,9 +12,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -39,10 +40,8 @@ class MySQLIntegrationTest extends IntegrationTest {
         entity.zonedDateTimeField = ZonedDateTime.now();
         repository.insert(entity);
 
-        TestDBEntity selectedEntity = repository.get(entity.id).get();
-        assertEquals(entity.dateField, selectedEntity.dateField);
-        assertEquals(entity.dateTimeField, selectedEntity.dateTimeField);
-        assertEquals(entity.zonedDateTimeField, selectedEntity.zonedDateTimeField);
+        Optional<TestDBEntity> selectedEntity = repository.get(entity.id);
+        assertThat(selectedEntity).get().isEqualToComparingFieldByField(entity);
     }
 
     @Test
@@ -50,17 +49,20 @@ class MySQLIntegrationTest extends IntegrationTest {
         createTestEntities();
 
         Query<TestDBEntity> query = repository.select();
-        query.where("int_field > ?", 3)
-             .where("string_field like ?", "value%")
-             .orderBy("int_field")
-             .limit(5);
+        query.where("int_field > ?", 3);
+        query.where("string_field like ?", "value%");
+        query.orderBy("int_field");
+        query.limit(5);
 
         int count = query.count();
-        assertEquals(26, count);
+        assertThat(count).isEqualTo(26);
 
         List<TestDBEntity> entities = query.fetch();
-        assertEquals(5, entities.size());
-        assertEquals(4, (int) entities.get(0).intField);
+        assertThat(entities).hasSize(5);
+        assertThat(entities.get(0).intField).isEqualTo(4);
+
+        Optional<Integer> sum = query.project("sum(int_field)", Integer.class);
+        assertThat(sum).hasValue(429);  // (4+29)*(26/2)
     }
 
     @Test
@@ -68,8 +70,8 @@ class MySQLIntegrationTest extends IntegrationTest {
         createTestEntities();
 
         List<TestDBEntity> entities = repository.select("string_field = ?", "value-10");
-        assertEquals(1, entities.size());
-        assertEquals(10, (int) entities.get(0).intField);
+        assertThat(entities).hasSize(1);
+        assertThat(entities.get(0).intField).isEqualTo(10);
     }
 
     private void createTestEntities() {

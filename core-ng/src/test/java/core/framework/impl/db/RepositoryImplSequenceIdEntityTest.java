@@ -73,33 +73,42 @@ class RepositoryImplSequenceIdEntityTest {
     void select() {
         createEntities();
 
-        Query<SequenceIdEntity> query = repository.select().orderBy("long_field").limit(5);
+        Query<SequenceIdEntity> query = repository.select();
+        query.orderBy("long_field");
+        query.limit(5);
 
-        List<SequenceIdEntity> entities = query.skip(0).fetch();
+        int count = query.count();
+        assertEquals(30, count);
+
+        query.skip(0);
+        List<SequenceIdEntity> entities = query.fetch();
         assertEquals(5, entities.size());
         assertEquals("value1", entities.get(0).stringField);
         assertEquals(Long.valueOf(1), entities.get(0).longField);
         assertEquals(Long.valueOf(5), entities.get(4).longField);
 
-        entities = query.skip(5).fetch();
+        query.skip(5);
+        entities = query.fetch();
         assertEquals(5, entities.size());
         assertEquals(Long.valueOf(6), entities.get(0).longField);
         assertEquals(Long.valueOf(10), entities.get(4).longField);
 
-        entities = query.skip(10).fetch();
+        query.skip(10);
+        entities = query.fetch();
         assertEquals(5, entities.size());
         assertEquals(Long.valueOf(11), entities.get(0).longField);
         assertEquals(Long.valueOf(15), entities.get(4).longField);
 
         query.where("long_field > ?", 10);
-
-        entities = query.skip(0).fetch();
+        query.skip(0);
+        entities = query.fetch();
         assertEquals(5, entities.size());
         assertEquals("value11", entities.get(0).stringField);
         assertEquals(Long.valueOf(11), entities.get(0).longField);
         assertEquals(Long.valueOf(15), entities.get(4).longField);
 
-        entities = query.skip(5).fetch();
+        query.skip(5);
+        entities = query.fetch();
         assertEquals(5, entities.size());
         assertEquals(Long.valueOf(16), entities.get(0).longField);
         assertEquals(Long.valueOf(20), entities.get(4).longField);

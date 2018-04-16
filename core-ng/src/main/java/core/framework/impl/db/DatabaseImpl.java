@@ -30,8 +30,6 @@ import java.util.Properties;
  * @author neo
  */
 public final class DatabaseImpl implements Database {
-    static final RowMapper.IntegerRowMapper ROW_MAPPER_INTEGER = new RowMapper.IntegerRowMapper();
-
     public final Pool<Connection> pool;
     public final DatabaseOperation operation;
 
@@ -60,7 +58,7 @@ public final class DatabaseImpl implements Database {
 
     private void initializeRowMappers() {
         rowMappers.put(String.class, new RowMapper.StringRowMapper());
-        rowMappers.put(Integer.class, ROW_MAPPER_INTEGER);
+        rowMappers.put(Integer.class, new RowMapper.IntegerRowMapper());
         rowMappers.put(Long.class, new RowMapper.LongRowMapper());
         rowMappers.put(Double.class, new RowMapper.DoubleRowMapper());
         rowMappers.put(BigDecimal.class, new RowMapper.BigDecimalRowMapper());
@@ -155,8 +153,8 @@ public final class DatabaseImpl implements Database {
         StopWatch watch = new StopWatch();
         try {
             new DatabaseClassValidator(entityClass).validateEntityClass();
-            RowMapper<T> mapper = registerViewClass(entityClass);
-            return new RepositoryImpl<>(this, entityClass, mapper);
+            registerViewClass(entityClass);
+            return new RepositoryImpl<>(this, entityClass);
         } finally {
             logger.info("register db entity, entityClass={}, elapsedTime={}", entityClass.getCanonicalName(), watch.elapsedTime());
         }
@@ -179,7 +177,7 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, returnedRows, 0);
-            logger.debug("select, sql={}, params={}, updatedRows={}, elapsedTime={}", sql, params, returnedRows, elapsedTime);
+            logger.debug("select, sql={}, params={}, returnedRows={}, elapsedTime={}", sql, params, returnedRows, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -187,12 +185,15 @@ public final class DatabaseImpl implements Database {
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
         StopWatch watch = new StopWatch();
+        int returnedRows = 0;
         try {
-            return operation.selectOne(sql, rowMapper(viewClass), params);
+            Optional<T> result = operation.selectOne(sql, rowMapper(viewClass), params);
+            if (result.isPresent()) returnedRows = 1;
+            return result;
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, 1, 0);
-            logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
+            ActionLogContext.track("db", elapsedTime, returnedRows, 0);
+            logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsedTime={}", sql, params, returnedRows, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -220,13 +221,12 @@ public final class DatabaseImpl implements Database {
         return mapper;
     }
 
-    private <T> RowMapper<T> registerViewClass(Class<T> viewClass) {
+    private <T> void registerViewClass(Class<T> viewClass) {
         if (rowMappers.containsKey(viewClass)) {
             throw Exceptions.error("found duplicate view class, viewClass={}", viewClass.getCanonicalName());
         }
         RowMapper<T> mapper = new RowMapperBuilder<>(viewClass, operation.enumMapper).build();
         rowMappers.put(viewClass, mapper);
-        return mapper;
     }
 
     private void checkTooManyRowsReturned(int size) {

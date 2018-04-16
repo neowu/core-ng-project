@@ -1,20 +1,25 @@
 package core.framework.db;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author neo
  */
 public interface Query<T> {
-    Query<T> where(String condition, Object... params);
+    void where(String condition, Object... params);
 
-    Query<T> orderBy(String sort);
+    void orderBy(String sort);
 
-    Query<T> skip(int skip);
+    void skip(int skip);
 
-    Query<T> limit(int limit);
+    void limit(int limit);
 
     List<T> fetch();
 
-    int count();
+    <P> Optional<P> project(String projection, Class<P> viewClass);
+
+    default int count() {
+        return project("count(1)", Integer.class).orElseThrow(() -> new Error("unexpected result"));
+    }
 }

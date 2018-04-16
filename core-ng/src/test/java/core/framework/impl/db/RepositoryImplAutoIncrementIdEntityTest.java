@@ -88,7 +88,8 @@ class RepositoryImplAutoIncrementIdEntityTest {
 
     @Test
     void selectWithLimit() {
-        Query<AutoIncrementIdEntity> query = repository.select().limit(1000);
+        Query<AutoIncrementIdEntity> query = repository.select();
+        query.limit(1000);
         List<AutoIncrementIdEntity> entities = query.fetch();
         assertTrue(entities.isEmpty());
 

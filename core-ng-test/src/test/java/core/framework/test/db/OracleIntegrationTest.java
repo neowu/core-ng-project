@@ -12,8 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -37,10 +36,10 @@ class OracleIntegrationTest extends IntegrationTest {
         TestSequenceIdDBEntity entity = new TestSequenceIdDBEntity();
         entity.intField = 1;
         Optional<Long> id = repository.insert(entity);
+        assertThat(id).isPresent();
 
-        assertTrue(id.isPresent());
-        TestSequenceIdDBEntity selectedEntity = repository.get(id.get()).get();
-        assertEquals(entity.intField, selectedEntity.intField);
+        Optional<TestSequenceIdDBEntity> selectedEntity = repository.get(id.get());
+        assertThat(selectedEntity).get().isEqualToIgnoringGivenFields(entity, "id");
     }
 
     @Test
@@ -53,15 +52,15 @@ class OracleIntegrationTest extends IntegrationTest {
         }
 
         Query<TestSequenceIdDBEntity> query = repository.select();
-        query.where("int_field > ?", 3)
-             .where("string_field like ?", "value%")
-             .orderBy("int_field")
-             .limit(5);
+        query.where("int_field > ?", 3);
+        query.where("string_field like ?", "value%");
+        query.orderBy("int_field");
+        query.limit(5);
 
         int count = query.count();
-        assertEquals(26, count);
+        assertThat(count).isEqualTo(26);
 
         List<TestSequenceIdDBEntity> entities = query.fetch();
-        assertEquals(5, entities.size());
+        assertThat(entities).hasSize(5);
     }
 }

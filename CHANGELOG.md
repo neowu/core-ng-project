@@ -1,11 +1,9 @@
 ## Change log
-### 6.1.3 (4/10/2018 - )
-* http: rethink api expose, make it site specific, revert other management controller, changed property to sys.site.publishAPI.allowCIDR
+### 6.1.2/6.1.3 (4/9/2018 - )
+* site: added publishAPI() / sys.site.publishAPI.allowCIDR to allow access /sys/_api from trusted network 
 * kafka: update to 1.1.0, add management controller method to increase partition/delete records 
 * search: update es to 6.2.3
-
-### 6.1.2 (4/9/2018 - 4/10/2018)
-* http: support allow /_sys/* url by cidr, via sys.http.management.allowCIDR property
+* db: add query.project()
 
 ### 6.1.1 (4/4/2018 - 4/9/2018)
 * action: simpliy actionId naming scheme, since actionId doesn't need to be used in path anymore

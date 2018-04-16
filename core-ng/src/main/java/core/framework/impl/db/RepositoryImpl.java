@@ -25,85 +25,33 @@ public final class RepositoryImpl<T> implements Repository<T> {
     private final InsertQuery<T> insertQuery;
     private final UpdateQuery<T> updateQuery;
     private final String deleteSQL;
-    private final RowMapper<T> rowMapper;
+    private final Class<T> entityClass;
 
-    RepositoryImpl(DatabaseImpl database, Class<T> entityClass, RowMapper<T> rowMapper) {
+    RepositoryImpl(DatabaseImpl database, Class<T> entityClass) {
         this.database = database;
         validator = new RepositoryEntityValidator<>(entityClass);
         insertQuery = new InsertQuery<>(entityClass);
         selectQuery = new SelectQuery<>(entityClass, database.vendor);
         updateQuery = new UpdateQueryBuilder<>(entityClass).build();
         deleteSQL = DeleteQueryBuilder.build(entityClass);
-        this.rowMapper = rowMapper;
+        this.entityClass = entityClass;
     }
 
     @Override
     public Query<T> select() {
-        return new QueryImpl<>(this, selectQuery.dialect);
-    }
-
-    List<T> fetch(String sql, Object... params) {
-        StopWatch watch = new StopWatch();
-        int returnedRows = 0;
-        try {
-            List<T> results = database.operation.select(sql, rowMapper, params);
-            returnedRows = results.size();
-            checkTooManyRowsReturned(returnedRows);
-            return results;
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, returnedRows, 0);
-            logger.debug("fetch, sql={}, params={}, returnedRows={}, elapsedTime={}", sql, params, returnedRows, elapsedTime);
-            checkSlowOperation(elapsedTime);
-        }
-    }
-
-    @Override
-    public int count(String where, Object... params) {
-        StopWatch watch = new StopWatch();
-        String sql = selectQuery.countSQL(where);
-        try {
-            return database.operation.selectOne(sql, DatabaseImpl.ROW_MAPPER_INTEGER, params).orElseThrow(() -> new Error("unexpected result"));
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, 1, 0);
-            logger.debug("count, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            checkSlowOperation(elapsedTime);
-        }
+        return new QueryImpl<>(database, entityClass, selectQuery);
     }
 
     @Override
     public Optional<T> selectOne(String where, Object... params) {
-        StopWatch watch = new StopWatch();
         String sql = selectQuery.selectSQL(where);
-        int returnedRows = 0;
-        try {
-            Optional<T> result = database.operation.selectOne(sql, rowMapper, params);
-            if (result.isPresent()) returnedRows = 1;
-            return result;
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, returnedRows, 0);
-            logger.debug("selectOne, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
-            checkSlowOperation(elapsedTime);
-        }
+        return database.selectOne(sql, entityClass, params);
     }
 
     @Override
     public Optional<T> get(Object... primaryKeys) {
-        StopWatch watch = new StopWatch();
         String sql = selectQuery.getSQL;
-        int returnedRows = 0;
-        try {
-            Optional<T> result = database.operation.selectOne(sql, rowMapper, primaryKeys);
-            if (result.isPresent()) returnedRows = 1;
-            return result;
-        } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, returnedRows, 0);
-            logger.debug("get, sql={}, params={}, elapsedTime={}", sql, primaryKeys, elapsedTime);
-            checkSlowOperation(elapsedTime);
-        }
+        return database.selectOne(sql, entityClass, primaryKeys);
     }
 
     @Override
@@ -166,8 +114,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
             database.operation.batchUpdate(sql, params);
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, 0, entities.size());
-            logger.debug("batch insert, sql={}, size={}, elapsedTime={}", sql, entities.size(), elapsedTime);
+            int size = entities.size();
+            ActionLogContext.track("db", elapsedTime, 0, size);
+            logger.debug("batchInsert, sql={}, size={}, elapsedTime={}", sql, size, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -187,23 +136,13 @@ public final class RepositoryImpl<T> implements Repository<T> {
         try {
             int[] results = database.operation.batchUpdate(deleteSQL, params);
             deletedRows = Arrays.stream(results).sum();
-            for (int result : results) {
-                if (result != 1) {
-                    logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", Arrays.toString(results));
-                    break;
-                }
-            }
+            if (deletedRows != primaryKeys.size())
+                logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", Arrays.toString(results));
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, 0, deletedRows);
-            logger.debug("delete, sql={}, size={}, elapsedTime={}", deleteSQL, primaryKeys.size(), elapsedTime);
+            logger.debug("batchDelete, sql={}, size={}, elapsedTime={}", deleteSQL, primaryKeys.size(), elapsedTime);
             checkSlowOperation(elapsedTime);
-        }
-    }
-
-    private void checkTooManyRowsReturned(int size) {
-        if (size > database.tooManyRowsReturnedThreshold) {
-            logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }
     }
 
