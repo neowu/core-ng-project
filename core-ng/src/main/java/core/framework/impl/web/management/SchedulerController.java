@@ -2,6 +2,7 @@ package core.framework.impl.web.management;
 
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.web.http.IPAccessControl;
+import core.framework.log.Markers;
 import core.framework.util.Lists;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -40,7 +41,7 @@ public class SchedulerController {
         accessControl.validate(request.clientIP());
 
         String job = request.pathParam("job");
-        logger.info("trigger job, job={}", job);
+        logger.warn(Markers.errorCode("MANUAL_OPERATION"), "trigger job manually, job={}", job);   // log trace message, due to potential impact
         scheduler.triggerNow(job);
         return Response.text("job triggered, job=" + job);
     }

@@ -1,7 +1,6 @@
 package core.framework.impl.kafka;
 
 import core.framework.impl.json.JSONReader;
-import core.framework.impl.log.LogManager;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.util.Exceptions;
@@ -22,17 +21,15 @@ public class KafkaMessageListener {
     final Map<String, MessageHandlerHolder<?>> handlerHolders = Maps.newHashMap();
     final Map<String, BulkMessageHandlerHolder<?>> bulkHandlerHolders = Maps.newHashMap();
     final Kafka kafka;
-    final LogManager logManager;
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListener.class);
     private final String name;
     private final Set<String> topics = Sets.newHashSet();
     public int poolSize = Threads.availableProcessors() * 4;
     private KafkaMessageListenerThread[] listenerThreads;
 
-    KafkaMessageListener(Kafka kafka, String name, LogManager logManager) {
+    KafkaMessageListener(Kafka kafka, String name) {
         this.kafka = kafka;
         this.name = name;
-        this.logManager = logManager;
     }
 
     public <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
@@ -46,10 +43,10 @@ public class KafkaMessageListener {
 
     public void start() {
         listenerThreads = new KafkaMessageListenerThread[poolSize];
-        String group = logManager.appName;
+        String group = kafka.logManager.appName;
         for (int i = 0; i < poolSize; i++) {
             String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
-            Consumer<String, byte[]> consumer = kafka.consumer(group, topics);
+            Consumer<String, byte[]> consumer = kafka.consumer(group, topics, name);
             KafkaMessageListenerThread thread = new KafkaMessageListenerThread(name, consumer, this);
             thread.start();
             listenerThreads[i] = thread;

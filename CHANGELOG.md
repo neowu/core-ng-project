@@ -1,6 +1,8 @@
 ## Change log
 ### 6.1.4 (4/16/2018 - )
-
+* kafka: added POST /_sys/kafka/topic/:topic/message/:messageId, to allow publish message thru internal management API
+* bug: fix array param format 
+* bug: fix multiple kafka management controller conflict  
 
 ### 6.1.2/6.1.3 (4/9/2018 - 4/16/2018)
 * site: added publishAPI() / sys.site.publishAPI.allowCIDR to allow access /sys/_api from trusted network 
@@ -9,7 +11,7 @@
 * db: add query.project()
 
 ### 6.1.1 (4/4/2018 - 4/9/2018)
-* action: simpliy actionId naming scheme, since actionId doesn't need to be used in path anymore
+* action: simplify actionId naming scheme, since actionId doesn't need to be used in path anymore
           examples: action=api:patch:/ajax/product/:id, action=http:get:/, action=topic:some-topic, action=job:some-job  
 * api: typescript definition generates string enum
 

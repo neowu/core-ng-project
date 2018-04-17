@@ -28,17 +28,20 @@ import java.util.Set;
 public class Kafka {
     public final ProducerMetrics producerMetrics;
     public final ConsumerMetrics consumerMetrics;
+    final LogManager logManager;
     private final Logger logger = LoggerFactory.getLogger(Kafka.class);
     private final String name;
-    private final LogManager logManager;
+
     public String uri;
     public Duration maxProcessTime = Duration.ofMinutes(30);
-    public int maxPollRecords = 500;    // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
+    public int maxPollRecords = 500;            // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
     public int maxPollBytes = 3 * 1024 * 1024;  // get 3M bytes message at max
-    public int minPollBytes = 1;    // default kafka setting
+    public int minPollBytes = 1;                // default kafka setting
     public Duration minPollMaxWaitTime = Duration.ofMillis(500);
+
     private Producer<String, byte[]> producer;
     private KafkaMessageListener listener;
+    private AdminClient admin;
 
     public Kafka(String name, LogManager logManager) {
         this.name = name;
@@ -69,7 +72,7 @@ public class Kafka {
         }
     }
 
-    public Consumer<String, byte[]> consumer(String group, Set<String> topics) {
+    public Consumer<String, byte[]> consumer(String group, Set<String> topics, String thread) {
         if (uri == null) throw new Error("uri must not be null");
         StopWatch watch = new StopWatch();
         try {
@@ -89,21 +92,29 @@ public class Kafka {
             consumerMetrics.add(consumer.metrics());
             return consumer;
         } finally {
-            logger.info("create kafka consumer, uri={}, name={}, topics={}, elapsedTime={}", uri, name, topics, watch.elapsedTime());
+            logger.info("create kafka consumer, uri={}, thread={}, topics={}, elapsedTime={}", uri, thread, topics, watch.elapsedTime());
         }
     }
 
     public AdminClient admin() {
-        if (uri == null) throw new Error("uri must not be null");
+        if (admin == null) {
+            if (uri == null) throw new Error("uri must not be null");
 
-        Map<String, Object> config = Maps.newHashMap();
-        config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-        return AdminClient.create(config);
+            StopWatch watch = new StopWatch();
+            try {
+                Map<String, Object> config = Maps.newHashMap();
+                config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
+                admin = AdminClient.create(config);
+            } finally {
+                logger.info("create kafka admin, uri={}, name={}, elapsedTime={}", uri, name, watch.elapsedTime());
+            }
+        }
+        return admin;
     }
 
     public KafkaMessageListener listener() {
         if (listener == null) {
-            listener = new KafkaMessageListener(this, name, logManager);
+            listener = new KafkaMessageListener(this, name);
         }
         return listener;
     }
@@ -118,6 +129,10 @@ public class Kafka {
             logger.info("close kafka producer, name={}, uri={}", name, uri);
             producer.flush();
             producer.close();
+        }
+        if (admin != null) {
+            logger.info("close kafka admin, name={}, uri={}", name, uri);
+            admin.close();
         }
     }
 }

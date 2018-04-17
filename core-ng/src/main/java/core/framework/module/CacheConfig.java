@@ -95,7 +95,7 @@ public final class CacheConfig {
         if (state.cacheManager == null) throw Exceptions.error("cache() is not configured");
 
         String cacheName = cacheName(name, valueType);
-        logger.info("add cache, cacheName={}, valueType={}, beanName={}", cacheName, valueType.getTypeName(), name);
+        logger.info("add cache, cacheName={}, valueType={}, name={}", cacheName, valueType.getTypeName(), name);
         Cache<?> cache = state.cacheManager.add(cacheName, valueType, duration);
         context.beanFactory.bind(Types.generic(Cache.class, valueType), name, cache);
     }

@@ -41,15 +41,14 @@ public class KafkaController {
     public Response topics(Request request) throws ExecutionException, InterruptedException {
         accessControl.validate(request.clientIP());
         List<KafkaTopic> views = Lists.newArrayList();
-        try (AdminClient admin = kafka.admin()) {
-            Set<String> topics = admin.listTopics().names().get();
-            DescribeTopicsResult descriptions = admin.describeTopics(topics);
-            for (Map.Entry<String, KafkaFuture<TopicDescription>> entry : descriptions.values().entrySet()) {
-                String name = entry.getKey();
-                TopicDescription description = entry.getValue().get();
-                KafkaTopic view = view(name, description);
-                views.add(view);
-            }
+        AdminClient admin = kafka.admin();
+        Set<String> topics = admin.listTopics().names().get();
+        DescribeTopicsResult descriptions = admin.describeTopics(topics);
+        for (Map.Entry<String, KafkaFuture<TopicDescription>> entry : descriptions.values().entrySet()) {
+            String name = entry.getKey();
+            TopicDescription description = entry.getValue().get();
+            KafkaTopic view = view(name, description);
+            views.add(view);
         }
         return Response.bean(views);
     }
@@ -63,29 +62,19 @@ public class KafkaController {
     }
 
     void updateTopic(String topic, UpdateTopicRequest request) {
-        try (AdminClient admin = kafka.admin()) {
-            if (request.partitions != null) {
-                Map<String, NewPartitions> partitions = Maps.newHashMap();
-                partitions.put(topic, NewPartitions.increaseTo(request.partitions));
-                logger.info("create kafka partitions, topic={}, increaseTo={}", topic, request.partitions);
-                admin.createPartitions(partitions);
-            }
+        AdminClient admin = kafka.admin();
+        if (request.partitions != null) {
+            Map<String, NewPartitions> partitions = Maps.newHashMap();
+            partitions.put(topic, NewPartitions.increaseTo(request.partitions));
+            logger.info("update kafka partitions, topic={}, increaseTo={}", topic, request.partitions);
+            admin.createPartitions(partitions);
         }
-    }
-
-    public Response deleteRecords(Request request) {
-        accessControl.validate(request.clientIP());
-        String topic = request.pathParam("topic");
-        DeleteRecordRequest deleteRecordRequest = request.bean(DeleteRecordRequest.class);
-        deleteRecords(topic, deleteRecordRequest);
-        return Response.text(Strings.format("delete records request submitted, topic={}, request={}", topic, JSON.toJSON(deleteRecordRequest)));
-    }
-
-    void deleteRecords(String topic, DeleteRecordRequest request) {
-        try (AdminClient admin = kafka.admin()) {
+        if (request.deleteRecords != null) {
             Map<TopicPartition, RecordsToDelete> records = Maps.newHashMap();
-            records.put(new TopicPartition(topic, request.partition), RecordsToDelete.beforeOffset(request.offset));
-            logger.info("delete kafka records, topic={}, partition={}, offset={}", topic, request.partition, request.offset);
+            for (UpdateTopicRequest.DeleteRecord deleteRecord : request.deleteRecords) {
+                records.put(new TopicPartition(topic, deleteRecord.partition), RecordsToDelete.beforeOffset(deleteRecord.beforeOffset));
+            }
+            logger.info("delete kafka records, topic={}, records={}", topic, JSON.toJSON(request.deleteRecords));
             admin.deleteRecords(records);
         }
     }

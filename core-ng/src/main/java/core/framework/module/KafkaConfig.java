@@ -49,7 +49,6 @@ public final class KafkaConfig {
             KafkaController controller = new KafkaController(kafka);
             context.route(HTTPMethod.GET, managementPathPattern("/topic"), controller::topics, true);
             context.route(HTTPMethod.PUT, managementPathPattern("/topic/:topic"), controller::updateTopic, true);
-            context.route(HTTPMethod.DELETE, managementPathPattern("/topic/:topic/record"), controller::deleteRecords, true);
 
             return kafka;
         }
@@ -68,7 +67,7 @@ public final class KafkaConfig {
 
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
         if (state.kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
-        logger.info("create message publisher, topic={}, messageClass={}, beanName={}", topic, messageClass.getTypeName(), name);
+        logger.info("create message publisher, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
         MessagePublisher<T> publisher = new KafkaMessagePublisher<>(state.kafka.producer(), topic, messageClass, context.logManager);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
         state.handlerAdded = true;

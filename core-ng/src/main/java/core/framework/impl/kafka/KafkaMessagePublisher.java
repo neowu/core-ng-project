@@ -50,11 +50,7 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
         byte[] message = writer.toJSON(value);
         try {
             ProducerRecord<String, byte[]> record = new ProducerRecord<>(topic, key, message);
-            Headers headers = record.headers();
-            headers.add(KafkaHeaders.HEADER_CLIENT_IP, Strings.bytes(Network.localHostAddress()));
-            if (logManager.appName != null)
-                headers.add(KafkaHeaders.HEADER_CLIENT, Strings.bytes(logManager.appName));
-            linkContext(headers);
+            linkContext(record.headers());
             producer.send(record);
         } finally {
             long elapsedTime = watch.elapsedTime();
@@ -64,6 +60,9 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
     }
 
     private void linkContext(Headers headers) {
+        headers.add(KafkaHeaders.HEADER_CLIENT_IP, Strings.bytes(Network.localHostAddress()));
+        headers.add(KafkaHeaders.HEADER_CLIENT, Strings.bytes(logManager.appName));
+
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog == null) return;
 

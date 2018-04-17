@@ -90,7 +90,6 @@ public class WebServiceClient {
     public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {
         HTTPRequest request = new HTTPRequest(method, serviceURL);
         request.accept(ContentType.APPLICATION_JSON);
-        request.header(HTTPServerHandler.HEADER_CLIENT.toString(), logManager.appName);
         linkContext(request);
 
         if (requestType != null) {
@@ -135,15 +134,14 @@ public class WebServiceClient {
         }
     }
 
-    private void linkContext(HTTPRequest httpRequest) {
+    private void linkContext(HTTPRequest request) {
+        request.header(HTTPServerHandler.HEADER_CLIENT.toString(), logManager.appName);
+
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog == null) return;  // web service client may be used without action log context
 
-        httpRequest.header(HTTPServerHandler.HEADER_REF_ID.toString(), actionLog.refId());
-
-        if (actionLog.trace) {
-            httpRequest.header(HTTPServerHandler.HEADER_TRACE.toString(), "true");
-        }
+        request.header(HTTPServerHandler.HEADER_REF_ID.toString(), actionLog.refId());
+        if (actionLog.trace) request.header(HTTPServerHandler.HEADER_TRACE.toString(), "true");
     }
 
     void validateResponse(HTTPResponse response) {

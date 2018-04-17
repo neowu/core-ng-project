@@ -40,20 +40,14 @@ class KafkaControllerTest {
     void updateTopic() {
         UpdateTopicRequest request = new UpdateTopicRequest();
         request.partitions = 10;
+        request.deleteRecords = Lists.newArrayList();
+        UpdateTopicRequest.DeleteRecord deleteRecord = new UpdateTopicRequest.DeleteRecord();
+        deleteRecord.partition = 1;
+        deleteRecord.beforeOffset = 1000L;
+        request.deleteRecords.add(deleteRecord);
         controller.updateTopic("topic", request);
 
         verify(adminClient).createPartitions(argThat(partitions -> partitions.get("topic").totalCount() == 10));
-        verify(adminClient).close();
-    }
-
-    @Test
-    void deleteRecords() {
-        DeleteRecordRequest request = new DeleteRecordRequest();
-        request.partition = 1;
-        request.offset = 1000L;
-        controller.deleteRecords("topic", request);
-
         verify(adminClient).deleteRecords(argThat(records -> records.get(new TopicPartition("topic", 1)).beforeOffset() == 1000));
-        verify(adminClient).close();
     }
 }

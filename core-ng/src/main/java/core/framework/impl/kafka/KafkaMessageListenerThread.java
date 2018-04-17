@@ -45,7 +45,7 @@ class KafkaMessageListenerThread extends Thread {
         this.consumer = consumer;
         handlerHolders = listener.handlerHolders;
         bulkHandlerHolders = listener.bulkHandlerHolders;
-        logManager = listener.logManager;
+        logManager = listener.kafka.logManager;
         batchLongProcessThresholdInNano = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time of max
     }
 
