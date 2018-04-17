@@ -1,4 +1,7 @@
 ## Change log
+### 6.1.4 (4/16/2018 - )
+
+
 ### 6.1.2/6.1.3 (4/9/2018 - 4/16/2018)
 * site: added publishAPI() / sys.site.publishAPI.allowCIDR to allow access /sys/_api from trusted network 
 * kafka: update to 1.1.0, add management controller method to increase partition/delete records 
@@ -22,7 +25,7 @@
 * log: removed write action/trace to file, updated sys.properties log key to sys.log.appender
         sys.log.appender=console => write action/trace to console
         sys.log.appender=kafkaURI => forward log to kafka
-       (in cloud env, console logging is prefered no matter it's docker or systemd/journald, or use log forwarding) 
+       (in cloud env, console logging is preferred no matter it's docker or systemd/journald, or use log forwarding) 
 * http: update undertow to 2.0.1
 
 ### 5.3.8 (2/28/2018 - 3/4/2018)    !!! 5.3.X is last version to support Java 8

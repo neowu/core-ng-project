@@ -47,12 +47,19 @@ public final class KafkaConfig {
             context.shutdownHook.add(kafka::close);
 
             KafkaController controller = new KafkaController(kafka);
-            context.route(HTTPMethod.GET, "/_sys/kafka/topic", controller::topics, true);
-            context.route(HTTPMethod.PUT, "/_sys/kafka/topic/:topic", controller::updateTopic, true);
-            context.route(HTTPMethod.DELETE, "/_sys/kafka/topic/:topic/record", controller::deleteRecords, true);
+            context.route(HTTPMethod.GET, managementPathPattern("/topic"), controller::topics, true);
+            context.route(HTTPMethod.PUT, managementPathPattern("/topic/:topic"), controller::updateTopic, true);
+            context.route(HTTPMethod.DELETE, managementPathPattern("/topic/:topic/record"), controller::deleteRecords, true);
 
             return kafka;
         }
+    }
+
+    String managementPathPattern(String postfix) {
+        StringBuilder builder = new StringBuilder("/_sys/kafka");
+        if (name != null) builder.append('/').append(name);
+        builder.append(postfix);
+        return builder.toString();
     }
 
     public <T> MessagePublisher<T> publish(Class<T> messageClass) {

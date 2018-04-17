@@ -14,6 +14,7 @@
 * long running thread support or needed?
 * missing @PathParam, validation error not clear?
 * support websocket?
+* impl kafka controller to send message for troubleshooting purpose
 
 ### jdk 9 incompatible list
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
