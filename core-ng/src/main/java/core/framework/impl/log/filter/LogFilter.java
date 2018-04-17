@@ -1,5 +1,6 @@
 package core.framework.impl.log.filter;
 
+import core.framework.util.Exceptions;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
 
@@ -24,13 +25,40 @@ public class LogFilter {
     }
 
     private String filterParam(Object argument) {
+        if (argument == null) return null;
+
         String value;
         if (argument instanceof FilterParam) {
-            value = ((FilterParam) argument).filter(maskedFields);
+            return ((FilterParam) argument).filter(maskedFields);
+        } else if (argument.getClass().isArray()) {
+            return filterArrayParam(argument);
         } else {
             value = String.valueOf(argument);
         }
         return truncate(value, MAX_LONG_STRING_SIZE);
+    }
+
+    private String filterArrayParam(Object argument) {
+        if (argument instanceof Object[]) {
+            return Arrays.toString((Object[]) argument);
+        } else if (argument instanceof int[]) {
+            return Arrays.toString((int[]) argument);
+        } else if (argument instanceof long[]) {
+            return Arrays.toString((long[]) argument);
+        } else if (argument instanceof char[]) {
+            return Arrays.toString((char[]) argument);
+        } else if (argument instanceof double[]) {
+            return Arrays.toString((double[]) argument);
+        } else if (argument instanceof byte[]) {
+            return Arrays.toString((byte[]) argument);
+        } else if (argument instanceof boolean[]) {
+            return Arrays.toString((boolean[]) argument);
+        } else if (argument instanceof short[]) {
+            return Arrays.toString((short[]) argument);
+        } else if (argument instanceof float[]) {
+            return Arrays.toString((float[]) argument);
+        }
+        throw Exceptions.error("unknown array type, argumentClass={}", argument.getClass().getCanonicalName());
     }
 
     String truncate(String value, int maxSize) {

@@ -18,7 +18,7 @@ public class FieldParam implements FilterParam {
     @Override
     public String filter(Set<String> maskedFields) {
         if (maskedFields.contains(String.valueOf(field))) return "******";
-        if (value instanceof Object[]) return Arrays.toString((Object[]) value);
+        if (value instanceof Object[]) return Arrays.toString((Object[]) value);    // only support object array such as String[]
         return String.valueOf(value);
     }
 }
