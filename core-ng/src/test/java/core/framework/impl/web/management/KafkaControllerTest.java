@@ -1,8 +1,11 @@
 package core.framework.impl.web.management;
 
 import core.framework.impl.kafka.Kafka;
+import core.framework.impl.kafka.KafkaHeaders;
 import core.framework.util.Lists;
+import core.framework.util.Strings;
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +14,7 @@ import org.mockito.Mockito;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 
@@ -33,7 +36,7 @@ class KafkaControllerTest {
     @Test
     void nodes() {
         List<Node> nodes = Lists.newArrayList(new Node(1001, "kafka-0", 9092), new Node(1002, "kafka-1", 9092));
-        assertEquals("kafka-0:9092(1001), kafka-1:9092(1002)", controller.nodes(nodes));
+        assertThat(controller.nodes(nodes)).isEqualTo("kafka-0:9092(1001), kafka-1:9092(1002)");
     }
 
     @Test
@@ -49,5 +52,11 @@ class KafkaControllerTest {
 
         verify(adminClient).createPartitions(argThat(partitions -> partitions.get("topic").totalCount() == 10));
         verify(adminClient).deleteRecords(argThat(records -> records.get(new TopicPartition("topic", 1)).beforeOffset() == 1000));
+    }
+
+    @Test
+    void record() {
+        ProducerRecord<String, byte[]> record = controller.record("topic", "key", new byte[0]);
+        assertThat(record.headers().lastHeader(KafkaHeaders.HEADER_TRACE).value()).isEqualTo(Strings.bytes("true"));
     }
 }

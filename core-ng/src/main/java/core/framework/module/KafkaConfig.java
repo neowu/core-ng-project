@@ -49,6 +49,7 @@ public final class KafkaConfig {
             KafkaController controller = new KafkaController(kafka);
             context.route(HTTPMethod.GET, managementPathPattern("/topic"), controller::topics, true);
             context.route(HTTPMethod.PUT, managementPathPattern("/topic/:topic"), controller::updateTopic, true);
+            context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), controller::publish, true);
 
             return kafka;
         }

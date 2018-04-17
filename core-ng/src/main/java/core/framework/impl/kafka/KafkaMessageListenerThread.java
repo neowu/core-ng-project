@@ -8,6 +8,7 @@ import core.framework.log.Markers;
 import core.framework.util.Charsets;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
+import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -22,6 +23,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -144,16 +146,24 @@ class KafkaMessageListenerThread extends Thread {
             actionLog.context("topic", topic);
             actionLog.context("handler", holder.handler.getClass().getCanonicalName());
             actionLog.stat("messageCount", records.size());
+            Set<String> clients = Sets.newHashSet();
+            Set<String> clientIPs = Sets.newHashSet();
 
             List<Message<T>> messages = new ArrayList<>(records.size());
             for (ConsumerRecord<String, byte[]> record : records) {
                 T message = holder.reader.fromJSON(record.value());
                 validate(holder.validator, message, record);
                 messages.add(new Message<>(record.key(), message));
-                if ("true".equals(header(record.headers(), KafkaHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
+                Headers headers = record.headers();
+                if ("true".equals(header(headers, KafkaHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
                     actionLog.trace = true;
                 }
+                clients.add(header(headers, KafkaHeaders.HEADER_CLIENT));
+                clientIPs.add(header(headers, KafkaHeaders.HEADER_CLIENT_IP));
             }
+            logger.debug("clients={}", clients);
+            logger.debug("clientIPs={}", clientIPs);
+
             holder.handler.handle(messages);
         } catch (Throwable e) {
             logManager.logError(e);
