@@ -34,7 +34,7 @@ subprojects {
         effort = 'max'
         reportLevel = 'low'
         excludeFilter = rootProject.file('gradle/check/spotbugs-filter.xml')
-        toolVersion = '3.1.2'
+        toolVersion = '3.1.3'
     }
 
     tasks.withType(com.github.spotbugs.SpotBugsTask) {
@@ -45,7 +45,7 @@ subprojects {
     }
 
     jacoco {
-        toolVersion = '0.8.0'
+        toolVersion = '0.8.1'
     }
 
     jacocoTestReport {
