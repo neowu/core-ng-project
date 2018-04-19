@@ -77,7 +77,7 @@ public final class SiteConfig {
 
     public void publishAPI(String... cidrs) {
         logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceInterfaces, new IPAccessControl()), true);
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceInterfaces, new IPAccessControl(cidrs)), true);
     }
 
     public static class State {

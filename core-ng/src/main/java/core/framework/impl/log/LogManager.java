@@ -10,7 +10,7 @@ import org.slf4j.Marker;
 /**
  * @author neo
  */
-public final class LogManager {
+public class LogManager {
     public final String appName;
     public final LogFilter filter = new LogFilter();
     private final ThreadLocal<ActionLog> actionLog = new ThreadLocal<>();

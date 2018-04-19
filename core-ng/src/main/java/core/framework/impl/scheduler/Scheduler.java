@@ -84,9 +84,7 @@ public final class Scheduler {
                 ActionLog actionLog = logManager.begin("=== job execution begin ===");
                 String name = trigger.name();
                 actionLog.action("job:" + name);
-                if (trace) {
-                    actionLog.trace = true;
-                }
+                actionLog.trace = trace;
                 Job job = trigger.job();
                 actionLog.context("job", name);
                 actionLog.context("jobClass", job.getClass().getCanonicalName());

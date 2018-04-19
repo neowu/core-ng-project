@@ -3,6 +3,7 @@ package core.framework.impl.module;
 import core.framework.async.Executor;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.async.ExecutorImpl;
+import core.framework.impl.async.ThreadPools;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
@@ -18,6 +19,7 @@ import core.framework.impl.web.management.ThreadInfoController;
 import core.framework.impl.web.route.PathPatternValidator;
 import core.framework.util.ASCII;
 import core.framework.util.Lists;
+import core.framework.util.Threads;
 import core.framework.web.Controller;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
@@ -55,7 +57,7 @@ public final class ModuleContext {
 
         Executor executor;
         if (!isTest()) {
-            executor = new ExecutorImpl(logManager);
+            executor = new ExecutorImpl(ThreadPools.cachedThreadPool(Threads.availableProcessors() * 2, "executor-"), logManager);
             shutdownHook.add(((ExecutorImpl) executor)::stop);
         } else {
             executor = mockFactory.create(Executor.class);

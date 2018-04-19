@@ -1,4 +1,7 @@
 ## Change log
+### 6.1.5 (4/19/2018)
+* bug: fix site().publishAPI(cidrs) not setting cidr correctly
+
 ### 6.1.4 (4/16/2018 - 4/17/2018)
 * kafka: added POST /_sys/kafka/topic/:topic/message/:messageId, to allow publish message thru internal management API
 * bug: fix array param format 

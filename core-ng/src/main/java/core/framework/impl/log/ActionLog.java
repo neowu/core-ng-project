@@ -44,7 +44,7 @@ public final class ActionLog {
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
-    ActionLog(String message, LogFilter filter) {
+    public ActionLog(String message, LogFilter filter) {
         startElapsed = System.nanoTime();
         startCPUTime = THREAD.getCurrentThreadCpuTime();
         date = Instant.now();
