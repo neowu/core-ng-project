@@ -1,6 +1,6 @@
 language: java
 jdk:
-  - openjdk10
+  - oraclejdk9
 cache:
   directories:
     - $HOME/.gradle
