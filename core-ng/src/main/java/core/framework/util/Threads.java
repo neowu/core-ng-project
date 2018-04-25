@@ -21,16 +21,6 @@ public final class Threads {
         }
     }
 
-    // due to in docker/kubernetes environment, Runtime.getRuntime().availableProcessors() always return cores of host, not reflecting limits.cpu or cpus params,
-    // wit this way, it can pass -Dcore.availableProcessors to override the value
-    public static int availableProcessors() {
-        String availableProcessors = System.getProperty("core.availableProcessors");
-        if (availableProcessors != null) {
-            return Integer.parseInt(availableProcessors);
-        }
-        return Runtime.getRuntime().availableProcessors();
-    }
-
     static long sleepTime(Duration duration) {
         long milliseconds = duration.toMillis();
         double times = Randoms.number(0.8, 1.2); // +/-20% random

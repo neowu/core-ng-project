@@ -6,7 +6,6 @@ import core.framework.kafka.MessageHandler;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
-import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class KafkaMessageListener {
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListener.class);
     private final String name;
     private final Set<String> topics = Sets.newHashSet();
-    public int poolSize = Threads.availableProcessors() * 4;
+    public int poolSize = Runtime.getRuntime().availableProcessors() * 4;
     private KafkaMessageListenerThread[] listenerThreads;
 
     KafkaMessageListener(Kafka kafka, String name) {

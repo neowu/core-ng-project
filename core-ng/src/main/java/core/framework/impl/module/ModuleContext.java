@@ -19,7 +19,6 @@ import core.framework.impl.web.management.ThreadInfoController;
 import core.framework.impl.web.route.PathPatternValidator;
 import core.framework.util.ASCII;
 import core.framework.util.Lists;
-import core.framework.util.Threads;
 import core.framework.web.Controller;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
@@ -57,7 +56,7 @@ public final class ModuleContext {
 
         Executor executor;
         if (!isTest()) {
-            executor = new ExecutorImpl(ThreadPools.cachedThreadPool(Threads.availableProcessors() * 2, "executor-"), logManager);
+            executor = new ExecutorImpl(ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 2, "executor-"), logManager);
             shutdownHook.add(((ExecutorImpl) executor)::stop);
         } else {
             executor = mockFactory.create(Executor.class);
