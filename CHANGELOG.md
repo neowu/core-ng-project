@@ -1,6 +1,7 @@
 ## Change log
 ### 6.2.0 (4/25/2018 - )        !!! only support Java 10+
 * thread: removed core.framework.util.Threads.availableProcessors, since java 10 supports cpu limits well in docker/kub
+* db: update connection maxidle timeout to 1 hour, to fit most scenario (e.g. IDC with firewall)  
 
 ### 6.1.5 (4/19/2018)
 * bug: fix site().publishAPI(cidrs) not setting cidr correctly
