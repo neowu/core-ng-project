@@ -26,8 +26,8 @@ import java.util.function.Supplier;
 public class Pool<T extends AutoCloseable> {
     final BlockingDeque<PoolItem<T>> idleItems = new LinkedBlockingDeque<>();
     final String name;
+    final AtomicInteger size = new AtomicInteger(0);
     private final Logger logger = LoggerFactory.getLogger(Pool.class);
-    private final AtomicInteger size = new AtomicInteger(0);
     private final Supplier<T> factory;
     public Duration maxIdleTime = Duration.ofMinutes(30);
     private int minSize = 1;
@@ -61,20 +61,10 @@ public class Pool<T extends AutoCloseable> {
 
     public void returnItem(PoolItem<T> item) {
         if (item.broken) {
-            recycleItem(item);
+            closeResource(item.resource);
         } else {
             item.returnTime = System.currentTimeMillis();
             idleItems.push(item);
-        }
-    }
-
-    private void recycleItem(PoolItem<T> item) {
-        StopWatch watch = new StopWatch();
-        int size = this.size.decrementAndGet();
-        try {
-            closeResource(item.resource);
-        } finally {
-            logger.debug("recycle resource, pool={}, size={}, elapsed={}", name, size, watch.elapsedTime());
         }
     }
 
@@ -87,7 +77,7 @@ public class Pool<T extends AutoCloseable> {
         } catch (InterruptedException e) {
             throw new Error("interrupted during waiting for next available resource", e);
         } finally {
-            logger.debug("wait for next available resource, pool={}, size={}, elapsed={}", name, size.get(), watch.elapsedTime());
+            logger.debug("wait for next available resource, pool={}, elapsed={}", name, watch.elapsedTime());
         }
     }
 
@@ -100,7 +90,7 @@ public class Pool<T extends AutoCloseable> {
             size.getAndDecrement();
             throw e;
         } finally {
-            logger.debug("create new resource, pool={}, size={}, elapsed={}", name, size.get(), watch.elapsedTime());
+            logger.debug("create new resource, pool={}, elapsed={}", name, watch.elapsedTime());
         }
     }
 
@@ -128,7 +118,7 @@ public class Pool<T extends AutoCloseable> {
             if (Duration.between(Instant.ofEpochMilli(item.returnTime), now).getSeconds() >= maxIdleTimeInSeconds) {
                 boolean removed = idleItems.remove(item);
                 if (!removed) return;
-                recycleItem(item);
+                closeResource(item.resource);
             } else {
                 return;
             }
@@ -142,6 +132,7 @@ public class Pool<T extends AutoCloseable> {
     }
 
     private void closeResource(T resource) {
+        size.decrementAndGet();
         try {
             resource.close();
         } catch (Exception e) {

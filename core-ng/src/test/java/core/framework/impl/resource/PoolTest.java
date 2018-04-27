@@ -7,10 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowableOfType;
 
 /**
  * @author neo
@@ -28,22 +26,26 @@ class PoolTest {
     @Test
     void borrowAndReturn() {
         PoolItem<TestPoolResource> item = pool.borrowItem();
-        assertNotNull(item.resource);
+        assertThat(item.resource).isNotNull();
         pool.returnItem(item);
 
-        assertEquals(1, pool.idleItems.size());
-        assertTrue(pool.idleItems.getFirst().returnTime > 0);
+        assertThat(pool.idleItems.size()).isEqualTo(1);
+        assertThat(pool.size.get()).isEqualTo(1);
+        assertThat(pool.idleItems.getFirst().returnTime).isGreaterThan(0);
     }
 
     @Test
     void returnBrokenResource() {
         PoolItem<TestPoolResource> item = pool.borrowItem();
-        assertNotNull(item.resource);
+        assertThat(item.resource).isNotNull();
+        assertThat(pool.size.get()).isEqualTo(1);
+
         item.broken = true;
         pool.returnItem(item);
 
-        assertEquals(0, pool.idleItems.size());
-        assertTrue(item.resource.closed);
+        assertThat(pool.idleItems.size()).isZero();
+        assertThat(pool.size.get()).isZero();
+        assertThat(item.resource.closed).isTrue();
     }
 
     @Test
@@ -51,7 +53,8 @@ class PoolTest {
         pool.size(2, 2);
 
         pool.refresh();
-        assertEquals(2, pool.idleItems.size());
+        assertThat(pool.size.get()).isEqualTo(2);
+        assertThat(pool.idleItems.size()).isEqualTo(2);
     }
 
     @Test
@@ -65,15 +68,15 @@ class PoolTest {
         items.forEach(pool::returnItem);
 
         pool.refresh();
-        assertEquals(1, pool.idleItems.size());
+        assertThat(pool.size.get()).isEqualTo(1);
+        assertThat(pool.idleItems.size()).isEqualTo(1);
     }
 
     @Test
     void borrowWithTimeout() {
         pool.size(0, 0);
-
-        PoolException exception = assertThrows(PoolException.class, () -> pool.borrowItem());
-        assertEquals("POOL_TIME_OUT", exception.errorCode());
+        PoolException exception = catchThrowableOfType(() -> pool.borrowItem(), PoolException.class);
+        assertThat(exception.errorCode()).isEqualTo("POOL_TIME_OUT");
     }
 
     @Test
@@ -82,6 +85,6 @@ class PoolTest {
         pool.returnItem(item);
 
         pool.close();
-        assertTrue(item.resource.closed);
+        assertThat(item.resource.closed).isTrue();
     }
 }
