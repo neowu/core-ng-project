@@ -19,7 +19,11 @@ public final class ExecutorImpl implements Executor {
     private final ExecutorService executor;
     private final LogManager logManager;
 
-    public ExecutorImpl(ExecutorService executor, LogManager logManager) {
+    public ExecutorImpl(LogManager logManager) {
+        this(ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 2, "executor-"), logManager);
+    }
+
+    ExecutorImpl(ExecutorService executor, LogManager logManager) {
         this.executor = executor;
         this.logManager = logManager;
     }

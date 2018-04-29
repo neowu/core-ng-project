@@ -3,7 +3,6 @@ package core.framework.impl.module;
 import core.framework.async.Executor;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.async.ExecutorImpl;
-import core.framework.impl.async.ThreadPools;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
@@ -56,7 +55,7 @@ public final class ModuleContext {
 
         Executor executor;
         if (!isTest()) {
-            executor = new ExecutorImpl(ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 2, "executor-"), logManager);
+            executor = new ExecutorImpl(logManager);
             shutdownHook.add(((ExecutorImpl) executor)::stop);
         } else {
             executor = mockFactory.create(Executor.class);

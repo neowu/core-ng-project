@@ -12,6 +12,7 @@ import core.framework.web.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -26,25 +27,34 @@ import java.util.concurrent.TimeUnit;
 public final class Scheduler {
     public final Map<String, Task> tasks = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(Scheduler.class);
-    private final ScheduledExecutorService scheduler = ThreadPools.singleThreadScheduler("scheduler-");
-    private final ExecutorService jobExecutor = ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 4, "scheduler-job-");
+    private final ScheduledExecutorService scheduler;
+    private final ExecutorService jobExecutor;
     private final LogManager logManager;
     public ZoneId zoneId = ZoneId.systemDefault();
 
     public Scheduler(LogManager logManager) {
+        this(logManager, ThreadPools.singleThreadScheduler("scheduler-"),
+                ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 4, "scheduler-job-"));
+    }
+
+    Scheduler(LogManager logManager, ScheduledExecutorService scheduler, ExecutorService jobExecutor) {
         this.logManager = logManager;
+        this.scheduler = scheduler;
+        this.jobExecutor = jobExecutor;
     }
 
     public void start() {
-        ZonedDateTime now = ZonedDateTime.now(zoneId);
+        Clock clock = Clock.system(zoneId);
+        ZonedDateTime now = ZonedDateTime.now(clock);
         tasks.forEach((name, task) -> {
-            logger.info("schedule job, job={}, trigger={}, zone={}, jobClass={}", name, task.trigger(), zoneId, task.job().getClass().getCanonicalName());
             if (task instanceof FixedRateTask) {
                 schedule((FixedRateTask) task);
+                logger.info("schedule job, job={}, trigger={}, jobClass={}", name, task.trigger(), task.job().getClass().getCanonicalName());
             } else if (task instanceof TriggerTask) {
                 try {
                     ZonedDateTime next = next(((TriggerTask) task).trigger, now);
-                    schedule((TriggerTask) task, next);
+                    schedule((TriggerTask) task, next, clock);
+                    logger.info("schedule job, job={}, trigger={}, jobClass={}, next={}", name, task.trigger(), task.job().getClass().getCanonicalName(), next);
                 } catch (Throwable e) {
                     logger.error("failed to schedule job, job={}", name, e);  // next() with custom trigger impl may throw exception, we don't let runtime error fail startup
                 }
@@ -83,24 +93,24 @@ public final class Scheduler {
             throw Exceptions.error("found duplicate job, name={}, previous={}", name, previous.job().getClass().getCanonicalName());
     }
 
-    private ZonedDateTime next(Trigger trigger, ZonedDateTime previous) {
+    ZonedDateTime next(Trigger trigger, ZonedDateTime previous) {
         ZonedDateTime next = trigger.next(previous);
         if (next == null || !next.isAfter(previous)) throw Exceptions.error("next scheduled time must be after previous, previous={}, next={}", previous, next);
         return next;
     }
 
-    private void schedule(TriggerTask task, ZonedDateTime time) {
-        ZonedDateTime now = ZonedDateTime.now(zoneId);
+    void schedule(TriggerTask task, ZonedDateTime time, Clock clock) {
+        ZonedDateTime now = ZonedDateTime.now(clock);
         Duration delay = Duration.between(now, time);
         scheduler.schedule(() -> {
             ZonedDateTime next = next(task.trigger, time);
-            schedule(task, next);
+            schedule(task, next, clock);
             logger.info("execute scheduled job, job={}, time={}, next={}", task.name(), time, next);
             submitJob(task, false);
         }, delay.toNanos(), TimeUnit.NANOSECONDS);
     }
 
-    private void schedule(FixedRateTask task) {
+    void schedule(FixedRateTask task) {
         Duration delay = Duration.ofMillis((long) Randoms.number(1000, 3000)); // delay 1s to 3s
         scheduler.scheduleAtFixedRate(() -> {
             logger.info("execute scheduled job, job={}", task.name());
