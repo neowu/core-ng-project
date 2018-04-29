@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -30,7 +29,7 @@ public final class Scheduler {
     private final ScheduledExecutorService scheduler;
     private final ExecutorService jobExecutor;
     private final LogManager logManager;
-    public ZoneId zoneId = ZoneId.systemDefault();
+    public Clock clock = Clock.systemDefaultZone();
 
     public Scheduler(LogManager logManager) {
         this(logManager, ThreadPools.singleThreadScheduler("scheduler-"),
@@ -44,7 +43,6 @@ public final class Scheduler {
     }
 
     public void start() {
-        Clock clock = Clock.system(zoneId);
         ZonedDateTime now = ZonedDateTime.now(clock);
         tasks.forEach((name, task) -> {
             if (task instanceof FixedRateTask) {
@@ -53,7 +51,7 @@ public final class Scheduler {
             } else if (task instanceof TriggerTask) {
                 try {
                     ZonedDateTime next = next(((TriggerTask) task).trigger, now);
-                    schedule((TriggerTask) task, next, clock);
+                    schedule((TriggerTask) task, next);
                     logger.info("schedule job, job={}, trigger={}, jobClass={}, next={}", name, task.trigger(), task.job().getClass().getCanonicalName(), next);
                 } catch (Throwable e) {
                     logger.error("failed to schedule job, job={}", name, e);  // next() with custom trigger impl may throw exception, we don't let runtime error fail startup
@@ -79,7 +77,7 @@ public final class Scheduler {
     }
 
     public void addTriggerTask(String name, Job job, Trigger trigger) {
-        addTask(new TriggerTask(name, job, trigger, zoneId));
+        addTask(new TriggerTask(name, job, trigger, clock.getZone()));
     }
 
     private void addTask(Task task) {
@@ -99,12 +97,12 @@ public final class Scheduler {
         return next;
     }
 
-    void schedule(TriggerTask task, ZonedDateTime time, Clock clock) {
+    void schedule(TriggerTask task, ZonedDateTime time) {
         ZonedDateTime now = ZonedDateTime.now(clock);
         Duration delay = Duration.between(now, time);
         scheduler.schedule(() -> {
             ZonedDateTime next = next(task.trigger, time);
-            schedule(task, next, clock);
+            schedule(task, next);
             logger.info("execute scheduled job, job={}, time={}, next={}", task.name(), time, next);
             submitJob(task, false);
         }, delay.toNanos(), TimeUnit.NANOSECONDS);

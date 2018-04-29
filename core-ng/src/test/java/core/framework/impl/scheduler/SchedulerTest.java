@@ -47,9 +47,11 @@ class SchedulerTest {
 
     @Test
     void scheduleTriggerTask() {
-        TriggerTask task = new TriggerTask("trigger-job", null, previous -> previous.plusHours(1), ZoneId.systemDefault());
         ZonedDateTime now = ZonedDateTime.now();
-        scheduler.schedule(task, now, Clock.fixed(now.toInstant(), ZoneId.systemDefault()));
+        scheduler.clock = Clock.fixed(now.toInstant(), ZoneId.systemDefault());
+
+        TriggerTask task = new TriggerTask("trigger-job", null, previous -> previous.plusHours(1), ZoneId.systemDefault());
+        scheduler.schedule(task, now);
 
         ArgumentCaptor<Runnable> scheduledTask = ArgumentCaptor.forClass(Runnable.class);
         verify(schedulerExecutor).schedule(scheduledTask.capture(), eq(0L), eq(TimeUnit.NANOSECONDS));

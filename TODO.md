@@ -9,15 +9,12 @@
 * general retry and throttling?
 * webservice/redis/mongo client: client retry on network issue?
 * validator: annotation for website, like @HTMLSafeString?
-* mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
+* mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * missing @PathParam, validation error not clear?
 * support websocket?
 
-### jdk 9 incompatible list
+### jdk 9/10 incompatible list
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
-* alpine jdk 9 is not released yet, docker openjdk:jre-alpine image size is much smaller
-
-### jdk 10
 * class in interface module generates Validator make interface depends on core-ng module (java module)

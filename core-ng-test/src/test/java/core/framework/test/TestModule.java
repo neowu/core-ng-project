@@ -4,15 +4,21 @@ import core.framework.db.IsolationLevel;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.kafka.Message;
+import core.framework.scheduler.Job;
 import core.framework.test.db.TestDBEntity;
 import core.framework.test.db.TestSequenceIdDBEntity;
 import core.framework.test.inject.TestBean;
 import core.framework.test.kafka.TestMessage;
 import core.framework.test.module.AbstractTestModule;
 import core.framework.test.mongo.TestMongoEntity;
+import core.framework.test.scheduler.TestJob;
 import core.framework.test.search.TestDocument;
 import org.mockito.Mockito;
 
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -39,6 +45,8 @@ public class TestModule extends AbstractTestModule {
         configureSite();
 
         bind(new TestBean(requiredProperty("test.inject-test.property")));
+
+        configureJob();
     }
 
     private void configureSite() {
@@ -84,5 +92,15 @@ public class TestModule extends AbstractTestModule {
     private void configureMongo() {
         mongo().uri("mongodb://localhost:27017/test");
         mongo().collection(TestMongoEntity.class);
+    }
+
+    private void configureJob() {
+        schedule().timeZone(ZoneId.of("UTC"));
+        Job job = new TestJob();
+        schedule().fixedRate("fixed-rate-job", job, Duration.ofSeconds(10));
+        schedule().dailyAt("daily-job", job, LocalTime.NOON);
+        schedule().weeklyAt("weekly-job", job, DayOfWeek.MONDAY, LocalTime.NOON);
+        schedule().monthlyAt("monthly-job", job, 1, LocalTime.NOON);
+        schedule().trigger("trigger-job", job, previous -> previous.plusHours(1));
     }
 }

@@ -3,6 +3,7 @@
 * thread: removed core.framework.util.Threads.availableProcessors, since java 10 supports cpu limits well in docker/kube
 * db: update connection max idle timeout to 1 hour, to fit most scenario (e.g. IDC with firewall)  
 * scheduler: removed secondly trigger, replaced with custom trigger to make it more flexible
+* search: update es to 6.2.4 
 
 ### 6.1.5 (4/19/2018)
 * bug: fix site().publishAPI(cidrs) not setting cidr correctly

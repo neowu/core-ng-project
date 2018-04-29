@@ -10,6 +10,7 @@ import core.framework.impl.web.management.SchedulerController;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
 
+import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
@@ -31,7 +32,7 @@ public final class SchedulerConfig {
     public void timeZone(ZoneId zoneId) {
         if (state.triggerAdded) throw new Error("schedule().timeZone() must be configured before adding trigger");
         if (zoneId == null) throw new Error("zoneId must not be null");
-        state.scheduler.zoneId = zoneId;
+        state.scheduler.clock = Clock.system(zoneId);
     }
 
     public void fixedRate(String name, Job job, Duration rate) {
