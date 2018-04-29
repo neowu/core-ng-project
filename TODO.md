@@ -10,8 +10,7 @@
 * webservice/redis/mongo client: client retry on network issue?
 * validator: annotation for website, like @HTMLSafeString?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean
-* framework error, queue listener, background task error forward to kafka?
-* long running thread support or needed?
+* framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * missing @PathParam, validation error not clear?
 * support websocket?
 
@@ -21,5 +20,4 @@
 * alpine jdk 9 is not released yet, docker openjdk:jre-alpine image size is much smaller
 
 ### jdk 10
-* remove core.framework.util.Threads.availableProcessors, check default behavior and -XX:ActiveProcessorCount
 * class in interface module generates Validator make interface depends on core-ng module (java module)
