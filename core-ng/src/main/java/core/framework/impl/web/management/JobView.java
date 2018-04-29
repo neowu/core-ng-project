@@ -10,6 +10,6 @@ public class JobView {
     public String name;
     @Property(name = "job_class")
     public String jobClass;
-    @Property(name = "frequency")
-    public String frequency;
+    @Property(name = "trigger")
+    public String trigger;
 }

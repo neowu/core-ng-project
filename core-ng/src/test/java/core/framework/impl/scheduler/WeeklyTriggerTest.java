@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 import static java.time.LocalDateTime.parse;
 import static java.time.LocalTime.of;
 import static java.time.ZonedDateTime.of;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class WeeklyTriggerTest {
@@ -16,28 +17,29 @@ class WeeklyTriggerTest {
 
     @Test
     void next() {
-        WeeklyTrigger trigger = new WeeklyTrigger(null, null, DayOfWeek.WEDNESDAY, of(2, 0, 0), US);  // @WednesdayT2:00 every week
+        WeeklyTrigger trigger = new WeeklyTrigger(DayOfWeek.WEDNESDAY, of(2, 0));  // @WednesdayT2:00 every week
 
-        assertZonedDateTimeEquals("2016-01-13T02:00:00", trigger.next(of(parse("2016-01-13T01:00:00"), US)));   // 2016-1-13 is Wednesday
-        assertZonedDateTimeEquals("2016-01-13T02:00:00", trigger.next(of(parse("2016-01-13T01:00:00"), US).withZoneSameInstant(ZoneId.of("UTC"))));
+        assertZonedDateTimeEquals("2016-01-13T02:00:00", trigger.next(date("2016-01-13T01:00:00")));   // 2016-1-13 is Wednesday
+        assertThat(trigger.next(ZonedDateTime.parse("2016-01-13T01:00:00Z"))).isEqualTo("2016-01-13T02:00:00Z");
 
-        assertZonedDateTimeEquals("2016-01-20T02:00:00", trigger.next(of(parse("2016-01-13T02:00:00"), US)));
-        assertZonedDateTimeEquals("2016-01-20T02:00:00", trigger.next(of(parse("2016-01-13T02:30:00"), US)));
+        assertZonedDateTimeEquals("2016-01-20T02:00:00", trigger.next(date("2016-01-13T02:00:00")));
+        assertZonedDateTimeEquals("2016-01-20T02:00:00", trigger.next(date("2016-01-13T02:30:00")));
 
-        assertZonedDateTimeEquals("2016-01-13T02:00:00", trigger.next(of(parse("2016-01-12T01:00:00"), US)));   // 2016-1-12 is Tuesday, next should be Wednesday this week
-        assertZonedDateTimeEquals("2016-01-20T02:00:00", trigger.next(of(parse("2016-01-19T01:00:00"), US)));   // 2016-1-19 is Thursday, next should be Wednesday next week
+        assertZonedDateTimeEquals("2016-01-13T02:00:00", trigger.next(date("2016-01-12T01:00:00")));   // 2016-1-12 is Tuesday, next should be Wednesday this week
+        assertZonedDateTimeEquals("2016-01-20T02:00:00", trigger.next(date("2016-01-19T01:00:00")));   // 2016-1-19 is Thursday, next should be Wednesday next week
     }
 
     @Test
-    void frequency() {
-        WeeklyTrigger trigger = new WeeklyTrigger(null, null, DayOfWeek.WEDNESDAY, of(2, 0, 0), US);  // @WednesdayT2:00 every week
-        assertEquals("weekly@WEDNESDAY/02:00[America/Los_Angeles]", trigger.frequency());
+    void description() {
+        WeeklyTrigger trigger = new WeeklyTrigger(DayOfWeek.WEDNESDAY, of(2, 0));  // @WednesdayT2:00 every week
+        assertEquals("weekly@WEDNESDAY/02:00", trigger.toString());
+    }
 
-        trigger = new WeeklyTrigger(null, null, DayOfWeek.MONDAY, of(12, 0, 0), ZoneId.of("UTC"));  // @WednesdayT2:00 every week
-        assertEquals("weekly@MONDAY/12:00[UTC]", trigger.frequency());
+    private ZonedDateTime date(String date) {
+        return of(parse(date), US);
     }
 
     private void assertZonedDateTimeEquals(String expected, ZonedDateTime zonedDateTime) {
-        assertEquals(of(parse(expected), US).toInstant(), zonedDateTime.toInstant());
+        assertEquals(date(expected).toInstant(), zonedDateTime.toInstant());
     }
 }

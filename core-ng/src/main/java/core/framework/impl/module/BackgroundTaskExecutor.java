@@ -63,7 +63,7 @@ public class BackgroundTaskExecutor {
             try {
                 command.run();
             } catch (Throwable e) {
-                logger.warn("failed to run background task, error={}", e.getMessage(), e);
+                logger.error("failed to run background task, error={}", e.getMessage(), e);
             }
         }
     }

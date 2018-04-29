@@ -27,11 +27,11 @@ public class SchedulerController {
         accessControl.validate(request.clientIP());
 
         List<JobView> jobs = Lists.newArrayList();
-        scheduler.triggers.forEach((name, trigger) -> {
+        scheduler.tasks.forEach((name, trigger) -> {
             JobView job = new JobView();
             job.name = trigger.name();
             job.jobClass = trigger.job().getClass().getCanonicalName();
-            job.frequency = trigger.frequency();
+            job.trigger = trigger.trigger();
             jobs.add(job);
         });
         return Response.bean(jobs);

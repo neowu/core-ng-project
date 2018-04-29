@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import static java.time.LocalDateTime.parse;
 import static java.time.LocalTime.of;
 import static java.time.ZonedDateTime.of;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -18,41 +19,45 @@ class DailyTriggerTest {
 
     @Test
     void next() {
-        DailyTrigger trigger = new DailyTrigger(null, null, of(10, 0), US);
+        DailyTrigger trigger = new DailyTrigger(of(10, 0));
 
-        assertZonedDateTimeEquals("2017-04-10T10:00:00", trigger.next(of(parse("2017-04-10T09:00:00"), US)));
-        assertZonedDateTimeEquals("2017-04-10T10:00:00", trigger.next(of(parse("2017-04-10T09:00:00"), US).withZoneSameInstant(ZoneId.of("UTC"))));
+        assertZonedDateTimeEquals("2017-04-10T10:00:00", trigger.next(date("2017-04-10T09:00:00")));
+        assertThat(trigger.next(ZonedDateTime.parse("2017-04-10T09:00:00Z"))).isEqualTo("2017-04-10T10:00:00Z");
 
-        assertZonedDateTimeEquals("2017-04-11T10:00:00", trigger.next(of(parse("2017-04-10T10:00:00"), US)));
-        assertZonedDateTimeEquals("2017-04-11T10:00:00", trigger.next(of(parse("2017-04-10T11:00:00"), US)));
+        assertZonedDateTimeEquals("2017-04-11T10:00:00", trigger.next(date("2017-04-10T10:00:00")));
+        assertZonedDateTimeEquals("2017-04-11T10:00:00", trigger.next(date("2017-04-10T11:00:00")));
     }
 
     @Test
     void nextWithDayLightSavingStart() {
-        DailyTrigger trigger = new DailyTrigger(null, null, of(2, 30), US);
+        DailyTrigger trigger = new DailyTrigger(of(2, 30));
 
-        assertZonedDateTimeEquals("2017-03-12T02:30:00", trigger.next(of(parse("2017-03-12T01:00:00"), US)));  // daylight saving started at 2017/03/12
-        assertZonedDateTimeEquals("2017-03-13T02:30:00", trigger.next(of(parse("2017-03-12T02:30:00"), US)));
-        assertZonedDateTimeEquals("2017-03-14T02:30:00", trigger.next(of(parse("2017-03-13T02:30:00"), US)));
+        assertZonedDateTimeEquals("2017-03-12T02:30:00", trigger.next(date("2017-03-12T01:00:00")));  // daylight saving started at 2017/03/12
+        assertZonedDateTimeEquals("2017-03-13T02:30:00", trigger.next(date("2017-03-12T02:30:00")));
+        assertZonedDateTimeEquals("2017-03-14T02:30:00", trigger.next(date("2017-03-13T02:30:00")));
     }
 
     @Test
     void nextWithDayLightSavingEnd() {
-        DailyTrigger trigger = new DailyTrigger(null, null, of(2, 0), US);
+        DailyTrigger trigger = new DailyTrigger(of(2, 0));
 
-        assertZonedDateTimeEquals("2017-11-05T02:00:00", trigger.next(of(parse("2017-11-05T00:00:00"), US)));    // daylight saving ended at 2017/11/05
-        assertZonedDateTimeEquals("2017-11-06T02:00:00", trigger.next(of(parse("2017-11-05T02:00:00"), US)));
-        assertZonedDateTimeEquals("2017-11-06T02:00:00", trigger.next(of(parse("2017-11-05T02:30:00"), US)));
+        assertZonedDateTimeEquals("2017-11-05T02:00:00", trigger.next(date("2017-11-05T00:00:00")));    // daylight saving ended at 2017/11/05
+        assertZonedDateTimeEquals("2017-11-06T02:00:00", trigger.next(date("2017-11-05T02:00:00")));
+        assertZonedDateTimeEquals("2017-11-06T02:00:00", trigger.next(date("2017-11-05T02:30:00")));
     }
 
     @Test
-    void frequency() {
-        DailyTrigger trigger = new DailyTrigger(null, null, of(2, 30), US);
+    void description() {
+        DailyTrigger trigger = new DailyTrigger(of(2, 30));
 
-        assertEquals("daily@02:30[America/New_York]", trigger.frequency());
+        assertEquals("daily@02:30", trigger.toString());
+    }
+
+    private ZonedDateTime date(String date) {
+        return of(parse(date), US);
     }
 
     private void assertZonedDateTimeEquals(String expected, ZonedDateTime zonedDateTime) {
-        assertEquals(of(parse(expected), US).toInstant(), zonedDateTime.toInstant());
+        assertEquals(date(expected).toInstant(), zonedDateTime.toInstant());
     }
 }
