@@ -6,6 +6,7 @@ import core.framework.kafka.MessageHandler;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
+import core.framework.util.StopWatch;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,17 +45,19 @@ public class KafkaMessageListener {
         listenerThreads = new KafkaMessageListenerThread[poolSize];
         String group = kafka.logManager.appName;
         for (int i = 0; i < poolSize; i++) {
+            StopWatch watch = new StopWatch();
             String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
-            Consumer<String, byte[]> consumer = kafka.consumer(group, topics, name);
+            Consumer<String, byte[]> consumer = kafka.consumer(group, topics);
             KafkaMessageListenerThread thread = new KafkaMessageListenerThread(name, consumer, this);
             thread.start();
             listenerThreads[i] = thread;
+            logger.info("create kafka listener thread, name={}, topics={}, elapsedTime={}", name, topics, watch.elapsedTime());
         }
-        logger.info("kafka listener started, name={}, uri={}, topics={}", name, kafka.uri, topics);
+        logger.info("kafka listener started, uri={}, topics={}, name={}", kafka.uri, topics, name);
     }
 
     public void stop() {
-        logger.info("stop kafka listener, name={}, uri={}, topics={}", name, kafka.uri, topics);
+        logger.info("stop kafka listener, uri={}, topics={}, name={}", kafka.uri, topics, name);
         if (listenerThreads != null) {
             for (KafkaMessageListenerThread thread : listenerThreads) {
                 thread.shutdown();

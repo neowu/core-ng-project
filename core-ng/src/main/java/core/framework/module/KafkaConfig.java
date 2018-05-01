@@ -75,19 +75,19 @@ public final class KafkaConfig {
         return publisher;
     }
 
-    public <T> KafkaConfig subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler) {
-        return subscribe(topic, messageClass, handler, null);
+    public <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler) {
+        subscribe(topic, messageClass, handler, null);
     }
 
-    public <T> KafkaConfig subscribe(String topic, Class<T> messageClass, BulkMessageHandler<T> handler) {
-        return subscribe(topic, messageClass, null, handler);
+    public <T> void subscribe(String topic, Class<T> messageClass, BulkMessageHandler<T> handler) {
+        subscribe(topic, messageClass, null, handler);
     }
 
-    private <T> KafkaConfig subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
+    private <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
         if (state.kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
+        logger.info("subscribe topic, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
         state.kafka.listener().subscribe(topic, messageClass, handler, bulkHandler);
         state.handlerAdded = true;
-        return this;
     }
 
     public void poolSize(int poolSize) {

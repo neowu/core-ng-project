@@ -18,18 +18,16 @@ public final class ExecutorImpl implements Executor {
     private final Logger logger = LoggerFactory.getLogger(ExecutorImpl.class);
     private final ExecutorService executor;
     private final LogManager logManager;
+    private final String name;
 
-    public ExecutorImpl(LogManager logManager) {
-        this(ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 2, "executor-"), logManager);
-    }
-
-    ExecutorImpl(ExecutorService executor, LogManager logManager) {
+    public ExecutorImpl(ExecutorService executor, LogManager logManager, String name) {
         this.executor = executor;
         this.logManager = logManager;
+        this.name = name;
     }
 
     public void stop() {
-        logger.info("stop executor");
+        logger.info("stop executor, name={}", name);
         executor.shutdown();
         try {
             executor.awaitTermination(10, TimeUnit.SECONDS);     // wait 10 seconds to finish current tasks

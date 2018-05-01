@@ -30,7 +30,7 @@ public class MockKafka extends Kafka {
     }
 
     @Override
-    public Consumer<String, byte[]> consumer(String group, Set<String> topics, String thread) {
+    public Consumer<String, byte[]> consumer(String group, Set<String> topics) {
         MockConsumer<String, byte[]> consumer = new MockConsumer<>(OffsetResetStrategy.EARLIEST);
 
         List<TopicPartition> assignments = Lists.newArrayList();

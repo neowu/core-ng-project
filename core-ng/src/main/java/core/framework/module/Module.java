@@ -95,6 +95,10 @@ public abstract class Module {
         return new SchedulerConfig(context);
     }
 
+    public ExecutorConfig executor() {
+        return new ExecutorConfig(context);
+    }
+
     public APIConfig api() {
         return new APIConfig(context);
     }

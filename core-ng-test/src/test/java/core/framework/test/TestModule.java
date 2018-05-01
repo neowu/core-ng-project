@@ -47,6 +47,13 @@ public class TestModule extends AbstractTestModule {
         bind(new TestBean(requiredProperty("test.inject-test.property")));
 
         configureJob();
+
+        configureExecutor();
+    }
+
+    private void configureExecutor() {
+        executor().add(null, 1);
+        executor().add("name", 1);
     }
 
     private void configureSite() {

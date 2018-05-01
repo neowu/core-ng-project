@@ -1,8 +1,6 @@
 package core.framework.impl.module;
 
-import core.framework.async.Executor;
 import core.framework.http.HTTPMethod;
-import core.framework.impl.async.ExecutorImpl;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
@@ -52,15 +50,6 @@ public final class ModuleContext {
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
         startupHook.add(httpServer::start);
         shutdownHook.add(httpServer::stop);
-
-        Executor executor;
-        if (!isTest()) {
-            executor = new ExecutorImpl(logManager);
-            shutdownHook.add(((ExecutorImpl) executor)::stop);
-        } else {
-            executor = mockFactory.create(Executor.class);
-        }
-        beanFactory.bind(Executor.class, null, executor);
 
         route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
         ThreadInfoController threadInfoController = new ThreadInfoController();

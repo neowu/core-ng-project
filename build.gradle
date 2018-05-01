@@ -9,9 +9,9 @@ def mongoVersion = '3.5.0'
 def elasticVersion = '6.2.4'
 def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.1.0'
-def jacksonVersion = '2.9.4'
-def junitVersion = '5.1.0'
-def mockitoVersion = '2.17.0'
+def jacksonVersion = '2.9.5'
+def junitVersion = '5.2.0'
+def mockitoVersion = '2.18.3'
 def assertjVersion = '3.9.1'
 
 project(':core-ng-api') {
@@ -50,7 +50,7 @@ project(':core-ng-test') {
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
-        compileOnly "com.github.fakemongo:fongo:2.1.0@jar"
+        compileOnly "com.github.fakemongo:fongo:2.1.1@jar"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
         compileOnly "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch

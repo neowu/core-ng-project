@@ -29,7 +29,7 @@ class ExecutorImplTest {
             ((Callable<?>) invocation.getArgument(0)).call();
             return null;
         });
-        executor = new ExecutorImpl(executorService, logManager);
+        executor = new ExecutorImpl(executorService, logManager, "test");
     }
 
     @Test

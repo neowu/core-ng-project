@@ -23,7 +23,7 @@ class MockKafkaTest {
 
     @Test
     void consumer() {
-        MockConsumer<String, byte[]> consumer = (MockConsumer<String, byte[]>) kafka.consumer("local", Sets.newHashSet("topic"), "thread");
+        MockConsumer<String, byte[]> consumer = (MockConsumer<String, byte[]>) kafka.consumer("local", Sets.newHashSet("topic"));
         consumer.addRecord(new ConsumerRecord<>("topic", 0, 0, "key", Strings.bytes("value")));
         ConsumerRecords<String, byte[]> records = consumer.poll(0);
         assertEquals(1, records.count());

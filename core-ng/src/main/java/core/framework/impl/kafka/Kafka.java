@@ -72,28 +72,23 @@ public class Kafka {
         }
     }
 
-    public Consumer<String, byte[]> consumer(String group, Set<String> topics, String thread) {
+    public Consumer<String, byte[]> consumer(String group, Set<String> topics) {    // the creation/elapsedTime are be logged by KafkaMessageListener
         if (uri == null) throw new Error("uri must not be null");
-        StopWatch watch = new StopWatch();
-        try {
-            Map<String, Object> config = Maps.newHashMap();
-            config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-            config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
-            config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-            config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-            config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
-            config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
-            config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
-            config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
-            config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
-            config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
-            Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
-            consumer.subscribe(topics);
-            consumerMetrics.add(consumer.metrics());
-            return consumer;
-        } finally {
-            logger.info("create kafka consumer, uri={}, thread={}, topics={}, elapsedTime={}", uri, thread, topics, watch.elapsedTime());
-        }
+        Map<String, Object> config = Maps.newHashMap();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
+        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
+        config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
+        config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
+        config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
+        config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
+        config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
+        Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
+        consumer.subscribe(topics);
+        consumerMetrics.add(consumer.metrics());
+        return consumer;
     }
 
     public AdminClient admin() {

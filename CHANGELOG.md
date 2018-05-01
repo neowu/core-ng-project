@@ -1,9 +1,11 @@
 ## Change log
-### 6.2.0 (4/25/2018 - )        !!! only support Java 10+
+### 6.2.0 (4/25/2018 - 5/1/2018)        !!! only support Java 10+
 * thread: removed core.framework.util.Threads.availableProcessors, since java 10 supports cpu limits well in docker/kube
 * db: update connection max idle timeout to 1 hour, to fit most scenario (e.g. IDC with firewall)  
 * scheduler: removed secondly trigger, replaced with custom trigger to make it more flexible
 * search: update es to 6.2.4 
+* executor: !!! removed built-in Executor binding, please use executor().add(); in config to keep same behavior, 
+            allow executor().add(name, poolSize) to create multiple pools
 
 ### 6.1.5 (4/19/2018)
 * bug: fix site().publishAPI(cidrs) not setting cidr correctly
