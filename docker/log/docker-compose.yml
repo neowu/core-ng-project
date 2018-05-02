@@ -1,7 +1,7 @@
 version: "3"
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.3
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.2.4
     ports:
       - 9200:9200
       - 9300:9300
@@ -13,7 +13,7 @@ services:
 #      - xpack.security.enabled=false
 #      - xpack.ml.enabled=false     # if use elasticsearch image with xpack basic installed, must disable machine learning module
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:6.2.3
+    image: docker.elastic.co/kibana/kibana-oss:6.2.4
     ports:
       - 5601:5601
     environment:
@@ -36,7 +36,7 @@ services:
     depends_on:
       - zookeeper
   log-processor:
-    image: neowu/log-processor:6.1.4
+    image: neowu/log-processor:6.2.0
     environment:
       - JAVA_OPTS=-Xms256m -Xmx2048m -Xss256k -Djava.awt.headless=true
       - SYS_KAFKA_URI=kafka:9092
