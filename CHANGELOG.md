@@ -1,5 +1,5 @@
 ## Change log
-### 6.2.1 (5/3/2018)
+### 6.2.2 (5/3/2018)
 * scheduler: log error when trigger returned invalid next execution time
 
 ### 6.2.0 (4/25/2018 - 5/1/2018)        !!! only support Java 10+

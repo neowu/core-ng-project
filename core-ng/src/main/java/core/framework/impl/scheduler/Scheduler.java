@@ -103,6 +103,14 @@ public final class Scheduler {
         scheduler.schedule(() -> executeTask(task, time), delay.toNanos(), TimeUnit.NANOSECONDS);
     }
 
+    void schedule(FixedRateTask task) {
+        Duration delay = Duration.ofMillis((long) Randoms.number(1000, 3000)); // delay 1s to 3s
+        scheduler.scheduleAtFixedRate(() -> {
+            logger.info("execute scheduled job, job={}", task.name());
+            submitJob(task, false);
+        }, delay.toNanos(), task.rate.toNanos(), TimeUnit.NANOSECONDS);
+    }
+
     void executeTask(TriggerTask task, ZonedDateTime time) {
         try {
             ZonedDateTime next = next(task.trigger, time);
@@ -112,14 +120,6 @@ public final class Scheduler {
         } catch (Throwable e) {
             logger.error("failed to execute scheduled job, job is terminated, job={}, error={}", task.name(), e.getMessage(), e);
         }
-    }
-
-    void schedule(FixedRateTask task) {
-        Duration delay = Duration.ofMillis((long) Randoms.number(1000, 3000)); // delay 1s to 3s
-        scheduler.scheduleAtFixedRate(() -> {
-            logger.info("execute scheduled job, job={}", task.name());
-            submitJob(task, false);
-        }, delay.toNanos(), task.rate.toNanos(), TimeUnit.NANOSECONDS);
     }
 
     public void triggerNow(String name) {
