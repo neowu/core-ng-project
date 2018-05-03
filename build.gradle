@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '6.2.1'
+    version = '6.2.2'
 }
 
 def mongoVersion = '3.5.0'
