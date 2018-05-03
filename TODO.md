@@ -5,7 +5,7 @@
 * jdk9: split 3rd party product into modules? (e.g. mongo/es/kafka/db)
 * redis: support cluster?
 * inject: remove method inject support? 
-* template, use ByteBuffer[] for performance tuning?
+* template, use ByteBuffer[] for performance?
 * general retry and throttling?
 * webservice/redis/mongo client: client retry on network issue?
 * validator: annotation for website, like @HTMLSafeString?

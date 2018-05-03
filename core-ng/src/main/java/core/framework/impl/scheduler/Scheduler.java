@@ -100,12 +100,18 @@ public final class Scheduler {
     void schedule(TriggerTask task, ZonedDateTime time) {
         ZonedDateTime now = ZonedDateTime.now(clock);
         Duration delay = Duration.between(now, time);
-        scheduler.schedule(() -> {
+        scheduler.schedule(() -> executeTask(task, time), delay.toNanos(), TimeUnit.NANOSECONDS);
+    }
+
+    void executeTask(TriggerTask task, ZonedDateTime time) {
+        try {
             ZonedDateTime next = next(task.trigger, time);
             schedule(task, next);
             logger.info("execute scheduled job, job={}, time={}, next={}", task.name(), time, next);
             submitJob(task, false);
-        }, delay.toNanos(), TimeUnit.NANOSECONDS);
+        } catch (Throwable e) {
+            logger.error("failed to execute scheduled job, job is terminated, job={}, error={}", task.name(), e.getMessage(), e);
+        }
     }
 
     void schedule(FixedRateTask task) {

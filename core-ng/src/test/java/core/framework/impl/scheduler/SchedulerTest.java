@@ -1,7 +1,9 @@
 package core.framework.impl.scheduler;
 
 
-import org.assertj.core.api.Assertions;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
+import core.framework.scheduler.Job;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -16,11 +18,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author neo
@@ -29,18 +35,20 @@ class SchedulerTest {
     private Scheduler scheduler;
     private ScheduledExecutorService schedulerExecutor;
     private ExecutorService jobExecutor;
+    private LogManager logManager;
 
     @BeforeEach
     void createScheduler() {
         schedulerExecutor = mock(ScheduledExecutorService.class);
         jobExecutor = mock(ExecutorService.class);
-        scheduler = new Scheduler(null, schedulerExecutor, jobExecutor);
+        logManager = mock(LogManager.class);
+        scheduler = new Scheduler(logManager, schedulerExecutor, jobExecutor);
     }
 
     @Test
     void next() {
-        Assertions.assertThatThrownBy(() -> scheduler.next(previous -> null, ZonedDateTime.now()))
-                  .hasMessageContaining("must be after previous");
+        assertThatThrownBy(() -> scheduler.next(previous -> null, ZonedDateTime.now()))
+                .hasMessageContaining("must be after previous");
 
         assertThat(scheduler.next(previous -> previous.plusHours(1), ZonedDateTime.now())).isNotNull();
     }
@@ -71,5 +79,36 @@ class SchedulerTest {
 
         scheduledTask.getValue().run();
         verify(jobExecutor).submit((Callable<?>) any(Callable.class));
+    }
+
+    @Test
+    void executeTaskWithTriggerError() {
+        TriggerTask task = new TriggerTask("trigger-job", null, previous -> previous, ZoneId.systemDefault());
+        scheduler.executeTask(task, ZonedDateTime.now());
+
+        verify(jobExecutor, never()).submit((Callable<?>) any(Callable.class));
+    }
+
+    @Test
+    void triggerNow() throws Exception {
+        scheduler.addFixedRateTask("hourly-job", new TestJob(), Duration.ofHours(1));
+        scheduler.triggerNow("hourly-job");
+
+        ArgumentCaptor<Callable<?>> task = ArgumentCaptor.forClass(Callable.class);
+        verify(jobExecutor).submit(task.capture());
+
+        ActionLog actionLog = new ActionLog(null, null);
+        when(logManager.begin(anyString())).thenReturn(actionLog);
+
+        task.getValue().call();
+
+        assertThat(actionLog.trace).isTrue();
+    }
+
+    public static class TestJob implements Job {
+        @Override
+        public void execute() {
+
+        }
     }
 }
