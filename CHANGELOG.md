@@ -1,4 +1,7 @@
 ## Change log
+### 6.2.3 (5/9/2018 - )
+* api: typescript api, convert java date to string due to js only supports string as native json field type
+
 ### 6.2.2 (5/3/2018)
 * scheduler: log error when trigger returned invalid next execution time
 
