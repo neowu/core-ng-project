@@ -123,7 +123,7 @@ public class TypescriptDefinitionBuilder {
         if (String.class.equals(type)) return "string";
         if (Integer.class.equals(type) || Long.class.equals(type) || Double.class.equals(type) || BigDecimal.class.equals(type)) return "number";
         if (Boolean.class.equals(type)) return "boolean";
-        if (LocalDate.class.equals(type) || LocalDateTime.class.equals(type) || ZonedDateTime.class.equals(type) || Instant.class.equals(type)) return "string";
+        if (LocalDate.class.equals(type) || LocalDateTime.class.equals(type) || ZonedDateTime.class.equals(type) || Instant.class.equals(type)) return "Date";
         if (GenericTypes.rawClass(type).isEnum()) {
             @SuppressWarnings("unchecked")
             Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) type;

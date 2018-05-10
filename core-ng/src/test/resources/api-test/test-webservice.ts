@@ -4,7 +4,7 @@ export namespace core.framework.impl.web.service {
         boolean_field?: boolean;
         long_field?: number;
         double_field?: number;
-        date_field?: string;
+        date_field?: Date;
     }
 
     export interface TestWebService$TestResponse {
@@ -14,7 +14,7 @@ export namespace core.framework.impl.web.service {
     }
 
     export interface TestWebService$TestItem {
-        zoned_date_time_field?: string;
+        zoned_date_time_field?: Date;
         enum_field?: core.framework.impl.web.service.TestWebService$TestEnum;
     }
 
