@@ -14,24 +14,28 @@ import core.framework.impl.web.service.WebServiceControllerBuilder;
 import core.framework.impl.web.service.WebServiceImplValidator;
 import core.framework.impl.web.service.WebServiceInterfaceValidator;
 import core.framework.util.ASCII;
+import core.framework.util.Lists;
 import core.framework.web.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * @author neo
  */
 public final class APIConfig {
+    final List<Class<?>> serviceInterfaces = Lists.newArrayList();
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private final ModuleContext context;
-    private final State state;
+    private HTTPClient httpClient;
+    private Duration timeout = Duration.ofSeconds(30);
+    private Duration slowOperationThreshold = Duration.ofSeconds(15);
 
     APIConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.state("api", State::new);
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {
@@ -57,7 +61,7 @@ public final class APIConfig {
             }
         }
 
-        context.serviceInterfaces.add(serviceInterface);
+        serviceInterfaces.add(serviceInterface);
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
@@ -73,13 +77,13 @@ public final class APIConfig {
     }
 
     public void timeout(Duration timeout) {
-        if (state.httpClient != null) throw new Error("api().timeout() must be configured before adding client");
-        state.timeout = timeout;
+        if (httpClient != null) throw new Error("api().timeout() must be configured before adding client");
+        this.timeout = timeout;
     }
 
     public void slowOperationThreshold(Duration slowOperationThreshold) {
-        if (state.httpClient != null) throw new Error("api().slowOperationThreshold() must be configured before adding client");
-        state.slowOperationThreshold = slowOperationThreshold;
+        if (httpClient != null) throw new Error("api().slowOperationThreshold() must be configured before adding client");
+        this.slowOperationThreshold = slowOperationThreshold;
     }
 
     private <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {
@@ -91,21 +95,15 @@ public final class APIConfig {
     }
 
     private HTTPClient httpClient() {
-        if (state.httpClient == null) {
+        if (httpClient == null) {
             HTTPClient httpClient = new HTTPClientBuilder()
                     .userAgent("APIClient")
-                    .timeout(state.timeout)
-                    .slowOperationThreshold(state.slowOperationThreshold)
+                    .timeout(timeout)
+                    .slowOperationThreshold(slowOperationThreshold)
                     .build();
             context.shutdownHook.add(httpClient::close);
-            state.httpClient = httpClient;
+            this.httpClient = httpClient;
         }
-        return state.httpClient;
-    }
-
-    public static class State {
-        HTTPClient httpClient;
-        Duration timeout = Duration.ofSeconds(30);
-        Duration slowOperationThreshold = Duration.ofSeconds(15);
+        return httpClient;
     }
 }

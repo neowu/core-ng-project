@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
@@ -13,15 +12,16 @@ import java.time.Duration;
  */
 public final class RedisConfig {
     private final ModuleContext context;
-    private final State state;
+    private final Redis redis;
+    private String host;
 
     RedisConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.state("redis", State::new);
+        redis = createRedis();
+    }
 
-        if (state.redis == null) {
-            state.redis = createRedis();
-        }
+    void validate() {
+        if (host == null) throw new Error("redis().host() must be configured");
     }
 
     private Redis createRedis() {
@@ -40,37 +40,27 @@ public final class RedisConfig {
 
     public void host(String host) {
         if (!context.isTest()) {
-            RedisImpl redis = (RedisImpl) state.redis;
+            RedisImpl redis = (RedisImpl) this.redis;
             redis.host = host;
         }
-        state.host = host;
+        this.host = host;
     }
 
     public void poolSize(int minSize, int maxSize) {
         if (!context.isTest()) {
-            ((RedisImpl) state.redis).pool.size(minSize, maxSize);
+            ((RedisImpl) redis).pool.size(minSize, maxSize);
         }
     }
 
     public void slowOperationThreshold(Duration threshold) {
         if (!context.isTest()) {
-            ((RedisImpl) state.redis).slowOperationThreshold(threshold);
+            ((RedisImpl) redis).slowOperationThreshold(threshold);
         }
     }
 
     public void timeout(Duration timeout) {
         if (!context.isTest()) {
-            ((RedisImpl) state.redis).timeout(timeout);
-        }
-    }
-
-    public static class State implements Config.State {
-        String host;
-        Redis redis;
-
-        @Override
-        public void validate() {
-            if (host == null) throw new Error("redis().host() must be configured");
+            ((RedisImpl) redis).timeout(timeout);
         }
     }
 }

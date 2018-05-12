@@ -26,11 +26,10 @@ public final class SiteConfig {
     private final Logger logger = LoggerFactory.getLogger(SiteConfig.class);
 
     private final ModuleContext context;
-    private final State state;
+    private boolean messageConfigured;
 
     SiteConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.state("site", State::new);
     }
 
     public SessionConfig session() {
@@ -42,16 +41,16 @@ public final class SiteConfig {
     }
 
     public void message(List<String> paths, String... languages) {
-        if (state.messageConfigured) {
+        if (messageConfigured) {
             throw Exceptions.error("site().message() can only be configured once and must before site().template()");
         }
-        state.messageConfigured = true;
+        messageConfigured = true;
         context.beanFactory.bind(Message.class, null, context.httpServer.siteManager.message);
         context.httpServer.siteManager.message.load(paths, languages);
     }
 
     public void template(String path, Class<?> modelClass) {
-        state.messageConfigured = true; // can not configure message() after adding template
+        messageConfigured = true; // can not configure message() after adding template
         context.httpServer.siteManager.templateManager.add(path, modelClass);
     }
 
@@ -76,11 +75,9 @@ public final class SiteConfig {
     }
 
     public void publishAPI(String... cidrs) {
-        logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceInterfaces, new IPAccessControl(cidrs)), true);
-    }
+        APIConfig config = context.config(APIConfig.class, null);
 
-    public static class State {
-        boolean messageConfigured;
+        logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(config.serviceInterfaces, new IPAccessControl(cidrs)), true);
     }
 }

@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.http.ClientIPInterceptor;
 import core.framework.impl.web.http.LimitRateInterceptor;
@@ -18,11 +17,18 @@ import java.util.Arrays;
 public final class HTTPConfig {
     private final Logger logger = LoggerFactory.getLogger(HTTPConfig.class);
     private final ModuleContext context;
-    private final State state;
+
+    LimitRateInterceptor limitRateInterceptor;
+    boolean limitRateGroupAdded;
 
     HTTPConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.state("http", State::new);
+    }
+
+    void validate() {
+        if (limitRateInterceptor != null && !limitRateGroupAdded) {
+            throw new Error("limitRate() is configured but no group added, please remove unnecessary config");
+        }
     }
 
     public void httpPort(int port) {
@@ -42,11 +48,11 @@ public final class HTTPConfig {
     }
 
     public LimitRateConfig limitRate() {
-        if (state.limitRateInterceptor == null) {
-            state.limitRateInterceptor = new LimitRateInterceptor();
-            intercept(state.limitRateInterceptor);
+        if (limitRateInterceptor == null) {
+            limitRateInterceptor = new LimitRateInterceptor();
+            intercept(limitRateInterceptor);
         }
-        return new LimitRateConfig(state);
+        return new LimitRateConfig(this);
     }
 
     /**
@@ -72,17 +78,5 @@ public final class HTTPConfig {
 
     public void enableGZip() {
         context.httpServer.gzip = true;
-    }
-
-    public static class State implements Config.State {
-        LimitRateInterceptor limitRateInterceptor;
-        boolean limitRateGroupAdded;
-
-        @Override
-        public void validate() {
-            if (limitRateInterceptor != null && !limitRateGroupAdded) {
-                throw new Error("limitRate() is configured but no group added, please remove unnecessary config");
-            }
-        }
     }
 }

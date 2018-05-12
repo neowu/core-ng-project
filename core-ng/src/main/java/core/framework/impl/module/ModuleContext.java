@@ -6,6 +6,7 @@ import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.stat.Stat;
+import core.framework.impl.reflect.Classes;
 import core.framework.impl.web.ControllerClassValidator;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.ControllerInspector;
@@ -15,13 +16,19 @@ import core.framework.impl.web.management.PropertyController;
 import core.framework.impl.web.management.ThreadInfoController;
 import core.framework.impl.web.route.PathPatternValidator;
 import core.framework.util.ASCII;
+import core.framework.util.Exceptions;
 import core.framework.util.Lists;
+import core.framework.util.Maps;
 import core.framework.web.Controller;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -35,8 +42,7 @@ public final class ModuleContext {
     public final LogManager logManager;
     public final MockFactory mockFactory;
     public final Stat stat = new Stat();
-    public final Config config = new Config();
-    public final List<Class<?>> serviceInterfaces = Lists.newArrayList();   // TODO: make Config stateful and move this into APIConfig
+    private final Map<String, Object> configs = Maps.newHashMap();
     private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext(BeanFactory beanFactory, MockFactory mockFactory) {
@@ -78,5 +84,46 @@ public final class ModuleContext {
 
     public boolean isTest() {
         return mockFactory != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T config(Class<T> configClass, String name) {
+        return (T) configs.computeIfAbsent(configClass.getCanonicalName() + ":" + name, key -> createConfig(configClass, name));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Optional<T> getConfig(Class<T> configClass, String name) {
+        return Optional.ofNullable((T) configs.get(configClass.getCanonicalName() + ":" + name));
+    }
+
+    private <T> T createConfig(Class<T> configClass, String name) { // use weak type convention to hide unnecessary method from config class
+        try {
+            Optional<Constructor<T>> constructorOptional = Classes.constructor(configClass, ModuleContext.class, String.class);
+            if (constructorOptional.isPresent()) {
+                Constructor<T> constructor = constructorOptional.get();
+                constructor.setAccessible(true);
+                return constructor.newInstance(this, name);
+            }
+            constructorOptional = Classes.constructor(configClass, ModuleContext.class);
+            if (constructorOptional.isPresent()) {
+                Constructor<T> constructor = constructorOptional.get();
+                constructor.setAccessible(true);
+                return constructor.newInstance(this);
+            }
+            throw Exceptions.error("config class must have public constructor(context, name?), configClass={}", configClass.getCanonicalName());
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new Error(e);
+        }
+    }
+
+    public void validate() {    // call validate if declared, use weak type convention to hide unnecessary method from config class
+        configs.values().forEach(config -> Classes.method(config.getClass(), "validate").ifPresent(method -> {
+            try {
+                method.setAccessible(true);
+                method.invoke(config);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new Error(e);
+            }
+        }));
     }
 }

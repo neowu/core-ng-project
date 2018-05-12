@@ -57,7 +57,7 @@ public class DynamicInstanceBuilder<T> {
             CtClass[] params = new CtClass[constructorParamClasses.length];
             for (int i = 0; i < constructorParamClasses.length; i++) {
                 Class<?> paramClass = constructorParamClasses[i];
-                params[i] = classPool.getCtClass(paramClass.getCanonicalName());
+                params[i] = classPool.getCtClass(paramClass.getName());
             }
             CtConstructor constructor = new CtConstructor(params, classBuilder);
             constructor.setBody(body);

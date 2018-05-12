@@ -19,7 +19,7 @@ public abstract class AbstractTestModule extends Module {
         context = new ModuleContext(beanFactory, new MockFactoryImpl());
         logger.info("initialize application");
         initialize();
-        context.config.validate();
+        context.validate();
         ((TestBeanFactory) context.beanFactory).validateOverrideBindings();
     }
 

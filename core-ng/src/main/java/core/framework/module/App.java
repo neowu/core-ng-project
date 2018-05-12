@@ -29,6 +29,6 @@ public abstract class App extends Module {
         context = new ModuleContext(new BeanFactory(), null);
         logger.info("initialize application");
         initialize();
-        context.config.validate();
+        context.validate();
     }
 }

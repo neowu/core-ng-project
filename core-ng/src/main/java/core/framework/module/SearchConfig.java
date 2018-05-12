@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.search.ElasticSearchImpl;
 import core.framework.impl.search.log.ESLoggerContextFactory;
@@ -16,16 +15,17 @@ import java.time.Duration;
  * @author neo
  */
 public final class SearchConfig {
+    public final ElasticSearchImpl search;
     private final ModuleContext context;
-    private final State state;
+    private String host;
 
     SearchConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.state("elasticsearch", State::new);
+        search = createElasticSearch(context);
+    }
 
-        if (state.search == null) {
-            state.search = createElasticSearch(context);
-        }
+    void validate() {
+        if (host == null) throw new Error("search().host() must be configured");
     }
 
     private ElasticSearchImpl createElasticSearch(ModuleContext context) {
@@ -46,35 +46,25 @@ public final class SearchConfig {
 
     public void host(String host) {
         if (!context.isTest()) {
-            state.search.host(host);      // es requires host must be resolved, skip for unit test
+            search.host(host);      // es requires host must be resolved, skip for unit test
         }
-        state.host = host;
+        this.host = host;
     }
 
     public void sniff(boolean sniff) {
-        state.search.sniff = sniff;
+        search.sniff = sniff;
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        state.search.slowOperationThreshold = threshold;
+        search.slowOperationThreshold = threshold;
     }
 
     public void timeout(Duration timeout) {
-        state.search.timeout = timeout;
+        search.timeout = timeout;
     }
 
     public <T> void type(Class<T> documentClass) {
-        ElasticSearchType<T> searchType = state.search.type(documentClass);
+        ElasticSearchType<T> searchType = search.type(documentClass);
         context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), null, searchType);
-    }
-
-    public static class State implements Config.State {
-        public ElasticSearchImpl search;
-        String host;
-
-        @Override
-        public void validate() {
-            if (host == null) throw new Error("search().host() must be configured");
-        }
     }
 }

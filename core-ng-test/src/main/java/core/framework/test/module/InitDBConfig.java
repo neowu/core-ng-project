@@ -6,6 +6,7 @@ import core.framework.module.DBConfig;
 import core.framework.test.db.EntitySchemaGenerator;
 import core.framework.test.db.SQLScriptRunner;
 import core.framework.util.ClasspathResources;
+import core.framework.util.Exceptions;
 import core.framework.util.Types;
 
 import java.util.List;
@@ -14,24 +15,25 @@ import java.util.List;
  * @author neo
  */
 public final class InitDBConfig {
-    private final DBConfig.State state;
+    private final DBConfig config;
     private final ModuleContext context;
     private final String name;
 
     InitDBConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        state = context.config.state("db:" + name);
+        config = context.getConfig(DBConfig.class, name)
+                        .orElseThrow(() -> Exceptions.error("db({}) must be configured before initDB()", name == null ? "" : name));
     }
 
     public void runScript(String scriptPath) {
-        new SQLScriptRunner(state.database, ClasspathResources.text(scriptPath)).run();
+        new SQLScriptRunner(config.database, ClasspathResources.text(scriptPath)).run();
     }
 
     public void createSchema() {
-        List<Class<?>> entityClasses = state.entityClasses;
+        List<Class<?>> entityClasses = config.entityClasses;
         for (Class<?> entityClass : entityClasses) {
-            new EntitySchemaGenerator(state.database, entityClass).generate();
+            new EntitySchemaGenerator(config.database, entityClass).generate();
         }
     }
 

@@ -3,7 +3,6 @@ package core.framework.module;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.kafka.Kafka;
 import core.framework.impl.kafka.KafkaMessagePublisher;
-import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.management.KafkaController;
 import core.framework.kafka.BulkMessageHandler;
@@ -24,16 +23,19 @@ public final class KafkaConfig {
 
     private final ModuleContext context;
     private final String name;
-    private final State state;
+    private final Kafka kafka;
+    private boolean handlerAdded;
 
     KafkaConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        state = context.config.state("kafka:" + name, () -> new State(name));
+        kafka = createKafka(context, name);
+    }
 
-        if (state.kafka == null) {
-            state.kafka = createKafka(context, name);
-        }
+    void validate() {
+        if (kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured", name == null ? "" : name);
+        if (!handlerAdded)
+            throw Exceptions.error("kafka({}) is configured, but no producer/consumer added, please remove unnecessary config", name == null ? "" : name);
     }
 
     private Kafka createKafka(ModuleContext context, String name) {
@@ -67,11 +69,11 @@ public final class KafkaConfig {
     }
 
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
-        if (state.kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
+        if (kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
         logger.info("create message publisher, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
-        MessagePublisher<T> publisher = new KafkaMessagePublisher<>(state.kafka.producer(), topic, messageClass, context.logManager);
+        MessagePublisher<T> publisher = new KafkaMessagePublisher<>(kafka.producer(), topic, messageClass, context.logManager);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
-        state.handlerAdded = true;
+        handlerAdded = true;
         return publisher;
     }
 
@@ -84,54 +86,37 @@ public final class KafkaConfig {
     }
 
     private <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
-        if (state.kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
+        if (kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured first", name == null ? "" : name);
         logger.info("subscribe topic, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
-        state.kafka.listener().subscribe(topic, messageClass, handler, bulkHandler);
-        state.handlerAdded = true;
+        kafka.listener().subscribe(topic, messageClass, handler, bulkHandler);
+        handlerAdded = true;
     }
 
     public void poolSize(int poolSize) {
-        state.kafka.listener().poolSize = poolSize;
+        kafka.listener().poolSize = poolSize;
     }
 
     public void uri(String uri) {
-        if (state.kafka.uri != null)
-            throw Exceptions.error("kafka({}).uri() is already configured, uri={}, previous={}", name == null ? "" : name, uri, state.kafka.uri);
-        state.kafka.uri = uri;
+        if (kafka.uri != null)
+            throw Exceptions.error("kafka({}).uri() is already configured, uri={}, previous={}", name == null ? "" : name, uri, kafka.uri);
+        kafka.uri = uri;
     }
 
     public void maxProcessTime(Duration maxProcessTime) {
-        state.kafka.maxProcessTime = maxProcessTime;
+        kafka.maxProcessTime = maxProcessTime;
     }
 
     public void maxPoll(int maxRecords, int maxBytes) {
         if (maxRecords <= 0) throw Exceptions.error("max poll records must be greater than 0, value={}", maxRecords);
         if (maxBytes <= 0) throw Exceptions.error("max poll bytes must be greater than 0, value={}", maxBytes);
-        state.kafka.maxPollRecords = maxRecords;
-        state.kafka.maxPollBytes = maxBytes;
+        kafka.maxPollRecords = maxRecords;
+        kafka.maxPollBytes = maxBytes;
     }
 
     public void minPoll(int minBytes, Duration maxWaitTime) {
         if (minBytes <= 0) throw Exceptions.error("min poll bytes must be greater than 0, value={}", minBytes);
         if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw Exceptions.error("max wait time must be greater than 0, value={}", maxWaitTime);
-        state.kafka.minPollBytes = minBytes;
-        state.kafka.minPollMaxWaitTime = maxWaitTime;
-    }
-
-    public static class State implements Config.State {
-        final String name;
-        Kafka kafka;
-        boolean handlerAdded;
-
-        public State(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public void validate() {
-            if (kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured", name == null ? "" : name);
-            if (!handlerAdded)
-                throw Exceptions.error("kafka({}) is configured, but no producer/consumer added, please remove unnecessary config", name == null ? "" : name);
-        }
+        kafka.minPollBytes = minBytes;
+        kafka.minPollMaxWaitTime = maxWaitTime;
     }
 }

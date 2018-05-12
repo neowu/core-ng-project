@@ -20,24 +20,22 @@ import java.time.ZoneId;
  * @author neo
  */
 public final class SchedulerConfig {
-    private final State state;
+    private final Scheduler scheduler;
+    private boolean triggerAdded;
 
     SchedulerConfig(ModuleContext context) {
-        state = context.config.state("scheduler", State::new);
-        if (state.scheduler == null) {
-            state.scheduler = createScheduler(context);
-        }
+        scheduler = createScheduler(context);
     }
 
     public void timeZone(ZoneId zoneId) {
-        if (state.triggerAdded) throw new Error("schedule().timeZone() must be configured before adding trigger");
+        if (triggerAdded) throw new Error("schedule().timeZone() must be configured before adding trigger");
         if (zoneId == null) throw new Error("zoneId must not be null");
-        state.scheduler.clock = Clock.system(zoneId);
+        scheduler.clock = Clock.system(zoneId);
     }
 
     public void fixedRate(String name, Job job, Duration rate) {
-        state.scheduler.addFixedRateTask(name, job, rate);
-        state.triggerAdded = true;
+        scheduler.addFixedRateTask(name, job, rate);
+        triggerAdded = true;
     }
 
     public void dailyAt(String name, Job job, LocalTime time) {
@@ -53,8 +51,8 @@ public final class SchedulerConfig {
     }
 
     public void trigger(String name, Job job, Trigger trigger) {
-        state.scheduler.addTriggerTask(name, job, trigger);
-        state.triggerAdded = true;
+        scheduler.addTriggerTask(name, job, trigger);
+        triggerAdded = true;
     }
 
     private Scheduler createScheduler(ModuleContext context) {
@@ -67,10 +65,5 @@ public final class SchedulerConfig {
         context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
 
         return scheduler;
-    }
-
-    public static class State {
-        Scheduler scheduler;
-        boolean triggerAdded;
     }
 }

@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.mongo.MongoImpl;
 import core.framework.mongo.Mongo;
@@ -16,16 +15,20 @@ import java.time.Duration;
 public final class MongoConfig {
     private final ModuleContext context;
     private final String name;
-    private final State state;
+    private final MongoImpl mongo;
+    private String uri;
+    private boolean entityAdded;
 
     MongoConfig(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        state = context.config.state("mongo:" + name, () -> new State(name));
+        mongo = createMongo();
+    }
 
-        if (state.mongo == null) {
-            state.mongo = createMongo();
-        }
+    void validate() {
+        if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
+        if (!entityAdded)
+            throw Exceptions.error("mongo({}) is configured but no collection/view added, please remove unnecessary config", name == null ? "" : name);
     }
 
     private MongoImpl createMongo() {
@@ -42,54 +45,36 @@ public final class MongoConfig {
     }
 
     public void uri(String uri) {
-        if (state.uri != null) throw Exceptions.error("mongo({}).uri() is already configured, uri={}, previous={}", name == null ? "" : name, uri, state.uri);
-        state.mongo.uri(uri);
-        state.uri = uri;
+        if (this.uri != null) throw Exceptions.error("mongo({}).uri() is already configured, uri={}, previous={}", name == null ? "" : name, uri, this.uri);
+        mongo.uri(uri);
+        this.uri = uri;
     }
 
     public void poolSize(int minSize, int maxSize) {
-        state.mongo.poolSize(minSize, maxSize);
+        mongo.poolSize(minSize, maxSize);
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        state.mongo.slowOperationThreshold(threshold);
+        mongo.slowOperationThreshold(threshold);
     }
 
     public void tooManyRowsReturnedThreshold(int threshold) {
-        state.mongo.tooManyRowsReturnedThreshold = threshold;
+        mongo.tooManyRowsReturnedThreshold = threshold;
     }
 
     public void timeout(Duration timeout) {
-        state.mongo.timeout(timeout);
+        mongo.timeout(timeout);
     }
 
     public <T> void collection(Class<T> entityClass) {
-        if (state.uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
-        context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, state.mongo.collection(entityClass));
-        state.entityAdded = true;
+        if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
+        context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, mongo.collection(entityClass));
+        entityAdded = true;
     }
 
     public <T> void view(Class<T> viewClass) {
-        if (state.uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
-        state.mongo.view(viewClass);
-        state.entityAdded = true;
-    }
-
-    public static class State implements Config.State {
-        final String name;
-        MongoImpl mongo;
-        String uri;
-        boolean entityAdded;
-
-        public State(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public void validate() {
-            if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
-            if (!entityAdded)
-                throw Exceptions.error("mongo({}) is configured but no collection/view added, please remove unnecessary config", name == null ? "" : name);
-        }
+        if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
+        mongo.view(viewClass);
+        entityAdded = true;
     }
 }

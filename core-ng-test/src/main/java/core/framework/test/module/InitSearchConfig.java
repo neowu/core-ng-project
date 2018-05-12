@@ -12,19 +12,20 @@ import core.framework.util.Types;
  */
 public final class InitSearchConfig {
     private final ModuleContext context;
-    private final SearchConfig.State state;
+    private final SearchConfig config;
 
     InitSearchConfig(ModuleContext context) {
         this.context = context;
-        state = context.config.state("elasticsearch");
+        config = context.getConfig(SearchConfig.class, null)
+                        .orElseThrow(() -> new Error("search() must be configured before initSearch()"));
     }
 
     public void createIndex(String index, String sourcePath) {
-        state.search.createIndex(index, ClasspathResources.text(sourcePath));
+        config.search.createIndex(index, ClasspathResources.text(sourcePath));
     }
 
     public void createIndexTemplate(String name, String sourcePath) {
-        state.search.createIndexTemplate(name, ClasspathResources.text(sourcePath));
+        config.search.createIndexTemplate(name, ClasspathResources.text(sourcePath));
     }
 
     public <T> ElasticSearchTypeImpl<T> type(Class<T> documentClass) {
@@ -32,6 +33,6 @@ public final class InitSearchConfig {
     }
 
     public void flush(String index) {
-        state.search.flush(index);
+        config.search.flush(index);
     }
 }

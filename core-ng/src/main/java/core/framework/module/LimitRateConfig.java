@@ -6,14 +6,14 @@ import java.util.concurrent.TimeUnit;
  * @author neo
  */
 public final class LimitRateConfig {
-    private final HTTPConfig.State state;
+    private final HTTPConfig config;
 
-    LimitRateConfig(HTTPConfig.State state) {
-        this.state = state;
+    LimitRateConfig(HTTPConfig config) {
+        this.config = config;
     }
 
     public void add(String group, int maxPermits, int fillRate, TimeUnit unit) {
-        state.limitRateInterceptor.config(group, maxPermits, fillRate, unit);
-        state.limitRateGroupAdded = true;
+        config.limitRateInterceptor.config(group, maxPermits, fillRate, unit);
+        config.limitRateGroupAdded = true;
     }
 }

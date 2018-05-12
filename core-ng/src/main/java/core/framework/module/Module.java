@@ -76,7 +76,7 @@ public abstract class Module {
     }
 
     public HTTPConfig http() {
-        return new HTTPConfig(context);
+        return context.config(HTTPConfig.class, null);
     }
 
     public RouteConfig route() {
@@ -88,11 +88,11 @@ public abstract class Module {
     }
 
     public CacheConfig cache() {
-        return new CacheConfig(context);
+        return context.config(CacheConfig.class, null);
     }
 
     public SchedulerConfig schedule() {
-        return new SchedulerConfig(context);
+        return context.config(SchedulerConfig.class, null);
     }
 
     public ExecutorConfig executor() {
@@ -100,7 +100,7 @@ public abstract class Module {
     }
 
     public APIConfig api() {
-        return new APIConfig(context);
+        return context.config(APIConfig.class, null);
     }
 
     public DBConfig db() {
@@ -108,15 +108,15 @@ public abstract class Module {
     }
 
     public DBConfig db(String name) {
-        return new DBConfig(context, name);
+        return context.config(DBConfig.class, name);
     }
 
     public RedisConfig redis() {
-        return new RedisConfig(context);
+        return context.config(RedisConfig.class, null);
     }
 
     public SearchConfig search() {
-        return new SearchConfig(context);
+        return context.config(SearchConfig.class, null);
     }
 
     public MongoConfig mongo() {
@@ -124,7 +124,7 @@ public abstract class Module {
     }
 
     public MongoConfig mongo(String name) {
-        return new MongoConfig(context, name);
+        return context.config(MongoConfig.class, name);
     }
 
     public KafkaConfig kafka() {
@@ -132,7 +132,7 @@ public abstract class Module {
     }
 
     public KafkaConfig kafka(String name) {
-        return new KafkaConfig(context, name);
+        return context.config(KafkaConfig.class, name);
     }
 
     protected abstract void initialize();
