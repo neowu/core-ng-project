@@ -81,29 +81,28 @@ public class ModuleContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T config(Class<T> configClass, String name) {
-        return (T) configs.computeIfAbsent(configClass.getCanonicalName() + ":" + name, key -> createConfig(configClass, name));
-    }
-
-    private <T> T createConfig(Class<T> configClass, String name) { // use weak type convention to hide unnecessary method from config class
-        Class<T> targetConfigClass = targetConfigClass(configClass);
-        try {
-            Optional<Constructor<T>> constructorOptional = Classes.constructor(targetConfigClass, ModuleContext.class, String.class);
-            if (constructorOptional.isPresent()) {
-                Constructor<T> constructor = constructorOptional.get();
-                constructor.setAccessible(true);
-                return constructor.newInstance(this, name);
+    public <T> T config(Class<T> configClass, String name) {    // use weak type convention to hide unnecessary method from config class
+        return (T) configs.computeIfAbsent(configClass.getCanonicalName() + ":" + name, key -> {
+            Class<T> targetConfigClass = targetConfigClass(configClass);
+            try {
+                Optional<Constructor<T>> constructorOptional = Classes.constructor(targetConfigClass, ModuleContext.class, String.class);
+                if (constructorOptional.isPresent()) {
+                    Constructor<T> constructor = constructorOptional.get();
+                    constructor.setAccessible(true);
+                    return constructor.newInstance(this, name);
+                }
+                constructorOptional = Classes.constructor(targetConfigClass, ModuleContext.class);
+                if (constructorOptional.isPresent()) {
+                    if (name != null) throw Exceptions.error("config class does not support name, configClass={}, name={}", targetConfigClass.getCanonicalName(), name);
+                    Constructor<T> constructor = constructorOptional.get();
+                    constructor.setAccessible(true);
+                    return constructor.newInstance(this);
+                }
+                throw Exceptions.error("config class must have public constructor(context, name?), configClass={}", targetConfigClass.getCanonicalName());
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new Error(e);
             }
-            constructorOptional = Classes.constructor(targetConfigClass, ModuleContext.class);
-            if (constructorOptional.isPresent()) {
-                Constructor<T> constructor = constructorOptional.get();
-                constructor.setAccessible(true);
-                return constructor.newInstance(this);
-            }
-            throw Exceptions.error("config class must have public constructor(context, name?), configClass={}", configClass.getCanonicalName());
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new Error(e);
-        }
+        });
     }
 
     protected <T> Class<T> targetConfigClass(Class<T> configClass) {
