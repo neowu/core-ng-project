@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author neo
  */
 class MethodsTest {
-    private String testMethod(String param1, Integer param2) {
+    String testMethod(String param1, Integer param2) {
         return null;
     }
 
