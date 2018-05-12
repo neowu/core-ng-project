@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.db.Repository;
+import core.framework.impl.module.ModuleContext;
 import core.framework.test.db.EntitySchemaGenerator;
 import core.framework.test.db.SQLScriptRunner;
 import core.framework.test.module.TestModuleContext;
@@ -18,11 +19,11 @@ public final class InitDBConfig {
     private final TestModuleContext context;
     private final String name;
 
-    InitDBConfig(TestModuleContext context, String name) {
-        this.context = context;
+    InitDBConfig(ModuleContext context, String name) {
+        this.context = (TestModuleContext) context;
         this.name = name;
-        config = context.findConfig(DBConfig.class, name)
-                        .orElseThrow(() -> Exceptions.error("db({}) must be configured before initDB()", name == null ? "" : name));
+        config = this.context.findConfig(DBConfig.class, name)
+                             .orElseThrow(() -> Exceptions.error("db({}) must be configured before initDB()", name == null ? "" : name));
     }
 
     public void runScript(String scriptPath) {
