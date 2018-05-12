@@ -11,9 +11,9 @@ import core.framework.test.module.AbstractTestModule;
 public class TestModule extends AbstractTestModule {
     @Override
     protected void initialize() {
-        SearchConfig searchConfig = config(SearchConfig.class);
-        searchConfig.host("localhost");
-        searchConfig.type(TestDocument.class);
+        SearchConfig search = config(SearchConfig.class);
+        search.host("localhost");
+        search.type(TestDocument.class);
 
         config(InitSearchConfig.class).createIndex("document", "search-test/document-index.json");
     }

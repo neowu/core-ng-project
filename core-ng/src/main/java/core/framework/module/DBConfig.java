@@ -19,9 +19,9 @@ import java.util.List;
  * @author neo
  */
 public class DBConfig {
-    public final List<Class<?>> entityClasses = Lists.newArrayList();
-    public final DatabaseImpl database;
     protected final String name;
+    final List<Class<?>> entityClasses = Lists.newArrayList();
+    final DatabaseImpl database;
     private final ModuleContext context;
     private String url;
     private boolean entityAdded;
@@ -49,13 +49,14 @@ public class DBConfig {
 
     public void url(String url) {
         if (this.url != null) throw Exceptions.error("db({}).url() is already configured, url={}, previous={}", name == null ? "" : name, url, this.url);
-        database.vendor = vendor(url);
-        setDatabaseURL(url);
+        Vendor vendor = vendor(url);
+        database.vendor = vendor;
+        database.url(databaseURL(url, vendor));
         this.url = url;
     }
 
-    void setDatabaseURL(String url) {
-        database.url(url);
+    String databaseURL(String url, Vendor vendor) {
+        return url;
     }
 
     private Vendor vendor(String url) {
@@ -69,7 +70,6 @@ public class DBConfig {
 
     public void user(String user) {
         database.user = user;
-
     }
 
     public void password(String password) {

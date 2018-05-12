@@ -9,7 +9,7 @@ import java.util.Optional;
  * @author neo
  */
 public class TestModuleContext extends ModuleContext {
-    TestModuleContext(BeanFactory beanFactory) {
+    public TestModuleContext(BeanFactory beanFactory) {
         super(beanFactory);
     }
 

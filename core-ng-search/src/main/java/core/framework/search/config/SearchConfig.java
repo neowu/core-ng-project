@@ -13,7 +13,7 @@ import java.time.Duration;
  * @author neo
  */
 public class SearchConfig {
-    public final ElasticSearchImpl search;
+    final ElasticSearchImpl search;
     private final ModuleContext context;
     private String host;
 

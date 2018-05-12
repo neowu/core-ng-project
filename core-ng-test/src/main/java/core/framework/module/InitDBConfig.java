@@ -1,9 +1,9 @@
-package core.framework.test.module;
+package core.framework.module;
 
 import core.framework.db.Repository;
-import core.framework.module.DBConfig;
 import core.framework.test.db.EntitySchemaGenerator;
 import core.framework.test.db.SQLScriptRunner;
+import core.framework.test.module.TestModuleContext;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Exceptions;
 import core.framework.util.Types;

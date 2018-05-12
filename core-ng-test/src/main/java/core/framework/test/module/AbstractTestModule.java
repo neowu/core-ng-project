@@ -1,5 +1,6 @@
 package core.framework.test.module;
 
+import core.framework.module.InitDBConfig;
 import core.framework.module.Module;
 import core.framework.test.inject.TestBeanFactory;
 import org.slf4j.Logger;
@@ -35,6 +36,6 @@ public abstract class AbstractTestModule extends Module {
     }
 
     public InitDBConfig initDB(String name) {
-        return new InitDBConfig((TestModuleContext) context, name);
+        return context.config(InitDBConfig.class, name);
     }
 }

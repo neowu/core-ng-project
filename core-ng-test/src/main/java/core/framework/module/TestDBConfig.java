@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.impl.db.Vendor;
 import core.framework.impl.module.ModuleContext;
 import core.framework.util.Strings;
 
@@ -12,13 +13,13 @@ public class TestDBConfig extends DBConfig {
     }
 
     @Override
-    void setDatabaseURL(String url) {
-        String syntaxParam = hsqldbSyntaxParam();
-        database.url(Strings.format("jdbc:hsqldb:mem:{};{}", name == null ? "." : name, syntaxParam));
+    String databaseURL(String url, Vendor vendor) {
+        String syntaxParam = hsqldbSyntaxParam(vendor);
+        return Strings.format("jdbc:hsqldb:mem:{};{}", name == null ? "." : name, syntaxParam);
     }
 
-    private String hsqldbSyntaxParam() {
-        switch (database.vendor) {
+    private String hsqldbSyntaxParam(Vendor vendor) {
+        switch (vendor) {
             case ORACLE:
                 return "sql.syntax_ora=true";
             case MYSQL:
