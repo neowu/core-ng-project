@@ -8,6 +8,8 @@ import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.http.HTTPMethod;
+import core.framework.impl.reflect.GenericTypes;
+import core.framework.impl.reflect.Methods;
 import core.framework.impl.reflect.Params;
 import core.framework.impl.validate.type.JSONTypeValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
@@ -51,12 +53,12 @@ public class WebServiceInterfaceValidator {
         HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
 
         Path path = method.getDeclaredAnnotation(Path.class);
-        if (path == null) throw Exceptions.error("method must have @Path, method={}", method);
+        if (path == null) throw Exceptions.error("service method must have @Path, method={}", Methods.path(method));
         new PathPatternValidator(path.value()).validate();
 
         validateResponseBeanType(method.getGenericReturnType());
 
-        Set<String> pathVariables = pathVariables(path.value());
+        Set<String> pathVariables = pathVariables(path.value(), method);
         Type requestBeanType = null;
 
         Annotation[][] annotations = method.getParameterAnnotations();
@@ -67,12 +69,14 @@ public class WebServiceInterfaceValidator {
             Type paramType = paramTypes[i];
             PathParam pathParam = Params.annotation(annotations[i], PathParam.class);
             if (pathParam != null) {
-                validatePathParamType(paramType);
+                validatePathParamType(paramType, method);
                 pathParams.add(pathParam.value());
             } else {
                 if (requestBeanType != null)
-                    throw Exceptions.error("service method must not have more than one bean param, previous={}, current={}", requestBeanType.getTypeName(), paramType.getTypeName());
+                    throw Exceptions.error("service method must not have more than one bean param, previous={}, current={}, method={}", requestBeanType.getTypeName(), paramType.getTypeName(), Methods.path(method));
                 requestBeanType = paramType;
+
+                validateRequestBeanType(requestBeanType, method);
 
                 if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
                     requestBeanMapper.registerQueryParamBean(requestBeanType);
@@ -83,10 +87,21 @@ public class WebServiceInterfaceValidator {
         }
 
         if (pathVariables.size() != pathParams.size() || !pathVariables.containsAll(pathParams))
-            throw Exceptions.error("service method @PathParam params must match variable in path pattern, path={}, method={}", path.value(), method);
+            throw Exceptions.error("service method @PathParam params must match variable in path pattern, path={}, method={}", path.value(), Methods.path(method));
     }
 
-    private Set<String> pathVariables(String path) {
+    void validateRequestBeanType(Type beanType, Method method) {    // due to it's common to forget @PathParam in service method param, this is to make error message more friendly
+        Class<?> beanClass = GenericTypes.rawClass(beanType);
+
+        if (Integer.class.equals(beanClass)
+                || Long.class.equals(beanClass)
+                || String.class.equals(beanClass)
+                || beanClass.isEnum()) {
+            throw Exceptions.error("request bean must not be value type, if it is path param, please add @PathParam, beanClass={}, method={}", beanClass.getCanonicalName(), Methods.path(method));
+        }
+    }
+
+    private Set<String> pathVariables(String path, Method method) {
         Set<String> names = Sets.newHashSet();
         String[] tokens = Strings.split(path, '/');
         for (String token : tokens) {
@@ -94,20 +109,20 @@ public class WebServiceInterfaceValidator {
                 int paramIndex = token.indexOf('(');
                 int endIndex = paramIndex > 0 ? paramIndex : token.length();
                 boolean isNew = names.add(token.substring(1, endIndex));
-                if (!isNew) throw Exceptions.error("path must not have duplicate param name, path={}", path);
+                if (!isNew) throw Exceptions.error("path must not have duplicate param name, path={}, method={}", path, Methods.path(method));
             }
         }
         return names;
     }
 
-    private void validatePathParamType(Type paramType) {
+    private void validatePathParamType(Type paramType, Method method) {
         if (!(paramType instanceof Class))
-            throw Exceptions.error("path param must be class, type={}", paramType.getTypeName());
+            throw Exceptions.error("path param must be class, type={}, method={}", paramType.getTypeName(), Methods.path(method));
 
         Class<?> paramClass = (Class<?>) paramType;
 
         if (paramClass.isPrimitive())
-            throw Exceptions.error("primitive class is not supported, please use object class, paramClass={}", paramClass);
+            throw Exceptions.error("primitive class is not supported, please use object class, paramClass={}, method={}", paramClass, Methods.path(method));
 
         if (Integer.class.equals(paramClass)) return;
         if (Long.class.equals(paramClass)) return;
@@ -116,7 +131,7 @@ public class WebServiceInterfaceValidator {
             JSONTypeValidator.validateEnumClass(paramClass);
             return;
         }
-        throw Exceptions.error("path param class is not supported, paramClass={}", paramClass);
+        throw Exceptions.error("path param class is not supported, paramClass={}, method={}", paramClass, Methods.path(method));
     }
 
     private void validateResponseBeanType(Type responseBeanType) {
@@ -132,6 +147,6 @@ public class WebServiceInterfaceValidator {
         if (method.isAnnotationPresent(DELETE.class)) count++;
         if (method.isAnnotationPresent(PATCH.class)) count++;
         if (count != 1)
-            throw Exceptions.error("method must have exact one http method annotation, method={}", method);
+            throw Exceptions.error("method must have exact one http method annotation, method={}", Methods.path(method));
     }
 }

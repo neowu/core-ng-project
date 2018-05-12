@@ -33,14 +33,14 @@ class TestBean {
     @Property(name = "date")
     public LocalDate dateField;
 
-    @Property(name = "date_time")
+    @Property(name = "dateTime")
     public LocalDateTime dateTimeField;
-
-    @Property(name = "instant")
-    public Instant instantField;
 
     @Property(name = "zonedDateTime")
     public ZonedDateTime zonedDateTimeField;
+
+    @Property(name = "instant")
+    public Instant instantField;
 
     public Integer notAnnotatedField;
 

@@ -11,7 +11,6 @@
 * validator: annotation for website, like @HTMLSafeString?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
-* missing @PathParam, validation error not clear?
 * support websocket?
 
 ### jdk 9/10 incompatible list

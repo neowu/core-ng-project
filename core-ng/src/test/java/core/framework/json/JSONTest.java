@@ -11,11 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -31,8 +26,9 @@ class JSONTest {
         assertThat(json).contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertEquals("value1", parsedBean.mapField.get("key1"));
-        assertEquals("value2", parsedBean.mapField.get("key2"));
+        assertThat(parsedBean.mapField)
+                .containsEntry("key1", "value1")
+                .containsEntry("key2", "value2");
     }
 
     @Test
@@ -48,8 +44,7 @@ class JSONTest {
         assertThat(json).contains("\"child\":{\"boolean\":true,\"long\":200}");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertEquals(bean.childField.booleanField, parsedBean.childField.booleanField);
-        assertEquals(bean.childField.longField, parsedBean.childField.longField);
+        assertThat(parsedBean).isEqualToComparingFieldByFieldRecursively(bean);
     }
 
     @Test
@@ -69,10 +64,7 @@ class JSONTest {
         assertThat(json).contains("\"list\":[\"value1\",\"value2\"],\"children\":[{\"boolean\":true,\"long\":null},{\"boolean\":false,\"long\":null}]");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertEquals(bean.listField, parsedBean.listField);
-        assertEquals(2, parsedBean.childrenField.size());
-        assertTrue(parsedBean.childrenField.get(0).booleanField);
-        assertFalse(parsedBean.childrenField.get(1).booleanField);
+        assertThat(parsedBean).isEqualToComparingFieldByFieldRecursively(bean);
     }
 
     @Test
@@ -86,34 +78,40 @@ class JSONTest {
         String json = JSON.toJSON(bean);
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertEquals(bean.instantField, parsedBean.instantField);
-        assertEquals(bean.dateField, parsedBean.dateField);
-        assertEquals(bean.dateTimeField, parsedBean.dateTimeField);
-        assertEquals(bean.zonedDateTimeField.toInstant(), parsedBean.zonedDateTimeField.toInstant());
+        assertThat(parsedBean).isEqualToComparingOnlyGivenFields(bean, "instantField", "dateTimeField", "dateField");
+        assertThat(parsedBean.zonedDateTimeField).isEqualTo(bean.zonedDateTimeField);
+    }
+
+    @Test
+    void dateFieldFromJavaScript() {    // JS always encodes Date type into ISO format
+        TestBean bean = JSON.fromJSON(TestBean.class, "{\"date\": \"2018-05-10T05:42:09.776Z\", \"dateTime\": \"2018-05-10T05:42:09.776Z\", \"zonedDateTime\": \"2018-05-10T05:42:09.776Z\"}");
+
+        assertThat(bean.dateField).isEqualTo("2018-05-10");
+        assertThat(bean.dateTimeField).isEqualTo("2018-05-10T05:42:09.776");
+        assertThat(bean.zonedDateTimeField).isEqualTo("2018-05-10T05:42:09.776Z");
     }
 
     @Test
     void listObject() {
         List<TestBean> beans = JSON.fromJSON(Types.list(TestBean.class), "[{\"string\":\"n1\"},{\"string\":\"n2\"}]");
 
-        assertEquals(2, beans.size());
-        assertEquals("n1", beans.get(0).stringField);
-        assertEquals("n2", beans.get(1).stringField);
+        assertThat(beans).hasSize(2);
+        assertThat(beans.get(0).stringField).isEqualTo("n1");
+        assertThat(beans.get(1).stringField).isEqualTo("n2");
     }
 
     @Test
     void optionalObject() {
         Optional<TestBean> parsedBean = JSON.fromJSON(Types.optional(TestBean.class), JSON.toJSON(Optional.empty()));
-        assertFalse(parsedBean.isPresent());
+        assertThat(parsedBean).isNotPresent();
 
         parsedBean = JSON.fromJSON(Types.optional(TestBean.class), JSON.toJSON(null));
-        assertFalse(parsedBean.isPresent());
+        assertThat(parsedBean).isNotPresent();
 
         TestBean bean = new TestBean();
         bean.stringField = "name";
         parsedBean = JSON.fromJSON(Types.optional(TestBean.class), JSON.toJSON(Optional.of(bean)));
-        assertTrue(parsedBean.isPresent());
-        assertEquals(bean.stringField, parsedBean.get().stringField);
+        assertThat(parsedBean).get().isEqualToComparingFieldByField(bean);
     }
 
     @Test
@@ -121,7 +119,7 @@ class JSONTest {
         String json = JSON.toJSON(null);
         TestBean bean = JSON.fromJSON(TestBean.class, json);
 
-        assertNull(bean);
+        assertThat(bean).isNull();
     }
 
     @Test
@@ -132,16 +130,16 @@ class JSONTest {
         assertThat(json).contains("\"notAnnotatedField\":100");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertEquals(bean.notAnnotatedField, parsedBean.notAnnotatedField);
+        assertThat(parsedBean).isEqualToComparingFieldByFieldRecursively(bean);
     }
 
     @Test
     void enumValue() {
-        assertEquals(TestBean.TestEnum.A, JSON.fromEnumValue(TestBean.TestEnum.class, "A1"));
-        assertEquals(TestBean.TestEnum.C, JSON.fromEnumValue(TestBean.TestEnum.class, "C"));
+        assertThat(JSON.fromEnumValue(TestBean.TestEnum.class, "A1")).isEqualTo(TestBean.TestEnum.A);
+        assertThat(JSON.fromEnumValue(TestBean.TestEnum.class, "C")).isEqualTo(TestBean.TestEnum.C);
 
-        assertEquals("B1", JSON.toEnumValue(TestBean.TestEnum.B));
-        assertEquals("C", JSON.toEnumValue(TestBean.TestEnum.C));
+        assertThat(JSON.toEnumValue(TestBean.TestEnum.B)).isEqualTo("B1");
+        assertThat(JSON.toEnumValue(TestBean.TestEnum.C)).isEqualTo("C");
     }
 
     @Test
@@ -152,6 +150,6 @@ class JSONTest {
         assertThat(json).contains("\"empty\":{}");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertNotNull(parsedBean.empty);
+        assertThat(parsedBean.empty).isNotNull();
     }
 }
