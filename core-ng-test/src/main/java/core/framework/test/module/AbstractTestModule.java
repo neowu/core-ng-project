@@ -37,8 +37,4 @@ public abstract class AbstractTestModule extends Module {
     public InitDBConfig initDB(String name) {
         return new InitDBConfig((TestModuleContext) context, name);
     }
-
-    public InitSearchConfig initSearch() {
-        return new InitSearchConfig((TestModuleContext) context);
-    }
 }

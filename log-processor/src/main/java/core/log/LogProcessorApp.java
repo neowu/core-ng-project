@@ -2,6 +2,7 @@ package core.log;
 
 import core.framework.impl.log.stat.Stat;
 import core.framework.module.App;
+import core.framework.search.config.SearchConfig;
 import core.log.domain.ActionDocument;
 import core.log.domain.StatDocument;
 import core.log.domain.TraceDocument;
@@ -24,10 +25,11 @@ public class LogProcessorApp extends App {
     protected void initialize() {
         loadProperties("sys.properties");
 
-        search().host(requiredProperty("sys.elasticsearch.host"));
-        search().type(ActionDocument.class);
-        search().type(TraceDocument.class);
-        search().type(StatDocument.class);
+        SearchConfig search = config(SearchConfig.class);
+        search.host(requiredProperty("sys.elasticsearch.host"));
+        search.type(ActionDocument.class);
+        search.type(TraceDocument.class);
+        search.type(StatDocument.class);
 
         bind(IndexService.class);
         bind(ActionService.class);

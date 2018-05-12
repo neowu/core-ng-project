@@ -12,7 +12,6 @@ import core.framework.test.kafka.TestMessage;
 import core.framework.test.module.AbstractTestModule;
 import core.framework.test.mongo.TestMongoEntity;
 import core.framework.test.scheduler.TestJob;
-import core.framework.test.search.TestDocument;
 import org.mockito.Mockito;
 
 import java.time.DayOfWeek;
@@ -34,7 +33,6 @@ public class TestModule extends AbstractTestModule {
 
         configureDB();
         configureMongo();
-        configureSearch();
         configureKafka();
 
         redis().host("localhost");
@@ -78,12 +76,6 @@ public class TestModule extends AbstractTestModule {
         });
         kafka().subscribe("topic2", TestMessage.class, (String key, TestMessage message) -> {
         });
-    }
-
-    private void configureSearch() {
-        search().host("localhost");
-        search().type(TestDocument.class);
-        initSearch().createIndex("document", "search-test/document-index.json");
     }
 
     private void configureDB() {

@@ -12,6 +12,7 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * support websocket?
+* mongo: move mongo into separated lib
 
 ### jdk 9/10 incompatible list
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

@@ -1,8 +1,9 @@
 ## Change log
-### 6.2.3 (5/9/2018 - )
+### 6.3.0 (5/9/2018 - )
 * http: update undertow to 2.0.7
 * api: make error message more friendly when service method param misses @PathParam
 * config: make Config class stateful, use override style to configure during test
+* search: !!! moved search out to core-ng-search/core-ng-search-test module, use config(SearchConfig.class)/config(InitSearchConfig.class) to config, refer to log-processor gradle config for dependency config 
 
 ### 6.2.2 (5/3/2018)
 * scheduler: log error when trigger returned invalid next execution time

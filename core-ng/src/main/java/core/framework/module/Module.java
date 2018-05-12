@@ -115,10 +115,6 @@ public abstract class Module {
         return context.config(RedisConfig.class, null);
     }
 
-    public SearchConfig search() {
-        return context.config(SearchConfig.class, null);
-    }
-
     public MongoConfig mongo() {
         return mongo(null);
     }
@@ -133,6 +129,14 @@ public abstract class Module {
 
     public KafkaConfig kafka(String name) {
         return context.config(KafkaConfig.class, name);
+    }
+
+    public <T> T config(Class<T> configClass) {
+        return config(configClass, null);
+    }
+
+    public <T> T config(Class<T> configClass, String name) {
+        return context.config(configClass, name);
     }
 
     protected abstract void initialize();

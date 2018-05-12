@@ -2,12 +2,11 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '6.2.3'
+    version = '6.3.0'
 }
 
 def mongoVersion = '3.5.0'
 def elasticVersion = '6.2.4'
-def log4jVersion = '2.9.1'  // used by elasticsearch
 def kafkaVersion = '1.1.0'
 def jacksonVersion = '2.9.5'
 def junitVersion = '5.2.0'
@@ -31,8 +30,6 @@ project(':core-ng') {
         implementation 'io.undertow:undertow-core:2.0.7.Final'
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
-        compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
-        compileOnly "org.apache.logging.log4j:log4j-api:${log4jVersion}"        // used by elasticsearch
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
@@ -52,11 +49,30 @@ project(':core-ng-test') {
         compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "com.github.fakemongo:fongo:2.1.1@jar"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
-        compileOnly "org.elasticsearch.client:transport:${elasticVersion}"
-        compileOnly "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
         testRuntimeOnly 'com.vividsolutions:jts:1.13'                           // used by fongo
-        testRuntimeOnly "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
+    }
+}
+
+project(':core-ng-search') {
+    apply from: file("${rootDir}/gradle/lib.gradle")
+    dependencies {
+        api project(":core-ng")
+        api "org.elasticsearch.client:transport:${elasticVersion}"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+        testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+        testImplementation "org.assertj:assertj-core:${assertjVersion}"
+        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    }
+}
+
+project(':core-ng-search-test') {
+    apply from: file("${rootDir}/gradle/lib.gradle")
+    dependencies {
+        api project(":core-ng-test")
+        api project(":core-ng-search")
+        implementation "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
+        implementation "org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}"     // used by elasticsearch scaled_float
     }
 }
 
@@ -84,11 +100,9 @@ project(':log-processor') {
     apply from: file("${rootDir}/gradle/app.gradle")
     dependencies {
         compile project(':core-ng')
-        compile "org.elasticsearch.client:transport:${elasticVersion}"
+        compile project(':core-ng-search')
         compile "org.apache.kafka:kafka-clients:${kafkaVersion}"
-        runtime "org.apache.logging.log4j:log4j-api:${log4jVersion}"            // used by elasticsearch
         testCompile project(':core-ng-test')
-        testRuntime "org.apache.logging.log4j:log4j-core:${log4jVersion}"       // used by elasticsearch
-        testRuntime "org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}"     // used by elasticsearch scaled_float
+        testCompile project(':core-ng-search-test')
     }
 }
