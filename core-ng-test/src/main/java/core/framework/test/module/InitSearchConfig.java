@@ -1,6 +1,5 @@
 package core.framework.test.module;
 
-import core.framework.impl.module.ModuleContext;
 import core.framework.impl.search.ElasticSearchTypeImpl;
 import core.framework.module.SearchConfig;
 import core.framework.search.ElasticSearchType;
@@ -11,12 +10,12 @@ import core.framework.util.Types;
  * @author neo
  */
 public final class InitSearchConfig {
-    private final ModuleContext context;
+    private final TestModuleContext context;
     private final SearchConfig config;
 
-    InitSearchConfig(ModuleContext context) {
+    InitSearchConfig(TestModuleContext context) {
         this.context = context;
-        config = context.getConfig(SearchConfig.class, null)
+        config = context.findConfig(SearchConfig.class, null)
                         .orElseThrow(() -> new Error("search() must be configured before initSearch()"));
     }
 

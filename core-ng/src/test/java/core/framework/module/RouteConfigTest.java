@@ -21,7 +21,7 @@ class RouteConfigTest {
 
     @BeforeEach
     void createRouteConfig() {
-        ModuleContext context = new ModuleContext(new BeanFactory(), new TestMockFactory());
+        ModuleContext context = new ModuleContext(new BeanFactory());
         config = new RouteConfig(context);
     }
 

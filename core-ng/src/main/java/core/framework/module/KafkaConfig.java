@@ -18,7 +18,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public final class KafkaConfig {
+public class KafkaConfig {
     private final Logger logger = LoggerFactory.getLogger(KafkaConfig.class);
 
     private final ModuleContext context;
@@ -38,23 +38,19 @@ public final class KafkaConfig {
             throw Exceptions.error("kafka({}) is configured, but no producer/consumer added, please remove unnecessary config", name == null ? "" : name);
     }
 
-    private Kafka createKafka(ModuleContext context, String name) {
-        if (context.isTest()) {
-            return context.mockFactory.create(Kafka.class);
-        } else {
-            Kafka kafka = new Kafka(name, context.logManager);
-            context.stat.metrics.add(kafka.producerMetrics);
-            context.stat.metrics.add(kafka.consumerMetrics);
-            context.startupHook.add(kafka::initialize);
-            context.shutdownHook.add(kafka::close);
+    Kafka createKafka(ModuleContext context, String name) {
+        Kafka kafka = new Kafka(name, context.logManager);
+        context.stat.metrics.add(kafka.producerMetrics);
+        context.stat.metrics.add(kafka.consumerMetrics);
+        context.startupHook.add(kafka::initialize);
+        context.shutdownHook.add(kafka::close);
 
-            KafkaController controller = new KafkaController(kafka);
-            context.route(HTTPMethod.GET, managementPathPattern("/topic"), controller::topics, true);
-            context.route(HTTPMethod.PUT, managementPathPattern("/topic/:topic"), controller::updateTopic, true);
-            context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), controller::publish, true);
+        KafkaController controller = new KafkaController(kafka);
+        context.route(HTTPMethod.GET, managementPathPattern("/topic"), controller::topics, true);
+        context.route(HTTPMethod.PUT, managementPathPattern("/topic/:topic"), controller::updateTopic, true);
+        context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), controller::publish, true);
 
-            return kafka;
-        }
+        return kafka;
     }
 
     String managementPathPattern(String postfix) {

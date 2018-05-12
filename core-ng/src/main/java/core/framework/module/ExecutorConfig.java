@@ -20,15 +20,15 @@ public class ExecutorConfig {
     }
 
     public Executor add(String name, int poolSize) {
-        Executor executor;
-        if (!context.isTest()) {
-            String prefix = "executor-" + (name == null ? "" : name + "-");
-            executor = new ExecutorImpl(ThreadPools.cachedThreadPool(poolSize, prefix), context.logManager, name);
-            context.shutdownHook.add(((ExecutorImpl) executor)::stop);
-        } else {
-            executor = context.mockFactory.create(Executor.class);
-        }
+        Executor executor = createExecutor(name, poolSize);
         context.beanFactory.bind(Executor.class, name, executor);
+        return executor;
+    }
+
+    Executor createExecutor(String name, int poolSize) {
+        String prefix = "executor-" + (name == null ? "" : name + "-");
+        Executor executor = new ExecutorImpl(ThreadPools.cachedThreadPool(poolSize, prefix), context.logManager, name);
+        context.shutdownHook.add(((ExecutorImpl) executor)::stop);
         return executor;
     }
 }

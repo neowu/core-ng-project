@@ -26,7 +26,7 @@ public abstract class App extends Module {
         logger.info("initialize framework");
         Runtime runtime = Runtime.getRuntime();
         logger.info("availableProcessors={}, maxMemory={}", runtime.availableProcessors(), runtime.maxMemory());
-        context = new ModuleContext(new BeanFactory(), null);
+        context = new ModuleContext(new BeanFactory());
         logger.info("initialize application");
         initialize();
         context.validate();

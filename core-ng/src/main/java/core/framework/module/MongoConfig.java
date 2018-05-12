@@ -12,7 +12,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public final class MongoConfig {
+public class MongoConfig {
     private final ModuleContext context;
     private final String name;
     private final MongoImpl mongo;
@@ -23,6 +23,7 @@ public final class MongoConfig {
         this.context = context;
         this.name = name;
         mongo = createMongo();
+        context.beanFactory.bind(Mongo.class, name, mongo);
     }
 
     void validate() {
@@ -31,16 +32,10 @@ public final class MongoConfig {
             throw Exceptions.error("mongo({}) is configured but no collection/view added, please remove unnecessary config", name == null ? "" : name);
     }
 
-    private MongoImpl createMongo() {
-        MongoImpl mongo;
-        if (context.isTest()) {
-            mongo = context.mockFactory.create(MongoImpl.class);
-        } else {
-            mongo = new MongoImpl();
-            context.startupHook.add(mongo::initialize);
-            context.shutdownHook.add(mongo::close);
-        }
-        context.beanFactory.bind(Mongo.class, name, mongo);
+    MongoImpl createMongo() {
+        MongoImpl mongo = new MongoImpl();
+        context.startupHook.add(mongo::initialize);
+        context.shutdownHook.add(mongo::close);
         return mongo;
     }
 

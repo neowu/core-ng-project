@@ -18,7 +18,7 @@ class APIConfigTest {
 
     @BeforeEach
     void createAPIConfig() {
-        ModuleContext context = new ModuleContext(new BeanFactory(), new TestMockFactory());
+        ModuleContext context = new ModuleContext(new BeanFactory());
         config = new APIConfig(context);
     }
 
@@ -38,7 +38,6 @@ class APIConfigTest {
     public static class TestWebServiceImpl implements TestWebService {
         @Override
         public void put(Integer id) {
-
         }
     }
 }

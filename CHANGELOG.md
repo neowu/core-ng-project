@@ -2,7 +2,7 @@
 ### 6.2.3 (5/9/2018 - )
 * http: update undertow to 2.0.7
 * api: make error message more friendly when service method param misses @PathParam
-* config: make Config class stateful, remove previous State
+* config: make Config class stateful, use override style to configure during test
 
 ### 6.2.2 (5/3/2018)
 * scheduler: log error when trigger returned invalid next execution time

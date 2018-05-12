@@ -10,7 +10,6 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.impl.resource.PoolMetrics;
 import core.framework.util.Exceptions;
 import core.framework.util.Lists;
-import core.framework.util.Strings;
 import core.framework.util.Types;
 
 import java.time.Duration;
@@ -19,11 +18,11 @@ import java.util.List;
 /**
  * @author neo
  */
-public final class DBConfig {
+public class DBConfig {
     public final List<Class<?>> entityClasses = Lists.newArrayList();
     public final DatabaseImpl database;
+    protected final String name;
     private final ModuleContext context;
-    private final String name;
     private String url;
     private boolean entityAdded;
 
@@ -51,24 +50,12 @@ public final class DBConfig {
     public void url(String url) {
         if (this.url != null) throw Exceptions.error("db({}).url() is already configured, url={}, previous={}", name == null ? "" : name, url, this.url);
         database.vendor = vendor(url);
-        if (!context.isTest()) {
-            database.url(url);
-        } else {
-            String syntaxParam = hsqldbSyntaxParam();
-            database.url(Strings.format("jdbc:hsqldb:mem:{};{}", name == null ? "." : name, syntaxParam));
-        }
+        setDatabaseURL(url);
         this.url = url;
     }
 
-    private String hsqldbSyntaxParam() {
-        switch (database.vendor) {
-            case ORACLE:
-                return "sql.syntax_ora=true";
-            case MYSQL:
-                return "sql.syntax_mys=true";
-            default:
-                return "";
-        }
+    void setDatabaseURL(String url) {
+        database.url(url);
     }
 
     private Vendor vendor(String url) {
@@ -81,15 +68,12 @@ public final class DBConfig {
     }
 
     public void user(String user) {
-        if (!context.isTest()) {
-            database.user = user;
-        }
+        database.user = user;
+
     }
 
     public void password(String password) {
-        if (!context.isTest()) {
-            database.password = password;
-        }
+        database.password = password;
     }
 
     public void encryptedPassword(String encryptedPassword, String privateKey) {

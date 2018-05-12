@@ -72,7 +72,7 @@ public abstract class Module {
     }
 
     public LogConfig log() {
-        return new LogConfig(context);
+        return context.config(LogConfig.class, null);
     }
 
     public HTTPConfig http() {
@@ -84,7 +84,7 @@ public abstract class Module {
     }
 
     public SiteConfig site() {
-        return new SiteConfig(context);
+        return context.config(SiteConfig.class, null);
     }
 
     public CacheConfig cache() {
@@ -96,7 +96,7 @@ public abstract class Module {
     }
 
     public ExecutorConfig executor() {
-        return new ExecutorConfig(context);
+        return context.config(ExecutorConfig.class, null);
     }
 
     public APIConfig api() {

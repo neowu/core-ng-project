@@ -33,7 +33,7 @@ public final class SiteConfig {
     }
 
     public SessionConfig session() {
-        return new SessionConfig(context);
+        return context.config(SessionConfig.class, null);
     }
 
     public CDNConfig cdn() {

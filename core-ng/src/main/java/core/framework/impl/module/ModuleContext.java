@@ -33,21 +33,19 @@ import java.util.Optional;
 /**
  * @author neo
  */
-public final class ModuleContext {
+public class ModuleContext {
     public final BeanFactory beanFactory;
     public final List<Runnable> startupHook = Lists.newArrayList();
     public final ShutdownHook shutdownHook = new ShutdownHook();
     public final PropertyManager propertyManager = new PropertyManager();
     public final HTTPServer httpServer;
     public final LogManager logManager;
-    public final MockFactory mockFactory;
     public final Stat stat = new Stat();
-    private final Map<String, Object> configs = Maps.newHashMap();
+    protected final Map<String, Object> configs = Maps.newHashMap();
     private BackgroundTaskExecutor backgroundTask;
 
-    public ModuleContext(BeanFactory beanFactory, MockFactory mockFactory) {
+    public ModuleContext(BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
-        this.mockFactory = mockFactory;
 
         logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
 
@@ -82,29 +80,21 @@ public final class ModuleContext {
         httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
     }
 
-    public boolean isTest() {
-        return mockFactory != null;
-    }
-
     @SuppressWarnings("unchecked")
     public <T> T config(Class<T> configClass, String name) {
         return (T) configs.computeIfAbsent(configClass.getCanonicalName() + ":" + name, key -> createConfig(configClass, name));
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> Optional<T> getConfig(Class<T> configClass, String name) {
-        return Optional.ofNullable((T) configs.get(configClass.getCanonicalName() + ":" + name));
-    }
-
     private <T> T createConfig(Class<T> configClass, String name) { // use weak type convention to hide unnecessary method from config class
+        Class<T> targetConfigClass = targetConfigClass(configClass);
         try {
-            Optional<Constructor<T>> constructorOptional = Classes.constructor(configClass, ModuleContext.class, String.class);
+            Optional<Constructor<T>> constructorOptional = Classes.constructor(targetConfigClass, ModuleContext.class, String.class);
             if (constructorOptional.isPresent()) {
                 Constructor<T> constructor = constructorOptional.get();
                 constructor.setAccessible(true);
                 return constructor.newInstance(this, name);
             }
-            constructorOptional = Classes.constructor(configClass, ModuleContext.class);
+            constructorOptional = Classes.constructor(targetConfigClass, ModuleContext.class);
             if (constructorOptional.isPresent()) {
                 Constructor<T> constructor = constructorOptional.get();
                 constructor.setAccessible(true);
@@ -114,6 +104,10 @@ public final class ModuleContext {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new Error(e);
         }
+    }
+
+    protected <T> Class<T> targetConfigClass(Class<T> configClass) {
+        return configClass;
     }
 
     public void validate() {    // call validate if declared, use weak type convention to hide unnecessary method from config class

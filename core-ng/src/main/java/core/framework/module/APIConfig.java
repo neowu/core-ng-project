@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public final class APIConfig {
+public class APIConfig {
     final List<Class<?>> serviceInterfaces = Lists.newArrayList();
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private final ModuleContext context;
@@ -86,12 +86,8 @@ public final class APIConfig {
         this.slowOperationThreshold = slowOperationThreshold;
     }
 
-    private <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {
-        if (context.isTest()) {
-            return context.mockFactory.create(serviceInterface);
-        } else {
-            return new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
-        }
+    <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {
+        return new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
     }
 
     private HTTPClient httpClient() {

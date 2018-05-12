@@ -13,7 +13,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public final class SessionConfig {
+public class SessionConfig {
     private final Logger logger = LoggerFactory.getLogger(SessionConfig.class);
     private final ModuleContext context;
 
@@ -39,18 +39,14 @@ public final class SessionConfig {
     }
 
     public void redis(String host) {
-        if (context.isTest()) {
-            local();
-        } else {
-            logger.info("create redis session provider, host={}", host);
+        logger.info("create redis session provider, host={}", host);
 
-            RedisImpl redis = new RedisImpl("redis-session");
-            redis.host = host;
-            context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
-            context.stat.metrics.add(new PoolMetrics(redis.pool));
+        RedisImpl redis = new RedisImpl("redis-session");
+        redis.host = host;
+        context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
+        context.stat.metrics.add(new PoolMetrics(redis.pool));
 
-            context.shutdownHook.add(redis::close);
-            context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
-        }
+        context.shutdownHook.add(redis::close);
+        context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
     }
 }

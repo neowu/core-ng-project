@@ -17,7 +17,7 @@ class SystemModuleTest {
     @BeforeEach
     void createSystemModule() {
         systemModule = new SystemModule(null);
-        systemModule.context = new ModuleContext(new BeanFactory(), new TestMockFactory());
+        systemModule.context = new ModuleContext(new BeanFactory());
 
         System.clearProperty("sys.http.port");
     }

@@ -23,7 +23,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public final class CacheConfig {
+public class CacheConfig {
     private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
     private final ModuleContext context;
     private CacheManager cacheManager;
@@ -70,20 +70,19 @@ public final class CacheConfig {
         if (cacheManager != null)
             throw new Error("cache() is already configured, please configure cache store only once");
 
-        if (context.isTest()) {
-            logger.info("use local cache during test");
-            local();
-        } else {
-            logger.info("create redis cache manager, host={}", host);
+        configureRedis(host);
+    }
 
-            RedisImpl redis = new RedisImpl("redis-cache");
-            redis.host = host;
-            redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
-            context.shutdownHook.add(redis::close);
-            context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
-            context.stat.metrics.add(new PoolMetrics(redis.pool));
-            configureCacheManager(new RedisCacheStore(redis));
-        }
+    void configureRedis(String host) {
+        logger.info("create redis cache manager, host={}", host);
+
+        RedisImpl redis = new RedisImpl("redis-cache");
+        redis.host = host;
+        redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
+        context.shutdownHook.add(redis::close);
+        context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
+        context.stat.metrics.add(new PoolMetrics(redis.pool));
+        configureCacheManager(new RedisCacheStore(redis));
     }
 
     private void configureCacheManager(CacheStore cacheStore) {

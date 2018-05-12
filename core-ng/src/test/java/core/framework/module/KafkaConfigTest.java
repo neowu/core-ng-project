@@ -15,7 +15,7 @@ class KafkaConfigTest {
 
     @BeforeEach
     void createModuleContext() {
-        context = new ModuleContext(new BeanFactory(), new TestMockFactory());
+        context = new ModuleContext(new BeanFactory());
     }
 
     @Test
