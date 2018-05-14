@@ -3,4 +3,6 @@ include 'core-ng-api',
     'core-ng-test',
     'core-ng-search',
     'core-ng-search-test',
+    'core-ng-mongo',
+    'core-ng-mongo-test',
     'log-processor'

@@ -12,7 +12,6 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * support websocket?
-* mongo: move mongo into separated lib
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

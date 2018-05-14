@@ -54,6 +54,25 @@ project(':core-ng-test') {
     }
 }
 
+project(':core-ng-mongo') {
+    apply from: file("${rootDir}/gradle/lib.gradle")
+    dependencies {
+        api project(":core-ng")
+        api "org.mongodb:mongo-java-driver:${mongoVersion}"
+        testImplementation project(":core-ng-test")
+    }
+}
+
+project(':core-ng-mongo-test') {
+    apply from: file("${rootDir}/gradle/lib.gradle")
+    dependencies {
+        api project(":core-ng-test")
+        api project(":core-ng-mongo")
+        api "com.github.fakemongo:fongo:2.1.1@jar"
+        implementation 'com.vividsolutions:jts:1.13'                           // used by fongo
+    }
+}
+
 project(':core-ng-search') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {

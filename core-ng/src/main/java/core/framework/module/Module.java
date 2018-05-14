@@ -115,14 +115,6 @@ public abstract class Module {
         return context.config(RedisConfig.class, null);
     }
 
-    public MongoConfig mongo() {
-        return mongo(null);
-    }
-
-    public MongoConfig mongo(String name) {
-        return context.config(MongoConfig.class, name);
-    }
-
     public KafkaConfig kafka() {
         return kafka(null);
     }

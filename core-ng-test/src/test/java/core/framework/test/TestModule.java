@@ -10,7 +10,6 @@ import core.framework.test.db.TestSequenceIdDBEntity;
 import core.framework.test.inject.TestBean;
 import core.framework.test.kafka.TestMessage;
 import core.framework.test.module.AbstractTestModule;
-import core.framework.test.mongo.TestMongoEntity;
 import core.framework.test.scheduler.TestJob;
 import org.mockito.Mockito;
 
@@ -32,7 +31,6 @@ public class TestModule extends AbstractTestModule {
         bind(HTTPClient.class, new HTTPClientBuilder().build());
 
         configureDB();
-        configureMongo();
         configureKafka();
 
         redis().host("localhost");
@@ -88,11 +86,6 @@ public class TestModule extends AbstractTestModule {
         db().defaultIsolationLevel(IsolationLevel.READ_COMMITTED);
         db("oracle").repository(TestSequenceIdDBEntity.class);
         initDB("oracle").createSchema();
-    }
-
-    private void configureMongo() {
-        mongo().uri("mongodb://localhost:27017/test");
-        mongo().collection(TestMongoEntity.class);
     }
 
     private void configureJob() {

@@ -44,8 +44,6 @@ public final class SystemModule extends Module {
 
         property("sys.redis.host").ifPresent(host -> redis().host(host));
 
-        property("sys.mongo.uri").ifPresent(uri -> mongo().uri(uri));
-
         property("sys.site.publishAPI.allowCIDR").ifPresent(cidrs -> site().publishAPI(Strings.split(cidrs, ',')));
     }
 
