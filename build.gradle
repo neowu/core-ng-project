@@ -64,7 +64,7 @@ project(':core-ng-mongo-test') {
     dependencies {
         api project(":core-ng-test")
         api project(":core-ng-mongo")
-        api "com.github.fakemongo:fongo:2.1.1@jar"
+        implementation "com.github.fakemongo:fongo:2.1.1@jar"
         implementation 'com.vividsolutions:jts:1.13'                           // used by fongo
     }
 }
@@ -83,8 +83,8 @@ project(':core-ng-search-test') {
     dependencies {
         api project(":core-ng-test")
         api project(":core-ng-search")
-        implementation "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
-        implementation "org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}"     // used by elasticsearch scaled_float
+        testRuntimeOnly "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
+        testRuntimeOnly "org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}"     // used by elasticsearch scaled_float
     }
 }
 
