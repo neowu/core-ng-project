@@ -5,7 +5,6 @@ subprojects {
     version = '6.3.0'
 }
 
-def mongoVersion = '3.5.0'
 def elasticVersion = '6.2.4'
 def kafkaVersion = '1.1.0'
 def jacksonVersion = '2.9.5'
@@ -28,7 +27,6 @@ project(':core-ng') {
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${jacksonVersion}"
         implementation 'org.apache.httpcomponents:httpclient:4.5.5'
         implementation 'io.undertow:undertow-core:2.0.7.Final'
-        compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
@@ -46,11 +44,8 @@ project(':core-ng-test') {
         api "org.mockito:mockito-core:${mockitoVersion}"
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-        compileOnly "org.mongodb:mongo-java-driver:${mongoVersion}"
-        compileOnly "com.github.fakemongo:fongo:2.1.1@jar"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
-        testRuntimeOnly 'com.vividsolutions:jts:1.13'                           // used by fongo
     }
 }
 
@@ -58,8 +53,9 @@ project(':core-ng-mongo') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api "org.mongodb:mongo-java-driver:${mongoVersion}"
+        api 'org.mongodb:mongo-java-driver:3.5.0'
         testImplementation project(":core-ng-test")
+        testImplementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
     }
 }
 
