@@ -2,7 +2,9 @@ package core.framework.test.module;
 
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.reflect.Classes;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 /**
@@ -27,5 +29,10 @@ public class TestModuleContext extends ModuleContext {
         } catch (ClassNotFoundException e) {
             return configClass;
         }
+    }
+
+    @Override
+    protected Optional<Method> validateMethod(Object config) {
+        return Classes.method(config.getClass().getSuperclass(), "validate");
     }
 }

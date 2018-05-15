@@ -34,8 +34,8 @@ import java.util.List;
  * @author neo
  */
 public class ElasticSearchImpl implements ElasticSearch {
-    public final List<TransportAddress> addresses = Lists.newArrayList();
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
+    private final List<TransportAddress> addresses = Lists.newArrayList();
     public Duration slowOperationThreshold = Duration.ofSeconds(5);
     public Duration timeout = Duration.ofSeconds(10);
     public boolean sniff;      // if enabled, es client will use all nodes in cluster and only use "publish address" to connect

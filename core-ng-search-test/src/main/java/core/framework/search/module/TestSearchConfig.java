@@ -17,6 +17,11 @@ public class TestSearchConfig extends SearchConfig {
     }
 
     @Override
+    void setHost(String host) {
+        // set host will parse actual host name by InetSocketAddress, which can not be resolved in test env
+    }
+
+    @Override
     ElasticSearchImpl createElasticSearch(ModuleContext context) {
         bindESLogger();
         Path dataPath = Files.tempDir();

@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -105,12 +106,8 @@ public class ModuleContext {
         });
     }
 
-    protected <T> Class<T> targetConfigClass(Class<T> configClass) {
-        return configClass;
-    }
-
     public void validate() {    // call validate if declared, use weak type convention to hide unnecessary method from config class
-        configs.values().forEach(config -> Classes.method(config.getClass(), "validate").ifPresent(method -> {
+        configs.values().forEach(config -> validateMethod(config).ifPresent(method -> {
             try {
                 method.setAccessible(true);
                 method.invoke(config);
@@ -118,5 +115,13 @@ public class ModuleContext {
                 throw new Error(e);
             }
         }));
+    }
+
+    protected <T> Class<T> targetConfigClass(Class<T> configClass) {
+        return configClass;
+    }
+
+    protected Optional<Method> validateMethod(Object config) {
+        return Classes.method(config.getClass(), "validate");
     }
 }

@@ -15,6 +15,7 @@ import java.time.Duration;
 public class SearchConfig {
     final ElasticSearchImpl search;
     private final ModuleContext context;
+    private String host;
 
     SearchConfig(ModuleContext context) {
         this.context = context;
@@ -23,7 +24,7 @@ public class SearchConfig {
     }
 
     void validate() {
-        if (search.addresses.isEmpty()) throw new Error("search().host() must be configured");
+        if (host == null) throw new Error("search().host() must be configured");
     }
 
     ElasticSearchImpl createElasticSearch(ModuleContext context) {
@@ -35,7 +36,12 @@ public class SearchConfig {
     }
 
     public void host(String host) {
-        search.host(host);
+        setHost(host);
+        this.host = host;
+    }
+
+    void setHost(String host) {
+        search.host(host);      // es requires host must be resolved, skip for unit test
     }
 
     public void sniff(boolean sniff) {
