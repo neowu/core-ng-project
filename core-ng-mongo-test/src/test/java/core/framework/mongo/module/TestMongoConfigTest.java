@@ -1,6 +1,6 @@
-package core.framework.mongo.config;
+package core.framework.mongo.module;
 
-import core.framework.mongo.test.MockMongo;
+import core.framework.mongo.impl.MockMongo;
 import core.framework.test.inject.TestBeanFactory;
 import core.framework.test.module.TestModuleContext;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,5 @@
-package core.framework.search.test;
+package core.framework.search.impl;
 
-import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.util.StopWatch;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.network.NetworkModule;
@@ -26,7 +25,7 @@ public class MockElasticSearch extends ElasticSearchImpl {
     }
 
     @Override
-    protected Client createClient() {
+    Client createClient() {
         StopWatch watch = new StopWatch();
         try {
             Settings.Builder settings = Settings.builder();

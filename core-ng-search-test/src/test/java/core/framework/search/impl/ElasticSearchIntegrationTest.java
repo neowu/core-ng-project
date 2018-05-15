@@ -1,4 +1,4 @@
-package core.framework.search.test;
+package core.framework.search.impl;
 
 import core.framework.inject.Inject;
 import core.framework.search.ElasticSearch;

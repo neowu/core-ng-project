@@ -1,4 +1,4 @@
-package core.framework.search.test;
+package core.framework.search.impl;
 
 import core.framework.api.json.Property;
 import core.framework.search.Index;

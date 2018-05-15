@@ -1,9 +1,9 @@
-package core.framework.search.config;
+package core.framework.search.module;
 
 import core.framework.impl.module.ModuleContext;
+import core.framework.search.impl.ESLoggerConfigFactory;
 import core.framework.search.impl.ElasticSearchImpl;
-import core.framework.search.test.ESLoggerConfigFactory;
-import core.framework.search.test.MockElasticSearch;
+import core.framework.search.impl.MockElasticSearch;
 import core.framework.util.Files;
 
 import java.nio.file.Path;
@@ -24,10 +24,6 @@ public class TestSearchConfig extends SearchConfig {
         context.shutdownHook.add(search::close);
         context.shutdownHook.add(() -> Files.deleteDir(dataPath));
         return search;
-    }
-
-    @Override
-    void setHost(String host) {
     }
 
     // es refers to log4j core directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger

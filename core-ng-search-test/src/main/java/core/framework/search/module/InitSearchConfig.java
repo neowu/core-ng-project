@@ -1,4 +1,4 @@
-package core.framework.search.config;
+package core.framework.search.module;
 
 import core.framework.impl.module.ModuleContext;
 import core.framework.search.ElasticSearchType;

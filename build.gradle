@@ -64,8 +64,7 @@ project(':core-ng-mongo-test') {
     dependencies {
         api project(":core-ng-test")
         api project(":core-ng-mongo")
-        implementation "com.github.fakemongo:fongo:2.1.1@jar"
-        implementation 'com.vividsolutions:jts:1.13'                           // used by fongo
+        implementation 'com.github.fakemongo:fongo:2.1.1'
     }
 }
 

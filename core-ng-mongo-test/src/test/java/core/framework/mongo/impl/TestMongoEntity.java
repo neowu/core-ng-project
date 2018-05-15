@@ -1,4 +1,4 @@
-package core.framework.mongo.test;
+package core.framework.mongo.impl;
 
 import core.framework.mongo.Collection;
 import core.framework.mongo.Field;

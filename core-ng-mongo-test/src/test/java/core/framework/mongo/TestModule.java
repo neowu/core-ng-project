@@ -1,7 +1,7 @@
 package core.framework.mongo;
 
-import core.framework.mongo.config.MongoConfig;
-import core.framework.mongo.test.TestMongoEntity;
+import core.framework.mongo.impl.TestMongoEntity;
+import core.framework.mongo.module.MongoConfig;
 import core.framework.test.module.AbstractTestModule;
 
 /**

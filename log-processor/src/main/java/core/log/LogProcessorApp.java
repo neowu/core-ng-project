@@ -2,7 +2,7 @@ package core.log;
 
 import core.framework.impl.log.stat.Stat;
 import core.framework.module.App;
-import core.framework.search.config.SearchConfig;
+import core.framework.search.module.SearchConfig;
 import core.log.domain.ActionDocument;
 import core.log.domain.StatDocument;
 import core.log.domain.TraceDocument;

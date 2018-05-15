@@ -1,8 +1,8 @@
 package core.framework.search;
 
-import core.framework.search.config.InitSearchConfig;
-import core.framework.search.config.SearchConfig;
-import core.framework.search.test.TestDocument;
+import core.framework.search.impl.TestDocument;
+import core.framework.search.module.InitSearchConfig;
+import core.framework.search.module.SearchConfig;
 import core.framework.test.module.AbstractTestModule;
 
 /**

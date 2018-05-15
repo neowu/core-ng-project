@@ -1,8 +1,8 @@
-package core.framework.mongo.config;
+package core.framework.mongo.module;
 
 import core.framework.impl.module.ModuleContext;
+import core.framework.mongo.impl.MockMongo;
 import core.framework.mongo.impl.MongoImpl;
-import core.framework.mongo.test.MockMongo;
 
 /**
  * @author neo

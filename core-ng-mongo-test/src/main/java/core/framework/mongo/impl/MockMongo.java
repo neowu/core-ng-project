@@ -1,8 +1,7 @@
-package core.framework.mongo.test;
+package core.framework.mongo.impl;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.client.MongoDatabase;
-import core.framework.mongo.impl.MongoImpl;
 import core.framework.util.StopWatch;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.slf4j.Logger;
@@ -16,7 +15,7 @@ public class MockMongo extends MongoImpl {
     private final Fongo fongo = new Fongo("fongo");
 
     @Override
-    protected MongoDatabase createDatabase(CodecRegistry registry) {
+    MongoDatabase createDatabase(CodecRegistry registry) {
         StopWatch watch = new StopWatch();
         try {
             return fongo.getDatabase("test").withCodecRegistry(registry);

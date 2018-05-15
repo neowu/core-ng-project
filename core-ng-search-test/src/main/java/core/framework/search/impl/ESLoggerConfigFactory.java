@@ -1,4 +1,4 @@
-package core.framework.search.test;
+package core.framework.search.impl;
 
 import core.framework.impl.log.LoggerImpl;
 import core.framework.search.impl.log.ESLogger;

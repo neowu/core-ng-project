@@ -1,4 +1,4 @@
-package core.framework.mongo.config;
+package core.framework.mongo.module;
 
 import core.framework.impl.module.ModuleContext;
 import core.framework.mongo.Mongo;

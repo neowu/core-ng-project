@@ -25,11 +25,11 @@ public class MongoImpl implements Mongo {
     private final MongoClientOptions.Builder builder = MongoClientOptions.builder()
                                                                          .maxConnectionIdleTime((int) Duration.ofMinutes(30).toMillis())
                                                                          .cursorFinalizerEnabled(false); // framework always close db cursor
-    public MongoClientURI uri;
     public int tooManyRowsReturnedThreshold = 2000;
     int timeoutInMs = (int) Duration.ofSeconds(15).toMillis();
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     CodecRegistry registry;
+    private MongoClientURI uri;
     private MongoClient mongoClient;
     private MongoDatabase database;
 
@@ -38,7 +38,7 @@ public class MongoImpl implements Mongo {
         database = createDatabase(registry);
     }
 
-    protected MongoDatabase createDatabase(CodecRegistry registry) {
+    MongoDatabase createDatabase(CodecRegistry registry) {
         if (uri == null) throw new Error("uri must not be null");
         StopWatch watch = new StopWatch();
         try {
