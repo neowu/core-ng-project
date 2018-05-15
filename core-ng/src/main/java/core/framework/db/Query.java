@@ -17,6 +17,8 @@ public interface Query<T> {
 
     List<T> fetch();
 
+    Optional<T> fetchOne();
+
     <P> Optional<P> project(String projection, Class<P> viewClass);
 
     default int count() {

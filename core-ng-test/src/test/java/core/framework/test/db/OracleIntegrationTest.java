@@ -63,4 +63,20 @@ class OracleIntegrationTest extends IntegrationTest {
         List<TestSequenceIdDBEntity> entities = query.fetch();
         assertThat(entities).hasSize(5);
     }
+
+    @Test
+    void selectOne() {
+        TestSequenceIdDBEntity entity1 = new TestSequenceIdDBEntity();
+        entity1.intField = 1;
+        repository.insert(entity1);
+        TestSequenceIdDBEntity entity2 = new TestSequenceIdDBEntity();
+        entity2.intField = 2;
+        repository.insert(entity2);
+
+        Query<TestSequenceIdDBEntity> query = repository.select();
+        query.where("int_field = ?", 2);
+        Optional<TestSequenceIdDBEntity> result = query.fetchOne();
+
+        assertThat(result).isPresent().get().isEqualToIgnoringGivenFields(entity2, "id");
+    }
 }

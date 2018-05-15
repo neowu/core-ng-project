@@ -60,6 +60,13 @@ public class QueryImpl<T> implements Query<T> {
     }
 
     @Override
+    public Optional<T> fetchOne() {
+        String sql = selectQuery.fetchSQL(whereClause, sort, skip, limit);
+        Object[] params = selectQuery.fetchParams(this.params, skip, limit);
+        return database.selectOne(sql, entityClass, params);
+    }
+
+    @Override
     public <P> Optional<P> project(String projection, Class<P> viewClass) {
         String sql = selectQuery.projectionSQL(projection, whereClause);
         Object[] params = this.params.toArray();

@@ -43,12 +43,6 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public Optional<T> selectOne(String where, Object... params) {
-        String sql = selectQuery.selectSQL(where);
-        return database.selectOne(sql, entityClass, params);
-    }
-
-    @Override
     public Optional<T> get(Object... primaryKeys) {
         String sql = selectQuery.getSQL;
         return database.selectOne(sql, entityClass, primaryKeys);

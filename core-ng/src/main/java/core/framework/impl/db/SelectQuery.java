@@ -18,7 +18,6 @@ import java.util.List;
 final class SelectQuery<T> {
     final String getSQL;
     private final Dialect dialect;
-    private final String selectSQL;
     private final String table;
 
     SelectQuery(Class<?> entityClass, Vendor vendor) {
@@ -27,9 +26,7 @@ final class SelectQuery<T> {
         List<Field> fields = Classes.instanceFields(entityClass);
         String columns = columns(fields);
 
-        selectSQL = "SELECT " + columns + " FROM " + table;
-
-        StringBuilder builder = new StringBuilder(selectSQL).append(" WHERE ");
+        StringBuilder builder = new StringBuilder("SELECT ").append(columns).append(" FROM ").append(table).append(" WHERE ");
         int index = 0;
         for (Field field : fields) {
             if (field.isAnnotationPresent(PrimaryKey.class)) {
@@ -65,12 +62,6 @@ final class SelectQuery<T> {
             default:
                 throw Exceptions.error("not supported vendor, vendor={}", vendor);
         }
-    }
-
-    String selectSQL(String where) {
-        StringBuilder builder = new StringBuilder(selectSQL);
-        if (where != null) builder.append(" WHERE ").append(where);
-        return builder.toString();
     }
 
     String projectionSQL(String projection, StringBuilder where) {
