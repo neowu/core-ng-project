@@ -14,7 +14,7 @@ import java.util.Arrays;
 /**
  * @author neo
  */
-public final class HTTPConfig {
+public final class HTTPConfig implements Config {
     private final Logger logger = LoggerFactory.getLogger(HTTPConfig.class);
     private final ModuleContext context;
 
@@ -23,12 +23,6 @@ public final class HTTPConfig {
 
     HTTPConfig(ModuleContext context) {
         this.context = context;
-    }
-
-    void validate() {
-        if (limitRateInterceptor != null && !limitRateGroupAdded) {
-            throw new Error("limitRate() is configured but no group added, please remove unnecessary config");
-        }
     }
 
     public void httpPort(int port) {
@@ -78,5 +72,12 @@ public final class HTTPConfig {
 
     public void enableGZip() {
         context.httpServer.gzip = true;
+    }
+
+    @Override
+    public void validate() {
+        if (limitRateInterceptor != null && !limitRateGroupAdded) {
+            throw new Error("limitRate() is configured but no group added, please remove unnecessary config");
+        }
     }
 }

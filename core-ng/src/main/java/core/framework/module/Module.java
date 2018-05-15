@@ -123,11 +123,11 @@ public abstract class Module {
         return context.config(KafkaConfig.class, name);
     }
 
-    public <T> T config(Class<T> configClass) {
+    public <T extends Config> T config(Class<T> configClass) {
         return config(configClass, null);
     }
 
-    public <T> T config(Class<T> configClass, String name) {
+    public <T extends Config> T config(Class<T> configClass, String name) {
         return context.config(configClass, name);
     }
 

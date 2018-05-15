@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public final class InitDBConfig {
+public final class InitDBConfig implements Config {
     private final DBConfig config;
     private final TestModuleContext context;
     private final String name;
@@ -39,5 +39,10 @@ public final class InitDBConfig {
 
     public <T> Repository<T> repository(Class<T> entityClass) {
         return context.beanFactory.bean(Types.generic(Repository.class, entityClass), name);
+    }
+
+    @Override
+    public void validate() {
+
     }
 }

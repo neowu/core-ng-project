@@ -8,7 +8,7 @@ import core.framework.impl.module.ModuleContext;
 /**
  * @author neo
  */
-public class ExecutorConfig {
+public class ExecutorConfig implements Config {
     private final ModuleContext context;
 
     ExecutorConfig(ModuleContext context) {
@@ -30,5 +30,10 @@ public class ExecutorConfig {
         Executor executor = new ExecutorImpl(ThreadPools.cachedThreadPool(poolSize, prefix), context.logManager, name);
         context.shutdownHook.add(((ExecutorImpl) executor)::stop);
         return executor;
+    }
+
+    @Override
+    public void validate() {
+
     }
 }

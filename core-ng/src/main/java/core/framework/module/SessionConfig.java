@@ -13,7 +13,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class SessionConfig {
+public class SessionConfig implements Config {
     private final Logger logger = LoggerFactory.getLogger(SessionConfig.class);
     private final ModuleContext context;
 
@@ -48,5 +48,10 @@ public class SessionConfig {
 
         context.shutdownHook.add(redis::close);
         context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
+    }
+
+    @Override
+    public void validate() {
+
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public final class SiteConfig {
+public final class SiteConfig implements Config {
     private final Logger logger = LoggerFactory.getLogger(SiteConfig.class);
 
     private final ModuleContext context;
@@ -79,5 +79,10 @@ public final class SiteConfig {
 
         logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
         context.route(HTTPMethod.GET, "/_sys/api", new APIController(config.serviceInterfaces, new IPAccessControl(cidrs)), true);
+    }
+
+    @Override
+    public void validate() {
+
     }
 }

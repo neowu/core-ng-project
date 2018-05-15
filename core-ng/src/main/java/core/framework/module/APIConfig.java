@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class APIConfig {
+public class APIConfig implements Config {
     final List<Class<?>> serviceInterfaces = Lists.newArrayList();
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private final ModuleContext context;
@@ -101,5 +101,10 @@ public class APIConfig {
             this.httpClient = httpClient;
         }
         return httpClient;
+    }
+
+    @Override
+    public void validate() {
+
     }
 }

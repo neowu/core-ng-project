@@ -1,6 +1,7 @@
 package core.framework.search.module;
 
 import core.framework.impl.module.ModuleContext;
+import core.framework.module.Config;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchTypeImpl;
 import core.framework.test.module.TestModuleContext;
@@ -10,7 +11,7 @@ import core.framework.util.Types;
 /**
  * @author neo
  */
-public final class InitSearchConfig {
+public final class InitSearchConfig implements Config {
     private final TestModuleContext context;
     private final SearchConfig config;
 
@@ -34,5 +35,10 @@ public final class InitSearchConfig {
 
     public void flush(String index) {
         config.search.flush(index);
+    }
+
+    @Override
+    public void validate() {
+
     }
 }

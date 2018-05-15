@@ -23,19 +23,13 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class CacheConfig {
+public class CacheConfig implements Config {
     private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
     private final ModuleContext context;
     private CacheManager cacheManager;
 
     CacheConfig(ModuleContext context) {
         this.context = context;
-    }
-
-    void validate() {
-        if (cacheManager.caches().isEmpty()) {
-            throw new Error("cache() is configured but no cache added, please remove unnecessary config");
-        }
     }
 
     String cacheName(String name, Type valueType) {
@@ -105,5 +99,12 @@ public class CacheConfig {
 
     public void add(Type valueType, Duration duration) {
         add(null, valueType, duration);
+    }
+
+    @Override
+    public void validate() {
+        if (cacheManager.caches().isEmpty()) {
+            throw new Error("cache() is configured but no cache added, please remove unnecessary config");
+        }
     }
 }

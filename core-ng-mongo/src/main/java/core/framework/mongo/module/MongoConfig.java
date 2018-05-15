@@ -1,6 +1,7 @@
 package core.framework.mongo.module;
 
 import core.framework.impl.module.ModuleContext;
+import core.framework.module.Config;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
 import core.framework.mongo.impl.MongoImpl;
@@ -12,7 +13,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class MongoConfig {
+public class MongoConfig implements Config {
     final MongoImpl mongo;
     private final ModuleContext context;
     private final String name;
@@ -24,12 +25,6 @@ public class MongoConfig {
         this.name = name;
         mongo = createMongo();
         context.beanFactory.bind(Mongo.class, name, mongo);
-    }
-
-    void validate() {
-        if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
-        if (!entityAdded)
-            throw Exceptions.error("mongo({}) is configured but no collection/view added, please remove unnecessary config", name == null ? "" : name);
     }
 
     MongoImpl createMongo() {
@@ -71,5 +66,12 @@ public class MongoConfig {
         if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
         mongo.view(viewClass);
         entityAdded = true;
+    }
+
+    @Override
+    public void validate() {
+        if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
+        if (!entityAdded)
+            throw Exceptions.error("mongo({}) is configured but no collection/view added, please remove unnecessary config", name == null ? "" : name);
     }
 }

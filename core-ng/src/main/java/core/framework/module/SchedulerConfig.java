@@ -19,7 +19,7 @@ import java.time.ZoneId;
 /**
  * @author neo
  */
-public final class SchedulerConfig {
+public final class SchedulerConfig implements Config {
     private final Scheduler scheduler;
     private boolean triggerAdded;
 
@@ -65,5 +65,10 @@ public final class SchedulerConfig {
         context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
 
         return scheduler;
+    }
+
+    @Override
+    public void validate() {
+
     }
 }

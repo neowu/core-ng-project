@@ -11,7 +11,7 @@ import java.util.Arrays;
 /**
  * @author neo
  */
-public class LogConfig {
+public class LogConfig implements Config {
     private final ModuleContext context;
 
     LogConfig(ModuleContext context) {
@@ -34,5 +34,10 @@ public class LogConfig {
 
     public void maskFields(String... fields) {
         context.logManager.filter.maskedFields.addAll(Arrays.asList(fields));
+    }
+
+    @Override
+    public void validate() {
+
     }
 }

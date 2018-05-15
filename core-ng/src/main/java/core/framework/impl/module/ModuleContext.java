@@ -15,6 +15,7 @@ import core.framework.impl.web.management.MemoryUsageController;
 import core.framework.impl.web.management.PropertyController;
 import core.framework.impl.web.management.ThreadInfoController;
 import core.framework.impl.web.route.PathPatternValidator;
+import core.framework.module.Config;
 import core.framework.util.ASCII;
 import core.framework.util.Exceptions;
 import core.framework.util.Lists;
@@ -26,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,7 +42,7 @@ public class ModuleContext {
     public final HTTPServer httpServer;
     public final LogManager logManager;
     public final Stat stat = new Stat();
-    protected final Map<String, Object> configs = Maps.newHashMap();
+    protected final Map<String, Config> configs = Maps.newHashMap();
     private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext(BeanFactory beanFactory) {
@@ -82,9 +82,9 @@ public class ModuleContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T config(Class<T> configClass, String name) {    // use weak type convention to hide unnecessary method from config class
+    public <T extends Config> T config(Class<T> configClass, String name) {    // use weak type convention to hide unnecessary method from config class
         return (T) configs.computeIfAbsent(configClass.getCanonicalName() + ":" + name, key -> {
-            Class<T> targetConfigClass = targetConfigClass(configClass);
+            Class<T> targetConfigClass = configClass(configClass);
             try {
                 Optional<Constructor<T>> constructorOptional = Classes.constructor(targetConfigClass, ModuleContext.class, String.class);
                 if (constructorOptional.isPresent()) {
@@ -106,22 +106,11 @@ public class ModuleContext {
         });
     }
 
-    public void validate() {    // call validate if declared, use weak type convention to hide unnecessary method from config class
-        configs.values().forEach(config -> validateMethod(config).ifPresent(method -> {
-            try {
-                method.setAccessible(true);
-                method.invoke(config);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new Error(e);
-            }
-        }));
+    public void validate() {
+        configs.values().forEach(Config::validate);
     }
 
-    protected <T> Class<T> targetConfigClass(Class<T> configClass) {
+    protected <T> Class<T> configClass(Class<T> configClass) {
         return configClass;
-    }
-
-    protected Optional<Method> validateMethod(Object config) {
-        return Classes.method(config.getClass(), "validate");
     }
 }

@@ -35,13 +35,13 @@ class TestModuleContextTest {
 
     @Test
     void targetConfigClass() {
-        assertThat(context.targetConfigClass(APIConfig.class)).isEqualTo(TestAPIConfig.class);
-        assertThat(context.targetConfigClass(CacheConfig.class)).isEqualTo(TestCacheConfig.class);
-        assertThat(context.targetConfigClass(DBConfig.class)).isEqualTo(TestDBConfig.class);
-        assertThat(context.targetConfigClass(ExecutorConfig.class)).isEqualTo(TestExecutorConfig.class);
-        assertThat(context.targetConfigClass(KafkaConfig.class)).isEqualTo(TestKafkaConfig.class);
-        assertThat(context.targetConfigClass(LogConfig.class)).isEqualTo(TestLogConfig.class);
-        assertThat(context.targetConfigClass(RedisConfig.class)).isEqualTo(TestRedisConfig.class);
-        assertThat(context.targetConfigClass(SessionConfig.class)).isEqualTo(TestSessionConfig.class);
+        assertThat(context.configClass(APIConfig.class)).isEqualTo(TestAPIConfig.class);
+        assertThat(context.configClass(CacheConfig.class)).isEqualTo(TestCacheConfig.class);
+        assertThat(context.configClass(DBConfig.class)).isEqualTo(TestDBConfig.class);
+        assertThat(context.configClass(ExecutorConfig.class)).isEqualTo(TestExecutorConfig.class);
+        assertThat(context.configClass(KafkaConfig.class)).isEqualTo(TestKafkaConfig.class);
+        assertThat(context.configClass(LogConfig.class)).isEqualTo(TestLogConfig.class);
+        assertThat(context.configClass(RedisConfig.class)).isEqualTo(TestRedisConfig.class);
+        assertThat(context.configClass(SessionConfig.class)).isEqualTo(TestSessionConfig.class);
     }
 }

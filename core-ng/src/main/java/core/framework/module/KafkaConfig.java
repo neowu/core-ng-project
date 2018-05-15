@@ -18,7 +18,7 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class KafkaConfig {
+public class KafkaConfig implements Config {
     private final Logger logger = LoggerFactory.getLogger(KafkaConfig.class);
 
     private final ModuleContext context;
@@ -30,12 +30,6 @@ public class KafkaConfig {
         this.context = context;
         this.name = name;
         kafka = createKafka(context, name);
-    }
-
-    void validate() {
-        if (kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured", name == null ? "" : name);
-        if (!handlerAdded)
-            throw Exceptions.error("kafka({}) is configured, but no producer/consumer added, please remove unnecessary config", name == null ? "" : name);
     }
 
     Kafka createKafka(ModuleContext context, String name) {
@@ -114,5 +108,12 @@ public class KafkaConfig {
         if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw Exceptions.error("max wait time must be greater than 0, value={}", maxWaitTime);
         kafka.minPollBytes = minBytes;
         kafka.minPollMaxWaitTime = maxWaitTime;
+    }
+
+    @Override
+    public void validate() {
+        if (kafka.uri == null) throw Exceptions.error("kafka({}).uri() must be configured", name == null ? "" : name);
+        if (!handlerAdded)
+            throw Exceptions.error("kafka({}) is configured, but no producer/consumer added, please remove unnecessary config", name == null ? "" : name);
     }
 }

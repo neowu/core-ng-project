@@ -10,8 +10,8 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class RedisConfig {
-    protected final Redis redis;
+public class RedisConfig implements Config {
+    final Redis redis;
     private final ModuleContext context;
     private String host;
 
@@ -19,10 +19,6 @@ public class RedisConfig {
         this.context = context;
         redis = createRedis();
         context.beanFactory.bind(Redis.class, null, redis);
-    }
-
-    void validate() {
-        if (host == null) throw new Error("redis().host() must be configured");
     }
 
     Redis createRedis() {
@@ -53,5 +49,10 @@ public class RedisConfig {
 
     public void timeout(Duration timeout) {
         ((RedisImpl) redis).timeout(timeout);
+    }
+
+    @Override
+    public void validate() {
+        if (host == null) throw new Error("redis().host() must be configured");
     }
 }

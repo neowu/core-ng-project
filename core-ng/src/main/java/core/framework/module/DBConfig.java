@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class DBConfig {
+public class DBConfig implements Config {
     protected final String name;
     final List<Class<?>> entityClasses = Lists.newArrayList();
     final DatabaseImpl database;
@@ -30,12 +30,6 @@ public class DBConfig {
         this.context = context;
         this.name = name;
         this.database = createDatabase();
-    }
-
-    void validate() {
-        if (url == null) throw Exceptions.error("db({}).url() must be configured", name == null ? "" : name);
-        if (!entityAdded)
-            throw Exceptions.error("db({}) is configured but no repository/view added, please remove unnecessary config", name == null ? "" : name);
     }
 
     private DatabaseImpl createDatabase() {
@@ -116,5 +110,12 @@ public class DBConfig {
         context.beanFactory.bind(Types.generic(Repository.class, entityClass), name, database.repository(entityClass));
         entityAdded = true;
         entityClasses.add(entityClass);
+    }
+
+    @Override
+    public void validate() {
+        if (url == null) throw Exceptions.error("db({}).url() must be configured", name == null ? "" : name);
+        if (!entityAdded)
+            throw Exceptions.error("db({}) is configured but no repository/view added, please remove unnecessary config", name == null ? "" : name);
     }
 }

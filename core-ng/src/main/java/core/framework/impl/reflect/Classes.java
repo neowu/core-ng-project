@@ -3,7 +3,6 @@ package core.framework.impl.reflect;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -29,14 +28,6 @@ public final class Classes {
         Constructor<T>[] constructors = (Constructor<T>[]) instanceClass.getDeclaredConstructors();
         for (Constructor<T> constructor : constructors) {
             if (Arrays.equals(constructor.getGenericParameterTypes(), paramTypes)) return Optional.of(constructor);
-        }
-        return Optional.empty();
-    }
-
-    public static Optional<Method> method(Class<?> instanceClass, String methodName, Type... paramTypes) {
-        Method[] methods = instanceClass.getDeclaredMethods();
-        for (Method method : methods) {
-            if (methodName.equals(method.getName()) && Arrays.equals(method.getGenericParameterTypes(), paramTypes)) return Optional.of(method);
         }
         return Optional.empty();
     }
