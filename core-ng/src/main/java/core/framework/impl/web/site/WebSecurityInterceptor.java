@@ -2,6 +2,7 @@ package core.framework.impl.web.site;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
+import core.framework.util.Strings;
 import core.framework.web.Interceptor;
 import core.framework.web.Invocation;
 import core.framework.web.Request;
@@ -9,12 +10,25 @@ import core.framework.web.Response;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
  */
 public class WebSecurityInterceptor implements Interceptor {    // refer to https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
+    private final String contentSecurityPolicy;
+
+    public WebSecurityInterceptor(String... trustedSources) {
+        this.contentSecurityPolicy = contentSecurityPolicy(trustedSources);
+    }
+
+    String contentSecurityPolicy(String... trustedSources) {
+        String sources = trustedSources.length == 0 ? "https:" : "'self' " + Arrays.stream(trustedSources).collect(Collectors.joining(" "));
+        return Strings.format("default-src {}; object-src 'none'; frame-src 'none';", sources);
+    }
+
     @Override
     public Response intercept(Invocation invocation) throws Exception {
         Request request = invocation.context().request();
@@ -25,8 +39,8 @@ public class WebSecurityInterceptor implements Interceptor {    // refer to http
             response.header("Strict-Transport-Security", "max-age=31536000");
             response.contentType().ifPresent(contentType -> {
                 if (ContentType.TEXT_HTML.mediaType().equals(contentType.mediaType())) {
-                    response.header("X-Frame-Options", "DENY");
-                    response.header("X-XSS-Protection", "1; mode=block");
+                    response.header("Content-Security-Policy", contentSecurityPolicy);
+                    response.header("X-XSS-Protection", "1; mode=block");       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
                 }
                 response.header("X-Content-Type-Options", "nosniff");
             });

@@ -70,8 +70,8 @@ public final class SiteConfig implements Config {
         return new StaticContentConfig(controller);
     }
 
-    public void enableWebSecurity() {
-        context.httpServer.handler.interceptors.add(new WebSecurityInterceptor());
+    public void enableWebSecurity(String... trustedSources) {
+        context.httpServer.handler.interceptors.add(new WebSecurityInterceptor(trustedSources));
     }
 
     public void publishAPI(String... cidrs) {
