@@ -6,6 +6,7 @@ import core.framework.impl.cache.CacheManager;
 import core.framework.impl.cache.CacheStore;
 import core.framework.impl.cache.LocalCacheStore;
 import core.framework.impl.cache.RedisCacheStore;
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
@@ -23,13 +24,21 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class CacheConfig implements Config {
+public class CacheConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
-    private final ModuleContext context;
+    private ModuleContext context;
     private CacheManager cacheManager;
 
-    CacheConfig(ModuleContext context) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
+    }
+
+    @Override
+    protected void validate() {
+        if (cacheManager.caches().isEmpty()) {
+            throw new Error("cache is configured but no cache added, please remove unnecessary config");
+        }
     }
 
     String cacheName(String name, Type valueType) {
@@ -51,7 +60,7 @@ public class CacheConfig implements Config {
 
     public void local() {
         if (cacheManager != null)
-            throw new Error("cache() is already configured, please configure cache store only once");
+            throw new Error("cache is already configured, please configure cache store only once");
 
         logger.info("create local cache store");
         LocalCacheStore cacheStore = new LocalCacheStore();
@@ -62,7 +71,7 @@ public class CacheConfig implements Config {
 
     public void redis(String host) {
         if (cacheManager != null)
-            throw new Error("cache() is already configured, please configure cache store only once");
+            throw new Error("cache is already configured, please configure cache store only once");
 
         configureRedis(host);
     }
@@ -89,7 +98,7 @@ public class CacheConfig implements Config {
     }
 
     public void add(String name, Type valueType, Duration duration) {
-        if (cacheManager == null) throw Exceptions.error("cache() is not configured, please call cache().redis() or cache().local() first");
+        if (cacheManager == null) throw Exceptions.error("cache is not configured, please configure cache store first");
 
         String cacheName = cacheName(name, valueType);
         logger.info("add cache, cacheName={}, valueType={}, name={}", cacheName, valueType.getTypeName(), name);
@@ -99,12 +108,5 @@ public class CacheConfig implements Config {
 
     public void add(Type valueType, Duration duration) {
         add(null, valueType, duration);
-    }
-
-    @Override
-    public void validate() {
-        if (cacheManager.caches().isEmpty()) {
-            throw new Error("cache() is configured but no cache added, please remove unnecessary config");
-        }
     }
 }

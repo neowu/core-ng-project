@@ -1,8 +1,6 @@
 package core.framework.module;
 
 import core.framework.impl.db.Vendor;
-import core.framework.impl.inject.BeanFactory;
-import core.framework.test.module.TestModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,8 +14,7 @@ class TestDBConfigTest {
 
     @BeforeEach
     void createTestDBConfig() {
-        TestModuleContext context = new TestModuleContext(new BeanFactory());
-        config = new TestDBConfig(context, null);
+        config = new TestDBConfig();
     }
 
     @Test

@@ -14,7 +14,7 @@ class CacheConfigTest {
 
     @BeforeEach
     void createCacheConfig() {
-        config = new CacheConfig(null);
+        config = new CacheConfig();
     }
 
     @Test

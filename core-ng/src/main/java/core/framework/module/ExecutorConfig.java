@@ -3,16 +3,22 @@ package core.framework.module;
 import core.framework.async.Executor;
 import core.framework.impl.async.ExecutorImpl;
 import core.framework.impl.async.ThreadPools;
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 
 /**
  * @author neo
  */
-public class ExecutorConfig implements Config {
-    private final ModuleContext context;
+public class ExecutorConfig extends Config {
+    private ModuleContext context;
 
-    ExecutorConfig(ModuleContext context) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
+    }
+
+    @Override
+    protected void validate() {
     }
 
     public Executor add() {
@@ -30,10 +36,5 @@ public class ExecutorConfig implements Config {
         Executor executor = new ExecutorImpl(ThreadPools.cachedThreadPool(poolSize, prefix), context.logManager, name);
         context.shutdownHook.add(((ExecutorImpl) executor)::stop);
         return executor;
-    }
-
-    @Override
-    public void validate() {
-
     }
 }

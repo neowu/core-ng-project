@@ -1,7 +1,7 @@
 package core.framework.search.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
-import core.framework.module.Config;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchTypeImpl;
 import core.framework.test.module.TestModuleContext;
@@ -11,14 +11,18 @@ import core.framework.util.Types;
 /**
  * @author neo
  */
-public final class InitSearchConfig implements Config {
-    private final TestModuleContext context;
-    private final SearchConfig config;
+public final class InitSearchConfig extends Config {
+    private TestModuleContext context;
+    private SearchConfig config;
 
-    InitSearchConfig(ModuleContext context) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = (TestModuleContext) context;
-        config = this.context.findConfig(SearchConfig.class, null)
-                             .orElseThrow(() -> new Error("search() must be configured before initSearch()"));
+        config = this.context.getConfig(SearchConfig.class, null);
+    }
+
+    @Override
+    protected void validate() {
     }
 
     public void createIndex(String index, String sourcePath) {
@@ -35,10 +39,5 @@ public final class InitSearchConfig implements Config {
 
     public void flush(String index) {
         config.search.flush(index);
-    }
-
-    @Override
-    public void validate() {
-
     }
 }

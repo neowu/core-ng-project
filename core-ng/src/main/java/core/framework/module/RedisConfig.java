@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
@@ -10,15 +11,21 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class RedisConfig implements Config {
-    final Redis redis;
-    private final ModuleContext context;
+public class RedisConfig extends Config {
+    private ModuleContext context;
+    private Redis redis;
     private String host;
 
-    RedisConfig(ModuleContext context) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
         redis = createRedis();
         context.beanFactory.bind(Redis.class, null, redis);
+    }
+
+    @Override
+    protected void validate() {
+        if (host == null) throw new Error("redis host must be configured");
     }
 
     Redis createRedis() {
@@ -49,10 +56,5 @@ public class RedisConfig implements Config {
 
     public void timeout(Duration timeout) {
         ((RedisImpl) redis).timeout(timeout);
-    }
-
-    @Override
-    public void validate() {
-        if (host == null) throw new Error("redis().host() must be configured");
     }
 }

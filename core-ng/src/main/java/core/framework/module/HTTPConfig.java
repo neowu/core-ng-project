@@ -1,8 +1,8 @@
 package core.framework.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.http.ClientIPInterceptor;
-import core.framework.impl.web.http.LimitRateInterceptor;
 import core.framework.util.Exceptions;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
@@ -14,15 +14,17 @@ import java.util.Arrays;
 /**
  * @author neo
  */
-public final class HTTPConfig implements Config {
+public final class HTTPConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(HTTPConfig.class);
-    private final ModuleContext context;
+    private ModuleContext context;
 
-    LimitRateInterceptor limitRateInterceptor;
-    boolean limitRateGroupAdded;
-
-    HTTPConfig(ModuleContext context) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
+    }
+
+    @Override
+    protected void validate() {
     }
 
     public void httpPort(int port) {
@@ -42,11 +44,7 @@ public final class HTTPConfig implements Config {
     }
 
     public LimitRateConfig limitRate() {
-        if (limitRateInterceptor == null) {
-            limitRateInterceptor = new LimitRateInterceptor();
-            intercept(limitRateInterceptor);
-        }
-        return new LimitRateConfig(this);
+        return context.config(LimitRateConfig.class, null);
     }
 
     /**
@@ -72,12 +70,5 @@ public final class HTTPConfig implements Config {
 
     public void enableGZip() {
         context.httpServer.gzip = true;
-    }
-
-    @Override
-    public void validate() {
-        if (limitRateInterceptor != null && !limitRateGroupAdded) {
-            throw new Error("limitRate() is configured but no group added, please remove unnecessary config");
-        }
     }
 }

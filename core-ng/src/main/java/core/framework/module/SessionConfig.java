@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
@@ -13,13 +14,18 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class SessionConfig implements Config {
+public class SessionConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(SessionConfig.class);
-    private final ModuleContext context;
+    private ModuleContext context;
 
-    SessionConfig(ModuleContext context) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
         context.logManager.filter.maskedFields.add(context.httpServer.siteManager.sessionManager.sessionId.name);
+    }
+
+    @Override
+    protected void validate() {
     }
 
     public void timeout(Duration timeout) {
@@ -48,10 +54,5 @@ public class SessionConfig implements Config {
 
         context.shutdownHook.add(redis::close);
         context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
-    }
-
-    @Override
-    public void validate() {
-
     }
 }

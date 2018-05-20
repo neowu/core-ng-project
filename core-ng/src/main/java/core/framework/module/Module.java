@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.util.Exceptions;
 import org.slf4j.Logger;

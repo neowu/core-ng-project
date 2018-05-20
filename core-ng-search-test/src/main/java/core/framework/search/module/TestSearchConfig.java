@@ -12,10 +12,6 @@ import java.nio.file.Path;
  * @author neo
  */
 public class TestSearchConfig extends SearchConfig {
-    TestSearchConfig(ModuleContext context) {
-        super(context);
-    }
-
     @Override
     void setHost(String host) {
         // set host will parse actual host name by InetSocketAddress, which can not be resolved in test env

@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.scheduler.DailyTrigger;
 import core.framework.impl.scheduler.MonthlyTrigger;
@@ -19,16 +20,27 @@ import java.time.ZoneId;
 /**
  * @author neo
  */
-public final class SchedulerConfig implements Config {
-    private final Scheduler scheduler;
+public final class SchedulerConfig extends Config {
+    private Scheduler scheduler;
     private boolean triggerAdded;
 
-    SchedulerConfig(ModuleContext context) {
-        scheduler = createScheduler(context);
+    @Override
+    protected void initialize(ModuleContext context, String name) {
+        scheduler = new Scheduler(context.logManager);
+        context.startupHook.add(scheduler::start);
+        context.shutdownHook.add(scheduler::stop);
+
+        SchedulerController schedulerController = new SchedulerController(scheduler);
+        context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);
+        context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
+    }
+
+    @Override
+    protected void validate() {
     }
 
     public void timeZone(ZoneId zoneId) {
-        if (triggerAdded) throw new Error("schedule().timeZone() must be configured before adding trigger");
+        if (triggerAdded) throw new Error("schedule timeZone must be configured before adding trigger");
         if (zoneId == null) throw new Error("zoneId must not be null");
         scheduler.clock = Clock.system(zoneId);
     }
@@ -53,22 +65,5 @@ public final class SchedulerConfig implements Config {
     public void trigger(String name, Job job, Trigger trigger) {
         scheduler.addTriggerTask(name, job, trigger);
         triggerAdded = true;
-    }
-
-    private Scheduler createScheduler(ModuleContext context) {
-        Scheduler scheduler = new Scheduler(context.logManager);
-        context.startupHook.add(scheduler::start);
-        context.shutdownHook.add(scheduler::stop);
-
-        SchedulerController schedulerController = new SchedulerController(scheduler);
-        context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);
-        context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
-
-        return scheduler;
-    }
-
-    @Override
-    public void validate() {
-
     }
 }

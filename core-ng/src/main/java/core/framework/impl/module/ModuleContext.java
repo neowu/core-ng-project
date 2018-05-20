@@ -6,7 +6,6 @@ import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.stat.Stat;
-import core.framework.impl.reflect.Classes;
 import core.framework.impl.web.ControllerClassValidator;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.ControllerInspector;
@@ -15,9 +14,7 @@ import core.framework.impl.web.management.MemoryUsageController;
 import core.framework.impl.web.management.PropertyController;
 import core.framework.impl.web.management.ThreadInfoController;
 import core.framework.impl.web.route.PathPatternValidator;
-import core.framework.module.Config;
 import core.framework.util.ASCII;
-import core.framework.util.Exceptions;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.web.Controller;
@@ -25,11 +22,9 @@ import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author neo
@@ -82,25 +77,13 @@ public class ModuleContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Config> T config(Class<T> configClass, String name) {    // use weak type convention to hide unnecessary method from config class
+    public <T extends Config> T config(Class<T> configClass, String name) {
         return (T) configs.computeIfAbsent(configClass.getCanonicalName() + ":" + name, key -> {
-            Class<T> targetConfigClass = configClass(configClass);
             try {
-                Optional<Constructor<T>> constructorOptional = Classes.constructor(targetConfigClass, ModuleContext.class, String.class);
-                if (constructorOptional.isPresent()) {
-                    Constructor<T> constructor = constructorOptional.get();
-                    constructor.setAccessible(true);
-                    return constructor.newInstance(this, name);
-                }
-                constructorOptional = Classes.constructor(targetConfigClass, ModuleContext.class);
-                if (constructorOptional.isPresent()) {
-                    if (name != null) throw Exceptions.error("config class does not support name, configClass={}, name={}", targetConfigClass.getCanonicalName(), name);
-                    Constructor<T> constructor = constructorOptional.get();
-                    constructor.setAccessible(true);
-                    return constructor.newInstance(this);
-                }
-                throw Exceptions.error("config class must have public constructor(context, name?), configClass={}", targetConfigClass.getCanonicalName());
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                T config = configClass(configClass).getConstructor().newInstance();
+                config.initialize(this, name);
+                return config;
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 throw new Error(e);
             }
         });

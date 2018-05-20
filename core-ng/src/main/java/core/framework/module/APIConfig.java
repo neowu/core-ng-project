@@ -4,6 +4,7 @@ import core.framework.api.web.service.Path;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.bean.RequestBeanMapper;
@@ -26,16 +27,21 @@ import java.util.List;
 /**
  * @author neo
  */
-public class APIConfig implements Config {
+public class APIConfig extends Config {
     final List<Class<?>> serviceInterfaces = Lists.newArrayList();
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
-    private final ModuleContext context;
+    private ModuleContext context;
     private HTTPClient httpClient;
     private Duration timeout = Duration.ofSeconds(30);
     private Duration slowOperationThreshold = Duration.ofSeconds(15);
 
-    APIConfig(ModuleContext context) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
+    }
+
+    @Override
+    protected void validate() {
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {
@@ -77,12 +83,12 @@ public class APIConfig implements Config {
     }
 
     public void timeout(Duration timeout) {
-        if (httpClient != null) throw new Error("api().timeout() must be configured before adding client");
+        if (httpClient != null) throw new Error("api timeout must be configured before adding client");
         this.timeout = timeout;
     }
 
     public void slowOperationThreshold(Duration slowOperationThreshold) {
-        if (httpClient != null) throw new Error("api().slowOperationThreshold() must be configured before adding client");
+        if (httpClient != null) throw new Error("api slowOperationThreshold must be configured before adding client");
         this.slowOperationThreshold = slowOperationThreshold;
     }
 
@@ -101,10 +107,5 @@ public class APIConfig implements Config {
             this.httpClient = httpClient;
         }
         return httpClient;
-    }
-
-    @Override
-    public void validate() {
-
     }
 }

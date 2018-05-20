@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 /**
  * @author neo
  */
-public class WebSecurityInterceptor implements Interceptor {    // refer to https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
+public final class WebSecurityInterceptor implements Interceptor {    // refer to https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
     private final String contentSecurityPolicy;
 
     public WebSecurityInterceptor(String... trustedSources) {

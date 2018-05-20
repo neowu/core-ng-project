@@ -18,8 +18,8 @@ class APIConfigTest {
 
     @BeforeEach
     void createAPIConfig() {
-        ModuleContext context = new ModuleContext(new BeanFactory());
-        config = new APIConfig(context);
+        config = new APIConfig();
+        config.initialize(new ModuleContext(new BeanFactory()), null);
     }
 
     @Test

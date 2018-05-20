@@ -1,17 +1,12 @@
 package core.framework.module;
 
 import core.framework.impl.db.Vendor;
-import core.framework.impl.module.ModuleContext;
 import core.framework.util.Strings;
 
 /**
  * @author neo
  */
 public class TestDBConfig extends DBConfig {
-    TestDBConfig(ModuleContext context, String name) {
-        super(context, name);
-    }
-
     @Override
     String databaseURL(String url, Vendor vendor) {
         String syntaxParam = hsqldbSyntaxParam(vendor);

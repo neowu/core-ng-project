@@ -1,4 +1,4 @@
-package core.framework.search.module;
+package core.framework.module;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,17 +8,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class SearchConfigTest {
-    private SearchConfig config;
+class DBConfigTest {
+    private DBConfig config;
 
     @BeforeEach
-    void createSearchConfig() {
-        config = new SearchConfig();
+    void createDBConfig() {
+        config = new DBConfig();
     }
 
     @Test
     void validate() {
         assertThatThrownBy(() -> config.validate())
-                .hasMessageContaining("search host must be configured");
+                .hasMessageContaining("db url must be configured");
     }
 }

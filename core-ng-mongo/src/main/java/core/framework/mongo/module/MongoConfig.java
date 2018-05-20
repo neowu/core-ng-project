@@ -1,7 +1,7 @@
 package core.framework.mongo.module;
 
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
-import core.framework.module.Config;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
 import core.framework.mongo.impl.MongoImpl;
@@ -13,18 +13,26 @@ import java.time.Duration;
 /**
  * @author neo
  */
-public class MongoConfig implements Config {
-    final MongoImpl mongo;
-    private final ModuleContext context;
-    private final String name;
-    private String uri;
+public class MongoConfig extends Config {
+    String uri;
+    private ModuleContext context;
+    private String name;
+    private MongoImpl mongo;
     private boolean entityAdded;
 
-    MongoConfig(ModuleContext context, String name) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
         mongo = createMongo();
         context.beanFactory.bind(Mongo.class, name, mongo);
+    }
+
+    @Override
+    protected void validate() {
+        if (uri == null) throw Exceptions.error("mongo uri must be configured, name={}", name);
+        if (!entityAdded)
+            throw Exceptions.error("mongo is configured but no collection/view added, please remove unnecessary config, name={}", name);
     }
 
     MongoImpl createMongo() {
@@ -35,7 +43,7 @@ public class MongoConfig implements Config {
     }
 
     public void uri(String uri) {
-        if (this.uri != null) throw Exceptions.error("mongo({}).uri() is already configured, uri={}, previous={}", name == null ? "" : name, uri, this.uri);
+        if (this.uri != null) throw Exceptions.error("mongo uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri);
         mongo.uri(uri);
         this.uri = uri;
     }
@@ -57,21 +65,14 @@ public class MongoConfig implements Config {
     }
 
     public <T> void collection(Class<T> entityClass) {
-        if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
+        if (uri == null) throw Exceptions.error("mongo uri must be configured first, name={}", name);
         context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, mongo.collection(entityClass));
         entityAdded = true;
     }
 
     public <T> void view(Class<T> viewClass) {
-        if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured first", name == null ? "" : name);
+        if (uri == null) throw Exceptions.error("mongo uri must be configured first, name={}", name);
         mongo.view(viewClass);
         entityAdded = true;
-    }
-
-    @Override
-    public void validate() {
-        if (uri == null) throw Exceptions.error("mongo({}).uri() must be configured", name == null ? "" : name);
-        if (!entityAdded)
-            throw Exceptions.error("mongo({}) is configured but no collection/view added, please remove unnecessary config", name == null ? "" : name);
     }
 }

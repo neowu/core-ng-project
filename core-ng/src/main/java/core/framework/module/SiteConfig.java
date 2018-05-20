@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.http.IPAccessControl;
 import core.framework.impl.web.management.APIController;
@@ -22,14 +23,19 @@ import java.util.List;
 /**
  * @author neo
  */
-public final class SiteConfig implements Config {
+public final class SiteConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(SiteConfig.class);
 
-    private final ModuleContext context;
+    private ModuleContext context;
     private boolean messageConfigured;
 
-    SiteConfig(ModuleContext context) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
+    }
+
+    @Override
+    protected void validate() {
     }
 
     public SessionConfig session() {
@@ -42,7 +48,7 @@ public final class SiteConfig implements Config {
 
     public void message(List<String> paths, String... languages) {
         if (messageConfigured) {
-            throw Exceptions.error("site().message() can only be configured once and must before site().template()");
+            throw Exceptions.error("site message can only be configured once and must before adding template");
         }
         messageConfigured = true;
         context.beanFactory.bind(Message.class, null, context.httpServer.siteManager.message);
@@ -79,10 +85,5 @@ public final class SiteConfig implements Config {
 
         logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
         context.route(HTTPMethod.GET, "/_sys/api", new APIController(config.serviceInterfaces, new IPAccessControl(cidrs)), true);
-    }
-
-    @Override
-    public void validate() {
-
     }
 }

@@ -2,8 +2,7 @@ package core.framework.test.module;
 
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.module.ModuleContext;
-
-import java.util.Optional;
+import core.framework.util.Exceptions;
 
 /**
  * @author neo
@@ -14,8 +13,10 @@ public class TestModuleContext extends ModuleContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Optional<T> findConfig(Class<T> configClass, String name) {
-        return Optional.ofNullable((T) configs.get(configClass.getCanonicalName() + ":" + name));
+    public <T> T getConfig(Class<T> configClass, String name) {
+        T config = (T) configs.get(configClass.getCanonicalName() + ":" + name);
+        if (config == null) throw Exceptions.error("can not find config, configClass={}, name={}", configClass.getCanonicalName(), name);
+        return config;
     }
 
     @SuppressWarnings("unchecked")

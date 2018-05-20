@@ -6,6 +6,7 @@ import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.impl.db.DatabaseImpl;
 import core.framework.impl.db.Vendor;
+import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.resource.PoolMetrics;
 import core.framework.util.Exceptions;
@@ -18,18 +19,26 @@ import java.util.List;
 /**
  * @author neo
  */
-public class DBConfig implements Config {
-    protected final String name;
+public class DBConfig extends Config {
     final List<Class<?>> entityClasses = Lists.newArrayList();
-    final DatabaseImpl database;
-    private final ModuleContext context;
+    protected String name;
+    DatabaseImpl database;
+    private ModuleContext context;
     private String url;
     private boolean entityAdded;
 
-    DBConfig(ModuleContext context, String name) {
+    @Override
+    protected void initialize(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
         this.database = createDatabase();
+    }
+
+    @Override
+    protected void validate() {
+        if (url == null) throw Exceptions.error("db url must be configured, name={}", name);
+        if (!entityAdded)
+            throw Exceptions.error("db is configured but no repository/view added, please remove unnecessary config, name={}", name);
     }
 
     private DatabaseImpl createDatabase() {
@@ -42,7 +51,7 @@ public class DBConfig implements Config {
     }
 
     public void url(String url) {
-        if (this.url != null) throw Exceptions.error("db({}).url() is already configured, url={}, previous={}", name == null ? "" : name, url, this.url);
+        if (this.url != null) throw Exceptions.error("db url is already configured, name={}, url={}, previous={}", name, url, this.url);
         Vendor vendor = vendor(url);
         database.vendor = vendor;
         database.url(databaseURL(url, vendor));
@@ -100,22 +109,15 @@ public class DBConfig implements Config {
     }
 
     public void view(Class<?> viewClass) {
-        if (url == null) throw Exceptions.error("db({}).url() must be configured first", name == null ? "" : name);
+        if (url == null) throw Exceptions.error("db url must be configured first, name={}", name);
         database.view(viewClass);
         entityAdded = true;
     }
 
     public <T> void repository(Class<T> entityClass) {
-        if (url == null) throw Exceptions.error("db({}).url() must be configured first", name == null ? "" : name);
+        if (url == null) throw Exceptions.error("db url must be configured first, name={}", name);
         context.beanFactory.bind(Types.generic(Repository.class, entityClass), name, database.repository(entityClass));
         entityAdded = true;
         entityClasses.add(entityClass);
-    }
-
-    @Override
-    public void validate() {
-        if (url == null) throw Exceptions.error("db({}).url() must be configured", name == null ? "" : name);
-        if (!entityAdded)
-            throw Exceptions.error("db({}) is configured but no repository/view added, please remove unnecessary config", name == null ? "" : name);
     }
 }
