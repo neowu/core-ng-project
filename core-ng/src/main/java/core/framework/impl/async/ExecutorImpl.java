@@ -39,7 +39,7 @@ public final class ExecutorImpl implements Executor {
     @Override
     public <T> Future<T> submit(String action, Callable<T> task) {
         ActionLog parentActionLog = logManager.currentActionLog();
-        String taskAction = parentActionLog.action + ":" + action;
+        String taskAction = taskAction(action, parentActionLog.action);
         String refId = parentActionLog.refId();
         boolean trace = parentActionLog.trace;
         return executor.submit(() -> {
@@ -56,5 +56,11 @@ public final class ExecutorImpl implements Executor {
                 logManager.end("=== task execution end ===");
             }
         });
+    }
+
+    String taskAction(String action, String parentAction) {
+        String postfix = ":" + action;
+        if (parentAction.endsWith(postfix)) return parentAction;
+        return parentAction + postfix;
     }
 }

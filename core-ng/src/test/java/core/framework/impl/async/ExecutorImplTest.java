@@ -48,4 +48,10 @@ class ExecutorImplTest {
         assertThat(taskActionLog.trace).isEqualTo(true);
         assertThat(taskActionLog.refId()).isEqualTo("refId");
     }
+
+    @Test
+    void taskAction() {
+        assertThat(executor.taskAction("task", "parentAction")).isEqualTo("parentAction:task");
+        assertThat(executor.taskAction("task", "parentAction:task")).isEqualTo("parentAction:task");
+    }
 }
