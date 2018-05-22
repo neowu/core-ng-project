@@ -26,6 +26,7 @@ import java.util.List;
 public final class SiteConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(SiteConfig.class);
 
+    boolean webSecurityConfigured;
     private ModuleContext context;
     private boolean messageConfigured;
 
@@ -48,9 +49,10 @@ public final class SiteConfig extends Config {
 
     public void message(List<String> paths, String... languages) {
         if (messageConfigured) {
-            throw Exceptions.error("site message can only be configured once and must before adding template");
+            throw new Error("site message can only be configured once and must before adding template");
         }
         messageConfigured = true;
+
         context.beanFactory.bind(Message.class, null, context.httpServer.siteManager.message);
         context.httpServer.siteManager.message.load(paths, languages);
     }
@@ -77,6 +79,9 @@ public final class SiteConfig extends Config {
     }
 
     public void enableWebSecurity(String... trustedSources) {
+        if (webSecurityConfigured) throw new Error("web security is already configured");
+        webSecurityConfigured = true;
+
         context.httpServer.handler.interceptors.add(new WebSecurityInterceptor(trustedSources));
     }
 

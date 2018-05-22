@@ -1,4 +1,6 @@
 ## Change log
+### 6.3.2 (5/22/2018 - )
+
 ### 6.3.1 (5/16/2018 - 5/22/2018)
 * site: update site.enableWebSecurity(String... trustedSources) to use CSP to replace x-frame-options since it's deprecated 
 * executor: tweak case when task submit another task to executor, to support async long polling or retry use cases 
