@@ -45,7 +45,7 @@ public final class SystemModule extends Module {
         });
         property("sys.cdn.host").ifPresent(host -> site().cdn().host(host));
         property("sys.publishAPI.allowCIDR").ifPresent(cidrs -> site().publishAPI(Strings.split(cidrs, ',')));
-        property("sys.webSecurity.trustedSources").ifPresent(trustedSources -> site().enableWebSecurity(Strings.split(trustedSources, ',')));
+        property("sys.webSecurity.contentSecurityPolicy").ifPresent(policy -> site().webSecurity(policy));
     }
 
     void configureHTTP() {

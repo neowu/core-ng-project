@@ -78,11 +78,11 @@ public final class SiteConfig extends Config {
         return new StaticContentConfig(controller);
     }
 
-    public void enableWebSecurity(String... trustedSources) {
+    public void webSecurity(String contentSecurityPolicy) {
         if (webSecurityConfigured) throw new Error("web security is already configured");
         webSecurityConfigured = true;
 
-        context.httpServer.handler.interceptors.add(new WebSecurityInterceptor(trustedSources));
+        context.httpServer.handler.interceptors.add(new WebSecurityInterceptor(contentSecurityPolicy));
     }
 
     public void publishAPI(String... cidrs) {

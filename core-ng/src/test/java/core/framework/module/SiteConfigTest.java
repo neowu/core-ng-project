@@ -19,7 +19,7 @@ class SiteConfigTest {
     @Test
     void enableWebSecurity() {
         config.webSecurityConfigured = true;
-        assertThatThrownBy(() -> config.enableWebSecurity("*"))
+        assertThatThrownBy(() -> config.webSecurity("default-src *;"))
                 .hasMessageContaining("already configured");
     }
 }

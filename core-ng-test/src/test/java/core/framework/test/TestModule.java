@@ -55,7 +55,7 @@ public class TestModule extends AbstractTestModule {
     private void configureSite() {
         site().session().redis("localhost");
         site().cdn().host("//cdn");
-        site().enableWebSecurity();
+        site().webSecurity(null);
         site().publishAPI("0.0.0.0/0");
     }
 
