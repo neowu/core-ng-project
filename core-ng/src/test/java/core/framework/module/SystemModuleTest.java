@@ -7,17 +7,24 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
 class SystemModuleTest {
     private SystemModule systemModule;
+    private ModuleContext context;
 
     @BeforeEach
     void createSystemModule() {
+        context = spy(new ModuleContext(new BeanFactory()));
+
         systemModule = new SystemModule(null);
-        systemModule.context = new ModuleContext(new BeanFactory());
+        systemModule.context = context;
 
         System.clearProperty("sys.http.port");
     }
@@ -46,5 +53,16 @@ class SystemModuleTest {
         systemModule.configureHTTP();
         assertNull(systemModule.context.httpServer.httpPort);
         assertEquals((Integer) 8082, systemModule.context.httpServer.httpsPort);
+    }
+
+    @Test
+    void configureSite() {
+        SiteConfig config = mock(SiteConfig.class);
+        when(systemModule.context.config(SiteConfig.class, null)).thenReturn(config);
+
+        systemModule.context.propertyManager.properties.set("sys.webSecurity.trustedSources", "https://cdn1,https://cdn2");
+        systemModule.configureSite();
+
+        verify(config).webSecurity("https://cdn1", "https://cdn2");
     }
 }

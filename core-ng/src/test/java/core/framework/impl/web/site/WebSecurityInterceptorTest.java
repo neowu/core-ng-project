@@ -19,7 +19,14 @@ class WebSecurityInterceptorTest {
 
     @BeforeEach
     void createWebSecurityInterceptor() {
-        interceptor = new WebSecurityInterceptor(null);
+        interceptor = new WebSecurityInterceptor();
+    }
+
+    @Test
+    void contentSecurityPolicy() {
+        assertThat(interceptor.contentSecurityPolicy()).isEqualTo("default-src https://*; img-src https://* data:; object-src 'none'; frame-src 'none';");
+        assertThat(interceptor.contentSecurityPolicy("*")).isEqualTo("default-src https://*; img-src https://* data:; object-src 'none'; frame-src 'none';");
+        assertThat(interceptor.contentSecurityPolicy("https://cdn", "https://ga")).isEqualTo("default-src 'self' https://cdn https://ga; img-src 'self' https://cdn https://ga data:; object-src 'none'; frame-src 'none';");
     }
 
     @Test

@@ -35,7 +35,7 @@ public final class SystemModule extends Module {
         });
     }
 
-    private void configureSite() {
+    void configureSite() {
         property("sys.session.host").ifPresent(host -> {
             if ("local".equals(host)) {
                 site().session().local();
@@ -45,7 +45,7 @@ public final class SystemModule extends Module {
         });
         property("sys.cdn.host").ifPresent(host -> site().cdn().host(host));
         property("sys.publishAPI.allowCIDR").ifPresent(cidrs -> site().publishAPI(Strings.split(cidrs, ',')));
-        property("sys.webSecurity.contentSecurityPolicy").ifPresent(policy -> site().webSecurity(policy));
+        property("sys.webSecurity.trustedSources").ifPresent(sources -> site().webSecurity(Strings.split(sources, ',')));
     }
 
     void configureHTTP() {
