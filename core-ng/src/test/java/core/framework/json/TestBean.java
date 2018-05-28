@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-class TestBean {
+public class TestBean {
     @Property(name = "map")
     public final Map<String, String> mapField = Maps.newHashMap();
 
@@ -47,7 +47,7 @@ class TestBean {
     @Property(name = "empty")
     public Empty empty;
 
-    enum TestEnum {
+    public enum TestEnum {
         @Property(name = "A1")
         A,
         @Property(name = "B1")
@@ -55,7 +55,7 @@ class TestBean {
         C
     }
 
-    static class Child {
+    public static class Child {
         @Property(name = "boolean")
         public Boolean booleanField;
 
@@ -63,7 +63,7 @@ class TestBean {
         public Long longField;
     }
 
-    static class Empty {
+    public static class Empty {
 
     }
 }
