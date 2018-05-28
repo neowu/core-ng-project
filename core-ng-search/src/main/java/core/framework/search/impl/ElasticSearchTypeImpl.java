@@ -7,6 +7,7 @@ import core.framework.log.Markers;
 import core.framework.search.AnalyzeRequest;
 import core.framework.search.BulkDeleteRequest;
 import core.framework.search.BulkIndexRequest;
+import core.framework.search.CompleteRequest;
 import core.framework.search.DeleteByQueryRequest;
 import core.framework.search.DeleteRequest;
 import core.framework.search.ElasticSearchType;
@@ -39,14 +40,21 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilders;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestion;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -121,6 +129,41 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         Aggregations aggregationResponse = response.getAggregations();
         Map<String, Aggregation> aggregations = aggregationResponse == null ? Maps.newHashMap() : aggregationResponse.asMap();
         return new SearchResponse<>(items, response.getHits().getTotalHits(), aggregations);
+    }
+
+    @Override
+    public List<String> complete(CompleteRequest request) {
+        StopWatch watch = new StopWatch();
+        long esTookTime = 0;
+        String index = request.index == null ? this.index : request.index;
+        int options = 0;
+        try {
+            SuggestBuilder suggest = new SuggestBuilder().setGlobalText(request.prefix);
+            for (String field : request.fields) {
+                CompletionSuggestionBuilder suggestion = SuggestBuilders.completionSuggestion(field).skipDuplicates(true);
+                if (request.limit != null) suggestion.size(request.limit);
+                suggest.addSuggestion("completion:" + field, suggestion);
+            }
+            SearchRequestBuilder builder = client().prepareSearch(index).setFetchSource(false).suggest(suggest);
+            logger.debug("complete, index={}, type={}, request={}", index, type, builder);
+
+            org.elasticsearch.action.search.SearchResponse response = builder.get();
+            esTookTime = response.getTook().nanos();
+            if (response.getFailedShards() > 0) logger.warn("some shard failed, response={}", response);
+
+            Set<String> suggestions = response.getSuggest().filter(CompletionSuggestion.class).stream()
+                                              .map(CompletionSuggestion::getOptions).flatMap(Collection::stream).map(option -> option.getText().string())
+                                              .collect(Collectors.toCollection(LinkedHashSet::new));
+            options = suggestions.size();
+            return new ArrayList<>(suggestions);
+        } catch (ElasticsearchException e) {
+            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("elasticsearch", elapsedTime, (int) options, 0);
+            logger.debug("complete, options={}, esTookTime={}, elapsedTime={}", options, esTookTime, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
     }
 
     @Override
@@ -318,7 +361,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("elasticsearch", elapsedTime, totalHits, 0);
-            logger.debug("foreach, totalHits={}, esTookTime={}, elapsedTime={}", totalHits, esTookTime, elapsedTime);
+            logger.debug("forEach, totalHits={}, esTookTime={}, elapsedTime={}", totalHits, esTookTime, elapsedTime);
         }
     }
 

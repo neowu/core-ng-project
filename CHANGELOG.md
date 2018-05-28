@@ -1,6 +1,8 @@
 ## Change log
-### 6.3.2 (5/22/2018 - )
+### 6.3.2 (5/22/2018 - 5/28/2018)
 * site: finalize csp design, make img-src supports data:, use sys.webSecurity.trustedSources to configure 
+* http: update undertow to 2.0.9
+* search: support auto complete
 
 ### 6.3.1 (5/16/2018 - 5/22/2018)
 * site: update site.enableWebSecurity(String... trustedSources) to use CSP to replace x-frame-options since it's deprecated 

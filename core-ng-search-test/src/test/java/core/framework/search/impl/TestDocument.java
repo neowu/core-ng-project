@@ -1,6 +1,7 @@
 package core.framework.search.impl;
 
 import core.framework.api.json.Property;
+import core.framework.api.validate.NotNull;
 import core.framework.search.Index;
 
 import java.time.ZonedDateTime;
@@ -12,6 +13,14 @@ import java.time.ZonedDateTime;
 public class TestDocument {
     @Property(name = "id")
     public String id;
+
+    @NotNull
+    @Property(name = "completion1")
+    public String completion1;
+
+    @NotNull
+    @Property(name = "completion2")
+    public String completion2;
 
     @Property(name = "string_field")
     public String stringField;

@@ -4,6 +4,12 @@
   "mappings": {
     "document": {
       "properties": {
+        "completion1": {
+          "type": "completion"
+        },
+        "completion2": {
+          "type": "completion"
+        },
         "string_field": {
           "type": "text",
           "analyzer": "standard"

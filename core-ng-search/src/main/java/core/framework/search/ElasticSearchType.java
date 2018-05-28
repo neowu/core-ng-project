@@ -2,6 +2,7 @@ package core.framework.search;
 
 import org.elasticsearch.index.query.QueryBuilder;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +12,15 @@ import java.util.Optional;
  */
 public interface ElasticSearchType<T> {
     SearchResponse<T> search(SearchRequest request);
+
+    List<String> complete(CompleteRequest request);
+
+    default List<String> complete(String prefix, String... fields) {
+        CompleteRequest request = new CompleteRequest();
+        request.prefix = prefix;
+        request.fields = Arrays.asList(fields);
+        return complete(request);
+    }
 
     Optional<T> get(GetRequest request);
 
