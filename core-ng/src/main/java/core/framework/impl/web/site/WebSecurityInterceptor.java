@@ -27,7 +27,7 @@ public final class WebSecurityInterceptor implements Interceptor {    // refer t
     String contentSecurityPolicy(String... trustedSources) {
         String sources;
         if (trustedSources.length == 0 || trustedSources.length == 1 && "*".equals(trustedSources[0])) {
-            sources = "https://*";
+            sources = "https://*:*";
         } else {
             sources = "'self' " + Arrays.stream(trustedSources).collect(Collectors.joining(" "));
         }
