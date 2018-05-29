@@ -1,5 +1,4 @@
 language: java
-# Get latest install-jdk.sh script
 before_install:
   - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
 matrix:
