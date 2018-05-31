@@ -60,13 +60,11 @@ final class QueryParamBeanTypeValidator implements TypeVisitor {
         String name = queryParam.name();
 
         boolean added = visitedQueryParams.add(queryParam.name());
-        if (!added) {
+        if (!added)
             throw Exceptions.error("found duplicate query param, field={}, name={}", Fields.path(field), name);
-        }
 
         Class<?> fieldClass = field.getType();
-        if (fieldClass.isEnum()) {
+        if (fieldClass.isEnum())
             JSONTypeValidator.validateEnumClass(fieldClass);
-        }
     }
 }

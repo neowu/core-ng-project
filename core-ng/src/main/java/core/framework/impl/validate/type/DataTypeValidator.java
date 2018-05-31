@@ -54,9 +54,8 @@ public class DataTypeValidator {
     }
 
     private void visitObject(Class<?> objectClass, Field owner, String path) {
-        if (visitedClasses.contains(objectClass)) {
+        if (visitedClasses.contains(objectClass))
             throw Exceptions.error("class must not have circular reference, field={}", Fields.path(owner));
-        }
 
         visitedClasses.add(objectClass);
 
@@ -80,9 +79,8 @@ public class DataTypeValidator {
             } else if (GenericTypes.isMap(fieldType)) {
                 if (!allowChild)
                     throw Exceptions.error("map field is not allowed, field={}", Fields.path(field));
-                if (!GenericTypes.isGenericStringMap(fieldType)) {
+                if (!GenericTypes.isGenericStringMap(fieldType))
                     throw Exceptions.error("map must be Map<String,T> and T must be class, type={}, field={}", type.getTypeName(), Fields.path(field));
-                }
                 visitValue(GenericTypes.mapValueClass(fieldType), field, fieldPath);
             } else {
                 visitValue(GenericTypes.rawClass(fieldType), field, fieldPath);
@@ -94,42 +92,40 @@ public class DataTypeValidator {
 
     private void visitValue(Class<?> valueClass, Field owner, String path) {
         if (Date.class.isAssignableFrom(valueClass))
-            throw Exceptions.error("java.util.Date is not supported, please use java.time.LocalDateTime instead, field={}", Fields.path(owner));
+            throw Exceptions.error("java.util.Date is not supported, please use java.time.LocalDateTime/ZonedDateTime instead, field={}", Fields.path(owner));
 
-        if (valueClass.isPrimitive()) {
+        if (valueClass.isPrimitive())
             throw Exceptions.error("primitive class is not supported, please use object type, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
-        }
 
         if (allowedValueClass.apply(valueClass)) return;
 
-        if (valueClass.getPackage() != null && valueClass.getPackage().getName().startsWith("java")) {
-            throw Exceptions.error("field class is not supported, please contract arch team, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
-        }
+        if (valueClass.getPackage() != null && valueClass.getPackage().getName().startsWith("java"))
+            throw Exceptions.error("field class is not supported, please use value types such as String/Boolean/Integer/Enum/LocalDateTime, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
 
-        if (owner != null && !allowChild) {
+        if (owner != null && !allowChild)
             throw Exceptions.error("child object is not allowed, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
-        }
 
         visitObject(valueClass, owner, path);
     }
 
     private void visitList(Type listType, Field owner, String path) {
-        if (!GenericTypes.isGenericList(listType)) {
+        if (!GenericTypes.isGenericList(listType))
             throw Exceptions.error("list must be List<T> and T must be class, type={}", listType.getTypeName());
-        }
+
         Class<?> valueClass = GenericTypes.listValueClass(listType);
         visitValue(valueClass, owner, path);
     }
 
     private void validateClass(Class<?> objectClass) {
+        if (objectClass.isPrimitive() || objectClass.getPackage() != null && objectClass.getPackage().getName().startsWith("java") || objectClass.isEnum())
+            throw Exceptions.error("class must be bean class, class={}", objectClass.getCanonicalName());
         if (objectClass.isMemberClass() && !Modifier.isStatic(objectClass.getModifiers()))
             throw Exceptions.error("class must be static, class={}", objectClass.getCanonicalName());
-
         if (objectClass.isInterface() || Modifier.isAbstract(objectClass.getModifiers()) || !Modifier.isPublic(objectClass.getModifiers()))
             throw Exceptions.error("class must be public concrete, class={}", objectClass.getCanonicalName());
-        if (!Object.class.equals(objectClass.getSuperclass())) {
+        if (!Object.class.equals(objectClass.getSuperclass()))
             throw Exceptions.error("class must not have super class, class={}", objectClass.getCanonicalName());
-        }
+
         Constructor<?>[] constructors = objectClass.getDeclaredConstructors();
         if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
             throw Exceptions.error("class must have only one public default constructor, class={}, constructors={}", objectClass.getCanonicalName(), Arrays.toString(constructors));

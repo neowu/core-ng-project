@@ -21,6 +21,7 @@ import core.framework.util.Strings;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Set;
 
@@ -56,7 +57,7 @@ public class WebServiceInterfaceValidator {
         if (path == null) throw Exceptions.error("service method must have @Path, method={}", Methods.path(method));
         new PathPatternValidator(path.value()).validate();
 
-        validateResponseBeanType(method.getGenericReturnType());
+        validateResponseBeanType(method.getGenericReturnType(), method);
 
         Set<String> pathVariables = pathVariables(path.value(), method);
         Type requestBeanType = null;
@@ -91,14 +92,10 @@ public class WebServiceInterfaceValidator {
     }
 
     void validateRequestBeanType(Type beanType, Method method) {    // due to it's common to forget @PathParam in service method param, this is to make error message more friendly
-        Class<?> beanClass = GenericTypes.rawClass(beanType);
-
-        if (Integer.class.equals(beanClass)
-                || Long.class.equals(beanClass)
-                || String.class.equals(beanClass)
-                || beanClass.isEnum()) {
-            throw Exceptions.error("request bean must not be value type, if it is path param, please add @PathParam, beanClass={}, method={}", beanClass.getCanonicalName(), Methods.path(method));
-        }
+        boolean isGenericButNotList = beanType instanceof ParameterizedType && !GenericTypes.isGenericList(beanType);
+        boolean isValueType = beanType instanceof Class && isValueType((Class<?>) beanType);
+        if (isGenericButNotList || isValueType)
+            throw Exceptions.error("request bean type must be bean class or List<T>, if it is path param, please add @PathParam, beanType={}, method={}", beanType.getTypeName(), Methods.path(method));
     }
 
     private Set<String> pathVariables(String path, Method method) {
@@ -117,7 +114,7 @@ public class WebServiceInterfaceValidator {
 
     private void validatePathParamType(Type paramType, Method method) {
         if (!(paramType instanceof Class))
-            throw Exceptions.error("path param must be class, type={}, method={}", paramType.getTypeName(), Methods.path(method));
+            throw Exceptions.error("path param must be class type, type={}, method={}", paramType.getTypeName(), Methods.path(method));
 
         Class<?> paramClass = (Class<?>) paramType;
 
@@ -134,9 +131,16 @@ public class WebServiceInterfaceValidator {
         throw Exceptions.error("path param class is not supported, paramClass={}, method={}", paramClass, Methods.path(method));
     }
 
-    private void validateResponseBeanType(Type responseBeanType) {
-        if (void.class == responseBeanType) return;
-        responseBeanTypeValidator.validate(responseBeanType);
+    void validateResponseBeanType(Type beanType, Method method) {
+        if (void.class == beanType) return;
+
+        // due to it's common to return wrong type as response, this is to make error message more friendly
+        boolean isGenericButNotOptionalOrList = beanType instanceof ParameterizedType && !GenericTypes.isGenericOptional(beanType) && !GenericTypes.isGenericList(beanType);
+        boolean isValueType = beanType instanceof Class && isValueType((Class<?>) beanType);
+        if (isGenericButNotOptionalOrList || isValueType)
+            throw Exceptions.error("response bean type must be bean class, Optional<T> or List<T>, beanType={}, method={}", beanType.getTypeName(), Methods.path(method));
+
+        responseBeanTypeValidator.validate(beanType);
     }
 
     private void validateHTTPMethod(Method method) {
@@ -148,5 +152,9 @@ public class WebServiceInterfaceValidator {
         if (method.isAnnotationPresent(PATCH.class)) count++;
         if (count != 1)
             throw Exceptions.error("method must have exact one http method annotation, method={}", Methods.path(method));
+    }
+
+    private boolean isValueType(Class<?> type) {
+        return type.isPrimitive() || type.getPackage() != null && type.getPackage().getName().startsWith("java") || type.isEnum();
     }
 }

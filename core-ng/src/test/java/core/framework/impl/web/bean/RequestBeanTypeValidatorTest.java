@@ -3,8 +3,7 @@ package core.framework.impl.web.bean;
 import core.framework.util.Types;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -18,8 +17,9 @@ class RequestBeanTypeValidatorTest {
 
     @Test
     void optionalType() {
-        Error error = assertThrows(Error.class, () -> new RequestBeanTypeValidator(Types.optional(TestBean.class)).validate());
-        assertTrue(error.getMessage().startsWith("top level optional is not allowed"));
+        assertThatThrownBy(() -> new RequestBeanTypeValidator(Types.optional(TestBean.class)).validate())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("top level optional is not allowed");
     }
 
     @Test
