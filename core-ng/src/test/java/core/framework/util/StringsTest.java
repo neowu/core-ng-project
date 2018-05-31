@@ -2,6 +2,7 @@ package core.framework.util;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,17 +15,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class StringsTest {
     @Test
     void stringEquals() {
-        assertTrue(Strings.equals(null, null));
-        assertFalse(Strings.equals(null, ""));
-        assertFalse(Strings.equals("", null));
-        assertTrue(Strings.equals("", ""));
+        assertThat(Strings.equals(null, null)).isTrue();
+        assertThat(Strings.equals(null, "")).isFalse();
+        assertThat(Strings.equals("", null)).isFalse();
+        assertThat(Strings.equals("", "")).isTrue();
     }
 
     @Test
     void compare() {
-        assertEquals(-1, Strings.compare(null, ""));
-        assertEquals(1, Strings.compare("b", "a"));
-        assertEquals(0, Strings.compare(null, null));
+        assertThat(Strings.compare(null, "")).isEqualTo(-1);
+        assertThat(Strings.compare("b", "a")).isEqualTo(1);
+        assertThat(Strings.compare(null, null)).isZero();
     }
 
     @Test
