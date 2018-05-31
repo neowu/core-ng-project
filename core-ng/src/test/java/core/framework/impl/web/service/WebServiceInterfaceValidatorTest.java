@@ -32,6 +32,12 @@ class WebServiceInterfaceValidatorTest {
 
         assertThatThrownBy(() -> validator.validateRequestBeanType(Integer.class, method))
                 .isInstanceOf(Error.class).hasMessageContaining("if it is path param, please add @PathParam");
+
+        assertThatThrownBy(() -> validator.validateRequestBeanType(TestEnum.class, method))
+                .isInstanceOf(Error.class).hasMessageContaining("if it is path param, please add @PathParam");
+
+        assertThatThrownBy(() -> validator.validateRequestBeanType(Types.map(String.class, String.class), method))
+                .isInstanceOf(Error.class).hasMessageContaining("request bean type must be bean class or List<T>");
     }
 
     @Test
@@ -39,9 +45,13 @@ class WebServiceInterfaceValidatorTest {
         Method method = TestWebService.class.getDeclaredMethod("get", Integer.class);
 
         assertThatThrownBy(() -> validator.validateResponseBeanType(Integer.class, method))
-                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be bean class");
+                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be bean class, Optional<T> or List<T>");
 
         assertThatThrownBy(() -> validator.validateResponseBeanType(Types.map(String.class, String.class), method))
-                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be bean class");
+                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be bean class, Optional<T> or List<T>");
+    }
+
+    enum TestEnum {
+        A
     }
 }
