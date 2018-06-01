@@ -23,4 +23,10 @@ class SQLParamsTest {
         SQLParams params = new SQLParams(null);
         assertThat(params.toString()).isEqualTo("[]");
     }
+
+    @Test
+    void toStringWithNull() {
+        SQLParams params = new SQLParams(null, (Object[]) null);
+        assertThat(params.toString()).isEqualTo("null");
+    }
 }

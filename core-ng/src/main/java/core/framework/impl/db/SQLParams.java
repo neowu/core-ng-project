@@ -14,7 +14,7 @@ public class SQLParams {
 
     @Override
     public String toString() {
-        if (params == null) return null;
+        if (params == null) return "null";
         StringBuilder builder = new StringBuilder().append('[');
         int length = params.length;
         for (int i = 0; i < length; i++) {
