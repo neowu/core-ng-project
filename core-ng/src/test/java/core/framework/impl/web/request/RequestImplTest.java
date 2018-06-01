@@ -2,6 +2,7 @@ package core.framework.impl.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
+import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.impl.web.bean.TestQueryParamBean;
@@ -21,7 +22,7 @@ class RequestImplTest {
 
     @BeforeEach
     void createRequest() {
-        request = new RequestImpl(null, new RequestBeanMapper());
+        request = new RequestImpl(null, new RequestBeanMapper(new BeanClassNameValidator()));
     }
 
     @Test
@@ -34,7 +35,7 @@ class RequestImplTest {
     }
 
     @Test
-    void beanWithJsonPost() {
+    void beanWithJSONPost() {
         request.method = HTTPMethod.POST;
         request.contentType = ContentType.APPLICATION_JSON;
         request.body = Strings.bytes("{\"big_decimal_field\": 1}");

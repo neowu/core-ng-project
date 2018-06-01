@@ -15,20 +15,21 @@ import core.framework.impl.web.service.WebServiceControllerBuilder;
 import core.framework.impl.web.service.WebServiceImplValidator;
 import core.framework.impl.web.service.WebServiceInterfaceValidator;
 import core.framework.util.ASCII;
-import core.framework.util.Lists;
+import core.framework.util.Exceptions;
+import core.framework.util.Maps;
 import core.framework.web.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author neo
  */
 public class APIConfig extends Config {
-    final List<Class<?>> serviceInterfaces = Lists.newArrayList();
+    final Map<String, Class<?>> serviceInterfaces = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private ModuleContext context;
     private HTTPClient httpClient;
@@ -67,7 +68,8 @@ public class APIConfig extends Config {
             }
         }
 
-        serviceInterfaces.add(serviceInterface);
+        Class<?> previous = serviceInterfaces.putIfAbsent(serviceInterface.getSimpleName(), serviceInterface);
+        if (previous != null) throw Exceptions.error("found service interface with duplicate name which can be confusing, please use different class name, previousClass={}, class={}", previous.getCanonicalName(), serviceInterface.getCanonicalName());
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {

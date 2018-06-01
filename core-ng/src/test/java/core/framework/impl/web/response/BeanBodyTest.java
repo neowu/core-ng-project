@@ -1,5 +1,6 @@
 package core.framework.impl.web.response;
 
+import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.util.Lists;
@@ -17,7 +18,7 @@ class BeanBodyTest {
 
     @BeforeEach
     void createResponseBeanTypeValidator() {
-        validator = new ResponseBeanTypeValidator();
+        validator = new ResponseBeanTypeValidator(new BeanClassNameValidator());
     }
 
     @Test

@@ -26,7 +26,7 @@ class APIConfigTest {
     void service() {
         config.service(TestWebService.class, new TestWebServiceImpl());
 
-        assertThat(config.serviceInterfaces).contains(TestWebService.class);
+        assertThat(config.serviceInterfaces).containsEntry("TestWebService", TestWebService.class);
     }
 
     public interface TestWebService {

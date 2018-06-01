@@ -1,5 +1,6 @@
 package core.framework.impl.web.service;
 
+import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.util.Types;
@@ -18,7 +19,8 @@ class WebServiceInterfaceValidatorTest {
 
     @BeforeEach
     void createWebServiceInterfaceValidator() {
-        validator = new WebServiceInterfaceValidator(TestWebService.class, new RequestBeanMapper(), new ResponseBeanTypeValidator());
+        var classNameValidator = new BeanClassNameValidator();
+        validator = new WebServiceInterfaceValidator(TestWebService.class, new RequestBeanMapper(classNameValidator), new ResponseBeanTypeValidator(classNameValidator));
     }
 
     @Test

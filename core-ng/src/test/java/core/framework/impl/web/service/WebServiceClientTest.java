@@ -6,6 +6,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.impl.json.JSONMapper;
+import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.json.JSON;
 import core.framework.log.Severity;
@@ -31,7 +32,7 @@ class WebServiceClientTest {
 
     @BeforeEach
     void createWebServiceClient() {
-        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(), null);
+        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(new BeanClassNameValidator()), null);
     }
 
     @Test

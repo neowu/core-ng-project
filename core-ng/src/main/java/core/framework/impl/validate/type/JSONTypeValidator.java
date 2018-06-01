@@ -1,7 +1,7 @@
 package core.framework.impl.validate.type;
 
 import core.framework.api.json.Property;
-import core.framework.impl.reflect.Enums;
+import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,13 +23,16 @@ import java.util.Set;
  * @author neo
  */
 public class JSONTypeValidator implements TypeVisitor {
-    public static void validateEnumClass(Class<?> enumClass) {
-        Enum<?>[] constants = (Enum<?>[]) enumClass.getEnumConstants();
-        for (Enum<?> constant : constants) {
-            Property property = Enums.constantAnnotation(constant, Property.class);
-            if (property == null) {
-                throw Exceptions.error("enum must have @Property, enum={}", Enums.path(constant));
-            }
+    public static void validateEnum(Class<?> enumClass) {
+        Set<String> enumValues = Sets.newHashSet();
+        List<Field> fields = Classes.enumConstantFields(enumClass);
+        for (Field field : fields) {
+            Property property = field.getDeclaredAnnotation(Property.class);
+            if (property == null)
+                throw Exceptions.error("enum must have @Property, field={}", Fields.path(field));
+            boolean added = enumValues.add(property.name());
+            if (!added)
+                throw Exceptions.error("found duplicate property, field={}, name={}", Fields.path(field), property.name());
         }
     }
 
@@ -72,15 +76,14 @@ public class JSONTypeValidator implements TypeVisitor {
             throw Exceptions.error("@Property name attribute must not be empty, field={}", Fields.path(field));
         }
 
-        Set<String> properties = this.properties.computeIfAbsent(parentPath, key -> Sets.newHashSet());
-        if (properties.contains(name)) {
+        boolean added = this.properties.computeIfAbsent(parentPath, key -> Sets.newHashSet()).add(name);
+        if (!added) {
             throw Exceptions.error("found duplicate property, field={}, name={}", Fields.path(field), name);
         }
-        properties.add(name);
+    }
 
-        Class<?> fieldClass = field.getType();
-        if (fieldClass.isEnum()) {
-            validateEnumClass(fieldClass);
-        }
+    @Override
+    public void visitEnum(Class<?> enumClass, String parentPath) {
+        validateEnum(enumClass);
     }
 }

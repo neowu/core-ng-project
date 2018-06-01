@@ -5,7 +5,7 @@ import core.framework.db.Column;
 import core.framework.db.DBEnumValue;
 import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
-import core.framework.impl.reflect.Enums;
+import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -87,15 +88,30 @@ final class DatabaseClassValidator implements TypeVisitor {
             columns.add(column.name());
         }
 
-        if (fieldClass.isEnum()) {
-            validateEnumClass(fieldClass, field);
-        }
-
         PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
         if (primaryKey != null) {
             foundPrimaryKey = true;
 
             validatePrimaryKey(primaryKey, fieldClass, field);
+        }
+    }
+
+    @Override
+    public void visitEnum(Class<?> enumClass, String parentPath) {
+        Set<String> enumValues = Sets.newHashSet();
+        List<Field> fields = Classes.enumConstantFields(enumClass);
+        for (Field field : fields) {
+            DBEnumValue enumValue = field.getDeclaredAnnotation(DBEnumValue.class);
+            if (enumValue == null)
+                throw Exceptions.error("db enum must have @DBEnumValue, field={}", Fields.path(field));
+
+            boolean added = enumValues.add(enumValue.value());
+            if (!added)
+                throw Exceptions.error("found duplicate db enum value, field={}, value={}", Fields.path(field), enumValue.value());
+
+            Property property = field.getDeclaredAnnotation(Property.class);
+            if (property != null)
+                throw Exceptions.error("db enum must not have json annotation, please separate view and entity, field={}", Fields.path(field));
         }
     }
 
@@ -124,24 +140,5 @@ final class DatabaseClassValidator implements TypeVisitor {
 
         if (foundAutoIncrementalPrimaryKey && foundSequencePrimaryKey)
             throw Exceptions.error("db entity must not have both auto incremental and sequence primary key, field={}", Fields.path(field));
-    }
-
-    private void validateEnumClass(Class<?> enumClass, Field field) {
-        Enum<?>[] constants = (Enum<?>[]) enumClass.getEnumConstants();
-        Set<String> enumValues = Sets.newHashSet();
-        for (Enum<?> constant : constants) {
-            DBEnumValue enumValue = Enums.constantAnnotation(constant, DBEnumValue.class);
-            if (enumValue == null) {
-                throw Exceptions.error("db enum must have @DBEnumValue, field={}, enum={}", Fields.path(field), Enums.path(constant));
-            }
-            boolean added = enumValues.add(enumValue.value());
-            if (!added) {
-                throw Exceptions.error("db enum value must be unique, enum={}, value={}", Enums.path(constant), enumValue.value());
-            }
-            Property property = Enums.constantAnnotation(constant, Property.class);
-            if (property != null) {
-                throw Exceptions.error("db enum must not have json annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Enums.path(constant));
-            }
-        }
     }
 }

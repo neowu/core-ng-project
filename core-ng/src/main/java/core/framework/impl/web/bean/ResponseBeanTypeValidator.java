@@ -11,19 +11,38 @@ import java.util.Set;
  */
 public final class ResponseBeanTypeValidator {
     private final Set<Type> validatedTypes = Sets.newConcurrentHashSet();
+    private final BeanClassNameValidator classNameValidator;
+
+    public ResponseBeanTypeValidator(BeanClassNameValidator classNameValidator) {
+        this.classNameValidator = classNameValidator;
+    }
 
     public void validate(Type beanType) {
         if (!validatedTypes.contains(beanType)) {
-            new TypeValidator(beanType).validate();
+            new TypeValidator(beanType, classNameValidator).validate();
             validatedTypes.add(beanType);
         }
     }
 
     static class TypeValidator extends JSONTypeValidator {
-        TypeValidator(Type beanType) {
+        private final BeanClassNameValidator classNameValidator;
+
+        TypeValidator(Type beanType, BeanClassNameValidator classNameValidator) {
             super(beanType);
             validator.allowTopLevelOptional = true;
             validator.allowTopLevelList = true;
+            this.classNameValidator = classNameValidator;
+        }
+
+        @Override
+        public void visitEnum(Class<?> enumClass, String parentPath) {
+            super.visitEnum(enumClass, parentPath);
+            classNameValidator.validateBeanClass(enumClass);
+        }
+
+        @Override
+        public void visitClass(Class<?> objectClass, String path) {
+            classNameValidator.validateBeanClass(objectClass);
         }
     }
 }

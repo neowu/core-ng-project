@@ -11,19 +11,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RequestBeanTypeValidatorTest {
     @Test
     void listType() {
-        new RequestBeanTypeValidator(Types.list(String.class)).validate();
-        new RequestBeanTypeValidator(Types.list(TestBean.class)).validate();
+        var classNameValidator = new BeanClassNameValidator();
+        new RequestBeanTypeValidator(Types.list(String.class), classNameValidator).validate();
+        new RequestBeanTypeValidator(Types.list(TestBean.class), classNameValidator).validate();
     }
 
     @Test
     void optionalType() {
-        assertThatThrownBy(() -> new RequestBeanTypeValidator(Types.optional(TestBean.class)).validate())
+        assertThatThrownBy(() -> new RequestBeanTypeValidator(Types.optional(TestBean.class), new BeanClassNameValidator()).validate())
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("top level optional is not allowed");
     }
 
     @Test
     void beanType() {
-        new RequestBeanTypeValidator(TestBean.class).validate();
+        new RequestBeanTypeValidator(TestBean.class, new BeanClassNameValidator()).validate();
     }
 }

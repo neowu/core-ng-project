@@ -1,6 +1,7 @@
 ## Change log
 ### 6.3.3 (5/28/2018 - )
 * api: make error message more friendly when service response returns value type
+* api: add validation to prevent from using same simple class name for service interface and request/response bean, in order to improve maintainability and simplify API typescript definition generation  
 * db: fix sql params log should log @DBEnumValue value instead of enum.name()
 
 ### 6.3.2 (5/22/2018 - 5/28/2018)

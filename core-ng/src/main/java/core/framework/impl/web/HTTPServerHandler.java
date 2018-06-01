@@ -2,6 +2,7 @@ package core.framework.impl.web;
 
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
+import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.request.RequestImpl;
@@ -28,12 +29,13 @@ public class HTTPServerHandler implements HttpHandler {
     public static final HttpString HEADER_CLIENT = new HttpString("client");
 
     public final RequestParser requestParser = new RequestParser();
-    public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper();
-    public final ResponseBeanTypeValidator responseBeanTypeValidator = new ResponseBeanTypeValidator();
     public final Route route = new Route();
     public final Interceptors interceptors = new Interceptors();
     public final WebContextImpl webContext = new WebContextImpl();
     public final HTTPServerErrorHandler errorHandler;
+    private final BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
+    public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanClassNameValidator);
+    public final ResponseBeanTypeValidator responseBeanTypeValidator = new ResponseBeanTypeValidator(beanClassNameValidator);
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
     private final LogManager logManager;

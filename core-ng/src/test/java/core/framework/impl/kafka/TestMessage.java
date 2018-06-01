@@ -34,6 +34,16 @@ public class TestMessage {
     @Property(name = "children_field")
     public List<TestChild> childrenField;
 
+    @Property(name = "enum_field")
+    public TestEnum enumField;
+
+    public enum TestEnum {
+        @Property(name = "V1")
+        VALUE1,
+        @Property(name = "V2")
+        VALUE2
+    }
+
     public static class TestChild {
         @Property(name = "boolean_field")
         public Boolean booleanField;

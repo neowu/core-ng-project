@@ -97,9 +97,16 @@ public class DataTypeValidator {
         if (valueClass.isPrimitive())
             throw Exceptions.error("primitive class is not supported, please use object type, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
 
+        if (valueClass.isEnum()) {
+            if (visitor != null) {
+                visitor.visitEnum(valueClass, path);
+            }
+            return; // enum is allowed value type
+        }
+
         if (allowedValueClass.apply(valueClass)) return;
 
-        if (valueClass.getPackage() != null && valueClass.getPackage().getName().startsWith("java"))
+        if (valueClass.getPackageName().startsWith("java"))
             throw Exceptions.error("field class is not supported, please use value types such as String/Boolean/Integer/Enum/LocalDateTime, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));
 
         if (owner != null && !allowChild)
@@ -117,7 +124,7 @@ public class DataTypeValidator {
     }
 
     private void validateClass(Class<?> objectClass) {
-        if (objectClass.isPrimitive() || objectClass.getPackage() != null && objectClass.getPackage().getName().startsWith("java") || objectClass.isEnum())
+        if (objectClass.isPrimitive() || objectClass.getPackageName().startsWith("java") || objectClass.isEnum())
             throw Exceptions.error("class must be bean class, class={}", objectClass.getCanonicalName());
         if (objectClass.isMemberClass() && !Modifier.isStatic(objectClass.getModifiers()))
             throw Exceptions.error("class must be static, class={}", objectClass.getCanonicalName());

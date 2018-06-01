@@ -1,7 +1,7 @@
 package core.framework.mongo.impl;
 
 import core.framework.api.json.Property;
-import core.framework.impl.reflect.Enums;
+import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
@@ -16,6 +16,7 @@ import org.bson.types.ObjectId;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,14 +29,14 @@ public final class MongoClassValidator implements TypeVisitor {
     private boolean validateView;
     private Field id;
 
-    public MongoClassValidator(Class<?> entityClass) {
+    MongoClassValidator(Class<?> entityClass) {
         validator = new DataTypeValidator(entityClass);
         validator.allowedValueClass = this::allowedValueClass;
         validator.allowChild = true;
         validator.visitor = this;
     }
 
-    public void validateEntityClass() {
+    void validateEntityClass() {
         validator.validate();
 
         if (id == null) {
@@ -43,7 +44,7 @@ public final class MongoClassValidator implements TypeVisitor {
         }
     }
 
-    public void validateViewClass() {
+    void validateViewClass() {
         validateView = true;
         validator.validate();
     }
@@ -81,29 +82,25 @@ public final class MongoClassValidator implements TypeVisitor {
                 throw Exceptions.error("found duplicate field, field={}, mongoField={}", Fields.path(field), mongoFieldName);
             }
             fields.add(mongoFieldName);
-
-            Class<?> fieldClass = field.getType();
-            if (fieldClass.isEnum()) {
-                validateEnumClass(fieldClass, field);
-            }
         }
     }
 
-    private void validateEnumClass(Class<?> enumClass, Field field) {
-        Enum<?>[] constants = (Enum<?>[]) enumClass.getEnumConstants();
+    @Override
+    public void visitEnum(Class<?> enumClass, String parentPath) {
         Set<String> enumValues = Sets.newHashSet();
-        for (Enum<?> constant : constants) {
-            MongoEnumValue enumValue = Enums.constantAnnotation(constant, MongoEnumValue.class);
+        List<Field> fields = Classes.enumConstantFields(enumClass);
+        for (Field field : fields) {
+            MongoEnumValue enumValue = field.getDeclaredAnnotation(MongoEnumValue.class);
             if (enumValue == null) {
-                throw Exceptions.error("mongo enum must have @MongoEnumValue, field={}, enum={}", Fields.path(field), Enums.path(constant));
+                throw Exceptions.error("mongo enum must have @MongoEnumValue, field={}", Fields.path(field));
             }
             boolean added = enumValues.add(enumValue.value());
             if (!added) {
-                throw Exceptions.error("mongo enum value must be unique, enum={}, value={}", Enums.path(constant), enumValue.value());
+                throw Exceptions.error("mongo enum value must be unique, field={}, value={}", Fields.path(field), enumValue.value());
             }
-            Property property = Enums.constantAnnotation(constant, Property.class);
+            Property property = field.getDeclaredAnnotation(Property.class);
             if (property != null) {
-                throw Exceptions.error("mongo enum must not have json annotation, please separate view and entity, field={}, enum={}", Fields.path(field), Enums.path(constant));
+                throw Exceptions.error("mongo enum must not have json annotation, please separate view and entity, field={}", Fields.path(field));
             }
         }
     }
@@ -118,7 +115,7 @@ public final class MongoClassValidator implements TypeVisitor {
             }
             id = field;
         } else {
-            throw Exceptions.error("mongo nested entity class must not have @Id field, field={}", field);
+            throw Exceptions.error("mongo nested entity class must not have @Id field, field={}", Fields.path(field));
         }
     }
 }

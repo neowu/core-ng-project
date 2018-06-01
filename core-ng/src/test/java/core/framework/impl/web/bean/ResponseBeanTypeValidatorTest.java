@@ -12,7 +12,7 @@ class ResponseBeanTypeValidatorTest {
 
     @BeforeEach
     void createResponseBeanTypeValidator() {
-        validator = new ResponseBeanTypeValidator();
+        validator = new ResponseBeanTypeValidator(new BeanClassNameValidator());
     }
 
     @Test

@@ -125,7 +125,7 @@ public class WebServiceInterfaceValidator {
         if (Long.class.equals(paramClass)) return;
         if (String.class.equals(paramClass)) return;
         if (paramClass.isEnum()) {
-            JSONTypeValidator.validateEnumClass(paramClass);
+            JSONTypeValidator.validateEnum(paramClass);
             return;
         }
         throw Exceptions.error("path param class is not supported, paramClass={}, method={}", paramClass, Methods.path(method));

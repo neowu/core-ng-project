@@ -15,6 +15,11 @@ import java.util.Map;
 public final class RequestBeanMapper {
     private final Map<Type, Validator> requestBeanValidators = Maps.newConcurrentHashMap();
     private final Map<Type, QueryParamMapperHolder<?>> queryParamMappers = Maps.newConcurrentHashMap();
+    private final BeanClassNameValidator classNameValidator;
+
+    public RequestBeanMapper(BeanClassNameValidator classNameValidator) {
+        this.classNameValidator = classNameValidator;
+    }
 
     public <T> Map<String, String> toParams(Type beanType, T bean) {
         QueryParamMapperHolder<T> holder = registerQueryParamBean(beanType);
@@ -32,7 +37,7 @@ public final class RequestBeanMapper {
     @SuppressWarnings("unchecked")
     public <T> QueryParamMapperHolder<T> registerQueryParamBean(Type beanType) {
         return (QueryParamMapperHolder<T>) queryParamMappers.computeIfAbsent(beanType, key -> {
-            new QueryParamBeanTypeValidator(beanType).validate();
+            new QueryParamBeanTypeValidator(beanType, classNameValidator).validate();
             QueryParamMapper<T> mapper = new QueryParamMapperBuilder<>((Class<T>) beanType).build();
             Validator validator = new Validator(beanType, field -> field.getDeclaredAnnotation(QueryParam.class).name());
             return new QueryParamMapperHolder<>(mapper, validator);
@@ -53,7 +58,7 @@ public final class RequestBeanMapper {
 
     public Validator registerRequestBean(Type beanType) {
         return requestBeanValidators.computeIfAbsent(beanType, type -> {
-            new RequestBeanTypeValidator(beanType).validate();
+            new RequestBeanTypeValidator(beanType, classNameValidator).validate();
             return new Validator(beanType, field -> field.getDeclaredAnnotation(Property.class).name());
         });
     }

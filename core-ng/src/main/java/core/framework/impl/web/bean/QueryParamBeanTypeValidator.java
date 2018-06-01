@@ -23,8 +23,10 @@ import java.util.Set;
 final class QueryParamBeanTypeValidator implements TypeVisitor {
     private final DataTypeValidator validator;
     private final Set<String> visitedQueryParams = Sets.newHashSet();
+    private final BeanClassNameValidator classNameValidator;
 
-    QueryParamBeanTypeValidator(Type beanType) {
+    QueryParamBeanTypeValidator(Type beanType, BeanClassNameValidator classNameValidator) {
+        this.classNameValidator = classNameValidator;
         validator = new DataTypeValidator(beanType);
         validator.allowedValueClass = this::allowedValueClass;
         validator.visitor = this;
@@ -48,6 +50,11 @@ final class QueryParamBeanTypeValidator implements TypeVisitor {
     }
 
     @Override
+    public void visitClass(Class<?> objectClass, String path) {
+        classNameValidator.validateBeanClass(objectClass);
+    }
+
+    @Override
     public void visitField(Field field, String parentPath) {
         QueryParam queryParam = field.getDeclaredAnnotation(QueryParam.class);
         if (queryParam == null)
@@ -62,9 +69,11 @@ final class QueryParamBeanTypeValidator implements TypeVisitor {
         boolean added = visitedQueryParams.add(queryParam.name());
         if (!added)
             throw Exceptions.error("found duplicate query param, field={}, name={}", Fields.path(field), name);
+    }
 
-        Class<?> fieldClass = field.getType();
-        if (fieldClass.isEnum())
-            JSONTypeValidator.validateEnumClass(fieldClass);
+    @Override
+    public void visitEnum(Class<?> enumClass, String parentPath) {
+        classNameValidator.validateBeanClass(enumClass);
+        JSONTypeValidator.validateEnum(enumClass);
     }
 }
