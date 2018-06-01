@@ -177,7 +177,7 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, returnedRows, 0);
-            logger.debug("select, sql={}, params={}, returnedRows={}, elapsedTime={}", sql, params, returnedRows, elapsedTime);
+            logger.debug("select, sql={}, params={}, returnedRows={}, elapsedTime={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -193,7 +193,7 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, returnedRows, 0);
-            logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsedTime={}", sql, params, returnedRows, elapsedTime);
+            logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsedTime={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -208,7 +208,7 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, 0, updatedRows);
-            logger.debug("execute, sql={}, params={}, updatedRows={}, elapsedTime={}", sql, params, updatedRows, elapsedTime);
+            logger.debug("execute, sql={}, params={}, updatedRows={}, elapsedTime={}", sql, new SQLParams(operation.enumMapper, params), updatedRows, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

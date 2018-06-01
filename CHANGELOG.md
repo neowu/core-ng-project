@@ -1,6 +1,7 @@
 ## Change log
 ### 6.3.3 (5/28/2018 - )
 * api: make error message more friendly when service response returns value type
+* db: fix sql params log should log @DBEnumValue value instead of enum.name()
 
 ### 6.3.2 (5/22/2018 - 5/28/2018)
 * site: finalize csp design, make img-src supports data:, use sys.webSecurity.trustedSources to configure 

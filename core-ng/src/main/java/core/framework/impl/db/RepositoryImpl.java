@@ -59,7 +59,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, 0, 1);
-            logger.debug("insert, sql={}, params={}, elapsedTime={}", sql, params, elapsedTime);
+            logger.debug("insert, sql={}, params={}, elapsedTime={}", sql, new SQLParams(database.operation.enumMapper, params), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -77,7 +77,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, 0, updatedRows);
-            logger.debug("update, sql={}, params={}, elapsedTime={}", query.sql, query.params, elapsedTime);
+            logger.debug("update, sql={}, params={}, elapsedTime={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -93,7 +93,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, 0, deletedRows);
-            logger.debug("delete, sql={}, params={}, elapsedTime={}", deleteSQL, primaryKeys, elapsedTime);
+            logger.debug("delete, sql={}, params={}, elapsedTime={}", deleteSQL, new SQLParams(database.operation.enumMapper, primaryKeys), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
