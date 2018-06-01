@@ -11,6 +11,7 @@ import org.junit.jupiter.api.TestInstance;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -57,7 +58,7 @@ class RepositoryImplAssignedIdEntityTest {
         Optional<Long> id = repository.insert(entity);
         assertFalse(id.isPresent());
 
-        AssignedIdEntity selectedEntity = repository.get(entity.id).get();
+        AssignedIdEntity selectedEntity = repository.get(entity.id).orElseThrow();
 
         assertEquals(entity.id, selectedEntity.id);
         assertEquals(entity.stringField, selectedEntity.stringField);
@@ -80,7 +81,7 @@ class RepositoryImplAssignedIdEntityTest {
         updatedEntity.dateField = LocalDate.of(2016, Month.JULY, 5);
         repository.update(updatedEntity);
 
-        AssignedIdEntity selectedEntity = repository.get(entity.id).get();
+        AssignedIdEntity selectedEntity = repository.get(entity.id).orElseThrow();
         assertEquals(updatedEntity.stringField, selectedEntity.stringField);
         assertEquals(entity.intField, selectedEntity.intField);
         assertEquals(updatedEntity.dateField, selectedEntity.dateField);
@@ -111,12 +112,12 @@ class RepositoryImplAssignedIdEntityTest {
         entity2.stringField = "value2";
         entity2.intField = 12;
 
-        repository.batchInsert(Lists.newArrayList(entity1, entity2));
+        repository.batchInsert(List.of(entity1, entity2));
 
-        AssignedIdEntity selectedEntity1 = repository.get("1").get();
+        AssignedIdEntity selectedEntity1 = repository.get("1").orElseThrow();
         assertEquals(entity1.stringField, selectedEntity1.stringField);
 
-        AssignedIdEntity selectedEntity2 = repository.get("2").get();
+        AssignedIdEntity selectedEntity2 = repository.get("2").orElseThrow();
         assertEquals(entity2.stringField, selectedEntity2.stringField);
     }
 

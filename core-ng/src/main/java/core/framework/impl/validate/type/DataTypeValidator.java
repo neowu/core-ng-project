@@ -9,10 +9,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * @author neo
@@ -20,11 +23,13 @@ import java.util.function.Function;
 public class DataTypeValidator {
     public final Type type;
     private final Set<Class<?>> visitedClasses = Sets.newHashSet();
+    public Set<Class<?>> allowedValueClasses = Set.of(String.class, Boolean.class,
+            Integer.class, Long.class, Double.class, BigDecimal.class,
+            LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
     public boolean allowTopLevelList;
     public boolean allowTopLevelValue;
     public boolean allowTopLevelOptional;
     public boolean allowChild;
-    public Function<Class<?>, Boolean> allowedValueClass;
     public TypeVisitor visitor;
 
     public DataTypeValidator(Type type) {
@@ -38,7 +43,7 @@ public class DataTypeValidator {
             if (!allowTopLevelList) throw Exceptions.error("top level list is not allowed, type={}", type.getTypeName());
             visitList(type, null, null);
         } else {
-            if (allowTopLevelValue && allowedValueClass.apply(GenericTypes.rawClass(type))) return;
+            if (allowTopLevelValue && allowedValueClasses.contains(GenericTypes.rawClass(type))) return;
             visitObject(GenericTypes.rawClass(type), null, null);
         }
     }
@@ -104,7 +109,7 @@ public class DataTypeValidator {
             return; // enum is allowed value type
         }
 
-        if (allowedValueClass.apply(valueClass)) return;
+        if (allowedValueClasses.contains(valueClass)) return;
 
         if (valueClass.getPackageName().startsWith("java"))
             throw Exceptions.error("field class is not supported, please use value types such as String/Boolean/Integer/Enum/LocalDateTime, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner));

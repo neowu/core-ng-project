@@ -14,10 +14,6 @@ import core.framework.util.Sets;
 import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -34,7 +30,6 @@ final class DatabaseClassValidator implements TypeVisitor {
 
     DatabaseClassValidator(Class<?> entityClass) {
         validator = new DataTypeValidator(entityClass);
-        validator.allowedValueClass = this::allowedValueClass;
         validator.visitor = this;
     }
 
@@ -48,19 +43,6 @@ final class DatabaseClassValidator implements TypeVisitor {
     void validateViewClass() {
         validateView = true;
         validator.validate();
-    }
-
-    private boolean allowedValueClass(Class<?> valueClass) {
-        return String.class.equals(valueClass)
-                || Integer.class.equals(valueClass)
-                || Boolean.class.equals(valueClass)
-                || Long.class.equals(valueClass)
-                || Double.class.equals(valueClass)
-                || BigDecimal.class.equals(valueClass)
-                || LocalDate.class.equals(valueClass)
-                || LocalDateTime.class.equals(valueClass)
-                || ZonedDateTime.class.equals(valueClass)
-                || valueClass.isEnum();
     }
 
     @Override

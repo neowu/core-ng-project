@@ -115,7 +115,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         document("1", "value1", 1);
         document("2", "value2", 2);
 
-        documentType.bulkDelete(Lists.newArrayList("1", "2"));
+        documentType.bulkDelete(List.of("1", "2"));
         assertThat(documentType.get("1")).isNotPresent();
         assertThat(documentType.get("2")).isNotPresent();
     }

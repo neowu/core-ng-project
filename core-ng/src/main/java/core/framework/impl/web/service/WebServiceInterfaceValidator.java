@@ -128,7 +128,7 @@ public class WebServiceInterfaceValidator {
             JSONTypeValidator.validateEnum(paramClass);
             return;
         }
-        throw Exceptions.error("path param class is not supported, paramClass={}, method={}", paramClass, Methods.path(method));
+        throw Exceptions.error("path param class is not supported, paramClass={}, method={}", paramClass.getCanonicalName(), Methods.path(method));
     }
 
     void validateResponseBeanType(Type beanType, Method method) {
@@ -155,6 +155,6 @@ public class WebServiceInterfaceValidator {
     }
 
     private boolean isValueType(Class<?> type) {
-        return type.isPrimitive() || type.getPackage() != null && type.getPackage().getName().startsWith("java") || type.isEnum();
+        return type.isPrimitive() || type.getPackageName().startsWith("java") || type.isEnum();
     }
 }

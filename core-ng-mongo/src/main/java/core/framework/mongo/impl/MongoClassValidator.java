@@ -31,7 +31,9 @@ public final class MongoClassValidator implements TypeVisitor {
 
     MongoClassValidator(Class<?> entityClass) {
         validator = new DataTypeValidator(entityClass);
-        validator.allowedValueClass = this::allowedValueClass;
+        validator.allowedValueClasses = Set.of(ObjectId.class, String.class, Boolean.class,
+                Integer.class, Long.class, Double.class,
+                LocalDateTime.class, ZonedDateTime.class);
         validator.allowChild = true;
         validator.visitor = this;
     }
@@ -47,18 +49,6 @@ public final class MongoClassValidator implements TypeVisitor {
     void validateViewClass() {
         validateView = true;
         validator.validate();
-    }
-
-    private boolean allowedValueClass(Class<?> valueClass) {
-        return String.class.equals(valueClass)
-                || ObjectId.class.equals(valueClass)
-                || Integer.class.equals(valueClass)
-                || Boolean.class.equals(valueClass)
-                || Long.class.equals(valueClass)
-                || Double.class.equals(valueClass)
-                || LocalDateTime.class.equals(valueClass)
-                || ZonedDateTime.class.equals(valueClass)
-                || valueClass.isEnum();
     }
 
     @Override

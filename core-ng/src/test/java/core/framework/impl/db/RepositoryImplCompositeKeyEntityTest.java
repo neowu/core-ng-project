@@ -1,12 +1,13 @@
 package core.framework.impl.db;
 
 import core.framework.db.Repository;
-import core.framework.util.Lists;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,7 +50,7 @@ class RepositoryImplCompositeKeyEntityTest {
 
         repository.insert(entity);
 
-        CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).get();
+        CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).orElseThrow();
 
         assertEquals(entity.id1, selectedEntity.id1);
         assertEquals(entity.id2, selectedEntity.id2);
@@ -69,7 +70,7 @@ class RepositoryImplCompositeKeyEntityTest {
         entity.longField = 2L;
         repository.update(entity);
 
-        CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).get();
+        CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).orElseThrow();
         assertEquals(entity.longField, selectedEntity.longField);
     }
 
@@ -83,9 +84,9 @@ class RepositoryImplCompositeKeyEntityTest {
         entity2.id1 = "2-1";
         entity2.id2 = "2-2";
         entity2.booleanField = true;
-        repository.batchInsert(Lists.newArrayList(entity1, entity2));
+        repository.batchInsert(List.of(entity1, entity2));
 
-        repository.batchDelete(Lists.newArrayList(new Object[]{entity1.id1, entity1.id2}, new Object[]{entity2.id1, entity2.id2}));
+        repository.batchDelete(List.of(new Object[]{entity1.id1, entity1.id2}, new Object[]{entity2.id1, entity2.id2}));
 
         assertFalse(repository.get(entity1.id1, entity1.id2).isPresent());
         assertFalse(repository.get(entity2.id1, entity2.id2).isPresent());

@@ -41,27 +41,15 @@ public class JSONTypeValidator implements TypeVisitor {
 
     protected JSONTypeValidator(Type instanceType) {
         validator = new DataTypeValidator(instanceType);
-        validator.allowedValueClass = this::allowedValueClass;
+        validator.allowedValueClasses = Set.of(String.class, Boolean.class,
+                Integer.class, Long.class, Double.class, BigDecimal.class,
+                LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class);
         validator.allowChild = true;
         validator.visitor = this;
     }
 
     public void validate() {
         validator.validate();
-    }
-
-    private boolean allowedValueClass(Class<?> valueClass) {
-        return String.class.equals(valueClass)
-                || Integer.class.equals(valueClass)
-                || Boolean.class.equals(valueClass)
-                || Long.class.equals(valueClass)
-                || Double.class.equals(valueClass)
-                || BigDecimal.class.equals(valueClass)
-                || LocalDate.class.equals(valueClass)
-                || LocalDateTime.class.equals(valueClass)
-                || ZonedDateTime.class.equals(valueClass)
-                || Instant.class.equals(valueClass)
-                || valueClass.isEnum();
     }
 
     @Override

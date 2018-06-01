@@ -18,6 +18,7 @@ import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -55,7 +56,7 @@ class EntityEncoderBuilderTest {
         entity.child = new TestEntityChild();
         entity.child.enumField = TestEntityChild.TestEnum.ITEM1;
         entity.child.enumListField = Lists.newArrayList(TestEntityChild.TestEnum.ITEM2);
-        entity.listField = Lists.newArrayList("V1", "V2");
+        entity.listField = List.of("V1", "V2");
         entity.mapField = Maps.newHashMap();
         entity.mapField.put("K1", "V1");
         entity.mapField.put("K2", "V2");
