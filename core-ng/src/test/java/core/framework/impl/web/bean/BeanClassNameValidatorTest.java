@@ -1,9 +1,9 @@
 package core.framework.impl.web.bean;
 
+import core.framework.impl.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -18,16 +18,11 @@ class BeanClassNameValidatorTest {
     }
 
     @Test
-    void className() {
-        assertThat(validator.className(TestBean.class)).isEqualTo("BeanClassNameValidatorTest$TestBean");
-    }
-
-    @Test
     void validateBeanClass() {
-        validator.registeredClasses.put(validator.className(TestBean.class), Void.class);
+        validator.registeredClasses.put(Classes.className(TestBean.class), Void.class);
 
         assertThatThrownBy(() -> validator.validateBeanClass(TestBean.class))
-            .isInstanceOf(Error.class).hasMessageContaining("found bean class with duplicate name");
+                .isInstanceOf(Error.class).hasMessageContaining("found bean class with duplicate name");
     }
 
     public static class TestBean {

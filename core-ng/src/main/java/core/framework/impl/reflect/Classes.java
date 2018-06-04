@@ -23,4 +23,12 @@ public final class Classes {
                      .filter(Field::isEnumConstant)
                      .collect(Collectors.toList());
     }
+
+    // return class name without package, e.g. for nested class will be EnclosingClass$NestedClass
+    public static String className(Class<?> valueClass) {
+        String name = valueClass.getName();
+        int index = name.lastIndexOf('.');
+        if (index < 0) return name;
+        return name.substring(index + 1);
+    }
 }

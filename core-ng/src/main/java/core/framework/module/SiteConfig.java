@@ -5,6 +5,7 @@ import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.http.IPAccessControl;
 import core.framework.impl.web.management.APIController;
+import core.framework.impl.web.management.APIControllerV2;
 import core.framework.impl.web.site.StaticContentController;
 import core.framework.impl.web.site.StaticDirectoryController;
 import core.framework.impl.web.site.StaticFileController;
@@ -90,5 +91,6 @@ public class SiteConfig extends Config {
 
         logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
         context.route(HTTPMethod.GET, "/_sys/api", new APIController(config.serviceInterfaces, new IPAccessControl(cidrs)), true);
+        context.route(HTTPMethod.GET, "/_sys/api/v2", new APIControllerV2(config.serviceInterfaces, new IPAccessControl(cidrs)), true);
     }
 }

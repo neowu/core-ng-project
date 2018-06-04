@@ -54,9 +54,9 @@ public interface TestWebService {
     void patch(@PathParam("id") Integer id, TestRequest request);
 
     enum TestEnum {
-        @Property(name = "A")
+        @Property(name = "A1")
         A,
-        @Property(name = "B")
+        @Property(name = "B1")
         B
     }
 
