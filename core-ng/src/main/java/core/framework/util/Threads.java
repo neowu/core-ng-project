@@ -23,7 +23,7 @@ public final class Threads {
 
     static long sleepTime(Duration duration) {
         long milliseconds = duration.toMillis();
-        double times = Randoms.number(0.8, 1.2); // +/-20% random
+        double times = Randoms.nextDouble(0.8, 1.2); // +/-20% random
         return (long) (milliseconds * times);
     }
 }

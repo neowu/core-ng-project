@@ -15,7 +15,13 @@ public final class Randoms {
         return builder.toString();
     }
 
-    public static double number(double min, double max) {
+    // return next double, ranges in [min, max)
+    public static double nextDouble(double min, double max) {
         return (max - min) * ThreadLocalRandom.current().nextDouble() + min;
+    }
+
+    // return next int, ranges in [min, max)
+    public static int nextInt(int min, int max) {
+        return min + ThreadLocalRandom.current().nextInt(max - min);
     }
 }

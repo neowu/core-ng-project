@@ -104,7 +104,7 @@ public final class Scheduler {
     }
 
     void schedule(FixedRateTask task) {
-        Duration delay = Duration.ofMillis((long) Randoms.number(1000, 3000)); // delay 1s to 3s
+        Duration delay = Duration.ofMillis((long) Randoms.nextDouble(1000, 3000)); // delay 1s to 3s
         scheduler.scheduleAtFixedRate(() -> {
             logger.info("execute scheduled job, job={}", task.name());
             submitJob(task, false);
