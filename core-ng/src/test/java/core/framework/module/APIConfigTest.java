@@ -5,6 +5,7 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ class APIConfigTest {
     void service() {
         config.service(TestWebService.class, new TestWebServiceImpl());
 
-        assertThat(config.serviceInterfaces).containsEntry("TestWebService", TestWebService.class);
+        assertThat(config.serviceInterfaces).containsEntry(Classes.className(TestWebService.class), TestWebService.class);
     }
 
     public interface TestWebService {
