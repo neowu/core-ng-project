@@ -1,4 +1,8 @@
 ## Change log
+### 6.3.4 (6/4/2018 - )
+* db: added db().batchSize() to configure batch size on batchInsert and batchDelete
+* db: enable rewriteBatchedStatements=true for MySQL
+
 ### 6.3.3 (5/28/2018 - 6/4/2018)
 * api: make error message more friendly when service response returns value type
 * api: add validation to prevent from using same simple class name for service interface and request/response bean, in order to improve maintainability and simplify API typescript definition generation  

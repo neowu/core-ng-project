@@ -79,6 +79,11 @@ public class TestModule extends AbstractTestModule {
     private void configureDB() {
         db().url("jdbc:mysql://localhost:3306/test");
         db().defaultIsolationLevel(IsolationLevel.READ_UNCOMMITTED);
+        db().timeout(Duration.ofSeconds(10));
+        db().batchSize(7);
+        db().slowOperationThreshold(Duration.ofSeconds(5));
+        db().longTransactionThreshold(Duration.ofSeconds(5));
+        db().tooManyRowsReturnedThreshold(1000);
         db().repository(TestDBEntity.class);
         initDB().createSchema();
 

@@ -35,11 +35,11 @@ public final class DatabaseImpl implements Database {
 
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
     private final Map<Class<?>, RowMapper<?>> rowMappers = Maps.newHashMap();
-    public int tooManyRowsReturnedThreshold = 1000;
     public String user;
     public String password;
     public Vendor vendor;
-    long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
+    public int tooManyRowsReturnedThreshold = 1000;
+    public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     private String url;
     private Properties driverProperties;
     private Duration timeout;
@@ -90,6 +90,7 @@ public final class DatabaseImpl implements Database {
         if (url.startsWith("jdbc:mysql:")) {
             properties.put("connectTimeout", timeoutValue);
             properties.put("socketTimeout", timeoutValue);
+            properties.put("rewriteBatchedStatements", "true");     // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
         } else if (url.startsWith("jdbc:oracle:")) {
             properties.put("oracle.net.CONNECT_TIMEOUT", timeoutValue);
             properties.put("oracle.jdbc.ReadTimeout", timeoutValue);
@@ -133,10 +134,6 @@ public final class DatabaseImpl implements Database {
         } catch (ReflectiveOperationException e) {
             throw new Error(e);
         }
-    }
-
-    public void slowOperationThreshold(Duration threshold) {
-        slowOperationThresholdInNanos = threshold.toNanos();
     }
 
     public <T> void view(Class<T> viewClass) {

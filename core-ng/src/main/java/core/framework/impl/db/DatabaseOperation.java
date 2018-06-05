@@ -25,6 +25,7 @@ import java.util.Optional;
 public class DatabaseOperation {
     public final TransactionManager transactionManager;
     final EnumDBMapper enumMapper = new EnumDBMapper();
+    public int batchSize = 1000;   // use 1000 as default batch size by considering both MySQL and Oracle
     int queryTimeoutInSeconds;
 
     DatabaseOperation(Pool<Connection> pool) {
@@ -48,14 +49,22 @@ public class DatabaseOperation {
     }
 
     int[] batchUpdate(String sql, List<Object[]> params) {
+        int size = params.size();
+        int[] results = new int[size];
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
+            int index = 1;
             for (Object[] batchParams : params) {
                 setParams(statement, batchParams);
                 statement.addBatch();
+                if (index % batchSize == 0 || index == size) {
+                    int[] batchResult = statement.executeBatch();
+                    System.arraycopy(batchResult, 0, results, index - batchResult.length, batchResult.length);
+                }
+                index++;
             }
-            return statement.executeBatch();
+            return results;
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
@@ -159,8 +168,8 @@ public class DatabaseOperation {
     }
 
     private void setParams(PreparedStatement statement, Object... params) throws SQLException {
-        int index = 1;
         if (params != null) {
+            int index = 1;
             for (Object param : params) {
                 setParam(statement, index, param);
                 index++;

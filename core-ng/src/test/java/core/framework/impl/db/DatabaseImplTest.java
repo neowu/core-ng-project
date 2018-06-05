@@ -48,7 +48,7 @@ class DatabaseImplTest {
     void selectOneWithView() {
         insertRow(1, "string1", TestEnum.V1);
 
-        EntityView view = database.selectOne("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?", EntityView.class, 1).get();
+        EntityView view = database.selectOne("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?", EntityView.class, 1).orElseThrow();
 
         assertEquals("string1", view.stringField);
         assertEquals(TestEnum.V1, view.enumField);
@@ -81,10 +81,10 @@ class DatabaseImplTest {
 
     @Test
     void selectNumber() {
-        assertEquals(0, database.selectOne("SELECT count(id) FROM database_test", Integer.class).get().intValue());
-        assertEquals(0, database.selectOne("SELECT count(id) FROM database_test", Long.class).get().longValue());
-        assertEquals(0, database.selectOne("SELECT count(id) FROM database_test", Double.class).get().doubleValue());
-        assertEquals(BigDecimal.ZERO, database.selectOne("SELECT count(id) FROM database_test", BigDecimal.class).get());
+        assertEquals(0, database.selectOne("SELECT count(id) FROM database_test", Integer.class).orElseThrow().intValue());
+        assertEquals(0, database.selectOne("SELECT count(id) FROM database_test", Long.class).orElseThrow().longValue());
+        assertEquals(0, database.selectOne("SELECT count(id) FROM database_test", Double.class).orElseThrow().doubleValue());
+        assertEquals(BigDecimal.ZERO, database.selectOne("SELECT count(id) FROM database_test", BigDecimal.class).orElseThrow());
     }
 
     @Test
@@ -93,9 +93,9 @@ class DatabaseImplTest {
         LocalDateTime dateTime = LocalDateTime.of(2017, 11, 22, 13, 0, 0);
         database.execute("INSERT INTO database_test (id, date_field, date_time_field) VALUES (?, ?, ?)", 1, date, dateTime);
 
-        assertEquals(date, database.selectOne("SELECT date_field FROM database_test where id = ?", LocalDate.class, 1).get());
-        assertEquals(dateTime, database.selectOne("SELECT date_time_field FROM database_test where id = ?", LocalDateTime.class, 1).get());
-        assertEquals(dateTime, database.selectOne("SELECT date_time_field FROM database_test where id = ?", ZonedDateTime.class, 1).get().toLocalDateTime());
+        assertEquals(date, database.selectOne("SELECT date_field FROM database_test where id = ?", LocalDate.class, 1).orElseThrow());
+        assertEquals(dateTime, database.selectOne("SELECT date_time_field FROM database_test where id = ?", LocalDateTime.class, 1).orElseThrow());
+        assertEquals(dateTime, database.selectOne("SELECT date_time_field FROM database_test where id = ?", ZonedDateTime.class, 1).orElseThrow().toLocalDateTime());
     }
 
     @Test

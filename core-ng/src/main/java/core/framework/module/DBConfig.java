@@ -93,7 +93,7 @@ public class DBConfig extends Config {
     }
 
     public void slowOperationThreshold(Duration threshold) {
-        database.slowOperationThreshold(threshold);
+        database.slowOperationThresholdInNanos = threshold.toNanos();
     }
 
     public void tooManyRowsReturnedThreshold(int threshold) {
@@ -106,6 +106,10 @@ public class DBConfig extends Config {
 
     public void timeout(Duration timeout) {
         database.timeout(timeout);
+    }
+
+    public void batchSize(int size) {
+        database.operation.batchSize = size;
     }
 
     public void view(Class<?> viewClass) {
