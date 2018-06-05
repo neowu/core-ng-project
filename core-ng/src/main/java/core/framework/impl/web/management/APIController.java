@@ -1,7 +1,7 @@
 package core.framework.impl.web.management;
 
-import core.framework.http.ContentType;
-import core.framework.impl.web.api.TypescriptDefinitionBuilder;
+import core.framework.impl.web.api.APIDefinitionBuilder;
+import core.framework.impl.web.api.APIDefinitionResponse;
 import core.framework.impl.web.http.IPAccessControl;
 import core.framework.web.Controller;
 import core.framework.web.Request;
@@ -12,7 +12,6 @@ import java.util.Map;
 /**
  * @author neo
  */
-@Deprecated
 public class APIController implements Controller {
     private final Map<String, Class<?>> serviceInterfaces;
     private final IPAccessControl accessControl;
@@ -26,10 +25,10 @@ public class APIController implements Controller {
     public Response execute(Request request) {
         accessControl.validate(request.clientIP());
 
-        TypescriptDefinitionBuilder builder = new TypescriptDefinitionBuilder();
+        APIDefinitionBuilder builder = new APIDefinitionBuilder();
         serviceInterfaces.values().forEach(builder::addServiceInterface);
-        String definition = builder.build();
+        APIDefinitionResponse response = builder.build();
 
-        return Response.text(definition).contentType(ContentType.APPLICATION_JAVASCRIPT);
+        return Response.bean(response);
     }
 }

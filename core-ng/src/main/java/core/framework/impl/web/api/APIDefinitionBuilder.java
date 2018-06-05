@@ -1,4 +1,4 @@
-package core.framework.impl.web.api.v2;
+package core.framework.impl.web.api;
 
 import core.framework.api.json.Property;
 import core.framework.api.validate.NotNull;

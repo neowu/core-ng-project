@@ -72,10 +72,10 @@ public final class ConsoleAppender {
         for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
             String key = entry.getKey();
             PerformanceStat tracking = entry.getValue();
-            builder.append(LOG_SPLITTER)
-                   .append(key).append("Count=").append(tracking.count)
-                   .append(LOG_SPLITTER)
-                   .append(key).append("ElapsedTime=").append(tracking.totalElapsed);
+            builder.append(LOG_SPLITTER).append(key).append("Count=").append(tracking.count);
+            if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("ReadEntries=").append(tracking.readEntries);
+            if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("WriteEntries=").append(tracking.writeEntries);
+            builder.append(LOG_SPLITTER).append(key).append("ElapsedTime=").append(tracking.totalElapsed);
         }
 
         return builder.toString();

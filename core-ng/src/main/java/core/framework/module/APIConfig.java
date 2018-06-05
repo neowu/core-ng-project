@@ -6,6 +6,7 @@ import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.reflect.Classes;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.service.HTTPMethods;
@@ -68,7 +69,7 @@ public class APIConfig extends Config {
             }
         }
 
-        Class<?> previous = serviceInterfaces.putIfAbsent(serviceInterface.getSimpleName(), serviceInterface);
+        Class<?> previous = serviceInterfaces.putIfAbsent(Classes.className(serviceInterface), serviceInterface);
         if (previous != null) throw Exceptions.error("found service interface with duplicate name which can be confusing, please use different class name, previousClass={}, class={}", previous.getCanonicalName(), serviceInterface.getCanonicalName());
     }
 

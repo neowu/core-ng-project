@@ -11,14 +11,15 @@ import java.util.Map;
  * @author neo
  */
 public class ServiceDefinition {
+    public final List<Operation> operations = Lists.newArrayList();
     public String name;
-    public final List<ServiceMethodDefinition> methods = Lists.newArrayList();
 
-    public static class ServiceMethodDefinition {
+    public static class Operation {
+        public final Map<String, String> pathParams = Maps.newLinkedHashMap();
         public String name;
         public HTTPMethod method;
         public String path;
         public String responseType;
-        public final Map<String, String> params = Maps.newLinkedHashMap();
+        public String requestType;
     }
 }
