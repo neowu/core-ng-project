@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath "gradle.plugin.com.github.spotbugs:gradlePlugin:1.6.0"
+        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.2"
     }
 }
 

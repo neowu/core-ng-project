@@ -1,3 +1,5 @@
+enableFeaturePreview('STABLE_PUBLISHING')
+
 include 'core-ng-api',
     'core-ng',
     'core-ng-test',
