@@ -1,10 +1,6 @@
 language: java
-before_install:
-  - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh
-matrix:
-  include:
-    - env: JDK='OpenJDK 10'
-      install: . ./install-jdk.sh -F 10 -L GPL
+jdk:
+  - openjdk10
 cache:
   directories:
     - $HOME/.gradle
