@@ -5,13 +5,13 @@ import core.framework.api.validate.NotEmpty;
 import core.framework.api.validate.NotNull;
 import org.junit.jupiter.api.Test;
 
-import static core.framework.test.assertion.Assertions.assertThat;
+import static core.framework.test.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
  */
-class ValidatorAssertionTest {
+class ValidatorAssertTest {
     @Test
     void failWithMessage() {
         Bean bean = new Bean();
@@ -28,6 +28,13 @@ class ValidatorAssertionTest {
         Bean bean = new Bean();
         bean.field1 = "value";
         assertThat(bean).isValid();
+    }
+
+    @Test
+    void hasError() {
+        Bean bean = new Bean();
+        bean.field1 = "123456";
+        assertThat(bean).hasError().containsEntry("field1", "field1 must not be longer than 5");
     }
 
     static class Bean {

@@ -9,12 +9,12 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class EnumConversionAssertion extends AbstractAssert<EnumConversionAssertion, Class<? extends Enum<?>>> {
-    EnumConversionAssertion(Class<? extends Enum<?>> actual) {
-        super(actual, EnumConversionAssertion.class);
+public class EnumConversionAssert extends AbstractAssert<EnumConversionAssert, Class<? extends Enum<?>>> {
+    public EnumConversionAssert(Class<? extends Enum<?>> actual) {
+        super(actual, EnumConversionAssert.class);
     }
 
-    public EnumConversionAssertion hasExactlyEnumConstants(Class<? extends Enum<?>> enumClass) {
+    public void hasExactlyConstantsAs(Class<? extends Enum<?>> enumClass) {
         isNotNull();
 
         Set<String> values1 = enumValues(actual);
@@ -25,8 +25,6 @@ public class EnumConversionAssertion extends AbstractAssert<EnumConversionAssert
 
         Set<String> diff2 = difference(values2, values1);
         if (!diff2.isEmpty()) failWithMessage("%nExpecting:%n %s%nhas exactly constants of%n %s%nbut some constants were not found:%n <%s>", actual.getName(), enumClass.getName(), diff2);
-
-        return this;
     }
 
     private Set<String> enumValues(Class<? extends Enum<?>> enumClass1) {
