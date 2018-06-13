@@ -27,7 +27,7 @@ class ObjectValidatorListTest {
     @BeforeEach
     void createObjectValidator() {
         builder = new ObjectValidatorBuilder(Types.list(Bean.class), Field::getName);
-        validator = builder.build().get();
+        validator = builder.build().orElseThrow();
     }
 
     @Test

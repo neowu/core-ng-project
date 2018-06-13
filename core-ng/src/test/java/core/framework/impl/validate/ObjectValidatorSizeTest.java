@@ -24,7 +24,7 @@ class ObjectValidatorSizeTest {
 
     @BeforeEach
     void createObjectValidator() {
-        validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
+        validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().orElseThrow();
     }
 
     @Test

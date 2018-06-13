@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -36,7 +36,7 @@ class CacheImplTest {
         when(cacheStore.get("name:key")).thenReturn(Strings.bytes("1"));
 
         Integer value = cache.get("key", key -> null);
-        assertEquals(1, (int) value);
+        assertThat(value).isEqualTo(1);
     }
 
     @Test
@@ -44,7 +44,7 @@ class CacheImplTest {
         when(cacheStore.get("name:key")).thenReturn(null);
 
         Integer value = cache.get("key", key -> 1);
-        assertEquals(1, (int) value);
+        assertThat(value).isEqualTo(1);
 
         verify(cacheStore).put("name:key", Strings.bytes("1"), Duration.ofHours(1));
     }
@@ -54,8 +54,7 @@ class CacheImplTest {
         when(cacheStore.get("name:key")).thenReturn(Strings.bytes("1"));
 
         Optional<String> value = cache.get("key");
-        assertTrue(value.isPresent());
-        assertEquals("1", value.get());
+        assertThat(value).get().isEqualTo("1");
     }
 
     @Test
@@ -80,10 +79,7 @@ class CacheImplTest {
         when(cacheStore.getAll("name:key1", "name:key2", "name:key3")).thenReturn(values);
 
         Map<String, Integer> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> 2);
-        assertEquals(3, results.size());
-        assertEquals(1, results.get("key1").intValue());
-        assertEquals(2, results.get("key2").intValue());
-        assertEquals(3, results.get("key3").intValue());
+        assertThat(results).containsExactly(entry("key1", 1), entry("key2", 2), entry("key3", 3));
 
         verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && Arrays.equals(argument.get("name:key2"), Strings.bytes("2"))), eq(Duration.ofHours(1)));
     }

@@ -3,8 +3,7 @@ package core.framework.http;
 import core.framework.util.Charsets;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -13,29 +12,29 @@ class ContentTypeTest {
     @Test
     void parse() {
         ContentType type = ContentType.parse("application/json; charset=utf-8");
-        assertEquals("application/json", type.mediaType());
-        assertEquals(Charsets.UTF_8, type.charset().get());
+        assertThat(type.mediaType()).isEqualTo("application/json");
+        assertThat(type.charset()).get().isEqualTo(Charsets.UTF_8);
 
         type = ContentType.parse("image/png");
-        assertEquals("image/png", type.mediaType());
-        assertFalse(type.charset().isPresent());
+        assertThat(type.mediaType()).isEqualTo("image/png");
+        assertThat(type.charset()).isNotPresent();
 
         type = ContentType.parse("multipart/form-data; boundary=----WebKitFormBoundaryaANA7UQAvnwa2EkM");
-        assertEquals("multipart/form-data", type.mediaType());
-        assertFalse(type.charset().isPresent());
+        assertThat(type.mediaType()).isEqualTo("multipart/form-data");
+        assertThat(type.charset()).isNotPresent();
     }
 
     @Test
     void value() {
-        assertEquals("application/json; charset=utf-8", ContentType.APPLICATION_JSON.toString());
-        assertEquals("application/octet-stream", ContentType.APPLICATION_OCTET_STREAM.toString());
+        assertThat(ContentType.APPLICATION_JSON.toString()).isEqualTo("application/json; charset=utf-8");
+        assertThat(ContentType.APPLICATION_OCTET_STREAM.toString()).isEqualTo("application/octet-stream");
     }
 
     @Test
     void ignoreUnsupportedCharset() {
         ContentType type = ContentType.parse("image/jpeg; charset=binary");
 
-        assertEquals("image/jpeg", type.mediaType());
-        assertFalse(type.charset().isPresent());
+        assertThat(type.mediaType()).isEqualTo("image/jpeg");
+        assertThat(type.charset()).isNotPresent();
     }
 }

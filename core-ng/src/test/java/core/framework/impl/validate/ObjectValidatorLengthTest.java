@@ -25,7 +25,7 @@ class ObjectValidatorLengthTest {
     @BeforeAll
     void createObjectValidator() {
         builder = new ObjectValidatorBuilder(Bean.class, Field::getName);
-        validator = builder.build().get();
+        validator = builder.build().orElseThrow();
     }
 
     @Test

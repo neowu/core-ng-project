@@ -1,4 +1,6 @@
 ## Change log
+### 6.3.5 (6/13/2018 - )
+
 ### 6.3.4 (6/4/2018 - 6/13/2018)
 * db: added db().batchSize() to configure batch size on batchInsert and batchDelete
 * db: enable rewriteBatchedStatements=true for MySQL

@@ -9,8 +9,6 @@ import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,7 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DynamicInstanceBuilder<T> {
     private static final AtomicInteger INDEX = new AtomicInteger();
-    private final Logger logger = LoggerFactory.getLogger(DynamicInstanceBuilder.class);
     private final CtClass classBuilder;
     private final ClassPool classPool;
     private final SourceCode sourceCode = new SourceCode();
@@ -41,7 +38,7 @@ public class DynamicInstanceBuilder<T> {
             constructor.setBody(";");
             classBuilder.addConstructor(constructor);
         } catch (NotFoundException | CannotCompileException e) {
-            throw new CodeCompileException(e);
+            throw new Error(e);
         }
     }
 
@@ -63,8 +60,7 @@ public class DynamicInstanceBuilder<T> {
             constructor.setBody(body);
             classBuilder.addConstructor(constructor);
         } catch (CannotCompileException | NotFoundException e) {
-            logger.error("constructor body failed to compile:\n{}", body);
-            throw new CodeCompileException(e);
+            throw Exceptions.error("{}, source:\n{}", e.getMessage(), body, e);
         }
     }
 
@@ -73,8 +69,7 @@ public class DynamicInstanceBuilder<T> {
         try {
             classBuilder.addMethod(CtMethod.make(method, classBuilder));
         } catch (CannotCompileException e) {
-            logger.error("method failed to compile:\n{}", method);
-            throw new CodeCompileException(e);
+            throw Exceptions.error("{}, source:\n{}", e.getMessage(), method, e);
         }
     }
 
@@ -84,8 +79,7 @@ public class DynamicInstanceBuilder<T> {
         try {
             classBuilder.addField(CtField.make(field, classBuilder));
         } catch (CannotCompileException e) {
-            logger.error("field failed to compile:\n{}", field);
-            throw new CodeCompileException(e);
+            throw Exceptions.error("{}, source:\n{}", e.getMessage(), field, e);
         }
     }
 
@@ -96,7 +90,7 @@ public class DynamicInstanceBuilder<T> {
             classBuilder.detach();
             return targetClass.getDeclaredConstructor(constructorParamClasses).newInstance(constructorParams);
         } catch (CannotCompileException | ReflectiveOperationException e) {
-            throw new CodeCompileException(e);
+            throw new Error(e);
         }
     }
 

@@ -14,9 +14,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -50,8 +48,8 @@ class DatabaseImplTest {
 
         EntityView view = database.selectOne("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?", EntityView.class, 1).orElseThrow();
 
-        assertEquals("string1", view.stringField);
-        assertEquals(TestEnum.V1, view.enumField);
+        assertThat(view.enumField).isEqualTo(TestEnum.V1);
+        assertThat(view.stringField).isEqualTo("string1");
     }
 
     @Test
@@ -61,30 +59,30 @@ class DatabaseImplTest {
 
         List<EntityView> views = database.select("SELECT string_field as string_label, enum_field as enum_label FROM database_test", EntityView.class);
 
-        assertEquals(2, views.size());
-        assertEquals(TestEnum.V1, views.get(0).enumField);
-        assertEquals(TestEnum.V2, views.get(1).enumField);
+        assertThat(views).hasSize(2);
+        assertThat(views.get(0).enumField).isEqualTo(TestEnum.V1);
+        assertThat(views.get(1).enumField).isEqualTo(TestEnum.V2);
     }
 
     @Test
     void selectEmptyWithView() {
-        List<EntityView> views = database.select("SELECT string_field, enum_field FROM database_test where id = -1", EntityView.class);
+        List<EntityView> views = database.select("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = -1", EntityView.class);
 
-        assertTrue(views.isEmpty());
+        assertThat(views).isEmpty();
     }
 
     @Test
     void selectNullInt() {
         Optional<Integer> result = database.selectOne("SELECT max(id) FROM database_test", Integer.class);
-        assertFalse(result.isPresent());
+        assertThat(result).isNotPresent();
     }
 
     @Test
     void selectNumber() {
-        assertEquals(0, database.selectOne("SELECT count(id) FROM database_test", Integer.class).orElseThrow().intValue());
-        assertEquals(0, database.selectOne("SELECT count(id) FROM database_test", Long.class).orElseThrow().longValue());
-        assertEquals(0, database.selectOne("SELECT count(id) FROM database_test", Double.class).orElseThrow().doubleValue());
-        assertEquals(BigDecimal.ZERO, database.selectOne("SELECT count(id) FROM database_test", BigDecimal.class).orElseThrow());
+        assertThat(database.selectOne("SELECT count(id) FROM database_test", Integer.class)).get().isEqualTo(0);
+        assertThat(database.selectOne("SELECT count(id) FROM database_test", Long.class)).get().isEqualTo(0L);
+        assertThat(database.selectOne("SELECT count(id) FROM database_test", Double.class)).get().isEqualTo(0.0);
+        assertThat(database.selectOne("SELECT count(id) FROM database_test", BigDecimal.class)).get().isEqualTo(BigDecimal.ZERO);
     }
 
     @Test
@@ -93,9 +91,9 @@ class DatabaseImplTest {
         LocalDateTime dateTime = LocalDateTime.of(2017, 11, 22, 13, 0, 0);
         database.execute("INSERT INTO database_test (id, date_field, date_time_field) VALUES (?, ?, ?)", 1, date, dateTime);
 
-        assertEquals(date, database.selectOne("SELECT date_field FROM database_test where id = ?", LocalDate.class, 1).orElseThrow());
-        assertEquals(dateTime, database.selectOne("SELECT date_time_field FROM database_test where id = ?", LocalDateTime.class, 1).orElseThrow());
-        assertEquals(dateTime, database.selectOne("SELECT date_time_field FROM database_test where id = ?", ZonedDateTime.class, 1).orElseThrow().toLocalDateTime());
+        assertThat(database.selectOne("SELECT date_field FROM database_test where id = ?", LocalDate.class, 1)).get().isEqualTo(date);
+        assertThat(database.selectOne("SELECT date_time_field FROM database_test where id = ?", LocalDateTime.class, 1)).get().isEqualTo(dateTime);
+        assertThat(database.selectOne("SELECT date_time_field FROM database_test where id = ?", ZonedDateTime.class, 1).orElseThrow().toLocalDateTime()).isEqualTo(dateTime);
     }
 
     @Test
@@ -103,8 +101,7 @@ class DatabaseImplTest {
         insertRow(1, "string1", TestEnum.V1);
 
         Optional<String> result = database.selectOne("SELECT string_field FROM database_test", String.class);
-        assertTrue(result.isPresent());
-        assertEquals("string1", result.get());
+        assertThat(result).get().isEqualTo("string1");
     }
 
     @Test
@@ -114,8 +111,11 @@ class DatabaseImplTest {
             transaction.commit();
         }
 
-        Optional<EntityView> result = database.selectOne("SELECT string_field, enum_field FROM database_test where id = ?", EntityView.class, 1);
-        assertTrue(result.isPresent());
+        Optional<EntityView> result = database.selectOne("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?", EntityView.class, 1);
+        assertThat(result).get().satisfies(view -> {
+            assertThat(view.enumField).isEqualTo(TestEnum.V1);
+            assertThat(view.stringField).isEqualTo("string");
+        });
     }
 
     @Test
@@ -125,8 +125,8 @@ class DatabaseImplTest {
             transaction.rollback();
         }
 
-        Optional<EntityView> result = database.selectOne("SELECT string_field, enum_field FROM database_test where id = ?", EntityView.class, 1);
-        assertFalse(result.isPresent());
+        Optional<EntityView> result = database.selectOne("SELECT string_field as string_label, enum_field as enum_label FROM database_test where id = ?", EntityView.class, 1);
+        assertThat(result).isNotPresent();
     }
 
     private void insertRow(int id, String stringField, TestEnum enumField) {

@@ -1,7 +1,6 @@
 package core.framework.impl.template.expression;
 
 import core.framework.impl.asm.CodeBuilder;
-import core.framework.impl.asm.CodeCompileException;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.template.TemplateContext;
@@ -40,7 +39,7 @@ public class ExpressionBuilder {
             DynamicInstanceBuilder<Expression> builder = new DynamicInstanceBuilder<>(Expression.class, Expression.class.getCanonicalName());
             builder.addMethod(buildEval());
             return builder.build();
-        } catch (CodeCompileException e) {
+        } catch (Throwable e) {
             throw Exceptions.error("failed to compile expression, expression={}, location={}", expressionSource, location, e);
         }
     }
