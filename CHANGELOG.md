@@ -3,6 +3,7 @@
 * db: added db().batchSize() to configure batch size on batchInsert and batchDelete
 * db: enable rewriteBatchedStatements=true for MySQL
 * api: retire old /_sys/api, promote v2
+* test: replace EnumConversionValidator with assertJ extension, added validator assertions, refer to core.framework.test.assertion.Assertions
 
 ### 6.3.3 (5/28/2018 - 6/4/2018)
 * api: make error message more friendly when service response returns value type
