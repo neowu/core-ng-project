@@ -15,7 +15,7 @@ public final class ValidationErrors {
         errors.put(field, error);
     }
 
-    boolean hasError() {
+    public boolean hasError() {
         return errors != null;
     }
 }

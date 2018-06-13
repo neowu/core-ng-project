@@ -1,40 +1,52 @@
 package core.framework.test.assertion;
 
-import core.framework.impl.validate.Validator;
-import core.framework.validate.ValidationException;
+import core.framework.impl.validate.ObjectValidator;
+import core.framework.impl.validate.ObjectValidatorBuilder;
+import core.framework.impl.validate.ValidationErrors;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.MapAssert;
 
 import java.lang.reflect.Field;
+import java.util.Optional;
 
 /**
  * @author neo
  */
 public class ValidatorAssert extends AbstractAssert<ValidatorAssert, Object> {
+    private final ObjectValidator validator;
+
     public ValidatorAssert(Object actual) {
         super(actual, ValidatorAssert.class);
+        isNotNull();
+        this.validator = validator(actual);
     }
 
     public void isValid() {
-        isNotNull();
-        try {
-            validator().validate(actual);
-        } catch (ValidationException e) {
-            failWithMessage("%nExpecting:%n object %s%nto be valid, but found some violations:%n %s", actual.getClass().getName(), e.errors);
-        }
+        ValidationErrors errors = validate();
+        if (errors.hasError())
+            failWithMessage("%nExpecting:%n object %s%nto be valid, but found some violations:%n %s", actual.getClass().getName(), errors.errors);
     }
 
     public MapAssert<String, String> hasError() {
-        try {
-            validator().validate(actual);
+        ValidationErrors errors = validate();
+        if (!errors.hasError())
             failWithMessage("%nExpecting:%n object %s%nto be invalid, but found no violation", actual.getClass().getName());
-            return null;
-        } catch (ValidationException e) {
-            return new MapAssert<>(e.errors);
-        }
+        return new MapAssert<>(errors.errors);
     }
 
-    private Validator validator() {
-        return new Validator(actual.getClass(), Field::getName);
+    private ValidationErrors validate() {
+        ValidationErrors errors = new ValidationErrors();
+        validator.validate(actual, errors, false);
+        return errors;
+    }
+
+    private ObjectValidator validator(Object bean) {
+        Class<?> beanClass = bean.getClass();
+        ObjectValidatorBuilder builder = new ObjectValidatorBuilder(beanClass, Field::getName);
+        Optional<ObjectValidator> validatorOptional = builder.build();
+        if (!validatorOptional.isPresent()) {
+            failWithMessage("%nExpecting:%n  %s%nhas validation annotations, but was not found", beanClass.getName());
+        }
+        return validatorOptional.orElseThrow();
     }
 }
