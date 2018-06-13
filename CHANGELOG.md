@@ -1,5 +1,6 @@
 ## Change log
 ### 6.3.5 (6/13/2018 - )
+* executor: support to submit void task as syntax sugar
 
 ### 6.3.4 (6/4/2018 - 6/13/2018)
 * db: added db().batchSize() to configure batch size on batchInsert and batchDelete
@@ -20,7 +21,7 @@
 
 ### 6.3.1 (5/16/2018 - 5/22/2018)
 * site: update site.enableWebSecurity(String... trustedSources) to use CSP to replace x-frame-options since it's deprecated 
-* executor: tweak case when task submit another task to executor, to support async long polling or retry use cases 
+* executor: tweak use case when task submit another task to executor, to support async long polling or retry use cases 
 
 ### 6.3.0 (5/9/2018 - 5/15/2018)
 * http: update undertow to 2.0.7
