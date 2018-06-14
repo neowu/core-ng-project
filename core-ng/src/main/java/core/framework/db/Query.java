@@ -22,6 +22,6 @@ public interface Query<T> {
     <P> Optional<P> project(String projection, Class<P> viewClass);
 
     default int count() {
-        return project("count(1)", Integer.class).orElseThrow(() -> new Error("unexpected result"));
+        return project("count(1)", Integer.class).orElseThrow();
     }
 }
