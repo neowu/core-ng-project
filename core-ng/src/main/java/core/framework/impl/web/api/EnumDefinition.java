@@ -1,11 +1,11 @@
 package core.framework.impl.web.api;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author neo
  */
 public class EnumDefinition {
-    public List<String> constants;
+    public Map<String, String> fields;
     public String name;
 }

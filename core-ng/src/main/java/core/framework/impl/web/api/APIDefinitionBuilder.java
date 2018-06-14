@@ -110,9 +110,7 @@ public class APIDefinitionBuilder {
         type.name = entry.getKey();
         type.type = "enum";
         StringBuilder builder = new StringBuilder("{ ");
-        for (String constant : entry.getValue().constants) {
-            builder.append(constant).append(" = \"").append(constant).append("\", ");
-        }
+        entry.getValue().fields.forEach((name, constant) -> builder.append(name).append(" = \"").append(constant).append("\", "));
         builder.append('}');
         type.definition = builder.toString();
         return type;
@@ -162,7 +160,10 @@ public class APIDefinitionBuilder {
         enumTypes.computeIfAbsent(typeName, key -> {
             EnumDefinition definition = new EnumDefinition();
             definition.name = typeName;
-            definition.constants = Classes.enumConstantFields(enumClass).stream().map(field -> field.getDeclaredAnnotation(Property.class).name()).collect(Collectors.toList());
+            definition.fields = Maps.newLinkedHashMap();
+            Classes.enumConstantFields(enumClass).forEach(field -> {
+                definition.fields.put(field.getName(), field.getDeclaredAnnotation(Property.class).name());
+            });
             return definition;
         });
         return typeName;

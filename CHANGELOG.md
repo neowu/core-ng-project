@@ -1,6 +1,7 @@
 ## Change log
 ### 6.3.5 (6/13/2018 - )
 * executor: support to submit void task as syntax sugar
+* api: tweak enum generation to use JAVA_ENUM_NAME: "PROPERTY_VALUE" pattern
 
 ### 6.3.4 (6/4/2018 - 6/13/2018)
 * db: added db().batchSize() to configure batch size on batchInsert and batchDelete
