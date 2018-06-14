@@ -16,6 +16,7 @@ import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.impl.web.route.PathPatternValidator;
 import core.framework.util.Exceptions;
+import core.framework.util.Maps;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
 
@@ -23,6 +24,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -43,7 +45,12 @@ public class WebServiceInterfaceValidator {
         if (!serviceInterface.isInterface())
             throw Exceptions.error("service interface must be interface, serviceInterface={}", serviceInterface.getCanonicalName());
 
+        Map<String, Method> methodNames = Maps.newHashMap();
         for (Method method : serviceInterface.getDeclaredMethods()) {
+            Method previous = methodNames.put(method.getName(), method);
+            if (previous != null) {
+                throw Exceptions.error("found duplicate method name which can be confusing, please use different method name, method={}, previous={}", Methods.path(method), Methods.path(previous));
+            }
             validate(method);
         }
     }

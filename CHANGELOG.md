@@ -1,4 +1,7 @@
 ## Change log
+### 6.3.6 (6/14/208 - )
+* api: assert same service interface must not have duplicate method name
+
 ### 6.3.5 (6/13/2018 - 6/14/208)
 * executor: support to submit void task as syntax sugar
 * api: tweak enum generation to use JAVA_ENUM_NAME: "PROPERTY_VALUE" pattern
