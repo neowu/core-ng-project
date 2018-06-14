@@ -8,9 +8,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -27,8 +25,15 @@ class MockExecutorTest {
     void get() throws ExecutionException, InterruptedException, TimeoutException {
         Future<Integer> future = executor.submit("action", () -> 12);
 
-        assertTrue(future.isDone());
-        assertFalse(future.isCancelled());
-        assertEquals(12, future.get(0, TimeUnit.MILLISECONDS).intValue());
+        assertThat(future).isDone().isNotCancelled();
+        assertThat(future.get(0, TimeUnit.MILLISECONDS)).isEqualTo(12);
+    }
+
+    @Test
+    void submitTask() {
+        Future<Void> future = executor.submit("action", () -> {
+        });
+
+        assertThat(future).isDone().isNotCancelled();
     }
 }
