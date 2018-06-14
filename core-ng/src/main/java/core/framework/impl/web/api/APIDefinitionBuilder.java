@@ -36,13 +36,13 @@ public class APIDefinitionBuilder {
     private final Map<String, EnumDefinition> enumTypes = Maps.newLinkedHashMap();
 
     public void addServiceInterface(Class<?> serviceInterface) {
-        ServiceDefinition service = new ServiceDefinition();
+        var service = new ServiceDefinition();
         service.name = serviceInterface.getSimpleName();
 
         Method[] methods = serviceInterface.getMethods();
         Arrays.sort(methods, Comparator.comparing((Method method) -> method.getDeclaredAnnotation(Path.class).value()).thenComparing(method -> HTTPMethods.httpMethod(method).ordinal()));
         for (Method method : methods) {
-            ServiceDefinition.Operation operation = new ServiceDefinition.Operation();
+            var operation = new ServiceDefinition.Operation();
             operation.name = method.getName();
             operation.method = HTTPMethods.httpMethod(method);
             operation.path = method.getDeclaredAnnotation(Path.class).value();
@@ -55,7 +55,7 @@ public class APIDefinitionBuilder {
     }
 
     public APIDefinitionResponse build() {
-        APIDefinitionResponse response = new APIDefinitionResponse();
+        var response = new APIDefinitionResponse();
         response.services = services.stream().map(this::serviceResponse).collect(Collectors.toList());
 
         response.types = Lists.newArrayList();
@@ -66,14 +66,14 @@ public class APIDefinitionBuilder {
     }
 
     private APIDefinitionResponse.Service serviceResponse(ServiceDefinition service) {
-        APIDefinitionResponse.Service response = new APIDefinitionResponse.Service();
+        var response = new APIDefinitionResponse.Service();
         response.name = service.name;
         response.operations = service.operations.stream().map(this::operationResponse).collect(Collectors.toList());
         return response;
     }
 
     private APIDefinitionResponse.Operation operationResponse(ServiceDefinition.Operation operation) {
-        APIDefinitionResponse.Operation response = new APIDefinitionResponse.Operation();
+        var response = new APIDefinitionResponse.Operation();
         response.name = operation.name;
         response.method = operation.method.name();
         response.path = operation.path;
@@ -84,17 +84,17 @@ public class APIDefinitionBuilder {
     }
 
     private APIDefinitionResponse.PathParam pathParamResponse(Map.Entry<String, String> entry) {
-        APIDefinitionResponse.PathParam response = new APIDefinitionResponse.PathParam();
+        var response = new APIDefinitionResponse.PathParam();
         response.name = entry.getKey();
         response.type = entry.getValue();
         return response;
     }
 
     private APIDefinitionResponse.Type beanTypeResponse(Map.Entry<String, BeanTypeDefinition> entry) {
-        APIDefinitionResponse.Type type = new APIDefinitionResponse.Type();
+        var type = new APIDefinitionResponse.Type();
         type.name = entry.getKey();
         type.type = "interface";
-        StringBuilder builder = new StringBuilder("{ ");
+        var builder = new StringBuilder("{ ");
         for (BeanTypeDefinition.Field field : entry.getValue().fields) {
             builder.append(field.name);
             if (!field.notNull) builder.append('?');
@@ -106,11 +106,13 @@ public class APIDefinitionBuilder {
     }
 
     private APIDefinitionResponse.Type enumTypeResponse(Map.Entry<String, EnumDefinition> entry) {
-        APIDefinitionResponse.Type type = new APIDefinitionResponse.Type();
+        var type = new APIDefinitionResponse.Type();
         type.name = entry.getKey();
         type.type = "enum";
-        StringBuilder builder = new StringBuilder("{ ");
-        entry.getValue().fields.forEach((name, constant) -> builder.append(name).append(" = \"").append(constant).append("\", "));
+        var builder = new StringBuilder("{ ");
+        for (Map.Entry<String, String> field : entry.getValue().fields.entrySet()) {
+            builder.append(field.getKey()).append(" = \"").append(field.getValue()).append("\", ");
+        }
         builder.append('}');
         type.definition = builder.toString();
         return type;
@@ -140,12 +142,12 @@ public class APIDefinitionBuilder {
     private String parseBeanType(Class<?> beanClass) {
         String typeName = Classes.className(beanClass);
         if (!beanTypes.containsKey(typeName)) {
-            BeanTypeDefinition definition = new BeanTypeDefinition();
+            var definition = new BeanTypeDefinition();
             definition.name = typeName;
             beanTypes.put(typeName, definition);  // put into map to handle circular reference
 
             for (Field field : Classes.instanceFields(beanClass)) {
-                BeanTypeDefinition.Field fieldDefinition = new BeanTypeDefinition.Field();
+                var fieldDefinition = new BeanTypeDefinition.Field();
                 fieldDefinition.name = fieldName(field);
                 fieldDefinition.type = parseType(field.getGenericType());
                 if (field.isAnnotationPresent(NotNull.class)) fieldDefinition.notNull = true;
@@ -158,7 +160,7 @@ public class APIDefinitionBuilder {
     private String parseEnum(Class<?> enumClass) {
         String typeName = Classes.className(enumClass);
         enumTypes.computeIfAbsent(typeName, key -> {
-            EnumDefinition definition = new EnumDefinition();
+            var definition = new EnumDefinition();
             definition.name = typeName;
             definition.fields = Maps.newLinkedHashMap();
             Classes.enumConstantFields(enumClass).forEach(field -> {
