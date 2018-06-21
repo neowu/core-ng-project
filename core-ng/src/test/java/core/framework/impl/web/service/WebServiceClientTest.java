@@ -20,9 +20,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 /**
  * @author neo
@@ -37,7 +36,7 @@ class WebServiceClientTest {
 
     @Test
     void addQueryParams() {
-        HTTPRequest request = new HTTPRequest(HTTPMethod.POST, "/");
+        var request = new HTTPRequest(HTTPMethod.POST, "/");
 
         Map<String, String> params = Maps.newLinkedHashMap();
         params.put("p1", "v1");
@@ -46,26 +45,25 @@ class WebServiceClientTest {
 
         webServiceClient.addQueryParams(request, params);
 
-        assertEquals(2, request.params().size());
-        assertEquals("v1", request.params().get("p1"));
-        assertEquals("v3", request.params().get("p3"));
+        assertThat(request.params()).containsExactly(entry("p1", "v1"), entry("p3", "v3"));
     }
 
     @Test
     void serviceURL() {
-        assertEquals("http://localhost", webServiceClient.serviceURL("/", Maps.newHashMap()));     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
-        assertEquals("http://localhost/test", webServiceClient.serviceURL("/test", Maps.newHashMap()));
-        assertEquals("http://localhost/test/", webServiceClient.serviceURL("/test/", Maps.newHashMap()));
+        assertThat(webServiceClient.serviceURL("/", Maps.newHashMap())).isEqualTo("http://localhost");     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
+        assertThat(webServiceClient.serviceURL("/test", Maps.newHashMap())).isEqualTo("http://localhost/test");
+        assertThat(webServiceClient.serviceURL("/test/", Maps.newHashMap())).isEqualTo("http://localhost/test/");
 
         Map<String, Object> pathParams = Maps.newHashMap("id", "1+2");
-        assertEquals("http://localhost/test/1%2B2", webServiceClient.serviceURL("/test/:id(\\d+)", pathParams));
-        assertEquals("http://localhost/test/1%2B2", webServiceClient.serviceURL("/test/:id", pathParams));
+        assertThat(webServiceClient.serviceURL("/test/:id(\\d+)", pathParams)).isEqualTo("http://localhost/test/1%2B2");
+        assertThat(webServiceClient.serviceURL("/test/:id", pathParams)).isEqualTo("http://localhost/test/1%2B2");
     }
 
     @Test
     void serviceURLWithEmptyPathParam() {
-        ValidationException exception = assertThrows(ValidationException.class, () -> webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", "")));
-        assertThat(exception.getMessage()).contains("name=id");
+        assertThatThrownBy(() -> webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", "")))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("name=id");
     }
 
     @Test
@@ -76,8 +74,7 @@ class WebServiceClientTest {
         requestBean.intField = 23;
         webServiceClient.addRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
 
-        assertEquals(1, request.params().size());
-        assertEquals("23", request.params().get("int_field"));
+        assertThat(request.params()).containsExactly(entry("int_field", "23"));
     }
 
     @Test
@@ -88,8 +85,8 @@ class WebServiceClientTest {
         requestBean.stringField = "123value";
         webServiceClient.addRequestBean(request, HTTPMethod.POST, TestWebService.TestRequest.class, requestBean);
 
-        assertArrayEquals(JSONMapper.toJSON(requestBean), request.body());
-        assertEquals(ContentType.APPLICATION_JSON, request.contentType());
+        assertThat(request.body()).isEqualTo(JSONMapper.toJSON(requestBean));
+        assertThat(request.contentType()).isEqualTo(ContentType.APPLICATION_JSON);
     }
 
     @Test
@@ -104,9 +101,14 @@ class WebServiceClientTest {
         response.errorCode = "NOT_FOUND";
         response.message = "not found";
 
-        RemoteServiceException exception = assertThrows(RemoteServiceException.class, () -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.NOT_FOUND, Maps.newHashMap(), Strings.bytes(JSON.toJSON(response)))));
-        assertEquals(Severity.WARN, exception.severity());
-        assertEquals(response.errorCode, exception.errorCode());
-        assertEquals(response.message, exception.getMessage());
+        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.NOT_FOUND, Maps.newHashMap(), Strings.bytes(JSON.toJSON(response)))))
+                .isInstanceOf(RemoteServiceException.class)
+                .satisfies(throwable -> {
+                    RemoteServiceException exception = (RemoteServiceException) throwable;
+                    assertThat(exception.severity()).isEqualTo(Severity.WARN);
+                    assertThat(exception.errorCode()).isEqualTo(response.errorCode);
+                    assertThat(exception.getMessage()).isEqualTo(response.message);
+                    assertThat(exception.status).isEqualTo(HTTPStatus.NOT_FOUND);
+                });
     }
 }

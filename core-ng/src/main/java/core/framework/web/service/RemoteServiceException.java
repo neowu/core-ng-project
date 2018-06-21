@@ -1,5 +1,6 @@
 package core.framework.web.service;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.log.ErrorCode;
 import core.framework.log.Severity;
 
@@ -11,17 +12,20 @@ public final class RemoteServiceException extends RuntimeException implements Er
 
     private final Severity severity;
     private final String errorCode;
+    public final HTTPStatus status;
 
-    public RemoteServiceException(String message, Severity severity, String errorCode) {
+    public RemoteServiceException(String message, Severity severity, String errorCode, HTTPStatus status) {
         super(message);
         this.severity = severity;
         this.errorCode = errorCode;
+        this.status = status;
     }
 
-    public RemoteServiceException(String message, Severity severity, String errorCode, Throwable cause) {
+    public RemoteServiceException(String message, Severity severity, String errorCode, HTTPStatus status, Throwable cause) {
         super(message, cause);
         this.severity = severity;
         this.errorCode = errorCode;
+        this.status = status;
     }
 
     @Override

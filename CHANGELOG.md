@@ -1,4 +1,7 @@
 ## Change log
+### 6.3.7 (6/21/2018)
+* api: make RemoteServiceException exposes https status
+
 ### 6.3.6 (6/14/2018 - 6/21/2018)
 * api: assert same service interface must not have duplicate method name
 * search: update to 6.3.0, add analysis-common plugin for stemmer support during test

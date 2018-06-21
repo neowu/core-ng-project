@@ -8,7 +8,7 @@ import core.framework.web.service.RemoteServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -23,27 +23,29 @@ class HTTPServerErrorHandlerTest {
 
     @Test
     void httpStatus() {
-        assertEquals(HTTPStatus.INTERNAL_SERVER_ERROR, handler.httpStatus(new RemoteServiceException("error", Severity.WARN, "error_code")));
-        assertEquals(HTTPStatus.NOT_FOUND, handler.httpStatus(new NotFoundException("error")));
+        assertThat(handler.httpStatus(new RemoteServiceException("error", Severity.WARN, "error_code", HTTPStatus.BAD_REQUEST)))
+                .isEqualTo(HTTPStatus.BAD_REQUEST);
 
-        assertEquals(HTTPStatus.INTERNAL_SERVER_ERROR, handler.httpStatus(new Error()));
+        assertThat(handler.httpStatus(new NotFoundException("error"))).isEqualTo(HTTPStatus.NOT_FOUND);
+
+        assertThat(handler.httpStatus(new Error())).isEqualTo(HTTPStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void errorResponseWithErrorCodeException() {
         ErrorResponse response = handler.errorResponse(new NotFoundException("test-message", "TEST_ERROR_CODE"), null);
 
-        assertEquals("test-message", response.message);
-        assertEquals("TEST_ERROR_CODE", response.errorCode);
-        assertEquals("WARN", response.severity);
+        assertThat(response.message).isEqualTo("test-message");
+        assertThat(response.errorCode).isEqualTo("TEST_ERROR_CODE");
+        assertThat(response.severity).isEqualTo("WARN");
     }
 
     @Test
     void errorResponse() {
         ErrorResponse response = handler.errorResponse(new Error("test-message"), null);
 
-        assertEquals("test-message", response.message);
-        assertEquals("INTERNAL_ERROR", response.errorCode);
-        assertEquals("ERROR", response.severity);
+        assertThat(response.message).isEqualTo("test-message");
+        assertThat(response.errorCode).isEqualTo("INTERNAL_ERROR");
+        assertThat(response.severity).isEqualTo("ERROR");
     }
 }

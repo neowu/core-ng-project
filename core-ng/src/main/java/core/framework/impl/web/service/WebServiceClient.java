@@ -151,13 +151,13 @@ public class WebServiceClient {
         try {
             ErrorResponse error = JSONMapper.fromJSON(ErrorResponse.class, responseBody);
             logger.debug("failed to call remote service, id={}, severity={}, errorCode={}, remoteStackTrace={}", error.id, error.severity, error.errorCode, error.stackTrace);
-            throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode);
+            throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, status);
         } catch (RemoteServiceException e) {
             throw e;
         } catch (Throwable e) {
             String responseText = response.text();
             logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, responseText, e);
-            throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), Severity.ERROR, "REMOTE_SERVICE_ERROR", e);
+            throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), Severity.ERROR, "REMOTE_SERVICE_ERROR", status, e);
         }
     }
 

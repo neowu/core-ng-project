@@ -13,6 +13,7 @@ import core.framework.log.Severity;
 import core.framework.util.Exceptions;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Response;
+import core.framework.web.service.RemoteServiceException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import org.slf4j.Logger;
@@ -72,7 +73,7 @@ public class HTTPServerErrorHandler {
     HTTPStatus httpStatus(Throwable e) {
         ResponseStatus responseStatus = e.getClass().getDeclaredAnnotation(ResponseStatus.class);
         if (responseStatus != null) return responseStatus.value();
-
+        if (e instanceof RemoteServiceException) return ((RemoteServiceException) e).status;    // propagate underlying status code for REST convention
         return HTTPStatus.INTERNAL_SERVER_ERROR;
     }
 
