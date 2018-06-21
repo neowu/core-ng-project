@@ -2,7 +2,6 @@ package core.framework.search.impl;
 
 import core.framework.util.StopWatch;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.network.NetworkModule;
 import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.discovery.DiscoveryModule;
@@ -30,7 +29,6 @@ public class MockElasticSearch extends ElasticSearchImpl {
         try {
             Settings.Builder settings = Settings.builder();
             settings.put(Environment.PATH_HOME_SETTING.getKey(), dataPath)
-                    .put(NetworkModule.HTTP_ENABLED.getKey(), false)
                     .put(NetworkService.GLOBAL_NETWORK_BINDHOST_SETTING.getKey(), "_local_")
                     .put(DiscoveryModule.DISCOVERY_TYPE_SETTING.getKey(), "single-node");
             MockNode node = new MockNode(settings.build());

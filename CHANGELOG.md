@@ -1,7 +1,7 @@
 ## Change log
 ### 6.3.6 (6/14/208 - )
 * api: assert same service interface must not have duplicate method name
-* search: add analysis-common plugin for stemmer support during test
+* search: update to 6.3.0, add analysis-common plugin for stemmer support during test
 
 ### 6.3.5 (6/13/2018 - 6/14/208)
 * executor: support to submit void task as syntax sugar
