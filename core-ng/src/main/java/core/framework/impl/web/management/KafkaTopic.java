@@ -24,7 +24,7 @@ public class KafkaTopic {
         @Property(name = "replicas")
         public String replicas;
 
-        @Property(name = "in-sync-replicas")
+        @Property(name = "in_sync_replicas")
         public String inSyncReplicas;
     }
 }

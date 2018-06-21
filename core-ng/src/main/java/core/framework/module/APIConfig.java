@@ -102,7 +102,7 @@ public class APIConfig extends Config {
     private HTTPClient httpClient() {
         if (httpClient == null) {
             HTTPClient httpClient = new HTTPClientBuilder()
-                    .userAgent("APIClient")
+                    .userAgent(WebServiceClient.USER_AGENT)
                     .timeout(timeout)
                     .slowOperationThreshold(slowOperationThreshold)
                     .build();

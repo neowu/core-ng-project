@@ -32,6 +32,7 @@ import java.util.Map;
  */
 public class WebServiceClient {
     private final Logger logger = LoggerFactory.getLogger(WebServiceClient.class);
+    public static final String USER_AGENT = "APIClient";
 
     private final String serviceURL;
     private final HTTPClient httpClient;
