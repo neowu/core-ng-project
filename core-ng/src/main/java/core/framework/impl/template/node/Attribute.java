@@ -104,7 +104,7 @@ public class Attribute {
     }
 
     void addMessageAttribute(ContainerFragment parent, TemplateMetaContext context) {
-        String message = context.message.message(value).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
+        String message = context.message.get(value).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
         parent.addStaticContent(" ");
         parent.addStaticContent(name.substring(2));
         parent.addStaticContent("=\"");
@@ -121,7 +121,7 @@ public class Attribute {
                 parent.add(new HTMLContentFragment(value, context, location));
                 break;
             case "m:text":
-                String message = context.message.message(value).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
+                String message = context.message.get(value).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
                 parent.addStaticContent(message);
                 break;
             case "c:include":

@@ -6,5 +6,5 @@ import java.util.Optional;
  * @author neo
  */
 public interface MessageProvider {
-    Optional<String> message(String key);
+    Optional<String> get(String key);
 }
