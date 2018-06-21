@@ -1,5 +1,51 @@
 {
   "settings": {
+    "analysis": {
+      "filter": {
+        "synonym": {
+          "type": "synonym",
+          "synonyms": [
+            "1st, first",
+            "2nd, second"
+          ]
+        },
+        "english_stemmer": {
+          "type": "stemmer",
+          "name": "english"
+        },
+        "english_possessive_stemmer": {
+          "type": "stemmer",
+          "language": "possessive_english"
+        }
+      },
+      "analyzer": {
+        "english": {
+          "tokenizer": "standard",
+          "filter": [
+            "english_possessive_stemmer",
+            "lowercase",
+            "stop",
+            "english_stemmer"
+          ]
+        },
+        "english_search": {
+          "tokenizer": "standard",
+          "filter": [
+            "english_possessive_stemmer",
+            "lowercase",
+            "synonym",
+            "stop",
+            "english_stemmer"
+          ]
+        },
+        "keyword": {
+          "tokenizer": "keyword",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      }
+    }
   },
   "mappings": {
     "document": {
@@ -12,7 +58,8 @@
         },
         "string_field": {
           "type": "text",
-          "analyzer": "standard"
+          "analyzer": "english",
+          "search_analyzer": "english_search"
         },
         "num_field": {
           "type": "integer"

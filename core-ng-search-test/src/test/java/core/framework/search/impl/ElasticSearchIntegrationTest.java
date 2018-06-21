@@ -88,18 +88,25 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void search() {
-        TestDocument document = document("1", "value1", 1);
+        TestDocument document = document("1", "1st Test's Product", 1);
         elasticSearch.flush("document");
 
+        // test synonyms
         SearchRequest request = new SearchRequest();
-        request.query = QueryBuilders.matchQuery("string_field", document.stringField);
+        request.query = QueryBuilders.matchQuery("string_field", "first");
         request.sorts.add(SortBuilders.scriptSort(new Script("doc['num_field'].value * 3"), ScriptSortBuilder.ScriptSortType.NUMBER));
         SearchResponse<TestDocument> response = documentType.search(request);
 
         assertThat(response.totalHits).isEqualTo(1);
-        TestDocument returnedDocument = response.hits.get(0);
-        assertThat(returnedDocument).isEqualToIgnoringGivenFields(document, "zonedDateTimeField");
-        assertThat(returnedDocument.zonedDateTimeField).isEqualTo(document.zonedDateTimeField);
+        assertThat(response.hits.get(0)).isEqualToIgnoringGivenFields(document, "zonedDateTimeField");
+
+        // test stemmer
+        request = new SearchRequest();
+        request.query = QueryBuilders.matchQuery("string_field", "test");
+        response = documentType.search(request);
+
+        assertThat(response.totalHits).isEqualTo(1);
+        assertThat(response.hits.get(0)).isEqualToIgnoringGivenFields(document, "zonedDateTimeField");
     }
 
     @Test
