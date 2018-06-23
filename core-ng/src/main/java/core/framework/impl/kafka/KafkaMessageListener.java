@@ -83,10 +83,11 @@ public class KafkaMessageListener {
         }
     }
 
-    public void awaitTermination() {
+    public void awaitTermination(long timeoutInMs) {
         if (listenerThreads != null) {
+            long endTime = System.currentTimeMillis() + timeoutInMs;
             for (KafkaMessageListenerThread thread : listenerThreads) {
-                thread.awaitTermination();
+                thread.awaitTermination(endTime - System.currentTimeMillis());
             }
         }
         logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri, topics, name);

@@ -40,18 +40,21 @@ public final class ShutdownHook implements Runnable {
     }
 
     private void shutdownGracefully() {
+        long endTime = System.currentTimeMillis() + 25000;  // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
+
         // start shutdown process
         if (httpServer != null) httpServer.shutdown();
         if (scheduler != null) scheduler.shutdown();
         kafkaListeners.forEach(KafkaMessageListener::shutdown);
+        if (backgroundTask != null) backgroundTask.shutdown();
 
         // await to finish current processes
-        if (httpServer != null) httpServer.awaitTermination();
-        if (scheduler != null) scheduler.awaitTermination();
-        kafkaListeners.forEach(KafkaMessageListener::awaitTermination);
+        if (httpServer != null) httpServer.awaitTermination(endTime - System.currentTimeMillis());
+        if (scheduler != null) scheduler.awaitTermination(endTime - System.currentTimeMillis());
+        kafkaListeners.forEach(listener -> listener.awaitTermination(endTime - System.currentTimeMillis()));
 
         // stop executors after no more new requests
-        executors.forEach(ExecutorImpl::stop);
-        if (backgroundTask != null) backgroundTask.stop();
+        executors.forEach(executor -> executor.stop(endTime - System.currentTimeMillis()));
+        if (backgroundTask != null) backgroundTask.awaitTermination(endTime - System.currentTimeMillis());
     }
 }

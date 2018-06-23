@@ -28,19 +28,17 @@ public class BackgroundTaskExecutor {
         logger.info("background task executor started");
     }
 
-    public void stop() {
-        logger.info("stop background task executor");
-        scheduler.shutdown();
-        try {
-            boolean success = scheduler.awaitTermination(10, TimeUnit.SECONDS);
-            if (!success) logger.warn("failed to terminate background task executor");
-        } catch (InterruptedException e) {
-            logger.warn(e.getMessage(), e);
-        }
-    }
-
     public void scheduleWithFixedDelay(Runnable command, Duration rate) {
         tasks.add(new BackgroundTask(command, rate));
+    }
+
+    void shutdown() {
+        logger.info("shutting down background task executor");
+        scheduler.shutdown();
+    }
+
+    void awaitTermination(long timeoutInMs) {
+        ThreadPools.awaitTermination(scheduler, timeoutInMs, "background task executor");
     }
 
     private static class BackgroundTask implements Runnable {

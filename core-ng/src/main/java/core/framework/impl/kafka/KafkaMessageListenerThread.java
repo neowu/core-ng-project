@@ -74,14 +74,14 @@ class KafkaMessageListenerThread extends Thread {
         consumer.wakeup();
     }
 
-    void awaitTermination() {
+    void awaitTermination(long timeoutInMs) {
         try {
             synchronized (lock) {
-                long end = System.currentTimeMillis() + 15000;  // wait 15s
+                long end = System.currentTimeMillis() + timeoutInMs;
                 while (inProcessing.get()) {
                     long left = end - System.currentTimeMillis();
                     if (left <= 0) {
-                        logger.warn("failed to terminate kafka message listener thread");
+                        logger.warn("failed to terminate kafka message listener thread, name={}", getName());
                         break;
                     }
                     lock.wait(left);

@@ -15,8 +15,6 @@ import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-
 /**
  * @author neo
  */
@@ -81,10 +79,10 @@ public class HTTPServer {
         }
     }
 
-    public void awaitTermination() {
+    public void awaitTermination(long timeoutInMs) {
         if (server != null) {
             try {
-                boolean success = shutdownHandler.awaitShutdown(Duration.ofSeconds(15).toMillis());
+                boolean success = shutdownHandler.awaitShutdown(timeoutInMs);
                 if (!success) logger.warn("failed to wait all http requests to finish");
             } catch (InterruptedException e) {
                 logger.warn(e.getMessage(), e);

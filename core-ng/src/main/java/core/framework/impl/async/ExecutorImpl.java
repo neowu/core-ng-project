@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
@@ -23,19 +22,13 @@ public final class ExecutorImpl implements Executor {
     public ExecutorImpl(ExecutorService executor, LogManager logManager, String name) {
         this.executor = executor;
         this.logManager = logManager;
-        this.name = name;
+        this.name = "executor" + (name == null ? "" : "-" + name);
     }
 
-    public void stop() {
-        logger.info("shutting down executor, name={}", name);
+    public void stop(long timeoutInMs) {
+        logger.info("shutting down {}", name);
         executor.shutdown();
-        try {
-            boolean success = executor.awaitTermination(10, TimeUnit.SECONDS);
-            if (!success) logger.warn("failed to terminate executor, name={}", name);
-            else logger.info("executor stopped, name={}", name);
-        } catch (InterruptedException e) {
-            logger.warn(e.getMessage(), e);
-        }
+        ThreadPools.awaitTermination(executor, timeoutInMs, name);
     }
 
     @Override

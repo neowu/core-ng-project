@@ -64,23 +64,13 @@ public final class Scheduler {
     public void shutdown() {
         logger.info("shutting down scheduler");
         scheduler.shutdown();
-        try {
-            boolean success = scheduler.awaitTermination(5, TimeUnit.SECONDS);
-            if (!success) logger.warn("failed to terminate scheduler");
-        } catch (InterruptedException e) {
-            logger.warn(e.getMessage(), e);
-        }
+        ThreadPools.awaitTermination(scheduler, 5000, "scheduler");
+        logger.info("shutting down scheduler job executor");
         jobExecutor.shutdown();
     }
 
-    public void awaitTermination() {
-        try {
-            boolean success = jobExecutor.awaitTermination(15, TimeUnit.SECONDS);
-            if (!success) logger.warn("failed to terminate scheduler");
-            else logger.info("scheduler stopped");
-        } catch (InterruptedException e) {
-            logger.warn(e.getMessage(), e);
-        }
+    public void awaitTermination(long timeoutInMs) {
+        ThreadPools.awaitTermination(jobExecutor, timeoutInMs, "scheduler job executor");
     }
 
     public void addFixedRateTask(String name, Job job, Duration rate) {
