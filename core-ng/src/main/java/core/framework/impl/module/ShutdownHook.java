@@ -42,7 +42,7 @@ public final class ShutdownHook implements Runnable {
             for (Shutdown shutdown : shutdowns) {
                 try {
                     shutdown.execute(endTime - System.currentTimeMillis());
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.warn("failed to shutdown, method={}", shutdown, e);
                 }
             }
