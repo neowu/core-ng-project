@@ -10,6 +10,8 @@ import core.framework.web.service.RemoteServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -66,5 +68,12 @@ class HTTPServerErrorHandlerTest {
 
         var response = handler.errorResponse(new Error("test message"), "Mozilla/5.0", "actionId");
         assertThat(response).isInstanceOf(AJAXErrorResponse.class).isEqualToIgnoringGivenFields(expected, "stackTrace");
+    }
+
+    @Test
+    void errorHTML() {
+        String actionId = UUID.randomUUID().toString();
+        String html = handler.errorHTML(new Error("test message"), actionId);
+        assertThat(html).contains("test message").contains(actionId);
     }
 }

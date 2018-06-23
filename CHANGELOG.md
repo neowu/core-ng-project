@@ -1,7 +1,7 @@
 ## Change log
 ### 6.3.7 (6/21/2018)
 * api: make RemoteServiceException exposes https status
-* site: provide default ajax/json error response handling to cover common cases 
+* site: make default error handler fits most of cases to reduce the need of creating custom error handler 
 * make http server / scheduler / kafka listener / executor shutdown gracefully 
 
 ### 6.3.6 (6/14/2018 - 6/21/2018)

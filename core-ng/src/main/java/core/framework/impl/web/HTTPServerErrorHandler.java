@@ -65,7 +65,7 @@ public class HTTPServerErrorHandler {
             String userAgent = headers.getFirst(Headers.USER_AGENT);
             return Response.bean(errorResponse(e, userAgent, actionLog.id)).status(status);
         } else {
-            return Response.text(errorHTML(e)).status(status).contentType(ContentType.TEXT_HTML);
+            return Response.text(errorHTML(e, actionLog.id)).status(status).contentType(ContentType.TEXT_HTML);
         }
     }
 
@@ -104,14 +104,14 @@ public class HTTPServerErrorHandler {
         return HTTPStatus.INTERNAL_SERVER_ERROR;
     }
 
-    private String errorHTML(Throwable e) {
-        return "<html><body><h1>Error</h1><p>" + e.getMessage() + "</p><pre>" + Exceptions.stackTrace(e) + "</pre></body></html>";
+    String errorHTML(Throwable e, String actionId) {
+        return "<html><body><h1>Error</h1><p>" + e.getMessage() + "</p><p>id: " + actionId + "</p></body></html>";
     }
 
     private void renderDefaultErrorPage(Throwable e, HttpServerExchange exchange, ActionLog actionLog) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ContentType.TEXT_HTML.toString());
         exchange.setStatusCode(HTTPStatus.INTERNAL_SERVER_ERROR.code);
         actionLog.context("responseCode", exchange.getStatusCode());
-        exchange.getResponseSender().send(errorHTML(e));
+        exchange.getResponseSender().send(errorHTML(e, actionLog.id));
     }
 }
