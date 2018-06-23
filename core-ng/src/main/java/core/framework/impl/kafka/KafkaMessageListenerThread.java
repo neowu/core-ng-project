@@ -35,30 +35,32 @@ class KafkaMessageListenerThread extends Thread {
     }
 
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListenerThread.class);
-    private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Consumer<String, byte[]> consumer;
+    private final LogManager logManager;
     private final Map<String, KafkaMessageListener.MessageHandlerHolder<?>> handlerHolders;
     private final Map<String, KafkaMessageListener.BulkMessageHandlerHolder<?>> bulkHandlerHolders;
-    private final LogManager logManager;
+    private final AtomicBoolean shutdown = new AtomicBoolean(false);
+    private final AtomicBoolean inProcessing = new AtomicBoolean(false);
     private final double batchLongProcessThresholdInNano;
+    private final Object lock = new Object();
 
     KafkaMessageListenerThread(String name, Consumer<String, byte[]> consumer, KafkaMessageListener listener) {
         super(name);
         this.consumer = consumer;
         handlerHolders = listener.handlerHolders;
         bulkHandlerHolders = listener.bulkHandlerHolders;
-        logManager = listener.kafka.logManager;
-        batchLongProcessThresholdInNano = listener.kafka.maxProcessTime.toNanos() * 0.7; // 70% time of max
+        logManager = listener.logManager;
+        batchLongProcessThresholdInNano = listener.maxProcessTime.toNanos() * 0.7; // 70% time of max
     }
 
     @Override
     public void run() {
-        while (!stop.get()) {
+        while (!shutdown.get()) {
             try {
                 ConsumerRecords<String, byte[]> records = consumer.poll(Integer.MAX_VALUE);
                 process(consumer, records);
             } catch (Throwable e) {
-                if (!stop.get()) {
+                if (!shutdown.get()) {
                     logger.error("failed to pull message, retry in 30 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(30));
                 }
@@ -68,11 +70,30 @@ class KafkaMessageListenerThread extends Thread {
     }
 
     void shutdown() {
-        stop.set(true);
+        shutdown.set(true);
         consumer.wakeup();
     }
 
+    void awaitTermination() {
+        try {
+            synchronized (lock) {
+                long end = System.currentTimeMillis() + 15000;  // wait 15s
+                while (inProcessing.get()) {
+                    long left = end - System.currentTimeMillis();
+                    if (left <= 0) {
+                        logger.warn("failed to terminate kafka message listener thread");
+                        break;
+                    }
+                    lock.wait(left);
+                }
+            }
+        } catch (InterruptedException e) {
+            logger.warn(e.getMessage(), e);
+        }
+    }
+
     private void process(Consumer<String, byte[]> consumer, ConsumerRecords<String, byte[]> kafkaRecords) {
+        inProcessing.set(true);
         StopWatch watch = new StopWatch();
         int count = 0;
         int size = 0;
@@ -98,7 +119,17 @@ class KafkaMessageListenerThread extends Thread {
             }
         } finally {
             consumer.commitAsync();
+            inProcessing.set(false);
             logger.info("process kafka records, count={}, size={}, elapsedTime={}", count, size, watch.elapsedTime());
+            notifyTermination();
+        }
+    }
+
+    private void notifyTermination() {
+        if (shutdown.get()) {
+            synchronized (lock) {
+                lock.notifyAll();
+            }
         }
     }
 

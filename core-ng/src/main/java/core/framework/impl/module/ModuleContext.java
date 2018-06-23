@@ -2,7 +2,6 @@ package core.framework.impl.module;
 
 import core.framework.http.HTTPMethod;
 import core.framework.impl.inject.BeanFactory;
-import core.framework.impl.inject.ShutdownHook;
 import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.stat.Stat;
@@ -49,7 +48,7 @@ public class ModuleContext {
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
         startupHook.add(httpServer::start);
-        shutdownHook.add(httpServer::stop);
+        shutdownHook.httpServer = httpServer;
 
         route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
         ThreadInfoController threadInfoController = new ThreadInfoController();
@@ -63,7 +62,7 @@ public class ModuleContext {
         if (backgroundTask == null) {
             backgroundTask = new BackgroundTaskExecutor();
             startupHook.add(backgroundTask::start);
-            shutdownHook.add(backgroundTask::stop);
+            shutdownHook.backgroundTask = backgroundTask;
         }
         return backgroundTask;
     }

@@ -34,7 +34,7 @@ public class SearchConfig extends Config {
         System.setProperty("log4j2.loggerContextFactory", ESLoggerContextFactory.class.getName());
         ElasticSearchImpl search = new ElasticSearchImpl();
         context.startupHook.add(search::initialize);
-        context.shutdownHook.add(search::close);
+        context.shutdownHook.methods.add(search::close);
         return search;
     }
 

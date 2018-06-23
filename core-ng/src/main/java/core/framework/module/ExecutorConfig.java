@@ -33,8 +33,8 @@ public class ExecutorConfig extends Config {
 
     Executor createExecutor(String name, int poolSize) {
         String prefix = "executor-" + (name == null ? "" : name + "-");
-        Executor executor = new ExecutorImpl(ThreadPools.cachedThreadPool(poolSize, prefix), context.logManager, name);
-        context.shutdownHook.add(((ExecutorImpl) executor)::stop);
+        var executor = new ExecutorImpl(ThreadPools.cachedThreadPool(poolSize, prefix), context.logManager, name);
+        context.shutdownHook.executors.add(executor);
         return executor;
     }
 }

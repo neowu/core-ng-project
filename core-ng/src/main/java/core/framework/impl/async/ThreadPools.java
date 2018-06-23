@@ -1,9 +1,9 @@
 package core.framework.impl.async;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -14,13 +14,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class ThreadPools {
     public static ExecutorService cachedThreadPool(int poolSize, String prefix) {
-        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(poolSize, poolSize, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new ThreadFactoryImpl(prefix));
+        var threadPool = new ThreadPoolExecutor(poolSize, poolSize, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new ThreadFactoryImpl(prefix));
         threadPool.allowCoreThreadTimeOut(true);
         return threadPool;
     }
 
     public static ScheduledExecutorService singleThreadScheduler(String prefix) {
-        return Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl(prefix));
+        var scheduler = new ScheduledThreadPoolExecutor(1, new ThreadFactoryImpl(prefix));
+        scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        scheduler.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+        return scheduler;
     }
 
     static class ThreadFactoryImpl implements ThreadFactory {

@@ -43,7 +43,7 @@ public final class Scheduler {
     }
 
     public void start() {
-        ZonedDateTime now = ZonedDateTime.now(clock);
+        var now = ZonedDateTime.now(clock);
         tasks.forEach((name, task) -> {
             if (task instanceof FixedRateTask) {
                 schedule((FixedRateTask) task);
@@ -61,14 +61,25 @@ public final class Scheduler {
         logger.info("scheduler started");
     }
 
-    public void stop() {
-        logger.info("stop scheduler");
+    public void shutdown() {
+        logger.info("shutting down scheduler");
         scheduler.shutdown();
-        jobExecutor.shutdown();
         try {
-            jobExecutor.awaitTermination(10, TimeUnit.SECONDS);     // wait 10 seconds to finish current tasks
+            boolean success = scheduler.awaitTermination(5, TimeUnit.SECONDS);
+            if (!success) logger.warn("failed to terminate scheduler");
         } catch (InterruptedException e) {
-            logger.warn("failed to wait all tasks to finish", e);
+            logger.warn(e.getMessage(), e);
+        }
+        jobExecutor.shutdown();
+    }
+
+    public void awaitTermination() {
+        try {
+            boolean success = jobExecutor.awaitTermination(15, TimeUnit.SECONDS);
+            if (!success) logger.warn("failed to terminate scheduler");
+            else logger.info("scheduler stopped");
+        } catch (InterruptedException e) {
+            logger.warn(e.getMessage(), e);
         }
     }
 

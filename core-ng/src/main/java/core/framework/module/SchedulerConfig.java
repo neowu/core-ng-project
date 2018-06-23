@@ -28,7 +28,7 @@ public final class SchedulerConfig extends Config {
     protected void initialize(ModuleContext context, String name) {
         scheduler = new Scheduler(context.logManager);
         context.startupHook.add(scheduler::start);
-        context.shutdownHook.add(scheduler::stop);
+        context.shutdownHook.scheduler = scheduler;
 
         SchedulerController schedulerController = new SchedulerController(scheduler);
         context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);

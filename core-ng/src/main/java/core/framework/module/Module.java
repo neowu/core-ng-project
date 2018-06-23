@@ -24,7 +24,7 @@ public abstract class Module {
     }
 
     public void onShutdown(Runnable runnable) {
-        context.shutdownHook.add(runnable);
+        context.shutdownHook.methods.add(runnable);
     }
 
     public void onStartup(Runnable runnable) {

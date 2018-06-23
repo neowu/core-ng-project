@@ -22,8 +22,8 @@ public class TestSearchConfig extends SearchConfig {
         bindESLogger();
         Path dataPath = Files.tempDir();
         MockElasticSearch search = new MockElasticSearch(dataPath);
-        context.shutdownHook.add(search::close);
-        context.shutdownHook.add(() -> Files.deleteDir(dataPath));
+        context.shutdownHook.methods.add(search::close);
+        context.shutdownHook.methods.add(() -> Files.deleteDir(dataPath));
         return search;
     }
 

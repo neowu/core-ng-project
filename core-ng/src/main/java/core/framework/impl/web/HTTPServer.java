@@ -3,9 +3,11 @@ package core.framework.impl.web;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.site.SiteManager;
 import core.framework.util.StopWatch;
+import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
 import io.undertow.server.HttpHandler;
+import io.undertow.server.handlers.GracefulShutdownHandler;
 import io.undertow.server.handlers.encoding.ContentEncodingRepository;
 import io.undertow.server.handlers.encoding.DeflateEncodingProvider;
 import io.undertow.server.handlers.encoding.EncodingHandler;
@@ -13,13 +15,14 @@ import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+
 /**
  * @author neo
  */
 public class HTTPServer {
     static {
-        // make undertow to use slf4j
-        System.setProperty("org.jboss.logging.provider", "slf4j");
+        System.setProperty("org.jboss.logging.provider", "slf4j");  // make undertow to use slf4j
     }
 
     public final SiteManager siteManager = new SiteManager();
@@ -28,6 +31,7 @@ public class HTTPServer {
     public Integer httpPort;
     public Integer httpsPort;
     public boolean gzip;
+    private GracefulShutdownHandler shutdownHandler;
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
@@ -45,7 +49,8 @@ public class HTTPServer {
             if (httpPort != null) builder.addHttpListener(httpPort, "0.0.0.0");
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
 
-            builder.setHandler(handler())
+            shutdownHandler = handler();
+            builder.setHandler(shutdownHandler)
                    .setServerOption(UndertowOptions.DECODE_URL, false)
                    .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, true)
@@ -58,22 +63,34 @@ public class HTTPServer {
         }
     }
 
-    private HttpHandler handler() {
-        HTTPServerIOHandler handler = new HTTPServerIOHandler(this.handler);
-
-        if (!gzip) return handler;
-
-        GZipPredicate predicate = new GZipPredicate();
-        return new EncodingHandler(new ContentEncodingRepository()
-                .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, predicate)
-                .addEncodingHandler("deflate", new DeflateEncodingProvider(), 10, predicate))
-                .setNext(handler);
+    private GracefulShutdownHandler handler() {
+        HttpHandler handler = new HTTPServerIOHandler(this.handler);
+        if (gzip) {
+            var predicate = new GZipPredicate();
+            handler = new EncodingHandler(handler, new ContentEncodingRepository()
+                    .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, predicate)
+                    .addEncodingHandler("deflate", new DeflateEncodingProvider(), 10, predicate));
+        }
+        return Handlers.gracefulShutdown(handler);
     }
 
-    public void stop() {
+    public void shutdown() {
+        if (shutdownHandler != null) {
+            logger.info("shutting down http server");
+            shutdownHandler.shutdown();
+        }
+    }
+
+    public void awaitTermination() {
         if (server != null) {
-            logger.info("stop http server");
+            try {
+                boolean success = shutdownHandler.awaitShutdown(Duration.ofSeconds(15).toMillis());
+                if (!success) logger.warn("failed to wait all http requests to finish");
+            } catch (InterruptedException e) {
+                logger.warn(e.getMessage(), e);
+            }
             server.stop();
+            logger.info("http server stopped");
         }
     }
 }

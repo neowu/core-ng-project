@@ -27,12 +27,14 @@ public final class ExecutorImpl implements Executor {
     }
 
     public void stop() {
-        logger.info("stop executor, name={}", name);
+        logger.info("shutting down executor, name={}", name);
         executor.shutdown();
         try {
-            executor.awaitTermination(10, TimeUnit.SECONDS);     // wait 10 seconds to finish current tasks
+            boolean success = executor.awaitTermination(10, TimeUnit.SECONDS);
+            if (!success) logger.warn("failed to terminate executor, name={}", name);
+            else logger.info("executor stopped, name={}", name);
         } catch (InterruptedException e) {
-            logger.warn("failed to wait all tasks to finish", e);
+            logger.warn(e.getMessage(), e);
         }
     }
 

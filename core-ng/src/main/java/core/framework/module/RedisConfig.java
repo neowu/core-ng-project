@@ -30,7 +30,7 @@ public class RedisConfig extends Config {
 
     Redis createRedis() {
         Redis redis = new RedisImpl("redis");
-        context.shutdownHook.add(((RedisImpl) redis)::close);
+        context.shutdownHook.methods.add(((RedisImpl) redis)::close);
         context.backgroundTask().scheduleWithFixedDelay(((RedisImpl) redis).pool::refresh, Duration.ofMinutes(5));
         context.stat.metrics.add(new PoolMetrics(((RedisImpl) redis).pool));
         return redis;

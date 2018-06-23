@@ -32,7 +32,7 @@ public class LogConfig extends Config {
         KafkaAppender appender = KafkaAppender.create(kafkaURI, context.logManager.appName);
         context.logManager.kafkaAppender = appender;
         context.startupHook.add(appender::start);
-        context.shutdownHook.add(appender::stop);
+        context.shutdownHook.methods.add(appender::stop);
 
         context.stat.metrics.add(context.logManager.kafkaAppender.producerMetrics);
         context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(context.logManager.kafkaAppender, context.stat), Duration.ofSeconds(10));

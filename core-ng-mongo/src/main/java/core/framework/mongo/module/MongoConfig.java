@@ -38,7 +38,7 @@ public class MongoConfig extends Config {
     MongoImpl createMongo() {
         MongoImpl mongo = new MongoImpl();
         context.startupHook.add(mongo::initialize);
-        context.shutdownHook.add(mongo::close);
+        context.shutdownHook.methods.add(mongo::close);
         return mongo;
     }
 

@@ -106,7 +106,7 @@ public class APIConfig extends Config {
                     .timeout(timeout)
                     .slowOperationThreshold(slowOperationThreshold)
                     .build();
-            context.shutdownHook.add(httpClient::close);
+            context.shutdownHook.methods.add(httpClient::close);
             this.httpClient = httpClient;
         }
         return httpClient;

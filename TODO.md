@@ -11,6 +11,7 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * support websocket?
+* simplify validation annotation, remove message? because it's not used in frontend display anyway (not easy to translate)
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

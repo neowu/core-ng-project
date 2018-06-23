@@ -1,5 +1,6 @@
 package core.framework.impl.module;
 
+import core.framework.impl.async.ThreadPools;
 import core.framework.util.Lists;
 import core.framework.util.Randoms;
 import org.slf4j.Logger;
@@ -7,9 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class BackgroundTaskExecutor {
     private final Logger logger = LoggerFactory.getLogger(BackgroundTaskExecutor.class);
 
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new BackgroundTaskThreadFactory());
+    private final ScheduledExecutorService scheduler = ThreadPools.singleThreadScheduler("background-task-");
     private final List<BackgroundTask> tasks = Lists.newArrayList();
 
     public void start() {
@@ -32,20 +31,16 @@ public class BackgroundTaskExecutor {
     public void stop() {
         logger.info("stop background task executor");
         scheduler.shutdown();
+        try {
+            boolean success = scheduler.awaitTermination(10, TimeUnit.SECONDS);
+            if (!success) logger.warn("failed to terminate background task executor");
+        } catch (InterruptedException e) {
+            logger.warn(e.getMessage(), e);
+        }
     }
 
     public void scheduleWithFixedDelay(Runnable command, Duration rate) {
         tasks.add(new BackgroundTask(command, rate));
-    }
-
-    private static class BackgroundTaskThreadFactory implements ThreadFactory {
-        @Override
-        public Thread newThread(Runnable runnable) {
-            Thread thread = new Thread(runnable, "background-task");
-            thread.setPriority(Thread.NORM_PRIORITY - 1);
-            thread.setDaemon(true);
-            return thread;
-        }
     }
 
     private static class BackgroundTask implements Runnable {

@@ -2,6 +2,7 @@ package core.framework.module;
 
 import core.framework.http.HTTPMethod;
 import core.framework.impl.kafka.Kafka;
+import core.framework.impl.kafka.KafkaMessageListener;
 import core.framework.impl.kafka.KafkaMessagePublisher;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
@@ -24,6 +25,7 @@ public class KafkaConfig extends Config {
     String name;
     private ModuleContext context;
     private Kafka kafka;
+    private KafkaMessageListener listener;
     private boolean handlerAdded;
 
     @Override
@@ -41,11 +43,9 @@ public class KafkaConfig extends Config {
     }
 
     Kafka createKafka(ModuleContext context, String name) {
-        Kafka kafka = new Kafka(name, context.logManager);
+        Kafka kafka = new Kafka(name);
         context.stat.metrics.add(kafka.producerMetrics);
-        context.stat.metrics.add(kafka.consumerMetrics);
-        context.startupHook.add(kafka::initialize);
-        context.shutdownHook.add(kafka::close);
+        context.shutdownHook.methods.add(kafka::close);
 
         KafkaController controller = new KafkaController(kafka);
         context.route(HTTPMethod.GET, managementPathPattern("/topic"), controller::topics, true);
@@ -84,14 +84,13 @@ public class KafkaConfig extends Config {
     }
 
     private <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
-        if (kafka.uri == null) throw Exceptions.error("kafka uri must be configured first, name={}", name);
         logger.info("subscribe topic, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
-        kafka.listener().subscribe(topic, messageClass, handler, bulkHandler);
+        listener().subscribe(topic, messageClass, handler, bulkHandler);
         handlerAdded = true;
     }
 
     public void poolSize(int poolSize) {
-        kafka.listener().poolSize = poolSize;
+        listener().poolSize = poolSize;
     }
 
     public void uri(String uri) {
@@ -100,21 +99,34 @@ public class KafkaConfig extends Config {
         kafka.uri = uri;
     }
 
+    private KafkaMessageListener listener() {
+        if (listener == null) {
+            if (kafka.uri == null) throw Exceptions.error("kafka uri must be configured first, name={}", name);
+            listener = new KafkaMessageListener(kafka.uri, name, context.logManager);
+            context.startupHook.add(listener::start);
+            context.shutdownHook.kafkaListeners.add(listener);
+            context.stat.metrics.add(listener.consumerMetrics);
+        }
+        return listener;
+    }
+
     public void maxProcessTime(Duration maxProcessTime) {
-        kafka.maxProcessTime = maxProcessTime;
+        listener().maxProcessTime = maxProcessTime;
     }
 
     public void maxPoll(int maxRecords, int maxBytes) {
         if (maxRecords <= 0) throw Exceptions.error("max poll records must be greater than 0, value={}", maxRecords);
         if (maxBytes <= 0) throw Exceptions.error("max poll bytes must be greater than 0, value={}", maxBytes);
-        kafka.maxPollRecords = maxRecords;
-        kafka.maxPollBytes = maxBytes;
+        KafkaMessageListener listener = listener();
+        listener.maxPollRecords = maxRecords;
+        listener.maxPollBytes = maxBytes;
     }
 
     public void minPoll(int minBytes, Duration maxWaitTime) {
         if (minBytes <= 0) throw Exceptions.error("min poll bytes must be greater than 0, value={}", minBytes);
         if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw Exceptions.error("max wait time must be greater than 0, value={}", maxWaitTime);
-        kafka.minPollBytes = minBytes;
-        kafka.minPollMaxWaitTime = maxWaitTime;
+        KafkaMessageListener listener = listener();
+        listener.minPollBytes = minBytes;
+        listener.minPollMaxWaitTime = maxWaitTime;
     }
 }
