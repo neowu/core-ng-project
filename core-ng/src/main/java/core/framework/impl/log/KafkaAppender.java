@@ -93,11 +93,11 @@ public final class KafkaAppender {
         logForwarderThread.start();
     }
 
-    public void stop() {
+    public void stop(long timeoutInMs) {
         logger.info("stop log forwarder");
         stop.set(true);
         logForwarderThread.interrupt();
-        producer.close(5, TimeUnit.SECONDS);
+        producer.close(timeoutInMs <= 0 ? 1000 : timeoutInMs, TimeUnit.MILLISECONDS);
     }
 
     void forward(ActionLog log) {

@@ -6,6 +6,7 @@ import core.framework.impl.kafka.KafkaMessageListener;
 import core.framework.impl.kafka.KafkaMessagePublisher;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.web.management.KafkaController;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
@@ -45,7 +46,7 @@ public class KafkaConfig extends Config {
     Kafka createKafka(ModuleContext context, String name) {
         Kafka kafka = new Kafka(name);
         context.stat.metrics.add(kafka.producerMetrics);
-        context.shutdownHook.methods.add(kafka::close);
+        context.shutdownHook.add(ShutdownHook.STAGE_3, kafka::close);
 
         KafkaController controller = new KafkaController(kafka);
         context.route(HTTPMethod.GET, managementPathPattern("/topic"), controller::topics, true);
@@ -104,7 +105,8 @@ public class KafkaConfig extends Config {
             if (kafka.uri == null) throw Exceptions.error("kafka uri must be configured first, name={}", name);
             listener = new KafkaMessageListener(kafka.uri, name, context.logManager);
             context.startupHook.add(listener::start);
-            context.shutdownHook.kafkaListeners.add(listener);
+            context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> listener.shutdown());
+            context.shutdownHook.add(ShutdownHook.STAGE_1, listener::awaitTermination);
             context.stat.metrics.add(listener.consumerMetrics);
         }
         return listener;

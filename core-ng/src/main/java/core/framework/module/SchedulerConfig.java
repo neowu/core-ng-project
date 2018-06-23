@@ -3,6 +3,7 @@ package core.framework.module;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.scheduler.DailyTrigger;
 import core.framework.impl.scheduler.MonthlyTrigger;
 import core.framework.impl.scheduler.Scheduler;
@@ -28,7 +29,8 @@ public final class SchedulerConfig extends Config {
     protected void initialize(ModuleContext context, String name) {
         scheduler = new Scheduler(context.logManager);
         context.startupHook.add(scheduler::start);
-        context.shutdownHook.scheduler = scheduler;
+        context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> scheduler.shutdown());
+        context.shutdownHook.add(ShutdownHook.STAGE_1, scheduler::awaitTermination);
 
         SchedulerController schedulerController = new SchedulerController(scheduler);
         context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);

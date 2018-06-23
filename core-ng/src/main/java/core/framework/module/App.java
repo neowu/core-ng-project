@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.async.Task;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.module.ModuleContext;
 import org.slf4j.Logger;
@@ -15,7 +16,9 @@ public abstract class App extends Module {
         try {
             configure();
             logger.info("execute startup methods");
-            context.startupHook.forEach(java.lang.Runnable::run);
+            for (Task task : context.startupHook) {
+                task.execute();
+            }
         } catch (Throwable e) {
             logger.error("application failed to start, error={}", e.getMessage(), e);
             System.exit(1);

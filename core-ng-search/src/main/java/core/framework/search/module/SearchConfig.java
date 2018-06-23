@@ -2,6 +2,7 @@ package core.framework.search.module;
 
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchImpl;
@@ -34,7 +35,7 @@ public class SearchConfig extends Config {
         System.setProperty("log4j2.loggerContextFactory", ESLoggerContextFactory.class.getName());
         ElasticSearchImpl search = new ElasticSearchImpl();
         context.startupHook.add(search::initialize);
-        context.shutdownHook.methods.add(search::close);
+        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> search.close());
         return search;
     }
 

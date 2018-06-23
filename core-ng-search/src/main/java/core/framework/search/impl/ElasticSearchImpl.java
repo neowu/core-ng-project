@@ -63,11 +63,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         if (client == null) return;
 
         logger.info("close elasticsearch client");
-        try {
-            client.close();
-        } catch (ElasticsearchException e) {
-            logger.warn("failed to close elastic search client", e);
-        }
+        client.close();
     }
 
     @Override

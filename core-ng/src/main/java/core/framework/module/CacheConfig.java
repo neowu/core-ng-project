@@ -8,6 +8,7 @@ import core.framework.impl.cache.LocalCacheStore;
 import core.framework.impl.cache.RedisCacheStore;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
 import core.framework.impl.web.management.CacheController;
@@ -82,7 +83,7 @@ public class CacheConfig extends Config {
         RedisImpl redis = new RedisImpl("redis-cache");
         redis.host = host;
         redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
-        context.shutdownHook.methods.add(redis::close);
+        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.stat.metrics.add(new PoolMetrics(redis.pool));
         configureCacheManager(new RedisCacheStore(redis));

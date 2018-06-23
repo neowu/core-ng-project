@@ -2,6 +2,7 @@ package core.framework.module;
 
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
 import core.framework.redis.Redis;
@@ -29,10 +30,10 @@ public class RedisConfig extends Config {
     }
 
     Redis createRedis() {
-        Redis redis = new RedisImpl("redis");
-        context.shutdownHook.methods.add(((RedisImpl) redis)::close);
-        context.backgroundTask().scheduleWithFixedDelay(((RedisImpl) redis).pool::refresh, Duration.ofMinutes(5));
-        context.stat.metrics.add(new PoolMetrics(((RedisImpl) redis).pool));
+        var redis = new RedisImpl("redis");
+        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> redis.close());
+        context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
+        context.stat.metrics.add(new PoolMetrics(redis.pool));
         return redis;
     }
 

@@ -70,15 +70,15 @@ public class Kafka {
         return admin;
     }
 
-    public void close() {
+    public void close(long timeoutInMs) {
         if (producer != null) {
             logger.info("close kafka producer, name={}, uri={}", name, uri);
             producer.flush();
-            producer.close(5, TimeUnit.SECONDS);
+            producer.close(timeoutInMs <= 0 ? 1000 : timeoutInMs, TimeUnit.MILLISECONDS);    // timeout from shutdown hook can be negative, give 1000ms for best try before container be killed
         }
         if (admin != null) {
             logger.info("close kafka admin, name={}, uri={}", name, uri);
-            admin.close(5, TimeUnit.SECONDS);
+            admin.close(timeoutInMs <= 0 ? 1000 : timeoutInMs, TimeUnit.MILLISECONDS);
         }
     }
 }

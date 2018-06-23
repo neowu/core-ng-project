@@ -6,6 +6,7 @@ import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.web.ControllerHolder;
 import core.framework.impl.web.bean.RequestBeanMapper;
@@ -106,7 +107,7 @@ public class APIConfig extends Config {
                     .timeout(timeout)
                     .slowOperationThreshold(slowOperationThreshold)
                     .build();
-            context.shutdownHook.methods.add(httpClient::close);
+            context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> httpClient.close());
             this.httpClient = httpClient;
         }
         return httpClient;

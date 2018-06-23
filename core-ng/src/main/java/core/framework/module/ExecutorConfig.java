@@ -5,6 +5,7 @@ import core.framework.impl.async.ExecutorImpl;
 import core.framework.impl.async.ThreadPools;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 
 /**
  * @author neo
@@ -34,7 +35,7 @@ public class ExecutorConfig extends Config {
     Executor createExecutor(String name, int poolSize) {
         String prefix = "executor-" + (name == null ? "" : name + "-");
         var executor = new ExecutorImpl(ThreadPools.cachedThreadPool(poolSize, prefix), context.logManager, name);
-        context.shutdownHook.executors.add(executor);
+        context.shutdownHook.add(ShutdownHook.STAGE_2, executor::shutdown);
         return executor;
     }
 }

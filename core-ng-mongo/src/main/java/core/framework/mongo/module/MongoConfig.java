@@ -2,6 +2,7 @@ package core.framework.mongo.module;
 
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
 import core.framework.mongo.impl.MongoImpl;
@@ -36,9 +37,9 @@ public class MongoConfig extends Config {
     }
 
     MongoImpl createMongo() {
-        MongoImpl mongo = new MongoImpl();
+        var mongo = new MongoImpl();
         context.startupHook.add(mongo::initialize);
-        context.shutdownHook.methods.add(mongo::close);
+        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> mongo.close());
         return mongo;
     }
 

@@ -1,5 +1,6 @@
 package core.framework.impl.module;
 
+import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.log.DefaultLoggerFactory;
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 public class ModuleContext {
     public final BeanFactory beanFactory;
-    public final List<Runnable> startupHook = Lists.newArrayList();
+    public final List<Task> startupHook = Lists.newArrayList();
     public final ShutdownHook shutdownHook = new ShutdownHook();
     public final PropertyManager propertyManager = new PropertyManager();
     public final HTTPServer httpServer;
@@ -48,7 +49,8 @@ public class ModuleContext {
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
         startupHook.add(httpServer::start);
-        shutdownHook.httpServer = httpServer;
+        shutdownHook.add(ShutdownHook.STAGE_0, timeout -> httpServer.shutdown());
+        shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitTermination);
 
         route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
         ThreadInfoController threadInfoController = new ThreadInfoController();
@@ -62,7 +64,8 @@ public class ModuleContext {
         if (backgroundTask == null) {
             backgroundTask = new BackgroundTaskExecutor();
             startupHook.add(backgroundTask::start);
-            shutdownHook.backgroundTask = backgroundTask;
+            shutdownHook.add(ShutdownHook.STAGE_0, timeout -> backgroundTask.shutdown());
+            shutdownHook.add(ShutdownHook.STAGE_2, backgroundTask::awaitTermination);
         }
         return backgroundTask;
     }

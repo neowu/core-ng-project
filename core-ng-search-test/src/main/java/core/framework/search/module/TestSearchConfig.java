@@ -1,6 +1,7 @@
 package core.framework.search.module;
 
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 import core.framework.search.impl.ESLoggerConfigFactory;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.MockElasticSearch;
@@ -21,9 +22,9 @@ public class TestSearchConfig extends SearchConfig {
     ElasticSearchImpl createElasticSearch(ModuleContext context) {
         bindESLogger();
         Path dataPath = Files.tempDir();
-        MockElasticSearch search = new MockElasticSearch(dataPath);
-        context.shutdownHook.methods.add(search::close);
-        context.shutdownHook.methods.add(() -> Files.deleteDir(dataPath));
+        var search = new MockElasticSearch(dataPath);
+        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> search.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> Files.deleteDir(dataPath));
         return search;
     }
 

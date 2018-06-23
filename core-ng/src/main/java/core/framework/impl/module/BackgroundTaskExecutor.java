@@ -37,8 +37,10 @@ public class BackgroundTaskExecutor {
         scheduler.shutdown();
     }
 
-    void awaitTermination(long timeoutInMs) {
-        ThreadPools.awaitTermination(scheduler, timeoutInMs, "background task executor");
+    void awaitTermination(long timeoutInMs) throws InterruptedException {
+        boolean success = scheduler.awaitTermination(timeoutInMs, TimeUnit.MILLISECONDS);
+        if (!success) logger.warn("failed to terminate background task executor");
+        else logger.info("background task executor stopped");
     }
 
     private static class BackgroundTask implements Runnable {

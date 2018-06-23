@@ -13,22 +13,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class ThreadPoolThreadNameTest {
-    private ExecutorService threadPool;
+class CachedThreadPoolTest {
+    private ExecutorService pool;
 
     @BeforeEach
     void createThreadPool() {
-        threadPool = ThreadPools.cachedThreadPool(1, "test-thread-pool-");
+        pool = ThreadPools.cachedThreadPool(1, "test-thread-pool-");
     }
 
     @AfterEach
     void closeThreadPool() {
-        threadPool.shutdown();
+        pool.shutdown();
     }
 
     @Test
     void threadName() throws ExecutionException, InterruptedException {
-        Future<?> future = threadPool.submit(() -> assertThat(Thread.currentThread().getName()).isEqualTo("test-thread-pool-1"));
+        Future<?> future = pool.submit(() -> assertThat(Thread.currentThread().getName()).isEqualTo("test-thread-pool-1"));
         future.get();
     }
 }

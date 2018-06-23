@@ -5,6 +5,7 @@ import core.framework.impl.log.KafkaAppender;
 import core.framework.impl.log.stat.CollectStatTask;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.module.ShutdownHook;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -32,7 +33,7 @@ public class LogConfig extends Config {
         KafkaAppender appender = KafkaAppender.create(kafkaURI, context.logManager.appName);
         context.logManager.kafkaAppender = appender;
         context.startupHook.add(appender::start);
-        context.shutdownHook.methods.add(appender::stop);
+        context.shutdownHook.add(ShutdownHook.STAGE_3, appender::stop);
 
         context.stat.metrics.add(context.logManager.kafkaAppender.producerMetrics);
         context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(context.logManager.kafkaAppender, context.stat), Duration.ofSeconds(10));
