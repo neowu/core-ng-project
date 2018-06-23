@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -20,15 +21,13 @@ class ShutdownHookTest {
 
     @Test
     void run() throws Exception {
-        ShutdownHook.Shutdown shutdown1 = timeoutIn -> {
-            throw new Error("failed to shutdown");
-        };
-        ShutdownHook.Shutdown shutdown2 = mock(ShutdownHook.Shutdown.class);
+        var shutdown1 = mock(ShutdownHook.Shutdown.class);
+        doThrow(new Error("failed to shutdown")).when(shutdown1).execute(anyLong());
+        var shutdown2 = mock(ShutdownHook.Shutdown.class);
         shutdownHook.add(ShutdownHook.STAGE_0, shutdown1);
         shutdownHook.add(ShutdownHook.STAGE_10, shutdown2);
 
         shutdownHook.run();
-
         verify(shutdown2).execute(anyLong());
     }
 }
