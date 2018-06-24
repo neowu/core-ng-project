@@ -88,7 +88,8 @@ class KafkaMessageListenerThread extends Thread {
     private void process() {
         while (!shutdown.get()) {
             try {
-                ConsumerRecords<String, byte[]> records = consumer.poll(Integer.MAX_VALUE);
+                ConsumerRecords<String, byte[]> records = consumer.poll(10000);
+                if (records.isEmpty()) continue;
                 processRecords(records);
             } catch (Throwable e) {
                 if (shutdown.get()) break;

@@ -81,15 +81,15 @@ public class MessageProcessor {
             processing.set(true);
             while (!shutdown.get()) {
                 try {
-                    ConsumerRecords<String, byte[]> records = consumer.poll(Long.MAX_VALUE);
+                    ConsumerRecords<String, byte[]> records = consumer.poll(10000);
+                    if (records.isEmpty()) continue;
                     consume(TOPIC_ACTION_LOG, records, actionLogReader, actionService::index);
                     consume(TOPIC_STAT, records, statReader, statService::index);
                     consumer.commitAsync();
                 } catch (Throwable e) {
-                    if (!shutdown.get()) {
-                        logger.error("failed to process message, retry in 30 seconds", e);
-                        Threads.sleepRoughly(Duration.ofSeconds(30));
-                    }
+                    if (shutdown.get()) break;
+                    logger.error("failed to process message, retry in 10 seconds", e);
+                    Threads.sleepRoughly(Duration.ofSeconds(10));
                 }
             }
             consumer.close();
@@ -106,10 +106,9 @@ public class MessageProcessor {
                 indexService.createIndexTemplates();
                 return;
             } catch (Throwable e) {
-                if (!shutdown.get()) {
-                    logger.error("failed to create index templates, retry in 30 seconds", e);
-                    Threads.sleepRoughly(Duration.ofSeconds(30));
-                }
+                if (shutdown.get()) return;
+                logger.error("failed to create index templates, retry in 10 seconds", e);
+                Threads.sleepRoughly(Duration.ofSeconds(10));
             }
         }
     }
