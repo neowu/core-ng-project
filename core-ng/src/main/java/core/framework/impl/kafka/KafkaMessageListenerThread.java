@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -56,22 +55,14 @@ class KafkaMessageListenerThread extends Thread {
 
     @Override
     public void run() {
-        processing.set(true);
-        while (!shutdown.get()) {
-            try {
-                ConsumerRecords<String, byte[]> records = consumer.poll(Integer.MAX_VALUE);
-                process(consumer, records);
-            } catch (Throwable e) {
-                if (shutdown.get()) break;
-                logger.error("failed to pull message, retry in 10 seconds", e);
-                Threads.sleepRoughly(Duration.ofSeconds(10));
+        try {
+            processing.set(true);
+            process();
+        } finally {
+            processing.set(false);
+            synchronized (lock) {
+                lock.notifyAll();
             }
-        }
-        logger.info("close kafka consumer, name={}", getName());
-        consumer.close(10, TimeUnit.SECONDS);
-        processing.set(false);
-        synchronized (lock) {
-            lock.notifyAll();
         }
     }
 
@@ -94,8 +85,23 @@ class KafkaMessageListenerThread extends Thread {
         }
     }
 
-    private void process(Consumer<String, byte[]> consumer, ConsumerRecords<String, byte[]> kafkaRecords) {
-        StopWatch watch = new StopWatch();
+    private void process() {
+        while (!shutdown.get()) {
+            try {
+                ConsumerRecords<String, byte[]> records = consumer.poll(Integer.MAX_VALUE);
+                processRecords(records);
+            } catch (Throwable e) {
+                if (shutdown.get()) break;
+                logger.error("failed to pull message, retry in 10 seconds", e);
+                Threads.sleepRoughly(Duration.ofSeconds(10));
+            }
+        }
+        logger.info("close kafka consumer, name={}", getName());
+        consumer.close();
+    }
+
+    private void processRecords(ConsumerRecords<String, byte[]> kafkaRecords) {
+        var watch = new StopWatch();
         int count = 0;
         int size = 0;
         try {

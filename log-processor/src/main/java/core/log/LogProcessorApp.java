@@ -42,7 +42,7 @@ public class LogProcessorApp extends App {
         processor.initialize();
         stat.metrics.add(processor.metrics);
         onStartup(processor::start);
-        onShutdown(processor::stop);
+        onShutdown(processor::shutdown);
 
         schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
         schedule().fixedRate("collect-stat-job", bind(CollectStatJob.class), Duration.ofSeconds(10));

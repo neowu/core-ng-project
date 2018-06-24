@@ -27,9 +27,11 @@ import static core.framework.impl.log.message.LogTopics.TOPIC_STAT;
 public class MessageProcessor {
     public final ConsumerMetrics metrics = new ConsumerMetrics();
     private final Logger logger = LoggerFactory.getLogger(MessageProcessor.class);
-    private final AtomicBoolean stop = new AtomicBoolean(false);
     private final JSONReader<ActionLogMessage> actionLogReader = JSONReader.of(ActionLogMessage.class);
     private final JSONReader<StatMessage> statReader = JSONReader.of(StatMessage.class);
+    private final AtomicBoolean shutdown = new AtomicBoolean(false);
+    private final AtomicBoolean processing = new AtomicBoolean(false);
+    private final Object lock = new Object();
     @Inject
     KafkaConsumerFactory consumerFactory;
     @Inject
@@ -47,9 +49,26 @@ public class MessageProcessor {
         processorThread.start();
     }
 
-    public void stop() {
-        stop.set(true);
+    public void shutdown() throws InterruptedException {
+        logger.info("shutting down message processor");
+        shutdown.set(true);
         consumer.wakeup();
+        awaitTermination();
+    }
+
+    private void awaitTermination() throws InterruptedException {
+        long end = System.currentTimeMillis() + 10000;  // timeout in 10s
+        synchronized (lock) {
+            while (processing.get()) {
+                long left = end - System.currentTimeMillis();
+                if (left <= 0) {
+                    logger.warn("failed to terminate message processor");
+                    return;
+                }
+                lock.wait(left);
+            }
+        }
+        logger.info("message processor stopped");
     }
 
     public void initialize() {
@@ -59,31 +78,35 @@ public class MessageProcessor {
 
         processorThread = new Thread(() -> {
             logger.info("message processor started, kafkaURI={}", consumerFactory.uri);
-            while (!stop.get()) {
+            processing.set(true);
+            while (!shutdown.get()) {
                 try {
                     ConsumerRecords<String, byte[]> records = consumer.poll(Long.MAX_VALUE);
                     consume(TOPIC_ACTION_LOG, records, actionLogReader, actionService::index);
                     consume(TOPIC_STAT, records, statReader, statService::index);
                     consumer.commitAsync();
                 } catch (Throwable e) {
-                    if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
+                    if (!shutdown.get()) {
                         logger.error("failed to process message, retry in 30 seconds", e);
                         Threads.sleepRoughly(Duration.ofSeconds(30));
                     }
                 }
             }
             consumer.close();
-            logger.info("message processor stopped");
+            processing.set(false);
+            synchronized (lock) {
+                lock.notifyAll();
+            }
         }, "message-processor");
     }
 
     private void createIndexTemplates() {
-        while (!stop.get()) {
+        while (!shutdown.get()) {
             try {
                 indexService.createIndexTemplates();
-                break;
+                return;
             } catch (Throwable e) {
-                if (!stop.get()) {  // if not initiated by shutdown, exception types can be ShutdownSignalException, InterruptedException
+                if (!shutdown.get()) {
                     logger.error("failed to create index templates, retry in 30 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(30));
                 }
@@ -101,7 +124,7 @@ public class MessageProcessor {
         }
         if (messages.isEmpty()) return;
 
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             consumer.accept(messages);
         } finally {

@@ -89,7 +89,7 @@ public class KafkaMessageListener {
             for (KafkaMessageListenerThread thread : listenerThreads) {
                 try {
                     thread.awaitTermination(end - System.currentTimeMillis());
-                } catch (Throwable e) {
+                } catch (InterruptedException e) {
                     logger.warn(e.getMessage(), e);
                 }
             }
