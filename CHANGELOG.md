@@ -3,8 +3,7 @@
 * api: make RemoteServiceException exposes https status
 * site: make default error handler fits most of cases to reduce the need of creating custom error handler 
 * make http server / scheduler / kafka listener / executor shutdown gracefully 
-* httpClient: added DefaultServiceUnavailableRetryStrategy, enable evictIdleConnections
-* module: auto register close method if bind bean implements AutoCloseable interface 
+* httpClient: added DefaultServiceUnavailableRetryStrategy, enable evictIdleConnections 
 
 ### 6.3.6 (6/14/2018 - 6/21/2018)
 * api: assert same service interface must not have duplicate method name

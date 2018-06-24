@@ -94,10 +94,6 @@ public class ModuleContext {
 
     public void bind(Type type, String name, Object instance) {
         beanFactory.bind(type, name, instance);
-        if (instance instanceof AutoCloseable) {
-            logger.info("found auto closeable bean, added to shutdown hook, type={}, name={}", type.getTypeName(), name);
-            shutdownHook.add(ShutdownHook.STAGE_10, timeout -> ((AutoCloseable) instance).close());
-        }
     }
 
     public void validate() {
