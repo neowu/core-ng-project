@@ -38,7 +38,7 @@ public final class ShutdownHook implements Runnable {
         for (Map.Entry<Integer, List<Shutdown>> entry : stages.entrySet()) {
             Integer stage = entry.getKey();
             List<Shutdown> shutdowns = entry.getValue();
-            logger.info("start shutdown stage: {}", stage);
+            logger.info("shutdown stage: {}", stage);
             for (Shutdown shutdown : shutdowns) {
                 try {
                     shutdown.execute(endTime - System.currentTimeMillis());

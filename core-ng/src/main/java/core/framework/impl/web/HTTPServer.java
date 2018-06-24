@@ -79,9 +79,12 @@ public class HTTPServer {
     public void awaitTermination(long timeoutInMs) throws InterruptedException {
         if (server != null) {
             try {
-                shutdownHandler.awaitTermination(timeoutInMs);
+                boolean success = shutdownHandler.awaitTermination(timeoutInMs);
+                if (!success) {
+                    logger.warn("failed to wait all http requests to complete");
+                    server.getWorker().shutdownNow();
+                }
             } finally {
-                server.getWorker().shutdownNow();
                 server.stop();
                 logger.info("http server stopped");
             }

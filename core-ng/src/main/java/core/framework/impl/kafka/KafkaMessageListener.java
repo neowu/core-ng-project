@@ -85,11 +85,11 @@ public class KafkaMessageListener {
 
     public void awaitTermination(long timeoutInMs) {
         if (listenerThreads != null) {
-            long endTime = System.currentTimeMillis() + timeoutInMs;
+            long end = System.currentTimeMillis() + timeoutInMs;
             for (KafkaMessageListenerThread thread : listenerThreads) {
                 try {
-                    thread.awaitTermination(endTime - System.currentTimeMillis());
-                } catch (InterruptedException e) {
+                    thread.awaitTermination(end - System.currentTimeMillis());
+                } catch (Throwable e) {
                     logger.warn(e.getMessage(), e);
                 }
             }
