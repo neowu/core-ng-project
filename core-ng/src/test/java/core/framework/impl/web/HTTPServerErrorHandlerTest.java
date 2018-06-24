@@ -73,7 +73,10 @@ class HTTPServerErrorHandlerTest {
     @Test
     void errorHTML() {
         String actionId = UUID.randomUUID().toString();
-        String html = handler.errorHTML(new Error("test message"), actionId);
-        assertThat(html).contains("test message").contains(actionId);
+        String html = handler.errorHTML(new Error("error message"), actionId);
+        assertThat(html).contains("ERROR").contains("error message").contains(actionId);
+
+        html = handler.errorHTML(new NotFoundException("not found"), actionId);
+        assertThat(html).contains("NOT_FOUND").contains("not found").contains(actionId);
     }
 }

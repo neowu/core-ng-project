@@ -1,7 +1,7 @@
 package core.framework.impl.web.route;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.web.ControllerHolder;
+import core.framework.impl.web.controller.ControllerHolder;
 import core.framework.util.Exceptions;
 import core.framework.web.exception.MethodNotAllowedException;
 

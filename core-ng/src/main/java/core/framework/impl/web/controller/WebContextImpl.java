@@ -1,4 +1,4 @@
-package core.framework.impl.web;
+package core.framework.impl.web.controller;
 
 import core.framework.util.Maps;
 import core.framework.web.Request;
@@ -29,12 +29,12 @@ public class WebContextImpl implements WebContext {
         context.get().put(key, value);
     }
 
-    void initialize(Request request) {
+    public void initialize(Request request) {
         context.set(Maps.newHashMap());
         this.request.set(request);
     }
 
-    void cleanup() {
+    public void cleanup() {
         context.remove();
         request.remove();
     }

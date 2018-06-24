@@ -105,7 +105,8 @@ public class HTTPServerErrorHandler {
     }
 
     String errorHTML(Throwable e, String actionId) {
-        return "<html><body><h1>Error</h1><p>" + e.getMessage() + "</p><p>id: " + actionId + "</p></body></html>";
+        String errorCode = e instanceof ErrorCode ? ((ErrorCode) e).errorCode() : "ERROR";
+        return "<html><body><h1>" + errorCode + "</h1><p>" + e.getMessage() + "</p><p>id: " + actionId + "</p></body></html>";
     }
 
     private void renderDefaultErrorPage(Throwable e, HttpServerExchange exchange, ActionLog actionLog) {

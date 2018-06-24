@@ -1,4 +1,4 @@
-package core.framework.impl.web;
+package core.framework.impl.web.controller;
 
 import core.framework.util.Exceptions;
 

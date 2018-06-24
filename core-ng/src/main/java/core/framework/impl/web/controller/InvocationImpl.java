@@ -1,4 +1,4 @@
-package core.framework.impl.web;
+package core.framework.impl.web.controller;
 
 import core.framework.web.Interceptor;
 import core.framework.web.Invocation;
@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
 /**
  * @author neo
  */
-final class InvocationImpl implements Invocation {
+public final class InvocationImpl implements Invocation {
     private final Logger logger = LoggerFactory.getLogger(InvocationImpl.class);
 
     private final ControllerHolder controller;
@@ -23,7 +23,7 @@ final class InvocationImpl implements Invocation {
     private final WebContextImpl context;
     private int currentStack;
 
-    InvocationImpl(ControllerHolder controller, Interceptors interceptors, Request request, WebContextImpl context) {
+    public InvocationImpl(ControllerHolder controller, Interceptors interceptors, Request request, WebContextImpl context) {
         this.controller = controller;
         this.interceptors = interceptors;
         this.request = request;

@@ -5,13 +5,17 @@ import core.framework.impl.log.LogManager;
 import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanTypeValidator;
+import core.framework.impl.web.controller.ControllerHolder;
+import core.framework.impl.web.controller.Interceptors;
+import core.framework.impl.web.controller.InvocationImpl;
+import core.framework.impl.web.controller.WebContextImpl;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.request.RequestParser;
 import core.framework.impl.web.response.ResponseHandler;
 import core.framework.impl.web.response.ResponseImpl;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
-import core.framework.impl.web.site.SiteManager;
+import core.framework.impl.web.site.TemplateManager;
 import core.framework.web.Response;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -41,13 +45,15 @@ public class HTTPServerHandler implements HttpHandler {
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
+    private final ShutdownHandler shutdownHandler;
     private final HTTPServerHealthCheckHandler healthCheckHandler = new HTTPServerHealthCheckHandler();
 
-    HTTPServerHandler(LogManager logManager, SiteManager siteManager) {
+    HTTPServerHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager, ShutdownHandler shutdownHandler) {
         this.logManager = logManager;
-        sessionManager = siteManager.sessionManager;
-        responseHandler = new ResponseHandler(responseBeanTypeValidator, siteManager.templateManager);
+        this.sessionManager = sessionManager;
+        responseHandler = new ResponseHandler(responseBeanTypeValidator, templateManager);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
+        this.shutdownHandler = shutdownHandler;
     }
 
     @Override
@@ -70,27 +76,16 @@ public class HTTPServerHandler implements HttpHandler {
         ActionLog actionLog = logManager.begin("=== http transaction begin ===");
         RequestImpl request = new RequestImpl(exchange, requestBeanMapper);
         try {
-            webContext.initialize(request);     // initialize webContext at beginning, the customerErrorHandler in errorHandler may use it if any exception
-
+            webContext.initialize(request);
             requestParser.parse(request, exchange, actionLog);
+            linkContext(actionLog, exchange.getRequestHeaders());
+            shutdownHandler.handleRequest(exchange);
             request.session = sessionManager.load(request);
-
-            HeaderMap headers = exchange.getRequestHeaders();
-
-            String client = headers.getFirst(HTTPServerHandler.HEADER_CLIENT);
-            if (client != null) actionLog.context("client", client);
-
-            actionLog.refId(headers.getFirst(HTTPServerHandler.HEADER_REF_ID));
 
             ControllerHolder controller = route.get(path, request.method(), request.pathParams, actionLog);
             actionLog.action(controller.action);
             actionLog.context("controller", controller.controllerInfo);
             logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());
-
-            // trigger trace after action is determined due to trace log use action as part of path, is there better way?
-            if ("true".equals(headers.getFirst(HEADER_TRACE))) {
-                actionLog.trace = true;
-            }
 
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
             sessionManager.save(request, response);
@@ -101,6 +96,15 @@ public class HTTPServerHandler implements HttpHandler {
         } finally {
             webContext.cleanup();
             logManager.end("=== http transaction end ===");
+        }
+    }
+
+    void linkContext(ActionLog actionLog, HeaderMap headers) {
+        String client = headers.getFirst(HTTPServerHandler.HEADER_CLIENT);
+        if (client != null) actionLog.context("client", client);
+        actionLog.refId(headers.getFirst(HTTPServerHandler.HEADER_REF_ID));
+        if ("true".equals(headers.getFirst(HEADER_TRACE))) {
+            actionLog.trace = true;
         }
     }
 }
