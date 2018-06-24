@@ -16,7 +16,6 @@ import core.framework.module.TestKafkaConfig;
 import core.framework.module.TestLogConfig;
 import core.framework.module.TestRedisConfig;
 import core.framework.module.TestSessionConfig;
-import core.framework.test.inject.TestBeanFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +29,7 @@ class TestModuleContextTest {
 
     @BeforeEach
     void createTestModuleContext() {
-        context = new TestModuleContext(new TestBeanFactory());
+        context = new TestModuleContext();
     }
 
     @Test

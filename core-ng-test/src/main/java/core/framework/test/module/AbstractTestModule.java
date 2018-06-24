@@ -2,7 +2,6 @@ package core.framework.test.module;
 
 import core.framework.module.InitDBConfig;
 import core.framework.module.Module;
-import core.framework.test.inject.TestBeanFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,13 +13,12 @@ import java.lang.reflect.Type;
 public abstract class AbstractTestModule extends Module {
     private final Logger logger = LoggerFactory.getLogger(AbstractTestModule.class);
 
-    public final void configure(TestBeanFactory beanFactory) {
+    public final void configure() {
         logger.info("initialize test context");
-        context = new TestModuleContext(beanFactory);
+        context = new TestModuleContext();
         logger.info("initialize application");
         initialize();
         context.validate();
-        ((TestBeanFactory) context.beanFactory).validateOverrideBindings();
     }
 
     public <T> T overrideBinding(Class<? super T> type, T instance) {
@@ -28,7 +26,7 @@ public abstract class AbstractTestModule extends Module {
     }
 
     public <T> T overrideBinding(Type type, String name, T instance) {
-        return ((TestBeanFactory) context.beanFactory).overrideBinding(type, name, instance);
+        return ((TestModuleContext) context).overrideBinding(type, name, instance);
     }
 
     public InitDBConfig initDB() {
@@ -37,5 +35,9 @@ public abstract class AbstractTestModule extends Module {
 
     public InitDBConfig initDB(String name) {
         return context.config(InitDBConfig.class, name);
+    }
+
+    public void inject(Object instance) {
+        context.beanFactory.inject(instance);
     }
 }

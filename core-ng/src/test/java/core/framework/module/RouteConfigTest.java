@@ -1,7 +1,6 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.HTTPServerHealthCheckHandler;
 import core.framework.web.Controller;
@@ -21,8 +20,7 @@ class RouteConfigTest {
 
     @BeforeEach
     void createRouteConfig() {
-        ModuleContext context = new ModuleContext(new BeanFactory());
-        config = new RouteConfig(context);
+        config = new RouteConfig(new ModuleContext());
     }
 
     @Test

@@ -1,7 +1,6 @@
 package core.framework.module;
 
 import core.framework.async.Task;
-import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.module.ModuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ public abstract class App extends Module {
         logger.info("initialize framework");
         Runtime runtime = Runtime.getRuntime();
         logger.info("availableProcessors={}, maxMemory={}", runtime.availableProcessors(), runtime.maxMemory());
-        context = new ModuleContext(new BeanFactory());
+        context = new ModuleContext();
         logger.info("initialize application");
         initialize();
         context.validate();

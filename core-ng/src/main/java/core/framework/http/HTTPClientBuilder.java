@@ -7,6 +7,7 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
@@ -17,6 +18,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
@@ -38,19 +40,18 @@ public final class HTTPClientBuilder {
             HttpClientBuilder builder = HttpClients.custom();
             builder.setUserAgent(userAgent);
 
-            builder.setKeepAliveStrategy((response, context) -> keepAliveTimeout.toMillis());
-
             builder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
                    .setSSLContext(new SSLContextBuilder().loadTrustMaterial(TrustSelfSignedStrategy.INSTANCE).build());
 
-            // builder use PoolingHttpClientConnectionManager by default, and connTimeToLive will be set by keepAlive value
-
+            // builder use PoolingHttpClientConnectionManager by default
             builder.setDefaultSocketConfig(SocketConfig.custom().setSoKeepAlive(true).build());
-
             builder.setDefaultRequestConfig(RequestConfig.custom()
                                                          .setSocketTimeout((int) timeout.toMillis())
                                                          .setConnectionRequestTimeout((int) timeout.toMillis())
                                                          .setConnectTimeout((int) timeout.toMillis()).build());
+            builder.setKeepAliveStrategy((response, context) -> keepAliveTimeout.toMillis());
+            builder.setConnectionTimeToLive(keepAliveTimeout.toMillis(), TimeUnit.MILLISECONDS);
+            builder.evictIdleConnections(keepAliveTimeout.toMillis(), TimeUnit.MILLISECONDS);
 
             builder.setMaxConnPerRoute(maxConnections)
                    .setMaxConnTotal(maxConnections);
@@ -60,6 +61,7 @@ public final class HTTPClientBuilder {
             builder.disableAutomaticRetries();  // retry should be handled in framework level with better trace log
             if (!enableRedirect) builder.disableRedirectHandling();
             if (!enableCookie) builder.disableCookieManagement();
+            builder.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy());
 
             CloseableHttpClient httpClient = builder.build();
             return new HTTPClientImpl(httpClient, userAgent, slowOperationThreshold);

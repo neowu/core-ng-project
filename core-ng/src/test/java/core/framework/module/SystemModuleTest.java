@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,11 +16,10 @@ import static org.mockito.Mockito.when;
  */
 class SystemModuleTest {
     private SystemModule systemModule;
-    private ModuleContext context;
 
     @BeforeEach
     void createSystemModule() {
-        context = spy(new ModuleContext(new BeanFactory()));
+        ModuleContext context = spy(new ModuleContext());
 
         systemModule = new SystemModule(null);
         systemModule.context = context;

@@ -2,7 +2,6 @@ package core.framework.search.module;
 
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.MockElasticSearch;
-import core.framework.test.inject.TestBeanFactory;
 import core.framework.test.module.TestModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,7 @@ class TestSearchConfigTest {
 
     @Test
     void createElasticSearch() {
-        ElasticSearchImpl search = config.createElasticSearch(new TestModuleContext(new TestBeanFactory()));
+        ElasticSearchImpl search = config.createElasticSearch(new TestModuleContext());
         assertThat(search).isInstanceOf(MockElasticSearch.class);
 
         assertThat(System.getProperty("log4j.configurationFactory")).isNotNull();

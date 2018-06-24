@@ -1,6 +1,5 @@
 package core.framework.test;
 
-import core.framework.test.inject.TestBeanFactory;
 import core.framework.test.module.AbstractTestModule;
 import core.framework.util.Exceptions;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -16,23 +15,22 @@ public final class IntegrationExtension implements TestInstancePostProcessor {
     public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
         ExtensionContext.Store store = context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL);
         Class<?> testClass = context.getRequiredTestClass();
-        TestBeanFactory beanFactory = store.getOrComputeIfAbsent(TestBeanFactory.class, key -> createTestBeanFactory(testClass, store), TestBeanFactory.class);
-        beanFactory.inject(testInstance);
+        AbstractTestModule module = store.getOrComputeIfAbsent(AbstractTestModule.class, key -> createTestModule(testClass, store), AbstractTestModule.class);
+        module.inject(testInstance);
     }
 
-    private TestBeanFactory createTestBeanFactory(Class<?> testClass, ExtensionContext.Store store) {
+    private AbstractTestModule createTestModule(Class<?> testClass, ExtensionContext.Store store) {
         Boolean initialized = store.get(KEY_INITIALIZED, Boolean.class);
         if (Boolean.TRUE.equals(initialized)) throw new Error("test context failed to initialize, please check error message from previous integration test");
         store.put(KEY_INITIALIZED, true);
         Context context = findContext(testClass);
-        TestBeanFactory beanFactory = new TestBeanFactory();
         try {
             AbstractTestModule module = context.module().getConstructor().newInstance();
-            module.configure(beanFactory);
+            module.configure();
+            return module;
         } catch (ReflectiveOperationException e) {
             throw new Error("failed to create test context", e);
         }
-        return beanFactory;
     }
 
     private Context findContext(Class<?> testClass) {

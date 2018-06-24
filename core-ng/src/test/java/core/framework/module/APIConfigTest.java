@@ -3,7 +3,6 @@ package core.framework.module;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +19,7 @@ class APIConfigTest {
     @BeforeEach
     void createAPIConfig() {
         config = new APIConfig();
-        config.initialize(new ModuleContext(new BeanFactory()), null);
+        config.initialize(new ModuleContext(), null);
     }
 
     @Test

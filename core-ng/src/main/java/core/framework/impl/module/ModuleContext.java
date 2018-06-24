@@ -20,9 +20,11 @@ import core.framework.util.Maps;
 import core.framework.web.Controller;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +32,7 @@ import java.util.Map;
  * @author neo
  */
 public class ModuleContext {
-    public final BeanFactory beanFactory;
+    public final BeanFactory beanFactory = new BeanFactory();
     public final List<Task> startupHook = Lists.newArrayList();
     public final ShutdownHook shutdownHook = new ShutdownHook();
     public final PropertyManager propertyManager = new PropertyManager();
@@ -38,11 +40,10 @@ public class ModuleContext {
     public final LogManager logManager;
     public final Stat stat = new Stat();
     protected final Map<String, Config> configs = Maps.newHashMap();
+    private final Logger logger = LoggerFactory.getLogger(ModuleContext.class);
     private BackgroundTaskExecutor backgroundTask;
 
-    public ModuleContext(BeanFactory beanFactory) {
-        this.beanFactory = beanFactory;
-
+    public ModuleContext() {
         logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
 
         httpServer = new HTTPServer(logManager);
@@ -53,10 +54,10 @@ public class ModuleContext {
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitTermination);
 
         route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
-        ThreadInfoController threadInfoController = new ThreadInfoController();
+        var threadInfoController = new ThreadInfoController();
         route(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage, true);
         route(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump, true);
-        PropertyController propertyController = new PropertyController(propertyManager);
+        var propertyController = new PropertyController(propertyManager);
         route(HTTPMethod.GET, "/_sys/property", propertyController, true);
     }
 
@@ -72,7 +73,7 @@ public class ModuleContext {
 
     public void route(HTTPMethod method, String path, Controller controller, boolean skipInterceptor) {
         new PathPatternValidator(path).validate();
-        ControllerInspector inspector = new ControllerInspector(controller);
+        var inspector = new ControllerInspector(controller);
         new ControllerClassValidator(inspector.targetClass, inspector.targetMethod).validate();
         String action = "http:" + ASCII.toLowerCase(method.name()) + ":" + path;
         httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
@@ -89,6 +90,14 @@ public class ModuleContext {
                 throw new Error(e);
             }
         });
+    }
+
+    public void bind(Type type, String name, Object instance) {
+        beanFactory.bind(type, name, instance);
+        if (instance instanceof AutoCloseable) {
+            logger.info("found auto closeable bean, added to shutdown hook, type={}, name={}", type.getTypeName(), name);
+            shutdownHook.add(ShutdownHook.STAGE_10, timeout -> ((AutoCloseable) instance).close());
+        }
     }
 
     public void validate() {

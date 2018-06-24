@@ -35,7 +35,7 @@ public abstract class Module {
 
     public <T> T bind(Class<T> instanceClass) {
         T instance = context.beanFactory.create(instanceClass);
-        context.beanFactory.bind(instanceClass, null, instance);
+        context.bind(instanceClass, null, instance);
         return instance;
     }
 
@@ -49,7 +49,7 @@ public abstract class Module {
 
     public <T> T bind(Type type, String name, T instance) {
         context.beanFactory.inject(instance);
-        context.beanFactory.bind(type, name, instance);
+        context.bind(type, name, instance);
         return instance;
     }
 
