@@ -1,5 +1,6 @@
 ## Change log
-### 6.3.8 (6/24/2018 - )
+### 6.4.0 (6/24/2018 - )
+* session: !!! redis session key changed from "sessionId:{id}" to "sessionId:{sha256(id)}" for security reason, so the redis log won't show clear text session id value 
 
 ### 6.3.7 (6/21/2018 - 6/24/2018)
 * api: make RemoteServiceException exposes https status

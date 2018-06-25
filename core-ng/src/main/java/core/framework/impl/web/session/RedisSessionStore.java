@@ -1,5 +1,6 @@
 package core.framework.impl.web.session;
 
+import core.framework.crypto.Hash;
 import core.framework.redis.Redis;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
@@ -59,7 +60,7 @@ public class RedisSessionStore implements SessionStore {
         redis.del(key);
     }
 
-    private String sessionKey(String sessionId) {
-        return "session2:" + sessionId;
+    String sessionKey(String sessionId) {
+        return "session:" + Hash.sha256Hex(sessionId);
     }
 }
