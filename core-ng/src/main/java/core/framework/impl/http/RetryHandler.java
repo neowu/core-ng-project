@@ -46,7 +46,7 @@ public class RetryHandler implements HttpRequestRetryHandler {
         if (request.isAborted()) {
             return false;
         }
-        return (!clientContext.isRequestSent() || idempotentMethods.contains(request.getMethod()));
+        return !clientContext.isRequestSent() || idempotentMethods.contains(request.getMethod());
     }
 
     private void waitBeforeRetry(Duration waitTime) {
