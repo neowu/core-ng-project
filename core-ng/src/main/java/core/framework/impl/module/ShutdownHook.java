@@ -34,7 +34,6 @@ public final class ShutdownHook implements Runnable {
     @Override
     public void run() {
         long endTime = System.currentTimeMillis() + SHUTDOWN_TIMEOUT.toMillis();
-
         for (Map.Entry<Integer, List<Shutdown>> entry : stages.entrySet()) {
             Integer stage = entry.getKey();
             List<Shutdown> shutdowns = entry.getValue();
@@ -47,6 +46,7 @@ public final class ShutdownHook implements Runnable {
                 }
             }
         }
+        logger.info("shutdown completed");
     }
 
     public interface Shutdown {
