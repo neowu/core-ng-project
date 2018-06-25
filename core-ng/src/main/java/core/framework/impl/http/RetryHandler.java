@@ -1,5 +1,6 @@
 package core.framework.impl.http;
 
+import core.framework.http.HTTPMethod;
 import core.framework.log.Markers;
 import core.framework.util.Threads;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -18,7 +19,8 @@ import java.util.Set;
  */
 public class RetryHandler implements HttpRequestRetryHandler {
     private final Logger logger = LoggerFactory.getLogger(RetryHandler.class);
-    private final Set<String> idempotentMethods = Set.of("GET", "HEAD", "PUT", "DELETE", "OPTIONS", "TRACE");
+    private final Set<String> idempotentMethods = Set.of(HTTPMethod.GET.name(), HTTPMethod.PUT.name(), HTTPMethod.DELETE.name(),
+            HTTPMethod.HEAD.name(), HTTPMethod.OPTIONS.name(), HTTPMethod.TRACE.name());
     private final int maxRetries;
 
     public RetryHandler(int maxRetries) {
@@ -54,6 +56,6 @@ public class RetryHandler implements HttpRequestRetryHandler {
     }
 
     Duration waitTime(int executionCount) {
-        return Duration.ofMillis(500 * (int) Math.pow(2, executionCount - 1));
+        return Duration.ofMillis(500 * (long) Math.pow(2, executionCount - 1));
     }
 }
