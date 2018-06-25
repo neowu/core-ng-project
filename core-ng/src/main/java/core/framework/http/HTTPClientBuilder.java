@@ -1,6 +1,7 @@
 package core.framework.http;
 
 import core.framework.impl.http.HTTPClientImpl;
+import core.framework.impl.http.RetryHandler;
 import core.framework.util.StopWatch;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.SocketConfig;
@@ -32,6 +33,7 @@ public final class HTTPClientBuilder {
     private Duration slowOperationThreshold = Duration.ofSeconds(30);
     private boolean enableCookie = false;
     private boolean enableRedirect = false;
+    private Integer maxRetries;
     private String userAgent = "HTTPClient";
 
     public HTTPClient build() {
@@ -58,10 +60,15 @@ public final class HTTPClientBuilder {
 
             builder.disableAuthCaching();
             builder.disableConnectionState();
-            builder.disableAutomaticRetries();  // retry should be handled in framework level with better trace log
             if (!enableRedirect) builder.disableRedirectHandling();
             if (!enableCookie) builder.disableCookieManagement();
-            builder.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy());
+
+            if (maxRetries != null) {
+                builder.setRetryHandler(new RetryHandler(maxRetries));
+                builder.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy(maxRetries, 500));
+            } else {
+                builder.disableAutomaticRetries();
+            }
 
             CloseableHttpClient httpClient = builder.build();
             return new HTTPClientImpl(httpClient, userAgent, slowOperationThreshold);
@@ -104,6 +111,11 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder enableRedirect() {
         enableRedirect = true;
+        return this;
+    }
+
+    public HTTPClientBuilder enableRetry(int maxRetries) {
+        this.maxRetries = maxRetries;
         return this;
     }
 }

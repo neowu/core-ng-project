@@ -35,8 +35,8 @@ public class APIConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private ModuleContext context;
     private HTTPClient httpClient;
-    private Duration timeout = Duration.ofSeconds(30);
-    private Duration slowOperationThreshold = Duration.ofSeconds(15);
+    private Duration timeout = Duration.ofSeconds(15);    // kube graceful shutdown period is 30s, we need to finish api call within that time
+    private Duration slowOperationThreshold = Duration.ofSeconds(10);
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -106,6 +106,7 @@ public class APIConfig extends Config {
                     .userAgent(WebServiceClient.USER_AGENT)
                     .timeout(timeout)
                     .slowOperationThreshold(slowOperationThreshold)
+                    .enableRetry(3)
                     .build();
             context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> httpClient.close());
             this.httpClient = httpClient;
