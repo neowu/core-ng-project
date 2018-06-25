@@ -20,7 +20,6 @@ import core.framework.util.Maps;
 import core.framework.web.Controller;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
@@ -40,7 +39,6 @@ public class ModuleContext {
     public final LogManager logManager;
     public final Stat stat = new Stat();
     protected final Map<String, Config> configs = Maps.newHashMap();
-    private final Logger logger = LoggerFactory.getLogger(ModuleContext.class);
     private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext() {

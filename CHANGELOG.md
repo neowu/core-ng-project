@@ -1,4 +1,6 @@
 ## Change log
+### 6.3.8 (6/24/2018 - )
+
 ### 6.3.7 (6/21/2018 - 6/24/2018)
 * api: make RemoteServiceException exposes https status
 * site: make default error handler fits most of cases to reduce the need of creating custom error handler 
