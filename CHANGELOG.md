@@ -1,4 +1,7 @@
 ## Change log
+### 6.4.1 (6/26/2018 - )
+
+
 ### 6.4.0 (6/24/2018 - 6/25/2018)
 * session: !!! redis session key changed from "sessionId:{id}" to "sessionId:{sha256(id)}" for security reason, so the redis log won't show clear text session id value, 
         update lib will lose all existing user session, please deploy on scheduled time

@@ -35,7 +35,7 @@ public class RetryHandler implements HttpRequestRetryHandler {
         HttpUriRequest request = (HttpUriRequest) clientContext.getRequest();
 
         if (retry(request, clientContext)) {
-            logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http connection failed, retry soon");
+            logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http connection failed, retry soon", exception);
             Duration waitTime = waitTime(executionCount);
             waitBeforeRetry(waitTime);
             return true;
