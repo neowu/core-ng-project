@@ -15,11 +15,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class APIConfigTest {
     private APIConfig config;
+    private ModuleContext context;
 
     @BeforeEach
     void createAPIConfig() {
         config = new APIConfig();
-        config.initialize(new ModuleContext(), null);
+        context = new ModuleContext();
+        config.initialize(context, null);
     }
 
     @Test
@@ -27,6 +29,14 @@ class APIConfigTest {
         config.service(TestWebService.class, new TestWebServiceImpl());
 
         assertThat(config.serviceInterfaces).containsEntry(Classes.className(TestWebService.class), TestWebService.class);
+    }
+
+    @Test
+    void client() {
+        config.client(TestWebService.class, "http://localhost");
+
+        TestWebService client = context.beanFactory.bean(TestWebService.class, null);
+        assertThat(client).isNotNull();
     }
 
     public interface TestWebService {

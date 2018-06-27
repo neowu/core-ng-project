@@ -33,7 +33,7 @@ public class DynamicInstanceBuilder<T> {
         classBuilder = classPool.makeClass(className + "$" + (INDEX.getAndIncrement()));
 
         try {
-            classBuilder.addInterface(classPool.get(interfaceClass.getCanonicalName()));
+            classBuilder.addInterface(classPool.get(interfaceClass.getName()));
             CtConstructor constructor = new CtConstructor(null, classBuilder);
             constructor.setBody(";");
             classBuilder.addConstructor(constructor);
