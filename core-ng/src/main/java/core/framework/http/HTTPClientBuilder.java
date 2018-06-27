@@ -33,7 +33,7 @@ public final class HTTPClientBuilder {
     private Duration slowOperationThreshold = Duration.ofSeconds(30);
     private boolean enableCookie = false;
     private boolean enableRedirect = false;
-    private Integer maxRetries;
+    private int maxRetries;
     private String userAgent = "HTTPClient";
 
     public HTTPClient build() {
@@ -63,7 +63,7 @@ public final class HTTPClientBuilder {
             if (!enableRedirect) builder.disableRedirectHandling();
             if (!enableCookie) builder.disableCookieManagement();
 
-            if (maxRetries != null) {
+            if (maxRetries > 0) {
                 builder.setRetryHandler(new RetryHandler(maxRetries));
                 builder.setServiceUnavailableRetryStrategy(new DefaultServiceUnavailableRetryStrategy(maxRetries, 500));
             } else {
@@ -104,6 +104,11 @@ public final class HTTPClientBuilder {
         return this;
     }
 
+    public HTTPClientBuilder maxRetries(int maxRetries) {
+        this.maxRetries = maxRetries;
+        return this;
+    }
+
     public HTTPClientBuilder enableCookie() {
         enableCookie = true;
         return this;
@@ -111,11 +116,6 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder enableRedirect() {
         enableRedirect = true;
-        return this;
-    }
-
-    public HTTPClientBuilder enableRetry(int maxRetries) {
-        this.maxRetries = maxRetries;
         return this;
     }
 }

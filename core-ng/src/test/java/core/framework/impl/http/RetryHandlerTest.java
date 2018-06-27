@@ -1,11 +1,13 @@
 package core.framework.impl.http;
 
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,19 +39,24 @@ class RetryHandlerTest {
     void retry() {
         HttpUriRequest request = RequestBuilder.get().build();
         request.abort();
-        assertThat(handler.retry(request, clientContext)).isFalse();
+        assertThat(handler.retry(request, clientContext, new IOException())).isFalse();
     }
 
     @Test
     void retryWithIdempotentMethods() {
-        assertThat(handler.retry(RequestBuilder.get().build(), clientContext)).isTrue();
-        assertThat(handler.retry(RequestBuilder.put().build(), clientContext)).isTrue();
+        assertThat(handler.retry(RequestBuilder.get().build(), clientContext, new IOException())).isTrue();
+        assertThat(handler.retry(RequestBuilder.put().build(), clientContext, new IOException())).isTrue();
     }
 
     @Test
     void retryWithNotSentRequest() {
         when(clientContext.isRequestSent()).thenReturn(false);
 
-        assertThat(handler.retry(RequestBuilder.post().build(), clientContext)).isTrue();
+        assertThat(handler.retry(RequestBuilder.post().build(), clientContext, new IOException())).isTrue();
+    }
+
+    @Test
+    void retryWithPersistentConnectionDrop() {
+        assertThat(handler.retry(RequestBuilder.post().build(), clientContext, new NoHttpResponseException("connection failed"))).isTrue();
     }
 }

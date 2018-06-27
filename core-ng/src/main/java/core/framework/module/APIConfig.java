@@ -34,13 +34,17 @@ public class APIConfig extends Config {
     final Map<String, Class<?>> serviceInterfaces = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private ModuleContext context;
+    private HTTPClientBuilder httpClientBuilder;
     private HTTPClient httpClient;
-    private Duration timeout = Duration.ofSeconds(15);    // kube graceful shutdown period is 30s, we need to finish api call within that time
-    private Duration slowOperationThreshold = Duration.ofSeconds(10);
 
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
+        httpClientBuilder = new HTTPClientBuilder();
+        httpClientBuilder.userAgent(WebServiceClient.USER_AGENT)
+                         .timeout(Duration.ofSeconds(15))    // kube graceful shutdown period is 30s, we need to finish api call within that time
+                         .slowOperationThreshold(Duration.ofSeconds(10))
+                         .maxRetries(3);
     }
 
     @Override
@@ -79,35 +83,25 @@ public class APIConfig extends Config {
         RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
         new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, context.httpServer.handler.responseBeanTypeValidator).validate();
 
-        HTTPClient httpClient = httpClient();
+        HTTPClient httpClient = getOrCreateHTTPClient();
         WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, context.logManager);
         T client = createWebServiceClient(serviceInterface, webServiceClient);
         context.beanFactory.bind(serviceInterface, null, client);
         return new APIClientConfig(webServiceClient);
     }
 
-    public void timeout(Duration timeout) {
-        if (httpClient != null) throw new Error("api timeout must be configured before adding client");
-        this.timeout = timeout;
-    }
-
-    public void slowOperationThreshold(Duration slowOperationThreshold) {
-        if (httpClient != null) throw new Error("api slowOperationThreshold must be configured before adding client");
-        this.slowOperationThreshold = slowOperationThreshold;
-    }
-
     <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {
         return new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
     }
 
-    private HTTPClient httpClient() {
+    public HTTPClientBuilder httpClient() {
+        if (httpClient != null) throw new Error("http client must be configured before adding client");
+        return httpClientBuilder;
+    }
+
+    private HTTPClient getOrCreateHTTPClient() {
         if (httpClient == null) {
-            HTTPClient httpClient = new HTTPClientBuilder()
-                    .userAgent(WebServiceClient.USER_AGENT)
-                    .timeout(timeout)
-                    .slowOperationThreshold(slowOperationThreshold)
-                    .enableRetry(3)
-                    .build();
+            HTTPClient httpClient = httpClientBuilder.build();
             context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> httpClient.close());
             this.httpClient = httpClient;
         }

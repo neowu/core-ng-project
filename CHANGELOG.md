@@ -1,6 +1,7 @@
 ## Change log
-### 6.4.1 (6/26/2018 - )
-
+### 6.4.1 (6/26/2018 - 6/27/2018)
+* api: added api().httpClient() to configure http client for api client, and potentially support local experiment code to call website/interface directly 
+* api: retry on NoHttpResponseException with non-idempotent methods, trade off for availability/complexity, best result we can get with keep-alive + graceful shutdown + retry   
 
 ### 6.4.0 (6/24/2018 - 6/25/2018)
 * session: !!! redis session key changed from "sessionId:{id}" to "sessionId:{sha256(id)}" for security reason, so the redis log won't show clear text session id value, 

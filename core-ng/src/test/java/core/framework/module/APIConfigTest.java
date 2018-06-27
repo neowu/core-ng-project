@@ -8,6 +8,8 @@ import core.framework.impl.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -33,6 +35,7 @@ class APIConfigTest {
 
     @Test
     void client() {
+        config.httpClient().timeout(Duration.ofSeconds(5));
         config.client(TestWebService.class, "http://localhost");
 
         TestWebService client = context.beanFactory.bean(TestWebService.class, null);
