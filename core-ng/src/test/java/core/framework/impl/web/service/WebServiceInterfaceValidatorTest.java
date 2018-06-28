@@ -33,7 +33,7 @@ class WebServiceInterfaceValidatorTest {
                 .isInstanceOf(Error.class).hasMessageContaining("if it is path param, please add @PathParam");
 
         assertThatThrownBy(() -> validator.validateRequestBeanType(Types.map(String.class, String.class), method))
-                .isInstanceOf(Error.class).hasMessageContaining("request bean type must be bean class");
+                .isInstanceOf(Error.class).hasMessageContaining("request bean type must be class");
     }
 
     @Test
