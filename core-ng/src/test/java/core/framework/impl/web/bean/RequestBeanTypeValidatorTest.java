@@ -11,9 +11,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RequestBeanTypeValidatorTest {
     @Test
     void listType() {
-        var classNameValidator = new BeanClassNameValidator();
-        new RequestBeanTypeValidator(Types.list(String.class), classNameValidator).validate();
-        new RequestBeanTypeValidator(Types.list(TestBean.class), classNameValidator).validate();
+        assertThatThrownBy(() -> new RequestBeanTypeValidator(Types.list(String.class), new BeanClassNameValidator()).validate())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("top level list is not allowed");
     }
 
     @Test

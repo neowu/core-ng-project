@@ -4,7 +4,6 @@
       "name": "TestWebService",
       "operations": [
         {"name": "search", "method": "GET", "path": "/test", "pathParams": [], "responseType": "TestWebService$TestResponse", "requestType": "TestWebService$TestSearchRequest"},
-        {"name": "batch", "method": "PUT", "path": "/test", "pathParams": [], "responseType": "TestWebService$TestResponse[]", "requestType": "TestWebService$TestRequest[]"},
         {"name": "get", "method": "GET", "path": "/test/:id", "pathParams": [{"name": "id", "type": "number"}], "responseType": "TestWebService$TestResponse | null", "requestType": null},
         {"name": "create", "method": "PUT", "path": "/test/:id", "pathParams": [{"name": "id", "type": "number"}], "responseType": "void", "requestType": "TestWebService$TestRequest"},
         {"name": "delete", "method": "DELETE", "path": "/test/:id", "pathParams": [{"name": "id", "type": "string"}], "responseType": "void", "requestType": null},

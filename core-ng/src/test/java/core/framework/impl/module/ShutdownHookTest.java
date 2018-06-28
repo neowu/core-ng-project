@@ -1,5 +1,6 @@
 package core.framework.impl.module;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,11 @@ class ShutdownHookTest {
     @BeforeEach
     void createShutdownHook() {
         shutdownHook = new ShutdownHook();
+    }
+
+    @AfterEach
+    void cleanup() {
+        Runtime.getRuntime().removeShutdownHook(shutdownHook.thread);
     }
 
     @Test

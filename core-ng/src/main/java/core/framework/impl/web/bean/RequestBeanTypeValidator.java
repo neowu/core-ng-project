@@ -12,7 +12,6 @@ final class RequestBeanTypeValidator extends JSONTypeValidator {
 
     RequestBeanTypeValidator(Type instanceType, BeanClassNameValidator classNameValidator) {
         super(instanceType);
-        validator.allowTopLevelList = true;
         this.classNameValidator = classNameValidator;
     }
 

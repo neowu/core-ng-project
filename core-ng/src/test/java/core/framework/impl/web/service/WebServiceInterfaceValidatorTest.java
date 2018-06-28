@@ -33,7 +33,7 @@ class WebServiceInterfaceValidatorTest {
                 .isInstanceOf(Error.class).hasMessageContaining("if it is path param, please add @PathParam");
 
         assertThatThrownBy(() -> validator.validateRequestBeanType(Types.map(String.class, String.class), method))
-                .isInstanceOf(Error.class).hasMessageContaining("request bean type must be bean class or List<T>");
+                .isInstanceOf(Error.class).hasMessageContaining("request bean type must be bean class");
     }
 
     @Test
@@ -42,10 +42,10 @@ class WebServiceInterfaceValidatorTest {
         var method = TestWebService.class.getDeclaredMethod("get", Integer.class);
 
         assertThatThrownBy(() -> validator.validateResponseBeanType(Integer.class, method))
-                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be bean class, Optional<T> or List<T>");
+                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be class or Optional<T>");
 
         assertThatThrownBy(() -> validator.validateResponseBeanType(Types.map(String.class, String.class), method))
-                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be bean class, Optional<T> or List<T>");
+                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be class or Optional<T>");
     }
 
     @Test

@@ -5,15 +5,6 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         this.client = $1;
     }
 
-    public java.util.List batch(java.util.List param0) {
-        java.lang.reflect.Type requestType = core.framework.util.Types.list(core.framework.impl.web.service.TestWebService.TestRequest.class);
-        Object requestBean = param0;
-        java.util.Map pathParams = new java.util.HashMap();
-        String serviceURL = client.serviceURL("/test", pathParams);
-        java.util.List response = (java.util.List) client.execute(core.framework.http.HTTPMethod.PUT, serviceURL, requestType, requestBean, core.framework.util.Types.list(core.framework.impl.web.service.TestWebService.TestResponse.class));
-        return response;
-    }
-
     public void create(java.lang.Integer param0, core.framework.impl.web.service.TestWebService.TestRequest param1) {
         java.lang.reflect.Type requestType = core.framework.impl.web.service.TestWebService.TestRequest.class;
         Object requestBean = param1;

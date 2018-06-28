@@ -3,6 +3,7 @@
 * site: !!! updated csp design, allow to specify entire csp to keep maximum flexibility, this is due to difficulty of external sdk integration, e.g. facebook, ga  
         use site().security().csp(csp) or sys.webSecurity.csp to configure, site().security() will enable rest headers without csp          
 * sys: validate keys in sys.properties
+* api: removed support List<T> as request/response due to security concerns
 
 ### 6.4.1 (6/26/2018 - 6/27/2018)
 * api: added api().httpClient() to configure http client for api client, and potentially support local experiment code to call website/interface directly 

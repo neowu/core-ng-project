@@ -27,10 +27,10 @@ public final class ResponseBeanTypeValidator {
     static class TypeValidator extends JSONTypeValidator {
         private final BeanClassNameValidator classNameValidator;
 
+        // response bean doesn't support List<T> as response type, due to security concern, refer to https://www.owasp.org/index.php/AJAX_Security_Cheat_Sheet => Always return JSON with an Object on the outside
         TypeValidator(Type beanType, BeanClassNameValidator classNameValidator) {
             super(beanType);
             validator.allowTopLevelOptional = true;
-            validator.allowTopLevelList = true;
             this.classNameValidator = classNameValidator;
         }
 

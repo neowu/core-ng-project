@@ -4,8 +4,6 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.impl.web.response.BeanBody;
 import core.framework.impl.web.response.ResponseImpl;
 import core.framework.util.ClasspathResources;
-import core.framework.util.Lists;
-import core.framework.util.Types;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -13,10 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 /**
@@ -36,65 +33,53 @@ class WebServiceControllerBuilderTest {
     void get() throws Exception {
         when(request.pathParam("id", Integer.class)).thenReturn(1);
 
-        WebServiceControllerBuilder<TestWebService> builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("get", Integer.class));
+        var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("get", Integer.class));
         Controller controller = builder.build();
 
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("webservice-test/test-webservice-controller-get.java"), sourceCode);
+        assertThat(sourceCode).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-controller-get.java"));
 
         Response response = controller.execute(request);
-        assertEquals(HTTPStatus.OK, response.status());
+        assertThat(response.status()).isEqualTo(HTTPStatus.OK);
         @SuppressWarnings("unchecked")
         Optional<TestWebService.TestResponse> bean = (Optional<TestWebService.TestResponse>) ((BeanBody) ((ResponseImpl) response).body).bean;
-        assertEquals(2, (int) bean.get().intField);
+        assertThat(bean.orElseThrow().intField).isEqualTo(2);
     }
 
     @Test
     void create() throws Exception {
-        TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
+        var requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "value";
 
         when(request.pathParam("id", Integer.class)).thenReturn(1);
         when(request.bean(TestWebService.TestRequest.class)).thenReturn(requestBean);
 
-        WebServiceControllerBuilder<TestWebService> builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("create", Integer.class, TestWebService.TestRequest.class));
+        var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("create", Integer.class, TestWebService.TestRequest.class));
         Controller controller = builder.build();
 
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("webservice-test/test-webservice-controller-create.java"), sourceCode);
+        assertThat(sourceCode).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-controller-create.java"));
 
         Response response = controller.execute(request);
-        assertEquals(HTTPStatus.CREATED, response.status());
-    }
-
-    @Test
-    void batch() throws Exception {
-        TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
-        requestBean.stringField = "value";
-
-        when(request.bean(Types.list(TestWebService.TestRequest.class))).thenReturn(Lists.newArrayList(requestBean));
-
-        Controller controller = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("batch", List.class)).build();
-        Response response = controller.execute(request);
-        assertEquals(HTTPStatus.OK, response.status());
+        assertThat(response.status()).isEqualTo(HTTPStatus.CREATED);
     }
 
     @Test
     void patch() throws Exception {
-        TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
+        var requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "value";
 
         when(request.pathParam("id", Integer.class)).thenReturn(1);
         when(request.bean(TestWebService.TestRequest.class)).thenReturn(requestBean);
 
-        WebServiceControllerBuilder<TestWebService> builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("patch", Integer.class, TestWebService.TestRequest.class));
+        var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("patch", Integer.class, TestWebService.TestRequest.class));
         Controller controller = builder.build();
 
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("webservice-test/test-webservice-controller-patch.java"), sourceCode);
+        assertThat(sourceCode).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-controller-patch.java"));
 
         Response response = controller.execute(request);
-        assertEquals(HTTPStatus.OK, response.status());
+        assertThat(response.status()).isEqualTo(HTTPStatus.OK);
     }
 
     public static class TestWebServiceImpl implements TestWebService {
@@ -105,7 +90,7 @@ class WebServiceControllerBuilderTest {
 
         @Override
         public Optional<TestResponse> get(Integer id) {
-            assertEquals(1, (int) id);
+            assertThat(id).isEqualTo(1);
 
             TestResponse response = new TestResponse();
             response.intField = 2;
@@ -114,8 +99,8 @@ class WebServiceControllerBuilderTest {
 
         @Override
         public void create(Integer id, TestRequest request) {
-            assertEquals(1, (int) id);
-            assertEquals("value", request.stringField);
+            assertThat(id).isEqualTo(1);
+            assertThat(request.stringField).isEqualTo("value");
         }
 
         @Override
@@ -124,15 +109,9 @@ class WebServiceControllerBuilderTest {
         }
 
         @Override
-        public List<TestResponse> batch(List<TestRequest> requests) {
-            assertEquals(1, requests.size());
-            return Lists.newArrayList();
-        }
-
-        @Override
         public void patch(Integer id, TestRequest request) {
-            assertEquals(1, (int) id);
-            assertEquals("value", request.stringField);
+            assertThat(id).isEqualTo(1);
+            assertThat(request.stringField).isEqualTo("value");
         }
     }
 }

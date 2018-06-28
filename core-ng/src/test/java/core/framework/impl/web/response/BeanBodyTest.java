@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 /**
  * @author neo
  */
@@ -23,16 +25,11 @@ class BeanBodyTest {
 
     @Test
     void validateList() {
-        List<TestBean> list = Lists.newArrayList(new TestBean());
-        BeanBody body = new BeanBody(list);
-        body.validateBeanType(validator);
-    }
-
-    @Test
-    void validateEmptyList() {
         List<TestBean> list = Lists.newArrayList();
         BeanBody body = new BeanBody(list);
-        body.validateBeanType(validator);
+        assertThatThrownBy(() -> body.validateBeanType(validator))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("top level list is not allowed");
     }
 
     @Test

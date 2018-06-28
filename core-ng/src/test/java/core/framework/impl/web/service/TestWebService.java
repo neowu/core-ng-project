@@ -45,10 +45,6 @@ public interface TestWebService {
     @Path("/test/:id")
     void delete(@PathParam("id") String id);
 
-    @PUT
-    @Path("/test")
-    List<TestResponse> batch(List<TestRequest> requests);
-
     @PATCH
     @Path("/test/:id")
     void patch(@PathParam("id") Integer id, TestRequest request);

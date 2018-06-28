@@ -19,12 +19,12 @@ public final class ShutdownHook implements Runnable {
     public static final int STAGE_3 = 3;    // after no any task running, shutdown important resources, e.g. kafka producer, log forwarder
     public static final int STAGE_10 = 10;  // release all resources without dependencies
     private static final Duration SHUTDOWN_TIMEOUT = Duration.ofSeconds(25); // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
-
+    final Thread thread = new Thread(this, "shutdown");
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
     private final Map<Integer, List<Shutdown>> stages = new TreeMap<>();
 
     ShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(this, "shutdown"));
+        Runtime.getRuntime().addShutdownHook(thread);
     }
 
     public void add(int stage, Shutdown shutdown) {

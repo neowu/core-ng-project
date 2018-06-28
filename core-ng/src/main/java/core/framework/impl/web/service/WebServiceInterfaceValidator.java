@@ -99,10 +99,9 @@ public class WebServiceInterfaceValidator {
     }
 
     void validateRequestBeanType(Type beanType, Method method) {    // due to it's common to forget @PathParam in service method param, this is to make error message more friendly
-        boolean isGenericButNotList = beanType instanceof ParameterizedType && !GenericTypes.isGenericList(beanType);
-        boolean isValueType = beanType instanceof Class && isValueType((Class<?>) beanType);
-        if (isGenericButNotList || isValueType)
-            throw Exceptions.error("request bean type must be bean class or List<T>, if it is path param, please add @PathParam, beanType={}, method={}", beanType.getTypeName(), Methods.path(method));
+        boolean isValueType = isValueType(GenericTypes.rawClass(beanType));
+        if (isValueType)
+            throw Exceptions.error("request bean type must be class, if it is path param, please add @PathParam, beanType={}, method={}", beanType.getTypeName(), Methods.path(method));
     }
 
     private Set<String> pathVariables(String path, Method method) {
@@ -145,7 +144,7 @@ public class WebServiceInterfaceValidator {
         boolean isGenericButNotOptionalOrList = beanType instanceof ParameterizedType && !GenericTypes.isGenericOptional(beanType) && !GenericTypes.isGenericList(beanType);
         boolean isValueType = beanType instanceof Class && isValueType((Class<?>) beanType);
         if (isGenericButNotOptionalOrList || isValueType)
-            throw Exceptions.error("response bean type must be bean class, Optional<T> or List<T>, beanType={}, method={}", beanType.getTypeName(), Methods.path(method));
+            throw Exceptions.error("response bean type must be class or Optional<T>, beanType={}, method={}", beanType.getTypeName(), Methods.path(method));
 
         responseBeanTypeValidator.validate(beanType);
     }

@@ -4,6 +4,8 @@ import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 /**
  * @author neo
  */
@@ -17,8 +19,9 @@ class ResponseBeanTypeValidatorTest {
 
     @Test
     void listType() {
-        validator.validate(Types.list(String.class));
-        validator.validate(Types.list(TestBean.class));
+        assertThatThrownBy(() -> validator.validate(Types.list(String.class)))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("top level list is not allowed");
     }
 
     @Test
