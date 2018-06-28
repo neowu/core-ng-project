@@ -64,7 +64,7 @@ class SystemModuleTest {
 
         assertThatThrownBy(() -> systemModule.loadProperties(properties))
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("found unknown key")
+                .hasMessageContaining("found unknown")
                 .hasMessageContaining("allowedKeys=");
     }
 }
