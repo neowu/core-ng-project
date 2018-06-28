@@ -1,15 +1,14 @@
 package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
+import core.framework.util.Properties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author neo
@@ -19,10 +18,8 @@ class SystemModuleTest {
 
     @BeforeEach
     void createSystemModule() {
-        ModuleContext context = spy(new ModuleContext());
-
         systemModule = new SystemModule(null);
-        systemModule.context = context;
+        systemModule.context = new ModuleContext();
 
         System.clearProperty("sys.http.port");
     }
@@ -49,18 +46,25 @@ class SystemModuleTest {
         systemModule.context.propertyManager.properties.set("sys.https.port", "8082");
 
         systemModule.configureHTTP();
-        assertNull(systemModule.context.httpServer.httpPort);
-        assertEquals((Integer) 8082, systemModule.context.httpServer.httpsPort);
+        assertThat(systemModule.context.httpServer.httpPort).isNull();
+        assertThat(systemModule.context.httpServer.httpsPort).isEqualTo(8082);
     }
 
     @Test
     void configureSite() {
-        SiteConfig config = mock(SiteConfig.class);
-        when(systemModule.context.config(SiteConfig.class, null)).thenReturn(config);
-
-        systemModule.context.propertyManager.properties.set("sys.webSecurity.trustedSources", "https://cdn1,https://cdn2");
+        systemModule.context.propertyManager.properties.set("sys.security.csp", "default-src 'self';");
         systemModule.configureSite();
+        assertThat(systemModule.site().security().interceptor.contentSecurityPolicy).isEqualTo("default-src 'self';");
+    }
 
-        verify(config).webSecurity("https://cdn1", "https://cdn2");
+    @Test
+    void loadProperties() {
+        var properties = new Properties();
+        properties.set("sys.notAllowedKey", "value");
+
+        assertThatThrownBy(() -> systemModule.loadProperties(properties))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("found unknown key")
+                .hasMessageContaining("allowedKeys=");
     }
 }

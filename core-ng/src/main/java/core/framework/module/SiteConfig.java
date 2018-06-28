@@ -25,10 +25,9 @@ import java.util.List;
  */
 public class SiteConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(SiteConfig.class);
-
-    boolean webSecurityConfigured;
+    boolean messageConfigured;
+    private WebSecurityInterceptor webSecurityInterceptor;
     private ModuleContext context;
-    private boolean messageConfigured;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -78,11 +77,12 @@ public class SiteConfig extends Config {
         return new StaticContentConfig(controller);
     }
 
-    public void webSecurity(String... trustedSources) {
-        if (webSecurityConfigured) throw new Error("web security is already configured");
-        webSecurityConfigured = true;
-
-        context.httpServer.handler.interceptors.add(new WebSecurityInterceptor(trustedSources));
+    public WebSecurityConfig security() {
+        if (webSecurityInterceptor == null) {
+            webSecurityInterceptor = new WebSecurityInterceptor();
+            context.httpServer.handler.interceptors.add(webSecurityInterceptor);
+        }
+        return new WebSecurityConfig(webSecurityInterceptor);
     }
 
     public void publishAPI(String... cidrs) {

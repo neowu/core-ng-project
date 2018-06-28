@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,9 +18,9 @@ class SiteConfigTest {
     }
 
     @Test
-    void enableWebSecurity() {
-        config.webSecurityConfigured = true;
-        assertThatThrownBy(() -> config.webSecurity("default-src *;"))
-                .hasMessageContaining("already configured");
+    void message() {
+        config.messageConfigured = true;
+        assertThatThrownBy(() -> config.message(Lists.newArrayList()))
+                .hasMessageContaining("be configured once");
     }
 }
