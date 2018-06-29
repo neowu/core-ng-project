@@ -40,11 +40,11 @@ public class APIConfig extends Config {
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
-        httpClientBuilder = new HTTPClientBuilder();
-        httpClientBuilder.userAgent(WebServiceClient.USER_AGENT)
-                         .timeout(Duration.ofSeconds(15))    // kube graceful shutdown period is 30s, we need to finish api call within that time
-                         .slowOperationThreshold(Duration.ofSeconds(10))
-                         .maxRetries(3);
+        httpClientBuilder = new HTTPClientBuilder()
+                .userAgent(WebServiceClient.USER_AGENT)
+                .timeout(Duration.ofSeconds(15))    // kube graceful shutdown period is 30s, we need to finish api call within that time
+                .slowOperationThreshold(Duration.ofSeconds(10))
+                .maxRetries(3);
     }
 
     @Override

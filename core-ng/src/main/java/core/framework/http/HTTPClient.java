@@ -3,9 +3,8 @@ package core.framework.http;
 /**
  * @author neo
  */
-public interface HTTPClient extends AutoCloseable {
+public interface HTTPClient {
     HTTPResponse execute(HTTPRequest request);
 
-    @Override
     void close();
 }
