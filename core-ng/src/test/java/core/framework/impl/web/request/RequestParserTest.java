@@ -55,7 +55,7 @@ class RequestParserTest {
         RequestImpl request = new RequestImpl(null, null);
         Map<String, Deque<String>> params = new HashMap<>();
         params.computeIfAbsent("key", key -> new ArrayDeque<>()).add(URLEncoder.encode("value1 value2", "UTF-8"));     // undertow url decoding is disabled in core.framework.impl.web.HTTPServer.start, so the parser must decode all query param
-        params.computeIfAbsent("emptyKey", key -> new ArrayDeque<>()).add("");
+        params.computeIfAbsent("emptyKey", key -> new ArrayDeque<>()).add("");  // for use case: http://address?emptyKey=
         parser.parseQueryParams(request, params);
 
         assertThat(request.queryParam("key")).hasValue("value1 value2");
