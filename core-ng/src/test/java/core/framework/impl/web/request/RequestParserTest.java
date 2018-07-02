@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -33,26 +32,27 @@ class RequestParserTest {
 
     @Test
     void port() {
-        assertEquals(80, parser.port(80, null));
-        assertEquals(443, parser.port(80, "443"));
-        assertEquals(443, parser.port(80, "443, 80"));
+        assertThat(parser.port(80, null)).isEqualTo(80);
+        assertThat(parser.port(80, "443")).isEqualTo(443);
+        assertThat(parser.port(80, "443, 80")).isEqualTo(443);
     }
 
     @Test
     void requestPort() {
-        assertEquals(443, parser.requestPort("127.0.0.1", "https", null));
-        assertEquals(8080, parser.requestPort("127.0.0.1:8080", "http", null));
+        assertThat(parser.requestPort("127.0.0.1", "https", null)).isEqualTo(443);
+        assertThat(parser.requestPort("127.0.0.1:8080", "http", null)).isEqualTo(8080);
     }
 
     @Test
     void httpMethod() {
-        MethodNotAllowedException exception = assertThrows(MethodNotAllowedException.class, () -> parser.httpMethod("TRACK"));
-        assertThat(exception.getMessage()).contains("method=TRACK");
+        assertThatThrownBy(() -> parser.httpMethod("TRACK"))
+                .isInstanceOf(MethodNotAllowedException.class)
+                .hasMessageContaining("method=TRACK");
     }
 
     @Test
     void parseQueryParams() throws UnsupportedEncodingException {
-        RequestImpl request = new RequestImpl(null, null);
+        var request = new RequestImpl(null, null);
         Map<String, Deque<String>> params = new HashMap<>();
         params.computeIfAbsent("key", key -> new ArrayDeque<>()).add(URLEncoder.encode("value1 value2", "UTF-8"));     // undertow url decoding is disabled in core.framework.impl.web.HTTPServer.start, so the parser must decode all query param
         params.computeIfAbsent("emptyKey", key -> new ArrayDeque<>()).add("");  // for use case: http://address?emptyKey=
@@ -65,9 +65,9 @@ class RequestParserTest {
 
     @Test
     void parseBody() throws Throwable {
-        RequestImpl request = new RequestImpl(null, null);
+        var request = new RequestImpl(null, null);
         request.contentType = ContentType.TEXT_XML;
-        HttpServerExchange exchange = new HttpServerExchange(null, -1);
+        var exchange = new HttpServerExchange(null, -1);
         byte[] body = Strings.bytes("<xml/>");
         exchange.putAttachment(RequestBodyReader.REQUEST_BODY, new RequestBodyReader.RequestBody(body, null));
         parser.parseBody(request, exchange);
@@ -77,11 +77,11 @@ class RequestParserTest {
 
     @Test
     void requestURL() {
-        HttpServerExchange exchange = new HttpServerExchange(null, -1);
+        var exchange = new HttpServerExchange(null, -1);
         exchange.getRequestHeaders().put(Headers.HOST, "localhost");
         exchange.setRequestURI("/path");
         exchange.setQueryString("key=value");
-        RequestImpl request = new RequestImpl(exchange, null);
+        var request = new RequestImpl(exchange, null);
         request.scheme = "https";
         request.port = 443;
         String requestURL = parser.requestURL(request, exchange);
@@ -91,11 +91,11 @@ class RequestParserTest {
 
     @Test
     void requestURLIsTooLong() {
-        HttpServerExchange exchange = new HttpServerExchange(null, -1);
+        var exchange = new HttpServerExchange(null, -1);
         exchange.getRequestHeaders().put(Headers.HOST, "localhost");
         exchange.setRequestURI("/path");
 
-        StringBuilder builder = new StringBuilder(1000);
+        var builder = new StringBuilder(1000);
         for (int i = 0; i < 100; i++) {
             builder.append("1234567890");
         }
@@ -103,8 +103,8 @@ class RequestParserTest {
         RequestImpl request = new RequestImpl(exchange, null);
         request.scheme = "http";
         request.port = 80;
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> parser.requestURL(request, exchange));
-
-        assertThat(exception.getMessage()).contains("requestURL is too long");
+        assertThatThrownBy(() -> parser.requestURL(request, exchange))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("requestURL is too long");
     }
 }
