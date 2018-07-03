@@ -1,5 +1,5 @@
 ## Change log
-### 6.4.2 (6/28/2018 - )
+### 6.4.2 (6/28/2018 - 7/3/2018)
 * site: !!! updated csp design, allow to specify entire csp to keep maximum flexibility, this is due to difficulty of external sdk integration, e.g. facebook, ga  
         use site().security().csp(csp) or sys.webSecurity.csp to configure, site().security() will enable rest headers without csp          
 * sys: validate keys in sys.properties

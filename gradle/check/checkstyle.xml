@@ -28,6 +28,8 @@
         <module name="PublicReferenceToPrivateTypeCheck"/>  <!--provided by sevntu-checkstyle-->
 
         <!--Coding:-->
+        <module name="AvoidConstantAsFirstOperandInConditionCheck"/>    <!--provided by sevntu-checkstyle-->
+        <module name="AvoidHidingCauseExceptionCheck"/>                 <!--provided by sevntu-checkstyle-->
         <module name="DefaultComesLast"/>
         <module name="EmptyStatement"/>                 <!--Detects empty statements (standalone ';').-->
         <module name="EqualsAvoidNull"/>                <!--Checks that any combination of String literals with optional assignment is on the left side of an equals() comparison.-->
@@ -72,6 +74,7 @@
         <module name="ClassTypeParameterName"/>
         <module name="ConstantName"/>
         <module name="InterfaceTypeParameterName"/>
+        <module name="LambdaParameterName"/>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
         <module name="MemberName"/>

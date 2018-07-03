@@ -37,7 +37,7 @@ class RedisOutputStream {
             position += length;
         }
 
-        if (2 >= buffer.length - position) {
+        if (buffer.length - position <= 2) {
             flush();
         }
         buffer[position++] = '\r';

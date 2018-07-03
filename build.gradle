@@ -32,7 +32,7 @@ project(':core-ng') {
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-        testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
+        testRuntimeOnly 'org.hsqldb:hsqldb:2.4.1'
     }
 }
 
@@ -45,7 +45,7 @@ project(':core-ng-test') {
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
-        testRuntimeOnly 'org.hsqldb:hsqldb:2.4.0'
+        testRuntimeOnly 'org.hsqldb:hsqldb:2.4.1'
     }
 }
 
