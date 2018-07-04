@@ -21,7 +21,7 @@ class BeanValidatorMinMaxTest {
 
     @BeforeEach
     void createObjectValidator() {
-        validator = new BeanValidatorBuilder(Bean.class, Field::getName).build().get();
+        validator = new BeanValidatorBuilder(Bean.class, Field::getName).build().orElseThrow();
     }
 
     @Test

@@ -5,7 +5,7 @@ import core.framework.api.validate.NotEmpty;
 import core.framework.api.validate.NotNull;
 import org.junit.jupiter.api.Test;
 
-import static core.framework.test.Assertions.assertThat;
+import static core.framework.test.Assertions.assertBean;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -17,7 +17,7 @@ class ValidatorAssertTest {
         Bean bean = new Bean();
         bean.field2 = "";
 
-        assertThatThrownBy(() -> assertThat(bean).isValid())
+        assertThatThrownBy(() -> assertBean(bean).isValid())
                 .isInstanceOf(AssertionError.class)
                 .hasMessageContaining("to be valid, but found some violations:")
                 .hasMessageContaining("{field1=field must not be null, field2=field must not be empty}");
@@ -27,14 +27,14 @@ class ValidatorAssertTest {
     void isValid() {
         Bean bean = new Bean();
         bean.field1 = "value";
-        assertThat(bean).isValid();
+        assertBean(bean).isValid();
     }
 
     @Test
     void hasError() {
         Bean bean = new Bean();
         bean.field1 = "123456";
-        assertThat(bean).hasError().containsEntry("field1", "field1 must not be longer than 5");
+        assertBean(bean).hasError().containsEntry("field1", "field1 must not be longer than 5");
     }
 
     static class Bean {

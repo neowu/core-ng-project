@@ -1,8 +1,8 @@
 package core.framework.test.assertion;
 
+import core.framework.test.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static core.framework.test.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -11,12 +11,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class EnumConversionAssertTest {
     @Test
     void hasExactlyConstantsAs() {
-        assertThat(Enum1.class).hasExactlyConstantsAs(Enum2.class);
+        Assertions.assertEnumClass(Enum1.class).hasExactlyConstantsAs(Enum2.class);
     }
 
     @Test
     void failWithMessage() {
-        assertThatThrownBy(() -> assertThat(Enum1.class).hasExactlyConstantsAs(Enum3.class))
+        assertThatThrownBy(() -> Assertions.assertEnumClass(Enum1.class).hasExactlyConstantsAs(Enum3.class))
                 .isInstanceOf(AssertionError.class)
                 .hasMessageContaining("has exactly constants of")
                 .hasMessageContaining("<[C]>");

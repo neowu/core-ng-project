@@ -2,7 +2,7 @@ package core.log;
 
 import org.junit.jupiter.api.Test;
 
-import static core.framework.test.Assertions.assertConf;
+import static core.framework.test.Assertions.assertConfDirectory;
 
 /**
  * @author neo
@@ -10,6 +10,6 @@ import static core.framework.test.Assertions.assertConf;
 class ConfigTest extends IntegrationTest {
     @Test
     void conf() {
-        assertConf().overridesDefaultResources();
+        assertConfDirectory().overridesDefaultResources();
     }
 }
