@@ -62,6 +62,12 @@ class ResponseBeanMapperTest {
     }
 
     @Test
+    void fromJSONWithEmptyOptional() {
+        Optional<TestBean> parsedBean = responseBeanMapper.fromJSON(Types.optional(TestBean.class), Strings.bytes("null"));
+        assertThat(parsedBean).isNotPresent();
+    }
+
+    @Test
     void fromJSONWithOptional() {
         TestBean bean = new TestBean();
         bean.intField = 3;

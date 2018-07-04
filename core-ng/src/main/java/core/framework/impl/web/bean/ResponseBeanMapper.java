@@ -2,13 +2,9 @@ package core.framework.impl.web.bean;
 
 import core.framework.api.json.Property;
 import core.framework.impl.reflect.GenericTypes;
-import core.framework.impl.validate.ValidationException;
 import core.framework.impl.validate.Validator;
-import core.framework.json.JSON;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -18,7 +14,6 @@ import java.util.Optional;
  * @author neo
  */
 public class ResponseBeanMapper {
-    private final Logger logger = LoggerFactory.getLogger(ResponseBeanMapper.class);
     private final Map<Class<?>, BeanMapper<?>> mappers = Maps.newConcurrentHashMap();
     private final BeanClassNameValidator classNameValidator;
 
@@ -28,7 +23,7 @@ public class ResponseBeanMapper {
 
     @SuppressWarnings("unchecked")
     public <T> byte[] toJSON(T bean) {
-        if (bean instanceof Optional) {
+        if (bean instanceof Optional) {  // only support Optional<T> as response bean type
             Optional<?> optional = (Optional) bean;
             if (!optional.isPresent()) return Strings.bytes("null");
             T value = (T) optional.get();
@@ -40,12 +35,7 @@ public class ResponseBeanMapper {
 
     private <T> byte[] toJSON(Class<T> beanClass, T bean) {
         BeanMapper<T> mapper = register(beanClass);
-        try {
-            mapper.validator.validate(bean);
-        } catch (ValidationException e) {
-            logger.debug("failed to validate response bean, bean={}", JSON.toJSON(bean));  // log invalid bean for troubleshooting
-            throw e;
-        }
+        mapper.validator.validate(bean);
         return mapper.writer.toJSON(bean);
     }
 
@@ -68,7 +58,7 @@ public class ResponseBeanMapper {
         Class<T> beanClass = GenericTypes.isOptional(responseType) ? (Class<T>) GenericTypes.optionalValueClass(responseType) : (Class<T>) GenericTypes.rawClass(responseType);
         return (BeanMapper<T>) mappers.computeIfAbsent(beanClass, type -> {
             new BeanClassValidator(beanClass, classNameValidator).validate();
-            return new BeanMapper<T>(beanClass, new Validator(beanClass, field -> field.getDeclaredAnnotation(Property.class).name()));
+            return new BeanMapper<>(beanClass, new Validator(beanClass, field -> field.getDeclaredAnnotation(Property.class).name()));
         });
     }
 }

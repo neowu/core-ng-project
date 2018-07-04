@@ -1,6 +1,8 @@
 package core.framework.impl.web.response;
 
 import core.framework.impl.log.filter.BytesParam;
+import core.framework.impl.validate.ValidationException;
+import core.framework.json.JSON;
 import io.undertow.io.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +22,13 @@ public final class BeanBody implements Body {
 
     @Override
     public void send(Sender sender, ResponseHandlerContext context) {
-        byte[] body = context.responseBeanMapper.toJSON(bean);
-        logger.debug("[response] body={}", new BytesParam(body));
-        sender.send(ByteBuffer.wrap(body));
+        try {
+            byte[] body = context.responseBeanMapper.toJSON(bean);
+            logger.debug("[response] body={}", new BytesParam(body));
+            sender.send(ByteBuffer.wrap(body));
+        } catch (ValidationException e) {
+            logger.debug("failed to validate response bean, bean={}", JSON.toJSON(bean));  // log invalid bean for troubleshooting
+            throw e;
+        }
     }
 }

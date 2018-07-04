@@ -15,6 +15,7 @@ import core.framework.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 
+import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -157,6 +158,8 @@ public final class RequestImpl implements Request {
             }
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), "VALIDATION_ERROR", e);
+        } catch (UncheckedIOException e) {  // for invalid json string
+            throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
         }
     }
 }

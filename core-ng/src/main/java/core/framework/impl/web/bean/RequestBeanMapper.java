@@ -59,7 +59,7 @@ public class RequestBeanMapper {
     public <T> BeanMapper<T> registerRequestBean(Class<T> beanClass) {
         return (BeanMapper<T>) requestBeanMappers.computeIfAbsent(beanClass, type -> {
             new BeanClassValidator(beanClass, classNameValidator).validate();
-            return new BeanMapper<T>(beanClass, new Validator(beanClass, field -> field.getDeclaredAnnotation(Property.class).name()));
+            return new BeanMapper<>(beanClass, new Validator(beanClass, field -> field.getDeclaredAnnotation(Property.class).name()));
         });
     }
 

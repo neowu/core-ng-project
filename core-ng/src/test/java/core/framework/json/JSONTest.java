@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -98,20 +97,6 @@ class JSONTest {
         assertThat(beans).hasSize(2);
         assertThat(beans.get(0).stringField).isEqualTo("n1");
         assertThat(beans.get(1).stringField).isEqualTo("n2");
-    }
-
-    @Test
-    void optionalObject() {
-        Optional<TestBean> parsedBean = JSON.fromJSON(Types.optional(TestBean.class), JSON.toJSON(Optional.empty()));
-        assertThat(parsedBean).isNotPresent();
-
-        parsedBean = JSON.fromJSON(Types.optional(TestBean.class), JSON.toJSON(null));
-        assertThat(parsedBean).isNotPresent();
-
-        TestBean bean = new TestBean();
-        bean.stringField = "name";
-        parsedBean = JSON.fromJSON(Types.optional(TestBean.class), JSON.toJSON(Optional.of(bean)));
-        assertThat(parsedBean).get().isEqualToComparingFieldByField(bean);
     }
 
     @Test
