@@ -31,6 +31,7 @@ public final class BeanBody implements Body {
         sender.send(ByteBuffer.wrap(body));
     }
 
+    // TODO: validate response
     // to validate response bean, since it can not get declaration type from instance, try to construct original type as much as it can.
     void validateBeanType(ResponseBeanTypeValidator validator) {
         Type beanType;

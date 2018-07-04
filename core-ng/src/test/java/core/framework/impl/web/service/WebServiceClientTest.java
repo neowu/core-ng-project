@@ -12,7 +12,6 @@ import core.framework.json.JSON;
 import core.framework.log.Severity;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
-import core.framework.validate.ValidationException;
 import core.framework.web.service.RemoteServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +61,7 @@ class WebServiceClientTest {
     @Test
     void serviceURLWithEmptyPathParam() {
         assertThatThrownBy(() -> webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", "")))
-                .isInstanceOf(ValidationException.class)
+                .isInstanceOf(InternalServerErrorException.class)
                 .hasMessageContaining("name=id");
     }
 

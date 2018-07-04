@@ -1,7 +1,5 @@
 package core.framework.impl.validate;
 
-import core.framework.validate.ValidationException;
-
 import java.lang.reflect.Field;
 import java.util.function.Function;
 
@@ -9,7 +7,6 @@ import java.util.function.Function;
  * @author neo
  */
 public final class Validator {
-    // TODO: validate response, make validator return errors, to throw warn/error exceptions
     private final BeanValidator validator;
 
     public Validator(Class<?> beanClass, Function<Field, String> fieldNameProvider) {

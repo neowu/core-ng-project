@@ -16,9 +16,7 @@ import core.framework.json.JSON;
 import core.framework.log.Severity;
 import core.framework.util.Encodings;
 import core.framework.util.Exceptions;
-import core.framework.util.Maps;
 import core.framework.util.Strings;
-import core.framework.validate.ValidationException;
 import core.framework.web.service.RemoteServiceException;
 import core.framework.web.service.WebServiceClientInterceptor;
 import org.slf4j.Logger;
@@ -70,12 +68,11 @@ public class WebServiceClient {
 
     private String pathParam(Map<String, Object> pathParams, String variable) {
         Object param = pathParams.get(variable);
-        if (param == null) throw new ValidationException(Maps.newHashMap(variable, Strings.format("path param must not be null, name={}", variable)));
+        if (param == null) throw Exceptions.error("path param must not be null, name={}", variable);
         // convert logic matches PathParams
         if (param instanceof String) {
             String paramValue = (String) param;
-            if (Strings.isEmpty(paramValue))
-                throw new ValidationException(Maps.newHashMap(variable, Strings.format("path param must not be empty, name={}", variable)));
+            if (Strings.isEmpty(paramValue)) throw Exceptions.error("path param must not be empty, name={}", variable);
             return paramValue;
         } else if (param instanceof Number) {
             return String.valueOf(param);

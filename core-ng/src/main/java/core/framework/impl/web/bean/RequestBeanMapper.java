@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public final class RequestBeanMapper {
+public class RequestBeanMapper {
     private final Map<Class<?>, Validator> requestBeanValidators = Maps.newConcurrentHashMap();
     private final Map<Class<?>, QueryParamMapperHolder<?>> queryParamMappers = Maps.newConcurrentHashMap();
     private final BeanClassNameValidator classNameValidator;
@@ -38,7 +38,7 @@ public final class RequestBeanMapper {
         return (QueryParamMapperHolder<T>) queryParamMappers.computeIfAbsent(beanClass, key -> {
             new QueryParamBeanClassValidator(beanClass, classNameValidator).validate();
             QueryParamMapper<T> mapper = new QueryParamMapperBuilder<>(beanClass).build();
-            Validator validator = new Validator(beanClass, field -> field.getDeclaredAnnotation(QueryParam.class).name());
+            var validator = new Validator(beanClass, field -> field.getDeclaredAnnotation(QueryParam.class).name());
             return new QueryParamMapperHolder<>(mapper, validator);
         });
     }

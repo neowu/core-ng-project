@@ -3,6 +3,7 @@
 due to removed support List<T> as request/response 
 * web: request.bean must pass class type 
 * validation: remove support to validate top level List<T> 
+* validation: converted core.framework.impl.validate.ValidationException as internal exception, to treat as internal error, in application level, use BadRequestException instead
 
 ### 6.4.2 (6/28/2018 - 7/3/2018)
 * site: !!! updated csp design, allow to specify entire csp to keep maximum flexibility, this is due to difficulty of external sdk integration, e.g. facebook, ga  

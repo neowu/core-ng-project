@@ -33,7 +33,7 @@ class HTTPServerIOHandler implements HttpHandler {
                 return;
             }
 
-            RequestBodyReader reader = new RequestBodyReader(exchange, handler);
+            var reader = new RequestBodyReader(exchange, handler);
             StreamSourceChannel channel = exchange.getRequestChannel();
             reader.read(channel);  // channel will be null if getRequestChannel() is already called, but here should not be that case
             if (!reader.complete()) {
