@@ -1,5 +1,5 @@
 ## Change log
-### 6.5.0 (7/3/2018 - )
+### 6.5.0 (7/3/2018 - 7/4/2018)
 due to removed support List<T> as request/response type
 * web: request.bean must pass class type 
 * validation: remove support to validate top level List<T> 
