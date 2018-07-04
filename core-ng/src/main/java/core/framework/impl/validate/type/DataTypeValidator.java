@@ -28,7 +28,6 @@ public class DataTypeValidator {
             LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
     public boolean allowTopLevelList;
     public boolean allowTopLevelValue;
-    public boolean allowTopLevelOptional;
     public boolean allowChild;
     public TypeVisitor visitor;
 
@@ -37,8 +36,6 @@ public class DataTypeValidator {
     }
 
     public void validate() {
-        Type type = extractTopLevelOptional(this.type);
-
         if (GenericTypes.isList(type)) {
             if (!allowTopLevelList) throw Exceptions.error("top level list is not allowed, type={}", type.getTypeName());
             visitList(type, null, null);
@@ -46,16 +43,6 @@ public class DataTypeValidator {
             if (allowTopLevelValue && allowedValueClasses.contains(GenericTypes.rawClass(type))) return;
             visitObject(GenericTypes.rawClass(type), null, null);
         }
-    }
-
-    private Type extractTopLevelOptional(Type type) {
-        if (GenericTypes.isOptional(type)) {
-            if (!allowTopLevelOptional) throw Exceptions.error("top level optional is not allowed, type={}", type.getTypeName());
-            if (!GenericTypes.isGenericOptional(type))
-                throw Exceptions.error("top level optional must be Optional<T> and T must be class");
-            return GenericTypes.optionalValueClass(type);
-        }
-        return type;
     }
 
     private void visitObject(Class<?> objectClass, Field owner, String path) {

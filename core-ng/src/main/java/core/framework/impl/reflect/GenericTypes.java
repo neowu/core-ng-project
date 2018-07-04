@@ -40,13 +40,13 @@ public final class GenericTypes {
     }
 
     public static boolean isOptional(Type type) {
-        return Optional.class.isAssignableFrom(rawClass(type));
+        return Optional.class.equals(rawClass(type));
     }
 
     public static boolean isGenericOptional(Type type) {
         if (type instanceof ParameterizedType) {
             Class<?> rawClass = (Class<?>) ((ParameterizedType) type).getRawType();
-            return Optional.class.isAssignableFrom(rawClass)
+            return Optional.class.equals(rawClass)
                 && ((ParameterizedType) type).getActualTypeArguments()[0] instanceof Class;
         }
         return false;

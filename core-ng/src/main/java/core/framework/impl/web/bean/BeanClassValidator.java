@@ -5,10 +5,10 @@ import core.framework.impl.validate.type.JSONTypeValidator;
 /**
  * @author neo
  */
-final class RequestBeanClassValidator extends JSONTypeValidator {
+final class BeanClassValidator extends JSONTypeValidator {
     private final BeanClassNameValidator classNameValidator;
 
-    RequestBeanClassValidator(Class<?> beanClass, BeanClassNameValidator classNameValidator) {
+    BeanClassValidator(Class<?> beanClass, BeanClassNameValidator classNameValidator) {
         super(beanClass);
         this.classNameValidator = classNameValidator;
     }

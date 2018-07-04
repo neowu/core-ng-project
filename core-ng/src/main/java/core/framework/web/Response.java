@@ -23,6 +23,7 @@ public interface Response {
     }
 
     static Response bean(Object bean) {
+        if (bean == null) throw new Error("bean must not be null");
         return new ResponseImpl(new BeanBody(bean))
                 .contentType(ContentType.APPLICATION_JSON);
     }

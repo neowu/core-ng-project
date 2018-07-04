@@ -3,7 +3,7 @@ package core.framework.impl.web.response;
 import core.framework.api.http.HTTPStatus;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.filter.FieldParam;
-import core.framework.impl.web.bean.ResponseBeanTypeValidator;
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.site.TemplateManager;
 import core.framework.util.Encodings;
 import core.framework.web.CookieSpec;
@@ -23,8 +23,8 @@ public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
     private final ResponseHandlerContext context;
 
-    public ResponseHandler(ResponseBeanTypeValidator validator, TemplateManager templateManager) {
-        context = new ResponseHandlerContext(validator, templateManager);
+    public ResponseHandler(ResponseBeanMapper mapper, TemplateManager templateManager) {
+        context = new ResponseHandlerContext(mapper, templateManager);
     }
 
     public void render(ResponseImpl response, HttpServerExchange exchange, ActionLog actionLog) {

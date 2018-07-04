@@ -13,7 +13,7 @@ import core.framework.impl.reflect.Methods;
 import core.framework.impl.reflect.Params;
 import core.framework.impl.validate.type.JSONTypeValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
-import core.framework.impl.web.bean.ResponseBeanTypeValidator;
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.route.PathPatternValidator;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
@@ -33,12 +33,12 @@ import java.util.Set;
 public class WebServiceInterfaceValidator {
     private final Class<?> serviceInterface;
     private final RequestBeanMapper requestBeanMapper;
-    private final ResponseBeanTypeValidator responseBeanTypeValidator;
+    private final ResponseBeanMapper responseBeanMapper;
 
-    public WebServiceInterfaceValidator(Class<?> serviceInterface, RequestBeanMapper requestBeanMapper, ResponseBeanTypeValidator responseBeanTypeValidator) {
+    public WebServiceInterfaceValidator(Class<?> serviceInterface, RequestBeanMapper requestBeanMapper, ResponseBeanMapper responseBeanMapper) {
         this.serviceInterface = serviceInterface;
         this.requestBeanMapper = requestBeanMapper;
-        this.responseBeanTypeValidator = responseBeanTypeValidator;
+        this.responseBeanMapper = responseBeanMapper;
     }
 
     public void validate() {
@@ -146,7 +146,7 @@ public class WebServiceInterfaceValidator {
         if (isGenericButNotOptional || isValueType)
             throw Exceptions.error("response bean type must be bean class or Optional<T>, type={}, method={}", beanType.getTypeName(), Methods.path(method));
 
-        responseBeanTypeValidator.validate(beanType);
+        responseBeanMapper.register(beanType);
     }
 
     private void validateHTTPMethod(Method method) {

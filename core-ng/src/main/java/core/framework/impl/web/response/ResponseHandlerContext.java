@@ -1,17 +1,17 @@
 package core.framework.impl.web.response;
 
-import core.framework.impl.web.bean.ResponseBeanTypeValidator;
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.site.TemplateManager;
 
 /**
  * @author neo
  */
 final class ResponseHandlerContext {
-    final ResponseBeanTypeValidator validator;
+    final ResponseBeanMapper responseBeanMapper;
     final TemplateManager templateManager;
 
-    ResponseHandlerContext(ResponseBeanTypeValidator validator, TemplateManager templateManager) {
-        this.validator = validator;
+    ResponseHandlerContext(ResponseBeanMapper responseBeanMapper, TemplateManager templateManager) {
+        this.responseBeanMapper = responseBeanMapper;
         this.templateManager = templateManager;
     }
 }

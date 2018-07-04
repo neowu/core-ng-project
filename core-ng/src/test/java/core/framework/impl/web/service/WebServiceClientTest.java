@@ -6,17 +6,21 @@ import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.impl.json.JSONMapper;
+import core.framework.impl.validate.ValidationException;
 import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.json.JSON;
 import core.framework.log.Severity;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
+import core.framework.util.Types;
 import core.framework.web.service.RemoteServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,7 +34,8 @@ class WebServiceClientTest {
 
     @BeforeEach
     void createWebServiceClient() {
-        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(new BeanClassNameValidator()), null);
+        BeanClassNameValidator classNameValidator = new BeanClassNameValidator();
+        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(classNameValidator), new ResponseBeanMapper(classNameValidator), null);
     }
 
     @Test
@@ -61,7 +66,7 @@ class WebServiceClientTest {
     @Test
     void serviceURLWithEmptyPathParam() {
         assertThatThrownBy(() -> webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", "")))
-                .isInstanceOf(InternalServerErrorException.class)
+                .isInstanceOf(Error.class)
                 .hasMessageContaining("name=id");
     }
 
@@ -109,5 +114,33 @@ class WebServiceClientTest {
                     assertThat(exception.getMessage()).isEqualTo(response.message);
                     assertThat(exception.status).isEqualTo(HTTPStatus.NOT_FOUND);
                 });
+    }
+
+    @Test
+    void parseResponseWithVoid() {
+        assertThat(webServiceClient.parseResponse(void.class, null)).isNull();
+    }
+
+    @Test
+    void parseResponseWithEmptyOptional() {
+        assertThat(webServiceClient.parseResponse(Types.optional(TestWebService.TestResponse.class), new HTTPResponse(HTTPStatus.OK, Maps.newHashMap(), Strings.bytes("null"))))
+                .isEqualTo(Optional.empty());
+    }
+
+    @Test
+    void parseResponseWithValidationError() {
+        TestWebService.TestResponse response = new TestWebService.TestResponse();
+        assertThatThrownBy(() -> webServiceClient.parseResponse(TestWebService.TestResponse.class, new HTTPResponse(HTTPStatus.OK, Maps.newHashMap(), Strings.bytes(JSON.toJSON(response)))))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("int_field");
+    }
+
+    @Test
+    void parseResponse() {
+        TestWebService.TestResponse response = new TestWebService.TestResponse();
+        response.intField = 1;
+        response.stringMap = Maps.newHashMap("key", "value");
+        Object parsedResponse = webServiceClient.parseResponse(TestWebService.TestResponse.class, new HTTPResponse(HTTPStatus.OK, Maps.newHashMap(), Strings.bytes(JSON.toJSON(response))));
+        assertThat(parsedResponse).isEqualToComparingFieldByField(response);
     }
 }

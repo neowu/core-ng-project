@@ -5,7 +5,7 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
-import core.framework.impl.web.bean.ResponseBeanTypeValidator;
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.util.Types;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +60,7 @@ class WebServiceInterfaceValidatorTest {
 
     private WebServiceInterfaceValidator validator(Class<?> serviceInterface) {
         var classNameValidator = new BeanClassNameValidator();
-        return new WebServiceInterfaceValidator(serviceInterface, new RequestBeanMapper(classNameValidator), new ResponseBeanTypeValidator(classNameValidator));
+        return new WebServiceInterfaceValidator(serviceInterface, new RequestBeanMapper(classNameValidator), new ResponseBeanMapper(classNameValidator));
     }
 
     enum TestEnum {

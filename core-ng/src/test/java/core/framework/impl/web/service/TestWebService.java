@@ -97,6 +97,7 @@ public interface TestWebService {
     }
 
     class TestResponse {
+        @NotNull
         @Property(name = "int_field")
         public Integer intField;
 

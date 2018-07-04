@@ -9,6 +9,7 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.controller.ControllerHolder;
 import core.framework.impl.web.service.HTTPMethods;
 import core.framework.impl.web.service.WebServiceClient;
@@ -55,7 +56,7 @@ public class APIConfig extends Config {
         logger.info("create api service, interface={}", serviceInterface.getCanonicalName());
         new WebServiceInterfaceValidator(serviceInterface,
                 context.httpServer.handler.requestBeanMapper,
-                context.httpServer.handler.responseBeanTypeValidator).validate();
+                context.httpServer.handler.responseBeanMapper).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
 
         for (Method method : serviceInterface.getMethods()) {
@@ -81,10 +82,11 @@ public class APIConfig extends Config {
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
         logger.info("create api service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
-        new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, context.httpServer.handler.responseBeanTypeValidator).validate();
+        ResponseBeanMapper responseBeanMapper = context.httpServer.handler.responseBeanMapper;
+        new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper).validate();
 
         HTTPClient httpClient = getOrCreateHTTPClient();
-        WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, context.logManager);
+        WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, responseBeanMapper, context.logManager);
         T client = createWebServiceClient(serviceInterface, webServiceClient);
         context.beanFactory.bind(serviceInterface, null, client);
         return new APIClientConfig(webServiceClient);

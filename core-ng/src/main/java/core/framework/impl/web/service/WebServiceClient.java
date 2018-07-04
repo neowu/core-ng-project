@@ -11,6 +11,7 @@ import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.HTTPServerHandler;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.route.Path;
 import core.framework.json.JSON;
 import core.framework.log.Severity;
@@ -33,14 +34,16 @@ public class WebServiceClient {
     private final Logger logger = LoggerFactory.getLogger(WebServiceClient.class);
     private final String serviceURL;
     private final HTTPClient httpClient;
-    private final RequestBeanMapper mapper;
+    private final RequestBeanMapper requestBeanMapper;
+    private final ResponseBeanMapper responseBeanMapper;
     private final LogManager logManager;
     private WebServiceClientInterceptor interceptor;
 
-    public WebServiceClient(String serviceURL, HTTPClient httpClient, RequestBeanMapper mapper, LogManager logManager) {
+    public WebServiceClient(String serviceURL, HTTPClient httpClient, RequestBeanMapper requestBeanMapper, ResponseBeanMapper responseBeanMapper, LogManager logManager) {
         this.serviceURL = serviceURL;
         this.httpClient = httpClient;
-        this.mapper = mapper;
+        this.requestBeanMapper = requestBeanMapper;
+        this.responseBeanMapper = responseBeanMapper;
         this.logManager = logManager;
     }
 
@@ -100,19 +103,20 @@ public class WebServiceClient {
 
         HTTPResponse response = httpClient.execute(request);
         validateResponse(response);
-        if (void.class != responseType) {
-            return JSONMapper.fromJSON(responseType, response.body());
-        } else {
-            return null;
-        }
+        return parseResponse(responseType, response);
+    }
+
+    Object parseResponse(Type responseType, HTTPResponse response) {
+        if (void.class == responseType) return null;
+        return responseBeanMapper.fromJSON(responseType, response.body());
     }
 
     <T> void addRequestBean(HTTPRequest request, HTTPMethod method, Class<T> requestBeanClass, T requestBean) {
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-            Map<String, String> queryParams = mapper.toParams(requestBeanClass, requestBean);
+            Map<String, String> queryParams = requestBeanMapper.toParams(requestBeanClass, requestBean);
             addQueryParams(request, queryParams);
         } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT || method == HTTPMethod.PATCH) {
-            byte[] json = mapper.toJSON(requestBeanClass, requestBean);
+            byte[] json = requestBeanMapper.toJSON(requestBeanClass, requestBean);
             request.body(json, ContentType.APPLICATION_JSON);
         } else {
             throw Exceptions.error("not supported method, method={}", method);

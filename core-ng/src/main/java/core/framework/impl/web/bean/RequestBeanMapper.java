@@ -2,7 +2,6 @@ package core.framework.impl.web.bean;
 
 import core.framework.api.json.Property;
 import core.framework.api.web.service.QueryParam;
-import core.framework.impl.json.JSONMapper;
 import core.framework.impl.validate.Validator;
 import core.framework.util.Maps;
 
@@ -12,7 +11,7 @@ import java.util.Map;
  * @author neo
  */
 public class RequestBeanMapper {
-    private final Map<Class<?>, Validator> requestBeanValidators = Maps.newConcurrentHashMap();
+    private final Map<Class<?>, BeanMapper<?>> requestBeanMappers = Maps.newConcurrentHashMap();
     private final Map<Class<?>, QueryParamMapperHolder<?>> queryParamMappers = Maps.newConcurrentHashMap();
     private final BeanClassNameValidator classNameValidator;
 
@@ -44,21 +43,23 @@ public class RequestBeanMapper {
     }
 
     public <T> byte[] toJSON(Class<T> beanClass, T bean) {
-        registerRequestBean(beanClass).validate(bean);
-        return JSONMapper.toJSON(bean);
+        BeanMapper<T> holder = registerRequestBean(beanClass);
+        holder.validator.validate(bean);
+        return holder.writer.toJSON(bean);
     }
 
     public <T> T fromJSON(Class<T> beanClass, byte[] body) {
-        Validator validator = registerRequestBean(beanClass);
-        T bean = JSONMapper.fromJSON(beanClass, body);
-        validator.validate(bean);
+        BeanMapper<T> holder = registerRequestBean(beanClass);
+        T bean = holder.reader.fromJSON(body);
+        holder.validator.validate(bean);
         return bean;
     }
 
-    public <T> Validator registerRequestBean(Class<T> beanClass) {
-        return requestBeanValidators.computeIfAbsent(beanClass, type -> {
-            new RequestBeanClassValidator(beanClass, classNameValidator).validate();
-            return new Validator(beanClass, field -> field.getDeclaredAnnotation(Property.class).name());
+    @SuppressWarnings("unchecked")
+    public <T> BeanMapper<T> registerRequestBean(Class<T> beanClass) {
+        return (BeanMapper<T>) requestBeanMappers.computeIfAbsent(beanClass, type -> {
+            new BeanClassValidator(beanClass, classNameValidator).validate();
+            return new BeanMapper<T>(beanClass, new Validator(beanClass, field -> field.getDeclaredAnnotation(Property.class).name()));
         });
     }
 

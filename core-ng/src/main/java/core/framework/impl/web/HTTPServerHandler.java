@@ -4,7 +4,7 @@ import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
-import core.framework.impl.web.bean.ResponseBeanTypeValidator;
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.controller.ControllerHolder;
 import core.framework.impl.web.controller.Interceptors;
 import core.framework.impl.web.controller.InvocationImpl;
@@ -39,7 +39,7 @@ public class HTTPServerHandler implements HttpHandler {
     public final HTTPServerErrorHandler errorHandler;
     private final BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
     public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanClassNameValidator);
-    public final ResponseBeanTypeValidator responseBeanTypeValidator = new ResponseBeanTypeValidator(beanClassNameValidator);
+    public final ResponseBeanMapper responseBeanMapper = new ResponseBeanMapper(beanClassNameValidator);
 
     private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
     private final LogManager logManager;
@@ -51,7 +51,7 @@ public class HTTPServerHandler implements HttpHandler {
     HTTPServerHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager, ShutdownHandler shutdownHandler) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
-        responseHandler = new ResponseHandler(responseBeanTypeValidator, templateManager);
+        responseHandler = new ResponseHandler(responseBeanMapper, templateManager);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
         this.shutdownHandler = shutdownHandler;
     }
