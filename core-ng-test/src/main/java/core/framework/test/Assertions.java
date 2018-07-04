@@ -8,15 +8,15 @@ import core.framework.test.assertion.ValidatorAssert;
  * @author neo
  */
 public class Assertions {
-    public static EnumConversionAssert assertThat(Class<? extends Enum<?>> enumClass) {
+    public static EnumConversionAssert assertEnumClass(Class<? extends Enum<?>> enumClass) {
         return new EnumConversionAssert(enumClass);
     }
 
-    public static ValidatorAssert assertThat(Object bean) {
+    public static ValidatorAssert assertBean(Object bean) {
         return new ValidatorAssert(bean);
     }
 
-    public static EnvResourceAssert assertConf() {
+    public static EnvResourceAssert assertConfDirectory() {
         return new EnvResourceAssert();
     }
 }
