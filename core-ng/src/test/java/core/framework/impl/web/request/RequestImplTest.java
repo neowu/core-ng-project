@@ -46,7 +46,7 @@ class RequestImplTest {
     void beanWithJSONPost() {
         request.method = HTTPMethod.POST;
         request.contentType = ContentType.APPLICATION_JSON;
-        request.body = Strings.bytes("{\"big_decimal_field\": 1}");
+        request.body = Strings.bytes("{\"big_decimal_field\": 1, \"int_field\": 3}");
 
         TestBean bean = request.bean(TestBean.class);
         assertThat(bean.bigDecimalField).isEqualTo("1");

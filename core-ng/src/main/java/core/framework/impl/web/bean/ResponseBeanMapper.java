@@ -43,7 +43,7 @@ public class ResponseBeanMapper {
         try {
             mapper.validator.validate(bean);
         } catch (ValidationException e) {
-            logger.debug("failed to validate response bean, beanClass={}, bean={}", beanClass.getCanonicalName(), JSON.toJSON(bean));  // log invalid bean for troubleshooting
+            logger.debug("failed to validate response bean, bean={}", JSON.toJSON(bean));  // log invalid bean for troubleshooting
             throw e;
         }
         return mapper.writer.toJSON(bean);
@@ -51,7 +51,6 @@ public class ResponseBeanMapper {
 
     @SuppressWarnings("unchecked")
     public <T> T fromJSON(Type responseType, byte[] body) {
-        if (responseType == void.class) return null;
         BeanMapper<T> mapper = register(responseType);
         T bean = mapper.reader.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {

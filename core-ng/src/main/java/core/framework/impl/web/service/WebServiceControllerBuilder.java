@@ -13,7 +13,6 @@ import core.framework.web.Response;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.List;
 
 import static core.framework.impl.asm.Literal.type;
@@ -54,10 +53,10 @@ public class WebServiceControllerBuilder<T> {
         List<String> params = Lists.newArrayList();
 
         Annotation[][] annotations = method.getParameterAnnotations();
-        Type[] paramTypes = method.getGenericParameterTypes();
+        Class<?>[] paramClasses = method.getParameterTypes();
         for (int i = 0; i < annotations.length; i++) {
-            Type paramType = paramTypes[i];
-            String paramTypeLiteral = type(paramType);
+            Class<?> paramClass = paramClasses[i];
+            String paramTypeLiteral = type(paramClass);
             PathParam pathParam = Params.annotation(annotations[i], PathParam.class);
             if (pathParam != null) {
                 params.add(pathParam.value());
@@ -66,13 +65,13 @@ public class WebServiceControllerBuilder<T> {
                         pathParam.value(),
                         paramTypeLiteral,
                         pathParam.value(),
-                        variable(paramType));
+                        variable(paramClass));
             } else {
                 params.add("bean");
                 builder.indent(1).append("{} bean = ({}) request.bean({});\n",
                         paramTypeLiteral,
                         paramTypeLiteral,
-                        variable(paramType));
+                        variable(paramClass));
             }
         }
 

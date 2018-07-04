@@ -1,7 +1,11 @@
 package core.framework.impl.web.bean;
 
+import core.framework.impl.validate.ValidationException;
+import core.framework.json.JSON;
 import core.framework.util.Charsets;
 import core.framework.util.Lists;
+import core.framework.util.Strings;
+import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,13 +43,41 @@ class ResponseBeanMapperTest {
 
     @Test
     void toJSONWithOptional() {
-        Optional<TestBean> optional = Optional.of(new TestBean());
+        TestBean bean = new TestBean();
+        bean.intField = 5;
+        Optional<TestBean> optional = Optional.of(bean);
         byte[] bytes = responseBeanMapper.toJSON(optional);
         assertThat(bytes).isNotEmpty();
     }
 
     @Test
+    void toJSONWithValidationError() {
+        assertThatThrownBy(() -> responseBeanMapper.toJSON(new TestBean()))
+                .isInstanceOf(ValidationException.class);
+    }
+
+    @Test
     void registerBean() {
         responseBeanMapper.register(TestBean.class);
+    }
+
+    @Test
+    void fromJSONWithOptional() {
+        TestBean bean = new TestBean();
+        bean.intField = 3;
+        String json = JSON.toJSON(bean);
+
+        Optional<TestBean> parsedBean = responseBeanMapper.fromJSON(Types.optional(TestBean.class), Strings.bytes(json));
+        assertThat(parsedBean).get().isEqualToComparingFieldByField(bean);
+    }
+
+    @Test
+    void fromJSON() {
+        TestBean bean = new TestBean();
+        bean.intField = 3;
+        String json = JSON.toJSON(bean);
+
+        TestBean parsedBean = responseBeanMapper.fromJSON(TestBean.class, Strings.bytes(json));
+        assertThat(parsedBean).isEqualToComparingFieldByField(bean);
     }
 }

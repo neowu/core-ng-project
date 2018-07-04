@@ -1,6 +1,7 @@
 package core.framework.impl.web.bean;
 
 import core.framework.api.json.Property;
+import core.framework.api.validate.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class TestBean {
     @Property(name = "string_field")
     public String stringField;
 
+    @NotNull
     @Property(name = "int_field")
     public Integer intField;
 
