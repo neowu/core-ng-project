@@ -1,4 +1,9 @@
 ## Change log
+### 6.5.0 (7/3/2018 - )
+due to removed support List<T> as request/response 
+* web: request.bean must pass class type 
+* validation: remove support to validate top level List<T> 
+
 ### 6.4.2 (6/28/2018 - 7/3/2018)
 * site: !!! updated csp design, allow to specify entire csp to keep maximum flexibility, this is due to difficulty of external sdk integration, e.g. facebook, ga  
         use site().security().csp(csp) or sys.webSecurity.csp to configure, site().security() will enable rest headers without csp          

@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author neo
  */
-class ObjectValidatorSizeTest {
-    private ObjectValidator validator;
+class BeanValidatorSizeTest {
+    private BeanValidator validator;
 
     @BeforeEach
     void createObjectValidator() {
-        validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().orElseThrow();
+        validator = new BeanValidatorBuilder(Bean.class, Field::getName).build().orElseThrow();
     }
 
     @Test

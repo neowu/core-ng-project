@@ -9,6 +9,8 @@ import core.framework.impl.web.bean.ResponseBeanTypeValidator;
 import core.framework.util.Types;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -22,18 +24,18 @@ class WebServiceInterfaceValidatorTest {
     }
 
     @Test
-    void validateRequestBeanType() throws NoSuchMethodException {
+    void validateRequestBeanClass() throws NoSuchMethodException {
         var validator = validator(TestWebService.class);
         var method = TestWebService.class.getDeclaredMethod("get", Integer.class);
 
-        assertThatThrownBy(() -> validator.validateRequestBeanType(Integer.class, method))
+        assertThatThrownBy(() -> validator.validateRequestBeanClass(Integer.class, method))
                 .isInstanceOf(Error.class).hasMessageContaining("if it is path param, please add @PathParam");
 
-        assertThatThrownBy(() -> validator.validateRequestBeanType(TestEnum.class, method))
+        assertThatThrownBy(() -> validator.validateRequestBeanClass(TestEnum.class, method))
                 .isInstanceOf(Error.class).hasMessageContaining("if it is path param, please add @PathParam");
 
-        assertThatThrownBy(() -> validator.validateRequestBeanType(Types.map(String.class, String.class), method))
-                .isInstanceOf(Error.class).hasMessageContaining("request bean type must be class");
+        assertThatThrownBy(() -> validator.validateRequestBeanClass(Map.class, method))
+                .isInstanceOf(Error.class).hasMessageContaining("request bean type must be bean class");
     }
 
     @Test
@@ -42,10 +44,10 @@ class WebServiceInterfaceValidatorTest {
         var method = TestWebService.class.getDeclaredMethod("get", Integer.class);
 
         assertThatThrownBy(() -> validator.validateResponseBeanType(Integer.class, method))
-                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be class or Optional<T>");
+                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be bean class or Optional<T>");
 
         assertThatThrownBy(() -> validator.validateResponseBeanType(Types.map(String.class, String.class), method))
-                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be class or Optional<T>");
+                .isInstanceOf(Error.class).hasMessageContaining("response bean type must be bean class or Optional<T>");
     }
 
     @Test

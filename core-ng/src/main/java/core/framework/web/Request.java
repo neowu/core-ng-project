@@ -2,7 +2,6 @@ package core.framework.web;
 
 import core.framework.http.HTTPMethod;
 
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
@@ -46,7 +45,7 @@ public interface Request {
 
     Optional<byte[]> body();
 
-    <T> T bean(Type beanType);
+    <T> T bean(Class<T> beanClass);
 
     String clientIP();
 

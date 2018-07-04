@@ -15,7 +15,6 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 
 import java.io.UncheckedIOException;
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
 
@@ -142,15 +141,15 @@ public final class RequestImpl implements Request {
     }
 
     @Override
-    public <T> T bean(Type beanType) {
+    public <T> T bean(Class<T> beanClass) {
         try {
             if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-                return mapper.fromParams(beanType, queryParams);
+                return mapper.fromParams(beanClass, queryParams);
             } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT || method == HTTPMethod.PATCH) {
                 if (!formParams.isEmpty()) {
-                    return mapper.fromParams(beanType, formParams);
+                    return mapper.fromParams(beanClass, formParams);
                 } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
-                    return mapper.fromJSON(beanType, body);
+                    return mapper.fromJSON(beanClass, body);
                 }
                 throw new BadRequestException("body is missing or unsupported content type, method=" + method + ", contentType=" + contentType);
             } else {

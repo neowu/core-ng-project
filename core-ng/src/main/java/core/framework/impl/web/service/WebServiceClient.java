@@ -87,13 +87,13 @@ public class WebServiceClient {
     }
 
     // used by generated code, must be public
-    public Object execute(HTTPMethod method, String serviceURL, Type requestType, Object requestBean, Type responseType) {
+    public <T> Object execute(HTTPMethod method, String serviceURL, Class<T> requestBeanClass, T requestBean, Type responseType) {
         HTTPRequest request = new HTTPRequest(method, serviceURL);
         request.accept(ContentType.APPLICATION_JSON);
         linkContext(request);
 
-        if (requestType != null) {
-            addRequestBean(request, method, requestType, requestBean);
+        if (requestBeanClass != null) {
+            addRequestBean(request, method, requestBeanClass, requestBean);
         }
 
         if (interceptor != null) {
@@ -110,12 +110,12 @@ public class WebServiceClient {
         }
     }
 
-    void addRequestBean(HTTPRequest request, HTTPMethod method, Type requestType, Object requestBean) {
+    <T> void addRequestBean(HTTPRequest request, HTTPMethod method, Class<T> requestBeanClass, T requestBean) {
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-            Map<String, String> queryParams = mapper.toParams(requestType, requestBean);
+            Map<String, String> queryParams = mapper.toParams(requestBeanClass, requestBean);
             addQueryParams(request, queryParams);
         } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT || method == HTTPMethod.PATCH) {
-            byte[] json = mapper.toJSON(requestType, requestBean);
+            byte[] json = mapper.toJSON(requestBeanClass, requestBean);
             request.body(json, ContentType.APPLICATION_JSON);
         } else {
             throw Exceptions.error("not supported method, method={}", method);

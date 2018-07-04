@@ -19,14 +19,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author neo
  */
-class ObjectValidatorNotNullTest {
-    private ObjectValidatorBuilder builder;
-    private ObjectValidator validator;
+class BeanValidatorNotNullTest {
+    private BeanValidatorBuilder builder;
+    private BeanValidator validator;
 
     @BeforeEach
     void createObjectValidator() {
-        builder = new ObjectValidatorBuilder(Bean.class, Field::getName);
-        validator = builder.build().get();
+        builder = new BeanValidatorBuilder(Bean.class, Field::getName);
+        validator = builder.build().orElseThrow();
     }
 
     @Test

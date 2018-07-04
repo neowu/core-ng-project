@@ -10,20 +10,19 @@ import core.framework.util.Exceptions;
 import core.framework.util.Sets;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
  * @author neo
  */
-final class QueryParamBeanTypeValidator implements TypeVisitor {
+final class QueryParamBeanClassValidator implements TypeVisitor {
     private final DataTypeValidator validator;
     private final Set<String> visitedQueryParams = Sets.newHashSet();
     private final BeanClassNameValidator classNameValidator;
 
-    QueryParamBeanTypeValidator(Type beanType, BeanClassNameValidator classNameValidator) {
+    QueryParamBeanClassValidator(Class<?> beanClass, BeanClassNameValidator classNameValidator) {
         this.classNameValidator = classNameValidator;
-        validator = new DataTypeValidator(beanType);
+        validator = new DataTypeValidator(beanClass);
         validator.visitor = this;
     }
 

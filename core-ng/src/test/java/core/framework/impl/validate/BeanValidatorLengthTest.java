@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author neo
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ObjectValidatorLengthTest {
-    private ObjectValidatorBuilder builder;
-    private ObjectValidator validator;
+class BeanValidatorLengthTest {
+    private BeanValidatorBuilder builder;
+    private BeanValidator validator;
 
     @BeforeAll
     void createObjectValidator() {
-        builder = new ObjectValidatorBuilder(Bean.class, Field::getName);
+        builder = new BeanValidatorBuilder(Bean.class, Field::getName);
         validator = builder.build().orElseThrow();
     }
 

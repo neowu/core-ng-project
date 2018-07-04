@@ -2,16 +2,14 @@ package core.framework.impl.web.bean;
 
 import core.framework.impl.validate.type.JSONTypeValidator;
 
-import java.lang.reflect.Type;
-
 /**
  * @author neo
  */
-final class RequestBeanTypeValidator extends JSONTypeValidator {
+final class RequestBeanClassValidator extends JSONTypeValidator {
     private final BeanClassNameValidator classNameValidator;
 
-    RequestBeanTypeValidator(Type instanceType, BeanClassNameValidator classNameValidator) {
-        super(instanceType);
+    RequestBeanClassValidator(Class<?> beanClass, BeanClassNameValidator classNameValidator) {
+        super(beanClass);
         this.classNameValidator = classNameValidator;
     }
 

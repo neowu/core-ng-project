@@ -16,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author neo
  */
-class ObjectValidatorMinMaxTest {
-    private ObjectValidator validator;
+class BeanValidatorMinMaxTest {
+    private BeanValidator validator;
 
     @BeforeEach
     void createObjectValidator() {
-        validator = new ObjectValidatorBuilder(Bean.class, Field::getName).build().get();
+        validator = new BeanValidatorBuilder(Bean.class, Field::getName).build().get();
     }
 
     @Test

@@ -67,7 +67,7 @@ public class WebServiceInterfaceValidator {
         validateResponseBeanType(method.getGenericReturnType(), method);
 
         Set<String> pathVariables = pathVariables(path.value(), method);
-        Type requestBeanType = null;
+        Class<?> requestBeanClass = null;
 
         Annotation[][] annotations = method.getParameterAnnotations();
         Type[] paramTypes = method.getGenericParameterTypes();
@@ -80,16 +80,16 @@ public class WebServiceInterfaceValidator {
                 validatePathParamType(paramType, method);
                 pathParams.add(pathParam.value());
             } else {
-                if (requestBeanType != null)
-                    throw Exceptions.error("service method must not have more than one bean param, previous={}, current={}, method={}", requestBeanType.getTypeName(), paramType.getTypeName(), Methods.path(method));
-                requestBeanType = paramType;
+                if (requestBeanClass != null)
+                    throw Exceptions.error("service method must not have more than one bean param, previous={}, current={}, method={}", requestBeanClass.getTypeName(), paramType.getTypeName(), Methods.path(method));
+                requestBeanClass = GenericTypes.rawClass(paramType);
 
-                validateRequestBeanType(requestBeanType, method);
+                validateRequestBeanClass(requestBeanClass, method);
 
                 if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
-                    requestBeanMapper.registerQueryParamBean(requestBeanType);
+                    requestBeanMapper.registerQueryParamBean(requestBeanClass);
                 } else {
-                    requestBeanMapper.registerRequestBean(requestBeanType);
+                    requestBeanMapper.registerRequestBean(requestBeanClass);
                 }
             }
         }
@@ -98,10 +98,10 @@ public class WebServiceInterfaceValidator {
             throw Exceptions.error("service method @PathParam params must match variable in path pattern, path={}, method={}", path.value(), Methods.path(method));
     }
 
-    void validateRequestBeanType(Type beanType, Method method) {    // due to it's common to forget @PathParam in service method param, this is to make error message more friendly
-        boolean isValueType = isValueType(GenericTypes.rawClass(beanType));
+    void validateRequestBeanClass(Class<?> beanClass, Method method) {    // due to it's common to forget @PathParam in service method param, this is to make error message more friendly
+        boolean isValueType = isValueType(beanClass);
         if (isValueType)
-            throw Exceptions.error("request bean type must be class, if it is path param, please add @PathParam, beanType={}, method={}", beanType.getTypeName(), Methods.path(method));
+            throw Exceptions.error("request bean type must be bean class, if it is path param, please add @PathParam, type={}, method={}", beanClass.getCanonicalName(), Methods.path(method));
     }
 
     private Set<String> pathVariables(String path, Method method) {
@@ -141,10 +141,10 @@ public class WebServiceInterfaceValidator {
         if (void.class == beanType) return;
 
         // due to it's common to return wrong type as response, this is to make error message more friendly
-        boolean isGenericButNotOptionalOrList = beanType instanceof ParameterizedType && !GenericTypes.isGenericOptional(beanType) && !GenericTypes.isGenericList(beanType);
+        boolean isGenericButNotOptional = beanType instanceof ParameterizedType && !GenericTypes.isGenericOptional(beanType);
         boolean isValueType = beanType instanceof Class && isValueType((Class<?>) beanType);
-        if (isGenericButNotOptionalOrList || isValueType)
-            throw Exceptions.error("response bean type must be class or Optional<T>, beanType={}, method={}", beanType.getTypeName(), Methods.path(method));
+        if (isGenericButNotOptional || isValueType)
+            throw Exceptions.error("response bean type must be bean class or Optional<T>, type={}, method={}", beanType.getTypeName(), Methods.path(method));
 
         responseBeanTypeValidator.validate(beanType);
     }

@@ -1,5 +1,5 @@
-public class ObjectValidatorLengthTest$Bean$ObjectValidator implements core.framework.impl.validate.ObjectValidator {
-    private void validateBean0(core.framework.impl.validate.ObjectValidatorLengthTest.Bean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
+public class BeanValidatorLengthTest$Bean$Validator implements core.framework.impl.validate.BeanValidator {
+    private void validateBean0(core.framework.impl.validate.BeanValidatorLengthTest.Bean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
         if (bean.field1 == null) {
             if (!partial) errors.add("field1", "field must not be null");
         } else {
@@ -18,7 +18,7 @@ public class ObjectValidatorLengthTest$Bean$ObjectValidator implements core.fram
     }
 
     public void validate(Object instance, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
-        validateBean0((core.framework.impl.validate.ObjectValidatorLengthTest.Bean) instance, errors, partial);
+        validateBean0((core.framework.impl.validate.BeanValidatorLengthTest.Bean) instance, errors, partial);
     }
 
 }

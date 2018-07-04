@@ -51,7 +51,7 @@ public class WebServiceClientBuilder<T> {
         Type returnType = method.getGenericReturnType();
 
         Map<String, Integer> pathParamIndexes = Maps.newHashMap();
-        Type requestBeanType = null;
+        Class<?> requestBeanClass = null;
         Integer requestBeanIndex = null;
         builder.append("public {} {}(", type(returnType), method.getName());
         Annotation[][] annotations = method.getParameterAnnotations();
@@ -66,12 +66,12 @@ public class WebServiceClientBuilder<T> {
                 pathParamIndexes.put(pathParam.value(), i);
             } else {
                 requestBeanIndex = i;
-                requestBeanType = method.getGenericParameterTypes()[i];
+                requestBeanClass = method.getParameterTypes()[i];
             }
         }
         builder.append(") {\n");
 
-        builder.indent(1).append("java.lang.reflect.Type requestType = {};\n", requestBeanType == null ? "null" : variable(requestBeanType));
+        builder.indent(1).append("java.lang.Class requestBeanClass = {};\n", requestBeanClass == null ? "null" : variable(requestBeanClass));
         builder.indent(1).append("Object requestBean = {};\n", requestBeanIndex == null ? "null" : "param" + requestBeanIndex);
 
         builder.indent(1).append("java.util.Map pathParams = new java.util.HashMap();\n");
@@ -84,7 +84,7 @@ public class WebServiceClientBuilder<T> {
         builder.indent(1).append("String serviceURL = client.serviceURL({}, pathParams);\n", variable(path)); // to pass path as string literal, the escaped char will not be transferred, like \\, currently not convert is because only type regex may contain special char
 
         HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
-        builder.indent(1).append("{} response = ({}) client.execute({}, serviceURL, requestType, requestBean, {});\n",
+        builder.indent(1).append("{} response = ({}) client.execute({}, serviceURL, requestBeanClass, requestBean, {});\n",
                 returnTypeLiteral,
                 returnTypeLiteral,
                 variable(httpMethod),

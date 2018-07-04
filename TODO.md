@@ -11,6 +11,7 @@
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * support websocket?
 * review http://sevntu-checkstyle.github.io/sevntu.checkstyle/apidocs/index.html, add all needed
+* cache: hit rate report?
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

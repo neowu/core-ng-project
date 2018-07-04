@@ -1,7 +1,7 @@
 package core.framework.test.assertion;
 
-import core.framework.impl.validate.ObjectValidator;
-import core.framework.impl.validate.ObjectValidatorBuilder;
+import core.framework.impl.validate.BeanValidator;
+import core.framework.impl.validate.BeanValidatorBuilder;
 import core.framework.impl.validate.ValidationErrors;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.MapAssert;
@@ -13,7 +13,7 @@ import java.util.Optional;
  * @author neo
  */
 public class ValidatorAssert extends AbstractAssert<ValidatorAssert, Object> {
-    private final ObjectValidator validator;
+    private final BeanValidator validator;
 
     public ValidatorAssert(Object actual) {
         super(actual, ValidatorAssert.class);
@@ -40,10 +40,10 @@ public class ValidatorAssert extends AbstractAssert<ValidatorAssert, Object> {
         return errors;
     }
 
-    private ObjectValidator validator(Object bean) {
+    private BeanValidator validator(Object bean) {
         Class<?> beanClass = bean.getClass();
-        ObjectValidatorBuilder builder = new ObjectValidatorBuilder(beanClass, Field::getName);
-        Optional<ObjectValidator> validatorOptional = builder.build();
+        BeanValidatorBuilder builder = new BeanValidatorBuilder(beanClass, Field::getName);
+        Optional<BeanValidator> validatorOptional = builder.build();
         if (!validatorOptional.isPresent()) {
             failWithMessage("%nExpecting:%n  %s%nhas validation annotations, but was not found", beanClass.getName());
         }

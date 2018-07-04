@@ -3,17 +3,17 @@ package core.framework.impl.validate;
 import core.framework.validate.ValidationException;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.function.Function;
 
 /**
  * @author neo
  */
 public final class Validator {
-    private final ObjectValidator validator;
+    // TODO: validate response, make validator return errors, to throw warn/error exceptions
+    private final BeanValidator validator;
 
-    public Validator(Type instanceType, Function<Field, String> fieldNameProvider) {
-        ObjectValidatorBuilder builder = new ObjectValidatorBuilder(instanceType, fieldNameProvider);
+    public Validator(Class<?> beanClass, Function<Field, String> fieldNameProvider) {
+        var builder = new BeanValidatorBuilder(beanClass, fieldNameProvider);
         this.validator = builder.build().orElse(null);
     }
 

@@ -32,47 +32,33 @@ import static core.framework.impl.asm.Literal.variable;
 /**
  * @author neo
  */
-public class ObjectValidatorBuilder {
-    private final Type instanceType;
+public class BeanValidatorBuilder {
+    private final Class<?> beanClass;
     private final Function<Field, String> fieldNameProvider;
-    DynamicInstanceBuilder<ObjectValidator> builder;
+    DynamicInstanceBuilder<BeanValidator> builder;
     private int index = 0;
 
-    public ObjectValidatorBuilder(Type instanceType, Function<Field, String> fieldNameProvider) {
-        this.instanceType = instanceType;
+    public BeanValidatorBuilder(Class<?> beanClass, Function<Field, String> fieldNameProvider) {
+        this.beanClass = beanClass;
         this.fieldNameProvider = fieldNameProvider;
     }
 
-    public Optional<ObjectValidator> build() {
-        Class<?> targetClass = unwrapInstanceType();
-        if (Classes.instanceFields(targetClass).stream().noneMatch(this::hasValidationAnnotation)) return Optional.empty();
+    public Optional<BeanValidator> build() {
+        if (Classes.instanceFields(beanClass).stream().noneMatch(this::hasValidationAnnotation)) return Optional.empty();
 
-        builder = new DynamicInstanceBuilder<>(ObjectValidator.class, targetClass.getTypeName() + "$ObjectValidator");
-        String method = validateObjectMethod(targetClass, null);
+        builder = new DynamicInstanceBuilder<>(BeanValidator.class, beanClass.getName() + "$Validator");
+        String method = validateObjectMethod(beanClass, null);
 
-        CodeBuilder builder = new CodeBuilder().append("public void validate(Object instance, {} errors, boolean partial) {\n", type(ValidationErrors.class));
-        if (GenericTypes.isList(instanceType)) {
-            builder.indent(1).append("java.util.List list = (java.util.List) instance;\n")
-                   .indent(1).append("for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {\n")
-                   .indent(2).append("{} value = ({}) iterator.next();\n", type(targetClass), type(targetClass))
-                   .indent(2).append("if (value != null) {}(value, errors, partial);\n", method)
-                   .indent(1).append("}\n");
-        } else {
-            builder.indent(1).append("{}(({}) instance, errors, partial);\n", method, type(instanceType));
-        }
+        var builder = new CodeBuilder().append("public void validate(Object instance, {} errors, boolean partial) {\n", type(ValidationErrors.class));
+        builder.indent(1).append("{}(({}) instance, errors, partial);\n", method, type(beanClass));
         builder.append('}');
         this.builder.addMethod(builder.build());
         return Optional.of(this.builder.build());
     }
 
-    private Class<?> unwrapInstanceType() {
-        if (GenericTypes.isList(instanceType)) return GenericTypes.listValueClass(instanceType);
-        return GenericTypes.rawClass(instanceType);
-    }
-
     private String validateObjectMethod(Class<?> beanClass, String parentPath) {
         String methodName = "validate" + beanClass.getSimpleName() + (index++);
-        CodeBuilder builder = new CodeBuilder().append("private void {}({} bean, {} errors, boolean partial) {\n", methodName, type(beanClass), type(ValidationErrors.class));
+        var builder = new CodeBuilder().append("private void {}({} bean, {} errors, boolean partial) {\n", methodName, type(beanClass), type(ValidationErrors.class));
         for (Field field : Classes.instanceFields(beanClass)) {
             if (!hasValidationAnnotation(field)) continue;
             validateAnnotations(field);
