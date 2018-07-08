@@ -1,4 +1,7 @@
 ## Change log
+### 6.5.1 (7/7/2018 - )
+* template: support data url in html template
+
 ### 6.5.0 (7/3/2018 - 7/4/2018)
 due to removed support List<T> as request/response type
 * web: request.bean must pass class type 

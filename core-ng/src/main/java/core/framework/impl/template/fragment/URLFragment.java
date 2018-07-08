@@ -74,16 +74,6 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
         VALID_URI.set('%');
     }
 
-    static boolean isValidURL(String url) {
-        if (Strings.isEmpty(url)) return false;
-        if (url.contains("javascript:")) return false;
-        for (int i = 0; i < url.length(); i++) {
-            char ch = url.charAt(i);
-            if (!VALID_URI.get(ch)) return false;
-        }
-        return true;
-    }
-
     private final Logger logger = LoggerFactory.getLogger(URLFragment.class);
     private final ExpressionHolder expression;
     private final String location;
@@ -104,7 +94,17 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
         builder.append(url(url, context));
     }
 
-    private String url(String url, TemplateContext context) {
+    boolean isValidURL(String url) {
+        if (Strings.isEmpty(url)) return false;
+        if (url.contains("javascript:")) return false;
+        for (int i = 0; i < url.length(); i++) {
+            char ch = url.charAt(i);
+            if (!VALID_URI.get(ch)) return false;
+        }
+        return true;
+    }
+
+    String url(String url, TemplateContext context) {
         if (!isValidURL(url)) {
             logger.warn(Markers.errorCode("ILLEGAL_URL"), "illegal url detected, url={}, location={}", url, location);
             return "\"\"";
