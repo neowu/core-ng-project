@@ -1,5 +1,6 @@
 package core.framework.impl.web.response;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
 import core.framework.web.Response;
 import io.undertow.util.Headers;
@@ -32,5 +33,14 @@ class ResponseImplTest {
         assertThatThrownBy(() -> Response.bean(null))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("bean must not be null");
+    }
+
+    @Test
+    void redirect() {
+        assertThatThrownBy(() -> Response.redirect(null, HTTPStatus.OK))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("invalid redirect status");
+
+        assertThat(Response.redirect("/path").status()).isEqualTo(HTTPStatus.SEE_OTHER);
     }
 }

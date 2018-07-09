@@ -9,6 +9,7 @@ import core.framework.impl.web.response.FileBody;
 import core.framework.impl.web.response.ResponseImpl;
 import core.framework.impl.web.response.TemplateBody;
 import core.framework.impl.web.response.TextBody;
+import core.framework.util.Exceptions;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -52,9 +53,7 @@ public interface Response {
     }
 
     static Response redirect(String url) {
-        return new ResponseImpl(new ByteArrayBody(new byte[0]))
-                .header(HTTPHeaders.LOCATION, url)
-                .status(HTTPStatus.SEE_OTHER);
+        return redirect(url, HTTPStatus.SEE_OTHER);
     }
 
     static Response redirect(String url, HTTPStatus redirectStatus) {
@@ -62,7 +61,7 @@ public interface Response {
                 && redirectStatus != HTTPStatus.MOVED_PERMANENTLY
                 && redirectStatus != HTTPStatus.PERMANENT_REDIRECT
                 && redirectStatus != HTTPStatus.TEMPORARY_REDIRECT)
-            throw new Error("redirect status is not valid, status=" + redirectStatus);
+            throw Exceptions.error("invalid redirect status, status={}", redirectStatus);
 
         return new ResponseImpl(new ByteArrayBody(new byte[0]))
                 .header(HTTPHeaders.LOCATION, url)

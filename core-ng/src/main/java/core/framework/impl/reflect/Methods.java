@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * @author neo
  */
-public class Methods {
+public final class Methods {
     public static String path(Method method) {
         return method.getDeclaringClass().getCanonicalName() + "." + method.getName()
                 + '(' + Arrays.stream(method.getGenericParameterTypes()).map(Type::getTypeName).collect(Collectors.joining(", ")) + ')';

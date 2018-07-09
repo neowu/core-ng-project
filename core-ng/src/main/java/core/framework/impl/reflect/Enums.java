@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 /**
  * @author neo
  */
-public class Enums {
+public final class Enums {
     public static <T extends Enum<?>, A extends Annotation> A constantAnnotation(T constant, Class<A> annotationClass) {
         try {
             Field field = constant.getDeclaringClass().getField(constant.name());

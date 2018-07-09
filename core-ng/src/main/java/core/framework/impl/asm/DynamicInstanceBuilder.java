@@ -86,7 +86,7 @@ public class DynamicInstanceBuilder<T> {
     public T build(Object... constructorParams) {
         try {
             @SuppressWarnings("unchecked")
-            Class<T> targetClass = classBuilder.toClass();
+            Class<T> targetClass = (Class<T>) classBuilder.toClass();
             classBuilder.detach();
             return targetClass.getDeclaredConstructor(constructorParamClasses).newInstance(constructorParams);
         } catch (CannotCompileException | ReflectiveOperationException e) {

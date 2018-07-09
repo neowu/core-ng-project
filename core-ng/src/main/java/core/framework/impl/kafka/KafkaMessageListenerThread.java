@@ -30,10 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author neo
  */
 class KafkaMessageListenerThread extends Thread {
-    static double longProcessThreshold(double batchLongProcessThreshold, int recordCount, int totalCount) {
-        return batchLongProcessThreshold * recordCount / totalCount;
-    }
-
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListenerThread.class);
     private final Consumer<String, byte[]> consumer;
     private final LogManager logManager;
@@ -115,13 +111,13 @@ class KafkaMessageListenerThread extends Thread {
             for (Map.Entry<String, List<ConsumerRecord<String, byte[]>>> entry : messages.entrySet()) {
                 String topic = entry.getKey();
                 List<ConsumerRecord<String, byte[]>> records = entry.getValue();
-                KafkaMessageListener.BulkMessageHandlerHolder<?> bulkHandlerHolder = bulkHandlerHolders.get(topic);
-                if (bulkHandlerHolder != null) {
-                    handle(topic, bulkHandlerHolder, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
+                KafkaMessageListener.BulkMessageHandlerHolder<?> bulkHandler = bulkHandlerHolders.get(topic);
+                if (bulkHandler != null) {
+                    handle(topic, bulkHandler, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
                 } else {
-                    KafkaMessageListener.MessageHandlerHolder<?> handlerHolder = handlerHolders.get(topic);
-                    if (handlerHolder != null) {
-                        handle(topic, handlerHolder, records, longProcessThreshold(batchLongProcessThresholdInNano, 1, count));
+                    KafkaMessageListener.MessageHandlerHolder<?> handler = handlerHolders.get(topic);
+                    if (handler != null) {
+                        handle(topic, handler, records, longProcessThreshold(batchLongProcessThresholdInNano, 1, count));
                     }
                 }
             }
@@ -223,5 +219,9 @@ class KafkaMessageListenerThread extends Thread {
             logger.warn("failed to validate message, key={}, headers={}, message={}", record.key(), headers, new BytesParam(record.value()), e);
             throw e;
         }
+    }
+
+    double longProcessThreshold(double batchLongProcessThreshold, int recordCount, int totalCount) {
+        return batchLongProcessThreshold * recordCount / totalCount;
     }
 }
