@@ -31,6 +31,7 @@
         <module name="AvoidConstantAsFirstOperandInConditionCheck"/>    <!--provided by sevntu-checkstyle-->
         <module name="AvoidHidingCauseExceptionCheck"/>                 <!--provided by sevntu-checkstyle-->
         <module name="DefaultComesLast"/>
+        <module name="DiamondOperatorForVariableDefinitionCheck"/>      <!--provided by sevntu-checkstyle-->
         <module name="EmptyStatement"/>                 <!--Detects empty statements (standalone ';').-->
         <module name="EqualsAvoidNull"/>                <!--Checks that any combination of String literals with optional assignment is on the left side of an equals() comparison.-->
         <module name="EqualsHashCode"/>                 <!--Checks that classes that override equals() also override hashCode().-->

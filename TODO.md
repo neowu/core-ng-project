@@ -10,7 +10,6 @@
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * support websocket?
-* review http://sevntu-checkstyle.github.io/sevntu.checkstyle/apidocs/index.html, add all needed
 * cache: hit rate report?
 
 ### jdk 9/10 incompatible list
