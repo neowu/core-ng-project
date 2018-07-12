@@ -10,25 +10,14 @@ import core.framework.log.Severity;
  */
 @ResponseStatus(HTTPStatus.FORBIDDEN)
 public final class ForbiddenException extends RuntimeException implements ErrorCode {
-    public static final String DEFAULT_ERROR_CODE = "FORBIDDEN";
-
     private static final long serialVersionUID = 5472429043879214361L;
-
-    private final String errorCode;
 
     public ForbiddenException(String message) {
         super(message);
-        errorCode = DEFAULT_ERROR_CODE;
     }
 
-    public ForbiddenException(String message, String errorCode) {
-        super(message);
-        this.errorCode = errorCode;
-    }
-
-    public ForbiddenException(String message, String errorCode, Throwable cause) {
+    public ForbiddenException(String message, Throwable cause) {
         super(message, cause);
-        this.errorCode = errorCode;
     }
 
     @Override
@@ -38,6 +27,6 @@ public final class ForbiddenException extends RuntimeException implements ErrorC
 
     @Override
     public String errorCode() {
-        return errorCode;
+        return "FORBIDDEN";
     }
 }

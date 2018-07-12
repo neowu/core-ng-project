@@ -157,7 +157,7 @@ public final class RequestImpl implements Request {
                 throw Exceptions.error("not supported method, method={}", method);
             }
         } catch (ValidationException e) {
-            throw new BadRequestException(e.getMessage(), "VALIDATION_ERROR", e);
+            throw new BadRequestException(e.getMessage(), e.errorCode(), e);
         } catch (UncheckedIOException e) {  // for invalid json string
             throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
         }
