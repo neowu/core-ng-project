@@ -44,7 +44,7 @@ public class BeanValidatorBuilder {
 
     public Optional<BeanValidator> build() {
         validate(beanClass);
-        if ((Classes.instanceFields(beanClass).stream().noneMatch(this::hasValidationAnnotation))) return Optional.empty();
+        if (Classes.instanceFields(beanClass).stream().noneMatch(this::hasValidationAnnotation)) return Optional.empty();
         builder = new DynamicInstanceBuilder<>(BeanValidator.class, beanClass.getName() + "$Validator");
         String method = validateMethod(beanClass, null);
         var builder = new CodeBuilder().append("public void validate(Object instance, {} errors, boolean partial) {\n", type(ValidationErrors.class));
