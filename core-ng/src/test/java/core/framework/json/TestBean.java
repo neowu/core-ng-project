@@ -47,6 +47,9 @@ public class TestBean {
     @Property(name = "empty")
     public Empty empty;
 
+    @Property(name = "defaultValue")
+    public String defaultValueField = "defaultValue";
+
     public enum TestEnum {
         @Property(name = "A1")
         A,

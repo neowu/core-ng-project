@@ -137,4 +137,11 @@ class JSONTest {
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean.empty).isNotNull();
     }
+
+    @Test
+    void defaultValue() {
+        TestBean bean = JSON.fromJSON(TestBean.class, "{}");
+
+        assertThat(bean.defaultValueField).isEqualTo("defaultValue");
+    }
 }

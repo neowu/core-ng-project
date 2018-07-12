@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -36,8 +33,8 @@ class BeanValidatorSizeTest {
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
-        assertTrue(errors.hasError());
-        assertEquals(2, errors.errors.size());
+        assertThat(errors.hasError()).isTrue();
+        assertThat(errors.errors).hasSize(2);
         assertThat(errors.errors.get("stringList")).contains("stringList");
         assertThat(errors.errors.get("stringMap")).contains("stringMap");
     }
@@ -52,7 +49,7 @@ class BeanValidatorSizeTest {
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
-        assertFalse(errors.hasError());
+        assertThat(errors.hasError()).isFalse();
     }
 
     static class Bean {
