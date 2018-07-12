@@ -37,7 +37,7 @@ class ValidatorAssertTest {
         assertBean(bean).hasError().containsEntry("field1", "field1 must not be longer than 5");
     }
 
-    static class Bean {
+    public static class Bean {
         @NotNull
         @Length(max = 5, message = "field1 must not be longer than 5")
         public String field1;
