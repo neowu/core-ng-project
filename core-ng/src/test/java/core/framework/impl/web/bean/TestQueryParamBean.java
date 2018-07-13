@@ -1,6 +1,7 @@
 package core.framework.impl.web.bean;
 
 import core.framework.api.json.Property;
+import core.framework.api.validate.NotNull;
 import core.framework.api.web.service.QueryParam;
 
 import java.math.BigDecimal;
@@ -41,6 +42,10 @@ public class TestQueryParamBean {
 
     @QueryParam(name = "enum_field")
     public TestEnum enumField;
+
+    @NotNull
+    @QueryParam(name = "default_value_field")
+    public String defaultValueField = "value";
 
     public enum TestEnum {
         @Property(name = "V1")

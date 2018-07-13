@@ -20,13 +20,14 @@ import static core.framework.impl.asm.Literal.variable;
 class QueryParamMapperBuilder<T> {
     private final String helper = QueryParamMapperHelper.class.getCanonicalName();
     private final Class<T> beanClass;
+    DynamicInstanceBuilder<QueryParamMapper<T>> builder;
 
     QueryParamMapperBuilder(Class<T> beanClass) {
         this.beanClass = beanClass;
     }
 
     public QueryParamMapper<T> build() {
-        DynamicInstanceBuilder<QueryParamMapper<T>> builder = new DynamicInstanceBuilder<>(QueryParamMapper.class, QueryParamMapper.class.getCanonicalName() + "$" + beanClass.getSimpleName());
+        builder = new DynamicInstanceBuilder<>(QueryParamMapper.class, QueryParamMapper.class.getCanonicalName() + "$" + beanClass.getSimpleName());
         builder.addMethod(toParamsMethod());
         builder.addMethod(toBeanMethod());
         return builder.build();
@@ -62,27 +63,29 @@ class QueryParamMapperBuilder<T> {
             String fieldName = field.getName();
             Class<?> fieldClass = field.getType();
             String name = field.getDeclaredAnnotation(QueryParam.class).name();
+            builder.indent(1).append("if (params.containsKey(\"{}\")) {\n", name);
             if (String.class.equals(fieldClass)) {
-                builder.indent(1).append("bean.{} = (String)params.get(\"{}\");\n", fieldName, name);
+                builder.indent(2).append("bean.{} = (String)params.get(\"{}\");\n", fieldName, name);
             } else if (Integer.class.equals(fieldClass)) {
-                builder.indent(1).append("bean.{} = {}.toInt((String)params.get(\"{}\"));\n", fieldName, helper, name);
+                builder.indent(2).append("bean.{} = {}.toInt((String)params.get(\"{}\"));\n", fieldName, helper, name);
             } else if (Long.class.equals(fieldClass)) {
-                builder.indent(1).append("bean.{} = {}.toLong((String)params.get(\"{}\"));\n", fieldName, helper, name);
+                builder.indent(2).append("bean.{} = {}.toLong((String)params.get(\"{}\"));\n", fieldName, helper, name);
             } else if (Double.class.equals(fieldClass)) {
-                builder.indent(1).append("bean.{} = {}.toDouble((String)params.get(\"{}\"));\n", fieldName, helper, name);
+                builder.indent(2).append("bean.{} = {}.toDouble((String)params.get(\"{}\"));\n", fieldName, helper, name);
             } else if (BigDecimal.class.equals(fieldClass)) {
-                builder.indent(1).append("bean.{} = {}.toBigDecimal((String)params.get(\"{}\"));\n", fieldName, helper, name);
+                builder.indent(2).append("bean.{} = {}.toBigDecimal((String)params.get(\"{}\"));\n", fieldName, helper, name);
             } else if (Boolean.class.equals(fieldClass)) {
-                builder.indent(1).append("bean.{} = {}.toBoolean((String)params.get(\"{}\"));\n", fieldName, helper, name);
+                builder.indent(2).append("bean.{} = {}.toBoolean((String)params.get(\"{}\"));\n", fieldName, helper, name);
             } else if (LocalDateTime.class.equals(fieldClass)) {
-                builder.indent(1).append("bean.{} = {}.toDateTime((String)params.get(\"{}\"));\n", fieldName, helper, name);
+                builder.indent(2).append("bean.{} = {}.toDateTime((String)params.get(\"{}\"));\n", fieldName, helper, name);
             } else if (LocalDate.class.equals(fieldClass)) {
-                builder.indent(1).append("bean.{} = {}.toDate((String)params.get(\"{}\"));\n", fieldName, helper, name);
+                builder.indent(2).append("bean.{} = {}.toDate((String)params.get(\"{}\"));\n", fieldName, helper, name);
             } else if (ZonedDateTime.class.equals(fieldClass)) {
-                builder.indent(1).append("bean.{} = {}.toZonedDateTime((String)params.get(\"{}\"));\n", fieldName, helper, name);
+                builder.indent(2).append("bean.{} = {}.toZonedDateTime((String)params.get(\"{}\"));\n", fieldName, helper, name);
             } else if (fieldClass.isEnum()) {
-                builder.indent(1).append("bean.{} = ({}){}.toEnum((String)params.get(\"{}\"), {});\n", fieldName, type(fieldClass), helper, name, variable(fieldClass));
+                builder.indent(2).append("bean.{} = ({}){}.toEnum((String)params.get(\"{}\"), {});\n", fieldName, type(fieldClass), helper, name, variable(fieldClass));
             }
+            builder.indent(1).append("}\n", name);
         }
 
         builder.indent(1).append("return bean;\n");

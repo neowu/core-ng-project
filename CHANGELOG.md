@@ -1,7 +1,8 @@
 ## Change log
-### 6.5.1 (7/7/2018 - )
+### 6.5.1 (7/7/2018 - 7/12/2018)
 * template: support data url in html template
 * validation: if bean has default value, it requires to put @NotNull (this may break, review all request/response, and run unit test to verify)
+* web: query param mapper ignore not existed keys, in order to support default value in query bean  
 
 ### 6.5.0 (7/3/2018 - 7/4/2018)
 due to removed support List<T> as request/response type
