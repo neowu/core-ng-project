@@ -15,7 +15,7 @@ import java.util.Map;
  * @author neo
  */
 public final class WebSecurityInterceptor implements Interceptor {    // refer to https://www.owasp.org/index.php/OWASP_Secure_Headers_Project#tab=Headers
-    public String contentSecurityPolicy;
+    public String contentSecurityPolicy = "default-src 'self'; img-src 'self' data:; object-src 'none'; frame-src 'none';";
 
     @Override
     public Response intercept(Invocation invocation) throws Exception {
