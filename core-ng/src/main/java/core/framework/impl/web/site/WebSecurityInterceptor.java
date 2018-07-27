@@ -33,7 +33,7 @@ public final class WebSecurityInterceptor implements Interceptor {    // refer t
         response.header("Strict-Transport-Security", "max-age=31536000");
         response.contentType().ifPresent(contentType -> {
             if (ContentType.TEXT_HTML.mediaType().equals(contentType.mediaType())) {
-                if (contentSecurityPolicy != null) response.header("Content-Security-Policy", contentSecurityPolicy);
+                response.header("Content-Security-Policy", contentSecurityPolicy);
                 response.header("X-XSS-Protection", "1; mode=block");       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
             }
             response.header("X-Content-Type-Options", "nosniff");

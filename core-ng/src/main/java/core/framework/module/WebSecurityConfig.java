@@ -13,6 +13,7 @@ public class WebSecurityConfig {
     }
 
     public void contentSecurityPolicy(String policy) {
+        if (policy == null) throw new Error("policy must not be null");
         interceptor.contentSecurityPolicy = policy;
     }
 }
