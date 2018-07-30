@@ -1,5 +1,5 @@
 ## Change log
-### 6.5.2 (7/26/2018 - )
+### 6.5.2 (7/26/2018 - 7/30/2018)
 * kafka: update to 1.1.1
 * db: fix SQLParams may throw exception which cause action log failed to send
 
