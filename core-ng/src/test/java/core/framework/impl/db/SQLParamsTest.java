@@ -19,6 +19,13 @@ class SQLParamsTest {
     }
 
     @Test
+    void toStringWithUnregisteredEnum() {
+        EnumDBMapper mapper = new EnumDBMapper();
+        SQLParams params = new SQLParams(mapper, TestEnum.V1);
+        assertThat(params.toString()).isEqualTo("[V1]");
+    }
+
+    @Test
     void toStringWithEmpty() {
         SQLParams params = new SQLParams(null);
         assertThat(params.toString()).isEqualTo("[]");

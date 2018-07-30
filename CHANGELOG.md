@@ -1,6 +1,7 @@
 ## Change log
 ### 6.5.2 (7/26/2018 - )
 * kafka: update to 1.1.1
+* db: fix SQLParams may throw exception which cause action log failed to send
 
 ### 6.5.1 (7/7/2018 - 7/12/2018)
 * template: support data url in html template

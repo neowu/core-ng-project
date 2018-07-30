@@ -1,9 +1,13 @@
 package core.framework.impl.db;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author neo
  */
 public class SQLParams {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SQLParams.class);
     private final EnumDBMapper mapper;
     private final Object[] params;
 
@@ -26,7 +30,12 @@ public class SQLParams {
 
     private String value(Object param) {
         if (param instanceof Enum) {
-            return mapper.getDBValue((Enum<?>) param);
+            try {
+                return mapper.getDBValue((Enum<?>) param);
+            } catch (Throwable e) {
+                LOGGER.warn("failed to get db enum value, error={}", e.getMessage(), e);
+                return String.valueOf(param);
+            }
         }
         return String.valueOf(param);
     }
