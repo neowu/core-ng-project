@@ -71,11 +71,6 @@ public final class RepositoryImpl<T> implements Repository<T> {
         update(entity, false);
     }
 
-    @Override
-    public void partialUpdate(T entity) {
-        update(entity, true);
-    }
-
     private void update(T entity, boolean partial) {
         StopWatch watch = new StopWatch();
         validator.validate(entity, partial);
@@ -91,6 +86,11 @@ public final class RepositoryImpl<T> implements Repository<T> {
             logger.debug("update, sql={}, params={}, elapsedTime={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
+    }
+
+    @Override
+    public void partialUpdate(T entity) {
+        update(entity, true);
     }
 
     @Override
