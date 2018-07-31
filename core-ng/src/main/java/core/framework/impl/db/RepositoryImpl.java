@@ -1,7 +1,9 @@
 package core.framework.impl.db;
 
+import core.framework.db.Column;
 import core.framework.db.Query;
 import core.framework.db.Repository;
+import core.framework.impl.validate.Validator;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.Lists;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 public final class RepositoryImpl<T> implements Repository<T> {
     private final Logger logger = LoggerFactory.getLogger(RepositoryImpl.class);
     private final DatabaseImpl database;
-    private final RepositoryEntityValidator<T> validator;
+    private final Validator validator;
     private final SelectQuery<T> selectQuery;
     private final InsertQuery<T> insertQuery;
     private final UpdateQuery<T> updateQuery;
@@ -29,7 +31,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     RepositoryImpl(DatabaseImpl database, Class<T> entityClass) {
         this.database = database;
-        validator = new RepositoryEntityValidator<>(entityClass);
+        validator = new Validator(entityClass, field -> field.getDeclaredAnnotation(Column.class).name());
         insertQuery = new InsertQuery<>(entityClass);
         selectQuery = new SelectQuery<>(entityClass, database.vendor);
         updateQuery = new UpdateQueryBuilder<>(entityClass).build();
@@ -51,7 +53,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public Optional<Long> insert(T entity) {
         StopWatch watch = new StopWatch();
-        validator.validate(entity);
+        validator.validate(entity, false);
         String sql = insertQuery.sql;
         Object[] params = insertQuery.params(entity);
         try {
@@ -66,9 +68,18 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public void update(T entity) {
+        update(entity, false);
+    }
+
+    @Override
+    public void partialUpdate(T entity) {
+        update(entity, true);
+    }
+
+    private void update(T entity, boolean partial) {
         StopWatch watch = new StopWatch();
-        validator.partialValidate(entity);
-        UpdateQuery.Statement query = updateQuery.update(entity);
+        validator.validate(entity, partial);
+        UpdateQuery.Statement query = updateQuery.update(entity, partial);
         int updatedRows = 0;
         try {
             updatedRows = database.operation.update(query.sql, query.params);
@@ -101,7 +112,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public void batchInsert(List<T> entities) {
         StopWatch watch = new StopWatch();
-        entities.forEach(validator::validate);
+        entities.forEach(bean -> validator.validate(bean, false));
         String sql = insertQuery.sql;
         List<Object[]> params = entities.stream().map(insertQuery::params).collect(Collectors.toList());
         try {

@@ -33,6 +33,8 @@ public interface Repository<T> {
 
     void update(T entity);
 
+    void partialUpdate(T entity); // only update non-null fields
+
     void delete(Object... primaryKeys);
 
     void batchInsert(List<T> entities);

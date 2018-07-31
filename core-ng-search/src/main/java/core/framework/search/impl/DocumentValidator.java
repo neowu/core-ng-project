@@ -14,6 +14,6 @@ final class DocumentValidator<T> {
     }
 
     public void validate(T document) {
-        validator.validate(document);
+        validator.validate(document, false);
     }
 }

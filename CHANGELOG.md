@@ -1,4 +1,8 @@
 ## Change log
+### 6.6.0 (7/31/2018 - )
+* db: !!! replaced repository.update with repository.partialUpdate(), repository.update will update all fields and field can be NULL 
+* search: update to 6.3.2
+
 ### 6.5.2 (7/26/2018 - 7/30/2018)
 * kafka: update to 1.1.1
 * db: fix SQLParams may throw exception which cause action log failed to send

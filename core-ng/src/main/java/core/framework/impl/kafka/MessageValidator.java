@@ -15,6 +15,6 @@ public class MessageValidator<T> {
     }
 
     public void validate(T message) {
-        validator.validate(message);
+        validator.validate(message, false);
     }
 }

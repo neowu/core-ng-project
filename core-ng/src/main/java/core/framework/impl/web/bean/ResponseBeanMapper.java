@@ -35,7 +35,7 @@ public class ResponseBeanMapper {
 
     private <T> byte[] toJSON(Class<T> beanClass, T bean) {
         BeanMapper<T> mapper = register(beanClass);
-        mapper.validator.validate(bean);
+        mapper.validator.validate(bean, false);
         return mapper.writer.toJSON(bean);
     }
 
@@ -45,10 +45,10 @@ public class ResponseBeanMapper {
         T bean = mapper.reader.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {
             if (bean == null) return (T) Optional.empty();
-            mapper.validator.validate(bean);
+            mapper.validator.validate(bean, false);
             return (T) Optional.of(bean);
         } else {
-            mapper.validator.validate(bean);
+            mapper.validator.validate(bean, false);
             return bean;
         }
     }

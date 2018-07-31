@@ -4,7 +4,7 @@ package core.framework.impl.db;
  * @author neo
  */
 public interface UpdateQuery<T> {
-    Statement update(T entity);
+    Statement update(T entity, boolean partial);
 
     class Statement {
         final String sql;

@@ -21,14 +21,14 @@ public class RequestBeanMapper {
 
     public <T> Map<String, String> toParams(Class<T> beanClass, T bean) {
         QueryParamMapperHolder<T> holder = registerQueryParamBean(beanClass);
-        holder.validator.validate(bean);
+        holder.validator.validate(bean, false);
         return holder.mapper.toParams(bean);
     }
 
     public <T> T fromParams(Class<T> beanClass, Map<String, String> params) {
         QueryParamMapperHolder<T> holder = registerQueryParamBean(beanClass);
         T bean = holder.mapper.fromParams(params);
-        holder.validator.validate(bean);
+        holder.validator.validate(bean, false);
         return bean;
     }
 
@@ -44,14 +44,14 @@ public class RequestBeanMapper {
 
     public <T> byte[] toJSON(Class<T> beanClass, T bean) {
         BeanMapper<T> holder = registerRequestBean(beanClass);
-        holder.validator.validate(bean);
+        holder.validator.validate(bean, false);
         return holder.writer.toJSON(bean);
     }
 
     public <T> T fromJSON(Class<T> beanClass, byte[] body) {
         BeanMapper<T> holder = registerRequestBean(beanClass);
         T bean = holder.reader.fromJSON(body);
-        holder.validator.validate(bean);
+        holder.validator.validate(bean, false);
         return bean;
     }
 

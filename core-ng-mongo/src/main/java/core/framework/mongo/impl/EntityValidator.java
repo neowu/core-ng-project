@@ -18,6 +18,6 @@ final class EntityValidator<T> {
     }
 
     void validate(T entity) {
-        validator.validate(entity);
+        validator.validate(entity, false);
     }
 }

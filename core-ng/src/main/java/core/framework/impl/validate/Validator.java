@@ -18,11 +18,7 @@ public final class Validator {
         this.validator = builder.build().orElse(null);
     }
 
-    public void validate(Object bean) {
-        validate(bean, false);
-    }
-
-    private void validate(Object bean, boolean partial) {
+    public void validate(Object bean, boolean partial) {
         ValidationErrors errors = new ValidationErrors();
         if (bean == null) {
             errors.add("bean", "bean must not be null");
@@ -32,9 +28,5 @@ public final class Validator {
         }
         if (errors.hasError())
             throw new ValidationException(errors.errors);
-    }
-
-    public void partialValidate(Object bean) {
-        validate(bean, true);
     }
 }

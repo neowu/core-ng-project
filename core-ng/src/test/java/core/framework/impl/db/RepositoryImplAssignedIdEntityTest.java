@@ -67,9 +67,23 @@ class RepositoryImplAssignedIdEntityTest {
 
         AssignedIdEntity updatedEntity = new AssignedIdEntity();
         updatedEntity.id = entity.id;
+        updatedEntity.dateField = LocalDate.of(2016, Month.JULY, 5);
+        updatedEntity.intField = 12;
+        repository.update(updatedEntity);
+
+        assertThat(repository.get(entity.id)).get().isEqualToComparingFieldByField(updatedEntity);
+    }
+
+    @Test
+    void partialUpdate() {
+        AssignedIdEntity entity = entity(UUID.randomUUID().toString(), "string", 11);
+        repository.insert(entity);
+
+        AssignedIdEntity updatedEntity = new AssignedIdEntity();
+        updatedEntity.id = entity.id;
         updatedEntity.stringField = "updated";
         updatedEntity.dateField = LocalDate.of(2016, Month.JULY, 5);
-        repository.update(updatedEntity);
+        repository.partialUpdate(updatedEntity);
 
         assertThat(repository.get(entity.id)).get().isEqualToComparingOnlyGivenFields(updatedEntity, "stringField", "dateField");
     }

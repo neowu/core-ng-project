@@ -59,7 +59,7 @@ class RepositoryImplCompositeKeyEntityTest {
     }
 
     @Test
-    void update() {
+    void partialUpdate() {
         CompositeKeyEntity entity = new CompositeKeyEntity();
         entity.id1 = "id1";
         entity.id2 = "id2";
@@ -68,7 +68,7 @@ class RepositoryImplCompositeKeyEntityTest {
         repository.insert(entity);
 
         entity.longField = 2L;
-        repository.update(entity);
+        repository.partialUpdate(entity);
 
         CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).orElseThrow();
         assertEquals(entity.longField, selectedEntity.longField);

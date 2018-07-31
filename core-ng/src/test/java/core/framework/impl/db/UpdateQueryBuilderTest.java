@@ -30,7 +30,7 @@ class UpdateQueryBuilderTest {
         AutoIncrementIdEntity entity = new AutoIncrementIdEntity();
         entity.id = 1;
         entity.stringField = "new_value";
-        UpdateQuery.Statement statement = updateQuery.update(entity);
+        UpdateQuery.Statement statement = updateQuery.update(entity, true);
 
         assertEquals("UPDATE auto_increment_id_entity SET string_field = ? WHERE id = ?", statement.sql);
         assertEquals(2, statement.params.length);
