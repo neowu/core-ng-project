@@ -1,9 +1,10 @@
 package core.framework.impl.log.filter;
 
 import core.framework.util.Charsets;
-import core.framework.util.Sets;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
+
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,7 +16,7 @@ class JSONParamTest {
     void filterWithoutMasking() {
         String value = "{\"field1\": \"value1\"}";
         FilterParam param = param(value);
-        String message = param.filter(Sets.newHashSet());
+        String message = param.filter(Set.of());
         assertThat(message).isEqualTo(value);
     }
 
@@ -23,7 +24,7 @@ class JSONParamTest {
     void filterWithOneMaskedField() {
         String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"field2\": \"value2\"\n}";
         FilterParam param = param(value);
-        String message = param.filter(Sets.newHashSet("password", "passwordConfirm"));
+        String message = param.filter(Set.of("password", "passwordConfirm"));
         assertThat(message).isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"field2\": \"value2\"\n}");
     }
 
@@ -31,7 +32,7 @@ class JSONParamTest {
     void filterWithMultipleMaskedFields() {
         String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass123\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"pass\\\"123\",\n    \"passwordConfirm\": \"pass123\"}}";
         FilterParam param = param(value);
-        String message = param.filter(Sets.newHashSet("password", "passwordConfirm"));
+        String message = param.filter(Set.of("password", "passwordConfirm"));
         assertThat(message).isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"passwordConfirm\": \"******\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"******\",\n    \"passwordConfirm\": \"******\"}}");
     }
 
@@ -39,12 +40,12 @@ class JSONParamTest {
     void filterWithBrokenJSONMessage() {
         String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass12";
         FilterParam param = param(value);
-        String message = param.filter(Sets.newHashSet("password", "passwordConfirm"));
+        String message = param.filter(Set.of("password", "passwordConfirm"));
         assertThat(message).doesNotContain("pass123");
 
         value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\"";
         param = param(value);
-        message = param.filter(Sets.newHashSet("password", "passwordConfirm"));
+        message = param.filter(Set.of("password", "passwordConfirm"));
         assertThat(message).doesNotContain("pass123");
     }
 

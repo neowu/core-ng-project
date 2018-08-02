@@ -2,9 +2,9 @@ package core.framework.impl.template;
 
 import core.framework.impl.template.source.ClasspathTemplateSource;
 import core.framework.util.ClasspathResources;
-import core.framework.util.Lists;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,7 +22,7 @@ class HTMLTemplateTest {
         TestModel model = new TestModel();
         model.stringField = "string<";
         model.numberField = 100;
-        model.items.addAll(Lists.newArrayList("a", "b", "c"));
+        model.items.addAll(List.of("a", "b", "c"));
         model.children.add(child("child1", 1.0, true));
         model.children.add(child("child2", 2.0, false));
         model.htmlField = "<pre>html</pre>";

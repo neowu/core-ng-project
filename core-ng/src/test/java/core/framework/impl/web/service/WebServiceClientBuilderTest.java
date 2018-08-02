@@ -2,12 +2,12 @@ package core.framework.impl.web.service;
 
 import core.framework.http.HTTPMethod;
 import core.framework.util.ClasspathResources;
-import core.framework.util.Maps;
 import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,7 +42,7 @@ class WebServiceClientBuilderTest {
     void get() {
         TestWebService.TestResponse expectedResponse = new TestWebService.TestResponse();
 
-        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Maps.newHashMap("id", 1))))
+        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Map.of("id", 1))))
                 .thenReturn("http://localhost/test/1");
         when(webServiceClient.execute(HTTPMethod.GET, "http://localhost/test/1", null, null, Types.optional(TestWebService.TestResponse.class)))
                 .thenReturn(Optional.of(expectedResponse));
@@ -53,7 +53,7 @@ class WebServiceClientBuilderTest {
 
     @Test
     void create() {
-        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Maps.newHashMap("id", 1))))
+        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Map.of("id", 1))))
                 .thenReturn("http://localhost/test/1");
 
         TestWebService.TestRequest request = new TestWebService.TestRequest();
@@ -64,7 +64,7 @@ class WebServiceClientBuilderTest {
 
     @Test
     void patch() {
-        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Maps.newHashMap("id", 1))))
+        when(webServiceClient.serviceURL(startsWith("/test/:id"), eq(Map.of("id", 1))))
                 .thenReturn("http://localhost/test/1");
 
         TestWebService.TestRequest request = new TestWebService.TestRequest();

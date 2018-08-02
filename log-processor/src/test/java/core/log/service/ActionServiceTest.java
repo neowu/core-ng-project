@@ -6,7 +6,6 @@ import core.framework.inject.Inject;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.GetRequest;
 import core.framework.util.Lists;
-import core.framework.util.Maps;
 import core.log.IntegrationTest;
 import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;
@@ -16,6 +15,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,20 +35,20 @@ class ActionServiceTest extends IntegrationTest {
     @Test
     void index() {
         ActionLogMessage message1 = message("1", "OK");
-        message1.context = Maps.newHashMap("key", "value");
-        message1.stats = Maps.newHashMap("count", 1d);
+        message1.context = Map.of("key", "value");
+        message1.stats = Map.of("count", 1d);
         PerformanceStatMessage stat = new PerformanceStatMessage();
         stat.count = 1;
         stat.totalElapsed = 10L;
         stat.readEntries = 1;
         stat.writeEntries = 2;
-        message1.performanceStats = Maps.newHashMap("redis", stat);
+        message1.performanceStats = Map.of("redis", stat);
 
         ActionLogMessage message2 = message("2", "WARN");
         message2.traceLog = "trace";
 
         LocalDate now = LocalDate.of(2016, Month.JANUARY, 15);
-        actionService.index(Lists.newArrayList(message1, message2), now);
+        actionService.index(List.of(message1, message2), now);
 
         ActionDocument action = actionDocument(now, message1.id);
         assertEquals(message1.result, action.result);

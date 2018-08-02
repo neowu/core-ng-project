@@ -1,13 +1,13 @@
 package core.framework.impl.web.session;
 
 import core.framework.util.Maps;
-import core.framework.util.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,7 +47,7 @@ class LocalSessionStoreTest {
 
     @Test
     void save() {
-        localSessionStore.save("sessionId", Maps.newHashMap("key", "value"), Sets.newHashSet(), Duration.ofSeconds(30));
+        localSessionStore.save("sessionId", Map.of("key", "value"), Set.of(), Duration.ofSeconds(30));
 
         assertThat(localSessionStore.values).hasSize(1);
     }

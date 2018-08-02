@@ -58,14 +58,14 @@ class WebServiceClientTest {
         assertThat(webServiceClient.serviceURL("/test", Maps.newHashMap())).isEqualTo("http://localhost/test");
         assertThat(webServiceClient.serviceURL("/test/", Maps.newHashMap())).isEqualTo("http://localhost/test/");
 
-        Map<String, Object> pathParams = Maps.newHashMap("id", "1+2");
+        Map<String, Object> pathParams = Map.of("id", "1+2");
         assertThat(webServiceClient.serviceURL("/test/:id(\\d+)", pathParams)).isEqualTo("http://localhost/test/1%2B2");
         assertThat(webServiceClient.serviceURL("/test/:id", pathParams)).isEqualTo("http://localhost/test/1%2B2");
     }
 
     @Test
     void serviceURLWithEmptyPathParam() {
-        assertThatThrownBy(() -> webServiceClient.serviceURL("/test/:id", Maps.newHashMap("id", "")))
+        assertThatThrownBy(() -> webServiceClient.serviceURL("/test/:id", Map.of("id", "")))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("name=id");
     }
@@ -139,7 +139,7 @@ class WebServiceClientTest {
     void parseResponse() {
         TestWebService.TestResponse response = new TestWebService.TestResponse();
         response.intField = 1;
-        response.stringMap = Maps.newHashMap("key", "value");
+        response.stringMap = Map.of("key", "value");
         Object parsedResponse = webServiceClient.parseResponse(TestWebService.TestResponse.class, new HTTPResponse(HTTPStatus.OK, Maps.newHashMap(), Strings.bytes(JSON.toJSON(response))));
         assertThat(parsedResponse).isEqualToComparingFieldByField(response);
     }

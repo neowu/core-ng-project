@@ -14,12 +14,6 @@ public final class Maps {
         return new HashMap<>();
     }
 
-    public static <T, V> Map<T, V> newHashMap(T key, V value) {
-        HashMap<T, V> map = new HashMap<>();
-        map.put(key, value);
-        return map;
-    }
-
     public static <T, V> ConcurrentMap<T, V> newConcurrentHashMap() {
         return new ConcurrentHashMap<>();
     }

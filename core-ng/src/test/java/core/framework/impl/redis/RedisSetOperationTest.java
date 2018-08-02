@@ -1,6 +1,5 @@
 package core.framework.impl.redis;
 
-import core.framework.util.Sets;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -26,7 +25,7 @@ class RedisSetOperationTest extends AbstractRedisOperationTest {
         response("*3\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n");
         Set<String> members = redis.set().members("key");
 
-        assertEquals(Sets.newHashSet("1", "2", "3"), members);
+        assertEquals(Set.of("1", "2", "3"), members);
         assertRequestEquals("*2\r\n$8\r\nSMEMBERS\r\n$3\r\nkey\r\n");
     }
 

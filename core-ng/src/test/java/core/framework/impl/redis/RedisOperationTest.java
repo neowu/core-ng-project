@@ -115,7 +115,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         List<String> keys = Lists.newArrayList();
         redis.forEach("k*", keys::add);
 
-        assertEquals(Lists.newArrayList("k1", "k2"), keys);
+        assertEquals(List.of("k1", "k2"), keys);
         assertRequestEquals("*6\r\n$4\r\nSCAN\r\n$1\r\n0\r\n$5\r\nmatch\r\n$2\r\nk*\r\n$5\r\ncount\r\n$3\r\n500\r\n");
     }
 }

@@ -1,7 +1,8 @@
 package core.framework.impl.db.dialect;
 
-import core.framework.util.Lists;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -12,7 +13,7 @@ class MySQLDialectTest {
     @Test
     void fetchParams() {
         MySQLDialect dialect = new MySQLDialect(null, null);
-        Object[] params = dialect.fetchParams(Lists.newArrayList("value"), null, 100);
+        Object[] params = dialect.fetchParams(List.of("value"), null, 100);
 
         assertEquals(3, params.length);
         assertEquals("value", params[0]);

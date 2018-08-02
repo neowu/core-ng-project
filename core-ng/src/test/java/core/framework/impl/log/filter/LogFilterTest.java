@@ -1,8 +1,9 @@
 package core.framework.impl.log.filter;
 
-import core.framework.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +23,7 @@ class LogFilterTest {
         String message = filter.format("message, null={}, object={}, map={}, object[]={}, int[]={}, boolean[]={}, char[]={}",
                 null,
                 "string",
-                Maps.newHashMap("key", "value"),
+                Map.of("key", "value"),
                 new Object[]{1, "string", null},
                 new int[]{1, 2, 3},
                 new boolean[]{true},

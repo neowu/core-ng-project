@@ -57,8 +57,7 @@ class WebServiceControllerBuilderTest {
         var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("create", Integer.class, TestWebService.TestRequest.class));
         Controller controller = builder.build();
 
-        String sourceCode = builder.builder.sourceCode();
-        assertThat(sourceCode).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-controller-create.java"));
+        assertThat(builder.builder.sourceCode()).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-controller-create.java"));
 
         Response response = controller.execute(request);
         assertThat(response.status()).isEqualTo(HTTPStatus.CREATED);

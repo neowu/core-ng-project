@@ -1,6 +1,5 @@
 package core.framework.test.redis;
 
-import core.framework.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,12 +31,12 @@ class MockRedisHashTest {
 
     @Test
     void multiSet() {
-        redis.hash().multiSet("key5", Maps.newHashMap("field1", "value1"));
+        redis.hash().multiSet("key5", Map.of("field1", "value1"));
         Map<String, String> hash = redis.hash().getAll("key5");
         assertEquals(1, hash.size());
         assertEquals("value1", hash.get("field1"));
 
-        redis.hash().multiSet("key5", Maps.newHashMap("field2", "value2"));
+        redis.hash().multiSet("key5", Map.of("field2", "value2"));
         hash = redis.hash().getAll("key5");
         assertEquals(2, hash.size());
         assertEquals("value1", hash.get("field1"));

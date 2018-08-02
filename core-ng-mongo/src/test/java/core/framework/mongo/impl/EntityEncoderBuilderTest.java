@@ -3,9 +3,6 @@ package core.framework.mongo.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.util.ClasspathResources;
-import core.framework.util.Lists;
-import core.framework.util.Maps;
-import core.framework.util.Sets;
 import org.bson.json.JsonWriter;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;
@@ -19,7 +16,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -39,12 +38,12 @@ class EntityEncoderBuilderTest {
     @Test
     void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("mongo-test/entity-encoder.java"), sourceCode);
+        assertThat(sourceCode).isEqualTo(ClasspathResources.text("mongo-test/entity-encoder.java"));
     }
 
     @Test
     void encode() throws IOException {
-        assertEquals(Sets.newHashSet(TestEntityChild.TestEnum.class), builder.enumCodecFields.keySet());
+        assertThat(builder.enumCodecFields.keySet()).containsExactly(TestEntityChild.TestEnum.class);
 
         StringWriter writer = new StringWriter();
         TestEntity entity = new TestEntity();
@@ -55,11 +54,9 @@ class EntityEncoderBuilderTest {
         entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("America/New_York"));
         entity.child = new TestEntityChild();
         entity.child.enumField = TestEntityChild.TestEnum.ITEM1;
-        entity.child.enumListField = Lists.newArrayList(TestEntityChild.TestEnum.ITEM2);
+        entity.child.enumListField = List.of(TestEntityChild.TestEnum.ITEM2);
         entity.listField = List.of("V1", "V2");
-        entity.mapField = Maps.newHashMap();
-        entity.mapField.put("K1", "V1");
-        entity.mapField.put("K2", "V2");
+        entity.mapField = Map.of("K1", "V1", "K2", "V2");
 
         encoder.encode(new JsonWriter(writer, JsonWriterSettings.builder().indent(true).build()), entity);
 

@@ -1,11 +1,12 @@
 package core.framework.http;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.util.Maps;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -13,9 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class HTTPResponseTest {
     @Test
     void text() {
-        HTTPResponse response = new HTTPResponse(HTTPStatus.OK, Maps.newHashMap(HTTPHeaders.CONTENT_TYPE, ContentType.TEXT_PLAIN.toString()), Strings.bytes("value"));
+        var response = new HTTPResponse(HTTPStatus.OK, Map.of(HTTPHeaders.CONTENT_TYPE, ContentType.TEXT_PLAIN.toString()), Strings.bytes("value"));
 
-        assertEquals(ContentType.TEXT_PLAIN.toString(), response.contentType().orElse(null).toString());
-        assertEquals("value", response.text());
+        assertThat(response.contentType().orElseThrow().toString()).isEqualTo(ContentType.TEXT_PLAIN.toString());
+        assertThat(response.text()).isEqualTo("value");
     }
 }

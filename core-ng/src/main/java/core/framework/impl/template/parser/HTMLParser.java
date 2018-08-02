@@ -8,7 +8,6 @@ import core.framework.impl.template.node.Element;
 import core.framework.impl.template.node.Text;
 import core.framework.impl.template.source.TemplateSource;
 import core.framework.util.Exceptions;
-import core.framework.util.Sets;
 import core.framework.util.Strings;
 
 import java.util.ArrayDeque;
@@ -22,10 +21,10 @@ import java.util.regex.Pattern;
 public class HTMLParser {
     private final Pattern tagNamePattern = Pattern.compile("[a-z]+[a-z0-9\\-]*");
 
-    private final Set<String> voidElements = Sets.newHashSet("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
+    private final Set<String> voidElements = Set.of("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
 
     // loose checking to cover common cases, precise checking will be like e.g. checked attribute on input tag can be boolean attribute
-    private final Set<String> booleanAttributes = Sets.newHashSet("checked", "selected", "disabled", "readonly", "multiple", "ismap", "defer", "required", "sortable", "autofocus", "allowfullscreen", "async", "hidden");
+    private final Set<String> booleanAttributes = Set.of("checked", "selected", "disabled", "readonly", "multiple", "ismap", "defer", "required", "sortable", "autofocus", "allowfullscreen", "async", "hidden");
 
     private final HTMLLexer lexer;
     private final Deque<ContainerNode> stack = new ArrayDeque<>();

@@ -1,6 +1,5 @@
 package core.framework.test.redis;
 
-import core.framework.util.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +34,6 @@ class MockRedisSetTest {
         redis.set().add("key1", "value2");
 
         Set<String> values = redis.set().members("key1");
-        assertEquals(Sets.newHashSet("value1", "value2"), values);
+        assertEquals(Set.of("value1", "value2"), values);
     }
 }

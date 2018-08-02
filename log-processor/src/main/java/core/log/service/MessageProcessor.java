@@ -4,7 +4,6 @@ import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.impl.log.message.StatMessage;
 import core.framework.inject.Inject;
-import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -73,7 +72,7 @@ public class MessageProcessor {
 
     public void initialize() {
         consumer = consumerFactory.create();
-        consumer.subscribe(Lists.newArrayList(TOPIC_ACTION_LOG, TOPIC_STAT));
+        consumer.subscribe(List.of(TOPIC_ACTION_LOG, TOPIC_STAT));
         metrics.set(consumer.metrics());
 
         processorThread = new Thread(() -> {

@@ -5,7 +5,6 @@ import core.framework.inject.Inject;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.GetRequest;
 import core.framework.util.Lists;
-import core.framework.util.Maps;
 import core.log.IntegrationTest;
 import core.log.domain.StatDocument;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -32,7 +32,7 @@ class StatServiceTest extends IntegrationTest {
         StatMessage message = message("1");
 
         LocalDate now = LocalDate.of(2017, Month.OCTOBER, 10);
-        statService.index(Lists.newArrayList(message), now);
+        statService.index(List.of(message), now);
 
         StatDocument stat = statDocument(now, message.id);
         assertEquals(message.stats, stat.stats);
@@ -63,7 +63,7 @@ class StatServiceTest extends IntegrationTest {
         StatMessage message = new StatMessage();
         message.id = id;
         message.date = Instant.now();
-        message.stats = Maps.newHashMap("thread_count", 10d);
+        message.stats = Map.of("thread_count", 10d);
         return message;
     }
 }

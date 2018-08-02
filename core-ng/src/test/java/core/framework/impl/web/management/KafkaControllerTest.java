@@ -35,7 +35,7 @@ class KafkaControllerTest {
 
     @Test
     void nodes() {
-        List<Node> nodes = Lists.newArrayList(new Node(1001, "kafka-0", 9092), new Node(1002, "kafka-1", 9092));
+        var nodes = List.of(new Node(1001, "kafka-0", 9092), new Node(1002, "kafka-1", 9092));
         assertThat(controller.nodes(nodes)).isEqualTo("kafka-0:9092(1001), kafka-1:9092(1002)");
     }
 
