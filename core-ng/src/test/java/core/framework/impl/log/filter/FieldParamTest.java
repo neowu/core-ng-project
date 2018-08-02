@@ -31,6 +31,6 @@ class FieldParamTest {
         var value = Map.of("k1", "v1", "k2", "v2");
         var param = new FieldParam("key", value);
         String message = param.filter(Sets.newHashSet());
-        assertThat(message).startsWith("{").endsWith("}").contains("k1=v1").contains("k2=v2");
+        assertThat(message).isEqualTo("{k1=v1, k2=v2}");
     }
 }

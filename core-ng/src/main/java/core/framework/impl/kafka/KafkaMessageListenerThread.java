@@ -6,7 +6,6 @@ import core.framework.impl.log.filter.BytesParam;
 import core.framework.kafka.Message;
 import core.framework.log.Markers;
 import core.framework.util.Charsets;
-import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -102,9 +102,9 @@ class KafkaMessageListenerThread extends Thread {
         int count = 0;
         int size = 0;
         try {
-            Map<String, List<ConsumerRecord<String, byte[]>>> messages = Maps.newLinkedHashMap();
+            Map<String, List<ConsumerRecord<String, byte[]>>> messages = new LinkedHashMap<>();
             for (ConsumerRecord<String, byte[]> record : kafkaRecords) {
-                messages.computeIfAbsent(record.topic(), key -> Lists.newArrayList()).add(record);
+                messages.computeIfAbsent(record.topic(), key -> new ArrayList<>()).add(record);
                 count++;
                 size += record.value().length;
             }
