@@ -1,13 +1,16 @@
 package core.framework.impl.http;
 
+import org.apache.http.HttpHost;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.HttpHostConnectException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,5 +61,10 @@ class RetryHandlerTest {
     @Test
     void retryWithPersistentConnectionDrop() {
         assertThat(handler.retry(RequestBuilder.post().build(), clientContext, new NoHttpResponseException("connection failed"))).isTrue();
+    }
+
+    @Test
+    void retryWithConnectionRefused() {
+        assertThat(handler.retry(RequestBuilder.post().build(), clientContext, new HttpHostConnectException(new ConnectException("connection refused"), new HttpHost("localhost")))).isTrue();
     }
 }
