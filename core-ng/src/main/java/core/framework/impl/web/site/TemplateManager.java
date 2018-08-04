@@ -22,13 +22,13 @@ import java.util.Map;
  */
 public class TemplateManager {
     public final CDNManager cdnManager = new CDNManager();
-    public final Map<String, Map<String, HTMLTemplate>> templates = Maps.newConcurrentHashMap();    // path->language->template
+    private final Map<String, Map<String, HTMLTemplate>> templates = Maps.newConcurrentHashMap();    // path->language->template
     private final MessageImpl message;
     private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
 
-    public TemplateManager(WebDirectory webDirectory, MessageImpl message) {
+    TemplateManager(WebDirectory webDirectory, MessageImpl message) {
         this.webDirectory = webDirectory;
         this.message = message;
     }
@@ -83,7 +83,7 @@ public class TemplateManager {
         builder.cdn = cdnManager;
         Map<String, HTMLTemplate> templates = Maps.newHashMap();
         for (String language : message.languages) {
-            builder.message = key -> message.get(key, language);
+            builder.message = key -> message.getMessage(key, language);
             HTMLTemplate htmlTemplate = builder.build();
             templates.put(language, htmlTemplate);
         }

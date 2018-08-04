@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 public class MessageImpl implements Message {
     static final String DEFAULT_LANGUAGE = "_default";
     private static final Pattern MESSAGE_PROPERTY_PATH_PATTERN = Pattern.compile("[^_]+((_[a-zA-Z0-9]{2,4})*)\\.properties");
+    final Map<String, List<Properties>> messages = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(MessageImpl.class);
-    private final Map<String, List<Properties>> messages = Maps.newHashMap();
     String[] languages = new String[]{DEFAULT_LANGUAGE};
 
     public void load(List<String> paths, String... languages) {
@@ -51,7 +51,7 @@ public class MessageImpl implements Message {
         validateMessageKeys();
     }
 
-    private void validateMessageKeys() {
+    void validateMessageKeys() {
         Map<String, Set<String>> allLanguageKeys = Maps.newHashMap();
         Set<String> allKeys = Sets.newHashSet();
         messages.forEach((language, languageProperties) -> {
@@ -73,7 +73,7 @@ public class MessageImpl implements Message {
         if (DEFAULT_LANGUAGE.equals(language)) return;
 
         if (languages.length == 1 && languages[0].equals(DEFAULT_LANGUAGE)) {
-            throw Exceptions.error("language found, but only default language is enabled, path={}, language={}", path, language);
+            throw Exceptions.error("found language specific messages, but only default language is enabled, path={}, language={}", path, language);
         }
 
         if (Arrays.stream(languages).noneMatch(enabledLanguage -> enabledLanguage.startsWith(language))) {
@@ -106,7 +106,11 @@ public class MessageImpl implements Message {
     }
 
     @Override
-    public Optional<String> get(String key, String language) {
+    public String get(String key, String language) {
+        return getMessage(key, language).orElseThrow(() -> Exceptions.error("can not find message, key={}", key));
+    }
+
+    Optional<String> getMessage(String key, String language) {
         String targetLanguage = language == null ? DEFAULT_LANGUAGE : language;
         List<Properties> properties = messages.get(targetLanguage);
         if (properties == null) throw Exceptions.error("language is not defined, please check site().message(), language={}", targetLanguage);

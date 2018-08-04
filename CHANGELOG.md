@@ -3,6 +3,7 @@
 * db: !!! replaced repository.update with repository.partialUpdate(), repository.update will update all fields and field can be NULL 
 * search: update to 6.3.2
 * util: removed Lists.newArrayList(...values)/Sets.newHashSet(...values)/Maps.newHashMap(k,v) in favor of JDK 10 builtin List/Set/Map.of/copyOf
+* html: !!! changed Message.get(key) to return String rather than Optional<String>, and throw error if key not existed, to make it more strict
 
 ### 6.5.2 (7/26/2018 - 7/30/2018)
 * kafka: update to 1.1.1
