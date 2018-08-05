@@ -3,11 +3,6 @@ package core.framework.util;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -30,30 +25,35 @@ class StringsTest {
 
     @Test
     void truncate() {
-        assertNull(Strings.truncate(null, 10));
-        assertEquals("value", Strings.truncate("value", 10));
-        assertEquals("1234567890", Strings.truncate("123456789012345", 10));
+        assertThat(Strings.truncate(null, 10)).isNull();
+        assertThat(Strings.truncate("value", 10)).isEqualTo("value");
+        assertThat(Strings.truncate("123456789012345", 10)).isEqualTo("1234567890");
     }
 
     @Test
     void isEmpty() {
-        assertTrue(Strings.isEmpty(""));
-        assertTrue(Strings.isEmpty(" "));
+        assertThat(Strings.isEmpty("")).isTrue();
+        assertThat(Strings.isEmpty(" ")).isTrue();
 
-        assertFalse(Strings.isEmpty("1"));
-        assertFalse(Strings.isEmpty(" 1"));
+        assertThat(Strings.isEmpty("1")).isFalse();
+        assertThat(Strings.isEmpty(" 1")).isFalse();
     }
 
     @Test
     void split() {
-        assertArrayEquals(new String[]{""}, Strings.split("", '/'));
-        assertArrayEquals(new String[]{"", ""}, Strings.split("/", '/'));
-        assertArrayEquals(new String[]{"", "", ""}, Strings.split("//", '/'));
-        assertArrayEquals(new String[]{"", "1"}, Strings.split("/1", '/'));
-        assertArrayEquals(new String[]{"", "1", ""}, Strings.split("/1/", '/'));
-        assertArrayEquals(new String[]{"1", ""}, Strings.split("1/", '/'));
-        assertArrayEquals(new String[]{"1", "2"}, Strings.split("1/2", '/'));
-        assertArrayEquals(new String[]{"1", "2", "", "3"}, Strings.split("1/2//3", '/'));
-        assertArrayEquals(new String[]{"1", "2", "3"}, Strings.split("1/2/3", '/'));
+        assertThat(Strings.split("", '/')).containsExactly("");
+        assertThat(Strings.split("/", '/')).containsExactly("", "");
+        assertThat(Strings.split("//", '/')).containsExactly("", "", "");
+        assertThat(Strings.split("/1", '/')).containsExactly("", "1");
+        assertThat(Strings.split("/1/", '/')).containsExactly("", "1", "");
+        assertThat(Strings.split("1/", '/')).containsExactly("1", "");
+        assertThat(Strings.split("1/2", '/')).containsExactly("1", "2");
+        assertThat(Strings.split("1/2//3", '/')).containsExactly("1", "2", "", "3");
+        assertThat(Strings.split("1/2/3", '/')).containsExactly("1", "2", "3");
+    }
+
+    @Test
+    void format() {
+        assertThat(Strings.format("{}, {}, {}", 1, 2, 3, 4)).isEqualTo("1, 2, 3");
     }
 }

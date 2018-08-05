@@ -1,4 +1,6 @@
 ## Change log
+### 6.6.1 (8/5/2018 - )
+
 ### 6.6.0 (7/31/2018 - 8/5/2018)   !!! check break changes !!!
 * db: !!! replaced repository.update with repository.partialUpdate(), repository.update will update all fields and field can be NULL 
 * search: update to 6.3.2
