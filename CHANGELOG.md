@@ -1,5 +1,5 @@
 ## Change log
-### 6.6.0 (7/31/2018 - )
+### 6.6.0 (7/31/2018 - 8/5/2018)   !!! check break changes !!!
 * db: !!! replaced repository.update with repository.partialUpdate(), repository.update will update all fields and field can be NULL 
 * search: update to 6.3.2
 * util: removed Lists.newArrayList(...values)/Sets.newHashSet(...values)/Maps.newHashMap(k,v) in favor of JDK 10 builtin List/Set/Map.of/copyOf

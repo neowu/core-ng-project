@@ -137,11 +137,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void indices() {
         List<ElasticSearchIndex> indices = elasticSearch.indices();
 
-        assertThat(indices).hasSize(1);
-
-        ElasticSearchIndex index = indices.get(0);
-        assertThat(index.index).isEqualTo("document");
-        assertThat(index.state).isEqualTo(IndexMetaData.State.OPEN);
+        assertThat(indices).anyMatch(index -> "document".equals(index.index) && index.state == IndexMetaData.State.OPEN);
     }
 
     private TestDocument document(String id, String stringField, int numField) {

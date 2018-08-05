@@ -20,5 +20,6 @@ public class TestModule extends AbstractTestModule {
         search.type(TestDocument.class);
 
         config(InitSearchConfig.class).createIndex("document", "search-test/document-index.json");
+        config(InitSearchConfig.class).createIndexTemplate("document", "search-test/document-index-template.json");
     }
 }
