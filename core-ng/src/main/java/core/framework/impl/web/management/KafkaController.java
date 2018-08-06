@@ -7,7 +7,6 @@ import core.framework.impl.web.http.IPAccessControl;
 import core.framework.json.JSON;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
-import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.util.Network;
 import core.framework.util.Strings;
@@ -48,17 +47,16 @@ public class KafkaController {
 
     public Response topics(Request request) throws ExecutionException, InterruptedException {
         accessControl.validate(request.clientIP());
-        List<KafkaTopic> views = Lists.newArrayList();
+        var response = new ListKafkaTopicResponse();
         AdminClient admin = kafka.admin();
         Set<String> topics = admin.listTopics().names().get();
         DescribeTopicsResult descriptions = admin.describeTopics(topics);
         for (Map.Entry<String, KafkaFuture<TopicDescription>> entry : descriptions.values().entrySet()) {
             String name = entry.getKey();
             TopicDescription description = entry.getValue().get();
-            KafkaTopic view = view(name, description);
-            views.add(view);
+            response.topics.add(view(name, description));
         }
-        return Response.bean(views);
+        return Response.bean(response);
     }
 
     public Response updateTopic(Request request) {
@@ -112,11 +110,11 @@ public class KafkaController {
         return record;
     }
 
-    private KafkaTopic view(String name, TopicDescription description) {
-        KafkaTopic view = new KafkaTopic();
+    private ListKafkaTopicResponse.KafkaTopic view(String name, TopicDescription description) {
+        var view = new ListKafkaTopicResponse.KafkaTopic();
         view.name = name;
         for (TopicPartitionInfo info : description.partitions()) {
-            KafkaTopic.Partition partition = new KafkaTopic.Partition();
+            var partition = new ListKafkaTopicResponse.Partition();
             partition.id = info.partition();
             partition.leader = node(info.leader());
             partition.replicas = nodes(info.replicas());

@@ -26,15 +26,17 @@ public class SchedulerController {
     public Response jobs(Request request) {
         accessControl.validate(request.clientIP());
 
-        List<JobView> jobs = Lists.newArrayList();
+        var response = new ListJobResponse();
+        List<ListJobResponse.JobView> jobs = Lists.newArrayList();
         scheduler.tasks.forEach((name, trigger) -> {
-            JobView job = new JobView();
+            var job = new ListJobResponse.JobView();
             job.name = trigger.name();
             job.jobClass = trigger.job().getClass().getCanonicalName();
             job.trigger = trigger.trigger();
             jobs.add(job);
         });
-        return Response.bean(jobs);
+        response.jobs = jobs;
+        return Response.bean(response);
     }
 
     public Response triggerJob(Request request) {
