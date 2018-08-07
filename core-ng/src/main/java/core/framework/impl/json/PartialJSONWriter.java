@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
 /**
  * @author neo
  */
-public class PartialJSONWriter<T> {
+public final class PartialJSONWriter<T> {
     private static final ObjectMapper OBJECT_MAPPER = JSONMapper.createObjectMapper(false);
 
     public static <T> PartialJSONWriter<T> of(Type instanceType) {
