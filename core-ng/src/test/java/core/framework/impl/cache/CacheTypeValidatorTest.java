@@ -36,12 +36,12 @@ class CacheTypeValidatorTest {
 
         public Map<String, String> mapField;
 
-        public CacheChildItem childField;
+        public Child childField;
 
-        public List<CacheChildItem> childrenField;
+        public List<Child> childrenField;
     }
 
-    public static class CacheChildItem {
+    public static class Child {
         public BigDecimal bigDecimalField = BigDecimal.ZERO;
     }
 }

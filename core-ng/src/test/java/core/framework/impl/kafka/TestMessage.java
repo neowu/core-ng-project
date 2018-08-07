@@ -29,10 +29,10 @@ public class TestMessage {
     public Map<String, String> mapField;
 
     @Property(name = "child_field")
-    public TestChild childField;
+    public Child childField;
 
     @Property(name = "children_field")
-    public List<TestChild> childrenField;
+    public List<Child> childrenField;
 
     @Property(name = "enum_field")
     public TestEnum enumField;
@@ -44,7 +44,7 @@ public class TestMessage {
         VALUE2
     }
 
-    public static class TestChild {
+    public static class Child {
         @Property(name = "boolean_field")
         public Boolean booleanField;
     }

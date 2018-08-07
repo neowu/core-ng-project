@@ -44,7 +44,7 @@ class EntityDecoderBuilderTest {
         assertEquals("string", entity.stringField);
         assertEquals(Long.valueOf(325), entity.longField);
         assertEquals(ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("America/New_York")).toInstant(), entity.zonedDateTimeField.toInstant());
-        assertEquals(TestEntityChild.TestEnum.ITEM1, entity.child.enumField);
+        assertEquals(TestChildEntity.TestEnum.ITEM1, entity.child.enumField);
         assertEquals(2, entity.listField.size());
         assertEquals("V1", entity.listField.get(0));
         assertEquals("V2", entity.listField.get(1));

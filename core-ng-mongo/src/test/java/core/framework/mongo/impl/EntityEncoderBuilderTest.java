@@ -43,7 +43,7 @@ class EntityEncoderBuilderTest {
 
     @Test
     void encode() throws IOException {
-        assertThat(builder.enumCodecFields.keySet()).containsExactly(TestEntityChild.TestEnum.class);
+        assertThat(builder.enumCodecFields.keySet()).containsExactly(TestChildEntity.TestEnum.class);
 
         StringWriter writer = new StringWriter();
         TestEntity entity = new TestEntity();
@@ -52,9 +52,9 @@ class EntityEncoderBuilderTest {
         entity.longField = 325L;
         entity.stringField = "string";
         entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("America/New_York"));
-        entity.child = new TestEntityChild();
-        entity.child.enumField = TestEntityChild.TestEnum.ITEM1;
-        entity.child.enumListField = List.of(TestEntityChild.TestEnum.ITEM2);
+        entity.child = new TestChildEntity();
+        entity.child.enumField = TestChildEntity.TestEnum.ITEM1;
+        entity.child.enumListField = List.of(TestChildEntity.TestEnum.ITEM2);
         entity.listField = List.of("V1", "V2");
         entity.mapField = Map.of("K1", "V1", "K2", "V2");
 

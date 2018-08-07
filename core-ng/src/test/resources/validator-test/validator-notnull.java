@@ -1,19 +1,19 @@
 public class BeanValidatorNotNullTest$Bean$Validator implements core.framework.impl.validate.BeanValidator {
-    private void validateChildBean1(core.framework.impl.validate.BeanValidatorNotNullTest.ChildBean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
+    private void validateChild1(core.framework.impl.validate.BeanValidatorNotNullTest.Child bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
         if (bean.intField == null) {
             if (!partial) errors.add("child.intField", "intField must not be null");
         } else {
         }
     }
 
-    private void validateChildBean2(core.framework.impl.validate.BeanValidatorNotNullTest.ChildBean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
+    private void validateChild2(core.framework.impl.validate.BeanValidatorNotNullTest.Child bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
         if (bean.intField == null) {
             if (!partial) errors.add("children.intField", "intField must not be null");
         } else {
         }
     }
 
-    private void validateChildBean3(core.framework.impl.validate.BeanValidatorNotNullTest.ChildBean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
+    private void validateChild3(core.framework.impl.validate.BeanValidatorNotNullTest.Child bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
         if (bean.intField == null) {
             if (!partial) errors.add("childMap.intField", "intField must not be null");
         } else {
@@ -32,13 +32,13 @@ public class BeanValidatorNotNullTest$Bean$Validator implements core.framework.i
         if (bean.child == null) {
             if (!partial) errors.add("child", "field must not be null");
         } else {
-            validateChildBean1(bean.child, errors, partial);
+            validateChild1(bean.child, errors, partial);
         }
         if (bean.children == null) {
         } else {
             for (java.util.Iterator iterator = bean.children.iterator(); iterator.hasNext(); ) {
-                core.framework.impl.validate.BeanValidatorNotNullTest.ChildBean value = (core.framework.impl.validate.BeanValidatorNotNullTest.ChildBean) iterator.next();
-                if (value != null) validateChildBean2(value, errors, partial);
+                core.framework.impl.validate.BeanValidatorNotNullTest.Child value = (core.framework.impl.validate.BeanValidatorNotNullTest.Child) iterator.next();
+                if (value != null) validateChild2(value, errors, partial);
             }
         }
         if (bean.childMap == null) {
@@ -46,8 +46,8 @@ public class BeanValidatorNotNullTest$Bean$Validator implements core.framework.i
         } else {
             for (java.util.Iterator iterator = bean.childMap.entrySet().iterator(); iterator.hasNext(); ) {
                 java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
-                core.framework.impl.validate.BeanValidatorNotNullTest.ChildBean value = (core.framework.impl.validate.BeanValidatorNotNullTest.ChildBean) entry.getValue();
-                if (value != null) validateChildBean3(value, errors, partial);
+                core.framework.impl.validate.BeanValidatorNotNullTest.Child value = (core.framework.impl.validate.BeanValidatorNotNullTest.Child) entry.getValue();
+                if (value != null) validateChild3(value, errors, partial);
             }
         }
     }

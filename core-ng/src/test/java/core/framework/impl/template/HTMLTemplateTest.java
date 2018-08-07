@@ -32,8 +32,8 @@ class HTMLTemplateTest {
         assertEquals(ClasspathResources.text("template-test/template-result.html").replaceAll("\r\n", "\n"), result);
     }
 
-    private TestModelChild child(String stringField, Double doubleField, Boolean booleanField) {
-        TestModelChild child = new TestModelChild();
+    private TestChildModel child(String stringField, Double doubleField, Boolean booleanField) {
+        var child = new TestChildModel();
         child.stringField = stringField;
         child.doubleField = doubleField;
         child.booleanField = booleanField;

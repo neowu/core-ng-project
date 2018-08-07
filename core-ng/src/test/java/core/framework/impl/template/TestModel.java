@@ -11,7 +11,7 @@ public class TestModel {
     public String stringField;
     public Integer numberField;
     public List<String> items = Lists.newArrayList();
-    public List<TestModelChild> children = Lists.newArrayList();
+    public List<TestChildModel> children = Lists.newArrayList();
     public String htmlField;
 
     public Integer addToNumberField() {

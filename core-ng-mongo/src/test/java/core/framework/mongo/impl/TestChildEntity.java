@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class TestEntityChild {
+public class TestChildEntity {
     @Field(name = "boolean_field")
     public Boolean booleanField;
 

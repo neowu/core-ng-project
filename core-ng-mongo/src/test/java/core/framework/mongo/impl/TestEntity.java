@@ -50,14 +50,14 @@ public class TestEntity {
     public Map<String, String> mapField;
 
     @Field(name = "child")
-    public TestEntityChild child;
+    public TestChildEntity child;
 
     @Field(name = "children")
-    public List<TestEntityChild> children;
+    public List<TestChildEntity> children;
 
     @Field(name = "children_map")
-    public Map<String, TestEntityChild> childrenMap;
+    public Map<String, TestChildEntity> childrenMap;
 
     @Field(name = "null_child")
-    public TestEntityChild nullChild;
+    public TestChildEntity nullChild;
 }

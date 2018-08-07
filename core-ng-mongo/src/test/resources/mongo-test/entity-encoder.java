@@ -1,5 +1,5 @@
 public class EntityEncoder$TestEntity implements core.framework.mongo.impl.EntityEncoder {
-    private final core.framework.mongo.impl.EnumCodec enumCodecTestEnum4 = new core.framework.mongo.impl.EnumCodec(core.framework.mongo.impl.TestEntityChild.TestEnum.class);
+    private final core.framework.mongo.impl.EnumCodec enumCodecTestEnum4 = new core.framework.mongo.impl.EnumCodec(core.framework.mongo.impl.TestChildEntity.TestEnum.class);
 
     private void encodeListString1(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.List list) {
         writer.writeStartArray();
@@ -25,13 +25,13 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
     private void encodeListTestEnum5(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.List list) {
         writer.writeStartArray();
         for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
-            core.framework.mongo.impl.TestEntityChild.TestEnum value = (core.framework.mongo.impl.TestEntityChild.TestEnum) iterator.next();
+            core.framework.mongo.impl.TestChildEntity.TestEnum value = (core.framework.mongo.impl.TestChildEntity.TestEnum) iterator.next();
             enumCodecTestEnum4.encode(writer, value, null);
         }
         writer.writeEndArray();
     }
 
-    private void encodeTestEntityChild3(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, core.framework.mongo.impl.TestEntityChild entity) {
+    private void encodeTestChildEntity3(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, core.framework.mongo.impl.TestChildEntity entity) {
         writer.writeStartDocument();
         writer.writeName("boolean_field");
         wrapper.write(entity.booleanField);
@@ -45,25 +45,25 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         writer.writeEndDocument();
     }
 
-    private void encodeListTestEntityChild6(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.List list) {
+    private void encodeListTestChildEntity6(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.List list) {
         writer.writeStartArray();
         for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
-            core.framework.mongo.impl.TestEntityChild value = (core.framework.mongo.impl.TestEntityChild) iterator.next();
+            core.framework.mongo.impl.TestChildEntity value = (core.framework.mongo.impl.TestChildEntity) iterator.next();
             if (value == null) writer.writeNull();
-            else encodeTestEntityChild3(writer, wrapper, value);
+            else encodeTestChildEntity3(writer, wrapper, value);
         }
         writer.writeEndArray();
     }
 
-    private void encodeMapTestEntityChild7(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.Map map) {
+    private void encodeMapTestChildEntity7(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.Map map) {
         writer.writeStartDocument();
         for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
             String key = (String) entry.getKey();
-            core.framework.mongo.impl.TestEntityChild value = (core.framework.mongo.impl.TestEntityChild) entry.getValue();
+            core.framework.mongo.impl.TestChildEntity value = (core.framework.mongo.impl.TestChildEntity) entry.getValue();
             writer.writeName(key);
             if (value == null) writer.writeNull();
-            else encodeTestEntityChild3(writer, wrapper, value);
+            else encodeTestChildEntity3(writer, wrapper, value);
         }
         writer.writeEndDocument();
     }
@@ -94,16 +94,16 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         else encodeMapString2(writer, wrapper, entity.mapField);
         writer.writeName("child");
         if (entity.child == null) writer.writeNull();
-        else encodeTestEntityChild3(writer, wrapper, entity.child);
+        else encodeTestChildEntity3(writer, wrapper, entity.child);
         writer.writeName("children");
         if (entity.children == null) writer.writeNull();
-        else encodeListTestEntityChild6(writer, wrapper, entity.children);
+        else encodeListTestChildEntity6(writer, wrapper, entity.children);
         writer.writeName("children_map");
         if (entity.childrenMap == null) writer.writeNull();
-        else encodeMapTestEntityChild7(writer, wrapper, entity.childrenMap);
+        else encodeMapTestChildEntity7(writer, wrapper, entity.childrenMap);
         writer.writeName("null_child");
         if (entity.nullChild == null) writer.writeNull();
-        else encodeTestEntityChild3(writer, wrapper, entity.nullChild);
+        else encodeTestChildEntity3(writer, wrapper, entity.nullChild);
         writer.writeEndDocument();
     }
 

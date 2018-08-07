@@ -33,7 +33,7 @@ class BeanValidatorNotNullTest {
     @Test
     void validate() {
         var bean = new Bean();
-        bean.child = new ChildBean();
+        bean.child = new Child();
         bean.children = List.of(bean.child);
         bean.childMap = Map.of("child1", bean.child);
 
@@ -62,13 +62,13 @@ class BeanValidatorNotNullTest {
         @NotNull(message = "booleanField must not be null")
         public Boolean booleanField;
         @NotNull
-        public ChildBean child;
-        public List<ChildBean> children;
+        public Child child;
+        public List<Child> children;
         @NotNull
-        public Map<String, ChildBean> childMap;
+        public Map<String, Child> childMap;
     }
 
-    static class ChildBean {
+    static class Child {
         @NotNull(message = "intField must not be null")
         public Integer intField;
     }

@@ -1,7 +1,7 @@
 public class EntityDecoder$TestEntity implements core.framework.mongo.impl.EntityDecoder {
     private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(core.framework.mongo.impl.EntityDecoder.class);
 
-    private final core.framework.mongo.impl.EnumCodec enumCodecTestEnum19 = new core.framework.mongo.impl.EnumCodec(core.framework.mongo.impl.TestEntityChild.TestEnum.class);
+    private final core.framework.mongo.impl.EnumCodec enumCodecTestEnum19 = new core.framework.mongo.impl.EnumCodec(core.framework.mongo.impl.TestChildEntity.TestEnum.class);
 
     private java.util.List decodeListString10(org.bson.BsonReader reader, core.framework.mongo.impl.BsonReaderWrapper wrapper, String fieldPath) {
         java.util.List list = wrapper.startReadList(fieldPath);
@@ -34,17 +34,17 @@ public class EntityDecoder$TestEntity implements core.framework.mongo.impl.Entit
         if (list == null) return null;
         reader.readStartArray();
         while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-            core.framework.mongo.impl.TestEntityChild.TestEnum $22 = (core.framework.mongo.impl.TestEntityChild.TestEnum) enumCodecTestEnum19.read(reader, fieldPath);
+            core.framework.mongo.impl.TestChildEntity.TestEnum $22 = (core.framework.mongo.impl.TestChildEntity.TestEnum) enumCodecTestEnum19.read(reader, fieldPath);
             list.add($22);
         }
         reader.readEndArray();
         return list;
     }
 
-    public core.framework.mongo.impl.TestEntityChild decodeTestEntityChild16(org.bson.BsonReader reader, core.framework.mongo.impl.BsonReaderWrapper wrapper, String parentField) {
+    public core.framework.mongo.impl.TestChildEntity decodeTestChildEntity16(org.bson.BsonReader reader, core.framework.mongo.impl.BsonReaderWrapper wrapper, String parentField) {
         boolean hasContent = wrapper.startReadEntity(parentField);
         if (!hasContent) return null;
-        core.framework.mongo.impl.TestEntityChild entity = new core.framework.mongo.impl.TestEntityChild();
+        core.framework.mongo.impl.TestChildEntity entity = new core.framework.mongo.impl.TestChildEntity();
         reader.readStartDocument();
         while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
             String fieldName = reader.readName();
@@ -55,7 +55,7 @@ public class EntityDecoder$TestEntity implements core.framework.mongo.impl.Entit
                 continue;
             }
             if ("enum_field".equals(fieldName)) {
-                core.framework.mongo.impl.TestEntityChild.TestEnum $18 = (core.framework.mongo.impl.TestEntityChild.TestEnum) enumCodecTestEnum19.read(reader, fieldPath);
+                core.framework.mongo.impl.TestChildEntity.TestEnum $18 = (core.framework.mongo.impl.TestChildEntity.TestEnum) enumCodecTestEnum19.read(reader, fieldPath);
                 entity.enumField = $18;
                 continue;
             }
@@ -76,26 +76,26 @@ public class EntityDecoder$TestEntity implements core.framework.mongo.impl.Entit
         return entity;
     }
 
-    private java.util.List decodeListTestEntityChild25(org.bson.BsonReader reader, core.framework.mongo.impl.BsonReaderWrapper wrapper, String fieldPath) {
+    private java.util.List decodeListTestChildEntity25(org.bson.BsonReader reader, core.framework.mongo.impl.BsonReaderWrapper wrapper, String fieldPath) {
         java.util.List list = wrapper.startReadList(fieldPath);
         if (list == null) return null;
         reader.readStartArray();
         while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
-            core.framework.mongo.impl.TestEntityChild $26 = decodeTestEntityChild16(reader, wrapper, fieldPath);
+            core.framework.mongo.impl.TestChildEntity $26 = decodeTestChildEntity16(reader, wrapper, fieldPath);
             list.add($26);
         }
         reader.readEndArray();
         return list;
     }
 
-    private java.util.Map decodeMapTestEntityChild28(org.bson.BsonReader reader, core.framework.mongo.impl.BsonReaderWrapper wrapper, String parentField) {
+    private java.util.Map decodeMapTestChildEntity28(org.bson.BsonReader reader, core.framework.mongo.impl.BsonReaderWrapper wrapper, String parentField) {
         java.util.Map map = wrapper.startReadMap(parentField);
         if (map == null) return null;
         reader.readStartDocument();
         while (reader.readBsonType() != org.bson.BsonType.END_OF_DOCUMENT) {
             String fieldName = reader.readName();
             String fieldPath = parentField + "." + fieldName;
-            core.framework.mongo.impl.TestEntityChild $29 = decodeTestEntityChild16(reader, wrapper, fieldPath);
+            core.framework.mongo.impl.TestChildEntity $29 = decodeTestChildEntity16(reader, wrapper, fieldPath);
             map.put(fieldName, $29);
         }
         reader.readEndDocument();
@@ -161,22 +161,22 @@ public class EntityDecoder$TestEntity implements core.framework.mongo.impl.Entit
                 continue;
             }
             if ("child".equals(fieldName)) {
-                core.framework.mongo.impl.TestEntityChild $15 = decodeTestEntityChild16(reader, wrapper, fieldPath);
+                core.framework.mongo.impl.TestChildEntity $15 = decodeTestChildEntity16(reader, wrapper, fieldPath);
                 entity.child = $15;
                 continue;
             }
             if ("children".equals(fieldName)) {
-                java.util.List $24 = decodeListTestEntityChild25(reader, wrapper, fieldPath);
+                java.util.List $24 = decodeListTestChildEntity25(reader, wrapper, fieldPath);
                 entity.children = $24;
                 continue;
             }
             if ("children_map".equals(fieldName)) {
-                java.util.Map $27 = decodeMapTestEntityChild28(reader, wrapper, fieldPath);
+                java.util.Map $27 = decodeMapTestChildEntity28(reader, wrapper, fieldPath);
                 entity.childrenMap = $27;
                 continue;
             }
             if ("null_child".equals(fieldName)) {
-                core.framework.mongo.impl.TestEntityChild $30 = decodeTestEntityChild16(reader, wrapper, fieldPath);
+                core.framework.mongo.impl.TestChildEntity $30 = decodeTestChildEntity16(reader, wrapper, fieldPath);
                 entity.nullChild = $30;
                 continue;
             }
