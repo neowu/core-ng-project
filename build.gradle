@@ -25,7 +25,7 @@ project(':core-ng') {
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'org.apache.httpcomponents:httpclient:4.5.5'
-        implementation 'io.undertow:undertow-core:2.0.9.Final'
+        implementation 'io.undertow:undertow-core:2.0.11.Final'
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
