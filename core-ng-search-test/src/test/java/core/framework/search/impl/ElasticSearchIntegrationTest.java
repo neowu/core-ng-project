@@ -8,6 +8,7 @@ import core.framework.search.ForEach;
 import core.framework.search.IntegrationTest;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
+import core.framework.search.UpdateRequest;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
@@ -138,6 +139,29 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         List<ElasticSearchIndex> indices = elasticSearch.indices();
 
         assertThat(indices).anyMatch(index -> "document".equals(index.index) && index.state == IndexMetaData.State.OPEN);
+    }
+
+    @Test
+    void update() {
+        document("4", "value4", 4);
+        TestDocument document = new TestDocument();
+        document.stringField = "value5";
+        documentType.update("4", document);
+
+        assertThat(documentType.get("4")).get().satisfies(doc -> {
+            assertThat(doc.numField).isEqualTo(4);
+            assertThat(doc.stringField).isEqualTo("value5");
+        });
+
+        UpdateRequest<TestDocument> request = new UpdateRequest<>();
+        request.id = "4";
+        request.script = "ctx._source.num_field = ctx._source.num_field + 1";
+        documentType.update(request);
+
+        assertThat(documentType.get("4")).get().satisfies(doc -> {
+            assertThat(doc.numField).isEqualTo(5);
+            assertThat(doc.stringField).isEqualTo("value5");
+        });
     }
 
     private TestDocument document(String id, String stringField, int numField) {

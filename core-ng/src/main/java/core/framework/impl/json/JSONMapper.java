@@ -1,5 +1,6 @@
 package core.framework.impl.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -19,9 +20,9 @@ import java.lang.reflect.Type;
  * @author neo
  */
 public final class JSONMapper {
-    public static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
+    public static final ObjectMapper OBJECT_MAPPER = createObjectMapper(true);
 
-    private static ObjectMapper createObjectMapper() {
+    static ObjectMapper createObjectMapper(boolean includeNull) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.registerModule(new AfterburnerModule().setUseValueClassLoader(false));   // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
@@ -29,6 +30,7 @@ public final class JSONMapper {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(MapperFeature.USE_WRAPPER_NAME_AS_PROPERTY_NAME, true);
+        if (!includeNull) mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.setAnnotationIntrospector(new JSONAnnotationIntrospector());
         return mapper;
     }

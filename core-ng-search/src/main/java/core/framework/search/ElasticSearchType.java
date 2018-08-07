@@ -47,6 +47,15 @@ public interface ElasticSearchType<T> {
         bulkIndex(request);
     }
 
+    void update(UpdateRequest<T> request);
+
+    default void update(String id, T source) {
+        UpdateRequest<T> request = new UpdateRequest<>();
+        request.id = id;
+        request.source = source;
+        update(request);
+    }
+
     boolean delete(DeleteRequest request);
 
     default boolean delete(String id) {

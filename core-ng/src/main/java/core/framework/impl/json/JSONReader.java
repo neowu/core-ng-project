@@ -1,7 +1,6 @@
 package core.framework.impl.json;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
 import java.io.IOException;
@@ -15,9 +14,8 @@ import java.lang.reflect.Type;
  */
 public final class JSONReader<T> {
     public static <T> JSONReader<T> of(Type instanceType) {
-        ObjectMapper objectMapper = JSONMapper.OBJECT_MAPPER;
-        JavaType type = objectMapper.getTypeFactory().constructType(instanceType);
-        return new JSONReader<>(objectMapper.readerFor(type));
+        JavaType type = JSONMapper.OBJECT_MAPPER.getTypeFactory().constructType(instanceType);
+        return new JSONReader<>(JSONMapper.OBJECT_MAPPER.readerFor(type));
     }
 
     private final ObjectReader reader;
