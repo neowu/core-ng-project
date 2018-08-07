@@ -28,7 +28,7 @@ public class GZipPredicate implements Predicate {
 
     boolean resolve(HeaderMap headers) {
         String contentType = headers.getFirst(Headers.CONTENT_TYPE);
-        if (!gzipContentTypes.contains(contentType)) return false;
+        if (contentType == null || !gzipContentTypes.contains(contentType)) return false;
         String length = headers.getFirst(Headers.CONTENT_LENGTH);
         return length == null || Long.parseLong(length) > MIN_GZIP_LENGTH;
     }

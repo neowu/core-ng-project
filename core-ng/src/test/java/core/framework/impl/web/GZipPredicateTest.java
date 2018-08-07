@@ -6,8 +6,7 @@ import io.undertow.util.Headers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -21,32 +20,38 @@ class GZipPredicateTest {
     }
 
     @Test
-    void proceed() {
-        HeaderMap headers = new HeaderMap();
+    void resolve() {
+        var headers = new HeaderMap();
         headers.put(Headers.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
         headers.put(Headers.CONTENT_LENGTH, 50);
-        assertTrue(predicate.resolve(headers));
+        assertThat(predicate.resolve(headers)).isTrue();
     }
 
     @Test
-    void proceedWithChunk() {  // chunk does not have content-length header
-        HeaderMap headers = new HeaderMap();
+    void resolveWithChunk() {  // chunk does not have content-length header
+        var headers = new HeaderMap();
         headers.put(Headers.CONTENT_TYPE, ContentType.TEXT_CSS.toString());
-        assertTrue(predicate.resolve(headers));
+        assertThat(predicate.resolve(headers)).isTrue();
     }
 
     @Test
     void skipIfContentTypeNotMatch() {
-        HeaderMap headers = new HeaderMap();
+        var headers = new HeaderMap();
         headers.put(Headers.CONTENT_TYPE, "image/png");
-        assertFalse(predicate.resolve(headers));
+        assertThat(predicate.resolve(headers)).isFalse();
     }
 
     @Test
     void skipIfContentLengthIsTooSmall() {
-        HeaderMap headers = new HeaderMap();
+        var headers = new HeaderMap();
         headers.put(Headers.CONTENT_TYPE, ContentType.TEXT_PLAIN.toString());
         headers.put(Headers.CONTENT_LENGTH, 10);
-        assertFalse(predicate.resolve(headers));
+        assertThat(predicate.resolve(headers)).isFalse();
+    }
+
+    @Test
+    void skipWithoutContentType() {
+        var headers = new HeaderMap();
+        assertThat(predicate.resolve(headers)).isFalse();
     }
 }
