@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -202,6 +203,22 @@ public final class DatabaseImpl implements Database {
         try {
             updatedRows = operation.update(sql, params);
             return updatedRows;
+        } finally {
+            long elapsedTime = watch.elapsedTime();
+            ActionLogContext.track("db", elapsedTime, 0, updatedRows);
+            logger.debug("execute, sql={}, params={}, updatedRows={}, elapsedTime={}", sql, new SQLParams(operation.enumMapper, params), updatedRows, elapsedTime);
+            checkSlowOperation(elapsedTime);
+        }
+    }
+
+    @Override
+    public int[] batchExecute(String sql, List<Object[]> params) {
+        StopWatch watch = new StopWatch();
+        int updatedRows = 0;
+        try {
+            int[] results = operation.batchUpdate(sql, params);
+            updatedRows = Arrays.stream(results).sum();
+            return results;
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, 0, updatedRows);

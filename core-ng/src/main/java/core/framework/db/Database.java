@@ -13,5 +13,7 @@ public interface Database {
 
     int execute(String sql, Object... params);
 
+    int[] batchExecute(String sql, List<Object[]> params);
+
     Transaction beginTransaction();
 }

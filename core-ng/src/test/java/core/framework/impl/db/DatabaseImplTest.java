@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -116,6 +117,20 @@ class DatabaseImplTest {
             assertThat(view.enumField).isEqualTo(TestEnum.V1);
             assertThat(view.stringField).isEqualTo("string");
         });
+    }
+
+    @Test
+    void batchExecute() {
+        insertRow(1, "string1", TestEnum.V1);
+        insertRow(2, "string2", TestEnum.V2);
+
+        List<Object[]> params = new ArrayList<>();
+        params.add(new Object[]{"string3", 1});
+        params.add(new Object[]{"string4", 2});
+
+        int[] results = database.batchExecute("UPDATE database_test SET string_field = ? WHERE id = ?", params);
+
+        assertThat(results).containsExactly(1, 1);
     }
 
     @Test
