@@ -59,8 +59,8 @@ public class DatabaseOperation {
                 setParams(statement, batchParams);
                 statement.addBatch();
                 if (index % batchSize == 0 || index == size) {
-                    int[] batchResult = statement.executeBatch();
-                    System.arraycopy(batchResult, 0, results, index - batchResult.length, batchResult.length);
+                    int[] batchResults = statement.executeBatch();
+                    System.arraycopy(batchResults, 0, results, index - batchResults.length, batchResults.length);
                 }
                 index++;
             }

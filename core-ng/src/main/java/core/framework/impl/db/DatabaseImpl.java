@@ -222,7 +222,7 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("db", elapsedTime, 0, updatedRows);
-            logger.debug("execute, sql={}, params={}, updatedRows={}, elapsedTime={}", sql, new SQLParams(operation.enumMapper, params), updatedRows, elapsedTime);
+            logger.debug("batchExecute, sql={}, size={}, updatedRows={}, elapsedTime={}", sql, params.size(), updatedRows, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
