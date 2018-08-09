@@ -1,9 +1,12 @@
 ## Change log
+### 6.6.3 (8/9/2018 - )
+* redis: support List
+
 ### 6.6.2 (8/8/2018 - 8/8/2018)
 * db: support batchExecute
 
 ### 6.6.1 (8/5/2018 - 8/7/2018)
-* search: support update by partial doc or script 
+* search: support update by script 
 * http: update undertow to 2.0.11
 
 ### 6.6.0 (7/31/2018 - 8/5/2018)   !!! check break changes !!!

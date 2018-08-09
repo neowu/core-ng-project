@@ -3,7 +3,6 @@ package core.framework.search.impl;
 import core.framework.api.json.Property;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.json.JSONWriter;
-import core.framework.impl.json.PartialJSONWriter;
 import core.framework.impl.validate.Validator;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
@@ -32,7 +31,6 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.update.UpdateRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
@@ -75,7 +73,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     private final long slowOperationThresholdInNanos;
     private final JSONReader<T> reader;
     private final JSONWriter<T> writer;
-    private final PartialJSONWriter<T> partialWriter;
 
     ElasticSearchTypeImpl(ElasticSearchImpl elasticSearch, Class<T> documentClass, Duration slowOperationThreshold) {
         this.elasticSearch = elasticSearch;
@@ -86,7 +83,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         validator = new Validator(documentClass, field -> field.getDeclaredAnnotation(Property.class).name());
         reader = JSONReader.of(documentClass);
         writer = JSONWriter.of(documentClass);
-        partialWriter = PartialJSONWriter.of(documentClass);
     }
 
     @Override
@@ -242,18 +238,12 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     @Override
     public void update(UpdateRequest<T> request) {
+        if (request.script == null) throw Exceptions.error("request.script must not be null");
+
         StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         try {
-            UpdateRequestBuilder builder = client().prepareUpdate(index, type, request.id);
-            if (request.script != null) {
-                builder.setScript(new Script(request.script));
-            } else {
-                validator.validate(request.source, true);
-                byte[] document = partialWriter.toJSON(request.source);
-                builder.setDoc(document, XContentType.JSON);
-            }
-            builder.get();
+            client().prepareUpdate(index, type, request.id).setScript(new Script(request.script)).get();
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {

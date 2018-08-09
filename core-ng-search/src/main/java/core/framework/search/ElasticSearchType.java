@@ -49,10 +49,10 @@ public interface ElasticSearchType<T> {
 
     void update(UpdateRequest<T> request);
 
-    default void update(String id, T source) {
+    default void update(String id, String script) {
         UpdateRequest<T> request = new UpdateRequest<>();
         request.id = id;
-        request.source = source;
+        request.script = script;
         update(request);
     }
 
