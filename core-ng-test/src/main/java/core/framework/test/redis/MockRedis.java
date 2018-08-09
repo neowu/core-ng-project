@@ -2,12 +2,15 @@ package core.framework.test.redis;
 
 import core.framework.redis.Redis;
 import core.framework.redis.RedisHash;
+import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
 import core.framework.util.Exceptions;
+import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -20,6 +23,7 @@ public final class MockRedis implements Redis {
 
     private final MockRedisHash redisHash = new MockRedisHash(this);
     private final MockRedisSet redisSet = new MockRedisSet(this);
+    private final MockRedisList redisList = new MockRedisList(this);
 
     @Override
     public String get(String key) {
@@ -120,34 +124,45 @@ public final class MockRedis implements Redis {
         }
     }
 
+    @Override
+    public RedisList list() {
+        return redisList;
+    }
+
     enum ValueType {
-        VALUE, HASH, SET
+        VALUE, HASH, SET, LIST
     }
 
     static final class Value {
         static Value value(String value) {
-            return new Value(ValueType.VALUE, value, null, null);
+            return new Value(ValueType.VALUE, value, null, null, null);
         }
 
         static Value hashValue() {
-            return new Value(ValueType.HASH, null, Maps.newHashMap(), null);
+            return new Value(ValueType.HASH, null, Maps.newHashMap(), null, null);
         }
 
         static Value setValue() {
-            return new Value(ValueType.SET, null, null, Sets.newHashSet());
+            return new Value(ValueType.SET, null, null, Sets.newHashSet(), null);
+        }
+
+        static Value listValue() {
+            return new Value(ValueType.LIST, null, null, null, Lists.newArrayList());
         }
 
         final ValueType type;
         final Map<String, String> hash;
         final Set<String> set;
+        final List<String> list;
         String value;
         Long expirationTime;
 
-        private Value(ValueType type, String value, Map<String, String> hash, Set<String> set) {
+        private Value(ValueType type, String value, Map<String, String> hash, Set<String> set, List<String> list) {
             this.type = type;
             this.value = value;
             this.hash = hash;
             this.set = set;
+            this.list = list;
         }
 
         boolean expired(long now) {

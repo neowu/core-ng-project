@@ -31,4 +31,6 @@ public interface Redis {
     RedisHash hash();
 
     void forEach(String pattern, Consumer<String> consumer);
+
+    RedisList list();
 }

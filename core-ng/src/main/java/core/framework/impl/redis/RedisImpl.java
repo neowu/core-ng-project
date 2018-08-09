@@ -7,6 +7,7 @@ import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.redis.Redis;
 import core.framework.redis.RedisHash;
+import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
@@ -33,6 +34,7 @@ public final class RedisImpl implements Redis {
     private final Logger logger = LoggerFactory.getLogger(RedisImpl.class);
     private final RedisSet redisSet = new RedisSetImpl(this);
     private final RedisHash redisHash = new RedisHashImpl(this);
+    private final RedisList redisList = new RedisListImpl(this);
     private final String name;
     public Pool<RedisConnection> pool;
     public String host;
@@ -341,6 +343,11 @@ public final class RedisImpl implements Redis {
             ActionLogContext.track("redis", elapsedTime, count, 0);
             logger.debug("forEach, pattern={}, count={}, elapsedTime={}", pattern, count, elapsedTime);
         }
+    }
+
+    @Override
+    public RedisList list() {
+        return redisList;
     }
 
     void checkSlowOperation(long elapsedTime) {
