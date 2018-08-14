@@ -3,17 +3,13 @@ package core.framework.test.redis;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
  */
 class MockRedisSetTest {
-    MockRedis redis;
+    private MockRedis redis;
 
     @BeforeEach
     void createMockRedis() {
@@ -24,8 +20,8 @@ class MockRedisSetTest {
     void isMember() {
         redis.set().add("key6", "value1");
 
-        assertTrue(redis.set().isMember("key6", "value1"));
-        assertFalse(redis.set().isMember("key6", "value2"));
+        assertThat(redis.set().isMember("key6", "value1")).isTrue();
+        assertThat(redis.set().isMember("key6", "value2")).isFalse();
     }
 
     @Test
@@ -33,7 +29,14 @@ class MockRedisSetTest {
         redis.set().add("key1", "value1");
         redis.set().add("key1", "value2");
 
-        Set<String> values = redis.set().members("key1");
-        assertEquals(Set.of("value1", "value2"), values);
+        assertThat(redis.set().members("key1")).containsExactly("value1", "value2");
+    }
+
+    @Test
+    void remove() {
+        redis.set().add("key7", "value1", "value2");
+
+        assertThat(redis.set().remove("key7", "value1")).isTrue();
+        assertThat(redis.set().members("key7")).containsExactly("value2");
     }
 }

@@ -1,8 +1,6 @@
 package core.framework.test.redis;
 
 import core.framework.redis.RedisHash;
-import core.framework.util.Exceptions;
-import core.framework.util.Maps;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,55 +9,47 @@ import java.util.Map;
  * @author neo
  */
 public final class MockRedisHash implements RedisHash {
-    private final MockRedis redis;
+    private final MockRedisStore store;
 
-    public MockRedisHash(MockRedis redis) {
-        this.redis = redis;
+    MockRedisHash(MockRedisStore store) {
+        this.store = store;
     }
 
     @Override
     public Map<String, String> getAll(String key) {
-        MockRedis.Value value = redis.store.get(key);
-        if (value == null) return Maps.newHashMap();
-        validate(key, value);
-        return new HashMap<>(value.hash);
+        var value = store.get(key);
+        if (value == null) return Map.of();
+        return Map.copyOf(value.map());
     }
 
     @Override
     public String get(String key, String field) {
-        MockRedis.Value value = redis.store.get(key);
+        var value = store.get(key);
         if (value == null) return null;
-        validate(key, value);
-        return value.hash.get(field);
+        return value.map().get(field);
     }
 
     @Override
     public void set(String key, String field, String value) {
-        MockRedis.Value hashValue = redis.store.computeIfAbsent(key, k -> MockRedis.Value.hashValue());
-        validate(key, hashValue);
-        hashValue.hash.put(field, value);
+        var hashValue = store.putIfAbsent(key, new HashMap<>());
+        hashValue.map().put(field, value);
     }
 
     @Override
     public void multiSet(String key, Map<String, String> values) {
-        MockRedis.Value hashValue = redis.store.computeIfAbsent(key, k -> MockRedis.Value.hashValue());
-        validate(key, hashValue);
-        hashValue.hash.putAll(values);
+        var hashValue = store.putIfAbsent(key, new HashMap<>());
+        hashValue.map().putAll(values);
     }
 
     @Override
     public boolean del(String key, String... fields) {
-        MockRedis.Value hashValue = redis.store.computeIfAbsent(key, k -> MockRedis.Value.hashValue());
-        validate(key, hashValue);
+        var hashValue = store.putIfAbsent(key, new HashMap<>());
         boolean deleted = false;
+        Map<String, String> map = hashValue.map();
         for (String field : fields) {
-            String previous = hashValue.hash.remove(field);
+            String previous = map.remove(field);
             if (previous != null) deleted = true;
         }
         return deleted;
-    }
-
-    private void validate(String key, MockRedis.Value value) {
-        if (value.type != MockRedis.ValueType.HASH) throw Exceptions.error("invalid type, key={}, type={}", key, value.type);
     }
 }

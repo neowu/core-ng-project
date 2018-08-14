@@ -3,20 +3,18 @@ package core.framework.test.redis;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.entry;
 
 /**
  * @author neo
  */
 class MockRedisTest {
-    MockRedis redis;
+    private MockRedis redis;
 
     @BeforeEach
     void createMockRedis() {
@@ -26,9 +24,7 @@ class MockRedisTest {
     @Test
     void get() {
         redis.set("key1", "value");
-
-        String value = redis.get("key1");
-        assertEquals("value", value);
+        assertThat(redis.get("key1")).isEqualTo("value");
     }
 
     @Test
@@ -37,9 +33,7 @@ class MockRedisTest {
         redis.set("key3", "value3");
         Map<String, String> values = redis.multiGet("key1", "key3", "key2");
 
-        assertEquals("value2", values.get("key2"));
-        assertEquals("value3", values.get("key3"));
-        assertNull(values.get("key1"));
+        assertThat(values).containsExactly(entry("key2", "value2"), entry("key3", "value3"));
     }
 
     @Test
@@ -50,15 +44,14 @@ class MockRedisTest {
         redis.set("not-matched-1", "not-matched-value-1");
         redis.set("not-matched-2", "not-matched-value-2");
 
-        AtomicInteger count = new AtomicInteger(0);
+        var count = new AtomicInteger(0);
         redis.forEach("matched-*", key -> {
             String value = redis.get(key);
-            assertNotNull(value);
-            assertTrue(value.startsWith("matched-value-"));
+            assertThat(value).startsWith("matched-value-");
             count.incrementAndGet();
         });
 
-        assertEquals(3, count.get());
+        assertThat(count.get()).isEqualTo(3);
     }
 
     @Test
@@ -70,5 +63,40 @@ class MockRedisTest {
         result = redis.increaseBy("counter", 5);
         assertThat(result).isEqualTo(6);
         assertThat(redis.get("counter")).isEqualTo("6");
+    }
+
+    @Test
+    void set() {
+        redis.set("key4", "value4", Duration.ZERO);
+        assertThat(redis.get("key4")).isNull();
+    }
+
+    @Test
+    void setIfAbsent() {
+        redis.set("key8", "value8");
+        assertThat(redis.setIfAbsent("key8", "value9", Duration.ofMinutes(5))).isFalse();
+        assertThat(redis.get("key8")).isEqualTo("value8");
+    }
+
+    @Test
+    void expire() {
+        redis.set("key5", "value5");
+        redis.expire("key5", Duration.ZERO);
+        assertThat(redis.get("key4")).isNull();
+    }
+
+    @Test
+    void del() {
+        redis.set("key6", "value6");
+        redis.del("key6");
+        assertThat(redis.get("key6")).isNull();
+    }
+
+    @Test
+    void multiSet() {
+        redis.multiSet(Map.of("key7", "value7", "key8", "value8"));
+
+        assertThat(redis.get("key7")).isEqualTo("value7");
+        assertThat(redis.get("key8")).isEqualTo("value8");
     }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 public interface RedisList {
     String pop(String key);
 
-    void push(String key, String... values);
+    long push(String key, String... values);
 
     default List<String> range(String key) {
         return range(key, 0, -1);

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,7 +17,7 @@ class RedisSetOperationTest extends AbstractRedisOperationTest {
         response(":1\r\n");
         boolean added = redis.set().add("key", "item1");
 
-        assertTrue(added);
+        assertThat(added).isTrue();
         assertRequestEquals("*3\r\n$4\r\nSADD\r\n$3\r\nkey\r\n$5\r\nitem1\r\n");
     }
 

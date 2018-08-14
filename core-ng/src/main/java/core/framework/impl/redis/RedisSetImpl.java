@@ -31,13 +31,13 @@ public final class RedisSetImpl implements RedisSet {
     }
 
     @Override
-    public boolean add(String key, String value) {
+    public boolean add(String key, String... values) {
         StopWatch watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(SADD, encode(key), encode(value));
-            return connection.readLong() == 1;
+            connection.write(SADD, encode(key, values));
+            return connection.readLong() >= 1;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -45,7 +45,7 @@ public final class RedisSetImpl implements RedisSet {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime, 0, 1);
-            logger.debug("sadd, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
+            logger.debug("sadd, key={}, values={}, elapsedTime={}", key, values, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
     }

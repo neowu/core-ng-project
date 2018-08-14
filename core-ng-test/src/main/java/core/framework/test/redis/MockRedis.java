@@ -4,73 +4,56 @@ import core.framework.redis.Redis;
 import core.framework.redis.RedisHash;
 import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
-import core.framework.util.Exceptions;
-import core.framework.util.Lists;
 import core.framework.util.Maps;
-import core.framework.util.Sets;
 
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
  * @author neo
  */
 public final class MockRedis implements Redis {
-    final Map<String, Value> store = Maps.newConcurrentHashMap();
-
-    private final MockRedisHash redisHash = new MockRedisHash(this);
-    private final MockRedisSet redisSet = new MockRedisSet(this);
-    private final MockRedisList redisList = new MockRedisList(this);
+    private final MockRedisStore store = new MockRedisStore();
+    private final MockRedisHash hash = new MockRedisHash(store);
+    private final MockRedisSet set = new MockRedisSet(store);
+    private final MockRedisList list = new MockRedisList(store);
 
     @Override
     public String get(String key) {
-        Value value = value(key);
+        var value = store.get(key);
         if (value == null) return null;
-        return value.value;
-    }
-
-    private Value value(String key) {
-        Value value = store.get(key);
-        if (value == null) return null;
-        if (value.type != ValueType.VALUE) throw Exceptions.error("invalid type, key={}, type={}", key, value.type);
-        if (value.expired(System.currentTimeMillis())) {
-            store.remove(key);
-            return null;
-        }
-        return value;
+        return value.string();
     }
 
     @Override
     public void set(String key, String value) {
-        store.put(key, Value.value(value));
+        store.store.put(key, new MockRedisStore.Value(value));
     }
 
     @Override
     public void set(String key, String value, Duration expiration) {
-        Value redisValue = Value.value(value);
+        var redisValue = new MockRedisStore.Value(value);
         redisValue.expirationTime = System.currentTimeMillis() + expiration.toMillis();
-        store.put(key, redisValue);
+        store.store.put(key, redisValue);
     }
 
     @Override
     public RedisSet set() {
-        return redisSet;
+        return set;
     }
 
     @Override
     public boolean setIfAbsent(String key, String value, Duration expiration) {
-        Value redisValue = Value.value(value);
+        MockRedisStore.Value redisValue = new MockRedisStore.Value(value);
         redisValue.expirationTime = System.currentTimeMillis() + expiration.toMillis();
-        Object previous = store.putIfAbsent(key, redisValue);
+        Object previous = store.store.putIfAbsent(key, redisValue);
         return previous == null;
     }
 
     @Override
     public void expire(String key, Duration duration) {
-        Value value = store.get(key);
+        var value = store.get(key);
         if (value != null) {
             value.expirationTime = System.currentTimeMillis() + duration.toMillis();
         }
@@ -78,19 +61,18 @@ public final class MockRedis implements Redis {
 
     @Override
     public boolean del(String key) {
-        Value removed = store.remove(key);
+        var removed = store.store.remove(key);
         return removed != null;
     }
 
     @Override
     public long increaseBy(String key, long increment) {
-        Value value = value(key);
+        var value = store.get(key);
         if (value == null) {
-            value = Value.value("0");   // according to https://redis.io/commands/incrby, set to 0 if key not exists
-            store.put(key, value);
+            value = new MockRedisStore.Value("0");   // according to https://redis.io/commands/incrby, set to 0 if key not exists
         }
-        long result = Long.parseLong(value.value) + increment;
-        value.value = String.valueOf(result);
+        long result = Long.parseLong(value.string()) + increment;
+        store.store.put(key, new MockRedisStore.Value(String.valueOf(result)));
         return result;
     }
 
@@ -111,13 +93,13 @@ public final class MockRedis implements Redis {
 
     @Override
     public RedisHash hash() {
-        return redisHash;
+        return hash;
     }
 
     @Override
     public void forEach(String pattern, Consumer<String> consumer) {
         KeyMatcher matcher = new KeyMatcher(pattern);
-        for (String key : store.keySet()) {
+        for (String key : store.store.keySet()) {
             if (matcher.matches(key)) {
                 consumer.accept(key);
             }
@@ -126,47 +108,6 @@ public final class MockRedis implements Redis {
 
     @Override
     public RedisList list() {
-        return redisList;
-    }
-
-    enum ValueType {
-        VALUE, HASH, SET, LIST
-    }
-
-    static final class Value {
-        static Value value(String value) {
-            return new Value(ValueType.VALUE, value, null, null, null);
-        }
-
-        static Value hashValue() {
-            return new Value(ValueType.HASH, null, Maps.newHashMap(), null, null);
-        }
-
-        static Value setValue() {
-            return new Value(ValueType.SET, null, null, Sets.newHashSet(), null);
-        }
-
-        static Value listValue() {
-            return new Value(ValueType.LIST, null, null, null, Lists.newArrayList());
-        }
-
-        final ValueType type;
-        final Map<String, String> hash;
-        final Set<String> set;
-        final List<String> list;
-        String value;
-        Long expirationTime;
-
-        private Value(ValueType type, String value, Map<String, String> hash, Set<String> set, List<String> list) {
-            this.type = type;
-            this.value = value;
-            this.hash = hash;
-            this.set = set;
-            this.list = list;
-        }
-
-        boolean expired(long now) {
-            return expirationTime != null && now >= expirationTime;
-        }
+        return list;
     }
 }

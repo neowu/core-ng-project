@@ -50,13 +50,13 @@ public final class RedisListImpl implements RedisList {
     }
 
     @Override
-    public void push(String key, String... values) {
+    public long push(String key, String... values) {
         StopWatch watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.write(RPUSH, encode(key, values));
-            connection.readLong();
+            return connection.readLong();
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -64,7 +64,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime, 0, values.length);
-            logger.debug("rpush, key={}, value={}, elapsedTime={}", key, values, elapsedTime);
+            logger.debug("rpush, key={}, values={}, elapsedTime={}", key, values, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
     }

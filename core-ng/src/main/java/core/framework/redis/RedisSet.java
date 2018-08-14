@@ -6,7 +6,7 @@ import java.util.Set;
  * @author neo
  */
 public interface RedisSet {
-    boolean add(String key, String value);
+    boolean add(String key, String... values);
 
     Set<String> members(String key);
 
