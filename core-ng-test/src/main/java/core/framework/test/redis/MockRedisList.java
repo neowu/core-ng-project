@@ -26,10 +26,12 @@ public final class MockRedisList implements RedisList {
     }
 
     @Override
-    public void push(String key, String... values) {
+    public long push(String key, String... values) {
         assertThat(values).doesNotContainNull();
         var value = store.putIfAbsent(key, new ArrayList<>());
-        Collections.addAll(value.list(), values);
+        List<String> list = value.list();
+        Collections.addAll(list, values);
+        return list.size();
     }
 
     @Override
