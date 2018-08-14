@@ -40,7 +40,9 @@ public class TestModule extends AbstractTestModule {
 
         redis().host("localhost");
 
-        log().writeToConsole();
+        log().writeToKafka("localhost:9092");
+
+        configureCache();
 
         configureHTTP();
         configureSite();
@@ -50,6 +52,11 @@ public class TestModule extends AbstractTestModule {
         configureJob();
 
         configureExecutor();
+    }
+
+    private void configureCache() {
+        cache().redis("localhost");
+        cache().add(String.class, Duration.ofHours(6));
     }
 
     private void configureExecutor() {

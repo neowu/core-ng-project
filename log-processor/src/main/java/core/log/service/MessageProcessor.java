@@ -80,7 +80,7 @@ public class MessageProcessor {
             processing.set(true);
             while (!shutdown.get()) {
                 try {
-                    ConsumerRecords<String, byte[]> records = consumer.poll(10000);
+                    ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofSeconds(10));
                     if (records.isEmpty()) continue;
                     consume(TOPIC_ACTION_LOG, records, actionLogReader, actionService::index);
                     consume(TOPIC_STAT, records, statReader, statService::index);

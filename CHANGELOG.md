@@ -1,5 +1,6 @@
 ## Change log
 ### 6.6.4 (8/9/2018 - )
+* kafka: update to 2.0.0
 
 ### 6.6.3 (8/9/2018 - 8/9/2018)
 * redis: support List
