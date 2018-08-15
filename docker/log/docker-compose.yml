@@ -1,46 +1,46 @@
 version: "3"
 services:
-  elasticsearch:
-      image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.2
-    ports:
-      - 9200:9200
-      - 9300:9300
-    environment:
-      - cluster.name=log
-      - http.host=0.0.0.0
-      - transport.host=0.0.0.0
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-#      - xpack.security.enabled=false
-#      - xpack.ml.enabled=false     # if use elasticsearch image with xpack basic installed, must disable machine learning module
-  kibana:
-      image: docker.elastic.co/kibana/kibana-oss:6.3.2
-    ports:
-      - 5601:5601
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-#      - xpack.security.enabled=false
-    depends_on:
-      - elasticsearch
-  zookeeper:
-    image: zookeeper
-    ports:
-      - 2181
-    environment:
-      - JMXDISABLE=true
-  kafka:
-      image: neowu/kafka:2.0.0
-    ports:
-      - 9092:9092
-    environment:
-      - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092
-    depends_on:
-      - zookeeper
-  log-processor:
-    image: neowu/log-processor:6.3.6
-    environment:
-      - JAVA_OPTS=-Xms256m -Xmx2048m -Xss256k -Djava.awt.headless=true
-      - SYS_KAFKA_URI=kafka:9092
-      - SYS_ELASTICSEARCH_HOST=elasticsearch
-    depends_on:
-      - kafka
-      - elasticsearch
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.2
+        ports:
+        - 9200:9200
+        - 9300:9300
+        environment:
+        - cluster.name=log
+        - http.host=0.0.0.0
+        - transport.host=0.0.0.0
+        - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    #      - xpack.security.enabled=false
+    #      - xpack.ml.enabled=false     # if use elasticsearch image with xpack basic installed, must disable machine learning module
+    kibana:
+        image: docker.elastic.co/kibana/kibana-oss:6.3.2
+        ports:
+        - 5601:5601
+        environment:
+        - ELASTICSEARCH_URL=http://elasticsearch:9200
+        #      - xpack.security.enabled=false
+        depends_on:
+        - elasticsearch
+    zookeeper:
+        image: zookeeper
+        ports:
+        - 2181
+        environment:
+        - JMXDISABLE=true
+    kafka:
+        image: neowu/kafka:2.0.0
+        ports:
+        - 9092:9092
+        environment:
+        - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092 --override message.max.bytes=2000000
+        depends_on:
+        - zookeeper
+    log-processor:
+        image: neowu/log-processor:6.4.2
+        environment:
+        - JAVA_OPTS=-Xms256m -Xmx2048m -Xss256k -Djava.awt.headless=true
+        - SYS_KAFKA_URI=kafka:9092
+        - SYS_ELASTICSEARCH_HOST=elasticsearch
+        depends_on:
+        - kafka
+        - elasticsearch

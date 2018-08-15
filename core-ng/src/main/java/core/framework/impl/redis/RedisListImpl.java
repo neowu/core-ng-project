@@ -64,7 +64,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime, 0, values.length);
-            logger.debug("rpush, key={}, values={}, elapsedTime={}", key, values, elapsedTime);
+            logger.debug("rpush, key={}, values={}, size={}, elapsedTime={}", key, values, values.length, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
     }
@@ -73,11 +73,12 @@ public final class RedisListImpl implements RedisList {
     public List<String> range(String key, int start, int end) {
         StopWatch watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
-        int returnedFields = 0;
+        int returnedItems = 0;
         try {
             RedisConnection connection = item.resource;
             connection.write(LRANGE, encode(key), encode(start), encode(end));
             Object[] response = connection.readArray();
+            returnedItems = response.length;
             List<String> items = new ArrayList<>(response.length);
             for (Object value : response) {
                 items.add(decode((byte[]) value));
@@ -89,8 +90,8 @@ public final class RedisListImpl implements RedisList {
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime, returnedFields, 0);
-            logger.debug("lrange, key={}, start={}, end={}, elapsedTime={}", key, start, end, elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, returnedItems, 0);
+            logger.debug("lrange, key={}, start={}, end={}, returnedItems={}, elapsedTime={}", key, start, end, returnedItems, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
     }

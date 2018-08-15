@@ -292,8 +292,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, 0, request.ids.size());
-            logger.debug("bulkDelete, index={}, type={}, size={}, esTookTime={}, elapsedTime={}", index, type, request.ids.size(), esTookTime, elapsedTime);
+            int size = request.ids.size();
+            ActionLogContext.track("elasticsearch", elapsedTime, 0, size);
+            logger.debug("bulkDelete, index={}, type={}, ids={}, size={}, esTookTime={}, elapsedTime={}", index, type, request.ids, size, esTookTime, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

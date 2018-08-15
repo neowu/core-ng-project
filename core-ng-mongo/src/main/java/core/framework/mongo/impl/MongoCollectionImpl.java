@@ -397,7 +397,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("mongoDB", elapsedTime, 0, deletedRows);
-            logger.debug("bulkDelete, collection={}, size={}, elapsedTime={}", collectionName, ids.size(), elapsedTime);
+            logger.debug("bulkDelete, collection={}, ids={}, size={}, elapsedTime={}", collectionName, ids, ids.size(), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }

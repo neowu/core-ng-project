@@ -142,7 +142,7 @@ public final class ActionLog {
         stat.totalElapsed += elapsedTime;
         stat.increaseReadEntries(readEntries);
         stat.increaseWriteEntries(writeEntries);
-        add(event("[track] {}, elapsedTime={}, readEntries={}, writeEntries={}", action, elapsedTime, readEntries, writeEntries));
+        // not to add event to keep trace log concise
     }
 
     public String refId() {

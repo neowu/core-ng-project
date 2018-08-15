@@ -1,7 +1,8 @@
 ## Change log
-### 6.6.4 (8/9/2018 - )
+### 6.6.4 (8/9/2018 - 8/15/2018)
 * kafka: update to 2.0.0
 * redis: check values must not be empty in encoding
+* log: remove track debug log to make trace log concise 
 
 ### 6.6.3 (8/9/2018 - 8/9/2018)
 * redis: support List

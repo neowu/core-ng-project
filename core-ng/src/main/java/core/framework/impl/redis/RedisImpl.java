@@ -262,7 +262,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime, keys.length, 0);
-            logger.debug("mget, keys={}, elapsedTime={}", keys, elapsedTime);
+            logger.debug("mget, keys={}, size={}, elapsedTime={}", keys, keys.length, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -281,8 +281,9 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime, 0, values.size());
-            logger.debug("mset, values={}, elapsedTime={}", values, elapsedTime);
+            int size = values.size();
+            ActionLogContext.track("redis", elapsedTime, 0, size);
+            logger.debug("mset, values={}, size={}, elapsedTime={}", values, size, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -305,7 +306,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsedTime = watch.elapsedTime();
             ActionLogContext.track("redis", elapsedTime, 0, size);
-            logger.debug("mset, values={}, expiration={}, elapsedTime={}", values, expiration, elapsedTime);
+            logger.debug("mset, values={}, size={}, expiration={}, elapsedTime={}", values, size, expiration, elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
