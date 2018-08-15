@@ -36,7 +36,7 @@ services:
         depends_on:
         - zookeeper
     log-processor:
-        image: neowu/log-processor:6.4.2
+        image: neowu/log-processor:6.6.4
         environment:
         - JAVA_OPTS=-Xms256m -Xmx2048m -Xss256k -Djava.awt.headless=true
         - SYS_KAFKA_URI=kafka:9092
