@@ -20,8 +20,8 @@ class HTTPServerHandlerTest {
 
     @Test
     void linkContext() {
-        ActionLog actionLog = new ActionLog(null, null);
-        HeaderMap headers = new HeaderMap();
+        var actionLog = new ActionLog(null);
+        var headers = new HeaderMap();
         headers.put(HTTPServerHandler.HEADER_TRACE, "true");
         handler.linkContext(actionLog, headers);
 

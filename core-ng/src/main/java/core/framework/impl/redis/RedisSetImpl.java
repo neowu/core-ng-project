@@ -32,7 +32,7 @@ public final class RedisSetImpl implements RedisSet {
 
     @Override
     public boolean add(String key, String... values) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -52,7 +52,7 @@ public final class RedisSetImpl implements RedisSet {
 
     @Override
     public Set<String> members(String key) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         int returnedMembers = 0;
         try {
@@ -79,7 +79,7 @@ public final class RedisSetImpl implements RedisSet {
 
     @Override
     public boolean isMember(String key, String value) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -100,7 +100,7 @@ public final class RedisSetImpl implements RedisSet {
 
     @Override
     public boolean remove(String key, String... values) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;

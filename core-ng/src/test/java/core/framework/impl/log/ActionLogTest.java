@@ -20,7 +20,7 @@ class ActionLogTest {
     @BeforeEach
     void createActionLog() {
         filter = new LogFilter();
-        log = new ActionLog("begin", filter);
+        log = new ActionLog("begin");
     }
 
     @Test
@@ -47,7 +47,7 @@ class ActionLogTest {
 
     @Test
     void flushTraceLogWithWarning() {
-        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null, filter));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null), filter);
 
         assertTrue(log.flushTraceLog());
     }
@@ -56,7 +56,7 @@ class ActionLogTest {
     void result() {
         assertEquals("OK", log.result());
 
-        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null, filter));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null), filter);
         assertEquals("WARN", log.result());
     }
 
@@ -64,13 +64,13 @@ class ActionLogTest {
     void errorCode() {
         assertNull(log.errorCode());
 
-        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null, filter));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null), filter);
         assertEquals("UNASSIGNED", log.errorCode());
     }
 
     @Test
     void truncateErrorMessage() {
-        log.process(new LogEvent("logger", null, LogLevel.WARN, longString(300), null, null, filter));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, longString(300), null, null), filter);
 
         assertEquals(200, log.errorMessage.length());
     }
@@ -89,14 +89,14 @@ class ActionLogTest {
         log.track("db", 1000, 1, 0);
         PerformanceStat stat = log.performanceStats.get("db");
         assertEquals(1, stat.count);
-        assertEquals(1000, stat.totalElapsed);
+        assertEquals(1000, stat.elapsedTime);
         assertEquals(1, stat.readEntries.intValue());
         assertEquals(0, stat.writeEntries.intValue());
 
         log.track("db", 1000, 1, 1);
         stat = log.performanceStats.get("db");
         assertEquals(2, stat.count);
-        assertEquals(2000, stat.totalElapsed);
+        assertEquals(2000, stat.elapsedTime);
         assertEquals(2, stat.readEntries.intValue());
         assertEquals(1, stat.writeEntries.intValue());
     }

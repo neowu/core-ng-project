@@ -28,7 +28,7 @@ public class LogManager {
     }
 
     public ActionLog begin(String message) {
-        ActionLog actionLog = new ActionLog(message, filter);
+        var actionLog = new ActionLog(message);
         this.actionLog.set(actionLog);
         return actionLog;
     }
@@ -38,13 +38,13 @@ public class LogManager {
         this.actionLog.remove();
         actionLog.end(message);
 
-        if (consoleAppender != null) consoleAppender.write(actionLog);
-        if (kafkaAppender != null) kafkaAppender.forward(actionLog);
+        if (consoleAppender != null) consoleAppender.write(actionLog, filter);
+        if (kafkaAppender != null) kafkaAppender.forward(actionLog, filter);
     }
 
     public void process(LogEvent event) {
         ActionLog actionLog = currentActionLog();
-        if (actionLog != null) actionLog.process(event);    // process is called by loggerImpl.log, begin() may not be called before
+        if (actionLog != null) actionLog.process(event, filter);    // process is called by loggerImpl.log, begin() may not be called before
     }
 
     public ActionLog currentActionLog() {

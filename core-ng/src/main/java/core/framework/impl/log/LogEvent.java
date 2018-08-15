@@ -21,12 +21,10 @@ final class LogEvent {
     private final String message;
     private final Object[] arguments;
     private final Throwable exception;
-    private final LogFilter filter;
 
     private String logMessage;
 
-    @SuppressWarnings("ParameterNumber")
-    LogEvent(String logger, Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception, LogFilter filter) {
+    LogEvent(String logger, Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
         this.level = level;
         this.marker = marker;
         this.logger = logger;
@@ -34,12 +32,11 @@ final class LogEvent {
         this.arguments = arguments;
         this.exception = exception;
         thread = Thread.currentThread().getName();
-        this.filter = filter;
     }
 
-    String logMessage() {
+    String logMessage(LogFilter filter) {
         if (logMessage == null) {
-            StringBuilder builder = new StringBuilder(256);
+            var builder = new StringBuilder(256);
             builder.append(DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(time)))
                    .append(" [")
                    .append(thread)
@@ -48,22 +45,15 @@ final class LogEvent {
                    .append(' ')
                    .append(logger)
                    .append(" - ");
-
-            if (marker != null) {
-                builder.append('[').append(marker.getName()).append("] ");
-            }
-
-            builder.append(message())
-                   .append(System.lineSeparator());
-            if (exception != null)
-                builder.append(Exceptions.stackTrace(exception));
-
+            if (marker != null) builder.append('[').append(marker.getName()).append("] ");
+            builder.append(message(filter)).append(System.lineSeparator());
+            if (exception != null) builder.append(Exceptions.stackTrace(exception));
             logMessage = builder.toString();
         }
         return logMessage;
     }
 
-    String message() {
+    String message(LogFilter filter) {
         return filter.format(message, arguments);
     }
 

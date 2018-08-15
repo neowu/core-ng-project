@@ -44,7 +44,7 @@ public final class LoggerImpl extends AbstractLogger {
     @Override
     public void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
         if (level.value >= traceLevel.value) {
-            LogEvent event = new LogEvent(logger, marker, level, message, arguments, exception, logManager.filter);
+            var event = new LogEvent(logger, marker, level, message, arguments, exception);
             logManager.process(event);
 
             if (level.value >= infoLevel.value) {
@@ -54,7 +54,7 @@ public final class LoggerImpl extends AbstractLogger {
     }
 
     private void write(LogEvent event) {
-        String message = event.logMessage();
+        String message = event.logMessage(logManager.filter);
         if (event.level.value >= LogLevel.WARN.value)
             stderr.print(message);
         else

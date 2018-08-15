@@ -9,34 +9,30 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author neo
  */
 class PerformanceStatTest {
-    private PerformanceStat performanceStat;
+    private PerformanceStat stat;
 
     @BeforeEach
     void createPerformanceStat() {
-        performanceStat = new PerformanceStat();
+        stat = new PerformanceStat();
     }
 
     @Test
-    void increaseReadEntries() {
-        performanceStat.increaseReadEntries(null);
-        assertThat(performanceStat.readEntries).isNull();
+    void track() {
+        stat.track(100, null, null);
+        assertThat(stat.count).isEqualTo(1);
+        assertThat(stat.readEntries).isNull();
+        assertThat(stat.writeEntries).isNull();
 
-        performanceStat.increaseReadEntries(1);
-        assertThat(performanceStat.readEntries).isEqualTo(1);
+        stat.track(100, 1, 0);
+        assertThat(stat.count).isEqualTo(2);
+        assertThat(stat.elapsedTime).isEqualTo(200);
+        assertThat(stat.readEntries).isEqualTo(1);
+        assertThat(stat.writeEntries).isEqualTo(0);
 
-        performanceStat.increaseReadEntries(2);
-        assertThat(performanceStat.readEntries).isEqualTo(3);
-    }
-
-    @Test
-    void increaseWriteEntries() {
-        performanceStat.increaseWriteEntries(null);
-        assertThat(performanceStat.writeEntries).isNull();
-
-        performanceStat.increaseWriteEntries(1);
-        assertThat(performanceStat.writeEntries).isEqualTo(1);
-
-        performanceStat.increaseWriteEntries(2);
-        assertThat(performanceStat.writeEntries).isEqualTo(3);
+        stat.track(100, 1, 2);
+        assertThat(stat.count).isEqualTo(3);
+        assertThat(stat.elapsedTime).isEqualTo(300);
+        assertThat(stat.readEntries).isEqualTo(2);
+        assertThat(stat.writeEntries).isEqualTo(2);
     }
 }

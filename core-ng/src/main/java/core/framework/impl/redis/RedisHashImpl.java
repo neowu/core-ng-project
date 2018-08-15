@@ -33,7 +33,7 @@ public final class RedisHashImpl implements RedisHash {
 
     @Override
     public String get(String key, String field) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -53,7 +53,7 @@ public final class RedisHashImpl implements RedisHash {
 
     @Override
     public Map<String, String> getAll(String key) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         int returnedFields = 0;
         try {

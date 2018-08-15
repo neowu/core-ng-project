@@ -32,9 +32,8 @@ public final class ActionLog {
     final Map<String, Double> stats;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
-    private final LogFilter filter;
     private final long startCPUTime;
-    private final long startElapsed;
+    private final long startTime;
     public boolean trace;  // whether flush trace log for all subsequent actions
     public String action = "unassigned";
     String refId;
@@ -44,12 +43,11 @@ public final class ActionLog {
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
-    public ActionLog(String message, LogFilter filter) {
-        startElapsed = System.nanoTime();
+    public ActionLog(String message) {
+        startTime = System.nanoTime();
         startCPUTime = THREAD.getCurrentThreadCpuTime();
         date = Instant.now();
 
-        this.filter = filter;
         events = new LinkedList<>();
         context = Maps.newLinkedHashMap();
         stats = Maps.newLinkedHashMap();
@@ -68,14 +66,14 @@ public final class ActionLog {
     }
 
     public long elapsedTime() {
-        return System.nanoTime() - startElapsed;
+        return System.nanoTime() - startTime;
     }
 
-    void process(LogEvent event) {
+    void process(LogEvent event, LogFilter filter) {
         if (event.level.value > result.value) {
             result = event.level;
             errorCode = event.errorCode(); // only update error type/message if level raised, so error type will be first WARN or first ERROR
-            errorMessage = errorMessage(event);
+            errorMessage = errorMessage(event, filter);
         }
         if (events.size() < MAX_TRACE_HOLD_SIZE || event.level.value >= WARN.value) {  // after reach max holding lines, only add warning/error events
             add(event);
@@ -90,11 +88,11 @@ public final class ActionLog {
     }
 
     private LogEvent event(String message, Object... argument) {
-        return new LogEvent(LOGGER, null, DEBUG, message, argument, null, filter);
+        return new LogEvent(LOGGER, null, DEBUG, message, argument, null);
     }
 
-    private String errorMessage(LogEvent event) {
-        String message = event.message();
+    private String errorMessage(LogEvent event, LogFilter filter) {
+        String message = event.message(filter);
         if (message != null && message.length() > MAX_ERROR_MESSAGE_LENGTH)
             return message.substring(0, MAX_ERROR_MESSAGE_LENGTH);    // limit error message length in action log
         return message;
@@ -138,10 +136,7 @@ public final class ActionLog {
 
     public void track(String action, long elapsedTime, Integer readEntries, Integer writeEntries) {
         PerformanceStat stat = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
-        stat.count++;
-        stat.totalElapsed += elapsedTime;
-        stat.increaseReadEntries(readEntries);
-        stat.increaseWriteEntries(writeEntries);
+        stat.track(elapsedTime, readEntries, writeEntries);
         // not to add event to keep trace log concise
     }
 

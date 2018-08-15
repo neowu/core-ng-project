@@ -80,7 +80,7 @@ public final class RedisImpl implements Redis {
     }
 
     public byte[] getBytes(String key) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -100,7 +100,7 @@ public final class RedisImpl implements Redis {
 
     @Override
     public void set(String key, String value) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -124,7 +124,7 @@ public final class RedisImpl implements Redis {
     }
 
     public void set(String key, byte[] value, Duration expiration) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -149,7 +149,7 @@ public final class RedisImpl implements Redis {
 
     @Override
     public boolean setIfAbsent(String key, String value, Duration expiration) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -318,7 +318,7 @@ public final class RedisImpl implements Redis {
 
     @Override
     public void forEach(String pattern, Consumer<String> consumer) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = pool.borrowItem();
         int count = 0;
         try {

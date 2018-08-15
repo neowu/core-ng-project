@@ -1,5 +1,7 @@
 package core.framework.impl.log;
 
+import core.framework.impl.log.filter.LogFilter;
+
 import java.io.PrintStream;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -13,18 +15,18 @@ public final class ConsoleAppender {
     private final PrintStream stdout = System.out;
     private final PrintStream stderr = System.err;
 
-    void write(ActionLog log) {
+    void write(ActionLog log, LogFilter filter) {
         String message = message(log);
         stdout.println(message);
 
-        writeTrace(log);
+        writeTrace(log, filter);
     }
 
-    private void writeTrace(ActionLog log) {
+    private void writeTrace(ActionLog log, LogFilter filter) {
         if (!log.flushTraceLog()) return;
 
         for (LogEvent event : log.events) {
-            String message = event.logMessage();
+            String message = event.logMessage(filter);
             stderr.print(message);
         }
     }
@@ -57,7 +59,7 @@ public final class ConsoleAppender {
             builder.append(LOG_SPLITTER).append(key).append("Count=").append(tracking.count);
             if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("ReadEntries=").append(tracking.readEntries);
             if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("WriteEntries=").append(tracking.writeEntries);
-            builder.append(LOG_SPLITTER).append(key).append("ElapsedTime=").append(tracking.totalElapsed);
+            builder.append(LOG_SPLITTER).append(key).append("ElapsedTime=").append(tracking.elapsedTime);
         }
 
         return builder.toString();

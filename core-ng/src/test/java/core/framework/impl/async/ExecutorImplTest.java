@@ -34,13 +34,13 @@ class ExecutorImplTest {
 
     @Test
     void submit() {
-        ActionLog parentActionLog = new ActionLog(null, null);
+        ActionLog parentActionLog = new ActionLog(null);
         parentActionLog.action("parentAction");
         parentActionLog.refId("refId");
         parentActionLog.trace = true;
         when(logManager.currentActionLog()).thenReturn(parentActionLog);
 
-        ActionLog taskActionLog = new ActionLog(null, null);
+        ActionLog taskActionLog = new ActionLog(null);
         when(logManager.begin(anyString())).thenReturn(taskActionLog);
 
         executor.submit("action", () -> true);

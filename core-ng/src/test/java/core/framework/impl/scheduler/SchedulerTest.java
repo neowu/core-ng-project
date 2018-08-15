@@ -97,7 +97,7 @@ class SchedulerTest {
         ArgumentCaptor<Callable<?>> task = ArgumentCaptor.forClass(Callable.class);
         verify(jobExecutor).submit(task.capture());
 
-        ActionLog actionLog = new ActionLog(null, null);
+        ActionLog actionLog = new ActionLog(null);
         when(logManager.begin(anyString())).thenReturn(actionLog);
 
         task.getValue().call();

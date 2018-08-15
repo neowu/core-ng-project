@@ -31,7 +31,7 @@ public final class RedisListImpl implements RedisList {
 
     @Override
     public String pop(String key) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -51,7 +51,7 @@ public final class RedisListImpl implements RedisList {
 
     @Override
     public long push(String key, String... values) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -71,7 +71,7 @@ public final class RedisListImpl implements RedisList {
 
     @Override
     public List<String> range(String key, int start, int end) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         int returnedItems = 0;
         try {

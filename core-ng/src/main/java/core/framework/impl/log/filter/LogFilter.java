@@ -20,7 +20,10 @@ public class LogFilter {
             return message;    // log message can be null, e.g. message of NPE
         }
 
-        Object[] filteredArguments = Arrays.stream(arguments).map(this::filterParam).toArray();
+        Object[] filteredArguments = new Object[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            filteredArguments[i] = filterParam(arguments[i]);
+        }
         return Strings.format(message, filteredArguments);
     }
 

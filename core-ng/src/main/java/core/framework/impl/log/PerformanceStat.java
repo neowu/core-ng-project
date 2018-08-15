@@ -4,22 +4,21 @@ package core.framework.impl.log;
  * @author neo
  */
 final class PerformanceStat {
-    long totalElapsed;
     int count;
+    long elapsedTime;
     Integer readEntries;
     Integer writeEntries;
 
-    public void increaseReadEntries(Integer entries) {
-        if (entries != null) {
-            if (readEntries == null) readEntries = entries;
-            else readEntries += entries;
+    void track(long elapsedTime, Integer readEntries, Integer writeEntries) {
+        count++;
+        this.elapsedTime += elapsedTime;
+        if (readEntries != null) {
+            if (this.readEntries == null) this.readEntries = readEntries;
+            else this.readEntries += readEntries;
         }
-    }
-
-    public void increaseWriteEntries(Integer entries) {
-        if (entries != null) {
-            if (writeEntries == null) writeEntries = entries;
-            else writeEntries += entries;
+        if (writeEntries != null) {
+            if (this.writeEntries == null) this.writeEntries = writeEntries;
+            else this.writeEntries += writeEntries;
         }
     }
 }

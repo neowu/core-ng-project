@@ -2,6 +2,7 @@ package core.framework.impl.log;
 
 import core.framework.impl.json.JSONWriter;
 import core.framework.impl.kafka.ProducerMetrics;
+import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.impl.log.message.LogTopics;
 import core.framework.impl.log.message.PerformanceStatMessage;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -100,8 +102,8 @@ public final class KafkaAppender {
         producer.close(timeoutInMs <= 0 ? 1000 : timeoutInMs, TimeUnit.MILLISECONDS);
     }
 
-    void forward(ActionLog log) {
-        ActionLogMessage message = new ActionLogMessage();
+    void forward(ActionLog log, LogFilter filter) {
+        var message = new ActionLogMessage();
         message.app = appName;
         message.serverIP = Network.localHostAddress();
         message.id = log.id;
@@ -115,20 +117,21 @@ public final class KafkaAppender {
         message.errorMessage = log.errorMessage;
         message.context = log.context;
         message.stats = log.stats;
-        Map<String, PerformanceStatMessage> performanceStats = Maps.newLinkedHashMap();
-        log.performanceStats.forEach((key, stat) -> {
-            PerformanceStatMessage statMessage = new PerformanceStatMessage();
+        Map<String, PerformanceStatMessage> performanceStats = new LinkedHashMap<>(log.performanceStats.size());
+        for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
+            PerformanceStat stat = entry.getValue();
+            var statMessage = new PerformanceStatMessage();
             statMessage.count = stat.count;
-            statMessage.totalElapsed = stat.totalElapsed;
+            statMessage.totalElapsed = stat.elapsedTime;
             statMessage.readEntries = stat.readEntries;
             statMessage.writeEntries = stat.writeEntries;
-            performanceStats.put(key, statMessage);
-        });
+            performanceStats.put(entry.getKey(), statMessage);
+        }
         message.performanceStats = performanceStats;
         if (log.flushTraceLog()) {
-            StringBuilder builder = new StringBuilder(log.events.size() << 8);  // length * 256 as rough initial capacity
+            var builder = new StringBuilder(log.events.size() << 8);  // length * 256 as rough initial capacity
             for (LogEvent event : log.events) {
-                String traceMessage = event.logMessage();
+                String traceMessage = event.logMessage(filter);
                 if (builder.length() + traceMessage.length() >= MAX_TRACE_LENGTH) {
                     builder.append(traceMessage, 0, MAX_TRACE_LENGTH - builder.length());
                     builder.append("...(truncated)");
@@ -142,7 +145,7 @@ public final class KafkaAppender {
     }
 
     public void forward(Map<String, Double> stats) {
-        StatMessage message = new StatMessage();
+        var message = new StatMessage();
         message.id = UUID.randomUUID().toString();
         message.date = Instant.now();
         message.app = appName;
