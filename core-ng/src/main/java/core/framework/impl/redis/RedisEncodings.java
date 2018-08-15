@@ -39,26 +39,19 @@ class RedisEncodings {
         return bytes(text);
     }
 
-    static byte[][] encode(String... values) {
+    static byte[][] encode(String key, String... values) {
+        if (values.length == 0) throw new RedisException("values must not be empty");
         int length = values.length;
-        byte[][] result = new byte[length][];
-        for (int i = 0; i < length; i++) {
-            result[i] = encode(values[i]);
-        }
-        return result;
-    }
-
-    static byte[][] encode(String first, String... rest) {
-        int length = rest.length;
         byte[][] result = new byte[length + 1][];
-        result[0] = encode(first);
+        result[0] = encode(key);
         for (int i = 0; i < length; i++) {
-            result[i + 1] = encode(rest[i]);
+            result[i + 1] = encode(values[i]);
         }
         return result;
     }
 
     static byte[][] encode(Map<String, String> values) {
+        if (values.isEmpty()) throw new RedisException("values must not be empty");
         byte[][] result = new byte[values.size() * 2][];
         int index = 0;
         for (Map.Entry<String, String> entry : values.entrySet()) {
@@ -68,11 +61,12 @@ class RedisEncodings {
         return result;
     }
 
-    static byte[][] encode(String first, Map<String, String> rest) {
-        byte[][] result = new byte[rest.size() * 2 + 1][];
-        result[0] = encode(first);
+    static byte[][] encode(String key, Map<String, String> values) {
+        if (values.isEmpty()) throw new RedisException("values must not be empty");
+        byte[][] result = new byte[values.size() * 2 + 1][];
+        result[0] = encode(key);
         int index = 1;
-        for (Map.Entry<String, String> entry : rest.entrySet()) {
+        for (Map.Entry<String, String> entry : values.entrySet()) {
             result[index++] = encode(entry.getKey());
             result[index++] = encode(entry.getValue());
         }
