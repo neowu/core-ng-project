@@ -9,13 +9,14 @@ import java.util.Map;
 /**
  * @author neo
  */
-public final class ConsoleAppender {
+public final class ConsoleAppender implements Appender {
     private static final String LOG_SPLITTER = " | ";
 
     private final PrintStream stdout = System.out;
     private final PrintStream stderr = System.err;
 
-    void write(ActionLog log, LogFilter filter) {
+    @Override
+    public void append(ActionLog log, LogFilter filter) {
         String message = message(log);
         stdout.println(message);
 

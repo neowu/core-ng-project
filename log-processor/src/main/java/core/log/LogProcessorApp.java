@@ -1,17 +1,21 @@
 package core.log;
 
-import core.framework.impl.log.stat.Stat;
+import core.framework.impl.log.message.ActionLogMessage;
+import core.framework.impl.log.message.LogTopics;
+import core.framework.impl.log.message.StatMessage;
 import core.framework.module.App;
+import core.framework.module.SystemModule;
 import core.framework.search.module.SearchConfig;
 import core.log.domain.ActionDocument;
 import core.log.domain.StatDocument;
 import core.log.domain.TraceDocument;
 import core.log.job.CleanupOldIndexJob;
 import core.log.job.CollectStatJob;
+import core.log.kafka.ActionLogMessageHandler;
+import core.log.kafka.StatMessageHandler;
 import core.log.service.ActionService;
+import core.log.service.ElasticSearchAppender;
 import core.log.service.IndexService;
-import core.log.service.KafkaConsumerFactory;
-import core.log.service.MessageProcessor;
 import core.log.service.StatService;
 
 import java.time.Duration;
@@ -23,7 +27,7 @@ import java.time.LocalTime;
 public class LogProcessorApp extends App {
     @Override
     protected void initialize() {
-        loadProperties("sys.properties");
+        load(new SystemModule("sys.properties"));
 
         SearchConfig search = config(SearchConfig.class);
         search.host(requiredProperty("sys.elasticsearch.host"));
@@ -31,20 +35,20 @@ public class LogProcessorApp extends App {
         search.type(TraceDocument.class);
         search.type(StatDocument.class);
 
-        bind(IndexService.class);
+        IndexService indexService = bind(IndexService.class);
         bind(ActionService.class);
         bind(StatService.class);
 
-        Stat stat = bind(new Stat());
+        context.logManager.appender = bind(ElasticSearchAppender.class);
+        onStartup(indexService::createIndexTemplatesUntilSuccess);
 
-        bind(KafkaConsumerFactory.class, new KafkaConsumerFactory(requiredProperty("sys.kafka.uri")));
-        MessageProcessor processor = bind(MessageProcessor.class);
-        processor.initialize();
-        stat.metrics.add(processor.metrics);
-        onStartup(processor::start);
-        onShutdown(processor::shutdown);
+        kafka().poolSize(2);
+        kafka().minPoll(1024 * 1024, Duration.ofMillis(500));  // try to get at least 1M message
+        kafka().maxPoll(2000, 3 * 1024 * 1024);  // get 3M message at max
+        kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
+        kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));
 
         schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
-        schedule().fixedRate("collect-stat-job", bind(CollectStatJob.class), Duration.ofSeconds(10));
+        schedule().fixedRate("collect-stat-job", bind(new CollectStatJob(context.stat)), Duration.ofSeconds(10));
     }
 }

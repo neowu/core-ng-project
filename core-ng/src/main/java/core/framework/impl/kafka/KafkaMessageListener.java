@@ -61,11 +61,10 @@ public class KafkaMessageListener {
 
     public void start() {
         listenerThreads = new KafkaMessageListenerThread[poolSize];
-        String group = logManager.appName;
         for (int i = 0; i < poolSize; i++) {
             StopWatch watch = new StopWatch();
             String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
-            Consumer<String, byte[]> consumer = consumer(group, topics);
+            Consumer<String, byte[]> consumer = consumer(topics);
             KafkaMessageListenerThread thread = new KafkaMessageListenerThread(name, consumer, this);
             thread.start();
             listenerThreads[i] = thread;
@@ -97,11 +96,11 @@ public class KafkaMessageListener {
         logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri, topics, name);
     }
 
-    private Consumer<String, byte[]> consumer(String group, Set<String> topics) {
+    private Consumer<String, byte[]> consumer(Set<String> topics) {
         if (uri == null) throw new Error("uri must not be null");
         Map<String, Object> config = Maps.newHashMap();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, group);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, logManager.appName);
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());

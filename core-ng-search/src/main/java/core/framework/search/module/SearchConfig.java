@@ -7,6 +7,7 @@ import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.log.ESLoggerContextFactory;
+import core.framework.util.Exceptions;
 import core.framework.util.Types;
 
 import java.time.Duration;
@@ -18,6 +19,7 @@ public class SearchConfig extends Config {
     ElasticSearchImpl search;
     private ModuleContext context;
     private String host;
+    private boolean typeAdded;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -29,6 +31,8 @@ public class SearchConfig extends Config {
     @Override
     protected void validate() {
         if (host == null) throw new Error("search host must be configured");
+        if (!typeAdded)
+            throw Exceptions.error("elasticsearch is configured but no type added, please remove unnecessary config");
     }
 
     ElasticSearchImpl createElasticSearch(ModuleContext context) {
@@ -63,5 +67,6 @@ public class SearchConfig extends Config {
     public <T> void type(Class<T> documentClass) {
         ElasticSearchType<T> searchType = search.type(documentClass);
         context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), null, searchType);
+        typeAdded = true;
     }
 }

@@ -31,7 +31,7 @@ public final class SystemModule extends Module {
     private final Set<String> allowedKeys = Set.of(SYS_JDBC_URL, SYS_JDBC_USER, SYS_JDBC_PASSWORD,
             SYS_LOG_APPENDER, SYS_HTTP_ALLOW_CIDR, SYS_HTTP_PORT, SYS_HTTPS_PORT,
             SYS_SECURITY_CSP, SYS_PUBLISH_API_ALLOW_CIDR, SYS_CDN_HOST, SYS_SESSION_HOST,
-            SYS_CACHE_HOST, SYS_REDIS_HOST, SYS_KAFKA_URI);
+            SYS_CACHE_HOST, SYS_REDIS_HOST, SYS_KAFKA_URI, "sys.elasticsearch.host", "sys.mongo.uri"); // allow elasticsearch and mongo as optional modules
     private final String propertyFileClasspath;
 
     public SystemModule(String propertyFileClasspath) {

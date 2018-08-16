@@ -15,8 +15,7 @@ public class LogManager {
     public final LogFilter filter = new LogFilter();
     private final ThreadLocal<ActionLog> actionLog = new ThreadLocal<>();
     private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.INFO, LogLevel.DEBUG);
-    public ConsoleAppender consoleAppender;
-    public KafkaAppender kafkaAppender;
+    public Appender appender;
 
     public LogManager() {
         String appName = System.getProperty("core.appName");
@@ -38,8 +37,7 @@ public class LogManager {
         this.actionLog.remove();
         actionLog.end(message);
 
-        if (consoleAppender != null) consoleAppender.write(actionLog, filter);
-        if (kafkaAppender != null) kafkaAppender.forward(actionLog, filter);
+        if (appender != null) appender.append(actionLog, filter);
     }
 
     public void process(LogEvent event) {

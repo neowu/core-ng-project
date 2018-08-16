@@ -17,8 +17,12 @@ import java.util.UUID;
 public class CollectStatJob implements Job {
     @Inject
     StatService statService;
-    @Inject
-    Stat stat;
+
+    private final Stat stat;
+
+    public CollectStatJob(Stat stat) {
+        this.stat = stat;
+    }
 
     @Override
     public void execute() {
