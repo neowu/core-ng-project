@@ -3,7 +3,6 @@ package core.log.job;
 import core.framework.impl.log.message.StatMessage;
 import core.framework.impl.log.stat.Stat;
 import core.framework.inject.Inject;
-import core.framework.scheduler.Job;
 import core.framework.util.Network;
 import core.log.service.StatService;
 
@@ -14,18 +13,17 @@ import java.util.UUID;
 /**
  * @author neo
  */
-public class CollectStatJob implements Job {
+public class CollectStatTask implements Runnable {
+    private final Stat stat;
     @Inject
     StatService statService;
 
-    private final Stat stat;
-
-    public CollectStatJob(Stat stat) {
+    public CollectStatTask(Stat stat) {
         this.stat = stat;
     }
 
     @Override
-    public void execute() {
+    public void run() {
         StatMessage message = message();
         statService.index(message);
     }

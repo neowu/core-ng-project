@@ -11,13 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @author neo
  */
-class CollectStatJobTest extends IntegrationTest {
+class CollectStatTaskTest extends IntegrationTest {
     @Inject
-    CollectStatJob job;
+    CollectStatTask task;
 
     @Test
     void message() {
-        StatMessage message = job.message();
+        StatMessage message = task.message();
 
         assertEquals("log-processor", message.app);
         assertNotNull(message.stats.get("sys_load_avg"));

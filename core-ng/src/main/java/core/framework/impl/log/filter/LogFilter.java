@@ -40,27 +40,27 @@ public class LogFilter {
         return truncate(value, MAX_PARAM_SIZE);
     }
 
-    private String filterArrayParam(Object argument) {
-        if (argument instanceof Object[]) {
-            return Arrays.toString((Object[]) argument);
-        } else if (argument instanceof int[]) {
-            return Arrays.toString((int[]) argument);
-        } else if (argument instanceof long[]) {
-            return Arrays.toString((long[]) argument);
-        } else if (argument instanceof char[]) {
-            return Arrays.toString((char[]) argument);
-        } else if (argument instanceof double[]) {
-            return Arrays.toString((double[]) argument);
-        } else if (argument instanceof byte[]) {
-            return Arrays.toString((byte[]) argument);
-        } else if (argument instanceof boolean[]) {
-            return Arrays.toString((boolean[]) argument);
-        } else if (argument instanceof short[]) {
-            return Arrays.toString((short[]) argument);
-        } else if (argument instanceof float[]) {
-            return Arrays.toString((float[]) argument);
+    private String filterArrayParam(Object param) {
+        if (param instanceof Object[]) {
+            return Arrays.toString((Object[]) param);
+        } else if (param instanceof int[]) {
+            return Arrays.toString((int[]) param);
+        } else if (param instanceof long[]) {
+            return Arrays.toString((long[]) param);
+        } else if (param instanceof char[]) {
+            return Arrays.toString((char[]) param);
+        } else if (param instanceof double[]) {
+            return Arrays.toString((double[]) param);
+        } else if (param instanceof byte[]) {
+            return Arrays.toString((byte[]) param);
+        } else if (param instanceof boolean[]) {
+            return Arrays.toString((boolean[]) param);
+        } else if (param instanceof short[]) {
+            return Arrays.toString((short[]) param);
+        } else if (param instanceof float[]) {
+            return Arrays.toString((float[]) param);
         }
-        throw Exceptions.error("unknown array type, argumentClass={}", argument.getClass().getCanonicalName());
+        throw Exceptions.error("unknown array type, paramClass={}", param.getClass().getCanonicalName());
     }
 
     String truncate(String value, int maxSize) {

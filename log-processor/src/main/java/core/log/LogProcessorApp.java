@@ -10,7 +10,7 @@ import core.log.domain.ActionDocument;
 import core.log.domain.StatDocument;
 import core.log.domain.TraceDocument;
 import core.log.job.CleanupOldIndexJob;
-import core.log.job.CollectStatJob;
+import core.log.job.CollectStatTask;
 import core.log.kafka.ActionLogMessageHandler;
 import core.log.kafka.StatMessageHandler;
 import core.log.service.ActionService;
@@ -48,7 +48,8 @@ public class LogProcessorApp extends App {
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));
 
+        context.backgroundTask().scheduleWithFixedDelay(bind(new CollectStatTask(context.stat)), Duration.ofSeconds(10));
+
         schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
-        schedule().fixedRate("collect-stat-job", bind(new CollectStatJob(context.stat)), Duration.ofSeconds(10));
     }
 }
