@@ -17,18 +17,12 @@ public final class ConsoleAppender implements Appender {
 
     @Override
     public void append(ActionLog log, LogFilter filter) {
-        String message = message(log);
-        stdout.println(message);
+        stdout.println(message(log));
 
-        writeTrace(log, filter);
-    }
-
-    private void writeTrace(ActionLog log, LogFilter filter) {
-        if (!log.flushTraceLog()) return;
-
-        for (LogEvent event : log.events) {
-            String message = event.logMessage(filter);
-            stderr.print(message);
+        if (log.flushTraceLog()) {
+            for (LogEvent event : log.events) {
+                stderr.print(event.logMessage(filter));
+            }
         }
     }
 
