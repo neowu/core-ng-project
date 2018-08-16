@@ -6,7 +6,6 @@ import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
-import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -17,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,14 +26,13 @@ import java.util.Set;
  */
 public class KafkaMessageListener {
     public final ConsumerMetrics consumerMetrics;
-    final Map<String, MessageHandlerHolder<?>> handlerHolders = Maps.newHashMap();
-    final Map<String, BulkMessageHandlerHolder<?>> bulkHandlerHolders = Maps.newHashMap();
+    final Map<String, MessageProcess<?>> processes = new HashMap<>();
     final LogManager logManager;
 
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListener.class);
     private final String uri;
     private final String name;
-    private final Set<String> topics = Sets.newHashSet();
+    private final Set<String> topics = new HashSet<>();
 
     public int poolSize = Runtime.getRuntime().availableProcessors() * 4;
     public Duration maxProcessTime = Duration.ofMinutes(30);
@@ -55,17 +55,16 @@ public class KafkaMessageListener {
         topics.add(topic);
         MessageValidator<T> validator = new MessageValidator<>(messageClass);
         JSONReader<T> reader = JSONReader.of(messageClass);
-        if (handler != null) handlerHolders.put(topic, new MessageHandlerHolder<>(handler, reader, validator));
-        if (bulkHandler != null) bulkHandlerHolders.put(topic, new BulkMessageHandlerHolder<>(bulkHandler, reader, validator));
+        processes.put(topic, new MessageProcess<>(handler, bulkHandler, reader, validator));
     }
 
     public void start() {
         listenerThreads = new KafkaMessageListenerThread[poolSize];
         for (int i = 0; i < poolSize; i++) {
-            StopWatch watch = new StopWatch();
+            var watch = new StopWatch();
             String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
             Consumer<String, byte[]> consumer = consumer(topics);
-            KafkaMessageListenerThread thread = new KafkaMessageListenerThread(name, consumer, this);
+            var thread = new KafkaMessageListenerThread(name, consumer, this);
             thread.start();
             listenerThreads[i] = thread;
             logger.info("create kafka listener thread, name={}, topics={}, elapsedTime={}", name, topics, watch.elapsedTime());
@@ -115,27 +114,4 @@ public class KafkaMessageListener {
         return consumer;
     }
 
-    static class BulkMessageHandlerHolder<T> {
-        final BulkMessageHandler<T> handler;
-        final MessageValidator<T> validator;
-        final JSONReader<T> reader;
-
-        BulkMessageHandlerHolder(BulkMessageHandler<T> handler, JSONReader<T> reader, MessageValidator<T> validator) {
-            this.handler = handler;
-            this.validator = validator;
-            this.reader = reader;
-        }
-    }
-
-    static class MessageHandlerHolder<T> {
-        final MessageHandler<T> handler;
-        final MessageValidator<T> validator;
-        final JSONReader<T> reader;
-
-        MessageHandlerHolder(MessageHandler<T> handler, JSONReader<T> reader, MessageValidator<T> validator) {
-            this.handler = handler;
-            this.validator = validator;
-            this.reader = reader;
-        }
-    }
 }

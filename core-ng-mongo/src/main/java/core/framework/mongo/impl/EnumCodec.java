@@ -3,6 +3,7 @@ package core.framework.mongo.impl;
 import core.framework.impl.reflect.Enums;
 import core.framework.mongo.MongoEnumValue;
 import core.framework.util.Exceptions;
+import core.framework.util.Maps;
 import org.bson.BsonReader;
 import org.bson.BsonType;
 import org.bson.BsonWriter;
@@ -13,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +30,7 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
         T[] constants = enumClass.getEnumConstants();
         this.enumClass = enumClass;
         encodingMappings = new EnumMap<>(enumClass);
-        decodingMappings = new HashMap<>(constants.length);
+        decodingMappings = Maps.newHashMapWithExpectedSize(constants.length);
         for (T constant : constants) {
             String value = Enums.constantAnnotation(constant, MongoEnumValue.class).value();
             encodingMappings.put(constant, value);

@@ -1,10 +1,9 @@
-package core.log.job;
+package core.log.service;
 
 import core.framework.impl.log.message.StatMessage;
 import core.framework.impl.log.stat.Stat;
 import core.framework.inject.Inject;
 import core.framework.util.Network;
-import core.log.service.StatService;
 
 import java.time.Instant;
 import java.util.Map;

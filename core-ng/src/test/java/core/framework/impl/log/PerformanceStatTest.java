@@ -25,13 +25,13 @@ class PerformanceStatTest {
 
         stat.track(100, 1, 0);
         assertThat(stat.count).isEqualTo(2);
-        assertThat(stat.elapsedTime).isEqualTo(200);
+        assertThat(stat.totalElapsed).isEqualTo(200);
         assertThat(stat.readEntries).isEqualTo(1);
         assertThat(stat.writeEntries).isEqualTo(0);
 
         stat.track(100, 1, 2);
         assertThat(stat.count).isEqualTo(3);
-        assertThat(stat.elapsedTime).isEqualTo(300);
+        assertThat(stat.totalElapsed).isEqualTo(300);
         assertThat(stat.readEntries).isEqualTo(2);
         assertThat(stat.writeEntries).isEqualTo(2);
     }

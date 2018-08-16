@@ -1,4 +1,4 @@
-package core.log.job;
+package core.log.service;
 
 import core.framework.impl.log.message.StatMessage;
 import core.framework.inject.Inject;

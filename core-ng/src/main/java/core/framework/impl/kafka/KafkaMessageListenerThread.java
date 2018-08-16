@@ -7,7 +7,6 @@ import core.framework.kafka.Message;
 import core.framework.log.Markers;
 import core.framework.util.Charsets;
 import core.framework.util.Maps;
-import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -20,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +33,7 @@ class KafkaMessageListenerThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(KafkaMessageListenerThread.class);
     private final Consumer<String, byte[]> consumer;
     private final LogManager logManager;
-    private final Map<String, KafkaMessageListener.MessageHandlerHolder<?>> handlerHolders;
-    private final Map<String, KafkaMessageListener.BulkMessageHandlerHolder<?>> bulkHandlerHolders;
+    private final Map<String, MessageProcess<?>> processes;
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
     private final AtomicBoolean processing = new AtomicBoolean(false);
     private final double batchLongProcessThresholdInNano;
@@ -43,8 +42,7 @@ class KafkaMessageListenerThread extends Thread {
     KafkaMessageListenerThread(String name, Consumer<String, byte[]> consumer, KafkaMessageListener listener) {
         super(name);
         this.consumer = consumer;
-        handlerHolders = listener.handlerHolders;
-        bulkHandlerHolders = listener.bulkHandlerHolders;
+        processes = listener.processes;
         logManager = listener.logManager;
         batchLongProcessThresholdInNano = listener.maxProcessTime.toNanos() * 0.7; // 70% time of max
     }
@@ -111,14 +109,11 @@ class KafkaMessageListenerThread extends Thread {
             for (Map.Entry<String, List<ConsumerRecord<String, byte[]>>> entry : messages.entrySet()) {
                 String topic = entry.getKey();
                 List<ConsumerRecord<String, byte[]>> records = entry.getValue();
-                KafkaMessageListener.BulkMessageHandlerHolder<?> bulkHandler = bulkHandlerHolders.get(topic);
-                if (bulkHandler != null) {
-                    handle(topic, bulkHandler, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
+                MessageProcess<?> process = processes.get(topic);
+                if (process.bulkHandler != null) {
+                    handleBulk(topic, process, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
                 } else {
-                    KafkaMessageListener.MessageHandlerHolder<?> handler = handlerHolders.get(topic);
-                    if (handler != null) {
-                        handle(topic, handler, records, longProcessThreshold(batchLongProcessThresholdInNano, 1, count));
-                    }
+                    handle(topic, process, records, longProcessThreshold(batchLongProcessThresholdInNano, 1, count));
                 }
             }
         } finally {
@@ -127,17 +122,17 @@ class KafkaMessageListenerThread extends Thread {
         }
     }
 
-    private <T> void handle(String topic, KafkaMessageListener.MessageHandlerHolder<T> holder, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
+    private <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
         for (ConsumerRecord<String, byte[]> record : records) {
             ActionLog actionLog = logManager.begin("=== message handling begin ===");
             try {
                 actionLog.action("topic:" + topic);
                 actionLog.context("topic", topic);
-                actionLog.context("handler", holder.handler.getClass().getCanonicalName());
+                actionLog.context("handler", process.handler.getClass().getCanonicalName());
                 actionLog.context("key", record.key());
                 logger.debug("message={}", new BytesParam(record.value()));
 
-                T message = holder.reader.fromJSON(record.value());
+                T message = process.reader.fromJSON(record.value());
 
                 Headers headers = record.headers();
                 actionLog.refId(header(headers, KafkaHeaders.HEADER_REF_ID));
@@ -149,35 +144,33 @@ class KafkaMessageListenerThread extends Thread {
                     actionLog.trace = true;
                 }
 
-                holder.validator.validate(message);
+                process.validator.validate(message);
 
-                holder.handler.handle(record.key(), message);
+                process.handler.handle(record.key(), message);
             } catch (Throwable e) {
                 logManager.logError(e);
             } finally {
                 long elapsedTime = actionLog.elapsedTime();
-                if (elapsedTime > longProcessThresholdInNano) {
-                    logger.warn(Markers.errorCode("LONG_PROCESS"), "took too long to process message, elapsedTime={}", elapsedTime);
-                }
+                checkSlowProcess(elapsedTime, longProcessThresholdInNano);
                 logManager.end("=== message handling end ===");
             }
         }
     }
 
-    private <T> void handle(String topic, KafkaMessageListener.BulkMessageHandlerHolder<T> holder, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
+    private <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
         ActionLog actionLog = logManager.begin("=== message handling begin ===");
         try {
             actionLog.action("topic:" + topic);
             actionLog.context("topic", topic);
-            actionLog.context("handler", holder.handler.getClass().getCanonicalName());
+            actionLog.context("handler", process.bulkHandler.getClass().getCanonicalName());
             actionLog.stat("messageCount", records.size());
-            Set<String> clients = Sets.newHashSet();
-            Set<String> clientIPs = Sets.newHashSet();
+            Set<String> clients = new HashSet<>();
+            Set<String> clientIPs = new HashSet<>();
 
             List<Message<T>> messages = new ArrayList<>(records.size());
             for (ConsumerRecord<String, byte[]> record : records) {
-                T message = holder.reader.fromJSON(record.value());
-                validate(holder.validator, message, record);
+                T message = process.reader.fromJSON(record.value());
+                validate(process.validator, message, record);
                 messages.add(new Message<>(record.key(), message));
                 Headers headers = record.headers();
                 if ("true".equals(header(headers, KafkaHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
@@ -189,14 +182,12 @@ class KafkaMessageListenerThread extends Thread {
             logger.debug("clients={}", clients);
             logger.debug("clientIPs={}", clientIPs);
 
-            holder.handler.handle(messages);
+            process.bulkHandler.handle(messages);
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
             long elapsedTime = actionLog.elapsedTime();
-            if (elapsedTime > longProcessThresholdInNano) {
-                logger.warn(Markers.errorCode("LONG_PROCESS"), "took too long to process message, elapsedTime={}", elapsedTime);
-            }
+            checkSlowProcess(elapsedTime, longProcessThresholdInNano);
             logManager.end("=== message handling end ===");
         }
     }
@@ -213,11 +204,16 @@ class KafkaMessageListenerThread extends Thread {
         } catch (Exception e) {
             Header[] recordHeaders = record.headers().toArray();
             Map<String, String> headers = Maps.newHashMapWithExpectedSize(recordHeaders.length);
-            for (Header recordHeader : recordHeaders) {
+            for (Header recordHeader : recordHeaders)
                 headers.put(recordHeader.key(), new String(recordHeader.value(), Charsets.UTF_8));
-            }
             logger.warn("failed to validate message, key={}, headers={}, message={}", record.key(), headers, new BytesParam(record.value()), e);
             throw e;
+        }
+    }
+
+    private void checkSlowProcess(long elapsedTime, double longProcessThreshold) {
+        if (elapsedTime > longProcessThreshold) {
+            logger.warn(Markers.errorCode("LONG_PROCESS"), "took too long to process message, elapsedTime={}", elapsedTime);
         }
     }
 

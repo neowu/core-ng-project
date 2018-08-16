@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -45,7 +44,7 @@ public final class HTTPClientImpl implements HTTPClient {
         System.setProperty("jdk.tls.allowUnsafeServerCertChange", "true");
 
         HTTPStatus[] values = HTTPStatus.values();
-        HTTP_STATUSES = new HashMap<>(values.length);
+        HTTP_STATUSES = Maps.newHashMapWithExpectedSize(values.length);
         for (HTTPStatus status : values) {
             HTTP_STATUSES.put(status.code, status);
         }

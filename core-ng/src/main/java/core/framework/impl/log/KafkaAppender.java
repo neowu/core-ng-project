@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author neo
  */
 public final class KafkaAppender implements Appender {
-    public final ProducerMetrics producerMetrics;
+    public final ProducerMetrics producerMetrics = new ProducerMetrics("log-forwarder");
     private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
     private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
     private final String appName;
@@ -55,8 +55,6 @@ public final class KafkaAppender implements Appender {
         config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
         config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");
         producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
-
-        producerMetrics = new ProducerMetrics("log-forwarder");
         producerMetrics.set(producer.metrics());
 
         logForwarderThread = new Thread(() -> {

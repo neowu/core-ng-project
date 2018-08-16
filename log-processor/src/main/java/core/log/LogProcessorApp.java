@@ -10,10 +10,10 @@ import core.log.domain.ActionDocument;
 import core.log.domain.StatDocument;
 import core.log.domain.TraceDocument;
 import core.log.job.CleanupOldIndexJob;
-import core.log.job.CollectStatTask;
 import core.log.kafka.ActionLogMessageHandler;
 import core.log.kafka.StatMessageHandler;
 import core.log.service.ActionService;
+import core.log.service.CollectStatTask;
 import core.log.service.ElasticSearchAppender;
 import core.log.service.IndexService;
 import core.log.service.StatService;
@@ -42,7 +42,7 @@ public class LogProcessorApp extends App {
         context.logManager.appender = bind(ElasticSearchAppender.class);
         onStartup(indexService::createIndexTemplatesUntilSuccess);
 
-        kafka().poolSize(2);
+        kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));  // try to get at least 1M message
         kafka().maxPoll(2000, 3 * 1024 * 1024);  // get 3M message at max
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));

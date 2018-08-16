@@ -5,13 +5,13 @@ package core.framework.impl.log;
  */
 final class PerformanceStat {
     int count;
-    long elapsedTime;
+    long totalElapsed;
     Integer readEntries;
     Integer writeEntries;
 
     void track(long elapsedTime, Integer readEntries, Integer writeEntries) {
         count++;
-        this.elapsedTime += elapsedTime;
+        this.totalElapsed += elapsedTime;
         if (readEntries != null) {
             if (this.readEntries == null) this.readEntries = readEntries;
             else this.readEntries += readEntries;

@@ -26,9 +26,17 @@ class ConsoleAppenderTest {
     void message() {
         var action = new ActionLog("begin");
         action.action("action");
+        action.refId("refId");
+        action.context("context", "value");
+        action.track("db", 100, 1, 0);
         action.end("end");
 
         String message = appender.message(action);
-        assertThat(message).contains("| OK |").contains("| action=action |");
+        assertThat(message)
+                .contains("| OK |")
+                .contains("| refId=refId |")
+                .contains("| action=action |")
+                .contains("| context=value |")
+                .contains("| dbCount=1 | dbReadEntries=1 | dbWriteEntries=0 | dbElapsedTime=100");
     }
 }

@@ -1,11 +1,12 @@
 package core.framework.impl.log;
 
 import core.framework.util.Exceptions;
-import core.framework.util.Maps;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ public final class ActionLog {
     private static final int MAX_ERROR_MESSAGE_LENGTH = 200;
     private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
     private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
+
     public final String id;
     final Instant date;
     final Map<String, String> context;
@@ -48,9 +50,9 @@ public final class ActionLog {
         date = Instant.now();
 
         events = new LinkedList<>();
-        context = Maps.newLinkedHashMap();
-        stats = Maps.newLinkedHashMap();
-        performanceStats = Maps.newHashMap();
+        context = new LinkedHashMap<>();
+        stats = new HashMap<>();
+        performanceStats = new HashMap<>();
         id = UUID.randomUUID().toString();
 
         add(event(message));
@@ -86,8 +88,8 @@ public final class ActionLog {
         }
     }
 
-    private LogEvent event(String message, Object... argument) {
-        return new LogEvent(LOGGER, null, DEBUG, message, argument, null);
+    private LogEvent event(String message, Object... arguments) {
+        return new LogEvent(LOGGER, null, DEBUG, message, arguments, null);
     }
 
     private String errorMessage(LogEvent event) {

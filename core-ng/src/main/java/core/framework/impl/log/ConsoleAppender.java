@@ -60,7 +60,7 @@ public final class ConsoleAppender implements Appender {
             builder.append(LOG_SPLITTER).append(key).append("Count=").append(tracking.count);
             if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("ReadEntries=").append(tracking.readEntries);
             if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("WriteEntries=").append(tracking.writeEntries);
-            builder.append(LOG_SPLITTER).append(key).append("ElapsedTime=").append(tracking.elapsedTime);
+            builder.append(LOG_SPLITTER).append(key).append("TotalElapsed=").append(tracking.totalElapsed);
         }
 
         return builder.toString();
