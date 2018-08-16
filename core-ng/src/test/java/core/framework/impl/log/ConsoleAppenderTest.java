@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
@@ -19,14 +18,13 @@ class ConsoleAppenderTest {
 
     @Test
     void filterLineSeparator() {
-        String message = "line1\nline2";
-        String filteredMessage = appender.filterLineSeparator(message);
-        assertEquals("line1 line2", filteredMessage);
+        assertThat(appender.filterLineSeparator("line1\nline2")).isEqualTo("line1 line2");
+        assertThat(appender.filterLineSeparator("line1\r\nline2")).isEqualTo("line1  line2");
     }
 
     @Test
     void message() {
-        ActionLog action = new ActionLog("begin");
+        var action = new ActionLog("begin");
         action.action("action");
         action.end("end");
 
