@@ -58,9 +58,9 @@ public final class ConsoleAppender implements Appender {
             String key = entry.getKey();
             PerformanceStat tracking = entry.getValue();
             builder.append(LOG_SPLITTER).append(key).append("Count=").append(tracking.count);
-            if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("ReadEntries=").append(tracking.readEntries);
-            if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("WriteEntries=").append(tracking.writeEntries);
-            builder.append(LOG_SPLITTER).append(key).append("TotalElapsed=").append(tracking.totalElapsed);
+            if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("Reads=").append(tracking.readEntries);
+            if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("Writes=").append(tracking.writeEntries);
+            builder.append(LOG_SPLITTER).append(key).append("Elapsed=").append(tracking.totalElapsed);
         }
 
         return builder.toString();

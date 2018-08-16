@@ -37,6 +37,6 @@ class ConsoleAppenderTest {
                 .contains("| refId=refId |")
                 .contains("| action=action |")
                 .contains("| context=value |")
-                .contains("| dbCount=1 | dbReadEntries=1 | dbWriteEntries=0 | dbElapsedTime=100");
+                .contains("| dbCount=1 | dbReads=1 | dbWrites=0 | dbElapsed=100");
     }
 }
