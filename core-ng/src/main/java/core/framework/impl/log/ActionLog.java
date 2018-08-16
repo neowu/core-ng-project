@@ -1,6 +1,5 @@
 package core.framework.impl.log;
 
-import core.framework.impl.log.filter.LogFilter;
 import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 
@@ -69,11 +68,11 @@ public final class ActionLog {
         return System.nanoTime() - startTime;
     }
 
-    void process(LogEvent event, LogFilter filter) {
+    void process(LogEvent event) {
         if (event.level.value > result.value) {
             result = event.level;
             errorCode = event.errorCode(); // only update error type/message if level raised, so error type will be first WARN or first ERROR
-            errorMessage = errorMessage(event, filter);
+            errorMessage = errorMessage(event);
         }
         if (events.size() < MAX_TRACE_HOLD_SIZE || event.level.value >= WARN.value) {  // after reach max holding lines, only add warning/error events
             add(event);
@@ -91,8 +90,8 @@ public final class ActionLog {
         return new LogEvent(LOGGER, null, DEBUG, message, argument, null);
     }
 
-    private String errorMessage(LogEvent event, LogFilter filter) {
-        String message = event.message(filter);
+    private String errorMessage(LogEvent event) {
+        String message = event.message();
         if (message != null && message.length() > MAX_ERROR_MESSAGE_LENGTH)
             return message.substring(0, MAX_ERROR_MESSAGE_LENGTH);    // limit error message length in action log
         return message;

@@ -3,6 +3,7 @@ package core.framework.impl.log;
 import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.marker.ErrorCodeMarker;
 import core.framework.util.Exceptions;
+import core.framework.util.Strings;
 import org.slf4j.Marker;
 
 import java.time.Instant;
@@ -46,15 +47,16 @@ final class LogEvent {
                    .append(logger)
                    .append(" - ");
             if (marker != null) builder.append('[').append(marker.getName()).append("] ");
-            builder.append(message(filter)).append(System.lineSeparator());
+            builder.append(filter.format(message, arguments)).append(System.lineSeparator());
             if (exception != null) builder.append(Exceptions.stackTrace(exception));
             logMessage = builder.toString();
         }
         return logMessage;
     }
 
-    String message(LogFilter filter) {
-        return filter.format(message, arguments);
+    String message() {  // only be called for error message, it assumes warn/error message won't contains sensitive data which should not be logged as warn/error in first place
+        if (arguments == null || arguments.length == 0) return message;
+        return Strings.format(message, arguments);
     }
 
     String errorCode() {

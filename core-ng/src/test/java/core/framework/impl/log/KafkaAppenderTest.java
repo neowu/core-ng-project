@@ -27,7 +27,7 @@ class KafkaAppenderTest {
     void forward() {
         var log = new ActionLog("begin");
         log.action("action");
-        log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null), filter);
+        log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
         log.track("db", 1000, 1, 2);
 
         kafkaAppender.forward(log, filter);

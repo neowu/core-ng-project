@@ -44,7 +44,7 @@ public class LogManager {
 
     public void process(LogEvent event) {
         ActionLog actionLog = currentActionLog();
-        if (actionLog != null) actionLog.process(event, filter);    // process is called by loggerImpl.log, begin() may not be called before
+        if (actionLog != null) actionLog.process(event);    // process is called by loggerImpl.log, begin() may not be called before
     }
 
     public ActionLog currentActionLog() {

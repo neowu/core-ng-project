@@ -36,11 +36,14 @@ class LogFilterTest {
                            .contains("int[]=[1, 2, 3],")
                            .contains("boolean[]=[true],")
                            .contains("char[]=[1, 2]");
+
+        assertThat(filter.format("message", (Object[]) null)).isEqualTo("message");
+        assertThat(filter.format("message")).isEqualTo("message");
     }
 
     @Test
     void truncate() {
-        String message = "1234567890";
+        var message = "1234567890";
         String value = filter.truncate(message, 5);
         assertThat(value).isEqualTo("12345...(truncated)");
     }

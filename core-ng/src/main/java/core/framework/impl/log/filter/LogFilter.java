@@ -11,15 +11,14 @@ import java.util.Set;
  * @author neo
  */
 public class LogFilter {
-    private static final int MAX_LONG_STRING_SIZE = 15000; // limit long param string to 15k
+    private static final int MAX_PARAM_SIZE = 15000; // limit long param string to 15k
 
     public final Set<String> maskedFields = Sets.newHashSet();
 
     public String format(String message, Object... arguments) {
-        if (arguments == null) {
+        if (arguments == null || arguments.length == 0) {
             return message;    // log message can be null, e.g. message of NPE
         }
-
         Object[] filteredArguments = new Object[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
             filteredArguments[i] = filterParam(arguments[i]);
@@ -38,7 +37,7 @@ public class LogFilter {
         } else {
             value = String.valueOf(argument);
         }
-        return truncate(value, MAX_LONG_STRING_SIZE);
+        return truncate(value, MAX_PARAM_SIZE);
     }
 
     private String filterArrayParam(Object argument) {
