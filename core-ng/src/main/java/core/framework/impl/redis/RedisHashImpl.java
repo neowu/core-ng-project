@@ -44,10 +44,10 @@ public final class RedisHashImpl implements RedisHash {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsed();
-            ActionLogContext.track("redis", elapsedTime, 1, 0);
-            logger.debug("hget, key={}, field={}, elapsed={}", key, field, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 1, 0);
+            logger.debug("hget, key={}, field={}, elapsed={}", key, field, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 
@@ -72,16 +72,16 @@ public final class RedisHashImpl implements RedisHash {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsed();
-            ActionLogContext.track("redis", elapsedTime, returnedFields, 0);
-            logger.debug("hgetAll, key={}, returnedFields={}, elapsed={}", key, returnedFields, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, returnedFields, 0);
+            logger.debug("hgetAll, key={}, returnedFields={}, elapsed={}", key, returnedFields, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public void set(String key, String field, String value) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -92,16 +92,16 @@ public final class RedisHashImpl implements RedisHash {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsed();
-            ActionLogContext.track("redis", elapsedTime, 0, 1);
-            logger.debug("hset, key={}, field={}, value={}, elapsed={}", key, field, value, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 0, 1);
+            logger.debug("hset, key={}, field={}, value={}, elapsed={}", key, field, value, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public void multiSet(String key, Map<String, String> values) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
@@ -112,30 +112,32 @@ public final class RedisHashImpl implements RedisHash {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsed();
+            long elapsed = watch.elapsed();
             int size = values.size();
-            ActionLogContext.track("redis", elapsedTime, 0, size);
-            logger.debug("hmset, key={}, values={}, size={}, elapsed={}", key, values, size, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            ActionLogContext.track("redis", elapsed, 0, size);
+            logger.debug("hmset, key={}, values={}, size={}, elapsed={}", key, values, size, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 
     @Override
-    public boolean del(String key, String... fields) {
-        StopWatch watch = new StopWatch();
+    public long del(String key, String... fields) {
+        var watch = new StopWatch();
+        long deletedFields = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.write(HDEL, encode(key, fields));
-            return connection.readLong() >= 1;
+            deletedFields = connection.readLong();
+            return deletedFields;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsedTime = watch.elapsed();
-            ActionLogContext.track("redis", elapsedTime, 0, fields.length);
-            logger.debug("hdel, key={}, fields={}, size={}, elapsed={}", key, fields, fields.length, elapsedTime);
+            ActionLogContext.track("redis", elapsedTime, 0, (int) deletedFields);
+            logger.debug("hdel, key={}, fields={}, size={}, deletedFields={}, elapsed={}", key, fields, fields.length, deletedFields, elapsedTime);
             redis.checkSlowOperation(elapsedTime);
         }
     }

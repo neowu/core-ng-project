@@ -9,9 +9,9 @@ final class PerformanceStat {
     Integer readEntries;
     Integer writeEntries;
 
-    void track(long elapsedTime, Integer readEntries, Integer writeEntries) {
+    void track(long elapsed, Integer readEntries, Integer writeEntries) {
         count++;
-        this.totalElapsed += elapsedTime;
+        this.totalElapsed += elapsed;
         if (readEntries != null) {
             if (this.readEntries == null) this.readEntries = readEntries;
             else this.readEntries += readEntries;

@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -54,9 +54,9 @@ class RedisHashOperationTest extends AbstractRedisOperationTest {
     @Test
     void del() {
         response(":1\r\n");
-        boolean deleted = redis.hash().del("key", "f1");
+        long deleted = redis.hash().del("key", "f1");
 
-        assertTrue(deleted);
+        assertThat(deleted).isEqualTo(1);
         assertRequestEquals("*3\r\n$4\r\nHDEL\r\n$3\r\nkey\r\n$2\r\nf1\r\n");
     }
 }

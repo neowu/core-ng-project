@@ -42,13 +42,14 @@ public final class MockRedisHash implements RedisHash {
     }
 
     @Override
-    public boolean del(String key, String... fields) {
-        var hashValue = store.putIfAbsent(key, new HashMap<>());
-        boolean deleted = false;
-        Map<String, String> map = hashValue.map();
+    public long del(String key, String... fields) {
+        MockRedisStore.Value value = store.get(key);
+        if (value == null) return 0;
+        long deleted = 0;
+        Map<String, String> map = value.map();
         for (String field : fields) {
             String previous = map.remove(field);
-            if (previous != null) deleted = true;
+            if (previous != null) deleted++;
         }
         return deleted;
     }

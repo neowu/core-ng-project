@@ -149,7 +149,7 @@ class KafkaMessageListenerThread extends Thread {
             } catch (Throwable e) {
                 logManager.logError(e);
             } finally {
-                long elapsed = actionLog.elapsedTime();
+                long elapsed = actionLog.elapsed();
                 checkSlowProcess(elapsed, longProcessThresholdInNano);
                 logManager.end("=== message handling end ===");
             }
@@ -188,7 +188,7 @@ class KafkaMessageListenerThread extends Thread {
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
-            long elapsed = actionLog.elapsedTime();
+            long elapsed = actionLog.elapsed();
             checkSlowProcess(elapsed, longProcessThresholdInNano);
             logManager.end("=== message handling end ===");
         }

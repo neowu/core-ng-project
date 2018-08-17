@@ -61,12 +61,12 @@ public final class ActionLog {
 
     void end(String message) {
         cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
-        elapsed = elapsedTime();
+        elapsed = elapsed();
         add(event("[context] elapsed={}", elapsed));
         add(event(message));
     }
 
-    public long elapsedTime() {
+    public long elapsed() {
         return System.nanoTime() - startTime;
     }
 
@@ -135,9 +135,9 @@ public final class ActionLog {
         add(event("[stat] {}={}", key, value));
     }
 
-    public void track(String action, long elapsedTime, Integer readEntries, Integer writeEntries) {
+    public void track(String action, long elapsed, Integer readEntries, Integer writeEntries) {
         PerformanceStat stat = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
-        stat.track(elapsedTime, readEntries, writeEntries);
+        stat.track(elapsed, readEntries, writeEntries);
         // not to add event to keep trace log concise
     }
 

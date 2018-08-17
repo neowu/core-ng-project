@@ -58,10 +58,10 @@ public final class RepositoryImpl<T> implements Repository<T> {
         try {
             return database.operation.insert(sql, params, insertQuery.generatedColumn);
         } finally {
-            long elapsedTime = watch.elapsed();
-            ActionLogContext.track("db", elapsedTime, 0, 1);
-            logger.debug("insert, sql={}, params={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("db", elapsed, 0, 1);
+            logger.debug("insert, sql={}, params={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 

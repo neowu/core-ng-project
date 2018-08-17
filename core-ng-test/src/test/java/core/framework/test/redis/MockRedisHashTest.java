@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 /**
  * @author neo
@@ -22,37 +22,31 @@ class MockRedisHashTest {
     @Test
     void set() {
         redis.hash().set("key4", "field1", "value1");
-        assertEquals("value1", redis.hash().get("key4", "field1"));
+        assertThat(redis.hash().get("key4", "field1")).isEqualTo("value1");
 
         redis.hash().set("key4", "field2", "value2");
-        assertEquals("value1", redis.hash().get("key4", "field1"));
-        assertEquals("value2", redis.hash().get("key4", "field2"));
+        assertThat(redis.hash().get("key4", "field1")).isEqualTo("value1");
+        assertThat(redis.hash().get("key4", "field2")).isEqualTo("value2");
     }
 
     @Test
     void multiSet() {
         redis.hash().multiSet("key5", Map.of("field1", "value1"));
         Map<String, String> hash = redis.hash().getAll("key5");
-        assertEquals(1, hash.size());
-        assertEquals("value1", hash.get("field1"));
+        assertThat(hash).containsExactly(entry("field1", "value1"));
 
         redis.hash().multiSet("key5", Map.of("field2", "value2"));
         hash = redis.hash().getAll("key5");
-        assertEquals(2, hash.size());
-        assertEquals("value1", hash.get("field1"));
-        assertEquals("value2", hash.get("field2"));
+        assertThat(hash).containsEntry("field1", "value1").containsEntry("field2", "value2");
     }
 
     @Test
     void del() {
         redis.hash().set("key1", "field1", "value1");
         redis.hash().set("key1", "field2", "value2");
-        boolean deleted = redis.hash().del("key1", "field1");
-
-        assertTrue(deleted);
+        assertThat(redis.hash().del("key1", "field1")).isEqualTo(1);
 
         Map<String, String> hash = redis.hash().getAll("key1");
-        assertEquals(1, hash.size());
-        assertEquals("value2", hash.get("field2"));
+        assertThat(hash).containsExactly(entry("field2", "value2"));
     }
 }
