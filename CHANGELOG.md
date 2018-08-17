@@ -1,7 +1,7 @@
 ## Change log
-### 6.6.5 (8/15/2018 - )
+### 6.6.5 (8/15/2018 - 8/17/2018)
 * log: make log-processor leverage built-in kafak support, to index action as well
-* redis: fix forEach elapsed time tracking 
+* redis:mongo:elasticserch: fix forEach elapsed time tracking 
 * redis: replace setnx with set command
 
 ### 6.6.4 (8/9/2018 - 8/15/2018)

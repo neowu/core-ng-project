@@ -6,12 +6,14 @@ import core.framework.inject.Inject;
 import core.framework.mongo.IntegrationTest;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
+import core.framework.mongo.Query;
 import core.framework.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -152,6 +154,16 @@ class MongoIntegrationTest extends IntegrationTest {
         long updatedCount = collection.update(Filters.eq("string_field", entities.get(0).stringField), Updates.set("enum_field", TestMongoEntity.TestEnum.VALUE2));
         assertThat(updatedCount).isEqualTo(1);
         assertThat(collection.get(entities.get(0).id)).get().satisfies(loadedEntity -> assertThat(loadedEntity.enumField).isEqualTo(TestMongoEntity.TestEnum.VALUE2));
+    }
+
+    @Test
+    void forEach() {
+        List<TestMongoEntity> entities = testEntities();
+        collection.bulkInsert(entities);
+
+        List<TestMongoEntity> returnedEntities = new ArrayList<>();
+        collection.forEach(new Query(), returnedEntities::add);
+        assertThat(returnedEntities).hasSize(2);
     }
 
     private TestMongoEntity createEntity(String stringField, TestMongoEntity.TestEnum enumField) {

@@ -115,13 +115,6 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
     }
 
-    private void validate(SearchRequest request) {
-        int skip = request.skip == null ? 0 : request.skip;
-        int limit = request.limit == null ? 0 : request.limit;
-        if (skip + limit > 10000)
-            throw Exceptions.error("result window is too large, skip + limit must be less than or equal to 10000, skip={}, limit={}", request.skip, request.limit);
-    }
-
     private SearchResponse<T> searchResponse(org.elasticsearch.action.search.SearchResponse response) {
         SearchHit[] hits = response.getHits().getHits();
         List<T> items = new ArrayList<>(hits.length);
@@ -344,14 +337,12 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     @Override
     public void forEach(ForEach<T> forEach) {
         var watch = new StopWatch();
-        if (forEach.consumer == null) throw new Error("forEach.consumer must not be null");
-        if (forEach.query == null) throw new Error("forEach.query must not be null");
-        if (forEach.scrollTimeout == null) throw new Error("forEach.scrollTimeout must not be null");
-        if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null and greater than 0");
-
+        long start = System.nanoTime();
+        long esClientTook = 0;
+        long esServerTook = 0;
+        validate(forEach);
         TimeValue keepAlive = TimeValue.timeValueNanos(forEach.scrollTimeout.toNanos());
         String index = forEach.index == null ? this.index : forEach.index;
-        long esTook = 0;
         int totalHits = 0;
         try {
             SearchRequestBuilder builder = client().prepareSearch(index)
@@ -359,14 +350,15 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                                                    .addSort(SortBuilders.fieldSort("_doc"))
                                                    .setScroll(keepAlive)
                                                    .setSize(forEach.limit);
-            logger.debug("foreach, index={}, type={}, request={}", index, type, builder);
+            logger.debug("forEach, index={}, type={}, request={}", index, type, builder);
             org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
 
             while (true) {
-                esTook += searchResponse.getTook().nanos();
+                esServerTook += searchResponse.getTook().nanos();
                 if (searchResponse.getFailedShards() > 0) logger.warn("some shard failed, response={}", searchResponse);
 
                 SearchHit[] hits = searchResponse.getHits().getHits();
+                esClientTook += System.nanoTime() - start;
                 if (hits.length == 0) break;
                 totalHits += hits.length;
 
@@ -374,6 +366,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                     forEach.consumer.accept(reader.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
                 }
 
+                start = System.nanoTime();
                 String scrollId = searchResponse.getScrollId();
                 searchResponse = client().prepareSearchScroll(scrollId).setScroll(keepAlive).get();
             }
@@ -382,8 +375,22 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("elasticsearch", elapsed, totalHits, 0);
-            logger.debug("forEach, totalHits={}, esTook={}, elapsed={}", totalHits, esTook, elapsed);
+            logger.debug("forEach, totalHits={}, esServerTook={}, esClientTook={}, elapsed={}", totalHits, esServerTook, esClientTook, elapsed);
         }
+    }
+
+    private void validate(SearchRequest request) {
+        int skip = request.skip == null ? 0 : request.skip;
+        int limit = request.limit == null ? 0 : request.limit;
+        if (skip + limit > 10000)
+            throw Exceptions.error("result window is too large, skip + limit must be less than or equal to 10000, skip={}, limit={}", request.skip, request.limit);
+    }
+
+    private void validate(ForEach<T> forEach) {
+        if (forEach.consumer == null) throw new Error("forEach.consumer must not be null");
+        if (forEach.query == null) throw new Error("forEach.query must not be null");
+        if (forEach.scrollTimeout == null) throw new Error("forEach.scrollTimeout must not be null");
+        if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null and greater than 0");
     }
 
     private Client client() {

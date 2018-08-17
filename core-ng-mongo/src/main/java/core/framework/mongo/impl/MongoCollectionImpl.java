@@ -114,18 +114,19 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         var watch = new StopWatch();
         if (get.id == null) throw new Error("get.id must not be null");
 
-        int returnedRows = 0;
+        int returnedDocs = 0;
         try {
             T result = collection(get.readPreference).find(Filters.eq("_id", get.id)).first();
-            if (result != null) returnedRows = 1;
+            if (result != null) returnedDocs = 1;
             return Optional.ofNullable(result);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, returnedRows, 0);
-            logger.debug("get, collection={}, id={}, readPref={}, elapsed={}",
+            ActionLogContext.track("mongoDB", elapsed, returnedDocs, 0);
+            logger.debug("get, collection={}, id={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     get.id,
                     get.readPreference == null ? null : get.readPreference.getName(),
+                    returnedDocs,
                     elapsed);
             checkSlowOperation(elapsed);
         }
@@ -135,7 +136,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     public Optional<T> findOne(FindOne findOne) {
         var watch = new StopWatch();
         Bson filter = findOne.filter == null ? new BsonDocument() : findOne.filter;
-        int returnedRows = 0;
+        int returnedDocs = 0;
         try {
             List<T> results = new ArrayList<>(2);
             FindIterable<T> query = collection()
@@ -145,15 +146,16 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             fetch(query, results);
             if (results.isEmpty()) return Optional.empty();
             if (results.size() > 1) throw new Error("more than one row returned");
-            returnedRows = 1;
+            returnedDocs = 1;
             return Optional.of(results.get(0));
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, returnedRows, 0);
-            logger.debug("findOne, collection={}, filter={}, readPref={}, elapsed={}",
+            ActionLogContext.track("mongoDB", elapsed, returnedDocs, 0);
+            logger.debug("findOne, collection={}, filter={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     new BsonParam(filter, mongo.registry),
                     findOne.readPreference == null ? null : findOne.readPreference.getName(),
+                    returnedDocs,
                     elapsed);
             checkSlowOperation(elapsed);
         }
@@ -172,7 +174,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             int size = results.size();
             ActionLogContext.track("mongoDB", elapsed, size, 0);
-            logger.debug("find, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, readPref={}, returnedRows={}, elapsed={}",
+            logger.debug("find, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     new BsonParam(query.filter, mongo.registry),
                     new BsonParam(query.projection, mongo.registry),
@@ -189,14 +191,23 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public void forEach(Query query, Consumer<T> consumer) {
         var watch = new StopWatch();
-        int returnedRows = 0;
-        try {
-            FindIterable<T> mongoQuery = mongoQuery(query);
-            returnedRows = apply(mongoQuery, consumer);
+        long start = System.nanoTime();
+        long mongoTook = 0;
+        int returnedDocs = 0;
+        try (MongoCursor<T> cursor = mongoQuery(query).iterator()) {
+            mongoTook += System.nanoTime() - start;
+            start = System.nanoTime();
+            while (cursor.hasNext()) {
+                T result = cursor.next();
+                returnedDocs++;
+                mongoTook += System.nanoTime() - start;
+                consumer.accept(result);
+                start = System.nanoTime();
+            }
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, returnedRows, 0);
-            logger.debug("forEach, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, readPref={}, returnedRows={}, elapsed={}",
+            ActionLogContext.track("mongoDB", mongoTook, returnedDocs, 0);
+            logger.debug("forEach, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, readPref={}, returnedDocs={}, mongoTook={}, elapsed={}",
                     collectionName,
                     new BsonParam(query.filter, mongo.registry),
                     new BsonParam(query.projection, mongo.registry),
@@ -204,7 +215,8 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
                     query.skip,
                     query.limit,
                     query.readPreference == null ? null : query.readPreference.getName(),
-                    returnedRows,
+                    returnedDocs,
+                    mongoTook,
                     elapsed);
         }
     }
@@ -216,18 +228,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         if (query.skip != null) mongoQuery.skip(query.skip);
         if (query.limit != null) mongoQuery.limit(query.limit);
         return mongoQuery;
-    }
-
-    private int apply(MongoIterable<T> mongoQuery, Consumer<T> consumer) {
-        int total = 0;
-        try (MongoCursor<T> cursor = mongoQuery.iterator()) {
-            while (cursor.hasNext()) {
-                T result = cursor.next();
-                total++;
-                consumer.accept(result);
-            }
-        }
-        return total;
     }
 
     @Override
@@ -248,7 +248,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             int size = results.size();
             ActionLogContext.track("mongoDB", elapsed, size, 0);
-            logger.debug("aggregate, collection={}, pipeline={}, readPref={}, returnedRows={}, elapsed={}",
+            logger.debug("aggregate, collection={}, pipeline={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     aggregate.pipeline.stream().map(stage -> new BsonParam(stage, mongo.registry)).toArray(),
                     aggregate.readPreference == null ? null : aggregate.readPreference.getName(),
@@ -277,7 +277,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             long elapsed = watch.elapsed();
             int size = results.size();
             ActionLogContext.track("mongoDB", elapsed, size, 0);
-            logger.debug("mapReduce, collection={}, map={}, reduce={}, filter={}, readPref={}, returnedRows={}, elapsed={}",
+            logger.debug("mapReduce, collection={}, map={}, reduce={}, filter={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     mapReduce.mapFunction,
                     mapReduce.reduceFunction,
