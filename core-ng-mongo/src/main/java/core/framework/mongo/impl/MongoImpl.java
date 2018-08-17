@@ -40,7 +40,7 @@ public class MongoImpl implements Mongo {
 
     MongoDatabase createDatabase(CodecRegistry registry) {
         if (uri == null) throw new Error("uri must not be null");
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             builder.connectTimeout(timeoutInMs);
             builder.socketTimeout(timeoutInMs);
@@ -50,7 +50,7 @@ public class MongoImpl implements Mongo {
             mongoClient = new MongoClient(uri);
             return mongoClient.getDatabase(uri.getDatabase());
         } finally {
-            logger.info("create mongo client, uri={}, elapsedTime={}", uri, watch.elapsedTime());
+            logger.info("create mongo client, uri={}, elapsed={}", uri, watch.elapsed());
         }
     }
 
@@ -64,11 +64,11 @@ public class MongoImpl implements Mongo {
 
     @Override
     public void dropCollection(String collection) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             database().getCollection(collection).drop();
         } finally {
-            logger.info("dropCollection, collection={}, elapsedTime={}", collection, watch.elapsedTime());
+            logger.info("dropCollection, collection={}, elapsed={}", collection, watch.elapsed());
         }
     }
 
@@ -87,23 +87,23 @@ public class MongoImpl implements Mongo {
     }
 
     public <T> MongoCollection<T> collection(Class<T> entityClass) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             new MongoClassValidator(entityClass).validateEntityClass();
             codecs.registerEntity(entityClass);
             return new MongoCollectionImpl<>(this, entityClass);
         } finally {
-            logger.info("register mongo entity, entityClass={}, elapsedTime={}", entityClass.getCanonicalName(), watch.elapsedTime());
+            logger.info("register mongo entity, entityClass={}, elapsed={}", entityClass.getCanonicalName(), watch.elapsed());
         }
     }
 
     public <T> void view(Class<T> viewClass) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             new MongoClassValidator(viewClass).validateViewClass();
             codecs.registerView(viewClass);
         } finally {
-            logger.info("register mongo view, viewClass={}, elapsedTime={}", viewClass.getCanonicalName(), watch.elapsedTime());
+            logger.info("register mongo view, viewClass={}, elapsed={}", viewClass.getCanonicalName(), watch.elapsed());
         }
     }
 

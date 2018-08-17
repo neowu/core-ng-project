@@ -138,23 +138,23 @@ public final class DatabaseImpl implements Database {
     }
 
     public <T> void view(Class<T> viewClass) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             new DatabaseClassValidator(viewClass).validateViewClass();
             registerViewClass(viewClass);
         } finally {
-            logger.info("register db view, viewClass={}, elapsedTime={}", viewClass.getCanonicalName(), watch.elapsedTime());
+            logger.info("register db view, viewClass={}, elapsed={}", viewClass.getCanonicalName(), watch.elapsed());
         }
     }
 
     public <T> Repository<T> repository(Class<T> entityClass) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             new DatabaseClassValidator(entityClass).validateEntityClass();
             registerViewClass(entityClass);
             return new RepositoryImpl<>(this, entityClass);
         } finally {
-            logger.info("register db entity, entityClass={}, elapsedTime={}", entityClass.getCanonicalName(), watch.elapsedTime());
+            logger.info("register db entity, entityClass={}, elapsed={}", entityClass.getCanonicalName(), watch.elapsed());
         }
     }
 
@@ -165,7 +165,7 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         int returnedRows = 0;
         try {
             List<T> results = operation.select(sql, rowMapper(viewClass), params);
@@ -173,41 +173,41 @@ public final class DatabaseImpl implements Database {
             checkTooManyRowsReturned(returnedRows);
             return results;
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, returnedRows, 0);
-            logger.debug("select, sql={}, params={}, returnedRows={}, elapsedTime={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("db", elapsed, returnedRows, 0);
+            logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         int returnedRows = 0;
         try {
             Optional<T> result = operation.selectOne(sql, rowMapper(viewClass), params);
             if (result.isPresent()) returnedRows = 1;
             return result;
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, returnedRows, 0);
-            logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsedTime={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("db", elapsed, returnedRows, 0);
+            logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public int execute(String sql, Object... params) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         int updatedRows = 0;
         try {
             updatedRows = operation.update(sql, params);
             return updatedRows;
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, 0, updatedRows);
-            logger.debug("execute, sql={}, params={}, updatedRows={}, elapsedTime={}", sql, new SQLParams(operation.enumMapper, params), updatedRows, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("db", elapsed, 0, updatedRows);
+            logger.debug("execute, sql={}, params={}, updatedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), updatedRows, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
@@ -220,10 +220,10 @@ public final class DatabaseImpl implements Database {
             updatedRows = Arrays.stream(results).sum();
             return results;
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, 0, updatedRows);
-            logger.debug("batchExecute, sql={}, size={}, updatedRows={}, elapsedTime={}", sql, params.size(), updatedRows, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("db", elapsed, 0, updatedRows);
+            logger.debug("batchExecute, sql={}, size={}, updatedRows={}, elapsed={}", sql, params.size(), updatedRows, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
@@ -249,9 +249,9 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    private void checkSlowOperation(long elapsedTime) {
-        if (elapsedTime > slowOperationThresholdInNanos) {
-            logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsedTime={}", elapsedTime);
+    private void checkSlowOperation(long elapsed) {
+        if (elapsed > slowOperationThresholdInNanos) {
+            logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsed={}", elapsed);
         }
     }
 }

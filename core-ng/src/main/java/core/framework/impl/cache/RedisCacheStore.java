@@ -2,7 +2,6 @@ package core.framework.impl.cache;
 
 import core.framework.impl.redis.RedisException;
 import core.framework.impl.redis.RedisImpl;
-import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +37,7 @@ public class RedisCacheStore implements CacheStore {
             return redis.multiGetBytes(keys);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
-            return Maps.newHashMap();
+            return Map.of();
         }
     }
 

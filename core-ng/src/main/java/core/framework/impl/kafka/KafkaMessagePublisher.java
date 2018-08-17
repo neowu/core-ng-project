@@ -44,18 +44,18 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
     public void publish(String topic, String key, T value) {
         if (topic == null) throw new Error("topic must not be null");
         if (key == null) throw new Error("key must not be null");   // if key is null, kafka will pick random partition which breaks determinacy
-        validator.validate(value);
 
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
+        validator.validate(value);
         byte[] message = writer.toJSON(value);
         try {
-            ProducerRecord<String, byte[]> record = new ProducerRecord<>(topic, key, message);
+            var record = new ProducerRecord<>(topic, key, message);
             linkContext(record.headers());
             producer.send(record);
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("kafka", elapsedTime);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
-            logger.debug("publish, topic={}, key={}, message={}, elapsedTime={}", topic, key, new BytesParam(message), elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("kafka", elapsed, 0, 1);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
+            logger.debug("publish, topic={}, key={}, message={}, elapsed={}", topic, key, new BytesParam(message), elapsed);
         }
     }
 

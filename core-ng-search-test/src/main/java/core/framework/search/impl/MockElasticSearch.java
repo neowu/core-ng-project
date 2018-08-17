@@ -25,7 +25,7 @@ public class MockElasticSearch extends ElasticSearchImpl {
 
     @Override
     Client createClient() {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             Settings.Builder settings = Settings.builder();
             settings.put(Environment.PATH_HOME_SETTING.getKey(), dataPath)
@@ -37,7 +37,7 @@ public class MockElasticSearch extends ElasticSearchImpl {
         } catch (NodeValidationException e) {
             throw new Error(e);
         } finally {
-            logger.info("create local elasticsearch node, dataPath={}, elapsedTime={}", dataPath, watch.elapsedTime());
+            logger.info("create local elasticsearch node, dataPath={}, elapsed={}", dataPath, watch.elapsed());
         }
     }
 }

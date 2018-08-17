@@ -37,21 +37,21 @@ public final class EntitySchemaGenerator {
     }
 
     public void generate() {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         List<String> statements = schemeStatements();
         try {
             for (String statement : statements) {
                 database.execute(statement);
             }
         } finally {
-            logger.info("create schema, entityClass={}, sql={}, elapsedTime={}", entityClass.getCanonicalName(), statements, watch.elapsedTime());
+            logger.info("create schema, entityClass={}, sql={}, elapsed={}", entityClass.getCanonicalName(), statements, watch.elapsed());
         }
     }
 
     private List<String> schemeStatements() {
         List<String> statements = Lists.newArrayList();
 
-        CodeBuilder builder = new CodeBuilder()
+        var builder = new CodeBuilder()
                 .append("CREATE TABLE ");
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");

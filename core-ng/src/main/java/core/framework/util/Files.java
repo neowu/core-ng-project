@@ -33,13 +33,13 @@ public final class Files {
     }
 
     public static byte[] bytes(Path file) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             return readAllBytes(file);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            LOGGER.debug("bytes, file={}, elapsedTime={}", file, watch.elapsedTime());
+            LOGGER.debug("bytes, file={}, elapsed={}", file, watch.elapsed());
         }
     }
 
@@ -52,7 +52,7 @@ public final class Files {
     }
 
     public static void copyDir(Path source, Path destination) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             walkFileTree(source, new SimpleFileVisitor<>() {
                 @Override
@@ -71,12 +71,12 @@ public final class Files {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            LOGGER.debug("copyDir, source={}, destination={}, elapsedTime={}", source, destination, watch.elapsedTime());
+            LOGGER.debug("copyDir, source={}, destination={}, elapsed={}", source, destination, watch.elapsed());
         }
     }
 
     public static void deleteDir(Path directory) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             walkFileTree(directory, new SimpleFileVisitor<>() {
                 @Override
@@ -94,7 +94,7 @@ public final class Files {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            LOGGER.debug("deleteDir, directory={}, elapsedTime={}", directory, watch.elapsedTime());
+            LOGGER.debug("deleteDir, directory={}, elapsed={}", directory, watch.elapsed());
         }
     }
 

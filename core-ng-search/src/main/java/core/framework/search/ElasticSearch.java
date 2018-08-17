@@ -16,5 +16,5 @@ public interface ElasticSearch {
 
     List<ElasticSearchIndex> indices();
 
-    void flush(String index);
+    void flushIndex(String index);
 }

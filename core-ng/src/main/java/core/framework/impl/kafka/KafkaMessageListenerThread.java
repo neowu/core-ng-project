@@ -118,7 +118,7 @@ class KafkaMessageListenerThread extends Thread {
             }
         } finally {
             consumer.commitAsync();
-            logger.info("process kafka records, count={}, size={}, elapsedTime={}", count, size, watch.elapsedTime());
+            logger.info("process kafka records, count={}, size={}, elapsed={}", count, size, watch.elapsed());
         }
     }
 
@@ -131,8 +131,7 @@ class KafkaMessageListenerThread extends Thread {
                 actionLog.context("handler", process.handler.getClass().getCanonicalName());
                 actionLog.context("key", record.key());
                 logger.debug("message={}", new BytesParam(record.value()));
-
-                T message = process.reader.fromJSON(record.value());
+                actionLog.track("kafka", 0, 1, 0);
 
                 Headers headers = record.headers();
                 actionLog.refId(header(headers, KafkaHeaders.HEADER_REF_ID));
@@ -143,15 +142,15 @@ class KafkaMessageListenerThread extends Thread {
                 if ("true".equals(header(headers, KafkaHeaders.HEADER_TRACE))) {
                     actionLog.trace = true;
                 }
-
+                T message = process.reader.fromJSON(record.value());
                 process.validator.validate(message);
 
                 process.handler.handle(record.key(), message);
             } catch (Throwable e) {
                 logManager.logError(e);
             } finally {
-                long elapsedTime = actionLog.elapsedTime();
-                checkSlowProcess(elapsedTime, longProcessThresholdInNano);
+                long elapsed = actionLog.elapsedTime();
+                checkSlowProcess(elapsed, longProcessThresholdInNano);
                 logManager.end("=== message handling end ===");
             }
         }
@@ -163,21 +162,24 @@ class KafkaMessageListenerThread extends Thread {
             actionLog.action("topic:" + topic);
             actionLog.context("topic", topic);
             actionLog.context("handler", process.bulkHandler.getClass().getCanonicalName());
-            actionLog.stat("messageCount", records.size());
+            int size = records.size();
+            actionLog.track("kafka", 0, size, 0);
+
             Set<String> clients = new HashSet<>();
             Set<String> clientIPs = new HashSet<>();
 
-            List<Message<T>> messages = new ArrayList<>(records.size());
+            List<Message<T>> messages = new ArrayList<>(size);
             for (ConsumerRecord<String, byte[]> record : records) {
-                T message = process.reader.fromJSON(record.value());
-                validate(process.validator, message, record);
-                messages.add(new Message<>(record.key(), message));
                 Headers headers = record.headers();
                 if ("true".equals(header(headers, KafkaHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
                     actionLog.trace = true;
                 }
                 clients.add(header(headers, KafkaHeaders.HEADER_CLIENT));
                 clientIPs.add(header(headers, KafkaHeaders.HEADER_CLIENT_IP));
+
+                T message = process.reader.fromJSON(record.value());
+                validate(process.validator, message, record);
+                messages.add(new Message<>(record.key(), message));
             }
             logger.debug("clients={}", clients);
             logger.debug("clientIPs={}", clientIPs);
@@ -186,8 +188,8 @@ class KafkaMessageListenerThread extends Thread {
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
-            long elapsedTime = actionLog.elapsedTime();
-            checkSlowProcess(elapsedTime, longProcessThresholdInNano);
+            long elapsed = actionLog.elapsedTime();
+            checkSlowProcess(elapsed, longProcessThresholdInNano);
             logManager.end("=== message handling end ===");
         }
     }
@@ -211,9 +213,9 @@ class KafkaMessageListenerThread extends Thread {
         }
     }
 
-    private void checkSlowProcess(long elapsedTime, double longProcessThreshold) {
-        if (elapsedTime > longProcessThreshold) {
-            logger.warn(Markers.errorCode("LONG_PROCESS"), "took too long to process message, elapsedTime={}", elapsedTime);
+    private void checkSlowProcess(long elapsed, double longProcessThreshold) {
+        if (elapsed > longProcessThreshold) {
+            logger.warn(Markers.errorCode("LONG_PROCESS"), "took too long to process message, elapsed={}", elapsed);
         }
     }
 

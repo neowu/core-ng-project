@@ -24,14 +24,14 @@ public final class HTMLTemplateEngine {
     private final CDNManager cdnManager = new CDNManager();
 
     public String process(String name, Object model) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             HTMLTemplate template = templates.get(name);
             if (template == null) throw Exceptions.error("template not found, name={}", name);
             TemplateContext context = new TemplateContext(model, cdnManager);
             return template.process(context);
         } finally {
-            logger.debug("process, name={}, elapsedTime={}", name, watch.elapsedTime());
+            logger.debug("process, name={}, elapsed={}", name, watch.elapsed());
         }
     }
 
@@ -50,7 +50,7 @@ public final class HTMLTemplateEngine {
             HTMLTemplate previous = templates.putIfAbsent(name, new HTMLTemplateBuilder(source, modelClass).build());
             if (previous != null) throw Exceptions.error("template is already added, name={}", name);
         } finally {
-            logger.info("add, name={}, modelClass={}, elapsedTime={}", name, modelClass.getCanonicalName(), watch.elapsedTime());
+            logger.info("add, name={}, modelClass={}, elapsed={}", name, modelClass.getCanonicalName(), watch.elapsed());
         }
     }
 }

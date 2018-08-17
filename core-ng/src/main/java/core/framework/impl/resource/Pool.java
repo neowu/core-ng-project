@@ -69,7 +69,7 @@ public class Pool<T extends AutoCloseable> {
     }
 
     private PoolItem<T> waitNextAvailableItem() {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             PoolItem<T> item = idleItems.poll(checkoutTimeoutInMs, TimeUnit.MILLISECONDS);
             if (item == null) throw new PoolException("timeout to wait for next available resource", "POOL_TIME_OUT");
@@ -77,12 +77,12 @@ public class Pool<T extends AutoCloseable> {
         } catch (InterruptedException e) {
             throw new Error("interrupted during waiting for next available resource", e);
         } finally {
-            logger.debug("wait for next available resource, pool={}, elapsed={}", name, watch.elapsedTime());
+            logger.debug("wait for next available resource, pool={}, elapsed={}", name, watch.elapsed());
         }
     }
 
     private PoolItem<T> createNewItem() {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         size.incrementAndGet();
         try {
             return new PoolItem<>(factory.get());
@@ -90,7 +90,7 @@ public class Pool<T extends AutoCloseable> {
             size.getAndDecrement();
             throw e;
         } finally {
-            logger.debug("create new resource, pool={}, elapsed={}", name, watch.elapsedTime());
+            logger.debug("create new resource, pool={}, elapsed={}", name, watch.elapsed());
         }
     }
 

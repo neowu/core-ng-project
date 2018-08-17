@@ -59,11 +59,11 @@ public final class SQLScriptRunner {
     }
 
     private void executeSQL(String sql) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             database.execute(sql);
         } finally {
-            logger.info("execute, sql={}, elapsedTime={}", sql, watch.elapsedTime());
+            logger.info("execute, sql={}, elapsed={}", sql, watch.elapsed());
         }
     }
 }

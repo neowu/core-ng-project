@@ -38,10 +38,10 @@ final class TransactionImpl implements Transaction {
         try {
             transactionManager.endTransaction();
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            logger.debug("end transaction, elapsedTime={}", elapsedTime);
-            if (elapsedTime > longTransactionThresholdInNanos) {
-                logger.warn(Markers.errorCode("LONG_TRANSACTION"), "long db transaction, elapsedTime={}", elapsedTime);
+            long elapsed = watch.elapsed();
+            logger.debug("end transaction, elapsed={}", elapsed);
+            if (elapsed > longTransactionThresholdInNanos) {
+                logger.warn(Markers.errorCode("LONG_TRANSACTION"), "long db transaction, elapsed={}", elapsed);
             }
         }
     }

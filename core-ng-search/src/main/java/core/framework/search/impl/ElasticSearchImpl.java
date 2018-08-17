@@ -50,12 +50,12 @@ public class ElasticSearchImpl implements ElasticSearch {
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             new DocumentClassValidator(documentClass).validate();
             return new ElasticSearchTypeImpl<>(this, documentClass, slowOperationThreshold);
         } finally {
-            logger.info("register elasticsearch type, documentClass={}, elapsedTime={}", documentClass.getCanonicalName(), watch.elapsedTime());
+            logger.info("register elasticsearch type, documentClass={}, elapsed={}", documentClass.getCanonicalName(), watch.elapsed());
         }
     }
 
@@ -68,67 +68,67 @@ public class ElasticSearchImpl implements ElasticSearch {
 
     @Override
     public void createIndex(String index, String source) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             client().admin().indices().prepareCreate(index).setSource(new BytesArray(source), XContentType.JSON).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            logger.info("create index, index={}, elapsedTime={}", index, watch.elapsedTime());
+            logger.info("create index, index={}, elapsed={}", index, watch.elapsed());
         }
     }
 
     @Override
     public void createIndexTemplate(String name, String source) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             client().admin().indices().preparePutTemplate(name).setSource(new BytesArray(source), XContentType.JSON).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            logger.info("create index template, name={}, elapsedTime={}", name, watch.elapsedTime());
+            logger.info("create index template, name={}, elapsed={}", name, watch.elapsed());
         }
     }
 
     @Override
-    public void flush(String index) {
-        StopWatch watch = new StopWatch();
+    public void flushIndex(String index) {
+        var watch = new StopWatch();
         try {
             client().admin().indices().prepareFlush(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            logger.info("flush, index={}, elapsedTime={}", index, watch.elapsedTime());
+            logger.info("flush index, index={}, elapsed={}", index, watch.elapsed());
         }
     }
 
     @Override
     public void closeIndex(String index) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             client().admin().indices().prepareClose(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            logger.info("close, index={}, elapsedTime={}", index, watch.elapsedTime());
+            logger.info("close index, index={}, elapsed={}", index, watch.elapsed());
         }
     }
 
     @Override
     public void deleteIndex(String index) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             client().admin().indices().prepareDelete(index).get();
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            logger.info("delete, index={}, elapsedTime={}", index, watch.elapsedTime());
+            logger.info("delete index, index={}, elapsed={}", index, watch.elapsed());
         }
     }
 
     @Override
     public List<ElasticSearchIndex> indices() {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             AdminClient adminClient = client().admin();
             ClusterStateResponse response = adminClient.cluster().state(new ClusterStateRequest().clear().metaData(true)).actionGet();
@@ -145,13 +145,13 @@ public class ElasticSearchImpl implements ElasticSearch {
         } catch (ElasticsearchException e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            logger.info("indices, elapsedTime={}", watch.elapsedTime());
+            logger.info("indices, elapsed={}", watch.elapsed());
         }
     }
 
     Client createClient() {
+        var watch = new StopWatch();
         if (addresses.isEmpty()) throw new Error("addresses must not be empty");
-        StopWatch watch = new StopWatch();
         try {
             Settings.Builder settings = Settings.builder();
             settings.put(NetworkService.TCP_CONNECT_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
@@ -165,7 +165,7 @@ public class ElasticSearchImpl implements ElasticSearch {
             addresses.forEach(client::addTransportAddress);
             return client;
         } finally {
-            logger.info("create elasticsearch client, addresses={}, elapsedTime={}", addresses, watch.elapsedTime());
+            logger.info("create elasticsearch client, addresses={}, elapsed={}", addresses, watch.elapsed());
         }
     }
 

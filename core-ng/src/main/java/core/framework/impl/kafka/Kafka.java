@@ -41,7 +41,7 @@ public class Kafka {
 
     protected Producer<String, byte[]> createProducer() {
         if (uri == null) throw new Error("uri must not be null");
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             Map<String, Object> config = Maps.newHashMap();
             config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
@@ -50,21 +50,20 @@ public class Kafka {
             producerMetrics.set(producer.metrics());
             return producer;
         } finally {
-            logger.info("create kafka producer, uri={}, name={}, elapsedTime={}", uri, name, watch.elapsedTime());
+            logger.info("create kafka producer, uri={}, name={}, elapsed={}", uri, name, watch.elapsed());
         }
     }
 
     public AdminClient admin() {
         if (admin == null) {
             if (uri == null) throw new Error("uri must not be null");
-
-            StopWatch watch = new StopWatch();
+            var watch = new StopWatch();
             try {
                 Map<String, Object> config = Maps.newHashMap();
                 config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
                 admin = AdminClient.create(config);
             } finally {
-                logger.info("create kafka admin, uri={}, name={}, elapsedTime={}", uri, name, watch.elapsedTime());
+                logger.info("create kafka admin, uri={}, name={}, elapsed={}", uri, name, watch.elapsed());
             }
         }
         return admin;

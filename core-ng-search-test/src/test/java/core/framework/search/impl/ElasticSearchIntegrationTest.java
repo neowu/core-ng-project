@@ -38,7 +38,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @AfterEach
     void cleanup() {
         documentType.deleteByQuery(QueryBuilders.matchAllQuery());
-        elasticSearch.flush("document");
+        elasticSearch.flushIndex("document");
     }
 
     @Test
@@ -58,7 +58,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
             documents.put(document.id, document);
         }
         documentType.bulkIndex(documents);
-        elasticSearch.flush("document");
+        elasticSearch.flushIndex("document");
 
         List<TestDocument> results = Lists.newArrayList();
 
@@ -80,7 +80,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         documents.put("3", document("3", "TreeSet", 3));
         documents.put("4", document("4", "TreeMap", 4));
         documentType.bulkIndex(documents);
-        elasticSearch.flush("document");
+        elasticSearch.flushIndex("document");
 
         List<String> options = documentType.complete("hash", "completion1", "completion2");
         assertThat(options).contains("HashSet-Complete1", "HashSet-Complete2", "HashMap-Complete1", "HashMap-Complete2");
@@ -89,7 +89,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @Test
     void search() {
         TestDocument document = document("1", "1st Test's Product", 1);
-        elasticSearch.flush("document");
+        elasticSearch.flushIndex("document");
 
         // test synonyms
         SearchRequest request = new SearchRequest();

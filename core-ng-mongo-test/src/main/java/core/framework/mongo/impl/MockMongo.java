@@ -16,11 +16,11 @@ public class MockMongo extends MongoImpl {
 
     @Override
     MongoDatabase createDatabase(CodecRegistry registry) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             return fongo.getDatabase("test").withCodecRegistry(registry);
         } finally {
-            logger.info("create mock mongo client, elapsedTime={}", watch.elapsedTime());
+            logger.info("create mock mongo client, elapsed={}", watch.elapsed());
         }
     }
 }

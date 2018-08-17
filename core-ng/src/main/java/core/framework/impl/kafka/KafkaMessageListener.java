@@ -67,7 +67,7 @@ public class KafkaMessageListener {
             var thread = new KafkaMessageListenerThread(name, consumer, this);
             thread.start();
             listenerThreads[i] = thread;
-            logger.info("create kafka listener thread, name={}, topics={}, elapsedTime={}", name, topics, watch.elapsedTime());
+            logger.info("create kafka listener thread, name={}, topics={}, elapsed={}", name, topics, watch.elapsed());
         }
         logger.info("kafka listener started, uri={}, topics={}, name={}", uri, topics, name);
     }

@@ -14,7 +14,7 @@ public final class StopWatch {
         start = System.nanoTime();
     }
 
-    public long elapsedTime() {
+    public long elapsed() {
         long end = System.nanoTime();
         return end - start;
     }

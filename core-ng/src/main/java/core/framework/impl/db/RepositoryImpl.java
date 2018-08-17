@@ -6,15 +6,14 @@ import core.framework.db.Repository;
 import core.framework.impl.validate.Validator;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
-import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -52,16 +51,16 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public Optional<Long> insert(T entity) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         validator.validate(entity, false);
         String sql = insertQuery.sql;
         Object[] params = insertQuery.params(entity);
         try {
             return database.operation.insert(sql, params, insertQuery.generatedColumn);
         } finally {
-            long elapsedTime = watch.elapsedTime();
+            long elapsedTime = watch.elapsed();
             ActionLogContext.track("db", elapsedTime, 0, 1);
-            logger.debug("insert, sql={}, params={}, elapsedTime={}", sql, new SQLParams(database.operation.enumMapper, params), elapsedTime);
+            logger.debug("insert, sql={}, params={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), elapsedTime);
             checkSlowOperation(elapsedTime);
         }
     }
@@ -72,7 +71,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     private void update(T entity, boolean partial) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         validator.validate(entity, partial);
         UpdateQuery.Statement query = updateQuery.update(entity, partial);
         int updatedRows = 0;
@@ -81,10 +80,10 @@ public final class RepositoryImpl<T> implements Repository<T> {
             if (updatedRows != 1)
                 logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, 0, updatedRows);
-            logger.debug("update, sql={}, params={}, elapsedTime={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("db", elapsed, 0, updatedRows);
+            logger.debug("update, sql={}, params={}, elapsed={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
@@ -95,41 +94,44 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public void delete(Object... primaryKeys) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         int deletedRows = 0;
         try {
             deletedRows = database.operation.update(deleteSQL, primaryKeys);
             if (deletedRows != 1)
                 logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", deletedRows);
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, 0, deletedRows);
-            logger.debug("delete, sql={}, params={}, elapsedTime={}", deleteSQL, new SQLParams(database.operation.enumMapper, primaryKeys), elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("db", elapsed, 0, deletedRows);
+            logger.debug("delete, sql={}, params={}, elapsed={}", deleteSQL, new SQLParams(database.operation.enumMapper, primaryKeys), elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public void batchInsert(List<T> entities) {
-        StopWatch watch = new StopWatch();
-        entities.forEach(bean -> validator.validate(bean, false));
+        var watch = new StopWatch();
         String sql = insertQuery.sql;
-        List<Object[]> params = entities.stream().map(insertQuery::params).collect(Collectors.toList());
+        List<Object[]> params = new ArrayList<>(entities.size());
+        for (T entity : entities) {
+            validator.validate(entity, false);
+            params.add(insertQuery.params(entity));
+        }
         try {
             database.operation.batchUpdate(sql, params);
         } finally {
-            long elapsedTime = watch.elapsedTime();
+            long elapsed = watch.elapsed();
             int size = entities.size();
-            ActionLogContext.track("db", elapsedTime, 0, size);
-            logger.debug("batchInsert, sql={}, size={}, elapsedTime={}", sql, size, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            ActionLogContext.track("db", elapsed, 0, size);
+            logger.debug("batchInsert, sql={}, size={}, elapsed={}", sql, size, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public void batchDelete(List<?> primaryKeys) {
-        StopWatch watch = new StopWatch();
-        List<Object[]> params = Lists.newArrayList();
+        var watch = new StopWatch();
+        List<Object[]> params = new ArrayList<>(primaryKeys.size());
         for (Object primaryKey : primaryKeys) {
             if (primaryKey instanceof Object[]) {
                 params.add((Object[]) primaryKey);
@@ -142,18 +144,18 @@ public final class RepositoryImpl<T> implements Repository<T> {
             int[] results = database.operation.batchUpdate(deleteSQL, params);
             deletedRows = Arrays.stream(results).sum();
             if (deletedRows != primaryKeys.size())
-                logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", Arrays.toString(results));
+                logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows does not match size of primary keys, rows={}", Arrays.toString(results));
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("db", elapsedTime, 0, deletedRows);
-            logger.debug("batchDelete, sql={}, size={}, elapsedTime={}", deleteSQL, primaryKeys.size(), elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("db", elapsed, 0, deletedRows);
+            logger.debug("batchDelete, sql={}, size={}, elapsed={}", deleteSQL, primaryKeys.size(), elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
-    private void checkSlowOperation(long elapsedTime) {
-        if (elapsedTime > database.slowOperationThresholdInNanos) {
-            logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsedTime={}", elapsedTime);
+    private void checkSlowOperation(long elapsed) {
+        if (elapsed > database.slowOperationThresholdInNanos) {
+            logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsed={}", elapsed);
         }
     }
 }

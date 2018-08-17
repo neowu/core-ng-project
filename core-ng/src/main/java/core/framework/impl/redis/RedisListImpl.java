@@ -42,10 +42,10 @@ public final class RedisListImpl implements RedisList {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime, 1, 0);
-            logger.debug("lpop, key={}, elapsedTime={}", key, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 1, 0);
+            logger.debug("lpop, key={}, elapsed={}", key, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 
@@ -62,10 +62,10 @@ public final class RedisListImpl implements RedisList {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime, 0, values.length);
-            logger.debug("rpush, key={}, values={}, size={}, elapsedTime={}", key, values, values.length, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 0, values.length);
+            logger.debug("rpush, key={}, values={}, size={}, elapsed={}", key, values, values.length, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 
@@ -73,26 +73,26 @@ public final class RedisListImpl implements RedisList {
     public List<String> range(String key, int start, int end) {
         var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
-        int returnedItems = 0;
+        int returnedValues = 0;
         try {
             RedisConnection connection = item.resource;
             connection.write(LRANGE, encode(key), encode(start), encode(end));
             Object[] response = connection.readArray();
-            returnedItems = response.length;
-            List<String> items = new ArrayList<>(response.length);
+            returnedValues = response.length;
+            List<String> values = new ArrayList<>(response.length);
             for (Object value : response) {
-                items.add(decode((byte[]) value));
+                values.add(decode((byte[]) value));
             }
-            return items;
+            return values;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime, returnedItems, 0);
-            logger.debug("lrange, key={}, start={}, end={}, returnedItems={}, elapsedTime={}", key, start, end, returnedItems, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, returnedValues, 0);
+            logger.debug("lrange, key={}, start={}, end={}, returnedValues={}, elapsed={}", key, start, end, returnedValues, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 }

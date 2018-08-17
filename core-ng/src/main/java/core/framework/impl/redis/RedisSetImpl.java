@@ -3,13 +3,13 @@ package core.framework.impl.redis;
 import core.framework.impl.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisSet;
+import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import static core.framework.impl.redis.Protocol.Command.SADD;
@@ -43,10 +43,11 @@ public final class RedisSetImpl implements RedisSet {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime, 0, 1);
-            logger.debug("sadd, key={}, values={}, elapsedTime={}", key, values, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            int size = values.length;
+            ActionLogContext.track("redis", elapsed, 0, size);
+            logger.debug("sadd, key={}, values={}, size={}, elapsed={}", key, values, size, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 
@@ -54,26 +55,26 @@ public final class RedisSetImpl implements RedisSet {
     public Set<String> members(String key) {
         var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
-        int returnedMembers = 0;
+        int returnedValues = 0;
         try {
             RedisConnection connection = item.resource;
             connection.write(SMEMBERS, encode(key));
             Object[] response = connection.readArray();
-            returnedMembers = response.length;
-            Set<String> members = new HashSet<>(returnedMembers);
-            for (Object member : response) {
-                members.add(decode((byte[]) member));
+            returnedValues = response.length;
+            Set<String> values = Sets.newHashSetWithExpectedSize(returnedValues);
+            for (Object value : response) {
+                values.add(decode((byte[]) value));
             }
-            return members;
+            return values;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime, returnedMembers, 0);
-            logger.debug("smembers, key={}, returnedMembers={}, elapsedTime={}", key, returnedMembers, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, returnedValues, 0);
+            logger.debug("smembers, key={}, returnedValues={}, elapsed={}", key, returnedValues, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 
@@ -91,10 +92,10 @@ public final class RedisSetImpl implements RedisSet {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime, 1, 0);
-            logger.debug("sismember, key={}, value={}, elapsedTime={}", key, value, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 1, 0);
+            logger.debug("sismember, key={}, value={}, elapsed={}", key, value, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 
@@ -111,10 +112,11 @@ public final class RedisSetImpl implements RedisSet {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("redis", elapsedTime, 0, values.length);
-            logger.debug("srem, key={}, values={}, size={}, elapsedTime={}", key, values, values.length, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            int size = values.length;
+            ActionLogContext.track("redis", elapsed, 0, size);
+            logger.debug("srem, key={}, values={}, size={}, elapsed={}", key, values, size, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 }

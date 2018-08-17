@@ -69,7 +69,7 @@ public final class HTTPClientImpl implements HTTPClient {
 
     @Override
     public HTTPResponse execute(HTTPRequest request) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         HttpUriRequest httpRequest = httpRequest(request);
         try (CloseableHttpResponse httpResponse = client.execute(httpRequest)) {
             int statusCode = httpResponse.getStatusLine().getStatusCode();
@@ -89,11 +89,11 @@ public final class HTTPClientImpl implements HTTPClient {
         } catch (IOException | UncheckedIOException e) {
             throw new HTTPClientException(e.getMessage(), "HTTP_COMMUNICATION_FAILED", e);
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("http", elapsedTime);
-            logger.debug("execute, elapsedTime={}", elapsedTime);
-            if (elapsedTime > slowOperationThresholdInNanos) {
-                logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http operation, elapsedTime={}", elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("http", elapsed);
+            logger.debug("execute, elapsed={}", elapsed);
+            if (elapsed > slowOperationThresholdInNanos) {
+                logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http operation, elapsed={}", elapsed);
             }
         }
     }

@@ -87,10 +87,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     @Override
     public SearchResponse<T> search(SearchRequest request) {
+        var watch = new StopWatch();
         validate(request);
-
-        StopWatch watch = new StopWatch();
-        long esTookTime = 0;
+        long esTook = 0;
         String index = request.index == null ? this.index : request.index;
         long hits = 0;
         try {
@@ -103,16 +102,16 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             logger.debug("search, index={}, type={}, request={}", index, type, builder);
             org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
             hits = searchResponse.getHits().getTotalHits();
-            esTookTime = searchResponse.getTook().nanos();
+            esTook = searchResponse.getTook().nanos();
             if (searchResponse.getFailedShards() > 0) logger.warn("some shard failed, response={}", searchResponse);
             return searchResponse(searchResponse);
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, (int) hits, 0);
-            logger.debug("search, hits={}, esTookTime={}, elapsedTime={}", hits, esTookTime, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, (int) hits, 0);
+            logger.debug("search, hits={}, esTook={}, elapsed={}", hits, esTook, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
@@ -136,8 +135,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     @Override
     public List<String> complete(CompleteRequest request) {
-        StopWatch watch = new StopWatch();
-        long esTookTime = 0;
+        var watch = new StopWatch();
+        long esTook = 0;
         String index = request.index == null ? this.index : request.index;
         int options = 0;
         try {
@@ -151,7 +150,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             logger.debug("complete, index={}, type={}, request={}", index, type, builder);
 
             org.elasticsearch.action.search.SearchResponse response = builder.get();
-            esTookTime = response.getTook().nanos();
+            esTook = response.getTook().nanos();
             if (response.getFailedShards() > 0) logger.warn("some shard failed, response={}", response);
 
             Set<String> suggestions = response.getSuggest().filter(CompletionSuggestion.class).stream()
@@ -162,16 +161,16 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, options, 0);
-            logger.debug("complete, options={}, esTookTime={}, elapsedTime={}", options, esTookTime, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, options, 0);
+            logger.debug("complete, options={}, esTook={}, elapsed={}", options, esTook, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public Optional<T> get(GetRequest request) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         int hits = 0;
         try {
@@ -182,16 +181,16 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, hits, 0);
-            logger.debug("get, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, hits, 0);
+            logger.debug("get, index={}, type={}, id={}, elapsed={}", index, type, request.id, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public void index(IndexRequest<T> request) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         validator.validate(request.source, false);
         byte[] document = writer.toJSON(request.source);
@@ -200,18 +199,18 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, 0, 1);
-            logger.debug("index, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, 0, 1);
+            logger.debug("index, index={}, type={}, id={}, elapsed={}", index, type, request.id, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public void bulkIndex(BulkIndexRequest<T> request) {
+        var watch = new StopWatch();
         if (request.sources == null || request.sources.isEmpty()) throw Exceptions.error("request.sources must not be empty");
 
-        StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         BulkRequestBuilder builder = client().prepareBulk();
         for (Map.Entry<String, T> entry : request.sources.entrySet()) {
@@ -221,42 +220,42 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             byte[] document = writer.toJSON(source);
             builder.add(client().prepareIndex(index, type, id).setSource(document, XContentType.JSON));
         }
-        long esTookTime = 0;
+        long esTook = 0;
         try {
             BulkResponse response = builder.get();
-            esTookTime = response.getTook().nanos();
+            esTook = response.getTook().nanos();
             if (response.hasFailures()) throw new SearchException(response.buildFailureMessage());
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, 0, request.sources.size());
-            logger.debug("bulkIndex, index={}, type={}, size={}, esTookTime={}, elapsedTime={}", index, type, request.sources.size(), esTookTime, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, 0, request.sources.size());
+            logger.debug("bulkIndex, index={}, type={}, size={}, esTook={}, elapsed={}", index, type, request.sources.size(), esTook, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public void update(UpdateRequest<T> request) {
+        var watch = new StopWatch();
         if (request.script == null) throw Exceptions.error("request.script must not be null");
 
-        StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         try {
             client().prepareUpdate(index, type, request.id).setScript(new Script(request.script)).get();
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, 0, 1);
-            logger.debug("update, index={}, type={}, id={}, script={}, elapsedTime={}", index, type, request.id, request.script, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, 0, 1);
+            logger.debug("update, index={}, type={}, id={}, script={}, elapsed={}", index, type, request.id, request.script, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public boolean delete(DeleteRequest request) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         boolean deleted = false;
         try {
@@ -266,68 +265,68 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, 0, deleted ? 1 : 0);
-            logger.debug("delete, index={}, type={}, id={}, elapsedTime={}", index, type, request.id, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, 0, deleted ? 1 : 0);
+            logger.debug("delete, index={}, type={}, id={}, elapsed={}", index, type, request.id, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public void bulkDelete(BulkDeleteRequest request) {
+        var watch = new StopWatch();
         if (request.ids == null || request.ids.isEmpty()) throw Exceptions.error("request.ids must not be empty");
 
-        StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         BulkRequestBuilder builder = client().prepareBulk();
         for (String id : request.ids) {
             builder.add(client().prepareDelete(index, type, id));
         }
-        long esTookTime = 0;
+        long esTook = 0;
         try {
             BulkResponse response = builder.get();
-            esTookTime = response.getTook().nanos();
+            esTook = response.getTook().nanos();
             if (response.hasFailures()) throw new SearchException(response.buildFailureMessage());
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
+            long elapsed = watch.elapsed();
             int size = request.ids.size();
-            ActionLogContext.track("elasticsearch", elapsedTime, 0, size);
-            logger.debug("bulkDelete, index={}, type={}, ids={}, size={}, esTookTime={}, elapsedTime={}", index, type, request.ids, size, esTookTime, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            ActionLogContext.track("elasticsearch", elapsed, 0, size);
+            logger.debug("bulkDelete, index={}, type={}, ids={}, size={}, esTook={}, elapsed={}", index, type, request.ids, size, esTook, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public long deleteByQuery(DeleteByQueryRequest request) {
+        var watch = new StopWatch();
         if (request.query == null) throw Exceptions.error("request.query must not be null");
 
-        StopWatch watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
-        long esTookTime = 0;
+        long esTook = 0;
         long deleted = 0;
         try {
             DeleteByQueryRequestBuilder builder = DeleteByQueryAction.INSTANCE.newRequestBuilder(client());
             BulkByScrollResponse response = builder.filter(request.query)
                                                    .source(index)
                                                    .get();
-            esTookTime = response.getTook().nanos();
+            esTook = response.getTook().nanos();
             deleted = response.getDeleted();
             return deleted;
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, 0, (int) deleted);
-            logger.debug("deleteByQuery, index={}, type={}, deleted={}, esTookTime={}, elapsedTime={}", index, type, deleted, esTookTime, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, 0, (int) deleted);
+            logger.debug("deleteByQuery, index={}, type={}, query={}, deleted={}, esTook={}, elapsed={}", index, type, request.query, deleted, esTook, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public List<String> analyze(AnalyzeRequest request) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         try {
             AnalyzeResponse response = client().admin().indices().prepareAnalyze(index, request.text).setAnalyzer(request.analyzer).get();
@@ -335,24 +334,24 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime);
-            logger.debug("analyze, index={}, analyzer={}, elapsedTime={}", index, request.analyzer, elapsedTime);
-            checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed);
+            logger.debug("analyze, index={}, analyzer={}, elapsed={}", index, request.analyzer, elapsed);
+            checkSlowOperation(elapsed);
         }
     }
 
     @Override
     public void forEach(ForEach<T> forEach) {
+        var watch = new StopWatch();
         if (forEach.consumer == null) throw new Error("forEach.consumer must not be null");
         if (forEach.query == null) throw new Error("forEach.query must not be null");
         if (forEach.scrollTimeout == null) throw new Error("forEach.scrollTimeout must not be null");
         if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null and greater than 0");
 
-        StopWatch watch = new StopWatch();
         TimeValue keepAlive = TimeValue.timeValueNanos(forEach.scrollTimeout.toNanos());
-        long esTookTime = 0;
         String index = forEach.index == null ? this.index : forEach.index;
+        long esTook = 0;
         int totalHits = 0;
         try {
             SearchRequestBuilder builder = client().prepareSearch(index)
@@ -364,7 +363,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             org.elasticsearch.action.search.SearchResponse searchResponse = builder.get();
 
             while (true) {
-                esTookTime += searchResponse.getTook().nanos();
+                esTook += searchResponse.getTook().nanos();
                 if (searchResponse.getFailedShards() > 0) logger.warn("some shard failed, response={}", searchResponse);
 
                 SearchHit[] hits = searchResponse.getHits().getHits();
@@ -381,9 +380,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         } catch (Exception e) {
             throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
         } finally {
-            long elapsedTime = watch.elapsedTime();
-            ActionLogContext.track("elasticsearch", elapsedTime, totalHits, 0);
-            logger.debug("forEach, totalHits={}, esTookTime={}, elapsedTime={}", totalHits, esTookTime, elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("elasticsearch", elapsed, totalHits, 0);
+            logger.debug("forEach, totalHits={}, esTook={}, elapsed={}", totalHits, esTook, elapsed);
         }
     }
 
@@ -391,9 +390,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         return elasticSearch.client();
     }
 
-    private void checkSlowOperation(long elapsedTime) {
-        if (elapsedTime > slowOperationThresholdInNanos) {
-            logger.warn(Markers.errorCode("SLOW_ES"), "slow elasticsearch operation, elapsedTime={}", elapsedTime);
+    private void checkSlowOperation(long elapsed) {
+        if (elapsed > slowOperationThresholdInNanos) {
+            logger.warn(Markers.errorCode("SLOW_ES"), "slow elasticsearch operation, elapsed={}", elapsed);
         }
     }
 }

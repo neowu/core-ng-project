@@ -37,7 +37,7 @@ public final class HTTPClientBuilder {
     private String userAgent = "HTTPClient";
 
     public HTTPClient build() {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             HttpClientBuilder builder = HttpClients.custom();
             builder.setUserAgent(userAgent);
@@ -75,7 +75,7 @@ public final class HTTPClientBuilder {
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
         } finally {
-            logger.info("create http client, elapsedTime={}", watch.elapsedTime());
+            logger.info("create http client, elapsed={}", watch.elapsed());
         }
     }
 

@@ -34,18 +34,18 @@ public class TemplateManager {
     }
 
     public String process(String templatePath, Object model, String language) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             HTMLTemplate template = get(templatePath, model.getClass(), language);
             TemplateContext context = new TemplateContext(model, cdnManager);
             return template.process(context);
         } finally {
-            logger.debug("process, templatePath={}, elapsedTime={}", templatePath, watch.elapsedTime());
+            logger.debug("process, templatePath={}, elapsed={}", templatePath, watch.elapsed());
         }
     }
 
     public void add(String templatePath, Class<?> modelClass) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             Map<String, HTMLTemplate> previous = templates.putIfAbsent(templatePath, load(templatePath, modelClass));
             if (previous != null) throw Exceptions.error("template was registered, templatePath={}", templatePath);
@@ -54,7 +54,7 @@ public class TemplateManager {
                 templateLastModifiedTimes.put(templatePath, Files.lastModified(path));
             }
         } finally {
-            logger.info("add, templatePath={}, modelClass={}, elapsedTime={}", templatePath, modelClass.getCanonicalName(), watch.elapsedTime());
+            logger.info("add, templatePath={}, modelClass={}, elapsed={}", templatePath, modelClass.getCanonicalName(), watch.elapsed());
         }
     }
 
@@ -79,7 +79,7 @@ public class TemplateManager {
     }
 
     private Map<String, HTMLTemplate> load(String templatePath, Class<?> modelClass) {
-        HTMLTemplateBuilder builder = new HTMLTemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass);
+        var builder = new HTMLTemplateBuilder(new FileTemplateSource(webDirectory.root(), templatePath), modelClass);
         builder.cdn = cdnManager;
         Map<String, HTMLTemplate> templates = Maps.newHashMap();
         for (String language : message.languages) {

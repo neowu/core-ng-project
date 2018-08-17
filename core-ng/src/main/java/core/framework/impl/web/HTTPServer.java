@@ -35,11 +35,9 @@ public class HTTPServer {
     }
 
     public void start() {
-        if (httpPort == null && httpsPort == null) {
-            httpPort = 8080;    // by default start http
-        }
+        if (httpPort == null && httpsPort == null) httpPort = 8080;    // by default start http
 
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         try {
             Undertow.Builder builder = Undertow.builder();
             if (httpPort != null) builder.addHttpListener(httpPort, "0.0.0.0");
@@ -54,7 +52,7 @@ public class HTTPServer {
             server = builder.build();
             server.start();
         } finally {
-            logger.info("http server started, httpPort={}, httpsPort={}, gzip={}, elapsedTime={}", httpPort, httpsPort, gzip, watch.elapsedTime());
+            logger.info("http server started, httpPort={}, httpsPort={}, gzip={}, elapsed={}", httpPort, httpsPort, gzip, watch.elapsed());
         }
     }
 

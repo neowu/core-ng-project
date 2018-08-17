@@ -38,6 +38,6 @@ public final class InitSearchConfig extends Config {
     }
 
     public void flush(String index) {
-        config.search.flush(index);
+        config.search.flushIndex(index);
     }
 }
