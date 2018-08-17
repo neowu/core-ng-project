@@ -40,7 +40,7 @@ public final class RedisImpl implements Redis {
     public Pool<RedisConnection> pool;
     public String host;
     long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
-    Duration timeout;
+    int timeoutInMs;
 
     public RedisImpl(String name) {
         this.name = name;
@@ -51,7 +51,7 @@ public final class RedisImpl implements Redis {
     }
 
     public void timeout(Duration timeout) {
-        this.timeout = timeout;
+        timeoutInMs = (int) timeout.toMillis();
         pool.checkoutTimeout(timeout);
     }
 
@@ -62,8 +62,8 @@ public final class RedisImpl implements Redis {
     private RedisConnection createConnection() {
         if (host == null) throw new Error("redis.host must not be null");
         try {
-            RedisConnection connection = new RedisConnection(host, timeout);
-            connection.connect();
+            var connection = new RedisConnection();
+            connection.connect(host, timeoutInMs);
             return connection;
         } catch (IOException e) {
             throw new UncheckedIOException(e);

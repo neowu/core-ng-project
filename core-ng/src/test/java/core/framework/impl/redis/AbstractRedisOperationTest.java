@@ -9,7 +9,6 @@ import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.time.Duration;
 
 import static core.framework.impl.redis.RedisEncodings.decode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,7 +19,7 @@ import static org.mockito.Mockito.when;
  * @author neo
  */
 abstract class AbstractRedisOperationTest {
-    RedisImpl redis;
+    protected RedisImpl redis;
     private ByteArrayOutputStream request;
     private PoolItem<RedisConnection> poolItem;
 
@@ -28,7 +27,7 @@ abstract class AbstractRedisOperationTest {
     @BeforeEach
     void createRedis() {
         request = new ByteArrayOutputStream();
-        RedisConnection connection = new RedisConnection(null, Duration.ZERO);
+        var connection = new RedisConnection();
         connection.outputStream = new RedisOutputStream(request, 512);
         poolItem = new PoolItem<>(connection);
         redis = new RedisImpl(null);

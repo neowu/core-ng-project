@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -25,17 +25,17 @@ class RedisImplTest {
 
     @Test
     void timeout() {
-        Duration timeout = Duration.ofSeconds(5);
+        var timeout = Duration.ofSeconds(5);
         redis.timeout(timeout);
 
-        assertEquals(timeout, redis.timeout);
+        assertThat(redis.timeoutInMs).isEqualTo(timeout.toMillis());
     }
 
     @Test
     void slowOperationThreshold() {
-        Duration threshold = Duration.ofSeconds(5);
+        var threshold = Duration.ofSeconds(5);
         redis.slowOperationThreshold(threshold);
 
-        assertEquals(threshold.toNanos(), redis.slowOperationThresholdInNanos);
+        assertThat(redis.slowOperationThresholdInNanos).isEqualTo(threshold.toNanos());
     }
 }

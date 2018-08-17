@@ -3,27 +3,18 @@ package core.framework.impl.redis;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.time.Duration;
 
 /**
  * @author neo
  */
 class RedisConnection implements AutoCloseable {
     private static final int DEFAULT_PORT = 6379;
-    private final String host;
-    private final int timeoutInMs;
 
     RedisOutputStream outputStream;
     RedisInputStream inputStream;
-
     private Socket socket;
 
-    RedisConnection(String host, Duration timeout) {
-        this.host = host;
-        timeoutInMs = (int) timeout.toMillis();
-    }
-
-    void connect() throws IOException {
+    void connect(String host, int timeoutInMs) throws IOException {
         socket = new Socket();
         socket.setReuseAddress(true);
         socket.setKeepAlive(true);
