@@ -23,7 +23,7 @@ class RedisInputStream {
     }
 
     String readSimpleString() throws IOException {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         while (true) {
             fill();
             byte value1 = buffer[position++];

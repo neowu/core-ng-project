@@ -1,7 +1,6 @@
 package core.framework.impl.redis;
 
 import core.framework.util.Lists;
-import core.framework.util.Maps;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -89,10 +88,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
     @Test
     void multiSet() {
         response("+OK\r\n");
-        Map<String, String> values = Maps.newLinkedHashMap();
-        values.put("k1", "v1");
-        values.put("k2", "v2");
-        redis.multiSet(values);
+        redis.multiSet(Map.of("k1", "v1", "k2", "v2"));
 
         assertRequestEquals("*5\r\n$4\r\nMSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n$2\r\nk2\r\n$2\r\nv2\r\n");
     }
@@ -100,10 +96,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
     @Test
     void multiSetWithExpiration() {
         response("+OK\r\n+OK\r\n");
-        Map<String, byte[]> values = Maps.newLinkedHashMap();
-        values.put("k1", encode("v1"));
-        values.put("k2", encode("v2"));
-        redis.multiSet(values, Duration.ofMinutes(1));
+        redis.multiSet(Map.of("k1", encode("v1"), "k2", encode("v2")), Duration.ofMinutes(1));
 
         assertRequestEquals("*5\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n$2\r\nex\r\n$2\r\n60\r\n"
                 + "*5\r\n$3\r\nSET\r\n$2\r\nk2\r\n$2\r\nv2\r\n$2\r\nex\r\n$2\r\n60\r\n");
@@ -112,7 +105,6 @@ class RedisOperationTest extends AbstractRedisOperationTest {
     @Test
     void increaseBy() {
         response(":1\r\n");
-
         redis.increaseBy("k1", 1);
 
         assertRequestEquals("*3\r\n$6\r\nINCRBY\r\n$2\r\nk1\r\n$1\r\n1\r\n");

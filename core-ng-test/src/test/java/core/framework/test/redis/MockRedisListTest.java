@@ -18,23 +18,31 @@ class MockRedisListTest {
 
     @Test
     void push() {
-        redis.list().push("key1", "val1");
-        redis.list().push("key1", "val2");
+        redis.list().push("key1", "v1");
+        redis.list().push("key1", "v2");
 
-        assertThat(redis.list().pop("key1")).isEqualTo("val1");
-        assertThat(redis.list().range("key1")).containsOnly("val2");
-        assertThat(redis.list().pop("key1")).isEqualTo("val2");
+        assertThat(redis.list().pop("key1")).isEqualTo("v1");
+        assertThat(redis.list().range("key1")).containsOnly("v2");
+        assertThat(redis.list().pop("key1")).isEqualTo("v2");
         assertThat(redis.list().range("key1")).isEmpty();
     }
 
     @Test
     void range() {
-        redis.list().push("key1", "val1", "val2", "val3");
+        redis.list().push("key2", "v1", "v2", "v3");
 
-        assertThat(redis.list().range("key1")).containsExactly("val1", "val2", "val3");
-        assertThat(redis.list().range("key1", 2, -1)).containsExactly("val3");
-        assertThat(redis.list().range("key1", 1, 2)).containsExactly("val2", "val3");
-        assertThat(redis.list().range("key1", -1, 5)).containsExactly("val1", "val2", "val3");
-        assertThat(redis.list().range("key1", 9, 10)).isEmpty();
+        assertThat(redis.list().range("key2")).containsExactly("v1", "v2", "v3");
+        assertThat(redis.list().range("key2", 2, -1)).containsExactly("v3");
+        assertThat(redis.list().range("key2", 1, 2)).containsExactly("v2", "v3");
+        assertThat(redis.list().range("key2", -1, 5)).containsExactly("v1", "v2", "v3");
+        assertThat(redis.list().range("key2", 9, 10)).isEmpty();
+    }
+
+    @Test
+    void set() {
+        redis.list().push("key3", "v1", "v2", "v3");
+        redis.list().set("key3", "v4", "v5", "v6");
+
+        assertThat(redis.list().range("key3")).containsExactly("v4", "v5", "v6");
     }
 }

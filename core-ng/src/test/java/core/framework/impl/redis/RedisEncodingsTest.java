@@ -34,9 +34,12 @@ class RedisEncodingsTest {
     }
 
     @Test
-    void encodeKeyWithValues() {
-        byte[][] result = RedisEncodings.encode("key", new String[]{"v1", "v2"});
+    void encodeStrings() {
+        byte[][] result = RedisEncodings.encode("key", "v1", "v2");
         assertThat(result).containsExactly(Strings.bytes("key"), Strings.bytes("v1"), Strings.bytes("v2"));
+
+        result = RedisEncodings.encode(null, "v1", "v2");
+        assertThat(result).containsExactly(Strings.bytes("v1"), Strings.bytes("v2"));
 
         assertThatThrownBy(() -> RedisEncodings.encode("key", new String[0]))
                 .isInstanceOf(RedisException.class)
@@ -44,27 +47,15 @@ class RedisEncodingsTest {
     }
 
     @Test
-    void encodeWithValues() {
-        byte[][] result = RedisEncodings.encode(new String[]{"v1", "v2"});
-        assertThat(result).containsExactly(Strings.bytes("v1"), Strings.bytes("v2"));
-    }
-
-    @Test
     void encodeMap() {
-        byte[][] result = RedisEncodings.encode(Map.of("k1", "v1"));
+        byte[][] result = RedisEncodings.encode(null, Map.of("k1", "v1"));
         assertThat(result).containsExactly(Strings.bytes("k1"), Strings.bytes("v1"));
 
-        assertThatThrownBy(() -> RedisEncodings.encode(Map.of()))
-                .isInstanceOf(RedisException.class)
-                .hasMessageContaining("values must not be empty");
-    }
-
-    @Test
-    void encodeKeyWithMap() {
-        byte[][] result = RedisEncodings.encode("key", Map.of("k1", "v1"));
+        result = RedisEncodings.encode("key", Map.of("k1", "v1"));
         assertThat(result).containsExactly(Strings.bytes("key"), Strings.bytes("k1"), Strings.bytes("v1"));
 
-        assertThatThrownBy(() -> RedisEncodings.encode("key", Map.of()))
+
+        assertThatThrownBy(() -> RedisEncodings.encode(null, Map.of()))
                 .isInstanceOf(RedisException.class)
                 .hasMessageContaining("values must not be empty");
     }

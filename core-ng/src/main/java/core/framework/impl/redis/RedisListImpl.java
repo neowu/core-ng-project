@@ -12,8 +12,11 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static core.framework.impl.redis.Protocol.Command.DEL;
+import static core.framework.impl.redis.Protocol.Command.EXEC;
 import static core.framework.impl.redis.Protocol.Command.LPOP;
 import static core.framework.impl.redis.Protocol.Command.LRANGE;
+import static core.framework.impl.redis.Protocol.Command.MULTI;
 import static core.framework.impl.redis.Protocol.Command.RPUSH;
 import static core.framework.impl.redis.RedisEncodings.decode;
 import static core.framework.impl.redis.RedisEncodings.encode;
@@ -92,6 +95,29 @@ public final class RedisListImpl implements RedisList {
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, returnedValues, 0);
             logger.debug("lrange, key={}, start={}, end={}, returnedValues={}, elapsed={}", key, start, end, returnedValues, elapsed);
+            redis.checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
+    public void set(String key, String... values) {
+        var watch = new StopWatch();
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.write(MULTI);
+            connection.write(DEL, encode(key));
+            connection.write(RPUSH, encode(key, values));
+            connection.write(EXEC);
+            connection.readAll(4);
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 0, values.length);
+            logger.debug("set, key={}, values={}, size={}, elapsed={}", key, values, values.length, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

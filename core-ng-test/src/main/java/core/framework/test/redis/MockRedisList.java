@@ -28,7 +28,7 @@ public final class MockRedisList implements RedisList {
     @Override
     public long push(String key, String... values) {
         assertThat(values).doesNotContainNull();
-        var value = store.putIfAbsent(key, new ArrayList<>());
+        var value = store.putIfAbsent(key, new ArrayList<>(values.length));
         List<String> list = value.list();
         Collections.addAll(list, values);
         return list.size();
@@ -45,5 +45,13 @@ public final class MockRedisList implements RedisList {
         int endIndex = end < 0 ? (int) end + size : (int) end;
         if (endIndex >= size) endIndex = size - 1;
         return List.copyOf(list.subList(startIndex, endIndex + 1));
+    }
+
+    @Override
+    public void set(String key, String... values) {
+        assertThat(values).doesNotContainNull();
+        List<String> list = new ArrayList<>(values.length);
+        Collections.addAll(list, values);
+        store.store.put(key, new MockRedisStore.Value(list));
     }
 }

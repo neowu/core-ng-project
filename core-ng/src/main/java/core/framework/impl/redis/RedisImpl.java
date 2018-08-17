@@ -166,7 +166,7 @@ public final class RedisImpl implements Redis {
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(Protocol.Command.DEL, encode(keys));
+            connection.write(Protocol.Command.DEL, encode(null, keys));
             deletedKeys = connection.readLong();
             return deletedKeys;
         } catch (IOException e) {
@@ -218,7 +218,7 @@ public final class RedisImpl implements Redis {
         try {
             RedisConnection connection = item.resource;
             Map<String, byte[]> values = Maps.newHashMapWithExpectedSize(keys.length);
-            connection.write(Protocol.Command.MGET, encode(keys));
+            connection.write(Protocol.Command.MGET, encode(null, keys));
             Object[] response = connection.readArray();
             for (int i = 0; i < response.length; i++) {
                 byte[] value = (byte[]) response[i];
@@ -244,7 +244,7 @@ public final class RedisImpl implements Redis {
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(Protocol.Command.MSET, encode(values));
+            connection.write(Protocol.Command.MSET, encode(null, values));
             connection.readSimpleString();
         } catch (IOException e) {
             item.broken = true;

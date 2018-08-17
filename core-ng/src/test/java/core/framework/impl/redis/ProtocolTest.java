@@ -7,10 +7,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import static core.framework.impl.redis.Protocol.Command.SET;
 import static core.framework.impl.redis.RedisEncodings.decode;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static core.framework.impl.redis.RedisEncodings.encode;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -18,53 +19,51 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ProtocolTest {
     @Test
     void write() throws IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        Protocol.write(new RedisOutputStream(stream, 8192), Protocol.Command.SET, RedisEncodings.encode("k1"), RedisEncodings.encode("v1"));
-        assertEquals("*3\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n", decode(stream.toByteArray()));
+        var stream = new ByteArrayOutputStream();
+        Protocol.write(new RedisOutputStream(stream, 8192), SET, encode("k1"), encode("v1"));
+        assertThat(decode(stream.toByteArray())).isEqualTo("*3\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n");
     }
 
     @Test
     void readError() {
-        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("-error-message\r\n"));
-        RedisException exception = assertThrows(RedisException.class, () -> Protocol.read(new RedisInputStream(stream)));
-        assertEquals("error-message", exception.getMessage());
+        var stream = new ByteArrayInputStream(Strings.bytes("-error-message\r\n"));
+        assertThatThrownBy(() -> Protocol.read(new RedisInputStream(stream)))
+                .isInstanceOf(RedisException.class)
+                .hasMessage("error-message");
     }
 
     @Test
     void readArray() throws IOException {
-        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("*3\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n"));
+        var stream = new ByteArrayInputStream(Strings.bytes("*3\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n"));
         Object[] response = (Object[]) Protocol.read(new RedisInputStream(stream));
-        assertEquals(3, response.length);
-        assertEquals("1", decode((byte[]) response[0]));
-        assertEquals("2", decode((byte[]) response[1]));
-        assertEquals("3", decode((byte[]) response[2]));
+        assertThat(response).containsExactly(encode("1"), encode("2"), encode("3"));
     }
 
     @Test
     void readSimpleString() throws IOException {
-        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("+OK\r\n"));
+        var stream = new ByteArrayInputStream(Strings.bytes("+OK\r\n"));
         String response = (String) Protocol.read(new RedisInputStream(stream));
-        assertEquals("OK", response);
+        assertThat(response).isEqualTo("OK");
     }
 
     @Test
     void readLong() throws IOException {
-        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes(":10\r\n"));
+        var stream = new ByteArrayInputStream(Strings.bytes(":10\r\n"));
         long response = (Long) Protocol.read(new RedisInputStream(stream));
-        assertEquals(10, response);
+        assertThat(response).isEqualTo(10);
     }
 
     @Test
     void readNullString() throws IOException {
-        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("$-1\r\n"));
+        var stream = new ByteArrayInputStream(Strings.bytes("$-1\r\n"));
         byte[] response = (byte[]) Protocol.read(new RedisInputStream(stream));
-        assertNull(response);
+        assertThat(response).isNull();
     }
 
     @Test
     void readEmptyString() throws IOException {
-        ByteArrayInputStream stream = new ByteArrayInputStream(Strings.bytes("$0\r\n\r\n"));
+        var stream = new ByteArrayInputStream(Strings.bytes("$0\r\n\r\n"));
         byte[] response = (byte[]) Protocol.read(new RedisInputStream(stream));
-        assertEquals("", decode(response));
+        assertThat(decode(response)).isEmpty();
     }
 }
