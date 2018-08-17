@@ -18,7 +18,7 @@ class RedisEncodingsTest {
     }
 
     @Test
-    void encodeInteger() {
+    void encodeLong() {
         assertThat(RedisEncodings.encode(-1)).isEqualTo(Strings.bytes("-1"));
         assertThat(RedisEncodings.encode(9)).isEqualTo(Strings.bytes("9"));
         assertThat(RedisEncodings.encode(88)).isEqualTo(Strings.bytes("88"));
@@ -28,22 +28,25 @@ class RedisEncodingsTest {
         assertThat(RedisEncodings.encode(444444)).isEqualTo(Strings.bytes("444444"));
         assertThat(RedisEncodings.encode(3333333)).isEqualTo(Strings.bytes("3333333"));
         assertThat(RedisEncodings.encode(-1234567890)).isEqualTo(Strings.bytes("-1234567890"));
-    }
 
-    @Test
-    void encodeLong() {
         assertThat(RedisEncodings.encode(5L)).isEqualTo(Strings.bytes("5"));
         assertThat(RedisEncodings.encode(-1234567890123456789L)).isEqualTo(Strings.bytes("-1234567890123456789"));
     }
 
     @Test
     void encodeKeyWithValues() {
-        byte[][] result = RedisEncodings.encode("key", "v1", "v2");
+        byte[][] result = RedisEncodings.encode("key", new String[]{"v1", "v2"});
         assertThat(result).containsExactly(Strings.bytes("key"), Strings.bytes("v1"), Strings.bytes("v2"));
 
         assertThatThrownBy(() -> RedisEncodings.encode("key", new String[0]))
                 .isInstanceOf(RedisException.class)
                 .hasMessageContaining("values must not be empty");
+    }
+
+    @Test
+    void encodeWithValues() {
+        byte[][] result = RedisEncodings.encode(new String[]{"v1", "v2"});
+        assertThat(result).containsExactly(Strings.bytes("v1"), Strings.bytes("v2"));
     }
 
     @Test

@@ -70,7 +70,7 @@ public final class RedisListImpl implements RedisList {
     }
 
     @Override
-    public List<String> range(String key, int start, int end) {
+    public List<String> range(String key, long start, long end) {
         var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         int returnedValues = 0;

@@ -74,8 +74,11 @@ class MockRedisTest {
     @Test
     void setIfAbsent() {
         redis.set("key8", "value8");
-        assertThat(redis.setIfAbsent("key8", "value9", Duration.ofMinutes(5))).isFalse();
+        assertThat(redis.set("key8", "value9", Duration.ofMinutes(5), true)).isFalse();
         assertThat(redis.get("key8")).isEqualTo("value8");
+
+        assertThat(redis.set("key9", "value9", null, true)).isTrue();
+        assertThat(redis.get("key9")).isEqualTo("value9");
     }
 
     @Test
@@ -88,7 +91,8 @@ class MockRedisTest {
     @Test
     void del() {
         redis.set("key6", "value6");
-        redis.del("key6");
+
+        assertThat(redis.del("key6")).isEqualTo(1);
         assertThat(redis.get("key6")).isNull();
     }
 

@@ -30,6 +30,11 @@ class MockRedisListTest {
     @Test
     void range() {
         redis.list().push("key1", "val1", "val2", "val3");
+
         assertThat(redis.list().range("key1")).containsExactly("val1", "val2", "val3");
+        assertThat(redis.list().range("key1", 2, -1)).containsExactly("val3");
+        assertThat(redis.list().range("key1", 1, 2)).containsExactly("val2", "val3");
+        assertThat(redis.list().range("key1", -1, 5)).containsExactly("val1", "val2", "val3");
+        assertThat(redis.list().range("key1", 9, 10)).isEmpty();
     }
 }

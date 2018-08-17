@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import static core.framework.impl.redis.RedisEncodings.encode;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -38,16 +38,25 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         response("+OK\r\n");
         redis.set("key", "value", Duration.ofMinutes(1));
 
-        assertRequestEquals("*4\r\n$5\r\nSETEX\r\n$3\r\nkey\r\n$2\r\n60\r\n$5\r\nvalue\r\n");
+        assertRequestEquals("*5\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nex\r\n$2\r\n60\r\n");
     }
 
     @Test
     void setIfAbsent() {
         response("+OK\r\n");
-        boolean result = redis.setIfAbsent("key", "value", Duration.ofMinutes(1));
+        boolean result = redis.set("key", "value", Duration.ofMinutes(1), true);
 
-        assertTrue(result);
+        assertThat(result).isTrue();
         assertRequestEquals("*6\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nnx\r\n$2\r\nex\r\n$2\r\n60\r\n");
+    }
+
+    @Test
+    void setIfAbsentWithPresentKey() {
+        response("$-1\r\n");
+        boolean result = redis.set("key", "value", null, true);
+
+        assertThat(result).isFalse();
+        assertRequestEquals("*4\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nnx\r\n");
     }
 
     @Test
@@ -96,8 +105,8 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         values.put("k2", encode("v2"));
         redis.multiSet(values, Duration.ofMinutes(1));
 
-        assertRequestEquals("*4\r\n$5\r\nSETEX\r\n$2\r\nk1\r\n$2\r\n60\r\n$2\r\nv1\r\n"
-                + "*4\r\n$5\r\nSETEX\r\n$2\r\nk2\r\n$2\r\n60\r\n$2\r\nv2\r\n");
+        assertRequestEquals("*5\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n$2\r\nex\r\n$2\r\n60\r\n"
+                + "*5\r\n$3\r\nSET\r\n$2\r\nk2\r\n$2\r\nv2\r\n$2\r\nex\r\n$2\r\n60\r\n");
     }
 
     @Test

@@ -10,17 +10,21 @@ import java.util.function.Consumer;
 public interface Redis {
     String get(String key);
 
-    void set(String key, String value);
+    default void set(String key, String value) {
+        set(key, value, null, false);
+    }
 
-    void set(String key, String value, Duration expiration);
+    default void set(String key, String value, Duration expiration) {
+        set(key, value, expiration, false);
+    }
+
+    boolean set(String key, String value, Duration expiration, boolean onlyIfAbsent);
 
     RedisSet set();
 
-    boolean setIfAbsent(String key, String value, Duration expiration);
-
     void expire(String key, Duration duration);
 
-    boolean del(String key);
+    long del(String... keys);
 
     long increaseBy(String key, long increment);
 

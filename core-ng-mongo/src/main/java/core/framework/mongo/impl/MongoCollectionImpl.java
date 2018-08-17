@@ -31,7 +31,6 @@ import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import org.bson.BsonDocument;
-import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,12 +93,11 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
 
     @Override
     public void bulkInsert(List<T> entities) {
+        var watch = new StopWatch();
         if (entities == null || entities.isEmpty()) throw Exceptions.error("entities must not be empty");
 
-        StopWatch watch = new StopWatch();
-        for (T entity : entities) {
+        for (T entity : entities)
             validator.validate(entity);
-        }
         try {
             collection().insertMany(entities, new InsertManyOptions().ordered(false));
         } finally {
@@ -113,9 +111,9 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
 
     @Override
     public Optional<T> get(Get get) {
+        var watch = new StopWatch();
         if (get.id == null) throw new Error("get.id must not be null");
 
-        var watch = new StopWatch();
         int returnedRows = 0;
         try {
             T result = collection(get.readPreference).find(Filters.eq("_id", get.id)).first();
@@ -190,7 +188,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
 
     @Override
     public void forEach(Query query, Consumer<T> consumer) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         int returnedRows = 0;
         try {
             FindIterable<T> mongoQuery = mongoQuery(query);
@@ -234,10 +232,10 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
 
     @Override
     public <V> List<V> aggregate(Aggregate<V> aggregate) {
+        var watch = new StopWatch();
         if (aggregate.pipeline == null || aggregate.pipeline.isEmpty()) throw new Error("aggregate.pipeline must not be empty");
         if (aggregate.resultClass == null) throw new Error("aggregate.resultClass must not be null");
 
-        var watch = new StopWatch();
         List<V> results = Lists.newArrayList();
         try {
             AggregateIterable<V> query = collection(aggregate.readPreference)
@@ -261,11 +259,11 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
 
     @Override
     public <V> List<V> mapReduce(MapReduce<V> mapReduce) {
+        var watch = new StopWatch();
         if (Strings.isEmpty(mapReduce.mapFunction)) throw new Error("mapReduce.mapFunction must not be empty");
         if (Strings.isEmpty(mapReduce.reduceFunction)) throw new Error("mapReduce.reduceFunction must not be empty");
         if (mapReduce.resultClass == null) throw new Error("mapReduce.resultClass must not be null");
 
-        var watch = new StopWatch();
         List<V> results = Lists.newArrayList();
         try {
             MapReduceIterable<V> query = collection(mapReduce.readPreference)
@@ -320,9 +318,8 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         var watch = new StopWatch();
         if (entities == null || entities.isEmpty()) throw Exceptions.error("entities must not be empty");
         int size = entities.size();
-        for (T entity : entities) {
+        for (T entity : entities)
             validator.validate(entity);
-        }
         try {
             List<ReplaceOneModel<T>> models = new ArrayList<>(size);
             for (T entity : entities) {
@@ -408,49 +405,29 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("mongoDB", elapsed, 0, deletedRows);
-            logger.debug("bulkDelete, collection={}, ids={}, size={}, elapsed={}", collectionName, ids, size, elapsed);
+            logger.debug("bulkDelete, collection={}, ids={}, size={}, deletedRows={}, elapsed={}", collectionName, ids, size, deletedRows, elapsed);
             checkSlowOperation(elapsed);
         }
     }
 
     private void checkSlowOperation(long elapsed) {
-        if (elapsed > mongo.slowOperationThresholdInNanos) {
+        if (elapsed > mongo.slowOperationThresholdInNanos)
             logger.warn(Markers.errorCode("SLOW_MONGODB"), "slow mongoDB query, elapsed={}", elapsed);
-        }
     }
 
     private void checkTooManyRowsReturned(int size) {
-        if (size > mongo.tooManyRowsReturnedThreshold) {
+        if (size > mongo.tooManyRowsReturnedThreshold)
             logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
-        }
     }
 
     private com.mongodb.client.MongoCollection<T> collection(ReadPreference readPreference) {
-        if (readPreference != null)
-            return collection().withReadPreference(readPreference);
+        if (readPreference != null) return collection().withReadPreference(readPreference);
         return collection();
     }
 
     private com.mongodb.client.MongoCollection<T> collection() {
-        if (collection == null) {
+        if (collection == null)
             collection = mongo.mongoCollection(entityClass);
-        }
         return collection;
-    }
-
-    static class BsonParam {
-        final Bson bson;
-        final CodecRegistry registry;
-
-        BsonParam(Bson bson, CodecRegistry registry) {
-            this.bson = bson;
-            this.registry = registry;
-        }
-
-        @Override
-        public String toString() {
-            if (bson == null) return "null";
-            return bson.toBsonDocument(null, registry).toJson();
-        }
     }
 }

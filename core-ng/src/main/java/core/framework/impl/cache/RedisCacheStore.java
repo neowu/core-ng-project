@@ -44,7 +44,7 @@ public class RedisCacheStore implements CacheStore {
     @Override
     public void put(String key, byte[] value, Duration expiration) {
         try {
-            redis.set(key, value, expiration);
+            redis.set(key, value, expiration, false);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
         }

@@ -27,28 +27,20 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public void set(String key, String value) {
-        store.store.put(key, new MockRedisStore.Value(value));
-    }
-
-    @Override
-    public void set(String key, String value, Duration expiration) {
-        var redisValue = new MockRedisStore.Value(value);
-        redisValue.expirationTime = System.currentTimeMillis() + expiration.toMillis();
-        store.store.put(key, redisValue);
+    public boolean set(String key, String value, Duration expiration, boolean onlyIfAbsent) {
+        MockRedisStore.Value redisValue = new MockRedisStore.Value(value);
+        if (expiration != null) redisValue.expirationTime = System.currentTimeMillis() + expiration.toMillis();
+        if (onlyIfAbsent) {
+            return store.store.putIfAbsent(key, redisValue) == null;
+        } else {
+            store.store.put(key, redisValue);
+            return true;
+        }
     }
 
     @Override
     public RedisSet set() {
         return set;
-    }
-
-    @Override
-    public boolean setIfAbsent(String key, String value, Duration expiration) {
-        MockRedisStore.Value redisValue = new MockRedisStore.Value(value);
-        redisValue.expirationTime = System.currentTimeMillis() + expiration.toMillis();
-        Object previous = store.store.putIfAbsent(key, redisValue);
-        return previous == null;
     }
 
     @Override
@@ -60,9 +52,12 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public boolean del(String key) {
-        var removed = store.store.remove(key);
-        return removed != null;
+    public long del(String... keys) {
+        long removed = 0;
+        for (String key : keys) {
+            if (store.store.remove(key) != null) removed++;
+        }
+        return removed;
     }
 
     @Override

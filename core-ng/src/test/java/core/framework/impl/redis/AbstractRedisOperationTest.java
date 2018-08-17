@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 
 import static core.framework.impl.redis.RedisEncodings.decode;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,7 +42,7 @@ abstract class AbstractRedisOperationTest {
     }
 
     void assertRequestEquals(String data) {
-        assertEquals(data, decode(request.toByteArray()));
+        assertThat(decode(request.toByteArray())).isEqualTo(data);
     }
 
     void response(String data) {
