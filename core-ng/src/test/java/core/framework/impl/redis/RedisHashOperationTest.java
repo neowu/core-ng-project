@@ -2,6 +2,7 @@ package core.framework.impl.redis;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +41,10 @@ class RedisHashOperationTest extends AbstractRedisOperationTest {
     @Test
     void multiSet() {
         response("+OK\r\n");
-        redis.hash().multiSet("key", Map.of("f2", "v2", "f1", "v1"));
+        Map<String, String> values = new LinkedHashMap<>();
+        values.put("f1", "v1");
+        values.put("f2", "v2");
+        redis.hash().multiSet("key", values);
 
         assertRequestEquals("*6\r\n$5\r\nHMSET\r\n$3\r\nkey\r\n$2\r\nf1\r\n$2\r\nv1\r\n$2\r\nf2\r\n$2\r\nv2\r\n");
     }
