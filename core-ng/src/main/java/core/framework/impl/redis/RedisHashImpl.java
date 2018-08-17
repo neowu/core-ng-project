@@ -135,10 +135,10 @@ public final class RedisHashImpl implements RedisHash {
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
-            long elapsedTime = watch.elapsed();
-            ActionLogContext.track("redis", elapsedTime, 0, (int) deletedFields);
-            logger.debug("hdel, key={}, fields={}, size={}, deletedFields={}, elapsed={}", key, fields, fields.length, deletedFields, elapsedTime);
-            redis.checkSlowOperation(elapsedTime);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 0, (int) deletedFields);
+            logger.debug("hdel, key={}, fields={}, size={}, deletedFields={}, elapsed={}", key, fields, fields.length, deletedFields, elapsed);
+            redis.checkSlowOperation(elapsed);
         }
     }
 }
