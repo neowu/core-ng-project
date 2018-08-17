@@ -3,7 +3,6 @@
 * log: make log-processor leverage built-in kafak support, to index action as well
 * redis,mongo,elasticserch: fix forEach elapsed time tracking 
 * redis: replace setnx with set command
-* reids: support redis.list().set(key, values) to replace entire list
 
 ### 6.6.4 (8/9/2018 - 8/15/2018)
 * kafka: update to 2.0.0

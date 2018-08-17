@@ -15,6 +15,4 @@ public interface RedisList {
     }
 
     List<String> range(String key, long start, long end);
-
-    void set(String key, String... values);
 }

@@ -46,12 +46,4 @@ public final class MockRedisList implements RedisList {
         if (endIndex >= size) endIndex = size - 1;
         return List.copyOf(list.subList(startIndex, endIndex + 1));
     }
-
-    @Override
-    public void set(String key, String... values) {
-        assertThat(values).doesNotContainNull();
-        List<String> list = new ArrayList<>(values.length);
-        Collections.addAll(list, values);
-        store.store.put(key, new MockRedisStore.Value(list));
-    }
 }

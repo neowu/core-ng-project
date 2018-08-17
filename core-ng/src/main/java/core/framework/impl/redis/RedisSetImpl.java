@@ -31,22 +31,23 @@ public final class RedisSetImpl implements RedisSet {
     }
 
     @Override
-    public boolean add(String key, String... values) {
+    public long add(String key, String... values) {
         var watch = new StopWatch();
+        long addedValues = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.write(SADD, encode(key, values));
-            return connection.readLong() >= 1;
+            addedValues = connection.readLong();
+            return addedValues;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            int size = values.length;
-            ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("sadd, key={}, values={}, size={}, elapsed={}", key, values, size, elapsed);
+            ActionLogContext.track("redis", elapsed, 0, (int) addedValues);
+            logger.debug("sadd, key={}, values={}, size={}, addedValues={}, elapsed={}", key, values, values.length, addedValues, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
@@ -100,13 +101,15 @@ public final class RedisSetImpl implements RedisSet {
     }
 
     @Override
-    public boolean remove(String key, String... values) {
+    public long remove(String key, String... values) {
         var watch = new StopWatch();
+        long removedValues = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.write(SREM, encode(key, values));
-            return connection.readLong() >= 1;
+            removedValues = connection.readLong();
+            return removedValues;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -115,7 +118,7 @@ public final class RedisSetImpl implements RedisSet {
             long elapsed = watch.elapsed();
             int size = values.length;
             ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("srem, key={}, values={}, size={}, elapsed={}", key, values, size, elapsed);
+            logger.debug("srem, key={}, values={}, size={}, removedValues={}, elapsed={}", key, values, size, removedValues, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

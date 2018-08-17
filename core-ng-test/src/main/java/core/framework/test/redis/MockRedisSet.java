@@ -2,8 +2,6 @@ package core.framework.test.redis;
 
 import core.framework.redis.RedisSet;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,10 +18,15 @@ public final class MockRedisSet implements RedisSet {
     }
 
     @Override
-    public boolean add(String key, String... values) {
+    public long add(String key, String... values) {
         assertThat(values).doesNotContainNull();
         var setValue = store.putIfAbsent(key, new HashSet<>());
-        return Collections.addAll(setValue.set(), values);
+        Set<String> set = setValue.set();
+        long addedValues = 0;
+        for (String value : values) {
+            if (set.add(value)) addedValues++;
+        }
+        return addedValues;
     }
 
     @Override
@@ -41,9 +44,14 @@ public final class MockRedisSet implements RedisSet {
     }
 
     @Override
-    public boolean remove(String key, String... values) {
+    public long remove(String key, String... values) {
         var redisValue = store.get(key);
-        if (redisValue == null) return false;
-        return redisValue.set().removeAll(Arrays.asList(values));
+        if (redisValue == null) return 0;
+        Set<String> set = redisValue.set();
+        long removedValues = 0;
+        for (String value : values) {
+            if (set.remove(value)) removedValues++;
+        }
+        return removedValues;
     }
 }

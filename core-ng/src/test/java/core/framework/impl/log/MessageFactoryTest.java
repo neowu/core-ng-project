@@ -20,7 +20,7 @@ class MessageFactoryTest {
     void stat() {
         StatMessage message = MessageFactory.stat(Map.of("sys_load_avg", 1d), "app");
         assertThat(message.id).isNotNull();
-        assertThat(message.stats).containsExactly(entry("sys_load_avg", 1d));
+        assertThat(message.stats).containsOnly(entry("sys_load_avg", 1d));
     }
 
     @Test

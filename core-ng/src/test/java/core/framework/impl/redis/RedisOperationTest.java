@@ -4,11 +4,13 @@ import core.framework.util.Lists;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import static core.framework.impl.redis.RedisEncodings.encode;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -79,16 +81,17 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         response("*3\r\n$2\r\nv1\r\n$-1\r\n$2\r\nv3\r\n");
         Map<String, String> values = redis.multiGet("k1", "k2", "k3");
 
-        assertEquals(2, values.size());
-        assertEquals("v1", values.get("k1"));
-        assertEquals("v3", values.get("k3"));
+        assertThat(values).containsOnly(entry("k1", "v1"), entry("k3", "v3"));
         assertRequestEquals("*4\r\n$4\r\nMGET\r\n$2\r\nk1\r\n$2\r\nk2\r\n$2\r\nk3\r\n");
     }
 
     @Test
     void multiSet() {
         response("+OK\r\n");
-        redis.multiSet(Map.of("k1", "v1", "k2", "v2"));
+        Map<String, String> values = new LinkedHashMap<>();
+        values.put("k1", "v1");
+        values.put("k2", "v2");
+        redis.multiSet(values);
 
         assertRequestEquals("*5\r\n$4\r\nMSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n$2\r\nk2\r\n$2\r\nv2\r\n");
     }
@@ -96,7 +99,10 @@ class RedisOperationTest extends AbstractRedisOperationTest {
     @Test
     void multiSetWithExpiration() {
         response("+OK\r\n+OK\r\n");
-        redis.multiSet(Map.of("k1", encode("v1"), "k2", encode("v2")), Duration.ofMinutes(1));
+        Map<String, byte[]> values = new LinkedHashMap<>();
+        values.put("k1", encode("v1"));
+        values.put("k2", encode("v2"));
+        redis.multiSet(values, Duration.ofMinutes(1));
 
         assertRequestEquals("*5\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n$2\r\nex\r\n$2\r\n60\r\n"
                 + "*5\r\n$3\r\nSET\r\n$2\r\nk2\r\n$2\r\nv2\r\n$2\r\nex\r\n$2\r\n60\r\n");

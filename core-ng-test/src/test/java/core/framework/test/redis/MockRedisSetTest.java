@@ -29,14 +29,14 @@ class MockRedisSetTest {
         redis.set().add("key1", "value1");
         redis.set().add("key1", "value2");
 
-        assertThat(redis.set().members("key1")).containsExactlyInAnyOrder("value1", "value2");
+        assertThat(redis.set().members("key1")).containsOnly("value1", "value2");
     }
 
     @Test
     void remove() {
         redis.set().add("key7", "value1", "value2");
 
-        assertThat(redis.set().remove("key7", "value1")).isTrue();
-        assertThat(redis.set().members("key7")).containsExactly("value2");
+        assertThat(redis.set().remove("key7", "value1")).isEqualTo(1);
+        assertThat(redis.set().members("key7")).containsOnly("value2");
     }
 }

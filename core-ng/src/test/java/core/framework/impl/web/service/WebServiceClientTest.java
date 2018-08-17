@@ -49,7 +49,7 @@ class WebServiceClientTest {
 
         webServiceClient.addQueryParams(request, params);
 
-        assertThat(request.params()).containsExactly(entry("p1", "v1"), entry("p3", "v3"));
+        assertThat(request.params()).containsOnly(entry("p1", "v1"), entry("p3", "v3"));
     }
 
     @Test
@@ -78,7 +78,7 @@ class WebServiceClientTest {
         requestBean.intField = 23;
         webServiceClient.addRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
 
-        assertThat(request.params()).containsExactly(entry("int_field", "23"));
+        assertThat(request.params()).containsOnly(entry("int_field", "23"));
     }
 
     @Test
