@@ -28,7 +28,7 @@ class RedisEncodings {
             return INT_BYTES_CACHE[(int) value];
         }
         String text = Long.toString(value);
-        return Strings.bytes(text);
+        return Strings.bytes(text); // according to JMH benchmark, text.getBytes(Charsets.UTF_8) beats getBytesWithOtherCharset or convert by char[] directly, refer to JDK impl for details
     }
 
     static byte[][] encode(String key, String... values) {

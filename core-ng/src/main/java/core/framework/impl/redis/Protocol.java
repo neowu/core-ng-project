@@ -29,10 +29,10 @@ final class Protocol {
     }
 
     static Object read(RedisInputStream stream) throws IOException {
-        return parse(stream);
+        return parseObject(stream);
     }
 
-    private static Object parse(RedisInputStream stream) throws IOException {
+    private static Object parseObject(RedisInputStream stream) throws IOException {
         byte firstByte = stream.readByte();
         switch (firstByte) {
             case SIMPLE_STRING_BYTE:
@@ -42,7 +42,7 @@ final class Protocol {
             case ARRAY_BYTE:
                 return parseArray(stream);
             case INTEGER_BYTE:
-                return stream.readLongCRLF();
+                return stream.readLong();
             case ERROR_BYTE:
                 String message = stream.readSimpleString();
                 throw new RedisException(message);
@@ -52,21 +52,21 @@ final class Protocol {
     }
 
     private static byte[] parseBulkString(RedisInputStream stream) throws IOException {
-        int length = (int) stream.readLongCRLF();
+        int length = (int) stream.readLong();
         if (length == -1) {
             return null;
         }
-        return stream.readBulkStringCRLF(length);
+        return stream.readBulkString(length);
     }
 
     private static Object[] parseArray(RedisInputStream stream) throws IOException {
-        int length = (int) stream.readLongCRLF();
+        int length = (int) stream.readLong();
         if (length == -1) {
             return null;
         }
-        Object[] array = new Object[length];
+        var array = new Object[length];
         for (int i = 0; i < length; i++) {
-            array[i] = parse(stream);       // redis won't put error within array, so here it doesn't expect RedisException
+            array[i] = parseObject(stream);       // redis won't put error within array, so here it doesn't expect RedisException
         }
         return array;
     }

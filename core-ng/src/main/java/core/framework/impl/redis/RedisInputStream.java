@@ -47,7 +47,7 @@ class RedisInputStream {
         return response;
     }
 
-    long readLongCRLF() throws IOException {
+    long readLong() throws IOException {
         fill();
         boolean negative = buffer[position] == '-';
         if (negative) {
@@ -69,7 +69,7 @@ class RedisInputStream {
         return negative ? -value : value;
     }
 
-    byte[] readBulkStringCRLF(int length) throws IOException {
+    byte[] readBulkString(int length) throws IOException {
         byte[] response = new byte[length];
         int offset = 0;
         while (offset < length) {
