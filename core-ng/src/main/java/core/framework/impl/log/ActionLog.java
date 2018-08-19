@@ -5,9 +5,9 @@ import core.framework.util.Exceptions;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public final class ActionLog {
         startCPUTime = THREAD.getCurrentThreadCpuTime();
         date = Instant.now();
 
-        events = new LinkedList<>();
+        events = new ArrayList<>(16);   // according to benchmark, ArrayList is as fast as LinkedList with max 3000 items, and has smaller memory footprint
         context = new LinkedHashMap<>();
         stats = new HashMap<>();
         performanceStats = new HashMap<>();
