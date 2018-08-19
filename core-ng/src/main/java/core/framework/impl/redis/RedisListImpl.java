@@ -35,7 +35,7 @@ public final class RedisListImpl implements RedisList {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(LPOP, encode(key));
+            connection.writeKeyCommand(LPOP, key);
             return decode(connection.readBulkString());
         } catch (IOException e) {
             item.broken = true;
@@ -52,10 +52,11 @@ public final class RedisListImpl implements RedisList {
     @Override
     public long push(String key, String... values) {
         var watch = new StopWatch();
+        if (values.length == 0) throw new Error("values must not be empty");
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(RPUSH, encode(key, values));
+            connection.writeKeyArgumentsCommand(RPUSH, key, values);
             return connection.readLong();
         } catch (IOException e) {
             item.broken = true;
@@ -76,7 +77,12 @@ public final class RedisListImpl implements RedisList {
         int returnedValues = 0;
         try {
             RedisConnection connection = item.resource;
-            connection.write(LRANGE, encode(key), encode(start), encode(end));
+            connection.writeArray(4);
+            connection.writeBulkString(LRANGE);
+            connection.writeBulkString(encode(key));
+            connection.writeBulkString(encode(start));
+            connection.writeBulkString(encode(end));
+            connection.flush();
             Object[] response = connection.readArray();
             returnedValues = response.length;
             List<String> values = new ArrayList<>(response.length);

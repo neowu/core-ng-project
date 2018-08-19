@@ -37,7 +37,7 @@ public final class RedisHashImpl implements RedisHash {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(HGET, encode(key), encode(field));
+            connection.writeKeyArgumentCommand(HGET, key, encode(field));
             return decode(connection.readBulkString());
         } catch (IOException e) {
             item.broken = true;
@@ -58,9 +58,9 @@ public final class RedisHashImpl implements RedisHash {
         int returnedFields = 0;
         try {
             RedisConnection connection = item.resource;
-            connection.write(HGETALL, encode(key));
+            connection.writeKeyCommand(HGETALL, key);
             Object[] response = connection.readArray();
-            if (response.length % 2 != 0) throw new RedisException("unexpected length of array, length=" + response.length);
+            if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
             returnedFields = response.length / 2;
             Map<String, String> values = Maps.newHashMapWithExpectedSize(returnedFields);
             for (int i = 0; i < response.length; i += 2) {
@@ -85,7 +85,12 @@ public final class RedisHashImpl implements RedisHash {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(HSET, encode(key), encode(field), encode(value));
+            connection.writeArray(4);
+            connection.writeBulkString(HSET);
+            connection.writeBulkString(encode(key));
+            connection.writeBulkString(encode(field));
+            connection.writeBulkString(encode(value));
+            connection.flush();
             connection.readLong();
         } catch (IOException e) {
             item.broken = true;
@@ -102,10 +107,18 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public void multiSet(String key, Map<String, String> values) {
         var watch = new StopWatch();
+        if (values.isEmpty()) throw new Error("values must not be empty");
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(HMSET, encode(key, values));
+            connection.writeArray(2 + values.size() * 2);
+            connection.writeBulkString(HMSET);
+            connection.writeBulkString(encode(key));
+            for (Map.Entry<String, String> entry : values.entrySet()) {
+                connection.writeBulkString(encode(entry.getKey()));
+                connection.writeBulkString(encode(entry.getValue()));
+            }
+            connection.flush();
             connection.readSimpleString();
         } catch (IOException e) {
             item.broken = true;
@@ -123,11 +136,12 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public long del(String key, String... fields) {
         var watch = new StopWatch();
+        if (fields.length == 0) throw new Error("fields must not be empty");
         long deletedFields = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(HDEL, encode(key, fields));
+            connection.writeKeyArgumentsCommand(HDEL, key, fields);
             deletedFields = connection.readLong();
             return deletedFields;
         } catch (IOException e) {

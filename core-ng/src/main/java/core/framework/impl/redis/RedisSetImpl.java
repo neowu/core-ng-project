@@ -33,11 +33,12 @@ public final class RedisSetImpl implements RedisSet {
     @Override
     public long add(String key, String... values) {
         var watch = new StopWatch();
+        if (values.length == 0) throw new Error("values must not be empty");
         long addedValues = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(SADD, encode(key, values));
+            connection.writeKeyArgumentsCommand(SADD, key, values);
             addedValues = connection.readLong();
             return addedValues;
         } catch (IOException e) {
@@ -59,7 +60,7 @@ public final class RedisSetImpl implements RedisSet {
         int returnedValues = 0;
         try {
             RedisConnection connection = item.resource;
-            connection.write(SMEMBERS, encode(key));
+            connection.writeKeyCommand(SMEMBERS, key);
             Object[] response = connection.readArray();
             returnedValues = response.length;
             Set<String> values = Sets.newHashSetWithExpectedSize(returnedValues);
@@ -85,7 +86,7 @@ public final class RedisSetImpl implements RedisSet {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(SISMEMBER, encode(key), encode(value));
+            connection.writeKeyArgumentCommand(SISMEMBER, key, encode(value));
             Long response = connection.readLong();
             return response == 1;
         } catch (IOException e) {
@@ -103,11 +104,12 @@ public final class RedisSetImpl implements RedisSet {
     @Override
     public long remove(String key, String... values) {
         var watch = new StopWatch();
+        if (values.length == 0) throw new Error("values must not be empty");
         long removedValues = 0;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(SREM, encode(key, values));
+            connection.writeKeyArgumentsCommand(SREM, key, values);
             removedValues = connection.readLong();
             return removedValues;
         } catch (IOException e) {

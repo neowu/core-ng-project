@@ -14,18 +14,15 @@ final class Protocol {
     private static final byte BULK_STRING_BYTE = '$';
     private static final byte ARRAY_BYTE = '*';
 
-    static void write(RedisOutputStream stream, Command command, byte[]... arguments) throws IOException {
+    static void writeArray(RedisOutputStream stream, int length) throws IOException {
         stream.write(ARRAY_BYTE);
-        stream.writeBytesCRLF(RedisEncodings.encode(arguments.length + 1));
+        stream.writeBytesCRLF(RedisEncodings.encode(length));
+    }
+
+    static void writeBulkString(RedisOutputStream stream, byte[] value) throws IOException {
         stream.write(BULK_STRING_BYTE);
-        stream.writeBytesCRLF(RedisEncodings.encode(command.value.length));
-        stream.writeBytesCRLF(command.value);
-        for (byte[] argument : arguments) {
-            stream.write(BULK_STRING_BYTE);
-            stream.writeBytesCRLF(RedisEncodings.encode(argument.length));
-            stream.writeBytesCRLF(argument);
-        }
-        stream.flush();
+        stream.writeBytesCRLF(RedisEncodings.encode(value.length));
+        stream.writeBytesCRLF(value);
     }
 
     static Object read(RedisInputStream stream) throws IOException {
@@ -53,17 +50,15 @@ final class Protocol {
 
     private static byte[] parseBulkString(RedisInputStream stream) throws IOException {
         int length = (int) stream.readLong();
-        if (length == -1) {
-            return null;
-        }
+        if (length == -1) return null;
+
         return stream.readBulkString(length);
     }
 
     private static Object[] parseArray(RedisInputStream stream) throws IOException {
         int length = (int) stream.readLong();
-        if (length == -1) {
-            return null;
-        }
+        if (length == -1) return null;
+
         var array = new Object[length];
         for (int i = 0; i < length; i++) {
             array[i] = parseObject(stream);       // redis won't put error within array, so here it doesn't expect RedisException
@@ -71,13 +66,27 @@ final class Protocol {
         return array;
     }
 
-    enum Command {
-        GET, SET, EXPIRE, DEL, INCRBY, MGET, MSET, SCAN, HGET, HGETALL, HSET, HMSET, HDEL, SADD, SMEMBERS, SISMEMBER, SREM, RPUSH, LPOP, LRANGE;
-        final byte[] value;
-
-        Command() {
-            value = Strings.bytes(name());
-        }
+    static class Command {
+        static final byte[] GET = Strings.bytes("GET");
+        static final byte[] SET = Strings.bytes("SET");
+        static final byte[] EXPIRE = Strings.bytes("EXPIRE");
+        static final byte[] DEL = Strings.bytes("DEL");
+        static final byte[] INCRBY = Strings.bytes("INCRBY");
+        static final byte[] MGET = Strings.bytes("MGET");
+        static final byte[] MSET = Strings.bytes("MSET");
+        static final byte[] SCAN = Strings.bytes("SCAN");
+        static final byte[] HGET = Strings.bytes("HGET");
+        static final byte[] HGETALL = Strings.bytes("HGETALL");
+        static final byte[] HSET = Strings.bytes("HSET");
+        static final byte[] HMSET = Strings.bytes("HMSET");
+        static final byte[] HDEL = Strings.bytes("HDEL");
+        static final byte[] SADD = Strings.bytes("SADD");
+        static final byte[] SMEMBERS = Strings.bytes("SMEMBERS");
+        static final byte[] SISMEMBER = Strings.bytes("SISMEMBER");
+        static final byte[] SREM = Strings.bytes("SREM");
+        static final byte[] RPUSH = Strings.bytes("RPUSH");
+        static final byte[] LPOP = Strings.bytes("LPOP");
+        static final byte[] LRANGE = Strings.bytes("LRANGE");
     }
 
     static class Keyword {

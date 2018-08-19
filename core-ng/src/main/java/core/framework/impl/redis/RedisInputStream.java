@@ -8,13 +8,13 @@ import java.io.InputStream;
  * @author neo
  */
 class RedisInputStream {
-    private final InputStream inputStream;
+    private final InputStream stream;
     private final byte[] buffer = new byte[8192];
     private int position;
     private int limit;
 
-    RedisInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
+    RedisInputStream(InputStream stream) {
+        this.stream = stream;
     }
 
     byte readByte() throws IOException {
@@ -88,7 +88,7 @@ class RedisInputStream {
 
     private void fill() throws IOException {
         if (position >= limit) {
-            limit = inputStream.read(buffer);
+            limit = stream.read(buffer);
             position = 0;
             if (limit == -1) {
                 throw new IOException("unexpected end of stream");

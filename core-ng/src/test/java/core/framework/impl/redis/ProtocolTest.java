@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static core.framework.impl.redis.Protocol.Command.SET;
 import static core.framework.impl.redis.RedisEncodings.decode;
 import static core.framework.impl.redis.RedisEncodings.encode;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,10 +17,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class ProtocolTest {
     @Test
-    void write() throws IOException {
+    void writeArray() throws IOException {
         var stream = new ByteArrayOutputStream();
-        Protocol.write(new RedisOutputStream(stream, 8192), SET, encode("k1"), encode("v1"));
-        assertThat(decode(stream.toByteArray())).isEqualTo("*3\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n");
+        var outputStream = new RedisOutputStream(stream, 8192);
+        Protocol.writeArray(outputStream, 3);
+        outputStream.flush();
+        assertThat(decode(stream.toByteArray())).isEqualTo("*3\r\n");
+    }
+
+    @Test
+    void writeBulkString() throws IOException {
+        var stream = new ByteArrayOutputStream();
+        var outputStream = new RedisOutputStream(stream, 8192);
+        Protocol.writeBulkString(outputStream, encode("value"));
+        outputStream.flush();
+        assertThat(decode(stream.toByteArray())).isEqualTo("$5\r\nvalue\r\n");
     }
 
     @Test

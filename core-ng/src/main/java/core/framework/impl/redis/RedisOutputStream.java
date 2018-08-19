@@ -8,12 +8,12 @@ import java.io.OutputStream;
  * @author neo
  */
 class RedisOutputStream {
-    private final OutputStream outputStream;
+    private final OutputStream stream;
     private final byte[] buffer;
     private int position;
 
-    RedisOutputStream(OutputStream outputStream, int bufferSize) {
-        this.outputStream = outputStream;
+    RedisOutputStream(OutputStream stream, int bufferSize) {
+        this.stream = stream;
         buffer = new byte[bufferSize];
     }
 
@@ -28,7 +28,7 @@ class RedisOutputStream {
         int length = bytes.length;
         if (length > buffer.length) {
             flush();
-            outputStream.write(bytes);
+            stream.write(bytes);
         } else {
             if (length > buffer.length - position) {
                 flush();
@@ -46,7 +46,7 @@ class RedisOutputStream {
 
     void flush() throws IOException {
         if (position > 0) {
-            outputStream.write(buffer, 0, position);
+            stream.write(buffer, 0, position);
             position = 0;
         }
     }

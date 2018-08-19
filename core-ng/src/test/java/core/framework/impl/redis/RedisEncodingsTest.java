@@ -3,10 +3,7 @@ package core.framework.impl.redis;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -31,33 +28,6 @@ class RedisEncodingsTest {
 
         assertThat(RedisEncodings.encode(5L)).isEqualTo(Strings.bytes("5"));
         assertThat(RedisEncodings.encode(-1234567890123456789L)).isEqualTo(Strings.bytes("-1234567890123456789"));
-    }
-
-    @Test
-    void encodeStrings() {
-        byte[][] result = RedisEncodings.encode("key", "v1", "v2");
-        assertThat(result).containsExactly(Strings.bytes("key"), Strings.bytes("v1"), Strings.bytes("v2"));
-
-        result = RedisEncodings.encode(null, "v1", "v2");
-        assertThat(result).containsExactly(Strings.bytes("v1"), Strings.bytes("v2"));
-
-        assertThatThrownBy(() -> RedisEncodings.encode("key", new String[0]))
-                .isInstanceOf(RedisException.class)
-                .hasMessageContaining("values must not be empty");
-    }
-
-    @Test
-    void encodeMap() {
-        byte[][] result = RedisEncodings.encode(null, Map.of("k1", "v1"));
-        assertThat(result).containsExactly(Strings.bytes("k1"), Strings.bytes("v1"));
-
-        result = RedisEncodings.encode("key", Map.of("k1", "v1"));
-        assertThat(result).containsExactly(Strings.bytes("key"), Strings.bytes("k1"), Strings.bytes("v1"));
-
-
-        assertThatThrownBy(() -> RedisEncodings.encode(null, Map.of()))
-                .isInstanceOf(RedisException.class)
-                .hasMessageContaining("values must not be empty");
     }
 
     @Test

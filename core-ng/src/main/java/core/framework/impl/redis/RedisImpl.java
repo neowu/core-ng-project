@@ -16,11 +16,17 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static core.framework.impl.redis.Protocol.Command.DEL;
+import static core.framework.impl.redis.Protocol.Command.EXPIRE;
+import static core.framework.impl.redis.Protocol.Command.GET;
+import static core.framework.impl.redis.Protocol.Command.INCRBY;
+import static core.framework.impl.redis.Protocol.Command.MGET;
+import static core.framework.impl.redis.Protocol.Command.MSET;
+import static core.framework.impl.redis.Protocol.Command.SCAN;
+import static core.framework.impl.redis.Protocol.Command.SET;
 import static core.framework.impl.redis.Protocol.Keyword.COUNT;
 import static core.framework.impl.redis.Protocol.Keyword.EX;
 import static core.framework.impl.redis.Protocol.Keyword.MATCH;
@@ -85,7 +91,7 @@ public final class RedisImpl implements Redis {
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(Protocol.Command.GET, encode(key));
+            connection.writeKeyCommand(GET, key);
             return connection.readBulkString();
         } catch (IOException e) {
             item.broken = true;
@@ -111,19 +117,21 @@ public final class RedisImpl implements Redis {
 
     public boolean set(String key, byte[] value, Duration expiration, boolean onlyIfAbsent) {
         var watch = new StopWatch();
-        PoolItem<RedisConnection> item = pool.borrowItem();
         boolean updated = false;
+        PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            List<byte[]> arguments = new ArrayList<>(5);
-            arguments.add(encode(key));
-            arguments.add(value);
-            if (onlyIfAbsent) arguments.add(NX);
+            int length = 3 + (onlyIfAbsent ? 1 : 0) + (expiration != null ? 2 : 0);
+            connection.writeArray(length);
+            connection.writeBulkString(SET);
+            connection.writeBulkString(encode(key));
+            connection.writeBulkString(value);
+            if (onlyIfAbsent) connection.writeBulkString(NX);
             if (expiration != null) {
-                arguments.add(EX);
-                arguments.add(encode(expiration.getSeconds()));
+                connection.writeBulkString(EX);
+                connection.writeBulkString(encode(expiration.getSeconds()));
             }
-            connection.write(Protocol.Command.SET, arguments.toArray(new byte[0][]));
+            connection.flush();
             String result = connection.readSimpleString();
             updated = "OK".equals(result);
             return updated;
@@ -141,11 +149,11 @@ public final class RedisImpl implements Redis {
 
     @Override
     public void expire(String key, Duration expiration) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(Protocol.Command.EXPIRE, encode(key), encode(expiration.getSeconds()));
+            connection.writeKeyArgumentCommand(EXPIRE, key, encode(expiration.getSeconds()));
             connection.readLong();
         } catch (IOException e) {
             item.broken = true;
@@ -161,12 +169,13 @@ public final class RedisImpl implements Redis {
 
     @Override
     public long del(String... keys) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
+        if (keys.length == 0) throw new Error("keys must not be empty");
         long deletedKeys = 0;
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(Protocol.Command.DEL, encode(null, keys));
+            connection.writeKeysCommand(DEL, keys);
             deletedKeys = connection.readLong();
             return deletedKeys;
         } catch (IOException e) {
@@ -183,11 +192,11 @@ public final class RedisImpl implements Redis {
 
     @Override
     public long increaseBy(String key, long increment) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(Protocol.Command.INCRBY, encode(key), encode(increment));
+            connection.writeKeyArgumentCommand(INCRBY, key, encode(increment));
             return connection.readLong();
         } catch (IOException e) {
             item.broken = true;
@@ -213,12 +222,13 @@ public final class RedisImpl implements Redis {
 
     public Map<String, byte[]> multiGetBytes(String... keys) {
         var watch = new StopWatch();
+        if (keys.length == 0) throw new Error("keys must not be empty");
         int returnedValues = 0;
+        Map<String, byte[]> values = Maps.newHashMapWithExpectedSize(keys.length);
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            Map<String, byte[]> values = Maps.newHashMapWithExpectedSize(keys.length);
-            connection.write(Protocol.Command.MGET, encode(null, keys));
+            connection.writeKeysCommand(MGET, keys);
             Object[] response = connection.readArray();
             for (int i = 0; i < response.length; i++) {
                 byte[] value = (byte[]) response[i];
@@ -241,10 +251,17 @@ public final class RedisImpl implements Redis {
     @Override
     public void multiSet(Map<String, String> values) {
         var watch = new StopWatch();
+        if (values.isEmpty()) throw new Error("values must not be empty");
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.write(Protocol.Command.MSET, encode(null, values));
+            connection.writeArray(1 + values.size() * 2);
+            connection.writeBulkString(MSET);
+            for (Map.Entry<String, String> entry : values.entrySet()) {
+                connection.writeBulkString(encode(entry.getKey()));
+                connection.writeBulkString(encode(entry.getValue()));
+            }
+            connection.flush();
             connection.readSimpleString();
         } catch (IOException e) {
             item.broken = true;
@@ -261,14 +278,21 @@ public final class RedisImpl implements Redis {
 
     public void multiSet(Map<String, byte[]> values, Duration expiration) {
         var watch = new StopWatch();
+        if (values.isEmpty()) throw new Error("values must not be empty");
         byte[] expirationValue = encode(expiration.getSeconds());
-        PoolItem<RedisConnection> item = pool.borrowItem();
         int size = values.size();
+        PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             for (Map.Entry<String, byte[]> entry : values.entrySet()) { // redis doesn't support mset with expiration, here to use pipeline
-                connection.write(Protocol.Command.SET, encode(entry.getKey()), entry.getValue(), EX, expirationValue);
+                connection.writeArray(5);
+                connection.writeBulkString(SET);
+                connection.writeBulkString(encode(entry.getKey()));
+                connection.writeBulkString(entry.getValue());
+                connection.writeBulkString(EX);
+                connection.writeBulkString(expirationValue);
             }
+            connection.flush();
             connection.readAll(size);
         } catch (IOException e) {
             item.broken = true;
@@ -299,7 +323,14 @@ public final class RedisImpl implements Redis {
             byte[] batchSize = encode("500"); // use 500 as batch
             String cursor = "0";
             do {
-                connection.write(Protocol.Command.SCAN, encode(cursor), MATCH, encode(pattern), COUNT, batchSize);
+                connection.writeArray(6);
+                connection.writeBulkString(SCAN);
+                connection.writeBulkString(encode(cursor));
+                connection.writeBulkString(MATCH);
+                connection.writeBulkString(encode(pattern));
+                connection.writeBulkString(COUNT);
+                connection.writeBulkString(batchSize);
+                connection.flush();
                 Object[] response = connection.readArray();
                 cursor = decode((byte[]) response[0]);
                 Object[] keys = (Object[]) response[1];
