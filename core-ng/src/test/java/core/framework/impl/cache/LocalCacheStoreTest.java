@@ -58,8 +58,8 @@ class LocalCacheStoreTest {
 
     @Test
     void putAll() {
-        var values = Map.of("key1", Strings.bytes("1")
-                , "key2", Strings.bytes("2"));
+        var values = Map.of("key1", Strings.bytes("1"),
+                "key2", Strings.bytes("2"));
         cacheStore.putAll(values, Duration.ofMinutes(1));
 
         assertEquals(2, cacheStore.caches.size());

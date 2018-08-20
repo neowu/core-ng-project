@@ -72,8 +72,8 @@ class CacheImplTest {
 
     @Test
     void getAll() {
-        var values = Map.of("name:key1", Strings.bytes("1")
-                , "name:key3", Strings.bytes("3"));
+        var values = Map.of("name:key1", Strings.bytes("1"),
+                "name:key3", Strings.bytes("3"));
         when(cacheStore.getAll("name:key1", "name:key2", "name:key3")).thenReturn(values);
 
         Map<String, Integer> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> 2);

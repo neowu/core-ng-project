@@ -51,10 +51,10 @@ class QueryParamMapperTest {
 
     @Test
     void fromParams() {
-        var params = Map.of("boolean_field", "true"
-                , "big_decimal_field", "345.67"
-                , "date_field", "2017-08-28"
-                , "long_field", "123");
+        var params = Map.of("boolean_field", "true",
+                "big_decimal_field", "345.67",
+                "date_field", "2017-08-28",
+                "long_field", "123");
 
         TestQueryParamBean bean = mapper.fromParams(params);
 
