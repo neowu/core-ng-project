@@ -1,5 +1,6 @@
 ## Change log
-### 6.6.6 (8/18/2018 - )
+### 6.6.6 (8/18/2018 - 8/20/2018)
+* kafka: tweak producer, added request rate/size metrics, enable compression
 
 ### 6.6.5 (8/15/2018 - 8/17/2018)   !!! minor API name changes, compile should fix !!! 
 * log: make log-processor leverage built-in kafak support, to index action as well

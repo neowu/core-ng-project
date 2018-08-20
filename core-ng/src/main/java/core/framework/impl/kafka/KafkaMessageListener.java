@@ -5,7 +5,6 @@ import core.framework.impl.log.LogManager;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.util.Exceptions;
-import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -97,17 +96,16 @@ public class KafkaMessageListener {
 
     private Consumer<String, byte[]> consumer(Set<String> topics) {
         if (uri == null) throw new Error("uri must not be null");
-        Map<String, Object> config = Maps.newHashMap();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, logManager.appName);
-        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-        config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
-        config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
-        config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
-        config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
-        config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
-        config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
+        Map<String, Object> config = Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,
+                ConsumerConfig.GROUP_ID_CONFIG, logManager.appName,
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false,
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest",
+                ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis(),
+                ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis(),
+                ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords,
+                ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes,
+                ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes,
+                ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
         Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
         consumer.subscribe(topics);
         consumerMetrics.add(consumer.metrics());

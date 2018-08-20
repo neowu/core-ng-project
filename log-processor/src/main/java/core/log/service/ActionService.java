@@ -82,7 +82,7 @@ public class ActionService {
     }
 
     private TraceDocument trace(ActionLogMessage message) {
-        TraceDocument traceLog = new TraceDocument();
+        var traceLog = new TraceDocument();
         traceLog.date = message.date;
         traceLog.id = message.id;
         traceLog.app = message.app;
@@ -94,7 +94,7 @@ public class ActionService {
     }
 
     private ActionDocument action(ActionLogMessage message) {
-        ActionDocument actionLog = new ActionDocument();
+        var actionLog = new ActionDocument();
         actionLog.date = message.date;
         actionLog.app = message.app;
         actionLog.serverIP = message.serverIP;

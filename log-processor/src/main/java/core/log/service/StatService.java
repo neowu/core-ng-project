@@ -55,7 +55,7 @@ public class StatService {
     }
 
     private StatDocument stat(StatMessage message) {
-        StatDocument stat = new StatDocument();
+        var stat = new StatDocument();
         stat.date = message.date;
         stat.app = message.app;
         stat.serverIP = message.serverIP;

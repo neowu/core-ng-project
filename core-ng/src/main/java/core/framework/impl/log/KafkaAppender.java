@@ -6,7 +6,6 @@ import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.impl.log.message.LogTopics;
 import core.framework.impl.log.message.StatMessage;
-import core.framework.util.Maps;
 import core.framework.util.Threads;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -49,11 +48,12 @@ public final class KafkaAppender implements Appender {
     public KafkaAppender(String uri, String appName) {
         this.appName = appName;
 
-        Map<String, Object> config = Maps.newHashMap();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-        config.put(ProducerConfig.ACKS_CONFIG, "0");    // no acknowledge to maximize performance
-        config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
-        config.put(ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");
+        Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,
+                ProducerConfig.ACKS_CONFIG, "0",                                    // no acknowledge to maximize performance
+                ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis(),  // metadata update timeout
+                ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy",
+                ProducerConfig.LINGER_MS_CONFIG, 50,
+                ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");
         producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
         producerMetrics.set(producer.metrics());
 

@@ -43,9 +43,9 @@ public class Kafka {
         if (uri == null) throw new Error("uri must not be null");
         var watch = new StopWatch();
         try {
-            Map<String, Object> config = Maps.newHashMap();
-            config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
-            config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
+            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,
+                    ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy",
+                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
             Producer<String, byte[]> producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());
             producerMetrics.set(producer.metrics());
             return producer;
