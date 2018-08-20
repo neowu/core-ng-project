@@ -1,6 +1,5 @@
 package core.framework.impl.kafka;
 
-import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
@@ -59,8 +58,7 @@ public class Kafka {
             if (uri == null) throw new Error("uri must not be null");
             var watch = new StopWatch();
             try {
-                Map<String, Object> config = Maps.newHashMap();
-                config.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
+                Map<String, Object> config = Map.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, uri);
                 admin = AdminClient.create(config);
             } finally {
                 logger.info("create kafka admin, uri={}, name={}, elapsed={}", uri, name, watch.elapsed());

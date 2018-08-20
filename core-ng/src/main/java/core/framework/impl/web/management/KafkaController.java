@@ -77,7 +77,7 @@ public class KafkaController {
         }
         if (request.deleteRecords != null) {
             Map<TopicPartition, RecordsToDelete> records = Maps.newHashMap();
-            for (UpdateTopicRequest.DeleteRecord deleteRecord : request.deleteRecords) {
+            for (var deleteRecord : request.deleteRecords) {
                 records.put(new TopicPartition(topic, deleteRecord.partition), RecordsToDelete.beforeOffset(deleteRecord.beforeOffset));
             }
             logger.info("delete kafka records, topic={}, records={}", topic, JSON.toJSON(request.deleteRecords));

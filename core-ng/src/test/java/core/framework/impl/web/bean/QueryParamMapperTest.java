@@ -1,7 +1,6 @@
 package core.framework.impl.web.bean;
 
 import core.framework.util.ClasspathResources;
-import core.framework.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,11 +51,10 @@ class QueryParamMapperTest {
 
     @Test
     void fromParams() {
-        Map<String, String> params = Maps.newHashMap();
-        params.put("boolean_field", "true");
-        params.put("big_decimal_field", "345.67");
-        params.put("date_field", "2017-08-28");
-        params.put("long_field", "123");
+        var params = Map.of("boolean_field", "true"
+                , "big_decimal_field", "345.67"
+                , "date_field", "2017-08-28"
+                , "long_field", "123");
 
         TestQueryParamBean bean = mapper.fromParams(params);
 

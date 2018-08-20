@@ -22,15 +22,23 @@ public final class Maps {
         return new LinkedHashMap<>();
     }
 
+    public static <T, V> Map<T, V> newLinkedHashMapWithExpectedSize(int size) {
+        return new LinkedHashMap<>(capacity(size));
+    }
+
+    public static <T, V> Map<T, V> newHashMapWithExpectedSize(int size) {
+        return new HashMap<>(capacity(size));
+    }
+
     // refer to guava maps impl, init capacity with load factor 0.75
     // https://github.com/google/guava/blob/master/guava/src/com/google/common/collect/Maps.java
-    public static <T, V> Map<T, V> newHashMapWithExpectedSize(int size) {
+    private static int capacity(int size) {
         int capacity;
         if (size < 3) {
             capacity = size + 1;
         } else {
             capacity = (int) ((float) size / 0.75f + 1);
         }
-        return new HashMap<>(capacity);
+        return capacity;
     }
 }

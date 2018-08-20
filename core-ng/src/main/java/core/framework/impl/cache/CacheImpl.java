@@ -8,7 +8,6 @@ import core.framework.util.Maps;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +60,7 @@ public class CacheImpl<T> implements Cache<T> {
             cacheKeys[index] = cacheKey(key);
             index++;
         }
-        Map<String, T> values = new LinkedHashMap<>(size);
+        Map<String, T> values = Maps.newLinkedHashMapWithExpectedSize(size);
         Map<String, byte[]> newValues = Maps.newHashMapWithExpectedSize(size);
         Map<String, byte[]> cacheValues = cacheStore.getAll(cacheKeys);
         index = 0;

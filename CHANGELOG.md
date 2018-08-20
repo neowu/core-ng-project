@@ -1,4 +1,6 @@
 ## Change log
+### 6.6.7 (8/20/2018 - )
+
 ### 6.6.6 (8/18/2018 - 8/20/2018)
 * kafka: tweak producer, added request rate/size metrics, enable compression
 

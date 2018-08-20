@@ -1,6 +1,5 @@
 package core.framework.impl.cache;
 
-import core.framework.util.Maps;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,9 +58,8 @@ class LocalCacheStoreTest {
 
     @Test
     void putAll() {
-        Map<String, byte[]> values = Maps.newHashMap();
-        values.put("key1", Strings.bytes("1"));
-        values.put("key2", Strings.bytes("2"));
+        var values = Map.of("key1", Strings.bytes("1")
+                , "key2", Strings.bytes("2"));
         cacheStore.putAll(values, Duration.ofMinutes(1));
 
         assertEquals(2, cacheStore.caches.size());

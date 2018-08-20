@@ -7,11 +7,12 @@ import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.impl.web.bean.TestQueryParamBean;
-import core.framework.util.Maps;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -63,7 +64,7 @@ class RequestImplTest {
 
     @Test
     void beanWithValidationError() {
-        doThrow(new ValidationException(Maps.newHashMap())).when(mapper).fromJSON(eq(TestBean.class), any());
+        doThrow(new ValidationException(Map.of())).when(mapper).fromJSON(eq(TestBean.class), any());
         request.method = HTTPMethod.POST;
         request.contentType = ContentType.APPLICATION_JSON;
         request.body = Strings.bytes("{\"big_decimal_field\": 1}");

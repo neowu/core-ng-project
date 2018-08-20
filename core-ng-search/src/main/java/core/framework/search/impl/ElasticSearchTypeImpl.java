@@ -22,7 +22,6 @@ import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
 import core.framework.search.UpdateRequest;
 import core.framework.util.Exceptions;
-import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
@@ -122,7 +121,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             items.add(reader.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
         }
         Aggregations aggregationResponse = response.getAggregations();
-        Map<String, Aggregation> aggregations = aggregationResponse == null ? Maps.newHashMap() : aggregationResponse.asMap();
+        Map<String, Aggregation> aggregations = aggregationResponse == null ? Map.of() : aggregationResponse.asMap();
         return new SearchResponse<>(items, response.getHits().getTotalHits(), aggregations);
     }
 

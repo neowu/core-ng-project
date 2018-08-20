@@ -54,9 +54,9 @@ class WebServiceClientTest {
 
     @Test
     void serviceURL() {
-        assertThat(webServiceClient.serviceURL("/", Maps.newHashMap())).isEqualTo("http://localhost");     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
-        assertThat(webServiceClient.serviceURL("/test", Maps.newHashMap())).isEqualTo("http://localhost/test");
-        assertThat(webServiceClient.serviceURL("/test/", Maps.newHashMap())).isEqualTo("http://localhost/test/");
+        assertThat(webServiceClient.serviceURL("/", Map.of())).isEqualTo("http://localhost");     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
+        assertThat(webServiceClient.serviceURL("/test", Map.of())).isEqualTo("http://localhost/test");
+        assertThat(webServiceClient.serviceURL("/test/", Map.of())).isEqualTo("http://localhost/test/");
 
         Map<String, Object> pathParams = Map.of("id", "1+2");
         assertThat(webServiceClient.serviceURL("/test/:id(\\d+)", pathParams)).isEqualTo("http://localhost/test/1%2B2");
@@ -95,7 +95,7 @@ class WebServiceClientTest {
 
     @Test
     void validateResponse() {
-        webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.OK, Maps.newHashMap(), null));
+        webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.OK, Map.of(), null));
     }
 
     @Test
@@ -105,7 +105,7 @@ class WebServiceClientTest {
         response.errorCode = "NOT_FOUND";
         response.message = "not found";
 
-        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.NOT_FOUND, Maps.newHashMap(), Strings.bytes(JSON.toJSON(response)))))
+        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.NOT_FOUND, Map.of(), Strings.bytes(JSON.toJSON(response)))))
                 .isInstanceOf(RemoteServiceException.class)
                 .satisfies(throwable -> {
                     RemoteServiceException exception = (RemoteServiceException) throwable;
@@ -123,14 +123,14 @@ class WebServiceClientTest {
 
     @Test
     void parseResponseWithEmptyOptional() {
-        assertThat(webServiceClient.parseResponse(Types.optional(TestWebService.TestResponse.class), new HTTPResponse(HTTPStatus.OK, Maps.newHashMap(), Strings.bytes("null"))))
+        assertThat(webServiceClient.parseResponse(Types.optional(TestWebService.TestResponse.class), new HTTPResponse(HTTPStatus.OK, Map.of(), Strings.bytes("null"))))
                 .isEqualTo(Optional.empty());
     }
 
     @Test
     void parseResponseWithValidationError() {
         TestWebService.TestResponse response = new TestWebService.TestResponse();
-        assertThatThrownBy(() -> webServiceClient.parseResponse(TestWebService.TestResponse.class, new HTTPResponse(HTTPStatus.OK, Maps.newHashMap(), Strings.bytes(JSON.toJSON(response)))))
+        assertThatThrownBy(() -> webServiceClient.parseResponse(TestWebService.TestResponse.class, new HTTPResponse(HTTPStatus.OK, Map.of(), Strings.bytes(JSON.toJSON(response)))))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("int_field");
     }
@@ -140,7 +140,7 @@ class WebServiceClientTest {
         TestWebService.TestResponse response = new TestWebService.TestResponse();
         response.intField = 1;
         response.stringMap = Map.of("key", "value");
-        Object parsedResponse = webServiceClient.parseResponse(TestWebService.TestResponse.class, new HTTPResponse(HTTPStatus.OK, Maps.newHashMap(), Strings.bytes(JSON.toJSON(response))));
+        Object parsedResponse = webServiceClient.parseResponse(TestWebService.TestResponse.class, new HTTPResponse(HTTPStatus.OK, Map.of(), Strings.bytes(JSON.toJSON(response))));
         assertThat(parsedResponse).isEqualToComparingFieldByField(response);
     }
 }

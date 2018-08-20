@@ -1,6 +1,5 @@
 package core.framework.impl.cache;
 
-import core.framework.util.Maps;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,13 +72,12 @@ class CacheImplTest {
 
     @Test
     void getAll() {
-        Map<String, byte[]> values = Maps.newHashMap();
-        values.put("name:key1", Strings.bytes("1"));
-        values.put("name:key3", Strings.bytes("3"));
+        var values = Map.of("name:key1", Strings.bytes("1")
+                , "name:key3", Strings.bytes("3"));
         when(cacheStore.getAll("name:key1", "name:key2", "name:key3")).thenReturn(values);
 
         Map<String, Integer> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> 2);
-        assertThat(results).containsExactly(entry("key1", 1), entry("key2", 2), entry("key3", 3));
+        assertThat(results).containsOnly(entry("key1", 1), entry("key2", 2), entry("key3", 3));
 
         verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && Arrays.equals(argument.get("name:key2"), Strings.bytes("2"))), eq(Duration.ofHours(1)));
     }

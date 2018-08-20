@@ -2,7 +2,6 @@ package core.framework.impl.validate;
 
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Size;
-import core.framework.util.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +26,7 @@ class BeanValidatorSizeTest {
     void validate() {
         Bean bean = new Bean();
         bean.stringList = List.of("1", "2", "3", "4");
-        bean.stringMap = Maps.newHashMap();
+        bean.stringMap = Map.of();
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
