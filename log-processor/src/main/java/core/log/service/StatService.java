@@ -17,6 +17,8 @@ import java.util.Map;
  */
 public class StatService {
     @Inject
+    IndexService indexService;
+    @Inject
     ElasticSearchType<StatDocument> statType;
 
     public void index(List<StatMessage> messages) {
@@ -40,7 +42,7 @@ public class StatService {
                 stats.put(message.id, stat(message));
             }
             BulkIndexRequest<StatDocument> request = new BulkIndexRequest<>();
-            request.index = IndexName.name("stat", now);
+            request.index = indexService.indexName("stat", now);
             request.sources = stats;
             statType.bulkIndex(request);
         }
@@ -48,7 +50,7 @@ public class StatService {
 
     private void index(StatMessage message, LocalDate now) {
         IndexRequest<StatDocument> request = new IndexRequest<>();
-        request.index = IndexName.name("stat", now);
+        request.index = indexService.indexName("stat", now);
         request.id = message.id;
         request.source = stat(message);
         statType.index(request);

@@ -17,7 +17,7 @@ import java.time.Month;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ActionServiceTest extends IntegrationTest {
     @Inject
     ActionService actionService;
-
+    @Inject
+    IndexService indexService;
     @Inject
     ElasticSearchType<ActionDocument> actionType;
-
     @Inject
     ElasticSearchType<TraceDocument> traceType;
 
@@ -51,13 +51,12 @@ class ActionServiceTest extends IntegrationTest {
         actionService.index(List.of(message1, message2), now);
 
         ActionDocument action = actionDocument(now, message1.id);
-        assertEquals(message1.result, action.result);
-        assertEquals(message1.performanceStats.get("redis").count, action.performanceStats.get("redis").count);
-        assertEquals(message1.performanceStats.get("redis").readEntries, action.performanceStats.get("redis").readEntries);
+        assertThat(action.result).isEqualTo(message1.result);
+        assertThat(action.performanceStats.get("redis")).isEqualToComparingFieldByField(message1.performanceStats.get("redis"));
 
         TraceDocument trace = traceDocument(now, message2.id);
-        assertEquals(message2.id, trace.id);
-        assertEquals(message2.traceLog, trace.content);
+        assertThat(trace.id).isEqualTo(message2.id);
+        assertThat(trace.content).isEqualTo(message2.traceLog);
     }
 
     @Test
@@ -73,25 +72,25 @@ class ActionServiceTest extends IntegrationTest {
         actionService.index(messages, now);
 
         ActionDocument action = actionDocument(now, messages.get(0).id);
-        assertEquals("TRACE", action.result);
+        assertThat(action.result).isEqualTo("TRACE");
     }
 
     private ActionDocument actionDocument(LocalDate now, String id) {
-        GetRequest request = new GetRequest();
-        request.index = IndexName.name("action", now);
+        var request = new GetRequest();
+        request.index = indexService.indexName("action", now);
         request.id = id;
         return actionType.get(request).orElseThrow(() -> new Error("not found"));
     }
 
     private TraceDocument traceDocument(LocalDate now, String id) {
-        GetRequest request = new GetRequest();
-        request.index = IndexName.name("trace", now);
+        var request = new GetRequest();
+        request.index = indexService.indexName("trace", now);
         request.id = id;
         return traceType.get(request).orElseThrow(() -> new Error("not found"));
     }
 
     private ActionLogMessage message(String id, String result) {
-        ActionLogMessage message = new ActionLogMessage();
+        var message = new ActionLogMessage();
         message.id = id;
         message.date = Instant.now();
         message.result = result;

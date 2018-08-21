@@ -18,6 +18,8 @@ import java.util.Map;
  */
 public class ActionService {
     @Inject
+    IndexService indexService;
+    @Inject
     ElasticSearchType<ActionDocument> actionType;
     @Inject
     ElasticSearchType<TraceDocument> traceType;
@@ -53,7 +55,7 @@ public class ActionService {
 
     private void indexAction(ActionDocument action, LocalDate now) {
         IndexRequest<ActionDocument> request = new IndexRequest<>();
-        request.index = IndexName.name("action", now);
+        request.index = indexService.indexName("action", now);
         request.id = action.id;
         request.source = action;
         actionType.index(request);
@@ -61,14 +63,14 @@ public class ActionService {
 
     private void indexActions(Map<String, ActionDocument> actions, LocalDate now) {
         BulkIndexRequest<ActionDocument> request = new BulkIndexRequest<>();
-        request.index = IndexName.name("action", now);
+        request.index = indexService.indexName("action", now);
         request.sources = actions;
         actionType.bulkIndex(request);
     }
 
     private void indexTrace(TraceDocument trace, LocalDate now) {
         IndexRequest<TraceDocument> request = new IndexRequest<>();
-        request.index = IndexName.name("trace", now);
+        request.index = indexService.indexName("trace", now);
         request.id = trace.id;
         request.source = trace;
         traceType.index(request);
@@ -76,7 +78,7 @@ public class ActionService {
 
     private void indexTraces(Map<String, TraceDocument> traces, LocalDate now) {
         BulkIndexRequest<TraceDocument> request = new BulkIndexRequest<>();
-        request.index = IndexName.name("trace", now);
+        request.index = indexService.indexName("trace", now);
         request.sources = traces;
         traceType.bulkIndex(request);
     }

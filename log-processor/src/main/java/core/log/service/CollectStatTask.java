@@ -30,7 +30,7 @@ public class CollectStatTask implements Runnable {
     StatMessage message() {
         Map<String, Double> stats = stat.collect();
 
-        StatMessage message = new StatMessage();
+        var message = new StatMessage();
         message.id = UUID.randomUUID().toString();
         message.date = Instant.now();
         message.app = "log-processor";

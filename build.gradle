@@ -7,10 +7,10 @@ subprojects {
 
 def elasticVersion = '6.3.2'
 def kafkaVersion = '2.0.0'
-def jacksonVersion = '2.9.5'
+def jacksonVersion = '2.9.6'
 def junitVersion = '5.2.0'
-def mockitoVersion = '2.18.3'
-def assertjVersion = '3.10.0'
+def mockitoVersion = '2.21.0'
+def assertjVersion = '3.11.0'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -24,8 +24,8 @@ project(':core-ng') {
         implementation 'org.javassist:javassist:3.23.1-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-        implementation 'org.apache.httpcomponents:httpclient:4.5.5'
-        implementation 'io.undertow:undertow-core:2.0.12.Final'
+        implementation 'org.apache.httpcomponents:httpclient:4.5.6'
+        implementation 'io.undertow:undertow-core:2.0.13.Final'
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
