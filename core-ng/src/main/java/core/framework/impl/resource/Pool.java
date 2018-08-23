@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Iterator;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -110,12 +109,12 @@ public class Pool<T extends AutoCloseable> {
 
     private void recycleIdleItems() {
         Iterator<PoolItem<T>> iterator = idleItems.descendingIterator();
-        long maxIdleTimeInSeconds = maxIdleTime.getSeconds();
-        Instant now = Instant.now();
+        long maxIdleTimeInMs = maxIdleTime.toMillis();
+        long now = System.currentTimeMillis();
 
         while (iterator.hasNext()) {
             PoolItem<T> item = iterator.next();
-            if (Duration.between(Instant.ofEpochMilli(item.returnTime), now).getSeconds() >= maxIdleTimeInSeconds) {
+            if (now - item.returnTime >= maxIdleTimeInMs) {
                 boolean removed = idleItems.remove(item);
                 if (!removed) return;
                 closeResource(item.resource);

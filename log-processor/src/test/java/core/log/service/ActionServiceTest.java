@@ -37,7 +37,7 @@ class ActionServiceTest extends IntegrationTest {
         ActionLogMessage message1 = message("1", "OK");
         message1.context = Map.of("key", "value");
         message1.stats = Map.of("count", 1d);
-        PerformanceStatMessage stat = new PerformanceStatMessage();
+        var stat = new PerformanceStatMessage();
         stat.count = 1;
         stat.totalElapsed = 10L;
         stat.readEntries = 1;
@@ -51,6 +51,8 @@ class ActionServiceTest extends IntegrationTest {
         actionService.index(List.of(message1, message2), now);
 
         ActionDocument action = actionDocument(now, message1.id);
+        assertThat(action.id).isEqualTo(message1.id);
+        assertThat(action.date).isEqualTo(message1.date);
         assertThat(action.result).isEqualTo(message1.result);
         assertThat(action.performanceStats.get("redis")).isEqualToComparingFieldByField(message1.performanceStats.get("redis"));
 

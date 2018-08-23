@@ -1,4 +1,6 @@
 ## Change log
+### 6.6.8 (8/23/2018 - )
+
 ### 6.6.7 (8/20/2018 - 8/23/2018)
 * log-processor: change index pattern to name-yyyy.MM.dd, to make clean index job works with metricbeats
 * utils: deleted core.framework.util.Charsets, in favor of java.nio.charset.StandardCharsets (as IDE prompts)

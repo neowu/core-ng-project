@@ -20,7 +20,8 @@
       ],
       "properties": {
         "date": {
-          "type": "date"
+          "type": "date",
+          "format": "strict_date_time"
         },
         "id": {
           "type": "keyword"
