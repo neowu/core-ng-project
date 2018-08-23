@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class ConsumerMetrics implements Metrics {
     private final String name;
-    private final List<Metric> recordsLagMax = Lists.newArrayList();        // use non-thread-safe list because add is initialized by single thread, see core.framework.impl.kafka.KafkaMessageListener.start
+    private final List<Metric> recordsLagMax = Lists.newArrayList();        // use non-thread-safe list as it's ok to fail once, and the list is initialized on startup
     private final List<Metric> recordsConsumedRate = Lists.newArrayList();
     private final List<Metric> bytesConsumedRate = Lists.newArrayList();
     private final List<Metric> fetchRate = Lists.newArrayList();
@@ -24,16 +24,14 @@ public class ConsumerMetrics implements Metrics {
 
     @Override
     public void collect(Map<String, Double> stats) {
-        if (!recordsLagMax.isEmpty()) {
-            stats.put(statName("records_max_lag"), sum(recordsLagMax));
-            stats.put(statName("records_consumed_rate"), sum(recordsConsumedRate));
-            stats.put(statName("bytes_consumed_rate"), sum(bytesConsumedRate));
-            stats.put(statName("fetch_rate"), sum(fetchRate));
-        }
+        stats.put(statName("records_max_lag"), sum(recordsLagMax));
+        stats.put(statName("records_consumed_rate"), sum(recordsConsumedRate));
+        stats.put(statName("bytes_consumed_rate"), sum(bytesConsumedRate));
+        stats.put(statName("fetch_rate"), sum(fetchRate));
     }
 
     void add(Map<MetricName, ? extends Metric> kafkaMetrics) {
-        for (Map.Entry<MetricName, ? extends Metric> entry : kafkaMetrics.entrySet()) {
+        for (var entry : kafkaMetrics.entrySet()) {
             MetricName name = entry.getKey();
             if ("consumer-fetch-manager-metrics".equals(name.group())) {
                 if ("records-lag-max".equals(name.name())) recordsLagMax.add(entry.getValue());
@@ -44,12 +42,17 @@ public class ConsumerMetrics implements Metrics {
         }
     }
 
-    private double sum(List<Metric> metrics) {
-        return metrics.stream().mapToDouble(metric -> (double) metric.metricValue()).filter(Double::isFinite).sum();
+    double sum(List<Metric> metrics) {
+        double sum = 0.0;
+        for (var metric : metrics) {
+            double value = (double) metric.metricValue();
+            if (Double.isFinite(value)) sum += value; // kafka uses infinity as initial value, e.g. org.apache.kafka.common.metrics.stats.Max
+        }
+        return sum;
     }
 
     String statName(String statName) {
-        StringBuilder builder = new StringBuilder("kafka_consumer");
+        var builder = new StringBuilder("kafka_consumer");
         if (name != null) builder.append('_').append(name);
         builder.append('_').append(statName);
         return builder.toString();

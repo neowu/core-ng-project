@@ -22,7 +22,7 @@ public class ProducerMetrics implements Metrics {
     @Override
     public void collect(Map<String, Double> stats) {
         if (requestRate != null) stats.put(statName("request_rate"), (Double) requestRate.metricValue());
-        if (requestSizeAvg != null) stats.put(statName("request_size_avg"), (Double) outgoingByteRate.metricValue());
+        if (requestSizeAvg != null) stats.put(statName("request_size_avg"), (Double) requestSizeAvg.metricValue());
         if (outgoingByteRate != null) stats.put(statName("outgoing_byte_rate"), (Double) outgoingByteRate.metricValue());
     }
 
