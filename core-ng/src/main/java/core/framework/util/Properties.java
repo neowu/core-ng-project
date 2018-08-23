@@ -20,7 +20,7 @@ public final class Properties {
         InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(classpath);
         if (stream == null) throw Exceptions.error("can not find property file in classpath, classpath={}", classpath);
         try (Reader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8))) {
-            java.util.Properties properties = new java.util.Properties();
+            var properties = new java.util.Properties();
             properties.load(reader);
             properties.forEach((key, value) -> set((String) key, (String) value));
         } catch (IOException e) {

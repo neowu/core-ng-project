@@ -163,9 +163,9 @@ public class APIDefinitionBuilder {
             var definition = new EnumDefinition();
             definition.name = typeName;
             definition.fields = Maps.newLinkedHashMap();
-            Classes.enumConstantFields(enumClass).forEach(field -> {
+            for (Field field : Classes.enumConstantFields(enumClass)) {
                 definition.fields.put(field.getName(), field.getDeclaredAnnotation(Property.class).name());
-            });
+            }
             return definition;
         });
         return typeName;

@@ -57,8 +57,8 @@
         <!--Imports:-->
         <module name="AvoidStarImport"/>
         <module name="IllegalImport"/>
-        <module name="UnusedImports"/>              <!--Checks for unused import statements.-->
         <module name="RedundantImport"/>            <!--Checks for imports that are redundant.-->
+        <module name="UnusedImports"/>              <!--Checks for unused import statements.-->
 
         <!--Miscellaneous:-->
         <module name="Indentation"/>

@@ -8,7 +8,6 @@ import core.framework.impl.resource.Pool;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.Exceptions;
-import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +35,7 @@ public final class DatabaseImpl implements Database {
     public final DatabaseOperation operation;
 
     private final Logger logger = LoggerFactory.getLogger(DatabaseImpl.class);
-    private final Map<Class<?>, RowMapper<?>> rowMappers = Maps.newHashMap();
+    private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
     public String user;
     public String password;
     public Vendor vendor;
