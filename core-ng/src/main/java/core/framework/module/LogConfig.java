@@ -10,7 +10,7 @@ import core.framework.impl.module.ShutdownHook;
 import core.framework.util.Exceptions;
 
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author neo
@@ -47,6 +47,6 @@ public class LogConfig extends Config {
     }
 
     public void maskFields(String... fields) {
-        context.logManager.filter.maskedFields.addAll(Arrays.asList(fields));
+        Collections.addAll(context.logManager.filter.maskedFields, fields);
     }
 }

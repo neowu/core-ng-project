@@ -1,9 +1,9 @@
 package core.framework.crypto;
 
-import core.framework.util.Charsets;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +23,6 @@ class RSATest {
         String message = "test message";
         byte[] encryptedMessage = rsa.encrypt(Strings.bytes(message));
         byte[] decryptedMessage = rsa.decrypt(encryptedMessage);
-        assertEquals(message, new String(decryptedMessage, Charsets.UTF_8));
+        assertEquals(message, new String(decryptedMessage, StandardCharsets.UTF_8));
     }
 }

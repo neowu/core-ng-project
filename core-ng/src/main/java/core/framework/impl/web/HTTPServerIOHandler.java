@@ -1,7 +1,6 @@
 package core.framework.impl.web;
 
 import core.framework.impl.web.request.RequestBodyReader;
-import core.framework.util.Charsets;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.form.FormDataParser;
@@ -9,6 +8,8 @@ import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.xnio.channels.StreamSourceChannel;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author neo
@@ -20,7 +21,7 @@ class HTTPServerIOHandler implements HttpHandler {
     HTTPServerIOHandler(HTTPServerHandler handler) {
         this.handler = handler;
         FormParserFactory.Builder builder = FormParserFactory.builder();
-        builder.setDefaultCharset(Charsets.UTF_8.name());
+        builder.setDefaultCharset(StandardCharsets.UTF_8.name());
         formParserFactory = builder.build();
     }
 

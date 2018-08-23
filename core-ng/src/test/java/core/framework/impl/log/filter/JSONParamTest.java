@@ -1,9 +1,9 @@
 package core.framework.impl.log.filter;
 
-import core.framework.util.Charsets;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +50,6 @@ class JSONParamTest {
     }
 
     private FilterParam param(String value) {
-        return new JSONParam(Strings.bytes(value), Charsets.UTF_8);
+        return new JSONParam(Strings.bytes(value), StandardCharsets.UTF_8);
     }
 }

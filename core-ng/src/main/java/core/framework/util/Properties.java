@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -19,7 +20,7 @@ public final class Properties {
     public void load(String classpath) {
         InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(classpath);
         if (stream == null) throw Exceptions.error("can not find property file in classpath, classpath={}", classpath);
-        try (Reader reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8))) {
+        try (Reader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             var properties = new java.util.Properties();
             properties.load(reader);
             properties.forEach((key, value) -> set((String) key, (String) value));

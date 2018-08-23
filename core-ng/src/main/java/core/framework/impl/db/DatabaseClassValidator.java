@@ -64,10 +64,9 @@ final class DatabaseClassValidator implements TypeVisitor {
         if (column == null)
             throw Exceptions.error("db entity field must have @Column, field={}", Fields.path(field));
 
-        if (columns.contains(column.name())) {
+        boolean added = columns.add(column.name());
+        if (!added) {
             throw Exceptions.error("found duplicate column, field={}, column={}", Fields.path(field), column.name());
-        } else {
-            columns.add(column.name());
         }
 
         PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);

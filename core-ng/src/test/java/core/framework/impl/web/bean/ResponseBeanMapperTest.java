@@ -2,13 +2,13 @@ package core.framework.impl.web.bean;
 
 import core.framework.impl.validate.ValidationException;
 import core.framework.json.JSON;
-import core.framework.util.Charsets;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
 import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +38,7 @@ class ResponseBeanMapperTest {
     void toJSONWithEmptyOptional() {
         Optional<TestBean> optional = Optional.empty();
         byte[] bytes = responseBeanMapper.toJSON(optional);
-        assertThat(new String(bytes, Charsets.UTF_8)).isEqualTo("null");
+        assertThat(new String(bytes, StandardCharsets.UTF_8)).isEqualTo("null");
     }
 
     @Test

@@ -2,6 +2,8 @@ package core.framework.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,7 +21,7 @@ class EncodingsTest {
     @Test
     void decodeBase64() {
         // from http://en.wikipedia.org/wiki/Base64
-        assertEquals("leasure.", new String(Encodings.decodeBase64("bGVhc3VyZS4="), Charsets.UTF_8));
+        assertEquals("leasure.", new String(Encodings.decodeBase64("bGVhc3VyZS4="), StandardCharsets.UTF_8));
     }
 
     @Test

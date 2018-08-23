@@ -1,11 +1,11 @@
 package core.framework.http;
 
 import core.framework.util.ASCII;
-import core.framework.util.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Optional;
 
@@ -13,12 +13,12 @@ import java.util.Optional;
  * @author neo
  */
 public final class ContentType {
-    public static final ContentType TEXT_HTML = create("text/html", Charsets.UTF_8);
-    public static final ContentType TEXT_CSS = create("text/css", Charsets.UTF_8);
-    public static final ContentType TEXT_PLAIN = create("text/plain", Charsets.UTF_8);
-    public static final ContentType TEXT_XML = create("text/xml", Charsets.UTF_8);
-    public static final ContentType APPLICATION_JSON = create("application/json", Charsets.UTF_8);
-    public static final ContentType APPLICATION_JAVASCRIPT = create("application/javascript", Charsets.UTF_8);
+    public static final ContentType TEXT_HTML = create("text/html", StandardCharsets.UTF_8);
+    public static final ContentType TEXT_CSS = create("text/css", StandardCharsets.UTF_8);
+    public static final ContentType TEXT_PLAIN = create("text/plain", StandardCharsets.UTF_8);
+    public static final ContentType TEXT_XML = create("text/xml", StandardCharsets.UTF_8);
+    public static final ContentType APPLICATION_JSON = create("application/json", StandardCharsets.UTF_8);
+    public static final ContentType APPLICATION_JAVASCRIPT = create("application/javascript", StandardCharsets.UTF_8);
     public static final ContentType APPLICATION_OCTET_STREAM = create("application/octet-stream", null);
     public static final ContentType IMAGE_PNG = create("image/png", null);
 

@@ -1,7 +1,8 @@
 package core.framework.impl.redis;
 
-import core.framework.util.Charsets;
 import core.framework.util.Strings;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author neo
@@ -26,11 +27,11 @@ class RedisEncodings {
             return INT_BYTES_CACHE[(int) value];
         }
         String text = Long.toString(value);
-        return Strings.bytes(text); // according to JMH benchmark, text.getBytes(Charsets.UTF_8) beats getBytesWithOtherCharset or convert by char[] directly, refer to JDK impl for details
+        return Strings.bytes(text); // according to JMH benchmark, text.getBytes(UTF_8) beats getBytesWithOtherCharset or convert by char[] directly, refer to JDK impl for details
     }
 
     static String decode(byte[] value) {
         if (value == null) return null;
-        return new String(value, Charsets.UTF_8);
+        return new String(value, StandardCharsets.UTF_8);
     }
 }

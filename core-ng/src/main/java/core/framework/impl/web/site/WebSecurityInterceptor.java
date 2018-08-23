@@ -7,9 +7,10 @@ import core.framework.web.Invocation;
 import core.framework.web.Request;
 import core.framework.web.Response;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Map;
+
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -51,18 +52,10 @@ public final class WebSecurityInterceptor implements Interceptor {    // refer t
                 String value = entry.getValue();
                 if (i == 0) builder.append('?');
                 else builder.append('&');
-                builder.append(encode(name)).append('=').append(encode(value));
+                builder.append(encode(name, UTF_8)).append('=').append(encode(value, UTF_8));
                 i++;
             }
         }
         return builder.toString();
-    }
-
-    private String encode(String value) {
-        try {
-            return URLEncoder.encode(value, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new Error(e);
-        }
     }
 }

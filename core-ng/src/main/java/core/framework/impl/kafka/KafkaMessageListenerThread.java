@@ -5,7 +5,6 @@ import core.framework.impl.log.LogManager;
 import core.framework.impl.log.filter.BytesParam;
 import core.framework.kafka.Message;
 import core.framework.log.Markers;
-import core.framework.util.Charsets;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
@@ -17,6 +16,7 @@ import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -197,7 +197,7 @@ class KafkaMessageListenerThread extends Thread {
     private String header(Headers headers, String key) {
         Header header = headers.lastHeader(key);
         if (header == null) return null;
-        return new String(header.value(), Charsets.UTF_8);
+        return new String(header.value(), StandardCharsets.UTF_8);
     }
 
     private <T> void validate(MessageValidator<T> validator, T value, ConsumerRecord<String, byte[]> record) {
@@ -207,7 +207,7 @@ class KafkaMessageListenerThread extends Thread {
             Header[] recordHeaders = record.headers().toArray();
             Map<String, String> headers = Maps.newHashMapWithExpectedSize(recordHeaders.length);
             for (Header recordHeader : recordHeaders)
-                headers.put(recordHeader.key(), new String(recordHeader.value(), Charsets.UTF_8));
+                headers.put(recordHeader.key(), new String(recordHeader.value(), StandardCharsets.UTF_8));
             logger.warn("failed to validate message, key={}, headers={}, message={}", record.key(), headers, new BytesParam(record.value()), e);
             throw e;
         }

@@ -6,12 +6,12 @@ import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPHeaders;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
-import core.framework.util.Charsets;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +32,7 @@ class HTTPClientImplTest {
     void responseBodyWithNoContent() throws IOException {
         byte[] body = httpClient.responseBody(null);   // apache http client return null for HEAD/204/205/304
 
-        assertEquals("", new String(body, Charsets.UTF_8));
+        assertEquals("", new String(body, StandardCharsets.UTF_8));
     }
 
     @Test

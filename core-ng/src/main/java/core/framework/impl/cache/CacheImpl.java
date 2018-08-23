@@ -3,10 +3,10 @@ package core.framework.impl.cache;
 import core.framework.cache.Cache;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.json.JSONWriter;
-import core.framework.util.Charsets;
 import core.framework.util.Maps;
 
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class CacheImpl<T> implements Cache<T> {
     public Optional<String> get(String key) {
         byte[] result = cacheStore.get(cacheKey(key));
         if (result == null) return Optional.empty();
-        return Optional.of(new String(result, Charsets.UTF_8));
+        return Optional.of(new String(result, StandardCharsets.UTF_8));
     }
 
     @Override

@@ -6,7 +6,6 @@ import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.filter.BytesParam;
 import core.framework.impl.log.filter.FieldParam;
 import core.framework.impl.log.filter.JSONParam;
-import core.framework.util.Charsets;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
@@ -22,10 +21,11 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Deque;
 import java.util.Map;
+
+import static java.net.URLDecoder.decode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -90,18 +90,10 @@ public final class RequestParser {
 
     void parseQueryParams(RequestImpl request, Map<String, Deque<String>> params) {
         for (Map.Entry<String, Deque<String>> entry : params.entrySet()) {
-            String name = decodeQueryParam(entry.getKey());
-            String value = decodeQueryParam(entry.getValue().getFirst());
+            String name = decode(entry.getKey(), UTF_8);
+            String value = decode(entry.getValue().getFirst(), UTF_8);
             logger.debug("[request:query] {}={}", name, value);
             request.queryParams.put(name, value);
-        }
-    }
-
-    private String decodeQueryParam(String value) {
-        try {
-            return URLDecoder.decode(value, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new Error(e);
         }
     }
 
@@ -129,9 +121,9 @@ public final class RequestParser {
 
         Object bodyParam = null;
         if (ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
-            bodyParam = new JSONParam(request.body, contentType.charset().orElse(Charsets.UTF_8));
+            bodyParam = new JSONParam(request.body, contentType.charset().orElse(UTF_8));
         } else if (ContentType.TEXT_XML.mediaType().equals(contentType.mediaType())) {
-            bodyParam = new BytesParam(request.body, contentType.charset().orElse(Charsets.UTF_8));
+            bodyParam = new BytesParam(request.body, contentType.charset().orElse(UTF_8));
         }
         if (bodyParam != null) logger.debug("[request] body={}", bodyParam);
     }
@@ -185,7 +177,7 @@ public final class RequestParser {
     }
 
     String requestURL(RequestImpl request, HttpServerExchange exchange) {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
 
         if (exchange.isHostIncludedInRequestURI()) {    // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
             builder.append(exchange.getRequestURI());

@@ -1,6 +1,7 @@
 ## Change log
 ### 6.6.7 (8/20/2018 - )
 * log-processor: change index pattern to name-yyyy.MM.dd, to make clean index job works with metricbeats
+* utils: deleted core.framework.util.Charsets, in favor of java.nio.charset.StandardCharsets (as IDE prompts)
 
 ### 6.6.6 (8/18/2018 - 8/20/2018)
 * kafka: tweak producer, added request rate/size metrics, enable compression

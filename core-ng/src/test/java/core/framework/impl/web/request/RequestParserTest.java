@@ -9,13 +9,13 @@ import io.undertow.util.Headers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -51,11 +51,11 @@ class RequestParserTest {
     }
 
     @Test
-    void parseQueryParams() throws UnsupportedEncodingException {
+    void parseQueryParams() {
         var request = new RequestImpl(null, null);
-        Map<String, Deque<String>> params = new HashMap<>();
-        params.computeIfAbsent("key", key -> new ArrayDeque<>()).add(URLEncoder.encode("value1 value2", "UTF-8"));     // undertow url decoding is disabled in core.framework.impl.web.HTTPServer.start, so the parser must decode all query param
-        params.computeIfAbsent("emptyKey", key -> new ArrayDeque<>()).add("");  // for use case: http://address?emptyKey=
+        // undertow url decoding is disabled in core.framework.impl.web.HTTPServer.start, so the parser must decode all query param
+        Map<String, Deque<String>> params = Map.of("key", new ArrayDeque<>(List.of(encode("value1 value2", UTF_8))),
+                "emptyKey", new ArrayDeque<>(List.of("")));  // for use case: http://address?emptyKey=
         parser.parseQueryParams(request, params);
 
         assertThat(request.queryParam("key")).hasValue("value1 value2");

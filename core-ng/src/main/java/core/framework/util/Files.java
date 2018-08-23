@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +30,7 @@ public final class Files {
     private static final Logger LOGGER = LoggerFactory.getLogger(Files.class);
 
     public static String text(Path file) {
-        return new String(bytes(file), Charsets.UTF_8);
+        return new String(bytes(file), StandardCharsets.UTF_8);
     }
 
     public static byte[] bytes(Path file) {

@@ -1,7 +1,8 @@
 package core.framework.http;
 
-import core.framework.util.Charsets;
 import org.junit.jupiter.api.Test;
+
+import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +14,7 @@ class ContentTypeTest {
     void parse() {
         ContentType type = ContentType.parse("application/json; charset=utf-8");
         assertThat(type.mediaType()).isEqualTo("application/json");
-        assertThat(type.charset()).get().isEqualTo(Charsets.UTF_8);
+        assertThat(type.charset()).get().isEqualTo(StandardCharsets.UTF_8);
 
         type = ContentType.parse("image/png");
         assertThat(type.mediaType()).isEqualTo("image/png");

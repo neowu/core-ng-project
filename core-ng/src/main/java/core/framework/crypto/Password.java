@@ -1,8 +1,8 @@
 package core.framework.crypto;
 
-import core.framework.util.Charsets;
 import core.framework.util.Encodings;
 
+import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 
 /**
@@ -18,7 +18,7 @@ public final class Password {
     public static String encrypt(String plainText, String publicKey) {
         RSA rsa = new RSA();
         rsa.publicKey(PEM.fromPEM(publicKey));
-        byte[] encryptedBytes = rsa.encrypt(plainText.getBytes(Charsets.UTF_8));
+        byte[] encryptedBytes = rsa.encrypt(plainText.getBytes(StandardCharsets.UTF_8));
         return Encodings.base64(encryptedBytes);
     }
 
@@ -27,7 +27,7 @@ public final class Password {
         rsa.privateKey(PEM.fromPEM(privateKey));
         byte[] encryptedBytes = Encodings.decodeBase64(encryptedText);
         byte[] plainText = rsa.decrypt(encryptedBytes);
-        return new String(plainText, Charsets.UTF_8);
+        return new String(plainText, StandardCharsets.UTF_8);
     }
 
     public static String[] generateKeyPair() {

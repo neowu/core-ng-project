@@ -1,9 +1,9 @@
 package core.framework.http;
 
-import core.framework.util.Charsets;
 import core.framework.util.Encodings;
 import core.framework.util.Maps;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -59,7 +59,7 @@ public final class HTTPRequest {
     }
 
     public void body(String body, ContentType contentType) {
-        byte[] bytes = body.getBytes(contentType.charset().orElse(Charsets.UTF_8));
+        byte[] bytes = body.getBytes(contentType.charset().orElse(StandardCharsets.UTF_8));
         body(bytes, contentType);
     }
 

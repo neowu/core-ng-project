@@ -1,5 +1,6 @@
 package core.framework.util;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.BitSet;
 
@@ -89,7 +90,7 @@ public final class Encodings {
             }
             position++;
         }
-        return new String(buffer, 0, position, Charsets.UTF_8);
+        return new String(buffer, 0, position, StandardCharsets.UTF_8);
     }
 
     public static String base64(String value) {

@@ -5,13 +5,14 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author neo
  */
 public final class ClasspathResources {
     public static String text(String path) {
-        return new String(bytes(path), Charsets.UTF_8);
+        return new String(bytes(path), StandardCharsets.UTF_8);
     }
 
     public static byte[] bytes(String path) {

@@ -4,12 +4,14 @@ import org.slf4j.helpers.MessageFormatter;
 
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * @author neo
  */
 public final class Strings {
     public static byte[] bytes(String text) {
-        return text.getBytes(Charsets.UTF_8);
+        return text.getBytes(UTF_8);
     }
 
     public static String format(String pattern, Object... params) {

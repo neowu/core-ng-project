@@ -20,7 +20,7 @@ public class JSONParam implements FilterParam {
         String value = new String(bytes, charset);
         if (!needMask(value, maskedFields)) return value;
 
-        StringBuilder builder = new StringBuilder(value);
+        var builder = new StringBuilder(value);
         for (String maskedField : maskedFields) {
             int current = -1;
             while (true) {

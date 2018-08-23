@@ -12,7 +12,6 @@ import core.framework.impl.log.filter.FieldParam;
 import core.framework.impl.log.filter.JSONParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
-import core.framework.util.Charsets;
 import core.framework.util.InputStreams;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
 
@@ -143,7 +143,7 @@ public final class HTTPClientImpl implements HTTPClient {
     private void logRequestBody(HTTPRequest request, ContentType contentType) {
         Object bodyParam;
         if (ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
-            bodyParam = new JSONParam(request.body(), contentType.charset().orElse(Charsets.UTF_8));
+            bodyParam = new JSONParam(request.body(), contentType.charset().orElse(StandardCharsets.UTF_8));
         } else {
             bodyParam = new BytesParam(request.body());
         }
@@ -167,7 +167,7 @@ public final class HTTPClientImpl implements HTTPClient {
         response.contentType().ifPresent(contentType -> {
             String mediaType = contentType.mediaType();
             if (mediaType.contains("text") || mediaType.contains("json")) {
-                logger.debug("[response] body={}", new BytesParam(response.body(), contentType.charset().orElse(Charsets.UTF_8)));
+                logger.debug("[response] body={}", new BytesParam(response.body(), contentType.charset().orElse(StandardCharsets.UTF_8)));
             }
         });
     }
