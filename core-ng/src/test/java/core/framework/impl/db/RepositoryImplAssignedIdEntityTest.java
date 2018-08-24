@@ -1,5 +1,6 @@
 package core.framework.impl.db;
 
+import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.util.Lists;
 import org.junit.jupiter.api.AfterAll;
@@ -33,6 +34,7 @@ class RepositoryImplAssignedIdEntityTest {
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
         database.vendor = Vendor.MYSQL;
         database.operation.batchSize = 7;
+        database.operation.transactionManager.defaultIsolationLevel = IsolationLevel.READ_UNCOMMITTED;
         database.execute("CREATE TABLE assigned_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), int_field INT, big_decimal_field DECIMAL(10,2), date_field DATE)");
 
         repository = database.repository(AssignedIdEntity.class);
@@ -127,7 +129,7 @@ class RepositoryImplAssignedIdEntityTest {
     }
 
     private AssignedIdEntity entity(String id, String stringField, int intField) {
-        AssignedIdEntity entity = new AssignedIdEntity();
+        var entity = new AssignedIdEntity();
         entity.id = id;
         entity.stringField = stringField;
         entity.intField = intField;

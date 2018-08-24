@@ -15,8 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -31,6 +30,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
         database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:mysql;sql.syntax_mys=true");
         database.vendor = Vendor.MYSQL;
+
         database.execute("CREATE TABLE auto_increment_id_entity (id INT AUTO_INCREMENT PRIMARY KEY, string_field VARCHAR(20), double_field DOUBLE, enum_field VARCHAR(10), date_time_field TIMESTAMP, zoned_date_time_field TIMESTAMP)");
 
         repository = database.repository(AutoIncrementIdEntity.class);
@@ -48,72 +48,72 @@ class RepositoryImplAutoIncrementIdEntityTest {
 
     @Test
     void insert() {
-        AutoIncrementIdEntity entity = new AutoIncrementIdEntity();
+        var entity = new AutoIncrementIdEntity();
         entity.stringField = "string";
         entity.doubleField = 3.25;
         entity.dateTimeField = LocalDateTime.now();
         entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2017, Month.APRIL, 3, 12, 0), ZoneId.of("UTC"));
 
         Optional<Long> id = repository.insert(entity);
-        assertTrue(id.isPresent());
+        assertThat(id).isPresent();
 
-        AutoIncrementIdEntity selectedEntity = repository.get(id.get()).orElseThrow(() -> new Error("not found"));
-
-        assertEquals((long) id.get(), (long) selectedEntity.id);
-        assertEquals(entity.stringField, selectedEntity.stringField);
-        assertEquals(entity.doubleField, selectedEntity.doubleField);
-        assertEquals(entity.dateTimeField, selectedEntity.dateTimeField);
-        assertEquals(entity.zonedDateTimeField.toInstant(), selectedEntity.zonedDateTimeField.toInstant());
+        assertThat(repository.get(id.orElseThrow()))
+                .get().isEqualToIgnoringGivenFields(entity, "id", "zonedDateTimeField")
+                .satisfies(selectedEntity -> {
+                    assertThat(selectedEntity.id).isEqualTo(id.orElseThrow().intValue());
+                    assertThat(selectedEntity.zonedDateTimeField).isEqualTo(entity.zonedDateTimeField);
+                });
     }
 
     @Test
     void selectOne() {
-        AutoIncrementIdEntity entity = new AutoIncrementIdEntity();
+        var entity = new AutoIncrementIdEntity();
         entity.stringField = "stringField#123456";
 
         Optional<Long> id = repository.insert(entity);
-        assertTrue(id.isPresent());
+        assertThat(id).isPresent();
 
-        AutoIncrementIdEntity selectedEntity = repository.selectOne("string_field = ?", entity.stringField).orElseThrow(() -> new Error("not found"));
+        AutoIncrementIdEntity selectedEntity = repository.selectOne("string_field = ?", entity.stringField).orElseThrow();
 
-        assertEquals((long) id.get(), (long) selectedEntity.id);
-        assertEquals(entity.stringField, selectedEntity.stringField);
+        assertThat(selectedEntity.id).isEqualTo(id.orElseThrow().intValue());
+        assertThat(selectedEntity.stringField).isEqualTo(entity.stringField);
     }
 
     @Test
     void selectAll() {
-        List<AutoIncrementIdEntity> entities = repository.select().fetch();
-        assertTrue(entities.isEmpty());
+        Query<AutoIncrementIdEntity> query = repository.select();
+        assertThat(query.fetch()).isEmpty();
     }
 
     @Test
     void selectWithLimit() {
         Query<AutoIncrementIdEntity> query = repository.select();
+        query.limit(0);
+        assertThat(query.fetch()).isEmpty();
+        assertThat(query.fetchOne()).isEmpty();
+
         query.limit(1000);
-        List<AutoIncrementIdEntity> entities = query.fetch();
-        assertTrue(entities.isEmpty());
+        assertThat(query.fetch()).isEmpty();
 
         query.where("string_field = ?", "value");
-        entities = query.fetch();
-        assertTrue(entities.isEmpty());
+        assertThat(query.fetch()).isEmpty();
     }
 
     @Test
     void select() {
-        AutoIncrementIdEntity entity1 = new AutoIncrementIdEntity();
+        var entity1 = new AutoIncrementIdEntity();
         entity1.stringField = "string1";
         entity1.enumField = TestEnum.V1;
         repository.insert(entity1);
 
-        AutoIncrementIdEntity entity2 = new AutoIncrementIdEntity();
+        var entity2 = new AutoIncrementIdEntity();
         entity2.stringField = "string2";
         entity2.enumField = TestEnum.V2;
         repository.insert(entity2);
 
         List<AutoIncrementIdEntity> entities = repository.select("enum_field = ?", TestEnum.V1);
 
-        assertEquals(1, entities.size());
-        assertEquals(entity1.enumField, entities.get(0).enumField);
-        assertEquals(entity1.stringField, entities.get(0).stringField);
+        assertThat(entities).hasSize(1);
+        assertThat(entities.get(0)).isEqualToIgnoringGivenFields(entity1, "id");
     }
 }
