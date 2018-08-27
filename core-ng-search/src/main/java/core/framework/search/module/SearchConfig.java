@@ -55,6 +55,10 @@ public class SearchConfig extends Config {
         search.slowOperationThreshold = threshold;
     }
 
+    public void timeout(Duration timeout) {
+        search.timeout = timeout;
+    }
+
     public <T> void type(Class<T> documentClass) {
         ElasticSearchType<T> searchType = search.type(documentClass);
         context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), null, searchType);

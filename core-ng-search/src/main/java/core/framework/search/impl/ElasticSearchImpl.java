@@ -28,13 +28,16 @@ import java.time.Duration;
  */
 public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
+    public Duration timeout = Duration.ofSeconds(10);
     public Duration slowOperationThreshold = Duration.ofSeconds(5);
     public String host;
     private RestHighLevelClient client;
 
     public void initialize() {
-        // refer to org.elasticsearch.client.RestClientBuilder for default timeout
-        client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, 9200)));
+        client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, 9200))
+                                                   .setRequestConfigCallback(builder -> builder.setSocketTimeout((int) timeout.toMillis()))
+                                                   .setHttpClientConfigCallback(builder -> builder.setMaxConnTotal(100).setMaxConnPerRoute(100))
+                                                   .setMaxRetryTimeoutMillis((int) timeout.toMillis()));
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
