@@ -5,6 +5,7 @@
     !!! removed @Index(index, type), replaced with @Index(name) as multiple types per index is deprecated and will be removed in ES 7.0
     switched to java high level client, which uses HTTP:9200
     removed DeleteByQuery, as no actual usage for now, can be substituted by ForEach if needed
+* cache: support evict and put multiple keys
 
 ### 6.6.7 (8/20/2018 - 8/23/2018)
 * log-processor: change index pattern to name-yyyy.MM.dd, to make clean index job works with metricbeats

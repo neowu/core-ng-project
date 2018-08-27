@@ -65,9 +65,9 @@ class CacheImplTest {
 
     @Test
     void evict() {
-        cache.evict("key");
+        cache.evict("key1", "key2");
 
-        verify(cacheStore).delete("name:key");
+        verify(cacheStore).delete("name:key1", "name:key2");
     }
 
     @Test
@@ -80,5 +80,14 @@ class CacheImplTest {
         assertThat(results).containsOnly(entry("key1", 1), entry("key2", 2), entry("key3", 3));
 
         verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && Arrays.equals(argument.get("name:key2"), Strings.bytes("2"))), eq(Duration.ofHours(1)));
+    }
+
+    @Test
+    void putAll() {
+        cache.putAll(Map.of("key1", 1, "key2", 2));
+
+        verify(cacheStore).putAll(argThat(argument -> argument.size() == 2
+                && Arrays.equals(argument.get("name:key1"), Strings.bytes("1"))
+                && Arrays.equals(argument.get("name:key2"), Strings.bytes("2"))), eq(Duration.ofHours(1)));
     }
 }

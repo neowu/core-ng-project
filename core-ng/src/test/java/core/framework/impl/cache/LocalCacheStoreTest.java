@@ -68,7 +68,8 @@ class LocalCacheStoreTest {
     @Test
     void delete() {
         cacheStore.put("key1", Strings.bytes("value"), Duration.ofMinutes(1));
-        cacheStore.delete("key1");
+        cacheStore.put("key2", Strings.bytes("value"), Duration.ofMinutes(1));
+        cacheStore.delete("key1", "key2");
 
         assertEquals(0, cacheStore.caches.size());
     }

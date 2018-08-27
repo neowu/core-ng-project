@@ -60,9 +60,9 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public void delete(String key) {
+    public void delete(String... keys) {
         try {
-            redis.del(key);
+            redis.del(keys);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
         }

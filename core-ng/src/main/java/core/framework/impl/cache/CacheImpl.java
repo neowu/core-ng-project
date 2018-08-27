@@ -86,8 +86,22 @@ public class CacheImpl<T> implements Cache<T> {
     }
 
     @Override
-    public void evict(String key) {
-        cacheStore.delete(cacheKey(key));
+    public void putAll(Map<String, T> values) {
+        Map<String, byte[]> cacheValues = Maps.newHashMapWithExpectedSize(values.size());
+        for (Map.Entry<String, T> entry : values.entrySet()) {
+            cacheValues.put(cacheKey(entry.getKey()), writer.toJSON(entry.getValue()));
+        }
+        cacheStore.putAll(cacheValues, duration);
+    }
+
+    @Override
+    public void evict(String... keys) {
+        if (keys.length == 0) throw new Error("keys must not be empty");
+        String[] cacheKeys = new String[keys.length];
+        for (int i = 0; i < keys.length; i++) {
+            cacheKeys[i] = cacheKey(keys[i]);
+        }
+        cacheStore.delete(cacheKeys);
     }
 
     private String cacheKey(String key) {

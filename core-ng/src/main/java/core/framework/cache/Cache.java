@@ -14,5 +14,7 @@ public interface Cache<T> {
 
     void put(String key, T value);
 
-    void evict(String key);
+    void putAll(Map<String, T> values);
+
+    void evict(String... keys);
 }
