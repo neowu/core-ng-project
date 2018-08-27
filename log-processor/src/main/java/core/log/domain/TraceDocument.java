@@ -8,7 +8,7 @@ import java.time.Instant;
 /**
  * @author neo
  */
-@Index(index = "trace", type = "trace")
+@Index(name = "trace")
 public class TraceDocument {
     @Property(name = "date")
     public Instant date;

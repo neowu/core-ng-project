@@ -2,10 +2,10 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '6.6.8'
+    version = '6.7.0'
 }
 
-def elasticVersion = '6.3.2'
+def elasticVersion = '6.4.0'
 def kafkaVersion = '2.0.0'
 def jacksonVersion = '2.9.6'
 def junitVersion = '5.2.0'
@@ -71,7 +71,7 @@ project(':core-ng-search') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api "org.elasticsearch.client:transport:${elasticVersion}"
+        api "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
         testImplementation project(":core-ng-test")
     }
 }
@@ -81,6 +81,8 @@ project(':core-ng-search-test') {
     dependencies {
         api project(":core-ng-test")
         api project(":core-ng-search")
+        implementation "org.elasticsearch.plugin:transport-netty4-client:${elasticVersion}"
+        implementation "org.elasticsearch.plugin:reindex-client:${elasticVersion}"
         implementation "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
         implementation "org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}"     // used by elasticsearch scaled_float
         implementation "org.codelibs.elasticsearch.module:analysis-common:${elasticVersion}"     // used by elasticsearch stemmer
@@ -111,10 +113,10 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
 project(':log-processor') {
     apply from: file("${rootDir}/gradle/app.gradle")
     dependencies {
-        compile project(':core-ng')
-        compile project(':core-ng-search')
-        compile "org.apache.kafka:kafka-clients:${kafkaVersion}"
-        testCompile project(':core-ng-test')
-        testCompile project(':core-ng-search-test')
+        implementation project(':core-ng')
+        implementation project(':core-ng-search')
+        implementation "org.apache.kafka:kafka-clients:${kafkaVersion}"
+        testImplementation project(':core-ng-test')
+        testImplementation project(':core-ng-search-test')
     }
 }

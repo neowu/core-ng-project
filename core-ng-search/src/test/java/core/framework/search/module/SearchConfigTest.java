@@ -1,5 +1,6 @@
 package core.framework.search.module;
 
+import core.framework.test.module.TestModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +15,7 @@ class SearchConfigTest {
     @BeforeEach
     void createSearchConfig() {
         config = new SearchConfig();
+        config.initialize(new TestModuleContext(), null);
     }
 
     @Test

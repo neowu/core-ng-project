@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @author neo
  */
-class MockNode extends Node {
+class LocalNode extends Node {
     private static List<Class<? extends Plugin>> plugins() {
         List<Class<? extends Plugin>> plugins = Lists.newArrayList();
         plugins.add(ReindexPlugin.class);
@@ -27,7 +27,7 @@ class MockNode extends Node {
         return plugins;
     }
 
-    MockNode(Settings settings) {
+    LocalNode(Settings settings) {
         super(new Environment(settings, null), plugins());
     }
 }

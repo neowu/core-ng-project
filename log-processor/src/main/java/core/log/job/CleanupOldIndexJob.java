@@ -2,17 +2,14 @@ package core.log.job;
 
 import core.framework.inject.Inject;
 import core.framework.scheduler.Job;
+import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
-import core.framework.search.ElasticSearchIndex;
-import core.framework.search.SearchException;
 import core.log.service.IndexService;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 /**
  * @author neo
@@ -31,14 +28,15 @@ public class CleanupOldIndexJob implements Job {
     }
 
     void cleanup(LocalDate now) {
-        List<ElasticSearchIndex> indices = elasticSearch.indices();
-        for (ElasticSearchIndex index : indices) {
-            indexService.createdDate(index.index).ifPresent(date -> {
+        ClusterStateResponse state = elasticSearch.state();
+        for (var entry : state.metadata.indices.entrySet()) {
+            String index = entry.getKey();
+            indexService.createdDate(index).ifPresent(date -> {
                 long days = ChronoUnit.DAYS.between(date, now);
                 if (days >= 30) {        // delete log older than 30 days, close index older than 7 days
-                    deleteIndex(index.index);
-                } else if (days >= 7 && index.state == IndexMetaData.State.OPEN) {
-                    closeIndex(index.index);
+                    deleteIndex(index);
+                } else if (days >= 7 && entry.getValue().state == ClusterStateResponse.IndexState.OPEN) {
+                    closeIndex(index);
                 }
             });
         }
@@ -47,7 +45,7 @@ public class CleanupOldIndexJob implements Job {
     private void deleteIndex(String index) {
         try {
             elasticSearch.deleteIndex(index);
-        } catch (SearchException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
     }
@@ -55,7 +53,7 @@ public class CleanupOldIndexJob implements Job {
     private void closeIndex(String index) {
         try {
             elasticSearch.closeIndex(index);
-        } catch (SearchException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
     }

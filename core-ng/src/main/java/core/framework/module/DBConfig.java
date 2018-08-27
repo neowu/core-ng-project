@@ -43,7 +43,7 @@ public class DBConfig extends Config {
     }
 
     private DatabaseImpl createDatabase() {
-        DatabaseImpl database = new DatabaseImpl("db" + (name == null ? "" : "-" + name));
+        var database = new DatabaseImpl("db" + (name == null ? "" : "-" + name));
         context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> database.close());
         context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(10));
         context.stat.metrics.add(new PoolMetrics(database.pool));

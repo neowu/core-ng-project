@@ -1,5 +1,10 @@
 ## Change log
-### 6.6.8 (8/23/2018 - )
+### 6.7.0 (8/23/2018 - )   !!! search API break changes !!!
+* db: skip query.fetch() if limit is 0
+* search: update to 6.4.0, 
+    !!! removed @Index(index, type), replaced with @Index(name) as multiple types per index is deprecated and will be removed in ES 7.0
+    switched to java high level client, which uses HTTP:9200
+    removed DeleteByQuery, as no actual usage for now, can be substituted by ForEach if needed
 
 ### 6.6.7 (8/20/2018 - 8/23/2018)
 * log-processor: change index pattern to name-yyyy.MM.dd, to make clean index job works with metricbeats

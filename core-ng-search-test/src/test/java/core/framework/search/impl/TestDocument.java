@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 /**
  * @author neo
  */
-@Index(index = "document", type = "document")
+@Index(name = "document")
 public class TestDocument {
     @Property(name = "id")
     public String id;

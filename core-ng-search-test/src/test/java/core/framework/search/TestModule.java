@@ -16,7 +16,6 @@ public class TestModule extends AbstractTestModule {
         SearchConfig search = config(SearchConfig.class);
         search.host("localhost");
         search.slowOperationThreshold(Duration.ofSeconds(5));
-        search.timeout(Duration.ofSeconds(10));
         search.type(TestDocument.class);
 
         config(InitSearchConfig.class).createIndex("document", "search-test/document-index.json");

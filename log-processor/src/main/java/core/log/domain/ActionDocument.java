@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-@Index(index = "action", type = "action")
+@Index(name = "action")
 public class ActionDocument {
     @Property(name = "date")
     public Instant date;

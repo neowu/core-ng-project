@@ -3,38 +3,33 @@ package core.framework.search.module;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 import core.framework.search.impl.ESLoggerConfigFactory;
-import core.framework.search.impl.ElasticSearchImpl;
-import core.framework.search.impl.MockElasticSearch;
-import core.framework.util.Files;
-
-import java.nio.file.Path;
+import core.framework.search.impl.LocalElasticSearch;
 
 /**
  * @author neo
  */
 public class TestSearchConfig extends SearchConfig {
     @Override
-    void setHost(String host) {
-        // set host will parse actual host name by InetSocketAddress, which can not be resolved in test env
+    protected void initialize(ModuleContext context, String name) {
+        super.initialize(context, name);
+        var search = new LocalElasticSearch();
+        search.start();
+        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> search.close());
     }
 
     @Override
-    ElasticSearchImpl createElasticSearch(ModuleContext context) {
-        bindESLogger();
-        Path dataPath = Files.tempDir();
-        var search = new MockElasticSearch(dataPath);
-        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> search.close());
-        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> Files.deleteDir(dataPath));
-        return search;
+    public void host(String host) {
+        search.host = "localhost";
     }
 
     // es refers to log4j core directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger
     // log4j-to-slf4j works if only transport client is used, but our integration test uses Node.
     // refer to org.elasticsearch.index.IndexModule(), in org.elasticsearch.index.SearchSlowLog(), setLevel calls log4j.core api
-    private void bindESLogger() {
+    @Override
+    void configureLogger() {
         if (System.getProperty("log4j.configurationFactory") != null) return;
         System.setProperty("log4j.configurationFactory", ESLoggerConfigFactory.class.getName());
         System.setProperty("log4j2.disable.jmx", "true");
-        ESLoggerConfigFactory.bindLogger();
+        ESLoggerConfigFactory.configureLogger();
     }
 }

@@ -18,7 +18,7 @@ class DocumentClassValidatorTest {
         new DocumentClassValidator(TestDocument.class).validate();
     }
 
-    @Index(index = "main", type = "test")
+    @Index(name = "test")
     public static class TestDocument {
         @Property(name = "date_time_field")
         public LocalDateTime dateTimeField;

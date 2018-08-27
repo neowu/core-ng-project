@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-@Index(index = "stat", type = "stat")
+@Index(name = "stat")
 public class StatDocument {
     @Property(name = "date")
     public Instant date;

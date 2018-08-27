@@ -12,7 +12,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(TYPE)
 @Retention(RUNTIME)
 public @interface Index {
-    String index();
-
-    String type();
+    String name();
 }

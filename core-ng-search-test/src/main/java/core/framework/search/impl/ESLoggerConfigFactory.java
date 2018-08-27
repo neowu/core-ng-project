@@ -23,7 +23,7 @@ import java.util.Map;
  * @author neo
  */
 public class ESLoggerConfigFactory extends ConfigurationFactory {  // due to elasticsearch refer to log4j impl, here is to bridge to coreng logger
-    public static void bindLogger() {
+    public static void configureLogger() {
         LoggerContext context = (LoggerContext) LogManager.getContext(false);
         Configuration config = context.getConfiguration();
 
@@ -39,7 +39,7 @@ public class ESLoggerConfigFactory extends ConfigurationFactory {  // due to ela
         appender.start();
         config.addAppender(appender);
 
-        LoggerConfig loggerConfig = new LoggerConfig("", Level.ALL, false);
+        var loggerConfig = new LoggerConfig("", Level.ALL, false);
         loggerConfig.addAppender(appender, null, null);
         config.addLogger("", loggerConfig);
         context.updateLoggers();

@@ -1,11 +1,11 @@
 package core.framework.search.impl;
 
 import core.framework.inject.Inject;
+import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.IndexRequest;
 import core.framework.search.IntegrationTest;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,14 +23,15 @@ class ElasticSearchTemplateIntegrationTest extends IntegrationTest {
     void closeIndex() {
         index("document-1", "1", "text-1", 2);
         elasticSearch.closeIndex("document-1");
-        assertThat(elasticSearch.indices()).anyMatch(index -> "document-1".equals(index.index) && index.state == IndexMetaData.State.CLOSE);
+        ClusterStateResponse.Index index = elasticSearch.state().metadata.indices.get("document-1");
+        assertThat(index.state).isEqualTo(ClusterStateResponse.IndexState.CLOSE);
     }
 
     @Test
     void deleteIndex() {
         index("document-2", "2", "text-2", 3);
         elasticSearch.deleteIndex("document-2");
-        assertThat(elasticSearch.indices()).noneMatch(index -> "document-2".equals(index.index));
+        assertThat(elasticSearch.state().metadata.indices).doesNotContainKeys("document-2");
     }
 
     private void index(String index, String id, String stringField, int numField) {

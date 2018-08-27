@@ -1,52 +1,40 @@
 package core.framework.search.impl;
 
-import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
+import core.framework.impl.json.JSONMapper;
+import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
-import core.framework.search.ElasticSearchIndex;
 import core.framework.search.ElasticSearchType;
-import core.framework.search.SearchException;
-import core.framework.util.Lists;
+import core.framework.util.InputStreams;
 import core.framework.util.StopWatch;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
-import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
-import org.elasticsearch.client.AdminClient;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Requests;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.bytes.BytesArray;
-import org.elasticsearch.common.collect.ImmutableOpenMap;
-import org.elasticsearch.common.network.NetworkService;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author neo
  */
 public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
-    private final List<TransportAddress> addresses = Lists.newArrayList();
     public Duration slowOperationThreshold = Duration.ofSeconds(5);
-    public Duration timeout = Duration.ofSeconds(10);
-    public boolean sniff;      // if enabled, es client will use all nodes in cluster and only use "publish address" to connect
-    private Client client;
-
-    public void host(String host) {
-        addresses.add(new TransportAddress(new InetSocketAddress(host, 9300)));
-    }
+    public String host;
+    private RestHighLevelClient client;
 
     public void initialize() {
-        client = createClient();
+        // refer to org.elasticsearch.client.RestClientBuilder for default timeout
+        client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, 9200, "http")));
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
@@ -59,10 +47,10 @@ public class ElasticSearchImpl implements ElasticSearch {
         }
     }
 
-    public void close() {
+    public void close() throws IOException {
         if (client == null) return;
 
-        logger.info("close elasticsearch client");
+        logger.info("close elasticsearch client, host={}", host);
         client.close();
     }
 
@@ -70,9 +58,9 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndex(String index, String source) {
         var watch = new StopWatch();
         try {
-            client().admin().indices().prepareCreate(index).setSource(new BytesArray(source), XContentType.JSON).get();
-        } catch (ElasticsearchException e) {
-            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+            client().indices().create(Requests.createIndexRequest(index).source(new BytesArray(source), XContentType.JSON), RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         } finally {
             logger.info("create index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -82,9 +70,9 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndexTemplate(String name, String source) {
         var watch = new StopWatch();
         try {
-            client().admin().indices().preparePutTemplate(name).setSource(new BytesArray(source), XContentType.JSON).get();
-        } catch (ElasticsearchException e) {
-            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+            client().indices().putTemplate(new PutIndexTemplateRequest(name).source(new BytesArray(source), XContentType.JSON), RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         } finally {
             logger.info("create index template, name={}, elapsed={}", name, watch.elapsed());
         }
@@ -94,9 +82,9 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void flushIndex(String index) {
         var watch = new StopWatch();
         try {
-            client().admin().indices().prepareFlush(index).get();
-        } catch (ElasticsearchException e) {
-            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+            client().indices().flush(Requests.flushRequest(index), RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         } finally {
             logger.info("flush index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -106,9 +94,9 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void closeIndex(String index) {
         var watch = new StopWatch();
         try {
-            client().admin().indices().prepareClose(index).get();
-        } catch (ElasticsearchException e) {
-            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+            client().indices().close(Requests.closeIndexRequest(index), RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         } finally {
             logger.info("close index, index={}, elapsed={}", index, watch.elapsed());
         }
@@ -118,58 +106,29 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void deleteIndex(String index) {
         var watch = new StopWatch();
         try {
-            client().admin().indices().prepareDelete(index).get();
-        } catch (ElasticsearchException e) {
-            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+            client().indices().delete(Requests.deleteIndexRequest(index), RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         } finally {
             logger.info("delete index, index={}, elapsed={}", index, watch.elapsed());
         }
     }
 
     @Override
-    public List<ElasticSearchIndex> indices() {
+    public ClusterStateResponse state() {
         var watch = new StopWatch();
         try {
-            AdminClient adminClient = client().admin();
-            ClusterStateResponse response = adminClient.cluster().state(new ClusterStateRequest().clear().metaData(true)).actionGet();
-            ImmutableOpenMap<String, IndexMetaData> indices = response.getState().getMetaData().indices();
-            List<ElasticSearchIndex> results = new ArrayList<>(indices.size());
-            for (ObjectObjectCursor<String, IndexMetaData> cursor : indices) {
-                IndexMetaData metaData = cursor.value;
-                ElasticSearchIndex index = new ElasticSearchIndex();
-                index.index = metaData.getIndex().getName();
-                index.state = metaData.getState();
-                results.add(index);
-            }
-            return results;
-        } catch (ElasticsearchException e) {
-            throw new SearchException(e);   // due to elastic search uses async executor to run, we have to wrap the exception to retain the original place caused the exception
+            Response response = client().getLowLevelClient().performRequest(new Request("GET", "/_cluster/state/metadata"));
+            byte[] bytes = InputStreams.bytesWithExpectedLength(response.getEntity().getContent(), (int) response.getEntity().getContentLength());
+            return JSONMapper.fromJSON(ClusterStateResponse.class, bytes);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         } finally {
             logger.info("indices, elapsed={}", watch.elapsed());
         }
     }
 
-    Client createClient() {
-        var watch = new StopWatch();
-        if (addresses.isEmpty()) throw new Error("addresses must not be empty");
-        try {
-            Settings.Builder settings = Settings.builder();
-            settings.put(NetworkService.TCP_CONNECT_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
-                    .put(TransportClient.CLIENT_TRANSPORT_PING_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
-                    .put(TransportClient.CLIENT_TRANSPORT_PING_TIMEOUT.getKey(), new TimeValue(timeout.toMillis()))
-                    .put(TransportClient.CLIENT_TRANSPORT_IGNORE_CLUSTER_NAME.getKey(), "true");     // refer to https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/transport-client.html
-            if (sniff) {
-                settings.put(TransportClient.CLIENT_TRANSPORT_SNIFF.getKey(), true);
-            }
-            TransportClient client = new PreBuiltTransportClient(settings.build());
-            addresses.forEach(client::addTransportAddress);
-            return client;
-        } finally {
-            logger.info("create elasticsearch client, addresses={}, elapsed={}", addresses, watch.elapsed());
-        }
-    }
-
-    Client client() {
+    RestHighLevelClient client() {
         if (client == null) initialize();
         return client;
     }

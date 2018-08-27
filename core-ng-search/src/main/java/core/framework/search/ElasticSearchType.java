@@ -1,8 +1,5 @@
 package core.framework.search;
 
-import org.elasticsearch.index.query.QueryBuilder;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,7 +15,7 @@ public interface ElasticSearchType<T> {
     default List<String> complete(String prefix, String... fields) {
         CompleteRequest request = new CompleteRequest();
         request.prefix = prefix;
-        request.fields = Arrays.asList(fields);
+        request.fields = List.of(fields);
         return complete(request);
     }
 
@@ -70,14 +67,6 @@ public interface ElasticSearchType<T> {
         BulkDeleteRequest request = new BulkDeleteRequest();
         request.ids = ids;
         bulkDelete(request);
-    }
-
-    long deleteByQuery(DeleteByQueryRequest request);
-
-    default long deleteByQuery(QueryBuilder query) {
-        DeleteByQueryRequest request = new DeleteByQueryRequest();
-        request.query = query;
-        return deleteByQuery(request);
     }
 
     List<String> analyze(AnalyzeRequest request);   // can be used to test customized analyzer

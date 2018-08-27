@@ -1,15 +1,14 @@
 package core.framework.search.impl;
 
 import core.framework.inject.Inject;
+import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
-import core.framework.search.ElasticSearchIndex;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.ForEach;
 import core.framework.search.IntegrationTest;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
 import core.framework.util.Lists;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.sort.ScriptSortBuilder;
@@ -22,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -39,7 +39,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @AfterEach
     void cleanup() {
-        documentType.deleteByQuery(QueryBuilders.matchAllQuery());
+        documentType.bulkDelete(range(0, 30).mapToObj(String::valueOf).collect(Collectors.toList()));
         elasticSearch.flushIndex("document");
     }
 
@@ -132,10 +132,10 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    void indices() {
-        List<ElasticSearchIndex> indices = elasticSearch.indices();
+    void state() {
+        ClusterStateResponse state = elasticSearch.state();
 
-        assertThat(indices).anyMatch(index -> "document".equals(index.index) && index.state == IndexMetaData.State.OPEN);
+        assertThat(state.metadata.indices.entrySet()).anyMatch(entry -> "document".equals(entry.getKey()) && entry.getValue().state == ClusterStateResponse.IndexState.OPEN);
     }
 
     @Test
@@ -148,7 +148,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     }
 
     private TestDocument document(String id, String stringField, int numField) {
-        TestDocument document = new TestDocument();
+        var document = new TestDocument();
         document.id = id;
         document.stringField = stringField;
         document.numField = numField;

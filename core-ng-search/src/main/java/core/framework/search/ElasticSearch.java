@@ -1,7 +1,5 @@
 package core.framework.search;
 
-import java.util.List;
-
 /**
  * @author neo
  */
@@ -14,7 +12,7 @@ public interface ElasticSearch {
 
     void deleteIndex(String index);
 
-    List<ElasticSearchIndex> indices();
+    ClusterStateResponse state();
 
     void flushIndex(String index);
 }
