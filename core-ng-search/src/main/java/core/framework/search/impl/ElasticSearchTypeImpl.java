@@ -56,6 +56,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.elasticsearch.client.Requests.searchRequest;
+
 /**
  * @author neo
  */
@@ -86,7 +88,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         long hits = 0;
         try {
-            var searchRequest = Requests.searchRequest(index);
+            var searchRequest = searchRequest(index);
             if (request.type != null) searchRequest.searchType(request.type);
             SearchSourceBuilder source = searchRequest.source().query(request.query);
             request.aggregations.forEach(source::aggregation);
@@ -127,14 +129,14 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         int options = 0;
         try {
-            SuggestBuilder suggest = new SuggestBuilder().setGlobalText(request.prefix);
+            var suggest = new SuggestBuilder().setGlobalText(request.prefix);
             for (String field : request.fields) {
                 CompletionSuggestionBuilder suggestion = SuggestBuilders.completionSuggestion(field).skipDuplicates(true);
                 if (request.limit != null) suggestion.size(request.limit);
                 suggest.addSuggestion("completion:" + field, suggestion);
             }
 
-            var searchRequest = Requests.searchRequest(index);
+            var searchRequest = searchRequest(index);
             searchRequest.source().fetchSource(false).suggest(suggest);
             logger.debug("complete, index={}, request={}", index, searchRequest);
 
@@ -164,7 +166,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         int hits = 0;
         try {
-            GetResponse response = elasticSearch.client().get(Requests.getRequest(index).id(request.id), RequestOptions.DEFAULT);
+            var getRequest = new org.elasticsearch.action.get.GetRequest(index, this.index, request.id);
+            GetResponse response = elasticSearch.client().get(getRequest, RequestOptions.DEFAULT);
             if (!response.isExists()) return Optional.empty();
             hits = 1;
             return Optional.of(reader.fromJSON(response.getSourceAsBytes()));
@@ -185,7 +188,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         validator.validate(request.source, false);
         byte[] document = writer.toJSON(request.source);
         try {
-            elasticSearch.client().index(Requests.indexRequest(index).type(this.index).id(request.id).source(document, XContentType.JSON), RequestOptions.DEFAULT);
+            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index, this.index, request.id).source(document, XContentType.JSON);
+            elasticSearch.client().index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
@@ -201,13 +205,13 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         var watch = new StopWatch();
         if (request.sources == null || request.sources.isEmpty()) throw Exceptions.error("request.sources must not be empty");
         String index = request.index == null ? this.index : request.index;
-        BulkRequest bulkRequest = Requests.bulkRequest();
+        var bulkRequest = new BulkRequest();
         for (Map.Entry<String, T> entry : request.sources.entrySet()) {
             String id = entry.getKey();
             T source = entry.getValue();
             validator.validate(source, false);
-            byte[] document = writer.toJSON(source);
-            bulkRequest.add(Requests.indexRequest(index).type(this.index).id(id).source(document, XContentType.JSON));
+            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index, this.index, id).source(writer.toJSON(source), XContentType.JSON);
+            bulkRequest.add(indexRequest);
         }
         long esTook = 0;
         try {
@@ -227,10 +231,10 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     @Override
     public void update(UpdateRequest<T> request) {
         var watch = new StopWatch();
-        if (request.script == null) throw Exceptions.error("request.script must not be null");
+        if (request.script == null) throw new Error("request.script must not be null");
         String index = request.index == null ? this.index : request.index;
         try {
-            var updateRequest = new org.elasticsearch.action.update.UpdateRequest().index(index).type(this.index).id(request.id).script(new Script(request.script));
+            var updateRequest = new org.elasticsearch.action.update.UpdateRequest(index, this.index, request.id).script(new Script(request.script));
             elasticSearch.client().update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -248,7 +252,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         boolean deleted = false;
         try {
-            DeleteResponse response = elasticSearch.client().delete(Requests.deleteRequest(index).type(this.index).id(request.id), RequestOptions.DEFAULT);
+            var deleteRequest = new org.elasticsearch.action.delete.DeleteRequest(index, this.index, request.id);
+            DeleteResponse response = elasticSearch.client().delete(deleteRequest, RequestOptions.DEFAULT);
             deleted = response.getResult() == DocWriteResponse.Result.DELETED;
             return deleted;
         } catch (IOException e) {
@@ -267,9 +272,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         if (request.ids == null || request.ids.isEmpty()) throw Exceptions.error("request.ids must not be empty");
 
         String index = request.index == null ? this.index : request.index;
-        BulkRequest bulkRequest = Requests.bulkRequest();
+        var bulkRequest = new BulkRequest();
         for (String id : request.ids) {
-            bulkRequest.add(Requests.deleteRequest(index).type(this.index).id(id));
+            bulkRequest.add(new org.elasticsearch.action.delete.DeleteRequest(index, this.index, id));
         }
         long esTook = 0;
         try {
@@ -316,7 +321,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = forEach.index == null ? this.index : forEach.index;
         int totalHits = 0;
         try {
-            var searchRequest = Requests.searchRequest(index).scroll(keepAlive);
+            var searchRequest = searchRequest(index).scroll(keepAlive);
             searchRequest.source().query(forEach.query).sort(SortBuilders.fieldSort("_doc")).size(forEach.limit);
             logger.debug("forEach, index={}, request={}", index, searchRequest);
             org.elasticsearch.action.search.SearchResponse response = elasticSearch.client().search(searchRequest, RequestOptions.DEFAULT);

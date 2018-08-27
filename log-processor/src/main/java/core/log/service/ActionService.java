@@ -84,33 +84,33 @@ public class ActionService {
     }
 
     private TraceDocument trace(ActionLogMessage message) {
-        var traceLog = new TraceDocument();
-        traceLog.date = message.date;
-        traceLog.id = message.id;
-        traceLog.app = message.app;
-        traceLog.action = message.action;
-        traceLog.result = message.result;
-        traceLog.content = message.traceLog;
-        traceLog.errorCode = message.errorCode;
-        return traceLog;
+        var document = new TraceDocument();
+        document.date = message.date;
+        document.id = message.id;
+        document.app = message.app;
+        document.action = message.action;
+        document.result = message.result;
+        document.content = message.traceLog;
+        document.errorCode = message.errorCode;
+        return document;
     }
 
     private ActionDocument action(ActionLogMessage message) {
-        var actionLog = new ActionDocument();
-        actionLog.date = message.date;
-        actionLog.app = message.app;
-        actionLog.serverIP = message.serverIP;
-        actionLog.id = message.id;
-        actionLog.result = message.result;
-        actionLog.refId = message.refId;
-        actionLog.action = message.action;
-        actionLog.errorCode = message.errorCode;
-        actionLog.errorMessage = message.errorMessage;
-        actionLog.elapsed = message.elapsed;
-        actionLog.cpuTime = message.cpuTime;
-        actionLog.context = message.context;
-        actionLog.stats = message.stats;
-        actionLog.performanceStats = message.performanceStats;
-        return actionLog;
+        var document = new ActionDocument();
+        document.date = message.date;
+        document.app = message.app;
+        document.serverIP = message.serverIP;
+        document.id = message.id;
+        document.result = message.result;
+        document.refId = message.refId;
+        document.action = message.action;
+        document.errorCode = message.errorCode;
+        document.errorMessage = message.errorMessage;
+        document.elapsed = message.elapsed;
+        document.cpuTime = message.cpuTime;
+        document.context = message.context;
+        document.stats = message.stats;
+        document.performanceStats = message.performanceStats;
+        return document;
     }
 }

@@ -34,7 +34,7 @@ public class ElasticSearchImpl implements ElasticSearch {
 
     public void initialize() {
         // refer to org.elasticsearch.client.RestClientBuilder for default timeout
-        client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, 9200, "http")));
+        client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, 9200)));
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
