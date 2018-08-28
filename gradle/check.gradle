@@ -10,13 +10,13 @@ buildscript {
 subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
-    apply plugin: com.github.spotbugs.SpotBugsPlugin
+//    apply plugin: com.github.spotbugs.SpotBugsPlugin
     apply plugin: 'jacoco'
 
     checkstyle {
         dependencies {
             checkstyle 'com.puppycrawl.tools:checkstyle:8.12'
-            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.30.0'
+            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.32.0'
         }
 
         configFile = rootProject.file('gradle/check/checkstyle.xml')
@@ -30,19 +30,19 @@ subprojects {
         consoleOutput = true
     }
 
-    spotbugs {
-        effort = 'max'
-        reportLevel = 'low'
-        excludeFilter = rootProject.file('gradle/check/spotbugs-filter.xml')
-        toolVersion = '3.1.6'
-    }
-
-    tasks.withType(com.github.spotbugs.SpotBugsTask) {
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
-    }
+//    spotbugs {
+//        effort = 'max'
+//        reportLevel = 'low'
+//        excludeFilter = rootProject.file('gradle/check/spotbugs-filter.xml')
+//        toolVersion = '3.1.6'
+//    }
+//
+//    tasks.withType(com.github.spotbugs.SpotBugsTask) {
+//        reports {
+//            xml.enabled = false
+//            html.enabled = true
+//        }
+//    }
 
     jacoco {
         toolVersion = '0.8.1'
