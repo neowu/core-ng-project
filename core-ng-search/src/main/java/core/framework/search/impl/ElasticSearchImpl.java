@@ -35,7 +35,8 @@ public class ElasticSearchImpl implements ElasticSearch {
 
     public void initialize() {
         client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, 9200))
-                                                   .setRequestConfigCallback(builder -> builder.setSocketTimeout((int) timeout.toMillis()))
+                                                   .setRequestConfigCallback(builder -> builder.setSocketTimeout((int) timeout.toMillis())
+                                                                                               .setConnectionRequestTimeout((int) timeout.toMillis()))  // timeout of requesting connection from connection pool
                                                    .setHttpClientConfigCallback(builder -> builder.setMaxConnTotal(100).setMaxConnPerRoute(100))
                                                    .setMaxRetryTimeoutMillis((int) timeout.toMillis()));
     }
