@@ -50,24 +50,21 @@ public class KafkaConfig extends Config {
         this.uri = uri;
     }
 
+    // for use case as replying message back to publisher, so the topic can be dynamic (different services (consumer group) expect to receive reply in their own topic)
     public <T> MessagePublisher<T> publish(Class<T> messageClass) {
         return publish(null, messageClass);
     }
 
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
         logger.info("create message publisher, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
-        var publisher = new MessagePublisherImpl<>(producer(), topic, messageClass, context.logManager);
+        if (producer == null) {
+            if (uri == null) throw Exceptions.error("kafka uri must be configured first, name={}", name);
+            producer = createProducer();
+        }
+        var publisher = new MessagePublisherImpl<>(producer, topic, messageClass, context.logManager);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
         handlerAdded = true;
         return publisher;
-    }
-
-    private MessageProducer producer() {
-        if (producer == null) {
-            if (uri == null) throw Exceptions.error("kafka uri must be configured first, name={}", name);
-            this.producer = createProducer();
-        }
-        return producer;
     }
 
     MessageProducer createProducer() {
