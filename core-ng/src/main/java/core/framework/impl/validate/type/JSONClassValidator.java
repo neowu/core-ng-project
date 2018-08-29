@@ -9,7 +9,6 @@ import core.framework.util.Sets;
 import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -22,7 +21,7 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class JSONTypeValidator implements TypeVisitor {
+public class JSONClassValidator implements TypeVisitor {
     public static void validateEnum(Class<?> enumClass) {
         Set<String> enumValues = Sets.newHashSet();
         List<Field> fields = Classes.enumConstantFields(enumClass);
@@ -36,11 +35,11 @@ public class JSONTypeValidator implements TypeVisitor {
         }
     }
 
-    protected final DataTypeValidator validator;
+    private final DataTypeValidator validator;
     private final Map<String, Set<String>> properties = Maps.newHashMap();
 
-    protected JSONTypeValidator(Type instanceType) {
-        validator = new DataTypeValidator(instanceType);
+    public JSONClassValidator(Class<?> instanceClass) {
+        validator = new DataTypeValidator(instanceClass);
         validator.allowedValueClasses = Set.of(String.class, Boolean.class,
                 Integer.class, Long.class, Double.class, BigDecimal.class,
                 LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class);

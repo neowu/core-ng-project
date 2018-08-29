@@ -4,7 +4,7 @@ import core.framework.api.json.Property;
 import core.framework.api.web.service.QueryParam;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.validate.type.DataTypeValidator;
-import core.framework.impl.validate.type.JSONTypeValidator;
+import core.framework.impl.validate.type.JSONClassValidator;
 import core.framework.impl.validate.type.TypeVisitor;
 import core.framework.util.Exceptions;
 import core.framework.util.Sets;
@@ -55,6 +55,6 @@ final class QueryParamBeanClassValidator implements TypeVisitor {
     @Override
     public void visitEnum(Class<?> enumClass, String parentPath) {
         classNameValidator.validateBeanClass(enumClass);
-        JSONTypeValidator.validateEnum(enumClass);
+        JSONClassValidator.validateEnum(enumClass);
     }
 }

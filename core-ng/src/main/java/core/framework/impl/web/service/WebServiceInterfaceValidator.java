@@ -11,7 +11,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.reflect.Methods;
 import core.framework.impl.reflect.Params;
-import core.framework.impl.validate.type.JSONTypeValidator;
+import core.framework.impl.validate.type.JSONClassValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.route.PathPatternValidator;
@@ -131,7 +131,7 @@ public class WebServiceInterfaceValidator {
         if (Long.class.equals(paramClass)) return;
         if (String.class.equals(paramClass)) return;
         if (paramClass.isEnum()) {
-            JSONTypeValidator.validateEnum(paramClass);
+            JSONClassValidator.validateEnum(paramClass);
             return;
         }
         throw Exceptions.error("path param class is not supported, paramClass={}, method={}", paramClass.getCanonicalName(), Methods.path(method));

@@ -1,13 +1,13 @@
 package core.framework.search.impl;
 
-import core.framework.impl.validate.type.JSONTypeValidator;
+import core.framework.impl.validate.type.JSONClassValidator;
 import core.framework.search.Index;
 import core.framework.util.Exceptions;
 
 /**
  * @author neo
  */
-final class DocumentClassValidator extends JSONTypeValidator {
+final class DocumentClassValidator extends JSONClassValidator {
     DocumentClassValidator(Class<?> documentClass) {
         super(documentClass);
     }
