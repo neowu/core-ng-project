@@ -23,12 +23,12 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class KafkaMessageListener {
+public class MessageListener {
     public final ConsumerMetrics consumerMetrics;
     final Map<String, MessageProcess<?>> processes = new HashMap<>();
     final LogManager logManager;
 
-    private final Logger logger = LoggerFactory.getLogger(KafkaMessageListener.class);
+    private final Logger logger = LoggerFactory.getLogger(MessageListener.class);
     private final String uri;
     private final String name;
     private final Set<String> topics = new HashSet<>();
@@ -40,9 +40,9 @@ public class KafkaMessageListener {
     public int minPollBytes = 1;                // default kafka setting
     public Duration minPollMaxWaitTime = Duration.ofMillis(500);
 
-    private KafkaMessageListenerThread[] listenerThreads;
+    private MessageListenerThread[] listenerThreads;
 
-    public KafkaMessageListener(String uri, String name, LogManager logManager) {
+    public MessageListener(String uri, String name, LogManager logManager) {
         this.uri = uri;
         this.name = name;
         this.logManager = logManager;
@@ -58,15 +58,15 @@ public class KafkaMessageListener {
     }
 
     public void start() {
-        listenerThreads = new KafkaMessageListenerThread[poolSize];
+        listenerThreads = new MessageListenerThread[poolSize];
         for (int i = 0; i < poolSize; i++) {
             var watch = new StopWatch();
             String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
             Consumer<String, byte[]> consumer = consumer(topics);
-            var thread = new KafkaMessageListenerThread(name, consumer, this);
+            var thread = new MessageListenerThread(name, consumer, this);
             thread.start();
             listenerThreads[i] = thread;
-            logger.info("create kafka listener thread, name={}, topics={}, elapsed={}", name, topics, watch.elapsed());
+            logger.info("create kafka listener thread, topics={}, name={}, elapsed={}", topics, name, watch.elapsed());
         }
         logger.info("kafka listener started, uri={}, topics={}, name={}", uri, topics, name);
     }
@@ -74,7 +74,7 @@ public class KafkaMessageListener {
     public void shutdown() {
         logger.info("shutting down kafka listener, uri={}, name={}", uri, name);
         if (listenerThreads != null) {
-            for (KafkaMessageListenerThread thread : listenerThreads) {
+            for (MessageListenerThread thread : listenerThreads) {
                 thread.shutdown();
             }
         }
@@ -83,7 +83,7 @@ public class KafkaMessageListener {
     public void awaitTermination(long timeoutInMs) {
         if (listenerThreads != null) {
             long end = System.currentTimeMillis() + timeoutInMs;
-            for (KafkaMessageListenerThread thread : listenerThreads) {
+            for (MessageListenerThread thread : listenerThreads) {
                 try {
                     thread.awaitTermination(end - System.currentTimeMillis());
                 } catch (InterruptedException e) {

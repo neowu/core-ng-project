@@ -9,7 +9,6 @@ import core.framework.log.ActionLogContext;
 import core.framework.util.Network;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
@@ -18,16 +17,16 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
-    private final Logger logger = LoggerFactory.getLogger(KafkaMessagePublisher.class);
+public class MessagePublisherImpl<T> implements MessagePublisher<T> {
+    private final Logger logger = LoggerFactory.getLogger(MessagePublisherImpl.class);
 
-    private final Producer<String, byte[]> producer;
+    private final MessageProducer producer;
     private final MessageValidator<T> validator;
     private final String topic;
     private final LogManager logManager;
     private final JSONWriter<T> writer;
 
-    public KafkaMessagePublisher(Producer<String, byte[]> producer, String topic, Class<T> messageClass, LogManager logManager) {
+    public MessagePublisherImpl(MessageProducer producer, String topic, Class<T> messageClass, LogManager logManager) {
         this.producer = producer;
         this.topic = topic;
         this.logManager = logManager;
@@ -60,13 +59,13 @@ public class KafkaMessagePublisher<T> implements MessagePublisher<T> {
     }
 
     private void linkContext(Headers headers) {
-        headers.add(KafkaHeaders.HEADER_CLIENT_IP, Strings.bytes(Network.localHostAddress()));
-        headers.add(KafkaHeaders.HEADER_CLIENT, Strings.bytes(logManager.appName));
+        headers.add(MessageHeaders.HEADER_CLIENT_IP, Strings.bytes(Network.localHostAddress()));
+        headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(logManager.appName));
 
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog == null) return;
 
-        headers.add(KafkaHeaders.HEADER_REF_ID, Strings.bytes(actionLog.refId()));
-        if (actionLog.trace) headers.add(KafkaHeaders.HEADER_TRACE, Strings.bytes("true"));
+        headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionLog.refId()));
+        if (actionLog.trace) headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));
     }
 }

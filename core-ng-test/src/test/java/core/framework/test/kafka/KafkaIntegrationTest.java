@@ -14,7 +14,7 @@ class KafkaIntegrationTest extends IntegrationTest {
 
     @Test
     void publish() {
-        TestMessage message = new TestMessage();
+        var message = new TestMessage();
         message.stringField = "value";
         publisher.publish("topic1", "key", message);
     }

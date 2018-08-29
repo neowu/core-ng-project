@@ -29,8 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author neo
  */
-class KafkaMessageListenerThread extends Thread {
-    private final Logger logger = LoggerFactory.getLogger(KafkaMessageListenerThread.class);
+class MessageListenerThread extends Thread {
+    private final Logger logger = LoggerFactory.getLogger(MessageListenerThread.class);
     private final Consumer<String, byte[]> consumer;
     private final LogManager logManager;
     private final Map<String, MessageProcess<?>> processes;
@@ -39,7 +39,7 @@ class KafkaMessageListenerThread extends Thread {
     private final double batchLongProcessThresholdInNano;
     private final Object lock = new Object();
 
-    KafkaMessageListenerThread(String name, Consumer<String, byte[]> consumer, KafkaMessageListener listener) {
+    MessageListenerThread(String name, Consumer<String, byte[]> consumer, MessageListener listener) {
         super(name);
         this.consumer = consumer;
         processes = listener.processes;
@@ -134,12 +134,12 @@ class KafkaMessageListenerThread extends Thread {
                 actionLog.track("kafka", 0, 1, 0);
 
                 Headers headers = record.headers();
-                actionLog.refId(header(headers, KafkaHeaders.HEADER_REF_ID));
-                String client = header(headers, KafkaHeaders.HEADER_CLIENT);
+                actionLog.refId(header(headers, MessageHeaders.HEADER_REF_ID));
+                String client = header(headers, MessageHeaders.HEADER_CLIENT);
                 if (client != null) actionLog.context("client", client);
-                String clientIP = header(headers, KafkaHeaders.HEADER_CLIENT_IP);
+                String clientIP = header(headers, MessageHeaders.HEADER_CLIENT_IP);
                 if (clientIP != null) actionLog.context("clientIP", clientIP);
-                if ("true".equals(header(headers, KafkaHeaders.HEADER_TRACE))) {
+                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) {
                     actionLog.trace = true;
                 }
                 T message = process.reader.fromJSON(record.value());
@@ -171,11 +171,11 @@ class KafkaMessageListenerThread extends Thread {
             List<Message<T>> messages = new ArrayList<>(size);
             for (ConsumerRecord<String, byte[]> record : records) {
                 Headers headers = record.headers();
-                if ("true".equals(header(headers, KafkaHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
+                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
                     actionLog.trace = true;
                 }
-                clients.add(header(headers, KafkaHeaders.HEADER_CLIENT));
-                clientIPs.add(header(headers, KafkaHeaders.HEADER_CLIENT_IP));
+                clients.add(header(headers, MessageHeaders.HEADER_CLIENT));
+                clientIPs.add(header(headers, MessageHeaders.HEADER_CLIENT_IP));
 
                 T message = process.reader.fromJSON(record.value());
                 validate(process.validator, message, record);
