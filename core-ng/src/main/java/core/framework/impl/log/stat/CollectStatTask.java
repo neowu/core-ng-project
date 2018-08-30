@@ -8,17 +8,17 @@ import java.util.Map;
  * @author neo
  */
 public final class CollectStatTask implements Runnable {
-    private final KafkaAppender kafkaAppender;
+    private final KafkaAppender appender;
     private final Stat stat;
 
-    public CollectStatTask(KafkaAppender kafkaAppender, Stat stat) {
-        this.kafkaAppender = kafkaAppender;
+    public CollectStatTask(KafkaAppender appender, Stat stat) {
+        this.appender = appender;
         this.stat = stat;
     }
 
     @Override
     public void run() {
         Map<String, Double> stats = stat.collect();
-        kafkaAppender.forward(stats);
+        appender.forward(stats);
     }
 }

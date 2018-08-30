@@ -59,7 +59,7 @@ public class MessageFactory {
         return message;
     }
 
-    static StatMessage stat(Map<String, Double> stats, String appName) {
+    public static StatMessage stat(Map<String, Double> stats, String appName) {
         var message = new StatMessage();
         message.id = UUID.randomUUID().toString();
         message.date = Instant.now();

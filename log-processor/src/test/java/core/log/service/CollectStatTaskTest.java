@@ -5,8 +5,7 @@ import core.framework.inject.Inject;
 import core.log.IntegrationTest;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -19,7 +18,7 @@ class CollectStatTaskTest extends IntegrationTest {
     void message() {
         StatMessage message = task.message();
 
-        assertEquals("log-processor", message.app);
-        assertNotNull(message.stats.get("sys_load_avg"));
+        assertThat(message.app).isEqualTo("log-processor");
+        assertThat(message.stats.get("sys_load_avg")).isNotNull();
     }
 }
