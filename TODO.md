@@ -9,8 +9,9 @@
 * validator: annotation for website, like @HTMLSafeString?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
-* support websocket?
 * cache: hit rate report?
+* support websocket?
+* streaming, data pipeline? (kafka stream/beam/google dataflow) 
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

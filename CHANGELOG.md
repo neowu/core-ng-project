@@ -1,5 +1,5 @@
 ## Change log
-### 6.7.0 (8/23/2018 - )   !!! search API break changes !!!
+### 6.7.0 (8/23/2018 - 8/31/2018)   !!! search API break changes !!!
 * db: skip query.fetch() if limit is 0
 * search: update to 6.4.0, 
     !!! removed @Index(index, type), replaced with @Index(name) as multiple types per index is deprecated and will be removed in ES 7.0
