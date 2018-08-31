@@ -15,13 +15,14 @@ apply plugin: org.flywaydb.gradle.FlywayPlugin
 tasks.withType(org.flywaydb.gradle.task.AbstractFlywayTask.class) { task ->
     task.doFirst {
         flyway {
+            configurations = ['runtimeClasspath'] // use runtimeOnly scope in actual db-migration project
             placeholderReplacement = false
             assert project.file('src/main/resources/db/migration').exists()
 
             def flywayProperties = env == null ? 'src/main/resources/flyway.properties' : "conf/${env}/resources/flyway.properties"
             assert project.file(flywayProperties).exists()
 
-            Properties properties = new Properties()
+            def properties = new Properties()
             project.file(flywayProperties).withInputStream {
                 properties.load(it)
             }

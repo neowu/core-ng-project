@@ -115,7 +115,7 @@ project(':log-processor') {
     dependencies {
         implementation project(':core-ng')
         implementation project(':core-ng-search')
-        implementation "org.apache.kafka:kafka-clients:${kafkaVersion}"
+        runtimeOnly "org.apache.kafka:kafka-clients:${kafkaVersion}"
         testImplementation project(':core-ng-test')
         testImplementation project(':core-ng-search-test')
     }

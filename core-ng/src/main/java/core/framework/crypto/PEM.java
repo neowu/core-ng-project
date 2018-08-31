@@ -13,7 +13,7 @@ import java.io.UncheckedIOException;
  */
 public final class PEM {
     public static String toPEM(String type, byte[] content) {
-        StringBuilder builder = new StringBuilder("-----BEGIN ")
+        var builder = new StringBuilder("-----BEGIN ")
                 .append(type)
                 .append("-----");
         String encodedContent = Encodings.base64(content);
@@ -26,8 +26,8 @@ public final class PEM {
     }
 
     public static byte[] fromPEM(String pemContent) {
-        StringBuilder content = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new StringReader(pemContent))) {
+        var content = new StringBuilder();
+        try (var reader = new BufferedReader(new StringReader(pemContent))) {
             while (true) {
                 String line = reader.readLine();
                 if (line == null) break;
