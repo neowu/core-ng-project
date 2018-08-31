@@ -1,4 +1,7 @@
 ## Change log
+### 6.7.1 (8/31/2018 - )
+* http: set tcp keep alive timeout to 620s, to adapt to both AWS ELB and gcloud LB
+
 ### 6.7.0 (8/23/2018 - 8/31/2018)   !!! search API break changes !!!
 * db: skip query.fetch() if limit is 0
 * search: update to 6.4.0, 
