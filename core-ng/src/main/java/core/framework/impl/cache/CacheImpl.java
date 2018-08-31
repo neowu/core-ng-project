@@ -6,12 +6,13 @@ import core.framework.impl.json.JSONWriter;
 import core.framework.util.Maps;
 
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -48,19 +49,15 @@ public class CacheImpl<T> implements Cache<T> {
     public Optional<String> get(String key) {
         byte[] result = cacheStore.get(cacheKey(key));
         if (result == null) return Optional.empty();
-        return Optional.of(new String(result, StandardCharsets.UTF_8));
+        return Optional.of(new String(result, UTF_8));
     }
 
     @Override
-    public Map<String, T> getAll(List<String> keys, Function<String, T> loader) {
+    public Map<String, T> getAll(Collection<String> keys, Function<String, T> loader) {
         int size = keys.size();
-        String[] cacheKeys = new String[size];
-        int index = 0;
-        for (String key : keys) {
-            cacheKeys[index] = cacheKey(key);
-            index++;
-        }
-        Map<String, T> values = Maps.newLinkedHashMapWithExpectedSize(size);
+        int index;
+        String[] cacheKeys = cacheKeys(keys);
+        Map<String, T> values = Maps.newHashMapWithExpectedSize(size);
         Map<String, byte[]> newValues = Maps.newHashMapWithExpectedSize(size);
         Map<String, byte[]> cacheValues = cacheStore.getAll(cacheKeys);
         index = 0;
@@ -95,13 +92,24 @@ public class CacheImpl<T> implements Cache<T> {
     }
 
     @Override
-    public void evict(String... keys) {
-        if (keys.length == 0) throw new Error("keys must not be empty");
-        String[] cacheKeys = new String[keys.length];
-        for (int i = 0; i < keys.length; i++) {
-            cacheKeys[i] = cacheKey(keys[i]);
-        }
+    public void evict(String key) {
+        cacheStore.delete(cacheKey(key));
+    }
+
+    @Override
+    public void evictAll(Collection<String> keys) {
+        String[] cacheKeys = cacheKeys(keys);
         cacheStore.delete(cacheKeys);
+    }
+
+    private String[] cacheKeys(Collection<String> keys) {
+        String[] cacheKeys = new String[keys.size()];
+        int index = 0;
+        for (String key : keys) {
+            cacheKeys[index] = cacheKey(key);
+            index++;
+        }
+        return cacheKeys;
     }
 
     private String cacheKey(String key) {

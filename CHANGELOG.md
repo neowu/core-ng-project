@@ -5,7 +5,7 @@
     !!! removed @Index(index, type), replaced with @Index(name) as multiple types per index is deprecated and will be removed in ES 7.0
     switched to java high level client, which uses HTTP:9200
     removed DeleteByQuery, as no actual usage for now, can be substituted by ForEach if needed
-* cache: support evict and put multiple keys
+* cache: support evict and put multiple keys, change keys to Collection<String>, since in real case, keys usually are constructed from List<String> or Set<String>
 * kafka: removed /_sys kafka admin support, for actual cases, it's still better use kafka provided scripts
 
 ### 6.6.7 (8/20/2018 - 8/23/2018)
