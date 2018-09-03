@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Deque;
+import java.util.EnumSet;
 import java.util.Map;
 
 import static java.net.URLDecoder.decode;
@@ -34,6 +35,7 @@ public final class RequestParser {
     private static final int MAX_URL_LENGTH = 1000;
     public final ClientIPParser clientIPParser = new ClientIPParser();
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
+    private final EnumSet<HTTPMethod> withBodyMethods = EnumSet.of(HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH);
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
         HeaderMap headers = exchange.getRequestHeaders();
@@ -66,7 +68,7 @@ public final class RequestParser {
 
         parseQueryParams(request, exchange.getQueryParameters());
 
-        if (request.method == HTTPMethod.POST || request.method == HTTPMethod.PUT || request.method == HTTPMethod.PATCH) {
+        if (withBodyMethods.contains(request.method)) {
             String contentType = headers.getFirst(Headers.CONTENT_TYPE);
             request.contentType = contentType == null ? null : ContentType.parse(contentType);
             parseBody(request, exchange);

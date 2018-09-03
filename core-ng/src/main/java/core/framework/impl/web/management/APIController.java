@@ -25,7 +25,7 @@ public class APIController implements Controller {
     public Response execute(Request request) {
         accessControl.validate(request.clientIP());
 
-        APIDefinitionBuilder builder = new APIDefinitionBuilder();
+        var builder = new APIDefinitionBuilder();
         serviceInterfaces.values().forEach(builder::addServiceInterface);
         APIDefinitionResponse response = builder.build();
 
