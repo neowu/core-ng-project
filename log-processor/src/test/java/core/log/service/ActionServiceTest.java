@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +60,17 @@ class ActionServiceTest extends IntegrationTest {
         TraceDocument trace = traceDocument(now, message2.id);
         assertThat(trace.id).isEqualTo(message2.id);
         assertThat(trace.content).isEqualTo(message2.traceLog);
+    }
+
+    @Test
+    void indexWithDifferentDateFormatValues() {
+        ActionLogMessage message = message("1", "OK");
+        // instant.toString() outputs without nano fraction if nano is 0, refer to java.time.format.DateTimeFormatter.ISO_INSTANT
+        message.date = ZonedDateTime.now().withNano(0).toInstant();
+        actionService.index(List.of(message));
+
+        message.date = ZonedDateTime.now().withNano(123456).toInstant();
+        actionService.index(List.of(message));
     }
 
     @Test

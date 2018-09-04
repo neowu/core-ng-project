@@ -10,7 +10,7 @@
       "properties": {
         "date": {
           "type": "date",
-          "format": "strict_date_time"
+          "format": "strict_date_optional_time"
         },
         "id": {
           "type": "keyword"
