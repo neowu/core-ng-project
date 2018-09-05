@@ -16,6 +16,7 @@ import core.framework.impl.web.response.ResponseImpl;
 import core.framework.impl.web.route.Route;
 import core.framework.impl.web.session.SessionManager;
 import core.framework.impl.web.site.TemplateManager;
+import core.framework.impl.web.websocket.WebSocketHandler;
 import core.framework.web.Response;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -37,6 +38,7 @@ public class HTTPServerHandler implements HttpHandler {
     public final Interceptors interceptors = new Interceptors();
     public final WebContextImpl webContext = new WebContextImpl();
     public final HTTPServerErrorHandler errorHandler;
+    public final WebSocketHandler webSocketHandler;
     private final BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
     public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanClassNameValidator);
     public final ResponseBeanMapper responseBeanMapper = new ResponseBeanMapper(beanClassNameValidator);
@@ -46,7 +48,7 @@ public class HTTPServerHandler implements HttpHandler {
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
     private final ShutdownHandler shutdownHandler;
-    private final HTTPServerHealthCheckHandler healthCheckHandler = new HTTPServerHealthCheckHandler();
+    private final HealthCheckHandler healthCheckHandler = new HealthCheckHandler();
 
     HTTPServerHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager, ShutdownHandler shutdownHandler) {
         this.logManager = logManager;
@@ -54,6 +56,7 @@ public class HTTPServerHandler implements HttpHandler {
         responseHandler = new ResponseHandler(responseBeanMapper, templateManager);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
         this.shutdownHandler = shutdownHandler;
+        webSocketHandler = new WebSocketHandler(logManager);
     }
 
     @Override
@@ -63,26 +66,31 @@ public class HTTPServerHandler implements HttpHandler {
             return;
         }
 
-        String path = exchange.getRequestPath();
-        if (HTTPServerHealthCheckHandler.PATH.equals(path)) {      // not treat health-check as action
+        if (HealthCheckHandler.PATH.equals(exchange.getRequestPath())) {      // not treat health-check as action
             healthCheckHandler.handle(exchange.getResponseSender());
             return;
         }
 
-        handle(path, exchange);
+        handle(exchange);
     }
 
-    private void handle(String path, HttpServerExchange exchange) {
+    private void handle(HttpServerExchange exchange) {
         ActionLog actionLog = logManager.begin("=== http transaction begin ===");
         RequestImpl request = new RequestImpl(exchange, requestBeanMapper);
         try {
             webContext.initialize(request);
             requestParser.parse(request, exchange, actionLog);
-            linkContext(actionLog, exchange.getRequestHeaders());
+            HeaderMap headers = exchange.getRequestHeaders();
+            linkContext(actionLog, headers);
             shutdownHandler.handleRequest(exchange);
             request.session = sessionManager.load(request);
 
-            ControllerHolder controller = route.get(path, request.method(), request.pathParams, actionLog);
+            if (webSocketHandler.isWebSocket(request.method(), headers)) {
+                webSocketHandler.handle(exchange, request, actionLog);
+                return; // with websocket, it doesn't save session
+            }
+
+            ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams, actionLog);
             actionLog.action(controller.action);
             actionLog.context("controller", controller.controllerInfo);
             logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());

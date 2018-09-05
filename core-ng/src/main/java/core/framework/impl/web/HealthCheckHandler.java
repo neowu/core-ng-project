@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 /**
  * @author neo
  */
-public class HTTPServerHealthCheckHandler {
+public class HealthCheckHandler {
     public static final String PATH = "/health-check";
     private final byte[] body = new byte[0];
 

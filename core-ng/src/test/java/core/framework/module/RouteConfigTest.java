@@ -2,15 +2,14 @@ package core.framework.module;
 
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.HTTPServerHealthCheckHandler;
+import core.framework.impl.web.HealthCheckHandler;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -36,8 +35,9 @@ class RouteConfigTest {
 
     @Test
     void routeWithReservedPath() {
-        Error error = assertThrows(Error.class, () -> config.add(HTTPMethod.GET, HTTPServerHealthCheckHandler.PATH, new TestController()));
-        assertThat(error.getMessage()).contains("health-check path is reserved by framework");
+        assertThatThrownBy(() -> config.add(HTTPMethod.GET, HealthCheckHandler.PATH, new TestController()))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("/health-check is reserved path");
     }
 
     static class TestControllers {

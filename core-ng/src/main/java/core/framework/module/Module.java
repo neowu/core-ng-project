@@ -86,6 +86,10 @@ public abstract class Module {
         return new RouteConfig(context);
     }
 
+    public WebSocketConfig ws() {
+        return new WebSocketConfig(context);
+    }
+
     public SiteConfig site() {
         return context.config(SiteConfig.class, null);
     }

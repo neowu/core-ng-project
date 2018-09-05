@@ -13,14 +13,14 @@ import static org.mockito.Mockito.verify;
 /**
  * @author neo
  */
-class HTTPServerHealthCheckHandlerTest {
-    private HTTPServerHealthCheckHandler handler;
+class HealthCheckHandlerTest {
+    private HealthCheckHandler handler;
     private Sender sender;
 
     @BeforeEach
     void createHTTPServerHealthCheckHandler() {
         sender = Mockito.mock(Sender.class);
-        handler = new HTTPServerHealthCheckHandler();
+        handler = new HealthCheckHandler();
     }
 
     @Test
