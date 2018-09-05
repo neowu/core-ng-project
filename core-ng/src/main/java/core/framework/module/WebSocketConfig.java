@@ -5,14 +5,11 @@ import core.framework.impl.web.HTTPServerIOHandler;
 import core.framework.impl.web.websocket.WebSocketHandler;
 import core.framework.web.websocket.ChannelListener;
 import core.framework.web.websocket.WebSocketContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author neo
  */
 public final class WebSocketConfig {
-    private final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
     private final ModuleContext context;
 
     WebSocketConfig(ModuleContext context) {
