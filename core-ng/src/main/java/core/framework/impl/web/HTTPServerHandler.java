@@ -47,27 +47,19 @@ public class HTTPServerHandler implements HttpHandler {
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
-    private final ShutdownHandler shutdownHandler;
-    private final HealthCheckHandler healthCheckHandler = new HealthCheckHandler();
 
-    HTTPServerHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager, ShutdownHandler shutdownHandler) {
+    HTTPServerHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
         responseHandler = new ResponseHandler(responseBeanMapper, templateManager);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
-        this.shutdownHandler = shutdownHandler;
         webSocketHandler = new WebSocketHandler(logManager);
     }
 
     @Override
     public void handleRequest(HttpServerExchange exchange) {
         if (exchange.isInIoThread()) {
-            exchange.dispatch(this);
-            return;
-        }
-
-        if (HealthCheckHandler.PATH.equals(exchange.getRequestPath())) {      // not treat health-check as action
-            healthCheckHandler.handle(exchange.getResponseSender());
+            exchange.dispatch(this);  // in io handler form parser will dispatch to current io thread
             return;
         }
 
@@ -76,13 +68,12 @@ public class HTTPServerHandler implements HttpHandler {
 
     private void handle(HttpServerExchange exchange) {
         ActionLog actionLog = logManager.begin("=== http transaction begin ===");
-        RequestImpl request = new RequestImpl(exchange, requestBeanMapper);
+        var request = new RequestImpl(exchange, requestBeanMapper);
         try {
             webContext.initialize(request);
             requestParser.parse(request, exchange, actionLog);
             HeaderMap headers = exchange.getRequestHeaders();
             linkContext(actionLog, headers);
-            shutdownHandler.handleRequest(exchange);
             request.session = sessionManager.load(request);
 
             if (webSocketHandler.isWebSocket(request.method(), headers)) {

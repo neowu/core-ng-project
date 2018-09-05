@@ -12,7 +12,7 @@ import java.util.Set;
  * @author neo
  */
 public class GZipPredicate implements Predicate {
-    private static final int MIN_GZIP_LENGTH = 20;
+    private static final int MIN_GZIP_LENGTH = 20;  // as nginx default, refer to http://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip_min_length
     private final Set<String> gzipContentTypes = Set.of(ContentType.TEXT_PLAIN.toString(),
             ContentType.TEXT_HTML.toString(),
             ContentType.TEXT_CSS.toString(),

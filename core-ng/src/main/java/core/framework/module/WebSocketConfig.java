@@ -1,7 +1,7 @@
 package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.HealthCheckHandler;
+import core.framework.impl.web.HTTPServerIOHandler;
 import core.framework.util.Exceptions;
 import core.framework.web.websocket.ChannelListener;
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ public final class WebSocketConfig {
     }
 
     public void add(String path, ChannelListener listener) {
-        if (HealthCheckHandler.PATH.equals(path)) throw new Error("/health-check is reserved path");
+        if (HTTPServerIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
         if (path.contains("/:")) throw Exceptions.error("websocket path must be static, path={}", path);
         Class<? extends ChannelListener> listenerClass = listener.getClass();
         if (listenerClass.isSynthetic())

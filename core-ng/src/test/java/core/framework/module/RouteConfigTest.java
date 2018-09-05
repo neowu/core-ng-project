@@ -2,7 +2,7 @@ package core.framework.module;
 
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.HealthCheckHandler;
+import core.framework.impl.web.HTTPServerIOHandler;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -35,7 +35,7 @@ class RouteConfigTest {
 
     @Test
     void routeWithReservedPath() {
-        assertThatThrownBy(() -> config.add(HTTPMethod.GET, HealthCheckHandler.PATH, new TestController()))
+        assertThatThrownBy(() -> config.add(HTTPMethod.GET, HTTPServerIOHandler.HEALTH_CHECK_PATH, new TestController()))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("/health-check is reserved path");
     }

@@ -1,5 +1,6 @@
 package core.framework.impl.redis;
 
+import core.framework.impl.log.filter.BytesParam;
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
 import core.framework.log.ActionLogContext;
@@ -142,7 +143,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, updated ? 1 : 0);
-            logger.debug("set, key={}, value={}, expiration={}, onlyIfAbsent={}, updated={}, elapsed={}", key, value, expiration, onlyIfAbsent, updated, elapsed);
+            logger.debug("set, key={}, value={}, expiration={}, onlyIfAbsent={}, updated={}, elapsed={}", key, new BytesParam(value), expiration, onlyIfAbsent, updated, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -301,7 +302,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("mset, values={}, size={}, expiration={}, elapsed={}", values, size, expiration, elapsed);
+            logger.debug("mset, values={}, size={}, expiration={}, elapsed={}", new BytesValueMapParam(values), size, expiration, elapsed);
             checkSlowOperation(elapsed);
         }
     }

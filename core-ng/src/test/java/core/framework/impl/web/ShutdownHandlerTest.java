@@ -1,12 +1,13 @@
 package core.framework.impl.web;
 
-import core.framework.web.exception.ServiceUnavailableException;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.StatusCodes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author neo
@@ -17,24 +18,25 @@ class ShutdownHandlerTest {
 
     @BeforeEach
     void createShutdownHandler() {
-        exchange = new HttpServerExchange(null, -1);
+        exchange = mock(HttpServerExchange.class);
         handler = new ShutdownHandler();
     }
 
     @Test
-    void handleRequest() {
-        handler.handleRequest(exchange);
+    void handle() {
+        assertThat(handler.handle(exchange)).isFalse();
         handler.exchangeEvent(exchange, () -> {
         });
-
         assertThat(handler.activeRequests).hasValue(0);
     }
 
     @Test
-    void shutdown() {
+    void handleShutdown() {
         handler.shutdown();
-        assertThatThrownBy(() -> handler.handleRequest(exchange))
-                .isInstanceOf(ServiceUnavailableException.class);
+        assertThat(handler.handle(exchange)).isTrue();
+
+        verify(exchange).setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
+        verify(exchange).endExchange();
     }
 
     @Test

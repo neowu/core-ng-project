@@ -1,6 +1,8 @@
 ## Change log
 ### 6.7.1 (8/31/2018 - )
 * http: set tcp keep alive timeout to 620s, to adapt to both AWS ELB and gcloud LB
+* http: move graceful shutdown logic into IO thread, and not count as action, before reading request 
+* http: process health-check in IO thread        
 * log-processor: fix index template should use strict_date_optional_time as date format
 * ws: draft websocket impl
 * api: tweak api client retry, shorten keep alive timeout, and retry on socketException (for connection reset)

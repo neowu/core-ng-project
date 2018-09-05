@@ -1,8 +1,10 @@
 package core.framework.impl.web;
 
-import core.framework.web.exception.ServiceUnavailableException;
 import io.undertow.server.ExchangeCompletionListener;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.util.StatusCodes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -12,15 +14,22 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class ShutdownHandler implements ExchangeCompletionListener {
     final AtomicLong activeRequests = new AtomicLong(0);
+    private final Logger logger = LoggerFactory.getLogger(ShutdownHandler.class);
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
     private final Object lock = new Object();
 
-    void handleRequest(HttpServerExchange exchange) {
+    boolean handle(HttpServerExchange exchange) {
         activeRequests.getAndIncrement();
         exchange.addExchangeCompleteListener(this);
 
-        if (shutdown.get())
-            throw new ServiceUnavailableException("server is shutting down");
+        if (shutdown.get()) {
+            logger.warn("reject request due to server is shutting down, requestURL={}", exchange.getRequestURL());
+            exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
+            exchange.endExchange();
+            return true;
+        }
+
+        return false;
     }
 
     void shutdown() {

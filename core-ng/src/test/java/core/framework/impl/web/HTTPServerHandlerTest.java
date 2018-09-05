@@ -15,7 +15,7 @@ class HTTPServerHandlerTest {
 
     @BeforeEach
     void createHTTPServerHandler() {
-        handler = new HTTPServerHandler(null, null, null, null);
+        handler = new HTTPServerHandler(null, null, null);
     }
 
     @Test

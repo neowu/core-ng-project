@@ -2,7 +2,7 @@ package core.framework.module;
 
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.HealthCheckHandler;
+import core.framework.impl.web.HTTPServerIOHandler;
 import core.framework.web.Controller;
 
 /**
@@ -36,7 +36,7 @@ public final class RouteConfig {
     }
 
     public void add(HTTPMethod method, String path, Controller controller) {
-        if (HealthCheckHandler.PATH.equals(path)) throw new Error("/health-check is reserved path");
+        if (HTTPServerIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
         context.route(method, path, controller, false);
     }
 }

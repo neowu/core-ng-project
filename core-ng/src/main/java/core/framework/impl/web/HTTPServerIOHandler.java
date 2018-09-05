@@ -14,19 +14,30 @@ import java.nio.charset.StandardCharsets;
 /**
  * @author neo
  */
-class HTTPServerIOHandler implements HttpHandler {
+public class HTTPServerIOHandler implements HttpHandler {
+    public static final String HEALTH_CHECK_PATH = "/health-check";
     private final FormParserFactory formParserFactory;
     private final HTTPServerHandler handler;
+    private final ShutdownHandler shutdownHandler;
 
-    HTTPServerIOHandler(HTTPServerHandler handler) {
+    HTTPServerIOHandler(HTTPServerHandler handler, ShutdownHandler shutdownHandler) {
         this.handler = handler;
-        FormParserFactory.Builder builder = FormParserFactory.builder();
+        var builder = FormParserFactory.builder();
         builder.setDefaultCharset(StandardCharsets.UTF_8.name());
         formParserFactory = builder.build();
+        this.shutdownHandler = shutdownHandler;
     }
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
+        if (HEALTH_CHECK_PATH.equals(exchange.getRequestPath())) {      // not treat health-check as action
+            exchange.endExchange(); // end exchange will send 200 / content-length=0
+            return;
+        }
+
+        boolean shutdown = shutdownHandler.handle(exchange);
+        if (shutdown) return;
+
         if (hasBody(exchange)) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read
             FormDataParser parser = formParserFactory.createParser(exchange);
             if (parser != null) {
