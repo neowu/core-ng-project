@@ -17,8 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author neo
  */
 public class ChannelImpl implements Channel {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
-    private final static ChannelCallback CALLBACK = new ChannelCallback();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
     final String action;
     final String clientIP;
     final String refId;
@@ -38,7 +37,7 @@ public class ChannelImpl implements Channel {
     public void send(String message) {
         var watch = new StopWatch();
         try {
-            WebSockets.sendText(message, channel, CALLBACK);
+            WebSockets.sendText(message, channel, ChannelCallback.INSTANCE);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("ws", elapsed, 0, 1);
@@ -50,7 +49,7 @@ public class ChannelImpl implements Channel {
     public void close() {
         var watch = new StopWatch();
         try {
-            WebSockets.sendClose(CloseMessage.NORMAL_CLOSURE, null, channel, CALLBACK);
+            WebSockets.sendClose(CloseMessage.NORMAL_CLOSURE, null, channel, ChannelCallback.INSTANCE);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("ws", elapsed, 0, 1);

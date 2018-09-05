@@ -7,12 +7,12 @@ import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.time.Duration;
 import java.util.Set;
 
@@ -51,8 +51,7 @@ public class RetryHandler implements HttpRequestRetryHandler {
 
         // with keep-alive + graceful shutdown, it's probably ok to retry on this exception even with non-idempotent methods
         // following exceptions mean server side drops or refuses the connection, the actual case is during deployment (kube), persistent connection established via kube-proxy, and wouldn't know if old pod was deleted
-        if (exception instanceof NoHttpResponseException
-                || exception instanceof HttpHostConnectException)
+        if (exception instanceof NoHttpResponseException || exception instanceof SocketException)
             return true;
 
         return !clientContext.isRequestSent() || idempotentMethods.contains(request.getMethod());

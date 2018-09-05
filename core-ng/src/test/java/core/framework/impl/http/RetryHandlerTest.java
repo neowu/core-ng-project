@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,5 +67,10 @@ class RetryHandlerTest {
     @Test
     void retryWithConnectionRefused() {
         assertThat(handler.retry(RequestBuilder.post().build(), clientContext, new HttpHostConnectException(new ConnectException("connection refused"), new HttpHost("localhost")))).isTrue();
+    }
+
+    @Test
+    void retryWithConnectionReset() {
+        assertThat(handler.retry(RequestBuilder.post().build(), clientContext, new SocketException("connection reset"))).isTrue();
     }
 }

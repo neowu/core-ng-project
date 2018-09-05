@@ -70,11 +70,11 @@ public class WebSocketHandler {
 
     public void shutdown() {
         for (var channel : channels) {
-            WebSockets.sendClose(CloseMessage.GOING_AWAY, "server is shutting down", channel, null);
+            WebSockets.sendClose(CloseMessage.GOING_AWAY, "server is shutting down", channel, ChannelCallback.INSTANCE);
         }
     }
 
-    private static class WebSocketListener extends AbstractReceiveListener {
+    private static final class WebSocketListener extends AbstractReceiveListener {
         private final Logger logger = LoggerFactory.getLogger(WebSocketListener.class);
         private final LogManager logManager;
 
@@ -99,7 +99,7 @@ public class WebSocketHandler {
                 wrapper.listener.onMessage(wrapper, data);
             } catch (Throwable e) {
                 logManager.logError(e);
-                WebSockets.sendClose(CloseMessage.UNEXPECTED_ERROR, e.getMessage(), channel, null);
+                WebSockets.sendClose(CloseMessage.UNEXPECTED_ERROR, e.getMessage(), channel, ChannelCallback.INSTANCE);
             } finally {
                 logManager.end("=== ws message handling end ===");
             }

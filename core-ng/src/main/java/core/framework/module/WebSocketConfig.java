@@ -21,7 +21,10 @@ public final class WebSocketConfig {
     public void add(String path, ChannelListener listener) {
         if (HealthCheckHandler.PATH.equals(path)) throw new Error("/health-check is reserved path");
         if (path.contains("/:")) throw Exceptions.error("websocket path must be static, path={}", path);
-        logger.info("ws, path={}, listener={}", path, listener.getClass().getCanonicalName());
+        Class<? extends ChannelListener> listenerClass = listener.getClass();
+        if (listenerClass.isSynthetic())
+            throw Exceptions.error("listener class must not be anonymous class or lambda, please create static class, listenerClass={}", listenerClass.getCanonicalName());
+        logger.info("ws, path={}, listener={}", path, listenerClass.getCanonicalName());
         ChannelListener previous = context.httpServer.handler.webSocketHandler.listeners.putIfAbsent(path, listener);
         if (previous != null) throw Exceptions.error("found duplicate ws listener, path={}, previousClass={}", previous.getClass().getCanonicalName());
     }
