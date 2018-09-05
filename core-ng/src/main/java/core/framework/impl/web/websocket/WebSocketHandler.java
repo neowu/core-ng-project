@@ -4,6 +4,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.request.RequestImpl;
+import core.framework.util.Exceptions;
 import core.framework.util.Sets;
 import core.framework.web.exception.NotFoundException;
 import core.framework.web.websocket.ChannelListener;
@@ -16,6 +17,8 @@ import io.undertow.websockets.core.WebSockets;
 import io.undertow.websockets.core.protocol.Handshake;
 import io.undertow.websockets.core.protocol.version13.Hybi13Handshake;
 import io.undertow.websockets.spi.AsyncWebSocketHttpServerExchange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +28,9 @@ import java.util.Set;
  * @author neo
  */
 public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChannel> {
+    private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
     static final String CHANNEL_KEY = "CHANNEL";
-    public final Map<String, ChannelListener> listeners = new HashMap<>();
+    private final Map<String, ChannelListener> listeners = new HashMap<>();
     public final WebSocketContextImpl context = new WebSocketContextImpl();
     private final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
     private final Handshake handshake = new Hybi13Handshake();
@@ -80,5 +84,17 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
     public void handleEvent(WebSocketChannel channel) { // only handle channel close event
         var wrapper = (ChannelImpl) channel.getAttribute(CHANNEL_KEY);
         context.remove(wrapper);
+    }
+
+    public void add(String path, ChannelListener listener) {
+        if (path.contains("/:")) throw Exceptions.error("websocket path must be static, path={}", path);
+
+        Class<? extends ChannelListener> listenerClass = listener.getClass();
+        if (listenerClass.isSynthetic())
+            throw Exceptions.error("listener class must not be anonymous class or lambda, please create static class, listenerClass={}", listenerClass.getCanonicalName());
+
+        logger.info("ws, path={}, listener={}", path, listenerClass.getCanonicalName());
+        ChannelListener previous = listeners.putIfAbsent(path, listener);
+        if (previous != null) throw Exceptions.error("found duplicate ws listener, path={}, previousClass={}", previous.getClass().getCanonicalName());
     }
 }

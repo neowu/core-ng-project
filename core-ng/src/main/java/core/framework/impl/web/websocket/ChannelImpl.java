@@ -79,10 +79,7 @@ public class ChannelImpl implements Channel {
 
     @Override
     public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        ChannelImpl channel = (ChannelImpl) object;
-        return Objects.equals(id, channel.id);
+        return this == object;  // every channel has its own id, only need to compare reference
     }
 
     @Override
