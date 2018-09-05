@@ -38,22 +38,21 @@ public class HTTPServerHandler implements HttpHandler {
     public final Interceptors interceptors = new Interceptors();
     public final WebContextImpl webContext = new WebContextImpl();
     public final HTTPServerErrorHandler errorHandler;
-    public final WebSocketHandler webSocketHandler;
     private final BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
     public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanClassNameValidator);
     public final ResponseBeanMapper responseBeanMapper = new ResponseBeanMapper(beanClassNameValidator);
-
     private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
+
+    public WebSocketHandler webSocketHandler;
 
     HTTPServerHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
         responseHandler = new ResponseHandler(responseBeanMapper, templateManager);
         errorHandler = new HTTPServerErrorHandler(responseHandler);
-        webSocketHandler = new WebSocketHandler(logManager);
     }
 
     @Override
@@ -76,7 +75,7 @@ public class HTTPServerHandler implements HttpHandler {
             linkContext(actionLog, headers);
             request.session = sessionManager.load(request);
 
-            if (webSocketHandler.isWebSocket(request.method(), headers)) {
+            if (webSocketHandler != null && webSocketHandler.isWebSocket(request.method(), headers)) {
                 webSocketHandler.handle(exchange, request, actionLog);
                 return; // with websocket, it doesn't save session
             }

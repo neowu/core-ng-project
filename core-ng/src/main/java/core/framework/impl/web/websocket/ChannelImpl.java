@@ -1,6 +1,7 @@
 package core.framework.impl.web.websocket;
 
 import core.framework.log.ActionLogContext;
+import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import core.framework.web.websocket.Channel;
 import core.framework.web.websocket.ChannelListener;
@@ -11,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -18,18 +22,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ChannelImpl implements Channel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
-    final String action;
-    final String clientIP;
-    final String refId;
+    final String id = UUID.randomUUID().toString();
+    final Set<String> rooms = Sets.newConcurrentHashSet();
     final ChannelListener listener;
     private final WebSocketChannel channel;
     private final Map<String, Object> context = new ConcurrentHashMap<>();
+    private final WebSocketContextImpl webSocketContext;
+    String action;
+    String clientIP;
+    String refId;
 
-    ChannelImpl(WebSocketChannel channel, String action, String clientIP, String refId, ChannelListener listener) {
+    ChannelImpl(WebSocketChannel channel, WebSocketContextImpl context, ChannelListener listener) {
         this.channel = channel;
-        this.action = action;
-        this.clientIP = clientIP;
-        this.refId = refId;
+        this.webSocketContext = context;
         this.listener = listener;
     }
 
@@ -41,7 +46,7 @@ public class ChannelImpl implements Channel {
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("ws", elapsed, 0, 1);
-            LOGGER.debug("send ws message, message={}, elapsed={}", message, elapsed);
+            LOGGER.debug("send ws message, id={}, message={}, elapsed={}", id, message, elapsed);
         }
     }
 
@@ -53,12 +58,35 @@ public class ChannelImpl implements Channel {
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("ws", elapsed, 0, 1);
-            LOGGER.debug("close ws channel, elapsed={}", elapsed);
+            LOGGER.debug("close ws channel, id={}, elapsed={}", id, elapsed);
         }
+    }
+
+    @Override
+    public void join(String room) {
+        webSocketContext.join(this, room);
+    }
+
+    @Override
+    public void leave(String room) {
+        webSocketContext.leave(this, room);
     }
 
     @Override
     public Map<String, Object> context() {
         return context;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        ChannelImpl channel = (ChannelImpl) object;
+        return Objects.equals(id, channel.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

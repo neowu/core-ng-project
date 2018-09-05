@@ -13,6 +13,7 @@
 * support websocket?
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
 * mask response json body, beanBody/httpClient?
+* http: rename HTTPServerIOHandler?
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

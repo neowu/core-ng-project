@@ -10,7 +10,4 @@ public interface ChannelListener {
     }
 
     void onMessage(Channel channel, String message);
-
-    default void onClose(Channel channel) {
-    }
 }

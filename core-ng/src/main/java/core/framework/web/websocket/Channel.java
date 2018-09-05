@@ -11,4 +11,8 @@ public interface Channel {
     Map<String, Object> context();
 
     void close();
+
+    void join(String room);
+
+    void leave(String room);
 }
