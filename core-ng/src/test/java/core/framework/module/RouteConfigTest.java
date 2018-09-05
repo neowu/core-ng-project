@@ -6,18 +6,20 @@ import core.framework.impl.web.HTTPServerIOHandler;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RouteConfigTest {
     private RouteConfig config;
 
-    @BeforeEach
+    @BeforeAll
     void createRouteConfig() {
         config = new RouteConfig(new ModuleContext());
     }

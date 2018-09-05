@@ -5,8 +5,9 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.reflect.Classes;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.time.Duration;
 
@@ -15,11 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class APIConfigTest {
     private APIConfig config;
     private ModuleContext context;
 
-    @BeforeEach
+    @BeforeAll
     void createAPIConfig() {
         config = new APIConfig();
         context = new ModuleContext();

@@ -34,7 +34,7 @@ public class ChannelImpl implements Channel {
 
     ChannelImpl(WebSocketChannel channel, WebSocketContextImpl context, ChannelListener listener) {
         this.channel = channel;
-        this.webSocketContext = context;
+        webSocketContext = context;
         this.listener = listener;
     }
 
