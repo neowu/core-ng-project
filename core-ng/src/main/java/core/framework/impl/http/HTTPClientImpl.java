@@ -7,9 +7,7 @@ import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.impl.log.filter.BytesParam;
 import core.framework.impl.log.filter.FieldParam;
-import core.framework.impl.log.filter.JSONParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.InputStreams;
@@ -28,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
 
@@ -84,7 +81,7 @@ public final class HTTPClientImpl implements HTTPClient {
             HttpEntity entity = httpResponse.getEntity();
             byte[] body = responseBody(entity);
             HTTPResponse response = new HTTPResponse(parseHTTPStatus(statusCode), headers, body);
-            logResponseText(response);
+            logger.debug("[response] body={}", BodyParam.param(body, response.contentType().orElse(null)));
             return response;
         } catch (IOException | UncheckedIOException e) {
             throw new HTTPClientException(e.getMessage(), "HTTP_COMMUNICATION_FAILED", e);
@@ -132,22 +129,12 @@ public final class HTTPClientImpl implements HTTPClient {
         byte[] body = request.body();
         if (body != null) {
             ContentType contentType = request.contentType();
-            logRequestBody(request, contentType);
+            logger.debug("[request] contentType={}, body={}", contentType, BodyParam.param(body, contentType));
             org.apache.http.entity.ContentType type = org.apache.http.entity.ContentType.create(contentType.mediaType(), contentType.charset().orElse(null));
             builder.setEntity(new ByteArrayEntity(request.body(), type));
         }
 
         return builder.build();
-    }
-
-    private void logRequestBody(HTTPRequest request, ContentType contentType) {
-        Object bodyParam;
-        if (ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
-            bodyParam = new JSONParam(request.body(), contentType.charset().orElse(StandardCharsets.UTF_8));
-        } else {
-            bodyParam = new BytesParam(request.body());
-        }
-        logger.debug("[request] contentType={}, body={}", contentType, bodyParam);
     }
 
     byte[] responseBody(HttpEntity entity) throws IOException {
@@ -161,14 +148,5 @@ public final class HTTPClientImpl implements HTTPClient {
                 return InputStreams.bytes(stream, 4096);
             }
         }
-    }
-
-    private void logResponseText(HTTPResponse response) {
-        response.contentType().ifPresent(contentType -> {
-            String mediaType = contentType.mediaType();
-            if (mediaType.contains("text") || mediaType.contains("json")) {
-                logger.debug("[response] body={}", new BytesParam(response.body(), contentType.charset().orElse(StandardCharsets.UTF_8)));
-            }
-        });
     }
 }

@@ -12,7 +12,6 @@
 * cache: hit rate report?
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
 
-* mask response json body, beanBody/httpClient?
 * http: publish non-api request (e.g. ws/upload) 
 * kafka: unique groupId to listen all messages for ws
 * ws: support json bean validation?

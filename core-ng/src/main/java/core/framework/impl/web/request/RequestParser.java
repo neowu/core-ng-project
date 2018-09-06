@@ -2,10 +2,9 @@ package core.framework.impl.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
+import core.framework.impl.http.BodyParam;
 import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.filter.BytesParam;
 import core.framework.impl.log.filter.FieldParam;
-import core.framework.impl.log.filter.JSONParam;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
@@ -108,26 +107,13 @@ public final class RequestParser {
     }
 
     void parseBody(RequestImpl request, HttpServerExchange exchange) throws Throwable {
-        RequestBodyReader.RequestBody body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
+        var body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
         if (body != null) {
             request.body = body.body();
-            logRequestBody(request);
+            logger.debug("[request] body={}", BodyParam.param(request.body, request.contentType));
         } else {
             parseForm(request, exchange);
         }
-    }
-
-    private void logRequestBody(RequestImpl request) {
-        ContentType contentType = request.contentType;
-        if (contentType == null) return;
-
-        Object bodyParam = null;
-        if (ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
-            bodyParam = new JSONParam(request.body, contentType.charset().orElse(UTF_8));
-        } else if (ContentType.TEXT_XML.mediaType().equals(contentType.mediaType())) {
-            bodyParam = new BytesParam(request.body, contentType.charset().orElse(UTF_8));
-        }
-        if (bodyParam != null) logger.debug("[request] body={}", bodyParam);
     }
 
     private void parseForm(RequestImpl request, HttpServerExchange exchange) {
