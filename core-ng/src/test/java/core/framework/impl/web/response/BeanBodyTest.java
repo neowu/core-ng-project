@@ -16,9 +16,9 @@ import static org.mockito.Mockito.mock;
 class BeanBodyTest {
     @Test
     void send() {
-        Sender sender = mock(Sender.class);
-        ResponseHandlerContext context = new ResponseHandlerContext(new ResponseBeanMapper(new BeanClassNameValidator()), null);
-        BeanBody body = new BeanBody(new TestBean());
+        var sender = mock(Sender.class);
+        var context = new ResponseHandlerContext(new ResponseBeanMapper(new BeanClassNameValidator()), null);
+        var body = new BeanBody(new TestBean());
         assertThatThrownBy(() -> body.send(sender, context))
                 .isInstanceOf(ValidationException.class);
     }

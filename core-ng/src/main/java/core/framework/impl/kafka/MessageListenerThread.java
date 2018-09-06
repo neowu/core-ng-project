@@ -5,7 +5,6 @@ import core.framework.impl.log.LogManager;
 import core.framework.impl.log.filter.BytesParam;
 import core.framework.kafka.Message;
 import core.framework.log.Markers;
-import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -181,7 +180,7 @@ class MessageListenerThread extends Thread {
                     clientIPs.add(header(headers, MessageHeaders.HEADER_CLIENT_IP));    // client will always send with clientIP
                 }
                 T message = process.reader.fromJSON(record.value());
-                validate(process.validator, message, record);
+                process.validator.validate(message);
                 messages.add(new Message<>(record.key(), message));
             }
             if (!clients.isEmpty()) {
@@ -198,23 +197,10 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private String header(Headers headers, String key) {
+    String header(Headers headers, String key) {
         Header header = headers.lastHeader(key);
         if (header == null) return null;
         return new String(header.value(), UTF_8);
-    }
-
-    private <T> void validate(MessageValidator<T> validator, T value, ConsumerRecord<String, byte[]> record) {
-        try {
-            validator.validate(value);
-        } catch (Exception e) {
-            Header[] recordHeaders = record.headers().toArray();
-            Map<String, String> headers = Maps.newHashMapWithExpectedSize(recordHeaders.length);
-            for (Header recordHeader : recordHeaders)
-                headers.put(recordHeader.key(), new String(recordHeader.value(), UTF_8));
-            logger.warn("failed to validate message, key={}, headers={}, message={}", record.key(), headers, new BytesParam(record.value()), e);
-            throw e;
-        }
     }
 
     private void checkSlowProcess(long elapsed, double longProcessThreshold) {

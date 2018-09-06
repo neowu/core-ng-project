@@ -2,6 +2,7 @@
 ### 6.8.0 (9/5/2018 - )  !!! api cleanup, remove replaceable method  !!!
 * session: removed session.remove(key), just use session.set(key, null)
 * redis: log returned value
+* validator: log bean if failed to validate, to help troubleshooting
 
 ### 6.7.1 (8/31/2018 - 9/5/2018)
 * http: set tcp keep alive timeout to 620s, to adapt to both AWS ELB and gcloud LB
