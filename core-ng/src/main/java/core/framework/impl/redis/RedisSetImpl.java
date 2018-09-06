@@ -48,7 +48,7 @@ public final class RedisSetImpl implements RedisSet {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, (int) addedValues);
-            logger.debug("sadd, key={}, values={}, size={}, addedValues={}, elapsed={}", key, values, values.length, addedValues, elapsed);
+            logger.debug("sadd, key={}, values={}, size={}, elapsed={}", key, values, values.length, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
@@ -57,13 +57,12 @@ public final class RedisSetImpl implements RedisSet {
     public Set<String> members(String key) {
         var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
-        int returnedValues = 0;
+        Set<String> values = null;
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyCommand(SMEMBERS, key);
             Object[] response = connection.readArray();
-            returnedValues = response.length;
-            Set<String> values = Sets.newHashSetWithExpectedSize(returnedValues);
+            values = Sets.newHashSetWithExpectedSize(response.length);
             for (Object value : response) {
                 values.add(decode((byte[]) value));
             }
@@ -74,8 +73,8 @@ public final class RedisSetImpl implements RedisSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, returnedValues, 0);
-            logger.debug("smembers, key={}, returnedValues={}, elapsed={}", key, returnedValues, elapsed);
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            logger.debug("smembers, key={}, returnedValues={}, elapsed={}", key, values, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
@@ -84,11 +83,13 @@ public final class RedisSetImpl implements RedisSet {
     public boolean isMember(String key, String value) {
         var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        boolean isMember = false;
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(SISMEMBER, key, encode(value));
             Long response = connection.readLong();
-            return response == 1;
+            isMember = response == 1;
+            return isMember;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -96,7 +97,7 @@ public final class RedisSetImpl implements RedisSet {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 1, 0);
-            logger.debug("sismember, key={}, value={}, elapsed={}", key, value, elapsed);
+            logger.debug("sismember, key={}, value={}, isMember={}, elapsed={}", key, value, isMember, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

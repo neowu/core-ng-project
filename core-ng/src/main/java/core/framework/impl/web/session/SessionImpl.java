@@ -1,5 +1,6 @@
 package core.framework.impl.web.session;
 
+import core.framework.util.Strings;
 import core.framework.web.Session;
 
 import java.util.HashMap;
@@ -24,8 +25,10 @@ public class SessionImpl implements Session {
 
     @Override
     public void set(String key, String value) {
-        values.put(key, value);
-        changedFields.add(key);
+        String previousValue = values.put(key, value);
+        if (!Strings.equals(previousValue, value)) {
+            changedFields.add(key);
+        }
     }
 
     boolean changed() {

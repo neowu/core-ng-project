@@ -33,7 +33,7 @@ public class RedisSessionStore implements SessionStore {
             redis.expire(key, sessionTimeout);
             return sessionValues;
         } catch (Exception e) {    // gracefully handle invalid data in redis, either legacy old format value, or invalid value inserted manually
-            logger.warn("failed to get redis session", e);
+            logger.warn("failed to get redis session values", e);
             return null;
         }
     }

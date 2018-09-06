@@ -68,7 +68,7 @@ public final class HTTPConfig extends Config {
         context.httpServer.handler.interceptors.add(new ClientIPInterceptor(cidrs));
     }
 
-    public void enableGZip() {
+    public void gzip() {
         context.httpServer.gzip = true;
     }
 }

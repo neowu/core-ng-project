@@ -89,11 +89,13 @@ public final class RedisImpl implements Redis {
 
     public byte[] getBytes(String key) {
         var watch = new StopWatch();
+        byte[] value = null;
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyCommand(GET, key);
-            return connection.readBulkString();
+            value = connection.readBulkString();
+            return value;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -101,7 +103,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 1, 0);
-            logger.debug("get, key={}, elapsed={}", key, elapsed);
+            logger.debug("get, key={}, returnedValue={}, elapsed={}", key, new BytesParam(value), elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -194,11 +196,13 @@ public final class RedisImpl implements Redis {
     @Override
     public long increaseBy(String key, long increment) {
         var watch = new StopWatch();
+        long value = 0;
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(INCRBY, key, encode(increment));
-            return connection.readLong();
+            value = connection.readLong();
+            return value;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -206,7 +210,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, 1);
-            logger.debug("increaseBy, key={}, increment={}, elapsed={}", key, increment, elapsed);
+            logger.debug("increaseBy, key={}, increment={}, returnedValue={}, elapsed={}", key, increment, value, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -224,7 +228,6 @@ public final class RedisImpl implements Redis {
     public Map<String, byte[]> multiGetBytes(String... keys) {
         var watch = new StopWatch();
         if (keys.length == 0) throw new Error("keys must not be empty");
-        int returnedValues = 0;
         Map<String, byte[]> values = Maps.newHashMapWithExpectedSize(keys.length);
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
@@ -235,7 +238,6 @@ public final class RedisImpl implements Redis {
                 byte[] value = (byte[]) response[i];
                 if (value != null) values.put(keys[i], value);
             }
-            returnedValues = values.size();
             return values;
         } catch (IOException e) {
             item.broken = true;
@@ -243,8 +245,8 @@ public final class RedisImpl implements Redis {
         } finally {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, returnedValues, 0);
-            logger.debug("mget, keys={}, size={}, returnedValues={}, elapsed={}", keys, keys.length, returnedValues, elapsed);
+            ActionLogContext.track("redis", elapsed, values.size(), 0);
+            logger.debug("mget, keys={}, size={}, returnedValues={}, elapsed={}", keys, keys.length, new BytesValueMapParam(values), elapsed);
             checkSlowOperation(elapsed);
         }
     }

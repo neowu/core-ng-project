@@ -76,7 +76,7 @@ public class TestModule extends AbstractTestModule {
     private void configureHTTP() {
         http().httpPort(8080);
         http().httpsPort(8443);
-        http().enableGZip();
+        http().gzip();
         http().maxForwardedIPs(2);
         http().allowCIDR("0.0.0.0/0");
     }

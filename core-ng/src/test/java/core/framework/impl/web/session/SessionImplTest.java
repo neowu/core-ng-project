@@ -26,4 +26,14 @@ class SessionImplTest {
         assertThat(session.changedFields).containsOnly("key");
         assertThat(session.get("key")).isNotPresent();
     }
+
+    @Test
+    void setWithoutChange() {
+        session.set("key", null);
+        assertThat(session.changedFields).isEmpty();
+
+        session.values.put("key", "value");
+        session.set("key", "value");
+        assertThat(session.changedFields).isEmpty();
+    }
 }

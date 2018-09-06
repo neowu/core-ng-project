@@ -34,7 +34,6 @@ public final class SessionManager {
             logger.debug("load session");
             Map<String, String> values = store.getAndRefresh(sessionId, timeout);
             if (values != null) {
-                logger.debug("[session] values={}", values);
                 session.id = sessionId;
                 session.values.putAll(values);
             }

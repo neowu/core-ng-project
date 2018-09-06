@@ -4,6 +4,8 @@ import core.framework.cache.Cache;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.json.JSONWriter;
 import core.framework.util.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -21,6 +23,7 @@ public class CacheImpl<T> implements Cache<T> {
     public final String name;
     public final Type valueType;
     public final Duration duration;
+    private final Logger logger = LoggerFactory.getLogger(CacheImpl.class);
     private final CacheStore cacheStore;
     private final JSONReader<T> reader;
     private final JSONWriter<T> writer;
@@ -39,6 +42,7 @@ public class CacheImpl<T> implements Cache<T> {
         String cacheKey = cacheKey(key);
         byte[] cacheValue = cacheStore.get(cacheKey);
         if (cacheValue == null) {
+            logger.debug("load value, key={}", key);
             T value = loader.apply(key);
             cacheStore.put(cacheKey, writer.toJSON(value), duration);
             return value;
@@ -65,6 +69,7 @@ public class CacheImpl<T> implements Cache<T> {
             String cacheKey = cacheKeys[index];
             byte[] cacheValue = cacheValues.get(cacheKey);
             if (cacheValue == null) {
+                logger.debug("load value, key={}", key);
                 T value = loader.apply(key);
                 newValues.put(cacheKey, writer.toJSON(value));
                 values.put(key, value);

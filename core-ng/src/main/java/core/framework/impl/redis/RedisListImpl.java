@@ -32,11 +32,13 @@ public final class RedisListImpl implements RedisList {
     @Override
     public String pop(String key) {
         var watch = new StopWatch();
+        String value = null;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyCommand(LPOP, key);
-            return decode(connection.readBulkString());
+            value = decode(connection.readBulkString());
+            return value;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -44,7 +46,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 1, 0);
-            logger.debug("lpop, key={}, elapsed={}", key, elapsed);
+            logger.debug("lpop, key={}, returnedValue={}, elapsed={}", key, value, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
@@ -74,7 +76,7 @@ public final class RedisListImpl implements RedisList {
     public List<String> range(String key, long start, long end) {
         var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
-        int returnedValues = 0;
+        List<String> values = null;
         try {
             RedisConnection connection = item.resource;
             connection.writeArray(4);
@@ -84,8 +86,7 @@ public final class RedisListImpl implements RedisList {
             connection.writeBulkString(encode(end));
             connection.flush();
             Object[] response = connection.readArray();
-            returnedValues = response.length;
-            List<String> values = new ArrayList<>(response.length);
+            values = new ArrayList<>(response.length);
             for (Object value : response) {
                 values.add(decode((byte[]) value));
             }
@@ -96,8 +97,8 @@ public final class RedisListImpl implements RedisList {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, returnedValues, 0);
-            logger.debug("lrange, key={}, start={}, end={}, returnedValues={}, elapsed={}", key, start, end, returnedValues, elapsed);
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            logger.debug("lrange, key={}, start={}, end={}, returnedValues={}, elapsed={}", key, start, end, values, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

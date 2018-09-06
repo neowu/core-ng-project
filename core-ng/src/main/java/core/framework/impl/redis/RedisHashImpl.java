@@ -34,11 +34,13 @@ public final class RedisHashImpl implements RedisHash {
     @Override
     public String get(String key, String field) {
         var watch = new StopWatch();
+        String value = null;
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(HGET, key, encode(field));
-            return decode(connection.readBulkString());
+            value = decode(connection.readBulkString());
+            return value;
         } catch (IOException e) {
             item.broken = true;
             throw new UncheckedIOException(e);
@@ -46,7 +48,7 @@ public final class RedisHashImpl implements RedisHash {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 1, 0);
-            logger.debug("hget, key={}, field={}, elapsed={}", key, field, elapsed);
+            logger.debug("hget, key={}, field={}, returnedValue={}, elapsed={}", key, field, value, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
@@ -55,14 +57,13 @@ public final class RedisHashImpl implements RedisHash {
     public Map<String, String> getAll(String key) {
         var watch = new StopWatch();
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
-        int returnedFields = 0;
+        Map<String, String> values = null;
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyCommand(HGETALL, key);
             Object[] response = connection.readArray();
             if (response.length % 2 != 0) throw new IOException("unexpected length of array, length=" + response.length);
-            returnedFields = response.length / 2;
-            Map<String, String> values = Maps.newHashMapWithExpectedSize(returnedFields);
+            values = Maps.newHashMapWithExpectedSize(response.length / 2);
             for (int i = 0; i < response.length; i += 2) {
                 values.put(decode((byte[]) response[i]), decode((byte[]) response[i + 1]));
             }
@@ -73,8 +74,8 @@ public final class RedisHashImpl implements RedisHash {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, returnedFields, 0);
-            logger.debug("hgetAll, key={}, returnedFields={}, elapsed={}", key, returnedFields, elapsed);
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            logger.debug("hgetAll, key={}, returnedValues={}, elapsed={}", key, values, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
