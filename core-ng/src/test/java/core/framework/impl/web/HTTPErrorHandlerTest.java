@@ -17,12 +17,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class HTTPServerErrorHandlerTest {
-    private HTTPServerErrorHandler handler;
+class HTTPErrorHandlerTest {
+    private HTTPErrorHandler handler;
 
     @BeforeEach
     void createHTTPServerErrorHandler() {
-        handler = new HTTPServerErrorHandler(null);
+        handler = new HTTPErrorHandler(null);
     }
 
     @Test

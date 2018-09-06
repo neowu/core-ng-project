@@ -1,9 +1,12 @@
 package core.framework.module;
 
+import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.web.HTTPIOHandler;
 import core.framework.impl.web.http.ClientIPInterceptor;
 import core.framework.util.Exceptions;
+import core.framework.web.Controller;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
 import org.slf4j.Logger;
@@ -23,16 +26,9 @@ public final class HTTPConfig extends Config {
         this.context = context;
     }
 
-    @Override
-    protected void validate() {
-    }
-
-    public void httpPort(int port) {
-        context.httpServer.httpPort = port;
-    }
-
-    public void httpsPort(int port) {
-        context.httpServer.httpsPort = port;
+    public void route(HTTPMethod method, String path, Controller controller) {
+        if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
+        context.route(method, path, controller, false);
     }
 
     public void intercept(Interceptor interceptor) {
@@ -41,6 +37,14 @@ public final class HTTPConfig extends Config {
 
     public void errorHandler(ErrorHandler handler) {
         context.httpServer.handler.errorHandler.customErrorHandler = handler;
+    }
+
+    public void httpPort(int port) {
+        context.httpServer.httpPort = port;
+    }
+
+    public void httpsPort(int port) {
+        context.httpServer.httpsPort = port;
     }
 
     public LimitRateConfig limitRate() {

@@ -10,19 +10,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class HTTPServerHandlerTest {
-    private HTTPServerHandler handler;
+class HTTPHandlerTest {
+    private HTTPHandler handler;
 
     @BeforeEach
     void createHTTPServerHandler() {
-        handler = new HTTPServerHandler(null, null, null);
+        handler = new HTTPHandler(null, null, null);
     }
 
     @Test
     void linkContext() {
         var actionLog = new ActionLog(null);
         var headers = new HeaderMap();
-        headers.put(HTTPServerHandler.HEADER_TRACE, "true");
+        headers.put(HTTPHandler.HEADER_TRACE, "true");
         handler.linkContext(actionLog, headers);
 
         assertThat(actionLog.trace).isTrue();

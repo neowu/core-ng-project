@@ -3,6 +3,7 @@
 * session: removed session.remove(key), just use session.set(key, null)
 * redis: log returned value
 * validator: log bean if failed to validate, to help troubleshooting
+* http: removed module config, route(), replaced with http().route(method,path,controller)
 
 ### 6.7.1 (8/31/2018 - 9/5/2018)
 * http: set tcp keep alive timeout to 620s, to adapt to both AWS ELB and gcloud LB

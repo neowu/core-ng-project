@@ -26,7 +26,9 @@ public final class Validator {
     public void validate(Object bean, boolean partial) {
         if (bean == null) {
             throw new ValidationException(Map.of("bean", "bean must not be null"));
-        } else if (validator != null) { // validator can be null if no validation annotation presents
+        }
+
+        if (validator != null) { // validator can be null if no validation annotation presents
             var errors = new ValidationErrors();
             validator.validate(bean, errors, partial);
             if (errors.hasError()) {

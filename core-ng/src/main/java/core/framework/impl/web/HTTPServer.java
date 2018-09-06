@@ -22,7 +22,7 @@ public class HTTPServer {
     }
 
     public final SiteManager siteManager = new SiteManager();
-    public final HTTPServerHandler handler;
+    public final HTTPHandler handler;
     private final Logger logger = LoggerFactory.getLogger(HTTPServer.class);
     private final ShutdownHandler shutdownHandler = new ShutdownHandler();
     public Integer httpPort;
@@ -31,7 +31,7 @@ public class HTTPServer {
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
-        handler = new HTTPServerHandler(logManager, siteManager.sessionManager, siteManager.templateManager);
+        handler = new HTTPHandler(logManager, siteManager.sessionManager, siteManager.templateManager);
     }
 
     public void start() {
@@ -61,7 +61,7 @@ public class HTTPServer {
     }
 
     private HttpHandler handler() {
-        HttpHandler handler = new HTTPServerIOHandler(this.handler, shutdownHandler);
+        HttpHandler handler = new HTTPIOHandler(this.handler, shutdownHandler);
         if (gzip) {
             var predicate = new GZipPredicate();
             handler = new EncodingHandler(handler, new ContentEncodingRepository()

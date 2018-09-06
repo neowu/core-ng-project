@@ -25,12 +25,12 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public class HTTPServerErrorHandler {
-    private final Logger logger = LoggerFactory.getLogger(HTTPServerErrorHandler.class);
+public class HTTPErrorHandler {
+    private final Logger logger = LoggerFactory.getLogger(HTTPErrorHandler.class);
     private final ResponseHandler responseHandler;
     public ErrorHandler customErrorHandler;
 
-    HTTPServerErrorHandler(ResponseHandler responseHandler) {
+    HTTPErrorHandler(ResponseHandler responseHandler) {
         this.responseHandler = responseHandler;
     }
 

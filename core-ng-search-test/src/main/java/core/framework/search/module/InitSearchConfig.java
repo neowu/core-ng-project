@@ -21,10 +21,6 @@ public final class InitSearchConfig extends Config {
         config = this.context.getConfig(SearchConfig.class, null);
     }
 
-    @Override
-    protected void validate() {
-    }
-
     public void createIndex(String index, String sourcePath) {
         config.search.createIndex(index, ClasspathResources.text(sourcePath));
     }

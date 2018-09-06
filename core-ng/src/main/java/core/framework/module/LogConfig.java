@@ -23,10 +23,6 @@ public class LogConfig extends Config {
         this.context = context;
     }
 
-    @Override
-    protected void validate() {
-    }
-
     public void writeToConsole() {
         setLogAppender(new ConsoleAppender());
     }

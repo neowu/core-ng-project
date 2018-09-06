@@ -26,10 +26,6 @@ public final class InitDBConfig extends Config {
         config = this.context.getConfig(DBConfig.class, name);
     }
 
-    @Override
-    protected void validate() {
-    }
-
     public void runScript(String scriptPath) {
         new SQLScriptRunner(config.database, ClasspathResources.text(scriptPath)).run();
     }

@@ -49,10 +49,6 @@ public class APIConfig extends Config {
                 .maxRetries(3);
     }
 
-    @Override
-    protected void validate() {
-    }
-
     public <T> void service(Class<T> serviceInterface, T service) {
         logger.info("create api service, interface={}", serviceInterface.getCanonicalName());
         new WebServiceInterfaceValidator(serviceInterface,

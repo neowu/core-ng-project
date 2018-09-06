@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public class HTTPServerHandler implements HttpHandler {
+public class HTTPHandler implements HttpHandler {
     public static final HttpString HEADER_REF_ID = new HttpString("ref-id");
     public static final HttpString HEADER_TRACE = new HttpString("trace");
     public static final HttpString HEADER_CLIENT = new HttpString("client");
@@ -37,22 +37,22 @@ public class HTTPServerHandler implements HttpHandler {
     public final Route route = new Route();
     public final Interceptors interceptors = new Interceptors();
     public final WebContextImpl webContext = new WebContextImpl();
-    public final HTTPServerErrorHandler errorHandler;
+    public final HTTPErrorHandler errorHandler;
     private final BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
     public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanClassNameValidator);
     public final ResponseBeanMapper responseBeanMapper = new ResponseBeanMapper(beanClassNameValidator);
-    private final Logger logger = LoggerFactory.getLogger(HTTPServerHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(HTTPHandler.class);
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
 
     public WebSocketHandler webSocketHandler;
 
-    HTTPServerHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
+    HTTPHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
         responseHandler = new ResponseHandler(responseBeanMapper, templateManager);
-        errorHandler = new HTTPServerErrorHandler(responseHandler);
+        errorHandler = new HTTPErrorHandler(responseHandler);
     }
 
     @Override
@@ -98,9 +98,9 @@ public class HTTPServerHandler implements HttpHandler {
     }
 
     void linkContext(ActionLog actionLog, HeaderMap headers) {
-        String client = headers.getFirst(HTTPServerHandler.HEADER_CLIENT);
+        String client = headers.getFirst(HTTPHandler.HEADER_CLIENT);
         if (client != null) actionLog.context("client", client);
-        actionLog.refId(headers.getFirst(HTTPServerHandler.HEADER_REF_ID));
+        actionLog.refId(headers.getFirst(HTTPHandler.HEADER_REF_ID));
         if ("true".equals(headers.getFirst(HEADER_TRACE))) {
             actionLog.trace = true;
         }

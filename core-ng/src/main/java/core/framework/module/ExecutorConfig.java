@@ -18,10 +18,6 @@ public class ExecutorConfig extends Config {
         this.context = context;
     }
 
-    @Override
-    protected void validate() {
-    }
-
     public Executor add() {
         return add(null, Runtime.getRuntime().availableProcessors() * 2);
     }

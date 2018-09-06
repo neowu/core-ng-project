@@ -1,6 +1,6 @@
 package core.framework.impl.web.request;
 
-import core.framework.impl.web.HTTPServerHandler;
+import core.framework.impl.web.HTTPHandler;
 import core.framework.util.Exceptions;
 import io.undertow.connector.PooledByteBuffer;
 import io.undertow.server.HttpServerExchange;
@@ -18,13 +18,13 @@ public final class RequestBodyReader implements ChannelListener<StreamSourceChan
     static final AttachmentKey<RequestBody> REQUEST_BODY = AttachmentKey.create(RequestBody.class);
 
     private final HttpServerExchange exchange;
-    private final HTTPServerHandler handler;
+    private final HTTPHandler handler;
     private final int contentLength;
     private boolean complete;
     private byte[] body;
     private int position = 0;
 
-    public RequestBodyReader(HttpServerExchange exchange, HTTPServerHandler handler) {
+    public RequestBodyReader(HttpServerExchange exchange, HTTPHandler handler) {
         this.exchange = exchange;
         this.handler = handler;
         contentLength = (int) exchange.getRequestContentLength();

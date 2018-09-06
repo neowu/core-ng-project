@@ -34,10 +34,6 @@ public class SiteConfig extends Config {
         this.context = context;
     }
 
-    @Override
-    protected void validate() {
-    }
-
     public SessionConfig session() {
         return context.config(SessionConfig.class, null);
     }

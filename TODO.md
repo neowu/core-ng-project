@@ -11,12 +11,12 @@
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * cache: hit rate report?
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
+
 * mask response json body, beanBody/httpClient?
-* http: rename HTTPServerIOHandler?
 * http: publish non-api request (e.g. ws/upload) 
-* http rename route() to http()?
 * kafka: unique groupId to listen all messages for ws
 * ws: support json bean validation?
+* http: rewrite path parsing for better speed?
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

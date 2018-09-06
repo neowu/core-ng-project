@@ -9,23 +9,23 @@ import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 import org.xnio.channels.StreamSourceChannel;
 
-import java.nio.charset.StandardCharsets;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
  */
-public class HTTPServerIOHandler implements HttpHandler {
+public class HTTPIOHandler implements HttpHandler {
     public static final String HEALTH_CHECK_PATH = "/health-check";
     private final FormParserFactory formParserFactory;
-    private final HTTPServerHandler handler;
+    private final HTTPHandler handler;
     private final ShutdownHandler shutdownHandler;
 
-    HTTPServerIOHandler(HTTPServerHandler handler, ShutdownHandler shutdownHandler) {
+    HTTPIOHandler(HTTPHandler handler, ShutdownHandler shutdownHandler) {
         this.handler = handler;
-        var builder = FormParserFactory.builder();
-        builder.setDefaultCharset(StandardCharsets.UTF_8.name());
-        formParserFactory = builder.build();
         this.shutdownHandler = shutdownHandler;
+        var builder = FormParserFactory.builder();
+        builder.setDefaultCharset(UTF_8.name());
+        formParserFactory = builder.build();
     }
 
     @Override

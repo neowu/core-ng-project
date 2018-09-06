@@ -9,7 +9,7 @@ import core.framework.http.HTTPResponse;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.web.HTTPServerHandler;
+import core.framework.impl.web.HTTPHandler;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.route.Path;
@@ -136,13 +136,13 @@ public class WebServiceClient {
     }
 
     private void linkContext(HTTPRequest request) {
-        request.header(HTTPServerHandler.HEADER_CLIENT.toString(), logManager.appName);
+        request.header(HTTPHandler.HEADER_CLIENT.toString(), logManager.appName);
 
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog == null) return;  // web service client may be used without action log context
 
-        request.header(HTTPServerHandler.HEADER_REF_ID.toString(), actionLog.refId());
-        if (actionLog.trace) request.header(HTTPServerHandler.HEADER_TRACE.toString(), "true");
+        request.header(HTTPHandler.HEADER_REF_ID.toString(), actionLog.refId());
+        if (actionLog.trace) request.header(HTTPHandler.HEADER_TRACE.toString(), "true");
     }
 
     void validateResponse(HTTPResponse response) {

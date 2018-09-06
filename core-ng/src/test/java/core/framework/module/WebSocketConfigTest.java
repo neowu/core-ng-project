@@ -1,7 +1,7 @@
 package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.HTTPServerIOHandler;
+import core.framework.impl.web.HTTPIOHandler;
 import core.framework.web.websocket.Channel;
 import core.framework.web.websocket.ChannelListener;
 import core.framework.web.websocket.WebSocketContext;
@@ -28,14 +28,14 @@ class WebSocketConfigTest {
 
     @Test
     void withReservedPath() {
-        assertThatThrownBy(() -> config.add(HTTPServerIOHandler.HEALTH_CHECK_PATH, new TestChannelListener()))
+        assertThatThrownBy(() -> config.listen(HTTPIOHandler.HEALTH_CHECK_PATH, new TestChannelListener()))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("/health-check is reserved path");
     }
 
     @Test
     void add() {
-        config.add("/ws2", new TestChannelListener());
+        config.listen("/ws2", new TestChannelListener());
 
         WebSocketContext webSocketContext = context.beanFactory.bean(WebSocketContext.class, null);
         assertThat(webSocketContext).isNotNull();

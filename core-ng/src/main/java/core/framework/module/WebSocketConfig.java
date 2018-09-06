@@ -1,7 +1,7 @@
 package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.web.HTTPServerIOHandler;
+import core.framework.impl.web.HTTPIOHandler;
 import core.framework.impl.web.websocket.WebSocketHandler;
 import core.framework.web.websocket.ChannelListener;
 import core.framework.web.websocket.WebSocketContext;
@@ -16,8 +16,8 @@ public final class WebSocketConfig {
         this.context = context;
     }
 
-    public void add(String path, ChannelListener listener) {
-        if (HTTPServerIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
+    public void listen(String path, ChannelListener listener) {
+        if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
 
         if (context.httpServer.handler.webSocketHandler == null) {
             context.httpServer.handler.webSocketHandler = new WebSocketHandler(context.logManager);

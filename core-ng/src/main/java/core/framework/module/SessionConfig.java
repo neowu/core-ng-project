@@ -25,10 +25,6 @@ public class SessionConfig extends Config {
         context.logManager.filter.maskedFields.add(context.httpServer.siteManager.sessionManager.sessionId.name);
     }
 
-    @Override
-    protected void validate() {
-    }
-
     public void timeout(Duration timeout) {
         context.httpServer.siteManager.sessionManager.timeout(timeout);
     }
