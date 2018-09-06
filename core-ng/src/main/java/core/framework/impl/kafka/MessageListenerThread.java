@@ -16,7 +16,6 @@ import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -174,16 +175,19 @@ class MessageListenerThread extends Thread {
                 if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
                     actionLog.trace = true;
                 }
-                clients.add(header(headers, MessageHeaders.HEADER_CLIENT));
-                clientIPs.add(header(headers, MessageHeaders.HEADER_CLIENT_IP));
-
+                String client = header(headers, MessageHeaders.HEADER_CLIENT);
+                if (client != null) {   // kafkaAppender does not send headers
+                    clients.add(client);
+                    clientIPs.add(header(headers, MessageHeaders.HEADER_CLIENT_IP));    // client will always send with clientIP
+                }
                 T message = process.reader.fromJSON(record.value());
                 validate(process.validator, message, record);
                 messages.add(new Message<>(record.key(), message));
             }
-            logger.debug("clients={}", clients);
-            logger.debug("clientIPs={}", clientIPs);
-
+            if (!clients.isEmpty()) {
+                logger.debug("clients={}", clients);
+                logger.debug("clientIPs={}", clientIPs);
+            }
             process.bulkHandler.handle(messages);
         } catch (Throwable e) {
             logManager.logError(e);
@@ -197,7 +201,7 @@ class MessageListenerThread extends Thread {
     private String header(Headers headers, String key) {
         Header header = headers.lastHeader(key);
         if (header == null) return null;
-        return new String(header.value(), StandardCharsets.UTF_8);
+        return new String(header.value(), UTF_8);
     }
 
     private <T> void validate(MessageValidator<T> validator, T value, ConsumerRecord<String, byte[]> record) {
@@ -207,7 +211,7 @@ class MessageListenerThread extends Thread {
             Header[] recordHeaders = record.headers().toArray();
             Map<String, String> headers = Maps.newHashMapWithExpectedSize(recordHeaders.length);
             for (Header recordHeader : recordHeaders)
-                headers.put(recordHeader.key(), new String(recordHeader.value(), StandardCharsets.UTF_8));
+                headers.put(recordHeader.key(), new String(recordHeader.value(), UTF_8));
             logger.warn("failed to validate message, key={}, headers={}, message={}", record.key(), headers, new BytesParam(record.value()), e);
             throw e;
         }

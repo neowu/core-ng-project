@@ -77,7 +77,7 @@ public class HTTPServerHandler implements HttpHandler {
 
             if (webSocketHandler != null && webSocketHandler.isWebSocket(request.method(), headers)) {
                 webSocketHandler.handle(exchange, request, actionLog);
-                return; // with websocket, it doesn't save session
+                return; // with WebSocket, not save session
             }
 
             ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams, actionLog);

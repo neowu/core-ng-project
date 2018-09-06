@@ -29,7 +29,7 @@ public final class SessionManager {
         if (store == null) return null;  // session store is not initialized
         if (!"https".equals(request.scheme())) return null;  // only load session under https
 
-        SessionImpl session = new SessionImpl();
+        var session = new SessionImpl();
         request.cookie(sessionId).ifPresent(sessionId -> {
             logger.debug("load session");
             Map<String, String> values = store.getAndRefresh(sessionId, timeout);

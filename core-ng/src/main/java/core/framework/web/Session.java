@@ -8,9 +8,7 @@ import java.util.Optional;
 public interface Session {
     Optional<String> get(String key);
 
-    void set(String key, String value);
-
-    void remove(String key);
+    void set(String key, String value); // set value to null to remove key
 
     void invalidate();
 }

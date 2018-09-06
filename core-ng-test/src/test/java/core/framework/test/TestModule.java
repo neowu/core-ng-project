@@ -66,6 +66,8 @@ public class TestModule extends AbstractTestModule {
 
     private void configureSite() {
         site().session().redis("localhost");
+        site().session().timeout(Duration.ofMinutes(30));
+        site().session().cookie("SessionId", "localhost");
         site().cdn().host("//cdn");
         site().security().contentSecurityPolicy("default-src 'self' https://cdn; img-src 'self' https://cdn data:; object-src 'none'; frame-src 'none';");
         site().publishAPI("0.0.0.0/0");

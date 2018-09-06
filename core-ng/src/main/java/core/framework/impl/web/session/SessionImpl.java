@@ -1,9 +1,9 @@
 package core.framework.impl.web.session;
 
-import core.framework.util.Maps;
-import core.framework.util.Sets;
 import core.framework.web.Session;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -12,8 +12,8 @@ import java.util.Set;
  * @author neo
  */
 public class SessionImpl implements Session {
-    final Map<String, String> values = Maps.newHashMap();
-    final Set<String> changedFields = Sets.newHashSet();
+    final Map<String, String> values = new HashMap<>();
+    final Set<String> changedFields = new HashSet<>();
     String id;
     boolean invalidated;
 
@@ -25,12 +25,6 @@ public class SessionImpl implements Session {
     @Override
     public void set(String key, String value) {
         values.put(key, value);
-        changedFields.add(key);
-    }
-
-    @Override
-    public void remove(String key) {
-        values.put(key, null);
         changedFields.add(key);
     }
 

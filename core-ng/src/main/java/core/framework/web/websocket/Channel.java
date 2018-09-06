@@ -1,6 +1,6 @@
 package core.framework.web.websocket;
 
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -8,11 +8,17 @@ import java.util.Map;
 public interface Channel {
     void send(String message);
 
-    Map<String, Object> context();
+    Context context();
 
     void close();
 
     void join(String room);
 
     void leave(String room);
+
+    interface Context {
+        Optional<Object> get(String key);
+
+        void put(String key, Object value);
+    }
 }

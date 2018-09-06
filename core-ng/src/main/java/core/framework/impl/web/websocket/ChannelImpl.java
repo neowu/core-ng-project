@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author neo
  */
-public class ChannelImpl implements Channel {
+public class ChannelImpl implements Channel, Channel.Context {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
     final String id = UUID.randomUUID().toString();
     final Set<String> rooms = Sets.newConcurrentHashSet();
@@ -73,8 +74,8 @@ public class ChannelImpl implements Channel {
     }
 
     @Override
-    public Map<String, Object> context() {
-        return context;
+    public Context context() {
+        return this;
     }
 
     @Override
@@ -85,5 +86,16 @@ public class ChannelImpl implements Channel {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public Optional<Object> get(String key) {
+        return Optional.ofNullable(context.get(key));
+    }
+
+    @Override
+    public void put(String key, Object value) {
+        if (value == null) context.remove(key);
+        else context.put(key, value);
     }
 }
