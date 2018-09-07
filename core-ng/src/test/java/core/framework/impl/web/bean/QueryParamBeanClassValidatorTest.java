@@ -8,6 +8,6 @@ import org.junit.jupiter.api.Test;
 class QueryParamBeanClassValidatorTest {
     @Test
     void validate() {
-        new QueryParamBeanClassValidator(TestQueryParamBean.class, new BeanClassNameValidator()).validate();
+        new QueryParamBeanClassValidator(TestQueryParamBean.class, new BeanMapperRegistry()).validate();
     }
 }

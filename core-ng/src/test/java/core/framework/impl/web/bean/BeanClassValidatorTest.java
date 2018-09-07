@@ -12,9 +12,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class BeanClassValidatorTest {
     @Test
     void validate() {
-        new BeanClassValidator(TestBean.class, new BeanClassNameValidator()).validate();
+        var registry = new BeanMapperRegistry();
 
-        assertThatThrownBy(() -> new BeanClassValidator(List.class, new BeanClassNameValidator()).validate())
+        new BeanClassValidator(TestBean.class, registry).validate();
+
+        assertThatThrownBy(() -> new BeanClassValidator(List.class, registry).validate())
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("top level list is not allowed");
     }

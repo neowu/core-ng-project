@@ -139,7 +139,7 @@ public class APIDefinitionBuilder {
         return parseBeanType((Class<?>) type);
     }
 
-    private String parseBeanType(Class<?> beanClass) {
+    public String parseBeanType(Class<?> beanClass) {
         String typeName = Classes.className(beanClass);
         if (!beanTypes.containsKey(typeName)) {
             var definition = new BeanTypeDefinition();

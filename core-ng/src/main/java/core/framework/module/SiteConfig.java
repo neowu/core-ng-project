@@ -85,6 +85,6 @@ public class SiteConfig extends Config {
         APIConfig config = context.config(APIConfig.class, null);
 
         logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(config.serviceInterfaces, new IPAccessControl(cidrs)), true);
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(config.serviceInterfaces, config.beanClasses, new IPAccessControl(cidrs)), true);
     }
 }

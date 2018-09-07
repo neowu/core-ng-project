@@ -1,30 +1,30 @@
 package core.framework.module;
 
+import core.framework.api.json.Property;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.reflect.Classes;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class APIConfigTest {
     private APIConfig config;
     private ModuleContext context;
 
-    @BeforeAll
+    @BeforeEach
     void createAPIConfig() {
-        config = new APIConfig();
         context = new ModuleContext();
+        config = new APIConfig();
         config.initialize(context, null);
     }
 
@@ -33,6 +33,17 @@ class APIConfigTest {
         config.service(TestWebService.class, new TestWebServiceImpl());
 
         assertThat(config.serviceInterfaces).containsEntry(Classes.className(TestWebService.class), TestWebService.class);
+    }
+
+    @Test
+    void bean() {
+        config.bean(TestBean.class);
+
+        assertThat(config.beanClasses).containsOnly(TestBean.class);
+
+        assertThatThrownBy(() -> config.bean(TestBean.class))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("bean class is already registered");
     }
 
     @Test
@@ -54,5 +65,10 @@ class APIConfigTest {
         @Override
         public void put(Integer id) {
         }
+    }
+
+    public static class TestBean {
+        @Property(name = "value")
+        public String value;
     }
 }

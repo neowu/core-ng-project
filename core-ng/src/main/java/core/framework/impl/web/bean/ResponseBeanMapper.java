@@ -1,24 +1,19 @@
 package core.framework.impl.web.bean;
 
-import core.framework.api.json.Property;
 import core.framework.impl.reflect.GenericTypes;
-import core.framework.impl.validate.Validator;
-import core.framework.util.Maps;
 import core.framework.util.Strings;
 
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.Optional;
 
 /**
  * @author neo
  */
 public class ResponseBeanMapper {
-    private final Map<Class<?>, BeanMapper<?>> mappers = Maps.newConcurrentHashMap();
-    private final BeanClassNameValidator classNameValidator;
+    private final BeanMapperRegistry registry;
 
-    public ResponseBeanMapper(BeanClassNameValidator classNameValidator) {
-        this.classNameValidator = classNameValidator;
+    public ResponseBeanMapper(BeanMapperRegistry registry) {
+        this.registry = registry;
     }
 
     @SuppressWarnings("unchecked")
@@ -56,9 +51,6 @@ public class ResponseBeanMapper {
     @SuppressWarnings("unchecked")
     public <T> BeanMapper<T> register(Type responseType) {
         Class<T> beanClass = GenericTypes.isOptional(responseType) ? (Class<T>) GenericTypes.optionalValueClass(responseType) : (Class<T>) GenericTypes.rawClass(responseType);
-        return (BeanMapper<T>) mappers.computeIfAbsent(beanClass, type -> {
-            new BeanClassValidator(beanClass, classNameValidator).validate();
-            return new BeanMapper<>(beanClass, new Validator(beanClass, field -> field.getDeclaredAnnotation(Property.class).name()));
-        });
+        return registry.register(beanClass);
     }
 }

@@ -3,7 +3,7 @@ package core.framework.impl.web.service;
 import core.framework.api.web.service.GET;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.impl.web.bean.BeanClassNameValidator;
+import core.framework.impl.web.bean.BeanMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.util.Types;
@@ -59,8 +59,8 @@ class WebServiceInterfaceValidatorTest {
     }
 
     private WebServiceInterfaceValidator validator(Class<?> serviceInterface) {
-        var classNameValidator = new BeanClassNameValidator();
-        return new WebServiceInterfaceValidator(serviceInterface, new RequestBeanMapper(classNameValidator), new ResponseBeanMapper(classNameValidator));
+        var registry = new BeanMapperRegistry();
+        return new WebServiceInterfaceValidator(serviceInterface, new RequestBeanMapper(registry), new ResponseBeanMapper(registry));
     }
 
     enum TestEnum {

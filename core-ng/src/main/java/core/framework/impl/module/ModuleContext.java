@@ -79,15 +79,18 @@ public class ModuleContext {
 
     @SuppressWarnings("unchecked")
     public <T extends Config> T config(Class<T> configClass, String name) {
-        return (T) configs.computeIfAbsent(configClass.getCanonicalName() + ":" + name, key -> {
+        String key = configClass.getCanonicalName() + ":" + name;   // not using computeIfAbsent, to avoid concurrent modification in nested call, e.g. httpConfig->publishAPIConfig->apiConfig
+        T config = (T) configs.get(key);
+        if (config == null) {
             try {
-                T config = configClass(configClass).getConstructor().newInstance();
+                config = configClass(configClass).getConstructor().newInstance();
                 config.initialize(this, name);
-                return config;
+                configs.put(key, config);
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 throw new Error(e);
             }
-        });
+        }
+        return config;
     }
 
     public void bind(Type type, String name, Object instance) {

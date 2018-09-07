@@ -10,11 +10,9 @@
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
 
 * http: wait java11 with http2 client? OkHttp's POST is 5x slower than apache http client 
-* http: publish non-api request (e.g. ws/upload) 
+* ws: provide way to handler json command with validation?
 * kafka: unique groupId to listen all messages for ws
-* ws: support json bean validation?
 * http: rewrite path parsing for better speed?
-* api: consider use smaller keepalive timeout e.g. 5 or 10s
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

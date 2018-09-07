@@ -8,6 +8,7 @@ import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.reflect.Classes;
+import core.framework.impl.web.bean.BeanMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.controller.ControllerHolder;
@@ -19,20 +20,23 @@ import core.framework.impl.web.service.WebServiceImplValidator;
 import core.framework.impl.web.service.WebServiceInterfaceValidator;
 import core.framework.util.ASCII;
 import core.framework.util.Exceptions;
-import core.framework.util.Maps;
 import core.framework.web.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author neo
  */
 public class APIConfig extends Config {
-    final Map<String, Class<?>> serviceInterfaces = Maps.newHashMap();
+    final Map<String, Class<?>> serviceInterfaces = new HashMap<>();
+    final Set<Class<?>> beanClasses = new HashSet<>();     // extra beans not defined in service interfaces, e.g. web socket json, raw controller request/response
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private ModuleContext context;
     private HTTPClientBuilder httpClientBuilder;
@@ -43,13 +47,15 @@ public class APIConfig extends Config {
         this.context = context;
         httpClientBuilder = new HTTPClientBuilder()
                 .userAgent(WebServiceClient.USER_AGENT)
-                .keepAliveTimeout(Duration.ofSeconds(25))
+                .keepAliveTimeout(Duration.ofSeconds(10))   // api client keep alive should be shorter than server side in case server side disconnect connection first, use short value to release connection sooner in quiet time and still fit busy time
                 .timeout(Duration.ofSeconds(15))    // kube graceful shutdown period is 30s, we need to finish api call within that time
                 .slowOperationThreshold(Duration.ofSeconds(10))
                 .maxRetries(3);
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {
+        if (!beanClasses.isEmpty()) throw new Error("api().service() must be configured before api().bean()");
+
         logger.info("create api service, interface={}", serviceInterface.getCanonicalName());
         new WebServiceInterfaceValidator(serviceInterface,
                 context.httpServer.handler.requestBeanMapper,
@@ -105,5 +111,16 @@ public class APIConfig extends Config {
             this.httpClient = httpClient;
         }
         return httpClient;
+    }
+
+    public void bean(Class<?>... beanClasses) {
+        BeanMapperRegistry registry = context.httpServer.handler.beanMapperRegistry;
+        for (Class<?> beanClass : beanClasses) {
+            if (registry.beanMappers.containsKey(beanClass)) {
+                throw Exceptions.error("bean class is already registered or referred by service interface, class={}", beanClass.getCanonicalName());
+            }
+            registry.register(beanClass);
+            this.beanClasses.add(beanClass);
+        }
     }
 }

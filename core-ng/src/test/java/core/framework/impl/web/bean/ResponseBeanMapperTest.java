@@ -23,7 +23,7 @@ class ResponseBeanMapperTest {
 
     @BeforeEach
     void createResponseBeanMapper() {
-        responseBeanMapper = new ResponseBeanMapper(new BeanClassNameValidator());
+        responseBeanMapper = new ResponseBeanMapper(new BeanMapperRegistry());
     }
 
     @Test

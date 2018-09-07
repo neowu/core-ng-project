@@ -9,19 +9,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class BeanClassNameValidatorTest {
-    private BeanClassNameValidator validator;
+class BeanMapperRegistryTest {
+    private BeanMapperRegistry registry;
 
     @BeforeEach
-    void createBeanClassNameValidator() {
-        validator = new BeanClassNameValidator();
+    void createBeanMapperRegistry() {
+        registry = new BeanMapperRegistry();
     }
 
     @Test
     void validateBeanClass() {
-        validator.registeredClasses.put(Classes.className(TestBean.class), Void.class);
+        registry.beanClasses.put(Classes.className(TestBean.class), Void.class);
 
-        assertThatThrownBy(() -> validator.validateBeanClass(TestBean.class))
+        assertThatThrownBy(() -> registry.validateBeanClass(TestBean.class))
                 .isInstanceOf(Error.class).hasMessageContaining("found bean class with duplicate name");
     }
 

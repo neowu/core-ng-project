@@ -1,6 +1,7 @@
 ## Change log
 ### 6.8.1 (9/6/2018 - )
 * http: make ip access check as built in logic, to deny before routing check (which may return not found or method not allowed)
+* api: added api().bean(beanClass) for raw request/response/ws bean
 
 ### 6.8.0 (9/5/2018 - 9/6/2018)  !!! api cleanup, remove replaceable method  !!!
 * session: removed session.remove(key), just use session.set(key, null)

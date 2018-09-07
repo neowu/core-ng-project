@@ -3,7 +3,7 @@ package core.framework.impl.web.request;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.validate.ValidationException;
-import core.framework.impl.web.bean.BeanClassNameValidator;
+import core.framework.impl.web.bean.BeanMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.impl.web.bean.TestQueryParamBean;
@@ -30,7 +30,7 @@ class RequestImplTest {
 
     @BeforeEach
     void createRequest() {
-        mapper = spy(new RequestBeanMapper(new BeanClassNameValidator()));
+        mapper = spy(new RequestBeanMapper(new BeanMapperRegistry()));
         request = new RequestImpl(null, mapper);
     }
 

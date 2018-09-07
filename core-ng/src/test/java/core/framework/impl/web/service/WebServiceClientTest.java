@@ -7,7 +7,7 @@ import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.impl.json.JSONMapper;
 import core.framework.impl.validate.ValidationException;
-import core.framework.impl.web.bean.BeanClassNameValidator;
+import core.framework.impl.web.bean.BeanMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.json.JSON;
@@ -34,8 +34,8 @@ class WebServiceClientTest {
 
     @BeforeEach
     void createWebServiceClient() {
-        BeanClassNameValidator classNameValidator = new BeanClassNameValidator();
-        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(classNameValidator), new ResponseBeanMapper(classNameValidator), null);
+        var registry = new BeanMapperRegistry();
+        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(registry), new ResponseBeanMapper(registry), null);
     }
 
     @Test

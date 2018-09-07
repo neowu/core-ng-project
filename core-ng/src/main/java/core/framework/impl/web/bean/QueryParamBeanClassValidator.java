@@ -18,10 +18,10 @@ import java.util.Set;
 final class QueryParamBeanClassValidator implements TypeVisitor {
     private final DataTypeValidator validator;
     private final Set<String> visitedQueryParams = Sets.newHashSet();
-    private final BeanClassNameValidator classNameValidator;
+    private final BeanMapperRegistry registry;
 
-    QueryParamBeanClassValidator(Class<?> beanClass, BeanClassNameValidator classNameValidator) {
-        this.classNameValidator = classNameValidator;
+    QueryParamBeanClassValidator(Class<?> beanClass, BeanMapperRegistry registry) {
+        this.registry = registry;
         validator = new DataTypeValidator(beanClass);
         validator.visitor = this;
     }
@@ -32,7 +32,7 @@ final class QueryParamBeanClassValidator implements TypeVisitor {
 
     @Override
     public void visitClass(Class<?> objectClass, String path) {
-        classNameValidator.validateBeanClass(objectClass);
+        registry.validateBeanClass(objectClass);
     }
 
     @Override
@@ -54,7 +54,7 @@ final class QueryParamBeanClassValidator implements TypeVisitor {
 
     @Override
     public void visitEnum(Class<?> enumClass, String parentPath) {
-        classNameValidator.validateBeanClass(enumClass);
+        registry.validateBeanClass(enumClass);
         JSONClassValidator.validateEnum(enumClass);
     }
 }
