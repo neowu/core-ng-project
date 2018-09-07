@@ -51,6 +51,7 @@ public class RetryHandler implements HttpRequestRetryHandler {
 
         // with keep-alive + graceful shutdown, it's probably ok to retry on this exception even with non-idempotent methods
         // following exceptions mean server side drops or refuses the connection, the actual case is during deployment (kube), persistent connection established via kube-proxy, and wouldn't know if old pod was deleted
+        // and we don't want to retry on timeout cases to avoid snowball effect
         if (exception instanceof NoHttpResponseException || exception instanceof SocketException)
             return true;
 

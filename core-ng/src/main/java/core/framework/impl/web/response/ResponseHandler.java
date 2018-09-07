@@ -11,6 +11,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.HeaderMap;
+import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,26 +41,30 @@ public class ResponseHandler {
 
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {
         HeaderMap headers = exchange.getResponseHeaders();
-        response.headers.forEach((name, value) -> {
+        for (var entry : response.headers.entrySet()) {
+            HttpString name = entry.getKey();
+            String value = entry.getValue();
             headers.put(name, value);
             logger.debug("[response:header] {}={}", name, new FieldParam(name, value));
-        });
+        }
     }
 
     private void putCookies(ResponseImpl response, HttpServerExchange exchange) {
         if (response.cookies != null) {
             Map<String, Cookie> cookies = exchange.getResponseCookies();
-            response.cookies.forEach((spec, value) -> {
+            for (var entry : response.cookies.entrySet()) {
+                CookieSpec spec = entry.getKey();
+                String value = entry.getValue();
                 CookieImpl cookie = cookie(spec, value);
                 cookies.put(spec.name, cookie);
                 logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
                         spec.name, new FieldParam(spec.name, cookie.getValue()), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
-            });
+            }
         }
     }
 
     CookieImpl cookie(CookieSpec spec, String value) {
-        CookieImpl cookie = new CookieImpl(spec.name);
+        var cookie = new CookieImpl(spec.name);
         if (value == null) {
             cookie.setMaxAge(0);
             cookie.setValue("");

@@ -1,4 +1,6 @@
 ## Change log
+### 6.8.1 (9/6/2018 - )
+
 ### 6.8.0 (9/5/2018 - 9/6/2018)  !!! api cleanup, remove replaceable method  !!!
 * session: removed session.remove(key), just use session.set(key, null)
 * redis: log returned value

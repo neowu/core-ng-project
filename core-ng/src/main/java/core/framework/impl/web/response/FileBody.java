@@ -17,7 +17,7 @@ import java.nio.file.StandardOpenOption;
  * @author neo
  */
 public final class FileBody implements Body {
-    private final Logger logger = LoggerFactory.getLogger(FileBody.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileBody.class);
     private final Path path;
 
     public FileBody(Path path) {
@@ -26,7 +26,7 @@ public final class FileBody implements Body {
 
     @Override
     public void send(Sender sender, ResponseHandlerContext context) {
-        logger.debug("[response] file={}", path);
+        LOGGER.debug("[response] file={}", path);
         try {
             FileChannel channel = FileChannel.open(path, StandardOpenOption.READ);
             sender.transferFrom(channel, new FileBodyCallback(channel));
