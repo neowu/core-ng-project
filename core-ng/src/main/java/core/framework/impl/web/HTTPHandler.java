@@ -9,6 +9,7 @@ import core.framework.impl.web.controller.ControllerHolder;
 import core.framework.impl.web.controller.Interceptors;
 import core.framework.impl.web.controller.InvocationImpl;
 import core.framework.impl.web.controller.WebContextImpl;
+import core.framework.impl.web.http.IPAccessControl;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.request.RequestParser;
 import core.framework.impl.web.response.ResponseHandler;
@@ -38,15 +39,18 @@ public class HTTPHandler implements HttpHandler {
     public final Interceptors interceptors = new Interceptors();
     public final WebContextImpl webContext = new WebContextImpl();
     public final HTTPErrorHandler errorHandler;
+
     private final BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
     public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanClassNameValidator);
     public final ResponseBeanMapper responseBeanMapper = new ResponseBeanMapper(beanClassNameValidator);
+
     private final Logger logger = LoggerFactory.getLogger(HTTPHandler.class);
     private final LogManager logManager;
     private final SessionManager sessionManager;
     private final ResponseHandler responseHandler;
 
     public WebSocketHandler webSocketHandler;
+    public IPAccessControl accessControl;
 
     HTTPHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
         this.logManager = logManager;
@@ -71,6 +75,9 @@ public class HTTPHandler implements HttpHandler {
         try {
             webContext.initialize(request);
             requestParser.parse(request, exchange, actionLog);
+
+            if (accessControl != null) accessControl.validate(request.clientIP());  // check ip before checking routing/web socket, return 403 asap
+
             HeaderMap headers = exchange.getRequestHeaders();
             linkContext(actionLog, headers);
             request.session = sessionManager.load(request);

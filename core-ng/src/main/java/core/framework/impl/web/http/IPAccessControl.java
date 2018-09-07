@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
  * @author neo
  */
 public class IPAccessControl {
+    public final List<CIDR> cidrs;
     private final Logger logger = LoggerFactory.getLogger(IPAccessControl.class);
-    private final List<CIDR> cidrs;
 
     public IPAccessControl(String... cidrs) {
         this.cidrs = cidrs(cidrs);

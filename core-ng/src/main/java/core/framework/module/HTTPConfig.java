@@ -4,7 +4,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.HTTPIOHandler;
-import core.framework.impl.web.http.ClientIPInterceptor;
+import core.framework.impl.web.http.IPAccessControl;
 import core.framework.util.Exceptions;
 import core.framework.web.Controller;
 import core.framework.web.ErrorHandler;
@@ -68,8 +68,14 @@ public final class HTTPConfig extends Config {
      * @param cidrs cidr blocks
      */
     public void allowCIDR(String... cidrs) {
+        if (context.httpServer.handler.accessControl != null) {
+            throw Exceptions.error("allow cidr is already configured, cidrs={}, previous={}",
+                    Arrays.toString(cidrs),
+                    context.httpServer.handler.accessControl.cidrs);
+        }
+
         logger.info("limit remote access, cidrs={}", Arrays.toString(cidrs));
-        context.httpServer.handler.interceptors.add(new ClientIPInterceptor(cidrs));
+        context.httpServer.handler.accessControl = new IPAccessControl(cidrs);
     }
 
     public void gzip() {

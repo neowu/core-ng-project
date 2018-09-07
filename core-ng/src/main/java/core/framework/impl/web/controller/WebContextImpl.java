@@ -1,9 +1,9 @@
 package core.framework.impl.web.controller;
 
-import core.framework.util.Maps;
 import core.framework.web.Request;
 import core.framework.web.WebContext;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +30,7 @@ public class WebContextImpl implements WebContext {
     }
 
     public void initialize(Request request) {
-        context.set(Maps.newHashMap());
+        context.set(new HashMap<>());
         this.request.set(request);
     }
 
