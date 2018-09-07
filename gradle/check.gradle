@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.4"
+        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.3'
     }
 }
 
@@ -31,13 +31,12 @@ subprojects {
     }
 
     spotbugs {
-        effort = 'max'
         reportLevel = 'low'
         excludeFilter = rootProject.file('gradle/check/spotbugs-filter.xml')
         toolVersion = '3.1.6'
     }
 
-    tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach {
         reports {
             xml.enabled = false
             html.enabled = true

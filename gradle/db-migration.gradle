@@ -12,8 +12,8 @@ def env = hasProperty('env') ? env : null
 
 apply plugin: org.flywaydb.gradle.FlywayPlugin
 
-tasks.withType(org.flywaydb.gradle.task.AbstractFlywayTask.class) { task ->
-    task.doFirst {
+tasks.withType(org.flywaydb.gradle.task.AbstractFlywayTask).configureEach {
+    doFirst {
         flyway {
             configurations = ['runtimeClasspath'] // use runtimeOnly scope in actual db-migration project
             placeholderReplacement = false

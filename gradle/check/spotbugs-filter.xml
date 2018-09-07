@@ -6,7 +6,6 @@
         <!--Se: group for serializable-->
         <!--RV_RETURN_VALUE_IGNORED: Method ignores return value-->
         <!--RV_RETURN_VALUE_IGNORED_BAD_PRACTICE: Method ignores exceptional return value-->
-        <!--RV_CHECK_FOR_POSITIVE_INDEXOF: Method checks to see if result of String.indexOf is positive-->
         <!--EI_EXPOSE_REP: May expose internal representation by returning reference to mutable object-->
         <!--EI_EXPOSE_REP2: May expose internal representation by incorporating reference to mutable object-->
         <!--URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD: Unread public/protected field-->
@@ -22,7 +21,6 @@
         <Bug code="CN,SQL,Se"
              pattern="RV_RETURN_VALUE_IGNORED,
                 RV_RETURN_VALUE_IGNORED_BAD_PRACTICE,
-                RV_CHECK_FOR_POSITIVE_INDEXOF,
                 EI_EXPOSE_REP,
                 EI_EXPOSE_REP2,
                 URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD,

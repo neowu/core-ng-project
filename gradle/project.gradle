@@ -9,7 +9,7 @@ subprojects {
     sourceCompatibility = JavaVersion.VERSION_1_10
     targetCompatibility = JavaVersion.VERSION_1_10
 
-    tasks.withType(JavaCompile) {
+    tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
         options.deprecation = true
         options.compilerArgs += ['-Xlint:all', '-proc:none']
@@ -28,7 +28,7 @@ subprojects {
     }
 
     afterEvaluate {
-        tasks.withType(Jar) {
+        tasks.withType(Jar).configureEach {
             manifest {
                 attributes 'Implementation-Title': project.name,
                         'Implementation-Version': project.version,
