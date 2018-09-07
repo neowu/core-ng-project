@@ -69,7 +69,7 @@ public final class TransactionManager {
         try {
             logger.debug("commit transaction");
             connection.resource.commit();
-            currentTransactionState.set(TransactionState.COMMITTED);
+            currentTransactionState.set(TransactionState.COMMIT);
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
@@ -81,7 +81,7 @@ public final class TransactionManager {
         try {
             logger.debug("rollback transaction");
             connection.resource.rollback();
-            currentTransactionState.set(TransactionState.ROLLED_BACK);
+            currentTransactionState.set(TransactionState.ROLLBACK);
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
@@ -97,7 +97,7 @@ public final class TransactionManager {
 
         try {
             if (state == TransactionState.START) {
-                logger.warn("roll back transaction due to state not changed, it could be either transaction.commit() not executed or exception occurred");
+                logger.warn("rollback transaction due to either transaction.commit() was not called or exception occurred");
                 connection.resource.rollback();
             }
         } catch (SQLException e) {
@@ -134,6 +134,6 @@ public final class TransactionManager {
     }
 
     private enum TransactionState {
-        START, COMMITTED, ROLLED_BACK
+        START, COMMIT, ROLLBACK
     }
 }

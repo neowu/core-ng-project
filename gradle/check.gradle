@@ -3,14 +3,14 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.2"
+        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.4"
     }
 }
 
 subprojects {
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
-//    apply plugin: com.github.spotbugs.SpotBugsPlugin
+    apply plugin: com.github.spotbugs.SpotBugsPlugin
     apply plugin: 'jacoco'
 
     checkstyle {
@@ -30,19 +30,19 @@ subprojects {
         consoleOutput = true
     }
 
-//    spotbugs {
-//        effort = 'max'
-//        reportLevel = 'low'
-//        excludeFilter = rootProject.file('gradle/check/spotbugs-filter.xml')
-//        toolVersion = '3.1.6'
-//    }
-//
-//    tasks.withType(com.github.spotbugs.SpotBugsTask) {
-//        reports {
-//            xml.enabled = false
-//            html.enabled = true
-//        }
-//    }
+    spotbugs {
+        effort = 'max'
+        reportLevel = 'low'
+        excludeFilter = rootProject.file('gradle/check/spotbugs-filter.xml')
+        toolVersion = '3.1.6'
+    }
+
+    tasks.withType(com.github.spotbugs.SpotBugsTask) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
 
     jacoco {
         toolVersion = '0.8.1'

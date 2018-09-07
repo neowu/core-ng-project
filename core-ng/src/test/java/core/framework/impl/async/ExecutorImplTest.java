@@ -6,7 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,25 +29,32 @@ class ExecutorImplTest {
         logManager = mock(LogManager.class);
         ExecutorService executorService = mock(ExecutorService.class);
         when(executorService.submit((Callable<?>) any(Callable.class))).then(invocation -> {
-            ((Callable<?>) invocation.getArgument(0)).call();
-            return null;
+            Object result = ((Callable<?>) invocation.getArgument(0)).call();
+            return CompletableFuture.completedFuture(result);
         });
         executor = new ExecutorImpl(executorService, logManager, "test");
     }
 
     @Test
-    void submit() {
-        ActionLog parentActionLog = new ActionLog(null);
+    void submit() throws ExecutionException, InterruptedException {
+        var parentActionLog = new ActionLog(null);
         parentActionLog.action("parentAction");
         parentActionLog.refId("refId");
         parentActionLog.trace = true;
         when(logManager.currentActionLog()).thenReturn(parentActionLog);
 
-        ActionLog taskActionLog = new ActionLog(null);
+        var taskActionLog = new ActionLog(null);
         when(logManager.begin(anyString())).thenReturn(taskActionLog);
 
-        executor.submit("action", () -> true);
+        Future<Boolean> future = executor.submit("action", () -> true);
         assertThat(taskActionLog.action).isEqualTo("parentAction:action");
+        assertThat(taskActionLog.trace).isEqualTo(true);
+        assertThat(taskActionLog.refId()).isEqualTo("refId");
+        assertThat(future.get()).isEqualTo(true);
+
+        executor.submit("task", () -> {
+        });
+        assertThat(taskActionLog.action).isEqualTo("parentAction:task");
         assertThat(taskActionLog.trace).isEqualTo(true);
         assertThat(taskActionLog.refId()).isEqualTo("refId");
     }
