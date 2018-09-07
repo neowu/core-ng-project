@@ -44,7 +44,9 @@ public final class Scheduler {
 
     public void start() {
         var now = ZonedDateTime.now(clock);
-        tasks.forEach((name, task) -> {
+        for (var entry : tasks.entrySet()) {
+            String name = entry.getKey();
+            Task task = entry.getValue();
             if (task instanceof FixedRateTask) {
                 schedule((FixedRateTask) task);
                 logger.info("schedule job, job={}, trigger={}, jobClass={}", name, task.trigger(), task.job().getClass().getCanonicalName());
@@ -57,7 +59,7 @@ public final class Scheduler {
                     logger.error("failed to schedule job, job={}", name, e);  // next() with custom trigger impl may throw exception, we don't let runtime error fail startup
                 }
             }
-        });
+        }
         logger.info("scheduler started");
     }
 

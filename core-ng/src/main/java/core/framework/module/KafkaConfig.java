@@ -39,7 +39,6 @@ public class KafkaConfig extends Config {
 
     @Override
     protected void validate() {
-        if (uri == null) throw Exceptions.error("kafka uri must be configured, name={}", name);
         if (!handlerAdded)
             throw Exceptions.error("kafka is configured, but no producer/consumer added, please remove unnecessary config, name={}", name);
     }
@@ -77,7 +76,7 @@ public class KafkaConfig extends Config {
     }
 
     String managementPathPattern(String postfix) {
-        StringBuilder builder = new StringBuilder("/_sys/kafka");
+        var builder = new StringBuilder("/_sys/kafka");
         if (name != null) builder.append('/').append(name);
         builder.append(postfix);
         return builder.toString();

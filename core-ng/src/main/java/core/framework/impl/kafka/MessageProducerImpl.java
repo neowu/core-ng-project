@@ -25,13 +25,12 @@ public class MessageProducerImpl implements MessageProducer {
     private final Producer<String, byte[]> producer;
 
     public MessageProducerImpl(String uri, String name) {
-        if (uri == null) throw new Error("uri must not be null");
         var watch = new StopWatch();
         try {
             this.uri = uri;
             this.name = name;
             this.producerMetrics = new ProducerMetrics(name);
-            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,
+            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,  // immutable map requires value must not be null
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy",
                     ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
             this.producer = new KafkaProducer<>(config, new StringSerializer(), new ByteArraySerializer());

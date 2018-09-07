@@ -40,7 +40,7 @@ public class MessageListener {
     public int minPollBytes = 1;                // default kafka setting
     public Duration minPollMaxWaitTime = Duration.ofMillis(500);
 
-    private MessageListenerThread[] listenerThreads;
+    private MessageListenerThread[] threads;
 
     public MessageListener(String uri, String name, LogManager logManager) {
         this.uri = uri;
@@ -58,45 +58,51 @@ public class MessageListener {
     }
 
     public void start() {
-        listenerThreads = new MessageListenerThread[poolSize];
+        this.threads = createListenerThreads(); // if it fails to create thread (such kafka host is invalid, failed to create consumer), this.threads will be null to skip shutdown/awaitTermination
+        for (var thread : threads) {
+            thread.start();
+        }
+        logger.info("kafka listener started, uri={}, topics={}, name={}", uri, topics, name);
+    }
+
+    private MessageListenerThread[] createListenerThreads() {
+        var threads = new MessageListenerThread[poolSize];
         for (int i = 0; i < poolSize; i++) {
             var watch = new StopWatch();
             String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
             Consumer<String, byte[]> consumer = consumer(topics);
             var thread = new MessageListenerThread(name, consumer, this);
-            thread.start();
-            listenerThreads[i] = thread;
+            threads[i] = thread;
             logger.info("create kafka listener thread, topics={}, name={}, elapsed={}", topics, name, watch.elapsed());
         }
-        logger.info("kafka listener started, uri={}, topics={}, name={}", uri, topics, name);
+        return threads;
     }
 
     public void shutdown() {
-        logger.info("shutting down kafka listener, uri={}, name={}", uri, name);
-        if (listenerThreads != null) {
-            for (MessageListenerThread thread : listenerThreads) {
+        if (threads != null) {
+            logger.info("shutting down kafka listener, uri={}, name={}", uri, name);
+            for (MessageListenerThread thread : threads) {
                 thread.shutdown();
             }
         }
     }
 
     public void awaitTermination(long timeoutInMs) {
-        if (listenerThreads != null) {
+        if (threads != null) {
             long end = System.currentTimeMillis() + timeoutInMs;
-            for (MessageListenerThread thread : listenerThreads) {
+            for (MessageListenerThread thread : threads) {
                 try {
                     thread.awaitTermination(end - System.currentTimeMillis());
                 } catch (InterruptedException e) {
                     logger.warn(e.getMessage(), e);
                 }
             }
+            logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri, topics, name);
         }
-        logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri, topics, name);
     }
 
     private Consumer<String, byte[]> consumer(Set<String> topics) {
-        if (uri == null) throw new Error("uri must not be null");
-        Map<String, Object> config = Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,
+        Map<String, Object> config = Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,   // immutable map requires value must not be null
                 ConsumerConfig.GROUP_ID_CONFIG, logManager.appName,
                 ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false,
                 ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest",
