@@ -18,10 +18,10 @@ class BeanMapperRegistryTest {
     }
 
     @Test
-    void validateBeanClass() {
+    void validateBeanClassName() {
         registry.beanClasses.put(Classes.className(TestBean.class), Void.class);
 
-        assertThatThrownBy(() -> registry.validateBeanClass(TestBean.class))
+        assertThatThrownBy(() -> registry.validateBeanClassName(TestBean.class))
                 .isInstanceOf(Error.class).hasMessageContaining("found bean class with duplicate name");
     }
 

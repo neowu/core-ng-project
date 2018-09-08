@@ -41,20 +41,18 @@ public class RequestBeanMapper {
     }
 
     public <T> byte[] toJSON(Class<T> beanClass, T bean) {
-        BeanMapper<T> mapper = registerRequestBean(beanClass);
-        mapper.validator.validate(bean, false);
-        return mapper.writer.toJSON(bean);
+        return registry.toJSON(beanClass, bean);
     }
 
     public <T> T fromJSON(Class<T> beanClass, byte[] body) {
-        BeanMapper<T> mapper = registerRequestBean(beanClass);
+        BeanMapper<T> mapper = registry.register(beanClass);
         T bean = mapper.reader.fromJSON(body);
         mapper.validator.validate(bean, false);
         return bean;
     }
 
-    public <T> BeanMapper<T> registerRequestBean(Class<T> beanClass) {
-        return registry.register(beanClass);
+    public void registerRequestBean(Class<?> beanClass) {
+        registry.register(beanClass);
     }
 
     static class QueryParamMapperHolder<T> {

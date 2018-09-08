@@ -23,7 +23,13 @@ public class BeanMapperRegistry {
         });
     }
 
-    void validateBeanClass(Class<?> beanClass) {
+    <T> byte[] toJSON(Class<T> beanClass, T bean) {
+        BeanMapper<T> mapper = register(beanClass);
+        mapper.validator.validate(bean, false);
+        return mapper.writer.toJSON(bean);
+    }
+
+    void validateBeanClassName(Class<?> beanClass) {
         beanClasses.compute(Classes.className(beanClass), (key, previous) -> {
             if (previous != null && !previous.equals(beanClass))
                 throw Exceptions.error("found bean class with duplicate name which can be confusing, please use different class name, previousClass={}, class={}", previous.getCanonicalName(), beanClass.getCanonicalName());
