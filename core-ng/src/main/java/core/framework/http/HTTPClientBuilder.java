@@ -27,8 +27,8 @@ import java.util.concurrent.TimeUnit;
 public final class HTTPClientBuilder {
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);
 
-    private Duration timeout = Duration.ofSeconds(60);
     private int maxConnections = 100;
+    private Duration timeout = Duration.ofSeconds(60);
     private Duration keepAliveTimeout = Duration.ofSeconds(60);
     private Duration slowOperationThreshold = Duration.ofSeconds(30);
     private boolean enableCookie = false;
@@ -51,9 +51,10 @@ public final class HTTPClientBuilder {
                                                          .setSocketTimeout((int) timeout.toMillis())
                                                          .setConnectionRequestTimeout((int) timeout.toMillis())
                                                          .setConnectTimeout((int) timeout.toMillis()).build());
-            builder.setKeepAliveStrategy((response, context) -> keepAliveTimeout.toMillis());
-            builder.setConnectionTimeToLive(keepAliveTimeout.toMillis(), TimeUnit.MILLISECONDS);
-            builder.evictIdleConnections(keepAliveTimeout.toMillis(), TimeUnit.MILLISECONDS);
+            long keepAliveTimeoutInMs = keepAliveTimeout.toMillis();
+            builder.setKeepAliveStrategy((response, context) -> keepAliveTimeoutInMs);
+            builder.setConnectionTimeToLive(keepAliveTimeoutInMs, TimeUnit.MILLISECONDS);
+            builder.evictIdleConnections(keepAliveTimeoutInMs, TimeUnit.MILLISECONDS);
 
             builder.setMaxConnPerRoute(maxConnections)
                    .setMaxConnTotal(maxConnections);

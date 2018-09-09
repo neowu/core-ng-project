@@ -17,9 +17,10 @@ import java.time.Duration;
  * @author neo
  */
 public final class TransactionManager {
+    private static final ThreadLocal<PoolItem<Connection>> CURRENT_CONNECTION = new ThreadLocal<>();
+    private static final ThreadLocal<TransactionState> CURRENT_TRANSACTION_STATE = new ThreadLocal<>();
+
     private final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
-    private final ThreadLocal<PoolItem<Connection>> currentConnection = new ThreadLocal<>();
-    private final ThreadLocal<TransactionState> currentTransactionState = new ThreadLocal<>();
     private final Pool<Connection> pool;
     public IsolationLevel defaultIsolationLevel;
     public long longTransactionThresholdInNanos = Duration.ofSeconds(10).toNanos();
@@ -29,9 +30,9 @@ public final class TransactionManager {
     }
 
     PoolItem<Connection> getConnection() {
-        PoolItem<Connection> connection = currentConnection.get();
+        PoolItem<Connection> connection = CURRENT_CONNECTION.get();
         if (connection != null) {
-            TransactionState state = currentTransactionState.get();
+            TransactionState state = CURRENT_TRANSACTION_STATE.get();
             if (state != TransactionState.START)
                 throw Exceptions.error("db access is not allowed after transaction ended, currentState={}", state);
             return connection;
@@ -41,12 +42,12 @@ public final class TransactionManager {
     }
 
     void returnConnection(PoolItem<Connection> connection) {
-        if (currentConnection.get() == null)
+        if (CURRENT_CONNECTION.get() == null)
             returnConnectionToPool(connection);
     }
 
     Transaction beginTransaction() {
-        if (currentConnection.get() != null)
+        if (CURRENT_CONNECTION.get() != null)
             throw new Error("nested transaction is not supported, please contact arch team");
 
         PoolItem<Connection> connection = getConnectionFromPool();
@@ -58,18 +59,18 @@ public final class TransactionManager {
         }
 
         // set state after real operation done, to avoid ending up unexpected state if error occurs
-        currentTransactionState.set(TransactionState.START);
-        currentConnection.set(connection);
+        CURRENT_TRANSACTION_STATE.set(TransactionState.START);
+        CURRENT_CONNECTION.set(connection);
 
         return new TransactionImpl(this, longTransactionThresholdInNanos);
     }
 
     void commitTransaction() {
-        PoolItem<Connection> connection = currentConnection.get();
+        PoolItem<Connection> connection = CURRENT_CONNECTION.get();
         try {
             logger.debug("commit transaction");
             connection.resource.commit();
-            currentTransactionState.set(TransactionState.COMMIT);
+            CURRENT_TRANSACTION_STATE.set(TransactionState.COMMIT);
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
@@ -77,11 +78,11 @@ public final class TransactionManager {
     }
 
     void rollbackTransaction() {
-        PoolItem<Connection> connection = currentConnection.get();
+        PoolItem<Connection> connection = CURRENT_CONNECTION.get();
         try {
             logger.debug("rollback transaction");
             connection.resource.rollback();
-            currentTransactionState.set(TransactionState.ROLLBACK);
+            CURRENT_TRANSACTION_STATE.set(TransactionState.ROLLBACK);
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
@@ -89,11 +90,11 @@ public final class TransactionManager {
     }
 
     void endTransaction() {
-        PoolItem<Connection> connection = currentConnection.get();
-        TransactionState state = currentTransactionState.get();
+        PoolItem<Connection> connection = CURRENT_CONNECTION.get();
+        TransactionState state = CURRENT_TRANSACTION_STATE.get();
         // clean up state first, to avoid ending up with unexpected state
-        currentConnection.remove();
-        currentTransactionState.remove();
+        CURRENT_CONNECTION.remove();
+        CURRENT_TRANSACTION_STATE.remove();
 
         try {
             if (state == TransactionState.START) {

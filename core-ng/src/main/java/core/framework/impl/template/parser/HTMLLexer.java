@@ -128,7 +128,7 @@ class HTMLLexer {
     private int findStartTagLength() {
         for (int i = currentIndex + 1; i < html.length(); i++) {
             char ch = html.charAt(i);
-            if (Character.isWhitespace(ch) || ch == '>' || ch == '/') {
+            if (ch == '>' || ch == '/' || Character.isWhitespace(ch)) {
                 return i - currentIndex;
             }
         }
@@ -158,7 +158,7 @@ class HTMLLexer {
     private int findAttributeNameLength() {
         for (int i = currentIndex; i < html.length(); i++) {
             char ch = html.charAt(i);
-            if (Character.isWhitespace(ch) || ch == '=' || ch == '/' || ch == '>') {
+            if (ch == '=' || ch == '/' || ch == '>' || Character.isWhitespace(ch)) {
                 return i - currentIndex;
             }
             if (ch == '<') {

@@ -69,7 +69,7 @@ public class ModuleContext {
         return backgroundTask;
     }
 
-    public void route(HTTPMethod method, String path, Controller controller, boolean skipInterceptor) {
+    public final void route(HTTPMethod method, String path, Controller controller, boolean skipInterceptor) {
         new PathPatternValidator(path).validate();
         var inspector = new ControllerInspector(controller);
         new ControllerClassValidator(inspector.targetClass, inspector.targetMethod).validate();

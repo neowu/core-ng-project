@@ -67,8 +67,9 @@ public class MessageListener {
 
     private MessageListenerThread[] createListenerThreads() {
         var threads = new MessageListenerThread[poolSize];
+        var watch = new StopWatch();
         for (int i = 0; i < poolSize; i++) {
-            var watch = new StopWatch();
+            watch.reset();
             String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
             Consumer<String, byte[]> consumer = consumer(topics);
             var thread = new MessageListenerThread(name, consumer, this);
@@ -104,7 +105,7 @@ public class MessageListener {
     private Consumer<String, byte[]> consumer(Set<String> topics) {
         Map<String, Object> config = Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,   // immutable map requires value must not be null
                 ConsumerConfig.GROUP_ID_CONFIG, logManager.appName,
-                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false,
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE,
                 ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest",
                 ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis(),
                 ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis(),

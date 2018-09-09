@@ -72,7 +72,7 @@ public class MessageImpl implements Message {
     private void validateLanguage(String path, String language) {
         if (DEFAULT_LANGUAGE.equals(language)) return;
 
-        if (languages.length == 1 && languages[0].equals(DEFAULT_LANGUAGE)) {
+        if (languages.length == 1 && DEFAULT_LANGUAGE.equals(languages[0])) {
             throw Exceptions.error("found language specific messages, but only default language is enabled, path={}, language={}", path, language);
         }
 

@@ -45,7 +45,7 @@ class RepositoryImplCompositeKeyEntityTest {
         CompositeKeyEntity entity = new CompositeKeyEntity();
         entity.id1 = "id1";
         entity.id2 = "id2";
-        entity.booleanField = true;
+        entity.booleanField = Boolean.TRUE;
         entity.longField = 1L;
 
         repository.insert(entity);
@@ -63,7 +63,7 @@ class RepositoryImplCompositeKeyEntityTest {
         CompositeKeyEntity entity = new CompositeKeyEntity();
         entity.id1 = "id1";
         entity.id2 = "id2";
-        entity.booleanField = true;
+        entity.booleanField = Boolean.TRUE;
         entity.longField = 1L;
         repository.insert(entity);
 
@@ -79,11 +79,11 @@ class RepositoryImplCompositeKeyEntityTest {
         CompositeKeyEntity entity1 = new CompositeKeyEntity();
         entity1.id1 = "1-1";
         entity1.id2 = "1-2";
-        entity1.booleanField = true;
+        entity1.booleanField = Boolean.TRUE;
         CompositeKeyEntity entity2 = new CompositeKeyEntity();
         entity2.id1 = "2-1";
         entity2.id2 = "2-2";
-        entity2.booleanField = true;
+        entity2.booleanField = Boolean.TRUE;
         repository.batchInsert(List.of(entity1, entity2));
 
         repository.batchDelete(List.of(new Object[]{entity1.id1, entity1.id2}, new Object[]{entity2.id1, entity2.id2}));

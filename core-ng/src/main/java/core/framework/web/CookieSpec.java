@@ -1,6 +1,7 @@
 package core.framework.web;
 
 import java.time.Duration;
+import java.util.Objects;
 
 /**
  * @author neo
@@ -50,23 +51,18 @@ public final class CookieSpec {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-
-        CookieSpec that = (CookieSpec) object;
-
-        return name.equals(that.name)
-            && !(domain != null ? !domain.equals(that.domain) : that.domain != null)
-            && !(path != null ? !path.equals(that.path) : that.path != null);
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (other == null || getClass() != other.getClass()) return false;
+        CookieSpec spec = (CookieSpec) other;
+        return Objects.equals(name, spec.name)
+                && Objects.equals(domain, spec.domain)
+                && Objects.equals(path, spec.path);
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + (domain != null ? domain.hashCode() : 0);
-        result = 31 * result + (path != null ? path.hashCode() : 0);
-        return result;
+        return Objects.hash(name, domain, path);
     }
 }
 

@@ -46,14 +46,13 @@ public final class EntityCodecs {
             throw Exceptions.error("entity or view class is registered, entityClass={}", entityClass.getCanonicalName());
     }
 
-    <T extends Enum<T>> CodecRegistry codecRegistry() {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    CodecRegistry codecRegistry() {
         List<Codec<?>> codecs = new ArrayList<>(this.codecs.values());
         codecs.add(new LocalDateTimeCodec());
         codecs.add(new ZonedDateTimeCodec());
         for (Class<? extends Enum<?>> enumClass : enumClasses) {
-            @SuppressWarnings("unchecked")
-            Class<T> codecClass = (Class<T>) enumClass;
-            codecs.add(new EnumCodec<>(codecClass));
+            codecs.add(new EnumCodec(enumClass));
         }
         return CodecRegistries.fromCodecs(codecs);
     }

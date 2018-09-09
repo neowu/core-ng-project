@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class ControllerInspectorTest {
     @Test
     void methodReference() throws NoSuchMethodException {
-        ControllerInspector inspector = new ControllerInspector(new TestControllers()::get);
+        var inspector = new ControllerInspector(new TestControllers()::get);
         assertEquals(TestControllers.class, inspector.targetClass);
         assertEquals(TestControllers.class.getDeclaredMethod("get", Request.class), inspector.targetMethod);
         assertEquals(TestControllers.class.getCanonicalName() + ".get", inspector.controllerInfo);
@@ -23,7 +23,7 @@ class ControllerInspectorTest {
 
     @Test
     void lambdaMethod() {
-        ControllerInspector inspector = new ControllerInspector(request -> null);
+        var inspector = new ControllerInspector(request -> null);
         assertThat(inspector.targetClass.getCanonicalName()).startsWith(ControllerInspectorTest.class.getCanonicalName());
         assertNotNull(inspector.targetMethod);
         assertThat(inspector.controllerInfo).startsWith(ControllerInspectorTest.class.getCanonicalName() + ".");
@@ -31,7 +31,7 @@ class ControllerInspectorTest {
 
     @Test
     void staticClass() throws NoSuchMethodException {
-        ControllerInspector inspector = new ControllerInspector(new TestController());
+        var inspector = new ControllerInspector(new TestController());
         assertEquals(TestController.class, inspector.targetClass);
         assertEquals(TestController.class.getMethod("execute", Request.class), inspector.targetMethod);
         assertEquals(TestController.class.getCanonicalName() + ".execute", inspector.controllerInfo);

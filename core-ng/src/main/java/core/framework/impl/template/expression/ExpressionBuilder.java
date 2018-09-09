@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import static core.framework.impl.asm.Literal.type;
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -40,7 +41,7 @@ public class ExpressionBuilder {
             builder.addMethod(buildEval());
             return builder.build();
         } catch (Throwable e) {
-            throw Exceptions.error("failed to compile expression, expression={}, location={}", expressionSource, location, e);
+            throw new Error(format("failed to compile expression, expression={}, location={}", expressionSource, location), e);
         }
     }
 
@@ -85,8 +86,8 @@ public class ExpressionBuilder {
         try {
             return modelClass.getField(fieldName).getGenericType();
         } catch (NoSuchFieldException e) {
-            throw Exceptions.error("can not find field, class={}, field={}, expression={}, location={}",
-                    modelClass, fieldName, expressionSource, location, e);
+            throw new Error(format("can not find field, class={}, field={}, expression={}, location={}",
+                    modelClass, fieldName, expressionSource, location), e);
         }
     }
 

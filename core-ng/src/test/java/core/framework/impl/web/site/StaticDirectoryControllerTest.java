@@ -20,7 +20,7 @@ class StaticDirectoryControllerTest {
 
     @Test
     void cache() {
-        controller.cache(Duration.ofSeconds(600));
+        controller.cache(Duration.ofMinutes(10));
 
         assertEquals("public, max-age=600", controller.cacheHeader);
     }

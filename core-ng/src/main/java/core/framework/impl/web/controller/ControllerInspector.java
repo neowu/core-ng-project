@@ -6,9 +6,6 @@ import core.framework.web.Request;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 
 /**
  * due to Java 9 doesn't provide formal way to reflect lambda method reference, we uses internal API for now
@@ -34,21 +31,22 @@ public class ControllerInspector {
             overrideAccessible(CONSTANT_POOL_GET_MEMBER_REF_INFO_AT);
 
             CONTROLLER_EXECUTE = Controller.class.getDeclaredMethod("execute", Request.class);
-        } catch (ReflectiveOperationException | PrivilegedActionException e) {
+        } catch (ReflectiveOperationException e) {
             throw new Error("failed to initialize controller inspector, please contact arch team", e);
         }
     }
 
-    private static void overrideAccessible(Method method) throws PrivilegedActionException, ReflectiveOperationException {
+    private static void overrideAccessible(Method method) throws ReflectiveOperationException {
         Field overrideField = AccessibleObject.class.getDeclaredField("override");
         Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-        Object unsafe = AccessController.doPrivileged((PrivilegedExceptionAction<?>) () -> {
-            Field field = unsafeClass.getDeclaredField("theUnsafe");
-            field.setAccessible(true);
-            return field.get(null);
-        });
-        long overrideFieldOffset = (long) unsafeClass.getMethod("objectFieldOffset", Field.class).invoke(unsafe, overrideField);
-        unsafeClass.getMethod("putBoolean", Object.class, long.class, boolean.class).invoke(unsafe, method, overrideFieldOffset, true);
+        Field field = unsafeClass.getDeclaredField("theUnsafe");
+        if (field.trySetAccessible()) {
+            Object unsafe = field.get(null);
+            long overrideFieldOffset = (long) unsafeClass.getMethod("objectFieldOffset", Field.class).invoke(unsafe, overrideField);
+            unsafeClass.getMethod("putBoolean", Object.class, long.class, boolean.class).invoke(unsafe, method, overrideFieldOffset, Boolean.TRUE);
+        } else {
+            throw new Error("failed to get unsafe");
+        }
     }
 
     public final Class<?> targetClass;

@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
  * @author neo
@@ -105,13 +106,13 @@ public class DatabaseOperation {
         }
     }
 
-    Optional<Long> insert(String sql, Object[] params, String generatedColumn) {
+    OptionalLong insert(String sql, Object[] params, String generatedColumn) {
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = insertStatement(connection.resource, sql, generatedColumn)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
             setParams(statement, params);
             statement.executeUpdate();
-            if (generatedColumn == null) return Optional.empty();
+            if (generatedColumn == null) return OptionalLong.empty();
             return fetchGeneratedKey(statement);
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
@@ -158,13 +159,13 @@ public class DatabaseOperation {
 
     // the LAST_INSERT_ID() function of mysql returns BIGINT, so here it uses Long
     // http://dev.mysql.com/doc/refman/5.7/en/information-functions.html
-    private Optional<Long> fetchGeneratedKey(PreparedStatement statement) throws SQLException {
+    private OptionalLong fetchGeneratedKey(PreparedStatement statement) throws SQLException {
         try (ResultSet keys = statement.getGeneratedKeys()) {
             if (keys.next()) {
-                return Optional.of(keys.getLong(1));
+                return OptionalLong.of(keys.getLong(1));
             }
         }
-        return Optional.empty();
+        return OptionalLong.empty();
     }
 
     private void setParams(PreparedStatement statement, Object... params) throws SQLException {

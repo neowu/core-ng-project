@@ -59,7 +59,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
     public static Double toDouble(String value) {
         if (Strings.isEmpty(value)) return null;
         try {
-            return Double.parseDouble(value);
+            return Double.valueOf(value);
         } catch (NumberFormatException e) {
             throw new BadRequestException(Strings.format("failed to parse double, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
         }

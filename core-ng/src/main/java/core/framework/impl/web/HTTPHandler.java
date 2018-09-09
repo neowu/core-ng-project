@@ -82,7 +82,7 @@ public class HTTPHandler implements HttpHandler {
             linkContext(actionLog, headers);
             request.session = sessionManager.load(request);
 
-            if (webSocketHandler != null && webSocketHandler.isWebSocket(request.method(), headers)) {
+            if (webSocketHandler != null && webSocketHandler.checkWebSocket(request.method(), headers)) {
                 webSocketHandler.handle(exchange, request, actionLog);
                 return; // with WebSocket, not save session
             }

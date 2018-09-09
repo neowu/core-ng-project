@@ -54,7 +54,7 @@ public class ShutdownHandler implements ExchangeCompletionListener {
     public void exchangeEvent(HttpServerExchange exchange, NextListener next) {
         try {
             long count = activeRequests.decrementAndGet();
-            if (shutdown.get() && count <= 0) {
+            if (count <= 0 && shutdown.get()) {
                 synchronized (lock) {
                     lock.notifyAll();
                 }

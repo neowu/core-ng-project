@@ -1,9 +1,10 @@
 package core.framework.impl.template.expression;
 
 import core.framework.impl.template.TemplateContext;
-import core.framework.util.Exceptions;
 
 import java.lang.reflect.Type;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -25,7 +26,7 @@ public class ExpressionHolder {
         try {
             return expression.eval(context);
         } catch (Throwable e) {
-            throw Exceptions.error("failed to eval expression, location={}, expression={}, error={}", location, expressionSource, e.getMessage(), e);
+            throw new Error(format("failed to eval expression, location={}, expression={}, error={}", location, expressionSource, e.getMessage()), e);
         }
     }
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,19 +34,19 @@ class OracleIntegrationTest extends IntegrationTest {
 
     @Test
     void insert() {
-        TestSequenceIdDBEntity entity = new TestSequenceIdDBEntity();
+        var entity = new TestSequenceIdDBEntity();
         entity.intField = 1;
-        Optional<Long> id = repository.insert(entity);
+        OptionalLong id = repository.insert(entity);
         assertThat(id).isPresent();
 
-        Optional<TestSequenceIdDBEntity> selectedEntity = repository.get(id.get());
+        Optional<TestSequenceIdDBEntity> selectedEntity = repository.get(id.orElseThrow());
         assertThat(selectedEntity).get().isEqualToIgnoringGivenFields(entity, "id");
     }
 
     @Test
     void select() {
         for (int i = 0; i < 30; i++) {
-            TestSequenceIdDBEntity entity = new TestSequenceIdDBEntity();
+            var entity = new TestSequenceIdDBEntity();
             entity.intField = i;
             entity.stringField = "value-" + i;
             repository.insert(entity);

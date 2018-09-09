@@ -37,7 +37,7 @@ class WebSocketConfigTest {
     void add() {
         config.listen("/ws2", new TestChannelListener());
 
-        WebSocketContext webSocketContext = context.beanFactory.bean(WebSocketContext.class, null);
+        WebSocketContext webSocketContext = (WebSocketContext) context.beanFactory.bean(WebSocketContext.class, null);
         assertThat(webSocketContext).isNotNull();
     }
 

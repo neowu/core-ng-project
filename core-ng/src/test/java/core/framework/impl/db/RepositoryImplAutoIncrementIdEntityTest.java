@@ -13,7 +13,7 @@ import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.OptionalLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,13 +54,13 @@ class RepositoryImplAutoIncrementIdEntityTest {
         entity.dateTimeField = LocalDateTime.now();
         entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2017, Month.APRIL, 3, 12, 0), ZoneId.of("UTC"));
 
-        Optional<Long> id = repository.insert(entity);
+        OptionalLong id = repository.insert(entity);
         assertThat(id).isPresent();
 
         assertThat(repository.get(id.orElseThrow()))
                 .get().isEqualToIgnoringGivenFields(entity, "id", "zonedDateTimeField")
                 .satisfies(selectedEntity -> {
-                    assertThat(selectedEntity.id).isEqualTo(id.orElseThrow().intValue());
+                    assertThat(selectedEntity.id).isEqualTo(id.orElseThrow());
                     assertThat(selectedEntity.zonedDateTimeField).isEqualTo(entity.zonedDateTimeField);
                 });
     }
@@ -70,12 +70,12 @@ class RepositoryImplAutoIncrementIdEntityTest {
         var entity = new AutoIncrementIdEntity();
         entity.stringField = "stringField#123456";
 
-        Optional<Long> id = repository.insert(entity);
+        OptionalLong id = repository.insert(entity);
         assertThat(id).isPresent();
 
         AutoIncrementIdEntity selectedEntity = repository.selectOne("string_field = ?", entity.stringField).orElseThrow();
 
-        assertThat(selectedEntity.id).isEqualTo(id.orElseThrow().intValue());
+        assertThat(selectedEntity.id).isEqualTo(id.orElseThrow());
         assertThat(selectedEntity.stringField).isEqualTo(entity.stringField);
     }
 

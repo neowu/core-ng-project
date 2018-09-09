@@ -45,6 +45,7 @@
         <module name="NestedTryDepth">                  <!--Restricts nested try-catch-finally blocks to a specified depth (default = 1).-->
             <property name="max" value="0"/>
         </module>
+        <module name="NoClone"/>
         <module name="NoFinalizer"/>
         <module name="OneStatementPerLine"/>                <!--Checks there is only one statement per line.-->
         <module name="OverloadMethodsDeclarationOrder"/>    <!--Checks that overload methods are grouped together.-->
@@ -108,6 +109,7 @@
         <module name="EmptyForInitializerPad"/>
         <module name="GenericWhitespace"/>          <!--Checks that the whitespace around the Generic tokens < and > are correct to the typical convention.-->
         <module name="MethodParamPad"/>             <!--Checks the padding between the identifier of a method definition, constructor definition, method call, or constructor invocation; and the left parenthesis of the parameter list. -->
+        <module name="NoLineWrap"/>
         <module name="NoWhitespaceAfter"/>          <!--Checks that there is no whitespace after a token.-->
         <module name="NoWhitespaceBefore">          <!--Checks that there is no whitespace before a token.-->
             <property name="allowLineBreaks" value="true"/>

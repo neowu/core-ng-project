@@ -4,9 +4,9 @@ package core.framework.web;
  * @author neo
  */
 public interface WebContext {
-    <T> T get(String key);
+    Object get(String key);
 
-    <T> void put(String key, T value);
+    void put(String key, Object value);
 
     Request request();
 }

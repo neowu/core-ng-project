@@ -68,20 +68,17 @@ public final class Types {
             }
             ParameterizedType that = (ParameterizedType) other;
             return rawType.equals(that.getRawType())
-                && that.getOwnerType() == null
-                && Arrays.equals(arguments, that.getActualTypeArguments());
+                    && that.getOwnerType() == null
+                    && Arrays.equals(arguments, that.getActualTypeArguments());
         }
 
         @Override
         public String toString() {
-            StringBuilder builder = new StringBuilder(rawType.getTypeName())
-                .append('<');
+            var builder = new StringBuilder(rawType.getTypeName()).append('<');
 
-            int i = 0;
-            for (Type argument : arguments) {
+            for (int i = 0; i < arguments.length; i++) {
                 if (i > 0) builder.append(", ");
-                builder.append(argument.getTypeName());
-                i++;
+                builder.append(arguments[i].getTypeName());
             }
 
             builder.append('>');

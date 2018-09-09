@@ -28,8 +28,7 @@ final class EnumDBMapper {
     }
 
     String getDBValue(Enum<?> value) {
-        @SuppressWarnings("unchecked")
-        Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) value.getClass();
+        Class<? extends Enum<?>> enumClass = value.getDeclaringClass();
         Map<Enum<?>, String> mapping = mappings.get(enumClass);
         if (mapping == null)
             throw Exceptions.error("enum class is not registered, register in module by db().view() or db().repository(), enumClass={}", enumClass.getCanonicalName());

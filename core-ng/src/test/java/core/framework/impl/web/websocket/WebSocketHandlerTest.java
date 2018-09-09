@@ -2,6 +2,7 @@ package core.framework.impl.web.websocket;
 
 import core.framework.http.HTTPMethod;
 import core.framework.impl.log.LogManager;
+import core.framework.web.exception.BadRequestException;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,11 +34,16 @@ class WebSocketHandlerTest {
     }
 
     @Test
-    void isWebSocket() {
-        var wsHeaders = new HeaderMap().put(Headers.SEC_WEB_SOCKET_KEY, "xxx").put(Headers.SEC_WEB_SOCKET_VERSION, "13");
+    void checkWebSocket() {
+        var headers = new HeaderMap()
+                .put(Headers.SEC_WEB_SOCKET_KEY, "xxx")
+                .put(Headers.SEC_WEB_SOCKET_VERSION, "13");
 
-        assertThat(handler.isWebSocket(HTTPMethod.GET, wsHeaders)).isTrue();
-        assertThat(handler.isWebSocket(HTTPMethod.PUT, wsHeaders)).isFalse();
-        assertThat(handler.isWebSocket(HTTPMethod.GET, wsHeaders.put(Headers.SEC_WEB_SOCKET_VERSION, "07"))).isFalse();
+        assertThat(handler.checkWebSocket(HTTPMethod.GET, headers)).isTrue();
+        assertThat(handler.checkWebSocket(HTTPMethod.PUT, headers)).isFalse();
+
+        assertThatThrownBy(() -> handler.checkWebSocket(HTTPMethod.GET, headers.put(Headers.SEC_WEB_SOCKET_VERSION, "07")))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("only support web socket version 13");
     }
 }

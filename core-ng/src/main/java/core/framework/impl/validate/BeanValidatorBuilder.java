@@ -27,6 +27,7 @@ import java.util.regex.PatternSyntaxException;
 
 import static core.framework.impl.asm.Literal.type;
 import static core.framework.impl.asm.Literal.variable;
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -227,7 +228,7 @@ public class BeanValidatorBuilder {
             try {
                 java.util.regex.Pattern.compile(pattern.value());
             } catch (PatternSyntaxException e) {
-                throw Exceptions.error("@Pattern has invalid pattern, pattern={}, field={}, fieldType={}", pattern.value(), fieldPath, fieldType.getTypeName(), e);
+                throw new Error(format("@Pattern has invalid pattern, pattern={}, field={}, fieldType={}", pattern.value(), fieldPath, fieldType.getTypeName()), e);
             }
         }
 

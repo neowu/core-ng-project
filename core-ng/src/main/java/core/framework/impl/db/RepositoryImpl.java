@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
  * @author neo
@@ -50,7 +51,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
     }
 
     @Override
-    public Optional<Long> insert(T entity) {
+    public OptionalLong insert(T entity) {
         var watch = new StopWatch();
         validator.validate(entity, false);
         String sql = insertQuery.sql;

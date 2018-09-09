@@ -6,6 +6,7 @@ import core.framework.impl.log.LogManager;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.util.Exceptions;
 import core.framework.util.Sets;
+import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.NotFoundException;
 import core.framework.web.websocket.ChannelListener;
 import io.undertow.server.HttpServerExchange;
@@ -28,10 +29,10 @@ import java.util.Set;
  * @author neo
  */
 public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChannel> {
-    private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
     static final String CHANNEL_KEY = "CHANNEL";
-    private final Map<String, ChannelListener> listeners = new HashMap<>();
     public final WebSocketContextImpl context = new WebSocketContextImpl();
+    private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
+    private final Map<String, ChannelListener> listeners = new HashMap<>();
     private final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
     private final Handshake handshake = new Hybi13Handshake();
     private final WebSocketMessageListener messageListener;
@@ -40,10 +41,13 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
         messageListener = new WebSocketMessageListener(logManager);
     }
 
-    public boolean isWebSocket(HTTPMethod method, HeaderMap headers) {
-        return method == HTTPMethod.GET
-                && headers.getFirst(Headers.SEC_WEB_SOCKET_KEY) != null
-                && headers.getFirst(Headers.SEC_WEB_SOCKET_VERSION).equals("13");  // only support latest ws version
+    public boolean checkWebSocket(HTTPMethod method, HeaderMap headers) {
+        if (method == HTTPMethod.GET && headers.getFirst(Headers.SEC_WEB_SOCKET_KEY) != null) {
+            String version = headers.getFirst(Headers.SEC_WEB_SOCKET_VERSION);
+            if ("13".equals(version)) return true;  // only support latest ws version
+            throw new BadRequestException("only support web socket version 13, version=" + version);
+        }
+        return false;
     }
 
     // refer to io.undertow.websockets.WebSocketProtocolHandshakeHandler

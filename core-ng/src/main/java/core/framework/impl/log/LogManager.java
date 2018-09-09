@@ -11,9 +11,10 @@ import org.slf4j.Marker;
  * @author neo
  */
 public class LogManager {
+    private static final ThreadLocal<ActionLog> ACTION_LOG = new ThreadLocal<>();
+
     public final String appName;
     public final LogFilter filter = new LogFilter();
-    private final ThreadLocal<ActionLog> actionLog = new ThreadLocal<>();
     private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.INFO, LogLevel.DEBUG);
     public Appender appender;
 
@@ -28,13 +29,13 @@ public class LogManager {
 
     public ActionLog begin(String message) {
         var actionLog = new ActionLog(message);
-        this.actionLog.set(actionLog);
+        ACTION_LOG.set(actionLog);
         return actionLog;
     }
 
     public void end(String message) {
         ActionLog actionLog = currentActionLog();
-        this.actionLog.remove();
+        ACTION_LOG.remove();
         actionLog.end(message);
 
         if (appender != null) appender.append(actionLog, filter);
@@ -46,7 +47,7 @@ public class LogManager {
     }
 
     public ActionLog currentActionLog() {
-        return actionLog.get();
+        return ACTION_LOG.get();
     }
 
     public void logError(Throwable e) {

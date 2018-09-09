@@ -10,32 +10,31 @@ import java.util.Map;
  * @author neo
  */
 public class WebContextImpl implements WebContext {
-    private final ThreadLocal<Map<String, Object>> context = new ThreadLocal<>();
-    private final ThreadLocal<Request> request = new ThreadLocal<>();
+    private static final ThreadLocal<Map<String, Object>> CONTEXT = new ThreadLocal<>();
+    private static final ThreadLocal<Request> REQUEST = new ThreadLocal<>();
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T> T get(String key) {
-        return (T) context.get().get(key);
+    public Object get(String key) {
+        return CONTEXT.get().get(key);
     }
 
     @Override
     public Request request() {
-        return request.get();
+        return REQUEST.get();
     }
 
     @Override
-    public <T> void put(String key, T value) {
-        context.get().put(key, value);
+    public void put(String key, Object value) {
+        CONTEXT.get().put(key, value);
     }
 
     public void initialize(Request request) {
-        context.set(new HashMap<>());
-        this.request.set(request);
+        CONTEXT.set(new HashMap<>());
+        REQUEST.set(request);
     }
 
     public void cleanup() {
-        context.remove();
-        request.remove();
+        CONTEXT.remove();
+        REQUEST.remove();
     }
 }

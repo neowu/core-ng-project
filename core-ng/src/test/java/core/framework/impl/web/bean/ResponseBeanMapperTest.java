@@ -63,17 +63,19 @@ class ResponseBeanMapperTest {
 
     @Test
     void fromJSONWithEmptyOptional() {
-        Optional<TestBean> parsedBean = responseBeanMapper.fromJSON(Types.optional(TestBean.class), Strings.bytes("null"));
+        @SuppressWarnings("unchecked")
+        var parsedBean = (Optional<TestBean>) responseBeanMapper.fromJSON(Types.optional(TestBean.class), Strings.bytes("null"));
         assertThat(parsedBean).isNotPresent();
     }
 
     @Test
     void fromJSONWithOptional() {
-        TestBean bean = new TestBean();
+        var bean = new TestBean();
         bean.intField = 3;
         String json = JSON.toJSON(bean);
 
-        Optional<TestBean> parsedBean = responseBeanMapper.fromJSON(Types.optional(TestBean.class), Strings.bytes(json));
+        @SuppressWarnings("unchecked")
+        var parsedBean = (Optional<TestBean>) responseBeanMapper.fromJSON(Types.optional(TestBean.class), Strings.bytes(json));
         assertThat(parsedBean).get().isEqualToComparingFieldByField(bean);
     }
 
@@ -83,7 +85,7 @@ class ResponseBeanMapperTest {
         bean.intField = 3;
         String json = JSON.toJSON(bean);
 
-        TestBean parsedBean = responseBeanMapper.fromJSON(TestBean.class, Strings.bytes(json));
+        TestBean parsedBean = (TestBean) responseBeanMapper.fromJSON(TestBean.class, Strings.bytes(json));
         assertThat(parsedBean).isEqualToComparingFieldByField(bean);
     }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.OptionalLong;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,12 +49,12 @@ class RepositoryImplSequenceIdEntityTest {
         SequenceIdEntity entity = new SequenceIdEntity();
         entity.stringField = "string";
 
-        Optional<Long> id = repository.insert(entity);
+        OptionalLong id = repository.insert(entity);
         assertTrue(id.isPresent());
 
-        SequenceIdEntity selectedEntity = repository.get(id.get()).get();
+        SequenceIdEntity selectedEntity = repository.get(id.orElseThrow()).orElseThrow();
 
-        assertEquals((long) id.get(), (long) selectedEntity.id);
+        assertEquals(id.orElseThrow(), (long) selectedEntity.id);
         assertEquals(entity.stringField, selectedEntity.stringField);
     }
 

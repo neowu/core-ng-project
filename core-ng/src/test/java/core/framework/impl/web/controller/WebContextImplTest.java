@@ -27,7 +27,7 @@ class WebContextImplTest {
     void get() {
         context.put("key", "value");
 
-        String value = context.get("key");
+        String value = (String) context.get("key");
         assertThat(value).isEqualTo("value");
     }
 }

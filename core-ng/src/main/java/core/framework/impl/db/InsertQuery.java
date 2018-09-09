@@ -26,8 +26,8 @@ final class InsertQuery<T> {
     InsertQuery(Class<T> entityClass) {
         List<Field> paramFields = Lists.newArrayList();
 
-        StringBuilder builder = new StringBuilder("INSERT INTO ");
-        StringBuilder valueClause = new StringBuilder();
+        var builder = new StringBuilder("INSERT INTO ");
+        var valueClause = new StringBuilder();
 
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");
@@ -74,7 +74,7 @@ final class InsertQuery<T> {
     }
 
     private Function<T, Object[]> paramBuilder(Class<T> entityClass, List<Field> paramFields) {
-        CodeBuilder builder = new CodeBuilder();
+        var builder = new CodeBuilder();
 
         String entityClassLiteral = type(entityClass);
         builder.append("public Object apply(Object value) {\n")

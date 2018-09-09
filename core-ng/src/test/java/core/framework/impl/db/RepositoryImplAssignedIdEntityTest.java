@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
-import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,7 +56,7 @@ class RepositoryImplAssignedIdEntityTest {
         entity.bigDecimalField = new BigDecimal("86.99");
         entity.dateField = LocalDate.of(2016, Month.JULY, 5);
 
-        Optional<Long> id = repository.insert(entity);
+        OptionalLong id = repository.insert(entity);
         assertFalse(id.isPresent());
 
         assertThat(repository.get(entity.id)).get().isEqualToComparingFieldByField(entity);

@@ -35,7 +35,7 @@ public final class StaticDirectoryController implements StaticContentController 
             throw new NotFoundException("not found, path=" + request.path());
 
         Response response = Response.file(filePath);
-        ContentType contentType = MimeTypes.get(filePath.getFileName().toString());
+        ContentType contentType = MimeTypes.get(String.valueOf(filePath.getFileName()));
         if (contentType != null) response.contentType(contentType);
         if (cacheHeader != null) response.header(HTTPHeaders.CACHE_CONTROL, cacheHeader);
         return response;

@@ -7,6 +7,8 @@ import core.framework.util.Strings;
 
 import java.util.Set;
 
+import static core.framework.util.Strings.format;
+
 /**
  * @author neo
  */
@@ -65,8 +67,8 @@ public class PathPatternValidator {
 
         for (int i = 0; i < segment.length(); i++) {
             char ch = segment.charAt(i);
-            if (!ASCII.isLetter(ch) && !ASCII.isDigit(ch) && ch != '_' && ch != '-' && ch != '.') {
-                throw Exceptions.error("path segment must only contain (letter / digit / _ / - / .), segment={}, pattern={}", segment, pattern);
+            if (ch != '_' && ch != '-' && ch != '.' && !ASCII.isLetter(ch) && !ASCII.isDigit(ch)) {
+                throw new Error(format("path segment must only contain (letter / digit / _ / - / .), segment={}, pattern={}", segment, pattern));
             }
         }
     }

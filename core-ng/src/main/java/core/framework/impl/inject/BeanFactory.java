@@ -1,5 +1,7 @@
 package core.framework.impl.inject;
 
+import core.framework.impl.reflect.Fields;
+import core.framework.impl.reflect.Methods;
 import core.framework.impl.reflect.Params;
 import core.framework.inject.Inject;
 import core.framework.inject.Named;
@@ -16,10 +18,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -38,10 +40,8 @@ public class BeanFactory {
             throw Exceptions.error("found duplicate bean, type={}, name={}, previous={}", type.getTypeName(), name, previous);
     }
 
-    public <T> T bean(Type type, String name) {
-        Key key = new Key(type, name);
-        @SuppressWarnings("unchecked")
-        T bean = (T) beans.get(key);
+    public Object bean(Type type, String name) {
+        Object bean = beans.get(new Key(type, name));
         if (bean == null) throw Exceptions.error("can not find bean, type={}, name={}", type.getTypeName(), name);
         return bean;
     }
@@ -65,15 +65,21 @@ public class BeanFactory {
             while (!visitorType.equals(Object.class)) {
                 for (Field field : visitorType.getDeclaredFields()) {
                     if (field.isAnnotationPresent(Inject.class)) {
-                        makeAccessible(field);
-                        field.set(instance, lookupValue(field));
+                        if (field.trySetAccessible()) {
+                            field.set(instance, lookupValue(field));
+                        } else {
+                            throw new Error(format("failed to inject field, field={}", Fields.path(field)));
+                        }
                     }
                 }
                 for (Method method : visitorType.getDeclaredMethods()) {
                     if (method.isAnnotationPresent(Inject.class)) {
-                        makeAccessible(method);
                         Object[] params = lookupParams(method);
-                        method.invoke(instance, params);
+                        if (method.trySetAccessible()) {
+                            method.invoke(instance, params);
+                        } else {
+                            throw new Error(format("failed to inject method, method={}", Methods.path(method)));
+                        }
                     }
                 }
                 visitorType = visitorType.getSuperclass();
@@ -81,7 +87,7 @@ public class BeanFactory {
         } catch (IllegalAccessException e) {
             throw new Error(e);
         } catch (InvocationTargetException e) {
-            throw Exceptions.error("failed to inject bean, beanClass={}, error={}", instance.getClass().getCanonicalName(), e.getTargetException().getMessage(), e);
+            throw new Error(format("failed to inject bean, beanClass={}, error={}", instance.getClass().getCanonicalName(), e.getTargetException().getMessage()), e);
         }
     }
 
@@ -116,20 +122,6 @@ public class BeanFactory {
         if (paramType instanceof ParameterizedType)
             return Types.generic((Class<?>) ((ParameterizedType) paramType).getRawType(), ((ParameterizedType) paramType).getActualTypeArguments());
         return paramType;
-    }
-
-    private void makeAccessible(Field field) {
-        AccessController.doPrivileged((PrivilegedAction<Field>) () -> {
-            field.setAccessible(true);
-            return field;
-        });
-    }
-
-    private void makeAccessible(Method method) {
-        AccessController.doPrivileged((PrivilegedAction<Method>) () -> {
-            method.setAccessible(true);
-            return method;
-        });
     }
 
     private boolean isTypeOf(Object instance, Type type) {

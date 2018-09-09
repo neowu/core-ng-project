@@ -34,9 +34,9 @@ class RetryHandlerTest {
     @Test
     void waitTime() {
         assertThat(handler.waitTime(1)).isEqualTo(Duration.ofMillis(500));
-        assertThat(handler.waitTime(2)).isEqualTo(Duration.ofMillis(1000));
-        assertThat(handler.waitTime(3)).isEqualTo(Duration.ofMillis(2000));
-        assertThat(handler.waitTime(4)).isEqualTo(Duration.ofMillis(4000));
+        assertThat(handler.waitTime(2)).isEqualTo(Duration.ofSeconds(1));
+        assertThat(handler.waitTime(3)).isEqualTo(Duration.ofSeconds(2));
+        assertThat(handler.waitTime(4)).isEqualTo(Duration.ofSeconds(4));
     }
 
     @Test
@@ -54,7 +54,7 @@ class RetryHandlerTest {
 
     @Test
     void retryWithNotSentRequest() {
-        when(clientContext.isRequestSent()).thenReturn(false);
+        when(clientContext.isRequestSent()).thenReturn(Boolean.FALSE);
 
         assertThat(handler.retry(RequestBuilder.post().build(), clientContext, new IOException())).isTrue();
     }

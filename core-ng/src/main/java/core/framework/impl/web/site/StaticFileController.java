@@ -21,7 +21,7 @@ public final class StaticFileController implements StaticContentController {
 
     public StaticFileController(Path contentFile) {
         this.contentFile = contentFile;
-        contentType = MimeTypes.get(contentFile.getFileName().toString());
+        contentType = MimeTypes.get(String.valueOf(contentFile.getFileName()));
     }
 
     @Override

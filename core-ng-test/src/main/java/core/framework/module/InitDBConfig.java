@@ -37,7 +37,8 @@ public final class InitDBConfig extends Config {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <T> Repository<T> repository(Class<T> entityClass) {
-        return context.beanFactory.bean(Types.generic(Repository.class, entityClass), name);
+        return (Repository<T>) context.beanFactory.bean(Types.generic(Repository.class, entityClass), name);
     }
 }

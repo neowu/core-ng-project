@@ -40,8 +40,8 @@ class RateLimiter {
 
         String key = group + "/" + clientIP;
         Rate rate;
-        synchronized (this) {
-            rate = this.rates.computeIfAbsent(key, k -> new Rate(config.maxPermits));
+        synchronized (rates) {
+            rate = rates.computeIfAbsent(key, k -> new Rate(config.maxPermits));
         }
         long currentTime = System.nanoTime();
         return rate.acquire(currentTime, config.maxPermits, config.fillRatePerNano);

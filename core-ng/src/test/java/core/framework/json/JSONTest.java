@@ -35,7 +35,7 @@ class JSONTest {
         TestBean bean = new TestBean();
 
         TestBean.Child child = new TestBean.Child();
-        child.booleanField = true;
+        child.booleanField = Boolean.TRUE;
         child.longField = 200L;
         bean.childField = child;
 
@@ -53,10 +53,10 @@ class JSONTest {
         bean.listField.add("value2");
 
         TestBean.Child child1 = new TestBean.Child();
-        child1.booleanField = true;
+        child1.booleanField = Boolean.TRUE;
         bean.childrenField.add(child1);
         TestBean.Child child2 = new TestBean.Child();
-        child2.booleanField = false;
+        child2.booleanField = Boolean.FALSE;
         bean.childrenField.add(child2);
 
         String json = JSON.toJSON(bean);
@@ -92,7 +92,8 @@ class JSONTest {
 
     @Test
     void listObject() {
-        List<TestBean> beans = JSON.fromJSON(Types.list(TestBean.class), "[{\"string\":\"n1\"},{\"string\":\"n2\"}]");
+        @SuppressWarnings("unchecked")
+        var beans = (List<TestBean>) JSON.fromJSON(Types.list(TestBean.class), "[{\"string\":\"n1\"},{\"string\":\"n2\"}]");
 
         assertThat(beans).hasSize(2);
         assertThat(beans.get(0).stringField).isEqualTo("n1");

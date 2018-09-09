@@ -13,6 +13,8 @@
 * ws: provide way to handler json command with validation?
 * kafka: unique groupId to listen all messages for ws
 * http: rewrite path parsing for better speed?
+* delete Exceptions.error()
+* rewrite all equals/hashcode
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

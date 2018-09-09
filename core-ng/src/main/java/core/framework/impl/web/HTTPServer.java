@@ -44,9 +44,9 @@ public class HTTPServer {
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
 
             builder.setHandler(handler())
-                   .setServerOption(UndertowOptions.DECODE_URL, false)
-                   .setServerOption(UndertowOptions.ENABLE_HTTP2, true)
-                   .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, true)
+                   .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
+                   .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
+                   .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
                    // set tcp idle timeout to 620s, by default AWS ALB uses 60s, GCloud LB uses 600s, since it is always deployed with LB, longer timeout doesn't hurt
                    // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
                    // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout

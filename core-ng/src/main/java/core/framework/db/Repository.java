@@ -2,6 +2,7 @@ package core.framework.db;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 /**
  * @author neo
@@ -29,7 +30,7 @@ public interface Repository<T> {
 
     Optional<T> get(Object... primaryKeys);
 
-    Optional<Long> insert(T entity);
+    OptionalLong insert(T entity);
 
     void update(T entity);
 

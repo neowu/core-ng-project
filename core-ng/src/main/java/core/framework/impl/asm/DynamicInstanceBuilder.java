@@ -1,7 +1,6 @@
 package core.framework.impl.asm;
 
 import core.framework.util.Exceptions;
-import core.framework.util.Strings;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -11,6 +10,8 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -60,7 +61,7 @@ public class DynamicInstanceBuilder<T> {
             constructor.setBody(body);
             classBuilder.addConstructor(constructor);
         } catch (CannotCompileException | NotFoundException e) {
-            throw Exceptions.error("{}, source:\n{}", e.getMessage(), body, e);
+            throw new Error(format("{}, source:\n{}", e.getMessage(), body), e);
         }
     }
 
@@ -69,17 +70,17 @@ public class DynamicInstanceBuilder<T> {
         try {
             classBuilder.addMethod(CtMethod.make(method, classBuilder));
         } catch (CannotCompileException e) {
-            throw Exceptions.error("{}, source:\n{}", e.getMessage(), method, e);
+            throw new Error(format("{}, source:\n{}", e.getMessage(), method), e);
         }
     }
 
     public void addField(String pattern, Object... argument) {
-        String field = Strings.format(pattern, argument);
+        String field = format(pattern, argument);
         sourceCode.fields.add(field);
         try {
             classBuilder.addField(CtField.make(field, classBuilder));
         } catch (CannotCompileException e) {
-            throw Exceptions.error("{}, source:\n{}", e.getMessage(), field, e);
+            throw new Error(format("{}, source:\n{}", e.getMessage(), field), e);
         }
     }
 

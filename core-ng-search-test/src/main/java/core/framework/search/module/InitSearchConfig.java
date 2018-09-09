@@ -29,8 +29,9 @@ public final class InitSearchConfig extends Config {
         config.search.createIndexTemplate(name, ClasspathResources.text(sourcePath));
     }
 
+    @SuppressWarnings("unchecked")
     public <T> ElasticSearchTypeImpl<T> type(Class<T> documentClass) {
-        return context.beanFactory.bean(Types.generic(ElasticSearchType.class, documentClass), null);
+        return (ElasticSearchTypeImpl<T>) context.beanFactory.bean(Types.generic(ElasticSearchType.class, documentClass), null);
     }
 
     public void flush(String index) {

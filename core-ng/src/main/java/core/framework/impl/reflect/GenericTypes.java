@@ -27,12 +27,10 @@ public final class GenericTypes {
     }
 
     public static boolean isGenericList(Type type) {
-        if (type instanceof ParameterizedType) {
-            Class<?> rawClass = (Class<?>) ((ParameterizedType) type).getRawType();
-            return List.class.isAssignableFrom(rawClass)
-                && ((ParameterizedType) type).getActualTypeArguments()[0] instanceof Class;
-        }
-        return false;
+        if (!(type instanceof ParameterizedType)) return false;
+
+        Class<?> rawClass = (Class<?>) ((ParameterizedType) type).getRawType();
+        return List.class.isAssignableFrom(rawClass) && ((ParameterizedType) type).getActualTypeArguments()[0] instanceof Class;
     }
 
     public static Class<?> listValueClass(Type type) {
@@ -44,12 +42,10 @@ public final class GenericTypes {
     }
 
     public static boolean isGenericOptional(Type type) {
-        if (type instanceof ParameterizedType) {
-            Class<?> rawClass = (Class<?>) ((ParameterizedType) type).getRawType();
-            return Optional.class.equals(rawClass)
-                && ((ParameterizedType) type).getActualTypeArguments()[0] instanceof Class;
-        }
-        return false;
+        if (!(type instanceof ParameterizedType)) return false;
+
+        Class<?> rawClass = (Class<?>) ((ParameterizedType) type).getRawType();
+        return Optional.class.equals(rawClass) && ((ParameterizedType) type).getActualTypeArguments()[0] instanceof Class;
     }
 
     public static Class<?> optionalValueClass(Type type) {
@@ -61,14 +57,12 @@ public final class GenericTypes {
     }
 
     public static boolean isGenericStringMap(Type type) {
-        if (type instanceof ParameterizedType) {
-            Type keyType = ((ParameterizedType) type).getActualTypeArguments()[0];
-            if (!(keyType instanceof Class)) return false;
-            Class<?> keyClass = (Class<?>) keyType;
-            return String.class.equals(keyClass)
-                && ((ParameterizedType) type).getActualTypeArguments()[1] instanceof Class;
-        }
-        return false;
+        if (!(type instanceof ParameterizedType)) return false;
+
+        Type keyType = ((ParameterizedType) type).getActualTypeArguments()[0];
+        if (!(keyType instanceof Class)) return false;
+        Class<?> keyClass = (Class<?>) keyType;
+        return String.class.equals(keyClass) && ((ParameterizedType) type).getActualTypeArguments()[1] instanceof Class;
     }
 
     public static Class<?> mapValueClass(Type type) {

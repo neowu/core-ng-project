@@ -84,17 +84,17 @@ public final class DatabaseImpl implements Database {
     }
 
     private Properties driverProperties() {
-        Properties properties = new Properties();
-        if (user != null) properties.put("user", user);
-        if (password != null) properties.put("password", password);
+        var properties = new Properties();
+        if (user != null) properties.setProperty("user", user);
+        if (password != null) properties.setProperty("password", password);
         String timeoutValue = String.valueOf(timeout.toMillis());
         if (url.startsWith("jdbc:mysql:")) {
-            properties.put("connectTimeout", timeoutValue);
-            properties.put("socketTimeout", timeoutValue);
-            properties.put("rewriteBatchedStatements", "true");     // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
+            properties.setProperty("connectTimeout", timeoutValue);
+            properties.setProperty("socketTimeout", timeoutValue);
+            properties.setProperty("rewriteBatchedStatements", "true");     // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
         } else if (url.startsWith("jdbc:oracle:")) {
-            properties.put("oracle.net.CONNECT_TIMEOUT", timeoutValue);
-            properties.put("oracle.jdbc.ReadTimeout", timeoutValue);
+            properties.setProperty("oracle.net.CONNECT_TIMEOUT", timeoutValue);
+            properties.setProperty("oracle.jdbc.ReadTimeout", timeoutValue);
         }
         return properties;
     }

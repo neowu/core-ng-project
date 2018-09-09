@@ -23,7 +23,7 @@ public class TestModel {
     }
 
     public Boolean booleanMethod() {
-        return true;
+        return Boolean.TRUE;
     }
 
     public String url() {

@@ -46,7 +46,7 @@ class ExecutorImplTest {
         var taskActionLog = new ActionLog(null);
         when(logManager.begin(anyString())).thenReturn(taskActionLog);
 
-        Future<Boolean> future = executor.submit("action", () -> true);
+        Future<Boolean> future = executor.submit("action", () -> Boolean.TRUE);
         assertThat(taskActionLog.action).isEqualTo("parentAction:action");
         assertThat(taskActionLog.trace).isEqualTo(true);
         assertThat(taskActionLog.refId()).isEqualTo("refId");

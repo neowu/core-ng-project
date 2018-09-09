@@ -28,17 +28,16 @@ public class ResponseBeanMapper {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T fromJSON(Type responseType, byte[] body) {
+    public Object fromJSON(Type responseType, byte[] body) {
         BeanMapper<?> mapper = register(responseType);
         Object bean = mapper.reader.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {
-            if (bean == null) return (T) Optional.empty();
+            if (bean == null) return Optional.empty();
             mapper.validator.validate(bean, false);
-            return (T) Optional.of(bean);
+            return Optional.of(bean);
         } else {
             mapper.validator.validate(bean, false);
-            return (T) bean;
+            return bean;
         }
     }
 

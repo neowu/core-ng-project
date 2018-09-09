@@ -75,7 +75,6 @@ public final class KafkaAppender implements Appender {
                 }
             }
         }, "log-forwarder");
-        logForwarderThread.setPriority(Thread.NORM_PRIORITY - 1);
     }
 
     public void start() {
