@@ -1,4 +1,7 @@
 ## Change log
+### 6.8.2 (9/10/2018 - )
+
+
 ### 6.8.1 (9/6/2018 - 9/10/2018)
 * http: make ip access check as built in logic, to deny before routing check (which may return not found or method not allowed)
 * api: added api().bean(beanClass) for raw request/response/ws bean

@@ -77,6 +77,7 @@
         <module name="UncommentedMain">             <!--Detects uncommented main methods.-->
             <property name="excludedClasses" value="\.Main$"/>
         </module>
+        <module name="UpperEll"/>
 
         <!--Modifiers:-->
         <module name="RedundantModifier"/>          <!--Checks for redundant modifiers in interface and annotation definitions.-->
