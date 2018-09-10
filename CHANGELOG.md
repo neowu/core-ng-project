@@ -1,5 +1,5 @@
 ## Change log
-### 6.8.1 (9/6/2018 - )
+### 6.8.1 (9/6/2018 - 9/10/2018)
 * http: make ip access check as built in logic, to deny before routing check (which may return not found or method not allowed)
 * api: added api().bean(beanClass) for raw request/response/ws bean
 * util: removed Exceptions.error(), use new Error(Strings.format()) instead, which is more straightforward and code analyzer friendly (easier to check whether hide root cause) 

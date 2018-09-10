@@ -27,7 +27,7 @@ public class ValidatorAssert extends AbstractAssert<ValidatorAssert, Object> {
             failWithMessage("%nExpecting:%n object %s%nto be valid, but found some violations:%n %s", actual.getClass().getName(), errors.errors);
     }
 
-    public MapAssert<String, String> hasError() {
+    public MapAssert<String, String> errors() {
         ValidationErrors errors = validate();
         if (!errors.hasError())
             failWithMessage("%nExpecting:%n object %s%nto be invalid, but found no violation", actual.getClass().getName());

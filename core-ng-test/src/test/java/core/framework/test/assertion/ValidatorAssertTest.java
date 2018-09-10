@@ -25,16 +25,16 @@ class ValidatorAssertTest {
 
     @Test
     void isValid() {
-        Bean bean = new Bean();
+        var bean = new Bean();
         bean.field1 = "value";
         assertBean(bean).isValid();
     }
 
     @Test
     void hasError() {
-        Bean bean = new Bean();
+        var bean = new Bean();
         bean.field1 = "123456";
-        assertBean(bean).hasError().containsEntry("field1", "field1 must not be longer than 5");
+        assertBean(bean).errors().containsEntry("field1", "field1 must not be longer than 5");
     }
 
     public static class Bean {
