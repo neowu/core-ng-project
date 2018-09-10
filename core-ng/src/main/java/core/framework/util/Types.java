@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -56,6 +57,7 @@ public final class Types {
             return null;
         }
 
+        // refer to sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl.hashCode, must return same hashcode as builtin type
         @Override
         public int hashCode() {
             return Arrays.hashCode(arguments) ^ rawType.hashCode();
@@ -63,11 +65,10 @@ public final class Types {
 
         @Override
         public boolean equals(Object other) {
-            if (!(other instanceof ParameterizedType)) {
-                return false;
-            }
+            if (!(other instanceof ParameterizedType)) return false;
+
             ParameterizedType that = (ParameterizedType) other;
-            return rawType.equals(that.getRawType())
+            return Objects.equals(rawType, that.getRawType())
                     && that.getOwnerType() == null
                     && Arrays.equals(arguments, that.getActualTypeArguments());
         }

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TypesTest {
     List<String> list;
@@ -16,9 +16,9 @@ class TypesTest {
 
         Type constructedType = Types.generic(List.class, String.class);
 
-        assertEquals(constructedType, builtInType);
-        assertEquals(builtInType, constructedType);
-
-        assertEquals(constructedType.hashCode(), builtInType.hashCode());
+        assertThat(constructedType).isEqualTo(builtInType)
+                                   .hasSameHashCodeAs(builtInType);
+        assertThat(builtInType).isEqualTo(constructedType)
+                               .hasSameHashCodeAs(constructedType);
     }
 }

@@ -1,10 +1,10 @@
 package core.framework.web.websocket;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author neo
  */
 public interface WebSocketContext {
-    Set<Channel> room(String name);
+    List<Channel> room(String name);
 }

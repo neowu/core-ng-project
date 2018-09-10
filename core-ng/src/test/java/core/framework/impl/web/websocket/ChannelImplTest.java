@@ -9,13 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ChannelImplTest {
     @Test
-    void asKey() {
-        var channel = new ChannelImpl(null, null, null);
-        assertThat(channel).isEqualTo(channel);
-        assertThat(channel).hasSameHashCodeAs(channel);
-    }
-
-    @Test
     void context() {
         var channel = new ChannelImpl(null, null, null);
         channel.context().put("k1", "v1");

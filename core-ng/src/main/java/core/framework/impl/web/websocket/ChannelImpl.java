@@ -12,8 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -79,18 +77,8 @@ public class ChannelImpl implements Channel, Channel.Context {
     }
 
     @Override
-    public boolean equals(Object object) {
-        return this == object;  // every channel has its own id, only need to compare reference
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public Optional<Object> get(String key) {
-        return Optional.ofNullable(context.get(key));
+    public Object get(String key) {
+        return context.get(key);
     }
 
     @Override
