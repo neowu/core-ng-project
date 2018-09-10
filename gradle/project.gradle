@@ -25,18 +25,17 @@ subprojects {
     test {
         useJUnitPlatform()
         failFast = true
+        testLogging.exceptionFormat 'full'
     }
 
     afterEvaluate {
         tasks.withType(Jar).configureEach {
             manifest {
                 attributes 'Implementation-Title': project.name,
-                        'Implementation-Version': project.version,
-                        'Created-By': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
-                        'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}",
-                        'Built-By': System.getProperty('user.name'),
-                        'Built-On': "${InetAddress.localHost.hostName}/${InetAddress.localHost.hostAddress}",
-                        'Build-Time': Instant.now().toString()
+                    'Implementation-Version': project.version,
+                    'Created-By': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
+                    'Built-With': "gradle ${project.gradle.gradleVersion}",
+                    'Build-Time': Instant.now().toString()
             }
         }
     }
