@@ -1,7 +1,6 @@
 package core.framework.impl.web.request;
 
 import core.framework.json.JSON;
-import core.framework.util.Exceptions;
 import core.framework.web.exception.BadRequestException;
 
 import static core.framework.util.Strings.format;
@@ -23,7 +22,7 @@ public class URLParamParser {    // parse query param and path param
         } else if (valueClass.isEnum()) {
             return (T) toEnum(param, (Class<? extends Enum<?>>) valueClass);
         }
-        throw Exceptions.error("not supported path param type, please contact arch team, type={}", valueClass.getCanonicalName());
+        throw new Error(format("not supported path param type, type={}", valueClass.getCanonicalName()));
     }
 
     public static <T extends Enum<?>> T toEnum(String value, Class<T> valueClass) {

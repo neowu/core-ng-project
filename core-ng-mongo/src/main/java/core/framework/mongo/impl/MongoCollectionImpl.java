@@ -26,7 +26,6 @@ import core.framework.mongo.Get;
 import core.framework.mongo.MapReduce;
 import core.framework.mongo.MongoCollection;
 import core.framework.mongo.Query;
-import core.framework.util.Exceptions;
 import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
@@ -40,6 +39,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -94,7 +95,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public void bulkInsert(List<T> entities) {
         var watch = new StopWatch();
-        if (entities == null || entities.isEmpty()) throw Exceptions.error("entities must not be empty");
+        if (entities == null || entities.isEmpty()) throw new Error("entities must not be empty");
 
         for (T entity : entities)
             validator.validate(entity);
@@ -303,7 +304,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         validator.validate(entity);
         try {
             id = mongo.codecs.id(entity);
-            if (id == null) throw Exceptions.error("entity must have id, entityClass={}", entityClass.getCanonicalName());
+            if (id == null) throw new Error(format("entity must have id, entityClass={}", entityClass.getCanonicalName()));
             collection().replaceOne(Filters.eq("_id", id), entity, new UpdateOptions().upsert(true));
         } finally {
             long elapsed = watch.elapsed();
@@ -316,7 +317,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public void bulkReplace(List<T> entities) {
         var watch = new StopWatch();
-        if (entities == null || entities.isEmpty()) throw Exceptions.error("entities must not be empty");
+        if (entities == null || entities.isEmpty()) throw new Error("entities must not be empty");
         int size = entities.size();
         for (T entity : entities)
             validator.validate(entity);
@@ -324,7 +325,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             List<ReplaceOneModel<T>> models = new ArrayList<>(size);
             for (T entity : entities) {
                 Object id = mongo.codecs.id(entity);
-                if (id == null) throw Exceptions.error("entity must have id, entityClass={}", entityClass.getCanonicalName());
+                if (id == null) throw new Error(format("entity must have id, entityClass={}", entityClass.getCanonicalName()));
                 models.add(new ReplaceOneModel<>(Filters.eq("_id", id), entity, new UpdateOptions().upsert(true)));
             }
             collection().bulkWrite(models, new BulkWriteOptions().ordered(false));

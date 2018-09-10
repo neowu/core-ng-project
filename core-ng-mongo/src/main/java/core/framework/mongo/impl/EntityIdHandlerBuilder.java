@@ -4,12 +4,12 @@ import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 import core.framework.mongo.Id;
-import core.framework.util.Exceptions;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
 
 import static core.framework.impl.asm.Literal.type;
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -36,7 +36,7 @@ final class EntityIdHandlerBuilder<T> {
         for (Field field : Classes.instanceFields(entityClass)) {
             if (field.isAnnotationPresent(Id.class)) return field;
         }
-        throw Exceptions.error("can not find id field, class={}", entityClass.getCanonicalName());
+        throw new Error(format("can not find id field, class={}", entityClass.getCanonicalName()));
     }
 
     private String generateIdIfAbsentMethod() {

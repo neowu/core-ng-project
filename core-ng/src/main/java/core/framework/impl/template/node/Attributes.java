@@ -2,12 +2,13 @@ package core.framework.impl.template.node;
 
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.fragment.ContainerFragment;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -91,6 +92,6 @@ public class Attributes {
         if (attribute != null) count++;
 
         if (count > 1 && attribute != null)
-            throw Exceptions.error("element must not have more than one dynamic content attribute, attribute={}, location={}", attribute.name, attribute.location);
+            throw new Error(format("element must not have more than one dynamic content attribute, attribute={}, location={}", attribute.name, attribute.location));
     }
 }

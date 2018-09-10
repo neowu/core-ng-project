@@ -1,11 +1,11 @@
 package core.framework.impl.scheduler;
 
 import core.framework.scheduler.Trigger;
-import core.framework.util.Exceptions;
-import core.framework.util.Strings;
 
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author tminglei, neo
@@ -19,7 +19,7 @@ public final class MonthlyTrigger implements Trigger {
         this.time = time;
 
         if (dayOfMonth < 1 || dayOfMonth > 28) {
-            throw Exceptions.error("unsupported dayOfMonth, please use 1-28, dayOfMonth={}", dayOfMonth);
+            throw new Error(format("unsupported dayOfMonth, please use 1-28, dayOfMonth={}", dayOfMonth));
         }
     }
 
@@ -34,6 +34,6 @@ public final class MonthlyTrigger implements Trigger {
 
     @Override
     public String toString() {
-        return Strings.format("monthly@{}/{}", dayOfMonth, time);
+        return format("monthly@{}/{}", dayOfMonth, time);
     }
 }

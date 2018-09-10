@@ -1,12 +1,12 @@
 package core.framework.impl.db;
 
-import core.framework.util.Exceptions;
-
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 interface RowMapper<T> {
     static void checkColumnCount(ResultSetWrapper resultSet) {
         int count = resultSet.columnCount();
-        if (count > 1) throw Exceptions.error("returned column count must be one, count={}", count);
+        if (count > 1) throw new Error(format("returned column count must be one, count={}", count));
     }
 
     T map(ResultSetWrapper resultSet) throws SQLException;

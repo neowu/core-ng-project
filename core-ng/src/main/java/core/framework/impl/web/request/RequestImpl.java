@@ -5,7 +5,6 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.validate.ValidationException;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.util.Encodings;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.web.CookieSpec;
 import core.framework.web.MultipartFile;
@@ -18,6 +17,8 @@ import io.undertow.server.handlers.Cookie;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -152,9 +153,9 @@ public final class RequestImpl implements Request {
                 } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
                     return mapper.fromJSON(beanClass, body);
                 }
-                throw new BadRequestException("body is missing or unsupported content type, method=" + method + ", contentType=" + contentType);
+                throw new BadRequestException(format("body is missing or unsupported content type, method={}, contentType={}", method, contentType));
             } else {
-                throw Exceptions.error("not supported method, method={}", method);
+                throw new Error(format("not supported method, method={}", method));
             }
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), e.errorCode(), e);

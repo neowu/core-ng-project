@@ -5,7 +5,6 @@ import core.framework.impl.template.HTMLTemplate;
 import core.framework.impl.template.HTMLTemplateBuilder;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.source.FileTemplateSource;
-import core.framework.util.Exceptions;
 import core.framework.util.Files;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
@@ -16,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -48,7 +49,7 @@ public class TemplateManager {
         var watch = new StopWatch();
         try {
             Map<String, HTMLTemplate> previous = templates.putIfAbsent(templatePath, load(templatePath, modelClass));
-            if (previous != null) throw Exceptions.error("template was registered, templatePath={}", templatePath);
+            if (previous != null) throw new Error(format("template was registered, templatePath={}", templatePath));
             if (webDirectory.localEnv) {
                 Path path = webDirectory.path(templatePath);
                 templateLastModifiedTimes.put(templatePath, Files.lastModified(path));
@@ -61,7 +62,7 @@ public class TemplateManager {
     private HTMLTemplate get(String templatePath, Class<?> modelClass, String language) {
         Map<String, HTMLTemplate> templates = this.templates.get(templatePath);
         if (templates == null)
-            throw Exceptions.error("template is not registered, please use site().template() to add template, templatePath={}", templatePath);
+            throw new Error(format("template is not registered, please use site().template() to add template, templatePath={}", templatePath));
 
         if (webDirectory.localEnv) {
             Path path = webDirectory.path(templatePath);
@@ -74,7 +75,7 @@ public class TemplateManager {
 
         String targetLanguage = language == null ? MessageImpl.DEFAULT_LANGUAGE : language;
         HTMLTemplate template = templates.get(targetLanguage);
-        if (template == null) throw Exceptions.error("language is not defined, please check site().message(), language={}", targetLanguage);
+        if (template == null) throw new Error(format("language is not defined, please check site().message(), language={}", targetLanguage));
         return template;
     }
 

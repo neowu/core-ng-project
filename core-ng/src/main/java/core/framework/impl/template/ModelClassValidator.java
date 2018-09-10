@@ -1,11 +1,13 @@
 package core.framework.impl.template;
 
+import core.framework.impl.reflect.Methods;
 import core.framework.impl.validate.type.DataTypeValidator;
 import core.framework.impl.validate.type.TypeVisitor;
-import core.framework.util.Exceptions;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -28,7 +30,7 @@ class ModelClassValidator implements TypeVisitor {
         Method[] methods = objectClass.getDeclaredMethods();
         for (Method method : methods) {
             if (Modifier.isPublic(method.getModifiers()) && method.getReturnType().isPrimitive()) {
-                throw Exceptions.error("primitive class as return type is not supported, please use object type, returnType={}, method={}", method.getReturnType(), method.getDeclaringClass().getCanonicalName() + "." + method.getName());
+                throw new Error(format("primitive class as return type is not supported, please use object type, returnType={}, method={}", method.getReturnType(), Methods.path(method)));
             }
         }
     }

@@ -8,7 +8,6 @@ import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.reflect.Classes;
-import core.framework.util.Exceptions;
 import core.framework.util.Lists;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
@@ -21,6 +20,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -114,6 +115,6 @@ public final class EntitySchemaGenerator {
         if (LocalDate.class.equals(fieldClass)) {
             return "DATE";
         }
-        throw Exceptions.error("unsupported field class, class={}", fieldClass.getCanonicalName());
+        throw new Error(format("unsupported field class, class={}", fieldClass.getCanonicalName()));
     }
 }

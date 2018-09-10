@@ -3,10 +3,11 @@ package core.framework.impl.web.bean;
 import core.framework.api.json.Property;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.validate.Validator;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -32,7 +33,7 @@ public class BeanMapperRegistry {
     void validateBeanClassName(Class<?> beanClass) {
         beanClasses.compute(Classes.className(beanClass), (key, previous) -> {
             if (previous != null && !previous.equals(beanClass))
-                throw Exceptions.error("found bean class with duplicate name which can be confusing, please use different class name, previousClass={}, class={}", previous.getCanonicalName(), beanClass.getCanonicalName());
+                throw new Error(format("found bean class with duplicate name which can be confusing, please use different class name, previousClass={}, class={}", previous.getCanonicalName(), beanClass.getCanonicalName()));
             return beanClass;
         });
     }

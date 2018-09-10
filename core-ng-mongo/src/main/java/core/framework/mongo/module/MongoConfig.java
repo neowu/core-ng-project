@@ -6,10 +6,11 @@ import core.framework.impl.module.ShutdownHook;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
 import core.framework.mongo.impl.MongoImpl;
-import core.framework.util.Exceptions;
 import core.framework.util.Types;
 
 import java.time.Duration;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -31,9 +32,9 @@ public class MongoConfig extends Config {
 
     @Override
     protected void validate() {
-        if (uri == null) throw Exceptions.error("mongo uri must be configured, name={}", name);
+        if (uri == null) throw new Error(format("mongo uri must be configured, name={}", name));
         if (!entityAdded)
-            throw Exceptions.error("mongo is configured but no collection/view added, please remove unnecessary config, name={}", name);
+            throw new Error(format("mongo is configured but no collection/view added, please remove unnecessary config, name={}", name));
     }
 
     MongoImpl createMongo() {
@@ -44,7 +45,7 @@ public class MongoConfig extends Config {
     }
 
     public void uri(String uri) {
-        if (this.uri != null) throw Exceptions.error("mongo uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri);
+        if (this.uri != null) throw new Error(format("mongo uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri));
         mongo.uri(uri);
         this.uri = uri;
     }
@@ -66,13 +67,13 @@ public class MongoConfig extends Config {
     }
 
     public <T> void collection(Class<T> entityClass) {
-        if (uri == null) throw Exceptions.error("mongo uri must be configured first, name={}", name);
+        if (uri == null) throw new Error(format("mongo uri must be configured first, name={}", name));
         context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, mongo.collection(entityClass));
         entityAdded = true;
     }
 
     public <T> void view(Class<T> viewClass) {
-        if (uri == null) throw Exceptions.error("mongo uri must be configured first, name={}", name);
+        if (uri == null) throw new Error(format("mongo uri must be configured first, name={}", name));
         mongo.view(viewClass);
         entityAdded = true;
     }

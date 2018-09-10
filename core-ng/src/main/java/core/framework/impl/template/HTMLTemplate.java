@@ -1,7 +1,8 @@
 package core.framework.impl.template;
 
 import core.framework.impl.template.fragment.ContainerFragment;
-import core.framework.util.Exceptions;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -15,10 +16,10 @@ public class HTMLTemplate extends ContainerFragment {
 
     public String process(TemplateContext context) {
         if (context.root == null)
-            throw Exceptions.error("root must not be null");
+            throw new Error("root must not be null");
 
         if (!modelClass.isInstance(context.root))
-            throw Exceptions.error("model class does not match, expectedClass={}, actualClass={}", modelClass.getCanonicalName(), context.root.getClass().getCanonicalName());
+            throw new Error(format("model class does not match, expectedClass={}, actualClass={}", modelClass.getCanonicalName(), context.root.getClass().getCanonicalName()));
 
         StringBuilder builder = new StringBuilder(2048);
         process(builder, context);

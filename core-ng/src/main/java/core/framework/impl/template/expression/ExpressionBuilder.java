@@ -5,7 +5,6 @@ import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
-import core.framework.util.Exceptions;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -96,7 +95,6 @@ public class ExpressionBuilder {
         for (Method method : methods) {
             if (method.getName().equals(methodName)) return method.getGenericReturnType();
         }
-        throw Exceptions.error("can not find method, class={}, method={}, expression={}, location={}",
-                modelClass, methodName, expressionSource, location);
+        throw new Error(format("can not find method, class={}, method={}, expression={}, location={}", modelClass.getCanonicalName(), methodName, expressionSource, location));
     }
 }

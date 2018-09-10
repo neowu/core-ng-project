@@ -9,7 +9,6 @@ import core.framework.impl.web.site.StaticContentController;
 import core.framework.impl.web.site.StaticDirectoryController;
 import core.framework.impl.web.site.StaticFileController;
 import core.framework.impl.web.site.WebSecurityInterceptor;
-import core.framework.util.Exceptions;
 import core.framework.web.site.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,8 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -60,7 +61,7 @@ public class SiteConfig extends Config {
     public StaticContentConfig staticContent(String path) {
         logger.info("add static content path, path={}", path);
         Path contentPath = context.httpServer.siteManager.webDirectory.path(path);
-        if (!Files.exists(contentPath, LinkOption.NOFOLLOW_LINKS)) throw Exceptions.error("path does not exist, path={}", path);
+        if (!Files.exists(contentPath, LinkOption.NOFOLLOW_LINKS)) throw new Error(format("path does not exist, path={}", path));
 
         StaticContentController controller;
         if (Files.isDirectory(contentPath)) {

@@ -2,7 +2,6 @@ package core.framework.impl.db;
 
 import core.framework.db.Database;
 import core.framework.db.Query;
-import core.framework.util.Exceptions;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
 
@@ -31,7 +30,7 @@ public class QueryImpl<T> implements Query<T> {
 
     @Override
     public void where(String condition, Object... params) {
-        if (Strings.isEmpty(condition)) throw Exceptions.error("condition must not be empty");
+        if (Strings.isEmpty(condition)) throw new Error("condition must not be empty");
         if (whereClause.length() > 0) whereClause.append(" AND ");
         whereClause.append(condition);
         Collections.addAll(this.params, params);

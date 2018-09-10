@@ -5,13 +5,14 @@ import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
-import core.framework.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -34,7 +35,7 @@ public final class TransactionManager {
         if (connection != null) {
             TransactionState state = CURRENT_TRANSACTION_STATE.get();
             if (state != TransactionState.START)
-                throw Exceptions.error("db access is not allowed after transaction ended, currentState={}", state);
+                throw new Error(format("db access is not allowed after transaction ended, currentState={}", state));
             return connection;
         }
 
@@ -48,7 +49,7 @@ public final class TransactionManager {
 
     Transaction beginTransaction() {
         if (CURRENT_CONNECTION.get() != null)
-            throw new Error("nested transaction is not supported, please contact arch team");
+            throw new Error("nested transaction is not supported");
 
         PoolItem<Connection> connection = getConnectionFromPool();
         try {

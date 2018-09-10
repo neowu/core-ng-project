@@ -8,7 +8,6 @@ import core.framework.impl.validate.type.TypeVisitor;
 import core.framework.mongo.Collection;
 import core.framework.mongo.Id;
 import core.framework.mongo.MongoEnumValue;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 import org.bson.types.ObjectId;
@@ -19,6 +18,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -42,7 +43,7 @@ public final class MongoClassValidator implements TypeVisitor {
         validator.validate();
 
         if (id == null) {
-            throw Exceptions.error("mongo entity class must have @Id field, class={}", validator.type.getTypeName());
+            throw new Error(format("mongo entity class must have @Id field, class={}", validator.type.getTypeName()));
         }
     }
 
@@ -54,7 +55,7 @@ public final class MongoClassValidator implements TypeVisitor {
     @Override
     public void visitClass(Class<?> objectClass, String path) {
         if (!validateView && path == null && !objectClass.isAnnotationPresent(Collection.class))
-            throw Exceptions.error("mongo entity class must have @Collection, class={}", objectClass.getCanonicalName());
+            throw new Error(format("mongo entity class must have @Collection, class={}", objectClass.getCanonicalName()));
     }
 
     @Override
@@ -64,12 +65,12 @@ public final class MongoClassValidator implements TypeVisitor {
         } else {
             core.framework.mongo.Field mongoField = field.getDeclaredAnnotation(core.framework.mongo.Field.class);
             if (mongoField == null)
-                throw Exceptions.error("mongo entity field must have @Field, field={}", Fields.path(field));
+                throw new Error(format("mongo entity field must have @Field, field={}", Fields.path(field)));
             String mongoFieldName = mongoField.name();
 
             Set<String> fields = this.fields.computeIfAbsent(parentPath, key -> Sets.newHashSet());
             if (fields.contains(mongoFieldName)) {
-                throw Exceptions.error("found duplicate field, field={}, mongoField={}", Fields.path(field), mongoFieldName);
+                throw new Error(format("found duplicate field, field={}, mongoField={}", Fields.path(field), mongoFieldName));
             }
             fields.add(mongoFieldName);
         }
@@ -82,15 +83,15 @@ public final class MongoClassValidator implements TypeVisitor {
         for (Field field : fields) {
             MongoEnumValue enumValue = field.getDeclaredAnnotation(MongoEnumValue.class);
             if (enumValue == null) {
-                throw Exceptions.error("mongo enum must have @MongoEnumValue, field={}", Fields.path(field));
+                throw new Error(format("mongo enum must have @MongoEnumValue, field={}", Fields.path(field)));
             }
             boolean added = enumValues.add(enumValue.value());
             if (!added) {
-                throw Exceptions.error("mongo enum value must be unique, field={}, value={}", Fields.path(field), enumValue.value());
+                throw new Error(format("mongo enum value must be unique, field={}, value={}", Fields.path(field), enumValue.value()));
             }
             Property property = field.getDeclaredAnnotation(Property.class);
             if (property != null) {
-                throw Exceptions.error("mongo enum must not have json annotation, please separate view and entity, field={}", Fields.path(field));
+                throw new Error(format("mongo enum must not have json annotation, please separate view and entity, field={}", Fields.path(field)));
             }
         }
     }
@@ -98,14 +99,14 @@ public final class MongoClassValidator implements TypeVisitor {
     private void validateId(Field field, boolean topLevel) {
         if (topLevel) {
             if (id != null)
-                throw Exceptions.error("mongo entity class must have only one @Id field, previous={}, current={}", Fields.path(id), Fields.path(field));
+                throw new Error(format("mongo entity class must have only one @Id field, previous={}, current={}", Fields.path(id), Fields.path(field)));
             Class<?> fieldClass = field.getType();
             if (!ObjectId.class.equals(fieldClass) && !String.class.equals(fieldClass)) {
-                throw Exceptions.error("@Id field must be either ObjectId or String, field={}, class={}", Fields.path(field), fieldClass.getCanonicalName());
+                throw new Error(format("@Id field must be either ObjectId or String, field={}, class={}", Fields.path(field), fieldClass.getCanonicalName()));
             }
             id = field;
         } else {
-            throw Exceptions.error("mongo nested entity class must not have @Id field, field={}", Fields.path(field));
+            throw new Error(format("mongo nested entity class must not have @Id field, field={}", Fields.path(field)));
         }
     }
 }

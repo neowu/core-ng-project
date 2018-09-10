@@ -1,6 +1,5 @@
 package core.framework.mongo.impl;
 
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 import org.bson.codecs.Codec;
@@ -11,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -43,7 +44,7 @@ public final class EntityCodecs {
         EntityCodec<T> codec = new EntityCodec<>(entityClass, idHandler, entityEncoder, entityDecoder);
         Codec<?> previous = codecs.putIfAbsent(entityClass, codec);
         if (previous != null)
-            throw Exceptions.error("entity or view class is registered, entityClass={}", entityClass.getCanonicalName());
+            throw new Error(format("entity or view class is registered, entityClass={}", entityClass.getCanonicalName()));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

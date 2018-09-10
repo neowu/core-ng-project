@@ -5,7 +5,6 @@ import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.HTTPIOHandler;
 import core.framework.impl.web.http.IPAccessControl;
-import core.framework.util.Exceptions;
 import core.framework.web.Controller;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
@@ -13,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -58,7 +59,7 @@ public final class HTTPConfig extends Config {
      * @param maxIPs the max number for forwarded ips
      */
     public void maxForwardedIPs(int maxIPs) {
-        if (maxIPs < 1) throw Exceptions.error("maxIPs must be greater than 1, maxIPs={}", maxIPs);
+        if (maxIPs < 1) throw new Error(format("maxIPs must be greater than 1, maxIPs={}", maxIPs));
         context.httpServer.handler.requestParser.clientIPParser.maxForwardedIPs = maxIPs;
     }
 
@@ -69,9 +70,7 @@ public final class HTTPConfig extends Config {
      */
     public void allowCIDR(String... cidrs) {
         if (context.httpServer.handler.accessControl != null) {
-            throw Exceptions.error("allow cidr is already configured, cidrs={}, previous={}",
-                    Arrays.toString(cidrs),
-                    context.httpServer.handler.accessControl.cidrs);
+            throw new Error(format("allow cidr is already configured, cidrs={}, previous={}", Arrays.toString(cidrs), context.httpServer.handler.accessControl.cidrs));
         }
 
         logger.info("limit remote access, cidrs={}", Arrays.toString(cidrs));

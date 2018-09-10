@@ -1,12 +1,13 @@
 package core.framework.module;
 
-import core.framework.util.Exceptions;
 import core.framework.util.Properties;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -56,7 +57,7 @@ public final class SystemModule extends Module {
 
     void loadProperties(Properties properties) {
         for (String key : properties.keys()) {
-            if (!allowedKeys.contains(key)) throw Exceptions.error("found unknown system module key, key={}, allowedKeys={}", key, allowedKeys);
+            if (!allowedKeys.contains(key)) throw new Error(format("found unknown system module key, key={}, allowedKeys={}", key, allowedKeys));
             context.propertyManager.properties.set(key, properties.get(key).orElse(null));
         }
     }

@@ -5,10 +5,11 @@ import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionHolder;
-import core.framework.util.Exceptions;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -21,15 +22,14 @@ public class IfFragment extends ContainerFragment {
     public IfFragment(String statement, TemplateMetaContext context, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);
         if (!matcher.matches())
-            throw Exceptions.error("statement must match \"(!)condition\", statement={}, location={}", statement, location);
+            throw new Error(format("statement must match \"(!)condition\", statement={}, location={}", statement, location));
 
         reverse = "!".equals(matcher.group(2));
         String condition = matcher.group(3);
 
         expression = new ExpressionBuilder(condition, context, location).build();
         if (!Boolean.class.equals(GenericTypes.rawClass(expression.returnType)))
-            throw Exceptions.error("if statement must return Boolean, condition={}, returnType={}, location={}",
-                condition, expression.returnType.getTypeName(), location);
+            throw new Error(format("if statement must return Boolean, condition={}, returnType={}, location={}", condition, expression.returnType.getTypeName(), location));
     }
 
     @Override

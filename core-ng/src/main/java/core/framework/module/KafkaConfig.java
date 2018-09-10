@@ -12,12 +12,13 @@ import core.framework.impl.web.management.KafkaController;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.kafka.MessagePublisher;
-import core.framework.util.Exceptions;
 import core.framework.util.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -40,12 +41,12 @@ public class KafkaConfig extends Config {
     @Override
     protected void validate() {
         if (!handlerAdded)
-            throw Exceptions.error("kafka is configured, but no producer/consumer added, please remove unnecessary config, name={}", name);
+            throw new Error(format("kafka is configured, but no producer/consumer added, please remove unnecessary config, name={}", name));
     }
 
     public void uri(String uri) {
         if (this.uri != null)
-            throw Exceptions.error("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri);
+            throw new Error(format("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri));
         this.uri = uri;
     }
 
@@ -55,9 +56,9 @@ public class KafkaConfig extends Config {
     }
 
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
-        logger.info("create message publisher, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
+        logger.info("publish, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
         if (producer == null) {
-            if (uri == null) throw Exceptions.error("kafka uri must be configured first, name={}", name);
+            if (uri == null) throw new Error(format("kafka uri must be configured first, name={}", name));
             producer = createProducer();
         }
         var publisher = new MessagePublisherImpl<>(producer, topic, messageClass, context.logManager);
@@ -91,14 +92,14 @@ public class KafkaConfig extends Config {
     }
 
     private <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
-        logger.info("subscribe topic, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
+        logger.info("subscribe, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
         listener().subscribe(topic, messageClass, handler, bulkHandler);
         handlerAdded = true;
     }
 
     private MessageListener listener() {
         if (listener == null) {
-            if (uri == null) throw Exceptions.error("kafka uri must be configured first, name={}", name);
+            if (uri == null) throw new Error(format("kafka uri must be configured first, name={}", name));
             listener = new MessageListener(uri, name, context.logManager);
             context.startupHook.add(listener::start);
             context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> listener.shutdown());
@@ -117,16 +118,16 @@ public class KafkaConfig extends Config {
     }
 
     public void maxPoll(int maxRecords, int maxBytes) {
-        if (maxRecords <= 0) throw Exceptions.error("max poll records must be greater than 0, value={}", maxRecords);
-        if (maxBytes <= 0) throw Exceptions.error("max poll bytes must be greater than 0, value={}", maxBytes);
+        if (maxRecords <= 0) throw new Error(format("max poll records must be greater than 0, value={}", maxRecords));
+        if (maxBytes <= 0) throw new Error(format("max poll bytes must be greater than 0, value={}", maxBytes));
         MessageListener listener = listener();
         listener.maxPollRecords = maxRecords;
         listener.maxPollBytes = maxBytes;
     }
 
     public void minPoll(int minBytes, Duration maxWaitTime) {
-        if (minBytes <= 0) throw Exceptions.error("min poll bytes must be greater than 0, value={}", minBytes);
-        if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw Exceptions.error("max wait time must be greater than 0, value={}", maxWaitTime);
+        if (minBytes <= 0) throw new Error(format("min poll bytes must be greater than 0, value={}", minBytes));
+        if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw new Error(format("max wait time must be greater than 0, value={}", maxWaitTime));
         MessageListener listener = listener();
         listener.minPollBytes = minBytes;
         listener.minPollMaxWaitTime = maxWaitTime;

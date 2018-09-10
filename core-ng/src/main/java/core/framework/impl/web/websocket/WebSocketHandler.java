@@ -4,7 +4,6 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.request.RequestImpl;
-import core.framework.util.Exceptions;
 import core.framework.util.Sets;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.NotFoundException;
@@ -24,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -91,14 +92,14 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
     }
 
     public void add(String path, ChannelListener listener) {
-        if (path.contains("/:")) throw Exceptions.error("websocket path must be static, path={}", path);
+        if (path.contains("/:")) throw new Error(format("web socket path must be static, path={}", path));
 
         Class<? extends ChannelListener> listenerClass = listener.getClass();
         if (listenerClass.isSynthetic())
-            throw Exceptions.error("listener class must not be anonymous class or lambda, please create static class, listenerClass={}", listenerClass.getCanonicalName());
+            throw new Error(format("listener class must not be anonymous class or lambda, please create static class, listenerClass={}", listenerClass.getCanonicalName()));
 
         logger.info("ws, path={}, listener={}", path, listenerClass.getCanonicalName());
         ChannelListener previous = listeners.putIfAbsent(path, listener);
-        if (previous != null) throw Exceptions.error("found duplicate ws listener, path={}, previousClass={}", previous.getClass().getCanonicalName());
+        if (previous != null) throw new Error(format("found duplicate web socket listener, path={}, previousClass={}", path, previous.getClass().getCanonicalName()));
     }
 }

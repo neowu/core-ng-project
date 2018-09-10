@@ -5,7 +5,6 @@ import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.Randoms;
 import core.framework.web.exception.NotFoundException;
@@ -19,6 +18,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -91,17 +92,17 @@ public final class Scheduler {
     private void addTask(Task task) {
         Class<? extends Job> jobClass = task.job().getClass();
         if (jobClass.isSynthetic())
-            throw Exceptions.error("job class must not be anonymous class or lambda, please create static class, jobClass={}", jobClass.getCanonicalName());
+            throw new Error(format("job class must not be anonymous class or lambda, please create static class, jobClass={}", jobClass.getCanonicalName()));
 
         String name = task.name();
         Task previous = tasks.putIfAbsent(name, task);
         if (previous != null)
-            throw Exceptions.error("found duplicate job, name={}, previous={}", name, previous.job().getClass().getCanonicalName());
+            throw new Error(format("found duplicate job, name={}, previous={}", name, previous.job().getClass().getCanonicalName()));
     }
 
     ZonedDateTime next(Trigger trigger, ZonedDateTime previous) {
         ZonedDateTime next = trigger.next(previous);
-        if (next == null || !next.isAfter(previous)) throw Exceptions.error("next scheduled time must be after previous, previous={}, next={}", previous, next);
+        if (next == null || !next.isAfter(previous)) throw new Error(format("next scheduled time must be after previous, previous={}, next={}", previous, next));
         return next;
     }
 

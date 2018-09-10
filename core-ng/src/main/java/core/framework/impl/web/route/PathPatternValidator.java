@@ -1,7 +1,6 @@
 package core.framework.impl.web.route;
 
 import core.framework.util.ASCII;
-import core.framework.util.Exceptions;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
 
@@ -21,10 +20,10 @@ public class PathPatternValidator {
 
     public void validate() {
         if (Strings.isEmpty(pattern))
-            throw Exceptions.error("path pattern must not be empty, pattern={}", pattern);
+            throw new Error(format("path pattern must not be empty, pattern={}", pattern));
 
         if (!Strings.startsWith(pattern, '/'))
-            throw Exceptions.error("path pattern must start with '/', pattern={}", pattern);
+            throw new Error(format("path pattern must start with '/', pattern={}", pattern));
 
         Set<String> variables = Sets.newHashSet();
         String[] tokens = Strings.split(pattern, '/');
@@ -45,16 +44,16 @@ public class PathPatternValidator {
         for (int i = 0; i < variable.length(); i++) {
             char ch = variable.charAt(i);
             if (!ASCII.isLetter(ch))
-                throw Exceptions.error("path variable must be letter, variable={}, pattern={}", variable, pattern);
+                throw new Error(format("path variable must be letter, variable={}, pattern={}", variable, pattern));
         }
 
         boolean isNew = variables.add(variable);
-        if (!isNew) throw Exceptions.error("found duplicate param name, path={}", pattern);
+        if (!isNew) throw new Error(format("found duplicate param name, path={}", pattern));
 
         if (variablePatternIndex > 0) {
             String variablePattern = token.substring(variablePatternIndex);
             if (!"(*)".equals(variablePattern)) {
-                throw Exceptions.error("path variable must be :name or :name(*), variable={}, pattern={}", token, pattern);
+                throw new Error(format("path variable must be :name or :name(*), variable={}, pattern={}", token, pattern));
             }
         }
     }
@@ -63,7 +62,7 @@ public class PathPatternValidator {
         if (segment.length() == 0) return;
 
         if (segment.charAt(segment.length() - 1) == '.')
-            throw Exceptions.error("path segment must not end with '.', segment={}, pattern={}", segment, pattern);
+            throw new Error(format("path segment must not end with '.', segment={}, pattern={}", segment, pattern));
 
         for (int i = 0; i < segment.length(); i++) {
             char ch = segment.charAt(i);

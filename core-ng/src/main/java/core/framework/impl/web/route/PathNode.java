@@ -1,11 +1,12 @@
 package core.framework.impl.web.route;
 
 import core.framework.impl.web.request.PathParams;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
 
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -42,10 +43,10 @@ class PathNode {
     }
 
     private URLHandler registerWildcardNode(String pathPattern, Path currentPath, String name) {
-        if (currentPath.next != null) throw Exceptions.error("wildcard must be at end of path pattern, path={}", pathPattern);
+        if (currentPath.next != null) throw new Error(format("wildcard must be at end of path pattern, path={}", pathPattern));
         if (wildcardNode != null) {
             if (!Strings.equals(wildcardNode.param, name))
-                throw Exceptions.error("found conflict dynamic pattern, path={}, param={}, conflictedParam={}", pathPattern, name, wildcardNode.param);
+                throw new Error(format("found conflict dynamic pattern, path={}, param={}, conflictedParam={}", pathPattern, name, wildcardNode.param));
         } else {
             wildcardNode = new DynamicNode(name);
         }
@@ -55,7 +56,7 @@ class PathNode {
     private URLHandler registerDynamicNode(String pathPattern, Path currentPath, String name) {
         if (dynamicNode != null) {
             if (!Strings.equals(dynamicNode.param, name))
-                throw Exceptions.error("found conflict dynamic pattern, path={}, param={}, conflictedParam={}", pathPattern, name, dynamicNode.param);
+                throw new Error(format("found conflict dynamic pattern, path={}, param={}, conflictedParam={}", pathPattern, name, dynamicNode.param));
         } else {
             dynamicNode = new DynamicNode(name);
         }

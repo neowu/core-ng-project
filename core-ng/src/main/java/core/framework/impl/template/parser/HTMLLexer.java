@@ -1,6 +1,6 @@
 package core.framework.impl.template.parser;
 
-import core.framework.util.Exceptions;
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -20,7 +20,7 @@ class HTMLLexer {
         this.html = html;
     }
 
-    public HTMLTokenType nextNodeToken() {
+    HTMLTokenType nextNodeToken() {
         reset();
 
         if (currentIndex >= html.length()) {
@@ -40,7 +40,7 @@ class HTMLLexer {
         }
     }
 
-    public HTMLTokenType nextElementToken() {
+    HTMLTokenType nextElementToken() {
         skipWhitespaces();
 
         if (currentIndex >= html.length()) {
@@ -63,7 +63,7 @@ class HTMLLexer {
         }
     }
 
-    public HTMLTokenType nextEndCommentToken() {
+    HTMLTokenType nextEndCommentToken() {
         reset();
 
         int length = -1;
@@ -73,13 +73,13 @@ class HTMLLexer {
                 break;
             }
         }
-        if (length == -1) throw Exceptions.error("comment is not closed, location={}", currentLocation());
+        if (length == -1) throw new Error(format("comment is not closed, location={}", currentLocation()));
         move(length);
 
         return HTMLTokenType.END_COMMENT;
     }
 
-    public HTMLTokenType nextScriptToken(String tagName) {
+    HTMLTokenType nextScriptToken(String tagName) {
         reset();
         String closeTag = "</" + tagName + ">";
         int length = -1;
@@ -90,7 +90,7 @@ class HTMLLexer {
                 break;
             }
         }
-        if (length == -1) throw Exceptions.error("script/css is not closed, location={}", currentLocation());
+        if (length == -1) throw new Error(format("script/css is not closed, location={}", currentLocation()));
 
         if (length > 0) {
             move(length);
@@ -100,11 +100,11 @@ class HTMLLexer {
         }
     }
 
-    public String currentToken() {
+    String currentToken() {
         return html.substring(startIndex, currentIndex);
     }
 
-    public String currentLocation() {
+    String currentLocation() {
         return name + ":" + currentLine + ":" + currentColumn;
     }
 
@@ -132,7 +132,7 @@ class HTMLLexer {
                 return i - currentIndex;
             }
         }
-        throw Exceptions.error("start tag is invalid, location={}", currentLocation());
+        throw new Error(format("start tag is invalid, location={}", currentLocation()));
     }
 
     private int findEndTagLength() {
@@ -143,7 +143,7 @@ class HTMLLexer {
                 return i - currentIndex + 1;
             }
         }
-        throw Exceptions.error("end tag is invalid, location={}", currentLocation());
+        throw new Error(format("end tag is invalid, location={}", currentLocation()));
     }
 
     private int findTextLength() {
@@ -162,16 +162,16 @@ class HTMLLexer {
                 return i - currentIndex;
             }
             if (ch == '<') {
-                throw Exceptions.error("attribute name is invalid, location={}", currentLocation());
+                throw new Error(format("attribute name is invalid, location={}", currentLocation()));
             }
         }
-        throw Exceptions.error("attribute name is invalid, location={}", currentLocation());
+        throw new Error(format("attribute name is invalid, location={}", currentLocation()));
     }
 
     private int findAttributeValueLength() {
         char currentChar = html.charAt(currentIndex);
         if (currentChar == '\'')
-            throw Exceptions.error("it is recommended to use double quote to delimit attribute value, location={}", currentLocation());
+            throw new Error(format("it is recommended to use double quote to delimit attribute value, location={}", currentLocation()));
 
         boolean hasDoubleQuote = currentChar == '"';
         int i = hasDoubleQuote ? currentIndex + 1 : currentIndex;
@@ -183,7 +183,7 @@ class HTMLLexer {
                 return i - currentIndex + 1;
             }
         }
-        throw Exceptions.error("attribute value is invalid, location={}", currentLocation());
+        throw new Error(format("attribute value is invalid, location={}", currentLocation()));
     }
 
     private boolean match(int index, String token) {
@@ -199,7 +199,7 @@ class HTMLLexer {
     }
 
     private void move(int length) {
-        if (length == 0) throw Exceptions.error("syntax is invalid, location={}", currentLocation());
+        if (length == 0) throw new Error(format("syntax is invalid, location={}", currentLocation()));
         for (int i = 0; i < length; i++) {
             char ch = html.charAt(currentIndex);
             if (ch == '\n') {

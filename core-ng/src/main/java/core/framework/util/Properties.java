@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static core.framework.util.Strings.format;
+
 /**
  * @author neo
  */
@@ -19,7 +21,7 @@ public final class Properties {
 
     public void load(String classpath) {
         InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(classpath);
-        if (stream == null) throw Exceptions.error("can not find property file in classpath, classpath={}", classpath);
+        if (stream == null) throw new Error(format("can not find property file in classpath, classpath={}", classpath));
         try (Reader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             var properties = new java.util.Properties();
             properties.load(reader);
@@ -39,7 +41,7 @@ public final class Properties {
 
     public void set(String key, String value) {
         String previous = this.properties.putIfAbsent(key, value);
-        if (previous != null) throw Exceptions.error("property already exists, key={}, previous={}, current={}", key, previous, value);
+        if (previous != null) throw new Error(format("property already exists, key={}, previous={}, current={}", key, previous, value));
     }
 
     public Set<String> keys() {

@@ -7,10 +7,11 @@ import core.framework.impl.db.dialect.Dialect;
 import core.framework.impl.db.dialect.MySQLDialect;
 import core.framework.impl.db.dialect.OracleDialect;
 import core.framework.impl.reflect.Classes;
-import core.framework.util.Exceptions;
 
 import java.lang.reflect.Field;
 import java.util.List;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -60,7 +61,7 @@ final class SelectQuery<T> {
             case ORACLE:
                 return new OracleDialect(table, columns);
             default:
-                throw Exceptions.error("not supported vendor, vendor={}", vendor);
+                throw new Error(format("not supported vendor, vendor={}", vendor));
         }
     }
 
@@ -75,7 +76,7 @@ final class SelectQuery<T> {
     }
 
     Object[] fetchParams(List<Object> params, Integer skip, Integer limit) {
-        if (skip != null && limit == null) throw Exceptions.error("limit must not be null if skip is not, skip={}", skip);
+        if (skip != null && limit == null) throw new Error(format("limit must not be null if skip is not, skip={}", skip));
         if (skip == null && limit == null) return params.toArray();
         return dialect.fetchParams(params, skip, limit);
     }

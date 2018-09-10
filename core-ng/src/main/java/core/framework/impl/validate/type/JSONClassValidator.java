@@ -3,7 +3,6 @@ package core.framework.impl.validate.type;
 import core.framework.api.json.Property;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
@@ -18,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static core.framework.util.Strings.format;
+
 /**
  * @author neo
  */
@@ -28,10 +29,10 @@ public class JSONClassValidator implements TypeVisitor {
         for (Field field : fields) {
             Property property = field.getDeclaredAnnotation(Property.class);
             if (property == null)
-                throw Exceptions.error("enum must have @Property, field={}", Fields.path(field));
+                throw new Error(format("enum must have @Property, field={}", Fields.path(field)));
             boolean added = enumValues.add(property.name());
             if (!added)
-                throw Exceptions.error("found duplicate property, field={}, name={}", Fields.path(field), property.name());
+                throw new Error(format("found duplicate property, field={}, name={}", Fields.path(field), property.name()));
         }
     }
 
@@ -55,17 +56,17 @@ public class JSONClassValidator implements TypeVisitor {
     public void visitField(Field field, String parentPath) {
         Property property = field.getDeclaredAnnotation(Property.class);
         if (property == null)
-            throw Exceptions.error("field must have @Property, field={}", Fields.path(field));
+            throw new Error(format("field must have @Property, field={}", Fields.path(field)));
 
         String name = property.name();
 
         if (Strings.isEmpty(name)) {
-            throw Exceptions.error("@Property name attribute must not be empty, field={}", Fields.path(field));
+            throw new Error(format("@Property name attribute must not be empty, field={}", Fields.path(field)));
         }
 
         boolean added = this.properties.computeIfAbsent(parentPath, key -> Sets.newHashSet()).add(name);
         if (!added) {
-            throw Exceptions.error("found duplicate property, field={}, name={}", Fields.path(field), name);
+            throw new Error(format("found duplicate property, field={}, name={}", Fields.path(field), name));
         }
     }
 

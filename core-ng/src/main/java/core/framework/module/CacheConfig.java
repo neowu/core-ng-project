@@ -13,7 +13,6 @@ import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
 import core.framework.impl.web.management.CacheController;
 import core.framework.util.ASCII;
-import core.framework.util.Exceptions;
 import core.framework.util.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +98,7 @@ public class CacheConfig extends Config {
     }
 
     public void add(String name, Type valueType, Duration duration) {
-        if (cacheManager == null) throw Exceptions.error("cache is not configured, please configure cache store first");
+        if (cacheManager == null) throw new Error("cache is not configured, please configure cache store first");
 
         String cacheName = cacheName(name, valueType);
         logger.info("add cache, cacheName={}, valueType={}, name={}", cacheName, valueType.getTypeName(), name);

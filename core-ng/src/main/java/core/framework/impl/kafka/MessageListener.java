@@ -4,7 +4,6 @@ import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.LogManager;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
-import core.framework.util.Exceptions;
 import core.framework.util.StopWatch;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -19,6 +18,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -50,8 +51,8 @@ public class MessageListener {
     }
 
     public <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
-        if (topics.contains(topic)) throw Exceptions.error("topic is already subscribed, topic={}", topic);
-        topics.add(topic);
+        boolean added = topics.add(topic);
+        if (!added) throw new Error(format("topic is already subscribed, topic={}", topic));
         MessageValidator<T> validator = new MessageValidator<>(messageClass);
         JSONReader<T> reader = JSONReader.of(messageClass);
         processes.put(topic, new MessageProcess<>(handler, bulkHandler, reader, validator));

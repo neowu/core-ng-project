@@ -7,6 +7,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
+import static core.framework.util.Strings.format;
+
 /**
  * @author neo
  */
@@ -18,7 +20,7 @@ public final class ClasspathResources {
     public static byte[] bytes(String path) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         URL resource = loader.getResource(path);
-        if (resource == null) throw Exceptions.error("can not load resource, path={}", path);
+        if (resource == null) throw new Error(format("can not load resource, path={}", path));
 
         URLConnection connection;
         int length;
@@ -30,7 +32,7 @@ public final class ClasspathResources {
         }
 
         if (length <= 0) {
-            throw Exceptions.error("unexpected length of classpath resource, path={}, length={}", path, length);
+            throw new Error(format("unexpected length of classpath resource, path={}, length={}", path, length));
         }
 
         try (InputStream stream = connection.getInputStream()) {

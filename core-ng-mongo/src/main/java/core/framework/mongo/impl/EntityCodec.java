@@ -1,6 +1,5 @@
 package core.framework.mongo.impl;
 
-import core.framework.util.Exceptions;
 import org.bson.BsonObjectId;
 import org.bson.BsonReader;
 import org.bson.BsonString;
@@ -12,6 +11,8 @@ import org.bson.codecs.EncoderContext;
 import org.bson.codecs.IdGenerator;
 import org.bson.codecs.ObjectIdGenerator;
 import org.bson.types.ObjectId;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -34,7 +35,7 @@ final class EntityCodec<T> implements CollectibleCodec<T> {
     public T generateIdIfAbsentFromDocument(T document) {
         if (!documentHasId(document)) {
             if (!idHandler.generateIdIfAbsent())
-                throw Exceptions.error("id must be assigned, documentClass={}", document.getClass().getCanonicalName());
+                throw new Error(format("id must be assigned, documentClass={}", document.getClass().getCanonicalName()));
             idHandler.set(document, idGenerator.generate());
         }
         return document;
@@ -50,7 +51,7 @@ final class EntityCodec<T> implements CollectibleCodec<T> {
         Object id = idHandler.get(document);
         if (id instanceof ObjectId) return new BsonObjectId((ObjectId) id);
         if (id instanceof String) new BsonString((String) id);
-        throw Exceptions.error("unsupported id type, id={}", id);
+        throw new Error(format("unsupported id type, id={}", id));
     }
 
     @Override

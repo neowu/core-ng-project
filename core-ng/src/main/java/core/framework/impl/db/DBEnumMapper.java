@@ -2,10 +2,11 @@ package core.framework.impl.db;
 
 import core.framework.db.DBEnumValue;
 import core.framework.impl.reflect.Enums;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -24,7 +25,7 @@ final class DBEnumMapper<T extends Enum<T>> {
         if (value == null) return null;
         T enumValue = mappings.get(value);
         if (enumValue == null)
-            throw Exceptions.error("can not parse value to enum, enumClass={}, value={}", enumClass.getCanonicalName(), value);
+            throw new Error(format("can not parse value to enum, enumClass={}, value={}", enumClass.getCanonicalName(), value));
         return enumValue;
     }
 

@@ -1,6 +1,5 @@
 package core.framework.impl.asm;
 
-import core.framework.util.Exceptions;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -25,7 +24,7 @@ public class DynamicInstanceBuilder<T> {
 
     public DynamicInstanceBuilder(Class<?> interfaceClass, String className) {
         if (!interfaceClass.isInterface())
-            throw Exceptions.error("interface class must be interface, interfaceClass={}", interfaceClass);
+            throw new Error(format("class must be interface, class={}", interfaceClass.getCanonicalName()));
 
         sourceCode.interfaceClass = interfaceClass;
         sourceCode.className = className;

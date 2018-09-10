@@ -19,7 +19,6 @@ import core.framework.impl.web.service.WebServiceControllerBuilder;
 import core.framework.impl.web.service.WebServiceImplValidator;
 import core.framework.impl.web.service.WebServiceInterfaceValidator;
 import core.framework.util.ASCII;
-import core.framework.util.Exceptions;
 import core.framework.web.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -79,7 +80,7 @@ public class APIConfig extends Config {
         }
 
         Class<?> previous = serviceInterfaces.putIfAbsent(Classes.className(serviceInterface), serviceInterface);
-        if (previous != null) throw Exceptions.error("found service interface with duplicate name which can be confusing, please use different class name, previousClass={}, class={}", previous.getCanonicalName(), serviceInterface.getCanonicalName());
+        if (previous != null) throw new Error(format("found service interface with duplicate name which can be confusing, please use different class name, previousClass={}, class={}", previous.getCanonicalName(), serviceInterface.getCanonicalName()));
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
@@ -117,7 +118,7 @@ public class APIConfig extends Config {
         BeanMapperRegistry registry = context.httpServer.handler.beanMapperRegistry;
         for (Class<?> beanClass : beanClasses) {
             if (registry.beanMappers.containsKey(beanClass)) {
-                throw Exceptions.error("bean class is already registered or referred by service interface, class={}", beanClass.getCanonicalName());
+                throw new Error(format("bean class is already registered or referred by service interface, class={}", beanClass.getCanonicalName()));
             }
             registry.register(beanClass);
             this.beanClasses.add(beanClass);

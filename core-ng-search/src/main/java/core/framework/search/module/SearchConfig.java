@@ -7,10 +7,11 @@ import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.log.ESLoggerContextFactory;
-import core.framework.util.Exceptions;
 import core.framework.util.Types;
 
 import java.time.Duration;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -22,7 +23,7 @@ public class SearchConfig extends Config {
 
     @Override
     protected void initialize(ModuleContext context, String name) {
-        if (name != null) throw Exceptions.error("search does not support multiple instances, name={}", name);
+        if (name != null) throw new Error(format("search does not support multiple instances, name={}", name));
         this.context = context;
         configureLogger();
         search = createElasticSearch(context);

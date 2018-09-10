@@ -5,7 +5,6 @@ import core.framework.impl.reflect.Methods;
 import core.framework.impl.reflect.Params;
 import core.framework.inject.Inject;
 import core.framework.inject.Named;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.Types;
 
@@ -33,22 +32,22 @@ public class BeanFactory {
         if (instance == null) throw new Error("instance must not be null");
 
         if (!isTypeOf(instance, type))
-            throw Exceptions.error("instance type does not match, type={}, instanceType={}", type.getTypeName(), instance.getClass().getCanonicalName());
+            throw new Error(format("instance type does not match, type={}, instanceType={}", type.getTypeName(), instance.getClass().getCanonicalName()));
 
         Object previous = beans.put(new Key(type, name), instance);
         if (previous != null)
-            throw Exceptions.error("found duplicate bean, type={}, name={}, previous={}", type.getTypeName(), name, previous);
+            throw new Error(format("found duplicate bean, type={}, name={}, previous={}", type.getTypeName(), name, previous));
     }
 
     public Object bean(Type type, String name) {
         Object bean = beans.get(new Key(type, name));
-        if (bean == null) throw Exceptions.error("can not find bean, type={}, name={}", type.getTypeName(), name);
+        if (bean == null) throw new Error(format("can not find bean, type={}, name={}", type.getTypeName(), name));
         return bean;
     }
 
     public <T> T create(Class<T> instanceClass) {
         if (instanceClass.isInterface() || Modifier.isAbstract(instanceClass.getModifiers()))
-            throw Exceptions.error("instance class must be concrete, class={}", instanceClass.getCanonicalName());
+            throw new Error(format("instance class must be concrete, class={}", instanceClass.getCanonicalName()));
 
         try {
             T instance = construct(instanceClass);
@@ -94,7 +93,7 @@ public class BeanFactory {
     private <T> T construct(Class<T> instanceClass) throws ReflectiveOperationException {
         Constructor<?>[] constructors = instanceClass.getDeclaredConstructors();
         if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {
-            throw Exceptions.error("instance class must have only one public default constructor, class={}, constructors={}", instanceClass.getCanonicalName(), Arrays.toString(constructors));
+            throw new Error(format("instance class must have only one public default constructor, class={}, constructors={}", instanceClass.getCanonicalName(), Arrays.toString(constructors)));
         }
         return instanceClass.getDeclaredConstructor().newInstance();
     }
@@ -127,6 +126,6 @@ public class BeanFactory {
     private boolean isTypeOf(Object instance, Type type) {
         if (type instanceof Class) return ((Class) type).isInstance(instance);
         if (type instanceof ParameterizedType) return isTypeOf(instance, ((ParameterizedType) type).getRawType());
-        throw Exceptions.error("not supported type, type={}", type);
+        throw new Error(format("not supported type, type={}", type));
     }
 }

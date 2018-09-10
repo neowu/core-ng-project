@@ -4,12 +4,13 @@ import core.framework.async.Task;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
-import core.framework.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -72,7 +73,7 @@ public abstract class Module {
     }
 
     public String requiredProperty(String key) {
-        return property(key).orElseThrow(() -> Exceptions.error("property key not found, key={}", key));
+        return property(key).orElseThrow(() -> new Error(format("property key not found, key={}", key)));
     }
 
     public LogConfig log() {

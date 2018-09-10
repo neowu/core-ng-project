@@ -7,13 +7,14 @@ import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.source.ClasspathTemplateSource;
 import core.framework.impl.template.source.StringTemplateSource;
 import core.framework.impl.template.source.TemplateSource;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -27,7 +28,7 @@ public final class HTMLTemplateEngine {
         var watch = new StopWatch();
         try {
             HTMLTemplate template = templates.get(name);
-            if (template == null) throw Exceptions.error("template not found, name={}", name);
+            if (template == null) throw new Error(format("template not found, name={}", name));
             TemplateContext context = new TemplateContext(model, cdnManager);
             return template.process(context);
         } finally {
@@ -48,7 +49,7 @@ public final class HTMLTemplateEngine {
         String name = source.name();
         try {
             HTMLTemplate previous = templates.putIfAbsent(name, new HTMLTemplateBuilder(source, modelClass).build());
-            if (previous != null) throw Exceptions.error("template is already added, name={}", name);
+            if (previous != null) throw new Error(format("template is already added, name={}", name));
         } finally {
             logger.info("add, name={}, modelClass={}, elapsed={}", name, modelClass.getCanonicalName(), watch.elapsed());
         }

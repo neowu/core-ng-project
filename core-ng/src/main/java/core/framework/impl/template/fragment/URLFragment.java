@@ -5,12 +5,13 @@ import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionHolder;
 import core.framework.log.Markers;
-import core.framework.util.Exceptions;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.BitSet;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -85,7 +86,7 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
         this.location = location;
 
         if (!String.class.equals(this.expression.returnType))
-            throw Exceptions.error("url statement must return String, expression={}, returnType={}, location={}", expression, this.expression.returnType.getTypeName(), location);
+            throw new Error(format("url statement must return String, expression={}, returnType={}, location={}", expression, this.expression.returnType.getTypeName(), location));
     }
 
     @Override

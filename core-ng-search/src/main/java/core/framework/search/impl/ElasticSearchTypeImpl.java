@@ -20,8 +20,8 @@ import core.framework.search.SearchException;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
 import core.framework.search.UpdateRequest;
-import core.framework.util.Exceptions;
 import core.framework.util.StopWatch;
+import core.framework.util.Strings;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -203,7 +203,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     @Override
     public void bulkIndex(BulkIndexRequest<T> request) {
         var watch = new StopWatch();
-        if (request.sources == null || request.sources.isEmpty()) throw Exceptions.error("request.sources must not be empty");
+        if (request.sources == null || request.sources.isEmpty()) throw new Error("request.sources must not be empty");
         String index = request.index == null ? this.index : request.index;
         var bulkRequest = new BulkRequest();
         for (Map.Entry<String, T> entry : request.sources.entrySet()) {
@@ -269,7 +269,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     @Override
     public void bulkDelete(BulkDeleteRequest request) {
         var watch = new StopWatch();
-        if (request.ids == null || request.ids.isEmpty()) throw Exceptions.error("request.ids must not be empty");
+        if (request.ids == null || request.ids.isEmpty()) throw new Error("request.ids must not be empty");
 
         String index = request.index == null ? this.index : request.index;
         var bulkRequest = new BulkRequest();
@@ -355,14 +355,14 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         int skip = request.skip == null ? 0 : request.skip;
         int limit = request.limit == null ? 0 : request.limit;
         if (skip + limit > 10000)
-            throw Exceptions.error("result window is too large, skip + limit must be less than or equal to 10000, skip={}, limit={}", request.skip, request.limit);
+            throw new Error(Strings.format("result window is too large, skip + limit must be less than or equal to 10000, skip={}, limit={}", request.skip, request.limit));
     }
 
     private void validate(ForEach<T> forEach) {
         if (forEach.consumer == null) throw new Error("forEach.consumer must not be null");
         if (forEach.query == null) throw new Error("forEach.query must not be null");
         if (forEach.scrollTimeout == null) throw new Error("forEach.scrollTimeout must not be null");
-        if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null and greater than 0");
+        if (forEach.limit == null || forEach.limit <= 0) throw new Error("forEach.limit must not be null or less than one");
     }
 
     private void checkSlowOperation(long elapsed) {

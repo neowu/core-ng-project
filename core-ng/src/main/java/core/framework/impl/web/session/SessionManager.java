@@ -1,7 +1,6 @@
 package core.framework.impl.web.session;
 
 import core.framework.impl.web.request.RequestImpl;
-import core.framework.util.Exceptions;
 import core.framework.web.CookieSpec;
 import core.framework.web.Response;
 import core.framework.web.Session;
@@ -11,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -60,7 +61,7 @@ public final class SessionManager {
     }
 
     public void sessionStore(SessionStore store) {
-        if (this.store != null) throw Exceptions.error("session store is already configured, previous={}", this.store);
+        if (this.store != null) throw new Error(format("session store is already configured, previous={}", this.store));
         this.store = store;
     }
 

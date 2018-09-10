@@ -1,9 +1,10 @@
 package core.framework.module;
 
 import core.framework.impl.web.site.StaticContentController;
-import core.framework.util.Exceptions;
 
 import java.time.Duration;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -16,7 +17,7 @@ public final class StaticContentConfig {
     }
 
     public void cache(Duration maxAge) {
-        if (maxAge == null || maxAge.getSeconds() <= 0) throw Exceptions.error("maxAge must be greater than 0, maxAge={}", maxAge);
+        if (maxAge == null || maxAge.getSeconds() <= 0) throw new Error(format("maxAge must be greater than 0, maxAge={}", maxAge));
         controller.cache(maxAge);
     }
 }

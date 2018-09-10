@@ -1,7 +1,6 @@
 package core.framework.impl.web.request;
 
 import core.framework.impl.web.HTTPHandler;
-import core.framework.util.Exceptions;
 import io.undertow.connector.PooledByteBuffer;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.AttachmentKey;
@@ -10,6 +9,8 @@ import org.xnio.IoUtils;
 import org.xnio.channels.StreamSourceChannel;
 
 import java.nio.ByteBuffer;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -54,7 +55,7 @@ public final class RequestBodyReader implements ChannelListener<StreamSourceChan
             }
             if (bytesRead == -1) {
                 if (contentLength >= 0 && position < body.length) {
-                    throw Exceptions.error("body ends prematurely, expected={}, actual={}", contentLength, position);
+                    throw new Error(format("body ends prematurely, expected={}, actual={}", contentLength, position));
                 } else if (body == null) {
                     body = new byte[0]; // without content length and has no body
                 }
@@ -70,7 +71,7 @@ public final class RequestBodyReader implements ChannelListener<StreamSourceChan
 
     private void ensureCapacity(int bytesRead) {
         if (contentLength >= 0) {
-            if (bytesRead + position > contentLength) throw Exceptions.error("body exceeds expected content length, expected={}", contentLength);
+            if (bytesRead + position > contentLength) throw new Error(format("body exceeds expected content length, expected={}", contentLength));
         } else {
             if (body == null) { // undertow buffer is 16k, if there is no content length, in most of cases, it's best just to create exact buffer as first read thru
                 body = new byte[bytesRead];

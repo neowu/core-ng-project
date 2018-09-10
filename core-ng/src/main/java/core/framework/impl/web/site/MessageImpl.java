@@ -1,6 +1,5 @@
 package core.framework.impl.web.site;
 
-import core.framework.util.Exceptions;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.util.Properties;
@@ -18,6 +17,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -64,7 +65,7 @@ public class MessageImpl implements Message {
             if (!allKeys.equals(keys)) {
                 Set<String> missingKeys = new HashSet<>(allKeys);
                 missingKeys.removeAll(keys);
-                throw Exceptions.error("message keys are missing for language, language={}, keys={}", language, missingKeys);
+                throw new Error(format("message keys are missing for language, language={}, keys={}", language, missingKeys));
             }
         });
     }
@@ -73,11 +74,11 @@ public class MessageImpl implements Message {
         if (DEFAULT_LANGUAGE.equals(language)) return;
 
         if (languages.length == 1 && DEFAULT_LANGUAGE.equals(languages[0])) {
-            throw Exceptions.error("found language specific messages, but only default language is enabled, path={}, language={}", path, language);
+            throw new Error(format("found language specific messages, but only default language is enabled, path={}, language={}", path, language));
         }
 
         if (Arrays.stream(languages).noneMatch(enabledLanguage -> enabledLanguage.startsWith(language))) {
-            throw Exceptions.error("language does not match enabled languages, path={}, language={}", path, language);
+            throw new Error(format("language does not match enabled languages, path={}, language={}", path, language));
         }
     }
 
@@ -99,7 +100,7 @@ public class MessageImpl implements Message {
     String language(String path) {
         Matcher matcher = MESSAGE_PROPERTY_PATH_PATTERN.matcher(path);
         if (!matcher.matches())
-            throw Exceptions.error("property path must match 'path/name_language.properties' pattern, path={}", path);
+            throw new Error(format("property path must match 'path/name_language.properties' pattern, path={}", path));
         String languagePostfix = matcher.group(1);
         if (Strings.isEmpty(languagePostfix)) return DEFAULT_LANGUAGE;
         return languagePostfix.substring(1);
@@ -107,13 +108,13 @@ public class MessageImpl implements Message {
 
     @Override
     public String get(String key, String language) {
-        return getMessage(key, language).orElseThrow(() -> Exceptions.error("can not find message, key={}", key));
+        return getMessage(key, language).orElseThrow(() -> new Error(format("can not find message, key={}", key)));
     }
 
     Optional<String> getMessage(String key, String language) {
         String targetLanguage = language == null ? DEFAULT_LANGUAGE : language;
         List<Properties> properties = messages.get(targetLanguage);
-        if (properties == null) throw Exceptions.error("language is not defined, please check site().message(), language={}", targetLanguage);
+        if (properties == null) throw new Error(format("language is not defined, please check site().message(), language={}", targetLanguage));
         for (Properties property : properties) {
             Optional<String> message = property.get(key);
             if (message.isPresent()) return message;

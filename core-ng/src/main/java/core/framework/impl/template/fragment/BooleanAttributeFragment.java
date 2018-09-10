@@ -5,7 +5,8 @@ import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionHolder;
-import core.framework.util.Exceptions;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -18,8 +19,7 @@ public class BooleanAttributeFragment implements Fragment {
         this.name = name;
         this.expression = new ExpressionBuilder(expression, context, location).build();
         if (!Boolean.class.equals(GenericTypes.rawClass(this.expression.returnType)))
-            throw Exceptions.error("boolean attribute expression must return Boolean, condition={}, returnType={}, location={}",
-                expression, this.expression.returnType.getTypeName(), location);
+            throw new Error(format("boolean attribute expression must return Boolean, condition={}, returnType={}, location={}", expression, this.expression.returnType.getTypeName(), location));
     }
 
     @Override

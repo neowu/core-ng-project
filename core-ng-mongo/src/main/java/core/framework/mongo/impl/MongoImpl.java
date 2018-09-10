@@ -7,7 +7,6 @@ import com.mongodb.client.MongoDatabase;
 import core.framework.mongo.Collection;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
-import core.framework.util.Exceptions;
 import core.framework.util.StopWatch;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -15,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -74,7 +75,7 @@ public class MongoImpl implements Mongo {
 
     public void uri(String uri) {
         this.uri = new MongoClientURI(uri, builder);
-        if (this.uri.getDatabase() == null) throw Exceptions.error("uri must have database, uri={}", uri);
+        if (this.uri.getDatabase() == null) throw new Error(format("uri must have database, uri={}", uri));
     }
 
     public void poolSize(int minSize, int maxSize) {

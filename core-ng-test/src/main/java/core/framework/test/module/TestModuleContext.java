@@ -2,7 +2,6 @@ package core.framework.test.module;
 
 import core.framework.impl.inject.Key;
 import core.framework.impl.module.ModuleContext;
-import core.framework.util.Exceptions;
 import core.framework.util.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -22,7 +23,7 @@ public class TestModuleContext extends ModuleContext {
     @SuppressWarnings("unchecked")
     public <T> T getConfig(Class<T> configClass, String name) {
         T config = (T) configs.get(configClass.getCanonicalName() + ":" + name);
-        if (config == null) throw Exceptions.error("can not find config, configClass={}, name={}", configClass.getCanonicalName(), name);
+        if (config == null) throw new Error(format("can not find config, configClass={}, name={}", configClass.getCanonicalName(), name));
         return config;
     }
 
@@ -41,7 +42,7 @@ public class TestModuleContext extends ModuleContext {
     public void bind(Type type, String name, Object instance) {
         var key = new Key(type, name);
         if (overrideBindings.contains(key)) {
-            if (skippedBindings.contains(key)) throw Exceptions.error("found duplicate bean, type={}, name={}", type.getTypeName(), name);
+            if (skippedBindings.contains(key)) throw new Error(format("found duplicate bean, type={}, name={}", type.getTypeName(), name));
             skippedBindings.add(key);
             logger.info("skip bean binding, bean is overridden in test context, type={}, name={}", type.getTypeName(), name);
         } else {
@@ -65,6 +66,6 @@ public class TestModuleContext extends ModuleContext {
         Set<Key> notAppliedBindings = new HashSet<>(overrideBindings);
         notAppliedBindings.removeAll(skippedBindings);
         if (!notAppliedBindings.isEmpty())
-            throw Exceptions.error("found unnecessary override bindings, please check test module, bindings={}", notAppliedBindings);
+            throw new Error(format("found unnecessary override bindings, please check test module, bindings={}", notAppliedBindings));
     }
 }

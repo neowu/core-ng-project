@@ -1,12 +1,13 @@
 package core.framework.impl.web.http;
 
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -23,7 +24,7 @@ class RateLimiter {
     public void config(String group, int maxPermits, int fillRate, TimeUnit unit) {
         double fillRatePerNano = ratePerNano(fillRate, unit);
         RateConfig previous = config.put(group, new RateConfig(maxPermits, fillRatePerNano));
-        if (previous != null) throw Exceptions.error("found duplicate group, group={}", group);
+        if (previous != null) throw new Error(format("found duplicate group, group={}", group));
     }
 
     double ratePerNano(int rate, TimeUnit unit) {

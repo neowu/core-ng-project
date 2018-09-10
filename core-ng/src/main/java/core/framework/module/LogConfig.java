@@ -7,10 +7,11 @@ import core.framework.impl.log.stat.CollectStatTask;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
-import core.framework.util.Exceptions;
 
 import java.time.Duration;
 import java.util.Collections;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -38,7 +39,7 @@ public class LogConfig extends Config {
     }
 
     private void setLogAppender(Appender appender) {
-        if (context.logManager.appender != null) throw Exceptions.error("log appender is already set, appender={}", context.logManager.appender.getClass().getSimpleName());
+        if (context.logManager.appender != null) throw new Error(format("log appender is already set, appender={}", context.logManager.appender.getClass().getSimpleName()));
         context.logManager.appender = appender;
     }
 

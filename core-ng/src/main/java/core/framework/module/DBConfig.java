@@ -10,12 +10,13 @@ import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.resource.PoolMetrics;
-import core.framework.util.Exceptions;
 import core.framework.util.Lists;
 import core.framework.util.Types;
 
 import java.time.Duration;
 import java.util.List;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -37,9 +38,9 @@ public class DBConfig extends Config {
 
     @Override
     protected void validate() {
-        if (url == null) throw Exceptions.error("db url must be configured, name={}", name);
+        if (url == null) throw new Error(format("db url must be configured, name={}", name));
         if (!entityAdded)
-            throw Exceptions.error("db is configured but no repository/view added, please remove unnecessary config, name={}", name);
+            throw new Error(format("db is configured but no repository/view added, please remove unnecessary config, name={}", name));
     }
 
     private DatabaseImpl createDatabase() {
@@ -52,7 +53,7 @@ public class DBConfig extends Config {
     }
 
     public void url(String url) {
-        if (this.url != null) throw Exceptions.error("db url is already configured, name={}, url={}, previous={}", name, url, this.url);
+        if (this.url != null) throw new Error(format("db url is already configured, name={}, url={}, previous={}", name, url, this.url));
         Vendor vendor = vendor(url);
         database.vendor = vendor;
         database.url(databaseURL(url, vendor));
@@ -69,7 +70,7 @@ public class DBConfig extends Config {
         } else if (url.startsWith("jdbc:oracle:")) {
             return Vendor.ORACLE;
         }
-        throw Exceptions.error("not supported database vendor, url={}", url);
+        throw new Error(format("not supported database vendor, url={}", url));
     }
 
     public void user(String user) {
@@ -114,13 +115,13 @@ public class DBConfig extends Config {
     }
 
     public void view(Class<?> viewClass) {
-        if (url == null) throw Exceptions.error("db url must be configured first, name={}", name);
+        if (url == null) throw new Error(format("db url must be configured first, name={}", name));
         database.view(viewClass);
         entityAdded = true;
     }
 
     public <T> void repository(Class<T> entityClass) {
-        if (url == null) throw Exceptions.error("db url must be configured first, name={}", name);
+        if (url == null) throw new Error(format("db url must be configured first, name={}", name));
         context.beanFactory.bind(Types.generic(Repository.class, entityClass), name, database.repository(entityClass));
         entityAdded = true;
         entityClasses.add(entityClass);

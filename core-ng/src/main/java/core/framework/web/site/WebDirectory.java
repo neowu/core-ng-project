@@ -1,6 +1,5 @@
 package core.framework.web.site;
 
-import core.framework.util.Exceptions;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +9,8 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -57,13 +58,13 @@ public final class WebDirectory {
     }
 
     public Path path(String path) {
-        if (!Strings.startsWith(path, '/')) throw Exceptions.error("path must start with '/', path={}", path);
+        if (!Strings.startsWith(path, '/')) throw new Error(format("path must start with '/', path={}", path));
         return root().resolve(path.substring(1)).toAbsolutePath();
     }
 
     public Path root() {
         if (root == null)
-            throw Exceptions.error("can not find web path, set working dir to module path for local dev env, workingDir={}, or check -Dcore.webPath for server env.", System.getProperty("user.dir"));
+            throw new Error(format("can not find web path, set working dir to module path for local dev env, workingDir={}, or check -Dcore.webPath for server env.", System.getProperty("user.dir")));
         return root;
     }
 }

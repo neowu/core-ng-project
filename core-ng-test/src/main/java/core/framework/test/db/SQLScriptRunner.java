@@ -1,7 +1,6 @@
 package core.framework.test.db;
 
 import core.framework.db.Database;
-import core.framework.util.Exceptions;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +10,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -54,7 +55,7 @@ public final class SQLScriptRunner {
                 }
             }
         } catch (RuntimeException | IOException e) {
-            throw Exceptions.error("failed to run script, error={}, line={}", e.getMessage(), lineNumber, e);
+            throw new Error(format("failed to run script, error={}, line={}", e.getMessage(), lineNumber), e);
         }
     }
 

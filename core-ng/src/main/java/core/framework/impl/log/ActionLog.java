@@ -1,7 +1,5 @@
 package core.framework.impl.log;
 
-import core.framework.util.Exceptions;
-
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.time.Instant;
@@ -15,6 +13,7 @@ import java.util.UUID;
 
 import static core.framework.impl.log.LogLevel.DEBUG;
 import static core.framework.impl.log.LogLevel.WARN;
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -122,11 +121,11 @@ public final class ActionLog {
     public void context(String key, Object value) {
         String contextValue = String.valueOf(value);
         if (contextValue.length() > MAX_CONTEXT_VALUE_LENGTH) { // prevent application code from putting large blob as context, e.g. xml or json response
-            throw Exceptions.error("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_CONTEXT_VALUE_LENGTH));
+            throw new Error(format("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_CONTEXT_VALUE_LENGTH)));
         }
         String previous = context.put(key, contextValue);
         // put context can be called by application code, check duplication to avoid producing huge trace log by accident
-        if (previous != null) throw Exceptions.error("found duplicate context key, key={}, value={}, previous={}", key, contextValue, previous);
+        if (previous != null) throw new Error(format("found duplicate context key, key={}, value={}, previous={}", key, contextValue, previous));
         add(event("[context] {}={}", key, contextValue));
     }
 

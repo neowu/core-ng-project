@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * due to Java 9 doesn't provide formal way to reflect lambda method reference, we uses internal API for now
+ * due to Java 9+ doesn't provide formal way to reflect lambda method reference, we uses internal API for now
  * and wait for JDK update in future
  *
  * @author neo
@@ -32,7 +32,7 @@ public class ControllerInspector {
 
             CONTROLLER_EXECUTE = Controller.class.getDeclaredMethod("execute", Request.class);
         } catch (ReflectiveOperationException e) {
-            throw new Error("failed to initialize controller inspector, please contact arch team", e);
+            throw new Error("failed to initialize controller inspector", e);
         }
     }
 

@@ -1,6 +1,5 @@
 package core.framework.impl.log.filter;
 
-import core.framework.util.Exceptions;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
 
@@ -19,48 +18,48 @@ public class LogFilter {
         if (arguments == null || arguments.length == 0) {
             return message;    // log message can be null, e.g. message of NPE
         }
-        Object[] filteredArguments = new Object[arguments.length];
+        var filteredArguments = new Object[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
-            filteredArguments[i] = filterParam(arguments[i]);
+            filteredArguments[i] = filterArgument(arguments[i]);
         }
         return Strings.format(message, filteredArguments);
     }
 
-    private String filterParam(Object argument) {
+    private String filterArgument(Object argument) {
         if (argument == null) return null;
 
         String value;
         if (argument instanceof FilterParam) {
-            return ((FilterParam) argument).filter(maskedFields);
+            value = ((FilterParam) argument).filter(maskedFields);
         } else if (argument.getClass().isArray()) {
-            return filterArrayParam(argument);
+            value = filterArrayArgument(argument);
         } else {
             value = String.valueOf(argument);
         }
         return truncate(value, MAX_PARAM_SIZE);
     }
 
-    private String filterArrayParam(Object param) {
-        if (param instanceof Object[]) {
-            return Arrays.toString((Object[]) param);
-        } else if (param instanceof int[]) {
-            return Arrays.toString((int[]) param);
-        } else if (param instanceof long[]) {
-            return Arrays.toString((long[]) param);
-        } else if (param instanceof char[]) {
-            return Arrays.toString((char[]) param);
-        } else if (param instanceof double[]) {
-            return Arrays.toString((double[]) param);
-        } else if (param instanceof byte[]) {
-            return Arrays.toString((byte[]) param);
-        } else if (param instanceof boolean[]) {
-            return Arrays.toString((boolean[]) param);
-        } else if (param instanceof short[]) {
-            return Arrays.toString((short[]) param);
-        } else if (param instanceof float[]) {
-            return Arrays.toString((float[]) param);
+    private String filterArrayArgument(Object argument) {
+        if (argument instanceof Object[]) {
+            return Arrays.toString((Object[]) argument);
+        } else if (argument instanceof int[]) {
+            return Arrays.toString((int[]) argument);
+        } else if (argument instanceof long[]) {
+            return Arrays.toString((long[]) argument);
+        } else if (argument instanceof char[]) {
+            return Arrays.toString((char[]) argument);
+        } else if (argument instanceof double[]) {
+            return Arrays.toString((double[]) argument);
+        } else if (argument instanceof byte[]) {
+            return Arrays.toString((byte[]) argument);
+        } else if (argument instanceof boolean[]) {
+            return Arrays.toString((boolean[]) argument);
+        } else if (argument instanceof short[]) {
+            return Arrays.toString((short[]) argument);
+        } else if (argument instanceof float[]) {
+            return Arrays.toString((float[]) argument);
         }
-        throw Exceptions.error("unknown array type, paramClass={}", param.getClass().getCanonicalName());
+        throw new Error(Strings.format("unknown array type, class={}", argument.getClass().getCanonicalName()));
     }
 
     String truncate(String value, int maxSize) {

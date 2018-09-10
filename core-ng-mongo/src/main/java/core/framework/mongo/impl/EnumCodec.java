@@ -2,7 +2,6 @@ package core.framework.mongo.impl;
 
 import core.framework.impl.reflect.Enums;
 import core.framework.mongo.MongoEnumValue;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
 import org.bson.BsonReader;
 import org.bson.BsonType;
@@ -15,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -56,7 +57,7 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
         } else if (currentType == BsonType.STRING) {
             String enumValue = reader.readString();
             T value = decodingMappings.get(enumValue);
-            if (value == null) throw Exceptions.error("can not decode value to enum, enumClass={}, value={}", enumClass.getCanonicalName(), enumValue);
+            if (value == null) throw new Error(format("can not decode value to enum, enumClass={}, value={}", enumClass.getCanonicalName(), enumValue));
             return value;
         } else {
             logger.warn("unexpected field type, field={}, type={}", field, currentType);

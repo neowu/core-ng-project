@@ -16,7 +16,6 @@ import core.framework.impl.web.route.Path;
 import core.framework.json.JSON;
 import core.framework.log.Severity;
 import core.framework.util.Encodings;
-import core.framework.util.Exceptions;
 import core.framework.util.Strings;
 import core.framework.web.service.RemoteServiceException;
 import core.framework.web.service.WebServiceClientInterceptor;
@@ -25,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -71,18 +72,18 @@ public class WebServiceClient {
 
     private String pathParam(Map<String, Object> pathParams, String variable) {
         Object param = pathParams.get(variable);
-        if (param == null) throw Exceptions.error("path param must not be null, name={}", variable);
+        if (param == null) throw new Error(format("path param must not be null, name={}", variable));
         // convert logic matches PathParams
         if (param instanceof String) {
             String paramValue = (String) param;
-            if (Strings.isEmpty(paramValue)) throw Exceptions.error("path param must not be empty, name={}", variable);
+            if (Strings.isEmpty(paramValue)) throw new Error(format("path param must not be empty, name={}", variable));
             return paramValue;
         } else if (param instanceof Number) {
             return String.valueOf(param);
         } else if (param instanceof Enum) {
             return JSON.toEnumValue((Enum<?>) param);
         } else {
-            throw Exceptions.error("not supported path param type, please contact arch team, type={}", param.getClass().getCanonicalName());
+            throw new Error(format("not supported path param type, type={}", param.getClass().getCanonicalName()));
         }
     }
 
@@ -119,12 +120,12 @@ public class WebServiceClient {
             byte[] json = requestBeanMapper.toJSON(requestBeanClass, requestBean);
             request.body(json, ContentType.APPLICATION_JSON);
         } else {
-            throw Exceptions.error("not supported method, method={}", method);
+            throw new Error(format("not supported method, method={}", method));
         }
     }
 
     public void intercept(WebServiceClientInterceptor interceptor) {
-        if (this.interceptor != null) throw Exceptions.error("found duplicate interceptor, previous={}", this.interceptor.getClass().getCanonicalName());
+        if (this.interceptor != null) throw new Error(format("found duplicate interceptor, previous={}", this.interceptor.getClass().getCanonicalName()));
         this.interceptor = interceptor;
     }
 
@@ -158,7 +159,7 @@ public class WebServiceClient {
         } catch (Throwable e) {
             String responseText = response.text();
             logger.warn("failed to decode response, statusCode={}, responseText={}", status.code, responseText, e);
-            throw new RemoteServiceException(Strings.format("internal communication failed, status={}, responseText={}", status.code, responseText), Severity.ERROR, "REMOTE_SERVICE_ERROR", status, e);
+            throw new RemoteServiceException(format("internal communication failed, status={}, responseText={}", status.code, responseText), Severity.ERROR, "REMOTE_SERVICE_ERROR", status, e);
         }
     }
 

@@ -3,7 +3,6 @@ package core.framework.impl.db;
 import core.framework.db.UncheckedSQLException;
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
-import core.framework.util.Exceptions;
 import core.framework.util.Lists;
 
 import java.math.BigDecimal;
@@ -19,6 +18,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -129,7 +130,7 @@ public class DatabaseOperation {
 
     private void validateSelectSQL(String sql) {
         if (sql.contains("*"))
-            throw Exceptions.error("sql must not contain wildcard(*), please only select columns needed, sql={}", sql);
+            throw new Error(format("sql must not contain wildcard(*), please only select columns needed, sql={}", sql));
     }
 
     private <T> Optional<T> fetchOne(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {
@@ -201,7 +202,7 @@ public class DatabaseOperation {
         } else if (param == null) {
             statement.setObject(index, null);
         } else {
-            throw Exceptions.error("unsupported param type, please contact arch team, type={}, value={}", param.getClass().getCanonicalName(), param);
+            throw new Error(format("unsupported param type, type={}, value={}", param.getClass().getCanonicalName(), param));
         }
     }
 }

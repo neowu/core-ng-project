@@ -2,11 +2,12 @@ package core.framework.impl.web.route;
 
 import core.framework.http.HTTPMethod;
 import core.framework.impl.web.controller.ControllerHolder;
-import core.framework.util.Exceptions;
 import core.framework.web.exception.MethodNotAllowedException;
 
 import java.util.EnumMap;
 import java.util.Map;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -22,7 +23,7 @@ class URLHandler {
     void put(HTTPMethod method, ControllerHolder controller) {
         ControllerHolder previous = controllers.putIfAbsent(method, controller);
         if (previous != null) {
-            throw Exceptions.error("found duplicate controller, path={}, method={}", pathPattern, method);
+            throw new Error(format("found duplicate controller, path={}, method={}", pathPattern, method));
         }
     }
 

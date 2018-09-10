@@ -13,7 +13,6 @@
 * ws: provide way to handler json command with validation?
 * kafka: unique groupId to listen all messages for ws
 * http: rewrite path parsing for better speed?
-* delete Exceptions.error()
 * rewrite all equals/hashcode
 
 ### jdk 9/10 incompatible list

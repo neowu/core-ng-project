@@ -7,13 +7,14 @@ import core.framework.impl.template.node.Document;
 import core.framework.impl.template.node.Element;
 import core.framework.impl.template.node.Text;
 import core.framework.impl.template.source.TemplateSource;
-import core.framework.util.Exceptions;
 import core.framework.util.Strings;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -58,11 +59,11 @@ public class HTMLParser {
                     String endTag = lexer.currentToken();
                     String endTagName = validateTagName(endTag.substring(2, endTag.length() - 1));
                     if (voidElements.contains(endTagName))
-                        throw Exceptions.error("void element must not have close tag, tag={}, location={}", endTagName, lexer.currentLocation());
+                        throw new Error(format("void element must not have close tag, tag={}, location={}", endTagName, lexer.currentLocation()));
                     closeTag(endTagName);
                     break;
                 default:
-                    throw Exceptions.error("unexpected type, type={}, location={}", type, lexer.currentLocation());
+                    throw new Error(format("unexpected type, type={}, location={}", type, lexer.currentLocation()));
             }
         }
         return document;
@@ -97,7 +98,7 @@ public class HTMLParser {
                     break;
                 case ATTRIBUTE_VALUE:
                     if (currentAttribute == null)
-                        throw Exceptions.error("attribute syntax is invalid, location={}", lexer.currentLocation());
+                        throw new Error(format("attribute syntax is invalid, location={}", lexer.currentLocation()));
                     String attributeValue = lexer.currentToken();
                     if (attributeValue.startsWith("\"")) {
                         currentAttribute.value = attributeValue.substring(1, attributeValue.length() - 1);
@@ -107,7 +108,7 @@ public class HTMLParser {
                     }
                     break;
                 default:
-                    throw Exceptions.error("unexpected type, type={}, location={}", type, lexer.currentLocation());
+                    throw new Error(format("unexpected type, type={}, location={}", type, lexer.currentLocation()));
             }
         }
     }
@@ -116,7 +117,7 @@ public class HTMLParser {
         while (true) {
             ContainerNode lastNode = stack.pop();
             if (lastNode instanceof Document)
-                throw Exceptions.error("can not find matched tag to close, tagName={}, location={}", tagName, lexer.currentLocation());
+                throw new Error(format("can not find matched tag to close, tagName={}, location={}", tagName, lexer.currentLocation()));
             Element element = (Element) lastNode;
             if (element.name.equals(tagName)) {
                 element.hasEndTag = true;
@@ -127,37 +128,36 @@ public class HTMLParser {
 
     private String validateTagName(String name) {
         if (!tagNamePattern.matcher(name).matches())
-            throw Exceptions.error("tag name must match {}, name={}, location={}", tagNamePattern.pattern(), name, lexer.currentLocation());
+            throw new Error(format("tag name must match {}, name={}, location={}", tagNamePattern.pattern(), name, lexer.currentLocation()));
         return name;
     }
 
     private void validateSelfCloseTag(String tagName) {
         if (voidElements.contains(tagName))
-            throw Exceptions.error("it is recommended not to close void element, tag={}, location={}", tagName, lexer.currentLocation());
+            throw new Error(format("it is recommended not to close void element, tag={}, location={}", tagName, lexer.currentLocation()));
         else
-            throw Exceptions.error("non void element must not be self-closed, tag={}, location={}", tagName, lexer.currentLocation());
+            throw new Error(format("non void element must not be self-closed, tag={}, location={}", tagName, lexer.currentLocation()));
     }
 
     private void validateAttribute(Attribute attribute) {
         boolean isBooleanAttribute = booleanAttributes.contains(attribute.name);
         if (!isBooleanAttribute && attribute.value == null)
-            throw Exceptions.error("non boolean attribute must have value, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location);
+            throw new Error(format("non boolean attribute must have value, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location));
         if (isBooleanAttribute && attribute.value != null)
-            throw Exceptions.error("it is recommended not to put value for boolean attribute, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location);
+            throw new Error(format("it is recommended not to put value for boolean attribute, attribute={}>{}, location={}", attribute.tagName, attribute.name, attribute.location));
 
         if ("link".equals(attribute.tagName) && "href".equals(attribute.name)
-            || "script".equals(attribute.tagName) && "src".equals(attribute.name)
-            || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
+                || "script".equals(attribute.tagName) && "src".equals(attribute.name)
+                || "img".equals(attribute.tagName) && "src".equals(attribute.name)) {
             validateStaticResourceURL(attribute);
         }
     }
 
     private void validateStaticResourceURL(Attribute attribute) {
         if (!attribute.value.startsWith("http://")
-            && !attribute.value.startsWith("https://")
-            && !attribute.value.startsWith("//")
-            && !Strings.startsWith(attribute.value, '/'))
-            throw Exceptions.error("static resource url value must be either absolute or start with '/', attribute={}>{}, value={}, location={}",
-                attribute.tagName, attribute.name, attribute.value, attribute.location);
+                && !attribute.value.startsWith("https://")
+                && !attribute.value.startsWith("//")
+                && !Strings.startsWith(attribute.value, '/'))
+            throw new Error(format("static resource url value must be either absolute or start with '/', attribute={}>{}, value={}, location={}", attribute.tagName, attribute.name, attribute.value, attribute.location));
     }
 }

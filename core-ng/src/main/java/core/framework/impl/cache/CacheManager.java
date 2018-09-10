@@ -1,8 +1,8 @@
 package core.framework.impl.cache;
 
 import core.framework.cache.Cache;
-import core.framework.util.Exceptions;
 import core.framework.util.Maps;
+import core.framework.util.Strings;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -27,7 +27,7 @@ public class CacheManager {
 
         CacheImpl<T> cache = new CacheImpl<>(name, valueType, duration, cacheStore);
         CacheImpl<?> previous = caches.putIfAbsent(name, cache);
-        if (previous != null) throw Exceptions.error("found duplicate cache name, name={}", name);
+        if (previous != null) throw new Error(Strings.format("found duplicate cache name, name={}", name));
         return cache;
     }
 

@@ -5,11 +5,12 @@ import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionHolder;
-import core.framework.util.Exceptions;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -23,7 +24,7 @@ public class ForFragment extends ContainerFragment {
     public ForFragment(String statement, TemplateMetaContext context, String location) {
         Matcher matcher = STATEMENT_PATTERN.matcher(statement);
         if (!matcher.matches())
-            throw Exceptions.error("statement must match \"var:list\", statement={}, location={}", statement, location);
+            throw new Error(format("statement must match \"var:list\", statement={}, location={}", statement, location));
 
         variable = matcher.group(1);
         String list = matcher.group(2);
@@ -31,7 +32,7 @@ public class ForFragment extends ContainerFragment {
         ExpressionBuilder builder = new ExpressionBuilder(list, context, location);
         this.expression = builder.build();
         if (!GenericTypes.isGenericList(expression.returnType))
-            throw Exceptions.error("for statement must return List<T>, list={}, returnType={}, location={}", list, expression.returnType.getTypeName(), location);
+            throw new Error(format("for statement must return List<T>, list={}, returnType={}, location={}", list, expression.returnType.getTypeName(), location));
 
         valueClass = GenericTypes.listValueClass(expression.returnType);
     }

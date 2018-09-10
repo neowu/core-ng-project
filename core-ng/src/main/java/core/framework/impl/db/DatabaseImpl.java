@@ -7,7 +7,6 @@ import core.framework.db.UncheckedSQLException;
 import core.framework.impl.resource.Pool;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
-import core.framework.util.Exceptions;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -111,7 +112,7 @@ public final class DatabaseImpl implements Database {
     }
 
     public void url(String url) {
-        if (!url.startsWith("jdbc:")) throw Exceptions.error("jdbc url must start with \"jdbc:\", url={}", url);
+        if (!url.startsWith("jdbc:")) throw new Error(format("jdbc url must start with \"jdbc:\", url={}", url));
         logger.info("set database connection url, url={}", url);
         this.url = url;
         driver = driver(url);
@@ -125,7 +126,7 @@ public final class DatabaseImpl implements Database {
         } else if (url.startsWith("jdbc:hsqldb:")) {
             return createDriver("org.hsqldb.jdbc.JDBCDriver");
         } else {
-            throw Exceptions.error("not supported database, url={}", url);
+            throw new Error(format("not supported database, url={}", url));
         }
     }
 
@@ -231,13 +232,13 @@ public final class DatabaseImpl implements Database {
         @SuppressWarnings("unchecked")
         RowMapper<T> mapper = (RowMapper<T>) rowMappers.get(viewClass);
         if (mapper == null)
-            throw Exceptions.error("view class is not registered, please register in module by db().view(), viewClass={}", viewClass.getCanonicalName());
+            throw new Error(format("view class is not registered, please register in module by db().view(), viewClass={}", viewClass.getCanonicalName()));
         return mapper;
     }
 
     private <T> void registerViewClass(Class<T> viewClass) {
         if (rowMappers.containsKey(viewClass)) {
-            throw Exceptions.error("found duplicate view class, viewClass={}", viewClass.getCanonicalName());
+            throw new Error(format("found duplicate view class, viewClass={}", viewClass.getCanonicalName()));
         }
         RowMapper<T> mapper = new RowMapperBuilder<>(viewClass, operation.enumMapper).build();
         rowMappers.put(viewClass, mapper);

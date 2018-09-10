@@ -8,7 +8,8 @@ import core.framework.impl.template.fragment.TextContentFragment;
 import core.framework.impl.template.fragment.URLFragment;
 import core.framework.impl.template.parser.HTMLParser;
 import core.framework.impl.template.source.TemplateSource;
-import core.framework.util.Exceptions;
+
+import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -104,7 +105,7 @@ public class Attribute {
     }
 
     void addMessageAttribute(ContainerFragment parent, TemplateMetaContext context) {
-        String message = context.message.get(value).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
+        String message = context.message.get(value).orElseThrow(() -> new Error(format("can not find message, key={}, location={}", value, location)));
         parent.addStaticContent(" ");
         parent.addStaticContent(name.substring(2));
         parent.addStaticContent("=\"");
@@ -121,7 +122,7 @@ public class Attribute {
                 parent.add(new HTMLContentFragment(value, context, location));
                 break;
             case "m:text":
-                String message = context.message.get(value).orElseThrow(() -> Exceptions.error("can not find message, key={}, location={}", value, location));
+                String message = context.message.get(value).orElseThrow(() -> new Error(format("can not find message, key={}, location={}", value, location)));
                 parent.addStaticContent(message);
                 break;
             case "c:include":
@@ -130,7 +131,7 @@ public class Attribute {
                 document.buildTemplate(parent, context, includedSource);
                 break;
             default:
-                throw Exceptions.error("not supported dynamic content attribute, name={}", name);
+                throw new Error(format("not supported dynamic content attribute, name={}", name));
         }
     }
 }
