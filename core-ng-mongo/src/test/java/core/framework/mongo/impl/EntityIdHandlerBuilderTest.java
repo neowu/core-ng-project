@@ -29,8 +29,8 @@ class EntityIdHandlerBuilderTest {
     }
 
     @Test
-    void setId() {
-        ObjectId id = new ObjectId();
+    void set() {
+        var id = new ObjectId();
         TestEntity entity = new TestEntity();
         handler.set(entity, id);
 
@@ -38,8 +38,8 @@ class EntityIdHandlerBuilderTest {
     }
 
     @Test
-    void getId() {
-        TestEntity entity = new TestEntity();
+    void testGet() {
+        var entity = new TestEntity();
         entity.id = new ObjectId();
         ObjectId id = (ObjectId) handler.get(entity);
 

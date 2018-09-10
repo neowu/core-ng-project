@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class SQLParamsTest {
     @Test
-    void toStringWithEnum() {
+    void convertToStringWithEnum() {
         EnumDBMapper mapper = new EnumDBMapper();
         mapper.registerEnumClass(TestEnum.class);
         SQLParams params = new SQLParams(mapper, "String", 1, TestEnum.V2, LocalDate.of(2018, 6, 1));
@@ -19,20 +19,20 @@ class SQLParamsTest {
     }
 
     @Test
-    void toStringWithUnregisteredEnum() {
+    void convertToStringWithUnregisteredEnum() {
         EnumDBMapper mapper = new EnumDBMapper();
         SQLParams params = new SQLParams(mapper, TestEnum.V1);
         assertThat(params.toString()).isEqualTo("[V1]");
     }
 
     @Test
-    void toStringWithEmpty() {
+    void convertToStringWithEmpty() {
         SQLParams params = new SQLParams(null);
         assertThat(params.toString()).isEqualTo("[]");
     }
 
     @Test
-    void toStringWithNull() {
+    void convertToStringWithNull() {
         SQLParams params = new SQLParams(null, (Object[]) null);
         assertThat(params.toString()).isEqualTo("null");
     }

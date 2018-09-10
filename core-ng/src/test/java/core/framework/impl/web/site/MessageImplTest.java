@@ -50,14 +50,14 @@ class MessageImplTest {
     }
 
     @Test
-    void getWithNotDefinedLanguage() {
+    void testGetWithNotDefinedLanguage() {
         assertThatThrownBy(() -> message.get("key1", "es_GT"))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("language is not defined");
     }
 
     @Test
-    void getWithNotExistedKey() {
+    void testGetWithNotExistedKey() {
         assertThatThrownBy(() -> message.get("notExistedKey", "zh"))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("can not find message");

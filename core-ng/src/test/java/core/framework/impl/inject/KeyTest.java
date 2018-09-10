@@ -6,15 +6,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class KeyTest {
     @Test
-    void asMapKey() {
-        Key stringKey1 = new Key(String.class, null);
-        Key stringKey2 = new Key(String.class, null);
+    void testAsMapKey() {
+        var stringKey1 = new Key(String.class, null);
+        var stringKey2 = new Key(String.class, null);
         assertThat(stringKey1)
                 .isEqualTo(stringKey2)
                 .hasSameHashCodeAs(stringKey2);
 
-        Key stringKey3 = new Key(String.class, "name");
-        Key stringKey4 = new Key(String.class, "name");
+        var stringKey3 = new Key(String.class, "name");
+        var stringKey4 = new Key(String.class, "name");
         assertThat(stringKey3)
                 .isEqualTo(stringKey4)
                 .hasSameHashCodeAs(stringKey4);

@@ -20,7 +20,7 @@ class PropertiesTest {
     }
 
     @Test
-    void getEmptyValue() {
+    void testGetEmptyValue() {
         properties.set("key", "");
 
         assertFalse(properties.get("key").isPresent());

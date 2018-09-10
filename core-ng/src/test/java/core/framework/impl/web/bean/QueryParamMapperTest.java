@@ -31,7 +31,7 @@ class QueryParamMapperTest {
     }
 
     @Test
-    void toParams() {
+    void testToParams() {
         var bean = new TestQueryParamBean();
         bean.stringField = "value";
         bean.intField = 12;

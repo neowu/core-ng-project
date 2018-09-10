@@ -23,7 +23,7 @@ class LocalSessionStoreTest {
     }
 
     @Test
-    void getAndRefresh() {
+    void testGetAndRefresh() {
         localSessionStore.values.put("sessionId", new LocalSessionStore.SessionValue(Instant.now().plus(Duration.ofHours(1)), Maps.newHashMap()));
         Map<String, String> values = localSessionStore.getAndRefresh("sessionId", Duration.ofSeconds(30));
 
@@ -31,7 +31,7 @@ class LocalSessionStoreTest {
     }
 
     @Test
-    void getAndRefreshWithExpiredSession() {
+    void testGetAndRefreshWithExpiredSession() {
         localSessionStore.values.put("sessionId", new LocalSessionStore.SessionValue(Instant.now().minus(Duration.ofSeconds(30)), Maps.newHashMap()));
         Map<String, String> values = localSessionStore.getAndRefresh("sessionId", Duration.ofSeconds(30));
 
@@ -39,7 +39,7 @@ class LocalSessionStoreTest {
     }
 
     @Test
-    void getAndRefreshWithNotExistedSessionId() {
+    void testGetAndRefreshWithNotExistedSessionId() {
         Map<String, String> values = localSessionStore.getAndRefresh("sessionId", Duration.ofSeconds(30));
 
         assertThat(values).isNull();

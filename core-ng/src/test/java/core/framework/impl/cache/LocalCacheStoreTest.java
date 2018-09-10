@@ -23,7 +23,7 @@ class LocalCacheStoreTest {
     }
 
     @Test
-    void getAll() {
+    void testGetAll() {
         Map<String, byte[]> values = cacheStore.getAll("key1", "key2");
         assertNull(values.get("key1"));
         assertNull(values.get("key2"));
@@ -39,7 +39,7 @@ class LocalCacheStoreTest {
     }
 
     @Test
-    void getExpiredKey() {
+    void testGetWithExpiredKey() {
         byte[] value = Strings.bytes("value");
         cacheStore.put("key1", value, Duration.ZERO);
 

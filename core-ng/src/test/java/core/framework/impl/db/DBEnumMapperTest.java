@@ -3,8 +3,7 @@ package core.framework.impl.db;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -18,9 +17,9 @@ class DBEnumMapperTest {
     }
 
     @Test
-    void getEnum() {
-        assertNull(mapper.getEnum(null));
-        assertEquals(TestEnum.V1, mapper.getEnum("DB_V1"));
-        assertEquals(TestEnum.V2, mapper.getEnum("DB_V2"));
+    void testGetEnum() {
+        assertThat(mapper.getEnum(null)).isNull();
+        assertThat(mapper.getEnum("DB_V1")).isEqualTo(TestEnum.V1);
+        assertThat(mapper.getEnum("DB_V2")).isEqualTo(TestEnum.V2);
     }
 }
