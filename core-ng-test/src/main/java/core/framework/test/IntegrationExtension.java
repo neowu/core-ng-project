@@ -22,7 +22,7 @@ public final class IntegrationExtension implements TestInstancePostProcessor {
     private AbstractTestModule createTestModule(Class<?> testClass, ExtensionContext.Store store) {
         Boolean initialized = store.get(KEY_INITIALIZED, Boolean.class);
         if (Boolean.TRUE.equals(initialized)) throw new Error("test context failed to initialize, please check error message from previous integration test");
-        store.put(KEY_INITIALIZED, true);
+        store.put(KEY_INITIALIZED, Boolean.TRUE);
         Context context = findContext(testClass);
         try {
             AbstractTestModule module = context.module().getConstructor().newInstance();

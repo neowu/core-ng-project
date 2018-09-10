@@ -177,7 +177,7 @@ public final class RequestParser {
                    .append("://")
                    .append(exchange.getHostName());
 
-            if (!("http".equals(scheme) && port == 80) && !("https".equals(scheme) && port == 443)) {
+            if (!(port == 80 && "http".equals(scheme)) && !(port == 443 && "https".equals(scheme))) {
                 builder.append(':').append(port);
             }
 

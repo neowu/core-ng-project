@@ -29,16 +29,26 @@
 
         <!--Coding:-->
         <module name="AvoidConstantAsFirstOperandInConditionCheck"/>    <!--provided by sevntu-checkstyle-->
-        <module name="AvoidHidingCauseExceptionCheck"/>                 <!--provided by sevntu-checkstyle-->
+        <module name="AvoidHidingCauseException"/>                      <!--provided by sevntu-checkstyle-->
+        <module name="CustomDeclarationOrder">                          <!--provided by sevntu-checkstyle-->
+            <property name="customDeclarationOrder"
+                      value="Field(static .*) ### Method(static .*) ### DeclareAnonClassField(.*)
+                      ### Field(.*) ### Ctor(.*) ### MainMethod(.*) ### Method(.*)
+                      ### InnerEnum(.*) ### InnerInterface(.*) ### InnerClass(.*)"/>
+        </module>
         <module name="DefaultComesLast"/>
         <module name="DiamondOperatorForVariableDefinitionCheck"/>      <!--provided by sevntu-checkstyle-->
         <module name="EmptyStatement"/>                 <!--Detects empty statements (standalone ';').-->
+        <module name="EmptyPublicCtorInClassCheck"/>    <!--provided by sevntu-checkstyle-->
         <module name="EqualsAvoidNull"/>                <!--Checks that any combination of String literals with optional assignment is on the left side of an equals() comparison.-->
         <module name="EqualsHashCode"/>                 <!--Checks that classes that override equals() also override hashCode().-->
         <module name="FallThrough"/>
         <module name="IllegalInstantiation"/>           <!--Checks for illegal instantiations where a factory method is preferred.-->
         <module name="InnerAssignment"/>
+        <module name="LogicConditionNeedOptimizationCheck"/>            <!--provided by sevntu-checkstyle-->
+        <module name="MapIterationInForEachLoop"/>            <!--provided by sevntu-checkstyle-->
         <module name="MissingSwitchDefault"/>           <!--Checks that switch statement has "default" clause.-->
+        <module name="MoveVariableInsideIfCheck"/>     <!--provided by sevntu-checkstyle-->
         <module name="MultipleVariableDeclarations"/>   <!--Checks that each variable declaration is in its own statement and on its own line.-->
         <module name="NestedForDepth"/>                 <!--Restricts nested for blocks to a specified depth (default = 1).-->
         <module name="NestedIfDepth"/>                  <!--Restricts nested if-else blocks to a specified depth (default = 1).-->

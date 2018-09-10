@@ -74,8 +74,8 @@ public class BeanFactory {
                 }
                 for (Method method : visitorType.getDeclaredMethods()) {
                     if (method.isAnnotationPresent(Inject.class)) {
-                        Object[] params = lookupParams(method);
                         if (method.trySetAccessible()) {
+                            Object[] params = lookupParams(method);
                             method.invoke(instance, params);
                         } else {
                             throw new Error(format("failed to inject method, method={}", Methods.path(method)));

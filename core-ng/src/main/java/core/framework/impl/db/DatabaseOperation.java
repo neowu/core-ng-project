@@ -134,10 +134,9 @@ public class DatabaseOperation {
 
     private <T> Optional<T> fetchOne(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {
         try (ResultSet resultSet = statement.executeQuery()) {
-            ResultSetWrapper wrapper = new ResultSetWrapper(resultSet);
             T result = null;
             if (resultSet.next()) {
-                result = mapper.map(wrapper);
+                result = mapper.map(new ResultSetWrapper(resultSet));
                 if (resultSet.next())
                     throw new Error("more than one row returned");
             }

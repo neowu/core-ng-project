@@ -205,41 +205,40 @@ public class BeanValidatorBuilder {
 
     private void validateAnnotations(Field field, Object beanWithDefaultValues) throws IllegalAccessException {
         Type fieldType = field.getGenericType();
-        String fieldPath = Fields.path(field);
 
         if (!field.isAnnotationPresent(NotNull.class) && field.get(beanWithDefaultValues) != null)
-            throw Exceptions.error("field with default value must have @NotNull, field={}, fieldType={}", fieldPath, fieldType.getTypeName());
+            throw Exceptions.error("field with default value must have @NotNull, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName());
 
         Size size = field.getDeclaredAnnotation(Size.class);
         if (size != null && !GenericTypes.isList(fieldType) && !GenericTypes.isMap(fieldType))
-            throw Exceptions.error("@Size must on List<?> or Map<String, ?>, field={}, fieldType={}", fieldPath, fieldType.getTypeName());
+            throw Exceptions.error("@Size must on List<?> or Map<String, ?>, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName());
 
         NotEmpty notEmpty = field.getDeclaredAnnotation(NotEmpty.class);
         if (notEmpty != null && !String.class.equals(fieldType))
-            throw Exceptions.error("@NotEmpty must on String, field={}, fieldType={}", fieldPath, fieldType.getTypeName());
+            throw Exceptions.error("@NotEmpty must on String, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName());
 
         Length length = field.getDeclaredAnnotation(Length.class);
         if (length != null && !String.class.equals(fieldType))
-            throw Exceptions.error("@Length must on String, field={}, fieldType={}", fieldPath, fieldType.getTypeName());
+            throw Exceptions.error("@Length must on String, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName());
 
         Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
         if (pattern != null) {
-            if (!String.class.equals(fieldType)) throw Exceptions.error("@Pattern must on String, field={}, fieldType={}", fieldPath, fieldType.getTypeName());
+            if (!String.class.equals(fieldType)) throw Exceptions.error("@Pattern must on String, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName());
             try {
                 java.util.regex.Pattern.compile(pattern.value());
             } catch (PatternSyntaxException e) {
-                throw new Error(format("@Pattern has invalid pattern, pattern={}, field={}, fieldType={}", pattern.value(), fieldPath, fieldType.getTypeName()), e);
+                throw new Error(format("@Pattern has invalid pattern, pattern={}, field={}, fieldType={}", pattern.value(), Fields.path(field), fieldType.getTypeName()), e);
             }
         }
 
         Class<?> fieldClass = GenericTypes.rawClass(fieldType);
         Max max = field.getDeclaredAnnotation(Max.class);
         if (max != null && !Number.class.isAssignableFrom(fieldClass))
-            throw Exceptions.error("@Max must on Number, field={}, fieldType={}", fieldPath, fieldType.getTypeName());
+            throw Exceptions.error("@Max must on Number, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName());
 
         Min min = field.getDeclaredAnnotation(Min.class);
         if (min != null && !Number.class.isAssignableFrom(fieldClass))
-            throw Exceptions.error("@Min must on Number, field={}, fieldType={}", fieldPath, fieldType.getTypeName());
+            throw Exceptions.error("@Min must on Number, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName());
     }
 
     private boolean isValueClass(Class<?> fieldClass) {

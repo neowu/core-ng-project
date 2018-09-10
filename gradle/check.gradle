@@ -32,8 +32,12 @@ subprojects {
 
     spotbugs {
         reportLevel = 'low'
-        excludeFilter = rootProject.file('gradle/check/spotbugs-filter.xml')
+        includeFilter = rootProject.file('gradle/check/spotbugs.xml')
         toolVersion = '3.1.6'
+    }
+
+    dependencies {
+        spotbugsPlugins 'com.mebigfatguy.fb-contrib:fb-contrib:7.4.3.sb'
     }
 
     tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach {

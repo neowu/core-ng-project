@@ -37,11 +37,11 @@ public class ControllerInspector {
     }
 
     private static void overrideAccessible(Method method) throws ReflectiveOperationException {
-        Field overrideField = AccessibleObject.class.getDeclaredField("override");
         Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
         Field field = unsafeClass.getDeclaredField("theUnsafe");
         if (field.trySetAccessible()) {
             Object unsafe = field.get(null);
+            Field overrideField = AccessibleObject.class.getDeclaredField("override");
             long overrideFieldOffset = (long) unsafeClass.getMethod("objectFieldOffset", Field.class).invoke(unsafe, overrideField);
             unsafeClass.getMethod("putBoolean", Object.class, long.class, boolean.class).invoke(unsafe, method, overrideFieldOffset, Boolean.TRUE);
         } else {

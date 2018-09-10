@@ -143,7 +143,6 @@ final class EntityDecoderBuilder<T> {
     }
 
     private String decodeValue(CodeBuilder builder, Type valueType, int indent) {
-        Class<?> valueClass = GenericTypes.rawClass(valueType);
         String variable = "$" + (index++);
         builder.indent(indent);
         if (Integer.class.equals(valueType)) {
@@ -172,7 +171,7 @@ final class EntityDecoderBuilder<T> {
             String method = decodeMapMethod(GenericTypes.mapValueClass(valueType));
             builder.append("java.util.Map {} = {}(reader, wrapper, fieldPath);\n", variable, method);
         } else {
-            String method = decodeEntityMethod(valueClass);
+            String method = decodeEntityMethod(GenericTypes.rawClass(valueType));
             builder.append("{} {} = {}(reader, wrapper, fieldPath);\n", type(valueType), variable, method);
         }
         return variable;

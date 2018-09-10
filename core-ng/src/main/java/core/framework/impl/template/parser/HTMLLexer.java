@@ -177,7 +177,7 @@ class HTMLLexer {
         int i = hasDoubleQuote ? currentIndex + 1 : currentIndex;
         for (; i < html.length(); i++) {
             char ch = html.charAt(i);
-            if (!hasDoubleQuote && (Character.isWhitespace(ch) || ch == '>' || match(i, "/>"))) {
+            if (!hasDoubleQuote && (ch == '>' || Character.isWhitespace(ch) || match(i, "/>"))) {
                 return i - currentIndex;
             } else if (ch == '"') {
                 return i - currentIndex + 1;

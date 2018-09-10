@@ -76,7 +76,7 @@ public final class ActionLog {
             errorCode = event.errorCode(); // only update error type/message if level raised, so error type will be first WARN or first ERROR
             errorMessage = errorMessage(event);
         }
-        if (events.size() < MAX_TRACE_HOLD_SIZE || event.level.value >= WARN.value) {  // after reach max holding lines, only add warning/error events
+        if (event.level.value >= WARN.value || events.size() < MAX_TRACE_HOLD_SIZE) {  // after reach max holding lines, only add warning/error events
             add(event);
         }
     }

@@ -58,8 +58,6 @@ final class DatabaseClassValidator implements TypeVisitor {
 
     @Override
     public void visitField(Field field, String parentPath) {
-        Class<?> fieldClass = field.getType();
-
         Column column = field.getDeclaredAnnotation(Column.class);
         if (column == null)
             throw Exceptions.error("db entity field must have @Column, field={}", Fields.path(field));
@@ -72,8 +70,7 @@ final class DatabaseClassValidator implements TypeVisitor {
         PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
         if (primaryKey != null) {
             foundPrimaryKey = true;
-
-            validatePrimaryKey(primaryKey, fieldClass, field);
+            validatePrimaryKey(primaryKey, field.getType(), field);
         }
     }
 

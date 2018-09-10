@@ -49,8 +49,8 @@ public class IPAccessControl {
     private boolean allow(String clientIP) {
         InetAddress address = address(clientIP);
         if (isLocal(address)) return true;
-        byte[] ipAddress = address.getAddress();
         if (cidrs != null) {
+            byte[] ipAddress = address.getAddress();
             for (CIDR cidr : cidrs) {
                 if (cidr.matches(ipAddress)) return true;
             }
