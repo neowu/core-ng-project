@@ -26,7 +26,7 @@ class WebSocketHandlerTest {
     void add() {
         assertThatThrownBy(() -> handler.add("/ws/:name", (channel, message) -> {
         })).isInstanceOf(Error.class)
-           .hasMessageContaining("websocket path must be static");
+           .hasMessageContaining("web socket path must be static");
 
         assertThatThrownBy(() -> handler.add("/ws", (channel, message) -> {
         })).isInstanceOf(Error.class)
