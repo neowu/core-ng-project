@@ -6,7 +6,6 @@ import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.impl.json.JSONMapper;
-import core.framework.impl.validate.ValidationException;
 import core.framework.impl.web.bean.BeanMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
@@ -14,13 +13,11 @@ import core.framework.json.JSON;
 import core.framework.log.Severity;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
-import core.framework.util.Types;
 import core.framework.web.service.RemoteServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -114,33 +111,5 @@ class WebServiceClientTest {
                     assertThat(exception.getMessage()).isEqualTo(response.message);
                     assertThat(exception.status).isEqualTo(HTTPStatus.NOT_FOUND);
                 });
-    }
-
-    @Test
-    void parseResponseWithVoid() {
-        assertThat(webServiceClient.parseResponse(void.class, null)).isNull();
-    }
-
-    @Test
-    void parseResponseWithEmptyOptional() {
-        assertThat(webServiceClient.parseResponse(Types.optional(TestWebService.TestResponse.class), new HTTPResponse(HTTPStatus.OK, Map.of(), Strings.bytes("null"))))
-                .isEqualTo(Optional.empty());
-    }
-
-    @Test
-    void parseResponseWithValidationError() {
-        TestWebService.TestResponse response = new TestWebService.TestResponse();
-        assertThatThrownBy(() -> webServiceClient.parseResponse(TestWebService.TestResponse.class, new HTTPResponse(HTTPStatus.OK, Map.of(), Strings.bytes(JSON.toJSON(response)))))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("int_field");
-    }
-
-    @Test
-    void parseResponse() {
-        TestWebService.TestResponse response = new TestWebService.TestResponse();
-        response.intField = 1;
-        response.stringMap = Map.of("key", "value");
-        Object parsedResponse = webServiceClient.parseResponse(TestWebService.TestResponse.class, new HTTPResponse(HTTPStatus.OK, Map.of(), Strings.bytes(JSON.toJSON(response))));
-        assertThat(parsedResponse).isEqualToComparingFieldByField(response);
     }
 }

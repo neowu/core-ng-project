@@ -104,11 +104,6 @@ public class WebServiceClient {
 
         HTTPResponse response = httpClient.execute(request);
         validateResponse(response);
-        return parseResponse(responseType, response);
-    }
-
-    Object parseResponse(Type responseType, HTTPResponse response) {
-        if (void.class == responseType) return null;
         return responseBeanMapper.fromJSON(responseType, response.body());
     }
 
@@ -120,7 +115,7 @@ public class WebServiceClient {
             byte[] json = requestBeanMapper.toJSON(requestBeanClass, requestBean);
             request.body(json, ContentType.APPLICATION_JSON);
         } else {
-            throw new Error(format("not supported method, method={}", method));
+            throw new Error("not supported method, method=" + method);
         }
     }
 

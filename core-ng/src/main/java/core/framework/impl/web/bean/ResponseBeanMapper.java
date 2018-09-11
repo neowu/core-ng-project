@@ -29,6 +29,8 @@ public class ResponseBeanMapper {
     }
 
     public Object fromJSON(Type responseType, byte[] body) {
+        if (void.class == responseType) return null;
+
         BeanMapper<?> mapper = register(responseType);
         Object bean = mapper.reader.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {

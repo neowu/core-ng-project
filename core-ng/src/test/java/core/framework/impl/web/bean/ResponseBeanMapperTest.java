@@ -1,7 +1,7 @@
 package core.framework.impl.web.bean;
 
+import core.framework.impl.json.JSONMapper;
 import core.framework.impl.validate.ValidationException;
-import core.framework.json.JSON;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
 import core.framework.util.Types;
@@ -72,20 +72,32 @@ class ResponseBeanMapperTest {
     void fromJSONWithOptional() {
         var bean = new TestBean();
         bean.intField = 3;
-        String json = JSON.toJSON(bean);
 
         @SuppressWarnings("unchecked")
-        var parsedBean = (Optional<TestBean>) responseBeanMapper.fromJSON(Types.optional(TestBean.class), Strings.bytes(json));
+        var parsedBean = (Optional<TestBean>) responseBeanMapper.fromJSON(Types.optional(TestBean.class), JSONMapper.toJSON(bean));
         assertThat(parsedBean).get().isEqualToComparingFieldByField(bean);
+    }
+
+    @Test
+    void fromJSONWithValidationError() {
+        var bean = new TestBean();
+
+        assertThatThrownBy(() -> responseBeanMapper.fromJSON(TestBean.class, JSONMapper.toJSON(bean)))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("int_field");
+    }
+
+    @Test
+    void fromJSONWithVoid() {
+        assertThat(responseBeanMapper.fromJSON(void.class, null)).isNull();
     }
 
     @Test
     void fromJSON() {
         TestBean bean = new TestBean();
         bean.intField = 3;
-        String json = JSON.toJSON(bean);
 
-        TestBean parsedBean = (TestBean) responseBeanMapper.fromJSON(TestBean.class, Strings.bytes(json));
+        TestBean parsedBean = (TestBean) responseBeanMapper.fromJSON(TestBean.class, JSONMapper.toJSON(bean));
         assertThat(parsedBean).isEqualToComparingFieldByField(bean);
     }
 }
