@@ -61,7 +61,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
         try {
             return Double.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException(Strings.format("failed to parse double, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(Strings.format("failed to parse double, value={}", value), "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -70,7 +70,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
         try {
             return new BigDecimal(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException(Strings.format("failed to parse big decimal, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(Strings.format("failed to parse big decimal, value={}", value), "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -89,7 +89,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
         try {
             return ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         } catch (DateTimeParseException e) {
-            throw new BadRequestException(Strings.format("failed to parse zoned date time, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(Strings.format("failed to parse zoned date time, value={}", value), "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -98,7 +98,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
         try {
             return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         } catch (DateTimeParseException e) {
-            throw new BadRequestException(Strings.format("failed to parse local date time, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(Strings.format("failed to parse local date time, value={}", value), "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -107,7 +107,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
         try {
             return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE);
         } catch (DateTimeParseException e) {
-            throw new BadRequestException(Strings.format("failed to parse local date, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(Strings.format("failed to parse local date, value={}", value), "INVALID_HTTP_REQUEST", e);
         }
     }
 }

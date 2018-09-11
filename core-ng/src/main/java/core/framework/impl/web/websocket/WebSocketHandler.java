@@ -46,7 +46,7 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
         if (method == HTTPMethod.GET && headers.getFirst(Headers.SEC_WEB_SOCKET_KEY) != null) {
             String version = headers.getFirst(Headers.SEC_WEB_SOCKET_VERSION);
             if ("13".equals(version)) return true;  // only support latest ws version
-            throw new BadRequestException("only support web socket version 13, version=" + version);
+            throw new BadRequestException("only support web socket version 13, version=" + version, "INVALID_HTTP_REQUEST");
         }
         return false;
     }

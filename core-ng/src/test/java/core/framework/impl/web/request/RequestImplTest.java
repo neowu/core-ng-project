@@ -9,6 +9,7 @@ import core.framework.impl.web.bean.TestBean;
 import core.framework.impl.web.bean.TestQueryParamBean;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
+import io.undertow.server.handlers.CookieImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -71,5 +72,13 @@ class RequestImplTest {
         assertThatThrownBy(() -> request.bean(TestBean.class))
                 .isInstanceOf(BadRequestException.class)
                 .satisfies(exception -> assertThat(((BadRequestException) exception).errorCode()).isEqualTo("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void parseCookieValue() {
+        assertThat(request.parseCookieValue(null)).isNotPresent();
+
+        assertThatThrownBy(() -> request.parseCookieValue(new CookieImpl("cookie", "invalidValue%")))
+                .isInstanceOf(BadRequestException.class);
     }
 }

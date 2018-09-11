@@ -5,9 +5,7 @@ import core.framework.web.exception.BadRequestException;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -15,19 +13,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class URLParamParserTest {
     @Test
     void failedToParseEnum() {
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> URLParamParser.parse("V2", TestEnum.class));
-        assertThat(exception.getMessage()).contains("failed to parse");
+        assertThatThrownBy(() -> URLParamParser.parse("V2", TestEnum.class))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("failed to parse enum");
     }
 
     @Test
     void parseBoolean() {
-        assertTrue(URLParamParser.parse("true", Boolean.class));
+        assertThat(URLParamParser.parse("true", Boolean.class)).isTrue();
     }
 
     @Test
     void parseEnum() {
-        TestEnum value = URLParamParser.parse("V1", TestEnum.class);
-        assertEquals(TestEnum.VALUE, value);
+        assertThat(URLParamParser.parse("V1", TestEnum.class))
+                .isEqualTo(TestEnum.VALUE);
     }
 
     enum TestEnum {

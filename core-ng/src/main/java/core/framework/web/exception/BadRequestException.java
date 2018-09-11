@@ -10,15 +10,13 @@ import core.framework.log.Severity;
  */
 @ResponseStatus(HTTPStatus.BAD_REQUEST)
 public final class BadRequestException extends RuntimeException implements ErrorCode {
-    public static final String DEFAULT_ERROR_CODE = "BAD_REQUEST";
-
     private static final long serialVersionUID = -2304226404736886782L;
 
     private final String errorCode;
 
     public BadRequestException(String message) {
         super(message);
-        errorCode = DEFAULT_ERROR_CODE;
+        errorCode = "BAD_REQUEST";
     }
 
     public BadRequestException(String message, String errorCode) {

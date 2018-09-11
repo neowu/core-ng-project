@@ -24,6 +24,7 @@ import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Map;
 
+import static core.framework.util.Strings.format;
 import static java.net.URLDecoder.decode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -91,10 +92,18 @@ public final class RequestParser {
 
     void parseQueryParams(RequestImpl request, Map<String, Deque<String>> params) {
         for (Map.Entry<String, Deque<String>> entry : params.entrySet()) {
-            String name = decode(entry.getKey(), UTF_8);
-            String value = decode(entry.getValue().getFirst(), UTF_8);
+            String name = parseQueryParam(entry.getKey());
+            String value = parseQueryParam(entry.getValue().getFirst());
             logger.debug("[request:query] {}={}", name, value);
             request.queryParams.put(name, value);
+        }
+    }
+
+    private String parseQueryParam(String value) {
+        try {
+            return decode(value, UTF_8);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("failed to parse query param, param=" + value, "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -188,7 +197,7 @@ public final class RequestParser {
         if (!Strings.isEmpty(queryString)) builder.append('?').append(queryString);
 
         String requestURL = builder.toString();
-        if (requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(Strings.format("requestURL is too long, requestURL={}...(truncated)", requestURL.substring(0, MAX_URL_LENGTH / 8)));
+        if (requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(format("requestURL is too long, requestURL={}...(truncated)", Strings.truncate(requestURL, 50)), "INVALID_HTTP_REQUEST");
         return requestURL;
     }
 }

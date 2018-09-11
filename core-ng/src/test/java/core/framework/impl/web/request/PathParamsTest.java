@@ -4,8 +4,7 @@ import core.framework.web.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -20,7 +19,11 @@ class PathParamsTest {
 
     @Test
     void putEmptyPathParam() {
-        BadRequestException exception = assertThrows(BadRequestException.class, () -> pathParams.put("id", ""));
-        assertThat(exception.getMessage()).contains("name=id, value=");
+        assertThatThrownBy(() -> pathParams.put("id", ""))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("path param must not be empty");
+
+        assertThatThrownBy(() -> pathParams.put("id", "invalidURIValue%"))
+                .isInstanceOf(BadRequestException.class);
     }
 }

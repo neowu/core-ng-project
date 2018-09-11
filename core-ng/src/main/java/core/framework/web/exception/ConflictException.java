@@ -10,15 +10,13 @@ import core.framework.log.Severity;
  */
 @ResponseStatus(HTTPStatus.CONFLICT)
 public final class ConflictException extends RuntimeException implements ErrorCode {
-    public static final String DEFAULT_ERROR_CODE = "CONFLICT";
-
     private static final long serialVersionUID = 7787085179989898162L;
 
     private final String errorCode;
 
     public ConflictException(String message) {
         super(message);
-        errorCode = DEFAULT_ERROR_CODE;
+        errorCode = "CONFLICT";
     }
 
     public ConflictException(String message, String errorCode) {

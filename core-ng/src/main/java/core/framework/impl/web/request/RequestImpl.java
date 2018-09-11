@@ -74,11 +74,15 @@ public final class RequestImpl implements Request {
     @Override
     public Optional<String> cookie(CookieSpec spec) {
         Cookie cookie = exchange.getRequestCookies().get(spec.name);
+        return parseCookieValue(cookie);
+    }
+
+    Optional<String> parseCookieValue(Cookie cookie) {
         if (cookie == null) return Optional.empty();
         try {
             return Optional.of(Encodings.decodeURIComponent(cookie.getValue()));
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(e.getMessage(), "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -153,14 +157,14 @@ public final class RequestImpl implements Request {
                 } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
                     return mapper.fromJSON(beanClass, body);
                 }
-                throw new BadRequestException(format("body is missing or unsupported content type, method={}, contentType={}", method, contentType));
+                throw new BadRequestException(format("body is missing or unsupported content type, method={}, contentType={}", method, contentType), "INVALID_HTTP_REQUEST");
             } else {
                 throw new Error(format("not supported method, method={}", method));
             }
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), e.errorCode(), e);
         } catch (UncheckedIOException e) {  // for invalid json string
-            throw new BadRequestException(e.getMessage(), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(e.getMessage(), "INVALID_HTTP_REQUEST", e);
         }
     }
 }

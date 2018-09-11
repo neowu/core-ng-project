@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ConflictExceptionTest {
     @Test
     void severity() {
-        var exception = new ConflictException("error", ConflictException.DEFAULT_ERROR_CODE);
+        var exception = new ConflictException("error", "CONFLICT");
         assertThat(exception.severity()).isEqualTo(Severity.WARN);
     }
 }

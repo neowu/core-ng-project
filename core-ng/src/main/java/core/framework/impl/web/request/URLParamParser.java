@@ -29,7 +29,7 @@ public class URLParamParser {    // parse query param and path param
         try {
             return JSON.fromEnumValue(valueClass, value);
         } catch (IllegalArgumentException e) {
-            throw new BadRequestException(format("failed to parse enum, enumClass={}, value={}", valueClass.getCanonicalName(), value), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(format("failed to parse enum, enumClass={}, value={}", valueClass.getCanonicalName(), value), "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -37,7 +37,7 @@ public class URLParamParser {    // parse query param and path param
         try {
             return Long.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException(format("failed to parse long, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(format("failed to parse long, value={}", value), "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -45,7 +45,7 @@ public class URLParamParser {    // parse query param and path param
         try {
             return Integer.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException(format("failed to parse int, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(format("failed to parse int, value={}", value), "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -53,7 +53,7 @@ public class URLParamParser {    // parse query param and path param
         try {
             return Boolean.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException(format("failed to parse boolean, value={}", value), BadRequestException.DEFAULT_ERROR_CODE, e);
+            throw new BadRequestException(format("failed to parse boolean, value={}", value), "INVALID_HTTP_REQUEST", e);
         }
     }
 }
