@@ -91,7 +91,7 @@ public class DBConfig extends Config {
     }
 
     public void defaultIsolationLevel(IsolationLevel level) {
-        database.operation.transactionManager.defaultIsolationLevel = level;
+        database.isolationLevel = level;
     }
 
     public void slowOperationThreshold(Duration threshold) {

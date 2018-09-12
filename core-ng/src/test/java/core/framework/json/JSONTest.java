@@ -17,14 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JSONTest {
     @Test
     void mapField() {
-        TestBean bean = new TestBean();
+        var bean = new TestBean();
         bean.mapField.put("key1", "value1");
         bean.mapField.put("key2", "value2");
 
         String json = JSON.toJSON(bean);
         assertThat(json).contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}");
 
-        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
+        var parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean.mapField)
                 .containsEntry("key1", "value1")
                 .containsEntry("key2", "value2");
@@ -32,9 +32,9 @@ class JSONTest {
 
     @Test
     void childField() {
-        TestBean bean = new TestBean();
+        var bean = new TestBean();
 
-        TestBean.Child child = new TestBean.Child();
+        var child = new TestBean.Child();
         child.booleanField = Boolean.TRUE;
         child.longField = 200L;
         bean.childField = child;
@@ -42,17 +42,17 @@ class JSONTest {
         String json = JSON.toJSON(bean);
         assertThat(json).contains("\"child\":{\"boolean\":true,\"long\":200}");
 
-        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
+        var parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean).isEqualToComparingFieldByFieldRecursively(bean);
     }
 
     @Test
     void listField() {
-        TestBean bean = new TestBean();
+        var bean = new TestBean();
         bean.listField.add("value1");
         bean.listField.add("value2");
 
-        TestBean.Child child1 = new TestBean.Child();
+        var child1 = new TestBean.Child();
         child1.booleanField = Boolean.TRUE;
         bean.childrenField.add(child1);
         TestBean.Child child2 = new TestBean.Child();
@@ -68,12 +68,11 @@ class JSONTest {
 
     @Test
     void dateField() {
-        TestBean bean = new TestBean();
+        var bean = new TestBean();
         bean.instantField = Instant.now();
         bean.dateTimeField = LocalDateTime.ofInstant(bean.instantField, ZoneId.systemDefault());
         bean.dateField = bean.dateTimeField.toLocalDate();
         bean.zonedDateTimeField = ZonedDateTime.ofInstant(bean.instantField, ZoneId.systemDefault());
-
         String json = JSON.toJSON(bean);
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
@@ -110,7 +109,7 @@ class JSONTest {
 
     @Test
     void notAnnotatedField() {
-        TestBean bean = new TestBean();
+        var bean = new TestBean();
         bean.notAnnotatedField = 100;
         String json = JSON.toJSON(bean);
         assertThat(json).contains("\"notAnnotatedField\":100");

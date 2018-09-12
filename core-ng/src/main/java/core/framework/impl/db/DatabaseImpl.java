@@ -1,6 +1,7 @@
 package core.framework.impl.db;
 
 import core.framework.db.Database;
+import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
@@ -42,6 +43,7 @@ public final class DatabaseImpl implements Database {
     public Vendor vendor;
     public int tooManyRowsReturnedThreshold = 1000;
     public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
+    public IsolationLevel isolationLevel;
     private String url;
     private Properties driverProperties;
     private Duration timeout;
@@ -78,7 +80,10 @@ public final class DatabaseImpl implements Database {
             this.driverProperties = driverProperties;
         }
         try {
-            return driver.connect(url, driverProperties);
+            Connection connection = driver.connect(url, driverProperties);
+            if (isolationLevel != null)
+                connection.setTransactionIsolation(isolationLevel.level);
+            return connection;
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);
         }

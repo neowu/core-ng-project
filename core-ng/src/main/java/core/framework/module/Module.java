@@ -54,13 +54,13 @@ public abstract class Module {
         return instance;
     }
 
-    public Object bean(Type type, String name) {
-        return context.beanFactory.bean(type, name);
-    }
-
     @SuppressWarnings("unchecked")
     public <T> T bean(Class<T> instanceClass) {
         return (T) bean(instanceClass, null);
+    }
+
+    public Object bean(Type type, String name) {
+        return context.beanFactory.bean(type, name);
     }
 
     public void loadProperties(String classpath) {

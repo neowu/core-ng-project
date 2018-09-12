@@ -1,6 +1,5 @@
 package core.framework.impl.db;
 
-import core.framework.db.IsolationLevel;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
 import core.framework.impl.resource.Pool;
@@ -23,7 +22,6 @@ public final class TransactionManager {
 
     private final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
     private final Pool<Connection> pool;
-    public IsolationLevel defaultIsolationLevel;
     public long longTransactionThresholdInNanos = Duration.ofSeconds(10).toNanos();
 
     TransactionManager(Pool<Connection> pool) {
@@ -39,19 +37,18 @@ public final class TransactionManager {
             return connection;
         }
 
-        return getConnectionFromPool();
+        return pool.borrowItem();
     }
 
     void returnConnection(PoolItem<Connection> connection) {
         if (CURRENT_CONNECTION.get() == null)
-            returnConnectionToPool(connection);
+            returnConnectionToPool(connection, false);
     }
 
     Transaction beginTransaction() {
-        if (CURRENT_CONNECTION.get() != null)
-            throw new Error("nested transaction is not supported");
+        if (CURRENT_CONNECTION.get() != null) throw new Error("nested transaction is not supported");
 
-        PoolItem<Connection> connection = getConnectionFromPool();
+        PoolItem<Connection> connection = pool.borrowItem();
         try {
             connection.resource.setAutoCommit(false);
         } catch (SQLException e) {
@@ -93,39 +90,26 @@ public final class TransactionManager {
     void endTransaction() {
         PoolItem<Connection> connection = CURRENT_CONNECTION.get();
         TransactionState state = CURRENT_TRANSACTION_STATE.get();
-        // clean up state first, to avoid ending up with unexpected state
+        // cleanup state first, to avoid ending up with unexpected state
         CURRENT_CONNECTION.remove();
         CURRENT_TRANSACTION_STATE.remove();
 
         try {
             if (state == TransactionState.START) {
-                logger.warn("rollback transaction due to either transaction.commit() was not called or exception occurred");
+                logger.warn("rollback transaction due to transaction.commit() was not called or exception occurred");
                 connection.resource.rollback();
             }
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
-            returnConnectionToPool(connection);
+            returnConnectionToPool(connection, true);
         }
     }
 
-    private PoolItem<Connection> getConnectionFromPool() {
-        PoolItem<Connection> connection = pool.borrowItem();
+    private void returnConnectionToPool(PoolItem<Connection> connection, boolean resetAutoCommit) {
         try {
-            if (defaultIsolationLevel != null)
-                connection.resource.setTransactionIsolation(defaultIsolationLevel.level);
-            return connection;
-        } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
-            pool.returnItem(connection);
-            throw new UncheckedSQLException(e);
-        }
-    }
-
-    private void returnConnectionToPool(PoolItem<Connection> connection) {
-        try {
-            if (!connection.broken)
+            if (!connection.broken && resetAutoCommit)
                 connection.resource.setAutoCommit(true);
         } catch (SQLException e) {
             Connections.checkConnectionStatus(connection, e);
