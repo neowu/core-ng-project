@@ -2,7 +2,6 @@ package core.framework.impl.web.service;
 
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.http.HTTPMethod;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Params;
@@ -49,11 +48,12 @@ public class WebServiceClientBuilder<T> {
         CodeBuilder builder = new CodeBuilder();
 
         Type returnType = method.getGenericReturnType();
+        Class<?> returnClass = method.getReturnType();
 
         Map<String, Integer> pathParamIndexes = Maps.newHashMap();
         Class<?> requestBeanClass = null;
         Integer requestBeanIndex = null;
-        builder.append("public {} {}(", type(returnType), method.getName());
+        builder.append("public {} {}(", type(returnClass), method.getName());
         Annotation[][] annotations = method.getParameterAnnotations();
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
@@ -78,19 +78,12 @@ public class WebServiceClientBuilder<T> {
         pathParamIndexes.forEach((name, index) ->
                 builder.indent(1).append("pathParams.put({}, param{});\n", variable(name), index));
 
-        String returnTypeLiteral = returnType == void.class ? type(Void.class) : type(returnType);
-
         String path = method.getDeclaredAnnotation(Path.class).value();
-        builder.indent(1).append("String serviceURL = client.serviceURL({}, pathParams);\n", variable(path)); // to pass path as string literal, the escaped char will not be transferred, like \\, currently not convert is because only type regex may contain special char
+        builder.indent(1).append("String serviceURL = client.serviceURL({}, pathParams);\n", variable(path)); // to pass path as string literal, not escaping char, like \\ which is not allowed, refer to core.framework.impl.web.route.PathPatternValidator
 
-        HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
-        builder.indent(1).append("{} response = ({}) client.execute({}, serviceURL, requestBeanClass, requestBean, {});\n",
-                returnTypeLiteral,
-                returnTypeLiteral,
-                variable(httpMethod),
-                variable(returnType));
-
-        if (returnType != void.class) builder.indent(1).append("return response;\n");
+        builder.indent(1);
+        if (returnType != void.class) builder.append("return ({}) ", type(returnClass));
+        builder.append("client.execute({}, serviceURL, requestBeanClass, requestBean, {});\n", variable(HTTPMethods.httpMethod(method)), variable(returnType));
 
         builder.append("}");
         return builder.build();

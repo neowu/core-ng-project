@@ -47,7 +47,7 @@ class WebServiceClientBuilderTest {
         when(webServiceClient.execute(HTTPMethod.GET, "http://localhost/test/1", null, null, Types.optional(TestWebService.TestResponse.class)))
                 .thenReturn(Optional.of(expectedResponse));
 
-        TestWebService.TestResponse response = client.get(1).get();
+        TestWebService.TestResponse response = client.get(1).orElseThrow();
         assertSame(expectedResponse, response);
     }
 

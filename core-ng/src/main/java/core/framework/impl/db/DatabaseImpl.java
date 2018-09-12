@@ -81,8 +81,7 @@ public final class DatabaseImpl implements Database {
         }
         try {
             Connection connection = driver.connect(url, driverProperties);
-            if (isolationLevel != null)
-                connection.setTransactionIsolation(isolationLevel.level);
+            if (isolationLevel != null) connection.setTransactionIsolation(isolationLevel.level);
             return connection;
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);

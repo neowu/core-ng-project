@@ -9,8 +9,8 @@ import java.lang.reflect.Type;
  * @author neo
  */
 public final class Literal {
-    public static String type(Type type) {
-        return GenericTypes.rawClass(type).getCanonicalName();
+    public static String type(Class<?> value) {
+        return value.getCanonicalName();
     }
 
     public static String variable(Enum<?> value) {

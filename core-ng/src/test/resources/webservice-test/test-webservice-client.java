@@ -11,7 +11,7 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         java.util.Map pathParams = new java.util.HashMap();
         pathParams.put("id", param0);
         String serviceURL = client.serviceURL("/test/:id", pathParams);
-        java.lang.Void response = (java.lang.Void) client.execute(core.framework.http.HTTPMethod.PUT, serviceURL, requestBeanClass, requestBean, void.class);
+        client.execute(core.framework.http.HTTPMethod.PUT, serviceURL, requestBeanClass, requestBean, void.class);
     }
 
     public void delete(java.lang.String param0) {
@@ -20,7 +20,7 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         java.util.Map pathParams = new java.util.HashMap();
         pathParams.put("id", param0);
         String serviceURL = client.serviceURL("/test/:id", pathParams);
-        java.lang.Void response = (java.lang.Void) client.execute(core.framework.http.HTTPMethod.DELETE, serviceURL, requestBeanClass, requestBean, void.class);
+        client.execute(core.framework.http.HTTPMethod.DELETE, serviceURL, requestBeanClass, requestBean, void.class);
     }
 
     public java.util.Optional get(java.lang.Integer param0) {
@@ -29,8 +29,7 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         java.util.Map pathParams = new java.util.HashMap();
         pathParams.put("id", param0);
         String serviceURL = client.serviceURL("/test/:id", pathParams);
-        java.util.Optional response = (java.util.Optional) client.execute(core.framework.http.HTTPMethod.GET, serviceURL, requestBeanClass, requestBean, core.framework.util.Types.optional(core.framework.impl.web.service.TestWebService.TestResponse.class));
-        return response;
+        return (java.util.Optional) client.execute(core.framework.http.HTTPMethod.GET, serviceURL, requestBeanClass, requestBean, core.framework.util.Types.optional(core.framework.impl.web.service.TestWebService.TestResponse.class));
     }
 
     public void patch(java.lang.Integer param0, core.framework.impl.web.service.TestWebService.TestRequest param1) {
@@ -39,7 +38,7 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         java.util.Map pathParams = new java.util.HashMap();
         pathParams.put("id", param0);
         String serviceURL = client.serviceURL("/test/:id", pathParams);
-        java.lang.Void response = (java.lang.Void) client.execute(core.framework.http.HTTPMethod.PATCH, serviceURL, requestBeanClass, requestBean, void.class);
+        client.execute(core.framework.http.HTTPMethod.PATCH, serviceURL, requestBeanClass, requestBean, void.class);
     }
 
     public core.framework.impl.web.service.TestWebService.TestResponse search(core.framework.impl.web.service.TestWebService.TestSearchRequest param0) {
@@ -47,8 +46,7 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         Object requestBean = param0;
         java.util.Map pathParams = new java.util.HashMap();
         String serviceURL = client.serviceURL("/test", pathParams);
-        core.framework.impl.web.service.TestWebService.TestResponse response = (core.framework.impl.web.service.TestWebService.TestResponse) client.execute(core.framework.http.HTTPMethod.GET, serviceURL, requestBeanClass, requestBean, core.framework.impl.web.service.TestWebService.TestResponse.class);
-        return response;
+        return (core.framework.impl.web.service.TestWebService.TestResponse) client.execute(core.framework.http.HTTPMethod.GET, serviceURL, requestBeanClass, requestBean, core.framework.impl.web.service.TestWebService.TestResponse.class);
     }
 
 }
