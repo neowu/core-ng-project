@@ -90,7 +90,7 @@ public class DBConfig extends Config {
         database.pool.size(minSize, maxSize);
     }
 
-    public void defaultIsolationLevel(IsolationLevel level) {
+    public void isolationLevel(IsolationLevel level) {
         database.isolationLevel = level;
     }
 

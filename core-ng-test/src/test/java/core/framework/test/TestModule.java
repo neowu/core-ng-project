@@ -94,7 +94,7 @@ public class TestModule extends AbstractTestModule {
 
     private void configureDB() {
         db().url("jdbc:mysql://localhost:3306/test");
-        db().defaultIsolationLevel(IsolationLevel.READ_UNCOMMITTED);
+        db().isolationLevel(IsolationLevel.READ_UNCOMMITTED);
         db().timeout(Duration.ofSeconds(10));
         db().batchSize(7);
         db().slowOperationThreshold(Duration.ofSeconds(5));
@@ -104,7 +104,7 @@ public class TestModule extends AbstractTestModule {
         initDB().createSchema();
 
         db("oracle").url("jdbc:oracle:thin:@localhost:1521/test");
-        db().defaultIsolationLevel(IsolationLevel.READ_COMMITTED);
+        db().isolationLevel(IsolationLevel.READ_COMMITTED);
         db("oracle").repository(TestSequenceIdDBEntity.class);
         initDB("oracle").createSchema();
     }

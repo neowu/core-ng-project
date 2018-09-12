@@ -33,8 +33,8 @@ class RepositoryImplAssignedIdEntityTest {
         database = new DatabaseImpl("db");
         database.url("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
         database.vendor = Vendor.MYSQL;
+        database.isolationLevel = IsolationLevel.READ_UNCOMMITTED;
         database.operation.batchSize = 7;
-        database.operation.transactionManager.defaultIsolationLevel = IsolationLevel.READ_UNCOMMITTED;
         database.execute("CREATE TABLE assigned_id_entity (id VARCHAR(36) PRIMARY KEY, string_field VARCHAR(20), int_field INT, big_decimal_field DECIMAL(10,2), date_field DATE)");
 
         repository = database.repository(AssignedIdEntity.class);
