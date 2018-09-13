@@ -80,7 +80,7 @@ public final class HTTPClientImpl implements HTTPClient {
 
             HttpEntity entity = httpResponse.getEntity();
             byte[] body = responseBody(entity);
-            HTTPResponse response = new HTTPResponse(parseHTTPStatus(statusCode), headers, body);
+            var response = new HTTPResponse(parseHTTPStatus(statusCode), headers, body);
             logger.debug("[response] body={}", BodyParam.param(body, response.contentType().orElse(null)));
             return response;
         } catch (IOException | UncheckedIOException e) {

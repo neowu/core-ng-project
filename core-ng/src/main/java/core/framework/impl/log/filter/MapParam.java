@@ -21,8 +21,7 @@ public class MapParam implements FilterParam {
         for (Map.Entry<String, String> entry : values.entrySet()) {
             if (index > 0) builder.append(", ");
             String key = entry.getKey();
-            builder.append(key)
-                   .append('=');
+            builder.append(key).append('=');
 
             if (maskedFields.contains(key)) builder.append("******");
             else builder.append(entry.getValue());
