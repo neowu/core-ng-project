@@ -34,7 +34,7 @@ final class RowMapperBuilder<T> {
     }
 
     private String mapMethod() {
-        CodeBuilder builder = new CodeBuilder().append("public Object map({} resultSet) {\n", type(ResultSetWrapper.class));
+        var builder = new CodeBuilder().append("public Object map({} resultSet) {\n", type(ResultSetWrapper.class));
         String entityClassLiteral = type(entityClass);
         builder.indent(1).append("{} entity = new {}();\n", entityClassLiteral, entityClassLiteral);
 

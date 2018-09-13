@@ -35,10 +35,10 @@ final class EntityDecoderBuilder<T> {
         builder = new DynamicInstanceBuilder<>(EntityDecoder.class, EntityDecoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
     }
 
-    public EntityDecoder<T> build() {
+    EntityDecoder<T> build() {
         builder.addField("private final {} logger = {}.getLogger({});", type(Logger.class), type(LoggerFactory.class), variable(EntityDecoder.class));
         String methodName = decodeEntityMethod(entityClass);
-        CodeBuilder builder = new CodeBuilder()
+        var builder = new CodeBuilder()
                 .append("public Object decode(org.bson.BsonReader reader) {\n")
                 .indent(1).append("{} wrapper = new {}(reader);\n", type(BsonReaderWrapper.class), type(BsonReaderWrapper.class))
                 .indent(1).append("return {}(reader, wrapper, {});\n", methodName, variable(""))
@@ -162,7 +162,7 @@ final class EntityDecoderBuilder<T> {
         } else if (Double.class.equals(valueType)) {
             builder.append("java.lang.Double {} = wrapper.readDouble(fieldPath);\n", variable);
         } else if (ObjectId.class.equals(valueType)) {
-            builder.append("{} {} = wrapper.readObjectId(fieldPath);\n", type(ObjectId.class), variable);
+            builder.append("org.bson.types.ObjectId {} = wrapper.readObjectId(fieldPath);\n", variable);
         } else if (Boolean.class.equals(valueType)) {
             builder.append("java.lang.Boolean {} = wrapper.readBoolean(fieldPath);\n", variable);
         } else if (GenericTypes.isGenericList(valueType)) {

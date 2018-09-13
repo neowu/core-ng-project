@@ -30,7 +30,7 @@ public final class Literal {
     public static String variable(String text) {
         if (text == null) return "null";
 
-        StringBuilder builder = new StringBuilder("\"");
+        var builder = new StringBuilder("\"");
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
             switch (ch) {

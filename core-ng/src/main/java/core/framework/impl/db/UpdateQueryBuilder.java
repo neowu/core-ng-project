@@ -41,9 +41,10 @@ class UpdateQueryBuilder<T> {
     }
 
     private String updateMethod(Class<T> entityClass, List<Field> primaryKeyFields, List<Field> columnFields) {
-        CodeBuilder builder = new CodeBuilder();
+        var builder = new CodeBuilder();
+        String entityClassLiteral = type(entityClass);
         builder.append("public {} update(Object value, boolean partial) {\n", type(UpdateQuery.Statement.class))
-               .indent(1).append("{} entity = ({}) value;\n", type(entityClass), type(entityClass));
+               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
 
         for (Field primaryKeyField : primaryKeyFields) {
             builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", primaryKeyField.getName(), primaryKeyField.getName());

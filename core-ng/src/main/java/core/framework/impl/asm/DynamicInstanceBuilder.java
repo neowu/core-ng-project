@@ -22,7 +22,7 @@ public class DynamicInstanceBuilder<T> {
     private final SourceCode sourceCode = new SourceCode();
     private Class<?>[] constructorParamClasses;
 
-    public DynamicInstanceBuilder(Class<?> interfaceClass, String className) {
+    public DynamicInstanceBuilder(Class<? super T> interfaceClass, String className) {
         if (!interfaceClass.isInterface())
             throw new Error(format("class must be interface, class={}", interfaceClass.getCanonicalName()));
 
