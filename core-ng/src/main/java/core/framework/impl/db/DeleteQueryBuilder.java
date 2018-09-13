@@ -13,9 +13,7 @@ import java.lang.reflect.Field;
 final class DeleteQueryBuilder {
     static String build(Class<?> entityClass) {
         Table table = entityClass.getDeclaredAnnotation(Table.class);
-        StringBuilder builder = new StringBuilder("DELETE FROM ")
-            .append(table.name())
-            .append(" WHERE ");
+        var builder = new StringBuilder("DELETE FROM ").append(table.name()).append(" WHERE ");
         int index = 0;
         for (Field field : Classes.instanceFields(entityClass)) {
             if (field.isAnnotationPresent(PrimaryKey.class)) {
@@ -25,7 +23,6 @@ final class DeleteQueryBuilder {
                 index++;
             }
         }
-
         return builder.toString();
     }
 }

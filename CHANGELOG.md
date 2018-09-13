@@ -2,6 +2,7 @@
 ### 6.8.2 (9/10/2018 - )
 * http: change framework bad request error code to "INVALID_HTTP_REQUEST" 
 * db: changed db().defaultIsolationLevel() to db().isolationLevel(), and if specified, isolation level will be set on connection creation, rather than before every transaction started (to avoid unnecessary db operation)
+* api: webservice client logs the calling method
 
 ### 6.8.1 (9/6/2018 - 9/10/2018)
 * http: make ip access check as built in logic, to deny before routing check (which may return not found or method not allowed)

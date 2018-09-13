@@ -4,8 +4,11 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
+import core.framework.impl.reflect.Methods;
 import core.framework.impl.reflect.Params;
 import core.framework.util.Maps;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -33,6 +36,7 @@ public class WebServiceClientBuilder<T> {
 
     public T build() {
         builder.addField("private final {} client;", type(WebServiceClient.class));
+        builder.addField("private final {} logger = {}.getLogger({});", type(Logger.class), type(LoggerFactory.class), variable(WebServiceClient.class));
         builder.constructor(new Class<?>[]{WebServiceClient.class}, "this.client = $1;");
 
         Method[] methods = serviceInterface.getMethods();
@@ -70,6 +74,8 @@ public class WebServiceClientBuilder<T> {
             }
         }
         builder.append(") {\n");
+
+        builder.indent(1).append("logger.debug(\"call web service, method={}\");\n", Methods.path(method));
 
         builder.indent(1).append("java.lang.Class requestBeanClass = {};\n", requestBeanClass == null ? "null" : variable(requestBeanClass));
         builder.indent(1).append("Object requestBean = {};\n", requestBeanIndex == null ? "null" : "param" + requestBeanIndex);
