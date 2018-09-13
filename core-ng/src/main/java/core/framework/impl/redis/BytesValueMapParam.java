@@ -16,7 +16,7 @@ class BytesValueMapParam {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         builder.append('{');
         int index = 0;
         for (Map.Entry<String, byte[]> entry : values.entrySet()) {

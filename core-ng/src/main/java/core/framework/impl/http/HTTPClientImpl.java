@@ -7,7 +7,7 @@ import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.impl.log.filter.FieldParam;
+import core.framework.impl.log.filter.MapParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.InputStreams;
@@ -74,9 +74,9 @@ public final class HTTPClientImpl implements HTTPClient {
 
             Map<String, String> headers = Maps.newHashMap();
             for (Header header : httpResponse.getAllHeaders()) {
-                logger.debug("[response:header] {}={}", header.getName(), header.getValue());
                 headers.putIfAbsent(header.getName(), header.getValue());
             }
+            logger.debug("[response] headers={}", new MapParam(headers));
 
             HttpEntity entity = httpResponse.getEntity();
             byte[] body = responseBody(entity);
@@ -116,15 +116,17 @@ public final class HTTPClientImpl implements HTTPClient {
             throw new HTTPClientException("uri is invalid, uri=" + uri, "INVALID_URL", e);
         }
 
-        request.headers().forEach((name, value) -> {
-            logger.debug("[request:header] {}={}", name, new FieldParam(name, value));
-            builder.setHeader(name, value);
-        });
+        Map<String, String> headers = request.headers();
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            builder.setHeader(entry.getKey(), entry.getValue());
+        }
+        logger.debug("[request] headers={}", new MapParam(headers));
 
-        request.params().forEach((name, value) -> {
-            logger.debug("[request:param] {}={}", name, value);
-            builder.addParameter(name, value);
-        });
+        Map<String, String> params = request.params();
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            builder.addParameter(entry.getKey(), entry.getValue());
+        }
+        if (!params.isEmpty()) logger.debug("[request] params={}", new MapParam(params));
 
         byte[] body = request.body();
         if (body != null) {
