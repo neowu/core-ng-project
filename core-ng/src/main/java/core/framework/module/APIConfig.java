@@ -68,9 +68,8 @@ public class APIConfig extends Config {
             String path = method.getDeclaredAnnotation(Path.class).value();
             Controller controller = new WebServiceControllerBuilder<>(serviceInterface, service, method).build();
             try {
-                Class<?>[] parameterTypes = method.getParameterTypes();
                 Class<?> serviceClass = service.getClass();
-                Method targetMethod = serviceClass.getMethod(method.getName(), parameterTypes);
+                Method targetMethod = serviceClass.getMethod(method.getName(), method.getParameterTypes());
                 String controllerInfo = serviceClass.getCanonicalName() + "." + targetMethod.getName();
                 String action = "api:" + ASCII.toLowerCase(httpMethod.name()) + ":" + path;
                 context.httpServer.handler.route.add(httpMethod, path, new ControllerHolder(controller, targetMethod, controllerInfo, action, false));

@@ -6,13 +6,13 @@ import core.framework.api.web.service.ResponseStatus;
 import core.framework.impl.asm.CodeBuilder;
 import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Params;
-import core.framework.util.Lists;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import static core.framework.impl.asm.Literal.type;
@@ -26,17 +26,11 @@ public class WebServiceControllerBuilder<T> {
     private final Class<T> serviceInterface;
     private final T service;
     private final Method method;
-    private final HTTPStatus responseStatus;
 
     public WebServiceControllerBuilder(Class<T> serviceInterface, T service, Method method) {
         this.serviceInterface = serviceInterface;
         this.service = service;
         this.method = method;
-
-        ResponseStatus status = method.getDeclaredAnnotation(ResponseStatus.class);
-        if (status != null) responseStatus = status.value();
-        else responseStatus = HTTPStatus.OK;
-
         builder = new DynamicInstanceBuilder<>(Controller.class, service.getClass().getCanonicalName() + "$" + method.getName());
     }
 
@@ -48,11 +42,11 @@ public class WebServiceControllerBuilder<T> {
     }
 
     private String buildMethod() {
-        CodeBuilder builder = new CodeBuilder();
+        var builder = new CodeBuilder();
         builder.append("public {} execute({} request) throws Exception {\n", type(Response.class), type(Request.class));
-        List<String> params = Lists.newArrayList();
 
         Annotation[][] annotations = method.getParameterAnnotations();
+        List<String> params = new ArrayList<>(annotations.length);
         Class<?>[] paramClasses = method.getParameterTypes();
         for (int i = 0; i < annotations.length; i++) {
             Class<?> paramClass = paramClasses[i];
@@ -80,21 +74,22 @@ public class WebServiceControllerBuilder<T> {
         } else {
             builder.indent(1).append("{} response = delegate.{}(", type(method.getReturnType()), method.getName());
         }
+        builder.appendCommaSeparatedValues(params).append(");\n");
 
-        builder.appendCommaSeparatedValues(params)
-               .append(");\n");
-
-        if (void.class.equals(method.getReturnType())) {
-            builder.indent(1).append("return {}.empty().status({});\n",
-                    Response.class.getCanonicalName(),
-                    variable(responseStatus));
+        if (void.class == method.getReturnType()) {
+            builder.indent(1).append("return {}.empty()", type(Response.class));
         } else {
-            builder.indent(1).append("return {}.bean(response).status({});\n",
-                    Response.class.getCanonicalName(),
-                    variable(responseStatus));
+            builder.indent(1).append("return {}.bean(response)", type(Response.class));
         }
+        builder.append(".status({});\n", variable(responseStatus()));
 
         builder.append("}");
         return builder.build();
+    }
+
+    private HTTPStatus responseStatus() {
+        ResponseStatus status = method.getDeclaredAnnotation(ResponseStatus.class);
+        if (status != null) return status.value();
+        return HTTPStatus.OK;
     }
 }

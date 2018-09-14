@@ -100,7 +100,7 @@ public class DataTypeValidator {
         if (allowedValueClasses.contains(valueClass)) return;
 
         if (valueClass.getPackageName().startsWith("java"))
-            throw new Error(format("field class is not supported, please use value types such as String/Boolean/Integer/Enum/LocalDateTime, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner)));
+            throw new Error(format("field class is not supported, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner)));
 
         if (owner != null && !allowChild)
             throw new Error(format("child object is not allowed, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner)));

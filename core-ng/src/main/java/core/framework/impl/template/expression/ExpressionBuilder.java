@@ -37,15 +37,15 @@ public class ExpressionBuilder {
     private Expression buildExpression() {
         try {
             DynamicInstanceBuilder<Expression> builder = new DynamicInstanceBuilder<>(Expression.class, Expression.class.getCanonicalName());
-            builder.addMethod(buildEval());
+            builder.addMethod(buildEvalMethod());
             return builder.build();
         } catch (Throwable e) {
             throw new Error(format("failed to compile expression, expression={}, location={}", expressionSource, location), e);
         }
     }
 
-    private String buildEval() {
-        CodeBuilder builder = new CodeBuilder();
+    private String buildEvalMethod() {
+        var builder = new CodeBuilder();
         builder.append("public Object eval({} context) {\n", type(TemplateContext.class));
         String rootClassLiteral = type(context.rootClass);
         builder.indent(1).append("{} $root = ({})context.root;\n", rootClassLiteral, rootClassLiteral);

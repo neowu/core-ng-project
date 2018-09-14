@@ -18,7 +18,7 @@ import static core.framework.impl.asm.Literal.variable;
  * @author neo
  */
 class QueryParamMapperBuilder<T> {
-    private final String helper = QueryParamMapperHelper.class.getCanonicalName();
+    private final String helper = type(QueryParamMapperHelper.class);
     private final Class<T> beanClass;
     DynamicInstanceBuilder<QueryParamMapper<T>> builder;
 
