@@ -111,4 +111,11 @@ class PathNodeTest {
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("param=var2, conflictedParam=var1");
     }
+
+    @Test
+    void invalidWildcardVariable() {
+        assertThatThrownBy(() -> root.register("/path/:var1(*)/"))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("wildcard path variable must be the last");
+    }
 }

@@ -48,7 +48,7 @@ class PathNode {
     }
 
     private URLHandler registerWildcardNode(String pathPattern, Path currentPath, String param) {
-        if (currentPath.next != null) throw new Error("wildcard must be at end of path pattern, path=" + pathPattern);
+        if (currentPath.next != null) throw new Error(format("wildcard path variable must be the last, path={}, param={}", pathPattern, param));
         if (wildcardNode != null) {
             if (!Strings.equals(wildcardNode.param, param))
                 throw new Error(format("found conflict dynamic pattern, path={}, param={}, conflictedParam={}", pathPattern, param, wildcardNode.param));

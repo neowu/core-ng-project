@@ -33,11 +33,4 @@ class PathPatternValidatorTest {
                 .isInstanceOf(Error.class)
                 .hasMessageContaining(":name(");
     }
-
-    @Test
-    void invalidWildcardVariable() {
-        assertThatThrownBy(() -> new PathPatternValidator("/path/:first(*)/:second(*)").validate())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("wildcard path variable must be at last");
-    }
 }

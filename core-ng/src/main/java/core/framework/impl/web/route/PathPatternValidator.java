@@ -25,17 +25,16 @@ public class PathPatternValidator {
 
         Set<String> variables = Sets.newHashSet();
         String[] tokens = Strings.split(pattern, '/');
-        for (int i = 0; i < tokens.length; i++) {
-            String token = tokens[i];
+        for (String token : tokens) {
             if (Strings.startsWith(token, ':')) {
-                validateVariable(token, pattern, variables, i == tokens.length - 1);
+                validateVariable(token, pattern, variables);
             } else {
                 validatePathSegment(token, pattern);
             }
         }
     }
 
-    private void validateVariable(String token, String pattern, Set<String> variables, boolean lastToken) {
+    private void validateVariable(String token, String pattern, Set<String> variables) {
         int patternIndex = token.indexOf('(');
         int endIndex = patternIndex > 0 ? patternIndex : token.length();
 
@@ -53,8 +52,6 @@ public class PathPatternValidator {
             String variablePattern = token.substring(patternIndex);
             if (!"(*)".equals(variablePattern))
                 throw new Error(format("path variable must be :name or :name(*), variable={}, pattern={}", token, pattern));
-            if (!lastToken)
-                throw new Error(format("wildcard path variable must be the last, variable={}, pattern={}", token, pattern));
         }
     }
 
