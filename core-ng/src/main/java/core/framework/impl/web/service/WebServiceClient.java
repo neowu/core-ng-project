@@ -50,7 +50,7 @@ public class WebServiceClient {
 
     // used by generated code, must be public
     public String serviceURL(String pathPattern, Map<String, Object> pathParams) {
-        StringBuilder builder = new StringBuilder(serviceURL);
+        var builder = new StringBuilder(serviceURL);
         Path path = Path.parse(pathPattern).next; // skip the first '/'
         while (path != null) {
             String value = path.value;

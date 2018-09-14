@@ -55,9 +55,13 @@ class WebServiceClientTest {
         assertThat(webServiceClient.serviceURL("/test", Map.of())).isEqualTo("http://localhost/test");
         assertThat(webServiceClient.serviceURL("/test/", Map.of())).isEqualTo("http://localhost/test/");
 
-        Map<String, Object> pathParams = Map.of("id", "1+2");
-        assertThat(webServiceClient.serviceURL("/test/:id(\\d+)", pathParams)).isEqualTo("http://localhost/test/1%2B2");
-        assertThat(webServiceClient.serviceURL("/test/:id", pathParams)).isEqualTo("http://localhost/test/1%2B2");
+        Map<String, Object> params = Map.of("id", "1+2");
+        assertThat(webServiceClient.serviceURL("/test/:id(*)", params)).isEqualTo("http://localhost/test/1%2B2");
+        assertThat(webServiceClient.serviceURL("/test/:id", params)).isEqualTo("http://localhost/test/1%2B2");
+
+        params = Map.of("customerId", "001");
+        assertThat(webServiceClient.serviceURL("/customer/:customerId/status", params)).isEqualTo("http://localhost/customer/001/status");
+        assertThat(webServiceClient.serviceURL("/customer/:customerId/status/", params)).isEqualTo("http://localhost/customer/001/status/");
     }
 
     @Test
@@ -69,9 +73,9 @@ class WebServiceClientTest {
 
     @Test
     void addRequestBeanWithGet() {
-        HTTPRequest request = new HTTPRequest(HTTPMethod.POST, "/");
+        var request = new HTTPRequest(HTTPMethod.POST, "/");
 
-        TestWebService.TestSearchRequest requestBean = new TestWebService.TestSearchRequest();
+        var requestBean = new TestWebService.TestSearchRequest();
         requestBean.intField = 23;
         webServiceClient.addRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
 
@@ -80,9 +84,9 @@ class WebServiceClientTest {
 
     @Test
     void addRequestBeanWithPost() {
-        HTTPRequest request = new HTTPRequest(HTTPMethod.POST, "/");
+        var request = new HTTPRequest(HTTPMethod.POST, "/");
 
-        TestWebService.TestRequest requestBean = new TestWebService.TestRequest();
+        var requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "123value";
         webServiceClient.addRequestBean(request, HTTPMethod.POST, TestWebService.TestRequest.class, requestBean);
 
@@ -97,7 +101,7 @@ class WebServiceClientTest {
 
     @Test
     void validateResponseWithErrorResponse() {
-        ErrorResponse response = new ErrorResponse();
+        var response = new ErrorResponse();
         response.severity = "WARN";
         response.errorCode = "NOT_FOUND";
         response.message = "not found";
