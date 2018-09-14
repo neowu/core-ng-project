@@ -18,7 +18,7 @@ public final class Route {
     private final Logger logger = LoggerFactory.getLogger(Route.class);
 
     private final Map<String, URLHandler> staticHandlers = Maps.newHashMap();
-    private final PathNode dynamicRoot = new PathNode();
+    private final PathNode dynamicRoot = new PathNode(null);
 
     public void add(HTTPMethod method, String path, ControllerHolder controller) {
         logger.info("route, method={}, path={}, controller={}", method, path, controller.controllerInfo);

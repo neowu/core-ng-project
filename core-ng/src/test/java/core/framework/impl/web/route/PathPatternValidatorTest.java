@@ -2,19 +2,12 @@ package core.framework.impl.web.route;
 
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
  */
 class PathPatternValidatorTest {
-    @Test
-    void duplicateVariable() {
-        Error error = assertThrows(Error.class, () -> new PathPatternValidator("/:name/path/:name").validate());
-        assertThat(error.getMessage()).contains("duplicate");
-    }
-
     @Test
     void validate() {
         new PathPatternValidator("/robot.txt").validate();
@@ -24,11 +17,27 @@ class PathPatternValidatorTest {
 
         new PathPatternValidator("/user/:id/name").validate();
         new PathPatternValidator("/v2/user/:id").validate();
+        new PathPatternValidator("/ajax/:path(*)").validate();
+    }
+
+    @Test
+    void duplicateVariable() {
+        assertThatThrownBy(() -> new PathPatternValidator("/:name/path/:name").validate())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("duplicate");
     }
 
     @Test
     void invalidVariable() {
-        Error error = assertThrows(Error.class, () -> new PathPatternValidator("/path/:name(").validate());
-        assertThat(error.getMessage()).contains(":name(");
+        assertThatThrownBy(() -> new PathPatternValidator("/path/:name(").validate())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining(":name(");
+    }
+
+    @Test
+    void invalidWildcardVariable() {
+        assertThatThrownBy(() -> new PathPatternValidator("/path/:first(*)/:second(*)").validate())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("wildcard path variable must be at last");
     }
 }

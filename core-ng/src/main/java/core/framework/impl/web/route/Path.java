@@ -6,23 +6,20 @@ package core.framework.impl.web.route;
 public final class Path {
     public static Path parse(String path) {
         Path root = new Path("/");
-
         if ("/".equals(path)) return root;
 
         Path current = root;
-        StringBuilder builder = new StringBuilder();
+        int from = 1;
         for (int i = 1; i < path.length(); i++) {
             char ch = path.charAt(i);
-            if (ch != '/') {
-                builder.append(ch);
-            } else {
-                current.next = new Path(builder.toString());
+            if (ch == '/') {
+                current.next = new Path(path.substring(from, i));
                 current = current.next;
-                builder = new StringBuilder();
+                from = i + 1;
             }
         }
 
-        String lastPath = builder.length() == 0 ? "/" : builder.toString();
+        String lastPath = from == path.length() ? "/" : path.substring(from);
         current.next = new Path(lastPath);
 
         return root;
@@ -35,8 +32,8 @@ public final class Path {
         this.value = value;
     }
 
-    public String subPath() {
-        StringBuilder builder = new StringBuilder();
+    String subPath() {
+        var builder = new StringBuilder();
         Path current = this;
 
         while (current != null) {

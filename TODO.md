@@ -1,19 +1,18 @@
 ### ideas
 * cache: advanced feature: local/remote 2 level, async get on expiration, pre warm? ben-manes/caffeine
-* redis: support cluster?
+* redis: support cluster? or just use https://github.com/twitter/twemproxy
 * inject: remove method inject support? 
 * template, use ByteBuffer[] for performance?
-* general retry and throttling?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
-* framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
+* mongo: update entity decoder to use switch(fieldName) to replace if statement? (optimization)
 * cache: hit rate report?
+* framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
 
 * http: wait java11 with http2 client? OkHttp's POST is 5x slower than apache http client 
 * ws: provide way to handler json command with validation?
 * kafka: unique groupId to listen all messages for ws
-* http: rewrite path parsing for better speed?
-* type literal: support better cast for generic, JSON.fromJSON() / bind
+* type literal: support better cast for generic, JSON.fromJSON() / bind?
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

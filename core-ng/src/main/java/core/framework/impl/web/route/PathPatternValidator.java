@@ -19,26 +19,25 @@ public class PathPatternValidator {
     }
 
     public void validate() {
-        if (Strings.isEmpty(pattern))
-            throw new Error(format("path pattern must not be empty, pattern={}", pattern));
+        if (Strings.isEmpty(pattern)) throw new Error(format("path pattern must not be empty, pattern={}", pattern));
 
-        if (!Strings.startsWith(pattern, '/'))
-            throw new Error(format("path pattern must start with '/', pattern={}", pattern));
+        if (!Strings.startsWith(pattern, '/')) throw new Error(format("path pattern must start with '/', pattern={}", pattern));
 
         Set<String> variables = Sets.newHashSet();
         String[] tokens = Strings.split(pattern, '/');
-        for (String token : tokens) {
+        for (int i = 0; i < tokens.length; i++) {
+            String token = tokens[i];
             if (Strings.startsWith(token, ':')) {
-                validateVariable(token, pattern, variables);
+                validateVariable(token, pattern, variables, i == tokens.length - 1);
             } else {
                 validatePathSegment(token, pattern);
             }
         }
     }
 
-    private void validateVariable(String token, String pattern, Set<String> variables) {
-        int variablePatternIndex = token.indexOf('(');
-        int endIndex = variablePatternIndex > 0 ? variablePatternIndex : token.length();
+    private void validateVariable(String token, String pattern, Set<String> variables, boolean lastToken) {
+        int patternIndex = token.indexOf('(');
+        int endIndex = patternIndex > 0 ? patternIndex : token.length();
 
         String variable = token.substring(1, endIndex);
         for (int i = 0; i < variable.length(); i++) {
@@ -48,13 +47,14 @@ public class PathPatternValidator {
         }
 
         boolean isNew = variables.add(variable);
-        if (!isNew) throw new Error(format("found duplicate param name, path={}", pattern));
+        if (!isNew) throw new Error("found duplicate param name, path=" + pattern);
 
-        if (variablePatternIndex > 0) {
-            String variablePattern = token.substring(variablePatternIndex);
-            if (!"(*)".equals(variablePattern)) {
+        if (patternIndex > 0) {
+            String variablePattern = token.substring(patternIndex);
+            if (!"(*)".equals(variablePattern))
                 throw new Error(format("path variable must be :name or :name(*), variable={}, pattern={}", token, pattern));
-            }
+            if (!lastToken)
+                throw new Error(format("wildcard path variable must be the last, variable={}, pattern={}", token, pattern));
         }
     }
 

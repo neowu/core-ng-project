@@ -1,9 +1,9 @@
 package core.framework.impl.web.route;
 
 import core.framework.impl.web.request.PathParams;
-import core.framework.util.Maps;
 import core.framework.util.Strings;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static core.framework.util.Strings.format;
@@ -12,53 +12,58 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 class PathNode {
-    protected URLHandler handler;
+    private final String param;
+    private URLHandler handler;
     private Map<String, PathNode> staticNodes;
-    private DynamicNode dynamicNode;
-    private DynamicNode wildcardNode;
+    private PathNode dynamicNode;
+    private PathNode wildcardNode;
+
+    PathNode(String param) {
+        this.param = param;
+    }
 
     URLHandler register(String pathPattern) {
         return register(pathPattern, Path.parse(pathPattern).next);
     }
 
-    protected URLHandler register(String pathPattern, Path currentPath) {
+    private URLHandler register(String pathPattern, Path currentPath) {
         if (currentPath == null) {
             if (handler == null) handler = new URLHandler(pathPattern);
             return handler;
         } else if (Strings.startsWith(currentPath.value, ':')) {
             int paramIndex = currentPath.value.indexOf('(');
             int endIndex = paramIndex > 0 ? paramIndex : currentPath.value.length();
-            String name = currentPath.value.substring(1, endIndex);
+            String param = currentPath.value.substring(1, endIndex);
             boolean wildcard = paramIndex > 0;
             if (wildcard) {
-                return registerWildcardNode(pathPattern, currentPath, name);
+                return registerWildcardNode(pathPattern, currentPath, param);
             } else {
-                return registerDynamicNode(pathPattern, currentPath, name);
+                return registerDynamicNode(pathPattern, currentPath, param);
             }
         } else {
-            if (staticNodes == null) staticNodes = Maps.newHashMap();
-            PathNode staticNode = staticNodes.computeIfAbsent(currentPath.value, key -> new PathNode());
+            if (staticNodes == null) staticNodes = new HashMap<>();
+            PathNode staticNode = staticNodes.computeIfAbsent(currentPath.value, key -> new PathNode(null));
             return staticNode.register(pathPattern, currentPath.next);
         }
     }
 
-    private URLHandler registerWildcardNode(String pathPattern, Path currentPath, String name) {
-        if (currentPath.next != null) throw new Error(format("wildcard must be at end of path pattern, path={}", pathPattern));
+    private URLHandler registerWildcardNode(String pathPattern, Path currentPath, String param) {
+        if (currentPath.next != null) throw new Error("wildcard must be at end of path pattern, path=" + pathPattern);
         if (wildcardNode != null) {
-            if (!Strings.equals(wildcardNode.param, name))
-                throw new Error(format("found conflict dynamic pattern, path={}, param={}, conflictedParam={}", pathPattern, name, wildcardNode.param));
+            if (!Strings.equals(wildcardNode.param, param))
+                throw new Error(format("found conflict dynamic pattern, path={}, param={}, conflictedParam={}", pathPattern, param, wildcardNode.param));
         } else {
-            wildcardNode = new DynamicNode(name);
+            wildcardNode = new PathNode(param);
         }
         return wildcardNode.register(pathPattern, currentPath.next);
     }
 
-    private URLHandler registerDynamicNode(String pathPattern, Path currentPath, String name) {
+    private URLHandler registerDynamicNode(String pathPattern, Path currentPath, String param) {
         if (dynamicNode != null) {
-            if (!Strings.equals(dynamicNode.param, name))
-                throw new Error(format("found conflict dynamic pattern, path={}, param={}, conflictedParam={}", pathPattern, name, dynamicNode.param));
+            if (!Strings.equals(dynamicNode.param, param))
+                throw new Error(format("found conflict dynamic pattern, path={}, param={}, conflictedParam={}", pathPattern, param, dynamicNode.param));
         } else {
-            dynamicNode = new DynamicNode(name);
+            dynamicNode = new PathNode(param);
         }
         return dynamicNode.register(pathPattern, currentPath.next);
     }
@@ -67,7 +72,7 @@ class PathNode {
         return find(Path.parse(path), pathParams);
     }
 
-    protected URLHandler find(Path currentPath, PathParams pathParams) {
+    private URLHandler find(Path currentPath, PathParams pathParams) {
         Path nextPath = currentPath.next;
         if (nextPath == null) return handler;
 
@@ -106,13 +111,5 @@ class PathNode {
             }
         }
         return null;
-    }
-
-    static class DynamicNode extends PathNode {
-        final String param;
-
-        DynamicNode(String param) {
-            this.param = param;
-        }
     }
 }

@@ -2,6 +2,7 @@ package core.framework.impl.web.route;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -12,8 +13,8 @@ class PathTest {
     @Test
     void parseRootURL() {
         Path path = Path.parse("/");
-        assertEquals("/", path.value);
-        assertNull(path.next);
+        assertThat(path.value).isEqualTo("/");
+        assertThat(path.next).isNull();
     }
 
     @Test

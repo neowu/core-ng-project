@@ -31,7 +31,7 @@ class RateLimiter {
         return rate / (double) unit.toNanos(1);
     }
 
-    public boolean acquire(String group, String clientIP) {
+    boolean acquire(String group, String clientIP) {
         RateConfig config = this.config.get(group);
 
         if (config == null) {
