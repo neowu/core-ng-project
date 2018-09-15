@@ -33,7 +33,7 @@ class ExpressionParser {
                 if (NUMBER_PATTERN.matcher(field).matches()) continue;
 
                 if (!FIELD_PATTERN.matcher(field).matches())
-                    throw new Error(format("invalid field name, field={}", field));
+                    throw new Error("invalid field name, field=" + field);
                 FieldToken token = new FieldToken(field);
                 token.next = parse(expression.substring(i + 1));
                 if (token.next instanceof ValueToken)
@@ -74,13 +74,14 @@ class ExpressionParser {
     }
 
     private void parseMethodParams(MethodToken token, String params) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < params.length(); i++) {
+        var builder = new StringBuilder();
+        int length = params.length();
+        for (int i = 0; i < length; i++) {
             char ch = params.charAt(i);
             if (ch == ',') {
                 String param = builder.toString().trim();
-                if (param.length() == 0)
-                    throw new Error(format("expect param before ',', method={}", token.name));
+                if (param.isEmpty())
+                    throw new Error("expect param before ',', method=" + token.name);
                 token.params.add(parse(param));
                 builder = new StringBuilder();
             } else {
@@ -94,7 +95,8 @@ class ExpressionParser {
 
     private int findMethodEnd(String expression, int index) {
         int leftParentheses = 0;
-        for (int i = index; i < expression.length(); i++) {
+        int length = expression.length();
+        for (int i = index; i < length; i++) {
             char ch = expression.charAt(i);
             if (ch == ')') {
                 if (leftParentheses == 0) return i;

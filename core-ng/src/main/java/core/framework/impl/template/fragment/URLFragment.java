@@ -98,7 +98,8 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
     boolean isValidURL(String url) {
         if (Strings.isEmpty(url)) return false;
         if (url.contains("javascript:")) return false;
-        for (int i = 0; i < url.length(); i++) {
+        int length = url.length();
+        for (int i = 0; i < length; i++) {
             char ch = url.charAt(i);
             if (!VALID_URI.get(ch)) return false;
         }

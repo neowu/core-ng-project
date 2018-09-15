@@ -17,7 +17,8 @@ public final class PEM {
                 .append(type)
                 .append("-----");
         String encodedContent = Encodings.base64(content);
-        for (int i = 0; i < encodedContent.length(); i++) {
+        int length = encodedContent.length();
+        for (int i = 0; i < length; i++) {
             if (i % 64 == 0) builder.append('\n');
             builder.append(encodedContent.charAt(i));
         }

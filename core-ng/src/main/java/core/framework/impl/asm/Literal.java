@@ -31,7 +31,8 @@ public final class Literal {
         if (text == null) return "null";
 
         var builder = new StringBuilder("\"");
-        for (int i = 0; i < text.length(); i++) {
+        int length = text.length();
+        for (int i = 0; i < length; i++) {
             char ch = text.charAt(i);
             switch (ch) {
                 case '\n':

@@ -9,8 +9,10 @@ public final class Path {
         if ("/".equals(path)) return root;
 
         Path current = root;
+        int length = path.length();
         int from = 1;
-        for (int i = 1; i < path.length(); i++) {
+
+        for (int i = 1; i < length; i++) {
             char ch = path.charAt(i);
             if (ch == '/') {
                 current.next = new Path(path.substring(from, i));
@@ -19,7 +21,7 @@ public final class Path {
             }
         }
 
-        String lastPath = from == path.length() ? "/" : path.substring(from);
+        String lastPath = from == length ? "/" : path.substring(from);
         current.next = new Path(lastPath);
 
         return root;

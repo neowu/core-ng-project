@@ -41,7 +41,7 @@ class RedisInputStream {
         }
 
         String response = builder.toString();
-        if (response.length() == 0) {
+        if (response.isEmpty()) {
             throw new IOException("simple string must not be empty");
         }
         return response;

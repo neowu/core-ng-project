@@ -62,8 +62,9 @@ public final class ConsoleAppender implements Appender {
 
     String filterLineSeparator(String value) {
         if (value == null) return "";
-        StringBuilder builder = new StringBuilder(value.length());
-        for (int i = 0; i < value.length(); i++) {
+        int length = value.length();
+        var builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
             char ch = value.charAt(i);
             if (ch == '\n' || ch == '\r') builder.append(' ');
             else builder.append(ch);

@@ -18,7 +18,7 @@ final class SourceCode {
     String constructorBody;
 
     public String build() {
-        CodeBuilder builder = new CodeBuilder();
+        var builder = new CodeBuilder();
         String classSimpleName = className.substring(className.lastIndexOf('.') + 1);
         builder.append("public class {} implements {} {\n", classSimpleName, type(interfaceClass));
         for (String field : fields) {

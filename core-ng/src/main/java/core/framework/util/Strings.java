@@ -27,7 +27,8 @@ public final class Strings {
 
     public static boolean isEmpty(String text) {
         if (text == null) return true;
-        for (int i = 0; i < text.length(); i++) {
+        int length = text.length();
+        for (int i = 0; i < length; i++) {
             if (!Character.isWhitespace(text.charAt(i))) return false;
         }
         return true;

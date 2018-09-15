@@ -11,7 +11,7 @@ import java.io.PrintStream;
 public final class LoggerImpl extends AbstractLogger {
     static String abbreviateLoggerName(String name) {
         String[] tokens = Strings.split(name, '.');
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         int total = tokens.length >= 4 ? 3 : tokens.length - 1;
         int index = 1;
         for (String token : tokens) {

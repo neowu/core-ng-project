@@ -67,8 +67,9 @@ public class Stat {
     }
 
     final String garbageCollectorName(String name) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < name.length(); i++) {
+        var builder = new StringBuilder();
+        int length = name.length();
+        for (int i = 0; i < length; i++) {
             char ch = name.charAt(i);
             if (ch == ' ') builder.append('_');
             else builder.append(ASCII.toLowerCase(ch));

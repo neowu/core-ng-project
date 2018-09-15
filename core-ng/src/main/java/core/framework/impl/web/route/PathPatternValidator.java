@@ -39,7 +39,8 @@ public class PathPatternValidator {
         int endIndex = patternIndex > 0 ? patternIndex : token.length();
 
         String variable = token.substring(1, endIndex);
-        for (int i = 0; i < variable.length(); i++) {
+        int length = variable.length();
+        for (int i = 0; i < length; i++) {
             char ch = variable.charAt(i);
             if (!ASCII.isLetter(ch))
                 throw new Error(format("path variable must be letter, variable={}, pattern={}", variable, pattern));
@@ -56,15 +57,16 @@ public class PathPatternValidator {
     }
 
     private void validatePathSegment(String segment, String pattern) {
-        if (segment.length() == 0) return;
+        int length = segment.length();
+        if (length == 0) return;
 
-        if (segment.charAt(segment.length() - 1) == '.')
+        if (segment.charAt(length - 1) == '.')
             throw new Error(format("path segment must not end with '.', segment={}, pattern={}", segment, pattern));
 
-        for (int i = 0; i < segment.length(); i++) {
+        for (int i = 0; i < length; i++) {
             char ch = segment.charAt(i);
             if (ch != '_' && ch != '-' && ch != '.' && !ASCII.isLetter(ch) && !ASCII.isDigit(ch)) {
-                throw new Error(format("path segment must only contain (letter / digit / _ / - / .), segment={}, pattern={}", segment, pattern));
+                throw new Error(format("path segment must only contain (letter/digit/_/-/.), segment={}, pattern={}", segment, pattern));
             }
         }
     }
