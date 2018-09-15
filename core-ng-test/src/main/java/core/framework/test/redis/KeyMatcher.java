@@ -22,7 +22,7 @@ class KeyMatcher {
         for (int i = 0; i < keyLength; i++) {
             for (int j = 0; j < patternLength; j++) {
                 char ch = pattern.charAt(j);
-                if (key.charAt(i) == ch || ch == '?') {
+                if (ch == '?' || key.charAt(i) == ch) {
                     state[i + 1][j + 1] = state[i][j];
                 } else if (ch == '*') {
                     state[i + 1][j + 1] = state[i][j + 1] || state[i + 1][j];
