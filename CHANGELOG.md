@@ -1,5 +1,6 @@
 ## Change log
 ### 6.8.3 (9/13/2018 - )
+* http: removed request.queryParam(name, valueClass), only keep method to return string, since for type safety, we use @QueryParam bean, so only keep low level interface to keep flexibility 
 
 ### 6.8.2 (9/10/2018 - 9/13/2018)
 * http: change framework bad request error code to "INVALID_HTTP_REQUEST" 

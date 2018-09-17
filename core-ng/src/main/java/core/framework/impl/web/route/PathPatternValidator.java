@@ -13,9 +13,11 @@ import static core.framework.util.Strings.format;
  */
 public class PathPatternValidator {
     private final String pattern;
+    private final boolean allowWildcard;
 
-    public PathPatternValidator(String pattern) {
+    public PathPatternValidator(String pattern, boolean allowWildcard) {
         this.pattern = pattern;
+        this.allowWildcard = allowWildcard;
     }
 
     public void validate() {
@@ -53,6 +55,8 @@ public class PathPatternValidator {
             String variablePattern = token.substring(patternIndex);
             if (!"(*)".equals(variablePattern))
                 throw new Error(format("path variable must be :name or :name(*), variable={}, pattern={}", token, pattern));
+            if (!allowWildcard)
+                throw new Error(format("wildcard path variable is not allowed, variable={}, pattern={}", token, pattern));
         }
     }
 

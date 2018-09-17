@@ -72,8 +72,8 @@ public class WebServiceClient {
 
     private String pathParam(Map<String, Object> pathParams, String variable) {
         Object param = pathParams.get(variable);
-        if (param == null) throw new Error(format("path param must not be null, name={}", variable));
-        // convert logic matches PathParams
+        if (param == null) throw new Error("path param must not be null, name=" + variable);
+        // convert logic matches PathParamParser
         if (param instanceof String) {
             String paramValue = (String) param;
             if (Strings.isEmpty(paramValue)) throw new Error(format("path param must not be empty, name={}", variable));

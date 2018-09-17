@@ -70,7 +70,7 @@ public class ModuleContext {
     }
 
     public final void route(HTTPMethod method, String path, Controller controller, boolean skipInterceptor) {
-        new PathPatternValidator(path).validate();
+        new PathPatternValidator(path, true).validate();
         var inspector = new ControllerInspector(controller);
         new ControllerClassValidator(inspector.targetClass, inspector.targetMethod).validate();
         String action = "http:" + ASCII.toLowerCase(method.name()) + ":" + path;

@@ -10,22 +10,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class URLParamParserTest {
+class PathParamParserTest {
     @Test
     void failedToParseEnum() {
-        assertThatThrownBy(() -> URLParamParser.parse("V2", TestEnum.class))
+        assertThatThrownBy(() -> PathParamParser.parse("V2", TestEnum.class))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("failed to parse enum");
     }
 
     @Test
     void parseBoolean() {
-        assertThat(URLParamParser.parse("true", Boolean.class)).isTrue();
+        assertThat(PathParamParser.parse("true", Boolean.class)).isTrue();
     }
 
     @Test
     void parseEnum() {
-        assertThat(URLParamParser.parse("V1", TestEnum.class))
+        assertThat(PathParamParser.parse("V1", TestEnum.class))
                 .isEqualTo(TestEnum.VALUE);
     }
 

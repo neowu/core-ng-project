@@ -1,6 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.web.request.URLParamParser;
+import core.framework.impl.web.request.PathParamParser;
 import core.framework.json.JSON;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
@@ -48,12 +48,12 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
 
     public static Integer toInt(String value) {
         if (Strings.isEmpty(value)) return null;
-        return URLParamParser.toInt(value);
+        return PathParamParser.toInt(value);
     }
 
     public static Long toLong(String value) {
         if (Strings.isEmpty(value)) return null;
-        return URLParamParser.toLong(value);
+        return PathParamParser.toLong(value);
     }
 
     public static Double toDouble(String value) {
@@ -76,12 +76,16 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
 
     public static Boolean toBoolean(String value) {
         if (Strings.isEmpty(value)) return null;
-        return URLParamParser.toBoolean(value);
+        try {
+            return Boolean.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new BadRequestException("failed to parse boolean, value=" + value, "INVALID_HTTP_REQUEST", e);
+        }
     }
 
     public static <T extends Enum<?>> T toEnum(String value, Class<T> valueClass) {
         if (Strings.isEmpty(value)) return null;
-        return URLParamParser.toEnum(value, valueClass);
+        return PathParamParser.toEnum(value, valueClass);
     }
 
     public static ZonedDateTime toZonedDateTime(String value) {

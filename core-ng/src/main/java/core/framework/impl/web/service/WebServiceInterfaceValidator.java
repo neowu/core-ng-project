@@ -63,7 +63,7 @@ public class WebServiceInterfaceValidator {
 
         Path path = method.getDeclaredAnnotation(Path.class);
         if (path == null) throw new Error(format("service method must have @Path, method={}", Methods.path(method)));
-        new PathPatternValidator(path.value()).validate();
+        new PathPatternValidator(path.value(), false).validate();
 
         validateResponseBeanType(method.getGenericReturnType(), method);
 

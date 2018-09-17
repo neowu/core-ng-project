@@ -27,11 +27,7 @@ public interface Request {
         return pathParam(name, String.class);
     }
 
-    <T> Optional<T> queryParam(String name, Class<T> valueClass);
-
-    default Optional<String> queryParam(String name) {
-        return queryParam(name, String.class);
-    }
+    Optional<String> queryParam(String name);
 
     Map<String, String> queryParams();
 

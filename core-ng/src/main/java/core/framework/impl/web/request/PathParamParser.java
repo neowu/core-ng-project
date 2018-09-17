@@ -8,7 +8,7 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public class URLParamParser {    // parse query param and path param
+public class PathParamParser {
     @SuppressWarnings("unchecked")
     static <T> T parse(String param, Class<T> valueClass) {
         if (String.class.equals(valueClass)) {
@@ -17,12 +17,10 @@ public class URLParamParser {    // parse query param and path param
             return (T) toInt(param);
         } else if (Long.class.equals(valueClass)) {
             return (T) toLong(param);
-        } else if (Boolean.class.equals(valueClass)) {
-            return (T) toBoolean(param);
         } else if (valueClass.isEnum()) {
             return (T) toEnum(param, (Class<? extends Enum<?>>) valueClass);
         }
-        throw new Error(format("not supported path param type, type={}", valueClass.getCanonicalName()));
+        throw new Error("not supported path param type, type=" + valueClass.getCanonicalName());
     }
 
     public static <T extends Enum<?>> T toEnum(String value, Class<T> valueClass) {
@@ -37,7 +35,7 @@ public class URLParamParser {    // parse query param and path param
         try {
             return Long.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException(format("failed to parse long, value={}", value), "INVALID_HTTP_REQUEST", e);
+            throw new BadRequestException("failed to parse long, value=" + value, "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -45,15 +43,7 @@ public class URLParamParser {    // parse query param and path param
         try {
             return Integer.valueOf(value);
         } catch (NumberFormatException e) {
-            throw new BadRequestException(format("failed to parse int, value={}", value), "INVALID_HTTP_REQUEST", e);
-        }
-    }
-
-    public static Boolean toBoolean(String value) {
-        try {
-            return Boolean.valueOf(value);
-        } catch (NumberFormatException e) {
-            throw new BadRequestException(format("failed to parse boolean, value={}", value), "INVALID_HTTP_REQUEST", e);
+            throw new BadRequestException("failed to parse int, value=" + value, "INVALID_HTTP_REQUEST", e);
         }
     }
 }

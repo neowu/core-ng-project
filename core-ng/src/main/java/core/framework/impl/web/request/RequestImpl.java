@@ -106,14 +106,13 @@ public final class RequestImpl implements Request {
     @Override
     public <T> T pathParam(String name, Class<T> valueClass) {
         String value = pathParams.get(name);
-        return URLParamParser.parse(value, valueClass);
+        return PathParamParser.parse(value, valueClass);
     }
 
     @Override
-    public <T> Optional<T> queryParam(String name, Class<T> valueClass) {
+    public Optional<String> queryParam(String name) {
         String value = queryParams.get(name);
-        if (value == null) return Optional.empty();
-        return Optional.of(URLParamParser.parse(value, valueClass));
+        return Optional.ofNullable(value);
     }
 
     @Override

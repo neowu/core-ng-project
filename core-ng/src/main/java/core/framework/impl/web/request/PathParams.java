@@ -25,7 +25,7 @@ public final class PathParams {
 
     public String get(String name) {
         String value = params.get(name);
-        if (value == null) throw new Error(format("path param not found, name={}", name));
+        if (value == null) throw new Error("path param not found, name=" + name);
         return value;
     }
 }
