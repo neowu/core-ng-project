@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class PathParamParserTest {
     @Test
-    void toInt() {
+    void parseInt() {
         assertThat(PathParamParser.toInt("100")).isEqualTo(100);
 
         assertThatThrownBy(() -> PathParamParser.toInt("X"))
@@ -21,7 +21,7 @@ class PathParamParserTest {
     }
 
     @Test
-    void toLong() {
+    void parseLong() {
         assertThat(PathParamParser.toLong("100")).isEqualTo(100);
 
         assertThatThrownBy(() -> PathParamParser.toLong("X"))
@@ -30,7 +30,7 @@ class PathParamParserTest {
     }
 
     @Test
-    void toEnum() {
+    void parseEnum() {
         assertThat(PathParamParser.toEnum("V1", TestEnum.class)).isEqualTo(TestEnum.VALUE);
 
         assertThatThrownBy(() -> PathParamParser.toEnum("V2", TestEnum.class))

@@ -13,6 +13,9 @@
 * ws: provide way to handler json command with validation?
 * kafka: unique groupId to listen all messages for ws
 * type literal: support better cast for generic, JSON.fromJSON() / bind?
+* service topology logging/visualization? link ws call, link message sending? or istio
+* generate more efficient code for WebServiceClient.serviceURL?
+* http request, make queryParams/formParams readonly map?
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/
