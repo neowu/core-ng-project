@@ -31,7 +31,7 @@ class WebServiceControllerBuilderTest {
 
     @Test
     void get() throws Exception {
-        when(request.pathParam("id", Integer.class)).thenReturn(1);
+        when(request.pathParam("id")).thenReturn("1");
 
         var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("get", Integer.class));
         Controller controller = builder.build();
@@ -42,7 +42,7 @@ class WebServiceControllerBuilderTest {
         Response response = controller.execute(request);
         assertThat(response.status()).isEqualTo(HTTPStatus.OK);
         @SuppressWarnings("unchecked")
-        Optional<TestWebService.TestResponse> bean = (Optional<TestWebService.TestResponse>) ((BeanBody) ((ResponseImpl) response).body).bean;
+        var bean = (Optional<TestWebService.TestResponse>) ((BeanBody) ((ResponseImpl) response).body).bean;
         assertThat(bean.orElseThrow().intField).isEqualTo(2);
     }
 
@@ -51,7 +51,7 @@ class WebServiceControllerBuilderTest {
         var requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "value";
 
-        when(request.pathParam("id", Integer.class)).thenReturn(1);
+        when(request.pathParam("id")).thenReturn("1");
         when(request.bean(TestWebService.TestRequest.class)).thenReturn(requestBean);
 
         var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("create", Integer.class, TestWebService.TestRequest.class));
@@ -68,7 +68,7 @@ class WebServiceControllerBuilderTest {
         var requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "value";
 
-        when(request.pathParam("id", Integer.class)).thenReturn(1);
+        when(request.pathParam("id")).thenReturn("1");
         when(request.bean(TestWebService.TestRequest.class)).thenReturn(requestBean);
 
         var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("patch", Integer.class, TestWebService.TestRequest.class));
@@ -79,6 +79,24 @@ class WebServiceControllerBuilderTest {
 
         Response response = controller.execute(request);
         assertThat(response.status()).isEqualTo(HTTPStatus.OK);
+    }
+
+    @Test
+    void getEnum() throws Exception {
+        when(request.pathParam("id")).thenReturn("1");
+        when(request.pathParam("enum")).thenReturn("A1");
+
+        var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("getEnum", Long.class, TestWebService.TestEnum.class));
+        Controller controller = builder.build();
+
+        String sourceCode = builder.builder.sourceCode();
+        assertThat(sourceCode).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-controller-getEnum.java"));
+
+        Response response = controller.execute(request);
+        assertThat(response.status()).isEqualTo(HTTPStatus.OK);
+
+        var bean = (TestWebService.TestResponse) ((BeanBody) ((ResponseImpl) response).body).bean;
+        assertThat(bean).isNotNull();
     }
 
     public static class TestWebServiceImpl implements TestWebService {
@@ -111,6 +129,13 @@ class WebServiceControllerBuilderTest {
         public void patch(Integer id, TestRequest request) {
             assertThat(id).isEqualTo(1);
             assertThat(request.stringField).isEqualTo("value");
+        }
+
+        @Override
+        public TestResponse getEnum(Long id, TestEnum enumValue) {
+            assertThat(id).isEqualTo(1);
+            assertThat(enumValue).isEqualTo(TestEnum.A);
+            return new TestResponse();
         }
     }
 }

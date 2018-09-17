@@ -50,22 +50,24 @@ public class WebServiceControllerBuilder<T> {
         Class<?>[] paramClasses = method.getParameterTypes();
         for (int i = 0; i < annotations.length; i++) {
             Class<?> paramClass = paramClasses[i];
-            String paramTypeLiteral = type(paramClass);
+            String paramClassLiteral = type(paramClass);
             PathParam pathParam = Params.annotation(annotations[i], PathParam.class);
             if (pathParam != null) {
-                params.add(pathParam.value());
-                builder.indent(1).append("{} {} = ({}) request.pathParam(\"{}\", {});\n",
-                        paramTypeLiteral,
-                        pathParam.value(),
-                        paramTypeLiteral,
-                        pathParam.value(),
-                        variable(paramClass));
+                params.add("$" + pathParam.value());
+                if (String.class.equals(paramClass)) {
+                    builder.indent(1).append("String ${} = request.pathParam(\"{}\");\n", pathParam.value(), pathParam.value());
+                } else if (Integer.class.equals(paramClass)) {
+                    builder.indent(1).append("Integer ${} = {}.toInt(request.pathParam(\"{}\"));\n", pathParam.value(), type(PathParamParser.class), pathParam.value());
+                } else if (Long.class.equals(paramClass)) {
+                    builder.indent(1).append("Long ${} = {}.toLong(request.pathParam(\"{}\"));\n", pathParam.value(), type(PathParamParser.class), pathParam.value());
+                } else if (paramClass.isEnum()) {
+                    builder.indent(1).append("{} ${} = ({}){}.toEnum(request.pathParam(\"{}\"), {});\n", paramClassLiteral, pathParam.value(), paramClassLiteral, type(PathParamParser.class), pathParam.value(), variable(paramClass));
+                } else {
+                    throw new Error("not supported path param type, type=" + paramClass.getCanonicalName());
+                }
             } else {
                 params.add("bean");
-                builder.indent(1).append("{} bean = ({}) request.bean({});\n",
-                        paramTypeLiteral,
-                        paramTypeLiteral,
-                        variable(paramClass));
+                builder.indent(1).append("{} bean = ({}) request.bean({});\n", paramClassLiteral, paramClassLiteral, variable(paramClass));
             }
         }
 

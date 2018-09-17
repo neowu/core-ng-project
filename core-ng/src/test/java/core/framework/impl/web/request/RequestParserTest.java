@@ -18,6 +18,7 @@ import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 /**
  * @author neo
@@ -58,9 +59,7 @@ class RequestParserTest {
                 "emptyKey", new ArrayDeque<>(List.of("")));  // for use case: http://address?emptyKey=
         parser.parseQueryParams(request, params);
 
-        assertThat(request.queryParam("key")).hasValue("value1 value2");
-        assertThat(request.queryParam("notExistedKey")).isNotPresent();
-        assertThat(request.queryParam("emptyKey")).get().isEqualTo("");
+        assertThat(request.queryParams()).containsOnly(entry("key", "value1 value2"), entry("emptyKey", ""));
     }
 
     @Test

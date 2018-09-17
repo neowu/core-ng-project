@@ -104,15 +104,8 @@ public final class RequestImpl implements Request {
     }
 
     @Override
-    public <T> T pathParam(String name, Class<T> valueClass) {
-        String value = pathParams.get(name);
-        return PathParamParser.parse(value, valueClass);
-    }
-
-    @Override
-    public Optional<String> queryParam(String name) {
-        String value = queryParams.get(name);
-        return Optional.ofNullable(value);
+    public String pathParam(String name) {
+        return pathParams.get(name);
     }
 
     @Override
@@ -121,18 +114,8 @@ public final class RequestImpl implements Request {
     }
 
     @Override
-    public Optional<String> formParam(String name) {
-        return Optional.ofNullable(formParams.get(name));
-    }
-
-    @Override
     public Map<String, String> formParams() {
         return formParams;
-    }
-
-    @Override
-    public Optional<MultipartFile> file(String name) {
-        return Optional.ofNullable(files.get(name));
     }
 
     @Override

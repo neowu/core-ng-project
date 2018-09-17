@@ -21,21 +21,11 @@ public interface Request {
 
     Optional<String> header(String name);
 
-    <T> T pathParam(String name, Class<T> valueClass);
-
-    default String pathParam(String name) {
-        return pathParam(name, String.class);
-    }
-
-    Optional<String> queryParam(String name);
+    String pathParam(String name);
 
     Map<String, String> queryParams();
 
-    Optional<String> formParam(String name);
-
     Map<String, String> formParams();
-
-    Optional<MultipartFile> file(String name);
 
     Map<String, MultipartFile> files();
 

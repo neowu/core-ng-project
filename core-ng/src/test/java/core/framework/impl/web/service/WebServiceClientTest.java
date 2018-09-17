@@ -56,7 +56,6 @@ class WebServiceClientTest {
         assertThat(webServiceClient.serviceURL("/test/", Map.of())).isEqualTo("http://localhost/test/");
 
         Map<String, Object> params = Map.of("id", "1+2");
-        assertThat(webServiceClient.serviceURL("/test/:id(*)", params)).isEqualTo("http://localhost/test/1%2B2");
         assertThat(webServiceClient.serviceURL("/test/:id", params)).isEqualTo("http://localhost/test/1%2B2");
 
         params = Map.of("customerId", "001");

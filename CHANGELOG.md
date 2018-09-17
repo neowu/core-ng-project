@@ -1,6 +1,6 @@
 ## Change log
 ### 6.8.3 (9/13/2018 - )
-* http: removed request.queryParam(name, valueClass), only keep method to return string, since for type safety, we use @QueryParam bean, so only keep low level interface to keep flexibility 
+* http: removed request.pathParam/request.queryParam, for type safety, we use api interface/impl, so only keep low level interface to keep flexibility 
 * http: path param now only supports string/integer/number/enum
 
 ### 6.8.2 (9/10/2018 - 9/13/2018)

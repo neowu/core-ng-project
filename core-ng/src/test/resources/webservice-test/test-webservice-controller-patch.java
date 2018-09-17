@@ -6,9 +6,9 @@ public class TestWebServiceImpl$patch implements core.framework.web.Controller {
     }
 
     public core.framework.web.Response execute(core.framework.web.Request request) throws Exception {
-        java.lang.Integer id = (java.lang.Integer) request.pathParam("id", java.lang.Integer.class);
+        Integer $id = core.framework.impl.web.service.PathParamParser.toInt(request.pathParam("id"));
         core.framework.impl.web.service.TestWebService.TestRequest bean = (core.framework.impl.web.service.TestWebService.TestRequest) request.bean(core.framework.impl.web.service.TestWebService.TestRequest.class);
-        delegate.patch(id, bean);
+        delegate.patch($id, bean);
         return core.framework.web.Response.empty().status(core.framework.api.http.HTTPStatus.OK);
     }
 

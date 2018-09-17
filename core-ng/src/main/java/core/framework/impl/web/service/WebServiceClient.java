@@ -57,9 +57,7 @@ public class WebServiceClient {
             if ("/".equals(value)) {
                 builder.append(value);
             } else if (Strings.startsWith(value, ':')) {
-                int paramIndex = value.indexOf('(');
-                int endIndex = paramIndex > 0 ? paramIndex : value.length();
-                String variable = value.substring(1, endIndex);
+                String variable = value.substring(1);   // api service doesn't allow wildcard path, so the variable is in ":name" format
                 String pathParam = pathParam(pathParams, variable);
                 builder.append('/').append(Encodings.uriComponent(pathParam));
             } else {

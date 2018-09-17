@@ -1,6 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.web.request.PathParamParser;
+import core.framework.impl.web.service.PathParamParser;
 import core.framework.json.JSON;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
