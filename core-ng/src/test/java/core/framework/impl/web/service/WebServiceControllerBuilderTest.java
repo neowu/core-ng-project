@@ -82,7 +82,7 @@ class WebServiceControllerBuilderTest {
     }
 
     @Test
-    void getEnum() throws Exception {
+    void testGetEnum() throws Exception {
         when(request.pathParam("id")).thenReturn("1");
         when(request.pathParam("enum")).thenReturn("A1");
 

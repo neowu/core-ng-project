@@ -87,7 +87,7 @@ public class WebServiceClient {
 
     // used by generated code, must be public
     public <T> Object execute(HTTPMethod method, String serviceURL, Class<T> requestBeanClass, T requestBean, Type responseType) {
-        HTTPRequest request = new HTTPRequest(method, serviceURL);
+        var request = new HTTPRequest(method, serviceURL);
         request.accept(ContentType.APPLICATION_JSON);
         linkContext(request);
 
