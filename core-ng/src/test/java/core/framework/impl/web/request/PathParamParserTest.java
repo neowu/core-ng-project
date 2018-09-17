@@ -19,8 +19,8 @@ class PathParamParserTest {
     }
 
     @Test
-    void parseBoolean() {
-        assertThat(PathParamParser.parse("true", Boolean.class)).isTrue();
+    void parseInteger() {
+        assertThat(PathParamParser.parse("100", Integer.class)).isEqualTo(100);
     }
 
     @Test
