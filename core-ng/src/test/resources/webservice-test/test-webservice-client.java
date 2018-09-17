@@ -37,6 +37,17 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         return (java.util.Optional) client.execute(core.framework.http.HTTPMethod.GET, serviceURL, requestBeanClass, requestBean, core.framework.util.Types.optional(core.framework.impl.web.service.TestWebService.TestResponse.class));
     }
 
+    public core.framework.impl.web.service.TestWebService.TestResponse getEnum(java.lang.Long param0, core.framework.impl.web.service.TestWebService.TestEnum param1) {
+        logger.debug("call web service, method=core.framework.impl.web.service.TestWebService.getEnum(java.lang.Long, core.framework.impl.web.service.TestWebService$TestEnum)");
+        java.lang.Class requestBeanClass = null;
+        Object requestBean = null;
+        java.util.Map pathParams = new java.util.HashMap();
+        pathParams.put("id", param0);
+        pathParams.put("enum", param1);
+        String serviceURL = client.serviceURL("/test/:id/:enum", pathParams);
+        return (core.framework.impl.web.service.TestWebService.TestResponse) client.execute(core.framework.http.HTTPMethod.GET, serviceURL, requestBeanClass, requestBean, core.framework.impl.web.service.TestWebService.TestResponse.class);
+    }
+
     public void patch(java.lang.Integer param0, core.framework.impl.web.service.TestWebService.TestRequest param1) {
         logger.debug("call web service, method=core.framework.impl.web.service.TestWebService.patch(java.lang.Integer, core.framework.impl.web.service.TestWebService$TestRequest)");
         java.lang.Class requestBeanClass = core.framework.impl.web.service.TestWebService.TestRequest.class;

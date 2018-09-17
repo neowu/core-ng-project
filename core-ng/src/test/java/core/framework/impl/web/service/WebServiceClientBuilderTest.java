@@ -10,8 +10,7 @@ import org.mockito.Mockito;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.verify;
@@ -35,7 +34,7 @@ class WebServiceClientBuilderTest {
     @Test
     void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("webservice-test/test-webservice-client.java"), sourceCode);
+        assertThat(sourceCode).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-client.java"));
     }
 
     @Test
@@ -48,7 +47,7 @@ class WebServiceClientBuilderTest {
                 .thenReturn(Optional.of(expectedResponse));
 
         TestWebService.TestResponse response = client.get(1).orElseThrow();
-        assertSame(expectedResponse, response);
+        assertThat(response).isSameAs(expectedResponse);
     }
 
     @Test

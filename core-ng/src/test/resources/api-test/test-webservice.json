@@ -7,7 +7,8 @@
         {"name": "get", "method": "GET", "path": "/test/:id", "pathParams": [{"name": "id", "type": "number"}], "responseType": "TestWebService$TestResponse | null", "requestType": null},
         {"name": "create", "method": "PUT", "path": "/test/:id", "pathParams": [{"name": "id", "type": "number"}], "responseType": "void", "requestType": "TestWebService$TestRequest"},
         {"name": "delete", "method": "DELETE", "path": "/test/:id", "pathParams": [{"name": "id", "type": "string"}], "responseType": "void", "requestType": null},
-        {"name": "patch", "method": "PATCH", "path": "/test/:id", "pathParams": [{"name": "id", "type": "number"}], "responseType": "void", "requestType": "TestWebService$TestRequest"}
+        {"name": "patch", "method": "PATCH", "path": "/test/:id", "pathParams": [{"name": "id", "type": "number"}], "responseType": "void", "requestType": "TestWebService$TestRequest"},
+        {"name": "getEnum", "method": "GET", "path": "/test/:id/:enum", "pathParams": [{"name": "id", "type": "number"}, {"name": "enum", "type": "TestWebService$TestEnum"}], "responseType": "TestWebService$TestResponse", "requestType": null}
       ]
     }
   ],
