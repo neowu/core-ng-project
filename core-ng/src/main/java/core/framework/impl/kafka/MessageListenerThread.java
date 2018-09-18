@@ -17,11 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -129,8 +127,6 @@ class MessageListenerThread extends Thread {
                 actionLog.action("topic:" + topic);
                 actionLog.context("topic", topic);
                 actionLog.context("handler", process.handler.getClass().getCanonicalName());
-                actionLog.context("key", record.key());
-                logger.debug("message={}", new BytesParam(record.value()));
                 actionLog.track("kafka", 0, 1, 0);
 
                 Headers headers = record.headers();
@@ -142,6 +138,10 @@ class MessageListenerThread extends Thread {
                 if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) {
                     actionLog.trace = true;
                 }
+
+                actionLog.context("key", record.key());
+                logger.debug("[message] value={}", new BytesParam(record.value()));
+
                 T message = process.reader.fromJSON(record.value());
                 process.validator.validate(message);
 
@@ -165,28 +165,23 @@ class MessageListenerThread extends Thread {
             int size = records.size();
             actionLog.track("kafka", 0, size, 0);
 
-            Set<String> clients = new HashSet<>();
-            Set<String> clientIPs = new HashSet<>();
-
             List<Message<T>> messages = new ArrayList<>(size);
             for (ConsumerRecord<String, byte[]> record : records) {
                 Headers headers = record.headers();
                 if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
                     actionLog.trace = true;
                 }
-                String client = header(headers, MessageHeaders.HEADER_CLIENT);
-                if (client != null) {   // kafkaAppender does not send headers
-                    clients.add(client);
-                    clientIPs.add(header(headers, MessageHeaders.HEADER_CLIENT_IP));    // client will always send with clientIP
-                }
-                T message = process.reader.fromJSON(record.value());
+                String key = record.key();
+                byte[] value = record.value();
+                logger.debug("[message] key={}, value={}, client={}, clientIP={}", key, new BytesParam(value),
+                        header(headers, MessageHeaders.HEADER_CLIENT),
+                        header(headers, MessageHeaders.HEADER_CLIENT_IP));
+
+                T message = process.reader.fromJSON(value);
                 process.validator.validate(message);
-                messages.add(new Message<>(record.key(), message));
+                messages.add(new Message<>(key, message));
             }
-            if (!clients.isEmpty()) {
-                logger.debug("clients={}", clients);
-                logger.debug("clientIPs={}", clientIPs);
-            }
+
             process.bulkHandler.handle(messages);
         } catch (Throwable e) {
             logManager.logError(e);
