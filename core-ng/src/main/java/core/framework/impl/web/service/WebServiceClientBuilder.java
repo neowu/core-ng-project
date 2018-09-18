@@ -97,18 +97,18 @@ public class WebServiceClientBuilder<T> {
             }
 
             builder.indent(1).append("StringBuilder builder = new StringBuilder();\n");
-            int start = 0;
+            int currentIndex = 0;
             while (true) {
-                int variableStart = path.indexOf(':', start);
+                int variableStart = path.indexOf(':', currentIndex);
                 if (variableStart < 0) break;
                 int variableEnd = path.indexOf('/', variableStart);
                 if (variableEnd < 0) variableEnd = path.length();
-                builder.indent(1).append("builder.append({}).append({}.toString(param{}));\n", variable(path.substring(start, variableStart)),
+                builder.indent(1).append("builder.append({}).append({}.toString(param{}));\n", variable(path.substring(currentIndex, variableStart)),
                         type(PathParamHelper.class), pathParamIndexes.get(path.substring(variableStart + 1, variableEnd)));
-                start = variableEnd;
+                currentIndex = variableEnd;
             }
-            if (start < path.length()) {
-                builder.indent(1).append("builder.append({});\n", variable(path.substring(start)));
+            if (currentIndex < path.length()) {
+                builder.indent(1).append("builder.append({});\n", variable(path.substring(currentIndex)));
             }
             builder.indent(1).append("String path = builder.toString();\n");
         }
