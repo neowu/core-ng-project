@@ -1,8 +1,9 @@
 ## Change log
-### 6.8.3 (9/13/2018 - )
+### 6.8.3 (9/13/2018 - 9/18/2018)
 * http: removed request.pathParam/request.queryParam, for type safety, we use api interface/impl, so only keep low level interface to keep flexibility 
 * http: path param now only supports string/integer/number/enum
 * kafka: bulk message handler logs all message in trace for troubleshooting 
+* api: webservice client generates more efficient code for dynamic path pattern
 
 ### 6.8.2 (9/10/2018 - 9/13/2018)
 * http: change framework bad request error code to "INVALID_HTTP_REQUEST" 

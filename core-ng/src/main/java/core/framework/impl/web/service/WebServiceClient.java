@@ -12,11 +12,7 @@ import core.framework.impl.log.LogManager;
 import core.framework.impl.web.HTTPHandler;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
-import core.framework.impl.web.route.Path;
-import core.framework.json.JSON;
 import core.framework.log.Severity;
-import core.framework.util.Encodings;
-import core.framework.util.Strings;
 import core.framework.web.service.RemoteServiceException;
 import core.framework.web.service.WebServiceClientInterceptor;
 import org.slf4j.Logger;
@@ -49,45 +45,8 @@ public class WebServiceClient {
     }
 
     // used by generated code, must be public
-    public String serviceURL(String pathPattern, Map<String, Object> pathParams) {
-        var builder = new StringBuilder(serviceURL);
-        Path path = Path.parse(pathPattern).next; // skip the first '/'
-        while (path != null) {
-            String value = path.value;
-            if ("/".equals(value)) {
-                builder.append(value);
-            } else if (Strings.startsWith(value, ':')) {
-                String variable = value.substring(1);   // api service doesn't allow wildcard path, so the variable is in ":name" format
-                String pathParam = pathParam(pathParams, variable);
-                builder.append('/').append(Encodings.uriComponent(pathParam));
-            } else {
-                builder.append('/').append(value);
-            }
-            path = path.next;
-        }
-        return builder.toString();
-    }
-
-    private String pathParam(Map<String, Object> pathParams, String variable) {
-        Object param = pathParams.get(variable);
-        if (param == null) throw new Error("path param must not be null, name=" + variable);
-        // convert logic matches PathParamParser
-        if (param instanceof String) {
-            String paramValue = (String) param;
-            if (Strings.isEmpty(paramValue)) throw new Error(format("path param must not be empty, name={}", variable));
-            return paramValue;
-        } else if (param instanceof Number) {
-            return String.valueOf(param);
-        } else if (param instanceof Enum) {
-            return JSON.toEnumValue((Enum<?>) param);
-        } else {
-            throw new Error(format("not supported path param type, type={}", param.getClass().getCanonicalName()));
-        }
-    }
-
-    // used by generated code, must be public
-    public <T> Object execute(HTTPMethod method, String serviceURL, Class<T> requestBeanClass, T requestBean, Type responseType) {
-        var request = new HTTPRequest(method, serviceURL);
+    public <T> Object execute(HTTPMethod method, String path, Class<T> requestBeanClass, T requestBean, Type responseType) {
+        var request = new HTTPRequest(method, serviceURL + path);
         request.accept(ContentType.APPLICATION_JSON);
         linkContext(request);
 
@@ -105,6 +64,11 @@ public class WebServiceClient {
         return responseBeanMapper.fromJSON(responseType, response.body());
     }
 
+    public void intercept(WebServiceClientInterceptor interceptor) {
+        if (this.interceptor != null) throw new Error(format("found duplicate interceptor, previous={}", this.interceptor.getClass().getCanonicalName()));
+        this.interceptor = interceptor;
+    }
+
     <T> void addRequestBean(HTTPRequest request, HTTPMethod method, Class<T> requestBeanClass, T requestBean) {
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
             Map<String, String> queryParams = requestBeanMapper.toParams(requestBeanClass, requestBean);
@@ -115,11 +79,6 @@ public class WebServiceClient {
         } else {
             throw new Error("not supported method, method=" + method);
         }
-    }
-
-    public void intercept(WebServiceClientInterceptor interceptor) {
-        if (this.interceptor != null) throw new Error(format("found duplicate interceptor, previous={}", this.interceptor.getClass().getCanonicalName()));
-        this.interceptor = interceptor;
     }
 
     void addQueryParams(HTTPRequest request, Map<String, String> queryParams) {

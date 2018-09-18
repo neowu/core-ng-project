@@ -10,30 +10,30 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class PathParamParserTest {
+class PathParamHelperTest {
     @Test
     void parseInt() {
-        assertThat(PathParamParser.toInt("100")).isEqualTo(100);
+        assertThat(PathParamHelper.toInt("100")).isEqualTo(100);
 
-        assertThatThrownBy(() -> PathParamParser.toInt("X"))
+        assertThatThrownBy(() -> PathParamHelper.toInt("X"))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("failed to parse int");
     }
 
     @Test
     void parseLong() {
-        assertThat(PathParamParser.toLong("100")).isEqualTo(100);
+        assertThat(PathParamHelper.toLong("100")).isEqualTo(100);
 
-        assertThatThrownBy(() -> PathParamParser.toLong("X"))
+        assertThatThrownBy(() -> PathParamHelper.toLong("X"))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("failed to parse long");
     }
 
     @Test
     void parseEnum() {
-        assertThat(PathParamParser.toEnum("V1", TestEnum.class)).isEqualTo(TestEnum.VALUE);
+        assertThat(PathParamHelper.toEnum("V1", TestEnum.class)).isEqualTo(TestEnum.VALUE);
 
-        assertThatThrownBy(() -> PathParamParser.toEnum("V2", TestEnum.class))
+        assertThatThrownBy(() -> PathParamHelper.toEnum("V2", TestEnum.class))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("failed to parse enum");
     }

@@ -57,11 +57,11 @@ public class WebServiceControllerBuilder<T> {
                 if (String.class.equals(paramClass)) {
                     builder.indent(1).append("String ${} = request.pathParam(\"{}\");\n", pathParam.value(), pathParam.value());
                 } else if (Integer.class.equals(paramClass)) {
-                    builder.indent(1).append("Integer ${} = {}.toInt(request.pathParam(\"{}\"));\n", pathParam.value(), type(PathParamParser.class), pathParam.value());
+                    builder.indent(1).append("Integer ${} = {}.toInt(request.pathParam(\"{}\"));\n", pathParam.value(), type(PathParamHelper.class), pathParam.value());
                 } else if (Long.class.equals(paramClass)) {
-                    builder.indent(1).append("Long ${} = {}.toLong(request.pathParam(\"{}\"));\n", pathParam.value(), type(PathParamParser.class), pathParam.value());
+                    builder.indent(1).append("Long ${} = {}.toLong(request.pathParam(\"{}\"));\n", pathParam.value(), type(PathParamHelper.class), pathParam.value());
                 } else if (paramClass.isEnum()) {
-                    builder.indent(1).append("{} ${} = ({}){}.toEnum(request.pathParam(\"{}\"), {});\n", paramClassLiteral, pathParam.value(), paramClassLiteral, type(PathParamParser.class), pathParam.value(), variable(paramClass));
+                    builder.indent(1).append("{} ${} = ({}){}.toEnum(request.pathParam(\"{}\"), {});\n", paramClassLiteral, pathParam.value(), paramClassLiteral, type(PathParamHelper.class), pathParam.value(), variable(paramClass));
                 } else {
                     throw new Error("not supported path param type, type=" + paramClass.getCanonicalName());
                 }

@@ -1,6 +1,7 @@
 package core.framework.impl.web.service;
 
 import core.framework.json.JSON;
+import core.framework.util.Encodings;
 import core.framework.web.exception.BadRequestException;
 
 import static core.framework.util.Strings.format;
@@ -8,7 +9,7 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public final class PathParamParser {    // used by generated WebServiceController
+public final class PathParamHelper {    // used by generated WebServiceController and WebServiceClient
     public static <T extends Enum<?>> T toEnum(String value, Class<T> valueClass) {
         try {
             return JSON.fromEnumValue(valueClass, value);
@@ -31,5 +32,17 @@ public final class PathParamParser {    // used by generated WebServiceControlle
         } catch (NumberFormatException e) {
             throw new BadRequestException("failed to parse int, value=" + value, "INVALID_HTTP_REQUEST", e);
         }
+    }
+
+    public static String toString(String value) {
+        return Encodings.uriComponent(value);
+    }
+
+    public static String toString(Number value) {
+        return Encodings.uriComponent(String.valueOf(value));
+    }
+
+    public static <T extends Enum<?>> String toString(T enumValue) {
+        return Encodings.uriComponent(JSON.toEnumValue(enumValue));
     }
 }

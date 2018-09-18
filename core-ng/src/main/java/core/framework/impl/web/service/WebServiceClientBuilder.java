@@ -42,13 +42,13 @@ public class WebServiceClientBuilder<T> {
         Method[] methods = serviceInterface.getMethods();
         Arrays.sort(methods, Comparator.comparing(Method::getName));    // to make generated code deterministic
         for (Method method : methods) {
-            builder.addMethod(buildMethod(method));
+            builder.addMethod(buildImplMethod(method));
         }
 
         return builder.build(client);
     }
 
-    private String buildMethod(Method method) {
+    private String buildImplMethod(Method method) {
         CodeBuilder builder = new CodeBuilder();
 
         Type returnType = method.getGenericReturnType();
@@ -70,28 +70,47 @@ public class WebServiceClientBuilder<T> {
                 pathParamIndexes.put(pathParam.value(), i);
             } else {
                 requestBeanIndex = i;
-                requestBeanClass = method.getParameterTypes()[i];
+                requestBeanClass = paramClass;
             }
         }
         builder.append(") {\n");
-
         builder.indent(1).append("logger.debug(\"call web service, method={}\");\n", Methods.path(method));
 
-        builder.indent(1).append("java.lang.Class requestBeanClass = {};\n", requestBeanClass == null ? "null" : variable(requestBeanClass));
+        buildPath(builder, method.getDeclaredAnnotation(Path.class).value(), pathParamIndexes);
+        builder.indent(1).append("Class requestBeanClass = {};\n", requestBeanClass == null ? "null" : variable(requestBeanClass));
         builder.indent(1).append("Object requestBean = {};\n", requestBeanIndex == null ? "null" : "param" + requestBeanIndex);
-
-        builder.indent(1).append("java.util.Map pathParams = new java.util.HashMap();\n");
-        pathParamIndexes.forEach((name, index) ->
-                builder.indent(1).append("pathParams.put({}, param{});\n", variable(name), index));
-
-        String path = method.getDeclaredAnnotation(Path.class).value();
-        builder.indent(1).append("String serviceURL = client.serviceURL({}, pathParams);\n", variable(path)); // to pass path as string literal, not escaping char, like \\ which is not allowed, refer to core.framework.impl.web.route.PathPatternValidator
 
         builder.indent(1);
         if (returnType != void.class) builder.append("return ({}) ", type(returnClass));
-        builder.append("client.execute({}, serviceURL, requestBeanClass, requestBean, {});\n", variable(HTTPMethods.httpMethod(method)), variable(returnType));
+        builder.append("client.execute({}, path, requestBeanClass, requestBean, {});\n", variable(HTTPMethods.httpMethod(method)), variable(returnType));
 
         builder.append("}");
         return builder.build();
+    }
+
+    void buildPath(CodeBuilder builder, String path, Map<String, Integer> pathParamIndexes) {
+        if (pathParamIndexes.isEmpty()) {
+            builder.indent(1).append("String path = {};\n", variable(path)); // to pass path as string literal, not escaping char, like \\ which is not allowed, refer to core.framework.impl.web.route.PathPatternValidator
+        } else {
+            for (Map.Entry<String, Integer> entry : pathParamIndexes.entrySet()) {
+                builder.indent(1).append("if (param{} == null) throw new Error(\"path param must not be null, name={}\");\n", entry.getValue(), entry.getKey());
+            }
+
+            builder.indent(1).append("StringBuilder builder = new StringBuilder();\n");
+            int start = 0;
+            while (true) {
+                int variableStart = path.indexOf(':', start);
+                if (variableStart < 0) break;
+                int variableEnd = path.indexOf('/', variableStart);
+                if (variableEnd < 0) variableEnd = path.length();
+                builder.indent(1).append("builder.append({}).append({}.toString(param{}));\n", variable(path.substring(start, variableStart)),
+                        type(PathParamHelper.class), pathParamIndexes.get(path.substring(variableStart + 1, variableEnd)));
+                start = variableEnd;
+            }
+            if (start < path.length()) {
+                builder.indent(1).append("builder.append({});\n", variable(path.substring(start)));
+            }
+            builder.indent(1).append("String path = builder.toString();\n");
+        }
     }
 }

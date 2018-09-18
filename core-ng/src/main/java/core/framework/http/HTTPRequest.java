@@ -12,7 +12,7 @@ import java.util.Map;
 public final class HTTPRequest {
     private final String uri;
     private final HTTPMethod method;
-    private final Map<String, String> headers = Maps.newLinkedHashMap();
+    private final Map<String, String> headers = Maps.newLinkedHashMap();    // make headers/params order deterministic, (e.g. for use cases where http request needs to be signed by hash)
     private final Map<String, String> params = Maps.newLinkedHashMap();
     private ContentType contentType;
     private byte[] body;

@@ -50,27 +50,6 @@ class WebServiceClientTest {
     }
 
     @Test
-    void serviceURL() {
-        assertThat(webServiceClient.serviceURL("/", Map.of())).isEqualTo("http://localhost");     // as http standard, url without ending '/' will result in requestedPath = '/' on server side
-        assertThat(webServiceClient.serviceURL("/test", Map.of())).isEqualTo("http://localhost/test");
-        assertThat(webServiceClient.serviceURL("/test/", Map.of())).isEqualTo("http://localhost/test/");
-
-        Map<String, Object> params = Map.of("id", "1+2");
-        assertThat(webServiceClient.serviceURL("/test/:id", params)).isEqualTo("http://localhost/test/1%2B2");
-
-        params = Map.of("customerId", "001");
-        assertThat(webServiceClient.serviceURL("/customer/:customerId/status", params)).isEqualTo("http://localhost/customer/001/status");
-        assertThat(webServiceClient.serviceURL("/customer/:customerId/status/", params)).isEqualTo("http://localhost/customer/001/status/");
-    }
-
-    @Test
-    void serviceURLWithEmptyPathParam() {
-        assertThatThrownBy(() -> webServiceClient.serviceURL("/test/:id", Map.of("id", "")))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("name=id");
-    }
-
-    @Test
     void addRequestBeanWithGet() {
         var request = new HTTPRequest(HTTPMethod.POST, "/");
 

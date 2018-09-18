@@ -1,6 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.web.service.PathParamParser;
+import core.framework.impl.web.service.PathParamHelper;
 import core.framework.json.JSON;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
@@ -48,12 +48,12 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
 
     public static Integer toInt(String value) {
         if (Strings.isEmpty(value)) return null;
-        return PathParamParser.toInt(value);
+        return PathParamHelper.toInt(value);
     }
 
     public static Long toLong(String value) {
         if (Strings.isEmpty(value)) return null;
-        return PathParamParser.toLong(value);
+        return PathParamHelper.toLong(value);
     }
 
     public static Double toDouble(String value) {
@@ -85,7 +85,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
 
     public static <T extends Enum<?>> T toEnum(String value, Class<T> valueClass) {
         if (Strings.isEmpty(value)) return null;
-        return PathParamParser.toEnum(value, valueClass);
+        return PathParamHelper.toEnum(value, valueClass);
     }
 
     public static ZonedDateTime toZonedDateTime(String value) {
