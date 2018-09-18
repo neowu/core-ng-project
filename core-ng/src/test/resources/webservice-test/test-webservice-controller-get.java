@@ -6,7 +6,7 @@ public class TestWebServiceImpl$get implements core.framework.web.Controller {
     }
 
     public core.framework.web.Response execute(core.framework.web.Request request) throws Exception {
-        Integer $id = core.framework.impl.web.service.PathParamParser.toInt(request.pathParam("id"));
+        Integer $id = core.framework.impl.web.service.PathParamHelper.toInt(request.pathParam("id"));
         java.util.Optional response = delegate.get($id);
         return core.framework.web.Response.bean(response).status(core.framework.api.http.HTTPStatus.OK);
     }

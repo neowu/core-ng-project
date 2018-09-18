@@ -57,7 +57,7 @@ public class APIConfig extends Config {
     public <T> void service(Class<T> serviceInterface, T service) {
         if (!beanClasses.isEmpty()) throw new Error("api().service() must be configured before api().bean()");
 
-        logger.info("create api service, interface={}", serviceInterface.getCanonicalName());
+        logger.info("create web service, interface={}", serviceInterface.getCanonicalName());
         new WebServiceInterfaceValidator(serviceInterface,
                 context.httpServer.handler.requestBeanMapper,
                 context.httpServer.handler.responseBeanMapper).validate();
@@ -83,13 +83,13 @@ public class APIConfig extends Config {
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
-        logger.info("create api service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
+        logger.info("create web service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
         ResponseBeanMapper responseBeanMapper = context.httpServer.handler.responseBeanMapper;
         new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper).validate();
 
         HTTPClient httpClient = getOrCreateHTTPClient();
-        WebServiceClient webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, responseBeanMapper, context.logManager);
+        var webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, responseBeanMapper, context.logManager);
         T client = createWebServiceClient(serviceInterface, webServiceClient);
         context.beanFactory.bind(serviceInterface, null, client);
         return new APIClientConfig(webServiceClient);

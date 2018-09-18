@@ -6,10 +6,9 @@ import core.framework.api.web.service.PATCH;
 import core.framework.api.web.service.POST;
 import core.framework.api.web.service.PUT;
 import core.framework.http.HTTPMethod;
+import core.framework.impl.reflect.Methods;
 
 import java.lang.reflect.Method;
-
-import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -21,6 +20,6 @@ public class HTTPMethods {
         if (method.isAnnotationPresent(PUT.class)) return HTTPMethod.PUT;
         if (method.isAnnotationPresent(DELETE.class)) return HTTPMethod.DELETE;
         if (method.isAnnotationPresent(PATCH.class)) return HTTPMethod.PATCH;
-        throw new Error(format("unsupported method, method={}", method));
+        throw new Error("unsupported http method, method=" + Methods.path(method));
     }
 }
