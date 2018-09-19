@@ -1,7 +1,10 @@
 ## Change log
+### 6.8.4 (9/18/2018 - )
+* http: not setting Date response header as it's not necessary
+
 ### 6.8.3 (9/13/2018 - 9/18/2018)
 * http: removed request.pathParam/request.queryParam, for type safety, we use api interface/impl, so only keep low level interface to keep flexibility 
-* http: path param now only supports string/integer/number/enum
+* http: path param now only supports string/integer/long/enum
 * kafka: bulk message handler logs all message in trace for troubleshooting 
 * api: webservice client generates more efficient code for dynamic path pattern
 

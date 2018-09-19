@@ -9,7 +9,7 @@
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
 
-* http: wait java11 with http2 client? OkHttp's POST is 5x slower than apache http client 
+* http: switch to java 11 http client, not set userAgent for api client 
 * ws: provide way to handler json command with validation?
 * kafka: unique groupId to listen all messages for ws
 * type literal: support better cast for generic, JSON.fromJSON() / bind?
