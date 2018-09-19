@@ -147,7 +147,7 @@ public class DatabaseOperation {
 
     private <T> List<T> fetch(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {
         try (ResultSet resultSet = statement.executeQuery()) {
-            ResultSetWrapper wrapper = new ResultSetWrapper(resultSet);
+            var wrapper = new ResultSetWrapper(resultSet);
             List<T> results = Lists.newArrayList();
             while (resultSet.next()) {
                 T result = mapper.map(wrapper);
@@ -170,10 +170,8 @@ public class DatabaseOperation {
 
     private void setParams(PreparedStatement statement, Object... params) throws SQLException {
         if (params != null) {
-            int index = 1;
-            for (Object param : params) {
-                setParam(statement, index, param);
-                index++;
+            for (int i = 0; i < params.length; i++) {
+                setParam(statement, i + 1, params[i]);
             }
         }
     }

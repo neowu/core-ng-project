@@ -11,6 +11,7 @@ import core.framework.web.MultipartFile;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.MethodNotAllowedException;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.util.HeaderMap;
@@ -86,7 +87,11 @@ public final class RequestParser {
             }
         }
         if (hasCookies) {
-            exchange.getRequestCookies().forEach((name, cookie) -> logger.debug("[request:cookie] {}={}", name, new FieldParam(name, cookie.getValue())));
+            for (Map.Entry<String, Cookie> entry : exchange.getRequestCookies().entrySet()) {
+                String name = entry.getKey();
+                Cookie cookie = entry.getValue();
+                logger.debug("[request:cookie] {}={}", name, new FieldParam(name, cookie.getValue()));
+            }
         }
     }
 
@@ -194,7 +199,7 @@ public final class RequestParser {
         }
 
         String queryString = exchange.getQueryString();
-        if (!Strings.isEmpty(queryString)) builder.append('?').append(queryString);
+        if (!queryString.isEmpty()) builder.append('?').append(queryString);
 
         String requestURL = builder.toString();
         if (requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(format("requestURL is too long, requestURL={}...(truncated)", Strings.truncate(requestURL, 50)), "INVALID_HTTP_REQUEST");

@@ -10,16 +10,13 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.UUID;
 
-import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.delete;
 import static java.nio.file.Files.getLastModifiedTime;
-import static java.nio.file.Files.move;
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Files.walkFileTree;
 
@@ -49,30 +46,6 @@ public final class Files {
             createDirectories(directory);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
-        }
-    }
-
-    public static void copyDir(Path source, Path destination) {
-        var watch = new StopWatch();
-        try {
-            walkFileTree(source, new SimpleFileVisitor<>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attributes) throws IOException {
-                    Path targetPath = destination.resolve(source.relativize(dir));
-                    if (!exists(targetPath)) createDirectories(targetPath);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
-                    copy(file, destination.resolve(source.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } finally {
-            LOGGER.debug("copyDir, source={}, destination={}, elapsed={}", source, destination, watch.elapsed());
         }
     }
 
@@ -109,26 +82,6 @@ public final class Files {
         Path path = Paths.get(tempDir + "/" + UUID.randomUUID().toString());
         createDir(path);
         return path;
-    }
-
-    public static void deleteFile(Path file) {
-        try {
-            delete(file);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    public static void moveFile(Path source, Path destination) {
-        try {
-            move(source, destination, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    public static boolean exists(Path file) {
-        return java.nio.file.Files.exists(file);
     }
 
     public static long size(Path file) {

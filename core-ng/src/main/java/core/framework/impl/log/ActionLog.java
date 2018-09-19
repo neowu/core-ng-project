@@ -32,8 +32,8 @@ public final class ActionLog {
     final Map<String, Double> stats;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
-    private final long startCPUTime;
     private final long startTime;
+    private final long startCPUTime;
     public boolean trace;  // whether flush trace log for all subsequent actions
     public String action = "unassigned";
     String refId;

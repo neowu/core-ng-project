@@ -1,6 +1,7 @@
 ## Change log
 ### 6.8.4 (9/18/2018 - )
 * http: not setting Date response header as it's not necessary
+* util: delete some methods of Files, not too useful in cloud env 
 
 ### 6.8.3 (9/13/2018 - 9/18/2018)
 * http: removed request.pathParam/request.queryParam, for type safety, we use api interface/impl, so only keep low level interface to keep flexibility 

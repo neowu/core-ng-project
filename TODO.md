@@ -9,7 +9,7 @@
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
 
-* http: switch to java 11 http client, not set userAgent for api client 
+* http: switch to java 11 http client, not set userAgent for api client (in httperrorhandler, check userAgent==null to determine ajax or rest) 
 * ws: provide way to handler json command with validation?
 * kafka: unique groupId to listen all messages for ws
 * type literal: support better cast for generic, JSON.fromJSON() / bind?
