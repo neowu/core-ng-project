@@ -34,7 +34,7 @@ public final class ActionLogContext {
     }
 
     // used to collect business metrics, and can be aggregated by Elasticsearch/Kibana
-    public static void stat(String key, Number value) {
+    public static void stat(String key, double value) {
         LogManager logManager = logManager();
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog != null) {

@@ -28,7 +28,6 @@ public final class ActionLog {
     public final String id;
     final Instant date;
     final Map<String, String> context;
-    final Map<String, Double> stats;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
     private final long startTime;
@@ -39,6 +38,7 @@ public final class ActionLog {
     public List<String> correlationIds;    // with bulk message handler, there will be multiple correlationIds handled by one batch
     public List<String> clients;
     public List<String> refIds;
+    Map<String, Double> stats;
 
     String errorMessage;
     long elapsed;
@@ -54,7 +54,6 @@ public final class ActionLog {
 
         events = new ArrayList<>(16);   // according to benchmark, ArrayList is as fast as LinkedList with max 3000 items, and has smaller memory footprint
         context = new LinkedHashMap<>();
-        stats = new HashMap<>();
         performanceStats = new HashMap<>();
         id = ActionId.next();
 
@@ -133,8 +132,9 @@ public final class ActionLog {
         add(event("[context] {}={}", key, contextValue));
     }
 
-    public void stat(String key, Number value) {
-        stats.compute(key, (k, oldValue) -> (oldValue == null) ? value.doubleValue() : oldValue + value.doubleValue());
+    public void stat(String key, double value) {
+        if (stats == null) stats = new HashMap<>();
+        stats.compute(key, (k, oldValue) -> (oldValue == null) ? value : oldValue + value);
         add(event("[stat] {}={}", key, value));
     }
 
@@ -147,11 +147,6 @@ public final class ActionLog {
     public String correlationId() {
         if (correlationIds != null && correlationIds.size() == 1) return correlationIds.get(0);
         return id; // if there are multiple correlationIds (in batch), use current id as following correlationId
-    }
-
-    public List<String> correlationIds() {
-        if (correlationIds == null) return List.of(id);
-        return correlationIds;
     }
 
     public void action(String action) {

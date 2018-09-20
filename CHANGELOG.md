@@ -1,5 +1,5 @@
 ## Change log
-### 6.8.4 (9/18/2018 - )  !!! action log format changed, please use latest log-processor, docker: neowu/log-processor:6.8.4 !!! 
+### 6.8.4 (9/18/2018 - 9/20/2018)  !!! action log format changed, please use latest log-processor, docker: neowu/log-processor:6.8.4 !!! 
 * http: not setting Date response header as it's not necessary
 * util: delete some methods of Files, not too useful in cloud env 
 * api: for api ts definition change LocalDateTime/LocalDate to string type

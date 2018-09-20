@@ -33,6 +33,7 @@ class ConsoleAppenderTest {
         action.track("db", 100, 1, 0);
         action.clients = List.of("service");
         action.refIds = List.of("refId3");
+        action.stat("stat", 1);
         action.end("end");
 
         String message = appender.message(action);
@@ -43,6 +44,7 @@ class ConsoleAppenderTest {
                 .contains("| context=value |")
                 .contains("| client=service |")
                 .contains("| refId=refId3 |")
+                .contains("| stat=1.0 |")
                 .contains("| dbCount=1 | dbReads=1 | dbWrites=0 | dbElapsed=100");
 
     }

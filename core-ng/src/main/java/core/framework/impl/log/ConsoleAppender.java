@@ -57,6 +57,11 @@ public final class ConsoleAppender implements Appender {
             builder.append(LOG_SPLITTER).append("refId=");
             appendList(builder, log.refIds);
         }
+        if (log.stats != null) {
+            for (Map.Entry<String, Double> entry : log.stats.entrySet()) {
+                builder.append(LOG_SPLITTER).append(entry.getKey()).append('=').append(entry.getValue());
+            }
+        }
         for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
             String key = entry.getKey();
             PerformanceStat tracking = entry.getValue();
@@ -65,7 +70,6 @@ public final class ConsoleAppender implements Appender {
             if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("Writes=").append(tracking.writeEntries);
             builder.append(LOG_SPLITTER).append(key).append("Elapsed=").append(tracking.totalElapsed);
         }
-
         return builder.toString();
     }
 

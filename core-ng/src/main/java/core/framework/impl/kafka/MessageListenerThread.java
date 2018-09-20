@@ -186,8 +186,7 @@ class MessageListenerThread extends Thread {
 
                 String key = record.key();
                 byte[] value = record.value();
-
-                logger.debug("[message] key={}, value={}, refId={}", key, new BytesParam(value), refId);
+                logger.debug("[message] key={}, value={}, refId={}, client={}, correlationId={}", key, new BytesParam(value), refId, client, correlationId);
 
                 T message = process.reader.fromJSON(value);
                 messages.add(new Message<>(key, message));
