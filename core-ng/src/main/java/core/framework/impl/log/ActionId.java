@@ -42,12 +42,12 @@ class ActionId {
         bytes[1] = (byte) (timeInMs >> 24);
         bytes[2] = (byte) (timeInMs >> 16);
         bytes[3] = (byte) (timeInMs >> 8);
-        bytes[4] = (byte) (timeInMs);
+        bytes[4] = (byte) timeInMs;
         bytes[5] = (byte) (MACHINE_IDENTIFIER >> 16);   // 3 bytes as machine id, about 16M value space
         bytes[6] = (byte) (MACHINE_IDENTIFIER >> 8);
-        bytes[7] = (byte) (MACHINE_IDENTIFIER);
+        bytes[7] = (byte) MACHINE_IDENTIFIER;
         bytes[8] = (byte) (counter >> 8);               // 2 bytes for max 65535 actions per ms per server
-        bytes[9] = (byte) (counter);
+        bytes[9] = (byte) counter;
         return Encodings.hex(bytes);
     }
 }
