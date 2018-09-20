@@ -193,7 +193,7 @@ class MessageListenerThread extends Thread {
                 messages.add(new Message<>(key, message));
             }
 
-            if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);
+            if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
             if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
             if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
 
