@@ -2,11 +2,11 @@ package core.framework.impl.web.management;
 
 import core.framework.impl.kafka.MessageHeaders;
 import core.framework.impl.kafka.MessageProducer;
+import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.LogManager;
 import core.framework.impl.log.filter.BytesParam;
 import core.framework.impl.web.http.IPAccessControl;
-import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
-import core.framework.util.Network;
 import core.framework.util.Strings;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -22,9 +22,11 @@ public class KafkaController {
     private final Logger logger = LoggerFactory.getLogger(KafkaController.class);
     private final IPAccessControl accessControl = new IPAccessControl();
     private final MessageProducer producer;
+    private final LogManager logManager;
 
-    public KafkaController(MessageProducer producer) {
+    public KafkaController(MessageProducer producer, LogManager logManager) {
         this.producer = producer;
+        this.logManager = logManager;
     }
 
     public Response publish(Request request) {
@@ -43,11 +45,11 @@ public class KafkaController {
     ProducerRecord<String, byte[]> record(String topic, String key, byte[] body) {
         var record = new ProducerRecord<>(topic, key, body);
         Headers headers = record.headers();
-        headers.add(MessageHeaders.HEADER_CLIENT_IP, Strings.bytes(Network.localHostAddress()));
         headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(KafkaController.class.getSimpleName()));
-        String actionId = ActionLogContext.id();
-        if (actionId != null) headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionId));
         headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));  // auto trace
+        ActionLog actionLog = logManager.currentActionLog();
+        headers.add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));
+        headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionLog.id));
         return record;
     }
 }

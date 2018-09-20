@@ -6,7 +6,6 @@ import core.framework.impl.log.LogManager;
 import core.framework.impl.log.filter.BytesParam;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.ActionLogContext;
-import core.framework.util.Network;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -59,13 +58,13 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
     }
 
     private void linkContext(Headers headers) {
-        headers.add(MessageHeaders.HEADER_CLIENT_IP, Strings.bytes(Network.localHostAddress()));
         headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(logManager.appName));
 
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog == null) return;
 
-        headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionLog.refId()));
+        headers.add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));
         if (actionLog.trace) headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));
+        headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionLog.id));
     }
 }

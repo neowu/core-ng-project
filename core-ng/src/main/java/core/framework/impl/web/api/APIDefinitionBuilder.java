@@ -132,7 +132,8 @@ public class APIDefinitionBuilder {
         if (String.class.equals(type)) return "string";
         if (Integer.class.equals(type) || Long.class.equals(type) || Double.class.equals(type) || BigDecimal.class.equals(type)) return "number";
         if (Boolean.class.equals(type)) return "boolean";
-        if (LocalDate.class.equals(type) || LocalDateTime.class.equals(type) || ZonedDateTime.class.equals(type) || Instant.class.equals(type)) return "Date";
+        if (ZonedDateTime.class.equals(type) || Instant.class.equals(type)) return "Date";
+        if (LocalDate.class.equals(type) || LocalDateTime.class.equals(type)) return "string";  // in ts/js, Date is always convert to ISO datetime utc format, so here use string for date/datetime without timezone
         if (GenericTypes.rawClass(type).isEnum()) {
             return parseEnum((Class<?>) type);
         }

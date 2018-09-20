@@ -4,6 +4,7 @@ import core.framework.impl.log.filter.LogFilter;
 
 import java.io.PrintStream;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,16 +28,17 @@ public final class ConsoleAppender implements Appender {
     }
 
     String message(ActionLog log) {
-        StringBuilder builder = new StringBuilder(256);
+        var builder = new StringBuilder(256);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(log.date))
                .append(LOG_SPLITTER).append(log.result())
                .append(LOG_SPLITTER).append("elapsed=").append(log.elapsed)
                .append(LOG_SPLITTER).append("id=").append(log.id)
                .append(LOG_SPLITTER).append("action=").append(log.action);
 
-        if (log.refId != null)
-            builder.append(LOG_SPLITTER).append("refId=").append(log.refId);
-
+        if (log.correlationIds != null) {
+            builder.append(LOG_SPLITTER).append("correlationId=");
+            appendList(builder, log.correlationIds);
+        }
         String errorCode = log.errorCode();
         if (errorCode != null) {
             builder.append(LOG_SPLITTER).append("errorCode=").append(errorCode)
@@ -47,7 +49,14 @@ public final class ConsoleAppender implements Appender {
         for (Map.Entry<String, String> entry : log.context.entrySet()) {
             builder.append(LOG_SPLITTER).append(entry.getKey()).append('=').append(filterLineSeparator(entry.getValue()));
         }
-
+        if (log.clients != null) {
+            builder.append(LOG_SPLITTER).append("client=");
+            appendList(builder, log.clients);
+        }
+        if (log.refIds != null) {
+            builder.append(LOG_SPLITTER).append("refId=");
+            appendList(builder, log.refIds);
+        }
         for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
             String key = entry.getKey();
             PerformanceStat tracking = entry.getValue();
@@ -58,6 +67,15 @@ public final class ConsoleAppender implements Appender {
         }
 
         return builder.toString();
+    }
+
+    private void appendList(StringBuilder builder, List<String> items) {
+        int index = 0;
+        for (String item : items) {
+            if (index > 0) builder.append(',');
+            builder.append(item);
+            index++;
+        }
     }
 
     String filterLineSeparator(String value) {

@@ -1,7 +1,9 @@
 ## Change log
-### 6.8.4 (9/18/2018 - )
+### 6.8.4 (9/18/2018 - )  !!! action log format changed, please use latest log-processor, docker: neowu/log-processor:6.8.4 !!! 
 * http: not setting Date response header as it's not necessary
 * util: delete some methods of Files, not too useful in cloud env 
+* api: for api ts definition change LocalDateTime/LocalDate to string type
+* log: renamed old refId to correlationId, and now refId is for directly reference action, bulk message handler now logs all clients/correlationIds/refIds 
 
 ### 6.8.3 (9/13/2018 - 9/18/2018)
 * http: removed request.pathParam/request.queryParam, for type safety, we use api interface/impl, so only keep low level interface to keep flexibility 

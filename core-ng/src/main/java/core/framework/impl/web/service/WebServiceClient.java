@@ -94,8 +94,9 @@ public class WebServiceClient {
         ActionLog actionLog = logManager.currentActionLog();
         if (actionLog == null) return;  // web service client may be used without action log context
 
-        request.header(HTTPHandler.HEADER_REF_ID.toString(), actionLog.refId());
+        request.header(HTTPHandler.HEADER_CORRELATION_ID.toString(), actionLog.correlationId());
         if (actionLog.trace) request.header(HTTPHandler.HEADER_TRACE.toString(), "true");
+        request.header(HTTPHandler.HEADER_REF_ID.toString(), actionLog.id);
     }
 
     void validateResponse(HTTPResponse response) {

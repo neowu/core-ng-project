@@ -71,7 +71,7 @@ public class KafkaConfig extends Config {
         var producer = new MessageProducerImpl(uri, name);
         context.stat.metrics.add(producer.producerMetrics);
         context.shutdownHook.add(ShutdownHook.STAGE_3, producer::close);
-        var controller = new KafkaController(producer);
+        var controller = new KafkaController(producer, context.logManager);
         context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), controller::publish, true);
         return producer;
     }

@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static core.framework.impl.log.LogLevel.DEBUG;
 import static core.framework.impl.log.LogLevel.WARN;
@@ -34,12 +33,17 @@ public final class ActionLog {
     final List<LogEvent> events;
     private final long startTime;
     private final long startCPUTime;
+
     public boolean trace;  // whether flush trace log for all subsequent actions
     public String action = "unassigned";
-    String refId;
+    public List<String> correlationIds;    // with bulk message handler, there will be multiple correlationIds handled by one batch
+    public List<String> clients;
+    public List<String> refIds;
+
     String errorMessage;
     long elapsed;
     long cpuTime;
+
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
@@ -52,7 +56,7 @@ public final class ActionLog {
         context = new LinkedHashMap<>();
         stats = new HashMap<>();
         performanceStats = new HashMap<>();
-        id = UUID.randomUUID().toString();
+        id = ActionId.next();
 
         add(event(message));
         add(event("[context] id={}", id));
@@ -140,16 +144,14 @@ public final class ActionLog {
         // not to add event to keep trace log concise
     }
 
-    public String refId() {
-        if (refId == null) return id;
-        return refId;
+    public String correlationId() {
+        if (correlationIds != null && correlationIds.size() == 1) return correlationIds.get(0);
+        return id; // if there are multiple correlationIds (in batch), use current id as following correlationId
     }
 
-    public void refId(String refId) {
-        if (refId != null) {
-            add(event("[context] refId={}", refId));
-            this.refId = refId;
-        }
+    public List<String> correlationIds() {
+        if (correlationIds == null) return List.of(id);
+        return correlationIds;
     }
 
     public void action(String action) {

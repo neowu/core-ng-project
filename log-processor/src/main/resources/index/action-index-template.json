@@ -75,7 +75,13 @@
         "result": {
           "type": "keyword"
         },
+        "correlation_id": {
+          "type": "keyword"
+        },
         "ref_id": {
+          "type": "keyword"
+        },
+        "client": {
           "type": "keyword"
         },
         "action": {

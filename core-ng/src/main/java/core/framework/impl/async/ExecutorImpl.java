@@ -6,6 +6,7 @@ import core.framework.impl.log.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -38,13 +39,17 @@ public final class ExecutorImpl implements Executor {
     public <T> Future<T> submit(String action, Callable<T> task) {
         ActionLog parentActionLog = logManager.currentActionLog();
         String taskAction = taskAction(action, parentActionLog.action);
-        String refId = parentActionLog.refId();
+        String correlationId = parentActionLog.correlationId();
+        String refId = parentActionLog.id;
         boolean trace = parentActionLog.trace;
         return executor.submit(() -> {
             try {
                 ActionLog actionLog = logManager.begin("=== task execution begin ===");
                 actionLog.action(taskAction);
-                actionLog.refId(refId);
+                logger.debug("[context] correlationId={}", correlationId);
+                actionLog.correlationIds = List.of(correlationId);
+                logger.debug("[context] refId={}", refId);
+                actionLog.refIds = List.of(refId);
                 actionLog.trace = trace;
                 return task.call();
             } catch (Throwable e) {

@@ -26,13 +26,16 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * @author neo
  */
 public class HTTPHandler implements HttpHandler {
+    public static final HttpString HEADER_CORRELATION_ID = new HttpString("correlation-id");
+    public static final HttpString HEADER_CLIENT = new HttpString("client");
     public static final HttpString HEADER_REF_ID = new HttpString("ref-id");
     public static final HttpString HEADER_TRACE = new HttpString("trace");
-    public static final HttpString HEADER_CLIENT = new HttpString("client");
 
     public final RequestParser requestParser = new RequestParser();
     public final Route route = new Route();
@@ -106,10 +109,15 @@ public class HTTPHandler implements HttpHandler {
 
     void linkContext(ActionLog actionLog, HeaderMap headers) {
         String client = headers.getFirst(HTTPHandler.HEADER_CLIENT);
-        if (client != null) actionLog.context("client", client);
-        actionLog.refId(headers.getFirst(HTTPHandler.HEADER_REF_ID));
-        if ("true".equals(headers.getFirst(HEADER_TRACE))) {
+        if (client != null) actionLog.clients = List.of(client);
+
+        String refId = headers.getFirst(HTTPHandler.HEADER_REF_ID);
+        if (refId != null) actionLog.refIds = List.of(refId);
+
+        String correlationId = headers.getFirst(HTTPHandler.HEADER_CORRELATION_ID);
+        if (correlationId != null) actionLog.correlationIds = List.of(correlationId);
+
+        if ("true".equals(headers.getFirst(HEADER_TRACE)))
             actionLog.trace = true;
-        }
     }
 }

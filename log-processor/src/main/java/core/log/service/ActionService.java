@@ -102,8 +102,10 @@ public class ActionService {
         document.serverIP = message.serverIP;
         document.id = message.id;
         document.result = message.result;
-        document.refId = message.refId;
         document.action = message.action;
+        document.refIds = message.refIds;
+        document.clients = message.clients;
+        document.correlationIds = message.correlationIds;
         document.errorCode = message.errorCode;
         document.errorMessage = message.errorMessage;
         document.elapsed = message.elapsed;

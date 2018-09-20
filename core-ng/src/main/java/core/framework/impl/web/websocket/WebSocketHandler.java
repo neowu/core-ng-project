@@ -67,7 +67,7 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
             var wrapper = new ChannelImpl(channel, context, listener);
             wrapper.action = action;
             wrapper.clientIP = request.clientIP();
-            wrapper.refId = actionLog.id;
+            wrapper.refId = actionLog.id;   // with ws, correlationId and refId must be same as parent http action id
             actionLog.context("channel", wrapper.id);
             channel.setAttribute(CHANNEL_KEY, wrapper);
             channel.addCloseTask(this);

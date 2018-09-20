@@ -3,6 +3,7 @@ package core.framework.impl.log.message;
 import core.framework.api.json.Property;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,10 +20,14 @@ public class ActionLogMessage {
     public String id;
     @Property(name = "result")
     public String result;
-    @Property(name = "ref_id")
-    public String refId;
     @Property(name = "action")
     public String action;
+    @Property(name = "correlation_ids")
+    public List<String> correlationIds;
+    @Property(name = "clients")
+    public List<String> clients;
+    @Property(name = "ref_ids")
+    public List<String> refIds;
     @Property(name = "error_code")
     public String errorCode;
     @Property(name = "error_message")

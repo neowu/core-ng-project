@@ -5,6 +5,7 @@ import core.framework.impl.log.LogManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -39,7 +40,7 @@ class ExecutorImplTest {
     void submit() throws ExecutionException, InterruptedException {
         var parentActionLog = new ActionLog(null);
         parentActionLog.action("parentAction");
-        parentActionLog.refId("refId");
+        parentActionLog.correlationIds = List.of("correlationId");
         parentActionLog.trace = true;
         when(logManager.currentActionLog()).thenReturn(parentActionLog);
 
@@ -49,14 +50,14 @@ class ExecutorImplTest {
         Future<Boolean> future = executor.submit("action", () -> Boolean.TRUE);
         assertThat(taskActionLog.action).isEqualTo("parentAction:action");
         assertThat(taskActionLog.trace).isEqualTo(true);
-        assertThat(taskActionLog.refId()).isEqualTo("refId");
+        assertThat(taskActionLog.correlationIds).containsExactly("correlationId");
         assertThat(future.get()).isEqualTo(true);
 
         executor.submit("task", () -> {
         });
         assertThat(taskActionLog.action).isEqualTo("parentAction:task");
         assertThat(taskActionLog.trace).isEqualTo(true);
-        assertThat(taskActionLog.refId()).isEqualTo("refId");
+        assertThat(taskActionLog.correlationIds).containsExactly("correlationId");
     }
 
     @Test

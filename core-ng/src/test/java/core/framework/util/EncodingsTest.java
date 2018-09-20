@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -13,15 +12,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class EncodingsTest {
     @Test
     void base64() {
-        assertEquals("", Encodings.base64(""));
+        assertThat(Encodings.base64("")).isEqualTo("");
         // from http://en.wikipedia.org/wiki/Base64
-        assertEquals("bGVhc3VyZS4=", Encodings.base64("leasure."));
+        assertThat(Encodings.base64("leasure.")).isEqualTo("bGVhc3VyZS4=");
     }
 
     @Test
     void decodeBase64() {
         // from http://en.wikipedia.org/wiki/Base64
-        assertEquals("leasure.", new String(Encodings.decodeBase64("bGVhc3VyZS4="), StandardCharsets.UTF_8));
+        assertThat(new String(Encodings.decodeBase64("bGVhc3VyZS4="), StandardCharsets.UTF_8)).isEqualTo("leasure.");
     }
 
     @Test
@@ -31,30 +30,38 @@ class EncodingsTest {
             bytes[i] = (byte) i;
         }
         String encodedMessage = Encodings.base64URLSafe(bytes);
-        assertArrayEquals(bytes, Encodings.decodeBase64URLSafe(encodedMessage));
+        assertThat(Encodings.decodeBase64URLSafe(encodedMessage)).containsExactly(bytes);
     }
 
     @Test
     void uriComponent() {
-        assertEquals("%E2%9C%93", Encodings.uriComponent("✓"), "encode utf-8");
-        assertEquals("a%20b", Encodings.uriComponent("a b"));
-        assertEquals("a%2Bb", Encodings.uriComponent("a+b"));
-        assertEquals("a%3Db", Encodings.uriComponent("a=b"));
-        assertEquals("a%3Fb", Encodings.uriComponent("a?b"));
-        assertEquals("a%2Fb", Encodings.uriComponent("a/b"));
-        assertEquals("a%26b", Encodings.uriComponent("a&b"));
-        assertEquals("a%25b", Encodings.uriComponent("a%b"));
+        assertThat(Encodings.uriComponent("✓")).as("encode utf-8").isEqualTo("%E2%9C%93");
+        assertThat(Encodings.uriComponent("a b")).isEqualTo("a%20b");
+        assertThat(Encodings.uriComponent("a+b")).isEqualTo("a%2Bb");
+        assertThat(Encodings.uriComponent("a=b")).isEqualTo("a%3Db");
+        assertThat(Encodings.uriComponent("a?b")).isEqualTo("a%3Fb");
+        assertThat(Encodings.uriComponent("a/b")).isEqualTo("a%2Fb");
+        assertThat(Encodings.uriComponent("a&b")).isEqualTo("a%26b");
+        assertThat(Encodings.uriComponent("a%b")).isEqualTo("a%25b");
     }
 
     @Test
     void decodeURIComponent() {
-        assertEquals("✓", Encodings.decodeURIComponent("%E2%9C%93"), "decode utf-8");
-        assertEquals("a b", Encodings.decodeURIComponent("a%20b"));
-        assertEquals("a+b", Encodings.decodeURIComponent("a+b"));
-        assertEquals("a=b", Encodings.decodeURIComponent("a=b"));
-        assertEquals("a?b", Encodings.decodeURIComponent("a%3Fb"));
-        assertEquals("a/b", Encodings.decodeURIComponent("a%2Fb"));
-        assertEquals("a&b", Encodings.decodeURIComponent("a&b"));
-        assertEquals("a%b", Encodings.decodeURIComponent("a%25b"));
+        assertThat(Encodings.decodeURIComponent("%E2%9C%93")).as("decode utf-8").isEqualTo("✓");
+        assertThat(Encodings.decodeURIComponent("a%20b")).isEqualTo("a b");
+        assertThat(Encodings.decodeURIComponent("a+b")).isEqualTo("a+b");
+        assertThat(Encodings.decodeURIComponent("a=b")).isEqualTo("a=b");
+        assertThat(Encodings.decodeURIComponent("a%3Fb")).isEqualTo("a?b");
+        assertThat(Encodings.decodeURIComponent("a%3fb")).isEqualTo("a?b");
+        assertThat(Encodings.decodeURIComponent("a%2Fb")).isEqualTo("a/b");
+        assertThat(Encodings.decodeURIComponent("a&b")).isEqualTo("a&b");
+        assertThat(Encodings.decodeURIComponent("a%25b")).isEqualTo("a%b");
+    }
+
+    @Test
+    void hex() {
+        assertThat(Encodings.hex(new byte[]{0, 1, 0xf})).isEqualTo("00010F");
+        assertThat(Encodings.hex(new byte[]{-128, -1, 127})).isEqualTo("80FF7F");
+        assertThat(Encodings.hex(new byte[0])).isEqualTo("");
     }
 }

@@ -10,6 +10,8 @@ import io.undertow.websockets.core.WebSockets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * @author neo
  */
@@ -27,7 +29,10 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===");
         try {
             actionLog.action(wrapper.action);
-            actionLog.refId(wrapper.refId);
+            List<String> refIds = List.of(wrapper.refId);
+            logger.debug("[context] refId={}", wrapper.refId);
+            actionLog.refIds = refIds;
+            actionLog.correlationIds = refIds;
             actionLog.context("channel", wrapper.id);
             logger.debug("[channel] url={}", channel.getUrl());
             actionLog.context("listener", wrapper.listener.getClass().getCanonicalName());

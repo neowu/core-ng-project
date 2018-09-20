@@ -24,7 +24,9 @@ public class MessageFactory {
         message.id = log.id;
         message.date = log.date;
         message.result = log.result();
-        message.refId = log.refId;
+        message.correlationIds = log.correlationIds();
+        message.clients = log.clients;
+        message.refIds = log.refIds;
         message.elapsed = log.elapsed;
         message.cpuTime = log.cpuTime;
         message.action = log.action;

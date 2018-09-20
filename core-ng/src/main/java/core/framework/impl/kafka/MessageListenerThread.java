@@ -17,9 +17,11 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -130,14 +132,16 @@ class MessageListenerThread extends Thread {
                 actionLog.track("kafka", 0, 1, 0);
 
                 Headers headers = record.headers();
-                actionLog.refId(header(headers, MessageHeaders.HEADER_REF_ID));
+                for (Header header : headers)
+                    logger.debug("[header] {}={}", header.key(), new BytesParam(header.value()));
+
+                String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
+                if (correlationId != null) actionLog.correlationIds = List.of(correlationId);
+                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;
                 String client = header(headers, MessageHeaders.HEADER_CLIENT);
-                if (client != null) actionLog.context("client", client);
-                String clientIP = header(headers, MessageHeaders.HEADER_CLIENT_IP);
-                if (clientIP != null) actionLog.context("clientIP", clientIP);
-                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) {
-                    actionLog.trace = true;
-                }
+                if (client != null) actionLog.clients = List.of(client);
+                String refId = header(headers, MessageHeaders.HEADER_REF_ID);
+                if (refId != null) actionLog.refIds = List.of(refId);
 
                 actionLog.context("key", record.key());
                 logger.debug("[message] value={}", new BytesParam(record.value()));
@@ -166,20 +170,35 @@ class MessageListenerThread extends Thread {
             actionLog.track("kafka", 0, size, 0);
 
             List<Message<T>> messages = new ArrayList<>(size);
+            Set<String> correlationIds = new HashSet<>();
+            Set<String> clients = new HashSet<>();
+            Set<String> refIds = new HashSet<>();
+
             for (ConsumerRecord<String, byte[]> record : records) {
                 Headers headers = record.headers();
-                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) {    // trigger trace if any message is trace
-                    actionLog.trace = true;
-                }
+                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;    // trigger trace if any message is trace
+                String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
+                if (correlationId != null) correlationIds.add(correlationId);
+                String client = header(headers, MessageHeaders.HEADER_CLIENT);
+                if (client != null) clients.add(client);
+                String refId = header(headers, MessageHeaders.HEADER_REF_ID);
+                if (refId != null) refIds.add(refId);
+
                 String key = record.key();
                 byte[] value = record.value();
-                logger.debug("[message] key={}, value={}, client={}, clientIP={}", key, new BytesParam(value),
-                        header(headers, MessageHeaders.HEADER_CLIENT),
-                        header(headers, MessageHeaders.HEADER_CLIENT_IP));
+
+                logger.debug("[message] key={}, value={}, refId={}", key, new BytesParam(value), refId);
 
                 T message = process.reader.fromJSON(value);
-                process.validator.validate(message);
                 messages.add(new Message<>(key, message));
+            }
+
+            if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);
+            if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
+            if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
+
+            for (Message<T> message : messages) {
+                process.validator.validate(message.value);
             }
 
             process.bulkHandler.handle(messages);

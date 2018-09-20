@@ -1,10 +1,13 @@
 package core.framework.impl.kafka;
 
+import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.kafka.MessagePublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +32,8 @@ class MessagePublisherImplTest {
     @Test
     void publish() {
         logManager.begin("begin");
-        logManager.currentActionLog().refId("ref-id");
+        ActionLog actionLog = logManager.currentActionLog();
+        actionLog.correlationIds = List.of("ref-id");
         var message = new TestMessage();
         message.stringField = "value";
         publisher.publish(message);
@@ -37,8 +41,8 @@ class MessagePublisherImplTest {
 
         verify(producer).send(argThat(record -> {
             assertThat(record.key()).hasSize(36);
-            assertThat(record.headers().lastHeader(MessageHeaders.HEADER_CLIENT_IP).value()).isNotNull();
-            assertThat(new String(record.headers().lastHeader(MessageHeaders.HEADER_REF_ID).value(), UTF_8)).isEqualTo("ref-id");
+            assertThat(new String(record.headers().lastHeader(MessageHeaders.HEADER_CORRELATION_ID).value(), UTF_8)).isEqualTo("ref-id");
+            assertThat(new String(record.headers().lastHeader(MessageHeaders.HEADER_REF_ID).value(), UTF_8)).isEqualTo(actionLog.id);
             return true;
         }));
     }

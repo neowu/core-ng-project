@@ -23,8 +23,10 @@ class HTTPHandlerTest {
         var actionLog = new ActionLog(null);
         var headers = new HeaderMap();
         headers.put(HTTPHandler.HEADER_TRACE, "true");
+        headers.put(HTTPHandler.HEADER_CLIENT, "client");
         handler.linkContext(actionLog, headers);
 
         assertThat(actionLog.trace).isTrue();
+        assertThat(actionLog.clients).containsExactly("client");
     }
 }
