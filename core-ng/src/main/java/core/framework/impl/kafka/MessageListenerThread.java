@@ -1,5 +1,6 @@
 package core.framework.impl.kafka;
 
+import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.filter.BytesParam;
@@ -166,36 +167,8 @@ class MessageListenerThread extends Thread {
             actionLog.action("topic:" + topic);
             actionLog.context("topic", topic);
             actionLog.context("handler", process.bulkHandler.getClass().getCanonicalName());
-            int size = records.size();
-            actionLog.track("kafka", 0, size, 0);
 
-            List<Message<T>> messages = new ArrayList<>(size);
-            Set<String> correlationIds = new HashSet<>();
-            Set<String> clients = new HashSet<>();
-            Set<String> refIds = new HashSet<>();
-
-            for (ConsumerRecord<String, byte[]> record : records) {
-                Headers headers = record.headers();
-                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;    // trigger trace if any message is trace
-                String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
-                if (correlationId != null) correlationIds.add(correlationId);
-                String client = header(headers, MessageHeaders.HEADER_CLIENT);
-                if (client != null) clients.add(client);
-                String refId = header(headers, MessageHeaders.HEADER_REF_ID);
-                if (refId != null) refIds.add(refId);
-
-                String key = record.key();
-                byte[] value = record.value();
-                logger.debug("[message] key={}, value={}, refId={}, client={}, correlationId={}", key, new BytesParam(value), refId, client, correlationId);
-
-                T message = process.reader.fromJSON(value);
-                messages.add(new Message<>(key, message));
-            }
-
-            if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
-            if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
-            if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
-
+            List<Message<T>> messages = messages(records, actionLog, process.reader);
             for (Message<T> message : messages) {
                 process.validator.validate(message.value);
             }
@@ -208,6 +181,38 @@ class MessageListenerThread extends Thread {
             checkSlowProcess(elapsed, longProcessThresholdInNano);
             logManager.end("=== message handling end ===");
         }
+    }
+
+    <T> List<Message<T>> messages(List<ConsumerRecord<String, byte[]>> records, ActionLog actionLog, JSONReader<T> reader) {
+        int size = records.size();
+        actionLog.track("kafka", 0, size, 0);
+        List<Message<T>> messages = new ArrayList<>(size);
+        Set<String> correlationIds = new HashSet<>();
+        Set<String> clients = new HashSet<>();
+        Set<String> refIds = new HashSet<>();
+
+        for (ConsumerRecord<String, byte[]> record : records) {
+            Headers headers = record.headers();
+            if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;    // trigger trace if any message is trace
+            String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
+            if (correlationId != null) correlationIds.add(correlationId);
+            String client = header(headers, MessageHeaders.HEADER_CLIENT);
+            if (client != null) clients.add(client);
+            String refId = header(headers, MessageHeaders.HEADER_REF_ID);
+            if (refId != null) refIds.add(refId);
+
+            String key = record.key();
+            byte[] value = record.value();
+            logger.debug("[message] key={}, value={}, refId={}, client={}, correlationId={}", key, new BytesParam(value), refId, client, correlationId);
+
+            T message = reader.fromJSON(value);
+            messages.add(new Message<>(key, message));
+        }
+
+        if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
+        if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
+        if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
+        return messages;
     }
 
     String header(Headers headers, String key) {
