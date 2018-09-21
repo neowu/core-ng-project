@@ -52,24 +52,13 @@ public final class ActionLog {
         startCPUTime = THREAD.getCurrentThreadCpuTime();
         date = Instant.now();
 
-        events = new ArrayList<>(16);   // according to benchmark, ArrayList is as fast as LinkedList with max 3000 items, and has smaller memory footprint
+        events = new ArrayList<>(32);   // according to benchmark, ArrayList is as fast as LinkedList with max 3000 items, and has smaller memory footprint
         context = new LinkedHashMap<>();
         performanceStats = new HashMap<>();
         id = ActionId.next();
 
         add(event(message));
         add(event("[context] id={}", id));
-    }
-
-    void end(String message) {
-        cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
-        elapsed = elapsed();
-        add(event("[context] elapsed={}", elapsed));
-        add(event(message));
-    }
-
-    public long elapsed() {
-        return System.nanoTime() - startTime;
     }
 
     void process(LogEvent event) {
@@ -81,6 +70,17 @@ public final class ActionLog {
         if (event.level.value >= WARN.value || events.size() < MAX_TRACE_HOLD_SIZE) {  // after reach max holding lines, only add warning/error events
             add(event);
         }
+    }
+
+    void end(String message) {
+        cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
+        elapsed = elapsed();
+        add(event("[context] elapsed={}", elapsed));
+        add(event(message));
+    }
+
+    public long elapsed() {
+        return System.nanoTime() - startTime;
     }
 
     private void add(LogEvent event) {  // log inside action log will call this to add log event directly, so internal message won't be suspended

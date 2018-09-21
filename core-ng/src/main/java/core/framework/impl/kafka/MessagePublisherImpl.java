@@ -61,7 +61,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
         headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(logManager.appName));
 
         ActionLog actionLog = logManager.currentActionLog();
-        if (actionLog == null) return;
+        if (actionLog == null) return;      // publisher may be used without action log context
 
         headers.add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));
         if (actionLog.trace) headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));

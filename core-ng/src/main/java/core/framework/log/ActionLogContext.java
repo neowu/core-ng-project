@@ -12,22 +12,19 @@ import java.util.Optional;
  */
 public final class ActionLogContext {
     public static String id() {
-        LogManager logManager = logManager();
-        ActionLog actionLog = logManager.currentActionLog();
+        ActionLog actionLog = logManager().currentActionLog();
         if (actionLog == null) return null;
         return actionLog.id;
     }
 
     public static Optional<String> get(String key) {
-        LogManager logManager = logManager();
-        ActionLog actionLog = logManager.currentActionLog();
+        ActionLog actionLog = logManager().currentActionLog();
         if (actionLog == null) return Optional.empty();
         return actionLog.context(key);
     }
 
     public static void put(String key, Object value) {
-        LogManager logManager = logManager();
-        ActionLog actionLog = logManager.currentActionLog();
+        ActionLog actionLog = logManager().currentActionLog();
         if (actionLog != null) {    // here to check null is for unit testing the logManager.begin may not be called
             actionLog.context(key, value);
         }
@@ -35,8 +32,7 @@ public final class ActionLogContext {
 
     // used to collect business metrics, and can be aggregated by Elasticsearch/Kibana
     public static void stat(String key, double value) {
-        LogManager logManager = logManager();
-        ActionLog actionLog = logManager.currentActionLog();
+        ActionLog actionLog = logManager().currentActionLog();
         if (actionLog != null) {
             actionLog.stat(key, value);
         }
@@ -47,8 +43,7 @@ public final class ActionLogContext {
     }
 
     public static void track(String action, long elapsed, Integer readEntries, Integer writeEntries) {
-        LogManager logManager = logManager();
-        ActionLog actionLog = logManager.currentActionLog();
+        ActionLog actionLog = logManager().currentActionLog();
         if (actionLog != null) {
             actionLog.track(action, elapsed, readEntries, writeEntries);
         }

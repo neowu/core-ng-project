@@ -13,15 +13,14 @@ public final class LoggerImpl extends AbstractLogger {
         String[] tokens = Strings.split(name, '.');
         var builder = new StringBuilder();
         int total = tokens.length >= 4 ? 3 : tokens.length - 1;
-        int index = 1;
-        for (String token : tokens) {
-            if (index > 1) builder.append('.');
-            if (index <= total && token.length() >= 1) {
+        for (int i = 0; i < tokens.length; i++) {
+            String token = tokens[i];
+            if (i > 0) builder.append('.');
+            if (i < total && token.length() >= 1) {
                 builder.append(token.charAt(0));
             } else {
                 builder.append(token);
             }
-            index++;
         }
         return builder.toString();
     }
@@ -45,7 +44,8 @@ public final class LoggerImpl extends AbstractLogger {
     public void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
         if (level.value >= traceLevel.value) {
             var event = new LogEvent(logger, marker, level, message, arguments, exception);
-            logManager.process(event);
+            ActionLog actionLog = logManager.currentActionLog();
+            if (actionLog != null) actionLog.process(event);    // logManager.begin() may not be called
 
             if (level.value >= infoLevel.value) {
                 write(event);

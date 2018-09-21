@@ -34,16 +34,11 @@ public class LogManager {
     }
 
     public void end(String message) {
-        ActionLog actionLog = currentActionLog();
+        ActionLog actionLog = ACTION_LOG.get();
         ACTION_LOG.remove();
         actionLog.end(message);
 
         if (appender != null) appender.append(actionLog, filter);
-    }
-
-    public void process(LogEvent event) {
-        ActionLog actionLog = currentActionLog();
-        if (actionLog != null) actionLog.process(event);    // process is called by loggerImpl.log, begin() may not be called before
     }
 
     public ActionLog currentActionLog() {
