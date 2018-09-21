@@ -62,8 +62,9 @@ public class MessageFactory {
 
     public static StatMessage stat(Map<String, Double> stats, String appName) {
         var message = new StatMessage();
-        message.id = ActionId.next();
-        message.date = Instant.now();
+        var now = Instant.now();
+        message.id = LogManager.ID_GENERATOR.next(now);
+        message.date = now;
         message.app = appName;
         message.serverIP = Network.localHostAddress();
         message.stats = stats;

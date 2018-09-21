@@ -55,7 +55,7 @@ public final class ActionLog {
         events = new ArrayList<>(32);   // according to benchmark, ArrayList is as fast as LinkedList with max 3000 items, and has smaller memory footprint
         context = new LinkedHashMap<>();
         performanceStats = new HashMap<>();
-        id = ActionId.next();
+        id = LogManager.ID_GENERATOR.next(date);
 
         add(event(message));
         add(event("[context] id={}", id));

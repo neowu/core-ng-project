@@ -1,6 +1,7 @@
 ## Change log
 ### 6.8.5 (9/20/2018 - )
 * db: log params for batch operations, disable ssl for mysql
+* log: adjust logger name abbr, only leave last 2 tokens for long package
 
 ### 6.8.4 (9/18/2018 - 9/20/2018)  !!! action log format changed, please use latest log-processor, docker: neowu/log-processor:6.8.4 !!! 
 * http: not setting Date response header as it's not necessary

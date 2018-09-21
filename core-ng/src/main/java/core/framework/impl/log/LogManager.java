@@ -11,11 +11,13 @@ import org.slf4j.Marker;
  * @author neo
  */
 public class LogManager {
+    static final ActionIdGenerator ID_GENERATOR = new ActionIdGenerator();
     private static final ThreadLocal<ActionLog> ACTION_LOG = new ThreadLocal<>();
 
     public final String appName;
     public final LogFilter filter = new LogFilter();
     private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.INFO, LogLevel.DEBUG);
+
     public Appender appender;
 
     public LogManager() {

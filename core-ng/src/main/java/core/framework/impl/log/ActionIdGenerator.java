@@ -4,6 +4,7 @@ import core.framework.util.Encodings;
 
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.time.Instant;
 import java.util.Enumeration;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -11,12 +12,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author neo
  */
-class ActionId {
-    private static final AtomicInteger COUNTER = new AtomicInteger(ThreadLocalRandom.current().nextInt());
+class ActionIdGenerator {
     private static final int LOW_ORDER_THREE_BYTES = 0xFFFFFF;
-    private static final int MACHINE_IDENTIFIER = machineIdentifier() & LOW_ORDER_THREE_BYTES;
 
-    private static int machineIdentifier() {
+    private final AtomicInteger counter = new AtomicInteger(ThreadLocalRandom.current().nextInt());
+    private final int machineIdentifier = machineIdentifier() & LOW_ORDER_THREE_BYTES;
+
+    private int machineIdentifier() {
         try {
             var builder = new StringBuilder();
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -34,18 +36,18 @@ class ActionId {
     }
 
     // action id doesn't need strict uniqueness as UUID, here to generate shorter and more elasticsearch/lucene friendly id
-    static String next() {
-        long timeInMs = System.currentTimeMillis();
-        int counter = COUNTER.getAndIncrement() & LOW_ORDER_THREE_BYTES;
+    String next(Instant now) {
+        long time = now.toEpochMilli();
+        int counter = this.counter.getAndIncrement() & LOW_ORDER_THREE_BYTES;
         byte[] bytes = new byte[10];
-        bytes[0] = (byte) (timeInMs >> 32);     // save 5 bytes time in ms, about 34 years value space
-        bytes[1] = (byte) (timeInMs >> 24);
-        bytes[2] = (byte) (timeInMs >> 16);
-        bytes[3] = (byte) (timeInMs >> 8);
-        bytes[4] = (byte) timeInMs;
-        bytes[5] = (byte) (MACHINE_IDENTIFIER >> 16);   // 3 bytes as machine id, about 16M value space
-        bytes[6] = (byte) (MACHINE_IDENTIFIER >> 8);
-        bytes[7] = (byte) MACHINE_IDENTIFIER;
+        bytes[0] = (byte) (time >> 32);     // save 5 bytes time in ms, about 34 years value space
+        bytes[1] = (byte) (time >> 24);
+        bytes[2] = (byte) (time >> 16);
+        bytes[3] = (byte) (time >> 8);
+        bytes[4] = (byte) time;
+        bytes[5] = (byte) (machineIdentifier >> 16);   // 3 bytes as machine id, about 16M value space
+        bytes[6] = (byte) (machineIdentifier >> 8);
+        bytes[7] = (byte) machineIdentifier;
         bytes[8] = (byte) (counter >> 8);               // 2 bytes for max 65k actions per ms per server
         bytes[9] = (byte) counter;
         return Encodings.hex(bytes);

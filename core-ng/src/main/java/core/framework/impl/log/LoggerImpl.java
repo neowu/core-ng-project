@@ -12,11 +12,11 @@ public final class LoggerImpl extends AbstractLogger {
     static String abbreviateLoggerName(String name) {
         String[] tokens = Strings.split(name, '.');
         var builder = new StringBuilder();
-        int total = tokens.length >= 4 ? 3 : tokens.length - 1;
+        int abbrCount = tokens.length <= 4 ? tokens.length - 1 : tokens.length - 2;
         for (int i = 0; i < tokens.length; i++) {
             String token = tokens[i];
             if (i > 0) builder.append('.');
-            if (i < total && token.length() >= 1) {
+            if (i < abbrCount && token.length() >= 1) {
                 builder.append(token.charAt(0));
             } else {
                 builder.append(token);

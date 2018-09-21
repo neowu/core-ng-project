@@ -14,7 +14,7 @@
 * kafka: unique groupId to listen all messages for ws
 * type literal: support better cast for generic, JSON.fromJSON() / bind?
 * simplify PerformanceStat? benchmark HTTPString
-* actionId: init on startup
+* reduce trace log? only log thread/date once at front?
 
 ### jdk 9/10 incompatible list
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/
