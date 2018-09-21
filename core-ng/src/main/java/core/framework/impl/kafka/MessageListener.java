@@ -9,7 +9,6 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +71,7 @@ public class MessageListener {
         for (int i = 0; i < poolSize; i++) {
             watch.reset();
             String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
-            Consumer<String, byte[]> consumer = consumer(topics);
+            Consumer<byte[], byte[]> consumer = consumer(topics);
             var thread = new MessageListenerThread(name, consumer, this);
             threads[i] = thread;
             logger.info("create kafka listener thread, topics={}, name={}, elapsed={}", topics, name, watch.elapsed());
@@ -103,7 +102,7 @@ public class MessageListener {
         }
     }
 
-    private Consumer<String, byte[]> consumer(Set<String> topics) {
+    private Consumer<byte[], byte[]> consumer(Set<String> topics) {
         Map<String, Object> config = Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,   // immutable map requires value must not be null
                 ConsumerConfig.GROUP_ID_CONFIG, logManager.appName,
                 ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE,
@@ -114,7 +113,8 @@ public class MessageListener {
                 ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes,
                 ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes,
                 ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
-        Consumer<String, byte[]> consumer = new KafkaConsumer<>(config, new StringDeserializer(), new ByteArrayDeserializer());
+        var deserializer = new ByteArrayDeserializer();
+        Consumer<byte[], byte[]> consumer = new KafkaConsumer<>(config, deserializer, deserializer);
         consumer.subscribe(topics);
         consumerMetrics.add(consumer.metrics());
         return consumer;

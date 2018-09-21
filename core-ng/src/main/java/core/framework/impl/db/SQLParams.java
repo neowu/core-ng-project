@@ -6,8 +6,21 @@ import org.slf4j.LoggerFactory;
 /**
  * @author neo
  */
-public class SQLParams {
+class SQLParams {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLParams.class);
+
+    static String value(Object param, EnumDBMapper mapper) {
+        if (param instanceof Enum) {
+            try {
+                return mapper.getDBValue((Enum<?>) param);
+            } catch (Throwable e) {
+                LOGGER.warn("failed to get db enum value, error={}", e.getMessage(), e);
+                return String.valueOf(param);
+            }
+        }
+        return String.valueOf(param);
+    }
+
     private final EnumDBMapper mapper;
     private final Object[] params;
 
@@ -23,20 +36,8 @@ public class SQLParams {
         int length = params.length;
         for (int i = 0; i < length; i++) {
             if (i > 0) builder.append(", ");
-            builder.append(value(params[i]));
+            builder.append(value(params[i], mapper));
         }
         return builder.append(']').toString();
-    }
-
-    private String value(Object param) {
-        if (param instanceof Enum) {
-            try {
-                return mapper.getDBValue((Enum<?>) param);
-            } catch (Throwable e) {
-                LOGGER.warn("failed to get db enum value, error={}", e.getMessage(), e);
-                return String.valueOf(param);
-            }
-        }
-        return String.valueOf(param);
     }
 }

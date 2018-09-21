@@ -97,6 +97,7 @@ public final class DatabaseImpl implements Database {
             properties.setProperty("connectTimeout", timeoutValue);
             properties.setProperty("socketTimeout", timeoutValue);
             properties.setProperty("rewriteBatchedStatements", "true");     // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
+            properties.setProperty("useSSL", "false");                      // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
         } else if (url.startsWith("jdbc:oracle:")) {
             properties.setProperty("oracle.net.CONNECT_TIMEOUT", timeoutValue);
             properties.setProperty("oracle.jdbc.ReadTimeout", timeoutValue);
@@ -227,7 +228,7 @@ public final class DatabaseImpl implements Database {
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("db", elapsed, 0, updatedRows);
-            logger.debug("batchExecute, sql={}, size={}, updatedRows={}, elapsed={}", sql, params.size(), updatedRows, elapsed);
+            logger.debug("batchExecute, sql={}, params={}, size={}, updatedRows={}, elapsed={}", sql, new SQLBatchParams(operation.enumMapper, params), params.size(), updatedRows, elapsed);
             checkSlowOperation(elapsed);
         }
     }

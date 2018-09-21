@@ -29,7 +29,7 @@ class KafkaControllerTest {
     void record() {
         var actionLog = new ActionLog(null);
         when(logManager.currentActionLog()).thenReturn(actionLog);
-        ProducerRecord<String, byte[]> record = controller.record("topic", "key", new byte[0]);
+        ProducerRecord<byte[], byte[]> record = controller.record("topic", "key", new byte[0]);
         assertThat(record.headers().lastHeader(MessageHeaders.HEADER_TRACE).value()).isEqualTo(Strings.bytes("true"));
     }
 }

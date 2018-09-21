@@ -5,16 +5,20 @@ import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 
 /**
  * @author neo
  */
 public class MockMessageProducer implements MessageProducer {
-    private final Producer<String, byte[]> producer = new MockProducer<>(true, new StringSerializer(), new ByteArraySerializer());
+    private final Producer<byte[], byte[]> producer;
+
+    public MockMessageProducer() {
+        var serializer = new ByteArraySerializer();
+        producer = new MockProducer<>(true, serializer, serializer);
+    }
 
     @Override
-    public void send(ProducerRecord<String, byte[]> record) {
+    public void send(ProducerRecord<byte[], byte[]> record) {
         producer.send(record);
     }
 }

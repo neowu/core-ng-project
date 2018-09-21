@@ -35,15 +35,15 @@ public class KafkaController {
         String key = request.pathParam("key");
         byte[] body = request.body().orElseThrow(() -> new Error("body must not be null"));
 
-        ProducerRecord<String, byte[]> record = record(topic, key, body);
+        ProducerRecord<byte[], byte[]> record = record(topic, key, body);
         logger.warn(Markers.errorCode("MANUAL_OPERATION"), "publish message manually, topic={}", topic);   // log trace message, due to potential impact
         producer.send(record);
 
         return Response.text(Strings.format("message published, topic={}, key={}, message={}", topic, key, new BytesParam(body)));
     }
 
-    ProducerRecord<String, byte[]> record(String topic, String key, byte[] body) {
-        var record = new ProducerRecord<>(topic, key, body);
+    ProducerRecord<byte[], byte[]> record(String topic, String key, byte[] body) {
+        var record = new ProducerRecord<>(topic, Strings.bytes(key), body);
         Headers headers = record.headers();
         headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(KafkaController.class.getSimpleName()));
         headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));  // auto trace

@@ -41,7 +41,7 @@ class MessageListenerThreadTest {
 
     @Test
     void messages() {
-        ConsumerRecord<String, byte[]> record = new ConsumerRecord<>("topic", 0, 1, "key", Strings.bytes("{}"));
+        ConsumerRecord<byte[], byte[]> record = new ConsumerRecord<>("topic", 0, 1, Strings.bytes("key"), Strings.bytes("{}"));
         record.headers().add(MessageHeaders.HEADER_CLIENT, Strings.bytes("client"));
         record.headers().add(MessageHeaders.HEADER_REF_ID, Strings.bytes("refId"));
         record.headers().add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes("correlationId"));

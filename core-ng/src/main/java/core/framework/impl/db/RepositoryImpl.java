@@ -124,7 +124,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
             long elapsed = watch.elapsed();
             int size = entities.size();
             ActionLogContext.track("db", elapsed, 0, size);
-            logger.debug("batchInsert, sql={}, size={}, elapsed={}", sql, size, elapsed);
+            logger.debug("batchInsert, sql={}, params={}, size={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), size, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -149,7 +149,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("db", elapsed, 0, deletedRows);
-            logger.debug("batchDelete, sql={}, size={}, elapsed={}", deleteSQL, primaryKeys.size(), elapsed);
+            logger.debug("batchDelete, sql={}, params={}, size={}, elapsed={}", deleteSQL, new SQLBatchParams(database.operation.enumMapper, params), primaryKeys.size(), elapsed);
             checkSlowOperation(elapsed);
         }
     }

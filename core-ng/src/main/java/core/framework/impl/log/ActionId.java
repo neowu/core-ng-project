@@ -38,7 +38,7 @@ class ActionId {
         long timeInMs = System.currentTimeMillis();
         int counter = COUNTER.getAndIncrement() & LOW_ORDER_THREE_BYTES;
         byte[] bytes = new byte[10];
-        bytes[0] = (byte) (timeInMs >> 32);     // save 5 bytes time in ms, about 17 years value space
+        bytes[0] = (byte) (timeInMs >> 32);     // save 5 bytes time in ms, about 34 years value space
         bytes[1] = (byte) (timeInMs >> 24);
         bytes[2] = (byte) (timeInMs >> 16);
         bytes[3] = (byte) (timeInMs >> 8);
@@ -46,7 +46,7 @@ class ActionId {
         bytes[5] = (byte) (MACHINE_IDENTIFIER >> 16);   // 3 bytes as machine id, about 16M value space
         bytes[6] = (byte) (MACHINE_IDENTIFIER >> 8);
         bytes[7] = (byte) MACHINE_IDENTIFIER;
-        bytes[8] = (byte) (counter >> 8);               // 2 bytes for max 65535 actions per ms per server
+        bytes[8] = (byte) (counter >> 8);               // 2 bytes for max 65k actions per ms per server
         bytes[9] = (byte) counter;
         return Encodings.hex(bytes);
     }

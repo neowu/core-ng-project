@@ -9,7 +9,6 @@ import core.framework.util.Network;
 
 import java.time.Instant;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author neo
@@ -63,7 +62,7 @@ public class MessageFactory {
 
     public static StatMessage stat(Map<String, Double> stats, String appName) {
         var message = new StatMessage();
-        message.id = UUID.randomUUID().toString();
+        message.id = ActionId.next();
         message.date = Instant.now();
         message.app = appName;
         message.serverIP = Network.localHostAddress();

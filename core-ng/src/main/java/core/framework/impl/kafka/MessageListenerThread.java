@@ -32,7 +32,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 class MessageListenerThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(MessageListenerThread.class);
-    private final Consumer<String, byte[]> consumer;
+    private final Consumer<byte[], byte[]> consumer;
     private final LogManager logManager;
     private final Map<String, MessageProcess<?>> processes;
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
@@ -40,7 +40,7 @@ class MessageListenerThread extends Thread {
     private final double batchLongProcessThresholdInNano;
     private final Object lock = new Object();
 
-    MessageListenerThread(String name, Consumer<String, byte[]> consumer, MessageListener listener) {
+    MessageListenerThread(String name, Consumer<byte[], byte[]> consumer, MessageListener listener) {
         super(name);
         this.consumer = consumer;
         processes = listener.processes;
@@ -83,7 +83,7 @@ class MessageListenerThread extends Thread {
     private void process() {
         while (!shutdown.get()) {
             try {
-                ConsumerRecords<String, byte[]> records = consumer.poll(Duration.ofSeconds(10));
+                ConsumerRecords<byte[], byte[]> records = consumer.poll(Duration.ofSeconds(10));
                 if (records.isEmpty()) continue;
                 processRecords(records);
             } catch (Throwable e) {
@@ -96,20 +96,20 @@ class MessageListenerThread extends Thread {
         consumer.close();
     }
 
-    private void processRecords(ConsumerRecords<String, byte[]> kafkaRecords) {
+    private void processRecords(ConsumerRecords<byte[], byte[]> kafkaRecords) {
         var watch = new StopWatch();
         int count = 0;
         int size = 0;
         try {
-            Map<String, List<ConsumerRecord<String, byte[]>>> messages = new LinkedHashMap<>();
-            for (ConsumerRecord<String, byte[]> record : kafkaRecords) {
+            Map<String, List<ConsumerRecord<byte[], byte[]>>> messages = new LinkedHashMap<>();
+            for (ConsumerRecord<byte[], byte[]> record : kafkaRecords) {
                 messages.computeIfAbsent(record.topic(), key -> new ArrayList<>()).add(record);
                 count++;
                 size += record.value().length;
             }
-            for (Map.Entry<String, List<ConsumerRecord<String, byte[]>>> entry : messages.entrySet()) {
+            for (Map.Entry<String, List<ConsumerRecord<byte[], byte[]>>> entry : messages.entrySet()) {
                 String topic = entry.getKey();
-                List<ConsumerRecord<String, byte[]>> records = entry.getValue();
+                List<ConsumerRecord<byte[], byte[]>> records = entry.getValue();
                 MessageProcess<?> process = processes.get(topic);
                 if (process.bulkHandler != null) {
                     handleBulk(topic, process, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
@@ -123,8 +123,8 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
-        for (ConsumerRecord<String, byte[]> record : records) {
+    private <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, double longProcessThresholdInNano) {
+        for (ConsumerRecord<byte[], byte[]> record : records) {
             ActionLog actionLog = logManager.begin("=== message handling begin ===");
             try {
                 actionLog.action("topic:" + topic);
@@ -144,13 +144,14 @@ class MessageListenerThread extends Thread {
                 String refId = header(headers, MessageHeaders.HEADER_REF_ID);
                 if (refId != null) actionLog.refIds = List.of(refId);
 
-                actionLog.context("key", record.key());
-                logger.debug("[message] value={}", new BytesParam(record.value()));
+                String key = new String(record.key(), UTF_8);   // key will be not null in our system
+                actionLog.context("key", key);
 
-                T message = process.reader.fromJSON(record.value());
+                byte[] value = record.value();
+                logger.debug("[message] value={}", new BytesParam(value));
+                T message = process.reader.fromJSON(value);
                 process.validator.validate(message);
-
-                process.handler.handle(record.key(), message);
+                process.handler.handle(key, message);
             } catch (Throwable e) {
                 logManager.logError(e);
             } finally {
@@ -161,7 +162,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<String, byte[]>> records, double longProcessThresholdInNano) {
+    private <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, double longProcessThresholdInNano) {
         ActionLog actionLog = logManager.begin("=== message handling begin ===");
         try {
             actionLog.action("topic:" + topic);
@@ -183,7 +184,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    <T> List<Message<T>> messages(List<ConsumerRecord<String, byte[]>> records, ActionLog actionLog, JSONReader<T> reader) {
+    <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) {
         int size = records.size();
         actionLog.track("kafka", 0, size, 0);
         List<Message<T>> messages = new ArrayList<>(size);
@@ -191,7 +192,7 @@ class MessageListenerThread extends Thread {
         Set<String> clients = new HashSet<>();
         Set<String> refIds = new HashSet<>();
 
-        for (ConsumerRecord<String, byte[]> record : records) {
+        for (ConsumerRecord<byte[], byte[]> record : records) {
             Headers headers = record.headers();
             if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;    // trigger trace if any message is trace
             String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
@@ -201,7 +202,7 @@ class MessageListenerThread extends Thread {
             String refId = header(headers, MessageHeaders.HEADER_REF_ID);
             if (refId != null) refIds.add(refId);
 
-            String key = record.key();
+            String key = new String(record.key(), UTF_8);    // key will be not null in our system
             byte[] value = record.value();
             logger.debug("[message] key={}, value={}, refId={}, client={}, correlationId={}", key, new BytesParam(value), refId, client, correlationId);
 

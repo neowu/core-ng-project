@@ -47,7 +47,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
         validator.validate(value);
         byte[] message = writer.toJSON(value);
         try {
-            var record = new ProducerRecord<>(topic, key, message);
+            var record = new ProducerRecord<>(topic, Strings.bytes(key), message);
             linkContext(record.headers());
             producer.send(record);
         } finally {
