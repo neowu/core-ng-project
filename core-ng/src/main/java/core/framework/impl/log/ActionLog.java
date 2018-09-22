@@ -3,6 +3,7 @@ package core.framework.impl.log;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,7 +31,7 @@ public final class ActionLog {
     final Map<String, String> context;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
-    private final long startTime;
+    final long startTime;
     private final long startCPUTime;
 
     public boolean trace;  // whether flush trace log for all subsequent actions
@@ -58,7 +59,10 @@ public final class ActionLog {
         id = LogManager.ID_GENERATOR.next(date);
 
         add(event(message));
-        add(event("[context] id={}", id));
+        add(event("id={}", id));
+        add(event("date={}", DateTimeFormatter.ISO_INSTANT.format(date)));
+        Thread thread = Thread.currentThread();
+        add(event("thread={}", thread.getName()));
     }
 
     void process(LogEvent event) {
@@ -75,7 +79,7 @@ public final class ActionLog {
     void end(String message) {
         cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
         elapsed = elapsed();
-        add(event("[context] elapsed={}", elapsed));
+        add(event("elapsed={}", elapsed));
         add(event(message));
     }
 
@@ -150,7 +154,7 @@ public final class ActionLog {
     }
 
     public void action(String action) {
-        add(event("[context] action={}", action));
+        add(event("action={}", action));
         this.action = action;
     }
 }

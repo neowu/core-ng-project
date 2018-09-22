@@ -22,7 +22,7 @@ public final class ConsoleAppender implements Appender {
 
         if (log.flushTraceLog()) {
             for (LogEvent event : log.events) {
-                stderr.print(event.logMessage(filter));
+                stderr.print(event.trace(log.startTime, filter));
             }
         }
     }

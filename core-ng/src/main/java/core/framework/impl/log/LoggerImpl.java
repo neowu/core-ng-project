@@ -54,7 +54,7 @@ public final class LoggerImpl extends AbstractLogger {
     }
 
     private void write(LogEvent event) {
-        String message = event.logMessage(logManager.filter);
+        String message = event.info();
         if (event.level.value >= LogLevel.WARN.value)
             stderr.print(message);
         else

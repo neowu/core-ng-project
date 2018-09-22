@@ -47,7 +47,7 @@ public class MessageFactory {
         if (log.flushTraceLog()) {
             var builder = new StringBuilder(log.events.size() << 8);  // length * 256 as rough initial capacity
             for (LogEvent event : log.events) {
-                String traceMessage = event.logMessage(filter);
+                String traceMessage = event.trace(log.startTime, filter);
                 if (builder.length() + traceMessage.length() >= MAX_TRACE_LENGTH) {
                     builder.append(traceMessage, 0, MAX_TRACE_LENGTH - builder.length());
                     builder.append("...(truncated)");
