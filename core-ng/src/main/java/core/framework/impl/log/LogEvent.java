@@ -34,10 +34,9 @@ final class LogEvent {
     String trace(long startTime, LogFilter filter) {
         var builder = new StringBuilder(256);
         appendDuration(builder, time - startTime);
-        builder.append(' ')
-               .append(level.name())
-               .append(' ')
-               .append(logger)
+        builder.append(' ');
+        if (level != LogLevel.DEBUG) builder.append(level.name()).append(' ');
+        builder.append(logger)
                .append(" - ");
         if (marker != null) builder.append('[').append(marker.getName()).append("] ");
         builder.append(filter.format(message, arguments)).append(System.lineSeparator());
