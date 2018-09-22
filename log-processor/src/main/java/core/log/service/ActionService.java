@@ -32,9 +32,9 @@ public class ActionService {
     void index(List<ActionLogMessage> messages, LocalDate now) {
         if (messages.size() <= 5) { // use single index in quiet time
             for (ActionLogMessage message : messages) {
-                indexAction(action(message), now);
+                indexAction(message.id, action(message), now);
                 if (message.traceLog != null) {
-                    indexTrace(trace(message), now);
+                    indexTrace(message.id, trace(message), now);
                 }
             }
         } else {
@@ -53,12 +53,20 @@ public class ActionService {
         }
     }
 
-    private void indexAction(ActionDocument action, LocalDate now) {
+    private void indexAction(String id, ActionDocument action, LocalDate now) {
         IndexRequest<ActionDocument> request = new IndexRequest<>();
         request.index = indexService.indexName("action", now);
-        request.id = action.id;
+        request.id = id;
         request.source = action;
         actionType.index(request);
+    }
+
+    private void indexTrace(String id, TraceDocument trace, LocalDate now) {
+        IndexRequest<TraceDocument> request = new IndexRequest<>();
+        request.index = indexService.indexName("trace", now);
+        request.id = id;
+        request.source = trace;
+        traceType.index(request);
     }
 
     private void indexActions(Map<String, ActionDocument> actions, LocalDate now) {
@@ -68,14 +76,6 @@ public class ActionService {
         actionType.bulkIndex(request);
     }
 
-    private void indexTrace(TraceDocument trace, LocalDate now) {
-        IndexRequest<TraceDocument> request = new IndexRequest<>();
-        request.index = indexService.indexName("trace", now);
-        request.id = trace.id;
-        request.source = trace;
-        traceType.index(request);
-    }
-
     private void indexTraces(Map<String, TraceDocument> traces, LocalDate now) {
         BulkIndexRequest<TraceDocument> request = new BulkIndexRequest<>();
         request.index = indexService.indexName("trace", now);
@@ -83,24 +83,11 @@ public class ActionService {
         traceType.bulkIndex(request);
     }
 
-    private TraceDocument trace(ActionLogMessage message) {
-        var document = new TraceDocument();
-        document.date = message.date;
-        document.id = message.id;
-        document.app = message.app;
-        document.action = message.action;
-        document.result = message.result;
-        document.content = message.traceLog;
-        document.errorCode = message.errorCode;
-        return document;
-    }
-
     private ActionDocument action(ActionLogMessage message) {
         var document = new ActionDocument();
         document.date = message.date;
         document.app = message.app;
         document.serverIP = message.serverIP;
-        document.id = message.id;
         document.result = message.result;
         document.action = message.action;
         document.refIds = message.refIds;
@@ -113,6 +100,17 @@ public class ActionService {
         document.context = message.context;
         document.stats = message.stats;
         document.performanceStats = message.performanceStats;
+        return document;
+    }
+
+    private TraceDocument trace(ActionLogMessage message) {
+        var document = new TraceDocument();
+        document.date = message.date;
+        document.app = message.app;
+        document.action = message.action;
+        document.result = message.result;
+        document.errorCode = message.errorCode;
+        document.content = message.traceLog;
         return document;
     }
 }

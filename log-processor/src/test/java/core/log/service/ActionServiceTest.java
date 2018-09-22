@@ -54,7 +54,6 @@ class ActionServiceTest extends IntegrationTest {
         actionService.index(List.of(message1, message2), now);
 
         ActionDocument action = actionDocument(now, message1.id);
-        assertThat(action.id).isEqualTo(message1.id);
         assertThat(action.date).isEqualTo(message1.date);
         assertThat(action.result).isEqualTo(message1.result);
         assertThat(action.correlationIds).isEqualTo(message1.correlationIds);
@@ -63,7 +62,6 @@ class ActionServiceTest extends IntegrationTest {
         assertThat(action.performanceStats.get("redis")).isEqualToComparingFieldByField(message1.performanceStats.get("redis"));
 
         TraceDocument trace = traceDocument(now, message2.id);
-        assertThat(trace.id).isEqualTo(message2.id);
         assertThat(trace.content).isEqualTo(message2.traceLog);
     }
 

@@ -12,8 +12,6 @@ import java.time.Instant;
 public class TraceDocument {
     @Property(name = "date")
     public Instant date;
-    @Property(name = "id")
-    public String id;
     @Property(name = "app")
     public String app;
     @Property(name = "result")

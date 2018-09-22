@@ -12,9 +12,6 @@
           "type": "date",
           "format": "strict_date_optional_time"
         },
-        "id": {
-          "type": "keyword"
-        },
         "app": {
           "type": "keyword"
         },

@@ -19,8 +19,6 @@ public class ActionDocument {
     public String app;
     @Property(name = "server_ip")
     public String serverIP;
-    @Property(name = "id")
-    public String id;
     @Property(name = "result")
     public String result;
     @Property(name = "ref_id")
