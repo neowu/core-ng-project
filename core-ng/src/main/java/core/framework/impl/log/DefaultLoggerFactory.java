@@ -10,7 +10,6 @@ import java.util.Map;
  * @author neo
  */
 public final class DefaultLoggerFactory implements ILoggerFactory {
-    public final LogManager logManager = new LogManager();
     private final Map<String, Logger> loggers = Maps.newConcurrentHashMap();
 
     @Override
@@ -19,7 +18,7 @@ public final class DefaultLoggerFactory implements ILoggerFactory {
     }
 
     private Logger createLogger(String name) {
-        return new LoggerImpl(name, logManager, infoLevel(name), traceLevel(name));
+        return new LoggerImpl(name, infoLevel(name), traceLevel(name));
     }
 
     private LogLevel infoLevel(String name) {

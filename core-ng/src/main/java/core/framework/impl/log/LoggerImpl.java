@@ -25,17 +25,15 @@ public final class LoggerImpl extends AbstractLogger {
         return builder.toString();
     }
 
-    private final PrintStream stdout = System.out;
-    private final PrintStream stderr = System.err;
-    private final LogManager logManager;
+    private final String logger;
     private final LogLevel infoLevel;
     private final LogLevel traceLevel;
-    private final String logger;
+    private final PrintStream stdout = System.out;
+    private final PrintStream stderr = System.err;
 
-    LoggerImpl(String name, LogManager logManager, LogLevel infoLevel, LogLevel traceLevel) {
+    LoggerImpl(String name, LogLevel infoLevel, LogLevel traceLevel) {
         super(name);
         this.logger = abbreviateLoggerName(name);
-        this.logManager = logManager;
         this.infoLevel = infoLevel;
         this.traceLevel = traceLevel;
     }
@@ -44,7 +42,8 @@ public final class LoggerImpl extends AbstractLogger {
     public void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
         if (level.value >= traceLevel.value) {
             var event = new LogEvent(logger, marker, level, message, arguments, exception);
-            ActionLog actionLog = logManager.currentActionLog();
+
+            ActionLog actionLog = LogManager.ACTION_LOG.get();
             if (actionLog != null) actionLog.process(event);    // logManager.begin() may not be called
 
             if (level.value >= infoLevel.value) {

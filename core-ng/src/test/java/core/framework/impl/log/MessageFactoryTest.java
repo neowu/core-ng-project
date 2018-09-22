@@ -44,4 +44,14 @@ class MessageFactoryTest {
         assertThat(statMessage.readEntries).isEqualTo(1);
         assertThat(statMessage.writeEntries).isEqualTo(2);
     }
+
+    @Test
+    void trace() {
+        var log = new ActionLog("begin");
+        String trace = MessageFactory.trace(log, new LogFilter(), 200);
+        String suffix = "...(truncated)";
+        assertThat(trace).hasSize(200 + suffix.length())
+                         .contains("ActionLog - begin")
+                         .endsWith(suffix);
+    }
 }

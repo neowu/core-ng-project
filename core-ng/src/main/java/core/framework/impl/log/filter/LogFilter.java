@@ -10,7 +10,7 @@ import java.util.Set;
  * @author neo
  */
 public class LogFilter {
-    private static final int MAX_PARAM_SIZE = 15000; // limit long param string to 15k
+    private static final int MAX_PARAM_SIZE = 10000; // limit long param string to 10k
 
     public final Set<String> maskedFields = Sets.newHashSet();
 

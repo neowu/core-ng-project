@@ -3,7 +3,6 @@ package core.framework.impl.module;
 import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.inject.BeanFactory;
-import core.framework.impl.log.DefaultLoggerFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.stat.Stat;
 import core.framework.impl.web.HTTPServer;
@@ -20,7 +19,6 @@ import core.framework.util.Maps;
 import core.framework.web.Controller;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -35,15 +33,13 @@ public class ModuleContext {
     public final List<Task> startupHook = Lists.newArrayList();
     public final ShutdownHook shutdownHook = new ShutdownHook();
     public final PropertyManager propertyManager = new PropertyManager();
+    public final LogManager logManager = new LogManager();
     public final HTTPServer httpServer;
-    public final LogManager logManager;
     public final Stat stat = new Stat();
     protected final Map<String, Config> configs = Maps.newHashMap();
     private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext() {
-        logManager = ((DefaultLoggerFactory) LoggerFactory.getILoggerFactory()).logManager;
-
         httpServer = new HTTPServer(logManager);
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);

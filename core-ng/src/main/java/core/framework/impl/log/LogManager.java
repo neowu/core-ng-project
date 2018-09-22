@@ -5,19 +5,19 @@ import core.framework.log.ErrorCode;
 import core.framework.log.Markers;
 import core.framework.log.Severity;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 /**
  * @author neo
  */
 public class LogManager {
+    public static final ThreadLocal<ActionLog> ACTION_LOG = new ThreadLocal<>();
     static final ActionIdGenerator ID_GENERATOR = new ActionIdGenerator();
-    private static final ThreadLocal<ActionLog> ACTION_LOG = new ThreadLocal<>();
 
     public final String appName;
     public final LogFilter filter = new LogFilter();
-    private final Logger logger = new LoggerImpl(LoggerImpl.abbreviateLoggerName(LogManager.class.getCanonicalName()), this, LogLevel.INFO, LogLevel.DEBUG);
-
+    private final Logger logger = LoggerFactory.getLogger(LogManager.class);
     public Appender appender;
 
     public LogManager() {

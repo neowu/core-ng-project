@@ -14,7 +14,7 @@ import java.util.Map;
  * @author neo
  */
 public class MessageFactory {
-    private static final int MAX_TRACE_LENGTH = 1000000; // 1M
+    private static final int MAX_TRACE_LENGTH = 900000; // 900K, kafka max message size is 1M, leave 100K for rest, assume majority chars is in ascii (one char = one byte)
 
     public static ActionLogMessage actionLog(ActionLog log, String appName, LogFilter filter) {
         var message = new ActionLogMessage();
@@ -45,19 +45,22 @@ public class MessageFactory {
         }
         message.performanceStats = performanceStats;
         if (log.flushTraceLog()) {
-            var builder = new StringBuilder(log.events.size() << 8);  // length * 256 as rough initial capacity
-            for (LogEvent event : log.events) {
-                String traceMessage = event.trace(log.startTime, filter);
-                if (builder.length() + traceMessage.length() >= MAX_TRACE_LENGTH) {
-                    builder.append(traceMessage, 0, MAX_TRACE_LENGTH - builder.length());
-                    builder.append("...(truncated)");
-                    break;
-                }
-                builder.append(traceMessage);
-            }
-            message.traceLog = builder.toString();
+            message.traceLog = trace(log, filter, MAX_TRACE_LENGTH);
         }
         return message;
+    }
+
+    static String trace(ActionLog log, LogFilter filter, int maxLength) {
+        var builder = new StringBuilder(log.events.size() << 7);  // length * 128 as rough initial capacity
+        for (LogEvent event : log.events) {
+            event.trace(builder, log.startTime, filter);
+            if (builder.length() >= maxLength) {
+                builder.setLength(maxLength);
+                builder.append("...(truncated)");
+                break;
+            }
+        }
+        return builder.toString();
     }
 
     public static StatMessage stat(Map<String, Double> stats, String appName) {

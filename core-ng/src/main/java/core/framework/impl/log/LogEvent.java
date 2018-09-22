@@ -31,8 +31,7 @@ final class LogEvent {
         this.exception = exception;
     }
 
-    String trace(long startTime, LogFilter filter) {
-        var builder = new StringBuilder(256);
+    void trace(StringBuilder builder, long startTime, LogFilter filter) {
         appendDuration(builder, time - startTime);
         builder.append(' ');
         if (level != LogLevel.DEBUG) builder.append(level.name()).append(' ');
@@ -41,7 +40,6 @@ final class LogEvent {
         if (marker != null) builder.append('[').append(marker.getName()).append("] ");
         builder.append(filter.format(message, arguments)).append(System.lineSeparator());
         if (exception != null) builder.append(Exceptions.stackTrace(exception));
-        return builder.toString();
     }
 
     String message() {  // only be called for error message, it assumes warn/error message won't contains sensitive data which should not be logged as warn/error in first place
@@ -54,7 +52,7 @@ final class LogEvent {
         return null;
     }
 
-    String info() {
+    String info() {   // it assumes info/warn/error message doesn't contains sensitive data which should not in first place
         Instant now = Instant.now();
         var builder = new StringBuilder(256);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(now))

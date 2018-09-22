@@ -21,8 +21,11 @@ public final class ConsoleAppender implements Appender {
         stdout.println(message(log));
 
         if (log.flushTraceLog()) {
+            var builder = new StringBuilder(256);
             for (LogEvent event : log.events) {
-                stderr.print(event.trace(log.startTime, filter));
+                event.trace(builder, log.startTime, filter);
+                stderr.print(builder.toString());
+                builder.setLength(0);
             }
         }
     }

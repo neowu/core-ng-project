@@ -15,12 +15,14 @@ class LogEventTest {
     @Test
     void trace() {
         var event = new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message-{}", new Object[]{1}, new Error());
-        String message = event.trace(System.nanoTime(), new LogFilter());
-        assertThat(message).contains("WARN logger - [ERROR_CODE] message-1");
+        var builder = new StringBuilder();
+        event.trace(builder, System.nanoTime(), new LogFilter());
+        assertThat(builder.toString()).contains("WARN logger - [ERROR_CODE] message-1");
 
+        builder = new StringBuilder();
         event = new LogEvent("logger", null, LogLevel.DEBUG, "message", null, null);
-        message = event.trace(System.nanoTime(), new LogFilter());
-        assertThat(message).contains("logger - message");
+        event.trace(builder, System.nanoTime(), new LogFilter());
+        assertThat(builder.toString()).contains("logger - message");
     }
 
     @Test
