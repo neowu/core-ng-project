@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,6 +58,20 @@ class ExpressionParserTest {
     }
 
     @Test
+    void methodChain() {
+        Token token = parser.parse("method1().method2()");
+        assertThat(token).isInstanceOf(MethodToken.class);
+        MethodToken methodToken = (MethodToken) token;
+        assertThat(methodToken.name).isEqualTo("method1");
+        assertThat(methodToken.params).isEmpty();
+
+        assertThat(methodToken.next).isInstanceOf(MethodToken.class);
+        MethodToken methodToken2 = (MethodToken) ((MethodToken) token).next;
+        assertThat(methodToken2.name).isEqualTo("method2");
+        assertThat(methodToken2.params).isEmpty();
+    }
+
+    @Test
     void expression() {
         Token token = parser.parse("f1.f2.m1(f3.m2(), \"v1\", f4).f5");
 
@@ -81,5 +96,16 @@ class ExpressionParserTest {
 
         FieldToken f5 = (FieldToken) m1.next;
         assertEquals("f5", f5.name);
+    }
+
+    @Test
+    void invalidExpression() {
+        assertThatThrownBy(() -> parser.parse("method()."))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("method can only be followed by field or method");
+
+        assertThatThrownBy(() -> parser.parse("method().5"))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("value token must not be followed by '.'");
     }
 }
