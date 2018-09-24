@@ -110,6 +110,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @Test
     void delete() {
         documentType.index("1", document("1", "value", 1));
+        elasticSearch.flushIndex("document");
 
         boolean result = documentType.delete("1");
         assertThat(result).isTrue();
@@ -119,6 +120,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void bulkDelete() {
         documentType.index("1", document("1", "value1", 1));
         documentType.index("2", document("2", "value2", 2));
+        elasticSearch.flushIndex("document");
 
         documentType.bulkDelete(List.of("1", "2"));
         assertThat(documentType.get("1")).isNotPresent();
