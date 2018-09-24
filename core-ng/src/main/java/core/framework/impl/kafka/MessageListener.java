@@ -104,7 +104,7 @@ public class MessageListener {
 
     private Consumer<byte[], byte[]> consumer(Set<String> topics) {
         Map<String, Object> config = Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,   // immutable map requires value must not be null
-                ConsumerConfig.GROUP_ID_CONFIG, logManager.appName,
+                ConsumerConfig.GROUP_ID_CONFIG, LogManager.APP_NAME,
                 ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE,
                 ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest",
                 ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis(),

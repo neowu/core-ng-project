@@ -43,7 +43,7 @@ public final class LoggerImpl extends AbstractLogger {
         if (level.value >= traceLevel.value) {
             var event = new LogEvent(logger, marker, level, message, arguments, exception);
 
-            ActionLog actionLog = LogManager.ACTION_LOG.get();
+            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
             if (actionLog != null) actionLog.process(event);    // logManager.begin() may not be called
 
             if (level.value >= infoLevel.value) {

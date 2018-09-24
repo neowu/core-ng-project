@@ -2,62 +2,65 @@ package core.framework.impl.async;
 
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
 class ExecutorImplTest {
     private LogManager logManager;
+    private ExecutorService executorService;
     private ExecutorImpl executor;
 
     @BeforeEach
     void createExecutorImpl() {
-        logManager = mock(LogManager.class);
-        ExecutorService executorService = mock(ExecutorService.class);
-        when(executorService.submit((Callable<?>) any(Callable.class))).then(invocation -> {
-            Object result = ((Callable<?>) invocation.getArgument(0)).call();
-            return CompletableFuture.completedFuture(result);
-        });
+        logManager = new LogManager();
+        executorService = Executors.newSingleThreadExecutor();
         executor = new ExecutorImpl(executorService, logManager, "test");
+
+        ActionLog actionLog = logManager.begin("begin");
+        actionLog.action("parentAction");
+        actionLog.trace = true;
+        actionLog.correlationIds = List.of("correlationId");
+    }
+
+    @AfterEach
+    void cleanup() {
+        logManager.end("end");
+        executorService.shutdown();
     }
 
     @Test
     void submit() throws ExecutionException, InterruptedException {
-        var parentActionLog = new ActionLog(null);
-        parentActionLog.action("parentAction");
-        parentActionLog.correlationIds = List.of("correlationId");
-        parentActionLog.trace = true;
-        when(logManager.currentActionLog()).thenReturn(parentActionLog);
-
-        var taskActionLog = new ActionLog(null);
-        when(logManager.begin(anyString())).thenReturn(taskActionLog);
-
-        Future<Boolean> future = executor.submit("action", () -> Boolean.TRUE);
-        assertThat(taskActionLog.action).isEqualTo("parentAction:action");
-        assertThat(taskActionLog.trace).isEqualTo(true);
-        assertThat(taskActionLog.correlationIds).containsExactly("correlationId");
-        assertThat(future.get()).isEqualTo(true);
-
-        executor.submit("task", () -> {
+        Future<Boolean> future = executor.submit("action", () -> {
+            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            assertThat(actionLog.action).isEqualTo("parentAction:action");
+            assertThat(actionLog.trace).isEqualTo(true);
+            assertThat(actionLog.correlationIds).containsExactly("correlationId");
+            return Boolean.TRUE;
         });
-        assertThat(taskActionLog.action).isEqualTo("parentAction:task");
-        assertThat(taskActionLog.trace).isEqualTo(true);
-        assertThat(taskActionLog.correlationIds).containsExactly("correlationId");
+        assertThat(future.get()).isEqualTo(true);
+    }
+
+    @Test
+    void submitTask() throws ExecutionException, InterruptedException {
+        Future<Void> future = executor.submit("task", () -> {
+            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            assertThat(actionLog.action).isEqualTo("parentAction:task");
+            assertThat(actionLog.trace).isEqualTo(true);
+            assertThat(actionLog.correlationIds).containsExactly("correlationId");
+        });
+        assertThat(future.get()).isNull();
     }
 
     @Test

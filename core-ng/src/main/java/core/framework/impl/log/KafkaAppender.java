@@ -32,7 +32,6 @@ public final class KafkaAppender implements Appender {
     public final ProducerMetrics producerMetrics = new ProducerMetrics("log-forwarder");
     private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
     private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
-    private final String appName;
     private final Producer<byte[], byte[]> producer;
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
@@ -46,9 +45,8 @@ public final class KafkaAppender implements Appender {
         }
     };
 
-    public KafkaAppender(String uri, String appName) {
+    public KafkaAppender(String uri) {
         var watch = new StopWatch();
-        this.appName = appName;
         actionLogWriter = JSONWriter.of(ActionLogMessage.class);
         statWriter = JSONWriter.of(StatMessage.class);
         try {
@@ -100,10 +98,10 @@ public final class KafkaAppender implements Appender {
 
     @Override
     public void append(ActionLog log, LogFilter filter) {
-        queue.add(MessageFactory.actionLog(log, appName, filter));
+        queue.add(MessageFactory.actionLog(log, filter));
     }
 
     public void forward(Map<String, Double> stats) {
-        queue.add(MessageFactory.stat(stats, appName));
+        queue.add(MessageFactory.stat(stats));
     }
 }

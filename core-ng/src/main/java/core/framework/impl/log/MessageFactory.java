@@ -16,9 +16,9 @@ import java.util.Map;
 public class MessageFactory {
     private static final int MAX_TRACE_LENGTH = 900000; // 900K, kafka max message size is 1M, leave 100K for rest, assume majority chars is in ascii (one char = one byte)
 
-    public static ActionLogMessage actionLog(ActionLog log, String appName, LogFilter filter) {
+    public static ActionLogMessage actionLog(ActionLog log, LogFilter filter) {
         var message = new ActionLogMessage();
-        message.app = appName;
+        message.app = LogManager.APP_NAME;
         message.serverIP = Network.localHostAddress();
         message.id = log.id;
         message.date = log.date;
@@ -63,12 +63,12 @@ public class MessageFactory {
         return builder.toString();
     }
 
-    public static StatMessage stat(Map<String, Double> stats, String appName) {
+    public static StatMessage stat(Map<String, Double> stats) {
         var message = new StatMessage();
         var now = Instant.now();
         message.id = LogManager.ID_GENERATOR.next(now);
         message.date = now;
-        message.app = appName;
+        message.app = LogManager.APP_NAME;
         message.serverIP = Network.localHostAddress();
         message.stats = stats;
         return message;

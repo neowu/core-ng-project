@@ -32,7 +32,7 @@ class WebServiceClientTest {
     @BeforeEach
     void createWebServiceClient() {
         var registry = new BeanMapperRegistry();
-        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(registry), new ResponseBeanMapper(registry), null);
+        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(registry), new ResponseBeanMapper(registry));
     }
 
     @Test

@@ -29,7 +29,7 @@ public class LogConfig extends Config {
     }
 
     public void writeToKafka(String kafkaURI) {
-        var appender = new KafkaAppender(kafkaURI, context.logManager.appName);
+        var appender = new KafkaAppender(kafkaURI);
         setLogAppender(appender);
         context.startupHook.add(appender::start);
         context.shutdownHook.add(ShutdownHook.STAGE_3, appender::stop);

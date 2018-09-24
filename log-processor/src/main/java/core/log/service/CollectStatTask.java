@@ -27,6 +27,6 @@ public class CollectStatTask implements Runnable {
 
     StatMessage message() {
         Map<String, Double> stats = stat.collect();
-        return MessageFactory.stat(stats, "log-processor");
+        return MessageFactory.stat(stats);
     }
 }

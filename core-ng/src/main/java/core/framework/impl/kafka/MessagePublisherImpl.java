@@ -22,13 +22,11 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
     private final MessageProducer producer;
     private final MessageValidator<T> validator;
     private final String topic;
-    private final LogManager logManager;
     private final JSONWriter<T> writer;
 
-    public MessagePublisherImpl(MessageProducer producer, String topic, Class<T> messageClass, LogManager logManager) {
+    public MessagePublisherImpl(MessageProducer producer, String topic, Class<T> messageClass) {
         this.producer = producer;
         this.topic = topic;
-        this.logManager = logManager;
         this.validator = new MessageValidator<>(messageClass);
         writer = JSONWriter.of(messageClass);
     }
@@ -58,9 +56,9 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
     }
 
     private void linkContext(Headers headers) {
-        headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(logManager.appName));
+        headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(LogManager.APP_NAME));
 
-        ActionLog actionLog = logManager.currentActionLog();
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog == null) return;      // publisher may be used without action log context
 
         headers.add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));

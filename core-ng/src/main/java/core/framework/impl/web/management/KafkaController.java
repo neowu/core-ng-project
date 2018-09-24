@@ -22,11 +22,9 @@ public class KafkaController {
     private final Logger logger = LoggerFactory.getLogger(KafkaController.class);
     private final IPAccessControl accessControl = new IPAccessControl();
     private final MessageProducer producer;
-    private final LogManager logManager;
 
-    public KafkaController(MessageProducer producer, LogManager logManager) {
+    public KafkaController(MessageProducer producer) {
         this.producer = producer;
-        this.logManager = logManager;
     }
 
     public Response publish(Request request) {
@@ -47,7 +45,7 @@ public class KafkaController {
         Headers headers = record.headers();
         headers.add(MessageHeaders.HEADER_CLIENT, Strings.bytes(KafkaController.class.getSimpleName()));
         headers.add(MessageHeaders.HEADER_TRACE, Strings.bytes("true"));  // auto trace
-        ActionLog actionLog = logManager.currentActionLog();
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         headers.add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes(actionLog.correlationId()));
         headers.add(MessageHeaders.HEADER_REF_ID, Strings.bytes(actionLog.id));
         return record;

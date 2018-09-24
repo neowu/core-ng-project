@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.entry;
 class MessageFactoryTest {
     @Test
     void stat() {
-        StatMessage message = MessageFactory.stat(Map.of("sys_load_avg", 1d), "app");
+        StatMessage message = MessageFactory.stat(Map.of("sys_load_avg", 1d));
         assertThat(message.id).isNotNull();
         assertThat(message.stats).containsOnly(entry("sys_load_avg", 1d));
     }
@@ -30,7 +30,7 @@ class MessageFactoryTest {
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
         log.track("db", 1000, 1, 2);
 
-        ActionLogMessage message = MessageFactory.actionLog(log, "app", new LogFilter());
+        ActionLogMessage message = MessageFactory.actionLog(log, new LogFilter());
 
         assertThat(message).isNotNull();
         assertThat(message.app).isEqualTo("app");

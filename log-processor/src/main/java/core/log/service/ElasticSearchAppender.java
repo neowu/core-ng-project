@@ -18,7 +18,7 @@ public class ElasticSearchAppender implements Appender {
 
     @Override
     public void append(ActionLog log, LogFilter filter) {
-        ActionLogMessage message = MessageFactory.actionLog(log, "log-processor", filter);
+        ActionLogMessage message = MessageFactory.actionLog(log, filter);
         actionService.index(List.of(message));
     }
 }

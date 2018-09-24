@@ -14,7 +14,7 @@ public class BytesLogParam {
 
     @Override
     public String toString() {
-        if (bytes == null) return null;
+        if (bytes == null) return "null";
         return new String(bytes, UTF_8);
     }
 }

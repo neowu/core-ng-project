@@ -33,15 +33,13 @@ public class WebServiceClient {
     private final HTTPClient httpClient;
     private final RequestBeanMapper requestBeanMapper;
     private final ResponseBeanMapper responseBeanMapper;
-    private final LogManager logManager;
     private WebServiceClientInterceptor interceptor;
 
-    public WebServiceClient(String serviceURL, HTTPClient httpClient, RequestBeanMapper requestBeanMapper, ResponseBeanMapper responseBeanMapper, LogManager logManager) {
+    public WebServiceClient(String serviceURL, HTTPClient httpClient, RequestBeanMapper requestBeanMapper, ResponseBeanMapper responseBeanMapper) {
         this.serviceURL = serviceURL;
         this.httpClient = httpClient;
         this.requestBeanMapper = requestBeanMapper;
         this.responseBeanMapper = responseBeanMapper;
-        this.logManager = logManager;
     }
 
     // used by generated code, must be public
@@ -89,9 +87,9 @@ public class WebServiceClient {
     }
 
     private void linkContext(HTTPRequest request) {
-        request.header(HTTPHandler.HEADER_CLIENT.toString(), logManager.appName);
+        request.header(HTTPHandler.HEADER_CLIENT.toString(), LogManager.APP_NAME);
 
-        ActionLog actionLog = logManager.currentActionLog();
+        ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog == null) return;  // web service client may be used without action log context
 
         request.header(HTTPHandler.HEADER_CORRELATION_ID.toString(), actionLog.correlationId());

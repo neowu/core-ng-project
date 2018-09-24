@@ -37,7 +37,7 @@ public final class ExecutorImpl implements Executor {
 
     @Override
     public <T> Future<T> submit(String action, Callable<T> task) {
-        ActionLog parentActionLog = logManager.currentActionLog();
+        ActionLog parentActionLog = LogManager.CURRENT_ACTION_LOG.get();
         String taskAction = taskAction(action, parentActionLog.action);
         String correlationId = parentActionLog.correlationId();
         String refId = parentActionLog.id;
@@ -46,9 +46,9 @@ public final class ExecutorImpl implements Executor {
             try {
                 ActionLog actionLog = logManager.begin("=== task execution begin ===");
                 actionLog.action(taskAction);
-                logger.debug("[context] correlationId={}", correlationId);
+                logger.debug("correlationId={}", correlationId);
                 actionLog.correlationIds = List.of(correlationId);
-                logger.debug("[context] refId={}", refId);
+                logger.debug("refId={}", refId);
                 actionLog.refIds = List.of(refId);
                 actionLog.trace = trace;
                 return task.call();

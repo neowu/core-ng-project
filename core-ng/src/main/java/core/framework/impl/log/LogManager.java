@@ -12,39 +12,36 @@ import org.slf4j.Marker;
  * @author neo
  */
 public class LogManager {
-    public static final ThreadLocal<ActionLog> ACTION_LOG = new ThreadLocal<>();
+    public static final ThreadLocal<ActionLog> CURRENT_ACTION_LOG = new ThreadLocal<>();
+    public static final String APP_NAME;
+
     static final ActionIdGenerator ID_GENERATOR = new ActionIdGenerator();
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogManager.class);
 
-    public final String appName;
-    public final LogFilter filter = new LogFilter();
-    private final Logger logger = LoggerFactory.getLogger(LogManager.class);
-    public Appender appender;
-
-    public LogManager() {
+    static {
         String appName = System.getProperty("core.appName");
         if (appName == null) {
-            logger.info("not found -Dcore.appName, this should only happen in local dev env or test, use \"local\" as appName");
+            LOGGER.info("not found -Dcore.appName, this should only happen in local dev env or test, use \"local\" as appName");
             appName = "local";
         }
-        this.appName = appName;
+        APP_NAME = appName;
     }
+
+    public final LogFilter filter = new LogFilter();
+    public Appender appender;
 
     public ActionLog begin(String message) {
         var actionLog = new ActionLog(message);
-        ACTION_LOG.set(actionLog);
+        CURRENT_ACTION_LOG.set(actionLog);
         return actionLog;
     }
 
     public void end(String message) {
-        ActionLog actionLog = ACTION_LOG.get();
-        ACTION_LOG.remove();
+        ActionLog actionLog = CURRENT_ACTION_LOG.get();
+        CURRENT_ACTION_LOG.remove();
         actionLog.end(message);
 
         if (appender != null) appender.append(actionLog, filter);
-    }
-
-    public ActionLog currentActionLog() {
-        return ACTION_LOG.get();
     }
 
     public void logError(Throwable e) {
@@ -52,9 +49,9 @@ public class LogManager {
         String errorCode = errorCode(e);
         Marker marker = Markers.errorCode(errorCode);
         if (e instanceof ErrorCode && ((ErrorCode) e).severity() == Severity.WARN) {
-            logger.warn(marker, errorMessage, e);
+            LOGGER.warn(marker, errorMessage, e);
         } else {
-            logger.error(marker, errorMessage, e);
+            LOGGER.error(marker, errorMessage, e);
         }
     }
 

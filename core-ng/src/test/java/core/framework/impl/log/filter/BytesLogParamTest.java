@@ -13,6 +13,6 @@ class BytesLogParamTest {
     void convertToString() {
         assertThat(new BytesLogParam(Strings.bytes("value")).toString()).isEqualTo("value");
 
-        assertThat(new BytesLogParam(null).toString()).isNull();
+        assertThat(new BytesLogParam(null).toString()).isEqualTo("null");
     }
 }
