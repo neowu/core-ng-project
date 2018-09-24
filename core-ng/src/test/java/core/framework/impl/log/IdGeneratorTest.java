@@ -10,12 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class ActionIdGeneratorTest {
-    private ActionIdGenerator generator;
+class IdGeneratorTest {
+    private IdGenerator generator;
 
     @BeforeEach
-    void createActionIdGenerator() {
-        generator = new ActionIdGenerator();
+    void createIdGenerator() {
+        generator = new IdGenerator();
     }
 
     @Test

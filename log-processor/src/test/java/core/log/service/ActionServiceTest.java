@@ -1,7 +1,7 @@
 package core.log.service;
 
 import core.framework.impl.log.message.ActionLogMessage;
-import core.framework.impl.log.message.PerformanceStatMessage;
+import core.framework.impl.log.message.PerformanceStat;
 import core.framework.inject.Inject;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.GetRequest;
@@ -40,7 +40,7 @@ class ActionServiceTest extends IntegrationTest {
         message1.stats = Map.of("count", 1d);
         message1.correlationIds = List.of("id1", "id2");
         message1.clients = List.of("client");
-        var stat = new PerformanceStatMessage();
+        var stat = new PerformanceStat();
         stat.count = 1;
         stat.totalElapsed = 10L;
         stat.readEntries = 1;

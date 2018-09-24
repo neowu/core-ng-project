@@ -2,9 +2,7 @@ package core.framework.impl.log;
 
 import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.message.ActionLogMessage;
-import core.framework.impl.log.message.PerformanceStatMessage;
 import core.framework.impl.log.message.StatMessage;
-import core.framework.util.Maps;
 import core.framework.util.Network;
 
 import java.time.Instant;
@@ -33,17 +31,7 @@ public class MessageFactory {
         message.errorMessage = log.errorMessage;
         message.context = log.context;
         message.stats = log.stats;
-        Map<String, PerformanceStatMessage> performanceStats = Maps.newHashMapWithExpectedSize(log.performanceStats.size());
-        for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
-            PerformanceStat stat = entry.getValue();
-            var statMessage = new PerformanceStatMessage();
-            statMessage.count = stat.count;
-            statMessage.totalElapsed = stat.totalElapsed;
-            statMessage.readEntries = stat.readEntries;
-            statMessage.writeEntries = stat.writeEntries;
-            performanceStats.put(entry.getKey(), statMessage);
-        }
-        message.performanceStats = performanceStats;
+        message.performanceStats = log.performanceStats;
         if (log.flushTraceLog()) {
             message.traceLog = trace(log, filter, MAX_TRACE_LENGTH);
         }

@@ -1,7 +1,7 @@
 package core.log.domain;
 
 import core.framework.api.json.Property;
-import core.framework.impl.log.message.PerformanceStatMessage;
+import core.framework.impl.log.message.PerformanceStat;
 import core.framework.search.Index;
 
 import java.time.Instant;
@@ -42,5 +42,5 @@ public class ActionDocument {
     @Property(name = "stats")
     public Map<String, Double> stats;
     @Property(name = "perf_stats")
-    public Map<String, PerformanceStatMessage> performanceStats;
+    public Map<String, PerformanceStat> performanceStats;
 }

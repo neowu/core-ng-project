@@ -15,7 +15,7 @@ public class LogManager {
     public static final ThreadLocal<ActionLog> CURRENT_ACTION_LOG = new ThreadLocal<>();
     public static final String APP_NAME;
 
-    static final ActionIdGenerator ID_GENERATOR = new ActionIdGenerator();
+    static final IdGenerator ID_GENERATOR = new IdGenerator();
     private static final Logger LOGGER = LoggerFactory.getLogger(LogManager.class);
 
     static {

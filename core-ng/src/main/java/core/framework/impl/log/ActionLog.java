@@ -1,5 +1,7 @@
 package core.framework.impl.log;
 
+import core.framework.impl.log.message.PerformanceStat;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.time.Instant;
@@ -143,7 +145,16 @@ public final class ActionLog {
 
     public void track(String action, long elapsed, Integer readEntries, Integer writeEntries) {
         PerformanceStat stat = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
-        stat.track(elapsed, readEntries, writeEntries);
+        stat.count++;
+        stat.totalElapsed += elapsed;
+        if (readEntries != null) {
+            if (stat.readEntries == null) stat.readEntries = readEntries;
+            else stat.readEntries += readEntries;
+        }
+        if (writeEntries != null) {
+            if (stat.writeEntries == null) stat.writeEntries = writeEntries;
+            else stat.writeEntries += writeEntries;
+        }
         // not to add event to keep trace log concise
     }
 

@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author neo
  */
-class ActionIdGenerator {
+class IdGenerator {
     private static final int LOW_ORDER_THREE_BYTES = 0xFFFFFF;
 
     private final AtomicInteger counter = new AtomicInteger(ThreadLocalRandom.current().nextInt());

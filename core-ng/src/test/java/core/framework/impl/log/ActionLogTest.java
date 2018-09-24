@@ -1,5 +1,6 @@
 package core.framework.impl.log;
 
+import core.framework.impl.log.message.PerformanceStat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -85,17 +86,24 @@ class ActionLogTest {
     void track() {
         log.track("db", 1000, 1, 0);
         PerformanceStat stat = log.performanceStats.get("db");
-        assertEquals(1, stat.count);
-        assertEquals(1000, stat.totalElapsed);
-        assertEquals(1, stat.readEntries.intValue());
-        assertEquals(0, stat.writeEntries.intValue());
+        assertThat(stat.count).isEqualTo(1);
+        assertThat(stat.totalElapsed).isEqualTo(1000);
+        assertThat(stat.readEntries).isEqualTo(1);
+        assertThat(stat.writeEntries).isEqualTo(0);
 
         log.track("db", 1000, 1, 1);
         stat = log.performanceStats.get("db");
-        assertEquals(2, stat.count);
-        assertEquals(2000, stat.totalElapsed);
-        assertEquals(2, stat.readEntries.intValue());
-        assertEquals(1, stat.writeEntries.intValue());
+        assertThat(stat.count).isEqualTo(2);
+        assertThat(stat.totalElapsed).isEqualTo(2000);
+        assertThat(stat.readEntries).isEqualTo(2);
+        assertThat(stat.writeEntries).isEqualTo(1);
+
+        log.track("http", 3000, null, null);
+        stat = log.performanceStats.get("http");
+        assertThat(stat.count).isEqualTo(1);
+        assertThat(stat.totalElapsed).isEqualTo(3000);
+        assertThat(stat.readEntries).isNull();
+        assertThat(stat.writeEntries).isNull();
     }
 
     private String longString(int length) {

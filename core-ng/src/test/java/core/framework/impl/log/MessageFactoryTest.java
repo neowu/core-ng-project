@@ -2,7 +2,7 @@ package core.framework.impl.log;
 
 import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.message.ActionLogMessage;
-import core.framework.impl.log.message.PerformanceStatMessage;
+import core.framework.impl.log.message.PerformanceStat;
 import core.framework.impl.log.message.StatMessage;
 import core.framework.log.Markers;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ class MessageFactoryTest {
         assertThat(message.errorCode).isEqualTo("ERROR_CODE");
         assertThat(message.traceLog).isNotEmpty();
 
-        PerformanceStatMessage statMessage = message.performanceStats.get("db");
+        PerformanceStat statMessage = message.performanceStats.get("db");
         assertThat(statMessage.totalElapsed).isEqualTo(1000);
         assertThat(statMessage.count).isEqualTo(1);
         assertThat(statMessage.readEntries).isEqualTo(1);

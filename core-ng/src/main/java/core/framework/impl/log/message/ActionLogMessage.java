@@ -41,7 +41,7 @@ public class ActionLogMessage {
     @Property(name = "stats")
     public Map<String, Double> stats;
     @Property(name = "perf_stats")
-    public Map<String, PerformanceStatMessage> performanceStats;
+    public Map<String, PerformanceStat> performanceStats;
     @Property(name = "trace_log")
     public String traceLog;
 }
