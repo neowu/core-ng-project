@@ -7,9 +7,9 @@ import core.framework.api.json.Property;
  */
 public class PerformanceStat {
     @Property(name = "total_elapsed")
-    public Long totalElapsed = 0L;
+    public Long totalElapsed;
     @Property(name = "count")
-    public Integer count = 0;
+    public Integer count;
     @Property(name = "read_entries")
     public Integer readEntries;
     @Property(name = "write_entries")
