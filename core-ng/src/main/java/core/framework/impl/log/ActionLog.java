@@ -145,7 +145,7 @@ public final class ActionLog {
 
     public void track(String action, long elapsed, Integer readEntries, Integer writeEntries) {
         PerformanceStat stat = performanceStats.computeIfAbsent(action, key -> new PerformanceStat());
-        stat.count++;
+        stat.count += 1;
         stat.totalElapsed += elapsed;
         if (readEntries != null) {
             if (stat.readEntries == null) stat.readEntries = readEntries;

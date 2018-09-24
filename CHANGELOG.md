@@ -1,5 +1,5 @@
 ## Change log
-### 6.8.5 (9/20/2018 - )
+### 6.8.5 (9/20/2018 - 9/24/2018)
 * db: log params for batch operations, disable ssl for mysql
 * log: adjust logger name abbr, only leave last 2 tokens for long package
 * log: reduce trace log, only log thread/date once at beginning, replace timestamp with duration in nanos
