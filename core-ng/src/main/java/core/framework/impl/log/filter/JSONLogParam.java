@@ -6,11 +6,11 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class JSONParam implements FilterParam {
+public class JSONLogParam implements LogParam {
     private final byte[] bytes;
     private final Charset charset;
 
-    public JSONParam(byte[] bytes, Charset charset) {
+    public JSONLogParam(byte[] bytes, Charset charset) {
         this.bytes = bytes;
         this.charset = charset;
     }

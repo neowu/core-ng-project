@@ -29,8 +29,8 @@ public class LogFilter {
         if (argument == null) return null;
 
         String value;
-        if (argument instanceof FilterParam) {
-            value = ((FilterParam) argument).filter(maskedFields);
+        if (argument instanceof LogParam) {
+            value = ((LogParam) argument).filter(maskedFields);
         } else if (argument.getClass().isArray()) {
             value = filterArrayArgument(argument);
         } else {
@@ -54,12 +54,11 @@ public class LogFilter {
             return Arrays.toString((byte[]) argument);
         } else if (argument instanceof boolean[]) {
             return Arrays.toString((boolean[]) argument);
-        } else if (argument instanceof short[]) {
-            return Arrays.toString((short[]) argument);
         } else if (argument instanceof float[]) {
             return Arrays.toString((float[]) argument);
+        } else {    // in java there are only those possible array type, the last one is short[]
+            return Arrays.toString((short[]) argument);
         }
-        throw new Error(Strings.format("unknown array type, class={}", argument.getClass().getCanonicalName()));
     }
 
     String truncate(String value, int maxSize) {

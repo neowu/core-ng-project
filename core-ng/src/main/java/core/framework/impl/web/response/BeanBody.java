@@ -1,6 +1,6 @@
 package core.framework.impl.web.response;
 
-import core.framework.impl.log.filter.JSONParam;
+import core.framework.impl.log.filter.JSONLogParam;
 import io.undertow.io.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public final class BeanBody implements Body {
     @Override
     public void send(Sender sender, ResponseHandlerContext context) {
         byte[] body = context.responseBeanMapper.toJSON(bean);
-        LOGGER.debug("[response] body={}", new JSONParam(body, UTF_8));
+        LOGGER.debug("[response] body={}", new JSONLogParam(body, UTF_8));
         sender.send(ByteBuffer.wrap(body));
     }
 }

@@ -9,10 +9,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class BsonParamTest {
+class BsonLogParamTest {
     @Test
     void convertToString() {
-        var param = new BsonParam(Filters.eq("field", "value"), MongoClient.getDefaultCodecRegistry());
+        var param = new BsonLogParam(Filters.eq("field", "value"), MongoClient.getDefaultCodecRegistry());
         assertThat(param.toString()).isEqualTo("{ \"field\" : \"value\" }");
     }
 }

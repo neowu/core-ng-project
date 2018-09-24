@@ -7,10 +7,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * @author neo
  */
-class BytesValueMapParam {
+class BytesValueMapLogParam {
     private final Map<String, byte[]> values;
 
-    BytesValueMapParam(Map<String, byte[]> values) {
+    BytesValueMapLogParam(Map<String, byte[]> values) {
         this.values = values;
     }
 

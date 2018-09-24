@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -198,7 +199,7 @@ public class DatabaseOperation {
         } else if (param instanceof LocalDate) {
             statement.setDate(index, Date.valueOf((LocalDate) param));
         } else if (param == null) {
-            statement.setObject(index, null);
+            statement.setNull(index, Types.NULL);   // both mysql/hsql driver are not using sqlType param
         } else {
             throw new Error(format("unsupported param type, type={}, value={}", param.getClass().getCanonicalName(), param));
         }

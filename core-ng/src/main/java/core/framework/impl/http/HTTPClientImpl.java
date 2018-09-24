@@ -7,7 +7,7 @@ import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.impl.log.filter.MapParam;
+import core.framework.impl.log.filter.MapLogParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.InputStreams;
@@ -76,12 +76,12 @@ public final class HTTPClientImpl implements HTTPClient {
             for (Header header : httpResponse.getAllHeaders()) {
                 headers.putIfAbsent(header.getName(), header.getValue());
             }
-            logger.debug("[response] headers={}", new MapParam(headers));
+            logger.debug("[response] headers={}", new MapLogParam(headers));
 
             HttpEntity entity = httpResponse.getEntity();
             byte[] body = responseBody(entity);
             var response = new HTTPResponse(parseHTTPStatus(statusCode), headers, body);
-            logger.debug("[response] body={}", BodyParam.param(body, response.contentType().orElse(null)));
+            logger.debug("[response] body={}", BodyLogParam.param(body, response.contentType().orElse(null)));
             return response;
         } catch (IOException | UncheckedIOException e) {
             throw new HTTPClientException(e.getMessage(), "HTTP_COMMUNICATION_FAILED", e);
@@ -120,18 +120,18 @@ public final class HTTPClientImpl implements HTTPClient {
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             builder.setHeader(entry.getKey(), entry.getValue());
         }
-        logger.debug("[request] headers={}", new MapParam(headers));
+        logger.debug("[request] headers={}", new MapLogParam(headers));
 
         Map<String, String> params = request.params();
         for (Map.Entry<String, String> entry : params.entrySet()) {
             builder.addParameter(entry.getKey(), entry.getValue());
         }
-        if (!params.isEmpty()) logger.debug("[request] params={}", new MapParam(params));
+        if (!params.isEmpty()) logger.debug("[request] params={}", new MapLogParam(params));
 
         byte[] body = request.body();
         if (body != null) {
             ContentType contentType = request.contentType();
-            logger.debug("[request] contentType={}, body={}", contentType, BodyParam.param(body, contentType));
+            logger.debug("[request] contentType={}, body={}", contentType, BodyLogParam.param(body, contentType));
             org.apache.http.entity.ContentType type = org.apache.http.entity.ContentType.create(contentType.mediaType(), contentType.charset().orElse(null));
             builder.setEntity(new ByteArrayEntity(request.body(), type));
         }

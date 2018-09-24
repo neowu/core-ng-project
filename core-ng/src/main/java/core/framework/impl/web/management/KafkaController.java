@@ -4,7 +4,7 @@ import core.framework.impl.kafka.MessageHeaders;
 import core.framework.impl.kafka.MessageProducer;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.log.filter.BytesParam;
+import core.framework.impl.log.filter.BytesLogParam;
 import core.framework.impl.web.http.IPAccessControl;
 import core.framework.log.Markers;
 import core.framework.util.Strings;
@@ -39,7 +39,7 @@ public class KafkaController {
         logger.warn(Markers.errorCode("MANUAL_OPERATION"), "publish message manually, topic={}", topic);   // log trace message, due to potential impact
         producer.send(record);
 
-        return Response.text(Strings.format("message published, topic={}, key={}, message={}", topic, key, new BytesParam(body)));
+        return Response.text(Strings.format("message published, topic={}, key={}, message={}", topic, key, new BytesLogParam(body)));
     }
 
     ProducerRecord<byte[], byte[]> record(String topic, String key, byte[] body) {

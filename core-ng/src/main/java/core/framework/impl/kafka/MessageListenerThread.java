@@ -3,7 +3,7 @@ package core.framework.impl.kafka;
 import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.log.filter.BytesParam;
+import core.framework.impl.log.filter.BytesLogParam;
 import core.framework.kafka.Message;
 import core.framework.log.Markers;
 import core.framework.util.StopWatch;
@@ -133,22 +133,20 @@ class MessageListenerThread extends Thread {
                 actionLog.track("kafka", 0, 1, 0);
 
                 Headers headers = record.headers();
-                for (Header header : headers)
-                    logger.debug("[header] {}={}", header.key(), new BytesParam(header.value()));
-
+                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;
                 String correlationId = header(headers, MessageHeaders.HEADER_CORRELATION_ID);
                 if (correlationId != null) actionLog.correlationIds = List.of(correlationId);
-                if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;
                 String client = header(headers, MessageHeaders.HEADER_CLIENT);
                 if (client != null) actionLog.clients = List.of(client);
                 String refId = header(headers, MessageHeaders.HEADER_REF_ID);
                 if (refId != null) actionLog.refIds = List.of(refId);
+                logger.debug("[header] refId={}, client={}, correlationId={}", refId, client, correlationId);
 
                 String key = new String(record.key(), UTF_8);   // key will be not null in our system
                 actionLog.context("key", key);
 
                 byte[] value = record.value();
-                logger.debug("[message] value={}", new BytesParam(value));
+                logger.debug("[message] value={}", new BytesLogParam(value));
                 T message = process.reader.fromJSON(value);
                 process.validator.validate(message);
                 process.handler.handle(key, message);
@@ -204,7 +202,7 @@ class MessageListenerThread extends Thread {
 
             String key = new String(record.key(), UTF_8);    // key will be not null in our system
             byte[] value = record.value();
-            logger.debug("[message] key={}, value={}, refId={}, client={}, correlationId={}", key, new BytesParam(value), refId, client, correlationId);
+            logger.debug("[message] key={}, value={}, refId={}, client={}, correlationId={}", key, new BytesLogParam(value), refId, client, correlationId);
 
             T message = reader.fromJSON(value);
             messages.add(new Message<>(key, message));

@@ -2,9 +2,9 @@ package core.framework.impl.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
-import core.framework.impl.http.BodyParam;
+import core.framework.impl.http.BodyLogParam;
 import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.filter.FieldParam;
+import core.framework.impl.log.filter.FieldLogParam;
 import core.framework.util.Files;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
@@ -83,14 +83,14 @@ public final class RequestParser {
             if (Headers.COOKIE.equals(name)) {
                 hasCookies = true;
             } else {
-                logger.debug("[request:header] {}={}", name, new FieldParam(name, header.toArray()));
+                logger.debug("[request:header] {}={}", name, new HeaderLogParam(name, header));
             }
         }
         if (hasCookies) {
             for (Map.Entry<String, Cookie> entry : exchange.getRequestCookies().entrySet()) {
                 String name = entry.getKey();
                 Cookie cookie = entry.getValue();
-                logger.debug("[request:cookie] {}={}", name, new FieldParam(name, cookie.getValue()));
+                logger.debug("[request:cookie] {}={}", name, new FieldLogParam(name, cookie.getValue()));
             }
         }
     }
@@ -124,7 +124,7 @@ public final class RequestParser {
         var body = exchange.getAttachment(RequestBodyReader.REQUEST_BODY);
         if (body != null) {
             request.body = body.body();
-            logger.debug("[request] body={}", BodyParam.param(request.body, request.contentType));
+            logger.debug("[request] body={}", BodyLogParam.param(request.body, request.contentType));
         } else {
             parseForm(request, exchange);
         }
@@ -142,7 +142,7 @@ public final class RequestParser {
                     request.files.put(name, new MultipartFile(value.getPath(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
                 }
             } else {
-                logger.debug("[request:form] {}={}", name, new FieldParam(name, value.getValue()));
+                logger.debug("[request:form] {}={}", name, new FieldLogParam(name, value.getValue()));
                 request.formParams.put(name, value.getValue());
             }
         }

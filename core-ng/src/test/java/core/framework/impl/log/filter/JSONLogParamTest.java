@@ -11,11 +11,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class JSONParamTest {
+class JSONLogParamTest {
     @Test
     void filterWithoutMasking() {
         String value = "{\"field1\": \"value1\"}";
-        FilterParam param = param(value);
+        LogParam param = param(value);
         String message = param.filter(Set.of());
         assertThat(message).isEqualTo(value);
     }
@@ -23,7 +23,7 @@ class JSONParamTest {
     @Test
     void filterWithOneMaskedField() {
         String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"field2\": \"value2\"\n}";
-        FilterParam param = param(value);
+        LogParam param = param(value);
         String message = param.filter(Set.of("password", "passwordConfirm"));
         assertThat(message).isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"field2\": \"value2\"\n}");
     }
@@ -31,7 +31,7 @@ class JSONParamTest {
     @Test
     void filterWithMultipleMaskedFields() {
         String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass123\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"pass\\\"123\",\n    \"passwordConfirm\": \"pass123\"}}";
-        FilterParam param = param(value);
+        LogParam param = param(value);
         String message = param.filter(Set.of("password", "passwordConfirm"));
         assertThat(message).isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"passwordConfirm\": \"******\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"******\",\n    \"passwordConfirm\": \"******\"}}");
     }
@@ -39,7 +39,7 @@ class JSONParamTest {
     @Test
     void filterWithBrokenJSONMessage() {
         String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass12";
-        FilterParam param = param(value);
+        LogParam param = param(value);
         String message = param.filter(Set.of("password", "passwordConfirm"));
         assertThat(message).doesNotContain("pass123");
 
@@ -49,7 +49,7 @@ class JSONParamTest {
         assertThat(message).doesNotContain("pass123");
     }
 
-    private FilterParam param(String value) {
-        return new JSONParam(Strings.bytes(value), StandardCharsets.UTF_8);
+    private LogParam param(String value) {
+        return new JSONLogParam(Strings.bytes(value), StandardCharsets.UTF_8);
     }
 }

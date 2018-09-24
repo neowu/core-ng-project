@@ -6,10 +6,10 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class MapParam implements FilterParam {
+public class MapLogParam implements LogParam {
     private final Map<String, String> values;
 
-    public MapParam(Map<String, String> values) {
+    public MapLogParam(Map<String, String> values) {
         this.values = values;
     }
 

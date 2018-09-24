@@ -6,11 +6,11 @@ import org.bson.conversions.Bson;
 /**
  * @author neo
  */
-class BsonParam {
+class BsonLogParam {
     private final Bson bson;
     private final CodecRegistry registry;
 
-    BsonParam(Bson bson, CodecRegistry registry) {
+    BsonLogParam(Bson bson, CodecRegistry registry) {
         this.bson = bson;
         this.registry = registry;
     }

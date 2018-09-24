@@ -73,7 +73,9 @@ class RepositoryImplAssignedIdEntityTest {
         updatedEntity.intField = 12;
         repository.update(updatedEntity);
 
-        assertThat(repository.get(entity.id)).get().isEqualToComparingFieldByField(updatedEntity);
+        assertThat(repository.get(entity.id))
+                .get().isEqualToComparingFieldByField(updatedEntity)
+                .satisfies(selectedEntity -> assertThat(selectedEntity.stringField).isNull());
     }
 
     @Test
@@ -87,7 +89,9 @@ class RepositoryImplAssignedIdEntityTest {
         updatedEntity.dateField = LocalDate.of(2016, Month.JULY, 5);
         repository.partialUpdate(updatedEntity);
 
-        assertThat(repository.get(entity.id)).get().isEqualToComparingOnlyGivenFields(updatedEntity, "stringField", "dateField");
+        assertThat(repository.get(entity.id))
+                .get().isEqualToComparingOnlyGivenFields(updatedEntity, "stringField", "dateField")
+                .satisfies(selectedEntity -> assertThat(selectedEntity.intField).isEqualTo(11));
     }
 
     @Test

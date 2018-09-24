@@ -5,6 +5,6 @@ import java.util.Set;
 /**
  * @author neo
  */
-public interface FilterParam {
+public interface LogParam {
     String filter(Set<String> maskedFields);
 }

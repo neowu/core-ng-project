@@ -2,7 +2,7 @@ package core.framework.impl.web.response;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.filter.FieldParam;
+import core.framework.impl.log.filter.FieldLogParam;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.site.TemplateManager;
 import core.framework.util.Encodings;
@@ -45,7 +45,7 @@ public class ResponseHandler {
             HttpString name = entry.getKey();
             String value = entry.getValue();
             headers.put(name, value);
-            logger.debug("[response:header] {}={}", name, new FieldParam(name, value));
+            logger.debug("[response:header] {}={}", name, new FieldLogParam(name.toString(), value));
         }
     }
 
@@ -58,7 +58,7 @@ public class ResponseHandler {
                 CookieImpl cookie = cookie(spec, value);
                 cookies.put(spec.name, cookie);
                 logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
-                        spec.name, new FieldParam(spec.name, cookie.getValue()), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
+                        spec.name, new FieldLogParam(spec.name, cookie.getValue()), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
             }
         }
     }

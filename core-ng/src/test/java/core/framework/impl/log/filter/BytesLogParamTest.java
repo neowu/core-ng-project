@@ -8,9 +8,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class BytesParamTest {
+class BytesLogParamTest {
     @Test
     void convertToString() {
-        assertThat(new BytesParam(Strings.bytes("value")).toString()).isEqualTo("value");
+        assertThat(new BytesLogParam(Strings.bytes("value")).toString()).isEqualTo("value");
+
+        assertThat(new BytesLogParam(null).toString()).isNull();
     }
 }

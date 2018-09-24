@@ -1,6 +1,6 @@
 package core.framework.impl.redis;
 
-import core.framework.impl.log.filter.BytesParam;
+import core.framework.impl.log.filter.BytesLogParam;
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
 import core.framework.log.ActionLogContext;
@@ -103,7 +103,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 1, 0);
-            logger.debug("get, key={}, returnedValue={}, elapsed={}", key, new BytesParam(value), elapsed);
+            logger.debug("get, key={}, returnedValue={}, elapsed={}", key, new BytesLogParam(value), elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -145,7 +145,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, updated ? 1 : 0);
-            logger.debug("set, key={}, value={}, expiration={}, onlyIfAbsent={}, updated={}, elapsed={}", key, new BytesParam(value), expiration, onlyIfAbsent, updated, elapsed);
+            logger.debug("set, key={}, value={}, expiration={}, onlyIfAbsent={}, updated={}, elapsed={}", key, new BytesLogParam(value), expiration, onlyIfAbsent, updated, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -246,7 +246,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, values.size(), 0);
-            logger.debug("mget, keys={}, size={}, returnedValues={}, elapsed={}", keys, keys.length, new BytesValueMapParam(values), elapsed);
+            logger.debug("mget, keys={}, size={}, returnedValues={}, elapsed={}", keys, keys.length, new BytesValueMapLogParam(values), elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -304,7 +304,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("mset, values={}, size={}, expiration={}, elapsed={}", new BytesValueMapParam(values), size, expiration, elapsed);
+            logger.debug("mset, values={}, size={}, expiration={}, elapsed={}", new BytesValueMapLogParam(values), size, expiration, elapsed);
             checkSlowOperation(elapsed);
         }
     }
