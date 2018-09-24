@@ -33,7 +33,7 @@ class MessageFactoryTest {
         ActionLogMessage message = MessageFactory.actionLog(log, new LogFilter());
 
         assertThat(message).isNotNull();
-        assertThat(message.app).isEqualTo("app");
+        assertThat(message.app).isEqualTo(LogManager.APP_NAME);
         assertThat(message.action).isEqualTo("action");
         assertThat(message.errorCode).isEqualTo("ERROR_CODE");
         assertThat(message.traceLog).isNotEmpty();
