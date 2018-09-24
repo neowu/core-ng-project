@@ -1,5 +1,6 @@
 package core.log.service;
 
+import core.framework.impl.log.LogManager;
 import core.framework.impl.log.message.StatMessage;
 import core.framework.inject.Inject;
 import core.log.IntegrationTest;
@@ -18,7 +19,7 @@ class CollectStatTaskTest extends IntegrationTest {
     void message() {
         StatMessage message = task.message();
 
-        assertThat(message.app).isEqualTo("log-processor");
+        assertThat(message.app).isEqualTo(LogManager.APP_NAME);
         assertThat(message.stats.get("sys_load_avg")).isNotNull();
     }
 }
