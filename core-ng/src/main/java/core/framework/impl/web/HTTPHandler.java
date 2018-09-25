@@ -102,6 +102,8 @@ public class HTTPHandler implements HttpHandler {
             logManager.logError(e);
             errorHandler.handleError(e, exchange, request, actionLog);
         } finally {
+            // refer to io.undertow.io.AsyncSenderImpl.send(java.nio.ByteBuffer, io.undertow.io.IoCallback),
+            // sender.send() will write response until can't write more, then call channel.resumeWrites(), which will resume after this finally block finished, so this can be small delay
             webContext.cleanup();
             logManager.end("=== http transaction end ===");
         }

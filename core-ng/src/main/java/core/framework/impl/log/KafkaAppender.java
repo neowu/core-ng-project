@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class KafkaAppender implements Appender {
     public final ProducerMetrics producerMetrics = new ProducerMetrics("log-forwarder");
     private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
-    private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<ProducerRecord<byte[], byte[]>> records = new LinkedBlockingQueue<>();
     private final Producer<byte[], byte[]> producer;
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
@@ -41,7 +41,7 @@ public final class KafkaAppender implements Appender {
     private final Callback callback = (metadata, exception) -> {
         if (exception != null) {
             logger.warn("failed to send log message", exception);
-            queue.clear();
+            records.clear();
         }
     };
 
@@ -67,17 +67,12 @@ public final class KafkaAppender implements Appender {
             logger.info("log forwarder thread started, uri={}", uri);
             while (!stop.get()) {
                 try {
-                    Object message = queue.take();
-                    if (message instanceof ActionLogMessage) {
-                        var actionLog = (ActionLogMessage) message;
-                        producer.send(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, Strings.bytes(actionLog.id), actionLogWriter.toJSON(actionLog)), callback);
-                    } else if (message instanceof StatMessage) {
-                        var stat = (StatMessage) message;
-                        producer.send(new ProducerRecord<>(LogTopics.TOPIC_STAT, Strings.bytes(stat.id), statWriter.toJSON(stat)), callback);
-                    }
+                    ProducerRecord<byte[], byte[]> record = records.take();
+                    producer.send(record, callback);
                 } catch (Throwable e) {
                     if (!stop.get()) {
                         logger.warn("failed to send log message, retry in 30 seconds", e);
+                        records.clear();
                         Threads.sleepRoughly(Duration.ofSeconds(30));
                     }
                 }
@@ -98,10 +93,12 @@ public final class KafkaAppender implements Appender {
 
     @Override
     public void append(ActionLog log, LogFilter filter) {
-        queue.add(MessageFactory.actionLog(log, filter));
+        ActionLogMessage message = MessageFactory.actionLog(log, filter);
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, Strings.bytes(message.id), actionLogWriter.toJSON(message)));
     }
 
     public void forward(Map<String, Double> stats) {
-        queue.add(MessageFactory.stat(stats));
+        StatMessage message = MessageFactory.stat(stats);
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, Strings.bytes(message.id), statWriter.toJSON(message)));
     }
 }

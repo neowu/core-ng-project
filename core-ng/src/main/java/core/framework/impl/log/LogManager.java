@@ -41,7 +41,13 @@ public class LogManager {
         CURRENT_ACTION_LOG.remove();
         actionLog.end(message);
 
-        if (appender != null) appender.append(actionLog, filter);
+        if (appender != null) {
+            try {
+                appender.append(actionLog, filter);
+            } catch (Throwable e) {
+                LOGGER.warn("failed to append action log, error={}", e.getMessage(), e);
+            }
+        }
     }
 
     public void logError(Throwable e) {

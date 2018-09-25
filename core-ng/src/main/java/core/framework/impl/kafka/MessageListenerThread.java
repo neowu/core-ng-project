@@ -200,7 +200,7 @@ class MessageListenerThread extends Thread {
             String refId = header(headers, MessageHeaders.HEADER_REF_ID);
             if (refId != null) refIds.add(refId);
 
-            String key = new String(record.key(), UTF_8);    // key will be not null in our system
+            String key = new String(record.key(), UTF_8);    // key will not be null in our system
             byte[] value = record.value();
             logger.debug("[message] key={}, value={}, refId={}, client={}, correlationId={}", key, new BytesLogParam(value), refId, client, correlationId);
 

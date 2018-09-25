@@ -1,0 +1,4 @@
+extraction:
+    java:
+        before_index:
+        - "export JAVA_HOME=/usr/lib/jvm/java-10-openjdk-amd64"
