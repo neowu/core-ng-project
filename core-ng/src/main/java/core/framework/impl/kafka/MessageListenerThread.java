@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -101,7 +101,7 @@ class MessageListenerThread extends Thread {
         int count = 0;
         int size = 0;
         try {
-            Map<String, List<ConsumerRecord<byte[], byte[]>>> messages = new LinkedHashMap<>();
+            Map<String, List<ConsumerRecord<byte[], byte[]>>> messages = new HashMap<>();     // record in one topic maintains order
             for (ConsumerRecord<byte[], byte[]> record : kafkaRecords) {
                 messages.computeIfAbsent(record.topic(), key -> new ArrayList<>()).add(record);
                 count++;

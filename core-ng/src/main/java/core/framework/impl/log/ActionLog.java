@@ -21,12 +21,12 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public final class ActionLog {
+    private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
     private static final ThreadMXBean THREAD = ManagementFactory.getThreadMXBean();
 
     private static final int MAX_TRACE_HOLD_SIZE = 3000;    // normally 3000 lines trace is about 350k
     private static final int MAX_ERROR_MESSAGE_LENGTH = 200;
     private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
-    private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
 
     public final String id;
     final Instant date;

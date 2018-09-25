@@ -25,17 +25,17 @@ public class ActionService {
     ElasticSearchType<TraceDocument> traceType;
 
     public void index(List<ActionLogMessage> messages) {
-        LocalDate now = LocalDate.now();
-        index(messages, now);
+        index(messages, LocalDate.now());
+    }
+
+    public void index(ActionLogMessage message) {
+        index(message, LocalDate.now());
     }
 
     void index(List<ActionLogMessage> messages, LocalDate now) {
         if (messages.size() <= 5) { // use single index in quiet time
             for (ActionLogMessage message : messages) {
-                indexAction(message.id, action(message), now);
-                if (message.traceLog != null) {
-                    indexTrace(message.id, trace(message), now);
-                }
+                index(message, now);
             }
         } else {
             Map<String, ActionDocument> actions = Maps.newHashMapWithExpectedSize(messages.size());
@@ -50,6 +50,13 @@ public class ActionService {
             if (!traces.isEmpty()) {
                 indexTraces(traces, now);
             }
+        }
+    }
+
+    private void index(ActionLogMessage message, LocalDate now) {
+        indexAction(message.id, action(message), now);
+        if (message.traceLog != null) {
+            indexTrace(message.id, trace(message), now);
         }
     }
 

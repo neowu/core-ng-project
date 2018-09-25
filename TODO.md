@@ -14,7 +14,6 @@
 * kafka: unique groupId to listen all messages for ws
 * type literal: support better cast for generic, JSON.fromJSON() / bind?
 
-* benchmark HTTPString vs string
 * make logParam aware of max param length
 
 ### jdk 9/10 incompatible list

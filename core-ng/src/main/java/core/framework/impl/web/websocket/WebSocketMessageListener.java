@@ -29,18 +29,18 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===");
         try {
             actionLog.action(wrapper.action);
+            actionLog.context("channel", wrapper.id);
+            logger.debug("refId={}", wrapper.refId);
             List<String> refIds = List.of(wrapper.refId);
-            logger.debug("[context] refId={}", wrapper.refId);
             actionLog.refIds = refIds;
             actionLog.correlationIds = refIds;
-            actionLog.context("channel", wrapper.id);
             logger.debug("[channel] url={}", channel.getUrl());
-            actionLog.context("listener", wrapper.listener.getClass().getCanonicalName());
             logger.debug("[channel] remoteAddress={}", channel.getSourceAddress().getAddress().getHostAddress());
             actionLog.context("clientIP", wrapper.clientIP);
             String data = message.getData();
             logger.debug("[channel] message={}", data);
             actionLog.track("ws", 0, 1, 0);
+            actionLog.context("listener", wrapper.listener.getClass().getCanonicalName());
             wrapper.listener.onMessage(wrapper, data);
         } catch (Throwable e) {
             logManager.logError(e);

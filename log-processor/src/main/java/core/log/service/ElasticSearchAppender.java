@@ -7,8 +7,6 @@ import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.inject.Inject;
 
-import java.util.List;
-
 /**
  * @author neo
  */
@@ -19,6 +17,6 @@ public class ElasticSearchAppender implements Appender {
     @Override
     public void append(ActionLog log, LogFilter filter) {
         ActionLogMessage message = MessageFactory.actionLog(log, filter);
-        actionService.index(List.of(message));
+        actionService.index(message);
     }
 }

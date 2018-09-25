@@ -22,13 +22,11 @@ public class StatService {
     ElasticSearchType<StatDocument> statType;
 
     public void index(List<StatMessage> messages) {
-        LocalDate now = LocalDate.now();
-        index(messages, now);
+        index(messages, LocalDate.now());
     }
 
     public void index(StatMessage message) {
-        LocalDate now = LocalDate.now();
-        index(message.id, stat(message), now);
+        index(message.id, stat(message), LocalDate.now());
     }
 
     void index(List<StatMessage> messages, LocalDate now) {
