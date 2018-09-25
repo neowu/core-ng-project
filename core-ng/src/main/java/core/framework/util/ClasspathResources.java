@@ -5,22 +5,22 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 
 import static core.framework.util.Strings.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
  */
 public final class ClasspathResources {
     public static String text(String path) {
-        return new String(bytes(path), StandardCharsets.UTF_8);
+        return new String(bytes(path), UTF_8);
     }
 
     public static byte[] bytes(String path) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         URL resource = loader.getResource(path);
-        if (resource == null) throw new Error(format("can not load resource, path={}", path));
+        if (resource == null) throw new Error("can not load resource, path=" + path);
 
         URLConnection connection;
         int length;

@@ -41,7 +41,7 @@ public class KafkaConfig extends Config {
     @Override
     protected void validate() {
         if (!handlerAdded)
-            throw new Error(format("kafka is configured, but no producer/consumer added, please remove unnecessary config, name={}", name));
+            throw new Error("kafka is configured, but no producer/consumer added, please remove unnecessary config, name=" + name);
     }
 
     public void uri(String uri) {
@@ -58,7 +58,7 @@ public class KafkaConfig extends Config {
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
         logger.info("publish, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
         if (producer == null) {
-            if (uri == null) throw new Error(format("kafka uri must be configured first, name={}", name));
+            if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
             producer = createProducer();
         }
         var publisher = new MessagePublisherImpl<>(producer, topic, messageClass);
@@ -92,6 +92,7 @@ public class KafkaConfig extends Config {
     }
 
     private <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
+        if (handler == null && bulkHandler == null) throw new Error("handler must not be null");
         logger.info("subscribe, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
         listener().subscribe(topic, messageClass, handler, bulkHandler);
         handlerAdded = true;
@@ -99,7 +100,7 @@ public class KafkaConfig extends Config {
 
     private MessageListener listener() {
         if (listener == null) {
-            if (uri == null) throw new Error(format("kafka uri must be configured first, name={}", name));
+            if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
             listener = new MessageListener(uri, name, context.logManager);
             context.startupHook.add(listener::start);
             context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> listener.shutdown());
