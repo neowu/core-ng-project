@@ -32,7 +32,6 @@ final class LogEvent {
     }
 
     String message() {  // only be called for error message, it assumes warn/error message won't contains sensitive data which should not be logged as warn/error in first place
-        if (arguments == null || arguments.length == 0) return message;
         return Strings.format(message, arguments);
     }
 

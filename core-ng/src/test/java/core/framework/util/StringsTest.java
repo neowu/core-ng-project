@@ -55,5 +55,8 @@ class StringsTest {
     @Test
     void format() {
         assertThat(Strings.format("{}, {}, {}", 1, 2, 3, 4)).isEqualTo("1, 2, 3");
+
+        assertThat(Strings.format("{}")).isEqualTo("{}");
+        assertThat(Strings.format("{}", (Object[]) null)).isEqualTo("{}");
     }
 }
