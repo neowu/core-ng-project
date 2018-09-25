@@ -15,8 +15,11 @@ public class FieldLogParam implements LogParam {
     }
 
     @Override
-    public String filter(Set<String> maskedFields) {
-        if (maskedFields.contains(field)) return "******";
-        return value;
+    public void append(StringBuilder builder, Set<String> maskedFields) {
+        if (maskedFields.contains(field)) {
+            builder.append("******");
+        } else {
+            builder.append(value);
+        }
     }
 }

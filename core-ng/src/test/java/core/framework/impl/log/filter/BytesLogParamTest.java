@@ -10,9 +10,29 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class BytesLogParamTest {
     @Test
-    void convertToString() {
-        assertThat(new BytesLogParam(Strings.bytes("value")).toString()).isEqualTo("value");
+    void appendTruncatedValue() {
+        var param = new BytesLogParam(Strings.bytes("text-♥"));
+        var builder = new StringBuilder();
+        param.append(builder, 6);
 
-        assertThat(new BytesLogParam(null).toString()).isEqualTo("null");
+        assertThat(builder.toString()).isEqualTo("text-...(truncated)");
+    }
+
+    @Test
+    void appendNull() {
+        var param = new BytesLogParam(null);
+        var builder = new StringBuilder();
+        param.append(builder, 6);
+
+        assertThat(builder.toString()).isEqualTo("null");
+    }
+
+    @Test
+    void append() {
+        var param = new BytesLogParam(Strings.bytes("value"));
+        var builder = new StringBuilder();
+        param.append(builder, 10);
+
+        assertThat(builder.toString()).isEqualTo("value");
     }
 }

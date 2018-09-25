@@ -11,10 +11,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class FieldLogParamTest {
     @Test
-    void filter() {
+    void append() {
         var param = new FieldLogParam("SessionId", "value");
-        assertThat(param.filter(Set.of("SessionId"))).isNotEqualTo("value");
 
-        assertThat(param.filter(Set.of())).isEqualTo("value");
+        var builder = new StringBuilder();
+        param.append(builder, Set.of("SessionId"));
+        assertThat(builder.toString()).isNotEqualTo("value");
+
+        builder = new StringBuilder();
+        param.append(builder, Set.of());
+        assertThat(builder.toString()).isEqualTo("value");
     }
 }

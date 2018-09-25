@@ -20,9 +20,13 @@ class HeaderLogParam implements LogParam {
     }
 
     @Override
-    public String filter(Set<String> maskedFields) {
-        if (maskedFields.contains(header.toString())) return "******";
-        if (values.size() == 1) return values.getFirst();
-        return Arrays.toString(values.toArray());
+    public void append(StringBuilder builder, Set<String> maskedFields) {
+        if (maskedFields.contains(header.toString())) {
+            builder.append("******");
+        } else if (values.size() == 1) {
+            builder.append(values.getFirst());
+        } else {
+            builder.append(Arrays.toString(values.toArray()));
+        }
     }
 }

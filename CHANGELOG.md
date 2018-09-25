@@ -1,6 +1,6 @@
 ## Change log
 ### 6.8.6 (9/24/2018 - )
-
+* log: internal tweaking, make logParam be aware of max param length, consume less memory with large trace log
 
 ### 6.8.5 (9/20/2018 - 9/24/2018)
 * db: log params for batch operations, disable ssl for mysql

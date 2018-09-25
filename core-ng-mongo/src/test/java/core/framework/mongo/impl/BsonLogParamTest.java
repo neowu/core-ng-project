@@ -4,6 +4,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.model.Filters;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -11,8 +13,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class BsonLogParamTest {
     @Test
-    void convertToString() {
+    void append() {
         var param = new BsonLogParam(Filters.eq("field", "value"), MongoClient.getDefaultCodecRegistry());
-        assertThat(param.toString()).isEqualTo("{ \"field\" : \"value\" }");
+        var builder = new StringBuilder();
+        param.append(builder, Set.of());
+        assertThat(builder.toString()).isEqualTo("{ \"field\" : \"value\" }");
     }
 }

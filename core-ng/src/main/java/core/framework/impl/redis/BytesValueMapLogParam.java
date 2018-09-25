@@ -1,13 +1,16 @@
 package core.framework.impl.redis;
 
+import core.framework.impl.log.filter.LogParam;
+
 import java.util.Map;
+import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
  */
-class BytesValueMapLogParam {
+class BytesValueMapLogParam implements LogParam {
     private final Map<String, byte[]> values;
 
     BytesValueMapLogParam(Map<String, byte[]> values) {
@@ -15,8 +18,7 @@ class BytesValueMapLogParam {
     }
 
     @Override
-    public String toString() {
-        var builder = new StringBuilder();
+    public void append(StringBuilder builder, Set<String> maskedFields) {
         builder.append('{');
         int index = 0;
         for (Map.Entry<String, byte[]> entry : values.entrySet()) {
@@ -26,6 +28,6 @@ class BytesValueMapLogParam {
                    .append(new String(entry.getValue(), UTF_8));
             index++;
         }
-        return builder.append('}').toString();
+        builder.append('}');
     }
 }

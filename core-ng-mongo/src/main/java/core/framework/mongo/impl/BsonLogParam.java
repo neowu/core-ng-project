@@ -1,12 +1,15 @@
 package core.framework.mongo.impl;
 
+import core.framework.impl.log.filter.LogParam;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
+
+import java.util.Set;
 
 /**
  * @author neo
  */
-class BsonLogParam {
+class BsonLogParam implements LogParam {
     private final Bson bson;
     private final CodecRegistry registry;
 
@@ -16,8 +19,11 @@ class BsonLogParam {
     }
 
     @Override
-    public String toString() {
-        if (bson == null) return "null";
-        return bson.toBsonDocument(null, registry).toJson();
+    public void append(StringBuilder builder, Set<String> maskedFields) {
+        if (bson == null) {
+            builder.append("null");
+        } else {
+            builder.append(bson.toBsonDocument(null, registry).toJson());
+        }
     }
 }

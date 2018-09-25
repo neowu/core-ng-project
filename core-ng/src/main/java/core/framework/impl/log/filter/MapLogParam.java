@@ -14,8 +14,7 @@ public class MapLogParam implements LogParam {
     }
 
     @Override
-    public String filter(Set<String> maskedFields) {
-        var builder = new StringBuilder();
+    public void append(StringBuilder builder, Set<String> maskedFields) {
         builder.append('{');
         int index = 0;
         for (Map.Entry<String, String> entry : values.entrySet()) {
@@ -28,6 +27,6 @@ public class MapLogParam implements LogParam {
 
             index++;
         }
-        return builder.append('}').toString();
+        builder.append('}');
     }
 }

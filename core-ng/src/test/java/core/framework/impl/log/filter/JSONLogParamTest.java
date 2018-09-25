@@ -3,9 +3,9 @@ package core.framework.impl.log.filter;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -13,43 +13,56 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class JSONLogParamTest {
     @Test
-    void filterWithoutMasking() {
-        String value = "{\"field1\": \"value1\"}";
-        LogParam param = param(value);
-        String message = param.filter(Set.of());
-        assertThat(message).isEqualTo(value);
+    void filterWithoutMask() {
+        var param = new JSONLogParam(null, null);
+        var value = "{\"field1\": \"value1\"}";
+        assertThat(param.filter(value, Set.of()).toString()).isEqualTo(value);
     }
 
     @Test
     void filterWithOneMaskedField() {
-        String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"field2\": \"value2\"\n}";
-        LogParam param = param(value);
-        String message = param.filter(Set.of("password", "passwordConfirm"));
-        assertThat(message).isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"field2\": \"value2\"\n}");
+        var param = new JSONLogParam(null, null);
+        var value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"field2\": \"value2\"\n}";
+        assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
+                .isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"field2\": \"value2\"\n}");
     }
 
     @Test
     void filterWithMultipleMaskedFields() {
-        String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass123\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"pass\\\"123\",\n    \"passwordConfirm\": \"pass123\"}}";
-        LogParam param = param(value);
-        String message = param.filter(Set.of("password", "passwordConfirm"));
-        assertThat(message).isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"passwordConfirm\": \"******\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"******\",\n    \"passwordConfirm\": \"******\"}}");
+        var param = new JSONLogParam(null, null);
+        var value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass123\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"pass\\\"123\",\n    \"passwordConfirm\": \"pass123\"}}";
+        assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
+                .isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"passwordConfirm\": \"******\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"******\",\n    \"passwordConfirm\": \"******\"}}");
     }
 
     @Test
-    void filterWithBrokenJSONMessage() {
-        String value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass12";
-        LogParam param = param(value);
-        String message = param.filter(Set.of("password", "passwordConfirm"));
-        assertThat(message).doesNotContain("pass123");
+    void filterWithBrokenJSON() {
+        var param = new JSONLogParam(null, null);
+        var value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass12";
+        assertThat(param.filter(value, Set.of("password", "passwordConfirm"))).doesNotContain("pass123");
 
         value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\"";
-        param = param(value);
-        message = param.filter(Set.of("password", "passwordConfirm"));
-        assertThat(message).doesNotContain("pass123");
+        assertThat(param.filter(value, Set.of("password", "passwordConfirm"))).doesNotContain("pass123");
     }
 
-    private LogParam param(String value) {
-        return new JSONLogParam(Strings.bytes(value), StandardCharsets.UTF_8);
+    @Test
+    void append() {
+        var param = new JSONLogParam(Strings.bytes("message1234567890"), UTF_8);
+        var builder = new StringBuilder();
+        param.append(builder, Set.of(), 10);
+        assertThat(builder.toString()).isEqualTo("message12...(truncated)");
+
+        builder = new StringBuilder();
+        param.append(builder, Set.of());
+        assertThat(builder.toString()).isEqualTo("message1234567890");
+    }
+
+    @Test
+    void appendWithMask() {
+        var param = new JSONLogParam(Strings.bytes("{\"field1\":\"value1\",\"password\":\"pass123\",\"field2\":\"value2\"}"), UTF_8);
+        var builder = new StringBuilder();
+        param.append(builder, Set.of("password", "passwordConfirm"), 50);
+        assertThat(builder.toString())
+                .isEqualTo("{\"field1\":\"value1\",\"password\":\"******\",\"field2\":\"...(truncated)");
     }
 }

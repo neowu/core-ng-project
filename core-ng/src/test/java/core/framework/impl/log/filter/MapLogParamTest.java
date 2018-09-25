@@ -12,9 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class MapLogParamTest {
     @Test
-    void filter() {
+    void append() {
         var param = new MapLogParam(Map.of("SessionId", "123", "key1", "value1"));
-        String message = param.filter(Set.of("SessionId"));
-        assertThat(message).contains("SessionId=******").contains("key1=value1");
+        var builder = new StringBuilder();
+        param.append(builder, Set.of("SessionId"));
+        assertThat(builder.toString()).contains("SessionId=******").contains("key1=value1");
     }
 }

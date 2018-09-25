@@ -31,17 +31,6 @@ final class LogEvent {
         this.exception = exception;
     }
 
-    void trace(StringBuilder builder, long startTime, LogFilter filter) {
-        appendDuration(builder, time - startTime);
-        builder.append(' ');
-        if (level != LogLevel.DEBUG) builder.append(level.name()).append(' ');
-        builder.append(logger)
-               .append(" - ");
-        if (marker != null) builder.append('[').append(marker.getName()).append("] ");
-        builder.append(filter.format(message, arguments)).append(System.lineSeparator());
-        if (exception != null) builder.append(Exceptions.stackTrace(exception));
-    }
-
     String message() {  // only be called for error message, it assumes warn/error message won't contains sensitive data which should not be logged as warn/error in first place
         if (arguments == null || arguments.length == 0) return message;
         return Strings.format(message, arguments);
@@ -56,9 +45,7 @@ final class LogEvent {
         Instant now = Instant.now();
         var builder = new StringBuilder(256);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(now))
-               .append(" [")
-               .append(Thread.currentThread().getName())
-               .append("] ")
+               .append(" [").append(Thread.currentThread().getName()).append("] ")
                .append(level.name())
                .append(' ')
                .append(logger)
@@ -67,6 +54,18 @@ final class LogEvent {
         builder.append(message()).append(System.lineSeparator());
         if (exception != null) builder.append(Exceptions.stackTrace(exception));
         return builder.toString();
+    }
+
+    void appendTrace(StringBuilder builder, long startTime, LogFilter filter) {
+        appendDuration(builder, time - startTime);
+        builder.append(' ');
+        if (level != LogLevel.DEBUG) builder.append(level.name()).append(' ');
+        builder.append(logger)
+               .append(" - ");
+        if (marker != null) builder.append('[').append(marker.getName()).append("] ");
+        filter.appendFormat(builder, message, arguments);
+        builder.append(System.lineSeparator());
+        if (exception != null) builder.append(Exceptions.stackTrace(exception));
     }
 
     void appendDuration(StringBuilder builder, long durationInNanos) {

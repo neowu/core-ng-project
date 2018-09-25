@@ -41,7 +41,7 @@ public class MessageFactory {
     static String trace(ActionLog log, LogFilter filter, int maxLength) {
         var builder = new StringBuilder(log.events.size() << 7);  // length * 128 as rough initial capacity
         for (LogEvent event : log.events) {
-            event.trace(builder, log.startTime, filter);
+            event.appendTrace(builder, log.startTime, filter);
             if (builder.length() >= maxLength) {
                 builder.setLength(maxLength);
                 builder.append("...(truncated)");

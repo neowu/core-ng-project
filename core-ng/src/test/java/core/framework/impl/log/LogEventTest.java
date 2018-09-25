@@ -13,15 +13,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class LogEventTest {
     @Test
-    void trace() {
+    void appendTrace() {
         var event = new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message-{}", new Object[]{1}, new Error());
         var builder = new StringBuilder();
-        event.trace(builder, System.nanoTime(), new LogFilter());
+        event.appendTrace(builder, System.nanoTime(), new LogFilter());
         assertThat(builder.toString()).contains("WARN logger - [ERROR_CODE] message-1");
 
         builder = new StringBuilder();
         event = new LogEvent("logger", null, LogLevel.DEBUG, "message", null, null);
-        event.trace(builder, System.nanoTime(), new LogFilter());
+        event.appendTrace(builder, System.nanoTime(), new LogFilter());
         assertThat(builder.toString()).contains("logger - message");
     }
 

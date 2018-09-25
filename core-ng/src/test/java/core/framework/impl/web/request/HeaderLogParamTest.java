@@ -13,26 +13,32 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class HeaderLogParamTest {
     @Test
-    void filterWithMask() {
+    void appendWithMask() {
         var headers = new HeaderMap();
         HttpString name = new HttpString("SessionId");
         headers.put(name, "value");
 
         var param = new HeaderLogParam(name, headers.get(name));
-        assertThat(param.filter(Set.of("SessionId"))).isEqualTo("******");
+        var builder = new StringBuilder();
+        param.append(builder, Set.of("SessionId"));
+        assertThat(builder.toString()).isEqualTo("******");
     }
 
     @Test
-    void filter() {
+    void append() {
         var headers = new HeaderMap();
         HttpString name = new HttpString("client-id");
 
         headers.put(name, "client1");
-        assertThat(new HeaderLogParam(name, headers.get(name)).filter(Set.of()))
-                .isEqualTo("client1");
+        var builder = new StringBuilder();
+        var param = new HeaderLogParam(name, headers.get(name));
+        param.append(builder, Set.of());
+        assertThat(builder.toString()).isEqualTo("client1");
 
         headers.add(name, "client2");
-        assertThat(new HeaderLogParam(name, headers.get(name)).filter(Set.of()))
-                .isEqualTo("[client1, client2]");
+        builder = new StringBuilder();
+        param = new HeaderLogParam(name, headers.get(name));
+        param.append(builder, Set.of());
+        assertThat(builder.toString()).isEqualTo("[client1, client2]");
     }
 }

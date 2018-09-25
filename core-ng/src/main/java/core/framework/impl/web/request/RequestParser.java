@@ -202,7 +202,7 @@ public final class RequestParser {
         if (!queryString.isEmpty()) builder.append('?').append(queryString);
 
         String requestURL = builder.toString();
-        if (requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(format("requestURL is too long, requestURL={}...(truncated)", Strings.truncate(requestURL, 50)), "INVALID_HTTP_REQUEST");
+        if (requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(format("requestURL is too long, requestURL={}...(truncated)", requestURL.substring(0, 50)), "INVALID_HTTP_REQUEST");
         return requestURL;
     }
 }

@@ -1,12 +1,15 @@
 package core.framework.impl.db;
 
+import core.framework.impl.log.filter.LogParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 /**
  * @author neo
  */
-class SQLParams {
+class SQLParams implements LogParam {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLParams.class);
 
     static String value(Object param, EnumDBMapper mapper) {
@@ -30,14 +33,17 @@ class SQLParams {
     }
 
     @Override
-    public String toString() {
-        if (params == null) return "null";
-        var builder = new StringBuilder().append('[');
-        int length = params.length;
-        for (int i = 0; i < length; i++) {
-            if (i > 0) builder.append(", ");
-            builder.append(value(params[i], mapper));
+    public void append(StringBuilder builder, Set<String> maskedFields) {
+        if (params == null) {
+            builder.append("null");
+        } else {
+            builder.append('[');
+            int length = params.length;
+            for (int i = 0; i < length; i++) {
+                if (i > 0) builder.append(", ");
+                builder.append(value(params[i], mapper));
+            }
+            builder.append(']');
         }
-        return builder.append(']').toString();
     }
 }
