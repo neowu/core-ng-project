@@ -20,7 +20,7 @@ class SQLBatchParamsTest {
                 new Object[]{"param2", 2, TestEnum.V2},
                 new Object[]{"param3", 3, null}));
         var builder = new StringBuilder();
-        params.append(builder, Set.of());
+        params.append(builder, Set.of(), 10000);
 
         assertThat(builder.toString())
                 .isEqualTo("[[param1, 1, DB_V1], [param2, 2, DB_V2], [param3, 3, null]]");
@@ -32,7 +32,7 @@ class SQLBatchParamsTest {
                 new Object[]{"param2", 2},
                 new Object[]{"param3", 3}));
         var builder = new StringBuilder();
-        params.append(builder, 10);
+        params.append(builder, Set.of(), 10);
         assertThat(builder.toString())
                 .hasSize(10 + "...(truncated)".length())
                 .isEqualTo("[[param1, ...(truncated)");

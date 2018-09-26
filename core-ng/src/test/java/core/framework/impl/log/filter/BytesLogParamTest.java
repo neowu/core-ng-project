@@ -3,6 +3,8 @@ package core.framework.impl.log.filter;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -10,10 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class BytesLogParamTest {
     @Test
-    void appendTruncatedValue() {
+    void appendTruncation() {
         var param = new BytesLogParam(Strings.bytes("text-♥"));
         var builder = new StringBuilder();
-        param.append(builder, 6);
+        param.append(builder, Set.of(), 6);
 
         assertThat(builder.toString()).isEqualTo("text-...(truncated)");
     }
@@ -22,7 +24,7 @@ class BytesLogParamTest {
     void appendNull() {
         var param = new BytesLogParam(null);
         var builder = new StringBuilder();
-        param.append(builder, 6);
+        param.append(builder, Set.of(), 6);
 
         assertThat(builder.toString()).isEqualTo("null");
     }
@@ -31,7 +33,7 @@ class BytesLogParamTest {
     void append() {
         var param = new BytesLogParam(Strings.bytes("value"));
         var builder = new StringBuilder();
-        param.append(builder, 10);
+        param.append(builder, Set.of(), 10);
 
         assertThat(builder.toString()).isEqualTo("value");
     }

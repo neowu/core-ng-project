@@ -53,7 +53,7 @@ class JSONLogParamTest {
         assertThat(builder.toString()).isEqualTo("message12...(truncated)");
 
         builder = new StringBuilder();
-        param.append(builder, Set.of());
+        param.append(builder, Set.of(), 1000);
         assertThat(builder.toString()).isEqualTo("message1234567890");
     }
 

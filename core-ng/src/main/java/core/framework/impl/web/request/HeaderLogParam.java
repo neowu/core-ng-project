@@ -20,7 +20,7 @@ class HeaderLogParam implements LogParam {
     }
 
     @Override
-    public void append(StringBuilder builder, Set<String> maskedFields) {
+    public void append(StringBuilder builder, Set<String> maskedFields, int maxParamLength) {
         if (maskedFields.contains(header.toString())) {
             builder.append("******");
         } else if (values.size() == 1) {

@@ -16,20 +16,16 @@ public class JSONLogParam implements LogParam {
     }
 
     @Override
-    public void append(StringBuilder builder, Set<String> maskedFields) {
-        append(builder, maskedFields, MAX_PARAM_LENGTH);
-    }
-
-    void append(StringBuilder builder, Set<String> maskedFields, int maxLength) {
+    public void append(StringBuilder builder, Set<String> maskedFields, int maxParamLength) {
         boolean truncate = false;
         String value;
-        if (bytes.length > maxLength) {
-            value = new String(bytes, 0, maxLength, charset);
+        if (bytes.length > maxParamLength) {
+            value = new String(bytes, 0, maxParamLength, charset);
             truncate = true;
         } else {
             value = new String(bytes, charset);
         }
-        if (needMask(value, maskedFields)) {
+        if (shouldMask(value, maskedFields)) {
             builder.append(filter(value, maskedFields));
         } else {
             if (truncate) {
@@ -78,7 +74,7 @@ public class JSONLogParam implements LogParam {
         return null;
     }
 
-    private boolean needMask(String value, Set<String> maskedFields) {
+    private boolean shouldMask(String value, Set<String> maskedFields) {
         for (String maskedField : maskedFields) {
             int index = value.indexOf('\"' + maskedField + '\"');
             if (index >= 0) return true;

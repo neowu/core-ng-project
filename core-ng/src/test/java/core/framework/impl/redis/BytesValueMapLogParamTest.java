@@ -17,7 +17,7 @@ class BytesValueMapLogParamTest {
     void append() {
         var param = new BytesValueMapLogParam(Map.of("k1", bytes("v1"), "k2", bytes("v2")));
         var builder = new StringBuilder();
-        param.append(builder, Set.of());
+        param.append(builder, Set.of(), 1000);
         assertThat(builder.toString())
                 .contains("k1=v1")
                 .contains("k2=v2");
@@ -31,7 +31,7 @@ class BytesValueMapLogParamTest {
 
         var param = new BytesValueMapLogParam(values);
         var builder = new StringBuilder();
-        param.append(builder, 5);
+        param.append(builder, Set.of(), 5);
         assertThat(builder.toString())
                 .isEqualTo("{k1=v...(truncated)");
     }

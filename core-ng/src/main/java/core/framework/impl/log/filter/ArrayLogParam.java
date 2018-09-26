@@ -13,11 +13,8 @@ public class ArrayLogParam implements LogParam {
     }
 
     @Override
-    public void append(StringBuilder builder, Set<String> maskedFields) {
-        append(builder, builder.length() + MAX_PARAM_LENGTH);
-    }
-
-    void append(StringBuilder builder, int maxLength) {
+    public void append(StringBuilder builder, Set<String> maskedFields, int maxParamLength) {
+        int maxLength = builder.length() + maxParamLength;
         builder.append('[');
         for (int i = 0; i < values.length; i++) {
             String value = values[i];

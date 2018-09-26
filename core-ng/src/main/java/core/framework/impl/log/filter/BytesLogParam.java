@@ -15,15 +15,11 @@ public class BytesLogParam implements LogParam {
     }
 
     @Override
-    public void append(StringBuilder builder, Set<String> maskedFields) {
-        append(builder, MAX_PARAM_LENGTH);
-    }
-
-    void append(StringBuilder builder, int maxLength) {
+    public void append(StringBuilder builder, Set<String> maskedFields, int maxParamLength) {
         if (bytes == null) {
             builder.append("null");
-        } else if (bytes.length > maxLength) {
-            var value = new String(bytes, 0, maxLength, UTF_8);
+        } else if (bytes.length > maxParamLength) {
+            var value = new String(bytes, 0, maxParamLength, UTF_8);
             builder.append(value, 0, value.length() - 1);   // not use last char as can be cut off bytes
             builder.append("...(truncated)");
         } else {

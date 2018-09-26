@@ -16,7 +16,7 @@ class MapLogParamTest {
     void append() {
         var param = new MapLogParam(Map.of("SessionId", "123", "key1", "value1"));
         var builder = new StringBuilder();
-        param.append(builder, Set.of("SessionId"));
+        param.append(builder, Set.of("SessionId"), 1000);
         assertThat(builder.toString()).contains("SessionId=******").contains("key1=value1");
     }
 

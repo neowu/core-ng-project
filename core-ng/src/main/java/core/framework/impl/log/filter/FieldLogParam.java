@@ -15,7 +15,7 @@ public class FieldLogParam implements LogParam {
     }
 
     @Override
-    public void append(StringBuilder builder, Set<String> maskedFields) {
+    public void append(StringBuilder builder, Set<String> maskedFields, int maxParamLength) {
         if (maskedFields.contains(field)) {
             builder.append("******");
         } else {

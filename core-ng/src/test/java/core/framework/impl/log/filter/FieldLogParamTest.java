@@ -15,11 +15,11 @@ class FieldLogParamTest {
         var param = new FieldLogParam("SessionId", "value");
 
         var builder = new StringBuilder();
-        param.append(builder, Set.of("SessionId"));
+        param.append(builder, Set.of("SessionId"), 1000);
         assertThat(builder.toString()).isNotEqualTo("value");
 
         builder = new StringBuilder();
-        param.append(builder, Set.of());
+        param.append(builder, Set.of(), 1000);
         assertThat(builder.toString()).isEqualTo("value");
     }
 }

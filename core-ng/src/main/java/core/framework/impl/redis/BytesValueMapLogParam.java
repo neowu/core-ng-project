@@ -18,11 +18,8 @@ class BytesValueMapLogParam implements LogParam {
     }
 
     @Override
-    public void append(StringBuilder builder, Set<String> maskedFields) {
-        append(builder, builder.length() + MAX_PARAM_LENGTH);
-    }
-
-    void append(StringBuilder builder, int maxLength) {
+    public void append(StringBuilder builder, Set<String> maskedFields, int maxParamLength) {
+        int maxLength = builder.length() + maxParamLength;
         builder.append('{');
         int index = 0;
         for (Map.Entry<String, byte[]> entry : values.entrySet()) {

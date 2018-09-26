@@ -14,7 +14,7 @@ class ArrayLogParamTest {
     void append() {
         var param = new ArrayLogParam("1", "2", "3");
         var builder = new StringBuilder();
-        param.append(builder, Set.of());
+        param.append(builder, Set.of(), 1000);
         assertThat(builder.toString())
                 .isEqualTo("[1, 2, 3]");
     }
@@ -23,7 +23,7 @@ class ArrayLogParamTest {
     void appendWithTruncation() {
         var param = new ArrayLogParam("1", "2", "3");
         var builder = new StringBuilder();
-        param.append(builder, 5);
+        param.append(builder, Set.of(), 5);
         assertThat(builder.toString())
                 .isEqualTo("[1, 2...(truncated)");
     }

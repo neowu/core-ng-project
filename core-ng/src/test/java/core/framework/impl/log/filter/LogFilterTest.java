@@ -19,49 +19,49 @@ class LogFilterTest {
     }
 
     @Test
-    void appendFormatWithNullMessage() {
+    void appendWithNullMessage() {
         var builder = new StringBuilder();
-        filter.appendFormat(builder, null, 1, 2, 3);
+        filter.append(builder, null, 1, 2, 3);
         assertThat(builder.toString()).isEqualTo("null");
     }
 
     @Test
-    void appendFormatWithNullArguments() {
+    void appendWithNullArguments() {
         var builder = new StringBuilder();
-        filter.appendFormat(builder, "message", (Object[]) null);
+        filter.append(builder, "message", (Object[]) null);
         assertThat(builder.toString()).isEqualTo("message");
     }
 
     @Test
-    void appendFormatWithRedundantArguments() {
+    void appendWithRedundantArguments() {
         var builder = new StringBuilder();
-        filter.appendFormat(builder, "message-{}-{}", 1, 2, 3, 4);
+        filter.append(builder, "message-{}-{}", 1, 2, 3, 4);
         assertThat(builder.toString()).isEqualTo("message-1-2");
     }
 
     @Test
-    void appendFormatWithLessArguments() {
+    void appendWithLessArguments() {
         var builder = new StringBuilder();
-        filter.appendFormat(builder, "message-{}-{}", 1);
+        filter.append(builder, "message-{}-{}", 1);
         assertThat(builder.toString()).isEqualTo("message-1-{}");
 
         builder = new StringBuilder();
-        filter.appendFormat(builder, "message-{}-{}");
+        filter.append(builder, "message-{}-{}");
         assertThat(builder.toString()).isEqualTo("message-{}-{}");
     }
 
     @Test
-    void appendFormat() {
+    void append() {
         var builder = new StringBuilder();
-        filter.appendFormat(builder, "{}", 1);
+        filter.append(builder, "{}", 1);
         assertThat(builder.toString()).isEqualTo("1");
 
         builder = new StringBuilder();
-        filter.appendFormat(builder, "{}-text", 1);
+        filter.append(builder, "{}-text", 1);
         assertThat(builder.toString()).isEqualTo("1-text");
 
         builder = new StringBuilder();
-        filter.appendFormat(builder, "message, null={}, object={}, map={}, object[]={}, int[]={}, boolean[]={}, char[]={}", null,
+        filter.append(builder, "message, null={}, object={}, map={}, object[]={}, int[]={}, boolean[]={}, char[]={}", null,
                 "string",
                 Map.of("key", "value"),
                 new Object[]{1, "string", null},

@@ -41,7 +41,7 @@ final class LogEvent {
     }
 
     String info() {   // it assumes info/warn/error message doesn't contains sensitive data which should not in first place
-        Instant now = Instant.now();
+        var now = Instant.now();
         var builder = new StringBuilder(256);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(now))
                .append(" [").append(Thread.currentThread().getName()).append("] ")
@@ -62,7 +62,7 @@ final class LogEvent {
         builder.append(logger)
                .append(" - ");
         if (marker != null) builder.append('[').append(marker.getName()).append("] ");
-        filter.appendFormat(builder, message, arguments);
+        filter.append(builder, message, arguments);
         builder.append(System.lineSeparator());
         if (exception != null) builder.append(Exceptions.stackTrace(exception));
     }

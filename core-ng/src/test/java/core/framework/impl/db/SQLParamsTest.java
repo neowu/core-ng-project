@@ -18,7 +18,7 @@ class SQLParamsTest {
 
         var params = new SQLParams(mapper, "String", 1, TestEnum.V2, LocalDate.of(2018, 6, 1));
         var builder = new StringBuilder();
-        params.append(builder, Set.of());
+        params.append(builder, Set.of(), 1000);
         assertThat(builder.toString())
                 .isEqualTo("[String, 1, DB_V2, 2018-06-01]");
     }
@@ -27,7 +27,7 @@ class SQLParamsTest {
     void appendWithUnregisteredEnum() {
         var params = new SQLParams(new EnumDBMapper(), TestEnum.V1);
         var builder = new StringBuilder();
-        params.append(builder, Set.of());
+        params.append(builder, Set.of(), 1000);
         assertThat(builder.toString())
                 .isEqualTo("[V1]");
     }
@@ -36,7 +36,7 @@ class SQLParamsTest {
     void appendWithEmpty() {
         var params = new SQLParams(null);
         var builder = new StringBuilder();
-        params.append(builder, Set.of());
+        params.append(builder, Set.of(), 1000);
         assertThat(builder.toString()).isEqualTo("[]");
     }
 
@@ -44,7 +44,7 @@ class SQLParamsTest {
     void appendWithNull() {
         var params = new SQLParams(null, (Object[]) null);
         var builder = new StringBuilder();
-        params.append(builder, Set.of());
+        params.append(builder, Set.of(), 1000);
         assertThat(builder.toString())
                 .isEqualTo("null");
     }

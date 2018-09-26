@@ -20,7 +20,7 @@ class HeaderLogParamTest {
 
         var param = new HeaderLogParam(name, headers.get(name));
         var builder = new StringBuilder();
-        param.append(builder, Set.of("SessionId"));
+        param.append(builder, Set.of("SessionId"), 1000);
         assertThat(builder.toString()).isEqualTo("******");
     }
 
@@ -32,13 +32,13 @@ class HeaderLogParamTest {
         headers.put(name, "client1");
         var builder = new StringBuilder();
         var param = new HeaderLogParam(name, headers.get(name));
-        param.append(builder, Set.of());
+        param.append(builder, Set.of(), 1000);
         assertThat(builder.toString()).isEqualTo("client1");
 
         headers.add(name, "client2");
         builder = new StringBuilder();
         param = new HeaderLogParam(name, headers.get(name));
-        param.append(builder, Set.of());
+        param.append(builder, Set.of(), 1000);
         assertThat(builder.toString()).isEqualTo("[client1, client2]");
     }
 }

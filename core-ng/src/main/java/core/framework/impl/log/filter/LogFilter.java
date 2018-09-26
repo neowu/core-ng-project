@@ -9,9 +9,10 @@ import java.util.Set;
  * @author neo
  */
 public class LogFilter {
+    private static final int MAX_PARAM_LENGTH = 10000; // limit long param string to 10k
     public final Set<String> maskedFields = Sets.newHashSet();
 
-    public void appendFormat(StringBuilder builder, String message, Object... arguments) {
+    public void append(StringBuilder builder, String message, Object... arguments) {
         if (message == null || arguments == null) {
             builder.append(message);
             return;
@@ -39,17 +40,16 @@ public class LogFilter {
             return;
         }
         if (argument instanceof LogParam) {
-            ((LogParam) argument).append(builder, maskedFields);
+            ((LogParam) argument).append(builder, maskedFields, MAX_PARAM_LENGTH);
             return;
         }
-
         String value;
         if (argument.getClass().isArray()) {
             value = arrayArgument(argument);
         } else {
             value = String.valueOf(argument);
         }
-        truncate(builder, value, LogParam.MAX_PARAM_LENGTH);
+        truncate(builder, value, MAX_PARAM_LENGTH);
     }
 
     private String arrayArgument(Object argument) {

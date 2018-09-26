@@ -19,7 +19,7 @@ class BsonLogParam implements LogParam {
     }
 
     @Override
-    public void append(StringBuilder builder, Set<String> maskedFields) {
+    public void append(StringBuilder builder, Set<String> maskedFields, int maxParamLength) {
         if (bson == null) {
             builder.append("null");
         } else {
