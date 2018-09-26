@@ -19,11 +19,10 @@ class SQLBatchParams implements LogParam {
 
     @Override
     public void append(StringBuilder builder, Set<String> maskedFields) {
-        append(builder, MAX_PARAM_LENGTH);
+        append(builder, builder.length() + MAX_PARAM_LENGTH);
     }
 
     void append(StringBuilder builder, int maxLength) {
-        int previousLength = builder.length();
         builder.append('[');
         int index = 0;
         for (Object[] batch : params) {
@@ -37,8 +36,8 @@ class SQLBatchParams implements LogParam {
             }
             builder.append(']');
 
-            if (builder.length() - previousLength >= maxLength) {
-                builder.setLength(previousLength + maxLength);
+            if (builder.length() >= maxLength) {
+                builder.setLength(maxLength);
                 builder.append("...(truncated)");
                 return;
             }
