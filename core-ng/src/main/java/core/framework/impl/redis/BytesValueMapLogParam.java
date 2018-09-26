@@ -19,6 +19,11 @@ class BytesValueMapLogParam implements LogParam {
 
     @Override
     public void append(StringBuilder builder, Set<String> maskedFields) {
+        append(builder, MAX_PARAM_LENGTH);
+    }
+
+    void append(StringBuilder builder, int maxLength) {
+        int previousLength = builder.length();
         builder.append('{');
         int index = 0;
         for (Map.Entry<String, byte[]> entry : values.entrySet()) {
@@ -26,6 +31,13 @@ class BytesValueMapLogParam implements LogParam {
             builder.append(entry.getKey())
                    .append('=')
                    .append(new String(entry.getValue(), UTF_8));
+
+            if (builder.length() - previousLength >= maxLength) {
+                builder.setLength(previousLength + maxLength);
+                builder.append("...(truncated)");
+                return;
+            }
+
             index++;
         }
         builder.append('}');

@@ -1,5 +1,7 @@
 package core.framework.impl.redis;
 
+import core.framework.impl.log.filter.ArrayLogParam;
+import core.framework.impl.log.filter.MapLogParam;
 import core.framework.impl.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisHash;
@@ -129,7 +131,7 @@ public final class RedisHashImpl implements RedisHash {
             long elapsed = watch.elapsed();
             int size = values.size();
             ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("hmset, key={}, values={}, size={}, elapsed={}", key, values, size, elapsed);
+            logger.debug("hmset, key={}, values={}, size={}, elapsed={}", key, new MapLogParam(values), size, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
@@ -152,7 +154,7 @@ public final class RedisHashImpl implements RedisHash {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, (int) deletedFields);
-            logger.debug("hdel, key={}, fields={}, size={}, deletedFields={}, elapsed={}", key, fields, fields.length, deletedFields, elapsed);
+            logger.debug("hdel, key={}, fields={}, size={}, deletedFields={}, elapsed={}", key, new ArrayLogParam(fields), fields.length, deletedFields, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

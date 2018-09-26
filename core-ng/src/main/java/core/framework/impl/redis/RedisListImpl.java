@@ -1,5 +1,6 @@
 package core.framework.impl.redis;
 
+import core.framework.impl.log.filter.ArrayLogParam;
 import core.framework.impl.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisList;
@@ -67,7 +68,7 @@ public final class RedisListImpl implements RedisList {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, values.length);
-            logger.debug("rpush, key={}, values={}, size={}, elapsed={}", key, values, values.length, elapsed);
+            logger.debug("rpush, key={}, values={}, size={}, elapsed={}", key, new ArrayLogParam(values), values.length, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

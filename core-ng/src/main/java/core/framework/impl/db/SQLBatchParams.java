@@ -37,9 +37,8 @@ class SQLBatchParams implements LogParam {
             }
             builder.append(']');
 
-            int appendedLength = builder.length() - previousLength;
-            if (appendedLength >= maxLength) {
-                builder.setLength(appendedLength);
+            if (builder.length() - previousLength >= maxLength) {
+                builder.setLength(previousLength + maxLength);
                 builder.append("...(truncated)");
                 return;
             }

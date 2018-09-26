@@ -34,6 +34,7 @@ class SQLBatchParamsTest {
         var builder = new StringBuilder();
         params.append(builder, 10);
         assertThat(builder.toString())
-                .isEqualTo("[[param1, 1]...(truncated)");
+                .hasSize(10 + "...(truncated)".length())
+                .isEqualTo("[[param1, ...(truncated)");
     }
 }

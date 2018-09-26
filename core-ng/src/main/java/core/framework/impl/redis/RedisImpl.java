@@ -1,6 +1,8 @@
 package core.framework.impl.redis;
 
+import core.framework.impl.log.filter.ArrayLogParam;
 import core.framework.impl.log.filter.BytesLogParam;
+import core.framework.impl.log.filter.MapLogParam;
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
 import core.framework.log.ActionLogContext;
@@ -188,7 +190,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, (int) deletedKeys);
-            logger.debug("del, keys={}, size={}, deletedKeys={}, elapsed={}", keys, keys.length, deletedKeys, elapsed);
+            logger.debug("del, keys={}, size={}, deletedKeys={}, elapsed={}", new ArrayLogParam(keys), keys.length, deletedKeys, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -246,7 +248,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, values.size(), 0);
-            logger.debug("mget, keys={}, size={}, returnedValues={}, elapsed={}", keys, keys.length, new BytesValueMapLogParam(values), elapsed);
+            logger.debug("mget, keys={}, size={}, returnedValues={}, elapsed={}", new ArrayLogParam(keys), keys.length, new BytesValueMapLogParam(values), elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -274,7 +276,7 @@ public final class RedisImpl implements Redis {
             long elapsed = watch.elapsed();
             int size = values.size();
             ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("mset, values={}, size={}, elapsed={}", values, size, elapsed);
+            logger.debug("mset, values={}, size={}, elapsed={}", new MapLogParam(values), size, elapsed);
             checkSlowOperation(elapsed);
         }
     }

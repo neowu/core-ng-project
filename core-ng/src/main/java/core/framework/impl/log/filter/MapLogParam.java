@@ -15,6 +15,11 @@ public class MapLogParam implements LogParam {
 
     @Override
     public void append(StringBuilder builder, Set<String> maskedFields) {
+        append(builder, maskedFields, MAX_PARAM_LENGTH);
+    }
+
+    void append(StringBuilder builder, Set<String> maskedFields, int maxLength) {
+        int previousLength = builder.length();
         builder.append('{');
         int index = 0;
         for (Map.Entry<String, String> entry : values.entrySet()) {
@@ -24,6 +29,12 @@ public class MapLogParam implements LogParam {
 
             if (maskedFields.contains(key)) builder.append("******");
             else builder.append(entry.getValue());
+
+            if (builder.length() - previousLength >= maxLength) {
+                builder.setLength(previousLength + maxLength);
+                builder.append("...(truncated)");
+                return;
+            }
 
             index++;
         }

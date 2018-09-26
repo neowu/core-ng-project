@@ -1,5 +1,6 @@
 package core.framework.impl.redis;
 
+import core.framework.impl.log.filter.ArrayLogParam;
 import core.framework.impl.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisSet;
@@ -48,7 +49,7 @@ public final class RedisSetImpl implements RedisSet {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, (int) addedValues);
-            logger.debug("sadd, key={}, values={}, size={}, elapsed={}", key, values, values.length, elapsed);
+            logger.debug("sadd, key={}, values={}, size={}, elapsed={}", key, new ArrayLogParam(values), values.length, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
@@ -121,7 +122,7 @@ public final class RedisSetImpl implements RedisSet {
             long elapsed = watch.elapsed();
             int size = values.length;
             ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("srem, key={}, values={}, size={}, removedValues={}, elapsed={}", key, values, size, removedValues, elapsed);
+            logger.debug("srem, key={}, values={}, size={}, removedValues={}, elapsed={}", key, new ArrayLogParam(values), size, removedValues, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
