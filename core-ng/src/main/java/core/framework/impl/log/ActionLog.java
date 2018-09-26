@@ -1,6 +1,7 @@
 package core.framework.impl.log;
 
 import core.framework.impl.log.message.PerformanceStat;
+import core.framework.util.Strings;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -69,10 +70,10 @@ public final class ActionLog {
     void process(LogEvent event) {
         if (event.level.value > result.value) {
             result = event.level;
-            errorCode = event.errorCode(); // only update error type/message if level raised, so error type will be first WARN or first ERROR
-            errorMessage = errorMessage(event);
+            errorCode = event.errorCode();      // only update errorCode/message if level raised, so errorCode will be first WARN or ERROR
+            errorMessage = Strings.truncate(event.message(), MAX_ERROR_MESSAGE_LENGTH);     // limit error message length in action log
         }
-        if (event.level.value >= WARN.value || events.size() < MAX_TRACE_HOLD_SIZE) {  // after reach max holding lines, only add warning/error events
+        if (event.level.value >= WARN.value || events.size() < MAX_TRACE_HOLD_SIZE) {       // after reach max holding lines, only add warning/error events
             add(event);
         }
     }
@@ -97,13 +98,6 @@ public final class ActionLog {
 
     private LogEvent event(String message, Object... arguments) {
         return new LogEvent(LOGGER, null, DEBUG, message, arguments, null);
-    }
-
-    private String errorMessage(LogEvent event) {
-        String message = event.message();
-        if (message != null && message.length() > MAX_ERROR_MESSAGE_LENGTH)
-            return message.substring(0, MAX_ERROR_MESSAGE_LENGTH);    // limit error message length in action log
-        return message;
     }
 
     String result() {

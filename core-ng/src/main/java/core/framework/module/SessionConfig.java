@@ -22,7 +22,7 @@ public class SessionConfig extends Config {
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
-        context.logManager.filter.maskedFields.add(context.httpServer.siteManager.sessionManager.sessionId.name);
+        context.logManager.maskFields(context.httpServer.siteManager.sessionManager.sessionId.name);
     }
 
     public void timeout(Duration timeout) {
@@ -31,7 +31,7 @@ public class SessionConfig extends Config {
 
     public void cookie(String name, String domain) {
         context.httpServer.siteManager.sessionManager.cookie(name, domain);
-        context.logManager.filter.maskedFields.add(name);
+        context.logManager.maskFields(name);
     }
 
     public void local() {

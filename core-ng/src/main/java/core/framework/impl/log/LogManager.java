@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
+import java.util.Collections;
+
 /**
  * @author neo
  */
@@ -15,7 +17,9 @@ public class LogManager {
     public static final ThreadLocal<ActionLog> CURRENT_ACTION_LOG = new ThreadLocal<>();
     public static final String APP_NAME;
 
+    static final LogFilter FILTER = new LogFilter();
     static final IdGenerator ID_GENERATOR = new IdGenerator();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LogManager.class);
 
     static {
@@ -27,7 +31,6 @@ public class LogManager {
         APP_NAME = appName;
     }
 
-    public final LogFilter filter = new LogFilter();
     public Appender appender;
 
     public ActionLog begin(String message) {
@@ -43,7 +46,7 @@ public class LogManager {
 
         if (appender != null) {
             try {
-                appender.append(actionLog, filter);
+                appender.append(actionLog);
             } catch (Throwable e) {
                 LOGGER.warn("failed to append action log, error={}", e.getMessage(), e);
             }
@@ -63,5 +66,9 @@ public class LogManager {
 
     String errorCode(Throwable e) {
         return e instanceof ErrorCode ? ((ErrorCode) e).errorCode() : e.getClass().getCanonicalName();
+    }
+
+    public void maskFields(String... fields) {
+        Collections.addAll(FILTER.maskedFields, fields);
     }
 }

@@ -1,6 +1,5 @@
 package core.framework.impl.log;
 
-import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.impl.log.message.PerformanceStat;
 import core.framework.impl.log.message.StatMessage;
@@ -30,7 +29,7 @@ class MessageFactoryTest {
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
         log.track("db", 1000, 1, 2);
 
-        ActionLogMessage message = MessageFactory.actionLog(log, new LogFilter());
+        ActionLogMessage message = MessageFactory.actionLog(log);
 
         assertThat(message).isNotNull();
         assertThat(message.app).isEqualTo(LogManager.APP_NAME);
@@ -48,7 +47,7 @@ class MessageFactoryTest {
     @Test
     void trace() {
         var log = new ActionLog("begin");
-        String trace = MessageFactory.trace(log, new LogFilter(), 200);
+        String trace = MessageFactory.trace(log, 200);
         String suffix = "...(truncated)";
         assertThat(trace).hasSize(200 + suffix.length())
                          .contains("ActionLog - begin")

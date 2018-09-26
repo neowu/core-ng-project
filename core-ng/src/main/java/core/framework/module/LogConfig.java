@@ -9,7 +9,6 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 
 import java.time.Duration;
-import java.util.Collections;
 
 import static core.framework.util.Strings.format;
 
@@ -44,6 +43,6 @@ public class LogConfig extends Config {
     }
 
     public void maskFields(String... fields) {
-        Collections.addAll(context.logManager.filter.maskedFields, fields);
+        context.logManager.maskFields(fields);
     }
 }

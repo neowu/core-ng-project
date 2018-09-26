@@ -2,7 +2,6 @@ package core.framework.impl.log;
 
 import core.framework.impl.json.JSONWriter;
 import core.framework.impl.kafka.ProducerMetrics;
-import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.impl.log.message.LogTopics;
 import core.framework.impl.log.message.StatMessage;
@@ -92,8 +91,8 @@ public final class KafkaAppender implements Appender {
     }
 
     @Override
-    public void append(ActionLog log, LogFilter filter) {
-        ActionLogMessage message = MessageFactory.actionLog(log, filter);
+    public void append(ActionLog log) {
+        ActionLogMessage message = MessageFactory.actionLog(log);
         records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, Strings.bytes(message.id), actionLogWriter.toJSON(message)));
     }
 

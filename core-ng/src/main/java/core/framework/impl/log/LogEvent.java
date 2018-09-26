@@ -1,9 +1,7 @@
 package core.framework.impl.log;
 
-import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.marker.ErrorCodeMarker;
 import core.framework.util.Exceptions;
-import core.framework.util.Strings;
 import org.slf4j.Marker;
 
 import java.time.Instant;
@@ -31,8 +29,12 @@ final class LogEvent {
         this.exception = exception;
     }
 
-    String message() {  // only be called for error message, it assumes warn/error message won't contains sensitive data which should not be logged as warn/error in first place
-        return Strings.format(message, arguments);
+    String message() {  // only be called for error message
+        if (arguments == null || arguments.length == 0) return message;     // most of case, message is from exception, and without no arguments
+
+        var builder = new StringBuilder(256);
+        LogManager.FILTER.append(builder, message, arguments);
+        return builder.toString();
     }
 
     String errorCode() {
@@ -40,7 +42,7 @@ final class LogEvent {
         return null;
     }
 
-    String info() {   // it assumes info/warn/error message doesn't contains sensitive data which should not in first place
+    String info() {
         var now = Instant.now();
         var builder = new StringBuilder(256);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(now))
@@ -50,19 +52,20 @@ final class LogEvent {
                .append(logger)
                .append(" - ");
         if (marker != null) builder.append('[').append(marker.getName()).append("] ");
-        builder.append(message()).append(System.lineSeparator());
+        LogManager.FILTER.append(builder, message, arguments);
+        builder.append(System.lineSeparator());
         if (exception != null) builder.append(Exceptions.stackTrace(exception));
         return builder.toString();
     }
 
-    void appendTrace(StringBuilder builder, long startTime, LogFilter filter) {
+    void appendTrace(StringBuilder builder, long startTime) {
         appendDuration(builder, time - startTime);
         builder.append(' ');
         if (level != LogLevel.DEBUG) builder.append(level.name()).append(' ');
         builder.append(logger)
                .append(" - ");
         if (marker != null) builder.append('[').append(marker.getName()).append("] ");
-        filter.append(builder, message, arguments);
+        LogManager.FILTER.append(builder, message, arguments);
         builder.append(System.lineSeparator());
         if (exception != null) builder.append(Exceptions.stackTrace(exception));
     }

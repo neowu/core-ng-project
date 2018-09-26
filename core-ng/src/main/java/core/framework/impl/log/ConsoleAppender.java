@@ -1,6 +1,5 @@
 package core.framework.impl.log;
 
-import core.framework.impl.log.filter.LogFilter;
 import core.framework.impl.log.message.PerformanceStat;
 
 import java.io.PrintStream;
@@ -18,13 +17,13 @@ public final class ConsoleAppender implements Appender {
     private final PrintStream stderr = System.err;
 
     @Override
-    public void append(ActionLog log, LogFilter filter) {
+    public void append(ActionLog log) {
         stdout.println(message(log));
 
         if (log.flushTraceLog()) {
             var builder = new StringBuilder(256);
             for (LogEvent event : log.events) {
-                event.appendTrace(builder, log.startTime, filter);
+                event.appendTrace(builder, log.startTime);
                 stderr.print(builder.toString());
                 builder.setLength(0);
             }
