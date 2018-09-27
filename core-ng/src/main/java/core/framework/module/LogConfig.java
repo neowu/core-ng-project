@@ -1,6 +1,6 @@
 package core.framework.module;
 
-import core.framework.impl.log.Appender;
+import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.ConsoleAppender;
 import core.framework.impl.log.KafkaAppender;
 import core.framework.impl.log.stat.CollectStatTask;
@@ -9,6 +9,7 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 
 import java.time.Duration;
+import java.util.function.Consumer;
 
 import static core.framework.util.Strings.format;
 
@@ -37,7 +38,7 @@ public class LogConfig extends Config {
         context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(appender, context.stat), Duration.ofSeconds(10));
     }
 
-    private void setLogAppender(Appender appender) {
+    private void setLogAppender(Consumer<ActionLog> appender) {
         if (context.logManager.appender != null) throw new Error(format("log appender is already set, appender={}", context.logManager.appender.getClass().getSimpleName()));
         context.logManager.appender = appender;
     }

@@ -23,11 +23,12 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * @author neo
  */
-public final class KafkaAppender implements Appender {
+public final class KafkaAppender implements Consumer<ActionLog> {
     public final ProducerMetrics producerMetrics = new ProducerMetrics("log-forwarder");
     private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
     private final BlockingQueue<ProducerRecord<byte[], byte[]>> records = new LinkedBlockingQueue<>();
@@ -79,6 +80,12 @@ public final class KafkaAppender implements Appender {
         }, "log-forwarder");
     }
 
+    @Override
+    public void accept(ActionLog log) {
+        ActionLogMessage message = MessageFactory.actionLog(log);
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, Strings.bytes(message.id), actionLogWriter.toJSON(message)));
+    }
+
     public void start() {
         logForwarderThread.start();
     }
@@ -88,12 +95,6 @@ public final class KafkaAppender implements Appender {
         stop.set(true);
         logForwarderThread.interrupt();
         producer.close(timeoutInMs <= 0 ? 1000 : timeoutInMs, TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    public void append(ActionLog log) {
-        ActionLogMessage message = MessageFactory.actionLog(log);
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, Strings.bytes(message.id), actionLogWriter.toJSON(message)));
     }
 
     public void forward(Map<String, Double> stats) {

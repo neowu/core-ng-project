@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import java.util.Collections;
+import java.util.function.Consumer;
 
 /**
  * @author neo
@@ -31,7 +32,7 @@ public class LogManager {
         APP_NAME = appName;
     }
 
-    public Appender appender;
+    public Consumer<ActionLog> appender;
 
     public ActionLog begin(String message) {
         var actionLog = new ActionLog(message);
@@ -46,7 +47,7 @@ public class LogManager {
 
         if (appender != null) {
             try {
-                appender.append(actionLog);
+                appender.accept(actionLog);
             } catch (Throwable e) {
                 LOGGER.warn("failed to append action log, error={}", e.getMessage(), e);
             }

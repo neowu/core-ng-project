@@ -6,18 +6,19 @@ import java.io.PrintStream;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author neo
  */
-public final class ConsoleAppender implements Appender {
+public final class ConsoleAppender implements Consumer<ActionLog> {
     private static final String LOG_SPLITTER = " | ";
 
     private final PrintStream stdout = System.out;
     private final PrintStream stderr = System.err;
 
     @Override
-    public void append(ActionLog log) {
+    public void accept(ActionLog log) {
         stdout.println(message(log));
 
         if (log.flushTraceLog()) {
