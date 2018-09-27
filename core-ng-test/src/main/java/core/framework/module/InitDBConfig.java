@@ -4,9 +4,7 @@ import core.framework.db.Repository;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.test.db.EntitySchemaGenerator;
-import core.framework.test.db.SQLScriptRunner;
 import core.framework.test.module.TestModuleContext;
-import core.framework.util.ClasspathResources;
 import core.framework.util.Types;
 
 import java.util.List;
@@ -24,10 +22,6 @@ public final class InitDBConfig extends Config {
         this.context = (TestModuleContext) context;
         this.name = name;
         config = this.context.getConfig(DBConfig.class, name);
-    }
-
-    public void runScript(String scriptPath) {
-        new SQLScriptRunner(config.database, ClasspathResources.text(scriptPath)).run();
     }
 
     public void createSchema() {
