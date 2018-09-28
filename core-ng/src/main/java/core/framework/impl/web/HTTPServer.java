@@ -53,7 +53,8 @@ public class HTTPServer {
                    // set tcp idle timeout to 620s, by default AWS ALB uses 60s, GCloud LB uses 600s, since it is always deployed with LB, longer timeout doesn't hurt
                    // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
                    // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
-                   .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620 * 1000)
+                   .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620 * 1000)     // 620s
+                   .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10 * 1000)        // 10s
                    .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, 10L * 1024 * 1024);    // max post body is 10M
 
             server = builder.build();

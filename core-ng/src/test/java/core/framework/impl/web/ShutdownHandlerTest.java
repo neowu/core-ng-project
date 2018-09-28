@@ -1,6 +1,5 @@
 package core.framework.impl.web;
 
-import io.undertow.server.HttpServerExchange;
 import io.undertow.util.StatusCodes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,18 +13,18 @@ import static org.mockito.Mockito.verify;
  */
 class ShutdownHandlerTest {
     private ShutdownHandler handler;
-    private HttpServerExchange exchange;
+    private Exchange exchange;
 
     @BeforeEach
     void createShutdownHandler() {
-        exchange = mock(HttpServerExchange.class);
+        exchange = mock(Exchange.class);
         handler = new ShutdownHandler();
     }
 
     @Test
     void handle() {
         assertThat(handler.handle(exchange)).isFalse();
-        handler.exchangeEvent(exchange, () -> {
+        handler.exchangeEvent(null, () -> {
         });
         assertThat(handler.activeRequests).hasValue(0);
     }

@@ -35,7 +35,7 @@ public class HTTPIOHandler implements HttpHandler {
             return;
         }
 
-        boolean shutdown = shutdownHandler.handle(exchange);
+        boolean shutdown = shutdownHandler.handle(new Exchange(exchange));
         if (shutdown) return;
 
         if (hasBody(exchange)) {    // parse body early, not process until body is read (e.g. for chunked), to save one blocking thread during read

@@ -2,7 +2,6 @@ package core.framework.impl.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
-import core.framework.impl.validate.ValidationException;
 import core.framework.impl.web.bean.BeanMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.TestBean;
@@ -13,26 +12,18 @@ import io.undertow.server.handlers.CookieImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
 
 /**
  * @author neo
  */
 class RequestImplTest {
     private RequestImpl request;
-    private RequestBeanMapper mapper;
 
     @BeforeEach
     void createRequest() {
-        mapper = spy(new RequestBeanMapper(new BeanMapperRegistry()));
-        request = new RequestImpl(null, mapper);
+        request = new RequestImpl(null, new RequestBeanMapper(new BeanMapperRegistry()));
     }
 
     @Test
@@ -65,7 +56,6 @@ class RequestImplTest {
 
     @Test
     void beanWithValidationError() {
-        doThrow(new ValidationException(Map.of())).when(mapper).fromJSON(eq(TestBean.class), any());
         request.method = HTTPMethod.POST;
         request.contentType = ContentType.APPLICATION_JSON;
         request.body = Strings.bytes("{\"big_decimal_field\": 1}");

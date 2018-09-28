@@ -59,7 +59,7 @@ class MockRedisStore {
             return (Set<String>) value;
         }
 
-        private boolean expired(long now) {
+        boolean expired(long now) {
             return expirationTime != null && now >= expirationTime;
         }
     }
