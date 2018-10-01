@@ -1,5 +1,5 @@
 ## Change log
-### 6.8.6 (9/24/2018 - )    !!! only support java 11
+### 6.9.0 (9/24/2018 - )    !!! only support java 11
 * jdk: update to java 11 
 * log: internal tweaking, make logParam be aware of max param length, consume less memory with large trace log
 * db: removed test initDB().runScript(), since in real life we always prefer to use repository(), as refactor/entity typing/validation reason, script can still be achieved by calling database directly 
