@@ -5,7 +5,6 @@ import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
-import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -59,9 +58,8 @@ public class JSONClassValidator implements TypeVisitor {
             throw new Error(format("field must have @Property, field={}", Fields.path(field)));
 
         String name = property.name();
-
-        if (Strings.isEmpty(name)) {
-            throw new Error(format("@Property name attribute must not be empty, field={}", Fields.path(field)));
+        if (name.isBlank()) {
+            throw new Error(format("@Property name attribute must not be blank, field={}", Fields.path(field)));
         }
 
         boolean added = this.properties.computeIfAbsent(parentPath, key -> Sets.newHashSet()).add(name);

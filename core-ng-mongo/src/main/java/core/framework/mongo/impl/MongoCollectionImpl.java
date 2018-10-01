@@ -262,8 +262,8 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public <V> List<V> mapReduce(MapReduce<V> mapReduce) {
         var watch = new StopWatch();
-        if (Strings.isEmpty(mapReduce.mapFunction)) throw new Error("mapReduce.mapFunction must not be empty");
-        if (Strings.isEmpty(mapReduce.reduceFunction)) throw new Error("mapReduce.reduceFunction must not be empty");
+        if (Strings.isBlank(mapReduce.mapFunction)) throw new Error("mapReduce.mapFunction must not be blank");
+        if (Strings.isBlank(mapReduce.reduceFunction)) throw new Error("mapReduce.reduceFunction must not be blank");
         if (mapReduce.resultClass == null) throw new Error("mapReduce.resultClass must not be null");
 
         List<V> results = Lists.newArrayList();

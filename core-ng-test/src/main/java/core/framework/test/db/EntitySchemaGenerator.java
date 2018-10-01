@@ -68,7 +68,7 @@ public final class EntitySchemaGenerator {
 
             if (primaryKey != null) {
                 if (primaryKey.autoIncrement()) builder.append(" AUTO_INCREMENT");
-                if (!Strings.isEmpty(primaryKey.sequence())) {
+                if (!Strings.isBlank(primaryKey.sequence())) {
                     statements.add("CREATE SEQUENCE IF NOT EXISTS " + primaryKey.sequence());
                 }
                 primaryKeys.add(column.name());

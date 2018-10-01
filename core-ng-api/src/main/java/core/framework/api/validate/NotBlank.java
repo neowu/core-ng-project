@@ -7,13 +7,13 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * used for String field, to check string is not empty, be aware of null is not treated as empty,
- * this is to validate if the value presents, it must not be empty string
+ * used for String field, to check string is not blank, be aware of null is not treated as blank,
+ * this is to validate if the value presents, it must not be blank string
  *
  * @author neo
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface NotEmpty {
-    String message() default "field must not be empty";
+public @interface NotBlank {
+    String message() default "field must not be blank";
 }

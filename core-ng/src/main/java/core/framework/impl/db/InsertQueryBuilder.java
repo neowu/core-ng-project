@@ -57,7 +57,7 @@ class InsertQueryBuilder<T> {
                 if (primaryKey.autoIncrement()) {
                     generatedColumn = column.name();
                     continue;
-                } else if (!Strings.isEmpty(primaryKey.sequence())) {
+                } else if (!Strings.isBlank(primaryKey.sequence())) {
                     generatedColumn = column.name();
                     addColumn(builder, startLength, column.name());
                     addValue(valueClause, primaryKey.sequence() + ".NEXTVAL");

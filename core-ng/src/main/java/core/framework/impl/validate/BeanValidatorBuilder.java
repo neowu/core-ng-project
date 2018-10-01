@@ -3,7 +3,7 @@ package core.framework.impl.validate;
 import core.framework.api.validate.Length;
 import core.framework.api.validate.Max;
 import core.framework.api.validate.Min;
-import core.framework.api.validate.NotEmpty;
+import core.framework.api.validate.NotBlank;
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Pattern;
 import core.framework.api.validate.Size;
@@ -12,7 +12,6 @@ import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.reflect.GenericTypes;
-import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -125,8 +124,8 @@ public class BeanValidatorBuilder {
     }
 
     private void buildStringValidation(CodeBuilder builder, Field field, String pathLiteral) {
-        NotEmpty notEmpty = field.getDeclaredAnnotation(NotEmpty.class);
-        if (notEmpty != null) builder.indent(2).append("if ({}.isEmpty(bean.{})) errors.add({}, {});\n", type(Strings.class), field.getName(), pathLiteral, variable(notEmpty.message()));
+        NotBlank notBlank = field.getDeclaredAnnotation(NotBlank.class);
+        if (notBlank != null) builder.indent(2).append("if (bean.{}.isBlank()) errors.add({}, {});\n", field.getName(), pathLiteral, variable(notBlank.message()));
 
         Length length = field.getDeclaredAnnotation(Length.class);
         if (length != null) {
@@ -172,7 +171,7 @@ public class BeanValidatorBuilder {
 
     private boolean hasValidationAnnotation(Field field) {
         boolean hasAnnotation = field.isAnnotationPresent(NotNull.class)
-                || field.isAnnotationPresent(NotEmpty.class)
+                || field.isAnnotationPresent(NotBlank.class)
                 || field.isAnnotationPresent(Length.class)
                 || field.isAnnotationPresent(Max.class)
                 || field.isAnnotationPresent(Min.class)
@@ -212,9 +211,9 @@ public class BeanValidatorBuilder {
         if (size != null && !GenericTypes.isList(fieldType) && !GenericTypes.isMap(fieldType))
             throw new Error(format("@Size must on List<?> or Map<String, ?>, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
 
-        NotEmpty notEmpty = field.getDeclaredAnnotation(NotEmpty.class);
-        if (notEmpty != null && !String.class.equals(fieldType))
-            throw new Error(format("@NotEmpty must on String, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
+        NotBlank notBlank = field.getDeclaredAnnotation(NotBlank.class);
+        if (notBlank != null && !String.class.equals(fieldType))
+            throw new Error(format("@NotBlank must on String, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
 
         Length length = field.getDeclaredAnnotation(Length.class);
         if (length != null && !String.class.equals(fieldType))

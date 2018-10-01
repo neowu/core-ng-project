@@ -31,12 +31,12 @@ class StringsTest {
     }
 
     @Test
-    void isEmpty() {
-        assertThat(Strings.isEmpty("")).isTrue();
-        assertThat(Strings.isEmpty(" ")).isTrue();
+    void isBlank() {
+        assertThat(Strings.isBlank("")).isTrue();
+        assertThat(Strings.isBlank(" ")).isTrue();
 
-        assertThat(Strings.isEmpty("1")).isFalse();
-        assertThat(Strings.isEmpty(" 1")).isFalse();
+        assertThat(Strings.isBlank("1")).isFalse();
+        assertThat(Strings.isBlank(" 1")).isFalse();
     }
 
     @Test
@@ -58,5 +58,11 @@ class StringsTest {
 
         assertThat(Strings.format("{}")).isEqualTo("{}");
         assertThat(Strings.format("{}", (Object[]) null)).isEqualTo("{}");
+    }
+
+    @Test
+    void strip() {
+        assertThat(Strings.strip(null)).isNull();
+        assertThat(Strings.strip(" text ")).isEqualTo("text");
     }
 }

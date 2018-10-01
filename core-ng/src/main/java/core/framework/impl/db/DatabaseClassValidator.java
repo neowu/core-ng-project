@@ -104,7 +104,7 @@ final class DatabaseClassValidator implements TypeVisitor {
             }
         }
 
-        if (!Strings.isEmpty(primaryKey.sequence())) {
+        if (!Strings.isBlank(primaryKey.sequence())) {
             if (foundSequencePrimaryKey) throw new Error(format("db entity must not have more than one sequence primary key, field={}", Fields.path(field)));
             foundSequencePrimaryKey = true;
 

@@ -47,17 +47,17 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
     }
 
     public static Integer toInt(String value) {
-        if (Strings.isEmpty(value)) return null;
+        if (Strings.isBlank(value)) return null;
         return PathParamHelper.toInt(value);
     }
 
     public static Long toLong(String value) {
-        if (Strings.isEmpty(value)) return null;
+        if (Strings.isBlank(value)) return null;
         return PathParamHelper.toLong(value);
     }
 
     public static Double toDouble(String value) {
-        if (Strings.isEmpty(value)) return null;
+        if (Strings.isBlank(value)) return null;
         try {
             return Double.valueOf(value);
         } catch (NumberFormatException e) {
@@ -66,7 +66,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
     }
 
     public static BigDecimal toBigDecimal(String value) {
-        if (Strings.isEmpty(value)) return null;
+        if (Strings.isBlank(value)) return null;
         try {
             return new BigDecimal(value);
         } catch (NumberFormatException e) {
@@ -75,7 +75,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
     }
 
     public static Boolean toBoolean(String value) {
-        if (Strings.isEmpty(value)) return null;
+        if (Strings.isBlank(value)) return null;
         try {
             return Boolean.valueOf(value);
         } catch (NumberFormatException e) {
@@ -84,12 +84,12 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
     }
 
     public static <T extends Enum<?>> T toEnum(String value, Class<T> valueClass) {
-        if (Strings.isEmpty(value)) return null;
+        if (Strings.isBlank(value)) return null;
         return PathParamHelper.toEnum(value, valueClass);
     }
 
     public static ZonedDateTime toZonedDateTime(String value) {
-        if (Strings.isEmpty(value)) return null;
+        if (Strings.isBlank(value)) return null;
         try {
             return ZonedDateTime.parse(value, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         } catch (DateTimeParseException e) {
@@ -98,7 +98,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
     }
 
     public static LocalDateTime toDateTime(String value) {
-        if (Strings.isEmpty(value)) return null;
+        if (Strings.isBlank(value)) return null;
         try {
             return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         } catch (DateTimeParseException e) {
@@ -107,7 +107,7 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
     }
 
     public static LocalDate toDate(String value) {
-        if (Strings.isEmpty(value)) return null;
+        if (Strings.isBlank(value)) return null;
         try {
             return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE);
         } catch (DateTimeParseException e) {

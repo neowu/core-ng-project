@@ -18,12 +18,12 @@ public class PropertyManager {
     public Optional<String> property(String key) {
         String envVarName = envVarName(key);
         String value = System.getenv(envVarName);  // use env var to override property, e.g. under docker/kubenetes, SYS_HTTP_PORT to override sys.http.port
-        if (!Strings.isEmpty(value)) {
+        if (!Strings.isBlank(value)) {
             logger.info("found overridden property by env var {}, key={}, value={}", envVarName, key, maskValue(key, value));
             return Optional.of(value);
         }
         value = System.getProperty(key);     // use system property to override property, e.g. -Dsys.http.port=8080
-        if (!Strings.isEmpty(value)) {
+        if (!Strings.isBlank(value)) {
             logger.info("found overridden property by system property -D{}, key={}, value={}", key, key, maskValue(key, value));
             return Optional.of(value);
         }

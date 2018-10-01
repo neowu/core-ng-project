@@ -30,7 +30,7 @@ public class QueryImpl<T> implements Query<T> {
 
     @Override
     public void where(String condition, Object... params) {
-        if (Strings.isEmpty(condition)) throw new Error("condition must not be empty");
+        if (Strings.isBlank(condition)) throw new Error("condition must not be blank");
         if (whereClause.length() > 0) whereClause.append(" AND ");
         whereClause.append(condition);
         Collections.addAll(this.params, params);

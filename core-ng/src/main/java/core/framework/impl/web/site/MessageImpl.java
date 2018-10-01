@@ -102,7 +102,7 @@ public class MessageImpl implements Message {
         if (!matcher.matches())
             throw new Error(format("property path must match 'path/name_language.properties' pattern, path={}", path));
         String languagePostfix = matcher.group(1);
-        if (Strings.isEmpty(languagePostfix)) return DEFAULT_LANGUAGE;
+        if (Strings.isBlank(languagePostfix)) return DEFAULT_LANGUAGE;
         return languagePostfix.substring(1);
     }
 

@@ -11,7 +11,7 @@ public class ClientIPParser {
     public int maxForwardedIPs = 2;
 
     String parse(String remoteAddress, String xForwardedFor) {
-        if (Strings.isEmpty(xForwardedFor)) return remoteAddress;
+        if (Strings.isBlank(xForwardedFor)) return remoteAddress;
 
         int foundForwardedIPs = 1;
         int index = xForwardedFor.length() - 1;

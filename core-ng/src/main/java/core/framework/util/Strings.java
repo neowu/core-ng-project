@@ -25,13 +25,13 @@ public final class Strings {
         return text1.compareTo(text2);
     }
 
+    @Deprecated
     public static boolean isEmpty(String text) {
-        if (text == null) return true;
-        int length = text.length();
-        for (int i = 0; i < length; i++) {
-            if (!Character.isWhitespace(text.charAt(i))) return false;
-        }
-        return true;
+        return isBlank(text);
+    }
+
+    public static boolean isBlank(String text) {
+        return text == null || text.isBlank();
     }
 
     public static boolean equals(String text1, String text2) {
@@ -45,9 +45,9 @@ public final class Strings {
         return text.substring(0, maxLength);
     }
 
-    public static String trim(String text) {
+    public static String strip(String text) {
         if (text == null) return null;
-        return text.trim();
+        return text.strip();
     }
 
     public static boolean startsWith(String text, char prefix) {

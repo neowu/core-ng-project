@@ -137,7 +137,7 @@ public final class RequestParser {
         for (String name : formData) {
             FormData.FormValue value = formData.getFirst(name);
             if (value.isFile()) {
-                if (!Strings.isEmpty(value.getFileName())) {    // browser passes empty file name if not choose file in form
+                if (!Strings.isBlank(value.getFileName())) {    // browser passes blank file name if not choose file in form
                     logger.debug("[request:file] {}={}, size={}", name, value.getFileName(), Files.size(value.getPath()));
                     request.files.put(name, new MultipartFile(value.getPath(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
                 }

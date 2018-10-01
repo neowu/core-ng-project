@@ -27,7 +27,7 @@ class BeanValidatorNotNullTest {
     @Test
     void sourceCode() {
         assertThat(builder.builder.sourceCode())
-                .isEqualTo(ClasspathResources.text("validator-test/validator-notnull.java"));
+                .isEqualTo(ClasspathResources.text("validator-test/validator-not-null.java"));
     }
 
     @Test

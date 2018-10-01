@@ -33,9 +33,7 @@ public final class Properties {
 
     public Optional<String> get(String key) {
         String value = properties.get(key);
-        if (!Strings.isEmpty(value)) {
-            return Optional.of(value);
-        }
+        if (!Strings.isBlank(value)) return Optional.of(value);
         return Optional.empty();
     }
 
