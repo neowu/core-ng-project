@@ -2,14 +2,20 @@ package core.framework.http;
 
 import core.framework.util.Encodings;
 import core.framework.util.Maps;
+import core.framework.util.Strings;
 
-import java.nio.charset.StandardCharsets;
+import java.net.URLEncoder;
 import java.util.Map;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
  */
 public final class HTTPRequest {
+    // due to history issue, many web server may have issue if send charset=utf-8 explicitly, so not use charset
+    private static final ContentType APPLICATION_FORM_URLENCODED = ContentType.create("application/x-www-form-urlencoded", null);
+
     private final String uri;
     private final HTTPMethod method;
     private final Map<String, String> headers = Maps.newLinkedHashMap();    // make headers/params order deterministic, (e.g. for use cases where http request needs to be signed by hash)
@@ -50,7 +56,7 @@ public final class HTTPRequest {
         return params;
     }
 
-    public void addParam(String name, String value) {
+    public void param(String name, String value) {
         params.put(name, value);
     }
 
@@ -59,13 +65,24 @@ public final class HTTPRequest {
     }
 
     public void body(String body, ContentType contentType) {
-        byte[] bytes = body.getBytes(contentType.charset().orElse(StandardCharsets.UTF_8));
+        byte[] bytes = body.getBytes(contentType.charset().orElse(UTF_8));
         body(bytes, contentType);
     }
 
     public void body(byte[] body, ContentType contentType) {
         this.body = body;
         this.contentType = contentType;
+    }
+
+    public void form(Map<String, String> form) {
+        var builder = new StringBuilder(256);
+        boolean first = true;
+        for (Map.Entry<String, String> entry : form.entrySet()) {
+            if (!first) builder.append('&');
+            builder.append(URLEncoder.encode(entry.getKey(), UTF_8)).append('=').append(URLEncoder.encode(entry.getValue(), UTF_8));
+            first = false;
+        }
+        body(Strings.bytes(builder.toString()), APPLICATION_FORM_URLENCODED);
     }
 
     public ContentType contentType() {

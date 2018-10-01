@@ -28,13 +28,13 @@ services:
         ports:
         - 9092:9092
         environment:
-        - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092 --override message.max.bytes=2000000
+        - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092
         depends_on:
         - zookeeper
     log-processor:
         image: neowu/log-processor:6.8.5
         environment:
-        - JAVA_OPTS=-Xms256m -Xmx2048m -Xss256k -Djava.awt.headless=true
+        - JAVA_OPTS=-Xms256m -Xmx2048m -Xss256k
         - SYS_KAFKA_URI=kafka:9092
         - SYS_ELASTICSEARCH_HOST=elasticsearch
         depends_on:

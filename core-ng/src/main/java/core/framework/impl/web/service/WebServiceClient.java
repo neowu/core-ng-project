@@ -82,7 +82,7 @@ public class WebServiceClient {
     void addQueryParams(HTTPRequest request, Map<String, String> queryParams) {
         for (Map.Entry<String, String> entry : queryParams.entrySet()) {
             String value = entry.getValue();
-            if (value != null) request.addParam(entry.getKey(), value);
+            if (value != null) request.param(entry.getKey(), value);
         }
     }
 

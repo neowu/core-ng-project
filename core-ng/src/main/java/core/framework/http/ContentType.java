@@ -5,20 +5,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Optional;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
  */
 public final class ContentType {
-    public static final ContentType TEXT_HTML = create("text/html", StandardCharsets.UTF_8);
-    public static final ContentType TEXT_CSS = create("text/css", StandardCharsets.UTF_8);
-    public static final ContentType TEXT_PLAIN = create("text/plain", StandardCharsets.UTF_8);
-    public static final ContentType TEXT_XML = create("text/xml", StandardCharsets.UTF_8);
-    public static final ContentType APPLICATION_JSON = create("application/json", StandardCharsets.UTF_8);
-    public static final ContentType APPLICATION_JAVASCRIPT = create("application/javascript", StandardCharsets.UTF_8);
+    public static final ContentType TEXT_HTML = create("text/html", UTF_8);
+    public static final ContentType TEXT_CSS = create("text/css", UTF_8);
+    public static final ContentType TEXT_PLAIN = create("text/plain", UTF_8);
+    public static final ContentType TEXT_XML = create("text/xml", UTF_8);
+    public static final ContentType APPLICATION_JSON = create("application/json", UTF_8);
+    public static final ContentType APPLICATION_JAVASCRIPT = create("application/javascript", UTF_8);
     public static final ContentType APPLICATION_OCTET_STREAM = create("application/octet-stream", null);
     public static final ContentType IMAGE_PNG = create("image/png", null);
 

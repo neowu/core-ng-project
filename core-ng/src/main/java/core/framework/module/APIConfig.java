@@ -6,7 +6,6 @@ import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
-import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.web.bean.BeanMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
@@ -48,7 +47,6 @@ public class APIConfig extends Config {
         this.context = context;
         httpClientBuilder = new HTTPClientBuilder()
                 .userAgent(WebServiceClient.USER_AGENT)
-                .keepAliveTimeout(Duration.ofSeconds(10))   // api client keep alive should be shorter than server side in case server side disconnect connection first, use short value to release connection sooner in quiet time and still fit busy time
                 .timeout(Duration.ofSeconds(15))    // kube graceful shutdown period is 30s, we need to finish api call within that time
                 .slowOperationThreshold(Duration.ofSeconds(10))
                 .maxRetries(3);
@@ -106,9 +104,7 @@ public class APIConfig extends Config {
 
     private HTTPClient getOrCreateHTTPClient() {
         if (httpClient == null) {
-            HTTPClient httpClient = httpClientBuilder.build();
-            context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> httpClient.close());
-            this.httpClient = httpClient;
+            this.httpClient = httpClientBuilder.build();
         }
         return httpClient;
     }

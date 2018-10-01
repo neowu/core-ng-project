@@ -1,10 +1,11 @@
 ## Change log
-### 6.9.0 (9/24/2018 - )    !!! only support java 11
+### 6.9.0 (9/24/2018 - )    !!! only support java 11 !!!
 * jdk: update to java 11 
 * log: internal tweaking, make logParam be aware of max param length, consume less memory with large trace log
 * db: removed test initDB().runScript(), since in real life we always prefer to use repository(), as refactor/entity typing/validation reason, script can still be achieved by calling database directly 
-* util: renamed Strings.isEmpty to Strings.isBlank to match jdk 11
-* validation: renamed @NotEmpty to @NotBlank to match jdk 11 naming convention 
+* util: !!! renamed Strings.isEmpty to Strings.isBlank to match jdk 11
+* validation: !!! renamed @NotEmpty to @NotBlank to match jdk 11 naming convention 
+* httpClient: replaced apache httpClient with JDK builtin impl 
 
 ### 6.8.5 (9/20/2018 - 9/24/2018)   
 * db: log params for batch operations, disable ssl for mysql
