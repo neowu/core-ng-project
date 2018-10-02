@@ -101,14 +101,14 @@ public final class HTTPClientImpl implements HTTPClient {
             try {
                 HttpResponse<byte[]> httpResponse = client.send(httpRequest, BodyHandlers.ofByteArray());
                 HTTPResponse response = response(httpResponse);
-                if (response.status() == HTTPStatus.SERVICE_UNAVAILABLE && shouldRetry(attempts, null, request.method())) {
+                if (shouldRetry(attempts, request.method(), null, response.status())) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon");
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
                 }
                 return response;
             } catch (IOException | InterruptedException e) {
-                if (shouldRetry(attempts, e, request.method())) {
+                if (shouldRetry(attempts, request.method(), e, null)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon", e);
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
@@ -185,9 +185,9 @@ public final class HTTPClientImpl implements HTTPClient {
         return builder.toString();
     }
 
-    boolean shouldRetry(int attempts, Exception e, HTTPMethod method) {
+    boolean shouldRetry(int attempts, HTTPMethod method, Exception e, HTTPStatus status) {
         if (attempts >= maxRetries) return false;
-
+        if (status == HTTPStatus.SERVICE_UNAVAILABLE) return true;
         // POST is not idempotent, not retry on read time out
         return !(method == HTTPMethod.POST && e != null && e.getClass().equals(HttpTimeoutException.class));
     }

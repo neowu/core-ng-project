@@ -8,7 +8,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * @author neo
  */
-public class HTTPRequestHelper {
+public final class HTTPRequestHelper {
     public static void urlEncoding(StringBuilder builder, Map<String, String> params) {
         boolean first = true;
         for (Map.Entry<String, String> entry : params.entrySet()) {

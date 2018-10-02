@@ -9,7 +9,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * @author neo
  */
-public class BodyLogParam {
+public final class BodyLogParam {
     public static Object param(byte[] body, ContentType contentType) {
         if (contentType != null) {
             String mediaType = contentType.mediaType();
