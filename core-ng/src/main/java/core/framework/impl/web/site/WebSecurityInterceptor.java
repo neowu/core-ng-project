@@ -2,15 +2,13 @@ package core.framework.impl.web.site;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
+import core.framework.impl.http.HTTPRequestHelper;
 import core.framework.web.Interceptor;
 import core.framework.web.Invocation;
 import core.framework.web.Request;
 import core.framework.web.Response;
 
 import java.util.Map;
-
-import static java.net.URLEncoder.encode;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -44,17 +42,10 @@ public final class WebSecurityInterceptor implements Interceptor {    // refer t
     String redirectURL(Request request) {   // always assume https site is published on 443 port
         var builder = new StringBuilder("https://").append(request.hostName()).append(request.path());
 
-        Map<String, String> queryParams = request.queryParams();
-        if (!queryParams.isEmpty()) {
-            int i = 0;
-            for (Map.Entry<String, String> entry : queryParams.entrySet()) {
-                String name = entry.getKey();
-                String value = entry.getValue();
-                if (i == 0) builder.append('?');
-                else builder.append('&');
-                builder.append(encode(name, UTF_8)).append('=').append(encode(value, UTF_8));
-                i++;
-            }
+        Map<String, String> params = request.queryParams();
+        if (!params.isEmpty()) {
+            builder.append('?');
+            HTTPRequestHelper.urlEncoding(builder, params);
         }
         return builder.toString();
     }

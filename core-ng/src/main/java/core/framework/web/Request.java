@@ -15,7 +15,7 @@ public interface Request {
 
     String hostName();
 
-    String path();
+    String path();      // original path without decoding
 
     HTTPMethod method();
 

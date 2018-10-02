@@ -26,8 +26,6 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import static core.framework.util.Strings.format;
-import static java.net.URLDecoder.decode;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -40,28 +38,29 @@ public final class RequestParser {
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
         HeaderMap headers = exchange.getRequestHeaders();
-        logHeaders(headers, exchange);
-
-        String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
-        logger.debug("[request] remoteAddress={}", remoteAddress);
-
-        request.clientIP = clientIPParser.parse(remoteAddress, headers.getFirst(Headers.X_FORWARDED_FOR));
-        actionLog.context("clientIP", request.clientIP);
 
         request.scheme = scheme(exchange.getRequestScheme(), headers.getFirst(Headers.X_FORWARDED_PROTO));
         int requestPort = requestPort(headers.getFirst(Headers.HOST), request.scheme, exchange);
         request.port = port(requestPort, headers.getFirst(Headers.X_FORWARDED_PORT));
 
+        String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
+        logger.debug("[request] remoteAddress={}", remoteAddress);
+        request.clientIP = clientIPParser.parse(remoteAddress, headers.getFirst(Headers.X_FORWARDED_FOR));
+        actionLog.context("clientIP", request.clientIP);
+
+        String method = exchange.getRequestMethod().toString();
+        actionLog.context("method", method);
+
         request.requestURL = requestURL(request, exchange);
         actionLog.context("requestURL", request.requestURL);
+        request.path = path(exchange);
 
-        logger.debug("[request] path={}", request.path());
+        logHeaders(headers, exchange);
 
         String userAgent = headers.getFirst(Headers.USER_AGENT);
         if (userAgent != null) actionLog.context("userAgent", userAgent);
 
-        request.method = httpMethod(exchange.getRequestMethod().toString());
-        actionLog.context("method", request.method());      // for public site, there will be sniff requests from various sources. as it throws exception with unsupported method, so to log method at last, we can see details (headers) in trace for those illegal requests
+        request.method = httpMethod(method);    // parse method after logging header/etc, to gather more info in case we see unsupported method passed from internet
 
         parseQueryParams(request, exchange.getQueryParameters());
 
@@ -98,18 +97,10 @@ public final class RequestParser {
 
     void parseQueryParams(RequestImpl request, Map<String, Deque<String>> params) {
         for (Map.Entry<String, Deque<String>> entry : params.entrySet()) {
-            String name = parseQueryParam(entry.getKey());
-            String value = parseQueryParam(entry.getValue().getFirst());
+            String name = entry.getKey();
+            String value = entry.getValue().getFirst();
             logger.debug("[request:query] {}={}", name, value);
             request.queryParams.put(name, value);
-        }
-    }
-
-    private String parseQueryParam(String value) {
-        try {
-            return decode(value, UTF_8);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("failed to parse query param, param=" + value, "INVALID_HTTP_REQUEST", e);
         }
     }
 
@@ -182,7 +173,7 @@ public final class RequestParser {
     String requestURL(RequestImpl request, HttpServerExchange exchange) {
         var builder = new StringBuilder(128);
 
-        if (exchange.isHostIncludedInRequestURI()) {    // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
+        if (exchange.isHostIncludedInRequestURI()) {    // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html, when client sends request via forward proxy
             builder.append(exchange.getRequestURI());
         } else {
             String scheme = request.scheme;
@@ -205,5 +196,21 @@ public final class RequestParser {
         String requestURL = builder.toString();
         if (requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(format("requestURL is too long, requestURL={}...(truncated)", requestURL.substring(0, 50)), "INVALID_HTTP_REQUEST");
         return requestURL;
+    }
+
+    // not decoded path, in case there is '/' in decoded value to interfere path pattern matching
+    String path(HttpServerExchange exchange) {
+        String path = exchange.getRequestURI();
+        if (!exchange.isHostIncludedInRequestURI()) return path;
+
+        int index = path.indexOf("//");
+        if (index != -1) {
+            index = path.indexOf('/', index + 2);
+            if (index != -1) {
+                return path.substring(index);
+            }
+        }
+
+        return path;
     }
 }

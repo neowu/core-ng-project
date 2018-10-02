@@ -38,6 +38,7 @@ public final class RequestImpl implements Request {
     String scheme;
     int port;
     String requestURL;
+    String path;
     ContentType contentType;
     byte[] body;
 
@@ -63,7 +64,7 @@ public final class RequestImpl implements Request {
 
     @Override
     public String path() {
-        return exchange.getRequestPath();
+        return path;
     }
 
     @Override

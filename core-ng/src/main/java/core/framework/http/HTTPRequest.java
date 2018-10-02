@@ -1,10 +1,10 @@
 package core.framework.http;
 
+import core.framework.impl.http.HTTPRequestHelper;
 import core.framework.util.Encodings;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
 
-import java.net.URLEncoder;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -76,12 +76,7 @@ public final class HTTPRequest {
 
     public void form(Map<String, String> form) {
         var builder = new StringBuilder(256);
-        boolean first = true;
-        for (Map.Entry<String, String> entry : form.entrySet()) {
-            if (!first) builder.append('&');
-            builder.append(URLEncoder.encode(entry.getKey(), UTF_8)).append('=').append(URLEncoder.encode(entry.getValue(), UTF_8));
-            first = false;
-        }
+        HTTPRequestHelper.urlEncoding(builder, form);
         body(Strings.bytes(builder.toString()), APPLICATION_FORM_URLENCODED);
     }
 

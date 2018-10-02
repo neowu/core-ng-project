@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
@@ -32,7 +31,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static java.lang.String.CASE_INSENSITIVE_ORDER;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -152,17 +150,8 @@ public final class HTTPClientImpl implements HTTPClient {
     private String requestURI(String uri, Map<String, String> params) {
         if (params.isEmpty()) return uri;
 
-        var builder = new StringBuilder(256);
-        builder.append(uri);
-        boolean first = true;
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            if (first) builder.append('?');
-            else builder.append('&');
-            builder.append(URLEncoder.encode(entry.getKey(), UTF_8))
-                   .append('=')
-                   .append(URLEncoder.encode(entry.getValue(), UTF_8));
-            first = false;
-        }
+        var builder = new StringBuilder(256).append(uri).append('?');
+        HTTPRequestHelper.urlEncoding(builder, params);
         return builder.toString();
     }
 }
