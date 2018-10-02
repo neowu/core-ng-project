@@ -14,6 +14,7 @@ import core.framework.log.Markers;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
+import core.framework.util.Threads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -65,30 +67,53 @@ public final class HTTPClientImpl implements HTTPClient {
     private final HttpClient client;
     private final String userAgent;
     private final Duration timeout;
+    private final int maxRetries;
     private final long slowOperationThresholdInNanos;
 
-    public HTTPClientImpl(HttpClient client, String userAgent, Duration timeout, Duration slowOperationThreshold) {
+    public HTTPClientImpl(HttpClient client, String userAgent, Duration timeout, int maxRetries, Duration slowOperationThreshold) {
         this.client = client;
         this.userAgent = userAgent;
         this.timeout = timeout;
+        this.maxRetries = maxRetries;
         slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
     }
 
     @Override
     public HTTPResponse execute(HTTPRequest request) {
         var watch = new StopWatch();
-        HttpRequest httpRequest = httpRequest(request);
         try {
-            HttpResponse<byte[]> httpResponse = client.send(httpRequest, BodyHandlers.ofByteArray());
-            return response(httpResponse);
-        } catch (IOException | InterruptedException e) {
-            throw new HTTPClientException(e.getMessage(), "HTTP_COMMUNICATION_FAILED", e);
+            return executeWithRetry(request);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("http", elapsed);
             logger.debug("execute, elapsed={}", elapsed);
             if (elapsed > slowOperationThresholdInNanos) {
                 logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http operation, elapsed={}", elapsed);
+            }
+        }
+    }
+
+    private HTTPResponse executeWithRetry(HTTPRequest request) {
+        HttpRequest httpRequest = httpRequest(request);
+        int attempts = 0;
+        while (true) {
+            attempts++;
+            try {
+                HttpResponse<byte[]> httpResponse = client.send(httpRequest, BodyHandlers.ofByteArray());
+                HTTPResponse response = response(httpResponse);
+                if (response.status() == HTTPStatus.SERVICE_UNAVAILABLE && shouldRetry(attempts, null, request.method())) {
+                    logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon");
+                    Threads.sleepRoughly(waitTime(attempts));
+                    continue;
+                }
+                return response;
+            } catch (IOException | InterruptedException e) {
+                if (shouldRetry(attempts, e, request.method())) {
+                    logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon", e);
+                    Threads.sleepRoughly(waitTime(attempts));
+                    continue;
+                }
+                throw new HTTPClientException(e.getMessage(), "HTTP_COMMUNICATION_FAILED", e);
             }
         }
     }
@@ -158,5 +183,16 @@ public final class HTTPClientImpl implements HTTPClient {
         var builder = new StringBuilder(256).append(uri).append('?');
         HTTPRequestHelper.urlEncoding(builder, params);
         return builder.toString();
+    }
+
+    boolean shouldRetry(int attempts, Exception e, HTTPMethod method) {
+        if (attempts >= maxRetries) return false;
+
+        // POST is not idempotent, not retry on read time out
+        return !(method == HTTPMethod.POST && e != null && e.getClass().equals(HttpTimeoutException.class));
+    }
+
+    Duration waitTime(int attempts) {
+        return Duration.ofMillis(500 << attempts - 1);
     }
 }

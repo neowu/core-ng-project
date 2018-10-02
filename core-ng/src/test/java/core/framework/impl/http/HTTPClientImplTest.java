@@ -10,10 +10,13 @@ import core.framework.http.HTTPResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.ConnectException;
 import java.net.http.HttpClient;
+import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +34,7 @@ class HTTPClientImplTest {
 
     @BeforeEach
     void createHTTPClient() {
-        httpClient = new HTTPClientImpl(null, "TestUserAgent", Duration.ofSeconds(10), Duration.ZERO);
+        httpClient = new HTTPClientImpl(null, "TestUserAgent", Duration.ofSeconds(10), 3, Duration.ZERO);
     }
 
     @Test
@@ -79,5 +82,25 @@ class HTTPClientImplTest {
         assertThat(response.header(HTTPHeaders.CONTENT_TYPE)).as("header should be case insensitive").get().isEqualTo("text/html");
         assertThat(response.contentType()).get().satisfies(contentType -> assertThat(contentType.mediaType()).isEqualTo(ContentType.TEXT_HTML.mediaType()));
         assertThat(response.header(":status")).isEmpty();
+    }
+
+    @Test
+    void waitTime() {
+        assertThat(httpClient.waitTime(1)).isEqualTo(Duration.ofMillis(500));
+        assertThat(httpClient.waitTime(2)).isEqualTo(Duration.ofSeconds(1));
+        assertThat(httpClient.waitTime(3)).isEqualTo(Duration.ofSeconds(2));
+        assertThat(httpClient.waitTime(4)).isEqualTo(Duration.ofSeconds(4));
+    }
+
+    @Test
+    void shouldRetry() {
+        assertThat(httpClient.shouldRetry(1, new HttpTimeoutException("read timeout"), HTTPMethod.GET)).isTrue();
+        assertThat(httpClient.shouldRetry(2, new ConnectException("connection failed"), HTTPMethod.GET)).isTrue();
+        assertThat(httpClient.shouldRetry(3, new ConnectException("connection failed"), HTTPMethod.GET)).isFalse();
+
+        assertThat(httpClient.shouldRetry(1, new HttpConnectTimeoutException("connection timeout"), HTTPMethod.POST)).isTrue();
+        assertThat(httpClient.shouldRetry(1, new HttpTimeoutException("read timeout"), HTTPMethod.POST)).isFalse();
+
+        assertThat(httpClient.shouldRetry(1, null, HTTPMethod.PUT)).isTrue();
     }
 }

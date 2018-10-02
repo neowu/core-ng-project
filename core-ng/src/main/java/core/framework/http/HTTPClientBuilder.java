@@ -26,7 +26,7 @@ public final class HTTPClientBuilder {
     private Duration slowOperationThreshold = Duration.ofSeconds(30);
     private boolean enableCookie = false;
     private boolean enableRedirect = false;
-    //    private int maxRetries;
+    private int maxRetries = 1;
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
 
@@ -46,7 +46,7 @@ public final class HTTPClientBuilder {
             if (enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
             HttpClient httpClient = builder.build();
 
-            return new HTTPClientImpl(httpClient, userAgent, timeout, slowOperationThreshold);
+            return new HTTPClientImpl(httpClient, userAgent, timeout, maxRetries, slowOperationThreshold);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new Error(e);
         } finally {
@@ -69,10 +69,10 @@ public final class HTTPClientBuilder {
         return this;
     }
 
-//    public HTTPClientBuilder maxRetries(int maxRetries) {
-////        this.maxRetries = maxRetries;
-//        return this;
-//    }
+    public HTTPClientBuilder maxRetries(int maxRetries) {
+        this.maxRetries = maxRetries;
+        return this;
+    }
 
     public HTTPClientBuilder enableCookie() {
         enableCookie = true;
