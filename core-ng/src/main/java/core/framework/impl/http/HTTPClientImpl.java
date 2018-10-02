@@ -120,7 +120,12 @@ public final class HTTPClientImpl implements HTTPClient {
         Map<String, String> params = request.params();
         logger.debug("[request] method={}, uri={}, params={}", method, uri, new MapLogParam(params));
         try {
-            builder.uri(new URI(requestURI(uri, params)));
+            var requestURI = new URI(requestURI(uri, params));
+            builder.uri(requestURI);
+            // it seems undertow has bugs with h2c protocol, from test, not all the ExchangeCompletionListener will be executed which make ShutdownHandler not working properly
+            // and cause GOAWAY frame / EOF read issue with small UndertowOptions.NO_REQUEST_TIMEOUT (e.g. 10ms)
+            // by considering h2 is recommended, so only use http/1.1 without TLS
+            if ("http".equals(requestURI.getScheme())) builder.version(HttpClient.Version.HTTP_1_1);
         } catch (URISyntaxException e) {
             throw new HTTPClientException("uri is invalid, uri=" + uri, "INVALID_URL", e);
         }
