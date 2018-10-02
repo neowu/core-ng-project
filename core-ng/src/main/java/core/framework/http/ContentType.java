@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.Map;
 import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -25,8 +26,17 @@ public final class ContentType {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentType.class);
 
+    // cache most common ones to save paring time
+    private static final Map<String, ContentType> CACHE = Map.of(
+            APPLICATION_JSON.contentType, APPLICATION_JSON,
+            TEXT_HTML.contentType, TEXT_HTML
+    );
+
     // only cover common case, assume pattern is "media-type; charset=" or "multipart/form-data; boundary="
     public static ContentType parse(String contentType) {
+        ContentType type = CACHE.get(contentType);
+        if (type != null) return type;
+
         String mediaType = contentType;
         Charset charset = null;
 

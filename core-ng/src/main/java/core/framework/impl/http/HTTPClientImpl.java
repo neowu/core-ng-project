@@ -26,10 +26,11 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
+import static java.lang.String.CASE_INSENSITIVE_ORDER;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -80,19 +81,7 @@ public final class HTTPClientImpl implements HTTPClient {
         HttpRequest httpRequest = httpRequest(request);
         try {
             HttpResponse<byte[]> httpResponse = client.send(httpRequest, BodyHandlers.ofByteArray());
-            int statusCode = httpResponse.statusCode();
-            logger.debug("[response] status={}", statusCode);
-            Map<String, String> headers = new HashMap<>();
-            for (Map.Entry<String, List<String>> entry : httpResponse.headers().map().entrySet()) {
-                headers.put(entry.getKey(), entry.getValue().get(0));
-            }
-            logger.debug("[response] headers={}", new MapLogParam(headers));
-
-            byte[] body = httpResponse.body();
-            HTTPStatus status = parseHTTPStatus(statusCode);
-            var response = new HTTPResponse(status, headers, body);
-            logger.debug("[response] body={}", BodyLogParam.param(body, response.contentType().orElse(null)));
-            return response;
+            return response(httpResponse);
         } catch (IOException | InterruptedException e) {
             throw new HTTPClientException(e.getMessage(), "HTTP_COMMUNICATION_FAILED", e);
         } finally {
@@ -103,6 +92,22 @@ public final class HTTPClientImpl implements HTTPClient {
                 logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http operation, elapsed={}", elapsed);
             }
         }
+    }
+
+    HTTPResponse response(HttpResponse<byte[]> httpResponse) {
+        int statusCode = httpResponse.statusCode();
+        logger.debug("[response] status={}", statusCode);
+        Map<String, String> headers = new TreeMap<>(CASE_INSENSITIVE_ORDER);
+        for (Map.Entry<String, List<String>> entry : httpResponse.headers().map().entrySet()) {
+            headers.put(entry.getKey(), entry.getValue().get(0));
+        }
+        logger.debug("[response] headers={}", new MapLogParam(headers));
+
+        byte[] body = httpResponse.body();
+        HTTPStatus status = parseHTTPStatus(statusCode);
+        var response = new HTTPResponse(status, headers, body);
+        logger.debug("[response] body={}", BodyLogParam.param(body, response.contentType().orElse(null)));
+        return response;
     }
 
     HttpRequest httpRequest(HTTPRequest request) {
@@ -117,7 +122,7 @@ public final class HTTPClientImpl implements HTTPClient {
         } catch (URISyntaxException e) {
             throw new HTTPClientException("uri is invalid, uri=" + uri, "INVALID_URL", e);
         }
-        builder.setHeader(HTTPHeaders.USER_AGENT, userAgent);
+        request.header(HTTPHeaders.USER_AGENT, userAgent);
         Map<String, String> headers = request.headers();
         for (Map.Entry<String, String> entry : headers.entrySet()) {
             builder.setHeader(entry.getKey(), entry.getValue());
@@ -156,5 +161,4 @@ public final class HTTPClientImpl implements HTTPClient {
         }
         return builder.toString();
     }
-
 }

@@ -26,21 +26,24 @@ public final class HTTPClientBuilder {
     private Duration slowOperationThreshold = Duration.ofSeconds(30);
     private boolean enableCookie = false;
     private boolean enableRedirect = false;
-    private int maxRetries;
+    //    private int maxRetries;
     private String userAgent = "HTTPClient";
+    private boolean trustAll = false;
 
     public HTTPClient build() {
         var watch = new StopWatch();
         try {
             HttpClient.Builder builder = HttpClient.newBuilder();
 
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[]{new SelfSignedTrustManager()}, new SecureRandom());
-            builder.sslContext(sslContext);
+            if (trustAll) {
+                SSLContext sslContext = SSLContext.getInstance("TLS");
+                sslContext.init(null, new TrustManager[]{new SelfSignedTrustManager()}, new SecureRandom());
+                builder.sslContext(sslContext);
+            }
 
             builder.connectTimeout(timeout);
-            if (!enableRedirect) builder.followRedirects(HttpClient.Redirect.NORMAL);
-            if (!enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+            if (enableRedirect) builder.followRedirects(HttpClient.Redirect.NORMAL);
+            if (enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
             HttpClient httpClient = builder.build();
 
             return new HTTPClientImpl(httpClient, userAgent, timeout, slowOperationThreshold);
@@ -66,10 +69,10 @@ public final class HTTPClientBuilder {
         return this;
     }
 
-    public HTTPClientBuilder maxRetries(int maxRetries) {
-        this.maxRetries = maxRetries;
-        return this;
-    }
+//    public HTTPClientBuilder maxRetries(int maxRetries) {
+////        this.maxRetries = maxRetries;
+//        return this;
+//    }
 
     public HTTPClientBuilder enableCookie() {
         enableCookie = true;
@@ -78,6 +81,11 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder enableRedirect() {
         enableRedirect = true;
+        return this;
+    }
+
+    public HTTPClientBuilder trustAll() {
+        trustAll = true;
         return this;
     }
 }

@@ -47,9 +47,9 @@ public class APIConfig extends Config {
         this.context = context;
         httpClientBuilder = new HTTPClientBuilder()
                 .userAgent(WebServiceClient.USER_AGENT)
+                .trustAll()
                 .timeout(Duration.ofSeconds(15))    // kube graceful shutdown period is 30s, we need to finish api call within that time
-                .slowOperationThreshold(Duration.ofSeconds(10))
-                .maxRetries(3);
+                .slowOperationThreshold(Duration.ofSeconds(10));
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {

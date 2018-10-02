@@ -6,14 +6,21 @@ import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPHeaders;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
+import core.framework.http.HTTPResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author neo
@@ -47,5 +54,18 @@ class HTTPClientImplTest {
         HttpRequest httpRequest = httpClient.httpRequest(request);
         assertThat(httpRequest.uri().toString()).isEqualTo("http://localhost/uri?query=value");
         assertThat(httpRequest.headers().firstValue(HTTPHeaders.ACCEPT)).get().isEqualTo(ContentType.APPLICATION_JSON.toString());
+    }
+
+    @Test
+    void response() {
+        @SuppressWarnings("unchecked")
+        HttpResponse<byte[]> httpResponse = mock(HttpResponse.class);
+        when(httpResponse.statusCode()).thenReturn(200);
+        when(httpResponse.headers()).thenReturn(HttpHeaders.of(Map.of("content-type", List.of("text/html")), (name, value) -> true));
+
+        HTTPResponse response = httpClient.response(httpResponse);
+        assertThat(response.status()).isEqualTo(HTTPStatus.OK);
+        assertThat(response.header(HTTPHeaders.CONTENT_TYPE)).as("header should be case insensitive").get().isEqualTo("text/html");
+        assertThat(response.contentType()).get().satisfies(contentType -> assertThat(contentType.mediaType()).isEqualTo(ContentType.TEXT_HTML.mediaType()));
     }
 }
