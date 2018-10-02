@@ -48,12 +48,8 @@ public final class RequestParser {
         request.clientIP = clientIPParser.parse(remoteAddress, headers.getFirst(Headers.X_FORWARDED_FOR));
         actionLog.context("clientIP", request.clientIP);
 
-        String requestScheme = exchange.getRequestScheme();
-        logger.debug("[request] requestScheme={}", requestScheme);
-        String xForwardedProto = headers.getFirst(Headers.X_FORWARDED_PROTO);
-        request.scheme = xForwardedProto != null ? xForwardedProto : requestScheme;
-
-        int requestPort = requestPort(exchange.getRequestHeaders().getFirst(Headers.HOST), request.scheme, exchange);
+        request.scheme = scheme(exchange.getRequestScheme(), headers.getFirst(Headers.X_FORWARDED_PROTO));
+        int requestPort = requestPort(headers.getFirst(Headers.HOST), request.scheme, exchange);
         request.port = port(requestPort, headers.getFirst(Headers.X_FORWARDED_PORT));
 
         request.requestURL = requestURL(request, exchange);
@@ -74,6 +70,11 @@ public final class RequestParser {
             request.contentType = contentType == null ? null : ContentType.parse(contentType);
             parseBody(request, exchange);
         }
+    }
+
+    String scheme(String requestScheme, String xForwardedProto) {       // xForwardedProto is single value, refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
+        logger.debug("[request] requestScheme={}", requestScheme);
+        return xForwardedProto != null ? xForwardedProto : requestScheme;
     }
 
     private void logHeaders(HeaderMap headers, HttpServerExchange exchange) {
@@ -161,7 +162,7 @@ public final class RequestParser {
 
     // due to google cloud LB does not forward x-forwarded-port, here is to use x-forwarded-proto to determine port if any
     int requestPort(String host, String scheme, HttpServerExchange exchange) {    // refer to io.undertow.server.HttpServerExchange.getHostPort(), use x-forwarded-proto as request scheme
-        if (host != null) {
+        if (host != null) {     // HOST header is must for http/1.1, refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
             int colonIndex;
             if (Strings.startsWith(host, '[')) { //for ipv6 addresses we make sure we take out the first part, which can have multiple occurrences of :
                 colonIndex = host.indexOf(':', host.indexOf(']'));
@@ -179,7 +180,7 @@ public final class RequestParser {
     }
 
     String requestURL(RequestImpl request, HttpServerExchange exchange) {
-        var builder = new StringBuilder();
+        var builder = new StringBuilder(128);
 
         if (exchange.isHostIncludedInRequestURI()) {    // GET can use absolute url as request uri, http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
             builder.append(exchange.getRequestURI());

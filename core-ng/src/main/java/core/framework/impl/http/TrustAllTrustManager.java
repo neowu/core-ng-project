@@ -8,7 +8,7 @@ import java.security.cert.X509Certificate;
 /**
  * @author neo
  */
-public class SelfSignedTrustManager extends X509ExtendedTrustManager {
+public class TrustAllTrustManager extends X509ExtendedTrustManager {
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType) {
     }

@@ -25,11 +25,6 @@ public final class Strings {
         return text1.compareTo(text2);
     }
 
-    @Deprecated
-    public static boolean isEmpty(String text) {
-        return isBlank(text);
-    }
-
     public static boolean isBlank(String text) {
         return text == null || text.isBlank();
     }

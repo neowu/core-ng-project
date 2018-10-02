@@ -13,6 +13,7 @@ import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +100,10 @@ public final class HTTPClientImpl implements HTTPClient {
         logger.debug("[response] status={}", statusCode);
         Map<String, String> headers = new TreeMap<>(CASE_INSENSITIVE_ORDER);
         for (Map.Entry<String, List<String>> entry : httpResponse.headers().map().entrySet()) {
-            headers.put(entry.getKey(), entry.getValue().get(0));
+            String name = entry.getKey();
+            if (!Strings.startsWith(name, ':')) {   // not put pseudo headers
+                headers.put(name, entry.getValue().get(0));
+            }
         }
         logger.debug("[response] headers={}", new MapLogParam(headers));
 

@@ -1,7 +1,7 @@
 package core.framework.http;
 
 import core.framework.impl.http.HTTPClientImpl;
-import core.framework.impl.http.SelfSignedTrustManager;
+import core.framework.impl.http.TrustAllTrustManager;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public final class HTTPClientBuilder {
 
             if (trustAll) {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, new TrustManager[]{new SelfSignedTrustManager()}, new SecureRandom());
+                sslContext.init(null, new TrustManager[]{new TrustAllTrustManager()}, new SecureRandom());
                 builder.sslContext(sslContext);
             }
 

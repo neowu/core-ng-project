@@ -30,7 +30,7 @@ class HTTPClientImplTest {
 
     @BeforeEach
     void createHTTPClient() {
-        httpClient = new HTTPClientImpl(null, "", Duration.ofSeconds(10), Duration.ZERO);
+        httpClient = new HTTPClientImpl(null, "TestUserAgent", Duration.ofSeconds(10), Duration.ZERO);
     }
 
     @Test
@@ -54,6 +54,7 @@ class HTTPClientImplTest {
         HttpRequest httpRequest = httpClient.httpRequest(request);
         assertThat(httpRequest.uri().toString()).isEqualTo("http://localhost/uri?query=value");
         assertThat(httpRequest.headers().firstValue(HTTPHeaders.ACCEPT)).get().isEqualTo(ContentType.APPLICATION_JSON.toString());
+        assertThat(httpRequest.headers().firstValue(HTTPHeaders.USER_AGENT)).get().isEqualTo("TestUserAgent");
     }
 
     @Test
@@ -61,11 +62,12 @@ class HTTPClientImplTest {
         @SuppressWarnings("unchecked")
         HttpResponse<byte[]> httpResponse = mock(HttpResponse.class);
         when(httpResponse.statusCode()).thenReturn(200);
-        when(httpResponse.headers()).thenReturn(HttpHeaders.of(Map.of("content-type", List.of("text/html")), (name, value) -> true));
+        when(httpResponse.headers()).thenReturn(HttpHeaders.of(Map.of("content-type", List.of("text/html"), ":status", List.of("200")), (name, value) -> true));
 
         HTTPResponse response = httpClient.response(httpResponse);
         assertThat(response.status()).isEqualTo(HTTPStatus.OK);
         assertThat(response.header(HTTPHeaders.CONTENT_TYPE)).as("header should be case insensitive").get().isEqualTo("text/html");
         assertThat(response.contentType()).get().satisfies(contentType -> assertThat(contentType.mediaType()).isEqualTo(ContentType.TEXT_HTML.mediaType()));
+        assertThat(response.header(":status")).isEmpty();
     }
 }

@@ -39,9 +39,16 @@ class RequestParserTest {
     }
 
     @Test
+    void scheme() {
+        assertThat(parser.scheme("http", "https")).isEqualTo("https");
+        assertThat(parser.scheme("http", null)).isEqualTo("http");
+    }
+
+    @Test
     void requestPort() {
         assertThat(parser.requestPort("127.0.0.1", "https", null)).isEqualTo(443);
         assertThat(parser.requestPort("127.0.0.1:8080", "http", null)).isEqualTo(8080);
+        assertThat(parser.requestPort("[::1]:8080", "http", null)).isEqualTo(8080);
     }
 
     @Test
