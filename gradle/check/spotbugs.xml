@@ -596,7 +596,7 @@
     </Match>
 
     <!--
-    rules break with jdk 11, due to jdk 11 generated either wrong or different byte code
+    broken rules with jdk 11, due to jdk 11 generated either wrong or different byte code
 
     spotbugs:
     RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE

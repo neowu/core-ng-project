@@ -188,8 +188,11 @@ public final class HTTPClientImpl implements HTTPClient {
     boolean shouldRetry(int attempts, HTTPMethod method, Exception e, HTTPStatus status) {
         if (attempts >= maxRetries) return false;
         if (status == HTTPStatus.SERVICE_UNAVAILABLE) return true;
-        // POST is not idempotent, not retry on read time out
-        return !(method == HTTPMethod.POST && e != null && e.getClass().equals(HttpTimeoutException.class));
+        if (e != null) {
+            // POST is not idempotent, not retry on read time out
+            return !(method == HTTPMethod.POST && e.getClass().equals(HttpTimeoutException.class));
+        }
+        return false;
     }
 
     Duration waitTime(int attempts) {

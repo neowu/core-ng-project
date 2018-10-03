@@ -1,4 +1,7 @@
 ## Change log
+### 6.9.1 (10/3/2018)
+* httpClient: fix bug on detecting retry
+
 ### 6.9.0 (9/24/2018 - 10/2/2018)    !!! only support java 11 !!!
 * jdk: update to java 11 
 * log: internal tweaking, make logParam be aware of max param length, consume less memory with large trace log

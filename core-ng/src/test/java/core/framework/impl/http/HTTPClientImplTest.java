@@ -101,13 +101,26 @@ class HTTPClientImplTest {
 
     @Test
     void shouldRetry() {
+        assertThat(httpClient.shouldRetry(1, HTTPMethod.GET, null, HTTPStatus.OK)).isFalse();
+
+        assertThat(httpClient.shouldRetry(1, HTTPMethod.POST, null, HTTPStatus.CREATED)).isFalse();
+        assertThat(httpClient.shouldRetry(2, HTTPMethod.POST, null, HTTPStatus.CREATED)).isFalse();
+    }
+
+    @Test
+    void shouldRetryWithConnectionException() {
         assertThat(httpClient.shouldRetry(1, HTTPMethod.GET, new HttpTimeoutException("read timeout"), null)).isTrue();
         assertThat(httpClient.shouldRetry(2, HTTPMethod.GET, new ConnectException("connection failed"), null)).isTrue();
-        assertThat(httpClient.shouldRetry(2, HTTPMethod.GET, null, HTTPStatus.SERVICE_UNAVAILABLE)).isTrue();
         assertThat(httpClient.shouldRetry(3, HTTPMethod.GET, new ConnectException("connection failed"), null)).isFalse();
 
         assertThat(httpClient.shouldRetry(1, HTTPMethod.POST, new HttpConnectTimeoutException("connection timeout"), null)).isTrue();
         assertThat(httpClient.shouldRetry(1, HTTPMethod.POST, new HttpTimeoutException("read timeout"), null)).isFalse();
+
+        assertThat(httpClient.shouldRetry(2, HTTPMethod.PUT, new HttpTimeoutException("read timeout"), null)).isTrue();
+    }
+
+    @Test
+    void shouldRetryWithServiceUnavailable() {
         assertThat(httpClient.shouldRetry(1, HTTPMethod.POST, null, HTTPStatus.SERVICE_UNAVAILABLE)).isTrue();
         assertThat(httpClient.shouldRetry(3, HTTPMethod.POST, null, HTTPStatus.SERVICE_UNAVAILABLE)).isFalse();
 
