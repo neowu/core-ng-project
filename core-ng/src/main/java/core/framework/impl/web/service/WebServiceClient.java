@@ -70,7 +70,7 @@ public class WebServiceClient {
     <T> void addRequestBean(HTTPRequest request, HTTPMethod method, Class<T> requestBeanClass, T requestBean) {
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
             Map<String, String> queryParams = requestBeanMapper.toParams(requestBeanClass, requestBean);
-            addQueryParams(request, queryParams);
+            request.params.putAll(queryParams);
         } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT || method == HTTPMethod.PATCH) {
             byte[] json = requestBeanMapper.toJSON(requestBeanClass, requestBean);
             request.body(json, ContentType.APPLICATION_JSON);
@@ -79,22 +79,16 @@ public class WebServiceClient {
         }
     }
 
-    void addQueryParams(HTTPRequest request, Map<String, String> queryParams) {
-        for (Map.Entry<String, String> entry : queryParams.entrySet()) {
-            String value = entry.getValue();
-            if (value != null) request.param(entry.getKey(), value);
-        }
-    }
-
     private void linkContext(HTTPRequest request) {
-        request.header(HTTPHandler.HEADER_CLIENT.toString(), LogManager.APP_NAME);
+        Map<String, String> headers = request.headers;
+        headers.put(HTTPHandler.HEADER_CLIENT.toString(), LogManager.APP_NAME);
 
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog == null) return;  // web service client may be used without action log context
 
-        request.header(HTTPHandler.HEADER_CORRELATION_ID.toString(), actionLog.correlationId());
-        if (actionLog.trace) request.header(HTTPHandler.HEADER_TRACE.toString(), "true");
-        request.header(HTTPHandler.HEADER_REF_ID.toString(), actionLog.id);
+        headers.put(HTTPHandler.HEADER_CORRELATION_ID.toString(), actionLog.correlationId());
+        if (actionLog.trace) headers.put(HTTPHandler.HEADER_TRACE.toString(), "true");
+        headers.put(HTTPHandler.HEADER_REF_ID.toString(), actionLog.id);
     }
 
     void validateResponse(HTTPResponse response) {

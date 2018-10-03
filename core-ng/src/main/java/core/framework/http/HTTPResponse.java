@@ -3,9 +3,10 @@ package core.framework.http;
 import core.framework.api.http.HTTPStatus;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -50,7 +51,7 @@ public final class HTTPResponse {
     }
 
     private Charset charset() {
-        if (contentType == null) return StandardCharsets.UTF_8;
-        return contentType.charset().orElse(StandardCharsets.UTF_8);
+        if (contentType == null) return UTF_8;
+        return contentType.charset().orElse(UTF_8);
     }
 }

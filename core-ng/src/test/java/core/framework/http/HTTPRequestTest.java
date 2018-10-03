@@ -19,8 +19,9 @@ class HTTPRequestTest {
         var request = new HTTPRequest(HTTPMethod.POST, "http://localhost/uri");
         request.body("text", ContentType.TEXT_PLAIN);
 
-        assertThat(request.method()).isEqualTo(HTTPMethod.POST);
+        assertThat(request.method).isEqualTo(HTTPMethod.POST);
         assertThat(request.contentType()).isEqualTo(ContentType.TEXT_PLAIN);
+        assertThat(request.headers).containsEntry(HTTPHeaders.CONTENT_TYPE, "text/plain; charset=utf-8");
         assertThat(request.body()).isEqualTo(Strings.bytes("text"));
     }
 
@@ -29,13 +30,13 @@ class HTTPRequestTest {
         var request = new HTTPRequest(HTTPMethod.PATCH, "http://localhost/uri");
         request.accept(ContentType.APPLICATION_JSON);
 
-        assertThat(request.headers().get(HTTPHeaders.ACCEPT)).isEqualTo(ContentType.APPLICATION_JSON.toString());
+        assertThat(request.headers.get(HTTPHeaders.ACCEPT)).isEqualTo(ContentType.APPLICATION_JSON.toString());
     }
 
     @Test
     void method() {
-        assertThat(new HTTPRequest(HTTPMethod.GET, "http://localhost/uri").method()).isEqualTo(HTTPMethod.GET);
-        assertThat(new HTTPRequest(HTTPMethod.POST, "http://localhost/uri").method()).isEqualTo(HTTPMethod.POST);
+        assertThat(new HTTPRequest(HTTPMethod.GET, "http://localhost/uri").method).isEqualTo(HTTPMethod.GET);
+        assertThat(new HTTPRequest(HTTPMethod.POST, "http://localhost/uri").method).isEqualTo(HTTPMethod.POST);
     }
 
     @Test
@@ -43,7 +44,7 @@ class HTTPRequestTest {
         var request = new HTTPRequest(HTTPMethod.GET, "http://localhost/uri");
         request.basicAuth("Aladdin", "OpenSesame");
 
-        assertThat(request.headers()).contains(entry(HTTPHeaders.AUTHORIZATION, "Basic QWxhZGRpbjpPcGVuU2VzYW1l"));
+        assertThat(request.headers).contains(entry(HTTPHeaders.AUTHORIZATION, "Basic QWxhZGRpbjpPcGVuU2VzYW1l"));
     }
 
     @Test
@@ -54,7 +55,8 @@ class HTTPRequestTest {
         form.put("key2", "v1+v2");
         request.form(form);
 
-        assertThat(request.contentType().mediaType()).isEqualTo("application/x-www-form-urlencoded");
+        assertThat(request.contentType()).isEqualTo(ContentType.APPLICATION_FORM_URLENCODED);
+        assertThat(request.headers).containsEntry(HTTPHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
         assertThat(new String(request.body(), UTF_8)).isEqualTo("key1=v1+v2&key2=v1%2Bv2");
     }
 }

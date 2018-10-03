@@ -1,5 +1,6 @@
 package core.framework.impl.web.management;
 
+import core.framework.api.http.HTTPStatus;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.web.http.IPAccessControl;
 import core.framework.log.Markers;
@@ -40,6 +41,6 @@ public class SchedulerController {
         String job = request.pathParam("job");
         logger.warn(Markers.errorCode("MANUAL_OPERATION"), "trigger job manually, job={}", job);   // log trace message, due to potential impact
         scheduler.triggerNow(job);
-        return Response.text("job triggered, job=" + job);
+        return Response.text("job triggered, job=" + job).status(HTTPStatus.ACCEPTED);
     }
 }

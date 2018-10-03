@@ -11,7 +11,6 @@ import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.json.JSON;
 import core.framework.log.Severity;
-import core.framework.util.Maps;
 import core.framework.util.Strings;
 import core.framework.web.service.RemoteServiceException;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,20 +35,6 @@ class WebServiceClientTest {
     }
 
     @Test
-    void addQueryParams() {
-        var request = new HTTPRequest(HTTPMethod.POST, "/");
-
-        Map<String, String> params = Maps.newLinkedHashMap();
-        params.put("p1", "v1");
-        params.put("p2", null);
-        params.put("p3", "v3");
-
-        webServiceClient.addQueryParams(request, params);
-
-        assertThat(request.params()).containsOnly(entry("p1", "v1"), entry("p3", "v3"));
-    }
-
-    @Test
     void addRequestBeanWithGet() {
         var request = new HTTPRequest(HTTPMethod.POST, "/");
 
@@ -57,7 +42,7 @@ class WebServiceClientTest {
         requestBean.intField = 23;
         webServiceClient.addRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
 
-        assertThat(request.params()).containsOnly(entry("int_field", "23"));
+        assertThat(request.params).contains(entry("int_field", "23"));
     }
 
     @Test

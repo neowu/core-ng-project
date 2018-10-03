@@ -17,12 +17,13 @@ class BodyLogParamTest {
         assertThat(BodyLogParam.param(Strings.bytes("{}"), ContentType.APPLICATION_JSON))
                 .isInstanceOf(JSONLogParam.class);
 
-        assertThat(BodyLogParam.param(Strings.bytes("value"), null))
-                .isEqualTo("byte[5]");
-
         assertThat(BodyLogParam.param(Strings.bytes("<xml/>"), ContentType.TEXT_XML))
                 .isInstanceOf(BytesLogParam.class);
+        assertThat(BodyLogParam.param(Strings.bytes("key=value"), ContentType.APPLICATION_FORM_URLENCODED))
+                .isInstanceOf(BytesLogParam.class);
 
+        assertThat(BodyLogParam.param(Strings.bytes("value"), null))
+                .isEqualTo("byte[5]");
         assertThat(BodyLogParam.param(new byte[10], ContentType.IMAGE_PNG))
                 .isEqualTo("byte[10]");
     }

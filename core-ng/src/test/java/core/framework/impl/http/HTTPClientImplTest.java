@@ -51,7 +51,7 @@ class HTTPClientImplTest {
     @Test
     void httpRequest() {
         var request = new HTTPRequest(HTTPMethod.POST, "http://localhost/uri");
-        request.param("query", "value");
+        request.params.put("query", "value");
         request.accept(ContentType.APPLICATION_JSON);
         request.body("text", ContentType.TEXT_PLAIN);
 

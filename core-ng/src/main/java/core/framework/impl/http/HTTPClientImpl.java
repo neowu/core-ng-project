@@ -1,7 +1,6 @@
 package core.framework.impl.http;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.http.ContentType;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPHeaders;
@@ -101,14 +100,14 @@ public final class HTTPClientImpl implements HTTPClient {
             try {
                 HttpResponse<byte[]> httpResponse = client.send(httpRequest, BodyHandlers.ofByteArray());
                 HTTPResponse response = response(httpResponse);
-                if (shouldRetry(attempts, request.method(), null, response.status())) {
+                if (shouldRetry(attempts, request.method, null, response.status())) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon");
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
                 }
                 return response;
             } catch (IOException | InterruptedException e) {
-                if (shouldRetry(attempts, request.method(), e, null)) {
+                if (shouldRetry(attempts, request.method, e, null)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon", e);
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
@@ -140,33 +139,34 @@ public final class HTTPClientImpl implements HTTPClient {
     HttpRequest httpRequest(HTTPRequest request) {
         HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-        HTTPMethod method = request.method();
-        String uri = request.uri();
-        Map<String, String> params = request.params();
-        logger.debug("[request] method={}, uri={}, params={}", method, uri, new MapLogParam(params));
+        HTTPMethod method = request.method;
+        String uri = request.uri;
         try {
-            var requestURI = new URI(requestURI(uri, params));
+            var requestURI = new URI(requestURI(uri, request.params));
             builder.uri(requestURI);
             // it seems undertow has bugs with h2c protocol, from test, not all the ExchangeCompletionListener will be executed which make ShutdownHandler not working properly
             // and cause GOAWAY frame / EOF read issue with small UndertowOptions.NO_REQUEST_TIMEOUT (e.g. 10ms)
             // by considering h2 is recommended, so only use http/1.1 without TLS
             if ("http".equals(requestURI.getScheme())) builder.version(HttpClient.Version.HTTP_1_1);
+
+            logger.debug("[request] method={}, uri={}", method, requestURI);
         } catch (URISyntaxException e) {
             throw new HTTPClientException("uri is invalid, uri=" + uri, "INVALID_URL", e);
         }
-        request.header(HTTPHeaders.USER_AGENT, userAgent);
-        Map<String, String> headers = request.headers();
-        for (Map.Entry<String, String> entry : headers.entrySet()) {
+
+        if (!request.params.isEmpty())
+            logger.debug("[request] params={}", new MapLogParam(request.params));
+
+        request.headers.put(HTTPHeaders.USER_AGENT, userAgent);
+        for (Map.Entry<String, String> entry : request.headers.entrySet()) {
             builder.setHeader(entry.getKey(), entry.getValue());
         }
-        logger.debug("[request] headers={}", new MapLogParam(headers));
+        logger.debug("[request] headers={}", new MapLogParam(request.headers));
 
         HttpRequest.BodyPublisher bodyPublisher;
         byte[] body = request.body();
         if (body != null) {
-            ContentType contentType = request.contentType();
-            logger.debug("[request] contentType={}, body={}", contentType, BodyLogParam.param(body, contentType));
-            builder.setHeader(HTTPHeaders.CONTENT_TYPE, contentType.toString());
+            logger.debug("[request] body={}", BodyLogParam.param(body, request.contentType()));
             bodyPublisher = BodyPublishers.ofByteArray(body);
         } else {
             bodyPublisher = BodyPublishers.noBody();

@@ -4,6 +4,7 @@ import core.framework.http.ContentType;
 import core.framework.impl.cache.CacheImpl;
 import core.framework.impl.cache.CacheManager;
 import core.framework.impl.web.http.IPAccessControl;
+import core.framework.util.Strings;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import core.framework.web.exception.NotFoundException;
@@ -37,7 +38,7 @@ public class CacheController {
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
         cache.evict(key);
-        return Response.text("cache evicted, name=" + name + ", key=" + key);
+        return Response.text(Strings.format("cache evicted, name={}, key={}", name, key));
     }
 
     public Response list(Request request) {

@@ -15,7 +15,8 @@ public final class BodyLogParam {
             String mediaType = contentType.mediaType();
             if (ContentType.APPLICATION_JSON.mediaType().equals(mediaType)) {
                 return new JSONLogParam(body, contentType.charset().orElse(UTF_8));    // make json body filterable
-            } else if (mediaType.contains("text")) {
+            } else if (mediaType.contains("text")
+                    || ContentType.APPLICATION_FORM_URLENCODED.mediaType().equals(mediaType)) {
                 return new BytesLogParam(body);
             }
         }

@@ -1,6 +1,9 @@
 ## Change log
+### 6.9.2 (10/3/2018 - )
+* httpClient: tweak request/response to make it more low level style, as we have high level api client
+
 ### 6.9.1 (10/3/2018)
-* httpClient: fix bug on detecting retry
+* httpClient: fix bug on shouldRetry
 
 ### 6.9.0 (9/24/2018 - 10/2/2018)    !!! only support java 11 !!!
 * jdk: update to java 11 

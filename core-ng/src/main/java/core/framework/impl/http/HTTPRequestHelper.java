@@ -10,11 +10,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public final class HTTPRequestHelper {
     public static void urlEncoding(StringBuilder builder, Map<String, String> params) {
-        boolean first = true;
+        boolean added = false;
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            if (!first) builder.append('&');
-            builder.append(encode(entry.getKey(), UTF_8)).append('=').append(encode(entry.getValue(), UTF_8));
-            first = false;
+            String value = entry.getValue();
+            if (added) builder.append('&');
+            builder.append(encode(entry.getKey(), UTF_8)).append('=');
+            // url encoding doesn't differentiate null and empty, so treat null and empty same
+            if (value != null) builder.append(encode(value, UTF_8));
+            added = true;
         }
     }
 }
