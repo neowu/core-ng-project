@@ -1,7 +1,6 @@
 package core.framework.impl.web.site;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.http.ContentType;
 import core.framework.impl.http.HTTPRequestHelper;
 import core.framework.web.Interceptor;
 import core.framework.web.Invocation;
@@ -9,6 +8,8 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 
 import java.util.Map;
+
+import static core.framework.http.ContentType.TEXT_HTML;
 
 /**
  * @author neo
@@ -31,7 +32,7 @@ public final class WebSecurityInterceptor implements Interceptor {    // refer t
     void appendSecurityHeaders(Response response) {
         response.header("Strict-Transport-Security", "max-age=31536000");
         response.contentType().ifPresent(contentType -> {
-            if (ContentType.TEXT_HTML.mediaType().equals(contentType.mediaType())) {
+            if (TEXT_HTML.mediaType.equals(contentType.mediaType)) {
                 response.header("Content-Security-Policy", contentSecurityPolicy);
                 response.header("X-XSS-Protection", "1; mode=block");       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
             }

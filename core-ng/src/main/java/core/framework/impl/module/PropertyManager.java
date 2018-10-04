@@ -17,7 +17,9 @@ public class PropertyManager {
 
     public Optional<String> property(String key) {
         String envVarName = envVarName(key);
-        String value = System.getenv(envVarName);  // use env var to override property, e.g. under docker/kubenetes, SYS_HTTP_PORT to override sys.http.port
+        // use env var to override property, e.g. under docker/kubenetes, SYS_HTTP_PORT to override sys.http.port
+        // in kube env, ConfigMap can be bound as env variables
+        String value = System.getenv(envVarName);
         if (!Strings.isBlank(value)) {
             logger.info("found overridden property by env var {}, key={}, value={}", envVarName, key, maskValue(key, value));
             return Optional.of(value);

@@ -137,7 +137,7 @@ public final class RequestImpl implements Request {
             } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT || method == HTTPMethod.PATCH) {
                 if (!formParams.isEmpty()) {
                     return mapper.fromParams(beanClass, formParams);
-                } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType().equals(contentType.mediaType())) {
+                } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType.equals(contentType.mediaType)) {
                     return mapper.fromJSON(beanClass, body);
                 }
                 throw new BadRequestException(format("body is missing or unsupported content type, method={}, contentType={}", method, contentType), "INVALID_HTTP_REQUEST");

@@ -3,9 +3,7 @@ package core.framework.impl.web.site;
 import core.framework.http.ContentType;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -13,10 +11,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class MimeTypesTest {
     @Test
     void get() {
-        assertNull(MimeTypes.get("file"));
+        assertThat(MimeTypes.get("file")).isNull();
 
         ContentType contentType = MimeTypes.get("favicon.ico");
-        assertNotNull(contentType);
-        assertEquals("image/x-icon", contentType.mediaType());
+        assertThat(contentType).isNotNull();
+        assertThat(contentType.mediaType).isEqualTo("image/x-icon");
     }
 }

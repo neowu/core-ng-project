@@ -27,7 +27,6 @@ public final class ContentType {
     public static final ContentType IMAGE_PNG = create("image/png", null);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentType.class);
-
     // cache most common ones to save paring time
     private static final Map<String, ContentType> CACHE = Map.of(
             APPLICATION_JSON.contentType, APPLICATION_JSON,
@@ -55,6 +54,11 @@ public final class ContentType {
         return new ContentType(contentType, mediaType, charset);
     }
 
+    public static ContentType create(String mediaType, Charset charset) {
+        String contentType = charset == null ? mediaType : mediaType + "; charset=" + ASCII.toLowerCase(charset.name());
+        return new ContentType(contentType, mediaType, charset);
+    }
+
     private static Charset parseCharset(String charset) {
         try {
             return Charset.forName(charset);
@@ -64,23 +68,14 @@ public final class ContentType {
         }
     }
 
-    public static ContentType create(String mediaType, Charset charset) {
-        String contentType = charset == null ? mediaType : mediaType + "; charset=" + ASCII.toLowerCase(charset.name());
-        return new ContentType(contentType, mediaType, charset);
-    }
-
+    public final String mediaType;
     private final String contentType;
-    private final String mediaType;
     private final Charset charset;
 
     private ContentType(String contentType, String mediaType, Charset charset) {
         this.contentType = contentType;
         this.mediaType = mediaType;
         this.charset = charset;
-    }
-
-    public String mediaType() {
-        return mediaType;
     }
 
     public Optional<Charset> charset() {

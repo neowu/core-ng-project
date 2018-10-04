@@ -61,7 +61,7 @@ public class HTTPErrorHandler {
         HeaderMap headers = exchange.getRequestHeaders();
         String accept = headers.getFirst(Headers.ACCEPT);
 
-        if (accept != null && accept.contains(ContentType.APPLICATION_JSON.mediaType())) {
+        if (accept != null && accept.contains(ContentType.APPLICATION_JSON.mediaType)) {
             String userAgent = headers.getFirst(Headers.USER_AGENT);
             return Response.bean(errorResponse(e, userAgent, actionLog.id)).status(status);
         } else {

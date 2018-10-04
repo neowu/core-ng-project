@@ -86,7 +86,7 @@ class HTTPClientImplTest {
 
         HTTPResponse response = httpClient.response(httpResponse);
         assertThat(response.status).isEqualTo(HTTPStatus.OK);
-        assertThat(response.contentType.mediaType()).isEqualTo(ContentType.TEXT_HTML.mediaType());
+        assertThat(response.contentType.mediaType).isEqualTo(ContentType.TEXT_HTML.mediaType);
         assertThat(response.headers)
                 .doesNotContainKeys(":status")
                 .containsEntry(HTTPHeaders.CONTENT_TYPE, "text/html");
