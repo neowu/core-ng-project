@@ -100,7 +100,7 @@ public final class HTTPClientImpl implements HTTPClient {
             try {
                 HttpResponse<byte[]> httpResponse = client.send(httpRequest, BodyHandlers.ofByteArray());
                 HTTPResponse response = response(httpResponse);
-                if (shouldRetry(attempts, request.method, null, response.status())) {
+                if (shouldRetry(attempts, request.method, null, response.status)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon");
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
@@ -132,26 +132,24 @@ public final class HTTPClientImpl implements HTTPClient {
         byte[] body = httpResponse.body();
         HTTPStatus status = parseHTTPStatus(statusCode);
         var response = new HTTPResponse(status, headers, body);
-        logger.debug("[response] body={}", BodyLogParam.param(body, response.contentType().orElse(null)));
+        logger.debug("[response] body={}", BodyLogParam.param(body, response.contentType));
         return response;
     }
 
     HttpRequest httpRequest(HTTPRequest request) {
         HttpRequest.Builder builder = HttpRequest.newBuilder();
 
-        HTTPMethod method = request.method;
-        String uri = request.uri;
         try {
-            var requestURI = new URI(requestURI(uri, request.params));
+            var requestURI = new URI(requestURI(request.uri, request.params));
             builder.uri(requestURI);
             // it seems undertow has bugs with h2c protocol, from test, not all the ExchangeCompletionListener will be executed which make ShutdownHandler not working properly
             // and cause GOAWAY frame / EOF read issue with small UndertowOptions.NO_REQUEST_TIMEOUT (e.g. 10ms)
             // by considering h2 is recommended, so only use http/1.1 without TLS
             if ("http".equals(requestURI.getScheme())) builder.version(HttpClient.Version.HTTP_1_1);
 
-            logger.debug("[request] method={}, uri={}", method, requestURI);
+            logger.debug("[request] method={}, uri={}", request.method, requestURI);
         } catch (URISyntaxException e) {
-            throw new HTTPClientException("uri is invalid, uri=" + uri, "INVALID_URL", e);
+            throw new HTTPClientException("uri is invalid, uri=" + request.uri, "INVALID_URL", e);
         }
 
         if (!request.params.isEmpty())
@@ -164,14 +162,13 @@ public final class HTTPClientImpl implements HTTPClient {
         logger.debug("[request] headers={}", new MapLogParam(request.headers));
 
         HttpRequest.BodyPublisher bodyPublisher;
-        byte[] body = request.body();
-        if (body != null) {
-            logger.debug("[request] body={}", BodyLogParam.param(body, request.contentType()));
-            bodyPublisher = BodyPublishers.ofByteArray(body);
+        if (request.body != null) {
+            logger.debug("[request] body={}", BodyLogParam.param(request.body, request.contentType));
+            bodyPublisher = BodyPublishers.ofByteArray(request.body);
         } else {
             bodyPublisher = BodyPublishers.noBody();
         }
-        builder.method(method.name(), bodyPublisher);
+        builder.method(request.method.name(), bodyPublisher);
 
         builder.timeout(timeout);
         return builder.build();

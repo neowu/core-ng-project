@@ -49,7 +49,7 @@ public class WebServiceClient {
         linkContext(request);
 
         if (requestBeanClass != null) {
-            addRequestBean(request, method, requestBeanClass, requestBean);
+            putRequestBean(request, method, requestBeanClass, requestBean);
         }
 
         if (interceptor != null) {
@@ -59,7 +59,7 @@ public class WebServiceClient {
 
         HTTPResponse response = httpClient.execute(request);
         validateResponse(response);
-        return responseBeanMapper.fromJSON(responseType, response.body());
+        return responseBeanMapper.fromJSON(responseType, response.body);
     }
 
     public void intercept(WebServiceClientInterceptor interceptor) {
@@ -67,7 +67,7 @@ public class WebServiceClient {
         this.interceptor = interceptor;
     }
 
-    <T> void addRequestBean(HTTPRequest request, HTTPMethod method, Class<T> requestBeanClass, T requestBean) {
+    <T> void putRequestBean(HTTPRequest request, HTTPMethod method, Class<T> requestBeanClass, T requestBean) {
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
             Map<String, String> queryParams = requestBeanMapper.toParams(requestBeanClass, requestBean);
             request.params.putAll(queryParams);
@@ -92,11 +92,10 @@ public class WebServiceClient {
     }
 
     void validateResponse(HTTPResponse response) {
-        HTTPStatus status = response.status();
+        HTTPStatus status = response.status;
         if (status.code >= 200 && status.code < 300) return;
-        byte[] responseBody = response.body();
         try {
-            ErrorResponse error = JSONMapper.fromJSON(ErrorResponse.class, responseBody);
+            ErrorResponse error = JSONMapper.fromJSON(ErrorResponse.class, response.body);
             logger.debug("failed to call remote service, id={}, severity={}, errorCode={}, remoteStackTrace={}", error.id, error.severity, error.errorCode, error.stackTrace);
             throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, status);
         } catch (RemoteServiceException e) {

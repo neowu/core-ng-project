@@ -5,7 +5,6 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.impl.json.JSONMapper;
 import core.framework.impl.web.bean.BeanMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
@@ -35,26 +35,26 @@ class WebServiceClientTest {
     }
 
     @Test
-    void addRequestBeanWithGet() {
+    void putRequestBeanWithGet() {
         var request = new HTTPRequest(HTTPMethod.POST, "/");
 
         var requestBean = new TestWebService.TestSearchRequest();
         requestBean.intField = 23;
-        webServiceClient.addRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
+        webServiceClient.putRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
 
         assertThat(request.params).contains(entry("int_field", "23"));
     }
 
     @Test
-    void addRequestBeanWithPost() {
+    void putRequestBeanWithPost() {
         var request = new HTTPRequest(HTTPMethod.POST, "/");
 
         var requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "123value";
-        webServiceClient.addRequestBean(request, HTTPMethod.POST, TestWebService.TestRequest.class, requestBean);
+        webServiceClient.putRequestBean(request, HTTPMethod.POST, TestWebService.TestRequest.class, requestBean);
 
-        assertThat(request.body()).isEqualTo(JSONMapper.toJSON(requestBean));
-        assertThat(request.contentType()).isEqualTo(ContentType.APPLICATION_JSON);
+        assertThat(new String(request.body, UTF_8)).isEqualTo(JSON.toJSON(requestBean));
+        assertThat(request.contentType).isEqualTo(ContentType.APPLICATION_JSON);
     }
 
     @Test

@@ -20,9 +20,9 @@ class HTTPRequestTest {
         request.body("text", ContentType.TEXT_PLAIN);
 
         assertThat(request.method).isEqualTo(HTTPMethod.POST);
-        assertThat(request.contentType()).isEqualTo(ContentType.TEXT_PLAIN);
+        assertThat(request.contentType).isEqualTo(ContentType.TEXT_PLAIN);
         assertThat(request.headers).containsEntry(HTTPHeaders.CONTENT_TYPE, "text/plain; charset=utf-8");
-        assertThat(request.body()).isEqualTo(Strings.bytes("text"));
+        assertThat(request.body).isEqualTo(Strings.bytes("text"));
     }
 
     @Test
@@ -55,8 +55,8 @@ class HTTPRequestTest {
         form.put("key2", "v1+v2");
         request.form(form);
 
-        assertThat(request.contentType()).isEqualTo(ContentType.APPLICATION_FORM_URLENCODED);
+        assertThat(request.contentType).isEqualTo(ContentType.APPLICATION_FORM_URLENCODED);
         assertThat(request.headers).containsEntry(HTTPHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
-        assertThat(new String(request.body(), UTF_8)).isEqualTo("key1=v1+v2&key2=v1%2Bv2");
+        assertThat(new String(request.body, UTF_8)).isEqualTo("key1=v1+v2&key2=v1%2Bv2");
     }
 }

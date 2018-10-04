@@ -85,10 +85,11 @@ class HTTPClientImplTest {
         when(httpResponse.headers()).thenReturn(HttpHeaders.of(Map.of("content-type", List.of("text/html"), ":status", List.of("200")), (name, value) -> true));
 
         HTTPResponse response = httpClient.response(httpResponse);
-        assertThat(response.status()).isEqualTo(HTTPStatus.OK);
-        assertThat(response.header(HTTPHeaders.CONTENT_TYPE)).as("header should be case insensitive").get().isEqualTo("text/html");
-        assertThat(response.contentType()).get().satisfies(contentType -> assertThat(contentType.mediaType()).isEqualTo(ContentType.TEXT_HTML.mediaType()));
-        assertThat(response.header(":status")).isEmpty();
+        assertThat(response.status).isEqualTo(HTTPStatus.OK);
+        assertThat(response.contentType.mediaType()).isEqualTo(ContentType.TEXT_HTML.mediaType());
+        assertThat(response.headers)
+                .doesNotContainKeys(":status")
+                .containsEntry(HTTPHeaders.CONTENT_TYPE, "text/html");
     }
 
     @Test

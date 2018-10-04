@@ -16,7 +16,7 @@ class HTTPResponseTest {
     void text() {
         var response = new HTTPResponse(HTTPStatus.OK, Map.of(HTTPHeaders.CONTENT_TYPE, ContentType.TEXT_PLAIN.toString()), Strings.bytes("value"));
 
-        assertThat(response.contentType().orElseThrow().toString()).isEqualTo(ContentType.TEXT_PLAIN.toString());
+        assertThat(response.contentType.toString()).isEqualTo(ContentType.TEXT_PLAIN.toString());
         assertThat(response.text()).isEqualTo("value");
     }
 }

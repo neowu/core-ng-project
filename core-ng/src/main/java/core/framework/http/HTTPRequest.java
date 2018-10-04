@@ -18,8 +18,8 @@ public final class HTTPRequest {
     public final Map<String, String> params = Maps.newLinkedHashMap();
     public final Map<String, String> headers = Maps.newLinkedHashMap();    // make headers/params order deterministic
 
-    private byte[] body;
-    private ContentType contentType;
+    public byte[] body;
+    public ContentType contentType;
 
     public HTTPRequest(HTTPMethod method, String uri) {
         this.method = method;
@@ -34,8 +34,10 @@ public final class HTTPRequest {
         headers.put(HTTPHeaders.AUTHORIZATION, "Basic " + Encodings.base64(user + ':' + password));
     }
 
-    public byte[] body() {
-        return body;
+    public void body(byte[] body, ContentType contentType) {
+        this.body = body;
+        this.contentType = contentType;
+        headers.put(HTTPHeaders.CONTENT_TYPE, contentType.toString());
     }
 
     public void body(String body, ContentType contentType) {
@@ -43,19 +45,9 @@ public final class HTTPRequest {
         body(bytes, contentType);
     }
 
-    public void body(byte[] body, ContentType contentType) {
-        this.body = body;
-        this.contentType = contentType;
-        headers.put(HTTPHeaders.CONTENT_TYPE, contentType.toString());
-    }
-
     public void form(Map<String, String> form) {
         var builder = new StringBuilder(256);
         HTTPRequestHelper.urlEncoding(builder, form);
         body(Strings.bytes(builder.toString()), ContentType.APPLICATION_FORM_URLENCODED);
-    }
-
-    public ContentType contentType() {
-        return contentType;
     }
 }

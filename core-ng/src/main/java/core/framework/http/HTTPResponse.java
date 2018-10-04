@@ -4,7 +4,6 @@ import core.framework.api.http.HTTPStatus;
 
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -12,10 +11,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author neo
  */
 public final class HTTPResponse {
-    private final ContentType contentType;
-    private final HTTPStatus status;
-    private final Map<String, String> headers;
-    private final byte[] body;
+    public final HTTPStatus status;
+    public final byte[] body;
+    public final Map<String, String> headers;   // headers key is case insensitive
+    public final ContentType contentType;
 
     public HTTPResponse(HTTPStatus status, Map<String, String> headers, byte[] body) {
         this.status = status;
@@ -26,32 +25,9 @@ public final class HTTPResponse {
         this.contentType = contentType == null ? null : ContentType.parse(contentType);
     }
 
-    public HTTPStatus status() {
-        return status;
-    }
-
-    public Map<String, String> headers() {
-        return headers;
-    }
-
-    public Optional<String> header(String name) {
-        return Optional.ofNullable(headers.get(name));
-    }
-
-    public Optional<ContentType> contentType() {
-        return Optional.ofNullable(contentType);
-    }
-
     public String text() {
-        return new String(body, charset());
-    }
-
-    public byte[] body() {
-        return body;
-    }
-
-    private Charset charset() {
-        if (contentType == null) return UTF_8;
-        return contentType.charset().orElse(UTF_8);
+        Charset charset = UTF_8;
+        if (contentType != null) charset = contentType.charset().orElse(UTF_8);
+        return new String(body, charset);
     }
 }
