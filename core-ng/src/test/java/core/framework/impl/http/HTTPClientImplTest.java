@@ -59,7 +59,7 @@ class HTTPClientImplTest {
         assertThat(httpRequest.uri().toString()).isEqualTo("http://localhost/uri?query=value");
         assertThat(httpRequest.headers().firstValue(HTTPHeaders.ACCEPT)).get().isEqualTo(ContentType.APPLICATION_JSON.toString());
         assertThat(httpRequest.headers().firstValue(HTTPHeaders.USER_AGENT)).get().isEqualTo("TestUserAgent");
-        assertThat(httpRequest.version()).get().isEqualTo(HttpClient.Version.HTTP_1_1);
+        assertThat(httpRequest.version()).isEmpty();
     }
 
     @Test
@@ -74,7 +74,7 @@ class HTTPClientImplTest {
         var request = new HTTPRequest(HTTPMethod.GET, "https://localhost/uri");
         HttpRequest httpRequest = httpClient.httpRequest(request);
         assertThat(httpRequest.uri().toString()).isEqualTo("https://localhost/uri");
-        assertThat(httpRequest.version()).as("https uses h2 as default protocol").isEmpty();
+        assertThat(httpRequest.version()).get().isEqualTo(HttpClient.Version.HTTP_2);
     }
 
     @Test

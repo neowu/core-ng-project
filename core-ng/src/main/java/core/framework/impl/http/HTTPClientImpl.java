@@ -142,10 +142,8 @@ public final class HTTPClientImpl implements HTTPClient {
         try {
             var requestURI = new URI(requestURI(request.uri, request.params));
             builder.uri(requestURI);
-            // it seems undertow has bugs with h2c protocol, from test, not all the ExchangeCompletionListener will be executed which make ShutdownHandler not working properly
-            // and cause GOAWAY frame / EOF read issue with small UndertowOptions.NO_REQUEST_TIMEOUT (e.g. 10ms)
-            // by considering h2 is recommended, so only use http/1.1 without TLS
-            if ("http".equals(requestURI.getScheme())) builder.version(HttpClient.Version.HTTP_1_1);
+
+            if ("https".equals(requestURI.getScheme())) builder.version(HttpClient.Version.HTTP_2);
 
             logger.debug("[request] method={}, uri={}", request.method, requestURI);
         } catch (URISyntaxException e) {
@@ -153,7 +151,7 @@ public final class HTTPClientImpl implements HTTPClient {
         }
 
         if (!request.params.isEmpty())
-            logger.debug("[request] params={}", new MapLogParam(request.params));
+            logger.debug("[request] params={}", new MapLogParam(request.params));   // due to null/empty will be serialized to empty value, so here to log actual params
 
         request.headers.put(HTTPHeaders.USER_AGENT, userAgent);
         for (Map.Entry<String, String> entry : request.headers.entrySet()) {

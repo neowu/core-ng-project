@@ -33,7 +33,7 @@ public final class HTTPClientBuilder {
     public HTTPClient build() {
         var watch = new StopWatch();
         try {
-            HttpClient.Builder builder = HttpClient.newBuilder();
+            HttpClient.Builder builder = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1);
 
             if (trustAll) {
                 SSLContext sslContext = SSLContext.getInstance("TLS");

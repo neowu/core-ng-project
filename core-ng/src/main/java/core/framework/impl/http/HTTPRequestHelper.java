@@ -15,7 +15,7 @@ public final class HTTPRequestHelper {
             String value = entry.getValue();
             if (added) builder.append('&');
             builder.append(encode(entry.getKey(), UTF_8)).append('=');
-            // url encoding doesn't differentiate null and empty, so treat null and empty same
+            // url encoding doesn't differentiate null and empty, so treat null as empty value
             if (value != null) builder.append(encode(value, UTF_8));
             added = true;
         }

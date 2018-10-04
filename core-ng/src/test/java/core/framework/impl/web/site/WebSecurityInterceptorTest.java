@@ -1,12 +1,12 @@
 package core.framework.impl.web.site;
 
 import core.framework.http.ContentType;
-import core.framework.util.Maps;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,12 +47,13 @@ class WebSecurityInterceptorTest {
         Request request = mock(Request.class);
         when(request.hostName()).thenReturn("host");
         when(request.path()).thenReturn("/path");
-        Map<String, String> queryParams = Maps.newHashMap();
+        Map<String, String> queryParams = new LinkedHashMap<>();
         queryParams.put("key1", "value1");
         queryParams.put("key2", "value2");
+        queryParams.put("key3", "");
         when(request.queryParams()).thenReturn(queryParams);
 
         String redirectURL = interceptor.redirectURL(request);
-        assertThat(redirectURL).isEqualTo("https://host/path?key1=value1&key2=value2");
+        assertThat(redirectURL).isEqualTo("https://host/path?key1=value1&key2=value2&key3=");
     }
 }

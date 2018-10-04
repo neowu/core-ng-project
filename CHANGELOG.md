@@ -1,6 +1,7 @@
 ## Change log
 ### 6.9.2 (10/3/2018 - )
 * httpClient: tweak request/response to make it more low level style
+* api: refined query param bean behavior, empty value will be treated as null, refer to core.framework.impl.web.bean.QueryParamMapper 
 
 ### 6.9.1 (10/3/2018)
 * httpClient: fix bug on shouldRetry

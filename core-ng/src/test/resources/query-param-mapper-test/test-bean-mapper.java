@@ -18,38 +18,49 @@ public class QueryParamMapper$TestQueryParamBean implements core.framework.impl.
 
     public Object fromParams(java.util.Map params) {
         core.framework.impl.web.bean.TestQueryParamBean bean = new core.framework.impl.web.bean.TestQueryParamBean();
-        if (params.containsKey("zoned_date_time_field")) {
-            bean.zonedDateTimeField = core.framework.impl.web.bean.QueryParamMapperHelper.toZonedDateTime((String)params.get("zoned_date_time_field"));
+        String $zonedDateTimeField = (String)params.get("zoned_date_time_field");
+        if ($zonedDateTimeField != null) {
+            bean.zonedDateTimeField = core.framework.impl.web.bean.QueryParamMapperHelper.toZonedDateTime($zonedDateTimeField);
         }
-        if (params.containsKey("date_time_field")) {
-            bean.dateTimeField = core.framework.impl.web.bean.QueryParamMapperHelper.toDateTime((String)params.get("date_time_field"));
+        String $dateTimeField = (String)params.get("date_time_field");
+        if ($dateTimeField != null) {
+            bean.dateTimeField = core.framework.impl.web.bean.QueryParamMapperHelper.toDateTime($dateTimeField);
         }
-        if (params.containsKey("date_field")) {
-            bean.dateField = core.framework.impl.web.bean.QueryParamMapperHelper.toDate((String)params.get("date_field"));
+        String $dateField = (String)params.get("date_field");
+        if ($dateField != null) {
+            bean.dateField = core.framework.impl.web.bean.QueryParamMapperHelper.toDate($dateField);
         }
-        if (params.containsKey("string_field")) {
-            bean.stringField = (String)params.get("string_field");
+        String $stringField = (String)params.get("string_field");
+        if ($stringField != null) {
+            bean.stringField = core.framework.impl.web.bean.QueryParamMapperHelper.toString($stringField);
         }
-        if (params.containsKey("int_field")) {
-            bean.intField = core.framework.impl.web.bean.QueryParamMapperHelper.toInt((String)params.get("int_field"));
+        String $intField = (String)params.get("int_field");
+        if ($intField != null) {
+            bean.intField = core.framework.impl.web.bean.QueryParamMapperHelper.toInt($intField);
         }
-        if (params.containsKey("long_field")) {
-            bean.longField = core.framework.impl.web.bean.QueryParamMapperHelper.toLong((String)params.get("long_field"));
+        String $longField = (String)params.get("long_field");
+        if ($longField != null) {
+            bean.longField = core.framework.impl.web.bean.QueryParamMapperHelper.toLong($longField);
         }
-        if (params.containsKey("double_field")) {
-            bean.doubleField = core.framework.impl.web.bean.QueryParamMapperHelper.toDouble((String)params.get("double_field"));
+        String $doubleField = (String)params.get("double_field");
+        if ($doubleField != null) {
+            bean.doubleField = core.framework.impl.web.bean.QueryParamMapperHelper.toDouble($doubleField);
         }
-        if (params.containsKey("big_decimal_field")) {
-            bean.bigDecimalField = core.framework.impl.web.bean.QueryParamMapperHelper.toBigDecimal((String)params.get("big_decimal_field"));
+        String $bigDecimalField = (String)params.get("big_decimal_field");
+        if ($bigDecimalField != null) {
+            bean.bigDecimalField = core.framework.impl.web.bean.QueryParamMapperHelper.toBigDecimal($bigDecimalField);
         }
-        if (params.containsKey("boolean_field")) {
-            bean.booleanField = core.framework.impl.web.bean.QueryParamMapperHelper.toBoolean((String)params.get("boolean_field"));
+        String $booleanField = (String)params.get("boolean_field");
+        if ($booleanField != null) {
+            bean.booleanField = core.framework.impl.web.bean.QueryParamMapperHelper.toBoolean($booleanField);
         }
-        if (params.containsKey("enum_field")) {
-            bean.enumField = (core.framework.impl.web.bean.TestQueryParamBean.TestEnum)core.framework.impl.web.bean.QueryParamMapperHelper.toEnum((String)params.get("enum_field"), core.framework.impl.web.bean.TestQueryParamBean.TestEnum.class);
+        String $enumField = (String)params.get("enum_field");
+        if ($enumField != null) {
+            bean.enumField = (core.framework.impl.web.bean.TestQueryParamBean.TestEnum)core.framework.impl.web.bean.QueryParamMapperHelper.toEnum($enumField, core.framework.impl.web.bean.TestQueryParamBean.TestEnum.class);
         }
-        if (params.containsKey("default_value_field")) {
-            bean.defaultValueField = (String)params.get("default_value_field");
+        String $defaultValueField = (String)params.get("default_value_field");
+        if ($defaultValueField != null) {
+            bean.defaultValueField = core.framework.impl.web.bean.QueryParamMapperHelper.toString($defaultValueField);
         }
         return bean;
     }
