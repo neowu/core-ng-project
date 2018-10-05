@@ -17,7 +17,7 @@ class HTTPRequestHelperTest {
         Map<String, String> params = new LinkedHashMap<>();
         params.put("key1", "");
         params.put("key2", "value2");
-        params.put("key3", null);
+        params.put("key3", null);   // both null and empty will be serialized as empty
         HTTPRequestHelper.urlEncoding(builder, params);
         assertThat(builder.toString()).isEqualTo("key1=&key2=value2&key3=");
     }

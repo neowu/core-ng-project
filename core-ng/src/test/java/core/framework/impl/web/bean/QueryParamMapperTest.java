@@ -31,7 +31,7 @@ class QueryParamMapperTest {
     }
 
     @Test
-    void testToParams() {
+    void convertBeanToParams() {
         var bean = new TestQueryParamBean();
         bean.stringField = "value";
         bean.intField = 12;
@@ -54,7 +54,8 @@ class QueryParamMapperTest {
         var params = Map.of("boolean_field", "true",
                 "big_decimal_field", "345.67",
                 "date_field", "2017-08-28",
-                "long_field", "123");
+                "long_field", "123",
+                "double_field", "");
 
         TestQueryParamBean bean = mapper.fromParams(params);
 
@@ -62,6 +63,7 @@ class QueryParamMapperTest {
         assertThat(bean.bigDecimalField).isEqualTo("345.67");
         assertThat(bean.dateField).isEqualTo(LocalDate.of(2017, 8, 28));
         assertThat(bean.longField).isEqualTo(123);
+        assertThat(bean.doubleField).isNull();
         assertThat(bean.defaultValueField).isEqualTo("value");
     }
 }

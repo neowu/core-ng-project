@@ -20,4 +20,4 @@
 * class in interface module generates Validator make interface depends on core-ng module (java module)
 * it seems undertow has bugs with h2c protocol, from test, not all the ExchangeCompletionListener will be executed which make ShutdownHandler not working properly
   and cause GOAWAY frame / EOF read issue with small UndertowOptions.NO_REQUEST_TIMEOUT (e.g. 10ms)
-* jdk httpclient with http/2.0 seems to cause high cpu due to SequentialScheduler/SSLFlowDelegate
+* jdk httpclient with http/2.0 seems to cause high cpu due to endless loop of SequentialScheduler/SSLFlowDelegate
