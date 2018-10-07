@@ -33,7 +33,7 @@ public class DiagnosticController {
         return Response.text(invoke("gcClassHistogram"));
     }
 
-    String invoke(String operation) {
+    private String invoke(String operation) {
         try {
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();
             var name = new ObjectName("com.sun.management", "type", "DiagnosticCommand");
