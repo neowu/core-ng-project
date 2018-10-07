@@ -38,7 +38,7 @@ class SSLContextBuilder {
                 + "Y0L4ejwKFziPxGXVJE5MKVQBrNu4Zm5I+1SwSMI0A1PBMXSLWaqn6j9D5vchsVgs\n"
                 + "2H9+2fvrTrHGAI8L7qHzi+ODImYf\n"
                 + "-----END CERTIFICATE-----";
-        String privateKey1 = "-----BEGIN PRIVATE KEY-----\n"
+        String key = "-----BEGIN PRIVATE KEY-----\n"
                 + "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAMbb02eHbJeYc6V0\n"
                 + "dPXnb3W2sjfZEhrH+sx+cHJkHC1go+3ob/5/clnhPif956vBKD4bCqsw8SfnoYeR\n"
                 + "CgSRXKfHvogOz7dZId4Gk1hXd2h+X+wqSSlTEu4JniEoqf5cazCL3N4LwUGVGJCP\n"
@@ -55,7 +55,7 @@ class SSLContextBuilder {
                 + "nX1T2cCQuFQrYA==\n"
                 + "-----END PRIVATE KEY-----\n";
         try {
-            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(PEM.fromPEM(privateKey1)));
+            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(PEM.fromPEM(key)));
             Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(PEM.fromPEM(cert)));
 
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());

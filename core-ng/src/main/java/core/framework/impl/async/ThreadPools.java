@@ -13,6 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author neo
  */
 public final class ThreadPools {
+    // provide thread pool with no limit task queue, and start at max pool size num of threads
+    // with SynchronousQueue, it will only accept new tasks if there is an idle thread available (that's why Executors.newCachedThreadPool() uses Integer.MAX_VALUE as maximumPoolSize)
+    // refer to java.util.concurrent.ThreadPoolExecutor.execute for how it determines to create new thread
     public static ExecutorService cachedThreadPool(int poolSize, String prefix) {
         var threadPool = new ThreadPoolExecutor(poolSize, poolSize, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new ThreadFactoryImpl(prefix));
         threadPool.allowCoreThreadTimeOut(true);
