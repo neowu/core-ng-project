@@ -20,11 +20,11 @@ class PropertyControllerTest {
     }
 
     @Test
-    void text() {
+    void properties() {
         propertyManager.properties.set("sys.jdbc.user", "user");
         propertyManager.properties.set("sys.jdbc.password", "password");
 
-        assertThat(controller.text())
+        assertThat(controller.properties())
                 .contains("sys.jdbc.password=******")
                 .contains("sys.jdbc.user=user");
     }

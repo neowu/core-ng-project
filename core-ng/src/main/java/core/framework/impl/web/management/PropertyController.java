@@ -23,11 +23,11 @@ public class PropertyController implements Controller {
     @Override
     public Response execute(Request request) {
         accessControl.validate(request.clientIP());
-        return Response.text(text());
+        return Response.text(properties());
     }
 
-    String text() {
-        StringBuilder builder = new StringBuilder();
+    String properties() {
+        var builder = new StringBuilder();
         Set<String> keys = new TreeSet<>(propertyManager.properties.keys());   // sort by key
         for (String key : keys) {
             String value = propertyManager.property(key).orElse("");

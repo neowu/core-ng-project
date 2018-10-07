@@ -9,9 +9,8 @@ import core.framework.impl.web.HTTPServer;
 import core.framework.impl.web.controller.ControllerClassValidator;
 import core.framework.impl.web.controller.ControllerHolder;
 import core.framework.impl.web.controller.ControllerInspector;
-import core.framework.impl.web.management.MemoryUsageController;
+import core.framework.impl.web.management.DiagnosticController;
 import core.framework.impl.web.management.PropertyController;
-import core.framework.impl.web.management.ThreadInfoController;
 import core.framework.impl.web.route.PathPatternValidator;
 import core.framework.util.ASCII;
 import core.framework.util.Lists;
@@ -47,10 +46,10 @@ public class ModuleContext {
         shutdownHook.add(ShutdownHook.STAGE_0, timeout -> httpServer.shutdown());
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitTermination);
 
-        route(HTTPMethod.GET, "/_sys/memory", new MemoryUsageController(), true);
-        var threadInfoController = new ThreadInfoController();
-        route(HTTPMethod.GET, "/_sys/thread", threadInfoController::threadUsage, true);
-        route(HTTPMethod.GET, "/_sys/thread-dump", threadInfoController::threadDump, true);
+        var vmController = new DiagnosticController();
+        route(HTTPMethod.GET, "/_sys/vm", vmController::vm, true);
+        route(HTTPMethod.GET, "/_sys/thread", vmController::thread, true);
+        route(HTTPMethod.GET, "/_sys/heap", vmController::heap, true);
         var propertyController = new PropertyController(propertyManager);
         route(HTTPMethod.GET, "/_sys/property", propertyController, true);
     }

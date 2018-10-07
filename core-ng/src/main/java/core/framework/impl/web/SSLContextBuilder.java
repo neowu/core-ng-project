@@ -22,8 +22,8 @@ import java.security.spec.PKCS8EncodedKeySpec;
 /**
  * @author neo
  */
-class SSLContextBuilder {
-    SSLContext build() {
+public class SSLContextBuilder {
+    public SSLContext build() {
         String cert = "-----BEGIN CERTIFICATE-----\n"
                 + "MIICITCCAYoCCQCYd6FYSuVDODANBgkqhkiG9w0BAQUFADBVMQswCQYDVQQGEwJV\n"
                 + "UzEQMA4GA1UECAwHdW5rbm93bjEQMA4GA1UEBwwHdW5rbm93bjEQMA4GA1UECgwH\n"
