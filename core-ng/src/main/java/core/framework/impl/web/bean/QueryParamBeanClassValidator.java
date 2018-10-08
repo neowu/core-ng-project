@@ -18,7 +18,7 @@ import static core.framework.util.Strings.format;
  */
 final class QueryParamBeanClassValidator implements TypeVisitor {
     private final DataTypeValidator validator;
-    private final Set<String> visitedQueryParams = Sets.newHashSet();
+    private final Set<String> visitedParams = Sets.newHashSet();
     private final BeanMapperRegistry registry;
 
     QueryParamBeanClassValidator(Class<?> beanClass, BeanMapperRegistry registry) {
@@ -48,7 +48,7 @@ final class QueryParamBeanClassValidator implements TypeVisitor {
 
         String name = queryParam.name();
 
-        boolean added = visitedQueryParams.add(queryParam.name());
+        boolean added = visitedParams.add(queryParam.name());
         if (!added)
             throw new Error(format("found duplicate query param, field={}, name={}", Fields.path(field), name));
     }

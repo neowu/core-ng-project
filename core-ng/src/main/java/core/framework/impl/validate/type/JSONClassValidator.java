@@ -36,7 +36,7 @@ public class JSONClassValidator implements TypeVisitor {
     }
 
     private final DataTypeValidator validator;
-    private final Map<String, Set<String>> properties = Maps.newHashMap();
+    private final Map<String, Set<String>> visitedProperties = Maps.newHashMap();
 
     public JSONClassValidator(Class<?> instanceClass) {
         validator = new DataTypeValidator(instanceClass);
@@ -62,7 +62,7 @@ public class JSONClassValidator implements TypeVisitor {
             throw new Error(format("@Property name attribute must not be blank, field={}", Fields.path(field)));
         }
 
-        boolean added = this.properties.computeIfAbsent(parentPath, key -> Sets.newHashSet()).add(name);
+        boolean added = visitedProperties.computeIfAbsent(parentPath, key -> Sets.newHashSet()).add(name);
         if (!added) {
             throw new Error(format("found duplicate property, field={}, name={}", Fields.path(field), name));
         }
