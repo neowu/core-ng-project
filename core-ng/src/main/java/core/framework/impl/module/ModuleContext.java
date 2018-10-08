@@ -12,6 +12,8 @@ import core.framework.impl.web.controller.ControllerInspector;
 import core.framework.impl.web.management.DiagnosticController;
 import core.framework.impl.web.management.PropertyController;
 import core.framework.impl.web.route.PathPatternValidator;
+import core.framework.impl.web.service.ErrorResponse;
+import core.framework.impl.web.site.AJAXErrorResponse;
 import core.framework.util.ASCII;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
@@ -46,10 +48,13 @@ public class ModuleContext {
         shutdownHook.add(ShutdownHook.STAGE_0, timeout -> httpServer.shutdown());
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitTermination);
 
-        var vmController = new DiagnosticController();
-        route(HTTPMethod.GET, "/_sys/vm", vmController::vm, true);
-        route(HTTPMethod.GET, "/_sys/thread", vmController::thread, true);
-        route(HTTPMethod.GET, "/_sys/heap", vmController::heap, true);
+        httpServer.handler.beanMapperRegistry.register(ErrorResponse.class);
+        httpServer.handler.beanMapperRegistry.register(AJAXErrorResponse.class);
+
+        var diagnosticController = new DiagnosticController();
+        route(HTTPMethod.GET, "/_sys/vm", diagnosticController::vm, true);
+        route(HTTPMethod.GET, "/_sys/thread", diagnosticController::thread, true);
+        route(HTTPMethod.GET, "/_sys/heap", diagnosticController::heap, true);
         var propertyController = new PropertyController(propertyManager);
         route(HTTPMethod.GET, "/_sys/property", propertyController, true);
     }

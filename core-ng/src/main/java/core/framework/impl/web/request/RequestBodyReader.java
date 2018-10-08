@@ -71,7 +71,7 @@ public final class RequestBodyReader implements ChannelListener<StreamSourceChan
 
     private void ensureCapacity(int bytesRead) {
         if (contentLength >= 0) {
-            if (bytesRead + position > contentLength) throw new Error(format("body exceeds expected content length, expected={}", contentLength));
+            if (bytesRead + position > contentLength) throw new Error("body exceeds expected content length, expected=" + contentLength);
         } else {
             if (body == null) { // undertow buffer is 16k, if there is no content length, in most of cases, it's best just to create exact buffer as first read thru
                 body = new byte[bytesRead];

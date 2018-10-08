@@ -6,7 +6,6 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.impl.json.JSONMapper;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.HTTPHandler;
@@ -95,7 +94,7 @@ public class WebServiceClient {
         HTTPStatus status = response.status;
         if (status.code >= 200 && status.code < 300) return;
         try {
-            ErrorResponse error = JSONMapper.fromJSON(ErrorResponse.class, response.body);
+            ErrorResponse error = (ErrorResponse) responseBeanMapper.fromJSON(ErrorResponse.class, response.body);
             logger.debug("failed to call remote service, id={}, severity={}, errorCode={}, remoteStackTrace={}", error.id, error.severity, error.errorCode, error.stackTrace);
             throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, status);
         } catch (RemoteServiceException e) {

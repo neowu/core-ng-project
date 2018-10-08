@@ -42,6 +42,9 @@ public class TestBean {
     @Property(name = "instant")
     public Instant instantField;
 
+    @Property(name = "enum")
+    public TestEnum enumField;
+
     public Integer notAnnotatedField;
 
     @Property(name = "empty")

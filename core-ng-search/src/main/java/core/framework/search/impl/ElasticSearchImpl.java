@@ -1,11 +1,12 @@
 package core.framework.search.impl;
 
-import core.framework.impl.json.JSONMapper;
+import core.framework.impl.json.JSONReader;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.util.InputStreams;
 import core.framework.util.StopWatch;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
 import org.elasticsearch.client.Request;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 
@@ -123,12 +125,20 @@ public class ElasticSearchImpl implements ElasticSearch {
         var watch = new StopWatch();
         try {
             Response response = client().getLowLevelClient().performRequest(new Request("GET", "/_cluster/state/metadata"));
-            byte[] bytes = InputStreams.bytesWithExpectedLength(response.getEntity().getContent(), (int) response.getEntity().getContentLength());
-            return JSONMapper.fromJSON(ClusterStateResponse.class, bytes);
+            byte[] bytes = responseBody(response.getEntity());
+            JSONReader<ClusterStateResponse> reader = JSONReader.of(ClusterStateResponse.class);
+            return reader.fromJSON(bytes);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
             logger.info("indices, elapsed={}", watch.elapsed());
+        }
+    }
+
+    private byte[] responseBody(HttpEntity entity) throws IOException {
+        try (InputStream stream = entity.getContent()) {
+            int length = (int) entity.getContentLength();
+            return InputStreams.bytesWithExpectedLength(stream, length);
         }
     }
 

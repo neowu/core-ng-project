@@ -1,6 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.json.JSONMapper;
+import core.framework.impl.json.JSONWriter;
 import core.framework.impl.validate.ValidationException;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
@@ -20,10 +20,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class ResponseBeanMapperTest {
     private ResponseBeanMapper responseBeanMapper;
+    private JSONWriter<TestBean> writer;
 
     @BeforeEach
     void createResponseBeanMapper() {
         responseBeanMapper = new ResponseBeanMapper(new BeanMapperRegistry());
+        writer = JSONWriter.of(TestBean.class);
     }
 
     @Test
@@ -74,7 +76,7 @@ class ResponseBeanMapperTest {
         bean.intField = 3;
 
         @SuppressWarnings("unchecked")
-        var parsedBean = (Optional<TestBean>) responseBeanMapper.fromJSON(Types.optional(TestBean.class), JSONMapper.toJSON(bean));
+        var parsedBean = (Optional<TestBean>) responseBeanMapper.fromJSON(Types.optional(TestBean.class), writer.toJSON(bean));
         assertThat(parsedBean).get().isEqualToComparingFieldByField(bean);
     }
 
@@ -82,7 +84,7 @@ class ResponseBeanMapperTest {
     void fromJSONWithValidationError() {
         var bean = new TestBean();
 
-        assertThatThrownBy(() -> responseBeanMapper.fromJSON(TestBean.class, JSONMapper.toJSON(bean)))
+        assertThatThrownBy(() -> responseBeanMapper.fromJSON(TestBean.class, writer.toJSON(bean)))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("int_field");
     }
@@ -97,7 +99,7 @@ class ResponseBeanMapperTest {
         TestBean bean = new TestBean();
         bean.intField = 3;
 
-        TestBean parsedBean = (TestBean) responseBeanMapper.fromJSON(TestBean.class, JSONMapper.toJSON(bean));
+        TestBean parsedBean = (TestBean) responseBeanMapper.fromJSON(TestBean.class, writer.toJSON(bean));
         assertThat(parsedBean).isEqualToComparingFieldByField(bean);
     }
 }

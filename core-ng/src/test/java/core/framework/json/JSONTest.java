@@ -90,6 +90,17 @@ class JSONTest {
     }
 
     @Test
+    void enumField() {
+        var bean = new TestBean();
+        bean.enumField = TestBean.TestEnum.C;
+
+        String json = JSON.toJSON(bean);
+        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
+
+        assertThat(parsedBean.enumField).isEqualTo(bean.enumField);
+    }
+
+    @Test
     void listObject() {
         @SuppressWarnings("unchecked")
         var beans = (List<TestBean>) JSON.fromJSON(Types.list(TestBean.class), "[{\"string\":\"n1\"},{\"string\":\"n2\"}]");
