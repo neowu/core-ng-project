@@ -1,5 +1,6 @@
 ## Change log
 ### 6.9.3 (10/8/2018 - )
+* log: update slfj4 to 1.8, which switched to service provider model to bind logger factory and added java module support
 
 ### 6.9.2 (10/3/2018 - 10/8/2018)
 * httpClient: tweak request/response to make it more low level style, 
