@@ -45,7 +45,7 @@ public final class HTMLTemplateEngine {
     }
 
     private void add(TemplateSource source, Class<?> modelClass) {
-        StopWatch watch = new StopWatch();
+        var watch = new StopWatch();
         String name = source.name();
         try {
             HTMLTemplate previous = templates.putIfAbsent(name, new HTMLTemplateBuilder(source, modelClass).build());

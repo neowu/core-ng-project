@@ -14,6 +14,7 @@
 * type literal: support better cast for generic, JSON.fromJSON() / bind?
 * change gradle to kotlin?
 * replace @QueryParam with @Property?
+* impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 
 ### jdk 9/10/11 issues
 * gradle: gradle doesn't support java module as first class yet, https://guides.gradle.org/building-java-9-modules/

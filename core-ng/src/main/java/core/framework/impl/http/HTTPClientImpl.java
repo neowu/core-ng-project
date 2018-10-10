@@ -138,7 +138,6 @@ public final class HTTPClientImpl implements HTTPClient {
 
     HttpRequest httpRequest(HTTPRequest request) {
         HttpRequest.Builder builder = HttpRequest.newBuilder();
-
         try {
             var requestURI = new URI(requestURI(request.uri, request.params));
             builder.uri(requestURI);
@@ -180,6 +179,7 @@ public final class HTTPClientImpl implements HTTPClient {
         return builder.toString();
     }
 
+    // httpClient has builtin retry but without waiting, only retry on GET/HEAD methods, refer to jdk.internal.net.http.MultiExchange#canRetryRequest
     boolean shouldRetry(int attempts, HTTPMethod method, Exception e, HTTPStatus status) {
         if (attempts >= maxRetries) return false;
         if (status == HTTPStatus.SERVICE_UNAVAILABLE) return true;
