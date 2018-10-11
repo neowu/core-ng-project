@@ -134,7 +134,7 @@ due to removed support List<T> as request/response type
 ### 6.4.0 (6/24/2018 - 6/25/2018)
 * session: !!! redis session key changed from "sessionId:{id}" to "sessionId:{sha256(id)}" for security reason, so the redis log won't show clear text session id value, 
         update lib will lose all existing user session, please deploy on scheduled time
-* httpClient: added retry support, refer to core.framework.impl.http.RetryHandler for details
+* httpClient: added retry support, refer to core.framework.internal.http.RetryHandler for details
         make API client to retry (in kube env, persistent connection can be stale during deployment)
 
 ### 6.3.7 (6/21/2018 - 6/24/2018)

@@ -1,10 +1,10 @@
 package core.framework.impl.log;
 
-import core.framework.impl.json.JSONWriter;
 import core.framework.impl.kafka.ProducerMetrics;
 import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.impl.log.message.LogTopics;
 import core.framework.impl.log.message.StatMessage;
+import core.framework.internal.json.JSONMapper;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import core.framework.util.Threads;
@@ -36,8 +36,8 @@ public final class KafkaAppender implements Consumer<ActionLog> {
 
     private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Thread logForwarderThread;
-    private final JSONWriter<ActionLogMessage> actionLogWriter;
-    private final JSONWriter<StatMessage> statWriter;
+    private final JSONMapper<ActionLogMessage> actionLogMapper;
+    private final JSONMapper<StatMessage> statMapper;
     private final Callback callback = (metadata, exception) -> {
         if (exception != null) {
             logger.warn("failed to send log message", exception);
@@ -47,8 +47,8 @@ public final class KafkaAppender implements Consumer<ActionLog> {
 
     public KafkaAppender(String uri) {
         var watch = new StopWatch();
-        actionLogWriter = JSONWriter.of(ActionLogMessage.class);
-        statWriter = JSONWriter.of(StatMessage.class);
+        actionLogMapper = new JSONMapper<>(ActionLogMessage.class);
+        statMapper = new JSONMapper<>(StatMessage.class);
         try {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,
                     ProducerConfig.ACKS_CONFIG, "0",                                    // no acknowledge to maximize performance
@@ -83,7 +83,7 @@ public final class KafkaAppender implements Consumer<ActionLog> {
     @Override
     public void accept(ActionLog log) {
         ActionLogMessage message = MessageFactory.actionLog(log);
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, Strings.bytes(message.id), actionLogWriter.toJSON(message)));
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, Strings.bytes(message.id), actionLogMapper.toJSON(message)));
     }
 
     public void start() {
@@ -99,6 +99,6 @@ public final class KafkaAppender implements Consumer<ActionLog> {
 
     public void forward(Map<String, Double> stats) {
         StatMessage message = MessageFactory.stat(stats);
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, Strings.bytes(message.id), statWriter.toJSON(message)));
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, Strings.bytes(message.id), statMapper.toJSON(message)));
     }
 }

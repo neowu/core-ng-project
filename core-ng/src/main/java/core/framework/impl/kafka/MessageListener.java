@@ -1,6 +1,5 @@
 package core.framework.impl.kafka;
 
-import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.LogManager;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
@@ -52,9 +51,7 @@ public class MessageListener {
     public <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
         boolean added = topics.add(topic);
         if (!added) throw new Error(format("topic is already subscribed, topic={}", topic));
-        MessageValidator<T> validator = new MessageValidator<>(messageClass);
-        JSONReader<T> reader = JSONReader.of(messageClass);
-        processes.put(topic, new MessageProcess<>(handler, bulkHandler, reader, validator));
+        processes.put(topic, new MessageProcess<>(handler, bulkHandler, messageClass));
     }
 
     public void start() {

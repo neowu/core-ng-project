@@ -1,18 +1,20 @@
 import core.framework.impl.log.DefaultLoggerServiceProvider;
+import org.slf4j.spi.SLF4JServiceProvider;
 
-/**
- * @author neo
- */
-module core.ng {
+module core.framework {
+    requires transitive core.framework.api;
+    requires transitive java.sql;
     requires java.management;
     requires java.net.http;
-    requires transitive java.sql;
-    requires transitive core.ng.api;
     requires transitive org.slf4j;
     requires undertow.core;
-    requires transitive com.fasterxml.jackson.databind;
+    requires jackson.annotations;
+    requires com.fasterxml.jackson.core;
+    requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.module.afterburner;
+    requires javassist;
+    requires kafka.clients;
 
     exports core.framework.async;
     exports core.framework.cache;
@@ -35,5 +37,5 @@ module core.ng {
     exports core.framework.web.site;
     exports core.framework.web.websocket;
 
-    provides org.slf4j.spi.SLF4JServiceProvider with DefaultLoggerServiceProvider;
+    provides SLF4JServiceProvider with DefaultLoggerServiceProvider;
 }

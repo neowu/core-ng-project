@@ -1,9 +1,8 @@
 package core.framework.search.impl;
 
 import core.framework.api.json.Property;
-import core.framework.impl.json.JSONReader;
-import core.framework.impl.json.JSONWriter;
 import core.framework.impl.validate.Validator;
+import core.framework.internal.json.JSONMapper;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.search.AnalyzeRequest;
@@ -68,16 +67,14 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     private final String index;
     private final Validator validator;
     private final long slowOperationThresholdInNanos;
-    private final JSONReader<T> reader;
-    private final JSONWriter<T> writer;
+    private final JSONMapper<T> mapper;
 
     ElasticSearchTypeImpl(ElasticSearchImpl elasticSearch, Class<T> documentClass, Duration slowOperationThreshold) {
         this.elasticSearch = elasticSearch;
         this.slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
         this.index = documentClass.getDeclaredAnnotation(Index.class).name();
         validator = new Validator(documentClass, field -> field.getDeclaredAnnotation(Property.class).name());
-        reader = JSONReader.of(documentClass);
-        writer = JSONWriter.of(documentClass);
+        mapper = new JSONMapper<>(documentClass);
     }
 
     @Override
@@ -115,7 +112,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         SearchHit[] hits = response.getHits().getHits();
         List<T> items = new ArrayList<>(hits.length);
         for (SearchHit hit : hits) {
-            items.add(reader.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
+            items.add(mapper.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
         }
         Aggregations aggregationResponse = response.getAggregations();
         Map<String, Aggregation> aggregations = aggregationResponse == null ? Map.of() : aggregationResponse.asMap();
@@ -170,7 +167,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             GetResponse response = elasticSearch.client().get(getRequest, RequestOptions.DEFAULT);
             if (!response.isExists()) return Optional.empty();
             hits = 1;
-            return Optional.of(reader.fromJSON(response.getSourceAsBytes()));
+            return Optional.of(mapper.fromJSON(response.getSourceAsBytes()));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
@@ -186,7 +183,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         var watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         validator.validate(request.source, false);
-        byte[] document = writer.toJSON(request.source);
+        byte[] document = mapper.toJSON(request.source);
         try {
             var indexRequest = new org.elasticsearch.action.index.IndexRequest(index, this.index, request.id).source(document, XContentType.JSON);
             elasticSearch.client().index(indexRequest, RequestOptions.DEFAULT);
@@ -210,7 +207,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             String id = entry.getKey();
             T source = entry.getValue();
             validator.validate(source, false);
-            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index, this.index, id).source(writer.toJSON(source), XContentType.JSON);
+            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index, this.index, id).source(mapper.toJSON(source), XContentType.JSON);
             bulkRequest.add(indexRequest);
         }
         long esTook = 0;
@@ -336,7 +333,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                 totalHits += hits.length;
 
                 for (SearchHit hit : hits) {
-                    forEach.consumer.accept(reader.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
+                    forEach.consumer.accept(mapper.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
                 }
 
                 start = System.nanoTime();

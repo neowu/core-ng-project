@@ -1,8 +1,7 @@
 package core.framework.impl.cache;
 
 import core.framework.cache.Cache;
-import core.framework.impl.json.JSONReader;
-import core.framework.impl.json.JSONWriter;
+import core.framework.internal.json.JSONMapper;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +24,14 @@ public class CacheImpl<T> implements Cache<T> {
     public final Duration duration;
     private final Logger logger = LoggerFactory.getLogger(CacheImpl.class);
     private final CacheStore cacheStore;
-    private final JSONReader<T> reader;
-    private final JSONWriter<T> writer;
+    private final JSONMapper<T> mapper;
 
     CacheImpl(String name, Type valueType, Duration duration, CacheStore cacheStore) {
         this.name = name;
         this.valueType = valueType;
         this.duration = duration;
         this.cacheStore = cacheStore;
-        reader = JSONReader.of(valueType);
-        writer = JSONWriter.of(valueType);
+        mapper = new JSONMapper<>(valueType);
     }
 
     @Override
@@ -44,10 +41,10 @@ public class CacheImpl<T> implements Cache<T> {
         if (cacheValue == null) {
             logger.debug("load value, key={}", key);
             T value = loader.apply(key);
-            cacheStore.put(cacheKey, writer.toJSON(value), duration);
+            cacheStore.put(cacheKey, mapper.toJSON(value), duration);
             return value;
         }
-        return reader.fromJSON(cacheValue);
+        return mapper.fromJSON(cacheValue);
     }
 
     public Optional<String> get(String key) {
@@ -71,10 +68,10 @@ public class CacheImpl<T> implements Cache<T> {
             if (cacheValue == null) {
                 logger.debug("load value, key={}", key);
                 T value = loader.apply(key);
-                newValues.put(cacheKey, writer.toJSON(value));
+                newValues.put(cacheKey, mapper.toJSON(value));
                 values.put(key, value);
             } else {
-                values.put(key, reader.fromJSON(cacheValue));
+                values.put(key, mapper.fromJSON(cacheValue));
             }
             index++;
         }
@@ -84,14 +81,14 @@ public class CacheImpl<T> implements Cache<T> {
 
     @Override
     public void put(String key, T value) {
-        cacheStore.put(cacheKey(key), writer.toJSON(value), duration);
+        cacheStore.put(cacheKey(key), mapper.toJSON(value), duration);
     }
 
     @Override
     public void putAll(Map<String, T> values) {
         Map<String, byte[]> cacheValues = Maps.newHashMapWithExpectedSize(values.size());
         for (Map.Entry<String, T> entry : values.entrySet()) {
-            cacheValues.put(cacheKey(entry.getKey()), writer.toJSON(entry.getValue()));
+            cacheValues.put(cacheKey(entry.getKey()), mapper.toJSON(entry.getValue()));
         }
         cacheStore.putAll(cacheValues, duration);
     }

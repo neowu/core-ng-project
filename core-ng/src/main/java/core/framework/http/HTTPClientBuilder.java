@@ -1,7 +1,7 @@
 package core.framework.http;
 
-import core.framework.impl.http.HTTPClientImpl;
-import core.framework.impl.http.TrustAllTrustManager;
+import core.framework.internal.http.HTTPClientImpl;
+import core.framework.internal.http.TrustAllTrustManager;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

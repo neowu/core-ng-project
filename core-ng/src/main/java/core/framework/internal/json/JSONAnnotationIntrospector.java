@@ -1,4 +1,4 @@
-package core.framework.impl.json;
+package core.framework.internal.json;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.core.Version;

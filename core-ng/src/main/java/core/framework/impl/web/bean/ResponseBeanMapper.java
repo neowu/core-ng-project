@@ -32,7 +32,7 @@ public class ResponseBeanMapper {
         if (void.class == responseType) return null;
 
         BeanMapper<?> mapper = register(responseType);
-        Object bean = mapper.reader.fromJSON(body);
+        Object bean = mapper.mapper.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {
             if (bean == null) return Optional.empty();
             mapper.validator.validate(bean, false);

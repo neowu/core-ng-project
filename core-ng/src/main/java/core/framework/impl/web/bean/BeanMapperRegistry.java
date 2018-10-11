@@ -27,7 +27,7 @@ public class BeanMapperRegistry {
     <T> byte[] toJSON(Class<T> beanClass, T bean) {
         BeanMapper<T> mapper = register(beanClass);
         mapper.validator.validate(bean, false);
-        return mapper.writer.toJSON(bean);
+        return mapper.mapper.toJSON(bean);
     }
 
     void validateBeanClassName(Class<?> beanClass) {

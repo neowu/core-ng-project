@@ -1,6 +1,6 @@
 package core.framework.http;
 
-import core.framework.impl.http.HTTPRequestHelper;
+import core.framework.internal.http.HTTPRequestHelper;
 import core.framework.util.Encodings;
 import core.framework.util.Maps;
 import core.framework.util.Strings;

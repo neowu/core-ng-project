@@ -1,9 +1,9 @@
 package core.framework.impl.kafka;
 
-import core.framework.impl.json.JSONReader;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.filter.BytesLogParam;
+import core.framework.internal.json.JSONMapper;
 import core.framework.kafka.Message;
 import core.framework.log.Markers;
 import core.framework.util.StopWatch;
@@ -147,7 +147,7 @@ class MessageListenerThread extends Thread {
 
                 byte[] value = record.value();
                 logger.debug("[message] value={}", new BytesLogParam(value));
-                T message = process.reader.fromJSON(value);
+                T message = process.mapper.fromJSON(value);
                 process.validator.validate(message);
                 process.handler.handle(key, message);
             } catch (Throwable e) {
@@ -167,7 +167,7 @@ class MessageListenerThread extends Thread {
             actionLog.context("topic", topic);
             actionLog.context("handler", process.bulkHandler.getClass().getCanonicalName());
 
-            List<Message<T>> messages = messages(records, actionLog, process.reader);
+            List<Message<T>> messages = messages(records, actionLog, process.mapper);
             for (Message<T> message : messages) {
                 process.validator.validate(message.value);
             }
@@ -182,7 +182,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) {
+    <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONMapper<T> mapper) {
         int size = records.size();
         actionLog.track("kafka", 0, size, 0);
         List<Message<T>> messages = new ArrayList<>(size);
@@ -204,7 +204,7 @@ class MessageListenerThread extends Thread {
             byte[] value = record.value();
             logger.debug("[message] key={}, value={}, refId={}, client={}, correlationId={}", key, new BytesLogParam(value), refId, client, correlationId);
 
-            T message = reader.fromJSON(value);
+            T message = mapper.fromJSON(value);
             messages.add(new Message<>(key, message));
         }
 

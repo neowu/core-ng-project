@@ -1,4 +1,4 @@
-package core.framework.impl.http;
+package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;

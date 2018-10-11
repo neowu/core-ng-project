@@ -1,20 +1,17 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.json.JSONReader;
-import core.framework.impl.json.JSONWriter;
 import core.framework.impl.validate.Validator;
+import core.framework.internal.json.JSONMapper;
 
 /**
  * @author neo
  */
 class BeanMapper<T> {
-    final JSONReader<T> reader;
-    final JSONWriter<T> writer;
+    final JSONMapper<T> mapper;
     final Validator validator;
 
     BeanMapper(Class<T> beanClass, Validator validator) {
-        reader = JSONReader.of(beanClass);
-        writer = JSONWriter.of(beanClass);
+        mapper = new JSONMapper<>(beanClass);
         this.validator = validator;
     }
 }

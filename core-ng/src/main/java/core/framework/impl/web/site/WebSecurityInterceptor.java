@@ -1,7 +1,7 @@
 package core.framework.impl.web.site;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.impl.http.HTTPRequestHelper;
+import core.framework.internal.http.HTTPRequestHelper;
 import core.framework.web.Interceptor;
 import core.framework.web.Invocation;
 import core.framework.web.Request;

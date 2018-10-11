@@ -1,4 +1,4 @@
-package core.framework.impl.http;
+package core.framework.internal.http;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.X509ExtendedTrustManager;

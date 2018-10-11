@@ -1,4 +1,4 @@
-module core.ng.api {
+module core.framework.api {
     exports core.framework.api.web.service;
     exports core.framework.api.http;
     exports core.framework.api.json;

@@ -46,7 +46,7 @@ public class RequestBeanMapper {
 
     public <T> T fromJSON(Class<T> beanClass, byte[] body) {
         BeanMapper<T> mapper = registry.register(beanClass);
-        T bean = mapper.reader.fromJSON(body);
+        T bean = mapper.mapper.fromJSON(body);
         mapper.validator.validate(bean, false);
         return bean;
     }
