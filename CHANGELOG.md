@@ -1,5 +1,5 @@
 ## Change log
-### 6.9.3 (10/8/2018 - )
+### 6.9.3 (10/8/2018 - 10/11/2018)
 * log: update slfj4 to 1.8, which switched to service provider model to bind logger factory and added java module support
 * httpClient: fix keep alive timeout setting
 
