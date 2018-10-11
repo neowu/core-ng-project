@@ -40,15 +40,6 @@ public final class HTTPClientImpl implements HTTPClient {
     private static final Map<Integer, HTTPStatus> HTTP_STATUSES;
 
     static {
-        // allow server ssl cert change during renegotiation
-        // http client uses pooled connection, multiple requests to same host may hit different server behind LB
-        // refer to sun.security.ssl.ClientHandshakeContext, allowUnsafeServerCertChange = Utilities.getBooleanProperty("jdk.tls.allowUnsafeServerCertChange", false);
-        System.setProperty("jdk.tls.allowUnsafeServerCertChange", "true");
-
-        // api client keep alive should be shorter than server side in case server side disconnect connection first, use short value to release connection sooner in quiet time and still fit busy time
-        // refer to jdk.internal.net.http.ConnectionPool
-        System.setProperty("jdk.httpclient.keepalive.timeout", "15");   // 15s timeout for keep alive
-
         HTTPStatus[] values = HTTPStatus.values();
         HTTP_STATUSES = Maps.newHashMapWithExpectedSize(values.length);
         for (HTTPStatus status : values) {

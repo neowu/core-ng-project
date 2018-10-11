@@ -8,7 +8,7 @@ import java.security.cert.X509Certificate;
 /**
  * @author neo
  */
-public class TrustAllTrustManager extends X509ExtendedTrustManager {
+public class DefaultTrustManager extends X509ExtendedTrustManager {
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType) {
     }
@@ -21,6 +21,10 @@ public class TrustAllTrustManager extends X509ExtendedTrustManager {
     public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine) {
     }
 
+    // if impled X509ExtendedTrustManager, sslContext won't wrap sun.security.ssl.AbstractTrustManagerWrapper
+    // and there is no need to set "jdk.internal.httpclient.disableHostnameVerification" system property
+    // refer to sun.security.ssl.SSLContextImpl.chooseTrustManager
+    // refer to jdk.internal.net.http.common.Utils.hostnameVerificationDisabledValue
     @Override
     public void checkServerTrusted(X509Certificate[] chain, String authType) {
     }

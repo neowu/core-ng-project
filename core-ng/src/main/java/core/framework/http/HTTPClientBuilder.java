@@ -1,7 +1,7 @@
 package core.framework.http;
 
+import core.framework.internal.http.DefaultTrustManager;
 import core.framework.internal.http.HTTPClientImpl;
-import core.framework.internal.http.TrustAllTrustManager;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +20,19 @@ import java.time.Duration;
  * @author neo
  */
 public final class HTTPClientBuilder {
+    static {
+        // the system property must be set before loading jdk http client class, JDK uses static field to initialize those values
+
+        // allow server ssl cert change during renegotiation
+        // http client uses pooled connection, multiple requests to same host may hit different server behind LB
+        // refer to sun.security.ssl.ClientHandshakeContext, allowUnsafeServerCertChange = Utilities.getBooleanProperty("jdk.tls.allowUnsafeServerCertChange", false);
+        System.setProperty("jdk.tls.allowUnsafeServerCertChange", "true");
+
+        // api client keep alive should be shorter than server side in case server side disconnect connection first, use short value to release connection sooner in quiet time and still fit busy time
+        // refer to jdk.internal.net.http.ConnectionPool
+        System.setProperty("jdk.httpclient.keepalive.timeout", "15");   // 15s timeout for keep alive
+    }
+
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);
 
     private Duration timeout = Duration.ofSeconds(60);
@@ -37,7 +50,7 @@ public final class HTTPClientBuilder {
 
             if (trustAll) {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, new TrustManager[]{new TrustAllTrustManager()}, new SecureRandom());
+                sslContext.init(null, new TrustManager[]{new DefaultTrustManager()}, new SecureRandom());
                 builder.sslContext(sslContext);
             }
 
