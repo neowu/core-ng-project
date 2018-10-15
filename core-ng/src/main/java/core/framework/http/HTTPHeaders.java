@@ -4,7 +4,7 @@ package core.framework.http;
  * @author neo
  */
 public final class HTTPHeaders {
-    // http header is case insensitive, in framework all the headers are saved in lower case, and this match jdk and chrome style
+    // http header is case insensitive, use lower case value to match jdk and chrome style
     public static final String ACCEPT = "accept";
     public static final String ACCEPT_ENCODING = "accept-encoding";
     public static final String AUTHORIZATION = "authorization";

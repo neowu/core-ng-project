@@ -6,7 +6,7 @@ import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
 
-import java.util.Set;
+import java.util.Properties;
 import java.util.TreeSet;
 
 /**
@@ -27,11 +27,17 @@ public class PropertyController implements Controller {
     }
 
     String properties() {
-        var builder = new StringBuilder();
-        Set<String> keys = new TreeSet<>(propertyManager.properties.keys());   // sort by key
-        for (String key : keys) {
+        var builder = new StringBuilder(32768);
+        builder.append("# properties\n");
+        for (String key : new TreeSet<>(propertyManager.properties.keys())) {   // sort by key
             String value = propertyManager.property(key).orElse("");
             builder.append(key).append('=').append(propertyManager.maskValue(key, value)).append('\n');
+        }
+        builder.append("\n# system properties\n");
+        Properties properties = System.getProperties();
+        for (var key : new TreeSet<>(properties.stringPropertyNames())) { // sort by key
+            String value = properties.getProperty(key);
+            builder.append(key).append('=').append(value).append('\n');
         }
         return builder.toString();
     }

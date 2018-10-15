@@ -32,7 +32,7 @@ public class PropertyManager {
         return properties.get(key);
     }
 
-    public String maskValue(String key, String value) {
+    public String maskValue(String key, String value) { // generally only password or secretKey will be put into property file
         if (key.contains("password") || key.contains("secret")) return "******";
         return value;
     }

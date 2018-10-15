@@ -1,5 +1,5 @@
 ## Change log
-### 6.9.4 (10/11/2018 - )
+### 6.9.4 (10/11/2018 - 10/15/2018)
 * util: removed InputStreams, with JDK 11, inputStream added readAllBytes() method to read all bytes
 * httpclient: support gzip content-type
 

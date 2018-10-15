@@ -10,7 +10,6 @@ import core.framework.http.HTTPResponse;
 import core.framework.impl.log.filter.MapLogParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
-import core.framework.util.ASCII;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
@@ -31,7 +30,10 @@ import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.zip.GZIPInputStream;
+
+import static java.lang.String.CASE_INSENSITIVE_ORDER;
 
 /**
  * @author neo
@@ -111,12 +113,11 @@ public final class HTTPClientImpl implements HTTPClient {
     HTTPResponse response(HttpResponse<byte[]> httpResponse) {
         int statusCode = httpResponse.statusCode();
         logger.debug("[response] status={}", statusCode);
-        Map<String, List<String>> httpHeaders = httpResponse.headers().map();
-        Map<String, String> headers = Maps.newHashMapWithExpectedSize(httpHeaders.size());
-        for (Map.Entry<String, List<String>> entry : httpHeaders.entrySet()) {
+        Map<String, String> headers = new TreeMap<>(CASE_INSENSITIVE_ORDER);
+        for (Map.Entry<String, List<String>> entry : httpResponse.headers().map().entrySet()) {
             String name = entry.getKey();
             if (!Strings.startsWith(name, ':')) {   // not put pseudo headers
-                headers.put(ASCII.toLowerCase(name), entry.getValue().get(0));
+                headers.put(name, entry.getValue().get(0));
             }
         }
         logger.debug("[response] headers={}", new MapLogParam(headers));
