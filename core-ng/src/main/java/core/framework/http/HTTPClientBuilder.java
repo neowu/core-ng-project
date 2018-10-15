@@ -54,7 +54,7 @@ public final class HTTPClientBuilder {
                 builder.sslContext(sslContext);
             }
 
-            builder.connectTimeout(timeout);
+            builder.connectTimeout(Duration.ofMillis(timeout.toMillis() / 2));  // use shorter connect timeout for fast fail
             if (enableRedirect) builder.followRedirects(HttpClient.Redirect.NORMAL);
             if (enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
             HttpClient httpClient = builder.build();

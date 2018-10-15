@@ -7,7 +7,6 @@ import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.handlers.encoding.ContentEncodingRepository;
-import io.undertow.server.handlers.encoding.DeflateEncodingProvider;
 import io.undertow.server.handlers.encoding.EncodingHandler;
 import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
@@ -66,10 +65,9 @@ public class HTTPServer {
     private HttpHandler handler() {
         HttpHandler handler = new HTTPIOHandler(this.handler, shutdownHandler);
         if (gzip) {
-            var predicate = new GZipPredicate();
+            // only support gzip, deflate is less popular
             handler = new EncodingHandler(handler, new ContentEncodingRepository()
-                    .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, predicate)
-                    .addEncodingHandler("deflate", new DeflateEncodingProvider(), 10, predicate));
+                    .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, new GZipPredicate()));
         }
         return handler;
     }

@@ -7,9 +7,12 @@ import core.framework.http.HTTPHeaders;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
+import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.http.HttpClient;
 import java.net.http.HttpConnectTimeoutException;
@@ -20,7 +23,9 @@ import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -90,6 +95,23 @@ class HTTPClientImplTest {
         assertThat(response.headers)
                 .doesNotContainKeys(":status")
                 .containsEntry(HTTPHeaders.CONTENT_TYPE, "text/html");
+    }
+
+    @Test
+    void decodeGZipBody() throws IOException {
+        var stream = new ByteArrayOutputStream();
+        try (var gzip = new GZIPOutputStream(stream)) {
+            gzip.write(Strings.bytes("<html/>"));
+        }
+        byte[] body = httpClient.decodeBody("gzip", stream.toByteArray());
+        assertThat(new String(body, UTF_8)).isEqualTo("<html/>");
+    }
+
+    @Test
+    void decodeBody() {
+        byte[] bytes = Strings.bytes("<html/>");
+        assertThat(httpClient.decodeBody(null, bytes)).isSameAs(bytes);
+        assertThat(httpClient.decodeBody("identity", bytes)).isSameAs(bytes);
     }
 
     @Test
