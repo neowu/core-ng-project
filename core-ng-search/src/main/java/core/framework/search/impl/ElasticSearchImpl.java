@@ -4,7 +4,6 @@ import core.framework.internal.json.JSONMapper;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
-import core.framework.util.InputStreams;
 import core.framework.util.StopWatch;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -137,8 +136,7 @@ public class ElasticSearchImpl implements ElasticSearch {
 
     private byte[] responseBody(HttpEntity entity) throws IOException {
         try (InputStream stream = entity.getContent()) {
-            int length = (int) entity.getContentLength();
-            return InputStreams.bytesWithExpectedLength(stream, length);
+            return stream.readAllBytes();
         }
     }
 
