@@ -148,7 +148,8 @@ public final class HTTPClientImpl implements HTTPClient {
             var requestURI = new URI(requestURI(request.uri, request.params));
             builder.uri(requestURI);
 
-            if ("https".equals(requestURI.getScheme())) builder.version(HttpClient.Version.HTTP_2);
+            // disable http2 as http client has bug
+            // if ("https".equals(requestURI.getScheme())) builder.version(HttpClient.Version.HTTP_2);
 
             logger.debug("[request] method={}, uri={}", request.method, requestURI);
         } catch (URISyntaxException e) {

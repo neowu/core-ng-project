@@ -1,5 +1,6 @@
 ## Change log
-### 6.9.5 (10/16/2018 - )
+### 6.9.5 (10/16/2018)
+* http: disable http2 for both server and client, as jdk http client may cause busy loop issue if transaction is not proper closed
 
 ### 6.9.4 (10/11/2018 - 10/15/2018)
 * util: removed InputStreams, with JDK 11, inputStream added readAllBytes() method to read all bytes
