@@ -15,7 +15,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.12'
+            checkstyle 'com.puppycrawl.tools:checkstyle:8.13'
             checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.32.0'
         }
 
@@ -33,7 +33,7 @@ subprojects {
     spotbugs {
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '3.1.7'
+        toolVersion = '3.1.8'
     }
 
     dependencies {
