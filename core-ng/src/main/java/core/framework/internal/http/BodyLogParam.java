@@ -19,7 +19,7 @@ public final class BodyLogParam {
             } else if (contentType.mediaType.contains("text")
                     || contentType.mediaType.contains("xml")    // for application/xml
                     || APPLICATION_FORM_URLENCODED.mediaType.equals(contentType.mediaType)) {
-                return new BytesLogParam(body);
+                return new BytesLogParam(body, contentType.charset().orElse(UTF_8));
             }
         }
         return "byte[" + body.length + "]";
