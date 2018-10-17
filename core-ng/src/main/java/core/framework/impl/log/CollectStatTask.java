@@ -1,6 +1,6 @@
-package core.framework.impl.log.stat;
+package core.framework.impl.log;
 
-import core.framework.impl.log.KafkaAppender;
+import core.framework.internal.stat.Stat;
 
 import java.util.Map;
 

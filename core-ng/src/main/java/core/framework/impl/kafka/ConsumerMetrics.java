@@ -1,6 +1,6 @@
 package core.framework.impl.kafka;
 
-import core.framework.impl.log.stat.Metrics;
+import core.framework.internal.stat.Metrics;
 import core.framework.util.Lists;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;

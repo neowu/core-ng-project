@@ -1,4 +1,4 @@
-package core.framework.impl.log.stat;
+package core.framework.internal.stat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,9 @@
 package core.framework.module;
 
 import core.framework.impl.log.ActionLog;
+import core.framework.impl.log.CollectStatTask;
 import core.framework.impl.log.ConsoleAppender;
 import core.framework.impl.log.KafkaAppender;
-import core.framework.impl.log.stat.CollectStatTask;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;

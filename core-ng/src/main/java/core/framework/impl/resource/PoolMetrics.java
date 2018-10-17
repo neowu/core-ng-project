@@ -1,6 +1,6 @@
 package core.framework.impl.resource;
 
-import core.framework.impl.log.stat.Metrics;
+import core.framework.internal.stat.Metrics;
 
 import java.util.Map;
 

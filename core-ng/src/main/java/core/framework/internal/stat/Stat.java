@@ -1,4 +1,4 @@
-package core.framework.impl.log.stat;
+package core.framework.internal.stat;
 
 import core.framework.util.ASCII;
 import core.framework.util.Lists;
@@ -14,7 +14,6 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
@@ -27,6 +26,7 @@ public class Stat {
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats = Lists.newArrayList();
+    private final CPUStat cpuStat = new CPUStat(thread, os.getAvailableProcessors());
 
     public Stat() {
         List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
@@ -40,6 +40,7 @@ public class Stat {
         Map<String, Double> stats = Maps.newLinkedHashMap();
 
         stats.put("sys_load_avg", os.getSystemLoadAverage());
+        stats.put("cpu_usage", cpuStat.usage());
         stats.put("thread_count", (double) thread.getThreadCount());
         MemoryUsage usage = memory.getHeapMemoryUsage();
         stats.put("jvm_heap_used", (double) usage.getUsed());
@@ -77,29 +78,4 @@ public class Stat {
         return builder.toString();
     }
 
-    static class GCStat {
-        final String name;
-        final GarbageCollectorMXBean bean;
-        long previousCount;
-        long previousElapsed;
-
-        GCStat(String name, GarbageCollectorMXBean bean) {
-            this.name = name;
-            this.bean = bean;
-        }
-
-        long count() {
-            long previous = previousCount;
-            long current = bean.getCollectionCount();
-            previousCount = current;
-            return current - previous;
-        }
-
-        long elapsed() {
-            long previous = previousElapsed;
-            long current = bean.getCollectionTime();
-            previousElapsed = current;
-            return TimeUnit.NANOSECONDS.convert(current - previous, TimeUnit.MILLISECONDS);
-        }
-    }
 }

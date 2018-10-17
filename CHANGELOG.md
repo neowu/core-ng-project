@@ -1,4 +1,7 @@
 ## Change log
+### 6.9.6 (10/16/2018 - )
+* log: collect cpu usage stat, in container env, system load != cpu container/java process usage
+
 ### 6.9.5 (10/16/2018)
 * http: disable http2 for both server and client, as jdk http client may cause busy loop issue if transaction is not proper closed
 
