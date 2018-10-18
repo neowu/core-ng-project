@@ -1,7 +1,7 @@
 package core.log.kafka;
 
-import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.inject.Inject;
+import core.framework.internal.log.message.ActionLogMessage;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.Message;
 import core.log.service.ActionService;

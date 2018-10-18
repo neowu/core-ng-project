@@ -1,8 +1,8 @@
 package core.framework.impl.log;
 
-import core.framework.impl.log.message.ActionLogMessage;
-import core.framework.impl.log.message.PerformanceStat;
-import core.framework.impl.log.message.StatMessage;
+import core.framework.internal.log.message.ActionLogMessage;
+import core.framework.internal.log.message.PerformanceStat;
+import core.framework.internal.log.message.StatMessage;
 import core.framework.log.Markers;
 import org.junit.jupiter.api.Test;
 

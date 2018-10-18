@@ -1,8 +1,8 @@
 package core.log;
 
-import core.framework.impl.log.message.ActionLogMessage;
-import core.framework.impl.log.message.LogTopics;
-import core.framework.impl.log.message.StatMessage;
+import core.framework.internal.log.message.ActionLogMessage;
+import core.framework.internal.log.message.LogTopics;
+import core.framework.internal.log.message.StatMessage;
 import core.framework.module.App;
 import core.framework.module.SystemModule;
 import core.framework.search.module.SearchConfig;

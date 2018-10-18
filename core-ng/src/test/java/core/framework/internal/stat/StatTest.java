@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -20,17 +19,9 @@ class StatTest {
     }
 
     @Test
-    void garbageCollectorName() {
-        assertEquals("g1_young_generation", stat.garbageCollectorName("G1 Young Generation"));
-        assertEquals("g1_old_generation", stat.garbageCollectorName("G1 Old Generation"));
-    }
-
-    @Test
     void collect() {
         Map<String, Double> stats = stat.collect();
 
-        assertNotNull(stats.get("thread_count"));
-        assertNotNull(stats.get("jvm_heap_used"));
-        assertNotNull(stats.get("jvm_heap_max"));
+        assertThat(stats).containsKeys("cpu_usage", "thread_count", "jvm_heap_used", "jvm_heap_max");
     }
 }

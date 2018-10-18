@@ -1,10 +1,10 @@
 package core.framework.impl.log;
 
 import core.framework.impl.kafka.ProducerMetrics;
-import core.framework.impl.log.message.ActionLogMessage;
-import core.framework.impl.log.message.LogTopics;
-import core.framework.impl.log.message.StatMessage;
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.log.message.ActionLogMessage;
+import core.framework.internal.log.message.LogTopics;
+import core.framework.internal.log.message.StatMessage;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import core.framework.util.Threads;

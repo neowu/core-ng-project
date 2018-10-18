@@ -2,8 +2,8 @@ package core.log.service;
 
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.MessageFactory;
-import core.framework.impl.log.message.ActionLogMessage;
 import core.framework.inject.Inject;
+import core.framework.internal.log.message.ActionLogMessage;
 
 import java.util.function.Consumer;
 

@@ -1,8 +1,8 @@
 package core.log.service;
 
 import core.framework.impl.log.MessageFactory;
-import core.framework.impl.log.message.StatMessage;
 import core.framework.inject.Inject;
+import core.framework.internal.log.message.StatMessage;
 import core.framework.internal.stat.Stat;
 
 import java.util.Map;

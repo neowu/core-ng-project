@@ -1,7 +1,7 @@
 package core.framework.impl.log;
 
-import core.framework.impl.log.message.ActionLogMessage;
-import core.framework.impl.log.message.StatMessage;
+import core.framework.internal.log.message.ActionLogMessage;
+import core.framework.internal.log.message.StatMessage;
 import core.framework.util.Network;
 
 import java.time.Instant;

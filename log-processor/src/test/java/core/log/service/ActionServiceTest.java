@@ -1,8 +1,8 @@
 package core.log.service;
 
-import core.framework.impl.log.message.ActionLogMessage;
-import core.framework.impl.log.message.PerformanceStat;
 import core.framework.inject.Inject;
+import core.framework.internal.log.message.ActionLogMessage;
+import core.framework.internal.log.message.PerformanceStat;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.GetRequest;
 import core.framework.util.Lists;

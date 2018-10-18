@@ -1,4 +1,4 @@
-package core.framework.impl.log.message;
+package core.framework.internal.log.message;
 
 /**
  * @author neo

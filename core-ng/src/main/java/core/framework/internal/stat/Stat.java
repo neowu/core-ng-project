@@ -1,6 +1,5 @@
 package core.framework.internal.stat;
 
-import core.framework.util.ASCII;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
@@ -24,15 +23,14 @@ public class Stat {
     private final Logger logger = LoggerFactory.getLogger(Stat.class);
     private final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
+    private final CPUStat cpuStat = new CPUStat(thread, os.getAvailableProcessors());
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats = Lists.newArrayList();
-    private final CPUStat cpuStat = new CPUStat(thread, os.getAvailableProcessors());
 
     public Stat() {
         List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean bean : beans) {
-            String name = garbageCollectorName(bean.getName());
-            gcStats.add(new GCStat(name, bean));
+            gcStats.add(new GCStat(bean));
         }
     }
 
@@ -66,16 +64,4 @@ public class Stat {
             }
         }
     }
-
-    final String garbageCollectorName(String name) {
-        var builder = new StringBuilder();
-        int length = name.length();
-        for (int i = 0; i < length; i++) {
-            char ch = name.charAt(i);
-            if (ch == ' ') builder.append('_');
-            else builder.append(ASCII.toLowerCase(ch));
-        }
-        return builder.toString();
-    }
-
 }

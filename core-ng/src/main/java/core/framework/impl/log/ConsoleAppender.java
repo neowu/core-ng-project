@@ -1,6 +1,6 @@
 package core.framework.impl.log;
 
-import core.framework.impl.log.message.PerformanceStat;
+import core.framework.internal.log.message.PerformanceStat;
 
 import java.io.PrintStream;
 import java.time.format.DateTimeFormatter;
