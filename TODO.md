@@ -25,3 +25,5 @@
 * undertow http/2.0 has bug under jdk 11, causing http client keep reading from channel/frame (impact JDK 11 http client / OKHTTP works fine (probably because it cleanup connection pool after keep alive timeout))
 * undertow has bugs with h2c protocol, from test, not all the ExchangeCompletionListener will be executed which make ShutdownHandler not working properly
   and cause GOAWAY frame / EOF read issue with small UndertowOptions.NO_REQUEST_TIMEOUT (e.g. 10ms)
+* jdk httpclient doesn't work with http response without content-length, now we have to let Response.empty return 200
+  https://bugs.openjdk.java.net/browse/JDK-8211437  

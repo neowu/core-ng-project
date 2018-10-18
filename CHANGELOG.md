@@ -1,6 +1,8 @@
 ## Change log
-### 6.9.6 (10/16/2018 - )
+### 6.9.6 (10/16/2018 - 10/18/2018)
 * log: collect cpu usage stat, in container env, system load != cpu container/java process usage
+* http: due to jdk httpclient bug, it hangs if server return 204 no content, without content-length  
+        see https://bugs.openjdk.java.net/browse/JDK-8211437  
 
 ### 6.9.5 (10/16/2018)
 * http: disable http2 for both server and client, as jdk http client may cause busy loop issue if transaction is not proper closed
