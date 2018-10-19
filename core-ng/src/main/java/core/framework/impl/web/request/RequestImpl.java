@@ -4,7 +4,6 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.validate.ValidationException;
 import core.framework.impl.web.bean.RequestBeanMapper;
-import core.framework.util.Encodings;
 import core.framework.util.Maps;
 import core.framework.web.CookieSpec;
 import core.framework.web.MultipartFile;
@@ -12,7 +11,6 @@ import core.framework.web.Request;
 import core.framework.web.Session;
 import core.framework.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.Cookie;
 
 import java.io.UncheckedIOException;
 import java.util.Map;
@@ -33,14 +31,15 @@ public final class RequestImpl implements Request {
     private final HttpServerExchange exchange;
     private final RequestBeanMapper mapper;
     public Session session;
+
     HTTPMethod method;
     String clientIP;
     String scheme;
     int port;
     String requestURL;
-    String path;
     ContentType contentType;
     byte[] body;
+    Map<String, String> cookies;
 
     public RequestImpl(HttpServerExchange exchange, RequestBeanMapper mapper) {
         this.exchange = exchange;
@@ -64,7 +63,7 @@ public final class RequestImpl implements Request {
 
     @Override
     public String path() {
-        return path;
+        return exchange.getRequestPath();
     }
 
     @Override
@@ -74,17 +73,8 @@ public final class RequestImpl implements Request {
 
     @Override
     public Optional<String> cookie(CookieSpec spec) {
-        Cookie cookie = exchange.getRequestCookies().get(spec.name);
-        return parseCookieValue(cookie);
-    }
-
-    Optional<String> parseCookieValue(Cookie cookie) {
-        if (cookie == null) return Optional.empty();
-        try {
-            return Optional.of(Encodings.decodeURIComponent(cookie.getValue()));
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(e.getMessage(), "INVALID_HTTP_REQUEST", e);
-        }
+        if (cookies == null) return Optional.empty();
+        return Optional.ofNullable(cookies.get(spec.name));
     }
 
     @Override

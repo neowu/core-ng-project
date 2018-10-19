@@ -5,6 +5,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.filter.FieldLogParam;
 import core.framework.internal.http.BodyLogParam;
+import core.framework.util.Maps;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
 import core.framework.web.exception.BadRequestException;
@@ -25,7 +26,10 @@ import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Map;
 
+import static core.framework.util.Encodings.decodeURIComponent;
 import static core.framework.util.Strings.format;
+import static java.net.URLDecoder.decode;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -43,19 +47,19 @@ public final class RequestParser {
         int requestPort = requestPort(headers.getFirst(Headers.HOST), request.scheme, exchange);
         request.port = port(requestPort, headers.getFirst(Headers.X_FORWARDED_PORT));
 
-        String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
-        logger.debug("[request] remoteAddress={}", remoteAddress);
-        request.clientIP = clientIPParser.parse(remoteAddress, headers.getFirst(Headers.X_FORWARDED_FOR));
-        actionLog.context("clientIP", request.clientIP);
+        parseClientIP(request, exchange, actionLog, headers.getFirst(Headers.X_FORWARDED_FOR));
 
         String method = exchange.getRequestMethod().toString();
         actionLog.context("method", method);
 
         request.requestURL = requestURL(request, exchange);
         actionLog.context("requestURL", request.requestURL);
-        request.path = path(exchange);
 
-        logHeaders(headers, exchange);
+        logHeaders(headers);
+
+        if (headers.getFirst(Headers.COOKIE) != null) {
+            request.cookies = parseCookies(exchange.getRequestCookies());
+        }
 
         String userAgent = headers.getFirst(Headers.USER_AGENT);
         if (userAgent != null) actionLog.context("userAgent", userAgent);
@@ -71,36 +75,57 @@ public final class RequestParser {
         }
     }
 
+    private void parseClientIP(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog, String xForwardedFor) {
+        String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
+        logger.debug("[request] remoteAddress={}", remoteAddress);
+        request.clientIP = clientIPParser.parse(remoteAddress, xForwardedFor);
+        actionLog.context("clientIP", request.clientIP);
+    }
+
     String scheme(String requestScheme, String xForwardedProto) {       // xForwardedProto is single value, refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto
         logger.debug("[request] requestScheme={}", requestScheme);
         return xForwardedProto != null ? xForwardedProto : requestScheme;
     }
 
-    private void logHeaders(HeaderMap headers, HttpServerExchange exchange) {
-        boolean hasCookies = false;
+    private void logHeaders(HeaderMap headers) {
         for (HeaderValues header : headers) {
             HttpString name = header.getHeaderName();
-            if (Headers.COOKIE.equals(name)) {
-                hasCookies = true;
-            } else {
+            if (!Headers.COOKIE.equals(name)) {
                 logger.debug("[request:header] {}={}", name, new HeaderLogParam(name, header));
-            }
-        }
-        if (hasCookies) {
-            for (Map.Entry<String, Cookie> entry : exchange.getRequestCookies().entrySet()) {
-                String name = entry.getKey();
-                Cookie cookie = entry.getValue();
-                logger.debug("[request:cookie] {}={}", name, new FieldLogParam(name, cookie.getValue()));
             }
         }
     }
 
+    Map<String, String> parseCookies(Map<String, Cookie> cookies) {
+        Map<String, String> cookieValues = Maps.newHashMapWithExpectedSize(cookies.size());
+        for (Map.Entry<String, Cookie> entry : cookies.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue().getValue();
+            try {
+                String cookieName = decodeURIComponent(key);
+                String cookieValue = decodeURIComponent(value);
+                logger.debug("[request:cookie] {}={}", cookieName, new FieldLogParam(cookieName, cookieValue));
+                cookieValues.put(cookieName, cookieValue);
+            } catch (IllegalArgumentException e) {
+                // cookies is persistent in browser, here is to ignore, in case user may not be able to access website with legacy cookie
+                logger.warn("ignored invalid encoded cookie, name={}, value={}", key, value, e);
+            }
+        }
+        return cookieValues;
+    }
+
     void parseQueryParams(RequestImpl request, Map<String, Deque<String>> params) {
         for (Map.Entry<String, Deque<String>> entry : params.entrySet()) {
-            String name = entry.getKey();
-            String value = entry.getValue().getFirst();
-            logger.debug("[request:query] {}={}", name, value);
-            request.queryParams.put(name, value);
+            String key = entry.getKey();
+            String value = entry.getValue().peekFirst();
+            try {
+                String paramName = decode(key, UTF_8);
+                String paramValue = decode(value, UTF_8);
+                logger.debug("[request:query] {}={}", paramName, paramValue);
+                request.queryParams.put(paramName, paramValue);
+            } catch (IllegalArgumentException e) {
+                throw new BadRequestException(Strings.format("failed to parse query param, name={}, value={}", key, value), "INVALID_HTTP_REQUEST", e);
+            }
         }
     }
 
@@ -198,21 +223,5 @@ public final class RequestParser {
         String requestURL = builder.toString();
         if (requestURL.length() > MAX_URL_LENGTH) throw new BadRequestException(format("requestURL is too long, requestURL={}...(truncated)", requestURL.substring(0, 50)), "INVALID_HTTP_REQUEST");
         return requestURL;
-    }
-
-    // not decoded path, in case there is '/' in decoded value to interfere path pattern matching
-    String path(HttpServerExchange exchange) {
-        String path = exchange.getRequestURI();
-        if (!exchange.isHostIncludedInRequestURI()) return path;
-
-        int index = path.indexOf("//");
-        if (index != -1) {
-            index = path.indexOf('/', index + 2);
-            if (index != -1) {
-                return path.substring(index);
-            }
-        }
-
-        return path;
     }
 }

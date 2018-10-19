@@ -17,7 +17,7 @@ public final class PathParams {
     public void put(String name, String value) {
         if (value.isEmpty()) throw new BadRequestException(format("path param must not be empty, name={}, value={}", name, value), "INVALID_HTTP_REQUEST");
         try {
-            params.put(name, Encodings.decodeURIComponent(value));  // value here is not decoded, refer to core.framework.impl.web.request.RequestParser.path
+            params.put(name, Encodings.decodeURIComponent(value));  // value here is not decoded, see io.undertow.UndertowOptions.DECODE_URL and core.framework.impl.web.HTTPServer
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), "INVALID_HTTP_REQUEST", e);
         }

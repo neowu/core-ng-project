@@ -7,10 +7,12 @@ import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.impl.web.bean.TestQueryParamBean;
 import core.framework.util.Strings;
+import core.framework.web.CookieSpec;
 import core.framework.web.exception.BadRequestException;
-import io.undertow.server.handlers.CookieImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -65,10 +67,11 @@ class RequestImplTest {
     }
 
     @Test
-    void parseCookieValue() {
-        assertThat(request.parseCookieValue(null)).isNotPresent();
+    void cookie() {
+        CookieSpec spec = new CookieSpec("name");
+        assertThat(request.cookie(spec)).isNotPresent();
 
-        assertThatThrownBy(() -> request.parseCookieValue(new CookieImpl("cookie", "invalidValue%")))
-                .isInstanceOf(BadRequestException.class);
+        request.cookies = Map.of("name", "value");
+        assertThat(request.cookie(spec)).get().isEqualTo("value");
     }
 }

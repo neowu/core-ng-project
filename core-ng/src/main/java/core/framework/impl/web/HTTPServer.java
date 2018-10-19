@@ -43,6 +43,7 @@ public class HTTPServer {
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
 
             builder.setHandler(handler())
+                   .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
                    .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
                    // since we don't use Expires or Last- Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age

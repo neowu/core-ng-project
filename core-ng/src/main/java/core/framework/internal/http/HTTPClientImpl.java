@@ -93,18 +93,18 @@ public final class HTTPClientImpl implements HTTPClient {
                 HttpResponse<byte[]> httpResponse = client.send(httpRequest, new ByteArrayBodyHandler());
                 HTTPResponse response = response(httpResponse);
                 if (shouldRetry(attempts, request.method, null, response.status)) {
-                    logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon");
+                    logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon, uri={}", request.uri);
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
                 }
                 return response;
             } catch (IOException | InterruptedException e) {
                 if (shouldRetry(attempts, request.method, e, null)) {
-                    logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon", e);
+                    logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon, uri={}", request.uri, e);   // put uri in warn/error message to help troubleshooting, in gcloud error console or when trace is too large only warning shows
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
                 }
-                throw new HTTPClientException(e.getMessage(), "HTTP_COMMUNICATION_FAILED", e);
+                throw new HTTPClientException("http communication failed, uri=" + request.uri, "HTTP_COMMUNICATION_FAILED", e);
             }
         }
     }
