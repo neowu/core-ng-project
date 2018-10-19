@@ -124,7 +124,7 @@ public final class RequestParser {
                 logger.debug("[request:query] {}={}", paramName, paramValue);
                 request.queryParams.put(paramName, paramValue);
             } catch (IllegalArgumentException e) {
-                throw new BadRequestException(Strings.format("failed to parse query param, name={}, value={}", key, value), "INVALID_HTTP_REQUEST", e);
+                throw new BadRequestException(format("failed to parse query param, name={}, value={}", key, value), "INVALID_HTTP_REQUEST", e);
             }
         }
     }
