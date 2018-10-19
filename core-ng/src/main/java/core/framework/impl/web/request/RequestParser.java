@@ -5,7 +5,6 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.filter.FieldLogParam;
 import core.framework.internal.http.BodyLogParam;
-import core.framework.util.Files;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
 import core.framework.web.exception.BadRequestException;
@@ -21,6 +20,7 @@ import io.undertow.util.HttpString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Map;
@@ -122,16 +122,18 @@ public final class RequestParser {
         }
     }
 
-    private void parseForm(RequestImpl request, HttpServerExchange exchange) {
+    private void parseForm(RequestImpl request, HttpServerExchange exchange) throws IOException {
         FormData formData = exchange.getAttachment(FormDataParser.FORM_DATA);
         if (formData == null) return;
 
         for (String name : formData) {
             FormData.FormValue value = formData.getFirst(name);
-            if (value.isFile()) {
-                if (!Strings.isBlank(value.getFileName())) {    // browser passes blank file name if not choose file in form
-                    logger.debug("[request:file] {}={}, size={}", name, value.getFileName(), Files.size(value.getPath()));
-                    request.files.put(name, new MultipartFile(value.getPath(), value.getFileName(), value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
+            if (value.isFileItem()) {
+                String fileName = value.getFileName();
+                if (!Strings.isBlank(fileName)) {    // browser passes blank file name if not choose file in form
+                    FormData.FileItem item = value.getFileItem();
+                    logger.debug("[request:file] {}={}, size={}", name, fileName, item.getFileSize());
+                    request.files.put(name, new MultipartFile(item.getFile(), fileName, value.getHeaders().getFirst(Headers.CONTENT_TYPE)));
                 }
             } else {
                 logger.debug("[request:form] {}={}", name, new FieldLogParam(name, value.getValue()));

@@ -84,14 +84,6 @@ public final class Files {
         return path;
     }
 
-    public static long size(Path file) {
-        try {
-            return java.nio.file.Files.size(file);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     public static Instant lastModified(Path file) {
         try {
             return getLastModifiedTime(file).toInstant();
