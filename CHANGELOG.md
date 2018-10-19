@@ -1,4 +1,10 @@
 ## Change log
+### 6.9.7 (10/18/2018 - )
+* httpclient: workaround fix for httpclient, to discard body with response status 204
+* http: enabled HTTP2 support back, 
+        disabled always write keep alive response header, since it's default for HTTP/1.1
+        HTTP/1.0 client is less popular, for apache benchmark tool (ab), use alternative one (e.g. h2load from nghttp2, which will be installed with curl+http2 support)  
+
 ### 6.9.6 (10/16/2018 - 10/18/2018)
 * log: collect cpu usage stat, in container env, system load != cpu container/java process usage
 * http: due to jdk httpclient bug, it hangs if server return 204 no content, without content-length  

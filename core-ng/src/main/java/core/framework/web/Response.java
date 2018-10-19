@@ -42,7 +42,7 @@ public interface Response {
     // due to https://bugs.openjdk.java.net/browse/JDK-8211437, return 200 for now
     static Response empty() {
         return new ResponseImpl(new ByteArrayBody(new byte[0]))
-                .status(HTTPStatus.OK);
+                .status(HTTPStatus.NO_CONTENT);
     }
 
     static Response bytes(byte[] bytes) {

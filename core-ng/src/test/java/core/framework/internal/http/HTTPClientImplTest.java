@@ -74,14 +74,6 @@ class HTTPClientImplTest {
     }
 
     @Test
-    void httpRequestWithHTTPS() {
-        var request = new HTTPRequest(HTTPMethod.GET, "https://localhost/uri");
-        HttpRequest httpRequest = httpClient.httpRequest(request);
-        assertThat(httpRequest.uri().toString()).isEqualTo("https://localhost/uri");
-//        assertThat(httpRequest.version()).get().isEqualTo(HttpClient.Version.HTTP_2);
-    }
-
-    @Test
     void response() {
         @SuppressWarnings("unchecked")
         HttpResponse<byte[]> httpResponse = mock(HttpResponse.class);

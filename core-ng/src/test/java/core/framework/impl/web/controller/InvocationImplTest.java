@@ -28,7 +28,7 @@ class InvocationImplTest {
         InvocationImpl invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), interceptors, mock(Request.class), new WebContextImpl());
 
         Response response = invocation.proceed();
-        assertEquals(HTTPStatus.OK, response.status());
+        assertEquals(HTTPStatus.NO_CONTENT, response.status());
         assertTrue(controller.executed);
         for (Interceptor interceptor : interceptors.interceptors) {
             assertTrue(((TestInterceptor) interceptor).executed);
@@ -44,7 +44,7 @@ class InvocationImplTest {
         InvocationImpl invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, true), interceptors, mock(Request.class), new WebContextImpl());
 
         Response response = invocation.proceed();
-        assertEquals(HTTPStatus.OK, response.status());
+        assertEquals(HTTPStatus.NO_CONTENT, response.status());
         assertTrue(controller.executed);
         for (Interceptor interceptor : interceptors.interceptors) {
             assertFalse(((TestInterceptor) interceptor).executed);

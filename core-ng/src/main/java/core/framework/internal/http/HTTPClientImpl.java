@@ -25,7 +25,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.List;
@@ -91,7 +90,7 @@ public final class HTTPClientImpl implements HTTPClient {
         while (true) {
             attempts++;
             try {
-                HttpResponse<byte[]> httpResponse = client.send(httpRequest, BodyHandlers.ofByteArray());
+                HttpResponse<byte[]> httpResponse = client.send(httpRequest, new ByteArrayBodyHandler());
                 HTTPResponse response = response(httpResponse);
                 if (shouldRetry(attempts, request.method, null, response.status)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon");
@@ -113,6 +112,7 @@ public final class HTTPClientImpl implements HTTPClient {
     HTTPResponse response(HttpResponse<byte[]> httpResponse) {
         int statusCode = httpResponse.statusCode();
         logger.debug("[response] status={}", statusCode);
+
         Map<String, String> headers = new TreeMap<>(CASE_INSENSITIVE_ORDER);
         for (Map.Entry<String, List<String>> entry : httpResponse.headers().map().entrySet()) {
             String name = entry.getKey();
@@ -124,8 +124,7 @@ public final class HTTPClientImpl implements HTTPClient {
 
         byte[] body = decodeBody(headers.get(HTTPHeaders.CONTENT_ENCODING), httpResponse.body());
 
-        HTTPStatus status = parseHTTPStatus(statusCode);
-        var response = new HTTPResponse(status, headers, body);
+        var response = new HTTPResponse(parseHTTPStatus(statusCode), headers, body);
         logger.debug("[response] body={}", BodyLogParam.param(body, response.contentType));
         return response;
     }
@@ -147,10 +146,6 @@ public final class HTTPClientImpl implements HTTPClient {
         try {
             var requestURI = new URI(requestURI(request.uri, request.params));
             builder.uri(requestURI);
-
-            // disable http2 as http client has bug
-            // if ("https".equals(requestURI.getScheme())) builder.version(HttpClient.Version.HTTP_2);
-
             logger.debug("[request] method={}, uri={}", request.method, requestURI);
         } catch (URISyntaxException e) {
             throw new HTTPClientException("uri is invalid, uri=" + request.uri, "INVALID_URL", e);
