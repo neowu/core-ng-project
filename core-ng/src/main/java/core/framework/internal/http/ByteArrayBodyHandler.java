@@ -20,7 +20,7 @@ public class ByteArrayBodyHandler implements HttpResponse.BodyHandler<byte[]> {
         return HttpResponse.BodySubscribers.ofByteArray();
     }
 
-    class EmptyBodySubscriber implements HttpResponse.BodySubscriber<byte[]> {
+    static class EmptyBodySubscriber implements HttpResponse.BodySubscriber<byte[]> {
         @Override
         public void onSubscribe(Flow.Subscription subscription) {
         }
