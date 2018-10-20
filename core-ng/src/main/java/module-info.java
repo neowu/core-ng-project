@@ -4,9 +4,10 @@ import org.slf4j.spi.SLF4JServiceProvider;
 module core.framework {
     requires transitive core.framework.api;
     requires transitive java.sql;
+    requires transitive org.slf4j;
     requires java.management;
     requires java.net.http;
-    requires transitive org.slf4j;
+    requires xnio.api;
     requires undertow.core;
     requires jackson.annotations;
     requires com.fasterxml.jackson.core;
@@ -14,7 +15,7 @@ module core.framework {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.module.afterburner;
     requires javassist;
-    requires kafka.clients;
+    requires static kafka.clients;
 
     exports core.framework.async;
     exports core.framework.cache;

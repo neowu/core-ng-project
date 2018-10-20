@@ -1,6 +1,9 @@
 package core.framework.internal.http;
 
-import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandler;
+import java.net.http.HttpResponse.BodySubscriber;
+import java.net.http.HttpResponse.BodySubscribers;
+import java.net.http.HttpResponse.ResponseInfo;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -10,17 +13,17 @@ import java.util.concurrent.Flow;
 /**
  * @author neo
  */
-public class ByteArrayBodyHandler implements HttpResponse.BodyHandler<byte[]> {
+public class ByteArrayBodyHandler implements BodyHandler<byte[]> {
     @Override
-    public HttpResponse.BodySubscriber<byte[]> apply(HttpResponse.ResponseInfo response) {
+    public BodySubscriber<byte[]> apply(ResponseInfo response) {
         // due to JDK http client bug: https://bugs.openjdk.java.net/browse/JDK-8211437
         // if response doesn't have content-length, http client will hang until connection closed by server side (after keep alive timeout)
         // here explicitly discard body if is no content
         if (response.statusCode() == 204) return new EmptyBodySubscriber();
-        return HttpResponse.BodySubscribers.ofByteArray();
+        return BodySubscribers.ofByteArray();
     }
 
-    static class EmptyBodySubscriber implements HttpResponse.BodySubscriber<byte[]> {
+    static class EmptyBodySubscriber implements BodySubscriber<byte[]> {
         @Override
         public void onSubscribe(Flow.Subscription subscription) {
         }
