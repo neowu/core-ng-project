@@ -4,11 +4,12 @@
 * http: enabled HTTP2 support back, 
         disabled always write keep alive response header, since it's default for HTTP/1.1
         HTTP/1.0 client is less popular, for apache benchmark tool (ab), use alternative one (e.g. h2load from nghttp2, which will be installed with curl+http2 support)  
+* http: fixed jdk httpclient bug with 204 response code, changed Response.empty() back to return 204 
 
 ### 6.9.6 (10/16/2018 - 10/18/2018)
 * log: collect cpu usage stat, in container env, system load != cpu container/java process usage
-* http: due to jdk httpclient bug, it hangs if server return 204 no content, without content-length  
-        see https://bugs.openjdk.java.net/browse/JDK-8211437  
+* http: changed Response.empty() return 200 status code 
+        due to jdk httpclient bug, it hangs if server return 204 no content, without content-length, see https://bugs.openjdk.java.net/browse/JDK-8211437  
 
 ### 6.9.5 (10/16/2018)
 * http: disable http2 for both server and client, as jdk http client may cause busy loop issue if transaction is not proper closed

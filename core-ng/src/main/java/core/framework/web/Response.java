@@ -39,7 +39,6 @@ public interface Response {
                 .contentType(ContentType.TEXT_HTML);
     }
 
-    // due to https://bugs.openjdk.java.net/browse/JDK-8211437, return 200 for now
     static Response empty() {
         return new ResponseImpl(new ByteArrayBody(new byte[0]))
                 .status(HTTPStatus.NO_CONTENT);

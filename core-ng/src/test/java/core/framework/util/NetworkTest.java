@@ -2,7 +2,7 @@ package core.framework.util;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -10,7 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class NetworkTest {
     @Test
     void localHostAddress() {
-        String hostAddress = Network.localHostAddress();
-        assertNotNull(hostAddress);
+        assertThat(Network.LOCAL_HOST_ADDRESS).isNotNull();
+    }
+
+    @Test
+    void localHostName() {
+        assertThat(Network.LOCAL_HOST_NAME).isNotNull();
     }
 }

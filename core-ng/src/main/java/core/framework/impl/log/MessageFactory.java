@@ -16,7 +16,7 @@ public class MessageFactory {
     public static ActionLogMessage actionLog(ActionLog log) {
         var message = new ActionLogMessage();
         message.app = LogManager.APP_NAME;
-        message.serverIP = Network.localHostAddress();
+        message.serverIP = Network.LOCAL_HOST_ADDRESS;
         message.id = log.id;
         message.date = log.date;
         message.result = log.result();
@@ -56,7 +56,7 @@ public class MessageFactory {
         message.date = now;
         message.id = LogManager.ID_GENERATOR.next(now);
         message.app = LogManager.APP_NAME;
-        message.serverIP = Network.localHostAddress();
+        message.serverIP = Network.LOCAL_HOST_ADDRESS;
         message.stats = stats;
         return message;
     }

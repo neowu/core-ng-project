@@ -6,18 +6,17 @@ import java.net.UnknownHostException;
 /**
  * @author neo
  */
-public final class Network {
-    private static String localHostAddress;
+public final class Network {    // in cloud env, the application vm or container stick with same host ip / name during creation
+    public static final String LOCAL_HOST_ADDRESS;
+    public static final String LOCAL_HOST_NAME;
 
-    public static String localHostAddress() {
-        if (localHostAddress == null)
-            try {
-                String localHostName = InetAddress.getLocalHost().getHostAddress();
-                Network.localHostAddress = localHostName;
-                return localHostName;   // return temporary variable for lock free
-            } catch (UnknownHostException e) {
-                throw new Error(e);
-            }
-        return localHostAddress;
+    static {
+        try {
+            InetAddress address = InetAddress.getLocalHost();
+            LOCAL_HOST_ADDRESS = address.getHostAddress();
+            LOCAL_HOST_NAME = address.getHostName();
+        } catch (UnknownHostException e) {
+            throw new Error(e);
+        }
     }
 }

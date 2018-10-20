@@ -135,7 +135,6 @@ class RequestParserTest {
     @Test
     void parseCookiesWithInvalidValue() {
         Map<String, String> cookies = parser.parseCookies(Map.of("name", new CookieImpl("name", "%%")));
-
         assertThat(cookies).isEmpty();
     }
 }
