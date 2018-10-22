@@ -24,6 +24,7 @@ public class ShutdownHandler implements ExchangeCompletionListener {
 
         if (shutdown.get()) {
             logger.warn("reject request due to server is shutting down, requestURL={}", exchange.getRequestURL());
+            exchange.setPersistent(false);  // ask client not set keep alive for current connection, with persistent=false, undertow will send header "connection: close"
             exchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
             exchange.endExchange();
             return true;

@@ -21,6 +21,10 @@ class Exchange { // due to HttpServerExchange is final and can't be mocked (mock
         return exchange.getRequestURL();
     }
 
+    void setPersistent(boolean persistent) {
+        exchange.setPersistent(persistent);
+    }
+
     void setStatusCode(int statusCode) {
         exchange.setStatusCode(statusCode);
     }
