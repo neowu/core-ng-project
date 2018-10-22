@@ -10,14 +10,14 @@ import java.util.Map;
  * @author neo
  */
 public class ActionLogMessage {
+    @Property(name = "id")
+    public String id;
     @Property(name = "date")
     public Instant date;
     @Property(name = "app")
     public String app;
     @Property(name = "server_ip")
     public String serverIP;
-    @Property(name = "id")
-    public String id;
     @Property(name = "result")
     public String result;
     @Property(name = "action")

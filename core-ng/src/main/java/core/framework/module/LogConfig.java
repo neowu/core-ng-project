@@ -1,15 +1,14 @@
 package core.framework.module;
 
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.CollectStatTask;
-import core.framework.impl.log.ConsoleAppender;
-import core.framework.impl.log.KafkaAppender;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
+import core.framework.internal.log.CollectStatTask;
+import core.framework.internal.log.appender.ConsoleAppender;
+import core.framework.internal.log.appender.KafkaAppender;
+import core.framework.internal.log.appender.LogAppender;
 
 import java.time.Duration;
-import java.util.function.Consumer;
 
 import static core.framework.util.Strings.format;
 
@@ -24,23 +23,22 @@ public class LogConfig extends Config {
         this.context = context;
     }
 
-    public void writeToConsole() {
-        setLogAppender(new ConsoleAppender());
+    public void toConsole() {
+        appender(new ConsoleAppender());
     }
 
-    public void writeToKafka(String kafkaURI) {
+    public void toKafka(String kafkaURI) {
         var appender = new KafkaAppender(kafkaURI);
-        setLogAppender(appender);
+        appender(appender);
         context.startupHook.add(appender::start);
         context.shutdownHook.add(ShutdownHook.STAGE_3, appender::stop);
-
         context.stat.metrics.add(appender.producerMetrics);
-        context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(appender, context.stat), Duration.ofSeconds(10));
     }
 
-    private void setLogAppender(Consumer<ActionLog> appender) {
+    public void appender(LogAppender appender) {
         if (context.logManager.appender != null) throw new Error(format("log appender is already set, appender={}", context.logManager.appender.getClass().getSimpleName()));
         context.logManager.appender = appender;
+        context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(appender, context.stat), Duration.ofSeconds(10));
     }
 
     public void maskFields(String... fields) {

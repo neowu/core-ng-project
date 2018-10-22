@@ -13,7 +13,6 @@ import core.log.job.CleanupOldIndexJob;
 import core.log.kafka.ActionLogMessageHandler;
 import core.log.kafka.StatMessageHandler;
 import core.log.service.ActionService;
-import core.log.service.CollectStatTask;
 import core.log.service.ElasticSearchAppender;
 import core.log.service.IndexService;
 import core.log.service.StatService;
@@ -41,7 +40,7 @@ public class LogProcessorApp extends App {
         bind(ActionService.class);
         bind(StatService.class);
 
-        context.logManager.appender = bind(ElasticSearchAppender.class);
+        log().appender(bind(ElasticSearchAppender.class));
         onStartup(indexService::createIndexTemplatesUntilSuccess);
 
         kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
@@ -49,8 +48,6 @@ public class LogProcessorApp extends App {
         kafka().maxPoll(2000, 3 * 1024 * 1024);     // get 3M message at max
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));
-
-        context.backgroundTask().scheduleWithFixedDelay(bind(new CollectStatTask(context.stat)), Duration.ofSeconds(10));
 
         schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
     }

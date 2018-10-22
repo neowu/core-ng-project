@@ -5,7 +5,7 @@ package core.framework.module;
  */
 public class TestLogConfig extends LogConfig {
     @Override
-    public void writeToKafka(String kafkaURI) {
-        writeToConsole();
+    public void toKafka(String kafkaURI) {
+        toConsole();
     }
 }

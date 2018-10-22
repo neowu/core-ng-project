@@ -1,19 +1,15 @@
 package core.framework.impl.log;
 
 import core.framework.internal.log.message.ActionLogMessage;
-import core.framework.internal.log.message.StatMessage;
 import core.framework.util.Network;
-
-import java.time.Instant;
-import java.util.Map;
 
 /**
  * @author neo
  */
-public class MessageFactory {
+public class ActionLogMessageFactory {
     private static final int MAX_TRACE_LENGTH = 900000; // 900K, kafka max message size is 1M, leave 100K for rest, assume majority chars is in ascii (one char = one byte)
 
-    public static ActionLogMessage actionLog(ActionLog log) {
+    public ActionLogMessage create(ActionLog log) {
         var message = new ActionLogMessage();
         message.app = LogManager.APP_NAME;
         message.serverIP = Network.LOCAL_HOST_ADDRESS;
@@ -37,7 +33,7 @@ public class MessageFactory {
         return message;
     }
 
-    static String trace(ActionLog log, int maxLength) {
+    String trace(ActionLog log, int maxLength) {
         var builder = new StringBuilder(log.events.size() << 7);  // length * 128 as rough initial capacity
         for (LogEvent event : log.events) {
             event.appendTrace(builder, log.startTime);
@@ -48,16 +44,5 @@ public class MessageFactory {
             }
         }
         return builder.toString();
-    }
-
-    public static StatMessage stat(Map<String, Double> stats) {
-        var message = new StatMessage();
-        var now = Instant.now();
-        message.date = now;
-        message.id = LogManager.ID_GENERATOR.next(now);
-        message.app = LogManager.APP_NAME;
-        message.serverIP = Network.LOCAL_HOST_ADDRESS;
-        message.stats = stats;
-        return message;
     }
 }

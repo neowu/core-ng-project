@@ -1,4 +1,4 @@
-package core.framework.impl.log;
+package core.framework.internal.log.appender;
 
 import core.framework.impl.kafka.ProducerMetrics;
 import core.framework.internal.json.JSONMapper;
@@ -23,12 +23,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 /**
  * @author neo
  */
-public final class KafkaAppender implements Consumer<ActionLog> {
+public final class KafkaAppender implements LogAppender {
     public final ProducerMetrics producerMetrics = new ProducerMetrics("log-forwarder");
     private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
     private final BlockingQueue<ProducerRecord<byte[], byte[]>> records = new LinkedBlockingQueue<>();
@@ -81,9 +80,13 @@ public final class KafkaAppender implements Consumer<ActionLog> {
     }
 
     @Override
-    public void accept(ActionLog log) {
-        ActionLogMessage message = MessageFactory.actionLog(log);
+    public void append(ActionLogMessage message) {
         records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, Strings.bytes(message.id), actionLogMapper.toJSON(message)));
+    }
+
+    @Override
+    public void append(StatMessage message) {
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, Strings.bytes(message.id), statMapper.toJSON(message)));
     }
 
     public void start() {
@@ -95,10 +98,5 @@ public final class KafkaAppender implements Consumer<ActionLog> {
         stop.set(true);
         logForwarderThread.interrupt();
         producer.close(timeoutInMs <= 0 ? 1000 : timeoutInMs, TimeUnit.MILLISECONDS);
-    }
-
-    public void forward(Map<String, Double> stats) {
-        StatMessage message = MessageFactory.stat(stats);
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, Strings.bytes(message.id), statMapper.toJSON(message)));
     }
 }

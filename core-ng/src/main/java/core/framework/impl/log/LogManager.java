@@ -1,6 +1,7 @@
 package core.framework.impl.log;
 
 import core.framework.impl.log.filter.LogFilter;
+import core.framework.internal.log.appender.LogAppender;
 import core.framework.log.ErrorCode;
 import core.framework.log.Markers;
 import core.framework.log.Severity;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import java.util.Collections;
-import java.util.function.Consumer;
 
 /**
  * @author neo
@@ -18,9 +18,8 @@ public class LogManager {
     public static final ThreadLocal<ActionLog> CURRENT_ACTION_LOG = new ThreadLocal<>();
     public static final String APP_NAME;
 
+    public static final IdGenerator ID_GENERATOR = new IdGenerator();
     static final LogFilter FILTER = new LogFilter();
-    static final IdGenerator ID_GENERATOR = new IdGenerator();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LogManager.class);
 
     static {
@@ -32,7 +31,8 @@ public class LogManager {
         APP_NAME = appName;
     }
 
-    public Consumer<ActionLog> appender;
+    private final ActionLogMessageFactory actionLogMessageFactory = new ActionLogMessageFactory();
+    public LogAppender appender;
 
     public ActionLog begin(String message) {
         var actionLog = new ActionLog(message);
@@ -47,7 +47,7 @@ public class LogManager {
 
         if (appender != null) {
             try {
-                appender.accept(actionLog);
+                appender.append(actionLogMessageFactory.create(actionLog));
             } catch (Throwable e) {
                 LOGGER.warn("failed to append action log, error={}", e.getMessage(), e);
             }

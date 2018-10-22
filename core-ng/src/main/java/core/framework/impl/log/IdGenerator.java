@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author neo
  */
-class IdGenerator {
+public class IdGenerator {
     private static final int LOW_ORDER_THREE_BYTES = 0xFFFFFF;
 
     private final AtomicInteger counter = new AtomicInteger(ThreadLocalRandom.current().nextInt());
@@ -36,7 +36,7 @@ class IdGenerator {
     }
 
     // action id doesn't need strict uniqueness as UUID, here to generate shorter and more elasticsearch/lucene friendly id
-    String next(Instant now) {
+    public String next(Instant now) {
         long time = now.toEpochMilli();
         int counter = this.counter.getAndIncrement() & LOW_ORDER_THREE_BYTES;
         byte[] bytes = new byte[10];

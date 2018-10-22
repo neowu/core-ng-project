@@ -1,40 +1,41 @@
-package core.framework.impl.log;
+package core.framework.internal.log.appender;
 
+import core.framework.internal.log.message.ActionLogMessage;
 import core.framework.internal.log.message.PerformanceStat;
+import core.framework.internal.log.message.StatMessage;
 
 import java.io.PrintStream;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * @author neo
  */
-public final class ConsoleAppender implements Consumer<ActionLog> {
+public final class ConsoleAppender implements LogAppender {
     private static final String LOG_SPLITTER = " | ";
 
     private final PrintStream stdout = System.out;
     private final PrintStream stderr = System.err;
 
     @Override
-    public void accept(ActionLog log) {
-        stdout.println(message(log));
+    public void append(ActionLogMessage message) {
+        stdout.println(message(message));
 
-        if (log.flushTraceLog()) {
-            var builder = new StringBuilder(256);
-            for (LogEvent event : log.events) {
-                event.appendTrace(builder, log.startTime);
-                stderr.print(builder.toString());
-                builder.setLength(0);
-            }
+        if (message.traceLog != null) {
+            stderr.println(message.traceLog);
         }
     }
 
-    String message(ActionLog log) {
-        var builder = new StringBuilder(256);
+    @Override
+    public void append(StatMessage message) {
+        stdout.println(message(message));
+    }
+
+    String message(ActionLogMessage log) {
+        var builder = new StringBuilder(512);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(log.date))
-               .append(LOG_SPLITTER).append(log.result())
+               .append(LOG_SPLITTER).append(log.result)
                .append(LOG_SPLITTER).append("elapsed=").append(log.elapsed)
                .append(LOG_SPLITTER).append("id=").append(log.id)
                .append(LOG_SPLITTER).append("action=").append(log.action);
@@ -43,7 +44,7 @@ public final class ConsoleAppender implements Consumer<ActionLog> {
             builder.append(LOG_SPLITTER).append("correlationId=");
             appendList(builder, log.correlationIds);
         }
-        String errorCode = log.errorCode();
+        String errorCode = log.errorCode;
         if (errorCode != null) {
             builder.append(LOG_SPLITTER).append("errorCode=").append(errorCode)
                    .append(LOG_SPLITTER).append("errorMessage=").append(filterLineSeparator(log.errorMessage));
@@ -73,6 +74,17 @@ public final class ConsoleAppender implements Consumer<ActionLog> {
             if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("Reads=").append(tracking.readEntries);
             if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("Writes=").append(tracking.writeEntries);
             builder.append(LOG_SPLITTER).append(key).append("Elapsed=").append(tracking.totalElapsed);
+        }
+        return builder.toString();
+    }
+
+    String message(StatMessage message) {
+        var builder = new StringBuilder(512);
+        builder.append(DateTimeFormatter.ISO_INSTANT.format(message.date));
+        for (Map.Entry<String, Double> entry : message.stats.entrySet()) {
+            String key = entry.getKey();
+            String value = String.format("%.9f", entry.getValue());
+            builder.append(LOG_SPLITTER).append(key).append("=").append(value);
         }
         return builder.toString();
     }
