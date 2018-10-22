@@ -44,7 +44,7 @@ public class DatabaseOperation {
             setParams(statement, params);
             return statement.executeUpdate();
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.returnConnection(connection);
@@ -69,7 +69,7 @@ public class DatabaseOperation {
             }
             return results;
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.returnConnection(connection);
@@ -85,7 +85,7 @@ public class DatabaseOperation {
             setParams(statement, params);
             return fetchOne(statement, mapper);
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.returnConnection(connection);
@@ -101,7 +101,7 @@ public class DatabaseOperation {
             setParams(statement, params);
             return fetch(statement, mapper);
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.returnConnection(connection);
@@ -117,7 +117,7 @@ public class DatabaseOperation {
             if (generatedColumn == null) return OptionalLong.empty();
             return fetchGeneratedKey(statement);
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             transactionManager.returnConnection(connection);

@@ -52,7 +52,7 @@ public final class TransactionManager {
         try {
             connection.resource.setAutoCommit(false);
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         }
 
@@ -70,7 +70,7 @@ public final class TransactionManager {
             connection.resource.commit();
             CURRENT_TRANSACTION_STATE.set(TransactionState.COMMIT);
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         }
     }
@@ -82,7 +82,7 @@ public final class TransactionManager {
             connection.resource.rollback();
             CURRENT_TRANSACTION_STATE.set(TransactionState.ROLLBACK);
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         }
     }
@@ -100,7 +100,7 @@ public final class TransactionManager {
                 connection.resource.rollback();
             }
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             returnConnectionToPool(connection, true);
@@ -112,7 +112,7 @@ public final class TransactionManager {
             if (!connection.broken && resetAutoCommit)
                 connection.resource.setAutoCommit(true);
         } catch (SQLException e) {
-            Connections.checkConnectionStatus(connection, e);
+            Connections.checkConnectionState(connection, e);
             throw new UncheckedSQLException(e);
         } finally {
             pool.returnItem(connection);

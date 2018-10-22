@@ -5,6 +5,7 @@
         disabled always write keep alive response header, since it's default for HTTP/1.1
         HTTP/1.0 client is less popular, for apache benchmark tool (ab), use alternative one (e.g. h2load from nghttp2, which will be installed with curl+http2 support)  
 * http: fixed jdk httpclient bug with 204 response code, changed Response.empty() back to return 204 
+* db: close connection if query timed out, refer to core.framework.impl.db.Connections for reason
 
 ### 6.9.6 (10/16/2018 - 10/18/2018)
 * log: collect cpu usage stat, in container env, system load != cpu container/java process usage

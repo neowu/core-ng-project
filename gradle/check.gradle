@@ -15,7 +15,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.13'
+            checkstyle 'com.puppycrawl.tools:checkstyle:8.14'
             checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.32.0'
         }
 
