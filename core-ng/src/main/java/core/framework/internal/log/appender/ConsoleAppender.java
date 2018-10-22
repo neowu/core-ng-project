@@ -84,7 +84,7 @@ public final class ConsoleAppender implements LogAppender {
         for (Map.Entry<String, Double> entry : message.stats.entrySet()) {
             String key = entry.getKey();
             String value = String.format("%.9f", entry.getValue());
-            builder.append(LOG_SPLITTER).append(key).append("=").append(value);
+            builder.append(LOG_SPLITTER).append(key).append('=').append(value);
         }
         return builder.toString();
     }
