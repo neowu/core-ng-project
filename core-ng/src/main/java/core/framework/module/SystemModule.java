@@ -94,9 +94,9 @@ public final class SystemModule extends Module {
     private void configureLog() {
         property(SYS_LOG_APPENDER).ifPresent(appender -> {
             if ("console".equals(appender)) {
-                log().toConsole();
+                log().appendToConsole();
             } else {
-                log().toKafka(appender);
+                log().appendToKafka(appender);
             }
         });
     }

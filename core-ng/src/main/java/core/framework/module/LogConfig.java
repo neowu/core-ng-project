@@ -23,11 +23,11 @@ public class LogConfig extends Config {
         this.context = context;
     }
 
-    public void toConsole() {
+    public void appendToConsole() {
         appender(new ConsoleAppender());
     }
 
-    public void toKafka(String kafkaURI) {
+    public void appendToKafka(String kafkaURI) {
         var appender = new KafkaAppender(kafkaURI);
         appender(appender);
         context.startupHook.add(appender::start);
