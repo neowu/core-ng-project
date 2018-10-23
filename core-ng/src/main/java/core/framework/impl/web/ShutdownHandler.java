@@ -13,9 +13,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author neo
  */
 public class ShutdownHandler implements ExchangeCompletionListener {
+    public final AtomicBoolean shutdown = new AtomicBoolean(false);
     final AtomicLong activeRequests = new AtomicLong(0);
     private final Logger logger = LoggerFactory.getLogger(ShutdownHandler.class);
-    private final AtomicBoolean shutdown = new AtomicBoolean(false);
     private final Object lock = new Object();
 
     boolean handle(Exchange exchange) {

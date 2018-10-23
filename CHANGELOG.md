@@ -1,6 +1,6 @@
 ## Change log
-### 6.9.8 (10/22/2018 - )
-
+### 6.9.8 (10/22/2018 - 10/23/2018)
+* http: tweak gracefully shutdown, make server actively close connection if during shutdown, to make client not reuse it due to keep alive
 
 ### 6.9.7 (10/18/2018 - 10/22/2018)
 * httpclient: workaround fix for httpclient, to discard body with response status 204

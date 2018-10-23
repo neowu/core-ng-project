@@ -18,12 +18,6 @@ project(':core-ng-api') {
 
 project(':core-ng') {
     apply from: file("${rootDir}/gradle/lib.gradle")
-    compileJava {
-        doFirst {
-            options.compilerArgs += ['--module-path', classpath.asPath, '-Xlint:-requires-automatic']
-            classpath = files()
-        }
-    }
     dependencies {
         api project(":core-ng-api")
         api 'org.slf4j:slf4j-api:1.8.0-beta2'

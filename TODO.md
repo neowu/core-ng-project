@@ -15,8 +15,8 @@
 * change gradle to kotlin?
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 * rethink module structure to fit java module export requirement
-* run diagnostic when heap usage is high, send trace
-* http server / client shorter connect timeout? or find way to close connection right
+* run diagnostic when heap usage is high, send trace, log().alert() ?
+* http server / client shorter connect timeout? server side close all connections during shutdown?
 
 ### jdk 9/10/11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
@@ -27,3 +27,7 @@
   and cause GOAWAY frame / EOF read issue with small UndertowOptions.NO_REQUEST_TIMEOUT (e.g. 10ms)
 * jdk httpclient doesn't work with http response without content-length, now we have to let Response.empty return 200
   https://bugs.openjdk.java.net/browse/JDK-8211437  
+
+### kube deployment + http client keep alive issue, reference
+https://github.com/kubernetes/contrib/issues/1123
+https://trac.nginx.org/nginx/ticket/1022

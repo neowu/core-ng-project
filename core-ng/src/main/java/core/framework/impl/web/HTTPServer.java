@@ -30,7 +30,7 @@ public class HTTPServer {
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
-        handler = new HTTPHandler(logManager, siteManager.sessionManager, siteManager.templateManager);
+        handler = new HTTPHandler(logManager, siteManager.sessionManager, siteManager.templateManager, shutdownHandler);
     }
 
     public void start() {
