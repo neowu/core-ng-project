@@ -33,10 +33,6 @@ public class ShutdownHandler implements ExchangeCompletionListener {
         return false;
     }
 
-    void shutdown() {
-        shutdown.set(true);
-    }
-
     boolean awaitTermination(long timeoutInMs) throws InterruptedException {
         long end = System.currentTimeMillis() + timeoutInMs;
         synchronized (lock) {

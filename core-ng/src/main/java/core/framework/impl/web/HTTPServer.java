@@ -77,7 +77,7 @@ public class HTTPServer {
     public void shutdown() {
         if (server != null) {
             logger.info("shutting down http server");
-            shutdownHandler.shutdown();
+            shutdownHandler.shutdown.set(true);
             if (handler.webSocketHandler != null)
                 handler.webSocketHandler.shutdown();
         }

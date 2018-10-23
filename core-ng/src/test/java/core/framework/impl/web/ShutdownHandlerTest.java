@@ -31,7 +31,7 @@ class ShutdownHandlerTest {
 
     @Test
     void handleShutdown() {
-        handler.shutdown();
+        handler.shutdown.set(true);
         assertThat(handler.handle(exchange)).isTrue();
 
         verify(exchange).setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);

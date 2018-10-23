@@ -38,13 +38,17 @@ public class ResponseHandler {
         putHeaders(response, exchange);
         putCookies(response, exchange);
 
-        if (shutdownHandler.shutdown.get()) {   // if during shutdown, actively close client connection, otherwise it could be reuse after server stopped due to keep alive
-            exchange.setPersistent(false);
-        }
+        closeConnectionIfShutdown(exchange);
 
         response.body.send(exchange.getResponseSender(), context);
 
         actionLog.context("responseCode", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
+    }
+
+    void closeConnectionIfShutdown(HttpServerExchange exchange) {
+        if (shutdownHandler.shutdown.get()) {   // if during shutdown, actively close client connection, otherwise it could be reuse after server stopped due to keep alive
+            exchange.setPersistent(false);
+        }
     }
 
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {

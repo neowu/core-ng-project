@@ -53,13 +53,13 @@ public final class Files {
         try {
             walkFileTree(directory, new SimpleFileVisitor<>() {
                 @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) throws IOException {
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attributes) {
                     delete(file);
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+                public FileVisitResult postVisitDirectory(Path dir, IOException e) {
                     delete(dir);
                     return FileVisitResult.CONTINUE;
                 }
