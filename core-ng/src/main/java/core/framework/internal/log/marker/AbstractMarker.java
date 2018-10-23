@@ -1,4 +1,4 @@
-package core.framework.impl.log.marker;
+package core.framework.internal.log.marker;
 
 import org.slf4j.Marker;
 

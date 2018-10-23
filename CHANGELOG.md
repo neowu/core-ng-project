@@ -1,5 +1,5 @@
 ## Change log
-### 6.9.7 (10/18/2018 - )
+### 6.9.7 (10/18/2018 - 10/22/2018)
 * httpclient: workaround fix for httpclient, to discard body with response status 204
 * http: enabled HTTP2 support back, 
         disabled always write keep alive response header, since it's default for HTTP/1.1
@@ -7,6 +7,7 @@
 * http: fixed jdk httpclient bug with 204 response code, changed Response.empty() back to return 204 
 * http: in graceful shutdown handler, set "connection: close" header to ask client close the connection during deployment
 * db: close connection if query timed out, refer to core.framework.impl.db.Connections for reason
+* api: tweak timeout for zero downtime deployment, shorter api client connect timeout to 1s and max retry 5 times
 
 ### 6.9.6 (10/16/2018 - 10/18/2018)
 * log: collect cpu usage stat, in container env, system load != cpu container/java process usage

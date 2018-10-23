@@ -1,6 +1,6 @@
 package core.framework.impl.log;
 
-import core.framework.impl.log.marker.ErrorCodeMarker;
+import core.framework.internal.log.marker.ErrorCodeMarker;
 import core.framework.util.Exceptions;
 import core.framework.util.Network;
 import org.slf4j.Marker;

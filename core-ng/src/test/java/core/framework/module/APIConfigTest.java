@@ -48,7 +48,7 @@ class APIConfigTest {
 
     @Test
     void client() {
-        config.httpClient().timeout(Duration.ofSeconds(5));
+        config.httpClient().timeout(Duration.ofSeconds(1), Duration.ofSeconds(5));
         config.client(TestWebService.class, "http://localhost");
 
         TestWebService client = (TestWebService) context.beanFactory.bean(TestWebService.class, null);
