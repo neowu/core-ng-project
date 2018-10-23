@@ -1,4 +1,7 @@
 ## Change log
+### 6.9.8 (10/22/2018 - )
+
+
 ### 6.9.7 (10/18/2018 - 10/22/2018)
 * httpclient: workaround fix for httpclient, to discard body with response status 204
 * http: enabled HTTP2 support back, 

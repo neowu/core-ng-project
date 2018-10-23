@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '6.9.7'
+    version = '6.9.8'
 }
 
 def elasticVersion = '6.4.0'
@@ -20,7 +20,7 @@ project(':core-ng') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     compileJava {
         doFirst {
-            options.compilerArgs += ['--module-path', classpath.asPath]
+            options.compilerArgs += ['--module-path', classpath.asPath, '-Xlint:-requires-automatic']
             classpath = files()
         }
     }
