@@ -35,8 +35,7 @@ public final class HTTPClientBuilder {
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);
 
-    private Duration connectTimeout = Duration.ofSeconds(15);
-    private Duration requestTimeout = Duration.ofSeconds(60);
+    private Duration timeout = Duration.ofSeconds(60);
     private Duration slowOperationThreshold = Duration.ofSeconds(30);
     private boolean enableCookie = false;
     private boolean enableRedirect = false;
@@ -55,12 +54,12 @@ public final class HTTPClientBuilder {
                 builder.sslContext(sslContext);
             }
 
-            builder.connectTimeout(connectTimeout);
+            builder.connectTimeout(Duration.ofMillis(timeout.toMillis() / 15)); // use 1/15 timeout as connect timeout, e.g. 15s timeout => 1s connect timeout
             if (enableRedirect) builder.followRedirects(HttpClient.Redirect.NORMAL);
             if (enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
             HttpClient httpClient = builder.build();
 
-            return new HTTPClientImpl(httpClient, userAgent, requestTimeout, maxRetries, slowOperationThreshold);
+            return new HTTPClientImpl(httpClient, userAgent, timeout, maxRetries, slowOperationThreshold);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new Error(e);
         } finally {
@@ -68,9 +67,8 @@ public final class HTTPClientBuilder {
         }
     }
 
-    public HTTPClientBuilder timeout(Duration connectTimeout, Duration requestTimeout) {
-        this.connectTimeout = connectTimeout;
-        this.requestTimeout = requestTimeout;
+    public HTTPClientBuilder timeout(Duration requestTimeout) {
+        this.timeout = requestTimeout;
         return this;
     }
 

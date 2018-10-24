@@ -1,5 +1,6 @@
 package core.framework.impl.module;
 
+import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ public final class ShutdownHook implements Runnable {
 
     @Override
     public void run() {
+        var watch = new StopWatch();
         long endTime = System.currentTimeMillis() + SHUTDOWN_TIMEOUT.toMillis();
         for (Map.Entry<Integer, List<Shutdown>> entry : stages.entrySet()) {
             Integer stage = entry.getKey();
@@ -46,7 +48,7 @@ public final class ShutdownHook implements Runnable {
                 }
             }
         }
-        logger.info("shutdown completed");
+        logger.info("shutdown completed, elapsed={}", watch.elapsed());
     }
 
     public interface Shutdown {
