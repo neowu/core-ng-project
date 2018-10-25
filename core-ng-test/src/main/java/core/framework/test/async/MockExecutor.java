@@ -1,7 +1,9 @@
 package core.framework.test.async;
 
 import core.framework.async.Executor;
+import core.framework.async.Task;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -14,6 +16,11 @@ public class MockExecutor implements Executor {
     @Override
     public <T> Future<T> submit(String action, Callable<T> task) {
         return new ExecutorFuture<>(task);
+    }
+
+    @Override
+    public void submit(String action, Task task, Duration delay) {
+        // ignore all delayed task
     }
 
     private static class ExecutorFuture<T> implements Future<T> {

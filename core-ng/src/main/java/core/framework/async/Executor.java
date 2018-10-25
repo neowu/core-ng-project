@@ -1,5 +1,6 @@
 package core.framework.async;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -15,4 +16,6 @@ public interface Executor {
             return null;
         });
     }
+
+    void submit(String action, Task task, Duration delay);
 }

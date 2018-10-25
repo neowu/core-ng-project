@@ -16,7 +16,6 @@
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 * rethink module structure to fit java module export requirement
 * run diagnostic when heap usage is high, send trace, log().alert() ?
-* http server / client shorter connect timeout? server side close all connections during shutdown?
 
 ### jdk 9/10/11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
