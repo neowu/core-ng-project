@@ -1,5 +1,5 @@
 ## Change log
-### 6.9.9 (10/23/2018 - )   !!! this build is mainly to experiment api client http communication failure during deployment
+### 6.9.9 (10/23/2018 - 10/25/2018)   !!! this build is mainly to experiment api client http communication failure during deployment
 * httpclient: drop connection pool if encounter connection failure or 503, in case of next connection in pool is still connect to old server
 * http: shutdown http server at last, and hold shutdown at least 500ms to accept incoming request during shutdown (give kube/service iptable time to take effect)
 * executor: support submit task with delay, to support application retry task, to avoid sleep during task execution

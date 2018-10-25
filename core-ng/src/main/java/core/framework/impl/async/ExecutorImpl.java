@@ -61,7 +61,11 @@ public final class ExecutorImpl implements Executor {
             return null;
         });
         scheduler.schedule(() -> {
-            executor.submit(execution);
+            try {
+                executor.submit(execution);
+            } catch (Throwable e) {
+                logger.error(e.getMessage(), e);    // in scheduler.schedule exception will be silenced swallowed, here is to print if any
+            }
         }, delay.toMillis(), TimeUnit.MILLISECONDS);
     }
 
