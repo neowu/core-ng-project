@@ -22,7 +22,7 @@ public final class ShutdownHook implements Runnable {
     public static final int STAGE_7 = 7;    // release all resources without dependencies, e.g. db / redis / mongo / search
     public static final int STAGE_8 = 8;    // shutdown log forwarder, give more time try to forward all logs
     public static final int STAGE_9 = 9;    // finally stop the http server, to make sure it responses to incoming requests during shutdown
-    private static final Duration SHUTDOWN_TIMEOUT = Duration.ofSeconds(25); // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
+    public static final long SHUTDOWN_TIMEOUT_IN_MS = Duration.ofSeconds(25).toMillis(); // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
     final Thread thread = new Thread(this, "shutdown");
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
     private final Map<Integer, List<Shutdown>> stages = new TreeMap<>();
@@ -38,7 +38,7 @@ public final class ShutdownHook implements Runnable {
     @Override
     public void run() {
         var watch = new StopWatch();
-        long endTime = System.currentTimeMillis() + SHUTDOWN_TIMEOUT.toMillis();
+        long endTime = System.currentTimeMillis() + SHUTDOWN_TIMEOUT_IN_MS;
         for (Map.Entry<Integer, List<Shutdown>> entry : stages.entrySet()) {
             Integer stage = entry.getKey();
             List<Shutdown> shutdowns = entry.getValue();

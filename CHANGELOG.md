@@ -1,6 +1,7 @@
 ## Change log
 ### 6.9.9 (10/23/2018 - )   !!! this build is mainly to experiment api client http communication failure during deployment
 * httpclient: drop connection pool if encounter connection failure or 503, in case of next connection in pool is still connect to old server
+* http: shutdown http server at last, and hold shutdown at least 500ms to accept incoming request during shutdown (give kube/service iptable time to take effect)
 
 ### 6.9.8 (10/22/2018 - 10/23/2018)  !!! this build is mainly to experiment api client http communication failure during deployment
 * http: tweak gracefully shutdown, make server actively close connection if during shutdown, to make client not reuse it due to keep alive

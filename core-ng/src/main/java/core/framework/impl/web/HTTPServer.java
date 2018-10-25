@@ -12,6 +12,8 @@ import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static core.framework.impl.module.ShutdownHook.SHUTDOWN_TIMEOUT_IN_MS;
+
 /**
  * @author neo
  */
@@ -95,10 +97,19 @@ public class HTTPServer {
         }
     }
 
-    public void awaitTermination() {
+    public void awaitTermination(long timeoutInMs) {
         if (server != null) {
-            server.stop();
-            logger.info("http server stopped");
+            try {
+                // at least hold shutdown 500ms
+                // in case new requests still send to this server, lb/routing may takes some time to change (e.g. kube service/iptable)
+                long elapsed = SHUTDOWN_TIMEOUT_IN_MS - timeoutInMs;
+                if (elapsed < 500) Thread.sleep(500 - elapsed);
+            } catch (InterruptedException e) {
+                throw new Error(e);
+            } finally {
+                server.stop();
+                logger.info("http server stopped");
+            }
         }
     }
 }

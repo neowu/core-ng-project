@@ -47,7 +47,7 @@ public class ModuleContext {
         startupHook.add(httpServer::start);
         shutdownHook.add(ShutdownHook.STAGE_0, timeout -> httpServer.shutdown());
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitActiveRequestToComplete);
-        shutdownHook.add(ShutdownHook.STAGE_9, timeout -> httpServer.awaitTermination());
+        shutdownHook.add(ShutdownHook.STAGE_9, httpServer::awaitTermination);
 
         httpServer.handler.beanMapperRegistry.register(ErrorResponse.class);
         httpServer.handler.beanMapperRegistry.register(AJAXErrorResponse.class);
