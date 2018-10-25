@@ -55,14 +55,16 @@ public final class HTTPClientImpl implements HTTPClient {
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientImpl.class);
-    private final HttpClient client;
+    private final HttpClient.Builder builder;
     private final String userAgent;
     private final Duration timeout;
     private final int maxRetries;
     private final long slowOperationThresholdInNanos;
+    private HttpClient client;
 
-    public HTTPClientImpl(HttpClient client, String userAgent, Duration timeout, int maxRetries, Duration slowOperationThreshold) {
-        this.client = client;
+    public HTTPClientImpl(HttpClient.Builder builder, String userAgent, Duration timeout, int maxRetries, Duration slowOperationThreshold) {
+        this.builder = builder;
+        this.client = builder.build();
         this.userAgent = userAgent;
         this.timeout = timeout;
         this.maxRetries = maxRetries;
@@ -94,11 +96,13 @@ public final class HTTPClientImpl implements HTTPClient {
                 HTTPResponse response = response(httpResponse);
                 if (shouldRetry(attempts, request.method, null, response.status)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon, uri={}", request.uri);
+                    client = builder.build();   // drop all keep alive connections in pool if encounter remote server is shutting down to avoid future broken keep alive connections
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
                 }
                 return response;
             } catch (IOException | InterruptedException e) {
+                client = builder.build();   // drop all keep alive connections in pool if any connection become inactive, since we don't have precise control over connection pool
                 if (shouldRetry(attempts, request.method, e, null)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon, uri={}", request.uri, e);   // put uri in warn/error message to help troubleshooting, in gcloud error console or when trace is too large only warning shows
                     Threads.sleepRoughly(waitTime(attempts));

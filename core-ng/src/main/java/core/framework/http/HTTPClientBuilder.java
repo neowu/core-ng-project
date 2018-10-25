@@ -30,7 +30,7 @@ public final class HTTPClientBuilder {
 
         // api client keep alive should be shorter than server side in case server side disconnect connection first, use short value to release connection sooner in quiet time and still fit busy time
         // refer to jdk.internal.net.http.ConnectionPool
-        System.setProperty("jdk.httpclient.keepalive.timeout", "10");   // 10s timeout for keep alive
+        System.setProperty("jdk.httpclient.keepalive.timeout", "15");   // 15s timeout for keep alive
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);
@@ -57,9 +57,8 @@ public final class HTTPClientBuilder {
             builder.connectTimeout(Duration.ofMillis(timeout.toMillis() / 15)); // use 1/15 timeout as connect timeout, e.g. 15s timeout => 1s connect timeout
             if (enableRedirect) builder.followRedirects(HttpClient.Redirect.NORMAL);
             if (enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
-            HttpClient httpClient = builder.build();
 
-            return new HTTPClientImpl(httpClient, userAgent, timeout, maxRetries, slowOperationThreshold);
+            return new HTTPClientImpl(builder, userAgent, timeout, maxRetries, slowOperationThreshold);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new Error(e);
         } finally {

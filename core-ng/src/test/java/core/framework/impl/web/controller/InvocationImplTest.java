@@ -8,9 +8,8 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -19,35 +18,35 @@ import static org.mockito.Mockito.mock;
 class InvocationImplTest {
     @Test
     void process() throws Exception {
-        Stack stack = new Stack();
-        TestController controller = new TestController(stack, 3);
-        Interceptors interceptors = new Interceptors();
+        var stack = new Stack();
+        var controller = new TestController(stack, 3);
+        var interceptors = new Interceptors();
         interceptors.add(new TestInterceptor(stack, 0));
         interceptors.add(new TestInterceptor(stack, 1));
         interceptors.add(new TestInterceptor(stack, 2));
-        InvocationImpl invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), interceptors, mock(Request.class), new WebContextImpl());
+        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), interceptors, mock(Request.class), new WebContextImpl());
 
         Response response = invocation.proceed();
-        assertEquals(HTTPStatus.NO_CONTENT, response.status());
-        assertTrue(controller.executed);
+        assertThat(response.status()).isEqualTo(HTTPStatus.OK);
+        assertThat(controller.executed).isTrue();
         for (Interceptor interceptor : interceptors.interceptors) {
-            assertTrue(((TestInterceptor) interceptor).executed);
+            assertThat(((TestInterceptor) interceptor).executed).isTrue();
         }
     }
 
     @Test
     void skipInterceptor() throws Exception {
-        Stack stack = new Stack();
-        TestController controller = new TestController(stack, 0);
-        Interceptors interceptors = new Interceptors();
+        var stack = new Stack();
+        var controller = new TestController(stack, 0);
+        var interceptors = new Interceptors();
         interceptors.add(new TestInterceptor(stack, 0));
-        InvocationImpl invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, true), interceptors, mock(Request.class), new WebContextImpl());
+        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, true), interceptors, mock(Request.class), new WebContextImpl());
 
         Response response = invocation.proceed();
-        assertEquals(HTTPStatus.NO_CONTENT, response.status());
-        assertTrue(controller.executed);
+        assertThat(response.status()).isEqualTo(HTTPStatus.OK);
+        assertThat(controller.executed).isTrue();
         for (Interceptor interceptor : interceptors.interceptors) {
-            assertFalse(((TestInterceptor) interceptor).executed);
+            assertThat(((TestInterceptor) interceptor).executed).isFalse();
         }
     }
 

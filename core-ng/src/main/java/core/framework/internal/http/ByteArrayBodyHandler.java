@@ -19,6 +19,7 @@ public class ByteArrayBodyHandler implements BodyHandler<byte[]> {
         // due to JDK http client bug: https://bugs.openjdk.java.net/browse/JDK-8211437
         // if response doesn't have content-length, http client will hang until connection closed by server side (after keep alive timeout)
         // here explicitly discard body if is no content
+        // TODO: this is workaround, EmptyBodySubscriber will make http client always create new connection, will be removed by JDK 11.0.2 release
         if (response.statusCode() == 204) return new EmptyBodySubscriber();
         return BodySubscribers.ofByteArray();
     }

@@ -1,15 +1,15 @@
 ## Change log
-### 6.9.9 (10/23/2018 - )
+### 6.9.9 (10/23/2018 - )   !!! this build is mainly to experiment api client http communication failure during deployment
+* httpclient: drop connection pool if encounter connection failure or 503, in case of next connection in pool is still connect to old server
 
-### 6.9.8 (10/22/2018 - 10/23/2018)
+### 6.9.8 (10/22/2018 - 10/23/2018)  !!! this build is mainly to experiment api client http communication failure during deployment
 * http: tweak gracefully shutdown, make server actively close connection if during shutdown, to make client not reuse it due to keep alive
 
-### 6.9.7 (10/18/2018 - 10/22/2018)
+### 6.9.7 (10/18/2018 - 10/22/2018)  !!! this build is mainly to experiment api client http communication failure during deployment
 * httpclient: workaround fix for httpclient, to discard body with response status 204
 * http: enabled HTTP2 support back, 
-        disabled always write keep alive response header, since it's default for HTTP/1.1
-        HTTP/1.0 client is less popular, for apache benchmark tool (ab), use alternative one (e.g. h2load from nghttp2, which will be installed with curl+http2 support)  
-* http: fixed jdk httpclient bug with 204 response code, changed Response.empty() back to return 204 
+        disabled "always write keep alive response header", since it's default for HTTP/1.1
+        HTTP/1.0 client is less popular, for apache benchmark tool (ab), use alternative one (e.g. h2load from nghttp2, which will be installed with curl+http2 support)   
 * http: in graceful shutdown handler, set "connection: close" header to ask client close the connection during deployment
 * db: close connection if query timed out, refer to core.framework.impl.db.Connections for reason
 * api: tweak timeout for zero downtime deployment, shorter api client connect timeout to 1s and max retry 5 times
