@@ -9,7 +9,7 @@ public class TestWebServiceImpl$patch implements core.framework.web.Controller {
         Integer $id = core.framework.impl.web.service.PathParamHelper.toInt(request.pathParam("id"));
         core.framework.impl.web.service.TestWebService.TestRequest bean = (core.framework.impl.web.service.TestWebService.TestRequest) request.bean(core.framework.impl.web.service.TestWebService.TestRequest.class);
         delegate.patch($id, bean);
-        return core.framework.web.Response.empty().status(core.framework.api.http.HTTPStatus.OK);
+        return core.framework.web.Response.empty();
     }
 
 }

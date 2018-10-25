@@ -9,7 +9,7 @@ public class TestWebServiceImpl$getEnum implements core.framework.web.Controller
         Long $id = core.framework.impl.web.service.PathParamHelper.toLong(request.pathParam("id"));
         core.framework.impl.web.service.TestWebService.TestEnum $enum = (core.framework.impl.web.service.TestWebService.TestEnum)core.framework.impl.web.service.PathParamHelper.toEnum(request.pathParam("enum"), core.framework.impl.web.service.TestWebService.TestEnum.class);
         core.framework.impl.web.service.TestWebService.TestResponse response = delegate.getEnum($id, $enum);
-        return core.framework.web.Response.bean(response).status(core.framework.api.http.HTTPStatus.OK);
+        return core.framework.web.Response.bean(response);
     }
 
 }

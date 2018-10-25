@@ -1,6 +1,5 @@
 package core.framework.impl.web.service;
 
-import core.framework.api.http.HTTPStatus;
 import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.ResponseStatus;
 import core.framework.impl.asm.CodeBuilder;
@@ -83,15 +82,15 @@ public class WebServiceControllerBuilder<T> {
         } else {
             builder.indent(1).append("return {}.bean(response)", type(Response.class));
         }
-        builder.append(".status({});\n", variable(responseStatus()));
+
+        ResponseStatus status = method.getDeclaredAnnotation(ResponseStatus.class);
+        if (status == null) {
+            builder.append(";\n");
+        } else {
+            builder.append(".status({});\n", variable(status.value()));
+        }
 
         builder.append("}");
         return builder.build();
-    }
-
-    private HTTPStatus responseStatus() {
-        ResponseStatus status = method.getDeclaredAnnotation(ResponseStatus.class);
-        if (status != null) return status.value();
-        return HTTPStatus.OK;
     }
 }

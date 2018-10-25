@@ -54,7 +54,7 @@ public final class HTTPClientBuilder {
                 builder.sslContext(sslContext);
             }
 
-            builder.connectTimeout(Duration.ofMillis(timeout.toMillis() / 15)); // use 1/15 timeout as connect timeout, e.g. 15s timeout => 1s connect timeout
+            builder.connectTimeout(Duration.ofMillis(timeout.toMillis() / 10)); // use 1/10 timeout as connect timeout, e.g. 10s timeout => 1s connect timeout
             if (enableRedirect) builder.followRedirects(HttpClient.Redirect.NORMAL);
             if (enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
 
