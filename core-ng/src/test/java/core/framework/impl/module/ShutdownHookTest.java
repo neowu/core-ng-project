@@ -31,7 +31,7 @@ class ShutdownHookTest {
         doThrow(new Error("failed to shutdown")).when(shutdown1).execute(anyLong());
         var shutdown2 = mock(ShutdownHook.Shutdown.class);
         shutdownHook.add(ShutdownHook.STAGE_0, shutdown1);
-        shutdownHook.add(ShutdownHook.STAGE_10, shutdown2);
+        shutdownHook.add(ShutdownHook.STAGE_7, shutdown2);
 
         shutdownHook.run();
         verify(shutdown2).execute(anyLong());

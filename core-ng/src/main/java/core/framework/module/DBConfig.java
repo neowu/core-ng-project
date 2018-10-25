@@ -45,7 +45,7 @@ public class DBConfig extends Config {
 
     private DatabaseImpl createDatabase() {
         var database = new DatabaseImpl("db" + (name == null ? "" : "-" + name));
-        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> database.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> database.close());
         context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(10));
         context.stat.metrics.add(new PoolMetrics(database.pool));
         context.beanFactory.bind(Database.class, name, database);

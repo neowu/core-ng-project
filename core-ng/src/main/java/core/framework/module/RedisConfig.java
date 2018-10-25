@@ -31,7 +31,7 @@ public class RedisConfig extends Config {
 
     Redis createRedis() {
         var redis = new RedisImpl("redis");
-        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> redis.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.stat.metrics.add(new PoolMetrics(redis.pool));
         return redis;

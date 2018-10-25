@@ -17,8 +17,11 @@ public final class ShutdownHook implements Runnable {
     public static final int STAGE_0 = 0;    // send shutdown signal, begin to shutdown processor for external requests, e.g. http server / kafka listener / scheduler
     public static final int STAGE_1 = 1;    // await external request processor to stop
     public static final int STAGE_2 = 2;    // after no more new external requests, shutdown internal executors / background tasks
-    public static final int STAGE_3 = 3;    // after no any task running, shutdown important resources, e.g. kafka producer, log forwarder
-    public static final int STAGE_10 = 10;  // release all resources without dependencies
+    public static final int STAGE_3 = 3;    // after no any task running, shutdown kafka producer
+    public static final int STAGE_5 = 5;    // release all application defined shutdown hook
+    public static final int STAGE_7 = 7;    // release all resources without dependencies, e.g. db / redis / mongo / search
+    public static final int STAGE_8 = 8;    // shutdown log forwarder, give more time try to forward all logs
+    public static final int STAGE_9 = 9;    // finally stop the http server, to make sure it responses to incoming requests during shutdown
     private static final Duration SHUTDOWN_TIMEOUT = Duration.ofSeconds(25); // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
     final Thread thread = new Thread(this, "shutdown");
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);

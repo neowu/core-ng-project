@@ -83,18 +83,22 @@ public class HTTPServer {
         }
     }
 
-    public void awaitTermination(long timeoutInMs) throws InterruptedException {
+    public void awaitActiveRequestToComplete(long timeoutInMs) throws InterruptedException {
         if (server != null) {
-            try {
-                boolean success = shutdownHandler.awaitTermination(timeoutInMs);
-                if (!success) {
-                    logger.warn("failed to wait all http requests to complete");
-                    server.getWorker().shutdownNow();
-                }
-            } finally {
-                server.stop();
-                logger.info("http server stopped");
+            boolean success = shutdownHandler.awaitTermination(timeoutInMs);
+            if (!success) {
+                logger.warn("failed to wait active http requests to complete");
+                server.getWorker().shutdownNow();
+            } else {
+                logger.info("active http requests completed");
             }
+        }
+    }
+
+    public void awaitTermination() {
+        if (server != null) {
+            server.stop();
+            logger.info("http server stopped");
         }
     }
 }

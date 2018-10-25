@@ -40,7 +40,7 @@ public class MongoConfig extends Config {
     MongoImpl createMongo() {
         var mongo = new MongoImpl();
         context.startupHook.add(mongo::initialize);
-        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> mongo.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> mongo.close());
         return mongo;
     }
 

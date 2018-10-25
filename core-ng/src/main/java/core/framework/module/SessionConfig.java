@@ -49,7 +49,7 @@ public class SessionConfig extends Config {
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.stat.metrics.add(new PoolMetrics(redis.pool));
 
-        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> redis.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
         context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
     }
 }

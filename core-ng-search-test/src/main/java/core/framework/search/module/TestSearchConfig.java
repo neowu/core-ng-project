@@ -14,7 +14,7 @@ public class TestSearchConfig extends SearchConfig {
         super.initialize(context, name);
         var search = new LocalElasticSearch();
         search.start();
-        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> search.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> search.close());
     }
 
     @Override

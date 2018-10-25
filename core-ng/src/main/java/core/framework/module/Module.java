@@ -25,7 +25,7 @@ public abstract class Module {
     }
 
     public void onShutdown(Task task) {
-        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> task.execute());
+        context.shutdownHook.add(ShutdownHook.STAGE_5, timeout -> task.execute());
     }
 
     public void onStartup(Task task) {

@@ -31,7 +31,7 @@ public class LogConfig extends Config {
         var appender = new KafkaAppender(kafkaURI);
         appender(appender);
         context.startupHook.add(appender::start);
-        context.shutdownHook.add(ShutdownHook.STAGE_3, appender::stop);
+        context.shutdownHook.add(ShutdownHook.STAGE_8, appender::stop);
         context.stat.metrics.add(appender.producerMetrics);
     }
 

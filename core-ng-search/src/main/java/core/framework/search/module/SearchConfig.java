@@ -44,7 +44,7 @@ public class SearchConfig extends Config {
     private ElasticSearchImpl createElasticSearch(ModuleContext context) {
         var search = new ElasticSearchImpl();
         context.startupHook.add(search::initialize);
-        context.shutdownHook.add(ShutdownHook.STAGE_10, timeout -> search.close());
+        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> search.close());
         return search;
     }
 
