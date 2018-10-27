@@ -96,13 +96,17 @@ public final class HTTPClientImpl implements HTTPClient {
                 HTTPResponse response = response(httpResponse);
                 if (shouldRetry(attempts, request.method, null, response.status)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon, uri={}", request.uri);
-                    client = builder.build();   // drop all keep alive connections in pool if encounter remote server is shutting down to avoid future broken keep alive connections
+                    // drop all keep alive connections in pool if encounter remote server is shutting down to avoid future broken keep alive connections
+                    // TODO: this is workaround, should find better way or use http2 once jdk http client bug is fixed
+                    client = builder.build();
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
                 }
                 return response;
             } catch (IOException | InterruptedException e) {
-                client = builder.build();   // drop all keep alive connections in pool if any connection become inactive, since we don't have precise control over connection pool
+                // drop all keep alive connections in pool if any connection become inactive, since we don't have precise control over connection pool
+                // TODO: this is workaround, should find better way or use http2 once jdk http client bug is fixed
+                client = builder.build();
                 if (shouldRetry(attempts, request.method, e, null)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon, uri={}", request.uri, e);   // put uri in warn/error message to help troubleshooting, in gcloud error console or when trace is too large only warning shows
                     Threads.sleepRoughly(waitTime(attempts));

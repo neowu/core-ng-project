@@ -37,7 +37,7 @@ public final class ExecutorImpl implements Executor {
         synchronized (this) {
             if (scheduler != null) {
                 List<Runnable> delayedTasks = scheduler.shutdownNow(); // drop all delayed tasks
-                logger.info("delayed tasks stopped, unfinished={}", delayedTasks.size());
+                logger.info("stop {} delayed tasks, cancelled={}", name, delayedTasks.size());
             }
         }
         executor.shutdown();
