@@ -68,7 +68,7 @@ public final class HTTPClientBuilder {
     }
 
     public HTTPClientBuilder connectTimeout(Duration connectTimeout) {
-        this.timeout = connectTimeout;
+        this.connectTimeout = connectTimeout;
         return this;
     }
 
