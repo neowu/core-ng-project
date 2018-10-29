@@ -85,7 +85,7 @@ public class HTTPServer {
         }
     }
 
-    public void awaitActiveRequestToComplete(long timeoutInMs) throws InterruptedException {
+    public void awaitRequestCompletion(long timeoutInMs) throws InterruptedException {
         if (server != null) {
             boolean success = shutdownHandler.awaitTermination(timeoutInMs);
             if (!success) {

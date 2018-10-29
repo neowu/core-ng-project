@@ -30,7 +30,7 @@ public final class HTTPClientBuilder {
 
         // api client keep alive should be shorter than server side in case server side disconnect connection first
         // refer to jdk.internal.net.http.ConnectionPool
-        System.setProperty("jdk.httpclient.keepalive.timeout", "30");   // 30s timeout for keep alive
+        System.setProperty("jdk.httpclient.keepalive.timeout", "20");   // 20s timeout for keep alive
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);

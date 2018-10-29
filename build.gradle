@@ -5,7 +5,7 @@ subprojects {
     version = '6.9.10'
 }
 
-def elasticVersion = '6.4.0'
+def elasticVersion = '6.4.2'
 def kafkaVersion = '2.0.0'
 def jacksonVersion = '2.9.7'
 def junitVersion = '5.3.1'

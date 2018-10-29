@@ -46,7 +46,7 @@ public class ModuleContext {
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
         startupHook.add(httpServer::start);
         shutdownHook.add(ShutdownHook.STAGE_0, timeout -> httpServer.shutdown());
-        shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitActiveRequestToComplete);
+        shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);
         shutdownHook.add(ShutdownHook.STAGE_9, httpServer::awaitTermination);
 
         httpServer.handler.beanMapperRegistry.register(ErrorResponse.class);
@@ -64,8 +64,8 @@ public class ModuleContext {
         if (backgroundTask == null) {
             backgroundTask = new BackgroundTaskExecutor();
             startupHook.add(backgroundTask::start);
-            shutdownHook.add(ShutdownHook.STAGE_0, timeout -> backgroundTask.shutdown());
-            shutdownHook.add(ShutdownHook.STAGE_2, backgroundTask::awaitTermination);
+            shutdownHook.add(ShutdownHook.STAGE_2, timeoutInMs -> backgroundTask.shutdown());
+            shutdownHook.add(ShutdownHook.STAGE_3, backgroundTask::awaitTermination);
         }
         return backgroundTask;
     }

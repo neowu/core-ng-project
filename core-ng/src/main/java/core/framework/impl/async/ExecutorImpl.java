@@ -32,7 +32,7 @@ public final class ExecutorImpl implements Executor {
         this.name = "executor" + (name == null ? "" : "-" + name);
     }
 
-    public void shutdown(long timeoutInMs) throws InterruptedException {
+    public void shutdown() {
         logger.info("shutting down {}", name);
         synchronized (this) {
             if (scheduler != null) {
@@ -41,6 +41,9 @@ public final class ExecutorImpl implements Executor {
             }
         }
         executor.shutdown();
+    }
+
+    public void awaitTermination(long timeoutInMs) throws InterruptedException {
         boolean success = executor.awaitTermination(timeoutInMs, TimeUnit.MILLISECONDS);
         if (!success) logger.warn("failed to terminate {}", name);
         else logger.info("{} stopped", name);

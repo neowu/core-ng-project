@@ -31,7 +31,8 @@ public class ExecutorConfig extends Config {
     Executor createExecutor(String name, int poolSize) {
         String prefix = "executor-" + (name == null ? "" : name + "-");
         var executor = new ExecutorImpl(ThreadPools.cachedThreadPool(poolSize, prefix), context.logManager, name);
-        context.shutdownHook.add(ShutdownHook.STAGE_2, executor::shutdown);
+        context.shutdownHook.add(ShutdownHook.STAGE_2, timeoutInMs -> executor.shutdown());
+        context.shutdownHook.add(ShutdownHook.STAGE_3, executor::awaitTermination);
         return executor;
     }
 }
