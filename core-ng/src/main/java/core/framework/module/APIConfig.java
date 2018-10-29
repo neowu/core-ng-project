@@ -48,7 +48,8 @@ public class APIConfig extends Config {
         httpClientBuilder = new HTTPClientBuilder()
                 .userAgent(WebServiceClient.USER_AGENT)
                 .trustAll()
-                .timeout(Duration.ofSeconds(15))    // kube graceful shutdown period is 30s, we need to finish api call within that time
+                .connectTimeout(Duration.ofSeconds(2))
+                .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
                 .maxRetries(5)
                 .slowOperationThreshold(Duration.ofSeconds(10));
     }

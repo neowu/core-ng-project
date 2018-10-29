@@ -28,13 +28,14 @@ public final class HTTPClientBuilder {
         // refer to sun.security.ssl.ClientHandshakeContext, allowUnsafeServerCertChange = Utilities.getBooleanProperty("jdk.tls.allowUnsafeServerCertChange", false);
         System.setProperty("jdk.tls.allowUnsafeServerCertChange", "true");
 
-        // api client keep alive should be shorter than server side in case server side disconnect connection first, use short value to release connection sooner in quiet time and still fit busy time
+        // api client keep alive should be shorter than server side in case server side disconnect connection first
         // refer to jdk.internal.net.http.ConnectionPool
-        System.setProperty("jdk.httpclient.keepalive.timeout", "15");   // 15s timeout for keep alive
+        System.setProperty("jdk.httpclient.keepalive.timeout", "30");   // 30s timeout for keep alive
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);
 
+    private Duration connectTimeout = Duration.ofSeconds(30);
     private Duration timeout = Duration.ofSeconds(60);
     private Duration slowOperationThreshold = Duration.ofSeconds(30);
     private boolean enableCookie = false;
@@ -54,7 +55,7 @@ public final class HTTPClientBuilder {
                 builder.sslContext(sslContext);
             }
 
-            builder.connectTimeout(Duration.ofMillis(timeout.toMillis() / 10)); // use 1/10 timeout as connect timeout, e.g. 10s timeout => 1s connect timeout
+            builder.connectTimeout(connectTimeout);
             if (enableRedirect) builder.followRedirects(HttpClient.Redirect.NORMAL);
             if (enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
 
@@ -66,8 +67,13 @@ public final class HTTPClientBuilder {
         }
     }
 
-    public HTTPClientBuilder timeout(Duration requestTimeout) {
-        this.timeout = requestTimeout;
+    public HTTPClientBuilder connectTimeout(Duration connectTimeout) {
+        this.timeout = connectTimeout;
+        return this;
+    }
+
+    public HTTPClientBuilder timeout(Duration timeout) {
+        this.timeout = timeout;
         return this;
     }
 

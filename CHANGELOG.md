@@ -1,5 +1,6 @@
 ## Change log
 ### 6.9.10 (10/25/2018 - )
+* httpclient: added connectTimeout, as for internal api or external page fetching, it requires different settings
 
 ### 6.9.9 (10/23/2018 - 10/25/2018)   !!! this build is mainly to experiment api client http communication failure during deployment
 * httpclient: drop connection pool if encounter connection failure or 503, in case of next connection in pool is still connect to old server
