@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ConnectException;
-import java.net.http.HttpClient;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -39,7 +38,7 @@ class HTTPClientImplTest {
 
     @BeforeEach
     void createHTTPClient() {
-        httpClient = new HTTPClientImpl(HttpClient.newBuilder(), "TestUserAgent", Duration.ofSeconds(10), 3, Duration.ZERO);
+        httpClient = new HTTPClientImpl(null, "TestUserAgent", Duration.ofSeconds(10), 3, Duration.ZERO);
     }
 
     @Test
