@@ -55,16 +55,14 @@ public final class HTTPClientImpl implements HTTPClient {
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientImpl.class);
-    private final HttpClient.Builder builder;
     private final String userAgent;
     private final Duration timeout;
     private final int maxRetries;
     private final long slowOperationThresholdInNanos;
-    private HttpClient client;
+    private final HttpClient client;
 
-    public HTTPClientImpl(HttpClient.Builder builder, String userAgent, Duration timeout, int maxRetries, Duration slowOperationThreshold) {
-        this.builder = builder;
-        this.client = builder.build();
+    public HTTPClientImpl(HttpClient client, String userAgent, Duration timeout, int maxRetries, Duration slowOperationThreshold) {
+        this.client = client;
         this.userAgent = userAgent;
         this.timeout = timeout;
         this.maxRetries = maxRetries;
@@ -96,17 +94,11 @@ public final class HTTPClientImpl implements HTTPClient {
                 HTTPResponse response = response(httpResponse);
                 if (shouldRetry(attempts, request.method, null, response.status)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon, uri={}", request.uri);
-                    // drop all keep alive connections in pool if encounter remote server is shutting down to avoid future broken keep alive connections
-                    // TODO: this is workaround, should find better way or use http2 once jdk http client bug is fixed
-                    client = builder.build();
                     Threads.sleepRoughly(waitTime(attempts));
                     continue;
                 }
                 return response;
             } catch (IOException | InterruptedException e) {
-                // drop all keep alive connections in pool if any connection become inactive, since we don't have precise control over connection pool
-                // TODO: this is workaround, should find better way or use http2 once jdk http client bug is fixed
-                client = builder.build();
                 if (shouldRetry(attempts, request.method, e, null)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon, uri={}", request.uri, e);   // put uri in warn/error message to help troubleshooting, in gcloud error console or when trace is too large only warning shows
                     Threads.sleepRoughly(waitTime(attempts));

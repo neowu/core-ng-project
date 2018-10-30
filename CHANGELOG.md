@@ -1,5 +1,5 @@
 ## Change log
-### 6.9.10 (10/25/2018 - )
+### 6.9.10 (10/25/2018 - 10/30/2018)  !!! this build is mainly to experiment api client http communication failure during deployment
 * httpclient: added connectTimeout, as for internal api or external page fetching, it requires different settings
 * executor: shutdown executor in 2 steps, as there may multiple executors
 

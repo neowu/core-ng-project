@@ -29,8 +29,9 @@ public final class HTTPClientBuilder {
         System.setProperty("jdk.tls.allowUnsafeServerCertChange", "true");
 
         // api client keep alive should be shorter than server side in case server side disconnect connection first
-        // refer to jdk.internal.net.http.ConnectionPool
-        System.setProperty("jdk.httpclient.keepalive.timeout", "20");   // 20s timeout for keep alive
+        // refer to jdk.internal.net.http.ConnectionPool,
+        // jdk.internal.net.http.HttpClientImpl.SelectorManager.DEF_NODEADLINE uses 3s as interval to check
+        System.setProperty("jdk.httpclient.keepalive.timeout", "30");   // 30s timeout for keep alive
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);
@@ -59,7 +60,7 @@ public final class HTTPClientBuilder {
             if (enableRedirect) builder.followRedirects(HttpClient.Redirect.NORMAL);
             if (enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
 
-            return new HTTPClientImpl(builder, userAgent, timeout, maxRetries, slowOperationThreshold);
+            return new HTTPClientImpl(builder.build(), userAgent, timeout, maxRetries, slowOperationThreshold);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new Error(e);
         } finally {
