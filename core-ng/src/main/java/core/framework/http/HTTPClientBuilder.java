@@ -36,9 +36,9 @@ public final class HTTPClientBuilder {
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);
 
-    private Duration connectTimeout = Duration.ofSeconds(30);
+    private Duration connectTimeout = Duration.ofSeconds(25);
     private Duration timeout = Duration.ofSeconds(60);
-    private Duration slowOperationThreshold = Duration.ofSeconds(30);
+    private Duration slowOperationThreshold = Duration.ofSeconds(30);   // slow threshold should be greater than connect timeout, to let connect timeout happen first
     private boolean enableCookie = false;
     private boolean enableRedirect = false;
     private int maxRetries = 1;
