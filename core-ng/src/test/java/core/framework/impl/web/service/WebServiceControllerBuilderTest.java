@@ -78,7 +78,7 @@ class WebServiceControllerBuilderTest {
         assertThat(sourceCode).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-controller-patch.java"));
 
         Response response = controller.execute(request);
-        assertThat(response.status()).isEqualTo(HTTPStatus.OK);
+        assertThat(response.status()).isEqualTo(HTTPStatus.NO_CONTENT);
     }
 
     @Test

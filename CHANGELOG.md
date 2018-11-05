@@ -1,6 +1,6 @@
 ## Change log
-### 6.9.11 (10/30/2018 - )
-
+### 6.9.11 (10/30/2018 - 11/5/2018)   !!! this build is mainly to experiment api client http communication failure during deployment
+* httpclient: experiment to use okHTTP as http client
 
 ### 6.9.10 (10/25/2018 - 10/30/2018)  !!! this build is mainly to experiment api client http communication failure during deployment
 * httpclient: added connectTimeout, as for internal api or external page fetching, it requires different settings
