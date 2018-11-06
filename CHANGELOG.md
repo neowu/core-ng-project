@@ -1,5 +1,5 @@
 ## Change log
-### 6.9.11.1 (10/30/2018 - 11/5/2018)   !!! this build is mainly to experiment api client http communication failure during deployment
+### 6.9.11.2 (10/30/2018 - 11/5/2018)   !!! this build is mainly to experiment api client http communication failure during deployment
 * httpclient: experiment to use okHTTP as http client
 
 ### 6.9.10 (10/25/2018 - 10/30/2018)  !!! this build is mainly to experiment api client http communication failure during deployment
