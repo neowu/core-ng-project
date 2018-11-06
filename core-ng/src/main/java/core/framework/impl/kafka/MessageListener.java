@@ -7,7 +7,6 @@ import core.framework.util.StopWatch;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +103,7 @@ public class MessageListener {
         Map<String, Object> config = Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,   // immutable map requires value must not be null
                 ConsumerConfig.GROUP_ID_CONFIG, LogManager.APP_NAME,
                 ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE,
-                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, String.valueOf(OffsetResetStrategy.LATEST),
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest",      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
                 ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis(),
                 ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis(),
                 ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords,
