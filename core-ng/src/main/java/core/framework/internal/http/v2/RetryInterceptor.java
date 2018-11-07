@@ -3,6 +3,7 @@ package core.framework.internal.http.v2;
 import core.framework.api.http.HTTPStatus;
 import core.framework.log.Markers;
 import core.framework.util.Threads;
+import okhttp3.ConnectionPool;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -10,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 
@@ -20,8 +21,10 @@ import java.time.Duration;
 public class RetryInterceptor implements Interceptor {
     private final Logger logger = LoggerFactory.getLogger(RetryInterceptor.class);
     private final int maxRetries;
+    private final ConnectionPool pool;
 
-    public RetryInterceptor(int maxRetries) {
+    public RetryInterceptor(ConnectionPool pool, int maxRetries) {
+        this.pool = pool;
         this.maxRetries = maxRetries;
     }
 
@@ -39,7 +42,7 @@ public class RetryInterceptor implements Interceptor {
                     continue;
                 }
                 return response;
-            } catch (SocketTimeoutException | ConnectException e) {
+            } catch (SocketTimeoutException | SocketException e) {
                 /* read timeout exception trace
                 Caused by: java.net.SocketTimeoutException: Read timed out
                     at java.base/java.net.SocketInputStream.socketRead0(Native Method)
@@ -51,6 +54,7 @@ public class RetryInterceptor implements Interceptor {
                 */
                 if (attempts < maxRetries && !("POST".equals(request.method()) && e.getCause() != null && "Read timed out".equals(e.getCause().getMessage()))) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon, uri={}", request.url(), e);
+                    pool.evictAll();
                     Threads.sleepRoughly(waitTime(attempts));
                 } else {
                     throw e;

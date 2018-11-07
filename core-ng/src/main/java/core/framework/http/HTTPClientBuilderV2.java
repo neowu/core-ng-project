@@ -44,11 +44,12 @@ public final class HTTPClientBuilderV2 {
     public HTTPClient build() {
         var watch = new StopWatch();
         try {
+            var pool = new ConnectionPool(100, 30, TimeUnit.SECONDS);
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
                     .connectTimeout(connectTimeout.toMillis(), TimeUnit.MILLISECONDS)
                     .readTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
                     .writeTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
-                    .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
+                    .connectionPool(pool);
 
             if (trustAll) {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -59,7 +60,7 @@ public final class HTTPClientBuilderV2 {
             }
 
             if (maxRetries != null)
-                builder.addInterceptor(new RetryInterceptor(maxRetries));
+                builder.addInterceptor(new RetryInterceptor(pool, maxRetries));
 
             if (enableCookie) {
                 builder.cookieJar(new CookieManager());

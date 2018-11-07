@@ -1,27 +1,16 @@
 ## Change log
-### 6.9.11.2 (10/30/2018 - 11/5/2018)   !!! this build is mainly to experiment api client http communication failure during deployment
+### 6.9.11.3 (10/18/2018 - 11/5/2018)   !!! this build is mainly to experiment api client http communication failure during deployment
 * httpclient: experiment to use okHTTP as http client
-
-### 6.9.10 (10/25/2018 - 10/30/2018)  !!! this build is mainly to experiment api client http communication failure during deployment
 * httpclient: added connectTimeout, as for internal api or external page fetching, it requires different settings
 * executor: shutdown executor in 2 steps, as there may multiple executors
-
-### 6.9.9 (10/23/2018 - 10/25/2018)   !!! this build is mainly to experiment api client http communication failure during deployment
-* httpclient: drop connection pool if encounter connection failure or 503, in case of next connection in pool is still connect to old server
-* http: shutdown http server at last, and hold shutdown at least 500ms to accept incoming request during shutdown (give kube/service iptable time to take effect)
 * executor: support submit task with delay, to support application retry task, to avoid sleep during task execution
-
-### 6.9.8 (10/22/2018 - 10/23/2018)  !!! this build is mainly to experiment api client http communication failure during deployment
+* http: shutdown http server at last, and hold shutdown at least 500ms to accept incoming request during shutdown (give kube/service iptable time to take effect)
 * http: tweak gracefully shutdown, make server actively close connection if during shutdown, to make client not reuse it due to keep alive
-
-### 6.9.7 (10/18/2018 - 10/22/2018)  !!! this build is mainly to experiment api client http communication failure during deployment
-* httpclient: workaround fix for httpclient, to discard body with response status 204
 * http: enabled HTTP2 support back, 
         disabled "always write keep alive response header", since it's default for HTTP/1.1
         HTTP/1.0 client is less popular, for apache benchmark tool (ab), use alternative one (e.g. h2load from nghttp2, which will be installed with curl+http2 support)   
 * http: in graceful shutdown handler, set "connection: close" header to ask client close the connection during deployment
 * db: close connection if query timed out, refer to core.framework.impl.db.Connections for reason
-* api: tweak timeout for zero downtime deployment, shorter api client connect timeout to 1s and max retry 5 times
 
 ### 6.9.6 (10/16/2018 - 10/18/2018)
 * log: collect cpu usage stat, in container env, system load != cpu container/java process usage
