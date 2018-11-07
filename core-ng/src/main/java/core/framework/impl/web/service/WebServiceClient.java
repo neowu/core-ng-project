@@ -95,7 +95,7 @@ public class WebServiceClient {
         if (status.code >= 200 && status.code < 300) return;
         try {
             ErrorResponse error = (ErrorResponse) responseBeanMapper.fromJSON(ErrorResponse.class, response.body);
-            logger.debug("failed to call remote service, id={}, severity={}, errorCode={}, remoteStackTrace={}", error.id, error.severity, error.errorCode, error.stackTrace);
+            logger.debug("failed to call remote service, status={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", status, error.id, error.severity, error.errorCode, error.stackTrace);
             throw new RemoteServiceException(format("failed to call remote service, status={}, error={}", status, error.message), parseSeverity(error.severity), error.errorCode, status);
         } catch (RemoteServiceException e) {
             throw e;
