@@ -59,4 +59,13 @@ class HTTPRequestTest {
         assertThat(request.headers).containsEntry(HTTPHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
         assertThat(new String(request.body, UTF_8)).isEqualTo("key1=v1+v2&key2=v1%2Bv2");
     }
+
+    @Test
+    void requestURI() {
+        var request = new HTTPRequest(HTTPMethod.POST, "http://localhost/uri");
+        assertThat(request.requestURI()).isEqualTo("http://localhost/uri");
+
+        request.params.put("query", "value");
+        assertThat(request.requestURI()).isEqualTo("http://localhost/uri?query=value");
+    }
 }

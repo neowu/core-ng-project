@@ -144,7 +144,7 @@ public final class HTTPClientImpl implements HTTPClient {
     HttpRequest httpRequest(HTTPRequest request) {
         HttpRequest.Builder builder = HttpRequest.newBuilder();
         try {
-            var requestURI = new URI(requestURI(request.uri, request.params));
+            var requestURI = new URI(request.requestURI());
             builder.uri(requestURI);
             logger.debug("[request] method={}, uri={}", request.method, requestURI);
         } catch (URISyntaxException e) {
@@ -171,14 +171,6 @@ public final class HTTPClientImpl implements HTTPClient {
 
         builder.timeout(timeout);
         return builder.build();
-    }
-
-    private String requestURI(String uri, Map<String, String> params) {
-        if (params.isEmpty()) return uri;
-
-        var builder = new StringBuilder(256).append(uri).append('?');
-        HTTPRequestHelper.urlEncoding(builder, params);
-        return builder.toString();
     }
 
     // httpClient has builtin retry but without waiting, only retry on GET/HEAD methods, refer to jdk.internal.net.http.MultiExchange#canRetryRequest

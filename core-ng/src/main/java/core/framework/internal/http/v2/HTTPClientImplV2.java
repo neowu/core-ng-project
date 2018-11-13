@@ -9,7 +9,6 @@ import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.impl.log.filter.MapLogParam;
 import core.framework.internal.http.BodyLogParam;
-import core.framework.internal.http.HTTPRequestHelper;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.Maps;
@@ -103,7 +102,7 @@ public final class HTTPClientImplV2 implements HTTPClient {
     Request httpRequest(HTTPRequest request) {
         Request.Builder builder = new Request.Builder();
 
-        String url = requestURI(request.uri, request.params);
+        String url = request.requestURI();
         builder.url(url);
         logger.debug("[request] method={}, url={}", request.method, url);
 
@@ -125,13 +124,5 @@ public final class HTTPClientImplV2 implements HTTPClient {
         }
 
         return builder.build();
-    }
-
-    private String requestURI(String uri, Map<String, String> params) {
-        if (params.isEmpty()) return uri;
-
-        var builder = new StringBuilder(256).append(uri).append('?');
-        HTTPRequestHelper.urlEncoding(builder, params);
-        return builder.toString();
     }
 }

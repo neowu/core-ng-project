@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.time.Duration;
 
 /**
@@ -42,7 +40,7 @@ public class RetryInterceptor implements Interceptor {
                     continue;
                 }
                 return response;
-            } catch (SocketTimeoutException | SocketException e) {
+            } catch (IOException e) {
                 /* read timeout exception trace
                 Caused by: java.net.SocketTimeoutException: Read timed out
                     at java.base/java.net.SocketInputStream.socketRead0(Native Method)

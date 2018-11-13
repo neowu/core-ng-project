@@ -50,4 +50,12 @@ public final class HTTPRequest {
         HTTPRequestHelper.urlEncoding(builder, form);
         body(Strings.bytes(builder.toString()), ContentType.APPLICATION_FORM_URLENCODED);
     }
+
+    public String requestURI() {
+        if (params.isEmpty()) return uri;
+
+        var builder = new StringBuilder(256).append(uri).append('?');
+        HTTPRequestHelper.urlEncoding(builder, params);
+        return builder.toString();
+    }
 }
