@@ -56,6 +56,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.elasticsearch.client.Requests.searchRequest;
+import static org.elasticsearch.script.Script.DEFAULT_SCRIPT_LANG;
+import static org.elasticsearch.script.Script.DEFAULT_SCRIPT_TYPE;
 
 /**
  * @author neo
@@ -231,7 +233,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         if (request.script == null) throw new Error("request.script must not be null");
         String index = request.index == null ? this.index : request.index;
         try {
-            var updateRequest = new org.elasticsearch.action.update.UpdateRequest(index, this.index, request.id).script(new Script(request.script));
+            Map<String, Object> params = request.params == null ? Map.of() : request.params;
+            var script = new Script(DEFAULT_SCRIPT_TYPE, DEFAULT_SCRIPT_LANG, request.script, params);
+            var updateRequest = new org.elasticsearch.action.update.UpdateRequest(index, this.index, request.id).script(script);
             elasticSearch.client().update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

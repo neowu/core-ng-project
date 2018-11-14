@@ -144,7 +144,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void update() {
         documentType.index("4", document("4", "value4", 4));
 
-        documentType.update("4", "ctx._source.num_field = ctx._source.num_field + 1");
+        documentType.update("4", "ctx._source.num_field = ctx._source.num_field + params.value", Map.of("value", 1));
 
         assertThat(documentType.get("4").orElseThrow().numField).isEqualTo(5);
     }
