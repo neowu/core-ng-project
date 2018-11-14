@@ -55,10 +55,10 @@ public class HTTPHandler implements HttpHandler {
     public WebSocketHandler webSocketHandler;
     public IPAccessControl accessControl;
 
-    HTTPHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager, ShutdownHandler shutdownHandler) {
+    HTTPHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
-        responseHandler = new ResponseHandler(responseBeanMapper, templateManager, shutdownHandler);
+        responseHandler = new ResponseHandler(responseBeanMapper, templateManager);
         errorHandler = new HTTPErrorHandler(responseHandler);
     }
 

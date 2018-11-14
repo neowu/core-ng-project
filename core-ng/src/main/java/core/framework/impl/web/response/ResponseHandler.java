@@ -3,7 +3,6 @@ package core.framework.impl.web.response;
 import core.framework.api.http.HTTPStatus;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.filter.FieldLogParam;
-import core.framework.impl.web.ShutdownHandler;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.site.TemplateManager;
 import core.framework.util.Encodings;
@@ -24,11 +23,9 @@ import java.util.Map;
 public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
     private final ResponseHandlerContext context;
-    private final ShutdownHandler shutdownHandler;
 
-    public ResponseHandler(ResponseBeanMapper mapper, TemplateManager templateManager, ShutdownHandler shutdownHandler) {
+    public ResponseHandler(ResponseBeanMapper mapper, TemplateManager templateManager) {
         context = new ResponseHandlerContext(mapper, templateManager);
-        this.shutdownHandler = shutdownHandler;
     }
 
     public void render(ResponseImpl response, HttpServerExchange exchange, ActionLog actionLog) {
@@ -38,17 +35,9 @@ public class ResponseHandler {
         putHeaders(response, exchange);
         putCookies(response, exchange);
 
-        closeConnectionIfShutdown(exchange);
-
         response.body.send(exchange.getResponseSender(), context);
 
         actionLog.context("responseCode", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
-    }
-
-    void closeConnectionIfShutdown(HttpServerExchange exchange) {
-        if (shutdownHandler.shutdown.get()) {   // if during shutdown, actively close client connection, otherwise it could be reuse after server stopped due to keep alive
-            exchange.setPersistent(false);
-        }
     }
 
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {

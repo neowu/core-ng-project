@@ -30,7 +30,7 @@ public class HTTPServer {
     private Undertow server;
 
     public HTTPServer(LogManager logManager) {
-        handler = new HTTPHandler(logManager, siteManager.sessionManager, siteManager.templateManager, shutdownHandler);
+        handler = new HTTPHandler(logManager, siteManager.sessionManager, siteManager.templateManager);
     }
 
     public void start() {
@@ -77,7 +77,7 @@ public class HTTPServer {
     public void shutdown() {
         if (server != null) {
             logger.info("shutting down http server");
-            shutdownHandler.shutdown.set(true);
+            shutdownHandler.shutdown();
             if (handler.webSocketHandler != null)
                 handler.webSocketHandler.shutdown();
         }
