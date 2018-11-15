@@ -1,17 +1,15 @@
 package core.framework.mongo.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import core.framework.util.ClasspathResources;
-import org.bson.json.JsonWriter;
-import org.bson.json.JsonWriterSettings;
+import org.bson.BsonDocument;
+import org.bson.BsonDocumentWriter;
+import org.bson.json.JsonReader;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -19,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
@@ -45,7 +42,6 @@ class EntityEncoderBuilderTest {
     void encode() throws IOException {
         assertThat(builder.enumCodecFields.keySet()).containsExactly(TestChildEntity.TestEnum.class);
 
-        StringWriter writer = new StringWriter();
         TestEntity entity = new TestEntity();
         entity.id = new ObjectId("5627b47d54b92d03adb9e9cf");
         entity.booleanField = Boolean.TRUE;
@@ -58,12 +54,16 @@ class EntityEncoderBuilderTest {
         entity.listField = List.of("V1", "V2");
         entity.mapField = Map.of("K1", "V1", "K2", "V2");
 
-        encoder.encode(new JsonWriter(writer, JsonWriterSettings.builder().indent(true).build()), entity);
+        var bson = new BsonDocument();
+        try (var writer = new BsonDocumentWriter(bson)) {
+            encoder.encode(writer, entity);
+        }
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode expectedEntityNode = mapper.readTree(ClasspathResources.text("mongo-test/entity.json"));
-        JsonNode entityNode = mapper.readTree(writer.toString());
+        var expectedBSON = new BsonDocument();
+        try (var writer = new BsonDocumentWriter(expectedBSON)) {
+            writer.pipe(new JsonReader(ClasspathResources.text("mongo-test/entity.json")));
+        }
 
-        assertEquals(expectedEntityNode, entityNode);
+        assertThat(bson).isEqualTo(expectedBSON);
     }
 }

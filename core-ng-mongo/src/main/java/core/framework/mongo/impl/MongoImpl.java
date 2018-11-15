@@ -44,7 +44,8 @@ public class MongoImpl implements Mongo {
 
     MongoDatabase createDatabase(CodecRegistry registry) {
         if (uri == null) throw new Error("uri must not be null");
-        if (uri.getDatabase() == null) throw new Error("uri must have database, uri=" + uri);
+        String database = uri.getDatabase();
+        if (database == null) throw new Error("uri must have database, uri=" + uri);
         var watch = new StopWatch();
         try {
             connectionPoolSettings.maxWaitTime(timeoutInMs, TimeUnit.MILLISECONDS); // pool checkout timeout
@@ -64,7 +65,7 @@ public class MongoImpl implements Mongo {
                                               .applyConnectionString(uri)
                                               .build();
             mongoClient = MongoClients.create(settings);
-            return mongoClient.getDatabase(uri.getDatabase());
+            return mongoClient.getDatabase(database);
         } finally {
             logger.info("create mongo client, uri={}, elapsed={}", uri, watch.elapsed());
         }

@@ -4,7 +4,9 @@
   },
   "int_field": null,
   "double_field": null,
-  "long_field": 325,
+  "long_field": {
+    "$numberLong": "325"
+  },
   "boolean_field": true,
   "date_field": null,
   "zoned_date_time_field": {
