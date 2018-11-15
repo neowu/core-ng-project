@@ -1,5 +1,6 @@
 package core.framework.mongo.module;
 
+import com.mongodb.ConnectionString;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
@@ -16,10 +17,10 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public class MongoConfig extends Config {
+    protected MongoImpl mongo;
     String uri;
     private ModuleContext context;
     private String name;
-    private MongoImpl mongo;
     private boolean entityAdded;
 
     @Override
@@ -32,12 +33,12 @@ public class MongoConfig extends Config {
 
     @Override
     protected void validate() {
-        if (uri == null) throw new Error(format("mongo uri must be configured, name={}", name));
+        if (uri == null) throw new Error("mongo uri must be configured, name=" + name);
         if (!entityAdded)
-            throw new Error(format("mongo is configured but no collection/view added, please remove unnecessary config, name={}", name));
+            throw new Error("mongo is configured but no collection/view added, please remove unnecessary config, name=" + name);
     }
 
-    MongoImpl createMongo() {
+    private MongoImpl createMongo() {
         var mongo = new MongoImpl();
         context.startupHook.add(mongo::initialize);
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> mongo.close());
@@ -46,8 +47,14 @@ public class MongoConfig extends Config {
 
     public void uri(String uri) {
         if (this.uri != null) throw new Error(format("mongo uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri));
-        mongo.uri(uri);
+        var connectionString = new ConnectionString(uri);
+        if (connectionString.getDatabase() == null) throw new Error("uri must have database, uri=" + uri);
+        mongo.uri = connectionString(connectionString);
         this.uri = uri;
+    }
+
+    ConnectionString connectionString(ConnectionString uri) {
+        return uri;
     }
 
     public void poolSize(int minSize, int maxSize) {
@@ -67,13 +74,13 @@ public class MongoConfig extends Config {
     }
 
     public <T> void collection(Class<T> entityClass) {
-        if (uri == null) throw new Error(format("mongo uri must be configured first, name={}", name));
+        if (uri == null) throw new Error("mongo uri must be configured first, name=" + name);
         context.beanFactory.bind(Types.generic(MongoCollection.class, entityClass), name, mongo.collection(entityClass));
         entityAdded = true;
     }
 
     public <T> void view(Class<T> viewClass) {
-        if (uri == null) throw new Error(format("mongo uri must be configured first, name={}", name));
+        if (uri == null) throw new Error("mongo uri must be configured first, name=" + name);
         mongo.view(viewClass);
         entityAdded = true;
     }

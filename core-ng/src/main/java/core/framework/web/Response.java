@@ -40,7 +40,6 @@ public interface Response {
     }
 
     static Response empty() {
-        // TODO: return 200 for empty response with content-length=0, jdk 11 http client has bug to deal with 204 without content-length, will be fixed on JDK 11.0.2
         return new ResponseImpl(new ByteArrayBody(new byte[0])).status(HTTPStatus.NO_CONTENT);
     }
 

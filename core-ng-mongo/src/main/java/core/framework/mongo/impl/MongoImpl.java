@@ -1,9 +1,14 @@
 package core.framework.mongo.impl;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.connection.ClusterSettings;
+import com.mongodb.connection.ConnectionPoolSettings;
+import com.mongodb.connection.SocketSettings;
+import core.framework.impl.log.LogManager;
 import core.framework.mongo.Collection;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
@@ -14,8 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-
-import static core.framework.util.Strings.format;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
@@ -23,32 +27,43 @@ import static core.framework.util.Strings.format;
 public class MongoImpl implements Mongo {
     final EntityCodecs codecs = new EntityCodecs();
     private final Logger logger = LoggerFactory.getLogger(MongoImpl.class);
-    private final MongoClientOptions.Builder builder = MongoClientOptions.builder()
-                                                                         .maxConnectionIdleTime((int) Duration.ofMinutes(30).toMillis())
-                                                                         .cursorFinalizerEnabled(false); // framework always close db cursor
+    private final ConnectionPoolSettings.Builder connectionPoolSettings = ConnectionPoolSettings.builder()
+                                                                                                .maxConnectionIdleTime((int) Duration.ofMinutes(30).toMillis(), TimeUnit.MILLISECONDS);
+    public ConnectionString uri;
     public int tooManyRowsReturnedThreshold = 2000;
     int timeoutInMs = (int) Duration.ofSeconds(15).toMillis();
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     CodecRegistry registry;
-    private MongoClientURI uri;
     private MongoClient mongoClient;
     private MongoDatabase database;
 
     public void initialize() {
-        registry = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry(), codecs.codecRegistry());
+        registry = CodecRegistries.fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), codecs.codecRegistry());
         database = createDatabase(registry);
     }
 
     MongoDatabase createDatabase(CodecRegistry registry) {
         if (uri == null) throw new Error("uri must not be null");
+        if (uri.getDatabase() == null) throw new Error("uri must have database, uri=" + uri);
         var watch = new StopWatch();
         try {
-            builder.connectTimeout(timeoutInMs);
-            builder.socketTimeout(timeoutInMs);
-            builder.maxWaitTime(timeoutInMs);   // pool checkout timeout
-            builder.serverSelectionTimeout(timeoutInMs * 3);    // able to try 3 servers
-            builder.codecRegistry(registry);
-            mongoClient = new MongoClient(uri);
+            connectionPoolSettings.maxWaitTime(timeoutInMs, TimeUnit.MILLISECONDS); // pool checkout timeout
+            var socketSettings = SocketSettings.builder()
+                                               .connectTimeout(timeoutInMs, TimeUnit.MILLISECONDS)
+                                               .readTimeout(timeoutInMs, TimeUnit.MILLISECONDS)
+                                               .build();
+            var clusterSettings = ClusterSettings.builder()
+                                                 .serverSelectionTimeout(timeoutInMs * 3, TimeUnit.MILLISECONDS)    // able to try 3 servers
+                                                 .build();
+            var settings = MongoClientSettings.builder()
+                                              .applicationName(LogManager.APP_NAME)
+                                              .codecRegistry(registry)
+                                              .applyToConnectionPoolSettings(builder -> builder.applySettings(connectionPoolSettings.build()))
+                                              .applyToSocketSettings(builder -> builder.applySettings(socketSettings))
+                                              .applyToClusterSettings(builder -> builder.applySettings(clusterSettings))
+                                              .applyConnectionString(uri)
+                                              .build();
+            mongoClient = MongoClients.create(settings);
             return mongoClient.getDatabase(uri.getDatabase());
         } finally {
             logger.info("create mongo client, uri={}, elapsed={}", uri, watch.elapsed());
@@ -73,14 +88,9 @@ public class MongoImpl implements Mongo {
         }
     }
 
-    public void uri(String uri) {
-        this.uri = new MongoClientURI(uri, builder);
-        if (this.uri.getDatabase() == null) throw new Error(format("uri must have database, uri={}", uri));
-    }
-
     public void poolSize(int minSize, int maxSize) {
-        builder.minConnectionsPerHost(minSize);
-        builder.connectionsPerHost(maxSize);
+        connectionPoolSettings.minSize(minSize);
+        connectionPoolSettings.maxSize(maxSize);
     }
 
     public final void timeout(Duration timeout) {

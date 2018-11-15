@@ -11,6 +11,7 @@
         HTTP/1.0 client is less popular, for apache benchmark tool (ab), use alternative one (e.g. h2load from nghttp2, which will be installed with curl+http2 support)   
 * http: in graceful shutdown handler, set "connection: close" header to ask client close the connection during deployment
 * db: close connection if query timed out, refer to core.framework.impl.db.Connections for reason
+* mongo: replaced fongo with mongo-java-server, update driver to 3.9.0
 
 ### 6.9.6 (10/16/2018 - 10/18/2018)
 * log: collect cpu usage stat, in container env, system load != cpu container/java process usage

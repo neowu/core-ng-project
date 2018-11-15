@@ -13,7 +13,7 @@ import com.mongodb.client.model.DeleteOneModel;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.InsertManyOptions;
 import com.mongodb.client.model.ReplaceOneModel;
-import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import core.framework.log.ActionLogContext;
@@ -66,7 +66,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         var watch = new StopWatch();
         Bson filter = count.filter == null ? new BsonDocument() : count.filter;
         try {
-            return collection(count.readPreference).count(filter, new CountOptions().maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS));
+            return collection(count.readPreference).countDocuments(filter, new CountOptions().maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS));
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("mongoDB", elapsed, 1, 0);
@@ -306,7 +306,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         try {
             id = mongo.codecs.id(entity);
             if (id == null) throw new Error(format("entity must have id, entityClass={}", entityClass.getCanonicalName()));
-            collection().replaceOne(Filters.eq("_id", id), entity, new UpdateOptions().upsert(true));
+            collection().replaceOne(Filters.eq("_id", id), entity, new ReplaceOptions().upsert(true));
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("mongoDB", elapsed, 0, 1);
@@ -327,7 +327,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             for (T entity : entities) {
                 Object id = mongo.codecs.id(entity);
                 if (id == null) throw new Error(format("entity must have id, entityClass={}", entityClass.getCanonicalName()));
-                models.add(new ReplaceOneModel<>(Filters.eq("_id", id), entity, new UpdateOptions().upsert(true)));
+                models.add(new ReplaceOneModel<>(Filters.eq("_id", id), entity, new ReplaceOptions().upsert(true)));
             }
             collection().bulkWrite(models, new BulkWriteOptions().ordered(false));
         } finally {
