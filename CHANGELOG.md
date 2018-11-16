@@ -1,4 +1,7 @@
 ## Change log
+### 6.10.1 (11/16/2018 - )
+* kafka: set consumer client.id for monitoring
+
 ### 6.10.0 (10/18/2018 - 11/16/2018) 
 * httpclient: use okHTTP as implementation to support http/2.0 
               added connectTimeout, as for internal api or external page fetching, it requires different settings

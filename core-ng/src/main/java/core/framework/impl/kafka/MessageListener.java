@@ -69,13 +69,21 @@ public class MessageListener {
         var watch = new StopWatch();
         for (int i = 0; i < poolSize; i++) {
             watch.reset();
-            String name = "kafka-listener-" + (this.name == null ? "" : this.name + "-") + i;
-            Consumer<byte[], byte[]> consumer = consumer(topics);
+            String name = listenerThreadName(this.name, i);
+            Consumer<byte[], byte[]> consumer = consumer(topics, clientId(LogManager.APP_NAME, this.name, i));
             var thread = new MessageListenerThread(name, consumer, this);
             threads[i] = thread;
             logger.info("create kafka listener thread, topics={}, name={}, elapsed={}", topics, name, watch.elapsed());
         }
         return threads;
+    }
+
+    String listenerThreadName(String name, int index) {
+        return "kafka-listener-" + (name == null ? "" : name + "-") + index;
+    }
+
+    String clientId(String appName, String name, int index) {
+        return appName + "-" + (name == null ? "" : name + "-") + index;
     }
 
     public void shutdown() {
@@ -101,17 +109,19 @@ public class MessageListener {
         }
     }
 
-    private Consumer<byte[], byte[]> consumer(Set<String> topics) {
-        Map<String, Object> config = Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,   // immutable map requires value must not be null
-                ConsumerConfig.GROUP_ID_CONFIG, LogManager.APP_NAME,
-                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE,
-                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, ASCII.toLowerCase(OffsetResetStrategy.LATEST.name()),      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
-                ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis(),
-                ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis(),
-                ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords,
-                ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes,
-                ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes,
-                ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
+    private Consumer<byte[], byte[]> consumer(Set<String> topics, String clientId) {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);   // immutable map requires value must not be null
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, LogManager.APP_NAME);
+        config.put(ConsumerConfig.CLIENT_ID_CONFIG, clientId);      // will show in monitor metrics
+        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
+        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, ASCII.toLowerCase(OffsetResetStrategy.LATEST.name()));      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
+        config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
+        config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
+        config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
+        config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
+        config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
+        config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
         var deserializer = new ByteArrayDeserializer();
         Consumer<byte[], byte[]> consumer = new KafkaConsumer<>(config, deserializer, deserializer);
         consumer.subscribe(topics);
