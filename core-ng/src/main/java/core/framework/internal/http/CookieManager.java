@@ -1,4 +1,4 @@
-package core.framework.internal.http.v2;
+package core.framework.internal.http;
 
 import core.framework.util.Sets;
 import okhttp3.Cookie;

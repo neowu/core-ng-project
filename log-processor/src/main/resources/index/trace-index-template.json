@@ -8,8 +8,8 @@
   "mappings": {
     "trace": {
       "properties": {
-        "date": {
-          "@timestamp": "date",
+        "@timestamp": {
+          "type": "date",
           "format": "strict_date_optional_time"
         },
         "app": {

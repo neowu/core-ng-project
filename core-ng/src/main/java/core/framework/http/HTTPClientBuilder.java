@@ -1,20 +1,22 @@
 package core.framework.http;
 
+import core.framework.internal.http.CookieManager;
 import core.framework.internal.http.DefaultTrustManager;
 import core.framework.internal.http.HTTPClientImpl;
+import core.framework.internal.http.RetryInterceptor;
 import core.framework.util.StopWatch;
+import okhttp3.ConnectionPool;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.http.HttpClient;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
@@ -27,11 +29,6 @@ public final class HTTPClientBuilder {
         // http client uses pooled connection, multiple requests to same host may hit different server behind LB
         // refer to sun.security.ssl.ClientHandshakeContext, allowUnsafeServerCertChange = Utilities.getBooleanProperty("jdk.tls.allowUnsafeServerCertChange", false);
         System.setProperty("jdk.tls.allowUnsafeServerCertChange", "true");
-
-        // api client keep alive should be shorter than server side in case server side disconnect connection first
-        // refer to jdk.internal.net.http.ConnectionPool,
-        // jdk.internal.net.http.HttpClientImpl.SelectorManager.DEF_NODEADLINE uses 3s as interval to check
-        System.setProperty("jdk.httpclient.keepalive.timeout", "30");   // 30s timeout for keep alive
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);
@@ -40,27 +37,35 @@ public final class HTTPClientBuilder {
     private Duration timeout = Duration.ofSeconds(60);
     private Duration slowOperationThreshold = Duration.ofSeconds(30);   // slow threshold should be greater than connect timeout, to let connect timeout happen first
     private boolean enableCookie = false;
-    private boolean enableRedirect = false;
-    private int maxRetries = 1;
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
+    private Integer maxRetries;
 
     public HTTPClient build() {
         var watch = new StopWatch();
         try {
-            HttpClient.Builder builder = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1);
+            OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                    .connectTimeout(connectTimeout.toMillis(), TimeUnit.MILLISECONDS)
+                    .readTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+                    .writeTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+                    .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
 
             if (trustAll) {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, new TrustManager[]{new DefaultTrustManager()}, new SecureRandom());
-                builder.sslContext(sslContext);
+                var trustManager = new DefaultTrustManager();
+                sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
+                builder.hostnameVerifier((hostname, sslSession) -> true)
+                       .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
             }
 
-            builder.connectTimeout(connectTimeout);
-            if (enableRedirect) builder.followRedirects(HttpClient.Redirect.NORMAL);
-            if (enableCookie) builder.cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+            if (maxRetries != null)
+                builder.addInterceptor(new RetryInterceptor(maxRetries));
 
-            return new HTTPClientImpl(builder.build(), userAgent, timeout, maxRetries, slowOperationThreshold);
+            if (enableCookie) {
+                builder.cookieJar(new CookieManager());
+            }
+
+            return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             throw new Error(e);
         } finally {
@@ -95,11 +100,6 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder enableCookie() {
         enableCookie = true;
-        return this;
-    }
-
-    public HTTPClientBuilder enableRedirect() {
-        enableRedirect = true;
         return this;
     }
 

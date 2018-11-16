@@ -2,7 +2,7 @@ package core.framework.module;
 
 import core.framework.api.web.service.Path;
 import core.framework.http.HTTPClient;
-import core.framework.http.HTTPClientBuilderV2;
+import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
@@ -39,13 +39,13 @@ public class APIConfig extends Config {
     final Set<Class<?>> beanClasses = new HashSet<>();     // extra beans not defined in service interfaces, e.g. web socket json, raw controller request/response
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private ModuleContext context;
-    private HTTPClientBuilderV2 httpClientBuilder;
+    private HTTPClientBuilder httpClientBuilder;
     private HTTPClient httpClient;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
-        httpClientBuilder = new HTTPClientBuilderV2()
+        httpClientBuilder = new HTTPClientBuilder()
                 .userAgent(WebServiceClient.USER_AGENT)
                 .trustAll()
                 .connectTimeout(Duration.ofSeconds(2))
@@ -99,7 +99,7 @@ public class APIConfig extends Config {
         return new WebServiceClientBuilder<>(serviceInterface, webServiceClient).build();
     }
 
-    public HTTPClientBuilderV2 httpClient() {
+    public HTTPClientBuilder httpClient() {
         if (httpClient != null) throw new Error("http client must be configured before adding client");
         return httpClientBuilder;
     }

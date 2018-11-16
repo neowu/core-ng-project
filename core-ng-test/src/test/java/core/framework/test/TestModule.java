@@ -28,7 +28,7 @@ public class TestModule extends AbstractTestModule {
         loadProperties("test.properties");
 
         overrideBinding(HTTPClient.class, Mockito.mock(HTTPClient.class));  // in test context, override binding is defined before actual binding
-        bind(HTTPClient.class, new HTTPClientBuilder().enableCookie().enableRedirect().build());
+        bind(HTTPClient.class, new HTTPClientBuilder().enableCookie().build());
 
         configureDB();
         configureKafka();
