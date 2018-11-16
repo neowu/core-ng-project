@@ -54,7 +54,7 @@ class ActionServiceTest extends IntegrationTest {
         actionService.index(List.of(message1, message2), now);
 
         ActionDocument action = actionDocument(now, message1.id);
-        assertThat(action.date).isEqualTo(message1.date);
+        assertThat(action.timestamp).isEqualTo(message1.date);
         assertThat(action.result).isEqualTo(message1.result);
         assertThat(action.correlationIds).isEqualTo(message1.correlationIds);
         assertThat(action.refIds).isEqualTo(message1.refIds);

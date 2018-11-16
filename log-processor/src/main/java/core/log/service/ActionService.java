@@ -92,7 +92,7 @@ public class ActionService {
 
     private ActionDocument action(ActionLogMessage message) {
         var document = new ActionDocument();
-        document.date = message.date;
+        document.timestamp = message.date;
         document.app = message.app;
         document.serverIP = message.serverIP;
         document.result = message.result;
@@ -112,7 +112,7 @@ public class ActionService {
 
     private TraceDocument trace(ActionLogMessage message) {
         var document = new TraceDocument();
-        document.date = message.date;
+        document.timestamp = message.date;
         document.app = message.app;
         document.action = message.action;
         document.result = message.result;

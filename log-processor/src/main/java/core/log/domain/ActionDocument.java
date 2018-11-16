@@ -13,8 +13,8 @@ import java.util.Map;
  */
 @Index(name = "action")
 public class ActionDocument {
-    @Property(name = "date")
-    public Instant date;
+    @Property(name = "@timestamp")
+    public Instant timestamp;
     @Property(name = "app")
     public String app;
     @Property(name = "server_ip")

@@ -131,7 +131,7 @@ public class DatabaseOperation {
 
     private void validateSelectSQL(String sql) {
         if (sql.contains("*"))
-            throw new Error(format("sql must not contain wildcard(*), please only select columns needed, sql={}", sql));
+            throw new Error("sql must not contain wildcard(*), please only select columns needed, sql=" + sql);
     }
 
     private <T> Optional<T> fetchOne(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {

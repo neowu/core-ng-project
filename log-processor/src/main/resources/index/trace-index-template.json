@@ -9,7 +9,7 @@
     "trace": {
       "properties": {
         "date": {
-          "type": "date",
+          "@timestamp": "date",
           "format": "strict_date_optional_time"
         },
         "app": {

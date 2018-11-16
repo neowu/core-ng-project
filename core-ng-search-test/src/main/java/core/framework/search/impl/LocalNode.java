@@ -28,6 +28,10 @@ class LocalNode extends Node {
     }
 
     LocalNode(Settings settings) {
-        super(new Environment(settings, null), plugins());
+        super(new Environment(settings, null), plugins(), false);
+    }
+
+    @Override
+    protected void registerDerivedNodeNameWithLogger(String nodeName) {
     }
 }

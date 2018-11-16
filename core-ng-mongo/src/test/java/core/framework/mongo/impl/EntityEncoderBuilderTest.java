@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -39,7 +38,7 @@ class EntityEncoderBuilderTest {
     }
 
     @Test
-    void encode() throws IOException {
+    void encode() {
         assertThat(builder.enumCodecFields.keySet()).containsExactly(TestChildEntity.TestEnum.class);
 
         TestEntity entity = new TestEntity();

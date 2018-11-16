@@ -11,8 +11,8 @@ import java.util.Map;
  */
 @Index(name = "stat")
 public class StatDocument {
-    @Property(name = "date")
-    public Instant date;
+    @Property(name = "@timestamp")
+    public Instant timestamp;
     @Property(name = "app")
     public String app;
     @Property(name = "server_ip")

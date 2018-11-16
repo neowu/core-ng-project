@@ -10,8 +10,8 @@ import java.time.Instant;
  */
 @Index(name = "trace")
 public class TraceDocument {
-    @Property(name = "date")
-    public Instant date;
+    @Property(name = "@timestamp")
+    public Instant timestamp;
     @Property(name = "app")
     public String app;
     @Property(name = "result")

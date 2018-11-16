@@ -2,11 +2,11 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '6.9.11.5'
+    version = '6.10.0'
 }
 
-def elasticVersion = '6.4.3'
-def kafkaVersion = '2.0.0'
+def elasticVersion = '6.5.0'
+def kafkaVersion = '2.0.1'
 def jacksonVersion = '2.9.7'
 def junitVersion = '5.3.1'
 def mockitoVersion = '2.22.0'
@@ -83,9 +83,9 @@ project(':core-ng-search-test') {
         implementation "org.elasticsearch.plugin:transport-netty4-client:${elasticVersion}"
         implementation "org.elasticsearch.plugin:reindex-client:${elasticVersion}"
         implementation "org.codelibs.elasticsearch.module:lang-painless:${elasticVersion}"
-        implementation "org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}"     // used by elasticsearch scaled_float
-        implementation "org.codelibs.elasticsearch.module:analysis-common:${elasticVersion}"     // used by elasticsearch stemmer
-        implementation 'org.apache.logging.log4j:log4j-core:2.9.1'  // used by elasticsearch local node
+        implementation "org.codelibs.elasticsearch.module:mapper-extras:${elasticVersion}"      // used by elasticsearch scaled_float
+        implementation "org.codelibs.elasticsearch.module:analysis-common:${elasticVersion}"    // used by elasticsearch stemmer
+        implementation 'org.apache.logging.log4j:log4j-core:2.11.1'                             // used by elasticsearch local node
     }
 }
 
