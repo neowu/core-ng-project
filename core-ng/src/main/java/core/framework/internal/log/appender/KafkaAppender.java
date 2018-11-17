@@ -1,7 +1,7 @@
 package core.framework.internal.log.appender;
 
-import core.framework.impl.kafka.ProducerMetrics;
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.kafka.ProducerMetrics;
 import core.framework.internal.log.message.ActionLogMessage;
 import core.framework.internal.log.message.LogTopics;
 import core.framework.internal.log.message.StatMessage;

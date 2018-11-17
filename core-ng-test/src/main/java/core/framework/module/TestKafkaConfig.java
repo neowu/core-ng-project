@@ -1,6 +1,6 @@
 package core.framework.module;
 
-import core.framework.impl.kafka.MessageProducer;
+import core.framework.internal.kafka.MessageProducer;
 import core.framework.test.kafka.MockMessageProducer;
 
 /**

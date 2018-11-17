@@ -26,4 +26,10 @@ class MongoConfigTest {
         assertThatThrownBy(() -> config.validate())
                 .hasMessageContaining("no collection/view added");
     }
+
+    @Test
+    void uri() {
+        assertThatThrownBy(() -> config.uri("mongodb://localhost"))
+                .hasMessageContaining("uri must have database");
+    }
 }

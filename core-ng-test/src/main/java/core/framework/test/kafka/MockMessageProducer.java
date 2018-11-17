@@ -1,6 +1,6 @@
 package core.framework.test.kafka;
 
-import core.framework.impl.kafka.MessageProducer;
+import core.framework.internal.kafka.MessageProducer;
 import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;

@@ -1,4 +1,4 @@
-package core.framework.impl.kafka;
+package core.framework.internal.kafka;
 
 import core.framework.api.json.Property;
 import core.framework.api.validate.NotNull;

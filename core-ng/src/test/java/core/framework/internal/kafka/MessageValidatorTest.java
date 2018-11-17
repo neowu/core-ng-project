@@ -1,4 +1,4 @@
-package core.framework.impl.kafka;
+package core.framework.internal.kafka;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package core.framework.impl.kafka;
+package core.framework.internal.kafka;
 
 import core.framework.internal.stat.Metrics;
 import org.apache.kafka.common.Metric;

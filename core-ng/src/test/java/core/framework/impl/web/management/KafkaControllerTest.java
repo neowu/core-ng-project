@@ -1,7 +1,7 @@
 package core.framework.impl.web.management;
 
-import core.framework.impl.kafka.MessageHeaders;
 import core.framework.impl.log.LogManager;
+import core.framework.internal.kafka.MessageHeaders;
 import core.framework.util.Strings;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.AfterEach;

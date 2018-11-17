@@ -1,4 +1,4 @@
-package core.framework.impl.kafka;
+package core.framework.internal.kafka;
 
 import core.framework.internal.json.JSONMapper;
 import core.framework.kafka.BulkMessageHandler;

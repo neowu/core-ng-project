@@ -1,4 +1,4 @@
-package core.framework.impl.kafka;
+package core.framework.internal.kafka;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,12 +14,6 @@ class MessageListenerTest {
     @BeforeEach
     void createMessageListener() {
         listener = new MessageListener(null, null, null);
-    }
-
-    @Test
-    void clientId() {
-        assertThat(listener.clientId("test-service", null, 0)).isEqualTo("test-service-0");
-        assertThat(listener.clientId("test-service", "name", 1)).isEqualTo("test-service-name-1");
     }
 
     @Test

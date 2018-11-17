@@ -1,11 +1,11 @@
 package core.framework.impl.web.management;
 
-import core.framework.impl.kafka.MessageHeaders;
-import core.framework.impl.kafka.MessageProducer;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.filter.BytesLogParam;
 import core.framework.impl.web.http.IPAccessControl;
+import core.framework.internal.kafka.MessageHeaders;
+import core.framework.internal.kafka.MessageProducer;
 import core.framework.log.Markers;
 import core.framework.util.Strings;
 import core.framework.web.Request;
