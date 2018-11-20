@@ -11,11 +11,14 @@ import core.framework.search.SearchResponse;
 import core.framework.util.Lists;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.metrics.sum.ParsedSum;
 import org.elasticsearch.search.sort.ScriptSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -147,6 +150,26 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         documentType.update("4", "ctx._source.num_field = ctx._source.num_field + params.value", Map.of("value", 1));
 
         assertThat(documentType.get("4").orElseThrow().numField).isEqualTo(5);
+    }
+
+    @Test
+    void aggregate() {
+        documentType.index("1", document("1", "value1", 1));
+        documentType.index("2", document("2", "value1", 1));
+        documentType.index("3", document("3", "value3", 1));
+        elasticSearch.flushIndex("document");
+
+        SearchRequest request = new SearchRequest();
+        request.skip = 0;
+        request.limit = 1;
+        request.query = QueryBuilders.matchQuery("string_field", "value1");
+        request.aggregations.add(AggregationBuilders.sum("totalValue").field("num_field"));
+        SearchResponse<TestDocument> response = documentType.search(request);
+
+        assertThat(response.totalHits).isEqualTo(2);
+        assertThat(response.hits).hasSize(1);
+        assertThat(response.aggregations).containsKeys("totalValue");
+        assertThat(new BigDecimal(((ParsedSum) response.aggregations.get("totalValue")).getValue())).isEqualTo("2");
     }
 
     private TestDocument document(String id, String stringField, int numField) {
