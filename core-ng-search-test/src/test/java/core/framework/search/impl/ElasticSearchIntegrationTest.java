@@ -9,6 +9,7 @@ import core.framework.search.IntegrationTest;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
 import core.framework.util.Lists;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +113,29 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     }
 
     @Test
+    void searchDateRange() {
+        ZonedDateTime from = ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime to = from.plusDays(5);
+        documentType.index("1", document("1", "value1", 1, from));
+        documentType.index("2", document("2", "value2", 1, from.plusDays(1)));
+        documentType.index("3", document("3", "value3", 1, to));
+        documentType.index("4", document("4", "value4", 1, to.plusDays(1)));
+        elasticSearch.flushIndex("document");
+
+        var boolQuery = new BoolQueryBuilder();
+        boolQuery.must(QueryBuilders.rangeQuery("zoned_date_time_field").from(from).to(to));
+
+        var request = new SearchRequest();
+        request.query = boolQuery;
+
+        SearchResponse<TestDocument> response = documentType.search(request);
+
+        assertThat(response.totalHits).isEqualTo(3);
+        List<String> collect = response.hits.stream().map(document -> document.stringField).collect(Collectors.toList());
+        assertThat(collect).containsOnly("value1", "value2", "value3");
+    }
+
+    @Test
     void delete() {
         documentType.index("1", document("1", "value", 1));
         elasticSearch.flushIndex("document");
@@ -159,7 +184,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         documentType.index("3", document("3", "value3", 1));
         elasticSearch.flushIndex("document");
 
-        SearchRequest request = new SearchRequest();
+        var request = new SearchRequest();
         request.skip = 0;
         request.limit = 1;
         request.query = QueryBuilders.matchQuery("string_field", "value1");
@@ -173,11 +198,15 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     }
 
     private TestDocument document(String id, String stringField, int numField) {
+        return document(id, stringField, numField, ZonedDateTime.now(ZoneId.of("America/New_York")));
+    }
+
+    private TestDocument document(String id, String stringField, int numField, ZonedDateTime time) {
         var document = new TestDocument();
         document.id = id;
         document.stringField = stringField;
         document.numField = numField;
-        document.zonedDateTimeField = ZonedDateTime.now(ZoneId.of("America/New_York"));
+        document.zonedDateTimeField = time;
         document.completion1 = stringField + "-Complete1";
         document.completion2 = stringField + "-Complete2";
         return document;
