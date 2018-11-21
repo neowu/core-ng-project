@@ -65,6 +65,9 @@
         "num_field": {
           "type": "integer"
         },
+        "double_field": {
+          "type": "double"
+        },
         "zoned_date_time_field": {
           "type": "date"
         }

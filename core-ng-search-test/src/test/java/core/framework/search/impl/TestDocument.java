@@ -28,6 +28,9 @@ public class TestDocument {
     @Property(name = "num_field")
     public Integer numField;
 
+    @Property(name = "double_field")
+    public Double doubleField;
+
     @Property(name = "zoned_date_time_field")
     public ZonedDateTime zonedDateTimeField;
 }
