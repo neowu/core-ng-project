@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -115,7 +115,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void searchDateRange() {
-        ZonedDateTime from = ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC);
+        ZonedDateTime from = ZonedDateTime.now();
         ZonedDateTime to = from.plusDays(5);
         documentType.index("1", document("1", "value1", 1, 0, from));
         documentType.index("2", document("2", "value2", 1, 0, from.plusDays(1)));
@@ -124,7 +124,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         elasticSearch.flushIndex("document");
 
         var boolQuery = new BoolQueryBuilder();
-        boolQuery.must(QueryBuilders.rangeQuery("zoned_date_time_field").from(from).to(to));
+        boolQuery.must(QueryBuilders.rangeQuery("zoned_date_time_field").from(from.format(DateTimeFormatter.ISO_INSTANT)).to(to.format(DateTimeFormatter.ISO_INSTANT)));
 
         var request = new SearchRequest();
         request.query = boolQuery;
