@@ -45,9 +45,9 @@ public final class HTTPClientBuilder {
         var watch = new StopWatch();
         try {
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(connectTimeout.toMillis(), TimeUnit.MILLISECONDS)
-                    .readTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
-                    .writeTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS)
+                    .connectTimeout(connectTimeout)
+                    .readTimeout(timeout)
+                    .writeTimeout(timeout)
                     .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
 
             if (trustAll) {

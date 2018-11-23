@@ -10,7 +10,7 @@
         "string_field": {
           "type": "text"
         },
-        "num_field": {
+        "int_field": {
           "type": "integer"
         },
         "zoned_date_time_field": {

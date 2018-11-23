@@ -38,7 +38,7 @@ class ElasticSearchTemplateIntegrationTest extends IntegrationTest {
         TestDocument document = new TestDocument();
         document.id = id;
         document.stringField = stringField;
-        document.numField = numField;
+        document.intField = numField;
         document.completion1 = stringField + "-Complete1";
         document.completion2 = stringField + "-Complete2";
         IndexRequest<TestDocument> request = new IndexRequest<>();

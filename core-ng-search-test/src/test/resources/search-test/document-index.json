@@ -62,7 +62,7 @@
           "analyzer": "english",
           "search_analyzer": "english_search"
         },
-        "num_field": {
+        "int_field": {
           "type": "integer"
         },
         "double_field": {
