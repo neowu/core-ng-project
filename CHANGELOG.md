@@ -1,6 +1,7 @@
 ## Change log
 ### 6.10.1 (11/16/2018 - )
 * kafka: set consumer client.id for monitoring
+* api: change typescript api nullable definition to "type | null", to make it stricter
 
 ### 6.10.0 (10/18/2018 - 11/16/2018) 
 * httpclient: use okHTTP as implementation to support http/2.0 

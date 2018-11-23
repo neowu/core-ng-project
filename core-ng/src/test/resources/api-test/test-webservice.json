@@ -13,10 +13,10 @@
     }
   ],
   "types": [
-    {"name": "TestWebService$TestSearchRequest", "type": "interface", "definition": "{ int_field: number; boolean_field?: boolean; long_field?: number; double_field?: number; date_field?: string; }"},
-    {"name": "TestWebService$TestResponse", "type": "interface", "definition": "{ int_field: number; string_map?: {[key:string]: string;}; items?: {[key:string]: TestWebService$TestItem;}; }"},
-    {"name": "TestWebService$TestItem", "type": "interface", "definition": "{ zoned_date_time_field?: Date; enum_field?: TestWebService$TestEnum; }"},
-    {"name": "TestWebService$TestRequest", "type": "interface", "definition": "{ string_field: string; items?: TestWebService$TestItem[]; }"},
+    {"name": "TestWebService$TestSearchRequest", "type": "interface", "definition": "{ int_field: number; boolean_field: boolean | null; long_field: number | null; double_field: number | null; date_field: string | null; }"},
+    {"name": "TestWebService$TestResponse", "type": "interface", "definition": "{ int_field: number; string_map: {[key:string]: string;} | null; items: {[key:string]: TestWebService$TestItem;} | null; }"},
+    {"name": "TestWebService$TestItem", "type": "interface", "definition": "{ zoned_date_time_field: Date | null; enum_field: TestWebService$TestEnum | null; }"},
+    {"name": "TestWebService$TestRequest", "type": "interface", "definition": "{ string_field: string; items: TestWebService$TestItem[] | null; }"},
     {"name": "TestWebService$TestEnum", "type": "enum", "definition": "{ A = \"A1\", B = \"B1\", }"}
   ]
 }

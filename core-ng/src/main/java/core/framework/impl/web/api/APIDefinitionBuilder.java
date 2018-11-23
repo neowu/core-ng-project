@@ -96,9 +96,9 @@ public class APIDefinitionBuilder {
         type.type = "interface";
         var builder = new StringBuilder("{ ");
         for (BeanTypeDefinition.Field field : entry.getValue().fields) {
-            builder.append(field.name);
-            if (!field.notNull) builder.append('?');
-            builder.append(": ").append(field.type).append("; ");
+            builder.append(field.name).append(": ").append(field.type);
+            if (!field.notNull) builder.append(" | null");
+            builder.append("; ");
         }
         builder.append('}');
         type.definition = builder.toString();
