@@ -1,4 +1,7 @@
 ## Change log
+### 6.10.2 (11/24/2018 - )
+* search: update es to 6.5.1
+
 ### 6.10.1 (11/16/2018 - 11/23/2018)
 * kafka: set consumer client.id for monitoring
 * api: change typescript api nullable definition to "type | null", to make it stricter
@@ -16,7 +19,7 @@
 * db: close connection if query timed out, refer to core.framework.impl.db.Connections for reason
 * mongo: replaced fongo with mongo-java-server, update driver to 3.9.0
 * kafka: update to 2.0.1
-* search: updated es to 6.5.0
+* search: update es to 6.5.0
 * log-processor: changed timefield from date to @timestamp, as default value for timelion or visualization builder
 
 ### 6.9.6 (10/16/2018 - 10/18/2018)
