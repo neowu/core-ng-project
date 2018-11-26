@@ -5,7 +5,7 @@
 * template, use ByteBuffer[] for performance?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * mongo: update entity decoder to use switch(fieldName) to replace if statement? (optimization)
-* cache: hit rate report?
+* cache: hit rate report? cluster support? envoy?
 * framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
 
