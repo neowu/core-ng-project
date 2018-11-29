@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xbill.DNS.AAAARecord;
 import org.xbill.DNS.ARecord;
+import org.xbill.DNS.ExtendedResolver;
 import org.xbill.DNS.Lookup;
 import org.xbill.DNS.Record;
-import org.xbill.DNS.SimpleResolver;
 import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
 
@@ -22,11 +22,12 @@ import java.util.List;
  */
 public class DNSManager implements Dns {
     private final Logger logger = LoggerFactory.getLogger(DNSManager.class);
-    private final SimpleResolver resolver;
+    private final ExtendedResolver resolver;
 
-    public DNSManager(String dns) {
+    public DNSManager(String... nameServers) {
+        if (nameServers.length == 0) throw new Error("nameServers must not be empty");
         try {
-            resolver = new SimpleResolver(dns);
+            resolver = new ExtendedResolver(nameServers);
         } catch (UnknownHostException e) {
             throw new Error(e);
         }
@@ -38,9 +39,9 @@ public class DNSManager implements Dns {
             var lookup = new Lookup(hostname);
             lookup.setResolver(resolver);
             Record[] records = lookup.run();
-            if (lookup.getResult() != Lookup.SUCCESSFUL || records == null) {
+            if (records == null || lookup.getResult() != Lookup.SUCCESSFUL) {
                 logger.warn("failed to resolve host, host={}, fallback to system DNS", hostname);
-                return Dns.SYSTEM.lookup(hostname);
+                return List.of(InetAddress.getAllByName(hostname));
             }
             List<InetAddress> addresses = new ArrayList<>(records.length);
             for (Record record : records) {

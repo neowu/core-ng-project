@@ -41,7 +41,7 @@ public final class HTTPClientBuilder {
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
     private Integer maxRetries;
-    private String dns;
+    private String[] nameServers;
 
     public HTTPClient build() {
         var watch = new StopWatch();
@@ -60,7 +60,7 @@ public final class HTTPClientBuilder {
                        .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
             }
 
-            if (dns != null) builder.dns(new DNSManager(dns));
+            if (nameServers != null) builder.dns(new DNSManager(nameServers));
             if (maxRetries != null) builder.addInterceptor(new RetryInterceptor(maxRetries));
             if (enableCookie) builder.cookieJar(new CookieManager());
 
@@ -108,8 +108,8 @@ public final class HTTPClientBuilder {
     }
 
     // must include "dnsjava:dnsjava:version" as dependency to use custom dns resolver
-    public HTTPClientBuilder dns(String dns) {
-        this.dns = dns;
+    public HTTPClientBuilder dns(String... nameServers) {
+        this.nameServers = nameServers;
         return this;
     }
 }
