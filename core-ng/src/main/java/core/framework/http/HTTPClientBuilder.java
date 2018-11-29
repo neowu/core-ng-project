@@ -1,6 +1,7 @@
 package core.framework.http;
 
 import core.framework.internal.http.CookieManager;
+import core.framework.internal.http.DNSManager;
 import core.framework.internal.http.DefaultTrustManager;
 import core.framework.internal.http.HTTPClientImpl;
 import core.framework.internal.http.RetryInterceptor;
@@ -40,6 +41,7 @@ public final class HTTPClientBuilder {
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
     private Integer maxRetries;
+    private String dns;
 
     public HTTPClient build() {
         var watch = new StopWatch();
@@ -58,12 +60,9 @@ public final class HTTPClientBuilder {
                        .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
             }
 
-            if (maxRetries != null)
-                builder.addInterceptor(new RetryInterceptor(maxRetries));
-
-            if (enableCookie) {
-                builder.cookieJar(new CookieManager());
-            }
+            if (dns != null) builder.dns(new DNSManager(dns));
+            if (maxRetries != null) builder.addInterceptor(new RetryInterceptor(maxRetries));
+            if (enableCookie) builder.cookieJar(new CookieManager());
 
             return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
@@ -105,6 +104,12 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder trustAll() {
         trustAll = true;
+        return this;
+    }
+
+    // must include "dnsjava:dnsjava:version" as dependency to use custom dns resolver
+    public HTTPClientBuilder dns(String dns) {
+        this.dns = dns;
         return this;
     }
 }

@@ -27,6 +27,7 @@ project(':core-ng') {
         implementation 'com.squareup.okhttp3:okhttp:3.12.0'
         implementation 'io.undertow:undertow-core:2.0.15.Final'
         compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
+        compileOnly 'dnsjava:dnsjava:2.1.8'     // to support specify nameserver in http client
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"

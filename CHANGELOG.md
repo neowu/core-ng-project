@@ -1,8 +1,9 @@
 ## Change log
-### 6.10.2 (11/24/2018 - )
+### 6.10.2 (11/24/2018 - 11/29/2018)
 * search: update es to 6.5.1
 * kafka: update kafka to 2.1.0
 * redis: multGet values return in same order of keys
+* httpclient: add custom DNS support to solve DNS pollution issue
 
 ### 6.10.1 (11/16/2018 - 11/23/2018)
 * kafka: set consumer client.id for monitoring
