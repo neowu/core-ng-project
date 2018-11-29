@@ -73,7 +73,7 @@ public final class MockRedis implements Redis {
 
     @Override
     public Map<String, String> multiGet(String... keys) {
-        Map<String, String> results = Maps.newHashMapWithExpectedSize(keys.length);
+        Map<String, String> results = Maps.newLinkedHashMapWithExpectedSize(keys.length);
         for (String key : keys) {
             String value = get(key);
             if (value != null) results.put(key, value);

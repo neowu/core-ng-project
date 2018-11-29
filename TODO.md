@@ -17,6 +17,7 @@
 * rethink module structure to fit java module export requirement
 * run diagnostic when heap usage is high, send trace, log().alert() ?
 * JSON.from/to add validation?
+* specify app_name in sys.properties to allow deploy multiple same service as different name
 
 ### jdk 9/10/11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

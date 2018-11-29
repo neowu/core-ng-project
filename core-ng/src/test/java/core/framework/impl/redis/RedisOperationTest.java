@@ -81,7 +81,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         response("*3\r\n$2\r\nv1\r\n$-1\r\n$2\r\nv3\r\n");
         Map<String, String> values = redis.multiGet("k1", "k2", "k3");
 
-        assertThat(values).containsOnly(entry("k1", "v1"), entry("k3", "v3"));
+        assertThat(values).containsExactly(entry("k1", "v1"), entry("k3", "v3"));
         assertRequestEquals("*4\r\n$4\r\nMGET\r\n$2\r\nk1\r\n$2\r\nk2\r\n$2\r\nk3\r\n");
     }
 

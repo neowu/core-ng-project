@@ -220,7 +220,7 @@ public final class RedisImpl implements Redis {
     @Override
     public Map<String, String> multiGet(String... keys) {
         Map<String, byte[]> values = multiGetBytes(keys);
-        Map<String, String> result = Maps.newHashMapWithExpectedSize(values.size());
+        Map<String, String> result = Maps.newLinkedHashMapWithExpectedSize(values.size());
         for (Map.Entry<String, byte[]> entry : values.entrySet()) {
             result.put(entry.getKey(), decode(entry.getValue()));
         }
@@ -230,7 +230,7 @@ public final class RedisImpl implements Redis {
     public Map<String, byte[]> multiGetBytes(String... keys) {
         var watch = new StopWatch();
         if (keys.length == 0) throw new Error("keys must not be empty");
-        Map<String, byte[]> values = Maps.newHashMapWithExpectedSize(keys.length);
+        Map<String, byte[]> values = Maps.newLinkedHashMapWithExpectedSize(keys.length);
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
