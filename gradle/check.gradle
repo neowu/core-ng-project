@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.3'
+        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.5'
     }
 }
 
@@ -33,7 +33,7 @@ subprojects {
     spotbugs {
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '3.1.8'
+        toolVersion = '3.1.9'
     }
 
     dependencies {
@@ -53,7 +53,7 @@ subprojects {
 
     jacocoTestReport {
         // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport
-        executionData = fileTree(rootDir).include('build/**/jacoco/test.exec')
+        executionData.from(fileTree(rootDir).include('build/**/jacoco/test.exec'))
 
         reports {
             xml.enabled = true
