@@ -55,7 +55,7 @@ public final class KafkaAppender implements LogAppender {
                     ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis(),  // metadata update timeout
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                     ProducerConfig.LINGER_MS_CONFIG, 50,
-                    ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, Duration.ofSeconds(60).toMillis(),
+                    ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) Duration.ofSeconds(60).toMillis(),     // DELIVERY_TIMEOUT_MS_CONFIG is INT type
                     ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");      // if not specify, kafka uses producer-${seq} name, also impact jmx naming
             var serializer = new ByteArraySerializer();
             producer = new KafkaProducer<>(config, serializer, serializer);
