@@ -33,7 +33,7 @@ class MockRedisTest {
         redis.set("key3", "value3");
         Map<String, String> values = redis.multiGet("key1", "key3", "key2");
 
-        assertThat(values).containsExactly(entry("key2", "value2"), entry("key3", "value3"));
+        assertThat(values).containsExactly(entry("key3", "value3"), entry("key2", "value2"));
     }
 
     @Test
