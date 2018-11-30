@@ -31,7 +31,7 @@ public class MessageProducerImpl implements MessageProducer {
             this.name = name;
             this.producerMetrics = new ProducerMetrics(name);
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,  // immutable map requires value must not be null
-                    ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
+                    ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.ZSTD.name,
                     ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) Duration.ofSeconds(60).toMillis(),     // DELIVERY_TIMEOUT_MS_CONFIG is INT type
                     ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
             var serializer = new ByteArraySerializer();

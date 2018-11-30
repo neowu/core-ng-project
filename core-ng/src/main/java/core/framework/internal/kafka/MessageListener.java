@@ -73,7 +73,8 @@ public class MessageListener {
         for (int i = 0; i < poolSize; i++) {
             watch.reset();
             String name = listenerThreadName(this.name, i);
-            Consumer<byte[], byte[]> consumer = consumer(topics);
+            Consumer<byte[], byte[]> consumer = consumer();
+            consumer.subscribe(topics);
             var thread = new MessageListenerThread(name, consumer, this);
             threads[i] = thread;
             logger.info("create kafka listener thread, topics={}, name={}, elapsed={}", topics, name, watch.elapsed());
@@ -108,7 +109,7 @@ public class MessageListener {
         }
     }
 
-    private Consumer<byte[], byte[]> consumer(Set<String> topics) {
+    Consumer<byte[], byte[]> consumer() {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);   // immutable map requires value must not be null
         config.put(ConsumerConfig.GROUP_ID_CONFIG, LogManager.APP_NAME);
@@ -123,7 +124,6 @@ public class MessageListener {
         config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
         var deserializer = new ByteArrayDeserializer();
         Consumer<byte[], byte[]> consumer = new KafkaConsumer<>(config, deserializer, deserializer);
-        consumer.subscribe(topics);
         consumerMetrics.add(consumer.metrics());
         return consumer;
     }
