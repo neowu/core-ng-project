@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author neo
@@ -23,12 +24,21 @@ public class LogManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogManager.class);
 
     static {
-        String appName = System.getProperty("core.appName");
+        APP_NAME = appName(System.getenv());
+    }
+
+    static String appName(Map<String, String> env) {
+        String appName = env.get("APP_NAME");
+        if (appName != null) {
+            LOGGER.info("found APP_NAME env var, appName={}", appName);
+            return appName;
+        }
+        appName = System.getProperty("core.appName");
         if (appName == null) {
             LOGGER.info("not found -Dcore.appName, this should only happen in local dev env or test, use \"local\" as appName");
             appName = "local";
         }
-        APP_NAME = appName;
+        return appName;
     }
 
     private final ActionLogMessageFactory actionLogMessageFactory = new ActionLogMessageFactory();

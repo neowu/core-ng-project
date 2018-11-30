@@ -5,7 +5,9 @@ import core.framework.log.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -20,8 +22,14 @@ class LogManagerTest {
 
     @Test
     void errorCode() {
-        assertEquals("TEST_ERROR", logManager.errorCode(new TestException()));
-        assertEquals("java.lang.Exception", logManager.errorCode(new Exception()));
+        assertThat(logManager.errorCode(new TestException())).isEqualTo("TEST_ERROR");
+        assertThat(logManager.errorCode(new Exception())).isEqualTo("java.lang.Exception");
+    }
+
+    @Test
+    void appName() {
+        assertThat(LogManager.appName(Map.of("APP_NAME", "test"))).isEqualTo("test");
+        assertThat(LogManager.appName(Map.of())).isEqualTo("local");
     }
 
     private static class TestException extends Exception implements ErrorCode {
