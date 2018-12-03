@@ -8,6 +8,7 @@ import core.framework.search.ForEach;
 import core.framework.search.IntegrationTest;
 import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
+import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
@@ -46,6 +47,13 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void cleanup() {
         documentType.bulkDelete(range(0, 30).mapToObj(String::valueOf).collect(Collectors.toList()));
         elasticSearch.flushIndex("document");
+    }
+
+    @Test
+    void createIndex() {
+        assertThat(elasticSearch.state().metadata.indices).containsKey("document");
+
+        elasticSearch.createIndex("document", ClasspathResources.text("search-test/document-index.json"));
     }
 
     @Test

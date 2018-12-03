@@ -2,6 +2,7 @@
 ### 6.10.4 (11/29/2018 - ) !!! kafka producer compression changes only works with kafka 2.1.0+
 * kafka: update COMPRESSION_TYPE_CONFIG to ZSTD, requires kafka 2.1.0 on server side
 * app: support to use APP_NAME or -Dcore.appName to override appName, to support deploy same image/app with different name (multi tenancy)
+* elasticsearch: added ElasticSearchMigration to support migration
 
 ### 6.10.3 (11/24/2018 - 11/29/2018)
 * search: update es to 6.5.1

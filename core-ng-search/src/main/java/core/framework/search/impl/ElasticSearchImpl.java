@@ -7,6 +7,7 @@ import core.framework.search.ElasticSearchType;
 import core.framework.util.StopWatch;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
@@ -63,7 +64,12 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndex(String index, String source) {
         var watch = new StopWatch();
         try {
-            client().indices().create(Requests.createIndexRequest(index).source(new BytesArray(source), XContentType.JSON), RequestOptions.DEFAULT);
+            boolean exists = client().indices().exists(new GetIndexRequest().indices(index), RequestOptions.DEFAULT);
+            if (!exists) {
+                client().indices().create(Requests.createIndexRequest(index).source(new BytesArray(source), XContentType.JSON), RequestOptions.DEFAULT);
+            } else {
+                logger.info("index already exists, skip, index={}", index);
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
