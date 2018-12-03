@@ -21,7 +21,7 @@ public class ElasticSearchMigration {
         host = properties.get("sys.elasticsearch.host").orElseThrow();
     }
 
-    public void migrate(Consumer<ElasticSearch> consumer) throws IOException {
+    public void migrate(Consumer<ElasticSearch> consumer) {
         var search = new ElasticSearchImpl();
         try {
             search.host = host;
@@ -30,7 +30,15 @@ public class ElasticSearchMigration {
         } catch (Throwable e) {
             logger.error("failed to run migration", e);
         } finally {
+            close(search);
+        }
+    }
+
+    private void close(ElasticSearchImpl search) {
+        try {
             search.close();
+        } catch (IOException e) {
+            logger.warn("failed to close elasticsearch client, error={}", e.getMessage(), e);
         }
     }
 }
