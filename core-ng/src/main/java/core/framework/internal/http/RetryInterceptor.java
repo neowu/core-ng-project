@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.Duration;
 
+import static okhttp3.internal.Util.closeQuietly;
+
 /**
  * @author neo
  */
@@ -33,19 +35,24 @@ public class RetryInterceptor implements Interceptor {
                 Response response = chain.proceed(request);
                 if (shouldRetry(attempts, response.code())) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon, uri={}", request.url());
-                    Threads.sleepRoughly(waitTime(attempts));
+                    closeQuietly(response.body());
+                    sleep(waitTime(attempts));
                     continue;
                 }
                 return response;
             } catch (IOException e) {
                 if (shouldRetry(attempts, request.method(), e)) {
                     logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon, uri={}", request.url(), e);
-                    Threads.sleepRoughly(waitTime(attempts));
+                    sleep(waitTime(attempts));
                 } else {
                     throw e;
                 }
             }
         }
+    }
+
+    void sleep(Duration waitTime) {
+        Threads.sleepRoughly(waitTime);
     }
 
     boolean shouldRetry(int attempts, int statusCode) {

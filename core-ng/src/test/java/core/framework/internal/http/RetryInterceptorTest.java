@@ -1,15 +1,27 @@
 package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.Protocol;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okio.BufferedSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpTimeoutException;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author neo
@@ -19,7 +31,12 @@ class RetryInterceptorTest {
 
     @BeforeEach
     void createRetryInterceptor() {
-        interceptor = new RetryInterceptor(3);
+        interceptor = new RetryInterceptor(3) {
+            @Override
+            void sleep(Duration waitTime) {
+                // not sleep in test
+            }
+        };
     }
 
     @Test
@@ -42,5 +59,30 @@ class RetryInterceptorTest {
         assertThat(interceptor.shouldRetry(1, HTTPStatus.OK.code)).isFalse();
         assertThat(interceptor.shouldRetry(1, HTTPStatus.SERVICE_UNAVAILABLE.code)).isTrue();
         assertThat(interceptor.shouldRetry(3, HTTPStatus.SERVICE_UNAVAILABLE.code)).isFalse();
+    }
+
+    @Test
+    void closeResponseIfServiceUnavailable() throws IOException {
+        var request = new Request.Builder().url("http://localhost").build();
+        var source = mock(BufferedSource.class);
+        var serviceUnavailableResponse = new Response.Builder().request(request)
+                                                               .protocol(Protocol.HTTP_2)
+                                                               .code(HTTPStatus.SERVICE_UNAVAILABLE.code)
+                                                               .message("service unavailable")
+                                                               .body(ResponseBody.create(MediaType.get("application/json"), 0, source))
+                                                               .build();
+        var okResponse = new Response.Builder().request(request)
+                                               .protocol(Protocol.HTTP_2)
+                                               .code(HTTPStatus.OK.code)
+                                               .message("ok")
+                                               .build();
+
+        Interceptor.Chain chain = mock(Interceptor.Chain.class);
+        when(chain.request()).thenReturn(request);
+        when(chain.proceed(request)).thenReturn(serviceUnavailableResponse).thenReturn(okResponse);
+
+        interceptor.intercept(chain);
+
+        verify(source).close();
     }
 }
