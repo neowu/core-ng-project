@@ -31,12 +31,7 @@ class RetryInterceptorTest {
 
     @BeforeEach
     void createRetryInterceptor() {
-        interceptor = new RetryInterceptor(3) {
-            @Override
-            void sleep(Duration waitTime) {
-                // not sleep in test
-            }
-        };
+        interceptor = new TestRetryInterceptor(3);
     }
 
     @Test
@@ -84,5 +79,16 @@ class RetryInterceptorTest {
         interceptor.intercept(chain);
 
         verify(source).close();
+    }
+
+    static class TestRetryInterceptor extends RetryInterceptor {
+        TestRetryInterceptor(int maxRetries) {
+            super(maxRetries);
+        }
+
+        @Override
+        void sleep(Duration waitTime) {
+            // not sleep during test
+        }
     }
 }
