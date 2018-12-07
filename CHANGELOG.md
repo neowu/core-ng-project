@@ -1,6 +1,7 @@
 ## Change log
-### 6.10.5 (12/5/2018 - )
-* httpclient: fix: close response if got 503 in retry 
+### 6.10.4.1 (12/5/2018 - 12/7/2018)  (Test version)
+* httpclient: fix: close response if got 503 in retry
+* kafka: rollback COMPRESSION_TYPE_CONFIG to Snappy to compare cpu/ram usage vs. ZSTD
 
 ### 6.10.4 (11/29/2018 - 12/3/2018) !!! kafka producer compression changes only works with kafka 2.1.0+
 * kafka: update COMPRESSION_TYPE_CONFIG to ZSTD, requires kafka 2.1.0 on server side
