@@ -1,4 +1,4 @@
-package core.framework.impl.async;
+package core.framework.internal.async;
 
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;

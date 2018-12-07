@@ -1,8 +1,8 @@
 package core.framework.impl.scheduler;
 
-import core.framework.impl.async.ThreadPools;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
+import core.framework.internal.async.ThreadPools;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
 import core.framework.util.Maps;

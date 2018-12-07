@@ -1,4 +1,4 @@
-package core.framework.impl.async;
+package core.framework.internal.async;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

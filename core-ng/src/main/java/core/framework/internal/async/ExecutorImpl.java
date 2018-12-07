@@ -1,4 +1,4 @@
-package core.framework.impl.async;
+package core.framework.internal.async;
 
 import core.framework.async.Executor;
 import core.framework.async.Task;

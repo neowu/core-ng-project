@@ -1,4 +1,4 @@
-package core.framework.impl.async;
+package core.framework.internal.async;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;

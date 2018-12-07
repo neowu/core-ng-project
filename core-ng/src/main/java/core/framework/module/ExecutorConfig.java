@@ -1,11 +1,11 @@
 package core.framework.module;
 
 import core.framework.async.Executor;
-import core.framework.impl.async.ExecutorImpl;
-import core.framework.impl.async.ThreadPools;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
+import core.framework.internal.async.ExecutorImpl;
+import core.framework.internal.async.ThreadPools;
 
 /**
  * @author neo
