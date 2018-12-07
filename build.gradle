@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '6.10.4.1'
+    version = '6.10.4.2'
 }
 
 def elasticVersion = '6.5.1'
@@ -26,8 +26,8 @@ project(':core-ng') {
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:3.12.0'
         implementation 'io.undertow:undertow-core:2.0.16.Final'
-        compileOnly "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
-        compileOnly 'dnsjava:dnsjava:2.1.8'     // to support specify nameserver in http client
+        implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
+        implementation 'org.xerial.snappy:snappy-java:1.1.7.2'      // used by kafka message compression
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"

@@ -1,18 +1,14 @@
 ## Change log
-### 6.10.4.1 (12/5/2018 - 12/7/2018)  (Test version)
+### 6.10.4.2 (12/5/2018 - )  (Test version, still ongoing)
 * httpclient: fix: close response if got 503 in retry
-* kafka: rollback COMPRESSION_TYPE_CONFIG to Snappy to compare cpu/ram usage vs. ZSTD
-
-### 6.10.4 (11/29/2018 - 12/3/2018) !!! kafka producer compression changes only works with kafka 2.1.0+
-* kafka: update COMPRESSION_TYPE_CONFIG to ZSTD, requires kafka 2.1.0 on server side
 * app: support to use APP_NAME or -Dcore.appName to override appName, to support deploy same image/app with different name (multi tenancy)
 * elasticsearch: added ElasticSearchMigration to support migration
+* kafka: include kafka lib into framework, no need to add runtimeOnly in application (for simplifying, and our app is mostly service on cloud) 
 
 ### 6.10.3 (11/24/2018 - 11/29/2018)
 * search: update es to 6.5.1
 * kafka: update kafka to 2.1.0
 * redis: multGet values return in same order of keys
-* httpclient: add custom DNS support to solve DNS pollution issue
 
 ### 6.10.1 (11/16/2018 - 11/23/2018)
 * kafka: set consumer client.id for monitoring

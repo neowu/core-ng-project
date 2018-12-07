@@ -1,7 +1,6 @@
 package core.framework.http;
 
 import core.framework.internal.http.CookieManager;
-import core.framework.internal.http.DNSManager;
 import core.framework.internal.http.DefaultTrustManager;
 import core.framework.internal.http.HTTPClientImpl;
 import core.framework.internal.http.RetryInterceptor;
@@ -41,7 +40,6 @@ public final class HTTPClientBuilder {
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
     private Integer maxRetries;
-    private String[] nameServers;
 
     public HTTPClient build() {
         var watch = new StopWatch();
@@ -60,7 +58,6 @@ public final class HTTPClientBuilder {
                        .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
             }
 
-            if (nameServers != null) builder.dns(new DNSManager(nameServers));
             if (maxRetries != null) builder.addInterceptor(new RetryInterceptor(maxRetries));
             if (enableCookie) builder.cookieJar(new CookieManager());
 
@@ -104,12 +101,6 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder trustAll() {
         trustAll = true;
-        return this;
-    }
-
-    // must include "dnsjava:dnsjava:version" as dependency to use custom dns resolver
-    public HTTPClientBuilder dns(String... nameServers) {
-        this.nameServers = nameServers;
         return this;
     }
 }
