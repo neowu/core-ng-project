@@ -32,7 +32,7 @@ distributions {
 run {
     // assign all system properties to application, e.g. ./gradlew -Dkey=value :some-service:run
     System.properties.each { key, value ->
-        if (key != "user.dir") {
+        if (key != "user.dir" && key != "java.endorsed.dirs") {
             systemProperty key as String, value
         }
     }
