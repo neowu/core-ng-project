@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.5'
+        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.6'
     }
 }
 
@@ -15,7 +15,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.14'
+            checkstyle 'com.puppycrawl.tools:checkstyle:8.15'
             checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.32.0'
         }
 
@@ -26,7 +26,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
-        toolVersion = '6.9.0'
+        toolVersion = '6.10.0'
         consoleOutput = true
     }
 

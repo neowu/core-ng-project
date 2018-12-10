@@ -9,8 +9,10 @@ import java.lang.reflect.Type;
 public final class Methods {
     public static String path(Method method) {
         var builder = new StringBuilder();
-        builder.append(method.getDeclaringClass().getCanonicalName()).append('.').append(method.getName());
-        builder.append('(');
+        builder.append(method.getDeclaringClass().getCanonicalName())
+               .append('.')
+               .append(method.getName())
+               .append('(');
         Type[] paramTypes = method.getGenericParameterTypes();
         for (int i = 0; i < paramTypes.length; i++) {
             if (i > 0) builder.append(", ");
