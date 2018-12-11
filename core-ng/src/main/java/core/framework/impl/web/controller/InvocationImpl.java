@@ -48,12 +48,16 @@ public final class InvocationImpl implements Invocation {
     public Response proceed() throws Exception {
         if (controller.skipInterceptor || currentStack >= interceptors.interceptors.size()) {
             logger.debug("execute controller, controller={}", controller.controllerInfo);
-            return controller.controller.execute(request);
+            Response response = controller.controller.execute(request);
+            if (response == null) throw new Error("controller must not return null response, controller=" + controller.controllerInfo);
+            return response;
         } else {
             Interceptor interceptor = interceptors.interceptors.get(currentStack);
             currentStack++;
             logger.debug("intercept, interceptorClass={}", interceptor.getClass().getCanonicalName());
-            return interceptor.intercept(this);
+            Response response = interceptor.intercept(this);
+            if (response == null) throw new Error("interceptor must not return null response, interceptor=" + interceptor.getClass().getCanonicalName());
+            return response;
         }
     }
 }

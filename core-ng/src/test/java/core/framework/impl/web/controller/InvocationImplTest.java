@@ -9,6 +9,7 @@ import core.framework.web.Response;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -50,6 +51,19 @@ class InvocationImplTest {
         }
     }
 
+    @Test
+    void withNullResponse() {
+        Controller controller = request -> null;
+        Interceptors interceptors = new Interceptors();
+        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), interceptors, mock(Request.class), new WebContextImpl());
+
+        assertThatThrownBy(invocation::proceed).isInstanceOf(Error.class).hasMessageContaining("controller must not return null response");
+
+        interceptors.add(new TestNullResponseInterceptor());
+        invocation = new InvocationImpl(new ControllerHolder(request -> Response.empty(), null, null, null, false), interceptors, mock(Request.class), new WebContextImpl());
+        assertThatThrownBy(invocation::proceed).isInstanceOf(Error.class).hasMessageContaining("interceptor must not return null response");
+    }
+
     static class Stack {
         int currentStack = 0;
     }
@@ -85,9 +99,16 @@ class InvocationImplTest {
         @Override
         public Response intercept(Invocation invocation) throws Exception {
             executed = true;
-            assertEquals(expectedStack, stack.currentStack);
+            assertThat(stack.currentStack).isEqualTo(expectedStack);
             stack.currentStack++;
             return invocation.proceed();
+        }
+    }
+
+    static final class TestNullResponseInterceptor implements Interceptor {
+        @Override
+        public Response intercept(Invocation invocation) {
+            return null;
         }
     }
 }
