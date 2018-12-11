@@ -32,8 +32,7 @@ public class TestModule extends AbstractTestModule {
 
         configureDB();
         configureKafka();
-
-        redis().host("localhost");
+        configureRedis();
 
         log().appendToKafka("localhost:9092");
 
@@ -47,6 +46,12 @@ public class TestModule extends AbstractTestModule {
         configureJob();
 
         configureExecutor();
+    }
+
+    private void configureRedis() {
+        redis().host("localhost");
+
+        redis("redis2").host("localhost");
     }
 
     private void configureCache() {

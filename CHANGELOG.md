@@ -4,6 +4,7 @@
 * app: support to use APP_NAME or -Dcore.appName to override appName, to support deploy same image/app with different name (multi tenancy)
 * elasticsearch: added ElasticSearchMigration to support migration
 * kafka: include kafka lib into framework, no need to add runtimeOnly in application (for simplifying, and our app is mostly service on cloud) 
+* redis: supports to connect to multiple redis dbs from one app
 
 ### 6.10.3 (11/24/2018 - 11/29/2018)
 * search: update es to 6.5.1

@@ -27,7 +27,10 @@ public class MongoConfig extends Config {
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        mongo = createMongo();
+
+        mongo = new MongoImpl();
+        this.context.startupHook.add(mongo::initialize);
+        this.context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> mongo.close());
         context.beanFactory.bind(Mongo.class, name, mongo);
     }
 
@@ -36,13 +39,6 @@ public class MongoConfig extends Config {
         if (uri == null) throw new Error("mongo uri must be configured, name=" + name);
         if (!entityAdded)
             throw new Error("mongo is configured but no collection/view added, please remove unnecessary config, name=" + name);
-    }
-
-    private MongoImpl createMongo() {
-        var mongo = new MongoImpl();
-        context.startupHook.add(mongo::initialize);
-        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> mongo.close());
-        return mongo;
     }
 
     public void uri(String uri) {

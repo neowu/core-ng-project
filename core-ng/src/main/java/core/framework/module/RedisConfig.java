@@ -15,22 +15,24 @@ import java.time.Duration;
 public class RedisConfig extends Config {
     private ModuleContext context;
     private Redis redis;
+    private String name;
     private String host;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
+        this.name = name;
         redis = createRedis();
-        context.beanFactory.bind(Redis.class, null, redis);
+        context.beanFactory.bind(Redis.class, name, redis);
     }
 
     @Override
     protected void validate() {
-        if (host == null) throw new Error("redis host must be configured");
+        if (host == null) throw new Error("redis host must be configured, name=" + name);
     }
 
     Redis createRedis() {
-        var redis = new RedisImpl("redis");
+        var redis = new RedisImpl("redis" + (name == null ? "" : "-" + name));
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.stat.metrics.add(new PoolMetrics(redis.pool));

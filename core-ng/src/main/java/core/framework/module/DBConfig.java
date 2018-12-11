@@ -33,23 +33,19 @@ public class DBConfig extends Config {
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
         this.name = name;
-        this.database = createDatabase();
-    }
 
-    @Override
-    protected void validate() {
-        if (url == null) throw new Error(format("db url must be configured, name={}", name));
-        if (!entityAdded)
-            throw new Error(format("db is configured but no repository/view added, please remove unnecessary config, name={}", name));
-    }
-
-    private DatabaseImpl createDatabase() {
-        var database = new DatabaseImpl("db" + (name == null ? "" : "-" + name));
+        database = new DatabaseImpl("db" + (name == null ? "" : "-" + name));
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> database.close());
         context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(10));
         context.stat.metrics.add(new PoolMetrics(database.pool));
         context.beanFactory.bind(Database.class, name, database);
-        return database;
+    }
+
+    @Override
+    protected void validate() {
+        if (url == null) throw new Error("db url must be configured, name=" + name);
+        if (!entityAdded)
+            throw new Error("db is configured but no repository/view added, please remove unnecessary config, name=" + name);
     }
 
     public void url(String url) {

@@ -118,6 +118,10 @@ public abstract class Module {
         return context.config(RedisConfig.class, null);
     }
 
+    public RedisConfig redis(String name) {
+        return context.config(RedisConfig.class, name);
+    }
+
     public KafkaConfig kafka() {
         return kafka(null);
     }
