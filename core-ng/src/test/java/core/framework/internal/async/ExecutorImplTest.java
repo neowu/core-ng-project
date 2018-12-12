@@ -6,27 +6,27 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
  */
 class ExecutorImplTest {
     private LogManager logManager;
-    private ExecutorService executorService;
     private ExecutorImpl executor;
 
     @BeforeEach
     void createExecutorImpl() {
         logManager = new LogManager();
-        executorService = Executors.newSingleThreadExecutor();
-        executor = new ExecutorImpl(executorService, logManager, "test");
+        executor = new ExecutorImpl(1, "test", logManager);
 
         ActionLog actionLog = logManager.begin("begin");
         actionLog.action("parentAction");
@@ -37,7 +37,7 @@ class ExecutorImplTest {
     @AfterEach
     void cleanup() {
         logManager.end("end");
-        executorService.shutdown();
+        executor.shutdown();
     }
 
     @Test
@@ -67,5 +67,18 @@ class ExecutorImplTest {
     void taskAction() {
         assertThat(executor.taskAction("task", "parentAction")).isEqualTo("parentAction:task");
         assertThat(executor.taskAction("task", "parentAction:task")).isEqualTo("parentAction:task");
+    }
+
+    @Test
+    void submitAfterShutdown() {
+        executor.shutdown();
+        Future<Object> future = executor.submit("task", () -> null);
+        assertThat(future).isNotDone().isCancelled();
+
+        assertThatThrownBy(future::get).isInstanceOf(CancellationException.class);
+        assertThatThrownBy(() -> future.get(100, TimeUnit.MILLISECONDS)).isInstanceOf(CancellationException.class);
+
+        executor.submit("task", () -> {
+        }, Duration.ZERO);
     }
 }

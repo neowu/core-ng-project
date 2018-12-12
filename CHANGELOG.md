@@ -5,6 +5,7 @@
 * elasticsearch: added ElasticSearchMigration to support migration
 * kafka: include kafka lib into framework, no need to add runtimeOnly in application (for simplifying, and our app is mostly service on cloud) 
 * redis: supports to connect to multiple redis dbs from one app
+* executor: make task rejection as warning during shutdown
 
 ### 6.10.3 (11/24/2018 - 11/29/2018)
 * search: update es to 6.5.1

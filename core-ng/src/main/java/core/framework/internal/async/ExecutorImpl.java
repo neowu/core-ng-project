@@ -11,8 +11,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -26,10 +26,10 @@ public final class ExecutorImpl implements Executor {
     private final String name;
     private volatile ScheduledExecutorService scheduler;
 
-    public ExecutorImpl(ExecutorService executor, LogManager logManager, String name) {
-        this.executor = executor;
-        this.logManager = logManager;
+    public ExecutorImpl(int poolSize, String name, LogManager logManager) {
         this.name = "executor" + (name == null ? "" : "-" + name);
+        this.executor = ThreadPools.cachedThreadPool(poolSize, this.name + "-");
+        this.logManager = logManager;
     }
 
     public void shutdown() {
@@ -37,10 +37,10 @@ public final class ExecutorImpl implements Executor {
         synchronized (this) {
             if (scheduler != null) {
                 List<Runnable> delayedTasks = scheduler.shutdownNow(); // drop all delayed tasks
-                logger.info("stop {} delayed tasks, cancelled={}", name, delayedTasks.size());
+                logger.info("cancelled delayed tasks, name={}, cancelled={}", name, delayedTasks.size());
             }
+            executor.shutdown();
         }
-        executor.shutdown();
     }
 
     public void awaitTermination(long timeoutInMs) throws InterruptedException {
@@ -52,30 +52,44 @@ public final class ExecutorImpl implements Executor {
     @Override
     public <T> Future<T> submit(String action, Callable<T> task) {
         Callable<T> execution = execution(action, task);
-        return executor.submit(execution);
+        return submitTask(action, execution);
     }
 
     @Override
     public void submit(String action, Task task, Duration delay) {
-        ScheduledExecutorService scheduler = scheduler();
+        synchronized (this) {
+            if (executor.isShutdown()) {
+                logger.warn("reject task due to server is shutting down, action={}", action);    // with current executor impl, rejection only happens when shutdown
+                return;
+            }
+            if (scheduler == null) {
+                scheduler = ThreadPools.singleThreadScheduler(name + "-scheduler-");
+            }
+        }
         // construct execution outside scheduler thread, to obtain parent action log
         Callable<Void> execution = execution(action, () -> {
             task.execute();
             return null;
         });
-        scheduler.schedule(() -> {
-            try {
-                executor.submit(execution);
-            } catch (Throwable e) {
-                logger.error(e.getMessage(), e);    // in scheduler.schedule exception will be silenced swallowed, here is to print if any
-            }
-        }, delay.toMillis(), TimeUnit.MILLISECONDS);
+        try {
+            scheduler.schedule(() -> {
+                try {
+                    submitTask(action, execution);
+                } catch (Throwable e) {
+                    logger.error(e.getMessage(), e);    // in scheduler.schedule exception will be swallowed, here is to log if any
+                }
+            }, delay.toMillis(), TimeUnit.MILLISECONDS);
+        } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
+            logger.warn("reject task due to server is shutting down, action={}", action, e);
+        }
     }
 
-    private ScheduledExecutorService scheduler() {
-        synchronized (this) {
-            if (scheduler == null) scheduler = Executors.newSingleThreadScheduledExecutor();
-            return scheduler;
+    private <T> Future<T> submitTask(String action, Callable<T> execution) {
+        try {
+            return executor.submit(execution);
+        } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
+            logger.warn("reject task due to server is shutting down, action={}", action, e);
+            return new CancelledFuture<>();
         }
     }
 
