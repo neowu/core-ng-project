@@ -22,7 +22,7 @@ public class SessionConfig extends Config {
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
-        context.logManager.maskFields(context.httpServer.siteManager.sessionManager.sessionId.name);
+        cookie("SessionId", null);
     }
 
     public void timeout(Duration timeout) {
@@ -34,11 +34,16 @@ public class SessionConfig extends Config {
         context.logManager.maskFields(name);
     }
 
+    public void header(String name) {
+        context.httpServer.siteManager.sessionManager.header(name);
+        context.logManager.maskFields(name);
+    }
+
     public void local() {
         logger.info("create local session provider");
         LocalSessionStore sessionStore = new LocalSessionStore();
         context.backgroundTask().scheduleWithFixedDelay(sessionStore::cleanup, Duration.ofMinutes(30));
-        context.httpServer.siteManager.sessionManager.sessionStore(sessionStore);
+        context.httpServer.siteManager.sessionManager.store(sessionStore);
     }
 
     public void redis(String host) {
@@ -50,6 +55,6 @@ public class SessionConfig extends Config {
         context.stat.metrics.add(new PoolMetrics(redis.pool));
 
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
-        context.httpServer.siteManager.sessionManager.sessionStore(new RedisSessionStore(redis));
+        context.httpServer.siteManager.sessionManager.store(new RedisSessionStore(redis));
     }
 }

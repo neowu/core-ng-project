@@ -1,11 +1,12 @@
 ## Change log
-### 6.10.4.2 (12/5/2018 - )  (Test version, still ongoing)
+### 6.10.5 (12/5/2018 - 12/12/2018)
 * httpclient: fix: close response if got 503 in retry
 * app: support to use APP_NAME or -Dcore.appName to override appName, to support deploy same image/app with different name (multi tenancy)
 * elasticsearch: added ElasticSearchMigration to support migration
 * kafka: include kafka lib into framework, no need to add runtimeOnly in application (for simplifying, and our app is mostly service on cloud) 
 * redis: supports to connect to multiple redis dbs from one app
 * executor: make task rejection as warning during shutdown
+* session: support to use Header to pass sessionId, for mobile-api
 
 ### 6.10.3 (11/24/2018 - 11/29/2018)
 * search: update es to 6.5.1
