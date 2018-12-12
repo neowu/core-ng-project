@@ -71,14 +71,15 @@ public final class ExecutorImpl implements Executor {
             task.execute();
             return null;
         });
+        Runnable delayedTask = () -> {
+            try {
+                submitTask(action, execution);
+            } catch (Throwable e) {
+                logger.error(e.getMessage(), e);    // in scheduler.schedule exception will be swallowed, here is to log if any
+            }
+        };
         try {
-            scheduler.schedule(() -> {
-                try {
-                    submitTask(action, execution);
-                } catch (Throwable e) {
-                    logger.error(e.getMessage(), e);    // in scheduler.schedule exception will be swallowed, here is to log if any
-                }
-            }, delay.toMillis(), TimeUnit.MILLISECONDS);
+            scheduler.schedule(delayedTask, delay.toMillis(), TimeUnit.MILLISECONDS);
         } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
             logger.warn("reject task due to server is shutting down, action={}", action, e);
         }
