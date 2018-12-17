@@ -1,6 +1,9 @@
 ## Change log
+### 6.10.6 (12/13/2018 - )
+* httpclient: change HTTPResponse status from enum to int, as external server may uses arbitrary or extended values 
+
 ### 6.10.5 (12/5/2018 - 12/12/2018)
-* httpclient: fix: close response if got 503 in retry
+* httpclient: close response if got 503 in retry
 * app: support to use APP_NAME or -Dcore.appName to override appName, to support deploy same image/app with different name (multi tenancy)
 * elasticsearch: added ElasticSearchMigration to support migration
 * kafka: include kafka lib into framework, no need to add runtimeOnly in application (for simplifying, and our app is mostly service on cloud) 

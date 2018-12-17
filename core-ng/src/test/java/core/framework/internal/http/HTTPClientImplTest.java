@@ -1,6 +1,5 @@
 package core.framework.internal.http;
 
-import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPHeaders;
@@ -34,17 +33,6 @@ class HTTPClientImplTest {
     }
 
     @Test
-    void parseHTTPStatus() {
-        assertThat(HTTPClientImpl.parseHTTPStatus(200)).isEqualTo(HTTPStatus.OK);
-    }
-
-    @Test
-    void parseUnsupportedHTTPStatus() {
-        assertThatThrownBy(() -> HTTPClientImpl.parseHTTPStatus(525))
-                .isInstanceOf(HTTPClientException.class);
-    }
-
-    @Test
     void httpRequest() {
         var request = new HTTPRequest(HTTPMethod.POST, "http://localhost/uri");
         request.params.put("query", "value");
@@ -75,7 +63,7 @@ class HTTPClientImplTest {
                                                       .build();
 
         HTTPResponse response = httpClient.response(httpResponse);
-        assertThat(response.status).isEqualTo(HTTPStatus.OK);
+        assertThat(response.statusCode).isEqualTo(200);
         assertThat(response.contentType.mediaType).isEqualTo(ContentType.TEXT_HTML.mediaType);
         assertThat(response.headers).containsEntry(HTTPHeaders.CONTENT_TYPE, "text/html");
         assertThat(response.text()).isEqualTo("{}");

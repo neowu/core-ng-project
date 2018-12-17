@@ -12,6 +12,7 @@ import core.framework.impl.web.HTTPHandler;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.log.Severity;
+import core.framework.util.Maps;
 import core.framework.web.service.RemoteServiceException;
 import core.framework.web.service.WebServiceClientInterceptor;
 import org.slf4j.Logger;
@@ -27,6 +28,22 @@ import static core.framework.util.Strings.format;
  */
 public class WebServiceClient {
     public static final String USER_AGENT = "APIClient";
+    private static final Map<Integer, HTTPStatus> HTTP_STATUSES;
+
+    static {
+        HTTPStatus[] values = HTTPStatus.values();
+        HTTP_STATUSES = Maps.newHashMapWithExpectedSize(values.length);
+        for (HTTPStatus status : values) {
+            HTTP_STATUSES.put(status.code, status);
+        }
+    }
+
+    static HTTPStatus parseHTTPStatus(int statusCode) {
+        HTTPStatus status = HTTP_STATUSES.get(statusCode);
+        if (status == null) throw new Error("unsupported http status code, code=" + statusCode);
+        return status;
+    }
+
     private final Logger logger = LoggerFactory.getLogger(WebServiceClient.class);
     private final String serviceURL;
     private final HTTPClient httpClient;
@@ -91,16 +108,19 @@ public class WebServiceClient {
     }
 
     void validateResponse(HTTPResponse response) {
-        HTTPStatus status = response.status;
-        if (status.code >= 200 && status.code < 300) return;
+        int statusCode = response.statusCode;
+        if (statusCode >= 200 && statusCode < 300) return;
+        HTTPStatus status = parseHTTPStatus(statusCode);
+        // handle empty body, e.g. 503 during deployment
+        if (response.body.length == 0) throw new RemoteServiceException(format("failed to call remote service, statusCode={}", statusCode), Severity.ERROR, "REMOTE_SERVICE_ERROR", status);
         try {
             ErrorResponse error = (ErrorResponse) responseBeanMapper.fromJSON(ErrorResponse.class, response.body);
-            logger.debug("failed to call remote service, status={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", status, error.id, error.severity, error.errorCode, error.stackTrace);
-            throw new RemoteServiceException(format("failed to call remote service, status={}, error={}", status, error.message), parseSeverity(error.severity), error.errorCode, status);
+            logger.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
+            throw new RemoteServiceException(format("failed to call remote service, statusCode={}, error={}", statusCode, error.message), parseSeverity(error.severity), error.errorCode, status);
         } catch (RemoteServiceException e) {
             throw e;
         } catch (Throwable e) {
-            throw new RemoteServiceException(format("internal communication failed, status={}, responseText={}", status.code, response.text()), Severity.ERROR, "REMOTE_SERVICE_ERROR", status, e);
+            throw new RemoteServiceException(format("internal communication failed, statusCode={}, responseText={}", statusCode, response.text()), Severity.ERROR, "REMOTE_SERVICE_ERROR", status, e);
         }
     }
 

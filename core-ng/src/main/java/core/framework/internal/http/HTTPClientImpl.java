@@ -1,6 +1,5 @@
 package core.framework.internal.http;
 
-import core.framework.api.http.HTTPStatus;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPHeaders;
@@ -10,7 +9,6 @@ import core.framework.http.HTTPResponse;
 import core.framework.impl.log.filter.MapLogParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
-import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -18,7 +16,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,22 +30,6 @@ import static java.lang.String.CASE_INSENSITIVE_ORDER;
  * @author neo
  */
 public final class HTTPClientImpl implements HTTPClient {
-    private static final Map<Integer, HTTPStatus> HTTP_STATUSES;
-
-    static {
-        HTTPStatus[] values = HTTPStatus.values();
-        HTTP_STATUSES = Maps.newHashMapWithExpectedSize(values.length);
-        for (HTTPStatus status : values) {
-            HTTP_STATUSES.put(status.code, status);
-        }
-    }
-
-    static HTTPStatus parseHTTPStatus(int statusCode) {
-        HTTPStatus status = HTTP_STATUSES.get(statusCode);
-        if (status == null) throw new HTTPClientException("unsupported http status code, code=" + statusCode, "UNKNOWN_HTTP_STATUS_CODE");
-        return status;
-    }
-
     private final Logger logger = LoggerFactory.getLogger(HTTPClientImpl.class);
     private final String userAgent;
     private final long slowOperationThresholdInNanos;
@@ -89,11 +70,9 @@ public final class HTTPClientImpl implements HTTPClient {
         }
         logger.debug("[response] headers={}", new MapLogParam(headers));
 
-        byte[] body = null;
-        ResponseBody responseBody = httpResponse.body();
-        if (responseBody != null) body = responseBody.bytes();
+        byte[] body = httpResponse.body().bytes();  // according to ok http, call.execute always return non-null body
 
-        var response = new HTTPResponse(parseHTTPStatus(statusCode), headers, body);
+        var response = new HTTPResponse(statusCode, headers, body);
         logger.debug("[response] body={}", BodyLogParam.param(body, response.contentType));
         return response;
     }

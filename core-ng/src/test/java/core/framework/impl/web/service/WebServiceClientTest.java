@@ -59,7 +59,7 @@ class WebServiceClientTest {
 
     @Test
     void validateResponse() {
-        webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.OK, Map.of(), null));
+        webServiceClient.validateResponse(new HTTPResponse(200, Map.of(), null));
     }
 
     @Test
@@ -69,14 +69,38 @@ class WebServiceClientTest {
         response.errorCode = "NOT_FOUND";
         response.message = "not found";
 
-        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(HTTPStatus.NOT_FOUND, Map.of(), Strings.bytes(JSON.toJSON(response)))))
+        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(404, Map.of(), Strings.bytes(JSON.toJSON(response)))))
                 .isInstanceOf(RemoteServiceException.class)
                 .satisfies(throwable -> {
                     RemoteServiceException exception = (RemoteServiceException) throwable;
                     assertThat(exception.severity()).isEqualTo(Severity.WARN);
                     assertThat(exception.errorCode()).isEqualTo(response.errorCode);
-                    assertThat(exception.getMessage()).isEqualTo("failed to call remote service, status=NOT_FOUND, error=not found");
+                    assertThat(exception.getMessage()).isEqualTo("failed to call remote service, statusCode=404, error=not found");
                     assertThat(exception.status).isEqualTo(HTTPStatus.NOT_FOUND);
                 });
+    }
+
+    @Test
+    void validateResponseWithEmtpyBody() {
+        assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(503, Map.of(), new byte[0])))
+                .isInstanceOf(RemoteServiceException.class)
+                .satisfies(throwable -> {
+                    RemoteServiceException exception = (RemoteServiceException) throwable;
+                    assertThat(exception.severity()).isEqualTo(Severity.ERROR);
+                    assertThat(exception.errorCode()).isEqualTo("REMOTE_SERVICE_ERROR");
+                    assertThat(exception.getMessage()).isEqualTo("failed to call remote service, statusCode=503");
+                    assertThat(exception.status).isEqualTo(HTTPStatus.SERVICE_UNAVAILABLE);
+                });
+    }
+
+    @Test
+    void parseHTTPStatus() {
+        assertThat(WebServiceClient.parseHTTPStatus(200)).isEqualTo(HTTPStatus.OK);
+    }
+
+    @Test
+    void parseUnsupportedHTTPStatus() {
+        assertThatThrownBy(() -> WebServiceClient.parseHTTPStatus(525))
+                .isInstanceOf(Error.class);
     }
 }
