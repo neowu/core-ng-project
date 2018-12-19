@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -40,7 +41,7 @@ public class ModuleContext {
     public final HTTPServer httpServer;
     public final Stat stat = new Stat();
     protected final Map<String, Config> configs = Maps.newHashMap();
-    public Set<String> visitedProperties = new HashSet<>();
+    Set<String> visitedProperties = new HashSet<>();
     private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext() {
@@ -109,6 +110,11 @@ public class ModuleContext {
         visitedProperties = null;   // free object not used anymore
 
         configs.values().forEach(Config::validate);
+    }
+
+    public Optional<String> property(String key) {
+        visitedProperties.add(key);
+        return propertyManager.property(key);
     }
 
     protected <T> Class<T> configClass(Class<T> configClass) {

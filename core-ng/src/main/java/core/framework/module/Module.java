@@ -67,8 +67,7 @@ public abstract class Module {
     }
 
     public Optional<String> property(String key) {
-        context.visitedProperties.add(key);
-        return context.propertyManager.property(key);
+        return context.property(key);
     }
 
     public String requiredProperty(String key) {
