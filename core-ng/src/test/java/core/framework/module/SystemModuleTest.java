@@ -1,12 +1,10 @@
 package core.framework.module;
 
 import core.framework.impl.module.ModuleContext;
-import core.framework.util.Properties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -55,16 +53,5 @@ class SystemModuleTest {
         systemModule.context.propertyManager.properties.set("sys.security.csp", "default-src 'self';");
         systemModule.configureSite();
         assertThat(systemModule.site().security().interceptor.contentSecurityPolicy).isEqualTo("default-src 'self';");
-    }
-
-    @Test
-    void loadProperties() {
-        var properties = new Properties();
-        properties.set("sys.notAllowedKey", "value");
-
-        assertThatThrownBy(() -> systemModule.loadProperties(properties))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("found unknown")
-                .hasMessageContaining("allowedKeys=");
     }
 }

@@ -1,7 +1,9 @@
 ## Change log
-### 6.10.6 (12/13/2018 - )
+### 6.10.6 (12/13/2018 - 12/19/2018)
 * httpclient: change HTTPResponse status from enum to int, as external server may uses arbitrary or extended values 
 * search: update es to 6.5.3
+* module: report error if one property is not used, and encourage static config style (avoid conditional property key reading)
+* httpclient: make HTTPRequest.uri modifiable, allow ws client interceptor change uri dynamically
 
 ### 6.10.5 (12/5/2018 - 12/12/2018)
 * httpclient: close response if got 503 in retry

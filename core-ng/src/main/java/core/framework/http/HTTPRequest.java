@@ -13,11 +13,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author neo
  */
 public final class HTTPRequest {
-    public final String uri;
     public final HTTPMethod method;
     public final Map<String, String> params = Maps.newLinkedHashMap();
     public final Map<String, String> headers = Maps.newLinkedHashMap();    // make headers/params order deterministic
-
+    public String uri;
     public byte[] body;
     public ContentType contentType;
 
