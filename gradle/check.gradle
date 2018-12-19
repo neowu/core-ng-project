@@ -33,7 +33,7 @@ subprojects {
     spotbugs {
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '3.1.9'
+        toolVersion = '3.1.10'
     }
 
     dependencies {
