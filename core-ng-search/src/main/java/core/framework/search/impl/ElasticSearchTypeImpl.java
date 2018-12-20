@@ -85,7 +85,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         validate(request);
         long esTook = 0;
         String index = request.index == null ? this.index : request.index;
-        long hits = 0;
+        int hits = 0;
         try {
             var searchRequest = searchRequest(index);
             if (request.type != null) searchRequest.searchType(request.type);
@@ -104,7 +104,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             throw new UncheckedIOException(e);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("elasticsearch", elapsed, (int) hits, 0);
+            ActionLogContext.track("elasticsearch", elapsed, hits, 0);
             logger.debug("search, hits={}, esTook={}, elapsed={}", hits, esTook, elapsed);
             checkSlowOperation(elapsed);
         }
