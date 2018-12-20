@@ -94,11 +94,11 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             request.sorts.forEach(source::sort);
             if (request.skip != null) source.from(request.skip);
             if (request.limit != null) source.size(request.limit);
-            logger.debug("search, index={}, request={}", index, searchRequest);
-            org.elasticsearch.action.search.SearchResponse response = elasticSearch.client().search(searchRequest, RequestOptions.DEFAULT);
-            hits = response.getHits().getTotalHits();
+
+            org.elasticsearch.action.search.SearchResponse response = search(searchRequest);
             esTook = response.getTook().nanos();
-            if (response.getFailedShards() > 0) logger.warn("some shard failed, response={}", response);
+            hits = response.getHits().getHits().length;
+
             return searchResponse(response);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -108,6 +108,13 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             logger.debug("search, hits={}, esTook={}, elapsed={}", hits, esTook, elapsed);
             checkSlowOperation(elapsed);
         }
+    }
+
+    private org.elasticsearch.action.search.SearchResponse search(org.elasticsearch.action.search.SearchRequest searchRequest) throws IOException {
+        logger.debug("search, request={}", searchRequest);
+        org.elasticsearch.action.search.SearchResponse response = elasticSearch.client().search(searchRequest, RequestOptions.DEFAULT);
+        if (response.getFailedShards() > 0) logger.warn("some shard failed, response={}", response);
+        return response;
     }
 
     private SearchResponse<T> searchResponse(org.elasticsearch.action.search.SearchResponse response) {
@@ -137,11 +144,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
             var searchRequest = searchRequest(index);
             searchRequest.source().fetchSource(false).suggest(suggest);
-            logger.debug("complete, index={}, request={}", index, searchRequest);
 
-            org.elasticsearch.action.search.SearchResponse response = elasticSearch.client().search(searchRequest, RequestOptions.DEFAULT);
+            org.elasticsearch.action.search.SearchResponse response = search(searchRequest);
             esTook = response.getTook().nanos();
-            if (response.getFailedShards() > 0) logger.warn("some shard failed, response={}", response);
 
             List<String> suggestions = response.getSuggest().filter(CompletionSuggestion.class).stream()
                                                .map(CompletionSuggestion::getOptions).flatMap(Collection::stream).map(option -> option.getText().string())
