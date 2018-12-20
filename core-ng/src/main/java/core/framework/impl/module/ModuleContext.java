@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -104,8 +105,9 @@ public class ModuleContext {
 
     public void validate() {
         Set<String> keys = propertyManager.properties.keys();
-        for (String key : keys) {
-            if (!visitedProperties.contains(key)) throw new Error("found not used property, please remove unnecessary config, key=" + key);
+        Set<String> notUsedKeys = keys.stream().filter(key -> !visitedProperties.contains(key)).collect(Collectors.toSet());
+        if (!notUsedKeys.isEmpty()) {
+            throw new Error("found not used properties, please remove unnecessary config, keys=" + notUsedKeys);
         }
         visitedProperties = null;   // free object not used anymore
 

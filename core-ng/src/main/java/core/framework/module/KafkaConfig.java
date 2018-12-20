@@ -110,6 +110,13 @@ public class KafkaConfig extends Config {
         return listener;
     }
 
+    // by default listener use AppName as consumer group
+    // e.g. use Network.LOCAL_HOST_NAME to make every pod receives messages from topic, (local cache invalidation, web socket notification)
+    // use "${service-name}-${label}" to allow same service to be deployed for mutlitenancy
+    public void groupId(String groupId) {
+        listener().groupId = groupId;
+    }
+
     public void poolSize(int poolSize) {
         listener().poolSize = poolSize;
     }

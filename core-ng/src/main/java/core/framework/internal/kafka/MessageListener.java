@@ -43,6 +43,7 @@ public class MessageListener {
     public int maxPollBytes = 3 * 1024 * 1024;  // get 3M bytes message at max
     public int minPollBytes = 1;                // default kafka setting
     public Duration minPollMaxWaitTime = Duration.ofMillis(500);
+    public String groupId = LogManager.APP_NAME;
 
     private MessageListenerThread[] threads;
 
@@ -64,7 +65,7 @@ public class MessageListener {
         for (var thread : threads) {
             thread.start();
         }
-        logger.info("kafka listener started, uri={}, topics={}, name={}", uri, topics, name);
+        logger.info("kafka listener started, uri={}, topics={}, name={}, groupId={}", uri, topics, name, groupId);
     }
 
     private MessageListenerThread[] createListenerThreads() {
@@ -112,7 +113,7 @@ public class MessageListener {
     Consumer<byte[], byte[]> consumer() {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);   // immutable map requires value must not be null
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, LogManager.APP_NAME);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         config.put(ConsumerConfig.CLIENT_ID_CONFIG, Network.LOCAL_HOST_NAME + "-" + CONSUMER_CLIENT_ID_SEQUENCE.getAndIncrement());      // will show in monitor metrics
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, ASCII.toLowerCase(OffsetResetStrategy.LATEST.name()));      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")

@@ -23,7 +23,7 @@ class ModuleContextTest {
 
         assertThatThrownBy(() -> moduleContext.validate())
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("found not used property")
-                .hasMessageContaining("key=app.notUsedKey");
+                .hasMessageContaining("found not used properties")
+                .hasMessageContaining("keys=[app.notUsedKey]");
     }
 }

@@ -85,6 +85,7 @@ public class TestModule extends AbstractTestModule {
         kafka().uri("kafka://localhost:9092");
         kafka().maxProcessTime(Duration.ofMinutes(30));
         kafka().poolSize(1);
+        kafka().groupId("test");
         kafka().publish("topic", TestMessage.class);
         kafka().subscribe("topic1", TestMessage.class, (List<Message<TestMessage>> messages) -> {
         });

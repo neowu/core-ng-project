@@ -10,7 +10,6 @@
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
 
 * ws: provide way to handler json command with validation?
-* kafka: unique groupId to listen all messages for ws
 * type literal: support better cast for generic, JSON.fromJSON() / bind?
 * change gradle to kotlin?
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?

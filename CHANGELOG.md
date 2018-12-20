@@ -1,4 +1,8 @@
 ## Change log
+### 6.10.7 (12/19/2018 - )
+* module: report all not used property keys
+* kafka: support to specify consumerGroupId, for more flexible consumer structure setup
+
 ### 6.10.6 (12/13/2018 - 12/19/2018)
 * httpclient: change HTTPResponse status from enum to int, as external server may uses arbitrary or extended values 
 * search: update es to 6.5.3
