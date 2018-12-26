@@ -8,6 +8,8 @@ buildscript {
 }
 
 subprojects {
+    if (!plugins.hasPlugin(JavaPlugin)) return      // only apply to project has java plugin
+
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
     apply plugin: com.github.spotbugs.SpotBugsPlugin

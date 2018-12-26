@@ -3,6 +3,8 @@ import java.time.Instant
 defaultTasks 'clean', 'build'
 
 subprojects {
+    if (!childProjects.isEmpty()) return    // ignore parent project
+
     apply plugin: 'java'
     apply plugin: 'maven'
 
@@ -20,7 +22,7 @@ subprojects {
         mavenLocal()
     }
 
-    buildDir = "${rootDir}/build/${name}"
+    buildDir = "${rootDir}/build/${rootDir.relativePath(projectDir)}"
 
     test {
         useJUnitPlatform()
