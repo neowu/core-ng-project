@@ -14,7 +14,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +52,7 @@ public final class HTTPClientBuilder {
             if (trustAll) {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
                 var trustManager = new DefaultTrustManager();
-                sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
+                sslContext.init(null, new TrustManager[]{trustManager}, null);
                 builder.hostnameVerifier((hostname, sslSession) -> true)
                        .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
             }
