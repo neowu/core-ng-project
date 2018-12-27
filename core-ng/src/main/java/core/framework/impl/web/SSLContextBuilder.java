@@ -65,7 +65,7 @@ public class SSLContextBuilder {
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(keyStore, new char[0]);
 
-            SSLContext context = SSLContext.getInstance("TLSv1.3");
+            SSLContext context = SSLContext.getInstance("TLS");
             context.init(keyManagerFactory.getKeyManagers(), null, null);
             return context;
         } catch (KeyStoreException | IOException | CertificateException | UnrecoverableKeyException | NoSuchAlgorithmException | KeyManagementException | InvalidKeySpecException e) {
