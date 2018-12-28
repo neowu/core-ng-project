@@ -11,6 +11,7 @@ import io.undertow.server.handlers.encoding.EncodingHandler;
 import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnio.Options;
 
 /**
  * @author neo
@@ -43,8 +44,10 @@ public class HTTPServer {
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
 
             builder.setHandler(handler())
+                   .setSocketOption(Options.KEEP_ALIVE, Boolean.TRUE)
+                   .setSocketOption(Options.BACKLOG, 4096)
                    .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
-                   .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.FALSE)
+                   .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
                    // since we don't use Expires or Last- Modified header, so it's not necessary to set Date header, for cache, prefer cache-control/max-age
                    // refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.18.1
