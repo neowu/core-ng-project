@@ -11,6 +11,7 @@ import io.undertow.server.handlers.encoding.EncodingHandler;
 import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnio.Options;
 
 /**
  * @author neo
@@ -43,6 +44,7 @@ public class HTTPServer {
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
 
             builder.setHandler(handler())
+                   .setSocketOption(Options.KEEP_ALIVE, Boolean.TRUE)
                    .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
                    .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)
                    .setServerOption(UndertowOptions.ENABLE_RFC6265_COOKIE_VALIDATION, Boolean.TRUE)
@@ -54,6 +56,7 @@ public class HTTPServer {
                    // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
                    // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
                    .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620 * 1000)     // 620s
+                   .setServerOption(UndertowOptions.IDLE_TIMEOUT, 620 * 1000)
                    .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10 * 1000)        // 10s
                    .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, 10L * 1024 * 1024);    // max post body is 10M
 

@@ -1,5 +1,5 @@
 ## Change log
-### 6.10.7 (12/19/2018 - )
+### 6.10.7-b0 (12/19/2018 - ) (this is experiment build)
 * module: report all not used property keys
 * kafka: support to specify consumerGroupId, for more flexible consumer structure setup
 * search: update es to 6.5.4
