@@ -12,6 +12,7 @@ import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Options;
+import org.xnio.Sequence;
 
 /**
  * @author neo
@@ -44,7 +45,9 @@ public class HTTPServer {
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
 
             builder.setHandler(handler())
+                   .setSocketOption(Options.SSL_ENABLED_PROTOCOLS, Sequence.of("TLSv1.2"))
                    .setSocketOption(Options.KEEP_ALIVE, Boolean.TRUE)
+                   // set tcp back log larger, also requires to update kernel, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
                    .setSocketOption(Options.BACKLOG, 4096)
                    .setServerOption(UndertowOptions.DECODE_URL, Boolean.FALSE)
                    .setServerOption(UndertowOptions.ENABLE_HTTP2, Boolean.TRUE)

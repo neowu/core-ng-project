@@ -1,8 +1,9 @@
 ## Change log
-### 6.10.7-b2 (12/19/2018 - ) (this is experiment build)
+### 6.10.7 (12/19/2018 - )
 * module: report all not used property keys
 * kafka: support to specify consumerGroupId, for more flexible consumer structure setup
 * search: update es to 6.5.4
+* http: fallback to TLSv1.2 for HTTPS, TLSv1.3 causes various of issues (will check whether openjdk 11.0.2 or 12 improves)
 
 ### 6.10.6 (12/13/2018 - 12/19/2018)
 * httpclient: change HTTPResponse status from enum to int, as external server may uses arbitrary or extended values 
