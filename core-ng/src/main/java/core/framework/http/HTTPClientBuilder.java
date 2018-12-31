@@ -4,6 +4,7 @@ import core.framework.internal.http.CookieManager;
 import core.framework.internal.http.DefaultTrustManager;
 import core.framework.internal.http.HTTPClientImpl;
 import core.framework.internal.http.RetryInterceptor;
+import core.framework.internal.http.ServiceUnavailableInterceptor;
 import core.framework.util.StopWatch;
 import okhttp3.ConnectionPool;
 import okhttp3.ConnectionSpec;
@@ -59,8 +60,10 @@ public final class HTTPClientBuilder {
                 builder.hostnameVerifier((hostname, sslSession) -> true)
                        .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
             }
-
-            if (maxRetries != null) builder.addInterceptor(new RetryInterceptor(maxRetries));
+            if (maxRetries != null) {
+                builder.addNetworkInterceptor(new ServiceUnavailableInterceptor());
+                builder.addInterceptor(new RetryInterceptor(maxRetries));
+            }
             if (enableCookie) builder.cookieJar(new CookieManager());
 
             return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold);

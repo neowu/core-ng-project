@@ -48,7 +48,7 @@ public final class HTTPClientImpl implements HTTPClient {
         try (Response httpResponse = client.newCall(httpRequest).execute()) {
             return response(httpResponse);
         } catch (IOException e) {
-            throw new HTTPClientException("http communication failed, uri=" + request.uri, "HTTP_COMMUNICATION_FAILED", e);
+            throw new HTTPClientException("http request failed, uri=" + request.uri, "HTTP_REQUEST_FAILED", e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("http", elapsed);

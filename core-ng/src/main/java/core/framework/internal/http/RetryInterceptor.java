@@ -34,7 +34,7 @@ public class RetryInterceptor implements Interceptor {
             try {
                 Response response = chain.proceed(request);
                 if (shouldRetry(attempts, response.code())) {
-                    logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "service unavailable, retry soon, uri={}", request.url());
+                    logger.warn(Markers.errorCode("HTTP_REQUEST_FAILED"), "service unavailable, retry soon, uri={}", request.url());
                     closeQuietly(response.body());
                     sleep(waitTime(attempts));
                     continue;
@@ -42,7 +42,7 @@ public class RetryInterceptor implements Interceptor {
                 return response;
             } catch (IOException e) {
                 if (shouldRetry(attempts, request.method(), e)) {
-                    logger.warn(Markers.errorCode("HTTP_COMMUNICATION_FAILED"), "http communication failed, retry soon, uri={}", request.url(), e);
+                    logger.warn(Markers.errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}", request.url(), e);
                     sleep(waitTime(attempts));
                 } else {
                     throw e;

@@ -45,6 +45,7 @@ public class HTTPServer {
             if (httpsPort != null) builder.addHttpsListener(httpsPort, "0.0.0.0", new SSLContextBuilder().build());
 
             builder.setHandler(handler())
+                   // jdk 11 uses TLSv1.3 as default, which causes various of intermittent handshake or close channel issues under multi threading condition (both JDK httpclient and okHTTP), will check whether it improves on openjdk 11.0.2/12
                    .setSocketOption(Options.SSL_ENABLED_PROTOCOLS, Sequence.of("TLSv1.2"))
                    .setSocketOption(Options.KEEP_ALIVE, Boolean.TRUE)
                    // set tcp back log larger, also requires to update kernel, e.g. sysctl -w net.core.somaxconn=1024 && sysctl -w net.ipv4.tcp_max_syn_backlog=4096
