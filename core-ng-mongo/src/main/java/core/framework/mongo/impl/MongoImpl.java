@@ -95,7 +95,7 @@ public class MongoImpl implements Mongo {
     }
 
     public final void timeout(Duration timeout) {
-        timeoutInMs = (int) timeout.toMillis();
+        timeoutInMs = timeout.toMillis();
     }
 
     public <T> MongoCollection<T> collection(Class<T> entityClass) {
