@@ -42,7 +42,7 @@ class CPUStat {
             usedCPUTime += entry.getValue() - previousThreadCPUTimes.getOrDefault(threadId, 0L);
         }
 
-        return (double) usedCPUTime / ((currentTime - previousTime) * availableProcessors);
+        return (double) usedCPUTime / (currentTime - previousTime) / availableProcessors;
     }
 
     private Map<Long, Long> threadCPUTimes() {

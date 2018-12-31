@@ -28,10 +28,10 @@ public class MongoImpl implements Mongo {
     final EntityCodecs codecs = new EntityCodecs();
     private final Logger logger = LoggerFactory.getLogger(MongoImpl.class);
     private final ConnectionPoolSettings.Builder connectionPoolSettings = ConnectionPoolSettings.builder()
-                                                                                                .maxConnectionIdleTime((int) Duration.ofMinutes(30).toMillis(), TimeUnit.MILLISECONDS);
+                                                                                                .maxConnectionIdleTime(Duration.ofMinutes(30).toMillis(), TimeUnit.MILLISECONDS);
     public ConnectionString uri;
     public int tooManyRowsReturnedThreshold = 2000;
-    int timeoutInMs = (int) Duration.ofSeconds(15).toMillis();
+    long timeoutInMs = Duration.ofSeconds(15).toMillis();
     long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     CodecRegistry registry;
     private MongoClient mongoClient;
@@ -42,7 +42,7 @@ public class MongoImpl implements Mongo {
         database = createDatabase(registry);
     }
 
-    MongoDatabase createDatabase(CodecRegistry registry) {
+    private MongoDatabase createDatabase(CodecRegistry registry) {
         if (uri == null) throw new Error("uri must not be null");
         String database = uri.getDatabase();
         if (database == null) throw new Error("uri must have database, uri=" + uri);
@@ -50,8 +50,8 @@ public class MongoImpl implements Mongo {
         try {
             connectionPoolSettings.maxWaitTime(timeoutInMs, TimeUnit.MILLISECONDS); // pool checkout timeout
             var socketSettings = SocketSettings.builder()
-                                               .connectTimeout(timeoutInMs, TimeUnit.MILLISECONDS)
-                                               .readTimeout(timeoutInMs, TimeUnit.MILLISECONDS)
+                                               .connectTimeout((int) timeoutInMs, TimeUnit.MILLISECONDS)
+                                               .readTimeout((int) timeoutInMs, TimeUnit.MILLISECONDS)
                                                .build();
             var clusterSettings = ClusterSettings.builder()
                                                  .serverSelectionTimeout(timeoutInMs * 3, TimeUnit.MILLISECONDS)    // able to try 3 servers
