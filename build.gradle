@@ -63,7 +63,7 @@ project(':core-ng-mongo-test') {
     dependencies {
         api project(":core-ng-test")
         api project(":core-ng-mongo")
-        implementation 'de.bwaldvogel:mongo-java-server:1.9.8'
+        implementation 'de.bwaldvogel:mongo-java-server:1.11.1'
     }
 }
 
