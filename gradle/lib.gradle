@@ -11,5 +11,5 @@ tasks.register("sourcesJar", Jar) {
 }
 
 artifacts {
-    archives sourcesJar
+    archives tasks.named('sourcesJar')
 }
