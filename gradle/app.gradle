@@ -4,7 +4,7 @@ def env = hasProperty('env') ? env : null
 apply plugin: 'application'
 mainClassName = 'Main'
 
-processResources {
+tasks.named("processResources").configure {
     if (env != null) {
         assert project.file("conf/${env}/resources").exists()
         inputs.dir project.file("conf/${env}/resources")
@@ -12,11 +12,15 @@ processResources {
     }
 }
 
-distTar {
-    archiveName "${baseName}.${extension}"
+tasks.named("distTar").configure {
+    archiveFileName = "${archiveBaseName.get()}.${archiveExtension.get()}"
 }
 
-startScripts {
+tasks.named("distZip").configure {
+    enabled = false
+}
+
+tasks.named("startScripts").configure {
     defaultJvmOpts = ['-Dcore.webPath=APP_HOME_VAR/web', "-Dcore.appName=${project.name}"]
 
     doLast {
@@ -25,11 +29,7 @@ startScripts {
     }
 }
 
-distributions {
-    distZip.enabled = false
-}
-
-run {
+tasks.named("run").configure {
     // assign all system properties to application, e.g. ./gradlew -Dkey=value :some-service:run
     System.properties.each { key, value ->
         if (key != "user.dir" && key != "java.endorsed.dirs") {

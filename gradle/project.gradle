@@ -24,7 +24,7 @@ subprojects {
 
     buildDir = "${rootDir}/build/${rootDir.relativePath(projectDir)}"
 
-    test {
+    tasks.named('test') {
         useJUnitPlatform()
         failFast = true
         testLogging.exceptionFormat 'full'
@@ -50,6 +50,6 @@ allprojects {
     idea.module.inheritOutputDirs = true
 }
 
-wrapper {
-    gradleVersion = '5.0'
+tasks.named('wrapper') {
+    gradleVersion = '5.1'
 }

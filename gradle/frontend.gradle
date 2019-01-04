@@ -14,7 +14,7 @@ afterEvaluate {
     assert project.ext.has('frontendDir')
     String frontendDir = project.ext['frontendDir']
 
-    task buildFrontend {
+    tasks.register('buildFrontend') {
         doLast {
             assert file(frontendDir).exists()
 
