@@ -4,6 +4,8 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.filter.FieldLogParam;
 import core.framework.impl.web.bean.ResponseBeanMapper;
+import core.framework.impl.web.request.RequestImpl;
+import core.framework.impl.web.session.SessionManager;
 import core.framework.impl.web.site.TemplateManager;
 import core.framework.util.Encodings;
 import core.framework.web.CookieSpec;
@@ -23,12 +25,17 @@ import java.util.Map;
 public class ResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
     private final ResponseHandlerContext context;
+    private final SessionManager sessionManager;
 
-    public ResponseHandler(ResponseBeanMapper mapper, TemplateManager templateManager) {
+    public ResponseHandler(ResponseBeanMapper mapper, TemplateManager templateManager, SessionManager sessionManager) {
         context = new ResponseHandlerContext(mapper, templateManager);
+        this.sessionManager = sessionManager;
     }
 
-    public void render(ResponseImpl response, HttpServerExchange exchange, ActionLog actionLog) {
+    public void render(RequestImpl request, ResponseImpl response, HttpServerExchange exchange, ActionLog actionLog) {
+        // always try to save session before response, even for exception flow in case it's invalidated or generated new sessionId
+        sessionManager.save(request, response);
+
         HTTPStatus status = response.status();
         exchange.setStatusCode(status.code);
 

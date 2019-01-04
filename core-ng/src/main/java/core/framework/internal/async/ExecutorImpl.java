@@ -4,6 +4,7 @@ import core.framework.async.Executor;
 import core.framework.async.Task;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
+import core.framework.log.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,7 @@ public final class ExecutorImpl implements Executor {
     public void submit(String action, Task task, Duration delay) {
         synchronized (this) {
             if (executor.isShutdown()) {
-                logger.warn("reject task due to server is shutting down, action={}", action);    // with current executor impl, rejection only happens when shutdown
+                logger.warn(Markers.errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action);    // with current executor impl, rejection only happens when shutdown
                 return;
             }
             if (scheduler == null) {
@@ -81,7 +82,7 @@ public final class ExecutorImpl implements Executor {
         try {
             scheduler.schedule(delayedTask, delay.toMillis(), TimeUnit.MILLISECONDS);
         } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
-            logger.warn("reject task due to server is shutting down, action={}", action, e);
+            logger.warn(Markers.errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action, e);
         }
     }
 
@@ -89,7 +90,7 @@ public final class ExecutorImpl implements Executor {
         try {
             return executor.submit(execution);
         } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
-            logger.warn("reject task due to server is shutting down, action={}", action, e);
+            logger.warn(Markers.errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action, e);
             return new CancelledFuture<>();
         }
     }

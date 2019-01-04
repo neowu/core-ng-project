@@ -66,23 +66,23 @@ class SessionManagerTest {
     }
 
     @Test
-    void responseSessionIdToHeader() {
+    void putSessionIdToHeader() {
         sessionManager.header("SessionId");
         Response response = mock(Response.class);
 
         String sessionId = UUID.randomUUID().toString();
-        sessionManager.responseSessionId(response, sessionId);
+        sessionManager.putSessionId(response, sessionId);
 
         verify(response).header("SessionId", sessionId);
     }
 
     @Test
-    void responseSessionIdToCookie() {
+    void putSessionIdToCookie() {
         sessionManager.cookie("SessionId", null);
         Response response = mock(Response.class);
 
         String sessionId = UUID.randomUUID().toString();
-        sessionManager.responseSessionId(response, sessionId);
+        sessionManager.putSessionId(response, sessionId);
 
         verify(response).cookie(eq(new CookieSpec("SessionId").path("/")), eq(sessionId));
     }

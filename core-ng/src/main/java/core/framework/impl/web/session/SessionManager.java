@@ -41,17 +41,18 @@ public final class SessionManager {
 
     public void save(RequestImpl request, Response response) {
         SessionImpl session = (SessionImpl) request.session;
-        if (session == null) return;
+        if (session == null || session.saved) return;
 
+        session.saved = true;   // it will try to save session on both normal and exception flows, here is to only attempt once in case of store throws exception
         if (session.invalidated && session.id != null) {
             logger.debug("invalidate session");
             store.invalidate(session.id);
-            responseSessionId(response, null);
+            putSessionId(response, null);
         } else if (session.changed()) {
             logger.debug("save session");
             if (session.id == null) {
                 session.id = UUID.randomUUID().toString();
-                responseSessionId(response, session.id);
+                putSessionId(response, session.id);
             }
             store.save(session.id, session.values, session.changedFields, timeout);
         }
@@ -62,7 +63,7 @@ public final class SessionManager {
         return request.cookie(cookieSpec);
     }
 
-    void responseSessionId(Response response, String sessionId) {
+    void putSessionId(Response response, String sessionId) {
         if (header != null) {
             response.header(header, sessionId == null ? "" : sessionId);
         } else {

@@ -58,7 +58,7 @@ public class HTTPHandler implements HttpHandler {
     HTTPHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
-        responseHandler = new ResponseHandler(responseBeanMapper, templateManager);
+        responseHandler = new ResponseHandler(responseBeanMapper, templateManager, sessionManager);
         errorHandler = new HTTPErrorHandler(responseHandler);
     }
 
@@ -96,8 +96,7 @@ public class HTTPHandler implements HttpHandler {
             logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());
 
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
-            sessionManager.save(request, response);
-            responseHandler.render((ResponseImpl) response, exchange, actionLog);
+            responseHandler.render(request, (ResponseImpl) response, exchange, actionLog);
         } catch (Throwable e) {
             logManager.logError(e);
             errorHandler.handleError(e, exchange, request, actionLog);

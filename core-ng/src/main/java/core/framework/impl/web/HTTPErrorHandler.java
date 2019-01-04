@@ -44,7 +44,7 @@ public class HTTPErrorHandler {
             Response errorResponse = null;
             if (customErrorHandler != null) errorResponse = customErrorHandler.handle(request, e).orElse(null);
             if (errorResponse == null) errorResponse = defaultErrorResponse(e, exchange, actionLog);
-            responseHandler.render((ResponseImpl) errorResponse, exchange, actionLog);
+            responseHandler.render(request, (ResponseImpl) errorResponse, exchange, actionLog);
         } catch (Throwable error) {
             logger.error(error.getMessage(), e);
             if (exchange.isResponseStarted()) {

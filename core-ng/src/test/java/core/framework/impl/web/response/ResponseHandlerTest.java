@@ -15,7 +15,7 @@ class ResponseHandlerTest {
 
     @BeforeEach
     void createResponseHandler() {
-        responseHandler = new ResponseHandler(null, null);
+        responseHandler = new ResponseHandler(null, null, null);
     }
 
     @Test

@@ -17,6 +17,7 @@ public class SessionImpl implements Session {
     final Set<String> changedFields = new HashSet<>();
     String id;
     boolean invalidated;
+    boolean saved;
 
     @Override
     public Optional<String> get(String key) {
