@@ -20,8 +20,9 @@ class ResponseHandlerTest {
 
     @Test
     void cookie() {
-        CookieImpl cookie = responseHandler.cookie(new CookieSpec("test").secure(), "1=2");
+        CookieImpl cookie = responseHandler.cookie(new CookieSpec("test").secure().sameSite(), "1=2");
         assertThat(cookie.getName()).isEqualTo("test");
         assertThat(cookie.getValue()).isEqualTo("1%3D2");
+        assertThat(cookie.getSameSiteMode()).isEqualTo("Lax");
     }
 }

@@ -15,6 +15,7 @@ public final class CookieSpec {
     public boolean httpOnly;
     public boolean secure;
     public Duration maxAge;
+    public boolean sameSite;
 
     public CookieSpec(String name) {
         this.name = name;
@@ -46,7 +47,12 @@ public final class CookieSpec {
     }
 
     public CookieSpec sessionScope() {
-        this.maxAge = SESSION_SCOPE;
+        maxAge = SESSION_SCOPE;
+        return this;
+    }
+
+    public CookieSpec sameSite() {
+        sameSite = true;
         return this;
     }
 

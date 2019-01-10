@@ -83,7 +83,7 @@ public final class SessionManager {
 
     public void cookie(String name, String domain) {
         if (name == null) throw new Error("name must not be null");
-        cookieSpec = new CookieSpec(name).domain(domain).path("/").sessionScope().httpOnly().secure();
+        cookieSpec = new CookieSpec(name).domain(domain).path("/").sessionScope().httpOnly().secure().sameSite();
     }
 
     public void header(String name) {
