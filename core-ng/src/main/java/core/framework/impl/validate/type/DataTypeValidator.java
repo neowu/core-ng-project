@@ -48,7 +48,7 @@ public class DataTypeValidator {
 
     private void visitObject(Class<?> objectClass, Field owner, String path) {
         if (visitedClasses.contains(objectClass))
-            throw new Error(format("class must not have circular reference, field={}", Fields.path(owner)));
+            throw new Error("class must not have circular reference, field=" + Fields.path(owner));
 
         visitedClasses.add(objectClass);
 
@@ -72,15 +72,14 @@ public class DataTypeValidator {
             } else if (GenericTypes.isMap(fieldType)) {
                 if (!allowChild) throw new Error("map field is not allowed, field=" + Fields.path(field));
 
-                if (!GenericTypes.isGenericMap(fieldType)) throw new Error(format("map must be Map<K,V>, K must be String or Enum and V must be class, type={}, field={}", type.getTypeName(), Fields.path(field)));
+                if (!GenericTypes.isGenericMap(fieldType))
+                    throw new Error(format("map must be Map<K,V>, K must be String or Enum and V must be class, type={}, field={}", type.getTypeName(), Fields.path(field)));
 
                 Class<?> keyClass = GenericTypes.mapKeyClass(fieldType);
-                if (!String.class.equals(keyClass) && !keyClass.isEnum()) {
+                if (!String.class.equals(keyClass) && !keyClass.isEnum())
                     throw new Error(format("map key must be String or Enum, type={}, field={}", type.getTypeName(), Fields.path(field)));
-                }
-                if (keyClass.isEnum()) {
+                if (keyClass.isEnum() && visitor != null)
                     visitor.visitEnum(keyClass);
-                }
 
                 visitValue(GenericTypes.mapValueClass(fieldType), field, fieldPath);
             } else {
@@ -99,9 +98,7 @@ public class DataTypeValidator {
             throw new Error(format("primitive class is not supported, please use object type, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner)));
 
         if (valueClass.isEnum()) {
-            if (visitor != null) {
-                visitor.visitEnum(valueClass);
-            }
+            if (visitor != null) visitor.visitEnum(valueClass);
             return; // enum is allowed value type
         }
 

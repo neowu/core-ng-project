@@ -27,6 +27,11 @@ class CacheTypeValidatorTest {
         new CacheTypeValidator(String.class).validate();
     }
 
+    public enum TestEnum {
+        V1,
+        V2
+    }
+
     public static class CacheItem {
         public LocalDateTime dateTimeField;
 
@@ -39,6 +44,8 @@ class CacheTypeValidatorTest {
         public Child childField;
 
         public List<Child> childrenField;
+
+        public Map<TestEnum, String> enumMapField;
     }
 
     public static class Child {
