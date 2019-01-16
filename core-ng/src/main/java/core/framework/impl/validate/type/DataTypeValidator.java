@@ -78,7 +78,7 @@ public class DataTypeValidator {
                 Class<?> keyClass = GenericTypes.mapKeyClass(fieldType);
                 if (!String.class.equals(keyClass) && !keyClass.isEnum())
                     throw new Error(format("map key must be String or Enum, type={}, field={}", type.getTypeName(), Fields.path(field)));
-                if (keyClass.isEnum() && visitor != null)
+                if (visitor != null && keyClass.isEnum())
                     visitor.visitEnum(keyClass);
 
                 visitValue(GenericTypes.mapValueClass(fieldType), field, fieldPath);
