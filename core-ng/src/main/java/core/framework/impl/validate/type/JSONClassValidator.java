@@ -61,6 +61,7 @@ public class JSONClassValidator implements TypeVisitor {
         if (name.isBlank()) {
             throw new Error(format("@Property name attribute must not be blank, field={}", Fields.path(field)));
         }
+        // TODO: validate name must be field, starts with letter, only contains [a-zA-Z0-9_]
 
         boolean added = visitedProperties.computeIfAbsent(parentPath, key -> Sets.newHashSet()).add(name);
         if (!added) {
@@ -69,7 +70,7 @@ public class JSONClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitEnum(Class<?> enumClass, String parentPath) {
+    public void visitEnum(Class<?> enumClass) {
         validateEnum(enumClass);
     }
 }

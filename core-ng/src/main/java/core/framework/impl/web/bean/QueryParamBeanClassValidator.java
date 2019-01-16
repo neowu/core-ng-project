@@ -54,7 +54,7 @@ final class QueryParamBeanClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitEnum(Class<?> enumClass, String parentPath) {
+    public void visitEnum(Class<?> enumClass) {
         registry.validateBeanClassName(enumClass);
         JSONClassValidator.validateEnum(enumClass);
     }

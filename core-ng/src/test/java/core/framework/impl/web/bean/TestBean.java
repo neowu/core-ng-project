@@ -39,6 +39,9 @@ public class TestBean {
     @Property(name = "map_field")
     public Map<String, String> mapField;
 
+    @Property(name = "enum_map_field")
+    public Map<TestEnum, String> enumMapField;
+
     @Property(name = "child_field")
     public Child childField;
 

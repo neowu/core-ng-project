@@ -109,5 +109,8 @@ public interface TestWebService {
 
         @Property(name = "items")
         public Map<String, TestItem> items;
+
+        @Property(name = "enum_map")
+        public Map<TestEnum, String> enumMap;
     }
 }

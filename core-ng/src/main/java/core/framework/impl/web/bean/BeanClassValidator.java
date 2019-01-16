@@ -14,8 +14,8 @@ final class BeanClassValidator extends JSONClassValidator {
     }
 
     @Override
-    public void visitEnum(Class<?> enumClass, String parentPath) {
-        super.visitEnum(enumClass, parentPath);
+    public void visitEnum(Class<?> enumClass) {
+        super.visitEnum(enumClass);
         registry.validateBeanClassName(enumClass);
     }
 

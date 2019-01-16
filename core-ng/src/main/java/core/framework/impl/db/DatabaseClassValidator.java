@@ -38,7 +38,7 @@ final class DatabaseClassValidator implements TypeVisitor {
         validator.validate();
 
         if (!foundPrimaryKey)
-            throw new Error(format("db entity class must have @PrimaryKey, class={}", validator.type.getTypeName()));
+            throw new Error("db entity class must have @PrimaryKey, class=" + validator.type.getTypeName());
     }
 
     void validateViewClass() {
@@ -50,10 +50,10 @@ final class DatabaseClassValidator implements TypeVisitor {
     public void visitClass(Class<?> objectClass, String path) {
         if (validateView) {
             if (objectClass.isAnnotationPresent(Table.class))
-                throw new Error(format("db view class must not have @Table, class={}", objectClass.getCanonicalName()));
+                throw new Error("db view class must not have @Table, class=" + objectClass.getCanonicalName());
         } else {
             if (!objectClass.isAnnotationPresent(Table.class))
-                throw new Error(format("db entity class must have @Table, class={}", objectClass.getCanonicalName()));
+                throw new Error("db entity class must have @Table, class=" + objectClass.getCanonicalName());
         }
     }
 
@@ -61,7 +61,7 @@ final class DatabaseClassValidator implements TypeVisitor {
     public void visitField(Field field, String parentPath) {
         Column column = field.getDeclaredAnnotation(Column.class);
         if (column == null)
-            throw new Error(format("db entity field must have @Column, field={}", Fields.path(field)));
+            throw new Error("db entity field must have @Column, field=" + Fields.path(field));
 
         boolean added = columns.add(column.name());
         if (!added) {
@@ -76,13 +76,13 @@ final class DatabaseClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitEnum(Class<?> enumClass, String parentPath) {
+    public void visitEnum(Class<?> enumClass) {
         Set<String> enumValues = Sets.newHashSet();
         List<Field> fields = Classes.enumConstantFields(enumClass);
         for (Field field : fields) {
             DBEnumValue enumValue = field.getDeclaredAnnotation(DBEnumValue.class);
             if (enumValue == null)
-                throw new Error(format("db enum must have @DBEnumValue, field={}", Fields.path(field)));
+                throw new Error("db enum must have @DBEnumValue, field=" + Fields.path(field));
 
             boolean added = enumValues.add(enumValue.value());
             if (!added)
@@ -90,34 +90,27 @@ final class DatabaseClassValidator implements TypeVisitor {
 
             Property property = field.getDeclaredAnnotation(Property.class);
             if (property != null)
-                throw new Error(format("db enum must not have json annotation, please separate view and entity, field={}", Fields.path(field)));
+                throw new Error("db enum must not have json annotation, please separate view and entity, field=" + Fields.path(field));
         }
     }
 
     private void validatePrimaryKey(PrimaryKey primaryKey, Class<?> fieldClass, Field field) {
         if (primaryKey.autoIncrement()) {
-            if (foundAutoIncrementalPrimaryKey) throw new Error(format("db entity must not have more than one auto incremental primary key, field={}", Fields.path(field)));
+            if (foundAutoIncrementalPrimaryKey) throw new Error("db entity must not have more than one auto incremental primary key, field=" + Fields.path(field));
             foundAutoIncrementalPrimaryKey = true;
-
-            if (!(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
-                throw new Error(format("auto increment primary key must be Integer or Long, field={}", Fields.path(field)));
-            }
         }
 
         if (!Strings.isBlank(primaryKey.sequence())) {
-            if (foundSequencePrimaryKey) throw new Error(format("db entity must not have more than one sequence primary key, field={}", Fields.path(field)));
+            if (foundSequencePrimaryKey) throw new Error("db entity must not have more than one sequence primary key, field=" + Fields.path(field));
             foundSequencePrimaryKey = true;
+        }
 
-            if (!(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
-                throw new Error(format("sequence primary key must be Integer or Long, field={}", Fields.path(field)));
-            }
-
-            if (primaryKey.autoIncrement()) {
-                throw new Error(format("primary key must be either auto increment or sequence, field={}", Fields.path(field)));
-            }
+        if ((foundAutoIncrementalPrimaryKey || foundSequencePrimaryKey)
+                && !(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
+            throw new Error("auto increment or sequence primary key must be Integer or Long, field=" + Fields.path(field));
         }
 
         if (foundAutoIncrementalPrimaryKey && foundSequencePrimaryKey)
-            throw new Error(format("db entity must not have both auto incremental and sequence primary key, field={}", Fields.path(field)));
+            throw new Error("db entity must not have both auto incremental and sequence primary key, field=" + Fields.path(field));
     }
 }

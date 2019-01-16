@@ -168,7 +168,9 @@ final class EntityDecoderBuilder<T> {
         } else if (GenericTypes.isGenericList(valueType)) {
             String method = decodeListMethod(GenericTypes.listValueClass(valueType));
             builder.append("java.util.List {} = {}(reader, wrapper, fieldPath);\n", variable, method);
-        } else if (GenericTypes.isGenericStringMap(valueType)) {
+        } else if (GenericTypes.isGenericMap(valueType)) {
+            Class<?> keyClass = GenericTypes.mapKeyClass(valueType);
+            if (!String.class.equals(keyClass)) throw new Error("key class must be String, fieldType=" + valueType.getTypeName()); // TODO: impl
             String method = decodeMapMethod(GenericTypes.mapValueClass(valueType));
             builder.append("java.util.Map {} = {}(reader, wrapper, fieldPath);\n", variable, method);
         } else {

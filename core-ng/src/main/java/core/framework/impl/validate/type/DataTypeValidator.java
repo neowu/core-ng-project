@@ -66,14 +66,22 @@ public class DataTypeValidator {
             String fieldPath = path(path, field.getName());
             Type fieldType = field.getGenericType();
             if (GenericTypes.isList(fieldType)) {
-                if (!allowChild)
-                    throw new Error(format("list field is not allowed, field={}", Fields.path(field)));
+                if (!allowChild) throw new Error("list field is not allowed, field=" + Fields.path(field));
+
                 visitList(fieldType, field, fieldPath);
             } else if (GenericTypes.isMap(fieldType)) {
-                if (!allowChild)
-                    throw new Error(format("map field is not allowed, field={}", Fields.path(field)));
-                if (!GenericTypes.isGenericStringMap(fieldType))
-                    throw new Error(format("map must be Map<String,T> and T must be class, type={}, field={}", type.getTypeName(), Fields.path(field)));
+                if (!allowChild) throw new Error("map field is not allowed, field=" + Fields.path(field));
+
+                if (!GenericTypes.isGenericMap(fieldType)) throw new Error(format("map must be Map<K,V>, K must be String or Enum and V must be class, type={}, field={}", type.getTypeName(), Fields.path(field)));
+
+                Class<?> keyClass = GenericTypes.mapKeyClass(fieldType);
+                if (!String.class.equals(keyClass) && !keyClass.isEnum()) {
+                    throw new Error(format("map key must be String or Enum, type={}, field={}", type.getTypeName(), Fields.path(field)));
+                }
+                if (keyClass.isEnum()) {
+                    visitor.visitEnum(keyClass);
+                }
+
                 visitValue(GenericTypes.mapValueClass(fieldType), field, fieldPath);
             } else {
                 visitValue(GenericTypes.rawClass(fieldType), field, fieldPath);
@@ -92,7 +100,7 @@ public class DataTypeValidator {
 
         if (valueClass.isEnum()) {
             if (visitor != null) {
-                visitor.visitEnum(valueClass, path);
+                visitor.visitEnum(valueClass);
             }
             return; // enum is allowed value type
         }

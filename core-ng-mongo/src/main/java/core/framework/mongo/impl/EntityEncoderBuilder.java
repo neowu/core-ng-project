@@ -134,7 +134,10 @@ final class EntityEncoderBuilder<T> {
             String methodName = encodeListMethod(GenericTypes.listValueClass(fieldType));
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, wrapper, {});\n", methodName, fieldVariable);
-        } else if (GenericTypes.isGenericStringMap(fieldType)) {
+        } else if (GenericTypes.isGenericMap(fieldType)) {
+            Class<?> keyClass = GenericTypes.mapKeyClass(fieldType);
+            if (!String.class.equals(keyClass)) throw new Error("key class must be String, fieldType=" + fieldType.getTypeName()); // TODO: impl
+
             String methodName = encodeMapMethod(GenericTypes.mapValueClass(fieldType));
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, wrapper, {});\n", methodName, fieldVariable);

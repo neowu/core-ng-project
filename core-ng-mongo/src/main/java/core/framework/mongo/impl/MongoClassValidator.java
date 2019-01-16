@@ -77,7 +77,7 @@ public final class MongoClassValidator implements TypeVisitor {
     }
 
     @Override
-    public void visitEnum(Class<?> enumClass, String parentPath) {
+    public void visitEnum(Class<?> enumClass) {
         Set<String> enumValues = Sets.newHashSet();
         List<Field> fields = Classes.enumConstantFields(enumClass);
         for (Field field : fields) {

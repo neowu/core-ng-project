@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,9 @@ import java.util.Map;
 public class TestBean {
     @Property(name = "map")
     public final Map<String, String> mapField = Maps.newHashMap();
+
+    @Property(name = "enumMap")
+    public final Map<TestEnum, String> enumMapField = new EnumMap<>(TestEnum.class);
 
     @Property(name = "list")
     public final List<String> listField = Lists.newArrayList();

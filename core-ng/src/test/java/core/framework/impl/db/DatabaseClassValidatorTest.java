@@ -1,6 +1,11 @@
 package core.framework.impl.db;
 
+import core.framework.db.Column;
+import core.framework.db.PrimaryKey;
+import core.framework.db.Table;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -12,5 +17,19 @@ class DatabaseClassValidatorTest {
         new DatabaseClassValidator(AutoIncrementIdEntity.class).validateEntityClass();
         new DatabaseClassValidator(CompositeKeyEntity.class).validateEntityClass();
         new DatabaseClassValidator(SequenceIdEntity.class).validateEntityClass();
+    }
+
+    @Test
+    void withInvalidPrimaryKeyType() {
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithInvalidPrimaryKey.class).validateEntityClass())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("primary key must be Integer or Long");
+    }
+
+    @Table(name = "test_entity_with_invalid_pk")
+    public static class TestEntityWithInvalidPrimaryKey {
+        @PrimaryKey(autoIncrement = true)
+        @Column(name = "id")
+        public String id;
     }
 }

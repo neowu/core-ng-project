@@ -12,6 +12,6 @@ public interface TypeVisitor {
     default void visitField(Field field, String parentPath) {
     }
 
-    default void visitEnum(Class<?> enumClass, String parentPath) {
+    default void visitEnum(Class<?> enumClass) {
     }
 }

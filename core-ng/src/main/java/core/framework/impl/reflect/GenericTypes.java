@@ -56,13 +56,15 @@ public final class GenericTypes {
         return Map.class.isAssignableFrom(rawClass(type));
     }
 
-    public static boolean isGenericStringMap(Type type) {
+    public static boolean isGenericMap(Type type) {
         if (!(type instanceof ParameterizedType)) return false;
 
-        Type keyType = ((ParameterizedType) type).getActualTypeArguments()[0];
-        if (!(keyType instanceof Class)) return false;
-        Class<?> keyClass = (Class<?>) keyType;
-        return String.class.equals(keyClass) && ((ParameterizedType) type).getActualTypeArguments()[1] instanceof Class;
+        Type[] arguments = ((ParameterizedType) type).getActualTypeArguments();
+        return arguments[0] instanceof Class && arguments[1] instanceof Class;
+    }
+
+    public static Class<?> mapKeyClass(Type type) {
+        return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
     }
 
     public static Class<?> mapValueClass(Type type) {

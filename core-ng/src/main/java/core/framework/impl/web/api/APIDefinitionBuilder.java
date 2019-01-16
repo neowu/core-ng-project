@@ -126,8 +126,15 @@ public class APIDefinitionBuilder {
             return valueType + "[]";
         }
         if (GenericTypes.isMap(type)) {
+            Class<?> keyClass = GenericTypes.mapKeyClass(type);
             String valueType = parseType(GenericTypes.mapValueClass(type));
-            return "{[key:string]: " + valueType + ";}";
+            if (String.class.equals(keyClass)) {
+                return "{[key:string]: " + valueType + ";}";
+            } else if (keyClass.isEnum()) {
+                return "{[key in " + parseEnum(keyClass) + "]?: " + valueType + ";}";
+            } else {
+                throw new Error("unknown key class, class=" + keyClass.getCanonicalName());
+            }
         }
         if (String.class.equals(type)) return "string";
         if (Integer.class.equals(type) || Long.class.equals(type) || Double.class.equals(type) || BigDecimal.class.equals(type)) return "number";

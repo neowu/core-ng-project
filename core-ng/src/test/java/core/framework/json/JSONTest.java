@@ -20,14 +20,22 @@ class JSONTest {
         var bean = new TestBean();
         bean.mapField.put("key1", "value1");
         bean.mapField.put("key2", "value2");
+        bean.enumMapField.put(TestBean.TestEnum.A, "A1");
+        bean.enumMapField.put(TestBean.TestEnum.B, "B1");
 
         String json = JSON.toJSON(bean);
-        assertThat(json).contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}");
+        assertThat(json)
+                .contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}")
+                .contains("\"enumMap\":{\"A1\":\"A1\",\"B1\":\"B1\"}");
 
         var parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean.mapField)
                 .containsEntry("key1", "value1")
                 .containsEntry("key2", "value2");
+
+        assertThat(parsedBean.enumMapField)
+                .containsEntry(TestBean.TestEnum.A, "A1")
+                .containsEntry(TestBean.TestEnum.B, "B1");
     }
 
     @Test
