@@ -7,12 +7,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 /**
  * @author neo
@@ -31,7 +27,7 @@ class EntityDecoderBuilderTest {
     @Test
     void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("mongo-test/entity-decoder.java"), sourceCode);
+        assertThat(sourceCode).isEqualTo(ClasspathResources.text("mongo-test/entity-decoder.java"));
     }
 
     @Test
@@ -40,17 +36,15 @@ class EntityDecoderBuilderTest {
 
         TestEntity entity = decoder.decode(new JsonReader(entityJSON));
 
-        assertEquals(new ObjectId("5627b47d54b92d03adb9e9cf"), entity.id);
-        assertEquals("string", entity.stringField);
-        assertEquals(Long.valueOf(325), entity.longField);
-        assertEquals(ZonedDateTime.of(LocalDateTime.of(2016, 9, 1, 11, 0, 0), ZoneId.of("America/New_York")).toInstant(), entity.zonedDateTimeField.toInstant());
-        assertEquals(TestChildEntity.TestEnum.ITEM1, entity.child.enumField);
-        assertEquals(2, entity.listField.size());
-        assertEquals("V1", entity.listField.get(0));
-        assertEquals("V2", entity.listField.get(1));
-        assertNull(entity.nullChild);
+        assertThat(entity.id).isEqualTo(new ObjectId("5627b47d54b92d03adb9e9cf"));
+        assertThat(entity.stringField).isEqualTo("string");
+        assertThat(entity.longField).isEqualTo(325);
+        assertThat(entity.zonedDateTimeField).isEqualTo("2016-09-01T15:00:00Z");
+        assertThat(entity.child.enumField).isEqualTo(TestEnum.ITEM1);
+        assertThat(entity.listField).containsExactly("V1", "V2");
+        assertThat(entity.nullChild).isNull();
 
-        assertEquals("V1", entity.mapField.get("K1"));
-        assertEquals("V2", entity.mapField.get("K2"));
+        assertThat(entity.mapField).contains(entry("K1", "V1"), entry("K2", "V2"));
+        assertThat(entity.enumMapField).containsEntry(TestEnum.ITEM1, "V1");
     }
 }

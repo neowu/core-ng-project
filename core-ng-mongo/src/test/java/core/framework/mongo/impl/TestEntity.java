@@ -60,4 +60,7 @@ public class TestEntity {
 
     @Field(name = "null_child")
     public TestChildEntity nullChild;
+
+    @Field(name = "enum_map_field")
+    public Map<TestEnum, String> enumMapField;
 }

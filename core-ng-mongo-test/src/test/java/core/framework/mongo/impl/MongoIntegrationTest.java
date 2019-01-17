@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,21 +36,23 @@ class MongoIntegrationTest extends IntegrationTest {
 
     @Test
     void insert() {
-        TestMongoEntity entity = new TestMongoEntity();
+        var entity = new TestMongoEntity();
         entity.stringField = "string";
         entity.zonedDateTimeField = ZonedDateTime.parse("2016-09-01T11:00:00Z");
+        entity.enumMapField = Map.of(TestMongoEntity.TestEnum.VALUE2, "V2");
         collection.insert(entity);
 
         assertThat(entity.id).isNotNull();
         assertThat(collection.get(entity.id)).get().satisfies(loadedEntity -> {
             assertThat(loadedEntity.stringField).isEqualTo(entity.stringField);
             assertThat(loadedEntity.zonedDateTimeField).isEqualTo("2016-09-01T11:00:00Z");
+            assertThat(loadedEntity.enumMapField).containsEntry(TestMongoEntity.TestEnum.VALUE2, "V2");
         });
     }
 
     @Test
     void replace() {
-        TestMongoEntity entity = new TestMongoEntity();
+        var entity = new TestMongoEntity();
         entity.id = new ObjectId();
         entity.stringField = "value1";
         collection.replace(entity);

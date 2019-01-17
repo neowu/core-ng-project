@@ -48,6 +48,26 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
         }
     }
 
+    @Override
+    public T decode(BsonReader reader, DecoderContext context) {
+        return read(reader, reader.getCurrentName());
+    }
+
+    @Override
+    public Class<T> getEncoderClass() {
+        return enumClass;
+    }
+
+    // used by EntityEncoder
+    public String encodeMapKey(T value) {
+        return encodingMappings.get(value);
+    }
+
+    // used by EntityDecoder
+    public T decodeMapKey(String value) {
+        return decodingMappings.get(value);
+    }
+
     // used by EntityDecoder
     public T read(BsonReader reader, String field) {
         BsonType currentType = reader.getCurrentBsonType();
@@ -64,15 +84,5 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
             reader.skipValue();
             return null;
         }
-    }
-
-    @Override
-    public T decode(BsonReader reader, DecoderContext context) {
-        return read(reader, reader.getCurrentName());
-    }
-
-    @Override
-    public Class<T> getEncoderClass() {
-        return enumClass;
     }
 }

@@ -33,7 +33,7 @@ final class EntityEncoderBuilder<T> {
         builder = new DynamicInstanceBuilder<>(EntityEncoder.class, EntityEncoder.class.getCanonicalName() + "$" + entityClass.getSimpleName());
     }
 
-    public EntityEncoder<T> build() {
+    EntityEncoder<T> build() {
         String methodName = encodeEntityMethod(entityClass);
         CodeBuilder builder = new CodeBuilder();
         builder.append("public void encode(org.bson.BsonWriter writer, Object entity) {\n")
@@ -92,18 +92,30 @@ final class EntityEncoderBuilder<T> {
         return methodName;
     }
 
-    private String encodeMapMethod(Class<?> valueClass) {
-        String methodName = encodeMethods.get(Types.map(String.class, valueClass));
+    private String encodeMapMethod(Type mapFieldType) {
+        Class<?> keyClass = GenericTypes.mapKeyClass(mapFieldType);
+        Class<?> valueClass = GenericTypes.mapValueClass(mapFieldType);
+
+        String methodName = encodeMethods.get(mapFieldType);
         if (methodName != null) return methodName;
 
-        methodName = "encodeMap" + valueClass.getSimpleName() + (index++);
-        CodeBuilder builder = new CodeBuilder();
+        methodName = "encodeMap" + keyClass.getSimpleName() + valueClass.getSimpleName() + (index++);
+        var builder = new CodeBuilder();
         builder.append("private void {}(org.bson.BsonWriter writer, {} wrapper, java.util.Map map) {\n", methodName, type(BsonWriterWrapper.class));
         builder.indent(1).append("writer.writeStartDocument();\n")
                .indent(1).append("for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {\n")
-               .indent(2).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
-               .indent(2).append("String key = (String) entry.getKey();\n")
-               .indent(2).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
+               .indent(2).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n");
+
+        if (String.class.equals(keyClass)) {
+            builder.indent(2).append("String key = (String) entry.getKey();\n");
+        } else if (keyClass.isEnum()) {
+            String enumCodecVariable = registerEnumCodec(keyClass);
+            builder.indent(2).append("String key = {}.encodeMapKey(({}) entry.getKey());\n", enumCodecVariable, type(keyClass));
+        } else {
+            throw new Error("unknown key class, class=" + keyClass.getCanonicalName());
+        }
+
+        builder.indent(2).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
                .indent(2).append("writer.writeName(key);\n");
 
         encodeField(builder, "value", valueClass, 2);
@@ -113,7 +125,7 @@ final class EntityEncoderBuilder<T> {
                .append('}');
         this.builder.addMethod(builder.build());
 
-        encodeMethods.put(Types.map(String.class, valueClass), methodName);
+        encodeMethods.put(mapFieldType, methodName);
         return methodName;
     }
 
@@ -135,10 +147,7 @@ final class EntityEncoderBuilder<T> {
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, wrapper, {});\n", methodName, fieldVariable);
         } else if (GenericTypes.isGenericMap(fieldType)) {
-            Class<?> keyClass = GenericTypes.mapKeyClass(fieldType);
-            if (!String.class.equals(keyClass)) throw new Error("key class must be String, fieldType=" + fieldType.getTypeName()); // TODO: impl
-
-            String methodName = encodeMapMethod(GenericTypes.mapValueClass(fieldType));
+            String methodName = encodeMapMethod(fieldType);
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, wrapper, {});\n", methodName, fieldVariable);
         } else {

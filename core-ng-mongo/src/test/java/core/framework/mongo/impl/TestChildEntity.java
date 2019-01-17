@@ -1,7 +1,6 @@
 package core.framework.mongo.impl;
 
 import core.framework.mongo.Field;
-import core.framework.mongo.MongoEnumValue;
 import org.bson.types.ObjectId;
 
 import java.util.List;
@@ -22,10 +21,4 @@ public class TestChildEntity {
     @Field(name = "ref_id_field")
     public ObjectId refId;
 
-    public enum TestEnum {
-        @MongoEnumValue("I1")
-        ITEM1,
-        @MongoEnumValue("I2")
-        ITEM2
-    }
 }

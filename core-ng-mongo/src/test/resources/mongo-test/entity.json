@@ -31,5 +31,8 @@
   },
   "children": null,
   "children_map": null,
-  "null_child": null
+  "null_child": null,
+  "enum_map_field": {
+    "I1": "V1"
+  }
 }

@@ -90,11 +90,14 @@ final class EntityDecoderBuilder<T> {
         return field.getDeclaredAnnotation(core.framework.mongo.Field.class).name();
     }
 
-    private String decodeMapMethod(Class<?> valueClass) {
-        String methodName = decodeMethods.get(Types.map(String.class, valueClass));
+    private String decodeMapMethod(Type mapFieldType) {
+        Class<?> keyClass = GenericTypes.mapKeyClass(mapFieldType);
+        Class<?> valueClass = GenericTypes.mapValueClass(mapFieldType);
+
+        String methodName = decodeMethods.get(mapFieldType);
         if (methodName != null) return methodName;
 
-        methodName = "decodeMap" + valueClass.getSimpleName() + (index++);
+        methodName = "decodeMap" + keyClass.getSimpleName() + valueClass.getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder();
         builder.append("private java.util.Map {}(org.bson.BsonReader reader, {} wrapper, String parentField) {\n", methodName, type(BsonReaderWrapper.class))
                .indent(1).append("java.util.Map map = wrapper.startReadMap(parentField);\n")
@@ -105,7 +108,15 @@ final class EntityDecoderBuilder<T> {
                .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
 
         String variable = decodeValue(builder, valueClass, 2);
-        builder.indent(2).append("map.put(fieldName, {});\n", variable);
+
+        if (String.class.equals(keyClass)) {
+            builder.indent(2).append("map.put(fieldName, {});\n", variable);
+        } else if (keyClass.isEnum()) {
+            String enumCodecVariable = registerEnumCodec(keyClass);
+            builder.indent(2).append("map.put({}.decodeMapKey(fieldName), {});\n", enumCodecVariable, variable);
+        } else {
+            throw new Error("unknown key class, class=" + keyClass.getCanonicalName());
+        }
 
         builder.indent(1).append("}\n")
                .indent(1).append("reader.readEndDocument();\n")
@@ -113,7 +124,7 @@ final class EntityDecoderBuilder<T> {
                .append('}');
         this.builder.addMethod(builder.build());
 
-        decodeMethods.put(Types.map(String.class, valueClass), methodName);
+        decodeMethods.put(mapFieldType, methodName);
         return methodName;
     }
 
@@ -169,9 +180,7 @@ final class EntityDecoderBuilder<T> {
             String method = decodeListMethod(GenericTypes.listValueClass(valueType));
             builder.append("java.util.List {} = {}(reader, wrapper, fieldPath);\n", variable, method);
         } else if (GenericTypes.isGenericMap(valueType)) {
-            Class<?> keyClass = GenericTypes.mapKeyClass(valueType);
-            if (!String.class.equals(keyClass)) throw new Error("key class must be String, fieldType=" + valueType.getTypeName()); // TODO: impl
-            String method = decodeMapMethod(GenericTypes.mapValueClass(valueType));
+            String method = decodeMapMethod(valueType);
             builder.append("java.util.Map {} = {}(reader, wrapper, fieldPath);\n", variable, method);
         } else {
             Class<?> valueClass = GenericTypes.rawClass(valueType);

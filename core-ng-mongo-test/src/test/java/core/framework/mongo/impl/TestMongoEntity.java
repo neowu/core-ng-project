@@ -7,6 +7,7 @@ import core.framework.mongo.MongoEnumValue;
 import org.bson.types.ObjectId;
 
 import java.time.ZonedDateTime;
+import java.util.Map;
 
 /**
  * @author neo
@@ -25,10 +26,13 @@ public class TestMongoEntity {
     @Field(name = "zoned_date_time_field")
     public ZonedDateTime zonedDateTimeField;
 
+    @Field(name = "enum_map_field")
+    public Map<TestEnum, String> enumMapField;
+
     public enum TestEnum {
-        @MongoEnumValue("VALUE1")
+        @MongoEnumValue("V1")
         VALUE1,
-        @MongoEnumValue("VALUE2")
+        @MongoEnumValue("V2")
         VALUE2
     }
 }

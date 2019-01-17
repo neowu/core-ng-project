@@ -1,5 +1,5 @@
 public class EntityEncoder$TestEntity implements core.framework.mongo.impl.EntityEncoder {
-    private final core.framework.mongo.impl.EnumCodec enumCodecTestEnum4 = new core.framework.mongo.impl.EnumCodec(core.framework.mongo.impl.TestChildEntity.TestEnum.class);
+    private final core.framework.mongo.impl.EnumCodec enumCodecTestEnum4 = new core.framework.mongo.impl.EnumCodec(core.framework.mongo.impl.TestEnum.class);
 
     private void encodeListString1(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.List list) {
         writer.writeStartArray();
@@ -10,7 +10,7 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         writer.writeEndArray();
     }
 
-    private void encodeMapString2(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.Map map) {
+    private void encodeMapStringString2(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.Map map) {
         writer.writeStartDocument();
         for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
@@ -25,7 +25,7 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
     private void encodeListTestEnum5(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.List list) {
         writer.writeStartArray();
         for (java.util.Iterator iterator = list.iterator(); iterator.hasNext(); ) {
-            core.framework.mongo.impl.TestChildEntity.TestEnum value = (core.framework.mongo.impl.TestChildEntity.TestEnum) iterator.next();
+            core.framework.mongo.impl.TestEnum value = (core.framework.mongo.impl.TestEnum) iterator.next();
             enumCodecTestEnum4.encode(writer, value, null);
         }
         writer.writeEndArray();
@@ -55,7 +55,7 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         writer.writeEndArray();
     }
 
-    private void encodeMapTestChildEntity7(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.Map map) {
+    private void encodeMapStringTestChildEntity7(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.Map map) {
         writer.writeStartDocument();
         for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
@@ -64,6 +64,18 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
             writer.writeName(key);
             if (value == null) writer.writeNull();
             else encodeTestChildEntity3(writer, wrapper, value);
+        }
+        writer.writeEndDocument();
+    }
+
+    private void encodeMapTestEnumString8(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.Map map) {
+        writer.writeStartDocument();
+        for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
+            java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
+            String key = enumCodecTestEnum4.encodeMapKey((core.framework.mongo.impl.TestEnum) entry.getKey());
+            java.lang.String value = (java.lang.String) entry.getValue();
+            writer.writeName(key);
+            wrapper.write(value);
         }
         writer.writeEndDocument();
     }
@@ -91,7 +103,7 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         else encodeListString1(writer, wrapper, entity.listField);
         writer.writeName("map_field");
         if (entity.mapField == null) writer.writeNull();
-        else encodeMapString2(writer, wrapper, entity.mapField);
+        else encodeMapStringString2(writer, wrapper, entity.mapField);
         writer.writeName("child");
         if (entity.child == null) writer.writeNull();
         else encodeTestChildEntity3(writer, wrapper, entity.child);
@@ -100,10 +112,13 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         else encodeListTestChildEntity6(writer, wrapper, entity.children);
         writer.writeName("children_map");
         if (entity.childrenMap == null) writer.writeNull();
-        else encodeMapTestChildEntity7(writer, wrapper, entity.childrenMap);
+        else encodeMapStringTestChildEntity7(writer, wrapper, entity.childrenMap);
         writer.writeName("null_child");
         if (entity.nullChild == null) writer.writeNull();
         else encodeTestChildEntity3(writer, wrapper, entity.nullChild);
+        writer.writeName("enum_map_field");
+        if (entity.enumMapField == null) writer.writeNull();
+        else encodeMapTestEnumString8(writer, wrapper, entity.enumMapField);
         writer.writeEndDocument();
     }
 

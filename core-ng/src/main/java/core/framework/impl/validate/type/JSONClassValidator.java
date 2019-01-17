@@ -28,7 +28,7 @@ public class JSONClassValidator implements TypeVisitor {
         for (Field field : fields) {
             Property property = field.getDeclaredAnnotation(Property.class);
             if (property == null)
-                throw new Error(format("enum must have @Property, field={}", Fields.path(field)));
+                throw new Error("enum must have @Property, field=" + Fields.path(field));
             boolean added = enumValues.add(property.name());
             if (!added)
                 throw new Error(format("found duplicate property, field={}, name={}", Fields.path(field), property.name()));
@@ -55,13 +55,10 @@ public class JSONClassValidator implements TypeVisitor {
     public void visitField(Field field, String parentPath) {
         Property property = field.getDeclaredAnnotation(Property.class);
         if (property == null)
-            throw new Error(format("field must have @Property, field={}", Fields.path(field)));
+            throw new Error("field must have @Property, field=" + Fields.path(field));
 
         String name = property.name();
-        if (name.isBlank()) {
-            throw new Error(format("@Property name attribute must not be blank, field={}", Fields.path(field)));
-        }
-        // TODO: validate name must be field, starts with letter, only contains [a-zA-Z0-9_]
+        if (name.isBlank()) throw new Error("@Property name attribute must not be blank, field=" + Fields.path(field));
 
         boolean added = visitedProperties.computeIfAbsent(parentPath, key -> Sets.newHashSet()).add(name);
         if (!added) {
