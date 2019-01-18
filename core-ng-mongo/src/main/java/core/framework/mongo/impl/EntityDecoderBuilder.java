@@ -6,7 +6,6 @@ import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.mongo.Id;
 import core.framework.util.Maps;
-import core.framework.util.Types;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,11 +89,10 @@ final class EntityDecoderBuilder<T> {
         return field.getDeclaredAnnotation(core.framework.mongo.Field.class).name();
     }
 
-    private String decodeMapMethod(Type mapFieldType) {
-        Class<?> keyClass = GenericTypes.mapKeyClass(mapFieldType);
-        Class<?> valueClass = GenericTypes.mapValueClass(mapFieldType);
-
-        String methodName = decodeMethods.get(mapFieldType);
+    private String decodeMapMethod(Type mapType) {
+        Class<?> keyClass = GenericTypes.mapKeyClass(mapType);
+        Class<?> valueClass = GenericTypes.mapValueClass(mapType);
+        String methodName = decodeMethods.get(mapType);
         if (methodName != null) return methodName;
 
         methodName = "decodeMap" + keyClass.getSimpleName() + valueClass.getSimpleName() + (index++);
@@ -124,12 +122,13 @@ final class EntityDecoderBuilder<T> {
                .append('}');
         this.builder.addMethod(builder.build());
 
-        decodeMethods.put(mapFieldType, methodName);
+        decodeMethods.put(mapType, methodName);
         return methodName;
     }
 
-    private String decodeListMethod(Class<?> valueClass) {
-        String methodName = decodeMethods.get(Types.list(valueClass));
+    private String decodeListMethod(Type listType) {
+        Class<?> valueClass = GenericTypes.listValueClass(listType);
+        String methodName = decodeMethods.get(listType);
         if (methodName != null) return methodName;
 
         methodName = "decodeList" + valueClass.getSimpleName() + (index++);
@@ -149,7 +148,7 @@ final class EntityDecoderBuilder<T> {
         builder.append('}');
         this.builder.addMethod(builder.build());
 
-        decodeMethods.put(Types.list(valueClass), methodName);
+        decodeMethods.put(listType, methodName);
         return methodName;
     }
 
@@ -177,7 +176,7 @@ final class EntityDecoderBuilder<T> {
         } else if (Boolean.class.equals(valueType)) {
             builder.append("java.lang.Boolean {} = wrapper.readBoolean(fieldPath);\n", variable);
         } else if (GenericTypes.isGenericList(valueType)) {
-            String method = decodeListMethod(GenericTypes.listValueClass(valueType));
+            String method = decodeListMethod(valueType);
             builder.append("java.util.List {} = {}(reader, wrapper, fieldPath);\n", variable, method);
         } else if (GenericTypes.isGenericMap(valueType)) {
             String method = decodeMapMethod(valueType);

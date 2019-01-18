@@ -6,7 +6,6 @@ import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.mongo.Id;
 import core.framework.util.Maps;
-import core.framework.util.Types;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
@@ -70,8 +69,9 @@ final class EntityEncoderBuilder<T> {
         return field.getDeclaredAnnotation(core.framework.mongo.Field.class).name();
     }
 
-    private String encodeListMethod(Class<?> valueClass) {
-        String methodName = encodeMethods.get(Types.list(valueClass));
+    private String encodeListMethod(Type listFieldType) {
+        Class<?> valueClass = GenericTypes.listValueClass(listFieldType);
+        String methodName = encodeMethods.get(listFieldType);
         if (methodName != null) return methodName;
 
         methodName = "encodeList" + valueClass.getSimpleName() + (index++);
@@ -88,7 +88,7 @@ final class EntityEncoderBuilder<T> {
                .append('}');
         this.builder.addMethod(builder.build());
 
-        encodeMethods.put(Types.list(valueClass), methodName);
+        encodeMethods.put(listFieldType, methodName);
         return methodName;
     }
 
@@ -143,7 +143,7 @@ final class EntityEncoderBuilder<T> {
             String enumCodecVariable = registerEnumCodec(fieldClass);
             builder.indent(indent).append("{}.encode(writer, {}, null);\n", enumCodecVariable, fieldVariable);
         } else if (GenericTypes.isGenericList(fieldType)) {
-            String methodName = encodeListMethod(GenericTypes.listValueClass(fieldType));
+            String methodName = encodeListMethod(fieldType);
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, wrapper, {});\n", methodName, fieldVariable);
         } else if (GenericTypes.isGenericMap(fieldType)) {
