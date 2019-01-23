@@ -1,6 +1,5 @@
 <FindBugsFilter>
     <!--refer to https://spotbugs.readthedocs.io/en/latest/bugDescriptions.html-->
-    <!--OBL_UNSATISFIED_OBLIGATION: Method may fail to clean up stream or resource (spotbugs bug: https://github.com/spotbugs/spotbugs/issues/432)-->
     <Match>
         <Bug pattern="CNT_ROUGH_CONSTANT_VALUE,
             AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION,
@@ -596,8 +595,10 @@
     </Match>
 
     <!--
-    broken rules with jdk 11, due to jdk 11 generated either wrong or different byte code
+    broken rules with jdk 9
+    OBL_UNSATISFIED_OBLIGATION: Method may fail to clean up stream or resource (spotbugs bug: https://github.com/spotbugs/spotbugs/issues/432)
 
+    broken rules with jdk 11, due to jdk 11 generated either wrong or different byte code
     spotbugs:
     RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE
     RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE
