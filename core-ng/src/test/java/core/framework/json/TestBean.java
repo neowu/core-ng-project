@@ -1,6 +1,7 @@
 package core.framework.json;
 
 import core.framework.api.json.Property;
+import core.framework.api.validate.NotNull;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 
@@ -16,15 +17,19 @@ import java.util.Map;
  * @author neo
  */
 public class TestBean {
+    @NotNull
     @Property(name = "map")
     public final Map<String, String> mapField = Maps.newHashMap();
 
+    @NotNull
     @Property(name = "enumMap")
     public final Map<TestEnum, String> enumMapField = new EnumMap<>(TestEnum.class);
 
+    @NotNull
     @Property(name = "list")
     public final List<String> listField = Lists.newArrayList();
 
+    @NotNull
     @Property(name = "children")
     public final List<Child> childrenField = Lists.newArrayList();
 
@@ -54,6 +59,7 @@ public class TestBean {
     @Property(name = "empty")
     public Empty empty;
 
+    @NotNull
     @Property(name = "defaultValue")
     public String defaultValueField = "defaultValue";
 

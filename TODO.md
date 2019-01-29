@@ -15,7 +15,6 @@
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 * rethink module structure to fit java module export requirement
 * run diagnostic when heap usage is high, send trace, log().alert() ?
-* JSON.from/to add validation?
 
 ### jdk 11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

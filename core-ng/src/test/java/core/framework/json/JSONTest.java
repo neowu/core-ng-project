@@ -1,5 +1,6 @@
 package core.framework.json;
 
+import core.framework.impl.validate.ValidationException;
 import core.framework.util.Types;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -148,7 +150,7 @@ class JSONTest {
 
     @Test
     void empty() {
-        TestBean bean = new TestBean();
+        var bean = new TestBean();
         bean.empty = new TestBean.Empty();
         String json = JSON.toJSON(bean);
         assertThat(json).contains("\"empty\":{}");
@@ -162,5 +164,22 @@ class JSONTest {
         TestBean bean = JSON.fromJSON(TestBean.class, "{}");
 
         assertThat(bean.defaultValueField).isEqualTo("defaultValue");
+    }
+
+    @Test
+    void toJSONWithValidation() {
+        var bean = new TestBean();
+        bean.defaultValueField = null;
+
+        assertThatThrownBy(() -> JSON.toJSON(bean))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("validation failed");
+    }
+
+    @Test
+    void fromJSONWithValidation() {
+        assertThatThrownBy(() -> JSON.fromJSON(TestBean.class, "{\"defaultValue\": null}"))
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("validation failed");
     }
 }
