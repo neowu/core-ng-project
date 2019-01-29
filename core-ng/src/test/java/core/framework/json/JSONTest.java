@@ -167,17 +167,14 @@ class JSONTest {
     }
 
     @Test
-    void toJSONWithValidation() {
+    void validate() {
         var bean = new TestBean();
         bean.defaultValueField = null;
 
         assertThatThrownBy(() -> JSON.toJSON(bean))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("validation failed");
-    }
 
-    @Test
-    void fromJSONWithValidation() {
         assertThatThrownBy(() -> JSON.fromJSON(TestBean.class, "{\"defaultValue\": null}"))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("validation failed");

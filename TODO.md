@@ -21,7 +21,6 @@
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
 * class in interface module generates Validator make interface depends on core-ng module (java module)
 * JDK TLSv1.3 issues: cause jdk httpclient run into infinite loop on concurrent condition
-* jdk httpclient doesn't work with http response without content-length, now we have to let Response.empty return 200
   https://bugs.openjdk.java.net/browse/JDK-8211437  
 
 ### kube deployment + http client keep alive issue, reference
