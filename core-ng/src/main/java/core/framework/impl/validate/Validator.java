@@ -27,14 +27,6 @@ public final class Validator {
     }
 
     // serialize to json without any extra logic
-    private static JSONLogParam param(Object instance) {
-        try {
-            return new JSONLogParam(Strings.bytes(JSONMapper.OBJECT_MAPPER.writeValueAsString(instance)), UTF_8);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     public void validate(Object bean, boolean partial) {
         if (bean == null) {
             throw new ValidationException(Map.of("bean", "bean must not be null"));
@@ -49,6 +41,14 @@ public final class Validator {
                 LOGGER.debug("validate, beanClass={}, bean={}, partial={}", bean.getClass().getCanonicalName(), param(bean), partial);
                 throw new ValidationException(errors.errors);
             }
+        }
+    }
+
+    private JSONLogParam param(Object instance) {
+        try {
+            return new JSONLogParam(Strings.bytes(JSONMapper.OBJECT_MAPPER.writeValueAsString(instance)), UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }
