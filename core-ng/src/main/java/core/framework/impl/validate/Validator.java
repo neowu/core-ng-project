@@ -23,7 +23,6 @@ public final class Validator {
         this.validator = builder.build().orElse(null);
     }
 
-    // serialize to json without any extra logic
     public void validate(Object bean, boolean partial) {
         if (bean == null) {
             throw new ValidationException(Map.of("bean", "bean must not be null"));
