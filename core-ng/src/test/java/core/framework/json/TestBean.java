@@ -19,19 +19,19 @@ import java.util.Map;
 public class TestBean {
     @NotNull
     @Property(name = "map")
-    public final Map<String, String> mapField = Maps.newHashMap();
+    public Map<String, String> mapField = Maps.newHashMap();
 
     @NotNull
     @Property(name = "enumMap")
-    public final Map<TestEnum, String> enumMapField = new EnumMap<>(TestEnum.class);
+    public Map<TestEnum, String> enumMapField = new EnumMap<>(TestEnum.class);
 
     @NotNull
     @Property(name = "list")
-    public final List<String> listField = Lists.newArrayList();
+    public List<String> listField = Lists.newArrayList();
 
     @NotNull
     @Property(name = "children")
-    public final List<Child> childrenField = Lists.newArrayList();
+    public List<Child> childrenField = Lists.newArrayList();
 
     @Property(name = "child")
     public Child childField;
@@ -54,8 +54,6 @@ public class TestBean {
     @Property(name = "enum")
     public TestEnum enumField;
 
-    public Integer notAnnotatedField;
-
     @Property(name = "empty")
     public Empty empty;
 
@@ -68,6 +66,7 @@ public class TestBean {
         A,
         @Property(name = "B1")
         B,
+        @Property(name = "C")
         C
     }
 

@@ -28,8 +28,6 @@ public final class JSON {
         }
     }
 
-    // JSON is designed to be flexible, allow to serialize/deserialize any types including null, here only validate only if it's app defined class,
-    // and not include List<T> or Map<String, T>
     public static <T> T fromJSON(Class<T> instanceClass, String json) {
         try {
             T instance = OBJECT_MAPPER.readValue(json, instanceClass);

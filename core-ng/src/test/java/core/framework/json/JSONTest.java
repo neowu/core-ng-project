@@ -129,17 +129,6 @@ class JSONTest {
     }
 
     @Test
-    void notAnnotatedField() {
-        var bean = new TestBean();
-        bean.notAnnotatedField = 100;
-        String json = JSON.toJSON(bean);
-        assertThat(json).contains("\"notAnnotatedField\":100");
-
-        TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertThat(parsedBean).isEqualToComparingFieldByFieldRecursively(bean);
-    }
-
-    @Test
     void enumValue() {
         assertThat(JSON.fromEnumValue(TestBean.TestEnum.class, "A1")).isEqualTo(TestBean.TestEnum.A);
         assertThat(JSON.fromEnumValue(TestBean.TestEnum.class, "C")).isEqualTo(TestBean.TestEnum.C);
