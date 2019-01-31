@@ -131,8 +131,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         try {
             Response response = client().getLowLevelClient().performRequest(new Request("GET", "/_cluster/state/metadata"));
             byte[] bytes = responseBody(response.getEntity());
-            JSONMapper<ClusterStateResponse> mapper = new JSONMapper<>(ClusterStateResponse.class);
-            return mapper.fromJSON(bytes);
+            return new JSONMapper<ClusterStateResponse>(ClusterStateResponse.class).fromJSON(bytes);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {

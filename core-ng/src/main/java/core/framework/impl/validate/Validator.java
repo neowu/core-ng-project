@@ -2,12 +2,9 @@ package core.framework.impl.validate;
 
 import core.framework.impl.log.filter.JSONLogParam;
 import core.framework.internal.json.JSONMapper;
-import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.function.Function;
@@ -38,17 +35,11 @@ public final class Validator {
             if (errors.hasError()) {
                 // all validatable beans can be converted to JSON, only log content on failure path, not to slow down happy path
                 // use debug level not to interfere error_code in action log
-                LOGGER.debug("validate, beanClass={}, bean={}, partial={}", bean.getClass().getCanonicalName(), param(bean), partial);
+                LOGGER.debug("validate, beanClass={}, bean={}, partial={}", bean.getClass().getCanonicalName(),
+                        new JSONLogParam(new JSONMapper<>(bean.getClass()).toJSON(bean), UTF_8),
+                        partial);
                 throw new ValidationException(errors.errors);
             }
-        }
-    }
-
-    private JSONLogParam param(Object instance) {
-        try {
-            return new JSONLogParam(Strings.bytes(JSONMapper.OBJECT_MAPPER.writeValueAsString(instance)), UTF_8);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
         }
     }
 }

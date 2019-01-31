@@ -2,6 +2,7 @@
 ### 6.10.10 (1/16/2019 - )
 * mongo: support enum as map key to be consistent with other subsystem
 * json: JSON.fromJSON/toJSON added validation for app beans
+* search: update ES to 6.6.0
 
 ### 6.10.9 (1/7/2019 - 1/16/2019)
 * cookies: support SameSite attribute, and make SessionId cookie SameSite to prevent CSRF

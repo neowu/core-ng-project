@@ -31,7 +31,7 @@ public class LocalElasticSearch {
         try {
             Settings.Builder settings = Settings.builder();
             settings.put(Environment.PATH_HOME_SETTING.getKey(), dataPath)
-                    .put(NetworkService.GLOBAL_NETWORK_BINDHOST_SETTING.getKey(), "_local_")
+                    .put(NetworkService.GLOBAL_NETWORK_BIND_HOST_SETTING.getKey(), "_local_")
                     .put(DiscoveryModule.DISCOVERY_TYPE_SETTING.getKey(), "single-node");
             node = new LocalNode(settings.build());
             node.start();
