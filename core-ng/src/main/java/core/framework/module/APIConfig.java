@@ -115,7 +115,7 @@ public class APIConfig extends Config {
         BeanMapperRegistry registry = context.httpServer.handler.beanMapperRegistry;
         for (Class<?> beanClass : beanClasses) {
             if (registry.beanMappers.containsKey(beanClass)) {
-                throw new Error(format("bean class is already registered or referred by service interface, class={}", beanClass.getCanonicalName()));
+                throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             }
             registry.register(beanClass);
             this.beanClasses.add(beanClass);
