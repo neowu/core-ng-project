@@ -33,6 +33,13 @@ class DatabaseClassValidatorTest {
                 .hasMessageContaining("db entity field must not have default value");
     }
 
+    @Test
+    void viewWithPrimaryKey() {
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestViewWithPrimaryKey.class).validateViewClass())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("db view field must not have @PrimaryKey");
+    }
+
     @Table(name = "test_entity_with_invalid_pk")
     public static class TestEntityWithInvalidPrimaryKey {
         @PrimaryKey(autoIncrement = true)
@@ -48,5 +55,11 @@ class DatabaseClassValidatorTest {
 
         @Column(name = "name")
         public String name = "default";
+    }
+
+    public static class TestViewWithPrimaryKey {
+        @PrimaryKey(autoIncrement = true)
+        @Column(name = "id")
+        public Integer id;
     }
 }

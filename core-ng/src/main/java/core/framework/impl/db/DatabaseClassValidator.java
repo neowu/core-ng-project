@@ -77,13 +77,14 @@ final class DatabaseClassValidator implements TypeVisitor {
 
         PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
         if (primaryKey != null) {
+            if (validateView) throw new Error("db view field must not have @PrimaryKey, field=" + Fields.path(field));
             foundPrimaryKey = true;
             validatePrimaryKey(primaryKey, field.getType(), field);
         }
 
         try {
             // entity constructed by "new" with default value will break partialUpdate accidentally, due to fields are not null will be updated to db
-            if (field.get(entityWithDefaultValue) != null)
+            if (!validateView && field.get(entityWithDefaultValue) != null)
                 throw new Error("db entity field must not have default value, field=" + Fields.path(field));
         } catch (ReflectiveOperationException e) {
             throw new Error(e);
