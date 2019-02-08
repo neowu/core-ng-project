@@ -1,4 +1,7 @@
 ## Change log
+### 6.11.1 (2/8/2019 - )   !!! in this version, we will revisit all validation/bean/annotation/config
+* db: not allowing db entity with default value, due to it may cause undesired behavior on partialUpdate, ("new entity() -> change fields -> updatePartial(entity)" will update those fields with default value since they are not null)
+
 ### 6.10.10 (1/16/2019 - 1/31/2019)
 * mongo: support enum as map key to be consistent with other subsystem
 * json: JSON.fromJSON/toJSON added validation for app beans

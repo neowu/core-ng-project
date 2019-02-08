@@ -28,6 +28,7 @@ final class DatabaseClassValidator implements TypeVisitor {
     private boolean foundAutoIncrementalPrimaryKey;
     private boolean foundSequencePrimaryKey;
     private boolean validateView;
+    private Object entityWithDefaultValue;
 
     DatabaseClassValidator(Class<?> entityClass) {
         validator = new DataTypeValidator(entityClass);
@@ -54,6 +55,12 @@ final class DatabaseClassValidator implements TypeVisitor {
         } else {
             if (!objectClass.isAnnotationPresent(Table.class))
                 throw new Error("db entity class must have @Table, class=" + objectClass.getCanonicalName());
+
+            try {
+                entityWithDefaultValue = objectClass.getDeclaredConstructor().newInstance();
+            } catch (ReflectiveOperationException e) {
+                throw new Error(e);
+            }
         }
     }
 
@@ -72,6 +79,14 @@ final class DatabaseClassValidator implements TypeVisitor {
         if (primaryKey != null) {
             foundPrimaryKey = true;
             validatePrimaryKey(primaryKey, field.getType(), field);
+        }
+
+        try {
+            // entity constructed by "new" with default value will break partialUpdate accidentally, due to fields are not null will be updated to db
+            if (field.get(entityWithDefaultValue) != null)
+                throw new Error("db entity field must not have default value, field=" + Fields.path(field));
+        } catch (ReflectiveOperationException e) {
+            throw new Error(e);
         }
     }
 

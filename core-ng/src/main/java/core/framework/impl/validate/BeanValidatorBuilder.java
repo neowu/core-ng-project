@@ -157,9 +157,9 @@ public class BeanValidatorBuilder {
 
     private void validate(Class<?> beanClass) {
         try {
-            Object beanWithDefaultValues = beanClass.getDeclaredConstructor().newInstance();
+            Object beanWithDefaultValue = beanClass.getDeclaredConstructor().newInstance();
             for (Field field : Classes.instanceFields(beanClass)) {
-                validateAnnotations(field, beanWithDefaultValues);
+                validateAnnotations(field, beanWithDefaultValue);
                 Class<?> targetClass = targetValidationClass(field);
                 if (!isValueClass(targetClass))
                     validate(targetClass);

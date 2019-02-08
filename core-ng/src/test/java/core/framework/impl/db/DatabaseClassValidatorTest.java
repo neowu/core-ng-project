@@ -26,10 +26,27 @@ class DatabaseClassValidatorTest {
                 .hasMessageContaining("primary key must be Integer or Long");
     }
 
+    @Test
+    void withDefaultValue() {
+        assertThatThrownBy(() -> new DatabaseClassValidator(TestEntityWithDefaultValue.class).validateEntityClass())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("db entity field must not have default value");
+    }
+
     @Table(name = "test_entity_with_invalid_pk")
     public static class TestEntityWithInvalidPrimaryKey {
         @PrimaryKey(autoIncrement = true)
         @Column(name = "id")
         public String id;
+    }
+
+    @Table(name = "test_entity_with_default_value")
+    public static class TestEntityWithDefaultValue {
+        @PrimaryKey
+        @Column(name = "id")
+        public String id;
+
+        @Column(name = "name")
+        public String name = "default";
     }
 }
