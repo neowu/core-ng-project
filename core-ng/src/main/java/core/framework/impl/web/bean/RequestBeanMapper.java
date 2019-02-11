@@ -1,7 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.api.web.service.QueryParam;
-import core.framework.impl.validate.Validator;
+import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 
 import java.util.Map;
@@ -35,7 +34,7 @@ public class RequestBeanMapper {
         return (QueryParamMapperHolder<T>) queryParamMappers.computeIfAbsent(beanClass, key -> {
             new QueryParamBeanClassValidator(beanClass, registry).validate();
             QueryParamMapper<T> mapper = new QueryParamMapperBuilder<>(beanClass).build();
-            var validator = new Validator(beanClass, field -> field.getDeclaredAnnotation(QueryParam.class).name());
+            var validator = new Validator(beanClass);
             return new QueryParamMapperHolder<>(mapper, validator);
         });
     }

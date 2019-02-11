@@ -2,8 +2,8 @@ package core.framework.impl.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
-import core.framework.impl.validate.ValidationException;
 import core.framework.impl.web.bean.RequestBeanMapper;
+import core.framework.internal.validate.ValidationException;
 import core.framework.util.Maps;
 import core.framework.web.CookieSpec;
 import core.framework.web.MultipartFile;

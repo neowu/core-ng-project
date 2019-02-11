@@ -1,7 +1,7 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.validate.Validator;
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.validate.Validator;
 
 /**
  * @author neo

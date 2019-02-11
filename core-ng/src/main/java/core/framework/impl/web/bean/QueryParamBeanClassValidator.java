@@ -3,9 +3,9 @@ package core.framework.impl.web.bean;
 import core.framework.api.json.Property;
 import core.framework.api.web.service.QueryParam;
 import core.framework.impl.reflect.Fields;
-import core.framework.impl.validate.type.DataTypeValidator;
-import core.framework.impl.validate.type.JSONClassValidator;
-import core.framework.impl.validate.type.TypeVisitor;
+import core.framework.internal.validate.type.DataTypeValidator;
+import core.framework.internal.validate.type.JSONClassValidator;
+import core.framework.internal.validate.type.TypeVisitor;
 import core.framework.util.Sets;
 
 import java.lang.reflect.Field;

@@ -1,8 +1,8 @@
 package core.framework.impl.template;
 
 import core.framework.impl.reflect.Methods;
-import core.framework.impl.validate.type.DataTypeValidator;
-import core.framework.impl.validate.type.TypeVisitor;
+import core.framework.internal.validate.type.DataTypeValidator;
+import core.framework.internal.validate.type.TypeVisitor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

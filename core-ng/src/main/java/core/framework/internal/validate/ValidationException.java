@@ -1,7 +1,6 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 import core.framework.log.ErrorCode;
-import core.framework.util.Strings;
 
 import java.util.Map;
 
@@ -13,7 +12,7 @@ public final class ValidationException extends RuntimeException implements Error
     public final Map<String, String> errors;
 
     public ValidationException(Map<String, String> errors) {
-        super(Strings.format("validation failed, error={}", errors));
+        super("validation failed, error=" + errors);
         this.errors = errors;
     }
 

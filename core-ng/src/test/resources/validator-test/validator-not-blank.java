@@ -1,5 +1,5 @@
-public class BeanValidatorNotBlankTest$Bean$Validator implements core.framework.impl.validate.BeanValidator {
-    private void validateBean0(core.framework.impl.validate.BeanValidatorNotBlankTest.Bean bean, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
+public class BeanValidatorNotBlankTest$Bean$Validator implements core.framework.internal.validate.BeanValidator {
+    private void validateBean0(core.framework.internal.validate.BeanValidatorNotBlankTest.Bean bean, core.framework.internal.validate.ValidationErrors errors, boolean partial) {
         if (bean.stringField1 == null) {
             if (!partial) errors.add("stringField1", "field must not be null");
         } else {
@@ -11,8 +11,8 @@ public class BeanValidatorNotBlankTest$Bean$Validator implements core.framework.
         }
     }
 
-    public void validate(Object instance, core.framework.impl.validate.ValidationErrors errors, boolean partial) {
-        validateBean0((core.framework.impl.validate.BeanValidatorNotBlankTest.Bean) instance, errors, partial);
+    public void validate(Object instance, core.framework.internal.validate.ValidationErrors errors, boolean partial) {
+        validateBean0((core.framework.internal.validate.BeanValidatorNotBlankTest.Bean) instance, errors, partial);
     }
 
 }

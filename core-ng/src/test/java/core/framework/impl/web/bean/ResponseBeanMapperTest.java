@@ -1,7 +1,7 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.validate.ValidationException;
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.validate.ValidationException;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
 import core.framework.util.Types;
@@ -86,7 +86,7 @@ class ResponseBeanMapperTest {
 
         assertThatThrownBy(() -> responseBeanMapper.fromJSON(TestBean.class, mapper.toJSON(bean)))
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("int_field");
+                .hasMessageContaining("validation failed");
     }
 
     @Test

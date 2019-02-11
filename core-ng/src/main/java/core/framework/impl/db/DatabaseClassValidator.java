@@ -7,8 +7,8 @@ import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
-import core.framework.impl.validate.type.DataTypeValidator;
-import core.framework.impl.validate.type.TypeVisitor;
+import core.framework.internal.validate.type.DataTypeValidator;
+import core.framework.internal.validate.type.TypeVisitor;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
 

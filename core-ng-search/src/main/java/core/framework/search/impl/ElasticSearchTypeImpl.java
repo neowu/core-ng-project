@@ -1,8 +1,7 @@
 package core.framework.search.impl;
 
-import core.framework.api.json.Property;
-import core.framework.impl.validate.Validator;
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.validate.Validator;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.search.AnalyzeRequest;
@@ -75,7 +74,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         this.elasticSearch = elasticSearch;
         this.slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
         this.index = documentClass.getDeclaredAnnotation(Index.class).name();
-        validator = new Validator(documentClass, field -> field.getDeclaredAnnotation(Property.class).name());
+        validator = new Validator(documentClass);
         mapper = new JSONMapper<>(documentClass);
     }
 

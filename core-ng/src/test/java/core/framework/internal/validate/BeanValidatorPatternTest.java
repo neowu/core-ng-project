@@ -1,11 +1,9 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +18,7 @@ class BeanValidatorPatternTest {
 
     @BeforeEach
     void createObjectValidator() {
-        validator = new BeanValidatorBuilder(Bean.class, Field::getName).build().orElseThrow();
+        validator = new BeanValidatorBuilder(Bean.class).build().orElseThrow();
     }
 
     @Test

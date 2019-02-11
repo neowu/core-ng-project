@@ -1,9 +1,9 @@
 package core.framework.impl.web.response;
 
-import core.framework.impl.validate.ValidationException;
 import core.framework.impl.web.bean.BeanMapperRegistry;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.bean.TestBean;
+import core.framework.internal.validate.ValidationException;
 import io.undertow.io.Sender;
 import org.junit.jupiter.api.Test;
 

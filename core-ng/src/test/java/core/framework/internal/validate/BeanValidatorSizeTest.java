@@ -1,11 +1,10 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Size;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +18,7 @@ class BeanValidatorSizeTest {
 
     @BeforeEach
     void createObjectValidator() {
-        validator = new BeanValidatorBuilder(Bean.class, Field::getName).build().orElseThrow();
+        validator = new BeanValidatorBuilder(Bean.class).build().orElseThrow();
     }
 
     @Test

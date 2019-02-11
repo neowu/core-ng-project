@@ -1,4 +1,4 @@
-package core.framework.impl.validate.type;
+package core.framework.internal.validate.type;
 
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.reflect.GenericTypes;
@@ -121,13 +121,13 @@ public class DataTypeValidator {
 
     private void validateClass(Class<?> objectClass) {
         if (objectClass.isPrimitive() || objectClass.getPackageName().startsWith("java") || objectClass.isEnum())
-            throw new Error(format("class must be bean class, class={}", objectClass.getCanonicalName()));
+            throw new Error("class must be bean class, class=" + objectClass.getCanonicalName());
         if (objectClass.isMemberClass() && !Modifier.isStatic(objectClass.getModifiers()))
-            throw new Error(format("class must be static, class={}", objectClass.getCanonicalName()));
+            throw new Error("class must be static, class=" + objectClass.getCanonicalName());
         if (objectClass.isInterface() || Modifier.isAbstract(objectClass.getModifiers()) || !Modifier.isPublic(objectClass.getModifiers()))
-            throw new Error(format("class must be public concrete, class={}", objectClass.getCanonicalName()));
+            throw new Error("class must be public concrete, class=" + objectClass.getCanonicalName());
         if (!Object.class.equals(objectClass.getSuperclass()))
-            throw new Error(format("class must not have super class, class={}", objectClass.getCanonicalName()));
+            throw new Error("class must not have super class, class=" + objectClass.getCanonicalName());
 
         Constructor<?>[] constructors = objectClass.getDeclaredConstructors();
         if (constructors.length > 1 || constructors[0].getParameterCount() > 1 || !Modifier.isPublic(constructors[0].getModifiers())) {

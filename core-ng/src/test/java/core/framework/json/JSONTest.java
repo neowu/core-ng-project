@@ -1,6 +1,6 @@
 package core.framework.json;
 
-import core.framework.impl.validate.ValidationException;
+import core.framework.internal.validate.ValidationException;
 import core.framework.util.Types;
 import org.junit.jupiter.api.Test;
 

@@ -1,9 +1,8 @@
 package core.framework.impl.db;
 
-import core.framework.db.Column;
 import core.framework.db.Query;
 import core.framework.db.Repository;
-import core.framework.impl.validate.Validator;
+import core.framework.internal.validate.Validator;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.StopWatch;
@@ -31,7 +30,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     RepositoryImpl(DatabaseImpl database, Class<T> entityClass) {
         this.database = database;
-        validator = new Validator(entityClass, field -> field.getDeclaredAnnotation(Column.class).name());
+        validator = new Validator(entityClass);
         insertQuery = new InsertQueryBuilder<>(entityClass).build();
         selectQuery = new SelectQuery<>(entityClass, database.vendor);
         updateQuery = new UpdateQueryBuilder<>(entityClass).build();

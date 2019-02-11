@@ -1,9 +1,8 @@
 package core.framework.json;
 
 import com.fasterxml.jackson.databind.JavaType;
-import core.framework.api.json.Property;
-import core.framework.impl.validate.Validator;
-import core.framework.impl.validate.type.JSONClassValidator;
+import core.framework.internal.validate.Validator;
+import core.framework.internal.validate.type.JSONClassValidator;
 import core.framework.util.Maps;
 
 import java.io.IOException;
@@ -58,7 +57,7 @@ public final class JSON {
     private static void validate(Class<?> instanceClass, Object instance) {
         Validator validator = VALIDATORS.computeIfAbsent(instanceClass, key -> {
             new JSONClassValidator(instanceClass).validate();
-            return new Validator(key, field -> field.getDeclaredAnnotation(Property.class).name());
+            return new Validator(key);
         });
         validator.validate(instance, false);
     }

@@ -1,9 +1,7 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 import core.framework.api.validate.NotNull;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -13,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ValidatorTest {
     @Test
     void validate() {
-        var validator = new Validator(TestBean.class, Field::getName);
+        var validator = new Validator(TestBean.class);
         assertThatThrownBy(() -> validator.validate(null, false))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("bean must not be null");

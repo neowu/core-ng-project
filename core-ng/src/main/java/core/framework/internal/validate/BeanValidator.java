@@ -1,4 +1,4 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 /**
  * @author neo

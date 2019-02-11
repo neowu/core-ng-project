@@ -1,4 +1,4 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 import core.framework.api.validate.Length;
 import core.framework.api.validate.Max;
@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
 import static core.framework.impl.asm.Literal.type;
@@ -32,13 +31,11 @@ import static core.framework.util.Strings.format;
  */
 public class BeanValidatorBuilder {
     private final Class<?> beanClass;
-    private final Function<Field, String> fieldNameProvider;
     DynamicInstanceBuilder<BeanValidator> builder;
     private int index = 0;
 
-    public BeanValidatorBuilder(Class<?> beanClass, Function<Field, String> fieldNameProvider) {
+    public BeanValidatorBuilder(Class<?> beanClass) {
         this.beanClass = beanClass;
-        this.fieldNameProvider = fieldNameProvider;
     }
 
     public Optional<BeanValidator> build() {
@@ -150,7 +147,7 @@ public class BeanValidatorBuilder {
     }
 
     private String path(Field field, String parentPath) {
-        String path = fieldNameProvider.apply(field);
+        String path = field.getName();
         if (parentPath == null) return path;
         return parentPath + "." + path;
     }

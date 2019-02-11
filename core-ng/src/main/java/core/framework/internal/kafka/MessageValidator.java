@@ -1,8 +1,7 @@
 package core.framework.internal.kafka;
 
-import core.framework.api.json.Property;
-import core.framework.impl.validate.Validator;
-import core.framework.impl.validate.type.JSONClassValidator;
+import core.framework.internal.validate.Validator;
+import core.framework.internal.validate.type.JSONClassValidator;
 
 /**
  * @author neo
@@ -12,7 +11,7 @@ public class MessageValidator<T> {
 
     MessageValidator(Class<T> messageClass) {
         new JSONClassValidator(messageClass).validate();
-        validator = new Validator(messageClass, field -> field.getDeclaredAnnotation(Property.class).name());
+        validator = new Validator(messageClass);
     }
 
     public void validate(T message) {

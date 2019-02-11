@@ -1,10 +1,8 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 import core.framework.api.validate.Length;
 import core.framework.api.validate.Min;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Field;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,26 +13,26 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class BeanValidatorBuilderTest {
     @Test
     void withoutValidationAnnotation() {
-        assertThat(new BeanValidatorBuilder(Bean.class, Field::getName).build()).isNotPresent();
+        assertThat(new BeanValidatorBuilder(Bean.class).build()).isNotPresent();
     }
 
     @Test
     void validateMinAnnotation() {
-        assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithInvalidMinAnnotation.class, Field::getName).build())
+        assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithInvalidMinAnnotation.class).build())
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("@Min must on Number");
     }
 
     @Test
     void validateLengthAnnotation() {
-        assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithInvalidLengthAnnotation.class, Field::getName).build())
+        assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithInvalidLengthAnnotation.class).build())
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("@Length must on String");
     }
 
     @Test
     void validateNotNull() {
-        assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithDefaultValue.class, Field::getName).build())
+        assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithDefaultValue.class).build())
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("field with default value must have @NotNull");
     }

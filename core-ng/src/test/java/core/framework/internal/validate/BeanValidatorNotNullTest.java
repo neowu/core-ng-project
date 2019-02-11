@@ -1,11 +1,10 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 import core.framework.api.validate.NotNull;
 import core.framework.util.ClasspathResources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +19,7 @@ class BeanValidatorNotNullTest {
 
     @BeforeEach
     void createObjectValidator() {
-        builder = new BeanValidatorBuilder(Bean.class, Field::getName);
+        builder = new BeanValidatorBuilder(Bean.class);
         validator = builder.build().orElseThrow();
     }
 

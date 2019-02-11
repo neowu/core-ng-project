@@ -1,13 +1,11 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 import core.framework.impl.log.filter.JSONLogParam;
 import core.framework.internal.json.JSONMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.function.Function;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -18,8 +16,8 @@ public final class Validator {
     private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
     private final BeanValidator validator;
 
-    public Validator(Class<?> beanClass, Function<Field, String> fieldNameProvider) {
-        var builder = new BeanValidatorBuilder(beanClass, fieldNameProvider);
+    public Validator(Class<?> beanClass) {
+        var builder = new BeanValidatorBuilder(beanClass);
         this.validator = builder.build().orElse(null);
     }
 

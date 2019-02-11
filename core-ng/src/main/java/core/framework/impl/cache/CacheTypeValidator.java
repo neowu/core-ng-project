@@ -1,6 +1,6 @@
 package core.framework.impl.cache;
 
-import core.framework.impl.validate.type.DataTypeValidator;
+import core.framework.internal.validate.type.DataTypeValidator;
 
 import java.lang.reflect.Type;
 

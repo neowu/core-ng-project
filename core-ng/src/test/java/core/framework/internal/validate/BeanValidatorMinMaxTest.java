@@ -1,11 +1,10 @@
-package core.framework.impl.validate;
+package core.framework.internal.validate;
 
 import core.framework.api.validate.Max;
 import core.framework.api.validate.Min;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +20,7 @@ class BeanValidatorMinMaxTest {
 
     @BeforeEach
     void createObjectValidator() {
-        validator = new BeanValidatorBuilder(Bean.class, Field::getName).build().orElseThrow();
+        validator = new BeanValidatorBuilder(Bean.class).build().orElseThrow();
     }
 
     @Test

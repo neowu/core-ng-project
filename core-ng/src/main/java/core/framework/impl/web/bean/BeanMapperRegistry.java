@@ -1,8 +1,7 @@
 package core.framework.impl.web.bean;
 
-import core.framework.api.json.Property;
 import core.framework.impl.reflect.Classes;
-import core.framework.impl.validate.Validator;
+import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 
 import java.util.Map;
@@ -20,7 +19,7 @@ public class BeanMapperRegistry {
     public <T> BeanMapper<T> register(Class<T> beanClass) {
         return (BeanMapper<T>) beanMappers.computeIfAbsent(beanClass, type -> {
             new BeanClassValidator(beanClass, this).validate();
-            return new BeanMapper<>(beanClass, new Validator(beanClass, field -> field.getDeclaredAnnotation(Property.class).name()));
+            return new BeanMapper<>(beanClass, new Validator(beanClass));
         });
     }
 

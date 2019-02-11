@@ -1,6 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.validate.type.JSONClassValidator;
+import core.framework.internal.validate.type.JSONClassValidator;
 
 /**
  * @author neo

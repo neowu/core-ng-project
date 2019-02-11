@@ -3,6 +3,7 @@
 * db: not allowing db entity with default value, due to it may cause undesired behavior on partialUpdate, ("new entity() -> change fields -> updatePartial(entity)" will update those fields with default value since they are not null)
 * cache: not allowing to cache value (considered as bad practice, better wrap with class for maintenance)
          removed to register Cache<T> with name in CacheConfig, as it's generally for value type
+* validator: simplify validator, use field name as part of error key (actual use cases use JS to validate anyway, if there is actual need, may add @Label to customize the error key)
 
 ### 6.10.10 (1/16/2019 - 1/31/2019)
 * mongo: support enum as map key to be consistent with other subsystem

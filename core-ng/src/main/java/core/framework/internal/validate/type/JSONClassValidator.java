@@ -1,4 +1,4 @@
-package core.framework.impl.validate.type;
+package core.framework.internal.validate.type;
 
 import core.framework.api.json.Property;
 import core.framework.impl.reflect.Classes;
