@@ -56,11 +56,11 @@ public class TestModule extends AbstractTestModule {
 
     private void configureCache() {
         cache().redis("localhost");
-        cache().add(String.class, Duration.ofHours(6));
+        cache().add(TestDBEntity.class, Duration.ofHours(6));
     }
 
     private void configureExecutor() {
-        executor().add(null, 1);
+        executor().add();
         executor().add("name", 1);
     }
 
