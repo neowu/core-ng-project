@@ -1,10 +1,9 @@
 package core.framework.module;
 
-import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -18,11 +17,8 @@ class CacheConfigTest {
     }
 
     @Test
-    void cacheName() {
-        assertEquals("list-string", config.cacheName(null, Types.list(String.class)));
-
-        assertEquals("string", config.cacheName(null, String.class));
-
-        assertEquals("name", config.cacheName("name", String.class));
+    void validate() {
+        assertThatThrownBy(() -> config.validate())
+                .hasMessageContaining("cache is configured but no cache added");
     }
 }

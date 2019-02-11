@@ -14,7 +14,6 @@ class CacheTypeValidator {
         validator = new DataTypeValidator(instanceType);
         validator.allowChild = true;
         validator.allowTopLevelList = true;
-        validator.allowTopLevelValue = true;
     }
 
     public void validate() {

@@ -12,12 +12,10 @@ import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
 import core.framework.impl.web.management.CacheController;
-import core.framework.util.ASCII;
 import core.framework.util.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.Duration;
 
@@ -36,26 +34,9 @@ public class CacheConfig extends Config {
 
     @Override
     protected void validate() {
-        if (cacheManager.caches().isEmpty()) {
+        if (cacheManager == null || cacheManager.caches().isEmpty()) {
             throw new Error("cache is configured but no cache added, please remove unnecessary config");
         }
-    }
-
-    String cacheName(String name, Type valueType) {
-        if (name != null) return name;
-        if (valueType instanceof Class) {
-            return ASCII.toLowerCase(((Class<?>) valueType).getSimpleName());
-        } else if (valueType instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) valueType;
-            StringBuilder builder = new StringBuilder();
-            builder.append(ASCII.toLowerCase(((Class<?>) parameterizedType.getRawType()).getSimpleName()));
-            Type[] arguments = parameterizedType.getActualTypeArguments();
-            for (Type argument : arguments) {
-                builder.append('-').append(ASCII.toLowerCase(((Class<?>) argument).getSimpleName()));
-            }
-            return builder.toString();
-        }
-        return ASCII.toLowerCase(valueType.getTypeName());
     }
 
     public void local() {
@@ -97,16 +78,11 @@ public class CacheConfig extends Config {
         context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete, true);
     }
 
-    public void add(String name, Type valueType, Duration duration) {
+    public void add(Type cacheType, Duration duration) {
         if (cacheManager == null) throw new Error("cache is not configured, please configure cache store first");
 
-        String cacheName = cacheName(name, valueType);
-        logger.info("add cache, cacheName={}, valueType={}, name={}", cacheName, valueType.getTypeName(), name);
-        Cache<?> cache = cacheManager.add(cacheName, valueType, duration);
-        context.beanFactory.bind(Types.generic(Cache.class, valueType), name, cache);
-    }
-
-    public void add(Type valueType, Duration duration) {
-        add(null, valueType, duration);
+        logger.info("add cache, type={}", cacheType.getTypeName());
+        Cache<?> cache = cacheManager.add(cacheType, duration);
+        context.beanFactory.bind(Types.generic(Cache.class, cacheType), null, cache);
     }
 }

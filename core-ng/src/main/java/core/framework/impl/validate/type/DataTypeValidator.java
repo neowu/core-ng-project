@@ -28,7 +28,6 @@ public class DataTypeValidator {
             Integer.class, Long.class, Double.class, BigDecimal.class,
             LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
     public boolean allowTopLevelList;
-    public boolean allowTopLevelValue;
     public boolean allowChild;
     public TypeVisitor visitor;
 
@@ -41,7 +40,6 @@ public class DataTypeValidator {
             if (!allowTopLevelList) throw new Error(format("top level list is not allowed, type={}", type.getTypeName()));
             visitList(type, null, null);
         } else {
-            if (allowTopLevelValue && allowedValueClasses.contains(GenericTypes.rawClass(type))) return;
             visitObject(GenericTypes.rawClass(type), null, null);
         }
     }

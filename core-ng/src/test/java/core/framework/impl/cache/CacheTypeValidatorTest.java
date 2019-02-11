@@ -3,10 +3,7 @@ package core.framework.impl.cache;
 import core.framework.util.Types;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -14,41 +11,18 @@ import java.util.Map;
 class CacheTypeValidatorTest {
     @Test
     void validate() {
-        new CacheTypeValidator(CacheItem.class).validate();
+        new CacheTypeValidator(TestCache.class).validate();
     }
 
     @Test
     void validateListType() {
-        new CacheTypeValidator(Types.list(CacheItem.class)).validate();
+        new CacheTypeValidator(Types.list(TestCache.class)).validate();
     }
 
     @Test
     void validateValueType() {
-        new CacheTypeValidator(String.class).validate();
-    }
-
-    public enum TestEnum {
-        V1,
-        V2
-    }
-
-    public static class CacheItem {
-        public LocalDateTime dateTimeField;
-
-        public String stringField;
-
-        public List<String> listField;
-
-        public Map<String, String> mapField;
-
-        public Child childField;
-
-        public List<Child> childrenField;
-
-        public Map<TestEnum, String> enumMapField;
-    }
-
-    public static class Child {
-        public BigDecimal bigDecimalField = BigDecimal.ZERO;
+        assertThatThrownBy(() -> new CacheTypeValidator(String.class).validate())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("class must be bean class");
     }
 }
