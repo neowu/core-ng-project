@@ -54,6 +54,11 @@ public class APIConfig extends Config {
                 .maxRetries(5);
     }
 
+    @Override
+    protected void validate() {
+        httpClientBuilder = null;
+    }
+
     public <T> void service(Class<T> serviceInterface, T service) {
         if (!beanClasses.isEmpty()) throw new Error("api().service() must be configured before api().bean()");
 

@@ -44,7 +44,7 @@ public class WebServiceInterfaceValidator {
 
     public void validate() {
         if (!serviceInterface.isInterface())
-            throw new Error(format("service interface must be interface, serviceInterface={}", serviceInterface.getCanonicalName()));
+            throw new Error("service interface must be interface, serviceInterface=" + serviceInterface.getCanonicalName());
 
         Map<String, Method> methodNames = Maps.newHashMap();
         for (Method method : serviceInterface.getDeclaredMethods()) {
@@ -62,7 +62,7 @@ public class WebServiceInterfaceValidator {
         HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
 
         Path path = method.getDeclaredAnnotation(Path.class);
-        if (path == null) throw new Error(format("service method must have @Path, method={}", Methods.path(method)));
+        if (path == null) throw new Error("service method must have @Path, method=" + Methods.path(method));
         new PathPatternValidator(path.value(), false).validate();
 
         validateResponseBeanType(method.getGenericReturnType(), method);
@@ -158,7 +158,7 @@ public class WebServiceInterfaceValidator {
         if (method.isAnnotationPresent(DELETE.class)) count++;
         if (method.isAnnotationPresent(PATCH.class)) count++;
         if (count != 1)
-            throw new Error(format("method must have exact one http method annotation, method={}", Methods.path(method)));
+            throw new Error("method must have exact one http method annotation, method=" + Methods.path(method));
     }
 
     private boolean isValueType(Class<?> type) {

@@ -23,12 +23,10 @@ import core.framework.web.site.WebDirectory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -42,7 +40,7 @@ public class ModuleContext {
     public final HTTPServer httpServer;
     public final Stat stat = new Stat();
     protected final Map<String, Config> configs = Maps.newHashMap();
-    Set<String> visitedProperties = new HashSet<>();
+    PropertyValidator propertyValidator = new PropertyValidator();
     private BackgroundTaskExecutor backgroundTask;
 
     public ModuleContext() {
@@ -105,17 +103,14 @@ public class ModuleContext {
 
     public void validate() {
         Set<String> keys = propertyManager.properties.keys();
-        Set<String> notUsedKeys = keys.stream().filter(key -> !visitedProperties.contains(key)).collect(Collectors.toSet());
-        if (!notUsedKeys.isEmpty()) {
-            throw new Error("found not used properties, please remove unnecessary config, keys=" + notUsedKeys);
-        }
-        visitedProperties = null;   // free object not used anymore
+        propertyValidator.validate(keys);
+        propertyValidator = null;   // free object not used anymore
 
         configs.values().forEach(Config::validate);
     }
 
     public Optional<String> property(String key) {
-        visitedProperties.add(key);
+        propertyValidator.usedProperties.add(key);
         return propertyManager.property(key);
     }
 

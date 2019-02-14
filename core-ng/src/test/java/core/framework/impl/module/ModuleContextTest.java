@@ -3,7 +3,7 @@ package core.framework.impl.module;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -17,13 +17,8 @@ class ModuleContextTest {
     }
 
     @Test
-    void validate() {
-        moduleContext.propertyManager.properties.set("app.notUsedKey", "value");
-        moduleContext.visitedProperties.add("app.usedKey");
-
-        assertThatThrownBy(() -> moduleContext.validate())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("found not used properties")
-                .hasMessageContaining("keys=[app.notUsedKey]");
+    void property() {
+        moduleContext.property("app.key");
+        assertThat(moduleContext.propertyValidator.usedProperties).contains("app.key");
     }
 }

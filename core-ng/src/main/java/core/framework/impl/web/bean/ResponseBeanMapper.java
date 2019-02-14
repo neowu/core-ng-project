@@ -20,7 +20,7 @@ public class ResponseBeanMapper {
     public byte[] toJSON(Object bean) {
         if (bean instanceof Optional) {  // only support Optional<T> as response bean type
             Optional<?> optional = (Optional) bean;
-            if (!optional.isPresent()) return Strings.bytes("null");
+            if (optional.isEmpty()) return Strings.bytes("null");
             Object value = optional.get();
             return registry.toJSON((Class<Object>) value.getClass(), value);
         } else {
