@@ -18,13 +18,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class ResponseBeanMapperTest {
+class ResponseBeanBodyMapperTest {
     private ResponseBeanMapper responseBeanMapper;
     private JSONMapper<TestBean> mapper;
 
     @BeforeEach
     void createResponseBeanMapper() {
-        responseBeanMapper = new ResponseBeanMapper(new BeanMapperRegistry());
+        responseBeanMapper = new ResponseBeanMapper(new BeanBodyMapperRegistry());
         mapper = new JSONMapper<>(TestBean.class);
     }
 

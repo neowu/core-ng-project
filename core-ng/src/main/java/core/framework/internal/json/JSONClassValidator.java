@@ -1,8 +1,10 @@
-package core.framework.internal.validate.type;
+package core.framework.internal.json;
 
 import core.framework.api.json.Property;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
+import core.framework.internal.validate.BeanClassValidator;
+import core.framework.internal.validate.BeanClassVisitor;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 
@@ -21,7 +23,7 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public class JSONClassValidator implements TypeVisitor {
+public class JSONClassValidator implements BeanClassVisitor {
     public static void validateEnum(Class<?> enumClass) {
         Set<String> enumValues = Sets.newHashSet();
         List<Field> fields = Classes.enumConstantFields(enumClass);
@@ -35,11 +37,11 @@ public class JSONClassValidator implements TypeVisitor {
         }
     }
 
-    private final DataTypeValidator validator;
+    private final BeanClassValidator validator;
     private final Map<String, Set<String>> visitedProperties = Maps.newHashMap();
 
     public JSONClassValidator(Class<?> instanceClass) {
-        validator = new DataTypeValidator(instanceClass);
+        validator = new BeanClassValidator(instanceClass);
         validator.allowedValueClasses = Set.of(String.class, Boolean.class,
                 Integer.class, Long.class, Double.class, BigDecimal.class,
                 LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class);
@@ -60,7 +62,7 @@ public class JSONClassValidator implements TypeVisitor {
         String name = property.name();
         if (name.isBlank()) throw new Error("@Property name attribute must not be blank, field=" + Fields.path(field));
 
-        boolean added = visitedProperties.computeIfAbsent(parentPath, key -> Sets.newHashSet()).add(name);
+        boolean added = visitedProperties.computeIfAbsent(field.getDeclaringClass().getCanonicalName(), key -> Sets.newHashSet()).add(name);
         if (!added) {
             throw new Error(format("found duplicate property, field={}, name={}", Fields.path(field), name));
         }

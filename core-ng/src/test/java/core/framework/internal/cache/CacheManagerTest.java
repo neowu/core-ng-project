@@ -1,6 +1,5 @@
-package core.framework.impl.cache;
+package core.framework.internal.cache;
 
-import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,9 +18,6 @@ class CacheManagerTest {
 
     @Test
     void cacheName() {
-        assertThat(cacheManager.cacheName(Types.list(String.class)))
-                .isEqualTo("list-string");
-
         assertThat(cacheManager.cacheName(TestCache.class))
                 .isEqualTo("testcache");
     }

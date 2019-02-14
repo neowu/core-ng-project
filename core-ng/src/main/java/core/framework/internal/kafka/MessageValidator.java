@@ -1,7 +1,7 @@
 package core.framework.internal.kafka;
 
+import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.validate.Validator;
-import core.framework.internal.validate.type.JSONClassValidator;
 
 /**
  * @author neo

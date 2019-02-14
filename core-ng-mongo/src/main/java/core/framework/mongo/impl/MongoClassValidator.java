@@ -3,8 +3,8 @@ package core.framework.mongo.impl;
 import core.framework.api.json.Property;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
-import core.framework.internal.validate.type.DataTypeValidator;
-import core.framework.internal.validate.type.TypeVisitor;
+import core.framework.internal.validate.BeanClassValidator;
+import core.framework.internal.validate.BeanClassVisitor;
 import core.framework.mongo.Collection;
 import core.framework.mongo.Id;
 import core.framework.mongo.MongoEnumValue;
@@ -24,14 +24,14 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public final class MongoClassValidator implements TypeVisitor {
-    private final DataTypeValidator validator;
+public final class MongoClassValidator implements BeanClassVisitor {
+    private final BeanClassValidator validator;
     private final Map<String, Set<String>> fields = Maps.newHashMap();
     private boolean validateView;
     private Field id;
 
     MongoClassValidator(Class<?> entityClass) {
-        validator = new DataTypeValidator(entityClass);
+        validator = new BeanClassValidator(entityClass);
         validator.allowedValueClasses = Set.of(ObjectId.class, String.class, Boolean.class,
                 Integer.class, Long.class, Double.class,
                 LocalDateTime.class, ZonedDateTime.class);
@@ -43,7 +43,7 @@ public final class MongoClassValidator implements TypeVisitor {
         validator.validate();
 
         if (id == null) {
-            throw new Error(format("mongo entity class must have @Id field, class={}", validator.type.getTypeName()));
+            throw new Error("mongo entity class must have @Id field, class=" + validator.beanClass.getCanonicalName());
         }
     }
 

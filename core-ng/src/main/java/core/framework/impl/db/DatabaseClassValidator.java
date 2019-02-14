@@ -7,8 +7,8 @@ import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
-import core.framework.internal.validate.type.DataTypeValidator;
-import core.framework.internal.validate.type.TypeVisitor;
+import core.framework.internal.validate.BeanClassValidator;
+import core.framework.internal.validate.BeanClassVisitor;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
 
@@ -21,8 +21,8 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-final class DatabaseClassValidator implements TypeVisitor {
-    private final DataTypeValidator validator;
+final class DatabaseClassValidator implements BeanClassVisitor {
+    private final BeanClassValidator validator;
     private final Set<String> columns = Sets.newHashSet();
     private boolean foundPrimaryKey;
     private boolean foundAutoIncrementalPrimaryKey;
@@ -31,7 +31,7 @@ final class DatabaseClassValidator implements TypeVisitor {
     private Object entityWithDefaultValue;
 
     DatabaseClassValidator(Class<?> entityClass) {
-        validator = new DataTypeValidator(entityClass);
+        validator = new BeanClassValidator(entityClass);
         validator.visitor = this;
     }
 
@@ -39,7 +39,7 @@ final class DatabaseClassValidator implements TypeVisitor {
         validator.validate();
 
         if (!foundPrimaryKey)
-            throw new Error("db entity class must have @PrimaryKey, class=" + validator.type.getTypeName());
+            throw new Error("db entity class must have @PrimaryKey, class=" + validator.beanClass.getCanonicalName());
     }
 
     void validateViewClass() {

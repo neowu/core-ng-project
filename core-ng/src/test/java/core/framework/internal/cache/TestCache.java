@@ -1,4 +1,4 @@
-package core.framework.impl.cache;
+package core.framework.internal.cache;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

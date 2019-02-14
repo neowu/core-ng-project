@@ -1,6 +1,6 @@
 package core.framework.search.impl;
 
-import core.framework.internal.validate.type.JSONClassValidator;
+import core.framework.internal.json.JSONClassValidator;
 import core.framework.search.Index;
 
 /**

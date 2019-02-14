@@ -1,7 +1,7 @@
 ## Change log
 ### 6.11.1 (2/8/2019 - )   !!! in this version, we will revisit all validation/bean/annotation/config
 * db: not allowing db entity with default value, due to it may cause undesired behavior on partialUpdate, ("new entity() -> change fields -> updatePartial(entity)" will update those fields with default value since they are not null)
-* cache: not allowing to cache value (considered as bad practice, better wrap with class for maintenance)
+* cache: stop supporting value and List<T> (considered as bad practice, better wrap with class for maintenance)        
          removed to register Cache<T> with name in CacheConfig, as it's generally for value type
 * validator: simplify validator, use field name as part of error key (actual use cases use JS to validate anyway, if there is actual need, may add @Label to customize the error key)
 

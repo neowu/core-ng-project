@@ -9,10 +9,10 @@ import java.util.Map;
  * @author neo
  */
 public class RequestBeanMapper {
-    private final BeanMapperRegistry registry;
+    private final BeanBodyMapperRegistry registry;
     private final Map<Class<?>, QueryParamMapperHolder<?>> queryParamMappers = Maps.newConcurrentHashMap();
 
-    public RequestBeanMapper(BeanMapperRegistry registry) {
+    public RequestBeanMapper(BeanBodyMapperRegistry registry) {
         this.registry = registry;
     }
 
@@ -32,7 +32,7 @@ public class RequestBeanMapper {
     @SuppressWarnings("unchecked")
     public <T> QueryParamMapperHolder<T> registerQueryParamBean(Class<T> beanClass) {
         return (QueryParamMapperHolder<T>) queryParamMappers.computeIfAbsent(beanClass, key -> {
-            new QueryParamBeanClassValidator(beanClass, registry).validate();
+            new QueryParamClassValidator(beanClass, registry).validate();
             QueryParamMapper<T> mapper = new QueryParamMapperBuilder<>(beanClass).build();
             var validator = new Validator(beanClass);
             return new QueryParamMapperHolder<>(mapper, validator);
@@ -44,7 +44,7 @@ public class RequestBeanMapper {
     }
 
     public <T> T fromJSON(Class<T> beanClass, byte[] body) {
-        BeanMapper<T> mapper = registry.register(beanClass);
+        BeanBodyMapper<T> mapper = registry.register(beanClass);
         T bean = mapper.mapper.fromJSON(body);
         mapper.validator.validate(bean, false);
         return bean;

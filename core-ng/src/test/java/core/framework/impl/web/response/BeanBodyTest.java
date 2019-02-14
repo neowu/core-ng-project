@@ -1,6 +1,6 @@
 package core.framework.impl.web.response;
 
-import core.framework.impl.web.bean.BeanMapperRegistry;
+import core.framework.impl.web.bean.BeanBodyMapperRegistry;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.internal.validate.ValidationException;
@@ -17,7 +17,7 @@ class BeanBodyTest {
     @Test
     void send() {
         var sender = mock(Sender.class);
-        var context = new ResponseHandlerContext(new ResponseBeanMapper(new BeanMapperRegistry()), null);
+        var context = new ResponseHandlerContext(new ResponseBeanMapper(new BeanBodyMapperRegistry()), null);
         var body = new BeanBody(new TestBean());
         assertThatThrownBy(() -> body.send(sender, context))
                 .isInstanceOf(ValidationException.class);

@@ -1,6 +1,7 @@
 package core.framework.internal.validate.type;
 
 
+import core.framework.internal.validate.BeanClassValidator;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -8,18 +9,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class DataTypeValidatorTest {
+class BeanClassValidatorTest {
     @Test
     void validateObjectClass() {
-        assertThatThrownBy(() -> new DataTypeValidator(String.class).validate())
+        assertThatThrownBy(() -> new BeanClassValidator(String.class).validate())
             .isInstanceOf(Error.class)
             .hasMessageContaining("class must be bean class");
 
-        assertThatThrownBy(() -> new DataTypeValidator(int.class).validate())
+        assertThatThrownBy(() -> new BeanClassValidator(int.class).validate())
             .isInstanceOf(Error.class)
             .hasMessageContaining("class must be bean class");
 
-        assertThatThrownBy(() -> new DataTypeValidator(TestEnum.class).validate())
+        assertThatThrownBy(() -> new BeanClassValidator(TestEnum.class).validate())
             .isInstanceOf(Error.class)
             .hasMessageContaining("class must be bean class");
     }

@@ -1,8 +1,8 @@
 package core.framework.impl.template;
 
 import core.framework.impl.reflect.Methods;
-import core.framework.internal.validate.type.DataTypeValidator;
-import core.framework.internal.validate.type.TypeVisitor;
+import core.framework.internal.validate.BeanClassValidator;
+import core.framework.internal.validate.BeanClassVisitor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -12,11 +12,11 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-class ModelClassValidator implements TypeVisitor {
-    private final DataTypeValidator validator;
+class ModelClassValidator implements BeanClassVisitor {
+    private final BeanClassValidator validator;
 
     ModelClassValidator(Class<?> modelClass) {
-        validator = new DataTypeValidator(modelClass);
+        validator = new BeanClassValidator(modelClass);
         validator.allowChild = true;
         validator.visitor = this;
     }

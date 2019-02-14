@@ -30,6 +30,13 @@ subprojects {
         testLogging.exceptionFormat 'full'
     }
 
+    tasks.named('jar') {
+        // put parent name in final jar name, to resolve collision of child projects with same name under different parents
+        if (parent.depth > 0) {
+            archiveBaseName = "${parent.name}-${archiveBaseName.get()}"
+        }
+    }
+
     afterEvaluate {
         tasks.withType(Jar).configureEach {
             manifest {

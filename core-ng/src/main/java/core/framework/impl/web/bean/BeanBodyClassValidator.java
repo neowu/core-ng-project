@@ -1,14 +1,14 @@
 package core.framework.impl.web.bean;
 
-import core.framework.internal.validate.type.JSONClassValidator;
+import core.framework.internal.json.JSONClassValidator;
 
 /**
  * @author neo
  */
-final class BeanClassValidator extends JSONClassValidator {
-    private final BeanMapperRegistry registry;
+final class BeanBodyClassValidator extends JSONClassValidator {
+    private final BeanBodyMapperRegistry registry;
 
-    BeanClassValidator(Class<?> beanClass, BeanMapperRegistry registry) {
+    BeanBodyClassValidator(Class<?> beanClass, BeanBodyMapperRegistry registry) {
         super(beanClass);
         this.registry = registry;
     }

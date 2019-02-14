@@ -1,4 +1,4 @@
-package core.framework.impl.cache;
+package core.framework.internal.cache;
 
 import java.time.Duration;
 import java.util.Map;

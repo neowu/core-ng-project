@@ -1,8 +1,8 @@
 package core.framework.json;
 
 import com.fasterxml.jackson.databind.JavaType;
+import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.validate.Validator;
-import core.framework.internal.validate.type.JSONClassValidator;
 import core.framework.util.Maps;
 
 import java.io.IOException;

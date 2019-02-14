@@ -7,7 +7,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.reflect.Classes;
-import core.framework.impl.web.bean.BeanMapperRegistry;
+import core.framework.impl.web.bean.BeanBodyMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.controller.ControllerHolder;
@@ -112,7 +112,7 @@ public class APIConfig extends Config {
     }
 
     public void bean(Class<?>... beanClasses) {
-        BeanMapperRegistry registry = context.httpServer.handler.beanMapperRegistry;
+        BeanBodyMapperRegistry registry = context.httpServer.handler.beanBodyMapperRegistry;
         for (Class<?> beanClass : beanClasses) {
             if (registry.beanMappers.containsKey(beanClass)) {
                 throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());

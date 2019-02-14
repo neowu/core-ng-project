@@ -1,4 +1,4 @@
-package core.framework.internal.validate.type;
+package core.framework.internal.validate;
 
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.reflect.GenericTypes;
@@ -21,27 +21,21 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public class DataTypeValidator {
-    public final Type type;
+public class BeanClassValidator {
+    public final Class<?> beanClass;
     private final Set<Class<?>> visitedClasses = Sets.newHashSet();
     public Set<Class<?>> allowedValueClasses = Set.of(String.class, Boolean.class,
             Integer.class, Long.class, Double.class, BigDecimal.class,
             LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
-    public boolean allowTopLevelList;
     public boolean allowChild;
-    public TypeVisitor visitor;
+    public BeanClassVisitor visitor;
 
-    public DataTypeValidator(Type type) {
-        this.type = type;
+    public BeanClassValidator(Class<?> beanClass) {
+        this.beanClass = beanClass;
     }
 
     public void validate() {
-        if (GenericTypes.isList(type)) {
-            if (!allowTopLevelList) throw new Error(format("top level list is not allowed, type={}", type.getTypeName()));
-            visitList(type, null, null);
-        } else {
-            visitObject(GenericTypes.rawClass(type), null, null);
-        }
+        visitObject(beanClass, null, null);
     }
 
     private void visitObject(Class<?> objectClass, Field owner, String path) {
@@ -71,11 +65,11 @@ public class DataTypeValidator {
                 if (!allowChild) throw new Error("map field is not allowed, field=" + Fields.path(field));
 
                 if (!GenericTypes.isGenericMap(fieldType))
-                    throw new Error(format("map must be Map<K,V>, K must be String or Enum and V must be class, type={}, field={}", type.getTypeName(), Fields.path(field)));
+                    throw new Error("map must be Map<K,V>, K must be String or Enum and V must be class, field=" + Fields.path(field));
 
                 Class<?> keyClass = GenericTypes.mapKeyClass(fieldType);
                 if (!String.class.equals(keyClass) && !keyClass.isEnum())
-                    throw new Error(format("map key must be String or Enum, type={}, field={}", type.getTypeName(), Fields.path(field)));
+                    throw new Error("map key must be String or Enum, field=" + Fields.path(field));
                 if (visitor != null && keyClass.isEnum())
                     visitor.visitEnum(keyClass);
 

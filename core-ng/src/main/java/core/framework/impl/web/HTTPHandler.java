@@ -2,7 +2,7 @@ package core.framework.impl.web;
 
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
-import core.framework.impl.web.bean.BeanMapperRegistry;
+import core.framework.impl.web.bean.BeanBodyMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.controller.ControllerHolder;
@@ -43,9 +43,9 @@ public class HTTPHandler implements HttpHandler {
     public final WebContextImpl webContext = new WebContextImpl();
     public final HTTPErrorHandler errorHandler;
 
-    public final BeanMapperRegistry beanMapperRegistry = new BeanMapperRegistry();
-    public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanMapperRegistry);
-    public final ResponseBeanMapper responseBeanMapper = new ResponseBeanMapper(beanMapperRegistry);
+    public final BeanBodyMapperRegistry beanBodyMapperRegistry = new BeanBodyMapperRegistry();
+    public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanBodyMapperRegistry);
+    public final ResponseBeanMapper responseBeanMapper = new ResponseBeanMapper(beanBodyMapperRegistry);
 
     private final Logger logger = LoggerFactory.getLogger(HTTPHandler.class);
     private final LogManager logManager;

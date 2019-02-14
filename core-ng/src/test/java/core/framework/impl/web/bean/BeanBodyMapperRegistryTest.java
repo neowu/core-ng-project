@@ -9,12 +9,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class BeanMapperRegistryTest {
-    private BeanMapperRegistry registry;
+class BeanBodyMapperRegistryTest {
+    private BeanBodyMapperRegistry registry;
 
     @BeforeEach
     void createBeanMapperRegistry() {
-        registry = new BeanMapperRegistry();
+        registry = new BeanBodyMapperRegistry();
     }
 
     @Test

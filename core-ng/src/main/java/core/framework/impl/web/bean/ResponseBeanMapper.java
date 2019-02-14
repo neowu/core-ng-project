@@ -10,9 +10,9 @@ import java.util.Optional;
  * @author neo
  */
 public class ResponseBeanMapper {
-    private final BeanMapperRegistry registry;
+    private final BeanBodyMapperRegistry registry;
 
-    public ResponseBeanMapper(BeanMapperRegistry registry) {
+    public ResponseBeanMapper(BeanBodyMapperRegistry registry) {
         this.registry = registry;
     }
 
@@ -31,7 +31,7 @@ public class ResponseBeanMapper {
     public Object fromJSON(Type responseType, byte[] body) {
         if (void.class == responseType) return null;
 
-        BeanMapper<?> mapper = register(responseType);
+        BeanBodyMapper<?> mapper = register(responseType);
         Object bean = mapper.mapper.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {
             if (bean == null) return Optional.empty();
@@ -43,7 +43,7 @@ public class ResponseBeanMapper {
         }
     }
 
-    public BeanMapper<?> register(Type responseType) {
+    public BeanBodyMapper<?> register(Type responseType) {
         Class<?> beanClass = GenericTypes.isOptional(responseType) ? GenericTypes.optionalValueClass(responseType) : GenericTypes.rawClass(responseType);
         return registry.register(beanClass);
     }

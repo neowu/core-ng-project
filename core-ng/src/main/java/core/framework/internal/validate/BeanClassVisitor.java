@@ -1,11 +1,11 @@
-package core.framework.internal.validate.type;
+package core.framework.internal.validate;
 
 import java.lang.reflect.Field;
 
 /**
  * @author neo
  */
-public interface TypeVisitor {
+public interface BeanClassVisitor {
     default void visitClass(Class<?> objectClass, String path) {
     }
 

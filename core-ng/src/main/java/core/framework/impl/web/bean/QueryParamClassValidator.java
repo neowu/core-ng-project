@@ -3,9 +3,9 @@ package core.framework.impl.web.bean;
 import core.framework.api.json.Property;
 import core.framework.api.web.service.QueryParam;
 import core.framework.impl.reflect.Fields;
-import core.framework.internal.validate.type.DataTypeValidator;
-import core.framework.internal.validate.type.JSONClassValidator;
-import core.framework.internal.validate.type.TypeVisitor;
+import core.framework.internal.json.JSONClassValidator;
+import core.framework.internal.validate.BeanClassValidator;
+import core.framework.internal.validate.BeanClassVisitor;
 import core.framework.util.Sets;
 
 import java.lang.reflect.Field;
@@ -16,14 +16,14 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-final class QueryParamBeanClassValidator implements TypeVisitor {
-    private final DataTypeValidator validator;
+final class QueryParamClassValidator implements BeanClassVisitor {
+    private final BeanClassValidator validator;
     private final Set<String> visitedParams = Sets.newHashSet();
-    private final BeanMapperRegistry registry;
+    private final BeanBodyMapperRegistry registry;
 
-    QueryParamBeanClassValidator(Class<?> beanClass, BeanMapperRegistry registry) {
+    QueryParamClassValidator(Class<?> beanClass, BeanBodyMapperRegistry registry) {
         this.registry = registry;
-        validator = new DataTypeValidator(beanClass);
+        validator = new BeanClassValidator(beanClass);
         validator.visitor = this;
     }
 

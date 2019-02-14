@@ -14,7 +14,7 @@ import core.framework.impl.reflect.Params;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.route.PathPatternValidator;
-import core.framework.internal.validate.type.JSONClassValidator;
+import core.framework.internal.json.JSONClassValidator;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 import core.framework.util.Strings;

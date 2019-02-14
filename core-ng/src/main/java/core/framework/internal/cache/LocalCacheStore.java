@@ -1,4 +1,4 @@
-package core.framework.impl.cache;
+package core.framework.internal.cache;
 
 import core.framework.util.Maps;
 import org.slf4j.Logger;

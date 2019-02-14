@@ -1,11 +1,9 @@
-package core.framework.impl.cache;
+package core.framework.internal.cache;
 
 import core.framework.cache.Cache;
-import core.framework.impl.reflect.GenericTypes;
 import core.framework.util.ASCII;
 import core.framework.util.Maps;
 
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +21,11 @@ public class CacheManager {
         this.cacheStore = cacheStore;
     }
 
-    public <T> Cache<T> add(Type valueType, Duration duration) {
-        new CacheTypeValidator(valueType).validate();
+    public <T> Cache<T> add(Class<T> cacheClass, Duration duration) {
+        new CacheClassValidator(cacheClass).validate();
 
-        String name = cacheName(valueType);
-        CacheImpl<T> cache = new CacheImpl<>(name, valueType, duration, cacheStore);
+        String name = cacheName(cacheClass);
+        CacheImpl<T> cache = new CacheImpl<>(name, cacheClass, duration, cacheStore);
         CacheImpl<?> previous = caches.putIfAbsent(name, cache);
         if (previous != null) throw new Error("found duplicate cache name, name=" + name);
         return cache;
@@ -41,13 +39,7 @@ public class CacheManager {
         return new ArrayList<>(caches.values());
     }
 
-    // cache only supports List<T> and bean, may simplify further
-    String cacheName(Type valueType) {
-        if (valueType instanceof Class) {
-            return ASCII.toLowerCase(((Class<?>) valueType).getSimpleName());
-        } else if (GenericTypes.isGenericList(valueType)) {
-            return "list-" + ASCII.toLowerCase(GenericTypes.listValueClass(valueType).getSimpleName());
-        }
-        return ASCII.toLowerCase(valueType.getTypeName());
+    String cacheName(Class<?> cacheClass) {
+        return ASCII.toLowerCase(cacheClass.getSimpleName());
     }
 }

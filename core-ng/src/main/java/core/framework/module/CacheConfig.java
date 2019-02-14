@@ -2,21 +2,20 @@ package core.framework.module;
 
 import core.framework.cache.Cache;
 import core.framework.http.HTTPMethod;
-import core.framework.impl.cache.CacheManager;
-import core.framework.impl.cache.CacheStore;
-import core.framework.impl.cache.LocalCacheStore;
-import core.framework.impl.cache.RedisCacheStore;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
 import core.framework.impl.web.management.CacheController;
+import core.framework.internal.cache.CacheManager;
+import core.framework.internal.cache.CacheStore;
+import core.framework.internal.cache.LocalCacheStore;
+import core.framework.internal.cache.RedisCacheStore;
 import core.framework.util.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Type;
 import java.time.Duration;
 
 /**
@@ -78,11 +77,11 @@ public class CacheConfig extends Config {
         context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete, true);
     }
 
-    public void add(Type cacheType, Duration duration) {
+    public <T> void add(Class<T> cacheClass, Duration duration) {
         if (cacheManager == null) throw new Error("cache is not configured, please configure cache store first");
 
-        logger.info("add cache, type={}", cacheType.getTypeName());
-        Cache<?> cache = cacheManager.add(cacheType, duration);
-        context.beanFactory.bind(Types.generic(Cache.class, cacheType), null, cache);
+        logger.info("add cache, class={}", cacheClass.getCanonicalName());
+        Cache<T> cache = cacheManager.add(cacheClass, duration);
+        context.beanFactory.bind(Types.generic(Cache.class, cacheClass), null, cache);
     }
 }

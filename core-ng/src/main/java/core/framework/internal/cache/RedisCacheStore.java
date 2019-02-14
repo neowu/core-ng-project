@@ -1,4 +1,4 @@
-package core.framework.impl.cache;
+package core.framework.internal.cache;
 
 import core.framework.impl.redis.RedisException;
 import core.framework.impl.redis.RedisImpl;

@@ -1,4 +1,4 @@
-package core.framework.impl.cache;
+package core.framework.internal.cache;
 
 import core.framework.cache.Cache;
 import core.framework.internal.json.JSONMapper;
@@ -6,7 +6,6 @@ import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
@@ -20,18 +19,18 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class CacheImpl<T> implements Cache<T> {
     public final String name;
-    public final Type valueType;
+    public final Class<T> cacheClass;
     public final Duration duration;
     private final Logger logger = LoggerFactory.getLogger(CacheImpl.class);
     private final CacheStore cacheStore;
     private final JSONMapper<T> mapper;
 
-    CacheImpl(String name, Type valueType, Duration duration, CacheStore cacheStore) {
+    CacheImpl(String name, Class<T> cacheClass, Duration duration, CacheStore cacheStore) {
         this.name = name;
-        this.valueType = valueType;
+        this.cacheClass = cacheClass;
         this.duration = duration;
         this.cacheStore = cacheStore;
-        mapper = new JSONMapper<>(valueType);
+        mapper = new JSONMapper<>(cacheClass);
     }
 
     @Override

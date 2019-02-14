@@ -1,9 +1,9 @@
 package core.framework.impl.web.management;
 
 import core.framework.http.ContentType;
-import core.framework.impl.cache.CacheImpl;
-import core.framework.impl.cache.CacheManager;
 import core.framework.impl.web.http.IPAccessControl;
+import core.framework.internal.cache.CacheImpl;
+import core.framework.internal.cache.CacheManager;
 import core.framework.util.Strings;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -52,9 +52,9 @@ public class CacheController {
     }
 
     private CacheView view(CacheImpl<?> cache) {
-        CacheView view = new CacheView();
+        var view = new CacheView();
         view.name = cache.name;
-        view.type = cache.valueType.getTypeName();
+        view.type = cache.cacheClass.getCanonicalName();
         view.duration = (int) cache.duration.getSeconds();
         return view;
     }

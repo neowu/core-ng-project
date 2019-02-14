@@ -11,20 +11,20 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public class BeanMapperRegistry {
-    public final Map<Class<?>, BeanMapper<?>> beanMappers = Maps.newConcurrentHashMap();
+public class BeanBodyMapperRegistry {
+    public final Map<Class<?>, BeanBodyMapper<?>> beanMappers = Maps.newConcurrentHashMap();
     final Map<String, Class<?>> beanClasses = Maps.newConcurrentHashMap();
 
     @SuppressWarnings("unchecked")
-    public <T> BeanMapper<T> register(Class<T> beanClass) {
-        return (BeanMapper<T>) beanMappers.computeIfAbsent(beanClass, type -> {
-            new BeanClassValidator(beanClass, this).validate();
-            return new BeanMapper<>(beanClass, new Validator(beanClass));
+    public <T> BeanBodyMapper<T> register(Class<T> beanClass) {
+        return (BeanBodyMapper<T>) beanMappers.computeIfAbsent(beanClass, type -> {
+            new BeanBodyClassValidator(beanClass, this).validate();
+            return new BeanBodyMapper<>(beanClass, new Validator(beanClass));
         });
     }
 
     <T> byte[] toJSON(Class<T> beanClass, T bean) {
-        BeanMapper<T> mapper = register(beanClass);
+        BeanBodyMapper<T> mapper = register(beanClass);
         mapper.validator.validate(bean, false);
         return mapper.mapper.toJSON(bean);
     }

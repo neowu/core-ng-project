@@ -2,7 +2,7 @@ package core.framework.impl.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
-import core.framework.impl.web.bean.BeanMapperRegistry;
+import core.framework.impl.web.bean.BeanBodyMapperRegistry;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.TestBean;
 import core.framework.impl.web.bean.TestQueryParamBean;
@@ -25,7 +25,7 @@ class RequestImplTest {
 
     @BeforeEach
     void createRequest() {
-        request = new RequestImpl(null, new RequestBeanMapper(new BeanMapperRegistry()));
+        request = new RequestImpl(null, new RequestBeanMapper(new BeanBodyMapperRegistry()));
     }
 
     @Test
