@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class RequestBeanMapper {
     private final BeanMappers beanMappers;
-    private final Map<Class<?>, QueryParamMapperHolder<?>> queryParamMappers = Maps.newHashMap();
+    public final Map<Class<?>, QueryParamMapperHolder<?>> queryParamMappers = Maps.newHashMap();
 
     public RequestBeanMapper(BeanMappers beanMappers) {
         this.beanMappers = beanMappers;

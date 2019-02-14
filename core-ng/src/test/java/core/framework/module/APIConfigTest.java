@@ -4,6 +4,7 @@ import core.framework.api.json.Property;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
+import core.framework.api.web.service.QueryParam;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +48,17 @@ class APIConfigTest {
     }
 
     @Test
+    void queryParamBean() {
+        config.queryParamBean(TestQueryParamBean.class);
+
+        assertThat(config.beanClasses).containsOnly(TestQueryParamBean.class);
+
+        assertThatThrownBy(() -> config.queryParamBean(TestQueryParamBean.class))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("bean class is already registered");
+    }
+
+    @Test
     void client() {
         config.httpClient().timeout(Duration.ofSeconds(5));
         config.client(TestWebService.class, "http://localhost");
@@ -69,6 +81,11 @@ class APIConfigTest {
 
     public static class TestBean {
         @Property(name = "value")
+        public String value;
+    }
+
+    public static class TestQueryParamBean {
+        @QueryParam(name = "value")
         public String value;
     }
 }

@@ -121,12 +121,23 @@ public class APIConfig extends Config {
     }
 
     public void bean(Class<?>... beanClasses) {
-        BeanMappers registry = context.httpServer.handler.beanMappers;
+        BeanMappers mappers = context.httpServer.handler.beanMappers;
         for (Class<?> beanClass : beanClasses) {
-            if (registry.mappers.containsKey(beanClass)) {
+            if (mappers.mappers.containsKey(beanClass)) {
                 throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             }
-            registry.register(beanClass, beanClassNameValidator);
+            mappers.register(beanClass, beanClassNameValidator);
+            this.beanClasses.add(beanClass);
+        }
+    }
+
+    public void queryParamBean(Class<?>... queryParamBeanClasses) {
+        RequestBeanMapper mapper = context.httpServer.handler.requestBeanMapper;
+        for (Class<?> beanClass : queryParamBeanClasses) {
+            if (mapper.queryParamMappers.containsKey(beanClass)) {
+                throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+            }
+            mapper.registerQueryParamBean(beanClass, beanClassNameValidator);
             this.beanClasses.add(beanClass);
         }
     }

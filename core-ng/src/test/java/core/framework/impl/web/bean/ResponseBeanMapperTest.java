@@ -46,7 +46,7 @@ class ResponseBeanMapperTest {
 
     @Test
     void testToJSONWithOptional() {
-        TestBean bean = new TestBean();
+        var bean = new TestBean();
         bean.intField = 5;
         Optional<TestBean> optional = Optional.of(bean);
         byte[] bytes = responseBeanMapper.toJSON(optional);
@@ -60,7 +60,7 @@ class ResponseBeanMapperTest {
     }
 
     @Test
-    void registerBean() {
+    void register() {
         responseBeanMapper.register(TestBean.class, new BeanClassNameValidator());
     }
 
@@ -102,5 +102,15 @@ class ResponseBeanMapperTest {
 
         TestBean parsedBean = (TestBean) responseBeanMapper.fromJSON(TestBean.class, mapper.toJSON(bean));
         assertThat(parsedBean).isEqualToComparingFieldByField(bean);
+    }
+
+    @Test
+    void withUnregisteredBean() {
+        assertThatThrownBy(() -> responseBeanMapper.fromJSON(TestUnregisteredBean.class, new byte[0]))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("bean class is not registered");
+    }
+
+    public static class TestUnregisteredBean {
     }
 }
