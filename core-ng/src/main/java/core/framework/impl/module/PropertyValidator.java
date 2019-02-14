@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * @author neo
  */
-public class PropertyValidator {
+class PropertyValidator {
     final Set<String> usedProperties = new HashSet<>();
 
     void validate(Set<String> keys) {

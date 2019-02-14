@@ -11,6 +11,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.reflect.Methods;
 import core.framework.impl.reflect.Params;
+import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.route.PathPatternValidator;
@@ -35,11 +36,13 @@ public class WebServiceInterfaceValidator {
     private final Class<?> serviceInterface;
     private final RequestBeanMapper requestBeanMapper;
     private final ResponseBeanMapper responseBeanMapper;
+    private final BeanClassNameValidator beanClassNameValidator;
 
-    public WebServiceInterfaceValidator(Class<?> serviceInterface, RequestBeanMapper requestBeanMapper, ResponseBeanMapper responseBeanMapper) {
+    public WebServiceInterfaceValidator(Class<?> serviceInterface, RequestBeanMapper requestBeanMapper, ResponseBeanMapper responseBeanMapper, BeanClassNameValidator beanClassNameValidator) {
         this.serviceInterface = serviceInterface;
         this.requestBeanMapper = requestBeanMapper;
         this.responseBeanMapper = responseBeanMapper;
+        this.beanClassNameValidator = beanClassNameValidator;
     }
 
     public void validate() {
@@ -88,9 +91,9 @@ public class WebServiceInterfaceValidator {
                 validateRequestBeanClass(requestBeanClass, method);
 
                 if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
-                    requestBeanMapper.registerQueryParamBean(requestBeanClass);
+                    requestBeanMapper.registerQueryParamBean(requestBeanClass, beanClassNameValidator);
                 } else {
-                    requestBeanMapper.registerRequestBean(requestBeanClass);
+                    requestBeanMapper.registerRequestBean(requestBeanClass, beanClassNameValidator);
                 }
             }
         }
@@ -147,7 +150,7 @@ public class WebServiceInterfaceValidator {
         if (isGenericButNotOptional || isValueType)
             throw new Error(format("response bean type must be bean class or Optional<T>, type={}, method={}", beanType.getTypeName(), Methods.path(method)));
 
-        responseBeanMapper.register(beanType);
+        responseBeanMapper.register(beanType, beanClassNameValidator);
     }
 
     private void validateHTTPMethod(Method method) {

@@ -19,10 +19,10 @@ import static core.framework.util.Strings.format;
 final class QueryParamClassValidator implements BeanClassVisitor {
     private final BeanClassValidator validator;
     private final Set<String> visitedParams = Sets.newHashSet();
-    private final BeanBodyMapperRegistry registry;
+    private final BeanClassNameValidator beanClassNameValidator;
 
-    QueryParamClassValidator(Class<?> beanClass, BeanBodyMapperRegistry registry) {
-        this.registry = registry;
+    QueryParamClassValidator(Class<?> beanClass, BeanClassNameValidator beanClassNameValidator) {
+        this.beanClassNameValidator = beanClassNameValidator;
         validator = new BeanClassValidator(beanClass);
         validator.visitor = this;
     }
@@ -33,18 +33,18 @@ final class QueryParamClassValidator implements BeanClassVisitor {
 
     @Override
     public void visitClass(Class<?> objectClass, String path) {
-        registry.validateBeanClassName(objectClass);
+        beanClassNameValidator.validate(objectClass);
     }
 
     @Override
     public void visitField(Field field, String parentPath) {
         QueryParam queryParam = field.getDeclaredAnnotation(QueryParam.class);
         if (queryParam == null)
-            throw new Error(format("field must have @QueryParam, field={}", Fields.path(field)));
+            throw new Error("field must have @QueryParam, field=" + Fields.path(field));
 
         Property property = field.getDeclaredAnnotation(Property.class);
         if (property != null)
-            throw new Error(format("field must not have @Property, field={}", Fields.path(field)));
+            throw new Error("field must not have @Property, field=" + Fields.path(field));
 
         String name = queryParam.name();
 
@@ -55,7 +55,7 @@ final class QueryParamClassValidator implements BeanClassVisitor {
 
     @Override
     public void visitEnum(Class<?> enumClass) {
-        registry.validateBeanClassName(enumClass);
+        beanClassNameValidator.validate(enumClass);
         JSONClassValidator.validateEnum(enumClass);
     }
 }

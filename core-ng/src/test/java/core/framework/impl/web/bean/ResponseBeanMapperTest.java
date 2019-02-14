@@ -18,13 +18,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class ResponseBeanBodyMapperTest {
+class ResponseBeanMapperTest {
     private ResponseBeanMapper responseBeanMapper;
     private JSONMapper<TestBean> mapper;
 
     @BeforeEach
     void createResponseBeanMapper() {
-        responseBeanMapper = new ResponseBeanMapper(new BeanBodyMapperRegistry());
+        responseBeanMapper = new ResponseBeanMapper(new BeanMappers());
+        responseBeanMapper.register(TestBean.class, new BeanClassNameValidator());
         mapper = new JSONMapper<>(TestBean.class);
     }
 
@@ -33,7 +34,7 @@ class ResponseBeanBodyMapperTest {
         List<TestBean> list = Lists.newArrayList();
         assertThatThrownBy(() -> responseBeanMapper.toJSON(list))
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("class must be bean class");
+                .hasMessageContaining("response body class must be bean class");
     }
 
     @Test
@@ -60,7 +61,7 @@ class ResponseBeanBodyMapperTest {
 
     @Test
     void registerBean() {
-        responseBeanMapper.register(TestBean.class);
+        responseBeanMapper.register(TestBean.class, new BeanClassNameValidator());
     }
 
     @Test
@@ -96,7 +97,7 @@ class ResponseBeanBodyMapperTest {
 
     @Test
     void fromJSON() {
-        TestBean bean = new TestBean();
+        var bean = new TestBean();
         bean.intField = 3;
 
         TestBean parsedBean = (TestBean) responseBeanMapper.fromJSON(TestBean.class, mapper.toJSON(bean));

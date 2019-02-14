@@ -7,7 +7,8 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.reflect.Classes;
-import core.framework.impl.web.bean.BeanBodyMapperRegistry;
+import core.framework.impl.web.bean.BeanClassNameValidator;
+import core.framework.impl.web.bean.BeanMappers;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.controller.ControllerHolder;
@@ -41,6 +42,7 @@ public class APIConfig extends Config {
     private ModuleContext context;
     private HTTPClientBuilder httpClientBuilder;
     private HTTPClient httpClient;
+    private BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -57,6 +59,7 @@ public class APIConfig extends Config {
     @Override
     protected void validate() {
         httpClientBuilder = null;
+        beanClassNameValidator = null;
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {
@@ -65,7 +68,8 @@ public class APIConfig extends Config {
         logger.info("create web service, interface={}", serviceInterface.getCanonicalName());
         new WebServiceInterfaceValidator(serviceInterface,
                 context.httpServer.handler.requestBeanMapper,
-                context.httpServer.handler.responseBeanMapper).validate();
+                context.httpServer.handler.responseBeanMapper,
+                beanClassNameValidator).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
 
         for (Method method : serviceInterface.getMethods()) {
@@ -91,7 +95,7 @@ public class APIConfig extends Config {
         logger.info("create web service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
         ResponseBeanMapper responseBeanMapper = context.httpServer.handler.responseBeanMapper;
-        new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper).validate();
+        new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper, beanClassNameValidator).validate();
 
         HTTPClient httpClient = getOrCreateHTTPClient();
         var webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, responseBeanMapper);
@@ -117,12 +121,12 @@ public class APIConfig extends Config {
     }
 
     public void bean(Class<?>... beanClasses) {
-        BeanBodyMapperRegistry registry = context.httpServer.handler.beanBodyMapperRegistry;
+        BeanMappers registry = context.httpServer.handler.beanMappers;
         for (Class<?> beanClass : beanClasses) {
-            if (registry.beanMappers.containsKey(beanClass)) {
+            if (registry.mappers.containsKey(beanClass)) {
                 throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             }
-            registry.register(beanClass);
+            registry.register(beanClass, beanClassNameValidator);
             this.beanClasses.add(beanClass);
         }
     }

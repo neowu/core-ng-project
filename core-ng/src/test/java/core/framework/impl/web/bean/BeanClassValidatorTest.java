@@ -9,13 +9,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author neo
  */
-class BeanBodyClassValidatorTest {
+class BeanClassValidatorTest {
     @Test
     void validate() {
-        var registry = new BeanBodyMapperRegistry();
-        new BeanBodyClassValidator(TestBean.class, registry).validate();
+        var beanClassNameValidator = new BeanClassNameValidator();
+        new BeanClassValidator(TestBean.class, beanClassNameValidator).validate();
 
-        assertThatThrownBy(() -> new BeanBodyClassValidator(List.class, registry).validate())
+        assertThatThrownBy(() -> new BeanClassValidator(List.class, beanClassNameValidator).validate())
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("class must be bean class");
     }

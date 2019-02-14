@@ -3,7 +3,8 @@ package core.framework.impl.web.service;
 import core.framework.api.web.service.GET;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.impl.web.bean.BeanBodyMapperRegistry;
+import core.framework.impl.web.bean.BeanClassNameValidator;
+import core.framework.impl.web.bean.BeanMappers;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.util.Types;
@@ -59,12 +60,12 @@ class WebServiceInterfaceValidatorTest {
     }
 
     private WebServiceInterfaceValidator validator(Class<?> serviceInterface) {
-        var registry = new BeanBodyMapperRegistry();
-        return new WebServiceInterfaceValidator(serviceInterface, new RequestBeanMapper(registry), new ResponseBeanMapper(registry));
+        var registry = new BeanMappers();
+        return new WebServiceInterfaceValidator(serviceInterface, new RequestBeanMapper(registry), new ResponseBeanMapper(registry), new BeanClassNameValidator());
     }
 
     enum TestEnum {
-        A;
+        A
     }
 
     interface WebServiceWithDuplicateMethod {

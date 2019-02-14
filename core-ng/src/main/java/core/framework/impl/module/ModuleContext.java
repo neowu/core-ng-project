@@ -5,6 +5,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.HTTPServer;
+import core.framework.impl.web.bean.BeanMapper;
 import core.framework.impl.web.controller.ControllerClassValidator;
 import core.framework.impl.web.controller.ControllerHolder;
 import core.framework.impl.web.controller.ControllerInspector;
@@ -52,8 +53,8 @@ public class ModuleContext {
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);
         shutdownHook.add(ShutdownHook.STAGE_9, timeout -> httpServer.awaitTermination());
 
-        httpServer.handler.beanBodyMapperRegistry.register(ErrorResponse.class);
-        httpServer.handler.beanBodyMapperRegistry.register(AJAXErrorResponse.class);
+        httpServer.handler.beanMappers.mappers.put(ErrorResponse.class, new BeanMapper<>(ErrorResponse.class));
+        httpServer.handler.beanMappers.mappers.put(AJAXErrorResponse.class, new BeanMapper<>(AJAXErrorResponse.class));
 
         var diagnosticController = new DiagnosticController();
         route(HTTPMethod.GET, "/_sys/vm", diagnosticController::vm, true);

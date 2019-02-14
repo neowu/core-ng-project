@@ -5,7 +5,8 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.impl.web.bean.BeanBodyMapperRegistry;
+import core.framework.impl.web.bean.BeanClassNameValidator;
+import core.framework.impl.web.bean.BeanMappers;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.json.JSON;
@@ -30,8 +31,15 @@ class WebServiceClientTest {
 
     @BeforeEach
     void createWebServiceClient() {
-        var registry = new BeanBodyMapperRegistry();
-        webServiceClient = new WebServiceClient("http://localhost", null, new RequestBeanMapper(registry), new ResponseBeanMapper(registry));
+        var registry = new BeanMappers();
+        var beanClassNameValidator = new BeanClassNameValidator();
+        var requestBeanMapper = new RequestBeanMapper(registry);
+        var responseBeanMapper = new ResponseBeanMapper(registry);
+        requestBeanMapper.registerQueryParamBean(TestWebService.TestSearchRequest.class, beanClassNameValidator);
+        requestBeanMapper.registerRequestBean(TestWebService.TestRequest.class, beanClassNameValidator);
+        responseBeanMapper.register(ErrorResponse.class, beanClassNameValidator);
+
+        webServiceClient = new WebServiceClient("http://localhost", null, requestBeanMapper, responseBeanMapper);
     }
 
     @Test

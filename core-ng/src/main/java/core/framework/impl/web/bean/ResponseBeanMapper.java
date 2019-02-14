@@ -10,10 +10,10 @@ import java.util.Optional;
  * @author neo
  */
 public class ResponseBeanMapper {
-    private final BeanBodyMapperRegistry registry;
+    private final BeanMappers beanMappers;
 
-    public ResponseBeanMapper(BeanBodyMapperRegistry registry) {
-        this.registry = registry;
+    public ResponseBeanMapper(BeanMappers beanMappers) {
+        this.beanMappers = beanMappers;
     }
 
     @SuppressWarnings("unchecked")
@@ -22,16 +22,19 @@ public class ResponseBeanMapper {
             Optional<?> optional = (Optional) bean;
             if (optional.isEmpty()) return Strings.bytes("null");
             Object value = optional.get();
-            return registry.toJSON((Class<Object>) value.getClass(), value);
+            return beanMappers.toJSON((Class<Object>) value.getClass(), value);
+        } else if (bean.getClass().getPackageName().startsWith("java")) {   // provide better error message for developer, rather than return class is not registered message
+            throw new Error("response body class must be bean class, class=" + bean.getClass().getCanonicalName());
         } else {
-            return registry.toJSON((Class<Object>) bean.getClass(), bean);
+            return beanMappers.toJSON((Class<Object>) bean.getClass(), bean);
         }
     }
 
     public Object fromJSON(Type responseType, byte[] body) {
         if (void.class == responseType) return null;
 
-        BeanBodyMapper<?> mapper = register(responseType);
+        Class<?> beanClass = beanClass(responseType);
+        BeanMapper<?> mapper = beanMappers.mapper(beanClass);
         Object bean = mapper.mapper.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {
             if (bean == null) return Optional.empty();
@@ -43,8 +46,11 @@ public class ResponseBeanMapper {
         }
     }
 
-    public BeanBodyMapper<?> register(Type responseType) {
-        Class<?> beanClass = GenericTypes.isOptional(responseType) ? GenericTypes.optionalValueClass(responseType) : GenericTypes.rawClass(responseType);
-        return registry.register(beanClass);
+    public void register(Type responseType, BeanClassNameValidator beanClassNameValidator) {
+        beanMappers.register(beanClass(responseType), beanClassNameValidator);
+    }
+
+    private Class<?> beanClass(Type responseType) {
+        return GenericTypes.isOptional(responseType) ? GenericTypes.optionalValueClass(responseType) : GenericTypes.rawClass(responseType);
     }
 }
