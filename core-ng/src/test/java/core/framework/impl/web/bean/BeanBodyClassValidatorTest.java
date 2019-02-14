@@ -17,6 +17,6 @@ class BeanBodyClassValidatorTest {
 
         assertThatThrownBy(() -> new BeanBodyClassValidator(List.class, registry).validate())
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("top level list is not allowed");
+                .hasMessageContaining("class must be bean class");
     }
 }

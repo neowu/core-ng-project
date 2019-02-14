@@ -62,7 +62,7 @@ public class JSONClassValidator implements BeanClassVisitor {
         String name = property.name();
         if (name.isBlank()) throw new Error("@Property name attribute must not be blank, field=" + Fields.path(field));
 
-        boolean added = visitedProperties.computeIfAbsent(field.getDeclaringClass().getCanonicalName(), key -> Sets.newHashSet()).add(name);
+        boolean added = visitedProperties.computeIfAbsent(parentPath, key -> Sets.newHashSet()).add(name);
         if (!added) {
             throw new Error(format("found duplicate property, field={}, name={}", Fields.path(field), name));
         }

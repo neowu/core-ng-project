@@ -33,7 +33,7 @@ class ResponseBeanBodyMapperTest {
         List<TestBean> list = Lists.newArrayList();
         assertThatThrownBy(() -> responseBeanMapper.toJSON(list))
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("top level list is not allowed");
+                .hasMessageContaining("class must be bean class");
     }
 
     @Test
