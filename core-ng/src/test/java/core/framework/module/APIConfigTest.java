@@ -38,22 +38,15 @@ class APIConfigTest {
 
     @Test
     void bean() {
-        config.bean(TestBean.class);
+        config.bean(TestBean.class, TestQueryParamBean.class);
 
-        assertThat(config.beanClasses).containsOnly(TestBean.class);
+        assertThat(config.beanClasses).contains(TestBean.class, TestQueryParamBean.class);
 
         assertThatThrownBy(() -> config.bean(TestBean.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("bean class is already registered");
-    }
 
-    @Test
-    void queryParamBean() {
-        config.queryParamBean(TestQueryParamBean.class);
-
-        assertThat(config.beanClasses).containsOnly(TestQueryParamBean.class);
-
-        assertThatThrownBy(() -> config.queryParamBean(TestQueryParamBean.class))
+        assertThatThrownBy(() -> config.bean(TestQueryParamBean.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("bean class is already registered");
     }

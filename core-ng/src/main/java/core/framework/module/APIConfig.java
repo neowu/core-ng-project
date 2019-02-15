@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.api.web.service.Path;
+import core.framework.api.web.service.QueryParam;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
@@ -23,12 +24,15 @@ import core.framework.web.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static core.framework.util.Strings.format;
 
@@ -121,24 +125,26 @@ public class APIConfig extends Config {
     }
 
     public void bean(Class<?>... beanClasses) {
-        BeanMappers mappers = context.httpServer.handler.beanMappers;
+        logger.info("register bean body, classes={}", Arrays.stream(beanClasses).map(Class::getCanonicalName).collect(Collectors.toList()));
+        RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
+        BeanMappers beanMappers = context.httpServer.handler.beanMappers;
         for (Class<?> beanClass : beanClasses) {
-            if (mappers.mappers.containsKey(beanClass)) {
-                throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+            if (isQueryParamBean(beanClass)) {
+                if (requestBeanMapper.queryParamMappers.containsKey(beanClass))
+                    throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+                requestBeanMapper.registerQueryParamBean(beanClass, beanClassNameValidator);
+            } else {
+                if (beanMappers.mappers.containsKey(beanClass))
+                    throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+                beanMappers.register(beanClass, beanClassNameValidator);
             }
-            mappers.register(beanClass, beanClassNameValidator);
             this.beanClasses.add(beanClass);
         }
     }
 
-    public void queryParamBean(Class<?>... queryParamBeanClasses) {
-        RequestBeanMapper mapper = context.httpServer.handler.requestBeanMapper;
-        for (Class<?> beanClass : queryParamBeanClasses) {
-            if (mapper.queryParamMappers.containsKey(beanClass)) {
-                throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
-            }
-            mapper.registerQueryParamBean(beanClass, beanClassNameValidator);
-            this.beanClasses.add(beanClass);
-        }
+    private boolean isQueryParamBean(Class<?> beanClass) {
+        Field[] fields = beanClass.getDeclaredFields();
+        if (fields.length == 0) return false;
+        return fields[0].isAnnotationPresent(QueryParam.class);
     }
 }

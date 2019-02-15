@@ -8,6 +8,9 @@
         e.g.
         http().route(POST, "/ajax", bind(AJAXController.class)::ajax);
         api().bean(RequestBean.class, ResponseBean.class);  
+TODO:
+* make cache to validate after retrieve?
+* refine web body bean 
 
 ### 6.10.10 (1/16/2019 - 1/31/2019)
 * mongo: support enum as map key to be consistent with other subsystem
