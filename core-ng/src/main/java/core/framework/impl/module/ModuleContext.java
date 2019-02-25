@@ -58,7 +58,7 @@ public class ModuleContext {
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);
         shutdownHook.add(ShutdownHook.STAGE_9, timeout -> httpServer.awaitTermination());
 
-        beanBody(ErrorResponse.class, AJAXErrorResponse.class);
+        bean(ErrorResponse.class, AJAXErrorResponse.class);
 
         var diagnosticController = new DiagnosticController();
         route(HTTPMethod.GET, "/_sys/vm", diagnosticController::vm, true);
@@ -86,7 +86,8 @@ public class ModuleContext {
         httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
     }
 
-    public final void beanBody(Class<?>... beanClasses) {
+    // register http body bean and query param bean
+    public final void bean(Class<?>... beanClasses) {
         RequestBeanMapper requestBeanMapper = httpServer.handler.requestBeanMapper;
         BeanMappers beanMappers = httpServer.handler.beanMappers;
         for (Class<?> beanClass : beanClasses) {

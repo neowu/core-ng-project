@@ -35,7 +35,7 @@ public final class SchedulerConfig extends Config {
 
         var schedulerController = new SchedulerController(scheduler);
         context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);
-        context.beanBody(ListJobResponse.class);
+        context.bean(ListJobResponse.class);
         context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
     }
 

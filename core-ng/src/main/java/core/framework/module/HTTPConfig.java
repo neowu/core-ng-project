@@ -5,6 +5,7 @@ import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.HTTPIOHandler;
 import core.framework.impl.web.http.IPAccessControl;
+import core.framework.impl.web.site.AJAXErrorResponse;
 import core.framework.web.Controller;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
@@ -12,6 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static core.framework.util.Strings.format;
@@ -20,12 +24,14 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public final class HTTPConfig extends Config {
+    final Set<Class<?>> beanClasses = new HashSet<>();  // custom bean classes to publish via /_sys/api
     private final Logger logger = LoggerFactory.getLogger(HTTPConfig.class);
     private ModuleContext context;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
+        beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
     }
 
     public void route(HTTPMethod method, String path, Controller controller) {
@@ -35,7 +41,8 @@ public final class HTTPConfig extends Config {
 
     public void bean(Class<?>... beanClasses) {
         logger.info("register bean body, classes={}", Arrays.stream(beanClasses).map(Class::getCanonicalName).collect(Collectors.toList()));
-        context.beanBody(beanClasses);
+        context.bean(beanClasses);
+        Collections.addAll(this.beanClasses, beanClasses);
     }
 
     public void intercept(Interceptor interceptor) {

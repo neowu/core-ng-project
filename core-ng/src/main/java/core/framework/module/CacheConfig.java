@@ -74,7 +74,7 @@ public class CacheConfig extends Config {
 
         var controller = new CacheController(cacheManager);
         context.route(HTTPMethod.GET, "/_sys/cache", controller::list, true);
-        context.beanBody(ListCacheResponse.class);
+        context.bean(ListCacheResponse.class);
         context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", controller::get, true);
         context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete, true);
     }
