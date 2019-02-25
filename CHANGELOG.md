@@ -8,6 +8,7 @@
         e.g.
         http().route(POST, "/ajax", bind(AJAXController.class)::ajax);
         api().bean(RequestBean.class, ResponseBean.class);  
+* search: update ES to 6.6.1        
 TODO:
 * make cache to validate after retrieve?
 * refine web body bean 
