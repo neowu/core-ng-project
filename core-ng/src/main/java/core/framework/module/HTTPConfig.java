@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static core.framework.util.Strings.format;
 
@@ -30,6 +31,11 @@ public final class HTTPConfig extends Config {
     public void route(HTTPMethod method, String path, Controller controller) {
         if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
         context.route(method, path, controller, false);
+    }
+
+    public void bean(Class<?>... beanClasses) {
+        logger.info("register bean body, classes={}", Arrays.stream(beanClasses).map(Class::getCanonicalName).collect(Collectors.toList()));
+        context.beanBody(beanClasses);
     }
 
     public void intercept(Interceptor interceptor) {

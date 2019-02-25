@@ -1,11 +1,14 @@
 package core.framework.impl.module;
 
+import core.framework.api.web.service.QueryParam;
 import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.inject.BeanFactory;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.HTTPServer;
-import core.framework.impl.web.bean.BeanMapper;
+import core.framework.impl.web.bean.BeanClassNameValidator;
+import core.framework.impl.web.bean.BeanMappers;
+import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.controller.ControllerClassValidator;
 import core.framework.impl.web.controller.ControllerHolder;
 import core.framework.impl.web.controller.ControllerInspector;
@@ -22,6 +25,7 @@ import core.framework.web.Controller;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -41,6 +45,7 @@ public class ModuleContext {
     public final HTTPServer httpServer;
     public final Stat stat = new Stat();
     protected final Map<String, Config> configs = Maps.newHashMap();
+    public BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
     PropertyValidator propertyValidator = new PropertyValidator();
     private BackgroundTaskExecutor backgroundTask;
 
@@ -53,8 +58,7 @@ public class ModuleContext {
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);
         shutdownHook.add(ShutdownHook.STAGE_9, timeout -> httpServer.awaitTermination());
 
-        httpServer.handler.beanMappers.mappers.put(ErrorResponse.class, new BeanMapper<>(ErrorResponse.class));
-        httpServer.handler.beanMappers.mappers.put(AJAXErrorResponse.class, new BeanMapper<>(AJAXErrorResponse.class));
+        beanBody(ErrorResponse.class, AJAXErrorResponse.class);
 
         var diagnosticController = new DiagnosticController();
         route(HTTPMethod.GET, "/_sys/vm", diagnosticController::vm, true);
@@ -82,6 +86,28 @@ public class ModuleContext {
         httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
     }
 
+    public final void beanBody(Class<?>... beanClasses) {
+        RequestBeanMapper requestBeanMapper = httpServer.handler.requestBeanMapper;
+        BeanMappers beanMappers = httpServer.handler.beanMappers;
+        for (Class<?> beanClass : beanClasses) {
+            if (isQueryParamBean(beanClass)) {
+                if (requestBeanMapper.queryParamMappers.containsKey(beanClass))
+                    throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+                requestBeanMapper.registerQueryParamBean(beanClass, beanClassNameValidator);
+            } else {
+                if (beanMappers.mappers.containsKey(beanClass))
+                    throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+                beanMappers.register(beanClass, beanClassNameValidator);
+            }
+        }
+    }
+
+    private boolean isQueryParamBean(Class<?> beanClass) {
+        Field[] fields = beanClass.getDeclaredFields();
+        if (fields.length == 0) return false;
+        return fields[0].isAnnotationPresent(QueryParam.class);
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends Config> T config(Class<T> configClass, String name) {
         String key = configClass.getCanonicalName() + ":" + name;   // not using computeIfAbsent, to avoid concurrent modification in nested call, e.g. httpConfig->publishAPIConfig->apiConfig
@@ -106,6 +132,7 @@ public class ModuleContext {
         Set<String> keys = propertyManager.properties.keys();
         propertyValidator.validate(keys);
         propertyValidator = null;   // free object not used anymore
+        beanClassNameValidator = null;
 
         configs.values().forEach(Config::validate);
     }

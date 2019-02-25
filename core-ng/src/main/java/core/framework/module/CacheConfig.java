@@ -8,6 +8,7 @@ import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
 import core.framework.impl.web.management.CacheController;
+import core.framework.impl.web.management.ListCacheResponse;
 import core.framework.internal.cache.CacheManager;
 import core.framework.internal.cache.CacheStore;
 import core.framework.internal.cache.LocalCacheStore;
@@ -71,8 +72,9 @@ public class CacheConfig extends Config {
     private void configureCacheManager(CacheStore cacheStore) {
         cacheManager = new CacheManager(cacheStore);
 
-        CacheController controller = new CacheController(cacheManager);
+        var controller = new CacheController(cacheManager);
         context.route(HTTPMethod.GET, "/_sys/cache", controller::list, true);
+        context.beanBody(ListCacheResponse.class);
         context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", controller::get, true);
         context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete, true);
     }

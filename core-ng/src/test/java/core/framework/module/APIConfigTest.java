@@ -1,10 +1,8 @@
 package core.framework.module;
 
-import core.framework.api.json.Property;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.api.web.service.QueryParam;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -37,21 +34,6 @@ class APIConfigTest {
     }
 
     @Test
-    void bean() {
-        config.bean(TestBean.class, TestQueryParamBean.class);
-
-        assertThat(config.beanClasses).contains(TestBean.class, TestQueryParamBean.class);
-
-        assertThatThrownBy(() -> config.bean(TestBean.class))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("bean class is already registered");
-
-        assertThatThrownBy(() -> config.bean(TestQueryParamBean.class))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("bean class is already registered");
-    }
-
-    @Test
     void client() {
         config.httpClient().timeout(Duration.ofSeconds(5));
         config.client(TestWebService.class, "http://localhost");
@@ -70,15 +52,5 @@ class APIConfigTest {
         @Override
         public void put(Integer id) {
         }
-    }
-
-    public static class TestBean {
-        @Property(name = "value")
-        public String value;
-    }
-
-    public static class TestQueryParamBean {
-        @QueryParam(name = "value")
-        public String value;
     }
 }

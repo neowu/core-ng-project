@@ -1,15 +1,12 @@
 package core.framework.module;
 
 import core.framework.api.web.service.Path;
-import core.framework.api.web.service.QueryParam;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.reflect.Classes;
-import core.framework.impl.web.bean.BeanClassNameValidator;
-import core.framework.impl.web.bean.BeanMappers;
 import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.controller.ControllerHolder;
@@ -24,15 +21,10 @@ import core.framework.web.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static core.framework.util.Strings.format;
 
@@ -41,12 +33,10 @@ import static core.framework.util.Strings.format;
  */
 public class APIConfig extends Config {
     final Map<String, Class<?>> serviceInterfaces = new HashMap<>();
-    final Set<Class<?>> beanClasses = new HashSet<>();     // extra beans not defined in service interfaces, e.g. web socket json, raw controller request/response
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private ModuleContext context;
     private HTTPClientBuilder httpClientBuilder;
     private HTTPClient httpClient;
-    private BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -63,17 +53,14 @@ public class APIConfig extends Config {
     @Override
     protected void validate() {
         httpClientBuilder = null;
-        beanClassNameValidator = null;
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {
-        if (!beanClasses.isEmpty()) throw new Error("api().service() must be configured before api().bean()");
-
         logger.info("create web service, interface={}", serviceInterface.getCanonicalName());
         new WebServiceInterfaceValidator(serviceInterface,
                 context.httpServer.handler.requestBeanMapper,
                 context.httpServer.handler.responseBeanMapper,
-                beanClassNameValidator).validate();
+                context.beanClassNameValidator).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
 
         for (Method method : serviceInterface.getMethods()) {
@@ -99,7 +86,7 @@ public class APIConfig extends Config {
         logger.info("create web service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
         ResponseBeanMapper responseBeanMapper = context.httpServer.handler.responseBeanMapper;
-        new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper, beanClassNameValidator).validate();
+        new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper, context.beanClassNameValidator).validate();
 
         HTTPClient httpClient = getOrCreateHTTPClient();
         var webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, responseBeanMapper);
@@ -122,29 +109,5 @@ public class APIConfig extends Config {
             this.httpClient = httpClientBuilder.build();
         }
         return httpClient;
-    }
-
-    public void bean(Class<?>... beanClasses) {
-        logger.info("register bean body, classes={}", Arrays.stream(beanClasses).map(Class::getCanonicalName).collect(Collectors.toList()));
-        RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
-        BeanMappers beanMappers = context.httpServer.handler.beanMappers;
-        for (Class<?> beanClass : beanClasses) {
-            if (isQueryParamBean(beanClass)) {
-                if (requestBeanMapper.queryParamMappers.containsKey(beanClass))
-                    throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
-                requestBeanMapper.registerQueryParamBean(beanClass, beanClassNameValidator);
-            } else {
-                if (beanMappers.mappers.containsKey(beanClass))
-                    throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
-                beanMappers.register(beanClass, beanClassNameValidator);
-            }
-            this.beanClasses.add(beanClass);
-        }
-    }
-
-    private boolean isQueryParamBean(Class<?> beanClass) {
-        Field[] fields = beanClass.getDeclaredFields();
-        if (fields.length == 0) return false;
-        return fields[0].isAnnotationPresent(QueryParam.class);
     }
 }

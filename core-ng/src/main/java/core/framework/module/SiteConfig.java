@@ -3,6 +3,9 @@ package core.framework.module;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
+import core.framework.impl.web.api.APIDefinitionResponse;
+import core.framework.impl.web.bean.BeanMappers;
+import core.framework.impl.web.bean.RequestBeanMapper;
 import core.framework.impl.web.http.IPAccessControl;
 import core.framework.impl.web.management.APIController;
 import core.framework.impl.web.site.StaticContentController;
@@ -86,6 +89,9 @@ public class SiteConfig extends Config {
         APIConfig config = context.config(APIConfig.class, null);
 
         logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(config.serviceInterfaces, config.beanClasses, new IPAccessControl(cidrs)), true);
+        RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
+        BeanMappers beanMappers = context.httpServer.handler.beanMappers;
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(config.serviceInterfaces, beanMappers.mappers.keySet(), requestBeanMapper.queryParamMappers.keySet(), new IPAccessControl(cidrs)), true);
+        context.beanBody(APIDefinitionResponse.class);
     }
 }

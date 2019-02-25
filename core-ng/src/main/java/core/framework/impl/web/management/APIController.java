@@ -16,11 +16,14 @@ import java.util.Set;
 public class APIController implements Controller {
     private final Map<String, Class<?>> serviceInterfaces;
     private final Set<Class<?>> beanClasses;
+    private final Set<Class<?>> queryParamBeanClasses;
+
     private final IPAccessControl accessControl;
 
-    public APIController(Map<String, Class<?>> serviceInterfaces, Set<Class<?>> beanClasses, IPAccessControl accessControl) {
+    public APIController(Map<String, Class<?>> serviceInterfaces, Set<Class<?>> beanClasses, Set<Class<?>> queryParamBeanClasses, IPAccessControl accessControl) {
         this.serviceInterfaces = serviceInterfaces;
         this.beanClasses = beanClasses;
+        this.queryParamBeanClasses = queryParamBeanClasses;
         this.accessControl = accessControl;
     }
 
@@ -29,8 +32,9 @@ public class APIController implements Controller {
         accessControl.validate(request.clientIP());
 
         var builder = new APIDefinitionBuilder();
-        serviceInterfaces.values().forEach(builder::addServiceInterface);
         beanClasses.forEach(builder::parseBeanType);
+        queryParamBeanClasses.forEach(builder::parseBeanType);
+        serviceInterfaces.values().forEach(builder::addServiceInterface);
         APIDefinitionResponse response = builder.build();
 
         return Response.bean(response);

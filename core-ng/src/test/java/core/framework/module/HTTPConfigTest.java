@@ -1,5 +1,7 @@
 package core.framework.module;
 
+import core.framework.api.json.Property;
+import core.framework.api.web.service.QueryParam;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.HTTPIOHandler;
 import core.framework.web.Controller;
@@ -41,6 +43,20 @@ class HTTPConfigTest {
         config.route(PATCH, "/route-test", controller);
     }
 
+
+    @Test
+    void bean() {
+        config.bean(TestBean.class, TestQueryParamBean.class);
+
+        assertThatThrownBy(() -> config.bean(TestBean.class))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("bean class is already registered");
+
+        assertThatThrownBy(() -> config.bean(TestQueryParamBean.class))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("bean class is already registered");
+    }
+
     @Test
     void routeWithReservedPath() {
         assertThatThrownBy(() -> config.route(GET, HTTPIOHandler.HEALTH_CHECK_PATH, new TestController()))
@@ -63,5 +79,16 @@ class HTTPConfigTest {
         public Response execute(Request request) {
             return null;
         }
+    }
+
+
+    public static class TestBean {
+        @Property(name = "value")
+        public String value;
+    }
+
+    public static class TestQueryParamBean {
+        @QueryParam(name = "value")
+        public String value;
     }
 }

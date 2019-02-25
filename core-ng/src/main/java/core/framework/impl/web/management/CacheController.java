@@ -9,7 +9,6 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 import core.framework.web.exception.NotFoundException;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -43,16 +42,17 @@ public class CacheController {
 
     public Response list(Request request) {
         accessControl.validate(request.clientIP());
-        List<CacheView> caches = cacheManager.caches().stream().map(this::view).collect(Collectors.toList());
-        return Response.bean(caches);
+        ListCacheResponse response = new ListCacheResponse();
+        response.caches = cacheManager.caches().stream().map(this::view).collect(Collectors.toList());
+        return Response.bean(response);
     }
 
     private CacheImpl<?> cache(String name) {
         return cacheManager.get(name).orElseThrow(() -> new NotFoundException("cache not found, name=" + name));
     }
 
-    private CacheView view(CacheImpl<?> cache) {
-        var view = new CacheView();
+    private ListCacheResponse.Cache view(CacheImpl<?> cache) {
+        var view = new ListCacheResponse.Cache();
         view.name = cache.name;
         view.type = cache.cacheClass.getCanonicalName();
         view.duration = (int) cache.duration.getSeconds();

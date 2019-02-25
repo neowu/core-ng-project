@@ -8,6 +8,7 @@ import core.framework.impl.scheduler.DailyTrigger;
 import core.framework.impl.scheduler.MonthlyTrigger;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.scheduler.WeeklyTrigger;
+import core.framework.impl.web.management.ListJobResponse;
 import core.framework.impl.web.management.SchedulerController;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
@@ -32,8 +33,9 @@ public final class SchedulerConfig extends Config {
         context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> scheduler.shutdown());
         context.shutdownHook.add(ShutdownHook.STAGE_1, scheduler::awaitTermination);
 
-        SchedulerController schedulerController = new SchedulerController(scheduler);
+        var schedulerController = new SchedulerController(scheduler);
         context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);
+        context.beanBody(ListJobResponse.class);
         context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
     }
 
