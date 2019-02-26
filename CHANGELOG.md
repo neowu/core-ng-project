@@ -8,7 +8,8 @@
         e.g.
         http().route(POST, "/ajax", bind(AJAXController.class)::ajax);
         http().bean(RequestBean.class, ResponseBean.class);  
-* search: update ES to 6.6.1        
+* search: update ES to 6.6.1
+* db: close connection if statement is already closed due to previous error        
 TODO:
 * make cache to validate after retrieve?
 * refine web body bean 

@@ -27,4 +27,12 @@ class ConnectionsTest {
         Connections.checkConnectionState(connection, new SQLTimeoutException("Statement cancelled due to timeout or client request"));
         assertThat(connection.broken).isTrue();
     }
+
+    @Test
+    void withStatementIsClosed() {
+        // refer to com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(java.lang.Throwable, com.mysql.cj.exceptions.ExceptionInterceptor)
+        PoolItem<Connection> connection = new PoolItem<>(null);
+        Connections.checkConnectionState(connection, new SQLException("No operations allowed after statement closed", "S1009"));
+        assertThat(connection.broken).isTrue();
+    }
 }
