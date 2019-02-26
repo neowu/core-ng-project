@@ -38,6 +38,11 @@ subprojects {
     }
 
     afterEvaluate {
+        // update group on afterEvaluate since the project.gradle usually included in the first line of project build.gradle, which project.group is not assigned yet
+        if (parent.depth > 0) {
+            group = "${group}.${parent.name}"    // append parent into group, let child projects with same name under different parent have different artifactId
+        }
+
         tasks.withType(Jar).configureEach {
             manifest {
                 attributes 'Implementation-Title': project.name,
