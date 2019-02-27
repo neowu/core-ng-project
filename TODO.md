@@ -16,6 +16,9 @@
 * rethink module structure to fit java module export requirement
 * run diagnostic when heap usage is high, send trace, log().alert() ?
 
+* make cache to validate after retrieve?
+* refine web body bean 
+
 ### jdk 11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled

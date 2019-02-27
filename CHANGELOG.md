@@ -1,5 +1,5 @@
 ## Change log
-### 6.11.1 (2/8/2019 - )   !!! in this version, we will revisit all validation/bean/annotation/config
+### 6.11.1 (2/8/2019 - 2/27/2019)   !!! this version has behavior and config API changes
 * db: not allowing db entity with default value, due to it may cause undesired behavior on partialUpdate, ("new entity() -> change fields -> updatePartial(entity)" will update those fields with default value since they are not null)
 * cache: stop supporting value and List<T> (considered as bad practice, better wrap with class for maintenance)        
          removed to register Cache<T> with name in CacheConfig, as it's generally for value type
@@ -10,9 +10,6 @@
         http().bean(RequestBean.class, ResponseBean.class);  
 * search: update ES to 6.6.1
 * db: close connection if statement is already closed due to previous error        
-TODO:
-* make cache to validate after retrieve?
-* refine web body bean 
 
 ### 6.10.10 (1/16/2019 - 1/31/2019)
 * mongo: support enum as map key to be consistent with other subsystem
