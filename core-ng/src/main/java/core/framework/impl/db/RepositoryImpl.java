@@ -30,7 +30,7 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     RepositoryImpl(DatabaseImpl database, Class<T> entityClass) {
         this.database = database;
-        validator = new Validator(entityClass);
+        validator = Validator.of(entityClass);
         insertQuery = new InsertQueryBuilder<>(entityClass).build();
         selectQuery = new SelectQuery<>(entityClass, database.vendor);
         updateQuery = new UpdateQueryBuilder<>(entityClass).build();

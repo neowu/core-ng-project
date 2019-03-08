@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ValidatorTest {
     @Test
     void validate() {
-        var validator = new Validator(TestBean.class);
+        var validator = Validator.of(TestBean.class);
         assertThatThrownBy(() -> validator.validate(null, false))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("bean must not be null");

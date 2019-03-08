@@ -9,7 +9,7 @@ final class EntityValidator<T> {
     private final Validator validator;
 
     EntityValidator(Class<T> entityClass) {
-        validator = new Validator(entityClass);
+        validator = Validator.of(entityClass);
     }
 
     void validate(T entity) {

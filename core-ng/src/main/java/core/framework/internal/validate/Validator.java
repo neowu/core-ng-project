@@ -5,6 +5,7 @@ import core.framework.internal.json.JSONMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -13,10 +14,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author neo
  */
 public final class Validator {
+    private static final Map<Class<?>, Validator> VALIDATORS = new HashMap<>();    // validators are always created during startup in single thread, it's ok not be thread safe
     private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
+
+    public static Validator of(Class<?> beanClass) {
+        return VALIDATORS.computeIfAbsent(beanClass, Validator::new);
+    }
+
     private final BeanValidator validator;
 
-    public Validator(Class<?> beanClass) {
+    private Validator(Class<?> beanClass) {
         var builder = new BeanValidatorBuilder(beanClass);
         this.validator = builder.build().orElse(null);
     }

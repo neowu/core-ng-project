@@ -1,5 +1,6 @@
 ## Change log
 ### 6.11.2 (3/6/2019 - )
+* json: introduced Bean class to (de)serialize json with strict class type and bean validation, keep JSON loose to adapt any classes
 
 ### 6.11.1 (2/8/2019 - 2/27/2019)   !!! this version has behavior and config API changes
 * db: not allowing db entity with default value, due to it may cause undesired behavior on partialUpdate, ("new entity() -> change fields -> updatePartial(entity)" will update those fields with default value since they are not null)

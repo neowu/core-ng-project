@@ -40,7 +40,7 @@ public class RequestBeanMapper {
         if (!queryParamMappers.containsKey(beanClass)) {
             new QueryParamClassValidator(beanClass, beanClassNameValidator).validate();
             QueryParamMapper<T> mapper = new QueryParamMapperBuilder<>(beanClass).build();
-            var validator = new Validator(beanClass);
+            var validator = Validator.of(beanClass);
             queryParamMappers.put(beanClass, new QueryParamMapperHolder<>(mapper, validator));
         }
     }

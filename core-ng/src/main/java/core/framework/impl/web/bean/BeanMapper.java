@@ -6,12 +6,12 @@ import core.framework.internal.validate.Validator;
 /**
  * @author neo
  */
-public class BeanMapper<T> {
+class BeanMapper<T> {
     final JSONMapper<T> mapper;
     final Validator validator;
 
-    public BeanMapper(Class<T> beanClass) {
+    BeanMapper(Class<T> beanClass) {
         mapper = new JSONMapper<>(beanClass);
-        this.validator = new Validator(beanClass);
+        validator = Validator.of(beanClass);
     }
 }

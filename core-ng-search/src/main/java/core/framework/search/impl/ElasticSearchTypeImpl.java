@@ -74,7 +74,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         this.elasticSearch = elasticSearch;
         this.slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
         this.index = documentClass.getDeclaredAnnotation(Index.class).name();
-        validator = new Validator(documentClass);
+        validator = Validator.of(documentClass);
         mapper = new JSONMapper<>(documentClass);
     }
 

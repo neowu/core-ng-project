@@ -11,7 +11,7 @@ public class MessageValidator<T> {
 
     MessageValidator(Class<T> messageClass) {
         new JSONClassValidator(messageClass).validate();
-        validator = new Validator(messageClass);
+        validator = Validator.of(messageClass);
     }
 
     public void validate(T message) {
