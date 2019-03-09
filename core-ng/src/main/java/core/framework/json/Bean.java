@@ -17,9 +17,11 @@ public final class Bean {
     private static final Map<Class<?>, Validator> VALIDATORS = new HashMap<>(); // always requires register beanClass during startup, so not be thread safe
 
     public static void register(Class<?> beanClass) {
-        if (VALIDATORS.containsKey(beanClass)) throw new Error("bean class is already registered, beanClass=" + beanClass.getCanonicalName());
-        new JSONClassValidator(beanClass).validate();
-        VALIDATORS.put(beanClass, Validator.of(beanClass));
+        VALIDATORS.compute(beanClass, (key, value) -> {
+            if (value != null) throw new Error("bean class is already registered, beanClass=" + beanClass.getCanonicalName());
+            new JSONClassValidator(beanClass).validate();
+            return Validator.of(beanClass);
+        });
     }
 
     public static <T> T fromJSON(Class<T> beanClass, String json) {

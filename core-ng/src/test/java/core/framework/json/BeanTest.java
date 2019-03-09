@@ -22,6 +22,13 @@ class BeanTest {
     }
 
     @Test
+    void registerDuplicateBean() {
+        assertThatThrownBy(() -> Bean.register(TestBean.class))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("bean class is already registered");
+    }
+
+    @Test
     void mapField() {
         var bean = new TestBean();
         bean.mapField.put("key1", "value1");
