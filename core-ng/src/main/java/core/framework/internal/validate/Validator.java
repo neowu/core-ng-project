@@ -1,7 +1,8 @@
 package core.framework.internal.validate;
 
 import core.framework.impl.log.filter.JSONLogParam;
-import core.framework.internal.json.JSONMapper;
+import core.framework.json.JSON;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public final class Validator {
                 // all validatable beans can be converted to JSON, only log content on failure path, not to slow down happy path
                 // use debug level not to interfere error_code in action log
                 LOGGER.debug("validate, beanClass={}, bean={}, partial={}", bean.getClass().getCanonicalName(),
-                        new JSONLogParam(new JSONMapper<>(bean.getClass()).toJSON(bean), UTF_8),
+                        new JSONLogParam(Strings.bytes(JSON.toJSON(bean)), UTF_8),
                         partial);
                 throw new ValidationException(errors.errors);
             }

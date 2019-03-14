@@ -212,7 +212,7 @@ public final class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, 1);
-            logger.debug("increaseBy, key={}, increment={}, returnedValue={}, elapsed={}", key, increment, value, elapsed);
+            logger.debug("incrby, key={}, increment={}, returnedValue={}, elapsed={}", key, increment, value, elapsed);
             checkSlowOperation(elapsed);
         }
     }

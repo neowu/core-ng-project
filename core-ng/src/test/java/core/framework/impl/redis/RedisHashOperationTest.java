@@ -57,4 +57,12 @@ class RedisHashOperationTest extends AbstractRedisOperationTest {
         assertThat(deleted).isEqualTo(1);
         assertRequestEquals("*3\r\n$4\r\nHDEL\r\n$3\r\nkey\r\n$2\r\nf1\r\n");
     }
+
+    @Test
+    void increaseBy() {
+        response(":1\r\n");
+        redis.hash().increaseBy("key", "f1", 1);
+
+        assertRequestEquals("*4\r\n$7\r\nHINCRBY\r\n$3\r\nkey\r\n$2\r\nf1\r\n$1\r\n1\r\n");
+    }
 }

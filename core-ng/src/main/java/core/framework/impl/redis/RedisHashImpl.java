@@ -17,6 +17,7 @@ import java.util.Map;
 import static core.framework.impl.redis.Protocol.Command.HDEL;
 import static core.framework.impl.redis.Protocol.Command.HGET;
 import static core.framework.impl.redis.Protocol.Command.HGETALL;
+import static core.framework.impl.redis.Protocol.Command.HINCRBY;
 import static core.framework.impl.redis.Protocol.Command.HMSET;
 import static core.framework.impl.redis.Protocol.Command.HSET;
 import static core.framework.impl.redis.RedisEncodings.decode;
@@ -132,6 +133,28 @@ public final class RedisHashImpl implements RedisHash {
             int size = values.size();
             ActionLogContext.track("redis", elapsed, 0, size);
             logger.debug("hmset, key={}, values={}, size={}, elapsed={}", key, new MapLogParam(values), size, elapsed);
+            redis.checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
+    public long increaseBy(String key, String field, long increment) {
+        var watch = new StopWatch();
+        long value = 0;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeKeyArgumentsCommand(HINCRBY, key, field, String.valueOf(increment));
+            value = connection.readLong();
+            return value;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 0, 1);
+            logger.debug("hincrby, key={}, field={}, increment={}, returnedValue={}, elapsed={}", key, field, increment, value, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }

@@ -14,5 +14,7 @@ public interface RedisHash {
 
     void multiSet(String key, Map<String, String> values);
 
+    long increaseBy(String key, String field, long increment);
+
     long del(String key, String... fields);
 }

@@ -49,4 +49,15 @@ class MockRedisHashTest {
         Map<String, String> hash = redis.hash().getAll("key1");
         assertThat(hash).containsExactly(entry("field2", "value2"));
     }
+
+    @Test
+    void increaseBy() {
+        long result = redis.hash().increaseBy("key1", "field1", 1);
+        assertThat(result).isEqualTo(1);
+        assertThat(redis.hash().get("key1", "field1")).isEqualTo("1");
+
+        result = redis.hash().increaseBy("key1", "field1", 1);
+        assertThat(result).isEqualTo(2);
+        assertThat(redis.hash().get("key1", "field1")).isEqualTo("2");
+    }
 }

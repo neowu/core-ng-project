@@ -18,9 +18,9 @@ public final class Bean {
 
     public static void register(Class<?> beanClass) {
         VALIDATORS.compute(beanClass, (key, value) -> {
-            if (value != null) throw new Error("bean class is already registered, beanClass=" + beanClass.getCanonicalName());
-            new JSONClassValidator(beanClass).validate();
-            return Validator.of(beanClass);
+            if (value != null) throw new Error("bean class is already registered, beanClass=" + key.getCanonicalName());
+            new JSONClassValidator(key).validate();
+            return Validator.of(key);
         });
     }
 

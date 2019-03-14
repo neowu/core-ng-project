@@ -42,6 +42,20 @@ public final class MockRedisHash implements RedisHash {
     }
 
     @Override
+    public long increaseBy(String key, String field, long increment) {
+        var hashValue = store.putIfAbsent(key, new HashMap<>());
+
+        String value = hashValue.map().get(field);
+        if (value == null) {
+            hashValue.map().put(field, String.valueOf(increment));
+            return increment;
+        }
+        long result = Integer.parseInt(value) + increment;
+        hashValue.map().put(field, String.valueOf(result));
+        return result;
+    }
+
+    @Override
     public long del(String key, String... fields) {
         MockRedisStore.Value value = store.get(key);
         if (value == null) return 0;
