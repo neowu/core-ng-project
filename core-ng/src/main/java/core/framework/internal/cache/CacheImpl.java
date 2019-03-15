@@ -2,6 +2,8 @@ package core.framework.internal.cache;
 
 import core.framework.cache.Cache;
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.validate.ValidationException;
+import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,8 @@ public class CacheImpl<T> implements Cache<T> {
     private final Logger logger = LoggerFactory.getLogger(CacheImpl.class);
     private final CacheStore cacheStore;
     private final JSONMapper<T> mapper;
+    private final Validator validator;  // only validate when retrieve cache from store, in case data in cache store is stale, e.g. the class structure is changed but still got old data from cache
+    // it's opposite as DB, which only validate on save
 
     CacheImpl(String name, Class<T> cacheClass, Duration duration, CacheStore cacheStore) {
         this.name = name;
@@ -31,19 +35,21 @@ public class CacheImpl<T> implements Cache<T> {
         this.duration = duration;
         this.cacheStore = cacheStore;
         mapper = new JSONMapper<>(cacheClass);
+        validator = Validator.of(cacheClass);
     }
 
     @Override
     public T get(String key, Function<String, T> loader) {
         String cacheKey = cacheKey(key);
         byte[] cacheValue = cacheStore.get(cacheKey);
-        if (cacheValue == null) {
-            logger.debug("load value, key={}", key);
-            T value = loader.apply(key);
-            cacheStore.put(cacheKey, mapper.toJSON(value), duration);
-            return value;
+        if (cacheValue != null) {
+            T result = mapper.fromJSON(cacheValue);
+            if (validate(result)) return result;
         }
-        return mapper.fromJSON(cacheValue);
+        logger.debug("load value, key={}", key);
+        T value = loader.apply(key);
+        cacheStore.put(cacheKey, mapper.toJSON(value), duration);
+        return value;
     }
 
     public Optional<String> get(String key) {
@@ -64,13 +70,19 @@ public class CacheImpl<T> implements Cache<T> {
         for (String key : keys) {
             String cacheKey = cacheKeys[index];
             byte[] cacheValue = cacheValues.get(cacheKey);
-            if (cacheValue == null) {
+            boolean load = true;
+            if (cacheValue != null) {
+                T result = mapper.fromJSON(cacheValue);
+                if (validate(result)) {
+                    values.put(key, result);
+                    load = false;
+                }
+            }
+            if (load) {
                 logger.debug("load value, key={}", key);
                 T value = loader.apply(key);
                 newValues.put(cacheKey, mapper.toJSON(value));
                 values.put(key, value);
-            } else {
-                values.put(key, mapper.fromJSON(cacheValue));
             }
             index++;
         }
@@ -115,5 +127,15 @@ public class CacheImpl<T> implements Cache<T> {
 
     private String cacheKey(String key) {
         return name + ":" + key;
+    }
+
+    private boolean validate(T bean) {
+        try {
+            validator.validate(bean, false);
+            return true;
+        } catch (ValidationException e) {
+            logger.warn("failed to validate value from cache, will load by loader", e);
+            return false;
+        }
     }
 }

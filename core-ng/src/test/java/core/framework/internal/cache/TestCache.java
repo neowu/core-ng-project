@@ -1,5 +1,7 @@
 package core.framework.internal.cache;
 
+import core.framework.api.validate.NotNull;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.Map;
 public class TestCache {
     public LocalDateTime dateTimeField;
 
+    @NotNull
     public String stringField;
 
     public List<String> listField;
@@ -30,6 +33,7 @@ public class TestCache {
     }
 
     public static class Child {
+        @NotNull
         public BigDecimal bigDecimalField = BigDecimal.ZERO;
     }
 }
