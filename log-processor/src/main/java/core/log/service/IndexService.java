@@ -40,6 +40,7 @@ public class IndexService {
         search.createIndexTemplate("action", ClasspathResources.text("index/action-index-template.json"));
         search.createIndexTemplate("trace", ClasspathResources.text("index/trace-index-template.json"));
         search.createIndexTemplate("stat", ClasspathResources.text("index/stat-index-template.json"));
+        search.createIndexTemplate("event", ClasspathResources.text("index/event-index-template.json"));
     }
 
     String indexName(String name, LocalDate now) {

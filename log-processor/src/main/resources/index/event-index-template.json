@@ -1,0 +1,52 @@
+{
+  "index_patterns": "event-*",
+  "order": 1,
+  "settings": {
+    "number_of_shards": 1,
+    "refresh_interval": "5s"
+  },
+  "mappings": {
+    "event": {
+      "dynamic_templates": [
+        {
+          "context": {
+            "path_match": "context.*",
+            "mapping": {
+              "type": "keyword"
+            }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
+        "app": {
+          "type": "keyword"
+        },
+        "result": {
+          "type": "keyword"
+        },
+        "type": {
+          "type": "keyword"
+        },
+        "error_message": {
+          "type": "text",
+          "index": "false"
+        },
+        "exception_stack_trace": {
+          "type": "text",
+          "index": "false"
+        },
+        "elapsed": {
+          "type": "long"
+        },
+        "collect_time": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        }
+      }
+    }
+  }
+}

@@ -5,4 +5,5 @@ include 'core-ng-api',
     'core-ng-search-test',
     'core-ng-mongo',
     'core-ng-mongo-test',
-    'log-processor'
+    'log-processor',
+    'log-collector'
