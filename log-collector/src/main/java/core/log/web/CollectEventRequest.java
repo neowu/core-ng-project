@@ -49,7 +49,7 @@ public class CollectEventRequest {
         @Property(name = "exceptionStackTrace")
         public String exceptionStackTrace;
         @NotNull
-        @Property(name = "elaspedTime")
-        public Long elaspedTime;
+        @Property(name = "elapsedTime")
+        public Long elapsedTime;
     }
 }

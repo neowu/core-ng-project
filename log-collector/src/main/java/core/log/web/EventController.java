@@ -33,9 +33,8 @@ public class EventController {
         CollectEventRequest eventRequest = request.bean(CollectEventRequest.class);
         for (CollectEventRequest.Event event : eventRequest.events) {
             EventMessage message = message(event);
-
             message.app = app;
-            message.collectTime = now;
+            message.timestamp = now;
             if (userAgent != null) message.context.put("userAgent", userAgent);
             message.context.put("clientIP", clientIP);
 
@@ -48,14 +47,13 @@ public class EventController {
     private EventMessage message(CollectEventRequest.Event event) {
         var message = new EventMessage();
         message.id = event.id;
-        message.timestamp = event.date.toInstant();
+        message.eventTime = event.date.toInstant();
         message.type = event.type;
         message.result = String.valueOf(event.result);
-        message.elapsed = event.elaspedTime;
+        message.context = event.context;
         message.errorMessage = event.errorMessage;
         message.exceptionStackTrace = event.exceptionStackTrace;
-        message.context = event.context;
-        message.elapsed = event.elaspedTime;
+        message.elapsed = event.elapsedTime;
         return message;
     }
 }

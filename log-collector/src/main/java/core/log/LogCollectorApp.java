@@ -15,6 +15,8 @@ public class LogCollectorApp extends App {
     @Override
     protected void initialize() {
         load(new SystemModule("sys.properties"));
+        site().security();
+        site().staticContent("/robots.txt");
 
         kafka().publish(LogTopics.TOPIC_EVENT, EventMessage.class);
 

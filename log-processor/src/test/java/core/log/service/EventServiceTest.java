@@ -68,7 +68,7 @@ class EventServiceTest extends IntegrationTest {
         message.context = Map.of("clientIP", "127.0.0.1");
         message.type = "Test";
         message.app = "test";
-        message.collectTime = Instant.now();
+        message.eventTime = Instant.now();
         return message;
     }
 }

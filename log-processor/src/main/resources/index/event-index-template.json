@@ -25,6 +25,10 @@
         "app": {
           "type": "keyword"
         },
+        "event_time": {
+          "type": "date",
+          "format": "strict_date_optional_time"
+        },
         "result": {
           "type": "keyword"
         },
@@ -41,10 +45,6 @@
         },
         "elapsed": {
           "type": "long"
-        },
-        "collect_time": {
-          "type": "date",
-          "format": "strict_date_optional_time"
         }
       }
     }

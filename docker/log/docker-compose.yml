@@ -40,3 +40,11 @@ services:
         depends_on:
         - kafka
         - elasticsearch
+    log-collector:
+        image: neowu/log-collector:0.0.1
+        environment:
+            - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
+            - SYS_KAFKA_URI=kafka:9092
+            - SYS_LOG_APPENDER=kafka:9092
+        depends_on:
+            - kafka

@@ -58,7 +58,7 @@ public class EventService {
         var document = new EventDocument();
         document.timestamp = message.timestamp;
         document.app = message.app;
-        document.collectTime = message.collectTime;
+        document.eventTime = message.eventTime;
         document.result = message.result;
         document.type = message.type;
         document.errorMessage = message.errorMessage;
