@@ -41,7 +41,8 @@ public class EventController {
             eventMessagePublisher.publish(message.id, message);
         }
 
-        return Response.empty();
+        return Response.empty()
+                       .header("Access-Control-Allow-Origin", "*");
     }
 
     private EventMessage message(CollectEventRequest.Event event) {
