@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.10'
+        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.7.0'
     }
 }
 
@@ -35,7 +35,7 @@ subprojects {
     spotbugs {
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '3.1.11'
+        toolVersion = '3.1.12'
     }
 
     dependencies {

@@ -22,7 +22,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -99,6 +98,6 @@ public final class KafkaAppender implements LogAppender {
         logger.info("stop log forwarder");
         stop.set(true);
         logForwarderThread.interrupt();
-        producer.close(timeoutInMs <= 0 ? 1000 : timeoutInMs, TimeUnit.MILLISECONDS);
+        producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));
     }
 }

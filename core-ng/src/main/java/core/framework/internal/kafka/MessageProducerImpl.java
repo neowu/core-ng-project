@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
@@ -51,7 +50,7 @@ public class MessageProducerImpl implements MessageProducer {
         if (producer != null) {
             logger.info("close kafka producer, uri={}, name={}", uri, name);
             producer.flush();
-            producer.close(timeoutInMs <= 0 ? 1000 : timeoutInMs, TimeUnit.MILLISECONDS);    // close timeout must greater than 0, here use 1s to try best if no time left
+            producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));    // close timeout must greater than 0, here use 1s to try best if no time left
         }
     }
 }

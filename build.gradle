@@ -6,11 +6,11 @@ subprojects {
 }
 
 def elasticVersion = '6.6.1'
-def kafkaVersion = '2.1.1'
+def kafkaVersion = '2.2.0'
 def jacksonVersion = '2.9.8'
-def junitVersion = '5.3.2'
-def mockitoVersion = '2.23.4'
-def assertjVersion = '3.11.1'
+def junitVersion = '5.4.1'
+def mockitoVersion = '2.25.1'
+def assertjVersion = '3.12.2'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -24,7 +24,7 @@ project(':core-ng') {
         implementation 'org.javassist:javassist:3.24.1-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-        implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+        implementation 'com.squareup.okhttp3:okhttp:3.14.0'
         implementation 'io.undertow:undertow-core:2.0.17.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.7.2'      // used by kafka message compression
