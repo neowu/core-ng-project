@@ -44,11 +44,9 @@ class ServiceUnavailableInterceptorTest {
 
         interceptor.intercept(chain);
         Field field = RealConnection.class.getDeclaredField("noNewExchanges");
-        if (field.trySetAccessible()) {
-            field.setAccessible(true);
-            assertThat((boolean) field.get(connection)).isTrue();
-        } else {
+
+        if (!field.trySetAccessible())
             throw new Error("failed to access noNewExchanges field");
-        }
+        assertThat((boolean) field.get(connection)).isTrue();
     }
 }
