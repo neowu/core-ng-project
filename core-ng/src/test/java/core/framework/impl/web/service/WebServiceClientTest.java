@@ -84,12 +84,13 @@ class WebServiceClientTest {
                     assertThat(exception.severity()).isEqualTo(Severity.WARN);
                     assertThat(exception.errorCode()).isEqualTo(response.errorCode);
                     assertThat(exception.getMessage()).isEqualTo("failed to call remote service, statusCode=404, error=not found");
-                    assertThat(exception.status).isEqualTo(HTTPStatus.NOT_FOUND);
+                    assertThat(exception.remoteStatus).isEqualTo(HTTPStatus.NOT_FOUND);
+                    assertThat(exception.remoteErrorMessage).isEqualTo("not found");
                 });
     }
 
     @Test
-    void validateResponseWithEmtpyBody() {
+    void validateResponseWithEmptyBody() {
         assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(503, Map.of(), new byte[0])))
                 .isInstanceOf(RemoteServiceException.class)
                 .satisfies(throwable -> {
@@ -97,7 +98,7 @@ class WebServiceClientTest {
                     assertThat(exception.severity()).isEqualTo(Severity.ERROR);
                     assertThat(exception.errorCode()).isEqualTo("REMOTE_SERVICE_ERROR");
                     assertThat(exception.getMessage()).isEqualTo("failed to call remote service, statusCode=503");
-                    assertThat(exception.status).isEqualTo(HTTPStatus.SERVICE_UNAVAILABLE);
+                    assertThat(exception.remoteStatus).isEqualTo(HTTPStatus.SERVICE_UNAVAILABLE);
                 });
     }
 

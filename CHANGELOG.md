@@ -1,6 +1,7 @@
 ## Change log
 ### 6.11.3 (3/18/2019 - )
 * log: added log-collector to collect event from JS (draft)
+* api: expose remoteErrorMessage from RemoteServiceException
 
 ### 6.11.2 (3/6/2019 - 3/15/2019)
 * json: introduced Bean class to (de)serialize json with strict class type and bean validation, keep JSON loose to adapt any classes
