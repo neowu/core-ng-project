@@ -3,8 +3,8 @@ package core.framework.module;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
-import core.framework.impl.redis.RedisImpl;
 import core.framework.impl.resource.PoolMetrics;
+import core.framework.internal.redis.RedisImpl;
 import core.framework.redis.Redis;
 
 import java.time.Duration;

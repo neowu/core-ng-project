@@ -1,10 +1,10 @@
-package core.framework.impl.redis;
+package core.framework.internal.redis;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import static core.framework.impl.redis.RedisEncodings.encode;
+import static core.framework.internal.redis.RedisEncodings.encode;
 
 /**
  * @author neo

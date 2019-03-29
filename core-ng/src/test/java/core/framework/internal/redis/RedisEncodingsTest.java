@@ -1,4 +1,4 @@
-package core.framework.impl.redis;
+package core.framework.internal.redis;
 
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;

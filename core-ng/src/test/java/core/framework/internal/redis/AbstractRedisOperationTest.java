@@ -1,4 +1,4 @@
-package core.framework.impl.redis;
+package core.framework.internal.redis;
 
 import core.framework.impl.resource.Pool;
 import core.framework.impl.resource.PoolItem;
@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import static core.framework.impl.redis.RedisEncodings.decode;
+import static core.framework.internal.redis.RedisEncodings.decode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

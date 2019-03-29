@@ -1,7 +1,7 @@
 package core.framework.internal.cache;
 
-import core.framework.impl.redis.RedisException;
-import core.framework.impl.redis.RedisImpl;
+import core.framework.internal.redis.RedisException;
+import core.framework.internal.redis.RedisImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

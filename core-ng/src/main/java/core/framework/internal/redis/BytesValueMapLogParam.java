@@ -1,4 +1,4 @@
-package core.framework.impl.redis;
+package core.framework.internal.redis;
 
 import core.framework.impl.log.filter.LogParam;
 

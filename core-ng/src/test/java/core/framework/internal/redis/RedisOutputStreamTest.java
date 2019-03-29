@@ -1,4 +1,4 @@
-package core.framework.impl.redis;
+package core.framework.internal.redis;
 
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static core.framework.impl.redis.RedisEncodings.decode;
+import static core.framework.internal.redis.RedisEncodings.decode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**

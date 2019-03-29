@@ -1,4 +1,4 @@
-package core.framework.impl.redis;
+package core.framework.internal.redis;
 
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
@@ -7,8 +7,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static core.framework.impl.redis.RedisEncodings.decode;
-import static core.framework.impl.redis.RedisEncodings.encode;
+import static core.framework.internal.redis.RedisEncodings.decode;
+import static core.framework.internal.redis.RedisEncodings.encode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

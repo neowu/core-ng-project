@@ -1,4 +1,4 @@
-package core.framework.impl.redis;
+package core.framework.internal.redis;
 
 import core.framework.impl.log.filter.ArrayLogParam;
 import core.framework.impl.log.filter.BytesLogParam;
@@ -22,20 +22,20 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static core.framework.impl.redis.Protocol.Command.DEL;
-import static core.framework.impl.redis.Protocol.Command.EXPIRE;
-import static core.framework.impl.redis.Protocol.Command.GET;
-import static core.framework.impl.redis.Protocol.Command.INCRBY;
-import static core.framework.impl.redis.Protocol.Command.MGET;
-import static core.framework.impl.redis.Protocol.Command.MSET;
-import static core.framework.impl.redis.Protocol.Command.SCAN;
-import static core.framework.impl.redis.Protocol.Command.SET;
-import static core.framework.impl.redis.Protocol.Keyword.COUNT;
-import static core.framework.impl.redis.Protocol.Keyword.EX;
-import static core.framework.impl.redis.Protocol.Keyword.MATCH;
-import static core.framework.impl.redis.Protocol.Keyword.NX;
-import static core.framework.impl.redis.RedisEncodings.decode;
-import static core.framework.impl.redis.RedisEncodings.encode;
+import static core.framework.internal.redis.Protocol.Command.DEL;
+import static core.framework.internal.redis.Protocol.Command.EXPIRE;
+import static core.framework.internal.redis.Protocol.Command.GET;
+import static core.framework.internal.redis.Protocol.Command.INCRBY;
+import static core.framework.internal.redis.Protocol.Command.MGET;
+import static core.framework.internal.redis.Protocol.Command.MSET;
+import static core.framework.internal.redis.Protocol.Command.SCAN;
+import static core.framework.internal.redis.Protocol.Command.SET;
+import static core.framework.internal.redis.Protocol.Keyword.COUNT;
+import static core.framework.internal.redis.Protocol.Keyword.EX;
+import static core.framework.internal.redis.Protocol.Keyword.MATCH;
+import static core.framework.internal.redis.Protocol.Keyword.NX;
+import static core.framework.internal.redis.RedisEncodings.decode;
+import static core.framework.internal.redis.RedisEncodings.encode;
 
 /**
  * @author neo

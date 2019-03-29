@@ -1,4 +1,4 @@
-package core.framework.impl.redis;
+package core.framework.internal.redis;
 
 import core.framework.impl.log.filter.ArrayLogParam;
 import core.framework.impl.resource.PoolItem;
@@ -13,11 +13,11 @@ import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static core.framework.impl.redis.Protocol.Command.LPOP;
-import static core.framework.impl.redis.Protocol.Command.LRANGE;
-import static core.framework.impl.redis.Protocol.Command.RPUSH;
-import static core.framework.impl.redis.RedisEncodings.decode;
-import static core.framework.impl.redis.RedisEncodings.encode;
+import static core.framework.internal.redis.Protocol.Command.LPOP;
+import static core.framework.internal.redis.Protocol.Command.LRANGE;
+import static core.framework.internal.redis.Protocol.Command.RPUSH;
+import static core.framework.internal.redis.RedisEncodings.decode;
+import static core.framework.internal.redis.RedisEncodings.encode;
 
 /**
  * @author rexthk
