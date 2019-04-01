@@ -19,14 +19,14 @@ public class EventDocument {
     public Instant eventTime;
     @Property(name = "result")
     public String result;
-    @Property(name = "type")
-    public String type;
+    @Property(name = "action")
+    public String action;
+    @Property(name = "error_code")
+    public String errorCode;
     @Property(name = "context")
     public Map<String, String> context;
-    @Property(name = "error_message")
-    public String errorMessage;
-    @Property(name = "exception_stack_trace")
-    public String exceptionStackTrace;
+    @Property(name = "info")
+    public Map<String, String> info;
     @Property(name = "elapsed")
     public Long elapsed;
 }

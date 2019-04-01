@@ -40,16 +40,11 @@
       "result": {
         "type": "keyword"
       },
-      "type": {
+      "action": {
         "type": "keyword"
       },
-      "error_message": {
-        "type": "text",
-        "index": "false"
-      },
-      "exception_stack_trace": {
-        "type": "text",
-        "index": "false"
+      "error_code": {
+        "type": "keyword"
       },
       "elapsed": {
         "type": "long"

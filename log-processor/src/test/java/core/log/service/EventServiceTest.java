@@ -31,12 +31,14 @@ class EventServiceTest extends IntegrationTest {
     @Test
     void index() {
         EventMessage message = message("1");
+        message.info = Map.of("param", "value");
 
         var now = LocalDate.of(2019, Month.MARCH, 19);
         eventService.index(List.of(message), now);
 
         EventDocument event = eventDocument(now, message.id);
         assertThat(event.context).isEqualTo(message.context);
+        assertThat(event.info).containsEntry("param", "value");
     }
 
     @Test
@@ -63,11 +65,11 @@ class EventServiceTest extends IntegrationTest {
     private EventMessage message(String id) {
         var message = new EventMessage();
         message.id = id;
+        message.app = "test";
         message.timestamp = Instant.now();
         message.result = "OK";
+        message.action = "test";
         message.context = Map.of("clientIP", "127.0.0.1");
-        message.type = "Test";
-        message.app = "test";
         message.eventTime = Instant.now();
         return message;
     }

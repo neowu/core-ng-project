@@ -4,6 +4,7 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.http.HTTPHeaders;
 import core.framework.inject.Inject;
 import core.framework.internal.log.message.EventMessage;
+import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -50,9 +51,8 @@ public class EventController {
 
         CollectEventRequest eventRequest = request.bean(CollectEventRequest.class);
         for (CollectEventRequest.Event event : eventRequest.events) {
-            EventMessage message = message(event);
-            message.app = app;
-            message.timestamp = now;
+            EventMessage message = message(event, app, now);
+
             if (userAgent != null) message.context.put("userAgent", userAgent);
             message.context.put("clientIP", clientIP);
 
@@ -63,15 +63,17 @@ public class EventController {
                        .header("Access-Control-Allow-Origin", allowedOrigin);
     }
 
-    private EventMessage message(CollectEventRequest.Event event) {
+    EventMessage message(CollectEventRequest.Event event, String app, Instant now) {
         var message = new EventMessage();
         message.id = event.id;
+        message.timestamp = now;
+        message.app = app;
         message.eventTime = event.date.toInstant();
-        message.type = event.type;
-        message.result = String.valueOf(event.result);
+        message.result = JSON.toEnumValue(event.result);
+        message.action = event.action;
+        message.errorCode = event.errorCode;
         message.context = event.context;
-        message.errorMessage = event.errorMessage;
-        message.exceptionStackTrace = event.exceptionStackTrace;
+        message.info = event.info;
         message.elapsed = event.elapsedTime;
         return message;
     }

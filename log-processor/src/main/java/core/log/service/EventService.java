@@ -60,11 +60,11 @@ public class EventService {
         document.app = message.app;
         document.eventTime = message.eventTime;
         document.result = message.result;
-        document.type = message.type;
-        document.errorMessage = message.errorMessage;
-        document.elapsed = message.elapsed;
+        document.action = message.action;
+        document.errorCode = message.errorCode;
         document.context = message.context;
-        document.exceptionStackTrace = message.exceptionStackTrace;
+        document.info = message.info;
+        document.elapsed = message.elapsed;
         return document;
     }
 }

@@ -36,18 +36,18 @@ public class CollectEventRequest {
         @Property(name = "date")
         public ZonedDateTime date;
         @NotNull
-        @Property(name = "type")
-        public String type;
-        @NotNull
         @Property(name = "result")
         public Result result;
+        @Property(name = "action")
+        public String action;
+        @Property(name = "errorCode")
+        public String errorCode;
         @NotNull
         @Property(name = "context")
         public Map<String, String> context = new HashMap<>();
-        @Property(name = "errorMessage")
-        public String errorMessage;
-        @Property(name = "exceptionStackTrace")
-        public String exceptionStackTrace;
+        @NotNull
+        @Property(name = "info")
+        public Map<String, String> info = new HashMap<>();
         @NotNull
         @Property(name = "elapsedTime")
         public Long elapsedTime;

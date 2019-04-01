@@ -1,5 +1,5 @@
 ## Change log
-### 6.11.3 (3/18/2019 - )
+### 6.11.3 (3/18/2019 - 4/1/2019)
 * log: added log-collector to collect event from JS
 * api: RemoteServiceException uses original error message 
     e.g. website->svc1->svc2, website will be able to display error message from svc2
