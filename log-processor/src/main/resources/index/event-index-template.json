@@ -6,46 +6,53 @@
     "refresh_interval": "5s"
   },
   "mappings": {
-    "event": {
-      "dynamic_templates": [
-        {
-          "context": {
-            "path_match": "context.*",
-            "mapping": {
-              "type": "keyword"
-            }
+    "dynamic_templates": [
+      {
+        "context": {
+          "path_match": "context.*",
+          "mapping": {
+            "type": "keyword"
           }
         }
-      ],
-      "properties": {
-        "@timestamp": {
-          "type": "date",
-          "format": "strict_date_optional_time"
-        },
-        "app": {
-          "type": "keyword"
-        },
-        "event_time": {
-          "type": "date",
-          "format": "strict_date_optional_time"
-        },
-        "result": {
-          "type": "keyword"
-        },
-        "type": {
-          "type": "keyword"
-        },
-        "error_message": {
-          "type": "text",
-          "index": "false"
-        },
-        "exception_stack_trace": {
-          "type": "text",
-          "index": "false"
-        },
-        "elapsed": {
-          "type": "long"
+      },
+      {
+        "info": {
+          "path_match": "info.*",
+          "mapping": {
+            "type": "text",
+            "index": "false"
+          }
         }
+      }
+    ],
+    "properties": {
+      "@timestamp": {
+        "type": "date",
+        "format": "strict_date_optional_time"
+      },
+      "app": {
+        "type": "keyword"
+      },
+      "event_time": {
+        "type": "date",
+        "format": "strict_date_optional_time"
+      },
+      "result": {
+        "type": "keyword"
+      },
+      "type": {
+        "type": "keyword"
+      },
+      "error_message": {
+        "type": "text",
+        "index": "false"
+      },
+      "exception_stack_trace": {
+        "type": "text",
+        "index": "false"
+      },
+      "elapsed": {
+        "type": "long"
       }
     }
   }

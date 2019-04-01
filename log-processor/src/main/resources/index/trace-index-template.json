@@ -6,28 +6,26 @@
     "refresh_interval": "5s"
   },
   "mappings": {
-    "trace": {
-      "properties": {
-        "@timestamp": {
-          "type": "date",
-          "format": "strict_date_optional_time"
-        },
-        "app": {
-          "type": "keyword"
-        },
-        "result": {
-          "type": "keyword"
-        },
-        "action": {
-          "type": "keyword"
-        },
-        "error_code": {
-          "type": "keyword"
-        },
-        "content": {
-          "type": "text",
-          "index": "false"
-        }
+    "properties": {
+      "@timestamp": {
+        "type": "date",
+        "format": "strict_date_optional_time"
+      },
+      "app": {
+        "type": "keyword"
+      },
+      "result": {
+        "type": "keyword"
+      },
+      "action": {
+        "type": "keyword"
+      },
+      "error_code": {
+        "type": "keyword"
+      },
+      "content": {
+        "type": "text",
+        "index": "false"
       }
     }
   }

@@ -49,28 +49,26 @@
     }
   },
   "mappings": {
-    "document": {
-      "properties": {
-        "completion1": {
-          "type": "completion"
-        },
-        "completion2": {
-          "type": "completion"
-        },
-        "string_field": {
-          "type": "text",
-          "analyzer": "english",
-          "search_analyzer": "english_search"
-        },
-        "int_field": {
-          "type": "integer"
-        },
-        "double_field": {
-          "type": "double"
-        },
-        "zoned_date_time_field": {
-          "type": "date"
-        }
+    "properties": {
+      "completion1": {
+        "type": "completion"
+      },
+      "completion2": {
+        "type": "completion"
+      },
+      "string_field": {
+        "type": "text",
+        "analyzer": "english",
+        "search_analyzer": "english_search"
+      },
+      "int_field": {
+        "type": "integer"
+      },
+      "double_field": {
+        "type": "double"
+      },
+      "zoned_date_time_field": {
+        "type": "date"
       }
     }
   }

@@ -5,20 +5,18 @@
     "number_of_shards": 1
   },
   "mappings": {
-    "document": {
-      "properties": {
-        "string_field": {
-          "type": "text"
-        },
-        "int_field": {
-          "type": "integer"
-        },
-        "zoned_date_time_field": {
-          "type": "date"
-        },
-        "double_field": {
-          "type": "double"
-        }
+    "properties": {
+      "string_field": {
+        "type": "text"
+      },
+      "int_field": {
+        "type": "integer"
+      },
+      "zoned_date_time_field": {
+        "type": "date"
+      },
+      "double_field": {
+        "type": "double"
       }
     }
   }

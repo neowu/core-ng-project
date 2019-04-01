@@ -7,14 +7,16 @@ import core.framework.search.ElasticSearchType;
 import core.framework.util.StopWatch;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
+import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.PutIndexTemplateRequest;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
@@ -39,8 +41,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, 9200))
                                                    .setRequestConfigCallback(builder -> builder.setSocketTimeout((int) timeout.toMillis())
                                                                                                .setConnectionRequestTimeout((int) timeout.toMillis()))  // timeout of requesting connection from connection pool
-                                                   .setHttpClientConfigCallback(builder -> builder.setMaxConnTotal(100).setMaxConnPerRoute(100))
-                                                   .setMaxRetryTimeoutMillis((int) timeout.toMillis()));
+                                                   .setHttpClientConfigCallback(builder -> builder.setMaxConnTotal(100).setMaxConnPerRoute(100)));
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
@@ -64,9 +65,10 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void createIndex(String index, String source) {
         var watch = new StopWatch();
         try {
-            boolean exists = client().indices().exists(new GetIndexRequest().indices(index), RequestOptions.DEFAULT);
+            IndicesClient client = client().indices();
+            boolean exists = client.exists(new GetIndexRequest(index), RequestOptions.DEFAULT);
             if (!exists) {
-                client().indices().create(Requests.createIndexRequest(index).source(new BytesArray(source), XContentType.JSON), RequestOptions.DEFAULT);
+                client.create(new CreateIndexRequest(index).source(new BytesArray(source), XContentType.JSON), RequestOptions.DEFAULT);
             } else {
                 logger.info("index already exists, skip, index={}", index);
             }
