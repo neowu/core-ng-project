@@ -12,7 +12,7 @@ import java.util.Map;
 public class ProducerMetrics implements Metrics {
     private final String name;
     private Metric requestRate; // The number of requests sent per second, one request contains multiple batches
-    private Metric requestSizeAvg; // The average size of requests sent
+    Metric requestSizeAvg; // The average size of requests sent
     private Metric outgoingByteRate; // The number of outgoing bytes sent to all servers per second
 
     public ProducerMetrics(String name) {
@@ -22,7 +22,10 @@ public class ProducerMetrics implements Metrics {
     @Override
     public void collect(Map<String, Double> stats) {
         if (requestRate != null) stats.put(statName("request_rate"), (Double) requestRate.metricValue());
-        if (requestSizeAvg != null) stats.put(statName("request_size_avg"), (Double) requestSizeAvg.metricValue());
+        if (requestSizeAvg != null) {
+            Double value = (Double) requestSizeAvg.metricValue();
+            if (!value.isNaN()) stats.put(statName("request_size_avg"), value);     // avg value can be NaN, refer to https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=95652345
+        }
         if (outgoingByteRate != null) stats.put(statName("outgoing_byte_rate"), (Double) outgoingByteRate.metricValue());
     }
 

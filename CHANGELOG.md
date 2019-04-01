@@ -1,4 +1,7 @@
 ## Change log
+### 6.12.1 (4/1/2019)
+* kafka: fix kafka producer metrics can be NaN
+
 ### 6.12.0 (3/18/2019 - 4/1/2019)
 * log: added log-collector to collect event from JS
 * api: RemoteServiceException uses original error message 
