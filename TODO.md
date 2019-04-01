@@ -17,7 +17,6 @@
 * run diagnostic when heap usage is high, send trace, log().alert() ?
 
 * refine web body bean, revisit cache/validation impl 
-* remote service exception expose original error message?
 
 ### jdk 11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
