@@ -100,7 +100,7 @@ public class HTTPErrorHandler {
     HTTPStatus httpStatus(Throwable e) {
         ResponseStatus responseStatus = e.getClass().getDeclaredAnnotation(ResponseStatus.class);
         if (responseStatus != null) return responseStatus.value();
-        if (e instanceof RemoteServiceException) return ((RemoteServiceException) e).remoteStatus;    // propagate underlying status code for REST convention
+        if (e instanceof RemoteServiceException) return ((RemoteServiceException) e).status;    // propagate underlying status code for REST convention
         return HTTPStatus.INTERNAL_SERVER_ERROR;
     }
 

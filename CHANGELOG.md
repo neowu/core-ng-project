@@ -1,10 +1,12 @@
 ## Change log
 ### 6.11.3 (3/18/2019 - )
 * log: added log-collector to collect event from JS
-* api: expose remoteErrorMessage from RemoteServiceException
+* api: RemoteServiceException uses original error message 
+    e.g. website->svc1->svc2, website will be able to display error message from svc2
 * kafka: update to 2.2.0
 * http: update okHTTP to 3.14.0
-* search: update es to 6.7.0
+* search: update es to 6.7.0   
+    !!! ES is forcing one index can only have one type (and naming it as "_doc"), you may need to rebuild index when upgrading to latest, refer to https://github.com/elastic/elasticsearch/pull/38270
 
 ### 6.11.2 (3/6/2019 - 3/15/2019)
 * json: introduced Bean class to (de)serialize json with strict class type and bean validation, keep JSON loose to adapt any classes

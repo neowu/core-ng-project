@@ -112,11 +112,11 @@ public class WebServiceClient {
         if (statusCode >= 200 && statusCode < 300) return;
 
         // handle empty body gracefully, e.g. 503 during deployment
-        if (response.body.length == 0) throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode), (String) null);
+        if (response.body.length == 0) throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
 
         ErrorResponse error = errorResponse(response, statusCode);
         logger.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
-        throw new RemoteServiceException(format("failed to call remote service, statusCode={}, error={}", statusCode, error.message), parseSeverity(error.severity), error.errorCode, parseHTTPStatus(statusCode), error.message);
+        throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, parseHTTPStatus(statusCode));
     }
 
     private ErrorResponse errorResponse(HTTPResponse response, int statusCode) {

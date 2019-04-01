@@ -83,9 +83,8 @@ class WebServiceClientTest {
                     RemoteServiceException exception = (RemoteServiceException) throwable;
                     assertThat(exception.severity()).isEqualTo(Severity.WARN);
                     assertThat(exception.errorCode()).isEqualTo(response.errorCode);
-                    assertThat(exception.getMessage()).isEqualTo("failed to call remote service, statusCode=404, error=not found");
-                    assertThat(exception.remoteStatus).isEqualTo(HTTPStatus.NOT_FOUND);
-                    assertThat(exception.remoteErrorMessage).isEqualTo("not found");
+                    assertThat(exception.getMessage()).isEqualTo(response.message);
+                    assertThat(exception.status).isEqualTo(HTTPStatus.NOT_FOUND);
                 });
     }
 
@@ -98,7 +97,7 @@ class WebServiceClientTest {
                     assertThat(exception.severity()).isEqualTo(Severity.ERROR);
                     assertThat(exception.errorCode()).isEqualTo("REMOTE_SERVICE_ERROR");
                     assertThat(exception.getMessage()).isEqualTo("failed to call remote service, statusCode=503");
-                    assertThat(exception.remoteStatus).isEqualTo(HTTPStatus.SERVICE_UNAVAILABLE);
+                    assertThat(exception.status).isEqualTo(HTTPStatus.SERVICE_UNAVAILABLE);
                 });
     }
 

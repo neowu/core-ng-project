@@ -10,25 +10,22 @@ import core.framework.log.Severity;
 public final class RemoteServiceException extends RuntimeException implements ErrorCode {
     private static final long serialVersionUID = 6935063785656278927L;
 
-    public final HTTPStatus remoteStatus;
-    public final String remoteErrorMessage;
+    public final HTTPStatus status;
     private final Severity severity;
     private final String errorCode;
 
-    public RemoteServiceException(String message, Severity severity, String errorCode, HTTPStatus remoteStatus, String remoteErrorMessage) {
+    public RemoteServiceException(String message, Severity severity, String errorCode, HTTPStatus status) {
         super(message);
         this.severity = severity;
         this.errorCode = errorCode;
-        this.remoteStatus = remoteStatus;
-        this.remoteErrorMessage = remoteErrorMessage;
+        this.status = status;
     }
 
-    public RemoteServiceException(String message, Severity severity, String errorCode, HTTPStatus remoteStatus, Throwable cause) {
+    public RemoteServiceException(String message, Severity severity, String errorCode, HTTPStatus status, Throwable cause) {
         super(message, cause);
         this.severity = severity;
         this.errorCode = errorCode;
-        this.remoteStatus = remoteStatus;
-        this.remoteErrorMessage = null;
+        this.status = status;
     }
 
     @Override

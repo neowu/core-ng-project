@@ -27,7 +27,7 @@ class HTTPErrorHandlerTest {
 
     @Test
     void httpStatus() {
-        assertThat(handler.httpStatus(new RemoteServiceException("error", Severity.WARN, "error_code", HTTPStatus.BAD_REQUEST, "error")))
+        assertThat(handler.httpStatus(new RemoteServiceException("error", Severity.WARN, "error_code", HTTPStatus.BAD_REQUEST)))
                 .isEqualTo(HTTPStatus.BAD_REQUEST);
 
         assertThat(handler.httpStatus(new NotFoundException("error"))).isEqualTo(HTTPStatus.NOT_FOUND);
