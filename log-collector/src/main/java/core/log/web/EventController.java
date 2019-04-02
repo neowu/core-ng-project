@@ -26,23 +26,19 @@ public class EventController {
     }
 
     public Response options(Request request) {
-        String allowedOrigin = allowedOrigin(request);
+        String origin = request.header("Origin").orElseThrow(() -> new ForbiddenException("access denied"));
+        checkOrigin(origin);
 
         return Response.empty().status(HTTPStatus.OK)
-                       .header("Access-Control-Allow-Origin", allowedOrigin)
+                       .header("Access-Control-Allow-Origin", origin)
                        .header("Access-Control-Allow-Methods", "PUT, OPTIONS")
                        .header("Access-Control-Allow-Headers", "Accept, Content-Type");
     }
 
-    String allowedOrigin(Request request) {
-        String origin = request.header("Origin").orElseThrow(() -> new ForbiddenException("access denied"));
-        if (allowedOrigins.contains("*")) return "*";
-        if (allowedOrigins.contains(origin)) return origin;
-        throw new ForbiddenException("access denied");
-    }
-
     public Response put(Request request) {
-        String allowedOrigin = allowedOrigin(request);
+        String origin = request.header("Origin").orElse(null);
+        if (origin != null)
+            checkOrigin(origin);    // allow directly call, e.g. mobile app
 
         String app = request.pathParam("app");
         String userAgent = request.header(HTTPHeaders.USER_AGENT).orElse(null);
@@ -59,8 +55,14 @@ public class EventController {
             eventMessagePublisher.publish(message.id, message);
         }
 
-        return Response.empty()
-                       .header("Access-Control-Allow-Origin", allowedOrigin);
+        Response response = Response.empty();
+        if (origin != null) response.header("Access-Control-Allow-Origin", origin);
+        return response;
+    }
+
+    void checkOrigin(String origin) {
+        if (allowedOrigins.contains("*") || allowedOrigins.contains(origin)) return;
+        throw new ForbiddenException("access denied");
     }
 
     EventMessage message(CollectEventRequest.Event event, String app, Instant now) {

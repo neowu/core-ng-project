@@ -28,25 +28,22 @@ class EventControllerTest {
     }
 
     @Test
-    void allowedOriginWithWildcard() {
-        when(request.header("Origin")).thenReturn(Optional.of("https://localhost"));
+    void checkOriginWithWildcard() {
         var controller = new EventController(Set.of("*"));
-        String allowedOrigin = controller.allowedOrigin(request);
-        assertThat(allowedOrigin).isEqualTo("*");
+        controller.checkOrigin("https://localhost");
     }
 
     @Test
     void allowedOrigin() {
-        when(request.header("Origin")).thenReturn(Optional.of("https://localhost"));
         var controller = new EventController(Set.of("https://local", "https://localhost"));
-        assertThat(controller.allowedOrigin(request)).isEqualTo("https://localhost");
+        controller.checkOrigin("https://localhost");
     }
 
     @Test
-    void allowedOriginWithoutOriginHeader() {
+    void options() {
         when(request.header("Origin")).thenReturn(Optional.empty());
         var controller = new EventController(Set.of("*"));
-        assertThatThrownBy(() -> controller.allowedOrigin(request))
+        assertThatThrownBy(() -> controller.options(request))
                 .isInstanceOf(ForbiddenException.class);
     }
 
