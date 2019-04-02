@@ -134,7 +134,7 @@ public class CacheImpl<T> implements Cache<T> {
             validator.validate(bean, false);
             return true;
         } catch (ValidationException e) {
-            logger.warn("failed to validate value from cache, will load by loader", e);
+            logger.warn("failed to validate value from cache, will reload", e);
             return false;
         }
     }

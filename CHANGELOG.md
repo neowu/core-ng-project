@@ -1,4 +1,6 @@
 ## Change log
+### 6.12.2 (4/2/2019 - )
+
 ### 6.12.1 (4/1/2019)
 * kafka: fix kafka producer metrics can be NaN
 

@@ -84,7 +84,7 @@ public class BeanClassValidator {
 
     private void visitValue(Class<?> valueClass, Field owner, String path) {
         if (Date.class.isAssignableFrom(valueClass))
-            throw new Error(format("java.util.Date is not supported, please use java.time.LocalDateTime/ZonedDateTime instead, field={}", Fields.path(owner)));
+            throw new Error("java.util.Date is not supported, please use java.time.LocalDateTime/ZonedDateTime instead, field=" + Fields.path(owner));
 
         if (valueClass.isPrimitive())
             throw new Error(format("primitive class is not supported, please use object type, class={}, field={}", valueClass.getCanonicalName(), Fields.path(owner)));
@@ -107,7 +107,7 @@ public class BeanClassValidator {
 
     private void visitList(Type listType, Field owner, String path) {
         if (!GenericTypes.isGenericList(listType))
-            throw new Error(format("list must be List<T> and T must be class, type={}", listType.getTypeName()));
+            throw new Error("list must be List<T> and T must be class, type=" + listType.getTypeName());
 
         Class<?> valueClass = GenericTypes.listValueClass(listType);
         visitValue(valueClass, owner, path);
@@ -132,13 +132,13 @@ public class BeanClassValidator {
     private void validateField(Field field) {
         int modifiers = field.getModifiers();
         if (!Modifier.isPublic(modifiers))
-            throw new Error(format("field must be public, field={}", Fields.path(field)));
+            throw new Error("field must be public, field=" + Fields.path(field));
         if (Modifier.isTransient(modifiers))
-            throw new Error(format("field must not be transient, field={}", Fields.path(field)));
+            throw new Error("field must not be transient, field=" + Fields.path(field));
         if (Modifier.isStatic(modifiers))
-            throw new Error(format("field must not be static, field={}", Fields.path(field)));
+            throw new Error("field must not be static, field=" + Fields.path(field));
         if (Modifier.isFinal(modifiers))
-            throw new Error(format("field must not be final, field={}", Fields.path(field)));
+            throw new Error("field must not be final, field=" + Fields.path(field));
     }
 
     private String path(String parent, String field) {
