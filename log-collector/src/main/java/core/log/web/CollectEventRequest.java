@@ -1,6 +1,7 @@
 package core.log.web;
 
 import core.framework.api.json.Property;
+import core.framework.api.validate.NotBlank;
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Size;
 
@@ -38,8 +39,10 @@ public class CollectEventRequest {
         @NotNull
         @Property(name = "result")
         public Result result;
+        @NotBlank
         @Property(name = "action")
         public String action;
+        @NotBlank
         @Property(name = "errorCode")
         public String errorCode;
         @NotNull
