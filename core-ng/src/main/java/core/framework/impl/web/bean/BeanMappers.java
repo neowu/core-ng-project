@@ -26,7 +26,7 @@ public class BeanMappers {
     <T> BeanMapper<T> mapper(Class<T> beanClass) {
         @SuppressWarnings("unchecked")
         BeanMapper<T> mapper = (BeanMapper<T>) mappers.get(beanClass);
-        if (mapper == null) throw new Error("bean class is not registered, please use api().bean() to register, class=" + beanClass.getCanonicalName());
+        if (mapper == null) throw new Error("bean class is not registered, please use http().bean() to register, class=" + beanClass.getCanonicalName());
         return mapper;
     }
 }

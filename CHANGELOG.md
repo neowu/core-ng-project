@@ -23,7 +23,7 @@
 * cache: stop supporting value and List<T> (considered as bad practice, better wrap with class for maintenance)        
          removed to register Cache<T> with name in CacheConfig, as it's generally for value type
 * validator: simplify validator, use field name as part of error key (actual use cases use JS to validate anyway, if there is actual need, may add @Label to customize the error key)
-* http: body bean must be registered via api().bean(), this only applies to beans used by raw controllers directly 
+* http: body bean must be registered via http().bean(), this only applies to beans used by raw controllers directly 
         e.g.
         http().route(POST, "/ajax", bind(AJAXController.class)::ajax);
         http().bean(RequestBean.class, ResponseBean.class);  

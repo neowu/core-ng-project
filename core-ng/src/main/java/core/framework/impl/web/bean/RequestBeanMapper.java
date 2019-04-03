@@ -32,7 +32,7 @@ public class RequestBeanMapper {
     private <T> QueryParamMapperHolder<T> queryParamMapper(Class<T> beanClass) {
         @SuppressWarnings("unchecked")
         QueryParamMapperHolder<T> holder = (QueryParamMapperHolder<T>) queryParamMappers.get(beanClass);
-        if (holder == null) throw new Error("bean class is not registered, please use api().bean() to register, class=" + beanClass.getCanonicalName());
+        if (holder == null) throw new Error("bean class is not registered, please use http().bean() to register, class=" + beanClass.getCanonicalName());
         return holder;
     }
 
