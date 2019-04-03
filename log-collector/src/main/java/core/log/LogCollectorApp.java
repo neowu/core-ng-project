@@ -7,6 +7,7 @@ import core.framework.module.App;
 import core.framework.module.SystemModule;
 import core.framework.util.Strings;
 import core.log.web.CollectEventRequest;
+import core.log.web.CollectEventRequestValidator;
 import core.log.web.EventController;
 
 import java.util.Collections;
@@ -27,6 +28,8 @@ public class LogCollectorApp extends App {
         site().staticContent("/robots.txt");
 
         kafka().publish(LogTopics.TOPIC_EVENT, EventMessage.class);
+
+        bind(CollectEventRequestValidator.class);
 
         Set<String> allowedOrigins = allowedOrigins();
         EventController controller = bind(new EventController(allowedOrigins));

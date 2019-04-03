@@ -5,10 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -23,63 +20,63 @@ class ActionLogTest {
 
     @Test
     void contextValueIsTooLong() {
-        Error error = assertThrows(Error.class, () -> log.context("key", longString(1001)));
-        assertTrue(error.getMessage().startsWith("context value is too long"));
+        assertThatThrownBy(() -> log.context("key", "x".repeat(1001)))
+                .isInstanceOf(Error.class)
+                .hasMessageStartingWith("context value is too long");
     }
 
     @Test
     void duplicateContextKey() {
-        Error error = assertThrows(Error.class, () -> {
-            log.context("key", "value1");
-            log.context("key", "value2");
-        });
-        assertThat(error.getMessage()).contains("found duplicate context key");
+        log.context("key", "value1");
+        assertThatThrownBy(() -> log.context("key", "value2"))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("found duplicate context key");
     }
 
     @Test
     void flushTraceLogWithTrace() {
         log.trace = true;
 
-        assertTrue(log.flushTraceLog());
+        assertThat(log.flushTraceLog()).isTrue();
     }
 
     @Test
     void flushTraceLogWithWarning() {
         log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null));
 
-        assertTrue(log.flushTraceLog());
+        assertThat(log.flushTraceLog()).isTrue();
     }
 
     @Test
     void result() {
-        assertEquals("OK", log.result());
+        assertThat(log.result()).isEqualTo("OK");
 
         log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null));
-        assertEquals("WARN", log.result());
+        assertThat(log.result()).isEqualTo("WARN");
     }
 
     @Test
     void errorCode() {
-        assertNull(log.errorCode());
+        assertThat(log.errorCode()).isNull();
 
         log.process(new LogEvent("logger", null, LogLevel.WARN, null, null, null));
-        assertEquals("UNASSIGNED", log.errorCode());
+        assertThat(log.errorCode()).isEqualTo("UNASSIGNED");
     }
 
     @Test
     void truncateErrorMessage() {
-        log.process(new LogEvent("logger", null, LogLevel.WARN, longString(300), null, null));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, "x".repeat(300), null, null));
 
-        assertEquals(200, log.errorMessage.length());
+        assertThat(log.errorMessage.length()).isEqualTo(200);
     }
 
     @Test
     void stat() {
         log.stat("stat", 1);
-        assertEquals(1, log.stats.get("stat").intValue());
+        assertThat(log.stats.get("stat").intValue()).isEqualTo(1);
 
         log.stat("stat", 1);
-        assertEquals(2, log.stats.get("stat").intValue());
+        assertThat(log.stats.get("stat").intValue()).isEqualTo(2);
     }
 
     @Test
@@ -104,13 +101,5 @@ class ActionLogTest {
         assertThat(stat.totalElapsed).isEqualTo(3000);
         assertThat(stat.readEntries).isNull();
         assertThat(stat.writeEntries).isNull();
-    }
-
-    private String longString(int length) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            builder.append('x');
-        }
-        return builder.toString();
     }
 }

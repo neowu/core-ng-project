@@ -8,7 +8,6 @@ import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.web.Request;
 import core.framework.web.Response;
-import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.ForbiddenException;
 
 import java.time.Instant;
@@ -21,6 +20,8 @@ public class EventController {
     private final Set<String> allowedOrigins;
     @Inject
     MessagePublisher<EventMessage> eventMessagePublisher;
+    @Inject
+    CollectEventRequestValidator validator;
 
     public EventController(Set<String> allowedOrigins) {
         this.allowedOrigins = allowedOrigins;
@@ -47,7 +48,7 @@ public class EventController {
         String clientIP = request.clientIP();
 
         CollectEventRequest eventRequest = request.bean(CollectEventRequest.class);
-        validate(eventRequest);
+        validator.validate(eventRequest);
 
         for (CollectEventRequest.Event event : eventRequest.events) {
             EventMessage message = message(event, app, now);
@@ -81,15 +82,5 @@ public class EventController {
         message.info = event.info;
         message.elapsed = event.elapsedTime;
         return message;
-    }
-
-    void validate(CollectEventRequest request) {
-        for (CollectEventRequest.Event event : request.events) {
-            if (event.result == CollectEventRequest.Result.OK && event.action == null)
-                throw new BadRequestException("action must not be null if result is OK, id=" + event.id);
-            if ((event.result == CollectEventRequest.Result.WARN || event.result == CollectEventRequest.Result.ERROR)
-                    && event.errorCode == null)
-                throw new BadRequestException("errorCode must not be null if result is WARN/ERROR, id=" + event.id);
-        }
     }
 }

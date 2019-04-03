@@ -123,7 +123,7 @@ public final class ActionLog {
     public void context(String key, Object value) {
         String contextValue = String.valueOf(value);
         if (contextValue.length() > MAX_CONTEXT_VALUE_LENGTH) { // prevent application code from putting large blob as context, e.g. xml or json response
-            throw new Error(format("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_CONTEXT_VALUE_LENGTH)));
+            throw new Error(format("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_ERROR_MESSAGE_LENGTH)));
         }
         String previous = context.put(key, contextValue);
         // put context can be called by application code, check duplication to avoid producing huge trace log by accident
