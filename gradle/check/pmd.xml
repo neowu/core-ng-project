@@ -56,6 +56,7 @@
     <rule ref="category/java/design.xml/AbstractClassWithoutAnyMethod"/>
     <rule ref="category/java/design.xml/AvoidThrowingNewInstanceOfSameException"/>
     <rule ref="category/java/design.xml/AvoidThrowingNullPointerException"/>
+    <rule ref="category/java/design.xml/AvoidUncheckedExceptionsInSignatures"/>
     <rule ref="category/java/design.xml/ClassWithOnlyPrivateConstructorsShouldBeFinal"/>
     <rule ref="category/java/design.xml/CollapsibleIfStatements"/>
     <rule ref="category/java/design.xml/DoNotExtendJavaLangError"/>
@@ -89,6 +90,7 @@
     <rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray"/>
     <rule ref="category/java/errorprone.xml/CompareObjectsWithEquals"/>
     <rule ref="category/java/errorprone.xml/ConstructorCallsOverridableMethod"/>
+    <rule ref="category/java/errorprone.xml/DetachedTestCase"/>
     <rule ref="category/java/errorprone.xml/DoNotCallGarbageCollectionExplicitly"/>
     <rule ref="category/java/errorprone.xml/DoNotExtendJavaLangThrowable"/>
     <rule ref="category/java/errorprone.xml/DoNotThrowExceptionInFinally"/>
