@@ -2,6 +2,7 @@ package core.log.web;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.HTTPHeaders;
+import core.framework.impl.log.LogManager;
 import core.framework.inject.Inject;
 import core.framework.internal.log.message.EventMessage;
 import core.framework.json.JSON;
@@ -71,7 +72,7 @@ public class EventController {
 
     EventMessage message(CollectEventRequest.Event event, String app, Instant now) {
         var message = new EventMessage();
-        message.id = event.id;
+        message.id = LogManager.ID_GENERATOR.next(now);
         message.timestamp = now;
         message.app = app;
         message.eventTime = event.date.toInstant();

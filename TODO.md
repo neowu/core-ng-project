@@ -24,7 +24,8 @@
 * class in interface module generates Validator make interface depends on core-ng module (java module)
 * JDK TLSv1.3 issues: cause jdk httpclient run into infinite loop on concurrent condition  
   https://bugs.openjdk.java.net/browse/JDK-8213202  (fixed in openjdk 12)
-  or set system env jdk.tls.acknowledgeCloseNotify=true
+  or set system env jdk.tls.acknowledgeCloseNotify=true  
+* JDK HTTPClient issue: https://bugs.openjdk.java.net/browse/JDK-8211437
 
 ### kube deployment + http client keep alive issue, reference
 https://github.com/kubernetes/contrib/issues/1123

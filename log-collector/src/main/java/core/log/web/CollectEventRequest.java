@@ -31,9 +31,6 @@ public class CollectEventRequest {
 
     public static class Event {
         @NotNull
-        @Property(name = "id")
-        public String id;
-        @NotNull
         @Property(name = "date")
         public ZonedDateTime date;
         @NotNull

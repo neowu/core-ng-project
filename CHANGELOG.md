@@ -1,5 +1,6 @@
 ## Change log
 ### 6.12.2 (4/2/2019 - )
+* http: update undertow to 2.0.19
 
 ### 6.12.1 (4/1/2019)
 * kafka: fix kafka producer metrics can be NaN

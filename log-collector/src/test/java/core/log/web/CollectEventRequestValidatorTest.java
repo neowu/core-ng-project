@@ -44,7 +44,6 @@ class CollectEventRequestValidatorTest {
     private CollectEventRequest request(CollectEventRequest.Result result, String action, String errorCode) {
         CollectEventRequest request = new CollectEventRequest();
         var event = new CollectEventRequest.Event();
-        event.id = "1";
         event.result = result;
         event.action = action;
         event.errorCode = errorCode;

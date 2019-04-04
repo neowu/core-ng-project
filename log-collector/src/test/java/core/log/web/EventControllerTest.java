@@ -50,7 +50,6 @@ class EventControllerTest {
     @Test
     void message() {
         var event = new CollectEventRequest.Event();
-        event.id = "1";
         event.date = ZonedDateTime.now().minusHours(1);
         event.result = CollectEventRequest.Result.WARN;
         event.errorCode = "NOT_FOUND";
@@ -62,7 +61,7 @@ class EventControllerTest {
         Instant now = event.date.plusHours(1).toInstant();
         EventMessage message = controller.message(event, "test", now);
 
-        assertThat(message.id).isEqualTo(event.id);
+        assertThat(message.id).isNotNull();
         assertThat(message.timestamp).isEqualTo(now);
         assertThat(message.eventTime).isEqualTo(event.date.toInstant());
         assertThat(message.result).isEqualTo("WARN");
