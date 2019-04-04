@@ -27,6 +27,16 @@ public class EnumConversionAssert extends AbstractAssert<EnumConversionAssert, C
         if (!diff2.isEmpty()) failWithMessage("%nExpecting:%n %s%nhas exactly constants of%n %s%nbut some constants were not found:%n <%s>", actual.getName(), enumClass.getName(), diff2);
     }
 
+    public void hasAllConstantsOf(Class<? extends Enum<?>> enumClass) {
+        isNotNull();
+
+        Set<String> values1 = enumValues(enumClass);
+        Set<String> values2 = enumValues(actual);
+
+        Set<String> diff = difference(values1, values2);
+        if (!diff.isEmpty()) failWithMessage("%nExpecting:%n %s%nhas all constants of%n %s%nbut some constants were not found:%n <%s>", actual.getName(), enumClass.getName(), diff);
+    }
+
     private Set<String> enumValues(Class<? extends Enum<?>> enumClass1) {
         Set<String> values = Sets.newHashSet();
         Enum<?>[] constants = enumClass1.getEnumConstants();

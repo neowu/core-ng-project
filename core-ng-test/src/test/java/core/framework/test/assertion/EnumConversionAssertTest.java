@@ -1,8 +1,8 @@
 package core.framework.test.assertion;
 
-import core.framework.test.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static core.framework.test.Assertions.assertEnumClass;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -11,14 +11,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class EnumConversionAssertTest {
     @Test
     void hasExactlyConstantsAs() {
-        Assertions.assertEnumClass(Enum1.class).hasExactlyConstantsAs(Enum2.class);
+        assertEnumClass(Enum1.class).hasExactlyConstantsAs(Enum2.class);
+
+        assertThatThrownBy(() -> assertEnumClass(Enum1.class).hasExactlyConstantsAs(Enum3.class))
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContaining("has exactly constants of")
+                .hasMessageContaining("<[C]>");
     }
 
     @Test
-    void failWithMessage() {
-        assertThatThrownBy(() -> Assertions.assertEnumClass(Enum1.class).hasExactlyConstantsAs(Enum3.class))
+    void hasAllConstantsOf() {
+        assertEnumClass(Enum1.class).hasAllConstantsOf(Enum2.class);
+        assertEnumClass(Enum3.class).hasAllConstantsOf(Enum2.class);
+
+        assertThatThrownBy(() -> assertEnumClass(Enum1.class).hasAllConstantsOf(Enum3.class))
                 .isInstanceOf(AssertionError.class)
-                .hasMessageContaining("has exactly constants of")
+                .hasMessageContaining("has all constants of")
                 .hasMessageContaining("<[C]>");
     }
 
