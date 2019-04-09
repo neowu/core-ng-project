@@ -17,6 +17,8 @@
 * run diagnostic when heap usage is high, send trace, log().alert() ?
 
 * refine web body bean, revisit cache/validation impl 
+* /_sys/, kafka controller, should be call message handler directly?
+* trace log truncated, can't see exception at bottom?
 
 ### jdk 11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

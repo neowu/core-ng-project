@@ -46,13 +46,19 @@ class HTTPConfigTest {
 
     @Test
     void bean() {
-        config.bean(TestBean.class, TestQueryParamBean.class);
+        config.bean(TestBean.class);
+        config.bean(TestQueryParamBean.class);
+        config.bean(TestEnum.class);
 
         assertThatThrownBy(() -> config.bean(TestBean.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("bean class is already registered");
 
         assertThatThrownBy(() -> config.bean(TestQueryParamBean.class))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("bean class is already registered");
+
+        assertThatThrownBy(() -> config.bean(TestEnum.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("bean class is already registered");
     }
@@ -62,6 +68,11 @@ class HTTPConfigTest {
         assertThatThrownBy(() -> config.route(GET, HTTPIOHandler.HEALTH_CHECK_PATH, new TestController()))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("/health-check is reserved path");
+    }
+
+    public enum TestEnum {
+        @Property(name = "value")
+        VALUE
     }
 
     static class TestControllers {
@@ -80,7 +91,6 @@ class HTTPConfigTest {
             return null;
         }
     }
-
 
     public static class TestBean {
         @Property(name = "value")

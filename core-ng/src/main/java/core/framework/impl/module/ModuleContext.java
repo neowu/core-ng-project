@@ -58,7 +58,8 @@ public class ModuleContext {
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);
         shutdownHook.add(ShutdownHook.STAGE_9, timeout -> httpServer.awaitTermination());
 
-        bean(ErrorResponse.class, AJAXErrorResponse.class);
+        bean(ErrorResponse.class);
+        bean(AJAXErrorResponse.class);
 
         var diagnosticController = new DiagnosticController();
         route(HTTPMethod.GET, "/_sys/vm", diagnosticController::vm, true);
@@ -87,19 +88,17 @@ public class ModuleContext {
     }
 
     // register http body bean and query param bean
-    public final void bean(Class<?>... beanClasses) {
+    public final void bean(Class<?> beanClass) {
         RequestBeanMapper requestBeanMapper = httpServer.handler.requestBeanMapper;
         BeanMappers beanMappers = httpServer.handler.beanMappers;
-        for (Class<?> beanClass : beanClasses) {
-            if (isQueryParamBean(beanClass)) {
-                if (requestBeanMapper.queryParamMappers.containsKey(beanClass))
-                    throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
-                requestBeanMapper.registerQueryParamBean(beanClass, beanClassNameValidator);
-            } else {
-                if (beanMappers.mappers.containsKey(beanClass))
-                    throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
-                beanMappers.register(beanClass, beanClassNameValidator);
-            }
+        if (isQueryParamBean(beanClass)) {
+            if (requestBeanMapper.queryParamMappers.containsKey(beanClass))
+                throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+            requestBeanMapper.registerQueryParamBean(beanClass, beanClassNameValidator);
+        } else {
+            if (beanMappers.mappers.containsKey(beanClass))
+                throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+            beanMappers.register(beanClass, beanClassNameValidator);
         }
     }
 

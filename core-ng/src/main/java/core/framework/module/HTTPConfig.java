@@ -6,6 +6,7 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.HTTPIOHandler;
 import core.framework.impl.web.http.IPAccessControl;
 import core.framework.impl.web.site.AJAXErrorResponse;
+import core.framework.internal.json.JSONClassValidator;
 import core.framework.web.Controller;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
@@ -13,10 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static core.framework.util.Strings.format;
 
@@ -39,10 +38,16 @@ public final class HTTPConfig extends Config {
         context.route(method, path, controller, false);
     }
 
-    public void bean(Class<?>... beanClasses) {
-        logger.info("register bean body, classes={}", Arrays.stream(beanClasses).map(Class::getCanonicalName).collect(Collectors.toList()));
-        context.bean(beanClasses);
-        Collections.addAll(this.beanClasses, beanClasses);
+    public void bean(Class<?> beanClass) {
+        logger.info("register bean, class=" + beanClass.getCanonicalName());
+        if (beanClass.isEnum()) {   // enum is usually declared to expose constants via /_sys/api, e.g. errorCodes, or pathParams used by controller directly
+            context.beanClassNameValidator.validate(beanClass);
+            JSONClassValidator.validateEnum(beanClass);
+        } else {
+            context.bean(beanClass);
+        }
+        boolean added = this.beanClasses.add(beanClass);
+        if (!added) throw new Error("bean class is already registered, class=" + beanClass.getCanonicalName());
     }
 
     public void intercept(Interceptor interceptor) {

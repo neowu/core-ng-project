@@ -30,7 +30,7 @@ public class APIController implements Controller {
 
         var builder = new APIDefinitionBuilder();
         serviceInterfaces.values().forEach(builder::addServiceInterface);
-        beanClasses.forEach(builder::parseBeanType);
+        beanClasses.forEach(builder::parseType);
         APIDefinitionResponse response = builder.build();
 
         return Response.bean(response);

@@ -118,7 +118,7 @@ public class APIDefinitionBuilder {
         return type;
     }
 
-    private String parseType(Type type) {
+    public String parseType(Type type) {
         if (type == void.class) return "void";
         if (GenericTypes.isOptional(type)) return parseType(GenericTypes.optionalValueClass(type)) + " | null";
         if (GenericTypes.isList(type)) {
@@ -147,7 +147,7 @@ public class APIDefinitionBuilder {
         return parseBeanType((Class<?>) type);
     }
 
-    public String parseBeanType(Class<?> beanClass) {
+    private String parseBeanType(Class<?> beanClass) {
         String typeName = Classes.className(beanClass);
         if (!beanTypes.containsKey(typeName)) {
             var definition = new BeanTypeDefinition();

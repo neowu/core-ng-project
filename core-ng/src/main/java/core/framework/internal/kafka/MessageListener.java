@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -56,7 +54,7 @@ public class MessageListener {
 
     public <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
         boolean added = topics.add(topic);
-        if (!added) throw new Error(format("topic is already subscribed, topic={}", topic));
+        if (!added) throw new Error("topic is already subscribed, topic=" + topic);
         processes.put(topic, new MessageProcess<>(handler, bulkHandler, messageClass));
     }
 
