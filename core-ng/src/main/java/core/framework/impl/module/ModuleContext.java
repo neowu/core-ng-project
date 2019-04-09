@@ -89,13 +89,14 @@ public class ModuleContext {
 
     // register http body bean and query param bean
     public final void bean(Class<?> beanClass) {
-        RequestBeanMapper requestBeanMapper = httpServer.handler.requestBeanMapper;
-        BeanMappers beanMappers = httpServer.handler.beanMappers;
         if (isQueryParamBean(beanClass)) {
-            if (requestBeanMapper.queryParamMappers.containsKey(beanClass))
+            RequestBeanMapper requestBeanMapper = httpServer.handler.requestBeanMapper;
+            if (requestBeanMapper.queryParamMappers.containsKey(beanClass)) {
                 throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+            }
             requestBeanMapper.registerQueryParamBean(beanClass, beanClassNameValidator);
         } else {
+            BeanMappers beanMappers = httpServer.handler.beanMappers;
             if (beanMappers.mappers.containsKey(beanClass))
                 throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             beanMappers.register(beanClass, beanClassNameValidator);
