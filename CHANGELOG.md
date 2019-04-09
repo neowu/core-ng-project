@@ -4,6 +4,7 @@
 * search: update es to 6.7.1
 * test: added assertEnumClass(class1).hasAllConstantsOf(class2)
 * http: update http().bean() to accept only one class (for simplification), support register enum
+* http: revert okHTTP to 3.12.2 due to https://github.com/square/okhttp/issues/4875
 
 ### 6.12.1 (4/1/2019)
 * kafka: fix kafka producer metrics can be NaN
