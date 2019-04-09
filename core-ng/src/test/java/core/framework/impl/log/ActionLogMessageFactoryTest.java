@@ -43,11 +43,24 @@ class ActionLogMessageFactoryTest {
 
     @Test
     void trace() {
+        String suffix = "...(max trace length reached)\n";
         var log = new ActionLog("begin");
-        String trace = factory.trace(log, 200);
-        String suffix = "...(truncated)";
+        String trace = factory.trace(log, 200, 500);
         assertThat(trace).hasSize(200 + suffix.length())
                          .contains("ActionLog - begin")
                          .endsWith(suffix);
+
+        log.process(new LogEvent("logger", null, LogLevel.WARN, "warning", null, null));
+
+        trace = factory.trace(log, 200, 500);
+        assertThat(trace).endsWith("warning\n");
+
+        trace = factory.trace(log, 250, 500);   // the max debug length will hit warning event
+        assertThat(trace).contains("warning")
+                         .endsWith(suffix);
+
+        log.process(new LogEvent("logger", null, LogLevel.WARN, "warning2", null, null));
+        trace = factory.trace(log, 250, 320);   // truncate with hard limit
+        assertThat(trace).endsWith("...(truncated)");
     }
 }

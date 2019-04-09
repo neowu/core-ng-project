@@ -92,7 +92,7 @@ public final class ActionLog {
     private void add(LogEvent event) {  // log inside action log will call this to add log event directly, so internal message won't be suspended
         events.add(event);
         if (events.size() == MAX_TRACE_HOLD_SIZE) {
-            events.add(event("reached max trace log holding size, only collect critical log event from now on"));
+            events.add(event("...(max trace length reached)"));
         }
     }
 

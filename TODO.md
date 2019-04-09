@@ -18,7 +18,7 @@
 
 * refine web body bean, revisit cache/validation impl 
 * /_sys/, kafka controller, should be call message handler directly?
-* trace log truncated, can't see exception at bottom?
+* revisit trace log truncation, better/more elegant handling?
 
 ### jdk 11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
