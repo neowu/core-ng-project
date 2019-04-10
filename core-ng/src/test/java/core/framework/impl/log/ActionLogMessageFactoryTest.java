@@ -43,7 +43,7 @@ class ActionLogMessageFactoryTest {
 
     @Test
     void trace() {
-        String suffix = "...(max trace length reached)\n";
+        String suffix = "...(soft trace limit reached)\n";
         var log = new ActionLog("begin");
         String trace = factory.trace(log, 200, 500);
         assertThat(trace).hasSize(200 + suffix.length())
@@ -61,6 +61,6 @@ class ActionLogMessageFactoryTest {
 
         log.process(new LogEvent("logger", null, LogLevel.WARN, "warning2", null, null));
         trace = factory.trace(log, 250, 320);   // truncate with hard limit
-        assertThat(trace).endsWith("...(truncated)");
+        assertThat(trace).endsWith("...(hard trace limit reached)");
     }
 }

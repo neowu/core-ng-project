@@ -25,7 +25,7 @@ public final class ActionLog {
     private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
     private static final ThreadMXBean THREAD = ManagementFactory.getThreadMXBean();
 
-    private static final int MAX_TRACE_HOLD_SIZE = 3000;    // normally 3000 lines trace is about 350k
+    private static final int SOFT_EVENTS_LIMIT = 3000;    // normally 3000 lines trace is about 350k
     private static final int MAX_ERROR_MESSAGE_LENGTH = 200;
     private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
 
@@ -73,7 +73,7 @@ public final class ActionLog {
             errorCode = event.errorCode();      // only update errorCode/message if level raised, so errorCode will be first WARN or ERROR
             errorMessage = Strings.truncate(event.message(), MAX_ERROR_MESSAGE_LENGTH);     // limit error message length in action log
         }
-        if (event.level.value >= WARN.value || events.size() < MAX_TRACE_HOLD_SIZE) {       // after reach max holding lines, only add warning/error events
+        if (event.level.value >= WARN.value || events.size() < SOFT_EVENTS_LIMIT) {       // after reach max holding lines, only add warning/error events
             add(event);
         }
     }
@@ -91,8 +91,8 @@ public final class ActionLog {
 
     private void add(LogEvent event) {  // log inside action log will call this to add log event directly, so internal message won't be suspended
         events.add(event);
-        if (events.size() == MAX_TRACE_HOLD_SIZE) {
-            events.add(event("...(max trace length reached)"));
+        if (events.size() == SOFT_EVENTS_LIMIT) {
+            events.add(event("...(soft trace limit reached)"));
         }
     }
 
