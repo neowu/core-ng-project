@@ -1,5 +1,6 @@
 ## Change log
 ### 6.12.3 (4/9/2019 - )
+* http: update okHTTP to 3.14.1
 
 ### 6.12.2 (4/2/2019 - 4/9/2019)
 * http: update undertow to 2.0.20
