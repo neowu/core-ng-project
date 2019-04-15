@@ -13,7 +13,7 @@ import core.framework.util.Lists;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.metrics.sum.Sum;
+import org.elasticsearch.search.aggregations.metrics.Sum;
 import org.elasticsearch.search.sort.ScriptSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.junit.jupiter.api.AfterEach;
@@ -46,7 +46,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @AfterEach
     void cleanup() {
         documentType.bulkDelete(range(0, 30).mapToObj(String::valueOf).collect(Collectors.toList()));
-        elasticSearch.flushIndex("document");
+        elasticSearch.refreshIndex("document");
     }
 
     @Test
@@ -70,7 +70,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void forEach() {
         documentType.bulkIndex(range(0, 30).mapToObj(i -> document(String.valueOf(i), String.valueOf(i), i, 0, null))
                                            .collect(toMap(document -> document.id, identity())));
-        elasticSearch.flushIndex("document");
+        elasticSearch.refreshIndex("document");
 
         List<TestDocument> results = Lists.newArrayList();
 
@@ -90,7 +90,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
                 "2", document("2", "HashMap", 2, 0, null),
                 "3", document("3", "TreeSet", 3, 0, null),
                 "4", document("4", "TreeMap", 4, 0, null)));
-        elasticSearch.flushIndex("document");
+        elasticSearch.refreshIndex("document");
 
         List<String> options = documentType.complete("hash", "completion1", "completion2");
         assertThat(options).contains("HashSet-Complete1", "HashSet-Complete2", "HashMap-Complete1", "HashMap-Complete2");
@@ -100,7 +100,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void search() {
         TestDocument document = document("1", "1st Test's Product", 1, 0, null);
         documentType.index(document.id, document);
-        elasticSearch.flushIndex("document");
+        elasticSearch.refreshIndex("document");
 
         // test synonyms
         SearchRequest request = new SearchRequest();
@@ -128,7 +128,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         documentType.index("2", document("2", "value2", 1, 0, from.plusDays(1)));
         documentType.index("3", document("3", "value3", 1, 0, to));
         documentType.index("4", document("4", "value4", 1, 0, to.plusDays(1)));
-        elasticSearch.flushIndex("document");
+        elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();
         request.query = rangeQuery("zoned_date_time_field").from(from.format(DateTimeFormatter.ISO_INSTANT)).to(to.format(DateTimeFormatter.ISO_INSTANT));
@@ -143,7 +143,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @Test
     void delete() {
         documentType.index("1", document("1", "value", 1, 0, null));
-        elasticSearch.flushIndex("document");
+        elasticSearch.refreshIndex("document");
 
         boolean result = documentType.delete("1");
         assertThat(result).isTrue();
@@ -153,7 +153,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void bulkDelete() {
         documentType.index("1", document("1", "value1", 1, 0, null));
         documentType.index("2", document("2", "value2", 2, 0, null));
-        elasticSearch.flushIndex("document");
+        elasticSearch.refreshIndex("document");
 
         documentType.bulkDelete(List.of("1", "2"));
         assertThat(documentType.get("1")).isNotPresent();
@@ -187,7 +187,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         documentType.index("1", document("1", "value1", 0, 19.13, null));
         documentType.index("2", document("2", "value1", 0, 0.01, null));
         documentType.index("3", document("3", "value3", 0, 1.5, null));
-        elasticSearch.flushIndex("document");
+        elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();
         request.skip = 0;

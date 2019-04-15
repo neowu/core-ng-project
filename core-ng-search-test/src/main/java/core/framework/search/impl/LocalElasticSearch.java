@@ -6,6 +6,7 @@ import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.discovery.DiscoveryModule;
 import org.elasticsearch.env.Environment;
+import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,8 @@ public class LocalElasticSearch {
         this.dataPath = Files.tempDir();
         try {
             Settings.Builder settings = Settings.builder();
-            settings.put(Environment.PATH_HOME_SETTING.getKey(), dataPath)
+            settings.put(Node.NODE_NAME_SETTING.getKey(), "test")
+                    .put(Environment.PATH_HOME_SETTING.getKey(), dataPath)
                     .put(NetworkService.GLOBAL_NETWORK_BIND_HOST_SETTING.getKey(), "_local_")
                     .put(DiscoveryModule.DISCOVERY_TYPE_SETTING.getKey(), "single-node");
             node = new LocalNode(settings.build());

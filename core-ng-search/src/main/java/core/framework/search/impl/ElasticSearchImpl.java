@@ -92,14 +92,14 @@ public class ElasticSearchImpl implements ElasticSearch {
     }
 
     @Override
-    public void flushIndex(String index) {
+    public void refreshIndex(String index) {
         var watch = new StopWatch();
         try {
-            client().indices().flush(Requests.flushRequest(index), RequestOptions.DEFAULT);
+            client().indices().refresh(Requests.refreshRequest(index), RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            logger.info("flush index, index={}, elapsed={}", index, watch.elapsed());
+            logger.info("refresh index, index={}, elapsed={}", index, watch.elapsed());
         }
     }
 

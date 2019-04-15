@@ -14,5 +14,5 @@ public interface ElasticSearch {
 
     ClusterStateResponse state();
 
-    void flushIndex(String index);
+    void refreshIndex(String index);
 }

@@ -124,7 +124,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
         Aggregations aggregationResponse = response.getAggregations();
         Map<String, Aggregation> aggregations = aggregationResponse == null ? Map.of() : aggregationResponse.asMap();
-        return new SearchResponse<>(items, response.getHits().getTotalHits(), aggregations);
+        return new SearchResponse<>(items, response.getHits().getTotalHits().value, aggregations);
     }
 
     @Override
@@ -169,7 +169,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         int hits = 0;
         try {
-            var getRequest = new org.elasticsearch.action.get.GetRequest(index, "_doc", request.id);
+            var getRequest = new org.elasticsearch.action.get.GetRequest(index, request.id);
             GetResponse response = elasticSearch.client().get(getRequest, RequestOptions.DEFAULT);
             if (!response.isExists()) return Optional.empty();
             hits = 1;
@@ -191,7 +191,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         validator.validate(request.source, false);
         byte[] document = mapper.toJSON(request.source);
         try {
-            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index, "_doc", request.id).source(document, XContentType.JSON);
+            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index).id(request.id).source(document, XContentType.JSON);
             elasticSearch.client().index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -213,7 +213,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             String id = entry.getKey();
             T source = entry.getValue();
             validator.validate(source, false);
-            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index, "_doc", id).source(mapper.toJSON(source), XContentType.JSON);
+            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index).id(id).source(mapper.toJSON(source), XContentType.JSON);
             bulkRequest.add(indexRequest);
         }
         long esTook = 0;
@@ -239,7 +239,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         try {
             Map<String, Object> params = request.params == null ? Map.of() : request.params;
             var script = new Script(DEFAULT_SCRIPT_TYPE, DEFAULT_SCRIPT_LANG, request.script, params);
-            var updateRequest = new org.elasticsearch.action.update.UpdateRequest(index, "_doc", request.id).script(script);
+            var updateRequest = new org.elasticsearch.action.update.UpdateRequest(index, request.id).script(script);
             elasticSearch.client().update(updateRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -257,7 +257,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         boolean deleted = false;
         try {
-            var deleteRequest = new org.elasticsearch.action.delete.DeleteRequest(index, "_doc", request.id);
+            var deleteRequest = new org.elasticsearch.action.delete.DeleteRequest(index, request.id);
             DeleteResponse response = elasticSearch.client().delete(deleteRequest, RequestOptions.DEFAULT);
             deleted = response.getResult() == DocWriteResponse.Result.DELETED;
             return deleted;
@@ -279,7 +279,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         String index = request.index == null ? this.index : request.index;
         var bulkRequest = new BulkRequest();
         for (String id : request.ids) {
-            bulkRequest.add(new org.elasticsearch.action.delete.DeleteRequest(index, "_doc", id));
+            bulkRequest.add(new org.elasticsearch.action.delete.DeleteRequest(index, id));
         }
         long esTook = 0;
         try {
