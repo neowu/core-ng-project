@@ -1,7 +1,5 @@
 package core.framework.module;
 
-import core.framework.util.Strings;
-
 /**
  * @author neo
  */
@@ -44,14 +42,14 @@ public final class SystemModule extends Module {
             }
         });
         property("sys.cdn.host").ifPresent(host -> site().cdn().host(host));
-        property("sys.publishAPI.allowCIDR").ifPresent(cidrs -> site().publishAPI(Strings.split(cidrs, ',')));
+        property("sys.publishAPI.allowCIDR").ifPresent(cidrs -> site().publishAPI(new AllowCIDRParser(cidrs).parse()));
         property("sys.security.csp").ifPresent(policy -> site().security().contentSecurityPolicy(policy));
     }
 
     void configureHTTP() {
         property("sys.http.port").ifPresent(port -> http().httpPort(Integer.parseInt(port)));
         property("sys.https.port").ifPresent(port -> http().httpsPort(Integer.parseInt(port)));
-        property("sys.http.allowCIDR").ifPresent(cidrs -> http().allowCIDR(Strings.split(cidrs, ',')));
+        property("sys.http.allowCIDR").ifPresent(cidrs -> http().allowCIDR(new AllowCIDRParser(cidrs).parse()));
     }
 
     private void configureLog() {
