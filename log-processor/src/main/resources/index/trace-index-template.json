@@ -1,10 +1,6 @@
 {
   "index_patterns": "trace-*",
   "order": 1,
-  "settings": {
-    "number_of_shards": 1,
-    "refresh_interval": "5s"
-  },
   "mappings": {
     "properties": {
       "@timestamp": {
