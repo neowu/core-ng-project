@@ -1,4 +1,7 @@
 ## Change log
+### 6.12.4 (4/17/2019 - )
+
+
 ### 6.12.3 (4/9/2019 - 4/17/2019)
 * http: update okHTTP to 3.14.1
 * search: update es to 7.0.0, change index.flush to index.refresh (those 2 are different in ES)

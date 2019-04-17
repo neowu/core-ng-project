@@ -35,6 +35,7 @@ public class AllowCIDRParser {
     private String[] parseSemicolonDelimited(String value) {
         List<String> results = new ArrayList<>();
         for (String item : Strings.split(value, ';')) {
+            if (Strings.isBlank(item)) continue;
             int index = item.indexOf(':');
             Arrays.stream(Strings.split(item.substring(index + 1), ','))
                   .map(String::strip)

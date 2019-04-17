@@ -14,7 +14,7 @@ services:
         ports:
         - 5601:5601
         environment:
-            - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
         depends_on:
         - elasticsearch
     zookeeper:
@@ -43,8 +43,8 @@ services:
     log-collector:
         image: neowu/log-collector:6.12.3
         environment:
-            - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
-            - SYS_KAFKA_URI=kafka:9092
-            - SYS_LOG_APPENDER=kafka:9092
+        - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
+        - SYS_KAFKA_URI=kafka:9092
+        - SYS_LOG_APPENDER=kafka:9092
         depends_on:
-            - kafka
+        - kafka
