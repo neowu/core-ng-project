@@ -98,6 +98,24 @@ class JSONTest {
     }
 
     @Test
+    void nanoFractionOfDateField() {
+        assertThat(JSON.toJSON(LocalDateTime.of(2019, 4, 25, 1, 0, 0, 200000000)))
+                .contains("2019-04-25T01:00:00.200");
+
+        assertThat(JSON.toJSON(LocalDateTime.of(2019, 4, 25, 1, 0, 0, 0)))
+                .contains("2019-04-25T01:00:00.000");
+
+        assertThat(JSON.toJSON(ZonedDateTime.of(2019, 4, 25, 1, 0, 0, 200000000, ZoneId.of("UTC"))))
+                .contains("2019-04-25T01:00:00.200Z");
+
+        assertThat(JSON.toJSON(ZonedDateTime.of(2019, 4, 25, 1, 0, 0, 0, ZoneId.of("UTC"))))
+                .contains("2019-04-25T01:00:00Z");
+
+        assertThat(JSON.toJSON(ZonedDateTime.of(2019, 4, 25, 1, 0, 0, 0, ZoneId.of("America/New_York"))))
+                .contains("2019-04-25T05:00:00Z");  // New york is UTC+5
+    }
+
+    @Test
     void enumField() {
         var bean = new TestBean();
         bean.enumField = TestBean.TestEnum.C;
