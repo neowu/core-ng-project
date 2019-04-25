@@ -17,6 +17,6 @@ class BsonLogParamTest {
         var param = new BsonLogParam(Filters.eq("field", "value"), MongoClient.getDefaultCodecRegistry());
         var builder = new StringBuilder();
         param.append(builder, Set.of(), 1000);
-        assertThat(builder.toString()).isEqualTo("{ \"field\" : \"value\" }");
+        assertThat(builder.toString()).isEqualTo("{\"field\": \"value\"}");
     }
 }
