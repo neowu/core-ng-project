@@ -1,6 +1,6 @@
 ## Change log
 ### 6.12.4 (4/17/2019 - )
-
+* mongo: fix: unit test to support multiple test mongo servers on different ports
 
 ### 6.12.3 (4/9/2019 - 4/17/2019)
 * http: update okHTTP to 3.14.1

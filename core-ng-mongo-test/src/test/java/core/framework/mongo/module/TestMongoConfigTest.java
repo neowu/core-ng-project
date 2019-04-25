@@ -14,6 +14,7 @@ class TestMongoConfigTest {
     @BeforeEach
     void createTestMongoConfig() {
         config = new TestMongoConfig();
+        config.port = 27017;
     }
 
     @Test

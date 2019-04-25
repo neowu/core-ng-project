@@ -13,5 +13,9 @@ public class TestModule extends AbstractTestModule {
         MongoConfig mongo = config(MongoConfig.class);
         mongo.uri("mongodb://localhost:27017/test");
         mongo.collection(TestMongoEntity.class);
+
+        mongo = config(MongoConfig.class, "other");
+        mongo.uri("mongodb://localhost:27018/test");
+        mongo.collection(TestMongoEntity.class);
     }
 }

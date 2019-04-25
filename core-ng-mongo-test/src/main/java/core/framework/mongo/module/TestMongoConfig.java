@@ -7,21 +7,26 @@ import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author neo
  */
 public class TestMongoConfig extends MongoConfig {
+    private static final AtomicInteger NEXT_MONGO_SERVER_PORT = new AtomicInteger(27017);
+    int port;
+
     @Override
     protected void initialize(ModuleContext context, String name) {
         super.initialize(context, name);
         var server = new MongoServer(new MemoryBackend());
-        server.bind(new InetSocketAddress("localhost", 27017));
+        port = NEXT_MONGO_SERVER_PORT.getAndIncrement();
+        server.bind(new InetSocketAddress("localhost", port));
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.shutdown());
     }
 
     @Override
     ConnectionString connectionString(ConnectionString uri) {
-        return new ConnectionString("mongodb://localhost:27017/test");
+        return new ConnectionString("mongodb://localhost:" + port + "/test");
     }
 }
