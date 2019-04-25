@@ -24,11 +24,13 @@ public class TestMongoConfig extends MongoConfig {
     }
 
     private void startInMemoryMongoServer(ModuleContext context) {
-        // in test env, config is initialized in order and within same thread, so no threading issue
-        if (server == null) {
-            server = new MongoServer(new MemoryBackend());
-            server.bind(new InetSocketAddress("localhost", 27017));
-            context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.shutdown());
+        synchronized (TestMongoConfig.class) {
+            // in test env, config is initialized in order and within same thread, so no threading issue
+            if (server == null) {
+                server = new MongoServer(new MemoryBackend());
+                server.bind(new InetSocketAddress("localhost", 27017));
+                context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.shutdown());
+            }
         }
     }
 

@@ -21,18 +21,19 @@ public class TestSearchConfig extends SearchConfig {
     @Override
     protected void initialize(ModuleContext context, String name) {
         super.initialize(context, name);
-
         startLocalElasticSearch(context);
     }
 
     // currently multiple elasticsearch in one service will share one test local elasticsearch, therefor there might be document type collation (e.g. same document type on both es)
     // at this point this behavior is not causing big problem (can be workaround in unit test), so we keep this simple rather than start multiple local es on different port which is more complex and slow
     private void startLocalElasticSearch(ModuleContext context) {
-        // in test env, config is initialized in order and within same thread, so no threading issue
-        if (server == null) {
-            server = new LocalElasticSearch();
-            server.start();
-            context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.close());
+        synchronized (TestSearchConfig.class) {
+            // in test env, config is initialized in order and within same thread, so no threading issue
+            if (server == null) {
+                server = new LocalElasticSearch();
+                server.start();
+                context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.close());
+            }
         }
     }
 
