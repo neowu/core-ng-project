@@ -53,7 +53,7 @@ project(':core-ng-mongo') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api 'org.mongodb:mongo-java-driver:3.9.1'
+        api 'org.mongodb:mongo-java-driver:3.10.2'
         testImplementation project(":core-ng-test")
     }
 }

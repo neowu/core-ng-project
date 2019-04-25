@@ -14,11 +14,13 @@ class TestMongoConfigTest {
     @BeforeEach
     void createTestMongoConfig() {
         config = new TestMongoConfig();
-        config.port = 27017;
     }
 
     @Test
     void connectionString() {
-        assertThat(config.connectionString(null).getDatabase()).isNotNull();
+        assertThat(config.connectionString(null).getDatabase()).isEqualTo("test");
+
+        config.name = "other";
+        assertThat(config.connectionString(null).getDatabase()).isEqualTo("other");
     }
 }
