@@ -5,7 +5,6 @@ import core.framework.internal.log.message.EventMessage;
 import core.framework.internal.log.message.LogTopics;
 import core.framework.internal.log.message.StatMessage;
 import core.framework.module.App;
-import core.framework.module.SystemModule;
 import core.framework.search.module.SearchConfig;
 import core.log.domain.ActionDocument;
 import core.log.domain.EventDocument;
@@ -30,7 +29,7 @@ import java.time.LocalTime;
 public class LogProcessorApp extends App {
     @Override
     protected void initialize() {
-        load(new SystemModule("sys.properties"));
+        loadProperties("sys.properties");
 
         SearchConfig search = config(SearchConfig.class);
         search.host(requiredProperty("sys.elasticsearch.host"));
@@ -46,9 +45,17 @@ public class LogProcessorApp extends App {
         bind(StatService.class);
         bind(EventService.class);
 
-        log().appender(bind(ElasticSearchAppender.class));
+        property("sys.log.appender").ifPresent(appender -> {
+            if ("console".equals(appender)) {
+                log().appendToConsole();
+            } else if ("elasticsearch".equals(appender)) {
+                log().appender(bind(ElasticSearchAppender.class));
+            }
+        });
+
         onStartup(indexService::createIndexTemplatesUntilSuccess);
 
+        kafka().uri(requiredProperty("sys.kafka.uri"));
         kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get at least 1M message
         kafka().maxPoll(2000, 3 * 1024 * 1024);     // get 3M message at max
