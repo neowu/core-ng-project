@@ -5,11 +5,11 @@ subprojects {
     version = '6.12.5'
 }
 
-def elasticVersion = '7.0.0'
+def elasticVersion = '7.0.1'
 def kafkaVersion = '2.2.0'
 def jacksonVersion = '2.9.8'
-def junitVersion = '5.4.1'
-def mockitoVersion = '2.25.1'
+def junitVersion = '5.4.2'
+def mockitoVersion = '2.27.0'
 def assertjVersion = '3.12.2'
 
 project(':core-ng-api') {
@@ -21,7 +21,7 @@ project(':core-ng') {
     dependencies {
         api project(":core-ng-api")
         api 'org.slf4j:slf4j-api:1.8.0-beta4'
-        implementation 'org.javassist:javassist:3.24.1-GA'
+        implementation 'org.javassist:javassist:3.25.0-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:3.14.1'
