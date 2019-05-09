@@ -4,6 +4,7 @@
         console -> output to console
         elasticsearch -> index directly to elasticsearch
 * search: update es to 7.0.1        
+* cache: throw exception if loader returns null when called cache.get(key, loader)
 
 ### 6.12.4 (4/17/2019 - 4/25/2019)
 * mongo: fix: unit test to support multiple test mongo servers on different ports

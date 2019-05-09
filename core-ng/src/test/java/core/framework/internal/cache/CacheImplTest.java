@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -63,6 +64,13 @@ class CacheImplTest {
 
         Optional<String> value = cache.get("key");
         assertThat(value).get().isEqualTo("{}");
+    }
+
+    @Test
+    void loaderReturnsNull() {
+        assertThatThrownBy(() -> cache.get("key", key -> null))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("value must not be null");
     }
 
     @Test

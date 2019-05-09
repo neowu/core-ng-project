@@ -47,8 +47,14 @@ public class CacheImpl<T> implements Cache<T> {
             if (validate(result)) return result;
         }
         logger.debug("load value, key={}", key);
-        T value = loader.apply(key);
+        T value = load(loader, key);
         cacheStore.put(cacheKey, mapper.toJSON(value), duration);
+        return value;
+    }
+
+    private T load(Function<String, T> loader, String key) {
+        T value = loader.apply(key);
+        if (value == null) throw new Error("value must not be null, key=" + key);
         return value;
     }
 
@@ -80,7 +86,7 @@ public class CacheImpl<T> implements Cache<T> {
             }
             if (load) {
                 logger.debug("load value, key={}", key);
-                T value = loader.apply(key);
+                T value = load(loader, key);
                 newValues.put(cacheKey, mapper.toJSON(value));
                 values.put(key, value);
             }

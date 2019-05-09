@@ -8,6 +8,7 @@ import java.util.function.Function;
  * @author neo
  */
 public interface Cache<T> {
+    // loader must not return null, use wrapper class if it is necessary to cache null value
     T get(String key, Function<String, T> loader);
 
     Map<String, T> getAll(Collection<String> keys, Function<String, T> loader);
