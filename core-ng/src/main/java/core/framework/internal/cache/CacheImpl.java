@@ -52,12 +52,6 @@ public class CacheImpl<T> implements Cache<T> {
         return value;
     }
 
-    private T load(Function<String, T> loader, String key) {
-        T value = loader.apply(key);
-        if (value == null) throw new Error("value must not be null, key=" + key);
-        return value;
-    }
-
     public Optional<String> get(String key) {
         byte[] result = cacheStore.get(cacheKey(key));
         if (result == null) return Optional.empty();
@@ -133,6 +127,12 @@ public class CacheImpl<T> implements Cache<T> {
 
     private String cacheKey(String key) {
         return name + ":" + key;
+    }
+
+    private T load(Function<String, T> loader, String key) {
+        T value = loader.apply(key);
+        if (value == null) throw new Error("value must not be null, key=" + key);
+        return value;
     }
 
     private boolean validate(T bean) {
