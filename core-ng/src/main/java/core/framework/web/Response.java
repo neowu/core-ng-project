@@ -72,7 +72,9 @@ public interface Response {
 
     Response status(HTTPStatus status);
 
-    Response header(String name, Object value);
+    Optional<String> header(String name);
+
+    Response header(String name, String value);
 
     Optional<ContentType> contentType();
 

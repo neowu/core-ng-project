@@ -37,9 +37,14 @@ public final class ResponseImpl implements Response {
     }
 
     @Override
-    public Response header(String name, Object value) {
+    public Optional<String> header(String name) {
+        return Optional.ofNullable(headers.get(new HttpString(name)));
+    }
+
+    @Override
+    public Response header(String name, String value) {
         if (Headers.CONTENT_TYPE.equalToString(name)) throw new Error("must not use header() to update content type, please use response.contentType()");
-        headers.put(new HttpString(name), String.valueOf(value));
+        headers.put(new HttpString(name), value);
         return this;
     }
 

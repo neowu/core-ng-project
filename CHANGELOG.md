@@ -1,10 +1,11 @@
 ## Change log
-### 6.12.5 (5/7/2019 - )
+### 6.12.5 (5/7/2019 - 5/13/2019)
 * log-processor: support sys.log.appender to configure whether index log-processor action logs, by default it's empty (to configure by env in kube)
         console -> output to console
         elasticsearch -> index directly to elasticsearch
 * search: update es to 7.0.1        
 * cache: throw exception if loader returns null when called cache.get(key, loader)
+* site: not set csp by default, in case application may generate it dynamically, (and even with static setting, it's set by sys.properties explicitly anyway)
 
 ### 6.12.4 (4/17/2019 - 4/25/2019)
 * mongo: fix: unit test to support multiple test mongo servers on different ports

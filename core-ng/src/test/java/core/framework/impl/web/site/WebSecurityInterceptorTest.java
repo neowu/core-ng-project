@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,6 +41,17 @@ class WebSecurityInterceptorTest {
         verify(response).header("Content-Security-Policy", interceptor.contentSecurityPolicy);
         verify(response).header(eq("X-XSS-Protection"), anyString());
         verify(response).header(eq("X-Content-Type-Options"), anyString());
+    }
+
+    @Test
+    void skipCSP() {
+        interceptor.contentSecurityPolicy = null;
+
+        Response response = mock(Response.class);
+        when(response.contentType()).thenReturn(Optional.of(ContentType.TEXT_HTML));
+
+        interceptor.appendSecurityHeaders(response);
+        verify(response, never()).header(eq("Content-Security-Policy"), anyString());
     }
 
     @Test
