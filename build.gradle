@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '6.12.5'
+    version = '6.12.6'
 }
 
 def elasticVersion = '7.0.1'
@@ -24,7 +24,7 @@ project(':core-ng') {
         implementation 'org.javassist:javassist:3.25.0-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-        implementation 'com.squareup.okhttp3:okhttp:3.14.1'
+        implementation 'com.squareup.okhttp3:okhttp:3.14.2'
         implementation 'io.undertow:undertow-core:2.0.20.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.7.2'      // used by kafka message compression
