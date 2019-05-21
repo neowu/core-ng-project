@@ -1,6 +1,7 @@
 ## Change log
 ### 6.12.6 (5/20/2019 - )
 * http: update okHTTP to 3.14.2
+* search: (bug) ElasticSearchMigration throws exception on failure
 
 ### 6.12.5 (5/7/2019 - 5/13/2019)
 * log-processor: support sys.log.appender to configure whether index log-processor action logs, by default it's empty (to configure by env in kube)

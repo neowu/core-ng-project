@@ -29,6 +29,7 @@ public class ElasticSearchMigration {
             consumer.accept(search);
         } catch (Throwable e) {
             logger.error("failed to run migration", e);
+            throw e;
         } finally {
             close(search);
         }
