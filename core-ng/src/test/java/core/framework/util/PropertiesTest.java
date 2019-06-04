@@ -4,9 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -23,28 +21,29 @@ class PropertiesTest {
     void testGetEmptyValue() {
         properties.set("key", "");
 
-        assertFalse(properties.get("key").isPresent());
+        assertThat(properties.get("key")).isEmpty();
     }
 
     @Test
     void loadNotExistedFile() {
-        Error error = assertThrows(Error.class, () -> properties.load("not-existed-property.properties"));
-        assertThat(error.getMessage()).contains("can not find");
+        assertThatThrownBy(() -> properties.load("not-existed-property.properties"))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("can not find");
     }
 
     @Test
     void setWithDuplicateKey() {
-        Error error = assertThrows(Error.class, () -> {
+        assertThatThrownBy(() -> {
             properties.set("key1", "value1");
             properties.set("key1", "value2");
-        });
-        assertThat(error.getMessage()).contains("key=key1, previous=value1, current=value2");
+        }).isInstanceOf(Error.class)
+          .hasMessageContaining("key=key1, previous=value1, current=value2");
     }
 
     @Test
     void containsKey() {
         properties.properties.put("key", "");
 
-        assertTrue(properties.containsKey("key"));
+        assertThat(properties.containsKey("key")).isTrue();
     }
 }

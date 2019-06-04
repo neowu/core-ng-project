@@ -6,12 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import static core.framework.util.Strings.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author neo
@@ -20,9 +20,9 @@ public final class Properties {
     final Map<String, String> properties = Maps.newHashMap();
 
     public void load(String classpath) {
-        InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream(classpath);
-        if (stream == null) throw new Error(format("can not find property file in classpath, classpath={}", classpath));
-        try (Reader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+        InputStream stream = ClasspathResources.stream(classpath);
+        if (stream == null) throw new Error("can not find property file in classpath, classpath=" + classpath);
+        try (Reader reader = new BufferedReader(new InputStreamReader(stream, UTF_8))) {
             var properties = new java.util.Properties();
             properties.load(reader);
             properties.forEach((key, value) -> set((String) key, (String) value));

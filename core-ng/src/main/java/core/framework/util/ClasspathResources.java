@@ -3,6 +3,8 @@ package core.framework.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.net.URL;
+import java.util.Iterator;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -15,13 +17,28 @@ public final class ClasspathResources {
     }
 
     public static byte[] bytes(String path) {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream stream = loader.getResourceAsStream(path);
+        InputStream stream = stream(path);
         if (stream == null) throw new Error("can not load resource, path=" + path);
         try (stream) {
             return stream.readAllBytes();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        }
+    }
+
+    static InputStream stream(String classpath) {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        try {
+            Iterator<URL> urls = loader.getResources(classpath).asIterator();
+            if (urls.hasNext()) {
+                URL url = urls.next();
+                // to avoid have same resource name within different jars, as the order of loading jar is not determined on different env/os, we'd better avoid potential unexpected behavior
+                if (urls.hasNext()) throw new Error("found duplicate resources with same name, classpath=" + classpath);
+                return url.openStream();
+            }
+            return null;
+        } catch (IOException e) {
+            return null;
         }
     }
 }
