@@ -28,7 +28,7 @@ class PropertiesTest {
     void loadNotExistedFile() {
         assertThatThrownBy(() -> properties.load("not-existed-property.properties"))
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("can not find");
+                .hasMessageContaining("can not load");
     }
 
     @Test

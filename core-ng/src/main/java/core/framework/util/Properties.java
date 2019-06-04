@@ -21,7 +21,6 @@ public final class Properties {
 
     public void load(String classpath) {
         InputStream stream = ClasspathResources.stream(classpath);
-        if (stream == null) throw new Error("can not find property file in classpath, classpath=" + classpath);
         try (Reader reader = new BufferedReader(new InputStreamReader(stream, UTF_8))) {
             var properties = new java.util.Properties();
             properties.load(reader);
