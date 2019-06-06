@@ -2,6 +2,7 @@
 ### 6.12.7 (5/23/2019 - )
 * search: update es to 7.1.1
 * classpath/properties: check if there are multiple resources with same name in different jars (within same classapth)
+* kafka: update to 2.2.1
 
 ### 6.12.6 (5/20/2019 - 5/21/2019)
 * http: update okHTTP to 3.14.2
