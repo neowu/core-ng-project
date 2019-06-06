@@ -1,5 +1,5 @@
 ## Change log
-### 6.12.7 (5/23/2019 - )
+### 6.12.7 (5/23/2019 - 6/6/2019)
 * search: update es to 7.1.1
 * classpath/properties: check if there are multiple resources with same name in different jars (within same classapth)
 * kafka: update to 2.2.1

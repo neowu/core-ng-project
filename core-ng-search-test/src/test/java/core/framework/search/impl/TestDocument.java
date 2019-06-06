@@ -33,4 +33,14 @@ public class TestDocument {
 
     @Property(name = "zoned_date_time_field")
     public ZonedDateTime zonedDateTimeField;
+
+    @Property(name = "enum_field")
+    public TestEnum enumField;
+
+    public enum TestEnum {
+        @Property(name = "V1")
+        VALUE1,
+        @Property(name = "V2")
+        VALUE2
+    }
 }

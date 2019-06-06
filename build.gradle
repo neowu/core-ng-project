@@ -7,7 +7,7 @@ subprojects {
 
 def elasticVersion = '7.1.1'
 def kafkaVersion = '2.2.1'
-def jacksonVersion = '2.9.8'
+def jacksonVersion = '2.9.9'
 def junitVersion = '5.4.2'
 def mockitoVersion = '2.27.0'
 def assertjVersion = '3.12.2'
@@ -72,6 +72,7 @@ project(':core-ng-search') {
     dependencies {
         api project(":core-ng")
         api "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
+        api "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"                     // update jackson lib transitive dependencies from elasticsearch
         testImplementation project(":core-ng-test")
     }
 }

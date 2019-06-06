@@ -1,6 +1,7 @@
 package core.framework.search.impl;
 
 import core.framework.inject.Inject;
+import core.framework.json.JSON;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
@@ -32,7 +33,10 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 /**
  * @author neo
@@ -104,7 +108,9 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
         // test synonyms
         SearchRequest request = new SearchRequest();
-        request.query = QueryBuilders.matchQuery("string_field", "first");
+        request.query = boolQuery()
+                .must(matchQuery("string_field", "first"))
+                .filter(termQuery("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1)));
         request.sorts.add(SortBuilders.scriptSort(new Script("doc['int_field'].value * 3"), ScriptSortBuilder.ScriptSortType.NUMBER));
         SearchResponse<TestDocument> response = documentType.search(request);
 
@@ -113,7 +119,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
         // test stemmer
         request = new SearchRequest();
-        request.query = QueryBuilders.matchQuery("string_field", "test");
+        request.query = matchQuery("string_field", "test");
         response = documentType.search(request);
 
         assertThat(response.totalHits).isEqualTo(1);
@@ -192,7 +198,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         var request = new SearchRequest();
         request.skip = 0;
         request.limit = 1;
-        request.query = QueryBuilders.matchQuery("string_field", "value1");
+        request.query = matchQuery("string_field", "value1");
         request.aggregations.add(AggregationBuilders.sum("totalValue").field("double_field"));
         SearchResponse<TestDocument> response = documentType.search(request);
 
@@ -211,6 +217,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         document.intField = intField;
         document.doubleField = doubleField;
         document.zonedDateTimeField = time;
+        document.enumField = TestDocument.TestEnum.VALUE1;
         document.completion1 = stringField + "-Complete1";
         document.completion2 = stringField + "-Complete2";
         return document;

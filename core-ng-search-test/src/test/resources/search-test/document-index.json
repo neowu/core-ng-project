@@ -69,6 +69,9 @@
       },
       "zoned_date_time_field": {
         "type": "date"
+      },
+      "enum_field": {
+        "type": "keyword"
       }
     }
   }
