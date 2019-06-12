@@ -39,7 +39,7 @@ subprojects {
     }
 
     dependencies {
-        spotbugsPlugins 'com.mebigfatguy.fb-contrib:fb-contrib:7.4.5.sb'
+        spotbugsPlugins 'com.mebigfatguy.sb-contrib:sb-contrib:7.4.5'
     }
 
     tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach {
