@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.7.1'
+        classpath 'gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:2.0.0'
     }
 }
 
@@ -17,7 +17,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.19'
+            checkstyle 'com.puppycrawl.tools:checkstyle:8.20'
             checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.32.0'
         }
 
@@ -28,7 +28,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
-        toolVersion = '6.13.0'
+        toolVersion = '6.15.0'
         consoleOutput = true
     }
 
@@ -39,7 +39,7 @@ subprojects {
     }
 
     dependencies {
-        spotbugsPlugins 'com.mebigfatguy.fb-contrib:fb-contrib:7.4.3.sb'
+        spotbugsPlugins 'com.mebigfatguy.fb-contrib:fb-contrib:7.4.5.sb'
     }
 
     tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach {
@@ -50,7 +50,7 @@ subprojects {
     }
 
     jacoco {
-        toolVersion = '0.8.3'
+        toolVersion = '0.8.4'
     }
 
     tasks.named('jacocoTestReport').configure {

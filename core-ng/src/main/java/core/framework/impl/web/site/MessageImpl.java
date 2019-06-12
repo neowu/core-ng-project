@@ -28,7 +28,7 @@ public class MessageImpl implements Message {
     private static final Pattern MESSAGE_PROPERTY_PATH_PATTERN = Pattern.compile("[^_]+((_[a-zA-Z0-9]{2,4})*)\\.properties");
     final Map<String, List<Properties>> messages = Maps.newHashMap();
     private final Logger logger = LoggerFactory.getLogger(MessageImpl.class);
-    String[] languages = new String[]{DEFAULT_LANGUAGE};
+    String[] languages = {DEFAULT_LANGUAGE};
 
     public void load(List<String> paths, String... languages) {
         if (!messages.isEmpty()) throw new Error("messages must be empty");
