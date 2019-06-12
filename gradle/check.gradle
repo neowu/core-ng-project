@@ -17,8 +17,8 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.20'
-            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.32.0'
+            checkstyle 'com.puppycrawl.tools:checkstyle:8.21'
+            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.33.0'
         }
 
         configFile = rootProject.file('gradle/check/checkstyle.xml')
