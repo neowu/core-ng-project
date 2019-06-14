@@ -5,12 +5,12 @@ import core.framework.internal.log.message.EventMessage;
 import core.framework.internal.log.message.LogTopics;
 import core.framework.module.App;
 import core.framework.module.SystemModule;
+import core.framework.util.Sets;
 import core.framework.util.Strings;
 import core.log.web.CollectEventRequest;
 import core.log.web.CollectEventRequestValidator;
 import core.log.web.EventController;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -39,7 +39,7 @@ public class LogCollectorApp extends App {
 
     Set<String> allowedOrigins(String value) {
         String[] origins = Strings.split(value, ',');
-        Set<String> result = new HashSet<>();
+        Set<String> result = Sets.newHashSetWithExpectedSize(origins.length);
         for (String origin : origins) {
             result.add(origin.strip());
         }
