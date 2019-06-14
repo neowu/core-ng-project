@@ -83,7 +83,7 @@ public class HTTPHandler implements HttpHandler {
 
             HeaderMap headers = exchange.getRequestHeaders();
             linkContext(actionLog, headers);
-            request.session = sessionManager.load(request);
+            request.session = sessionManager.load(request, actionLog);
 
             if (webSocketHandler != null && webSocketHandler.checkWebSocket(request.method(), headers)) {
                 webSocketHandler.handle(exchange, request, actionLog);

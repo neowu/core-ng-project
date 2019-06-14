@@ -34,7 +34,7 @@ public class ResponseHandler {
 
     public void render(RequestImpl request, ResponseImpl response, HttpServerExchange exchange, ActionLog actionLog) {
         // always try to save session before response, even for exception flow in case it's invalidated or generated new sessionId
-        sessionManager.save(request, response);
+        sessionManager.save(request, response, actionLog);
 
         HTTPStatus status = response.status();
         exchange.setStatusCode(status.code);

@@ -1,5 +1,7 @@
 package core.framework.impl.web.session;
 
+import core.framework.crypto.Hash;
+import core.framework.impl.log.ActionLog;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.web.CookieSpec;
 import core.framework.web.Request;
@@ -23,7 +25,7 @@ public final class SessionManager {
     private Duration timeout = Duration.ofMinutes(20);
     private SessionStore store;
 
-    public Session load(Request request) {
+    public Session load(Request request, ActionLog actionLog) {
         if (store == null) return null;  // session store is not initialized
         if (!"https".equals(request.scheme())) return null;  // only load session under https
 
@@ -32,6 +34,7 @@ public final class SessionManager {
             logger.debug("load session");
             Map<String, String> values = store.getAndRefresh(sessionId, timeout);
             if (values != null) {
+                actionLog.context("sessionHash", Hash.md5Hex(sessionId));
                 session.id = sessionId;
                 session.values.putAll(values);
             }
@@ -39,19 +42,26 @@ public final class SessionManager {
         return session;
     }
 
-    public void save(RequestImpl request, Response response) {
+    public void save(RequestImpl request, Response response, ActionLog actionLog) {
         SessionImpl session = (SessionImpl) request.session;
         if (session == null || session.saved) return;
 
+        save(session, response, actionLog);
+    }
+
+    void save(SessionImpl session, Response response, ActionLog actionLog) {
         session.saved = true;   // it will try to save session on both normal and exception flows, here is to only attempt once in case of store throws exception
-        if (session.invalidated && session.id != null) {
-            logger.debug("invalidate session");
-            store.invalidate(session.id);
-            putSessionId(response, null);
+        if (session.invalidated) {
+            if (session.id != null) {
+                logger.debug("invalidate session");
+                store.invalidate(session.id);
+                putSessionId(response, null);
+            }
         } else if (session.changed()) {
             logger.debug("save session");
             if (session.id == null) {
                 session.id = UUID.randomUUID().toString();
+                actionLog.context("sessionHash", Hash.md5Hex(session.id));
                 putSessionId(response, session.id);
             }
             store.save(session.id, session.values, session.changedFields, timeout);
