@@ -7,7 +7,6 @@ import core.framework.internal.http.RetryInterceptor;
 import core.framework.internal.http.ServiceUnavailableInterceptor;
 import core.framework.util.StopWatch;
 import okhttp3.ConnectionPool;
-import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import javax.net.ssl.TrustManager;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,8 +48,7 @@ public final class HTTPClientBuilder {
                     .connectTimeout(connectTimeout)
                     .readTimeout(timeout)
                     .writeTimeout(timeout)
-                    .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS))
-                    .connectionSpecs(List.of(ConnectionSpec.RESTRICTED_TLS, ConnectionSpec.CLEARTEXT));
+                    .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
 
             if (trustAll) {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
