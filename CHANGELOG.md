@@ -1,5 +1,6 @@
 ## Change log
 ### 6.12.8 (6/12/2019 - )
+* log-collector: stripe on parsing app.allowedOrigins config 
 
 ### 6.12.7 (5/23/2019 - 6/6/2019)
 * search: update es to 7.1.1

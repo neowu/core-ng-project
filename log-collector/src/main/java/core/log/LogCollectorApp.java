@@ -10,7 +10,6 @@ import core.log.web.CollectEventRequest;
 import core.log.web.CollectEventRequestValidator;
 import core.log.web.EventController;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,17 +30,19 @@ public class LogCollectorApp extends App {
 
         bind(CollectEventRequestValidator.class);
 
-        Set<String> allowedOrigins = allowedOrigins();
+        Set<String> allowedOrigins = allowedOrigins(requiredProperty("app.allowedOrigins"));
         EventController controller = bind(new EventController(allowedOrigins));
         http().route(HTTPMethod.OPTIONS, "/event/:app", controller::options);
         http().route(HTTPMethod.PUT, "/event/:app", controller::put);
         http().bean(CollectEventRequest.class);
     }
 
-    private Set<String> allowedOrigins() {
-        String[] allowedOrigins = Strings.split(requiredProperty("app.allowedOrigins"), ',');
+    Set<String> allowedOrigins(String value) {
+        String[] origins = Strings.split(value, ',');
         Set<String> result = new HashSet<>();
-        Collections.addAll(result, allowedOrigins);
+        for (String origin : origins) {
+            result.add(origin.strip());
+        }
         return result;
     }
 }
