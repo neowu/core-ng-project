@@ -1,5 +1,5 @@
 ## Change log
-### 6.12.8 (6/12/2019 - )
+### 6.12.8 (6/12/2019 - 6/17/2019)
 * log-collector: stripe on parsing app.allowedOrigins config 
 * log: add sessionHash in ActionLogContext to improve data analytic
 * httpClient: make okHTTP use default ConnectionSpec to be able to connect to most servers
