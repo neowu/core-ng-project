@@ -61,6 +61,10 @@ public final class ContentType {
 
     private static Charset parseCharset(String charset) {
         try {
+            int semicolon = charset.indexOf(';');
+            if (semicolon > 0) {
+                return Charset.forName(charset.substring(0, semicolon));
+            }
             return Charset.forName(charset);
         } catch (UnsupportedCharsetException e) {
             LOGGER.warn("ignore unsupported charset, charset={}", charset);

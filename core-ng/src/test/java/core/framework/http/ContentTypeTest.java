@@ -16,6 +16,10 @@ class ContentTypeTest {
         assertThat(type.mediaType).isEqualTo("application/json");
         assertThat(type.charset()).get().isEqualTo(StandardCharsets.UTF_8);
 
+        type = ContentType.parse("application/vnd.maxmind.com-country+json; charset=UTF-8; version=2.1");
+        assertThat(type.mediaType).isEqualTo("application/vnd.maxmind.com-country+json");
+        assertThat(type.charset()).get().isEqualTo(StandardCharsets.UTF_8);
+
         type = ContentType.parse("image/png");
         assertThat(type.mediaType).isEqualTo("image/png");
         assertThat(type.charset()).isNotPresent();
