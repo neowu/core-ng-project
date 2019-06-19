@@ -1,6 +1,6 @@
 ## Change log
 ### 6.12.8.1 (6/19/2019)
-* httpClient: enhance charset parsing; some charset values have a version attribute.
+* httpClient: make charset parsing more robust, some charset values have a version attribute.
 
 ### 6.12.8 (6/12/2019 - 6/17/2019)
 * log-collector: stripe on parsing app.allowedOrigins config 

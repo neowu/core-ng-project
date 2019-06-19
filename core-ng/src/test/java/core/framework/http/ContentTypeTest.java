@@ -12,8 +12,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ContentTypeTest {
     @Test
     void parse() {
-        ContentType type = ContentType.parse("application/json; charset=utf-8");
+        ContentType type = ContentType.parse("application/json; charset=utf-8");    // within cache
         assertThat(type.mediaType).isEqualTo("application/json");
+        assertThat(type.charset()).get().isEqualTo(StandardCharsets.UTF_8);
+
+        type = ContentType.parse("application/javascript; charset=utf-8");    // not in cache
+        assertThat(type.mediaType).isEqualTo("application/javascript");
         assertThat(type.charset()).get().isEqualTo(StandardCharsets.UTF_8);
 
         type = ContentType.parse("application/vnd.maxmind.com-country+json; charset=UTF-8; version=2.1");
