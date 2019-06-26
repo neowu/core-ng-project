@@ -1,4 +1,6 @@
 ## Change log
+### 6.12.9 (6/26/2019 - )
+
 ### 6.12.8.1 (6/19/2019)
 * httpClient: make charset parsing more robust, some charset values have a version attribute.
 
