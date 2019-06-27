@@ -1,5 +1,6 @@
 ## Change log
 ### 6.12.9 (6/26/2019 - )
+* search: update es to 7.2.0
 
 ### 6.12.8.1 (6/19/2019)
 * httpClient: make charset parsing more robust, some charset values have a version attribute.
