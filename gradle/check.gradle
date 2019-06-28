@@ -18,7 +18,7 @@ subprojects {
     checkstyle {
         dependencies {
             checkstyle 'com.puppycrawl.tools:checkstyle:8.20'
-            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.33.0'
+            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.34.1'
         }
 
         configFile = rootProject.file('gradle/check/checkstyle.xml')
@@ -39,7 +39,7 @@ subprojects {
     }
 
     dependencies {
-        spotbugsPlugins 'com.mebigfatguy.sb-contrib:sb-contrib:7.4.5'
+        spotbugsPlugins 'com.mebigfatguy.sb-contrib:sb-contrib:7.4.6'
     }
 
     tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach {
