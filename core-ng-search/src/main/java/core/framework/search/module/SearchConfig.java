@@ -8,6 +8,7 @@ import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.log.ESLoggerContextFactory;
 import core.framework.util.Types;
+import org.apache.http.HttpHost;
 
 import java.time.Duration;
 
@@ -41,7 +42,7 @@ public class SearchConfig extends Config {
     }
 
     public void host(String host) {
-        search.host = host;
+        search.host = new HttpHost(host, 9200);
     }
 
     void configureLogger() {

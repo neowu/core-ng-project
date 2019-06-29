@@ -2,10 +2,13 @@ package core.framework.search.impl;
 
 import core.framework.util.Files;
 import core.framework.util.StopWatch;
+import org.apache.http.HttpHost;
+import org.elasticsearch.cluster.ClusterName;
 import org.elasticsearch.common.network.NetworkService;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.discovery.DiscoveryModule;
 import org.elasticsearch.env.Environment;
+import org.elasticsearch.http.HttpServerTransport;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeValidationException;
 import org.slf4j.Logger;
@@ -26,17 +29,20 @@ public class LocalElasticSearch {
     private Path dataPath;
     private LocalNode node;
 
-    public void start() {
+    public HttpHost start() {
         var watch = new StopWatch();
         this.dataPath = Files.tempDir();
         try {
             Settings.Builder settings = Settings.builder();
-            settings.put(Node.NODE_NAME_SETTING.getKey(), "test")
+            settings.put(ClusterName.CLUSTER_NAME_SETTING.getKey(), "test")
+                    .put(Node.NODE_NAME_SETTING.getKey(), "test")
                     .put(Environment.PATH_HOME_SETTING.getKey(), dataPath)
                     .put(NetworkService.GLOBAL_NETWORK_BIND_HOST_SETTING.getKey(), "_local_")
-                    .put(DiscoveryModule.DISCOVERY_TYPE_SETTING.getKey(), "single-node");
+                    .put(DiscoveryModule.DISCOVERY_TYPE_SETTING.getKey(), DiscoveryModule.SINGLE_NODE_DISCOVERY_TYPE);
             node = new LocalNode(settings.build());
             node.start();
+            // on same local server, there may be multiple es started, e.g. multiple test jobs on shared build server, this is to retrieve actual http port
+            return new HttpHost("localhost", node.injector().getInstance(HttpServerTransport.class).boundAddress().publishAddress().getPort());
         } catch (NodeValidationException e) {
             throw new Error(e);
         } finally {

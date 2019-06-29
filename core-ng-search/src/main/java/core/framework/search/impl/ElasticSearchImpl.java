@@ -34,11 +34,11 @@ public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
     public Duration timeout = Duration.ofSeconds(10);
     public Duration slowOperationThreshold = Duration.ofSeconds(5);
-    public String host;
+    public HttpHost host;
     private RestHighLevelClient client;
 
     public void initialize() {
-        client = new RestHighLevelClient(RestClient.builder(new HttpHost(host, 9200))
+        client = new RestHighLevelClient(RestClient.builder(host)
                                                    .setRequestConfigCallback(builder -> builder.setSocketTimeout((int) timeout.toMillis())
                                                                                                .setConnectionRequestTimeout((int) timeout.toMillis()))  // timeout of requesting connection from connection pool
                                                    .setHttpClientConfigCallback(builder -> builder.setMaxConnTotal(100).setMaxConnPerRoute(100)));

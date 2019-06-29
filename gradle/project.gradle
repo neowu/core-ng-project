@@ -27,6 +27,7 @@ subprojects {
     tasks.named('test') {
         useJUnitPlatform()
         failFast = true
+        testLogging.showStandardStreams = true
         testLogging.exceptionFormat 'full'
     }
 

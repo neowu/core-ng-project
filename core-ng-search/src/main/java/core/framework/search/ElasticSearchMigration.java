@@ -2,6 +2,7 @@ package core.framework.search;
 
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.util.Properties;
+import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +25,7 @@ public class ElasticSearchMigration {
     public void migrate(Consumer<ElasticSearch> consumer) {
         var search = new ElasticSearchImpl();
         try {
-            search.host = host;
+            search.host = new HttpHost(host, 9200);
             search.initialize();
             consumer.accept(search);
         } catch (Throwable e) {

@@ -4,13 +4,12 @@ import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 import core.framework.search.impl.ESLoggerConfigFactory;
 import core.framework.search.impl.LocalElasticSearch;
+import org.apache.http.HttpHost;
 
 /**
  * @author neo
  */
 public class TestSearchConfig extends SearchConfig {
-    private static LocalElasticSearch server;
-
     static {
         // refer to io.netty.util.NettyRuntime.AvailableProcessorsHolder.setAvailableProcessors
         // refer to org.elasticsearch.transport.netty4.Netty4Utils.setAvailableProcessors
@@ -18,28 +17,23 @@ public class TestSearchConfig extends SearchConfig {
         System.setProperty("es.set.netty.runtime.available.processors", "false");
     }
 
+    private HttpHost host;
+
     @Override
     protected void initialize(ModuleContext context, String name) {
         super.initialize(context, name);
         startLocalElasticSearch(context);
     }
 
-    // currently multiple elasticsearch in one service will share one test local elasticsearch, therefor there might be document type collation (e.g. same document type on both es)
-    // at this point this behavior is not causing big problem (can be workaround in unit test), so we keep this simple rather than start multiple local es on different port which is more complex and slow
     private void startLocalElasticSearch(ModuleContext context) {
-        synchronized (TestSearchConfig.class) {
-            // in test env, config is initialized in order and within same thread, so no threading issue
-            if (server == null) {
-                server = new LocalElasticSearch();
-                server.start();
-                context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.close());
-            }
-        }
+        var server = new LocalElasticSearch();
+        host = server.start();
+        context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.close());
     }
 
     @Override
     public void host(String host) {
-        search.host = "localhost";
+        search.host = this.host;
     }
 
     // es refers to log4j core directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger
