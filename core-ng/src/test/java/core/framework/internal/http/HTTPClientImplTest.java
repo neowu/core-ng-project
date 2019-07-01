@@ -59,7 +59,7 @@ class HTTPClientImplTest {
                                                       .code(200)
                                                       .message("OK")
                                                       .header("content-type", "text/html")
-                                                      .body(ResponseBody.create(MediaType.get("application/json"), Strings.bytes("{}")))
+                                                      .body(ResponseBody.create(Strings.bytes("{}"), MediaType.get("application/json")))
                                                       .build();
 
         HTTPResponse response = httpClient.response(httpResponse);

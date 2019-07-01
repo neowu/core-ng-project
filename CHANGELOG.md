@@ -1,8 +1,9 @@
 ## Change log
-### 6.12.9 (6/26/2019 - )
+### 6.13.0 (6/26/2019 - 7/1/2019)
 * search: update es to 7.2.0
 * search: fixed: to support multiple es integration jobs run on same build server
 * kafka: update to 2.3.0
+* httpClient: update okHTTP to 4.0.0
 
 ### 6.12.8.1 (6/19/2019)
 * httpClient: make charset parsing more robust, some charset values have a version attribute.

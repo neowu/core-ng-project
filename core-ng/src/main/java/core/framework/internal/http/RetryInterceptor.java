@@ -6,6 +6,7 @@ import core.framework.util.Threads;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class RetryInterceptor implements Interceptor {
                 Response response = chain.proceed(request);
                 if (shouldRetry(attempts, response.code())) {
                     logger.warn(Markers.errorCode("HTTP_REQUEST_FAILED"), "service unavailable, retry soon, uri={}", request.url());
-                    closeQuietly(response.body());
+                    closeRequestBody(response);
                     sleep(waitTime(attempts));
                     continue;
                 }
@@ -49,6 +50,11 @@ public class RetryInterceptor implements Interceptor {
                 }
             }
         }
+    }
+
+    private void closeRequestBody(Response response) {
+        ResponseBody responseBody = response.body();
+        if (responseBody != null) closeQuietly(responseBody);
     }
 
     void sleep(Duration waitTime) {

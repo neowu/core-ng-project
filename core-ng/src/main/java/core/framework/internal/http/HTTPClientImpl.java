@@ -16,6 +16,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,9 @@ public final class HTTPClientImpl implements HTTPClient {
         }
         logger.debug("[response] headers={}", new MapLogParam(headers));
 
-        byte[] body = httpResponse.body().bytes();  // according to ok http, call.execute always return non-null body
+        ResponseBody responseBody = httpResponse.body();
+        if (responseBody == null) throw new Error("unexpected response body"); // refer to okhttp3.Response.body(), call.execute always return non-null body except for cachedResponse/networkResponse
+        byte[] body = responseBody.bytes();
 
         var response = new HTTPResponse(statusCode, headers, body);
         logger.debug("[response] body={}", BodyLogParam.param(body, response.contentType));
@@ -99,9 +102,9 @@ public final class HTTPClientImpl implements HTTPClient {
 
         if (request.body != null) {
             logger.debug("[request] body={}", BodyLogParam.param(request.body, request.contentType));
-            builder.method(request.method.name(), RequestBody.create(MediaType.get(request.contentType.toString()), request.body));
+            builder.method(request.method.name(), RequestBody.create(request.body, MediaType.get(request.contentType.toString())));
         } else {
-            RequestBody body = request.method == HTTPMethod.GET || request.method == HTTPMethod.HEAD ? null : RequestBody.create(null, new byte[0]);
+            RequestBody body = request.method == HTTPMethod.GET || request.method == HTTPMethod.HEAD ? null : RequestBody.create(new byte[0], null);
             builder.method(request.method.name(), body);
         }
 

@@ -1,6 +1,7 @@
 package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
+import okhttp3.Connection;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 import okhttp3.internal.connection.RealConnection;
@@ -17,8 +18,27 @@ public class ServiceUnavailableInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Response response = chain.proceed(chain.request());
         if (response.code() == HTTPStatus.SERVICE_UNAVAILABLE.code) {
-            ((RealConnection) chain.connection()).noNewExchanges();
+            ConnectionWrapper connection = connection(chain);
+            connection.noNewExchanges();
         }
         return response;
+    }
+
+    ConnectionWrapper connection(Chain chain) {
+        // refer to Interceptor.connection(), only application interceptor returns null, here we always use as network interceptor
+        return new ConnectionWrapper(chain.connection());
+    }
+
+    // for unit test, RealConnection can not be mocked
+    static class ConnectionWrapper {
+        final Connection connection;
+
+        ConnectionWrapper(Connection connection) {
+            this.connection = connection;
+        }
+
+        void noNewExchanges() {
+            ((RealConnection) connection).noNewExchanges();
+        }
     }
 }

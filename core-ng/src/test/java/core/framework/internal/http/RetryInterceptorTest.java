@@ -64,7 +64,7 @@ class RetryInterceptorTest {
                                                                .protocol(Protocol.HTTP_2)
                                                                .code(HTTPStatus.SERVICE_UNAVAILABLE.code)
                                                                .message("service unavailable")
-                                                               .body(ResponseBody.create(MediaType.get("application/json"), 0, source))
+                                                               .body(ResponseBody.create(source, MediaType.get("application/json"), 0))
                                                                .build();
         var okResponse = new Response.Builder().request(request)
                                                .protocol(Protocol.HTTP_2)
