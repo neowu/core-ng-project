@@ -11,6 +11,7 @@
     <rule ref="category/java/bestpractices.xml/AvoidReassigningLoopVariables"/>
     <rule ref="category/java/bestpractices.xml/ConstantsInInterface"/>
     <rule ref="category/java/bestpractices.xml/DefaultLabelNotLastInSwitchStmt"/>
+    <rule ref="category/java/bestpractices.xml/DoubleBraceInitialization"/>
     <rule ref="category/java/bestpractices.xml/ForLoopCanBeForeach"/>
     <rule ref="category/java/bestpractices.xml/ForLoopVariableCount"/>
     <rule ref="category/java/bestpractices.xml/LooseCoupling"/>
@@ -34,7 +35,6 @@
     <rule ref="category/java/bestpractices.xml/UseTryWithResources"/>
     <rule ref="category/java/bestpractices.xml/UseVarargs"/>
 
-    <rule ref="category/java/codestyle.xml/AvoidFinalLocalVariable"/>
     <rule ref="category/java/codestyle.xml/AvoidProtectedFieldInFinalClass"/>
     <rule ref="category/java/codestyle.xml/AvoidProtectedMethodInFinalClassNotExtending"/>
     <rule ref="category/java/codestyle.xml/BooleanGetMethodName"/>
