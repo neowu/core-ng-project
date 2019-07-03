@@ -21,7 +21,7 @@ public class LogCollectorApp extends App {
     protected void initialize() {
         load(new SystemModule("sys.properties"));
         loadProperties("app.properties");
-        http().httpsPort(8444);
+        http().maxForwardedIPs(3);      // loose x-forwarded-for ip config, there are cdn/proxy before system, and in event collector, preventing fake client ip is less important
 
         site().security();
         site().staticContent("/robots.txt");
