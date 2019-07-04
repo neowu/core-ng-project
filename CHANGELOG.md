@@ -1,4 +1,6 @@
 ## Change log
+### 6.13.1 (7/4/2019 - )
+
 ### 6.13.0 (6/26/2019 - 7/1/2019)
 * search: update es to 7.2.0
 * search: fixed: to support multiple es integration jobs run on same build server
