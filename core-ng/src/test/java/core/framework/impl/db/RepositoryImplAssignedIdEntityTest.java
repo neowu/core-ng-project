@@ -1,6 +1,7 @@
 package core.framework.impl.db;
 
 import core.framework.db.IsolationLevel;
+import core.framework.db.Query;
 import core.framework.db.Repository;
 import core.framework.util.Lists;
 import org.junit.jupiter.api.AfterAll;
@@ -13,11 +14,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
@@ -131,6 +134,28 @@ class RepositoryImplAssignedIdEntityTest {
         assertThat(repository.get(entities.get(0).id)).isNotPresent();
         assertThat(repository.get(entities.get(1).id)).isNotPresent();
     }
+
+    @Test
+    void selectWithGroupBy() {
+        List<AssignedIdEntity> entities = Lists.newArrayList();
+        for (int i = 200; i < 250; i++) {
+            AssignedIdEntity entity = entity(String.valueOf(i), "group", 1);
+            entities.add(entity);
+        }
+        repository.batchInsert(entities);
+
+        Query<AssignedIdEntity> query = repository.select();
+        query.where("string_field = ?", "group");
+        query.groupBy("string_field");
+        Optional<Integer> sum = query.project("sum(int_field)", Integer.class);
+
+        assertThat(sum).hasValue(50);
+
+        assertThatThrownBy(query::fetch)
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("fetch must not be used with groupBy");
+    }
+
 
     private AssignedIdEntity entity(String id, String stringField, int intField) {
         var entity = new AssignedIdEntity();

@@ -59,16 +59,18 @@ public class QueryImpl<T> implements Query<T> {
 
     @Override
     public List<T> fetch() {
+        if (groupBy != null) throw new Error("fetch must not be used with groupBy, groupBy=" + groupBy);
         if (limit != null && limit == 0) return List.of();  // for pagination search api returns records and count, sometimes it passes limit = 0 to get count only
-        String sql = selectQuery.fetchSQL(whereClause, groupBy, sort, skip, limit);
+        String sql = selectQuery.fetchSQL(whereClause, sort, skip, limit);
         Object[] params = selectQuery.fetchParams(this.params, skip, limit);
         return database.select(sql, entityClass, params);
     }
 
     @Override
     public Optional<T> fetchOne() {
+        if (groupBy != null) throw new Error("fetch must not be used with groupBy, groupBy=" + groupBy);
         if (limit != null && limit == 0) return Optional.empty();
-        String sql = selectQuery.fetchSQL(whereClause, groupBy, sort, skip, limit);
+        String sql = selectQuery.fetchSQL(whereClause, sort, skip, limit);
         Object[] params = selectQuery.fetchParams(this.params, skip, limit);
         return database.selectOne(sql, entityClass, params);
     }

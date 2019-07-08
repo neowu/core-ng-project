@@ -7,7 +7,6 @@ import core.framework.impl.db.dialect.Dialect;
 import core.framework.impl.db.dialect.MySQLDialect;
 import core.framework.impl.db.dialect.OracleDialect;
 import core.framework.impl.reflect.Classes;
-import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -69,12 +68,12 @@ final class SelectQuery<T> {
     String projectionSQL(String projection, StringBuilder where, String groupBy) {
         StringBuilder builder = new StringBuilder("SELECT ").append(projection).append(" FROM ").append(table);
         if (where.length() > 0) builder.append(" WHERE ").append(where);
-        if (!Strings.isBlank(groupBy)) builder.append(" GROUP BY ").append(groupBy);
+        if (groupBy != null) builder.append(" GROUP BY ").append(groupBy);
         return builder.toString();
     }
 
-    String fetchSQL(StringBuilder where, String groupBy, String sort, Integer skip, Integer limit) {
-        return dialect.fetchSQL(where.length() > 0 ? where.toString() : null, groupBy, sort, skip, limit);
+    String fetchSQL(StringBuilder where, String sort, Integer skip, Integer limit) {
+        return dialect.fetchSQL(where.length() > 0 ? where.toString() : null, sort, skip, limit);
     }
 
     Object[] fetchParams(List<Object> params, Integer skip, Integer limit) {
