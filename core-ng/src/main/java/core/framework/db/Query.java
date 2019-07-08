@@ -11,6 +11,8 @@ public interface Query<T> {
 
     void orderBy(String sort);
 
+    void groupBy(String groupBy);
+
     void skip(int skip);
 
     void limit(int limit);
