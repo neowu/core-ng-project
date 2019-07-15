@@ -1,6 +1,7 @@
 ## Change log
-### 6.13.1 (7/4/2019 - )
+### 6.13.1 (7/4/2019 - 7/15/2019)
 * db: add Query.groupBy
+* http: load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 
 ### 6.13.0 (6/26/2019 - 7/1/2019)
 * search: update es to 7.2.0
