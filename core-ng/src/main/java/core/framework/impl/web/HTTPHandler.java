@@ -83,7 +83,6 @@ public class HTTPHandler implements HttpHandler {
 
             HeaderMap headers = exchange.getRequestHeaders();
             linkContext(actionLog, headers);
-            request.session = sessionManager.load(request, actionLog);
 
             if (webSocketHandler != null && webSocketHandler.checkWebSocket(request.method(), headers)) {
                 webSocketHandler.handle(exchange, request, actionLog);
@@ -94,6 +93,8 @@ public class HTTPHandler implements HttpHandler {
             actionLog.action(controller.action);
             actionLog.context("controller", controller.controllerInfo);
             logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());
+
+            request.session = sessionManager.load(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 
             Response response = new InvocationImpl(controller, interceptors, request, webContext).proceed();
             responseHandler.render(request, (ResponseImpl) response, exchange, actionLog);
