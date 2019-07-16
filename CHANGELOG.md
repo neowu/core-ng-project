@@ -1,4 +1,7 @@
 ## Change log
+### 6.13.2 (7/16/2019)
+* kafka: inject messagePublisher as mock in integration-test, to make it easier to verify  
+
 ### 6.13.1 (7/4/2019 - 7/15/2019)
 * db: add Query.groupBy
 * http: load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405

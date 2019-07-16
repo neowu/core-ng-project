@@ -57,17 +57,21 @@ public class KafkaConfig extends Config {
 
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
         logger.info("publish, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
-        if (producer == null) {
-            if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
-            producer = createProducer();
-        }
-        var publisher = new MessagePublisherImpl<>(producer, topic, messageClass);
+        if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
+        MessagePublisher<T> publisher = createMessagePublisher(topic, messageClass);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
         handlerAdded = true;
         return publisher;
     }
 
-    MessageProducer createProducer() {
+    <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
+        if (producer == null) {
+            this.producer = createMessageProducer();
+        }
+        return new MessagePublisherImpl<>(producer, topic, messageClass);
+    }
+
+    private MessageProducer createMessageProducer() {
         var producer = new MessageProducerImpl(uri, name);
         context.stat.metrics.add(producer.producerMetrics);
         context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
