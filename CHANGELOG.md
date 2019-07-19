@@ -1,5 +1,5 @@
 ## Change log
-### 6.13.2 (7/16/2019)
+### 6.13.2 (7/16/2019 - 7/19/2019)
 * kafka: inject messagePublisher as mock in integration-test, to make it easier to verify  
 
 ### 6.13.1 (7/4/2019 - 7/15/2019)
