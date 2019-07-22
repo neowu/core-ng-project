@@ -15,4 +15,6 @@ public interface Mongo {
     void createIndex(String collection, Bson keys, IndexOptions options);
 
     void dropCollection(String collection);
+
+    void runCommand(Bson command);
 }

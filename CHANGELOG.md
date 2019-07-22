@@ -1,7 +1,7 @@
 ## Change log
 ### 6.13.3 (7/22/2019)
 * mongo: support mongo migration
-* lib: various lib update
+* lib: various lib update 
 
 ### 6.13.2 (7/16/2019 - 7/19/2019)
 * kafka: inject messagePublisher as mock in integration-test, to make it easier to verify  

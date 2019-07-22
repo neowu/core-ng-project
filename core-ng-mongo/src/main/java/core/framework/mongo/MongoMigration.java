@@ -16,9 +16,13 @@ public class MongoMigration {
     private final String uri;
 
     public MongoMigration(String propertyFileClasspath) {
+        this(propertyFileClasspath, "sys.mongo.uri");
+    }
+
+    public MongoMigration(String propertyFileClasspath, String key) {
         var properties = new Properties();
         properties.load(propertyFileClasspath);
-        uri = properties.get("sys.mongo.uri").orElseThrow();
+        uri = properties.get(key).orElseThrow();
     }
 
     public void migrate(Consumer<Mongo> consumer) {

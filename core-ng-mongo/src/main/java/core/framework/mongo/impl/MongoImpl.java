@@ -101,6 +101,16 @@ public class MongoImpl implements Mongo {
         }
     }
 
+    @Override
+    public void runCommand(Bson command) {
+        var watch = new StopWatch();
+        try {
+            database().runCommand(command);
+        } finally {
+            logger.info("runCommand, command={}, elapsed={}", command, watch.elapsed());
+        }
+    }
+
     public void poolSize(int minSize, int maxSize) {
         connectionPoolSettings.minSize(minSize);
         connectionPoolSettings.maxSize(maxSize);
