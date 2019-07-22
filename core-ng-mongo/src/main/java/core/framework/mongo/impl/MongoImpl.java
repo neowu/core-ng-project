@@ -5,6 +5,7 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.IndexOptions;
 import com.mongodb.connection.ClusterSettings;
 import com.mongodb.connection.ConnectionPoolSettings;
 import com.mongodb.connection.SocketSettings;
@@ -15,6 +16,7 @@ import core.framework.mongo.MongoCollection;
 import core.framework.util.StopWatch;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +79,16 @@ public class MongoImpl implements Mongo {
 
         logger.info("close mongodb client, uri={}", uri);
         mongoClient.close();
+    }
+
+    @Override
+    public void createIndex(String collection, Bson keys, IndexOptions options) {
+        var watch = new StopWatch();
+        try {
+            database().getCollection(collection).createIndex(keys, options);
+        } finally {
+            logger.info("createIndex, collection={}, keys={}, options={}, elapsed={}", collection, keys, options, watch.elapsed());
+        }
     }
 
     @Override
