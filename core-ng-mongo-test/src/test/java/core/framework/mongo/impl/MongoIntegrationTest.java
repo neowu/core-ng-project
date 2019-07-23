@@ -40,7 +40,7 @@ class MongoIntegrationTest extends IntegrationTest {
     @Test
     void runCommand() {
         Document result = mongo.runCommand(new Document("buildInfo", 1));
-        assertThat(result.get("ok")).isEqualTo(1);
+        assertThat(result.get("ok")).isEqualTo(1.0);
     }
 
     @Test
