@@ -14,6 +14,7 @@ import core.framework.mongo.Collection;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
 import core.framework.util.StopWatch;
+import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
@@ -102,10 +103,10 @@ public class MongoImpl implements Mongo {
     }
 
     @Override
-    public void runCommand(Bson command) {
+    public Document runCommand(Bson command) {
         var watch = new StopWatch();
         try {
-            database().runCommand(command);
+            return database().runCommand(command);
         } finally {
             logger.info("runCommand, command={}, elapsed={}", command, watch.elapsed());
         }

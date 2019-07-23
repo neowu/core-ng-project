@@ -1,6 +1,7 @@
 package core.framework.mongo;
 
 import com.mongodb.client.model.IndexOptions;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 
 /**
@@ -16,5 +17,5 @@ public interface Mongo {
 
     void dropCollection(String collection);
 
-    void runCommand(Bson command);
+    Document runCommand(Bson command);
 }

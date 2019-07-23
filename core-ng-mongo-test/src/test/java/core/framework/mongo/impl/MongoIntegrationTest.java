@@ -1,6 +1,7 @@
 package core.framework.mongo.impl;
 
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import core.framework.inject.Inject;
 import core.framework.mongo.IntegrationTest;
@@ -8,6 +9,7 @@ import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;
 import core.framework.mongo.Query;
 import core.framework.util.Lists;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,13 @@ class MongoIntegrationTest extends IntegrationTest {
     @AfterEach
     void cleanup() {
         mongo.dropCollection("entity");
+        mongo.createIndex("entity", Indexes.ascending("string_field"));
+    }
+
+    @Test
+    void runCommand() {
+        Document result = mongo.runCommand(new Document("buildInfo", 1));
+        assertThat(result.get("ok")).isEqualTo(1);
     }
 
     @Test
