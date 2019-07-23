@@ -13,4 +13,7 @@ public interface RedisSet {
     boolean isMember(String key, String value);
 
     long remove(String key, String... values);
+
+    // use pop(key, Long.MAX_VALUE) to pop all elements
+    Set<String> pop(String key, long count);
 }

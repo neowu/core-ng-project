@@ -3,6 +3,7 @@ package core.framework.test.redis;
 import core.framework.redis.RedisSet;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,5 +54,25 @@ public final class MockRedisSet implements RedisSet {
             if (set.remove(value)) removedValues++;
         }
         return removedValues;
+    }
+
+    @Override
+    public Set<String> pop(String key, long count) {
+        var redisValue = store.get(key);
+        if (redisValue == null) return Set.of();
+        Set<String> set = redisValue.set();
+
+        Set<String> results = new HashSet<>();
+        long removed = 0;
+        for (Iterator<String> iterator = set.iterator(); iterator.hasNext(); ) {
+            if (removed == count) break;
+
+            String item = iterator.next();
+            iterator.remove();
+            results.add(item);
+            removed++;
+        }
+
+        return Set.copyOf(results);
     }
 }

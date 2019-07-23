@@ -45,4 +45,13 @@ class RedisSetOperationTest extends AbstractRedisOperationTest {
         assertThat(removed).isEqualTo(1);
         assertRequestEquals("*3\r\n$4\r\nSREM\r\n$3\r\nkey\r\n$5\r\nitem1\r\n");
     }
+
+    @Test
+    void pop() {
+        response("*3\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n");
+        Set<String> members = redis.set().pop("key", 3);
+
+        assertThat(members).containsOnly("1", "2", "3");
+        assertRequestEquals("*3\r\n$4\r\nSPOP\r\n$3\r\nkey\r\n$1\r\n3\r\n");
+    }
 }

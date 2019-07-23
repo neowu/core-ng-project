@@ -85,6 +85,7 @@ final class Protocol {
         static final byte[] SMEMBERS = Strings.bytes("SMEMBERS");
         static final byte[] SISMEMBER = Strings.bytes("SISMEMBER");
         static final byte[] SREM = Strings.bytes("SREM");
+        static final byte[] SPOP = Strings.bytes("SPOP");
         static final byte[] RPUSH = Strings.bytes("RPUSH");
         static final byte[] LPOP = Strings.bytes("LPOP");
         static final byte[] LRANGE = Strings.bytes("LRANGE");

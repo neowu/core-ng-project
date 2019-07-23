@@ -16,6 +16,7 @@ import java.util.Set;
 import static core.framework.internal.redis.Protocol.Command.SADD;
 import static core.framework.internal.redis.Protocol.Command.SISMEMBER;
 import static core.framework.internal.redis.Protocol.Command.SMEMBERS;
+import static core.framework.internal.redis.Protocol.Command.SPOP;
 import static core.framework.internal.redis.Protocol.Command.SREM;
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
@@ -123,6 +124,33 @@ public final class RedisSetImpl implements RedisSet {
             int size = values.length;
             ActionLogContext.track("redis", elapsed, 0, size);
             logger.debug("srem, key={}, values={}, size={}, removedValues={}, elapsed={}", key, new ArrayLogParam(values), size, removedValues, elapsed);
+            redis.checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
+    public Set<String> pop(String key, long count) {
+        var watch = new StopWatch();
+        if (count <= 0) throw new Error("count must be greater than 0");
+        Set<String> values = null;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeKeyArgumentCommand(SPOP, key, encode(count));
+            Object[] response = connection.readArray();
+            values = Sets.newHashSetWithExpectedSize(response.length);
+            for (Object value : response) {
+                values.add(decode((byte[]) value));
+            }
+            return values;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
+            logger.debug("spop, key={}, count={}, returnedValues={}, elapsed={}", key, count, values, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
