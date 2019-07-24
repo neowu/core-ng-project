@@ -47,8 +47,6 @@ public final class RequestParser {
         int requestPort = requestPort(headers.getFirst(Headers.HOST), request.scheme, exchange);
         request.port = port(requestPort, headers.getFirst(Headers.X_FORWARDED_PORT));
 
-        parseClientIP(request, exchange, actionLog, headers.getFirst(Headers.X_FORWARDED_FOR));
-
         String method = exchange.getRequestMethod().toString();
         actionLog.context("method", method);
 
@@ -56,6 +54,8 @@ public final class RequestParser {
         actionLog.context("requestURL", request.requestURL);
 
         logHeaders(headers);
+
+        parseClientIP(request, exchange, actionLog, headers.getFirst(Headers.X_FORWARDED_FOR)); // parse client ip after logging header, as ip in x-forwarded-for may be invalid
 
         if (headers.getFirst(Headers.COOKIE) != null) {
             request.cookies = parseCookies(exchange.getRequestCookies());

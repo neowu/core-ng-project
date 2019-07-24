@@ -38,7 +38,7 @@ public class IPAccessControl {
         try {
             return InetAddress.getByName(address);
         } catch (UnknownHostException e) {
-            throw new Error(e);
+            throw new Error("invalid ip", e);   // if attacker provide invalid ip value in x-forwarded-for header, we don't provide useful info in response
         }
     }
 
