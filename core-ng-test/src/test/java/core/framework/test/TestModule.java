@@ -27,6 +27,8 @@ public class TestModule extends AbstractTestModule {
     protected void initialize() {
         loadProperties("test.properties");
 
+        load(new OverrideBeanTest());
+
         overrideBinding(HTTPClient.class, Mockito.mock(HTTPClient.class));  // in test context, override binding is defined before actual binding
         bind(HTTPClient.class, new HTTPClientBuilder().enableCookie().build());
 

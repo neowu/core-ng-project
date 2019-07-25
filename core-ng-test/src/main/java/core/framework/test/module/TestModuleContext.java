@@ -38,15 +38,17 @@ public class TestModuleContext extends ModuleContext {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void bind(Type type, String name, Object instance) {
+    public <T> T bind(Type type, String name, T instance) {
         var key = new Key(type, name);
         if (overrideBindings.contains(key)) {
             if (skippedBindings.contains(key)) throw new Error(format("found duplicate bean, type={}, name={}", type.getTypeName(), name));
             skippedBindings.add(key);
             logger.info("skip bean binding, bean is overridden in test context, type={}, name={}", type.getTypeName(), name);
+            return (T) beanFactory.bean(type, name);
         } else {
-            super.bind(type, name, instance);
+            return super.bind(type, name, instance);
         }
     }
 

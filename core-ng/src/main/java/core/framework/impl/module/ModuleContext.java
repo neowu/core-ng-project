@@ -125,8 +125,9 @@ public class ModuleContext {
         return config;
     }
 
-    public void bind(Type type, String name, Object instance) {
+    public <T> T bind(Type type, String name, T instance) {
         beanFactory.bind(type, name, instance);
+        return instance;
     }
 
     public void validate() {

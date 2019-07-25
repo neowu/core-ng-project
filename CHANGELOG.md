@@ -1,6 +1,7 @@
 ## Change log
 ### 6.13.5 (7/24/2019 - )
 * http: clientIp parser validates ip in x-forwarded-for header
+* config: module.bind() will return overridden bean if any 
 
 ### 6.13.4 (7/23/2019)
 * redis: support set().pop()
