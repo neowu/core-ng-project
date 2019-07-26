@@ -57,9 +57,7 @@ public final class RequestParser {
 
         parseClientIP(request, exchange, actionLog, headers.getFirst(Headers.X_FORWARDED_FOR)); // parse client ip after logging header, as ip in x-forwarded-for may be invalid
 
-        if (headers.getFirst(Headers.COOKIE) != null) {
-            request.cookies = parseCookies(exchange.getRequestCookies());
-        }
+        parseCookies(request, exchange);
 
         String userAgent = headers.getFirst(Headers.USER_AGENT);
         if (userAgent != null) actionLog.context("userAgent", userAgent);
@@ -72,6 +70,21 @@ public final class RequestParser {
             String contentType = headers.getFirst(Headers.CONTENT_TYPE);
             request.contentType = contentType == null ? null : ContentType.parse(contentType);
             parseBody(request, exchange);
+        }
+    }
+
+    void parseCookies(RequestImpl request, HttpServerExchange exchange) {
+        HeaderValues cookieHeaders = exchange.getRequestHeaders().get(Headers.COOKIE);
+        if (cookieHeaders != null) {
+            try {
+                request.cookies = decodeCookies(exchange.getRequestCookies());
+            } catch (IllegalArgumentException e) {
+                logger.debug("[request:header] {}={}", Headers.COOKIE, new HeaderLogParam(Headers.COOKIE, cookieHeaders));
+                // entire cookie will be failed to parse if there is poison cookie value, undertow doesn't provide API to parse cookie individually
+                // since it's rare case, here is to use simplified solution to block entire request, rather than hide which may cause potential issues, e.g. never get SESSION_ID to login
+                // so this force client to clear all cookies and refresh
+                throw new BadRequestException("invalid cookie", "INVALID_COOKIE", e);
+            }
         }
     }
 
@@ -96,7 +109,7 @@ public final class RequestParser {
         }
     }
 
-    Map<String, String> parseCookies(Map<String, Cookie> cookies) {
+    Map<String, String> decodeCookies(Map<String, Cookie> cookies) {
         Map<String, String> cookieValues = Maps.newHashMapWithExpectedSize(cookies.size());
         for (Map.Entry<String, Cookie> entry : cookies.entrySet()) {
             String key = entry.getKey();
@@ -108,7 +121,7 @@ public final class RequestParser {
                 cookieValues.put(cookieName, cookieValue);
             } catch (IllegalArgumentException e) {
                 // cookies is persistent in browser, here is to ignore, in case user may not be able to access website with legacy cookie
-                logger.warn("ignored invalid encoded cookie, name={}, value={}", key, value, e);
+                logger.warn("ignore invalid encoded cookie, name={}, value={}", key, value, e);
             }
         }
         return cookieValues;

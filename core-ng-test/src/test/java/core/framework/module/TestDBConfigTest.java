@@ -20,9 +20,9 @@ class TestDBConfigTest {
     @Test
     void databaseURL() {
         assertThat(config.databaseURL(null, Vendor.MYSQL))
-                .isEqualTo("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
+            .isEqualTo("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
 
         assertThat(config.databaseURL(null, Vendor.ORACLE))
-                .isEqualTo("jdbc:hsqldb:mem:.;sql.syntax_ora=true");
+            .isEqualTo("jdbc:hsqldb:mem:.;sql.syntax_ora=true");
     }
 }
