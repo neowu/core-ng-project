@@ -1,5 +1,5 @@
 ## Change log
-### 6.13.5 (7/24/2019 - )
+### 6.13.5 (7/24/2019 - 7/26/2019)
 * http: clientIp parser validates ip in x-forwarded-for header
 * http: when request contains invalid cookies char, log cookies header and return 400
 * config: module.bind() will return overridden bean if any 
