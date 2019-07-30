@@ -34,13 +34,11 @@ class ElasticSearchTemplateIntegrationTest extends IntegrationTest {
         assertThat(elasticSearch.state().metadata.indices).doesNotContainKeys("document-2");
     }
 
-    private void index(String index, String id, String stringField, int numField) {
+    private void index(String index, String id, String stringField, int intField) {
         TestDocument document = new TestDocument();
         document.id = id;
         document.stringField = stringField;
-        document.intField = numField;
-        document.completion1 = stringField + "-Complete1";
-        document.completion2 = stringField + "-Complete2";
+        document.intField = intField;
         IndexRequest<TestDocument> request = new IndexRequest<>();
         request.id = id;
         request.source = document;

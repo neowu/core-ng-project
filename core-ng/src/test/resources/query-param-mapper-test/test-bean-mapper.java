@@ -5,6 +5,7 @@ public class QueryParamMapper$TestQueryParamBean implements core.framework.impl.
         params.put("zoned_date_time_field", core.framework.impl.web.bean.QueryParamMapperHelper.toString(bean.zonedDateTimeField));
         params.put("date_time_field", core.framework.impl.web.bean.QueryParamMapperHelper.toString(bean.dateTimeField));
         params.put("date_field", core.framework.impl.web.bean.QueryParamMapperHelper.toString(bean.dateField));
+        params.put("time_field", core.framework.impl.web.bean.QueryParamMapperHelper.toString(bean.timeField));
         params.put("string_field", bean.stringField);
         params.put("int_field", core.framework.impl.web.bean.QueryParamMapperHelper.toString(bean.intField));
         params.put("long_field", core.framework.impl.web.bean.QueryParamMapperHelper.toString(bean.longField));
@@ -29,6 +30,10 @@ public class QueryParamMapper$TestQueryParamBean implements core.framework.impl.
         String $dateField = (String)params.get("date_field");
         if ($dateField != null) {
             bean.dateField = core.framework.impl.web.bean.QueryParamMapperHelper.toDate($dateField);
+        }
+        String $timeField = (String)params.get("time_field");
+        if ($timeField != null) {
+            bean.timeField = core.framework.impl.web.bean.QueryParamMapperHelper.toTime($timeField);
         }
         String $stringField = (String)params.get("string_field");
         if ($stringField != null) {

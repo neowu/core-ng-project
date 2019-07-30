@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +62,9 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void index() {
-        TestDocument document = document("2", "value2", 2, 0, null);
+        TestDocument document = document("2", "value2", 2, 0,
+            ZonedDateTime.now(),
+            LocalTime.of(12, 1, 2, 200000000));
         documentType.index(document.id, document);
 
         Optional<TestDocument> returnedDocument = documentType.get(document.id);
@@ -72,7 +74,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void forEach() {
-        documentType.bulkIndex(range(0, 30).mapToObj(i -> document(String.valueOf(i), String.valueOf(i), i, 0, null))
+        documentType.bulkIndex(range(0, 30).mapToObj(i -> document(String.valueOf(i), String.valueOf(i), i, 0, null, null))
                                            .collect(toMap(document -> document.id, identity())));
         elasticSearch.refreshIndex("document");
 
@@ -90,10 +92,10 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void complete() {
-        documentType.bulkIndex(Map.of("1", document("1", "HashSet", 1, 0, null),
-                "2", document("2", "HashMap", 2, 0, null),
-                "3", document("3", "TreeSet", 3, 0, null),
-                "4", document("4", "TreeMap", 4, 0, null)));
+        documentType.bulkIndex(Map.of("1", document("1", "HashSet", 1, 0, null, null),
+            "2", document("2", "HashMap", 2, 0, null, null),
+            "3", document("3", "TreeSet", 3, 0, null, null),
+            "4", document("4", "TreeMap", 4, 0, null, null)));
         elasticSearch.refreshIndex("document");
 
         List<String> options = documentType.complete("hash", "completion1", "completion2");
@@ -102,15 +104,15 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void search() {
-        TestDocument document = document("1", "1st Test's Product", 1, 0, null);
+        TestDocument document = document("1", "1st Test's Product", 1, 0, null, LocalTime.NOON);
         documentType.index(document.id, document);
         elasticSearch.refreshIndex("document");
 
         // test synonyms
         SearchRequest request = new SearchRequest();
         request.query = boolQuery()
-                .must(matchQuery("string_field", "first"))
-                .filter(termQuery("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1)));
+            .must(matchQuery("string_field", "first"))
+            .filter(termQuery("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1)));
         request.sorts.add(SortBuilders.scriptSort(new Script("doc['int_field'].value * 3"), ScriptSortBuilder.ScriptSortType.NUMBER));
         SearchResponse<TestDocument> response = documentType.search(request);
 
@@ -130,25 +132,29 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     void searchDateRange() {
         ZonedDateTime from = ZonedDateTime.now();
         ZonedDateTime to = from.plusDays(5);
-        documentType.index("1", document("1", "value1", 1, 0, from));
-        documentType.index("2", document("2", "value2", 1, 0, from.plusDays(1)));
-        documentType.index("3", document("3", "value3", 1, 0, to));
-        documentType.index("4", document("4", "value4", 1, 0, to.plusDays(1)));
+        documentType.index("1", document("1", "value1", 1, 0, from, LocalTime.of(12, 0)));
+        documentType.index("2", document("2", "value2", 1, 0, from.plusDays(1), LocalTime.of(13, 0)));
+        documentType.index("3", document("3", "value3", 1, 0, to, LocalTime.of(14, 0)));
+        documentType.index("4", document("4", "value4", 1, 0, to.plusDays(1), LocalTime.of(15, 0)));
         elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();
-        request.query = rangeQuery("zoned_date_time_field").from(from.format(DateTimeFormatter.ISO_INSTANT)).to(to.format(DateTimeFormatter.ISO_INSTANT));
-
+        request.query = rangeQuery("zoned_date_time_field").from(from).to(to);
         SearchResponse<TestDocument> response = documentType.search(request);
-
         assertThat(response.totalHits).isEqualTo(3);
-        List<String> collect = response.hits.stream().map(document -> document.stringField).collect(Collectors.toList());
-        assertThat(collect).containsOnly("value1", "value2", "value3");
+        assertThat(response.hits.stream().map(document1 -> document1.stringField).collect(Collectors.toList()))
+            .containsOnly("value1", "value2", "value3");
+
+        request.query = rangeQuery("local_time_field").gt(LocalTime.of(13, 0));
+        response = documentType.search(request);
+        assertThat(response.totalHits).isEqualTo(2);
+        assertThat(response.hits.stream().map(document -> document.stringField).collect(Collectors.toList()))
+            .containsOnly("value3", "value4");
     }
 
     @Test
     void delete() {
-        documentType.index("1", document("1", "value", 1, 0, null));
+        documentType.index("1", document("1", "value", 1, 0, null, null));
         elasticSearch.refreshIndex("document");
 
         boolean result = documentType.delete("1");
@@ -157,8 +163,8 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void bulkDelete() {
-        documentType.index("1", document("1", "value1", 1, 0, null));
-        documentType.index("2", document("2", "value2", 2, 0, null));
+        documentType.index("1", document("1", "value1", 1, 0, null, null));
+        documentType.index("2", document("2", "value2", 2, 0, null, null));
         elasticSearch.refreshIndex("document");
 
         documentType.bulkDelete(List.of("1", "2"));
@@ -181,7 +187,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void update() {
-        documentType.index("4", document("4", "value4", 4, 0, null));
+        documentType.index("4", document("4", "value4", 4, 0, null, null));
 
         documentType.update("4", "ctx._source.int_field = ctx._source.int_field + params.value", Map.of("value", 1));
 
@@ -190,9 +196,9 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void aggregate() {
-        documentType.index("1", document("1", "value1", 0, 19.13, null));
-        documentType.index("2", document("2", "value1", 0, 0.01, null));
-        documentType.index("3", document("3", "value3", 0, 1.5, null));
+        documentType.index("1", document("1", "value1", 0, 19.13, null, null));
+        documentType.index("2", document("2", "value1", 0, 0.01, null, null));
+        documentType.index("3", document("3", "value3", 0, 1.5, null, null));
         elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();
@@ -210,13 +216,14 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         assertThat(sum).isEqualTo("19.1400");
     }
 
-    private TestDocument document(String id, String stringField, int intField, double doubleField, ZonedDateTime time) {
+    private TestDocument document(String id, String stringField, int intField, double doubleField, ZonedDateTime dateTimeField, LocalTime timeField) {
         var document = new TestDocument();
         document.id = id;
         document.stringField = stringField;
         document.intField = intField;
         document.doubleField = doubleField;
-        document.zonedDateTimeField = time;
+        document.zonedDateTimeField = dateTimeField;
+        document.localTimeField = timeField;
         document.enumField = TestDocument.TestEnum.VALUE1;
         document.completion1 = stringField + "-Complete1";
         document.completion2 = stringField + "-Complete2";

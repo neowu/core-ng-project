@@ -8,10 +8,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
@@ -24,9 +20,7 @@ import static core.framework.util.Strings.format;
 public class BeanClassValidator {
     public final Class<?> beanClass;
     private final Set<Class<?>> visitedClasses = Sets.newHashSet();
-    public Set<Class<?>> allowedValueClasses = Set.of(String.class, Boolean.class,
-            Integer.class, Long.class, Double.class, BigDecimal.class,
-            LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
+    public Set<Class<?>> allowedValueClasses = Set.of();
     public boolean allowChild;
     public BeanClassVisitor visitor;
 

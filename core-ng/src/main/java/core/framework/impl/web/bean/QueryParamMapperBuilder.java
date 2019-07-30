@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
 import static core.framework.impl.asm.Literal.type;
@@ -81,6 +82,8 @@ class QueryParamMapperBuilder<T> {
                 builder.indent(2).append("bean.{} = {}.toDateTime(${});\n", fieldName, helper, fieldName);
             } else if (LocalDate.class.equals(fieldClass)) {
                 builder.indent(2).append("bean.{} = {}.toDate(${});\n", fieldName, helper, fieldName);
+            } else if (LocalTime.class.equals(fieldClass)) {
+                builder.indent(2).append("bean.{} = {}.toTime(${});\n", fieldName, helper, fieldName);
             } else if (ZonedDateTime.class.equals(fieldClass)) {
                 builder.indent(2).append("bean.{} = {}.toZonedDateTime(${});\n", fieldName, helper, fieldName);
             } else if (fieldClass.isEnum()) {

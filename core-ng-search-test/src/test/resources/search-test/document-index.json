@@ -68,7 +68,12 @@
         "type": "double"
       },
       "zoned_date_time_field": {
-        "type": "date"
+        "type": "date",
+        "format": "strict_date_optional_time"
+      },
+      "local_time_field": {
+        "type": "date",
+        "format": "strict_hour_minute_second_fraction"
       },
       "enum_field": {
         "type": "keyword"

@@ -18,6 +18,7 @@ import java.lang.reflect.Type;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
@@ -168,12 +169,12 @@ public class BeanValidatorBuilder {
 
     private boolean hasValidationAnnotation(Field field) {
         boolean hasAnnotation = field.isAnnotationPresent(NotNull.class)
-                || field.isAnnotationPresent(NotBlank.class)
-                || field.isAnnotationPresent(Length.class)
-                || field.isAnnotationPresent(Max.class)
-                || field.isAnnotationPresent(Min.class)
-                || field.isAnnotationPresent(Pattern.class)
-                || field.isAnnotationPresent(Size.class);
+            || field.isAnnotationPresent(NotBlank.class)
+            || field.isAnnotationPresent(Length.class)
+            || field.isAnnotationPresent(Max.class)
+            || field.isAnnotationPresent(Min.class)
+            || field.isAnnotationPresent(Pattern.class)
+            || field.isAnnotationPresent(Size.class);
         if (hasAnnotation) return true;
 
         Class<?> targetClass = targetValidationClass(field);
@@ -238,13 +239,14 @@ public class BeanValidatorBuilder {
 
     private boolean isValueClass(Class<?> fieldClass) {
         return String.class.equals(fieldClass)
-                || Number.class.isAssignableFrom(fieldClass)
-                || Boolean.class.equals(fieldClass)
-                || LocalDate.class.equals(fieldClass)
-                || LocalDateTime.class.equals(fieldClass)
-                || ZonedDateTime.class.equals(fieldClass)
-                || Instant.class.equals(fieldClass)
-                || fieldClass.isEnum()
-                || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
+            || Number.class.isAssignableFrom(fieldClass)
+            || Boolean.class.equals(fieldClass)
+            || LocalDateTime.class.equals(fieldClass)
+            || LocalDate.class.equals(fieldClass)
+            || LocalTime.class.equals(fieldClass)
+            || Instant.class.equals(fieldClass)
+            || ZonedDateTime.class.equals(fieldClass)
+            || fieldClass.isEnum()
+            || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
     }
 }

@@ -1,5 +1,6 @@
 package core.framework.internal.cache;
 
+import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.validate.BeanClassValidator;
 
 /**
@@ -9,8 +10,8 @@ class CacheClassValidator {
     private final BeanClassValidator validator;
 
     CacheClassValidator(Class<?> cacheClass) {
-        validator = new BeanClassValidator(cacheClass);
-        validator.allowChild = true;
+        // cache class validator accepts all json types without @Property annotation checking
+        validator = JSONClassValidator.classValidator(cacheClass);
     }
 
     public void validate() {

@@ -8,6 +8,7 @@ import core.framework.util.Maps;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.EnumMap;
 import java.util.List;
@@ -50,6 +51,9 @@ public class TestBean {
 
     @Property(name = "instant")
     public Instant instantField;
+
+    @Property(name = "time")
+    public LocalTime timeField;
 
     @Property(name = "enum")
     public TestEnum enumField;

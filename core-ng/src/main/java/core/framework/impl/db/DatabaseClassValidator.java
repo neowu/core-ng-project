@@ -13,6 +13,10 @@ import core.framework.util.Sets;
 import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +36,9 @@ final class DatabaseClassValidator implements BeanClassVisitor {
 
     DatabaseClassValidator(Class<?> entityClass) {
         validator = new BeanClassValidator(entityClass);
+        validator.allowedValueClasses = Set.of(String.class, Boolean.class,
+            Integer.class, Long.class, Double.class, BigDecimal.class,
+            LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
         validator.visitor = this;
     }
 
@@ -122,7 +129,7 @@ final class DatabaseClassValidator implements BeanClassVisitor {
         }
 
         if ((foundAutoIncrementalPrimaryKey || foundSequencePrimaryKey)
-                && !(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
+            && !(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
             throw new Error("auto increment or sequence primary key must be Integer or Long, field=" + Fields.path(field));
         }
 

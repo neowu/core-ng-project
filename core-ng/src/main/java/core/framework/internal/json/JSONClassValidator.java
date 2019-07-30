@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,15 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public class JSONClassValidator implements BeanClassVisitor {
+    public static BeanClassValidator classValidator(Class<?> instanceClass) {
+        var validator = new BeanClassValidator(instanceClass);
+        validator.allowedValueClasses = Set.of(String.class, Boolean.class,
+            Integer.class, Long.class, Double.class, BigDecimal.class,
+            LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class);
+        validator.allowChild = true;
+        return validator;
+    }
+
     public static void validateEnum(Class<?> enumClass) {
         Set<String> enumValues = Sets.newHashSet();
         List<Field> fields = Classes.enumConstantFields(enumClass);
@@ -41,11 +51,7 @@ public class JSONClassValidator implements BeanClassVisitor {
     private final Map<String, Set<String>> visitedProperties = Maps.newHashMap();
 
     public JSONClassValidator(Class<?> instanceClass) {
-        validator = new BeanClassValidator(instanceClass);
-        validator.allowedValueClasses = Set.of(String.class, Boolean.class,
-                Integer.class, Long.class, Double.class, BigDecimal.class,
-                LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class);
-        validator.allowChild = true;
+        validator = classValidator(instanceClass);
         validator.visitor = this;
     }
 

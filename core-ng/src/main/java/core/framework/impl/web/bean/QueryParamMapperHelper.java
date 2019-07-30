@@ -7,6 +7,7 @@ import core.framework.web.exception.BadRequestException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -33,6 +34,11 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
     public static String toString(LocalDate date) {
         if (date == null) return null;
         return DateTimeFormatter.ISO_LOCAL_DATE.format(date);
+    }
+
+    public static String toString(LocalTime time) {
+        if (time == null) return null;
+        return DateTimeFormatter.ISO_LOCAL_TIME.format(time);
     }
 
     public static String toString(ZonedDateTime dateTime) {
@@ -108,6 +114,15 @@ final class QueryParamMapperHelper {   // used by generated QueryParamMapper
             return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         } catch (DateTimeParseException e) {
             throw new BadRequestException("failed to parse local date time, value=" + value, "INVALID_HTTP_REQUEST", e);
+        }
+    }
+
+    public static LocalTime toTime(String value) {
+        if (value.isEmpty()) return null;
+        try {
+            return LocalTime.parse(value, DateTimeFormatter.ISO_LOCAL_TIME);
+        } catch (DateTimeParseException e) {
+            throw new BadRequestException("failed to parse local time, value=" + value, "INVALID_HTTP_REQUEST", e);
         }
     }
 

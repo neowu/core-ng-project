@@ -11,12 +11,6 @@
       },
       "int_field": {
         "type": "integer"
-      },
-      "zoned_date_time_field": {
-        "type": "date"
-      },
-      "double_field": {
-        "type": "double"
       }
     }
   }

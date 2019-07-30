@@ -6,6 +6,11 @@ import core.framework.internal.validate.BeanClassVisitor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Set;
 
 import static core.framework.util.Strings.format;
 
@@ -17,6 +22,9 @@ class ModelClassValidator implements BeanClassVisitor {
 
     ModelClassValidator(Class<?> modelClass) {
         validator = new BeanClassValidator(modelClass);
+        validator.allowedValueClasses = Set.of(String.class, Boolean.class,
+            Integer.class, Long.class, Double.class, BigDecimal.class,
+            LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
         validator.allowChild = true;
         validator.visitor = this;
     }

@@ -20,7 +20,7 @@
 * /_sys/, kafka controller, should be call message handler directly?
 * revisit trace log truncation, better/more elegant handling?
 * ControllerInspector: better way to deal with JDK12, add "--add-opens java.base/jdk.internal.reflect=ALL-UNNAMED" ?
-* message publisher how to verify?
+* support LocalTime in db?
 
 ### jdk 11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

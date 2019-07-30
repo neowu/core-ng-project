@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -25,17 +26,17 @@ class JSONTest {
 
         String json = JSON.toJSON(bean);
         assertThat(json)
-                .contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}")
-                .contains("\"enumMap\":{\"A1\":\"A1\",\"B1\":\"B1\"}");
+            .contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}")
+            .contains("\"enumMap\":{\"A1\":\"A1\",\"B1\":\"B1\"}");
 
         var parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean.mapField)
-                .containsEntry("key1", "value1")
-                .containsEntry("key2", "value2");
+            .containsEntry("key1", "value1")
+            .containsEntry("key2", "value2");
 
         assertThat(parsedBean.enumMapField)
-                .containsEntry(TestBean.TestEnum.A, "A1")
-                .containsEntry(TestBean.TestEnum.B, "B1");
+            .containsEntry(TestBean.TestEnum.A, "A1")
+            .containsEntry(TestBean.TestEnum.B, "B1");
     }
 
     @Test
@@ -81,10 +82,11 @@ class JSONTest {
         bean.dateTimeField = LocalDateTime.ofInstant(bean.instantField, ZoneId.systemDefault());
         bean.dateField = bean.dateTimeField.toLocalDate();
         bean.zonedDateTimeField = ZonedDateTime.ofInstant(bean.instantField, ZoneId.systemDefault());
+        bean.timeField = LocalTime.ofInstant(bean.instantField, ZoneId.systemDefault());
         String json = JSON.toJSON(bean);
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertThat(parsedBean).isEqualToComparingOnlyGivenFields(bean, "instantField", "dateTimeField", "dateField");
+        assertThat(parsedBean).isEqualToComparingOnlyGivenFields(bean, "instantField", "dateTimeField", "dateField", "timeField");
         assertThat(parsedBean.zonedDateTimeField).isEqualTo(bean.zonedDateTimeField);
     }
 
@@ -100,19 +102,28 @@ class JSONTest {
     @Test
     void nanoFractionOfDateField() {
         assertThat(JSON.toJSON(LocalDateTime.of(2019, 4, 25, 1, 0, 0, 200000000)))
-                .contains("2019-04-25T01:00:00.200");
+            .isEqualTo("\"2019-04-25T01:00:00.200\"");
 
         assertThat(JSON.toJSON(LocalDateTime.of(2019, 4, 25, 1, 0, 0, 0)))
-                .contains("2019-04-25T01:00:00.000");
+            .isEqualTo("\"2019-04-25T01:00:00.000\"");
 
         assertThat(JSON.toJSON(ZonedDateTime.of(2019, 4, 25, 1, 0, 0, 200000000, ZoneId.of("UTC"))))
-                .contains("2019-04-25T01:00:00.200Z");
+            .isEqualTo("\"2019-04-25T01:00:00.200Z\"");
 
         assertThat(JSON.toJSON(ZonedDateTime.of(2019, 4, 25, 1, 0, 0, 0, ZoneId.of("UTC"))))
-                .contains("2019-04-25T01:00:00Z");
+            .isEqualTo("\"2019-04-25T01:00:00Z\"");
 
         assertThat(JSON.toJSON(ZonedDateTime.of(2019, 4, 25, 1, 0, 0, 0, ZoneId.of("America/New_York"))))
-                .contains("2019-04-25T05:00:00Z");  // New york is UTC+5
+            .isEqualTo("\"2019-04-25T05:00:00Z\"");  // New york is UTC+5
+
+        assertThat(JSON.toJSON(LocalTime.of(18, 0)))
+            .isEqualTo("\"18:00:00.000\"");
+
+        assertThat(JSON.toJSON(LocalTime.of(18, 1, 2, 200000000)))
+            .isEqualTo("\"18:01:02.200\"");
+
+        assertThat(JSON.toJSON(LocalTime.of(18, 1, 2, 123456789)))
+            .isEqualTo("\"18:01:02.123456789\"");
     }
 
     @Test

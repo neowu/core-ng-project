@@ -6,6 +6,7 @@ import core.framework.api.validate.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,9 @@ public class TestBean {
 
     @Property(name = "date_field")
     public LocalDate dateField;
+
+    @Property(name = "time_field")
+    public LocalTime timeField;
 
     @Property(name = "string_field")
     public String stringField;

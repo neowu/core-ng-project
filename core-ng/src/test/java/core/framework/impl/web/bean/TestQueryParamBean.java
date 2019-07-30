@@ -7,6 +7,7 @@ import core.framework.api.web.service.QueryParam;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -21,6 +22,9 @@ public class TestQueryParamBean {
 
     @QueryParam(name = "date_field")
     public LocalDate dateField;
+
+    @QueryParam(name = "time_field")
+    public LocalTime timeField;
 
     @QueryParam(name = "string_field")
     public String stringField;

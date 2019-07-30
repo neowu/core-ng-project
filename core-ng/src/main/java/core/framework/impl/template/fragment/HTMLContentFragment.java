@@ -19,7 +19,7 @@ public class HTMLContentFragment implements Fragment {
     public void process(StringBuilder builder, TemplateContext context) {
         Object result = expression.eval(context);
         if (result != null) {
-            builder.append(String.valueOf(result));
+            builder.append(result);
         }
     }
 }

@@ -9,6 +9,11 @@ import core.framework.internal.validate.BeanClassVisitor;
 import core.framework.util.Sets;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static core.framework.util.Strings.format;
@@ -24,6 +29,9 @@ final class QueryParamClassValidator implements BeanClassVisitor {
     QueryParamClassValidator(Class<?> beanClass, BeanClassNameValidator beanClassNameValidator) {
         this.beanClassNameValidator = beanClassNameValidator;
         validator = new BeanClassValidator(beanClass);
+        validator.allowedValueClasses = Set.of(String.class, Boolean.class,
+            Integer.class, Long.class, Double.class, BigDecimal.class,
+            LocalDate.class, LocalDateTime.class, ZonedDateTime.class, LocalTime.class);
         validator.visitor = this;
     }
 

@@ -4,6 +4,7 @@ import core.framework.api.json.Property;
 import core.framework.api.validate.NotNull;
 import core.framework.search.Index;
 
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
 /**
@@ -11,14 +12,13 @@ import java.time.ZonedDateTime;
  */
 @Index(name = "document")
 public class TestDocument {
+    @NotNull
     @Property(name = "id")
     public String id;
 
-    @NotNull
     @Property(name = "completion1")
     public String completion1;
 
-    @NotNull
     @Property(name = "completion2")
     public String completion2;
 
@@ -33,6 +33,9 @@ public class TestDocument {
 
     @Property(name = "zoned_date_time_field")
     public ZonedDateTime zonedDateTimeField;
+
+    @Property(name = "local_time_field")
+    public LocalTime localTimeField;
 
     @Property(name = "enum_field")
     public TestEnum enumField;

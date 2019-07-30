@@ -1,4 +1,7 @@
 ## Change log
+### 6.13.6 (7/29/2019 - )
+* bean: support LocalTime type in JSON/QueryParam (Cache/ES/Kafka/API)
+
 ### 6.13.5 (7/24/2019 - 7/26/2019)
 * http: clientIp parser validates ip in x-forwarded-for header
 * http: when request contains invalid cookies char, log cookies header and return 400
