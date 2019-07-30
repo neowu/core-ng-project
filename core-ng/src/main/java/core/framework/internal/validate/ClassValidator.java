@@ -17,19 +17,19 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public class BeanClassValidator {
-    public final Class<?> beanClass;
+public class ClassValidator {
+    public final Class<?> instanceClass;
     private final Set<Class<?>> visitedClasses = Sets.newHashSet();
     public Set<Class<?>> allowedValueClasses = Set.of();
     public boolean allowChild;
-    public BeanClassVisitor visitor;
+    public ClassVisitor visitor;
 
-    public BeanClassValidator(Class<?> beanClass) {
-        this.beanClass = beanClass;
+    public ClassValidator(Class<?> instanceClass) {
+        this.instanceClass = instanceClass;
     }
 
     public void validate() {
-        visitObject(beanClass, null, null);
+        visitObject(instanceClass, null, null);
     }
 
     private void visitObject(Class<?> objectClass, Field owner, String path) {

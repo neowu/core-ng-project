@@ -3,8 +3,8 @@ package core.framework.internal.json;
 import core.framework.api.json.Property;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
-import core.framework.internal.validate.BeanClassValidator;
-import core.framework.internal.validate.BeanClassVisitor;
+import core.framework.internal.validate.ClassValidator;
+import core.framework.internal.validate.ClassVisitor;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
 
@@ -24,9 +24,9 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public class JSONClassValidator implements BeanClassVisitor {
-    public static BeanClassValidator classValidator(Class<?> instanceClass) {
-        var validator = new BeanClassValidator(instanceClass);
+public final class JSONClassValidator implements ClassVisitor {
+    public static ClassValidator classValidator(Class<?> instanceClass) {
+        var validator = new ClassValidator(instanceClass);
         validator.allowedValueClasses = Set.of(String.class, Boolean.class,
             Integer.class, Long.class, Double.class, BigDecimal.class,
             LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class);
@@ -47,7 +47,7 @@ public class JSONClassValidator implements BeanClassVisitor {
         }
     }
 
-    private final BeanClassValidator validator;
+    private final ClassValidator validator;
     private final Map<String, Set<String>> visitedProperties = Maps.newHashMap();
 
     public JSONClassValidator(Class<?> instanceClass) {

@@ -12,11 +12,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class BeanClassValidatorTest {
     @Test
     void validate() {
-        var beanClassNameValidator = new BeanClassNameValidator();
-        new BeanClassValidator(TestBean.class, beanClassNameValidator).validate();
+        new BeanClassValidator(TestBean.class, new BeanClassNameValidator()).validate();
+    }
 
-        assertThatThrownBy(() -> new BeanClassValidator(List.class, beanClassNameValidator).validate())
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("class must be bean class");
+    @Test
+    void validateWithList() {
+        assertThatThrownBy(() -> new BeanClassValidator(List.class, new BeanClassNameValidator()).validate())
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("class must be bean class");
     }
 }

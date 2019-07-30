@@ -7,8 +7,8 @@ import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
-import core.framework.internal.validate.BeanClassValidator;
-import core.framework.internal.validate.BeanClassVisitor;
+import core.framework.internal.validate.ClassValidator;
+import core.framework.internal.validate.ClassVisitor;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
 
@@ -25,8 +25,8 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-final class DatabaseClassValidator implements BeanClassVisitor {
-    private final BeanClassValidator validator;
+final class DatabaseClassValidator implements ClassVisitor {
+    private final ClassValidator validator;
     private final Set<String> columns = Sets.newHashSet();
     private boolean foundPrimaryKey;
     private boolean foundAutoIncrementalPrimaryKey;
@@ -35,7 +35,7 @@ final class DatabaseClassValidator implements BeanClassVisitor {
     private Object entityWithDefaultValue;
 
     DatabaseClassValidator(Class<?> entityClass) {
-        validator = new BeanClassValidator(entityClass);
+        validator = new ClassValidator(entityClass);
         validator.allowedValueClasses = Set.of(String.class, Boolean.class,
             Integer.class, Long.class, Double.class, BigDecimal.class,
             LocalDate.class, LocalDateTime.class, ZonedDateTime.class);
@@ -46,7 +46,7 @@ final class DatabaseClassValidator implements BeanClassVisitor {
         validator.validate();
 
         if (!foundPrimaryKey)
-            throw new Error("db entity class must have @PrimaryKey, class=" + validator.beanClass.getCanonicalName());
+            throw new Error("db entity class must have @PrimaryKey, class=" + validator.instanceClass.getCanonicalName());
     }
 
     void validateViewClass() {

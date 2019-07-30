@@ -4,8 +4,8 @@ import core.framework.api.json.Property;
 import core.framework.api.web.service.QueryParam;
 import core.framework.impl.reflect.Fields;
 import core.framework.internal.json.JSONClassValidator;
-import core.framework.internal.validate.BeanClassValidator;
-import core.framework.internal.validate.BeanClassVisitor;
+import core.framework.internal.validate.ClassValidator;
+import core.framework.internal.validate.ClassVisitor;
 import core.framework.util.Sets;
 
 import java.lang.reflect.Field;
@@ -21,14 +21,14 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-final class QueryParamClassValidator implements BeanClassVisitor {
-    private final BeanClassValidator validator;
+final class QueryParamClassValidator implements ClassVisitor {
+    private final ClassValidator validator;
     private final Set<String> visitedParams = Sets.newHashSet();
     private final BeanClassNameValidator beanClassNameValidator;
 
     QueryParamClassValidator(Class<?> beanClass, BeanClassNameValidator beanClassNameValidator) {
         this.beanClassNameValidator = beanClassNameValidator;
-        validator = new BeanClassValidator(beanClass);
+        validator = new ClassValidator(beanClass);
         validator.allowedValueClasses = Set.of(String.class, Boolean.class,
             Integer.class, Long.class, Double.class, BigDecimal.class,
             LocalDate.class, LocalDateTime.class, ZonedDateTime.class, LocalTime.class);

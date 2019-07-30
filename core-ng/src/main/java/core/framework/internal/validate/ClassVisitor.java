@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 /**
  * @author neo
  */
-public interface BeanClassVisitor {
+public interface ClassVisitor {
     default void visitClass(Class<?> objectClass, String path) {
     }
 

@@ -1,26 +1,40 @@
 package core.framework.impl.web.bean;
 
 import core.framework.internal.json.JSONClassValidator;
+import core.framework.internal.validate.ClassVisitor;
+
+import java.lang.reflect.Field;
 
 /**
  * @author neo
  */
-final class BeanClassValidator extends JSONClassValidator {
+final class BeanClassValidator implements ClassVisitor {
     private final BeanClassNameValidator beanClassNameValidator;
+    private final JSONClassValidator validator;
 
     BeanClassValidator(Class<?> beanClass, BeanClassNameValidator beanClassNameValidator) {
-        super(beanClass);
+        validator = new JSONClassValidator(beanClass);
         this.beanClassNameValidator = beanClassNameValidator;
     }
 
-    @Override
-    public void visitEnum(Class<?> enumClass) {
-        super.visitEnum(enumClass);
-        beanClassNameValidator.validate(enumClass);
+    void validate() {
+        validator.validate();
     }
 
     @Override
     public void visitClass(Class<?> objectClass, String path) {
+        validator.visitClass(objectClass, path);
         beanClassNameValidator.validate(objectClass);
+    }
+
+    @Override
+    public void visitField(Field field, String parentPath) {
+        validator.visitField(field, parentPath);
+    }
+
+    @Override
+    public void visitEnum(Class<?> enumClass) {
+        validator.visitEnum(enumClass);
+        beanClassNameValidator.validate(enumClass);
     }
 }
