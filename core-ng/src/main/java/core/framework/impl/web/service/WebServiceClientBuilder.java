@@ -2,10 +2,10 @@ package core.framework.impl.web.service;
 
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.impl.asm.CodeBuilder;
-import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Methods;
 import core.framework.impl.reflect.Params;
+import core.framework.internal.asm.CodeBuilder;
+import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +17,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 
-import static core.framework.impl.asm.Literal.type;
-import static core.framework.impl.asm.Literal.variable;
+import static core.framework.internal.asm.Literal.type;
+import static core.framework.internal.asm.Literal.variable;
 
 /**
  * @author neo

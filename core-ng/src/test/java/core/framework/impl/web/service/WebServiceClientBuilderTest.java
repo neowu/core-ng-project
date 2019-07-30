@@ -1,7 +1,7 @@
 package core.framework.impl.web.service;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.asm.CodeBuilder;
+import core.framework.internal.asm.CodeBuilder;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;

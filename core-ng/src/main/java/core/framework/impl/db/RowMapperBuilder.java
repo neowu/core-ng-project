@@ -1,9 +1,9 @@
 package core.framework.impl.db;
 
 import core.framework.db.Column;
-import core.framework.impl.asm.CodeBuilder;
-import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
+import core.framework.internal.asm.CodeBuilder;
+import core.framework.internal.asm.DynamicInstanceBuilder;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -11,8 +11,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
-import static core.framework.impl.asm.Literal.type;
-import static core.framework.impl.asm.Literal.variable;
+import static core.framework.internal.asm.Literal.type;
+import static core.framework.internal.asm.Literal.variable;
 
 /**
  * @author neo

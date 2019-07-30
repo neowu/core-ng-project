@@ -1,4 +1,4 @@
-package core.framework.impl.asm;
+package core.framework.internal.asm;
 
 import org.junit.jupiter.api.Test;
 

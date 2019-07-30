@@ -1,15 +1,15 @@
 package core.framework.impl.template.expression;
 
-import core.framework.impl.asm.CodeBuilder;
-import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
+import core.framework.internal.asm.CodeBuilder;
+import core.framework.internal.asm.DynamicInstanceBuilder;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
-import static core.framework.impl.asm.Literal.type;
+import static core.framework.internal.asm.Literal.type;
 import static core.framework.util.Strings.format;
 
 /**

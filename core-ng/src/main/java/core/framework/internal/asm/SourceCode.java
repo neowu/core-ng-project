@@ -1,10 +1,10 @@
-package core.framework.impl.asm;
+package core.framework.internal.asm;
 
 import core.framework.util.Lists;
 
 import java.util.List;
 
-import static core.framework.impl.asm.Literal.type;
+import static core.framework.internal.asm.Literal.type;
 
 /**
  * @author neo

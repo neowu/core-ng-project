@@ -7,11 +7,11 @@ import core.framework.api.validate.NotBlank;
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Pattern;
 import core.framework.api.validate.Size;
-import core.framework.impl.asm.CodeBuilder;
-import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.reflect.GenericTypes;
+import core.framework.internal.asm.CodeBuilder;
+import core.framework.internal.asm.DynamicInstanceBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -23,8 +23,8 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
-import static core.framework.impl.asm.Literal.type;
-import static core.framework.impl.asm.Literal.variable;
+import static core.framework.internal.asm.Literal.type;
+import static core.framework.internal.asm.Literal.variable;
 import static core.framework.util.Strings.format;
 
 /**

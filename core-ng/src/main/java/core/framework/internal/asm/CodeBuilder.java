@@ -1,4 +1,4 @@
-package core.framework.impl.asm;
+package core.framework.internal.asm;
 
 import core.framework.util.Strings;
 

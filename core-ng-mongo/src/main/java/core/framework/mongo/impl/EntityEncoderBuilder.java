@@ -1,9 +1,9 @@
 package core.framework.mongo.impl;
 
-import core.framework.impl.asm.CodeBuilder;
-import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
 import core.framework.impl.reflect.GenericTypes;
+import core.framework.internal.asm.CodeBuilder;
+import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.mongo.Id;
 import core.framework.util.Maps;
 import org.bson.types.ObjectId;
@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
-import static core.framework.impl.asm.Literal.type;
-import static core.framework.impl.asm.Literal.variable;
+import static core.framework.internal.asm.Literal.type;
+import static core.framework.internal.asm.Literal.variable;
 
 /**
  * @author neo

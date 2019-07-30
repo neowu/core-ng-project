@@ -2,9 +2,9 @@ package core.framework.impl.web.service;
 
 import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.ResponseStatus;
-import core.framework.impl.asm.CodeBuilder;
-import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Params;
+import core.framework.internal.asm.CodeBuilder;
+import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -14,8 +14,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static core.framework.impl.asm.Literal.type;
-import static core.framework.impl.asm.Literal.variable;
+import static core.framework.internal.asm.Literal.type;
+import static core.framework.internal.asm.Literal.variable;
 
 /**
  * @author neo

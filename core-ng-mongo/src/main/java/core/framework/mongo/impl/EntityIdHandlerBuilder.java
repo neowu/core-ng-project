@@ -1,14 +1,14 @@
 package core.framework.mongo.impl;
 
-import core.framework.impl.asm.CodeBuilder;
-import core.framework.impl.asm.DynamicInstanceBuilder;
 import core.framework.impl.reflect.Classes;
+import core.framework.internal.asm.CodeBuilder;
+import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.mongo.Id;
 import org.bson.types.ObjectId;
 
 import java.lang.reflect.Field;
 
-import static core.framework.impl.asm.Literal.type;
+import static core.framework.internal.asm.Literal.type;
 import static core.framework.util.Strings.format;
 
 /**

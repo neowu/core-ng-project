@@ -1,4 +1,4 @@
-package core.framework.impl.asm;
+package core.framework.internal.asm;
 
 import core.framework.http.HTTPMethod;
 import core.framework.util.Types;
