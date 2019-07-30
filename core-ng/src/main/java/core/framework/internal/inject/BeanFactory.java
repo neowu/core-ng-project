@@ -1,4 +1,4 @@
-package core.framework.impl.inject;
+package core.framework.internal.inject;
 
 import core.framework.impl.reflect.Fields;
 import core.framework.impl.reflect.Methods;

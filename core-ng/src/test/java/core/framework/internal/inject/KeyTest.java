@@ -1,4 +1,4 @@
-package core.framework.impl.inject;
+package core.framework.internal.inject;
 
 import org.junit.jupiter.api.Test;
 

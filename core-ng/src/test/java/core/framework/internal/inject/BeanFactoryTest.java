@@ -1,4 +1,4 @@
-package core.framework.impl.inject;
+package core.framework.internal.inject;
 
 import core.framework.inject.Inject;
 import core.framework.inject.Named;

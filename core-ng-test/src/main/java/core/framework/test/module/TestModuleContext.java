@@ -1,7 +1,7 @@
 package core.framework.test.module;
 
-import core.framework.impl.inject.Key;
 import core.framework.impl.module.ModuleContext;
+import core.framework.internal.inject.Key;
 import core.framework.util.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
