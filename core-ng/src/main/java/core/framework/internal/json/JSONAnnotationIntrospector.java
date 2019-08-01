@@ -29,7 +29,8 @@ public class JSONAnnotationIntrospector extends AnnotationIntrospector {
         return checker.withFieldVisibility(Visibility.PUBLIC_ONLY)
                       .withSetterVisibility(Visibility.NONE)
                       .withGetterVisibility(Visibility.NONE)
-                      .withIsGetterVisibility(Visibility.NONE);
+                      .withIsGetterVisibility(Visibility.NONE)
+                      .withCreatorVisibility(Visibility.NONE);
     }
 
     @Override

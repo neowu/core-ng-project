@@ -1,6 +1,7 @@
 ## Change log
 ### 6.13.6 (7/29/2019 - )
 * bean: support LocalTime type in JSON/QueryParam (Cache/ES/Kafka/API)
+* property: module property overriding will check whether key is defined in property file first, to prevent env may have keys not in property file causes unexpected behavior of runtime 
 
 ### 6.13.5 (7/24/2019 - 7/26/2019)
 * http: clientIp parser validates ip in x-forwarded-for header
