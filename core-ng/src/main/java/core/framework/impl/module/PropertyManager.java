@@ -16,8 +16,7 @@ public class PropertyManager {
     private final Logger logger = LoggerFactory.getLogger(PropertyManager.class);
 
     public Optional<String> property(String key) {
-        Optional<String> propertyValue = properties.get(key);
-        if (propertyValue.isEmpty()) return Optional.empty();   // if the key is not defined in property file, do not check env, make env more deterministic, e.g. env may define property not in property files, which make integration-test inconsistent with runtime
+        if (!properties.containsKey(key)) return Optional.empty();   // if the key is not defined in property file, do not check env, make env more deterministic, e.g. env may define property not in property files, which make integration-test inconsistent with runtime
 
         String envVarName = envVarName(key);
         // use env var to override property, e.g. under docker/kubenetes, SYS_HTTP_PORT to override sys.http.port
@@ -33,7 +32,7 @@ public class PropertyManager {
             return Optional.of(value);
         }
 
-        return propertyValue;
+        return properties.get(key);
     }
 
     public String maskValue(String key, String value) { // generally only password or secretKey will be put into property file

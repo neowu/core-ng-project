@@ -29,6 +29,14 @@ class PropertyManagerTest {
     }
 
     @Test
+    void overridePropertyWithEmptyValue() {
+        System.setProperty("sys.cache.host", "overrideHost");
+        propertyManager.properties.set("sys.cache.host", "");
+
+        assertThat(propertyManager.property("sys.cache.host")).hasValue("overrideHost");
+    }
+
+    @Test
     void ignoreEnvIfKeyNotDefinedInProperties() {
         System.setProperty("sys.cache.host", "overrideHost");
 
