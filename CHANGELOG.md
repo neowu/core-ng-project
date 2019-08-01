@@ -1,5 +1,5 @@
 ## Change log
-### 6.13.6 (7/29/2019 - )
+### 6.13.6 (7/29/2019 - 8/1/2019)
 * bean: support LocalTime type in JSON/QueryParam (Cache/ES/Kafka/API)
 * property: module property overriding will check whether key is defined in property file first, to prevent env may have keys not in property file causes unexpected behavior of runtime 
 
