@@ -1,6 +1,7 @@
 ## Change log
-### 6.13.7 (8/1/2019 - )
+### 6.13.7 (8/1/2019 - 8/5/2019)
 * http: support allow/deny large ip ranges (only support ipv4 for now)
+* search: update es to 7.3.0
 
 ### 6.13.6.1 (7/29/2019 - 8/1/2019)
 * bean: support LocalTime type in JSON/QueryParam (Cache/ES/Kafka/API)
