@@ -72,7 +72,7 @@ public class TestModule extends AbstractTestModule {
         site().session().cookie("SessionId", "localhost");
         site().cdn().host("//cdn");
         site().security().contentSecurityPolicy("default-src 'self' https://cdn; img-src 'self' https://cdn data:; object-src 'none'; frame-src 'none';");
-        site().publishAPI("0.0.0.0/0");
+        site().publishAPI(List.of("0.0.0.0/0"));
     }
 
     private void configureHTTP() {
@@ -80,7 +80,8 @@ public class TestModule extends AbstractTestModule {
         http().httpsPort(8443);
         http().gzip();
         http().maxForwardedIPs(2);
-        http().allowCIDR("0.0.0.0/0");
+        http().access().allow(List.of("0.0.0.0/0"));
+        http().access().deny(List.of("10.0.0.0/24"));
     }
 
     private void configureKafka() {

@@ -1,7 +1,7 @@
 package core.framework.impl.web.management;
 
 import core.framework.http.ContentType;
-import core.framework.impl.web.http.IPAccessControl;
+import core.framework.impl.web.http.IPv4AccessControl;
 import core.framework.internal.cache.CacheImpl;
 import core.framework.internal.cache.CacheManager;
 import core.framework.util.Strings;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  */
 public class CacheController {
     private final CacheManager cacheManager;
-    private final IPAccessControl accessControl = new IPAccessControl();
+    private final IPv4AccessControl accessControl = new IPv4AccessControl();
 
     public CacheController(CacheManager cacheManager) {
         this.cacheManager = cacheManager;

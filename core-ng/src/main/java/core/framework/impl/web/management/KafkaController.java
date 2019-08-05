@@ -3,7 +3,7 @@ package core.framework.impl.web.management;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.log.filter.BytesLogParam;
-import core.framework.impl.web.http.IPAccessControl;
+import core.framework.impl.web.http.IPv4AccessControl;
 import core.framework.internal.kafka.MessageHeaders;
 import core.framework.internal.kafka.MessageProducer;
 import core.framework.log.Markers;
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class KafkaController {
     private final Logger logger = LoggerFactory.getLogger(KafkaController.class);
-    private final IPAccessControl accessControl = new IPAccessControl();
+    private final IPv4AccessControl accessControl = new IPv4AccessControl();
     private final MessageProducer producer;
 
     public KafkaController(MessageProducer producer) {

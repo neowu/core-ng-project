@@ -25,7 +25,7 @@ public final class ClasspathResources {
         }
     }
 
-    static InputStream stream(String path) {
+    public static InputStream stream(String path) {
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try {
             Iterator<URL> urls = loader.getResources(path).asIterator();

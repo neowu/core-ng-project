@@ -1,6 +1,6 @@
 package core.framework.impl.web.management;
 
-import core.framework.impl.web.http.IPAccessControl;
+import core.framework.impl.web.http.IPv4AccessControl;
 import core.framework.web.Request;
 import core.framework.web.Response;
 
@@ -16,7 +16,7 @@ import java.lang.management.ManagementFactory;
  * @author neo
  */
 public class DiagnosticController {
-    private final IPAccessControl accessControl = new IPAccessControl();
+    private final IPv4AccessControl accessControl = new IPv4AccessControl();
 
     public Response vm(Request request) {
         accessControl.validate(request.clientIP());

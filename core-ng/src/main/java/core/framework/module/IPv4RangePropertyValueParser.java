@@ -5,22 +5,23 @@ import core.framework.util.Strings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
  */
-public class AllowCIDRParser {
+public final class IPv4RangePropertyValueParser {
     private final String value;
 
-    public AllowCIDRParser(String value) {
+    public IPv4RangePropertyValueParser(String value) {
         this.value = value;
     }
 
     // support two formats,
     // 1. cidr,cidr
     // 2. name1: cidr, cidr; name2: cidr
-    public String[] parse() {
-        if (Strings.isBlank(value)) return new String[0];
+    public List<String> parse() {
+        if (Strings.isBlank(value)) return List.of();
         if (value.indexOf(':') > 0) {
             return parseSemicolonDelimited(value);
         } else {
@@ -28,11 +29,11 @@ public class AllowCIDRParser {
         }
     }
 
-    private String[] parseCommaDelimited(String value) {
-        return Arrays.stream(Strings.split(value, ',')).map(String::strip).toArray(String[]::new);
+    private List<String> parseCommaDelimited(String value) {
+        return Arrays.stream(Strings.split(value, ',')).map(String::strip).collect(Collectors.toList());
     }
 
-    private String[] parseSemicolonDelimited(String value) {
+    private List<String> parseSemicolonDelimited(String value) {
         List<String> results = new ArrayList<>();
         for (String item : Strings.split(value, ';')) {
             if (Strings.isBlank(item)) continue;
@@ -41,6 +42,6 @@ public class AllowCIDRParser {
                   .map(String::strip)
                   .forEach(results::add);
         }
-        return results.toArray(String[]::new);
+        return results;
     }
 }

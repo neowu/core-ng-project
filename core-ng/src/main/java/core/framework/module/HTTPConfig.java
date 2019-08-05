@@ -4,7 +4,6 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.HTTPIOHandler;
-import core.framework.impl.web.http.IPAccessControl;
 import core.framework.impl.web.site.AJAXErrorResponse;
 import core.framework.internal.json.JSONClassValidator;
 import core.framework.web.Controller;
@@ -13,7 +12,6 @@ import core.framework.web.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -81,18 +79,8 @@ public final class HTTPConfig extends Config {
         context.httpServer.handler.requestParser.clientIPParser.maxForwardedIPs = maxIPs;
     }
 
-    /**
-     * Set cidr blocks to filter ingress ip, e.g. 192.168.0.1/24 or 192.168.1.1/32 for single ip
-     *
-     * @param cidrs cidr blocks
-     */
-    public void allowCIDR(String... cidrs) {
-        if (context.httpServer.handler.accessControl != null) {
-            throw new Error(format("allow cidr is already configured, cidrs={}, previous={}", Arrays.toString(cidrs), context.httpServer.handler.accessControl.cidrs));
-        }
-
-        logger.info("limit remote access, cidrs={}", Arrays.toString(cidrs));
-        context.httpServer.handler.accessControl = new IPAccessControl(cidrs);
+    public AccessConfig access() {
+        return new AccessConfig(context);
     }
 
     public void gzip() {

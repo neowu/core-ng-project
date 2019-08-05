@@ -4,7 +4,8 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.api.APIDefinitionResponse;
-import core.framework.impl.web.http.IPAccessControl;
+import core.framework.impl.web.http.IPv4AccessControl;
+import core.framework.impl.web.http.IPv4Ranges;
 import core.framework.impl.web.management.APIController;
 import core.framework.impl.web.site.StaticContentController;
 import core.framework.impl.web.site.StaticDirectoryController;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
 import static core.framework.util.Strings.format;
@@ -83,12 +83,14 @@ public class SiteConfig extends Config {
         return new WebSecurityConfig(webSecurityInterceptor);
     }
 
-    public void publishAPI(String... cidrs) {
+    public void publishAPI(List<String> cidrs) {
         HTTPConfig httpConfig = context.config(HTTPConfig.class, null);
         APIConfig apiConfig = context.config(APIConfig.class, null);
 
-        logger.info("publish typescript api definition, cidrs={}", Arrays.toString(cidrs));
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(apiConfig.serviceInterfaces, httpConfig.beanClasses, new IPAccessControl(cidrs)), true);
+        logger.info("publish typescript api definition, cidrs={}", cidrs);
+        var accessControl = new IPv4AccessControl();
+        accessControl.allow = new IPv4Ranges(cidrs);
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(apiConfig.serviceInterfaces, httpConfig.beanClasses, accessControl), true);
         context.bean(APIDefinitionResponse.class);
     }
 }

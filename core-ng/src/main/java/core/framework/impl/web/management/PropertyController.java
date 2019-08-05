@@ -1,7 +1,7 @@
 package core.framework.impl.web.management;
 
 import core.framework.impl.module.PropertyManager;
-import core.framework.impl.web.http.IPAccessControl;
+import core.framework.impl.web.http.IPv4AccessControl;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -13,7 +13,7 @@ import java.util.TreeSet;
  * @author neo
  */
 public class PropertyController implements Controller {
-    private final IPAccessControl accessControl = new IPAccessControl();
+    private final IPv4AccessControl accessControl = new IPv4AccessControl();
     private final PropertyManager propertyManager;
 
     public PropertyController(PropertyManager propertyManager) {

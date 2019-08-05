@@ -2,7 +2,7 @@ package core.framework.impl.web.management;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.impl.scheduler.Scheduler;
-import core.framework.impl.web.http.IPAccessControl;
+import core.framework.impl.web.http.IPv4AccessControl;
 import core.framework.log.Markers;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SchedulerController {
     private final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
-    private final IPAccessControl accessControl = new IPAccessControl();
+    private final IPv4AccessControl accessControl = new IPv4AccessControl();
     private final Scheduler scheduler;
 
     public SchedulerController(Scheduler scheduler) {

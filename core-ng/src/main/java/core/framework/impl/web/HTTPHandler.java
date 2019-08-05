@@ -9,7 +9,7 @@ import core.framework.impl.web.controller.ControllerHolder;
 import core.framework.impl.web.controller.Interceptors;
 import core.framework.impl.web.controller.InvocationImpl;
 import core.framework.impl.web.controller.WebContextImpl;
-import core.framework.impl.web.http.IPAccessControl;
+import core.framework.impl.web.http.IPv4AccessControl;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.request.RequestParser;
 import core.framework.impl.web.response.ResponseHandler;
@@ -53,7 +53,7 @@ public class HTTPHandler implements HttpHandler {
     private final ResponseHandler responseHandler;
 
     public WebSocketHandler webSocketHandler;
-    public IPAccessControl accessControl;
+    public IPv4AccessControl accessControl;
 
     HTTPHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
         this.logManager = logManager;
