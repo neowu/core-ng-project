@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -140,7 +141,7 @@ public class APIDefinitionBuilder {
         if (Integer.class.equals(type) || Long.class.equals(type) || Double.class.equals(type) || BigDecimal.class.equals(type)) return "number";
         if (Boolean.class.equals(type)) return "boolean";
         if (ZonedDateTime.class.equals(type) || Instant.class.equals(type)) return "Date";
-        if (LocalDate.class.equals(type) || LocalDateTime.class.equals(type)) return "string";  // in ts/js, Date is always convert to ISO datetime utc format, so here use string for date/datetime without timezone
+        if (LocalDate.class.equals(type) || LocalDateTime.class.equals(type) || LocalTime.class.equals(type)) return "string";  // in ts/js, Date is always convert to ISO datetime utc format, so here use string for date/datetime without timezone
         if (GenericTypes.rawClass(type).isEnum()) {
             return parseEnum((Class<?>) type);
         }

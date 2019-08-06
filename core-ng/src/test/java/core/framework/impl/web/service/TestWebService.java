@@ -17,7 +17,10 @@ import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.QueryParam;
 import core.framework.api.web.service.ResponseStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -96,12 +99,21 @@ public interface TestWebService {
 
         @QueryParam(name = "date_field")
         public LocalDate dateField;
+
+        @QueryParam(name = "time_field")
+        public LocalTime timeField;
+
+        @QueryParam(name = "date_time_field")
+        public LocalDateTime localDateTime;
     }
 
     class TestResponse {
         @NotNull
         @Property(name = "int_field")
         public Integer intField;
+
+        @Property(name = "decimal_field")
+        public BigDecimal decimalField;
 
         @Size(min = 1)
         @Property(name = "string_map")
