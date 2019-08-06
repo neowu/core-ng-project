@@ -37,15 +37,15 @@ public class IPv4AccessControl {
             logger.debug("skip with ipv6 address");
             return true;
         }
-        if (deny != null && deny.matches(address)) {
-            logger.debug("ip matches denied ranges");
-            return false;
+        if (deny != null) {
+            if (allow != null && allow.matches(address)) {  // if deny is defined, check allow for exception if any
+                return true;
+            }
+            return !deny.matches(address);  // allow by default
+        } else if (allow != null) { // if only allow is defined, deny by default
+            return allow.matches(address);
+        } else {
+            throw new Error("unexpected state, allow and deny must not both be null");
         }
-        if (allow != null && allow.matches(address)) {
-            logger.debug("ip matches allowed ranges");
-            return true;
-        }
-        logger.debug("deny due to no range matches");
-        return false;
     }
 }

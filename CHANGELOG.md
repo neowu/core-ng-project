@@ -1,5 +1,5 @@
 ## Change log
-### 6.13.7.1 (8/1/2019 - 8/6/2019)
+### 6.13.8 (8/1/2019 - 8/6/2019)
 * http: support allow/deny large ip ranges (only support ipv4 for now)
 * search: update es to 7.3.0
 

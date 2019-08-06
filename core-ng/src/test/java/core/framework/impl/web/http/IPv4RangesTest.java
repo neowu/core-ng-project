@@ -72,6 +72,12 @@ class IPv4RangesTest {
         assertThat(ranges.matches(address("119.137.53.1"))).isTrue();
         assertThat(ranges.matches(address("119.137.53.254"))).isTrue();
         assertThat(ranges.matches(address("119.137.54.254"))).isTrue();
+
+        ranges = new IPv4Ranges(List.of("42.200.0.0/16", "43.224.4.0/22", "43.224.28.0/22"));
+        assertThat(ranges.matches(address("42.119.0.1"))).isFalse();
+        assertThat(ranges.matches(address("42.200.218.1"))).isTrue();
+        assertThat(ranges.matches(address("42.201.218.1"))).isFalse();
+        assertThat(ranges.matches(address("43.224.32.1"))).isFalse();
     }
 
     @Test
