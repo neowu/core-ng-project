@@ -5,8 +5,6 @@ import core.framework.impl.reflect.Methods;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -21,10 +19,10 @@ public class ControllerClassValidator {
 
     public void validate() {
         if (!Object.class.equals(controllerClass.getSuperclass())) {
-            throw new Error(format("controller class must not have super class, class={}", controllerClass.getCanonicalName()));
+            throw new Error("controller class must not have super class, class=" + controllerClass.getCanonicalName());
         }
         if (!Modifier.isPublic(controllerMethod.getModifiers())) {
-            throw new Error(format("controller method must be public, method={}", Methods.path(controllerMethod)));
+            throw new Error("controller method must be public, method=" + Methods.path(controllerMethod));
         }
     }
 }

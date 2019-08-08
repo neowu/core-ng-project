@@ -34,9 +34,9 @@ public final class SchedulerConfig extends Config {
         context.shutdownHook.add(ShutdownHook.STAGE_1, scheduler::awaitTermination);
 
         var schedulerController = new SchedulerController(scheduler);
-        context.route(HTTPMethod.GET, "/_sys/job", schedulerController::jobs, true);
+        context.route(HTTPMethod.GET, "/_sys/job", (LambdaController) schedulerController::jobs, true);
         context.bean(ListJobResponse.class);
-        context.route(HTTPMethod.POST, "/_sys/job/:job", schedulerController::triggerJob, true);
+        context.route(HTTPMethod.POST, "/_sys/job/:job", (LambdaController) schedulerController::triggerJob, true);
     }
 
     public void timeZone(ZoneId zoneId) {

@@ -10,7 +10,6 @@
 * streaming, data pipeline? (kafka stream/beam/google dataflow) 
 
 * ws: provide way to handler json command with validation?
-* type literal: support better cast for generic, JSON.fromJSON() / bind?
 * change gradle to kotlin?
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 * rethink module structure to fit java module export requirement
@@ -19,7 +18,6 @@
 * refine web body bean, revisit cache/validation impl 
 * /_sys/, kafka controller, should be call message handler directly?
 * revisit trace log truncation, better/more elegant handling?
-* ControllerInspector: better way to deal with JDK12, add "--add-opens java.base/jdk.internal.reflect=ALL-UNNAMED" ?
 * support LocalTime in db?
 
 ### jdk 11 issues

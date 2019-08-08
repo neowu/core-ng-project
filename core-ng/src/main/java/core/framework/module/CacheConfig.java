@@ -73,10 +73,10 @@ public class CacheConfig extends Config {
         cacheManager = new CacheManager(cacheStore);
 
         var controller = new CacheController(cacheManager);
-        context.route(HTTPMethod.GET, "/_sys/cache", controller::list, true);
+        context.route(HTTPMethod.GET, "/_sys/cache", (LambdaController) controller::list, true);
         context.bean(ListCacheResponse.class);
-        context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", controller::get, true);
-        context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", controller::delete, true);
+        context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", (LambdaController) controller::get, true);
+        context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", (LambdaController) controller::delete, true);
     }
 
     public <T> void add(Class<T> cacheClass, Duration duration) {

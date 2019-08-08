@@ -18,6 +18,7 @@ import core.framework.impl.web.service.ErrorResponse;
 import core.framework.impl.web.site.AJAXErrorResponse;
 import core.framework.internal.inject.BeanFactory;
 import core.framework.internal.stat.Stat;
+import core.framework.module.LambdaController;
 import core.framework.util.ASCII;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
@@ -62,11 +63,10 @@ public class ModuleContext {
         bean(AJAXErrorResponse.class);
 
         var diagnosticController = new DiagnosticController();
-        route(HTTPMethod.GET, "/_sys/vm", diagnosticController::vm, true);
-        route(HTTPMethod.GET, "/_sys/thread", diagnosticController::thread, true);
-        route(HTTPMethod.GET, "/_sys/heap", diagnosticController::heap, true);
-        var propertyController = new PropertyController(propertyManager);
-        route(HTTPMethod.GET, "/_sys/property", propertyController, true);
+        route(HTTPMethod.GET, "/_sys/vm", (LambdaController) diagnosticController::vm, true);
+        route(HTTPMethod.GET, "/_sys/thread", (LambdaController) diagnosticController::thread, true);
+        route(HTTPMethod.GET, "/_sys/heap", (LambdaController) diagnosticController::heap, true);
+        route(HTTPMethod.GET, "/_sys/property", new PropertyController(propertyManager), true);
     }
 
     public BackgroundTaskExecutor backgroundTask() {

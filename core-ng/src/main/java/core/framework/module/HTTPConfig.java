@@ -36,6 +36,10 @@ public final class HTTPConfig extends Config {
         context.route(method, path, controller, false);
     }
 
+    public void route(HTTPMethod method, String path, LambdaController controller) {
+        route(method, path, (Controller) controller);
+    }
+
     public void bean(Class<?> beanClass) {
         logger.info("register bean, class=" + beanClass.getCanonicalName());
         if (beanClass.isEnum()) {   // enum is usually declared to expose constants via /_sys/api, e.g. errorCodes, or pathParams used by controller directly
