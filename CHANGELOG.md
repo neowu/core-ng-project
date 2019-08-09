@@ -1,5 +1,5 @@
 ## Change log
-### 6.13.9 (8/8/2019)  !!! this will be last version for JDK 11, update to this version then start update all JDK runtime to 12+ !!! 
+### 6.13.9 (8/8/2019)  !!! this is the last version for JDK 11, update to this version then start update all JDK runtime to 12+ !!! 
 * config: update controller inspector to adapt to JDK 12+
 
 ### 6.13.8 (8/1/2019 - 8/6/2019)
