@@ -43,7 +43,7 @@ class RetryInterceptorTest {
         assertThat(interceptor.shouldRetry(1, "POST", new HttpConnectTimeoutException("connection timeout"))).isTrue();
         assertThat(interceptor.shouldRetry(1, "POST", new ConnectException("connection refused"))).isTrue();
 
-        SocketTimeoutException timeout = new SocketTimeoutException("timeout");
+        var timeout = new SocketTimeoutException("timeout");
         timeout.initCause(new SocketTimeoutException("Read timed out"));
         assertThat(interceptor.shouldRetry(1, "POST", timeout)).isFalse();
         assertThat(interceptor.shouldRetry(2, "PUT", timeout)).isTrue();

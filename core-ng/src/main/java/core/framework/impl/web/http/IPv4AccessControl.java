@@ -18,7 +18,10 @@ public class IPv4AccessControl {
     public void validate(String clientIP) {
         try {
             InetAddress address = InetAddress.getByName(clientIP);
-            if (isLocal(address)) return;
+            if (isLocal(address)) {
+                logger.debug("allow site local client address");
+                return;
+            }
 
             if (!allow(address.getAddress())) {
                 throw new ForbiddenException("access denied");
@@ -34,18 +37,21 @@ public class IPv4AccessControl {
 
     boolean allow(byte[] address) {
         if (address.length > 4) {   // only support ipv4, as Cloud LB generally uses ipv4 endpoint (gcloud supports both ipv4/v6, but ipv6 is not majority yet)
-            logger.debug("skip with ipv6 address");
+            logger.debug("skip with ipv6 client address");
             return true;
         }
-        if (deny != null) {
-            if (allow != null && allow.matches(address)) {  // if deny is defined, check allow for exception if any
-                return true;
-            }
-            return !deny.matches(address);  // allow by default
-        } else if (allow != null) { // if only allow is defined, deny by default
-            return allow.matches(address);
-        } else {
-            throw new Error("unexpected state, allow and deny must not both be null");
+
+        if (allow != null && allow.matches(address)) {
+            logger.debug("allow client ip within allowed ranges");
+            return true;
         }
+
+        if (deny == null || deny.matches(address)) {    // if deny == null, it blocks all
+            logger.debug("deny client ip within denied ranges");
+            return false;
+        }
+
+        logger.debug("allow client ip not within denied ranges");
+        return true;
     }
 }

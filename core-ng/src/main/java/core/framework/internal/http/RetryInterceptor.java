@@ -67,14 +67,14 @@ public class RetryInterceptor implements Interceptor {
 
     boolean shouldRetry(int attempts, String method, IOException e) {
         if (attempts >= maxRetries) return false;
-        /* read timeout exception trace
+        /* read timeout exception trace, only not retry on POST with read time out specifically, to exclude write timeout / connect time out cases
         Caused by: java.net.SocketTimeoutException: Read timed out
             at java.base/java.net.SocketInputStream.socketRead0(Native Method)
             at java.base/java.net.SocketInputStream.socketRead(SocketInputStream.java:115)
             at java.base/java.net.SocketInputStream.read(SocketInputStream.java:168)
             at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
-            at okio.Okio$2.read(Okio.java:140)
-            at okio.AsyncTimeout$2.read(AsyncTimeout.java:237)
+            at okio.InputStreamSource.read(Okio.kt:102)
+            at okio.AsyncTimeout$source$1.read(AsyncTimeout.kt:159)
         */
         return !("POST".equals(method) && e.getCause() != null && "Read timed out".equals(e.getCause().getMessage()));
     }

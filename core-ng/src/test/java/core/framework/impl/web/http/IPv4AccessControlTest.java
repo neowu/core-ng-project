@@ -83,16 +83,15 @@ class IPv4AccessControlTest {
     }
 
     @Test
-    void allowWithIPv6() {
-        assertThat(accessControl.allow(IPv4Ranges.address("2001:0db8:85a3:0000:0000:8a2e:0370:0000"))).isTrue();
-    }
-
-    @Test
-    void allowWithUnexpectedState() {
+    void denyByDefault() {
         accessControl.allow = null;
         accessControl.deny = null;
 
-        assertThatThrownBy(() -> accessControl.allow(IPv4Ranges.address("100.100.100.100")))
-            .isInstanceOf(Error.class);
+        assertThat(accessControl.allow(IPv4Ranges.address("100.100.100.100"))).isFalse();
+    }
+
+    @Test
+    void allowWithIPv6() {
+        assertThat(accessControl.allow(IPv4Ranges.address("2001:0db8:85a3:0000:0000:8a2e:0370:0000"))).isTrue();
     }
 }
