@@ -21,7 +21,8 @@ class TestDBConfigTest {
         assertThat(config.databaseURL(null))
             .isEqualTo("jdbc:hsqldb:mem:.;sql.syntax_mys=true");
 
-        assertThat(config.databaseURL("db1"))
-            .isEqualTo("jdbc:hsqldb:mem:db1;sql.syntax_ora=true");
+        config.name = "db1";
+        assertThat(config.databaseURL(null))
+            .isEqualTo("jdbc:hsqldb:mem:db1;sql.syntax_mys=true");
     }
 }
