@@ -1,0 +1,81 @@
+package core.framework.internal.db;
+
+import core.framework.db.Column;
+import core.framework.db.PrimaryKey;
+import core.framework.db.Table;
+import core.framework.impl.reflect.Classes;
+
+import java.lang.reflect.Field;
+import java.util.List;
+
+import static core.framework.util.Strings.format;
+
+/**
+ * @author neo
+ */
+final class SelectQuery<T> {
+    final String getSQL;
+    private final String table;
+    private final String columns;
+
+    SelectQuery(Class<?> entityClass) {
+        table = entityClass.getDeclaredAnnotation(Table.class).name();
+        List<Field> fields = Classes.instanceFields(entityClass);
+        columns = columns(fields);
+        getSQL = getSQL(fields);
+    }
+
+    private String getSQL(List<Field> fields) {
+        var builder = new StringBuilder("SELECT ").append(columns).append(" FROM ").append(table).append(" WHERE ");
+        int index = 0;
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(PrimaryKey.class)) {
+                Column column = field.getDeclaredAnnotation(Column.class);
+                if (index > 0) builder.append(" AND ");
+                builder.append(column.name()).append(" = ?");
+                index++;
+            }
+        }
+        return builder.toString();
+    }
+
+    private String columns(List<Field> fields) {
+        var builder = new StringBuilder();
+        int index = 0;
+        for (Field field : fields) {
+            Column column = field.getDeclaredAnnotation(Column.class);
+            if (index > 0) builder.append(", ");
+            builder.append(column.name());
+            index++;
+        }
+        return builder.toString();
+    }
+
+    String projectionSQL(String projection, StringBuilder where, String groupBy) {
+        StringBuilder builder = new StringBuilder("SELECT ").append(projection).append(" FROM ").append(table);
+        if (where.length() > 0) builder.append(" WHERE ").append(where);
+        if (groupBy != null) builder.append(" GROUP BY ").append(groupBy);
+        return builder.toString();
+    }
+
+    String fetchSQL(StringBuilder where, String sort, Integer skip, Integer limit) {
+        var builder = new StringBuilder("SELECT ").append(columns).append(" FROM ").append(table);
+        if (where.length() > 0) builder.append(" WHERE ").append(where);
+        if (sort != null) builder.append(" ORDER BY ").append(sort);
+        if (skip != null || limit != null) builder.append(" LIMIT ?,?");
+        return builder.toString();
+    }
+
+    Object[] fetchParams(List<Object> params, Integer skip, Integer limit) {
+        if (skip != null && limit == null) throw new Error(format("limit must not be null if skip is not, skip={}", skip));
+        if (skip == null && limit == null) return params.toArray();
+
+        Integer skipValue = skip == null ? Integer.valueOf(0) : skip;
+        if (params.isEmpty()) return new Object[]{skipValue, limit};
+        int length = params.size();
+        Object[] results = params.toArray(new Object[params.size() + 2]);
+        results[length] = skipValue;
+        results[length + 1] = limit;
+        return results;
+    }
+}

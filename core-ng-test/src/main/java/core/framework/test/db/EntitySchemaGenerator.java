@@ -10,7 +10,6 @@ import core.framework.impl.reflect.Classes;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.util.Lists;
 import core.framework.util.StopWatch;
-import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +67,6 @@ public final class EntitySchemaGenerator {
 
             if (primaryKey != null) {
                 if (primaryKey.autoIncrement()) builder.append(" AUTO_INCREMENT");
-                if (!Strings.isBlank(primaryKey.sequence())) {
-                    statements.add("CREATE SEQUENCE IF NOT EXISTS " + primaryKey.sequence());
-                }
                 primaryKeys.add(column.name());
             }
 

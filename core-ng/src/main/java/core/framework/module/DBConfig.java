@@ -4,12 +4,11 @@ import core.framework.crypto.Password;
 import core.framework.db.Database;
 import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
-import core.framework.impl.db.DatabaseImpl;
-import core.framework.impl.db.Vendor;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.resource.PoolMetrics;
+import core.framework.internal.db.DatabaseImpl;
 import core.framework.util.Lists;
 import core.framework.util.Types;
 
@@ -50,23 +49,12 @@ public class DBConfig extends Config {
 
     public void url(String url) {
         if (this.url != null) throw new Error(format("db url is already configured, name={}, url={}, previous={}", name, url, this.url));
-        Vendor vendor = vendor(url);
-        database.vendor = vendor;
-        database.url(databaseURL(url, vendor));
+        database.url(databaseURL(url));
         this.url = url;
     }
 
-    String databaseURL(String url, Vendor vendor) {
+    String databaseURL(String url) {
         return url;
-    }
-
-    private Vendor vendor(String url) {
-        if (url.startsWith("jdbc:mysql:")) {
-            return Vendor.MYSQL;
-        } else if (url.startsWith("jdbc:oracle:")) {
-            return Vendor.ORACLE;
-        }
-        throw new Error(format("not supported database vendor, url={}", url));
     }
 
     public void user(String user) {

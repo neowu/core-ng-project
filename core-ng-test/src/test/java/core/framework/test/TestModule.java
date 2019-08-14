@@ -6,7 +6,6 @@ import core.framework.http.HTTPClientBuilder;
 import core.framework.kafka.Message;
 import core.framework.scheduler.Job;
 import core.framework.test.db.TestDBEntity;
-import core.framework.test.db.TestSequenceIdDBEntity;
 import core.framework.test.inject.TestBean;
 import core.framework.test.kafka.TestMessage;
 import core.framework.test.module.AbstractTestModule;
@@ -106,11 +105,6 @@ public class TestModule extends AbstractTestModule {
         db().tooManyRowsReturnedThreshold(1000);
         db().repository(TestDBEntity.class);
         initDB().createSchema();
-
-        db("oracle").url("jdbc:oracle:thin:@localhost:1521/test");
-        db().isolationLevel(IsolationLevel.READ_COMMITTED);
-        db("oracle").repository(TestSequenceIdDBEntity.class);
-        initDB("oracle").createSchema();
     }
 
     private void configureJob() {

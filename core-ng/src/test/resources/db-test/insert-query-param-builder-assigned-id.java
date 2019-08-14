@@ -1,6 +1,6 @@
 public class InsertQuery$AssignedIdEntity$ParamBuilder implements java.util.function.Function {
     public Object apply(Object value) {
-        core.framework.impl.db.AssignedIdEntity entity = (core.framework.impl.db.AssignedIdEntity) value;
+        core.framework.internal.db.AssignedIdEntity entity = (core.framework.internal.db.AssignedIdEntity) value;
         Object[] params = new Object[5];
         params[0] = entity.id;
         params[1] = entity.stringField;

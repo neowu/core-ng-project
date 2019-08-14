@@ -19,6 +19,7 @@
 * /_sys/, kafka controller, should be call message handler directly?
 * revisit trace log truncation, better/more elegant handling?
 * support LocalTime in db?
+* db/redis diagnostic controller/stats?
 
 ### jdk 11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

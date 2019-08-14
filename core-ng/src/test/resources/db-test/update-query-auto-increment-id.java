@@ -1,6 +1,6 @@
-public class UpdateQueryBuilder$AutoIncrementIdEntity implements core.framework.impl.db.UpdateQuery {
-    public core.framework.impl.db.UpdateQuery.Statement update(Object value, boolean partial) {
-        core.framework.impl.db.AutoIncrementIdEntity entity = (core.framework.impl.db.AutoIncrementIdEntity) value;
+public class UpdateQueryBuilder$AutoIncrementIdEntity implements core.framework.internal.db.UpdateQuery {
+    public core.framework.internal.db.UpdateQuery.Statement update(Object value, boolean partial) {
+        core.framework.internal.db.AutoIncrementIdEntity entity = (core.framework.internal.db.AutoIncrementIdEntity) value;
         if (entity.id == null) throw new Error("primary key must not be null, field=id");
         StringBuilder sql = new StringBuilder("UPDATE auto_increment_id_entity SET ");
         java.util.List params = new java.util.ArrayList();
@@ -37,7 +37,7 @@ public class UpdateQueryBuilder$AutoIncrementIdEntity implements core.framework.
         }
         sql.append(" WHERE id = ?");
         params.add(entity.id);
-        return new core.framework.impl.db.UpdateQuery.Statement(sql.toString(), params.toArray());
+        return new core.framework.internal.db.UpdateQuery.Statement(sql.toString(), params.toArray());
     }
 
 }
