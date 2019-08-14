@@ -38,14 +38,14 @@ class ResponseBeanMapperTest {
     }
 
     @Test
-    void testToJSONWithEmptyOptional() {
+    void toJSONWithEmptyOptional() {
         Optional<TestBean> optional = Optional.empty();
         byte[] bytes = responseBeanMapper.toJSON(optional);
         assertThat(new String(bytes, StandardCharsets.UTF_8)).isEqualTo("null");
     }
 
     @Test
-    void testToJSONWithOptional() {
+    void toJSONWithOptional() {
         var bean = new TestBean();
         bean.intField = 5;
         Optional<TestBean> optional = Optional.of(bean);
@@ -54,7 +54,7 @@ class ResponseBeanMapperTest {
     }
 
     @Test
-    void testToJSONWithValidationError() {
+    void toJSONWithValidationError() {
         assertThatThrownBy(() -> responseBeanMapper.toJSON(new TestBean()))
                 .isInstanceOf(ValidationException.class);
     }

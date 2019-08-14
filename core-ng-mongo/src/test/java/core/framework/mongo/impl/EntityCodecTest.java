@@ -42,7 +42,7 @@ class EntityCodecTest {
     }
 
     @Test
-    void testGetDocumentId() {
+    void getDocumentId() {
         TestEntity entity = new TestEntity();
         entity.id = new ObjectId();
         assertEquals(new BsonObjectId(entity.id), entityCodec.getDocumentId(entity));

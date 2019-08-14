@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class KeyTest {
     @Test
-    void testAsMapKey() {
+    void asMapKey() {
         var stringKey1 = new Key(String.class, null);
         var stringKey2 = new Key(String.class, null);
         assertThat(stringKey1)

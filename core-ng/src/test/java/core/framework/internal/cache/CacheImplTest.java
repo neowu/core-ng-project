@@ -74,7 +74,7 @@ class CacheImplTest {
     }
 
     @Test
-    void testGetAll() {
+    void getAll() {
         var values = Map.of("name:key1", Strings.bytes(JSON.toJSON(cacheItem("v1"))),
                 "name:key3", Strings.bytes(JSON.toJSON(cacheItem("v3"))));
         when(cacheStore.getAll("name:key1", "name:key2", "name:key3")).thenReturn(values);
@@ -90,7 +90,7 @@ class CacheImplTest {
     }
 
     @Test
-    void testGetAllWithStaleData() {
+    void getAllWithStaleData() {
         var values = Map.of("name:key1", Strings.bytes("{}"),
                 "name:key2", Strings.bytes(JSON.toJSON(cacheItem("key2"))));
         when(cacheStore.getAll("name:key1", "name:key2")).thenReturn(values);

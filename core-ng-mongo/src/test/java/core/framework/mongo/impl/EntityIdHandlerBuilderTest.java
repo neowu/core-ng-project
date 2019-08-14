@@ -38,7 +38,7 @@ class EntityIdHandlerBuilderTest {
     }
 
     @Test
-    void testGet() {
+    void get() {
         var entity = new TestEntity();
         entity.id = new ObjectId();
         ObjectId id = (ObjectId) handler.get(entity);

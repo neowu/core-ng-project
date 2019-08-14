@@ -17,7 +17,7 @@ class DBEnumMapperTest {
     }
 
     @Test
-    void testGetEnum() {
+    void getEnum() {
         assertThat(mapper.getEnum(null)).isNull();
         assertThat(mapper.getEnum("DB_V1")).isEqualTo(TestEnum.V1);
         assertThat(mapper.getEnum("DB_V2")).isEqualTo(TestEnum.V2);

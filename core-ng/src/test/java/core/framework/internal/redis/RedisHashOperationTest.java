@@ -30,7 +30,7 @@ class RedisHashOperationTest extends AbstractRedisOperationTest {
     }
 
     @Test
-    void testGetAll() {
+    void getAll() {
         response("*4\r\n$1\r\n1\r\n$1\r\n2\r\n$1\r\n3\r\n$1\r\n4\r\n");
         Map<String, String> values = redis.hash().getAll("key");
 

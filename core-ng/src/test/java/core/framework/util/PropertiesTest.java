@@ -18,7 +18,7 @@ class PropertiesTest {
     }
 
     @Test
-    void testGetEmptyValue() {
+    void getEmptyValue() {
         properties.set("key", "");
 
         assertThat(properties.get("key")).isEmpty();
