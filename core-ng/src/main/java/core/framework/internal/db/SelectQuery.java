@@ -18,7 +18,7 @@ final class SelectQuery<T> {
     private final String table;
     private final String columns;
 
-    SelectQuery(Class<?> entityClass) {
+    SelectQuery(Class<T> entityClass) {
         table = entityClass.getDeclaredAnnotation(Table.class).name();
         List<Field> fields = Classes.instanceFields(entityClass);
         columns = columns(fields);

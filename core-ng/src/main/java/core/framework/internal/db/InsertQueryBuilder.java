@@ -40,7 +40,7 @@ class InsertQueryBuilder<T> {
     }
 
     private void buildSQL() {
-        var builder = new StringBuilder("INSERT INTO ");
+        var builder = new StringBuilder(256).append("INSERT INTO ");
 
         Table table = entityClass.getDeclaredAnnotation(Table.class);
         builder.append(table.name()).append(" (");
