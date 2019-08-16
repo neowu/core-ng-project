@@ -19,7 +19,7 @@ class WebSocketHandlerTest {
 
     @BeforeEach
     void createWebSocketHandler() {
-        handler = new WebSocketHandler(new LogManager());
+        handler = new WebSocketHandler(new LogManager(), null);
     }
 
     @Test

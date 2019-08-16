@@ -4,6 +4,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.log.ActionLog;
 import core.framework.impl.log.LogManager;
 import core.framework.impl.web.request.RequestImpl;
+import core.framework.impl.web.session.SessionManager;
 import core.framework.util.Sets;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.NotFoundException;
@@ -37,9 +38,11 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
     private final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
     private final Handshake handshake = new Hybi13Handshake();
     private final WebSocketMessageListener messageListener;
+    private final SessionManager sessionManager;
 
-    public WebSocketHandler(LogManager logManager) {
+    public WebSocketHandler(LogManager logManager, SessionManager sessionManager) {
         messageListener = new WebSocketMessageListener(logManager);
+        this.sessionManager = sessionManager;
     }
 
     public boolean checkWebSocket(HTTPMethod method, HeaderMap headers) {
@@ -59,6 +62,8 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
 
         ChannelListener listener = listeners.get(path);
         if (listener == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
+
+        request.session = sessionManager.load(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 
         var webSocketExchange = new AsyncWebSocketHttpServerExchange(exchange, channels);
         exchange.upgradeChannel((connection, httpServerExchange) -> {

@@ -20,7 +20,7 @@ public final class WebSocketConfig {
         if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
 
         if (context.httpServer.handler.webSocketHandler == null) {
-            context.httpServer.handler.webSocketHandler = new WebSocketHandler(context.logManager);
+            context.httpServer.handler.webSocketHandler = new WebSocketHandler(context.logManager, context.httpServer.siteManager.sessionManager);
             context.beanFactory.bind(WebSocketContext.class, null, context.httpServer.handler.webSocketHandler.context);
         }
 
