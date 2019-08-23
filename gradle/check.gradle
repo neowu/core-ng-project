@@ -30,6 +30,7 @@ subprojects {
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
         toolVersion = '6.17.0'
         consoleOutput = true
+        incrementalAnalysis = true
     }
 
     spotbugs {

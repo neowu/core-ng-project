@@ -64,5 +64,5 @@ allprojects {
 }
 
 tasks.named('wrapper') {
-    gradleVersion = '5.5'
+    gradleVersion = '5.6'
 }
