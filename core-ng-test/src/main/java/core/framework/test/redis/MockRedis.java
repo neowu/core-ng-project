@@ -105,4 +105,14 @@ public final class MockRedis implements Redis {
     public RedisList list() {
         return list;
     }
+
+    @Override
+    public long exists(String... keys) {
+        int count = 0;
+        for (String key : keys) {
+            if (store.get(key) != null) count++;
+        }
+
+        return count;
+    }
 }

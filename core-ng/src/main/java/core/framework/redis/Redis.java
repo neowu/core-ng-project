@@ -37,4 +37,6 @@ public interface Redis {
     void forEach(String pattern, Consumer<String> consumer);
 
     RedisList list();
+
+    long exists(String... keys);
 }

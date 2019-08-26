@@ -103,4 +103,24 @@ class MockRedisTest {
         assertThat(redis.get("key7")).isEqualTo("value7");
         assertThat(redis.get("key8")).isEqualTo("value8");
     }
+
+    @Test
+    void exists() {
+        assertThat(redis.exists("key1")).isEqualTo(0);
+        assertThat(redis.exists("key2")).isEqualTo(0);
+        assertThat(redis.exists("key3")).isEqualTo(0);
+        assertThat(redis.exists("key4")).isEqualTo(0);
+
+        redis.set("key1", "value");
+        assertThat(redis.exists("key1")).isEqualTo(1);
+
+        redis.set().add("key2", "value");
+        assertThat(redis.exists("key2")).isEqualTo(1);
+
+        redis.hash().set("key3", "field1", "value");
+        assertThat(redis.exists("key3")).isEqualTo(1);
+
+        redis.list().push("key4", "value");
+        assertThat(redis.exists("key4")).isEqualTo(1);
+    }
 }
