@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static core.framework.internal.redis.Protocol.Command.DEL;
-import static core.framework.internal.redis.Protocol.Command.EXISTS;
 import static core.framework.internal.redis.Protocol.Command.EXPIRE;
 import static core.framework.internal.redis.Protocol.Command.GET;
 import static core.framework.internal.redis.Protocol.Command.INCRBY;
@@ -361,28 +360,6 @@ public final class RedisImpl implements Redis {
     @Override
     public RedisList list() {
         return redisList;
-    }
-
-    @Override
-    public long exists(String... keys) {
-        var watch = new StopWatch();
-        PoolItem<RedisConnection> item = pool.borrowItem();
-        long count = 0;
-        try {
-            RedisConnection connection = item.resource;
-            connection.writeKeysCommand(EXISTS, keys);
-            count = connection.readLong();
-            return count;
-        } catch (IOException e) {
-            item.broken = true;
-            throw new UncheckedIOException(e);
-        } finally {
-            pool.returnItem(item);
-            long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed, 0, 1);
-            logger.debug("exists, keys={}, size={}, count={}, elapsed={}", new ArrayLogParam(keys), keys.length, count, elapsed);
-            checkSlowOperation(elapsed);
-        }
     }
 
     void checkSlowOperation(long elapsed) {
