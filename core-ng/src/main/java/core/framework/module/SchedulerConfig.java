@@ -5,6 +5,7 @@ import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.scheduler.DailyTrigger;
+import core.framework.impl.scheduler.HourlyTrigger;
 import core.framework.impl.scheduler.MonthlyTrigger;
 import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.scheduler.WeeklyTrigger;
@@ -48,6 +49,10 @@ public final class SchedulerConfig extends Config {
     public void fixedRate(String name, Job job, Duration rate) {
         scheduler.addFixedRateTask(name, job, rate);
         triggerAdded = true;
+    }
+
+    public void hourlyAt(String name, Job job, int minute, int second) {
+        trigger(name, job, new HourlyTrigger(minute, second));
     }
 
     public void dailyAt(String name, Job job, LocalTime time) {

@@ -19,7 +19,7 @@ public final class MonthlyTrigger implements Trigger {
         this.time = time;
 
         if (dayOfMonth < 1 || dayOfMonth > 28) {
-            throw new Error(format("unsupported dayOfMonth, please use 1-28, dayOfMonth={}", dayOfMonth));
+            throw new Error(format("dayOfMonth is out of range, please use 1-28, dayOfMonth={}", dayOfMonth));
         }
     }
 

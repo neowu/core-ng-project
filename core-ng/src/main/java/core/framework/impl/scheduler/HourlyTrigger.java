@@ -18,16 +18,20 @@ public final class HourlyTrigger implements Trigger {
         this.second = second;
 
         if (minute < 0 || minute > 59) {
-            throw new Error(format("minute out of range, please use 0-59, minute={}", minute));
+            throw new Error("minute is out of range, please use 0-59, minute=" + minute);
         }
         if (second < 0 || second > 59) {
-            throw new Error(format("second out of range, please use 0-59, second={}", second));
+            throw new Error("second is out of range, please use 0-59, second=" + second);
         }
     }
 
     @Override
     public ZonedDateTime next(ZonedDateTime previous) {
-        return previous.withMinute(minute).withSecond(second).withNano(0).plusHours(1);
+        ZonedDateTime next = previous.withMinute(minute).withSecond(second).withNano(0);
+        if (!next.isAfter(previous)) {
+            next = next.plusHours(1);
+        }
+        return next;
     }
 
     @Override

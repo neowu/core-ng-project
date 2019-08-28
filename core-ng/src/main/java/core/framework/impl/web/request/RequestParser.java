@@ -195,7 +195,7 @@ public final class RequestParser {
     int requestPort(String host, String scheme, HttpServerExchange exchange) {    // refer to io.undertow.server.HttpServerExchange.getHostPort(), use x-forwarded-proto as request scheme
         if (host != null) {     // HOST header is must for http/1.1, refer to https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
             int colonIndex;
-            if (Strings.startsWith(host, '[')) { //for ipv6 addresses we make sure we take out the first part, which can have multiple occurrences of :
+            if (Strings.startsWith(host, '[')) { //for ipv6 addresses make sure to take out the first part, which can have multiple occurrences of ':', e.g. Host: [::1]:5001
                 colonIndex = host.indexOf(':', host.indexOf(']'));
             } else {
                 colonIndex = host.indexOf(':');

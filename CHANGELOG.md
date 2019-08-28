@@ -1,4 +1,7 @@
 ## Change log
+### 7.0.1 (8/28/2019 - )
+* scheduler: support hourly trigger
+
 ### 7.0.0 (8/9/2019 - 8/27/2019) !!! only support jdk 12, recommended to update to 6.13.9 and all runtime to adoptopenjdk-12 before updating to 7.0.0 !!! 
 * project: updated source/target to java 12
 * db: drop oracle support, only support mysql to simplify  
