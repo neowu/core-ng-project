@@ -8,6 +8,7 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
 /**
@@ -67,5 +68,9 @@ class HTTPRequestTest {
 
         request.params.put("query", "value");
         assertThat(request.requestURI()).isEqualTo("http://localhost/uri?query=value");
+
+        assertThatThrownBy(() -> new HTTPRequest(HTTPMethod.POST, "http://localhost/uri?query=value"))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("uri must not contains query string");
     }
 }
