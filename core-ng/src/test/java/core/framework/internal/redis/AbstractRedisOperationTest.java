@@ -1,7 +1,7 @@
 package core.framework.internal.redis;
 
-import core.framework.impl.resource.Pool;
-import core.framework.impl.resource.PoolItem;
+import core.framework.internal.resource.Pool;
+import core.framework.internal.resource.PoolItem;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

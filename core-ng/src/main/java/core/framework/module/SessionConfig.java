@@ -3,10 +3,10 @@ package core.framework.module;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
-import core.framework.impl.resource.PoolMetrics;
 import core.framework.impl.web.session.LocalSessionStore;
 import core.framework.impl.web.session.RedisSessionStore;
 import core.framework.internal.redis.RedisImpl;
+import core.framework.internal.resource.PoolMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

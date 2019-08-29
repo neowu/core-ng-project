@@ -2,8 +2,8 @@ package core.framework.internal.db;
 
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
-import core.framework.impl.resource.Pool;
-import core.framework.impl.resource.PoolItem;
+import core.framework.internal.resource.Pool;
+import core.framework.internal.resource.PoolItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

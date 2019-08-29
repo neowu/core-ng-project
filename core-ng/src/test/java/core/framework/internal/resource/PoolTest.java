@@ -1,4 +1,4 @@
-package core.framework.impl.resource;
+package core.framework.internal.resource;
 
 import core.framework.util.Lists;
 import org.junit.jupiter.api.BeforeEach;

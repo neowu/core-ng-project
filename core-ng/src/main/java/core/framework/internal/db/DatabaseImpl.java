@@ -5,7 +5,7 @@ import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
 import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
-import core.framework.impl.resource.Pool;
+import core.framework.internal.resource.Pool;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.StopWatch;

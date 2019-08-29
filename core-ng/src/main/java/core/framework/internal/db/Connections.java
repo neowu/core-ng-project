@@ -1,6 +1,6 @@
 package core.framework.internal.db;
 
-import core.framework.impl.resource.PoolItem;
+import core.framework.internal.resource.PoolItem;
 
 import java.sql.Connection;
 import java.sql.SQLException;

@@ -1,7 +1,7 @@
 package core.framework.internal.redis;
 
 import core.framework.impl.log.filter.ArrayLogParam;
-import core.framework.impl.resource.PoolItem;
+import core.framework.internal.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisSet;
 import core.framework.util.Sets;

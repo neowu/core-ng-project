@@ -1,6 +1,6 @@
 package core.framework.internal.db;
 
-import core.framework.impl.resource.PoolItem;
+import core.framework.internal.resource.PoolItem;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;

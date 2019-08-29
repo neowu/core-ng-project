@@ -2,7 +2,7 @@ package core.framework.internal.redis;
 
 import core.framework.impl.log.filter.ArrayLogParam;
 import core.framework.impl.log.filter.MapLogParam;
-import core.framework.impl.resource.PoolItem;
+import core.framework.internal.resource.PoolItem;
 import core.framework.log.ActionLogContext;
 import core.framework.redis.RedisHash;
 import core.framework.util.Maps;

@@ -1,4 +1,4 @@
-package core.framework.impl.resource;
+package core.framework.internal.resource;
 
 /**
  * @author neo

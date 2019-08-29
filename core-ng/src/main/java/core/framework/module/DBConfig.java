@@ -7,8 +7,8 @@ import core.framework.db.Repository;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
-import core.framework.impl.resource.PoolMetrics;
 import core.framework.internal.db.DatabaseImpl;
+import core.framework.internal.resource.PoolMetrics;
 import core.framework.util.Lists;
 import core.framework.util.Types;
 

@@ -1,8 +1,8 @@
 package core.framework.internal.db;
 
 import core.framework.db.UncheckedSQLException;
-import core.framework.impl.resource.Pool;
-import core.framework.impl.resource.PoolItem;
+import core.framework.internal.resource.Pool;
+import core.framework.internal.resource.PoolItem;
 import core.framework.util.Lists;
 
 import java.math.BigDecimal;
