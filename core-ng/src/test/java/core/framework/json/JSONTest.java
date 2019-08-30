@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,13 +31,7 @@ class JSONTest {
             .contains("\"enumMap\":{\"A1\":\"A1\",\"B1\":\"B1\"}");
 
         var parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertThat(parsedBean.mapField)
-            .containsEntry("key1", "value1")
-            .containsEntry("key2", "value2");
-
-        assertThat(parsedBean.enumMapField)
-            .containsEntry(TestBean.TestEnum.A, "A1")
-            .containsEntry(TestBean.TestEnum.B, "B1");
+        assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
     }
 
     @Test
@@ -52,7 +47,7 @@ class JSONTest {
         assertThat(json).contains("\"child\":{\"boolean\":true,\"long\":200}");
 
         var parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertThat(parsedBean).isEqualToComparingFieldByFieldRecursively(bean);
+        assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
     }
 
     @Test
@@ -72,7 +67,7 @@ class JSONTest {
         assertThat(json).contains("\"list\":[\"value1\",\"value2\"],\"children\":[{\"boolean\":true,\"long\":null},{\"boolean\":false,\"long\":null}]");
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertThat(parsedBean).isEqualToComparingFieldByFieldRecursively(bean);
+        assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
     }
 
     @Test
@@ -86,8 +81,9 @@ class JSONTest {
         String json = JSON.toJSON(bean);
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
-        assertThat(parsedBean).isEqualToComparingOnlyGivenFields(bean, "instantField", "dateTimeField", "dateField", "timeField");
-        assertThat(parsedBean.zonedDateTimeField).isEqualTo(bean.zonedDateTimeField);
+        assertThat(parsedBean).usingRecursiveComparison()
+                              .withComparatorForType(Comparator.comparing(ZonedDateTime::toInstant), ZonedDateTime.class)
+                              .isEqualTo(bean);
     }
 
     @Test

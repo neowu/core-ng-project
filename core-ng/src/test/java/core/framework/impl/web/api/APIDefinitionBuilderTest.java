@@ -24,6 +24,6 @@ class APIDefinitionBuilderTest {
         builder.addServiceInterface(TestWebService.class);
         APIDefinitionResponse response = builder.build();
         APIDefinitionResponse expectedResponse = JSON.fromJSON(APIDefinitionResponse.class, ClasspathResources.text("api-test/test-webservice.json"));
-        assertThat(response).isEqualToComparingFieldByFieldRecursively(expectedResponse);
+        assertThat(response).usingRecursiveComparison().isEqualTo(expectedResponse);
     }
 }

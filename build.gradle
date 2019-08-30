@@ -8,9 +8,9 @@ subprojects {
 def elasticVersion = '7.3.1'
 def kafkaVersion = '2.3.0'
 def jacksonVersion = '2.9.9'
-def junitVersion = '5.5.0'
+def junitVersion = '5.5.1'
 def mockitoVersion = '3.0.0'
-def assertjVersion = '3.12.2'
+def assertjVersion = '3.13.2'
 
 project(':core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -63,7 +63,7 @@ project(':core-ng-mongo-test') {
     dependencies {
         api project(":core-ng-test")
         api project(":core-ng-mongo")
-        implementation 'de.bwaldvogel:mongo-java-server:1.17.1'
+        implementation 'de.bwaldvogel:mongo-java-server:1.19.0'
     }
 }
 

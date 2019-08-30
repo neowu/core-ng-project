@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -64,7 +65,7 @@ class BeanTest {
         assertThat(json).contains("\"child\":{\"boolean\":true,\"long\":200}");
 
         var parsedBean = Bean.fromJSON(TestBean.class, json);
-        assertThat(parsedBean).isEqualToComparingFieldByFieldRecursively(bean);
+        assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
     }
 
     @Test
@@ -84,7 +85,7 @@ class BeanTest {
         assertThat(json).contains("\"list\":[\"value1\",\"value2\"],\"children\":[{\"boolean\":true,\"long\":null},{\"boolean\":false,\"long\":null}]");
 
         TestBean parsedBean = Bean.fromJSON(TestBean.class, json);
-        assertThat(parsedBean).isEqualToComparingFieldByFieldRecursively(bean);
+        assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
     }
 
     @Test
@@ -97,8 +98,9 @@ class BeanTest {
         String json = Bean.toJSON(bean);
 
         TestBean parsedBean = Bean.fromJSON(TestBean.class, json);
-        assertThat(parsedBean).isEqualToComparingOnlyGivenFields(bean, "instantField", "dateTimeField", "dateField");
-        assertThat(parsedBean.zonedDateTimeField).isEqualTo(bean.zonedDateTimeField);
+        assertThat(parsedBean).usingRecursiveComparison()
+                              .withComparatorForType(Comparator.comparing(ZonedDateTime::toInstant), ZonedDateTime.class)
+                              .isEqualTo(bean);
     }
 
     @Test
