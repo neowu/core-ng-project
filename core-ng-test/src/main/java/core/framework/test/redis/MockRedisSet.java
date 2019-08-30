@@ -75,4 +75,11 @@ public final class MockRedisSet implements RedisSet {
 
         return Set.copyOf(results);
     }
+
+    @Override
+    public long size(String key) {
+        var redisValue = store.get(key);
+        if (redisValue == null) return 0;
+        return redisValue.set().size();
+    }
 }

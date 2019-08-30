@@ -51,4 +51,13 @@ class MockRedisSetTest {
         assertThat(redis.set().pop("key8", 1)).hasSize(1).containsAnyOf("value1", "value2");
         assertThat(redis.set().pop("key8", 1)).isEmpty();
     }
+
+    @Test
+    void size() {
+        redis.set().add("key10", "value1", "value2");
+        assertThat(redis.set().size("key10")).isEqualTo(2);
+
+        redis.set().pop("key10", 1);
+        assertThat(redis.set().size("key10")).isEqualTo(1);
+    }
 }

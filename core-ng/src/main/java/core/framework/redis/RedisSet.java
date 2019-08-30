@@ -16,4 +16,6 @@ public interface RedisSet {
 
     // use pop(key, Long.MAX_VALUE) to pop all elements
     Set<String> pop(String key, long count);
+
+    long size(String key);
 }
