@@ -1,7 +1,6 @@
 ## Change log
 ### 7.0.1 (8/28/2019 - 8/30/2019)
 * scheduler: support hourly trigger
-* httpClient: !!! do not allow to pass query string in "new HTTPRequest(method, uri)" anymore, must use request.params.put to append query param to ensure query param is proper encoded
 * redis: support set().size()
 
 ### 7.0.0 (8/9/2019 - 8/27/2019) !!! only support jdk 12, recommended to update to 6.13.9 and all runtime to adoptopenjdk-12 before updating to 7.0.0 !!! 

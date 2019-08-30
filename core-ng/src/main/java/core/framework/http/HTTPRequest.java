@@ -21,7 +21,6 @@ public final class HTTPRequest {
     public ContentType contentType;
 
     public HTTPRequest(HTTPMethod method, String uri) {
-        if (uri.indexOf('?') > -1) throw new Error("uri must not contains query string, please use request.params.put() to append query param, uri=" + uri);
         this.method = method;
         this.uri = uri;
     }
@@ -54,7 +53,7 @@ public final class HTTPRequest {
     public String requestURI() {
         if (params.isEmpty()) return uri;
 
-        var builder = new StringBuilder(256).append(uri).append('?');
+        var builder = new StringBuilder(256).append(uri).append(uri.indexOf('?') > -1 ? '&' : '?');
         HTTPRequestHelper.urlEncoding(builder, params);
         return builder.toString();
     }
