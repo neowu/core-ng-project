@@ -14,6 +14,7 @@ import java.io.UncheckedIOException;
 import java.util.Set;
 
 import static core.framework.internal.redis.Protocol.Command.SADD;
+import static core.framework.internal.redis.Protocol.Command.SCARD;
 import static core.framework.internal.redis.Protocol.Command.SISMEMBER;
 import static core.framework.internal.redis.Protocol.Command.SMEMBERS;
 import static core.framework.internal.redis.Protocol.Command.SPOP;
@@ -151,6 +152,28 @@ public final class RedisSetImpl implements RedisSet {
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, values == null ? 0 : values.size(), 0);
             logger.debug("spop, key={}, count={}, returnedValues={}, elapsed={}", key, count, values, elapsed);
+            redis.checkSlowOperation(elapsed);
+        }
+    }
+
+    @Override
+    public long size(String key) {
+        var watch = new StopWatch();
+        long size = 0;
+        PoolItem<RedisConnection> item = redis.pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeKeyCommand(SCARD, key);
+            size = connection.readLong();
+            return size;
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            redis.pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed);
+            logger.debug("scard, key={}, size={}, elapsed={}", key, size, elapsed);
             redis.checkSlowOperation(elapsed);
         }
     }
