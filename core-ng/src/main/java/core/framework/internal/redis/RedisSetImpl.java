@@ -172,7 +172,7 @@ public final class RedisSetImpl implements RedisSet {
         } finally {
             redis.pool.returnItem(item);
             long elapsed = watch.elapsed();
-            ActionLogContext.track("redis", elapsed);
+            ActionLogContext.track("redis", elapsed, 1, 0);
             logger.debug("scard, key={}, size={}, elapsed={}", key, size, elapsed);
             redis.checkSlowOperation(elapsed);
         }

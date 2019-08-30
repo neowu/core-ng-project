@@ -27,7 +27,7 @@ public final class MockRedisList implements RedisList {
 
     @Override
     public long push(String key, String... values) {
-        assertThat(values).doesNotContainNull();
+        assertThat(values).isNotEmpty().doesNotContainNull();
         var value = store.putIfAbsent(key, new ArrayList<>(values.length));
         List<String> list = value.list();
         Collections.addAll(list, values);

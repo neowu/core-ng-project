@@ -20,7 +20,7 @@ public final class MockRedisSet implements RedisSet {
 
     @Override
     public long add(String key, String... values) {
-        assertThat(values).doesNotContainNull();
+        assertThat(values).isNotEmpty().doesNotContainNull();
         var setValue = store.putIfAbsent(key, new HashSet<>());
         Set<String> set = setValue.set();
         long addedValues = 0;
@@ -46,6 +46,7 @@ public final class MockRedisSet implements RedisSet {
 
     @Override
     public long remove(String key, String... values) {
+        assertThat(values).isNotEmpty().doesNotContainNull();
         var redisValue = store.get(key);
         if (redisValue == null) return 0;
         Set<String> set = redisValue.set();

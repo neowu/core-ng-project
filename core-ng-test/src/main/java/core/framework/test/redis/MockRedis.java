@@ -10,6 +10,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author neo
  */
@@ -53,6 +55,7 @@ public final class MockRedis implements Redis {
 
     @Override
     public long del(String... keys) {
+        assertThat(keys).isNotEmpty();
         long removed = 0;
         for (String key : keys) {
             if (store.store.remove(key) != null) removed++;
@@ -73,6 +76,7 @@ public final class MockRedis implements Redis {
 
     @Override
     public Map<String, String> multiGet(String... keys) {
+        assertThat(keys).isNotEmpty();
         Map<String, String> results = Maps.newLinkedHashMapWithExpectedSize(keys.length);
         for (String key : keys) {
             String value = get(key);

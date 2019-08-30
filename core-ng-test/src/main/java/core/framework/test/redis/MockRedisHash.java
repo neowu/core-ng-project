@@ -5,6 +5,8 @@ import core.framework.redis.RedisHash;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author neo
  */
@@ -37,6 +39,7 @@ public final class MockRedisHash implements RedisHash {
 
     @Override
     public void multiSet(String key, Map<String, String> values) {
+        assertThat(values).isNotEmpty();
         var hashValue = store.putIfAbsent(key, new HashMap<>());
         hashValue.map().putAll(values);
     }
@@ -57,6 +60,7 @@ public final class MockRedisHash implements RedisHash {
 
     @Override
     public long del(String key, String... fields) {
+        assertThat(fields).isNotEmpty();
         MockRedisStore.Value value = store.get(key);
         if (value == null) return 0;
         long deleted = 0;
