@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpTimeoutException;
-import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -31,7 +31,9 @@ class RetryInterceptorTest {
 
     @BeforeEach
     void createRetryInterceptor() {
-        interceptor = new TestRetryInterceptor(3);
+        interceptor = new RetryInterceptor(3, time -> {
+            // skip sleep
+        });
     }
 
     @Test
@@ -43,8 +45,15 @@ class RetryInterceptorTest {
         assertThat(interceptor.shouldRetry(1, "POST", new HttpConnectTimeoutException("connection timeout"))).isTrue();
         assertThat(interceptor.shouldRetry(1, "POST", new ConnectException("connection refused"))).isTrue();
 
+        // socket read timeout caught by AsyncTimeout
         var timeout = new SocketTimeoutException("timeout");
         timeout.initCause(new SocketTimeoutException("Read timed out"));
+        assertThat(interceptor.shouldRetry(1, "POST", timeout)).isFalse();
+        assertThat(interceptor.shouldRetry(2, "PUT", timeout)).isTrue();
+
+        // okio AsyncTimeout close socket when timeout
+        timeout = new SocketTimeoutException("timeout");
+        timeout.initCause(new SocketException("Socket closed"));
         assertThat(interceptor.shouldRetry(1, "POST", timeout)).isFalse();
         assertThat(interceptor.shouldRetry(2, "PUT", timeout)).isTrue();
     }
@@ -79,16 +88,5 @@ class RetryInterceptorTest {
         interceptor.intercept(chain);
 
         verify(source).close();
-    }
-
-    static class TestRetryInterceptor extends RetryInterceptor {
-        TestRetryInterceptor(int maxRetries) {
-            super(maxRetries);
-        }
-
-        @Override
-        void sleep(Duration waitTime) {
-            // not sleep during test
-        }
     }
 }

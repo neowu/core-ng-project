@@ -41,6 +41,7 @@ public class APIConfig extends Config {
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
+        // default value is for internal api call only, targeting for kube env (with short connect timeout and more retries)
         httpClientBuilder = new HTTPClientBuilder()
                 .userAgent(WebServiceClient.USER_AGENT)
                 .trustAll()

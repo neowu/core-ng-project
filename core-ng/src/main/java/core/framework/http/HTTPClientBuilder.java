@@ -6,6 +6,7 @@ import core.framework.internal.http.HTTPClientImpl;
 import core.framework.internal.http.RetryInterceptor;
 import core.framework.internal.http.ServiceUnavailableInterceptor;
 import core.framework.util.StopWatch;
+import core.framework.util.Threads;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -45,10 +46,11 @@ public final class HTTPClientBuilder {
         var watch = new StopWatch();
         try {
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                    .connectTimeout(connectTimeout)
-                    .readTimeout(timeout)
-                    .writeTimeout(timeout)
-                    .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
+                .connectTimeout(connectTimeout)
+                .readTimeout(timeout)
+                .writeTimeout(timeout)
+                .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
+                .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
 
             if (trustAll) {
                 SSLContext sslContext = SSLContext.getInstance("TLS");
@@ -59,7 +61,7 @@ public final class HTTPClientBuilder {
             }
             if (maxRetries != null) {
                 builder.addNetworkInterceptor(new ServiceUnavailableInterceptor());
-                builder.addInterceptor(new RetryInterceptor(maxRetries));
+                builder.addInterceptor(new RetryInterceptor(maxRetries, Threads::sleepRoughly));
             }
             if (enableCookie) builder.cookieJar(new CookieManager());
 
@@ -104,5 +106,15 @@ public final class HTTPClientBuilder {
     public HTTPClientBuilder trustAll() {
         trustAll = true;
         return this;
+    }
+
+    Duration callTimeout() {
+        int attempts = maxRetries == null ? 1 : maxRetries;
+        long timeout = connectTimeout.toMillis() + this.timeout.toMillis() * attempts;
+        for (int i = 1; i < attempts; i++) {
+            timeout += 600 << i - 1;    // rough sleep can be +20% of 500ms
+        }
+        timeout += 2000;  // add 2 seconds as buffer
+        return Duration.ofMillis(timeout);
     }
 }

@@ -1,4 +1,22 @@
 ## Change log
+### 7.0.2 (9/3/2019 - 9/4/2019)
+* httpClient: added callTimeout as last timeout defense, as in prod env we encountered http client handing with timeout set
+  java.lang.Thread.State: RUNNABLE
+   	at java.net.SocketInputStream.socketRead0(java.base@12.0.2/Native Method)
+   	at java.net.SocketInputStream.socketRead(java.base@12.0.2/Unknown Source)
+   	at java.net.SocketInputStream.read(java.base@12.0.2/Unknown Source)
+   	at java.net.SocketInputStream.read(java.base@12.0.2/Unknown Source)
+   	at okio.InputStreamSource.read(Okio.kt:102)
+   	at okio.AsyncTimeout$source$1.read(AsyncTimeout.kt:159)
+   	at okio.RealBufferedSource.indexOf(RealBufferedSource.kt:349)
+   	at okio.RealBufferedSource.readUtf8LineStrict(RealBufferedSource.kt:222)
+   	at okhttp3.internal.http1.Http1ExchangeCodec.readHeaderLine(Http1ExchangeCodec.kt:210)
+   	at okhttp3.internal.http1.Http1ExchangeCodec.readResponseHeaders(Http1ExchangeCodec.kt:181)
+   	at okhttp3.internal.connection.Exchange.readResponseHeaders(Exchange.kt:105)
+   	at okhttp3.internal.http.CallServerInterceptor.intercept(CallServerInterceptor.kt:82)
+   	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:112)
+   	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:87)
+
 ### 7.0.1 (8/28/2019 - 8/30/2019)
 * scheduler: support hourly trigger
 * redis: support set().size()
