@@ -1,6 +1,6 @@
 package core.framework.search.impl;
 
-import core.framework.impl.log.LoggerImpl;
+import core.framework.internal.log.LoggerImpl;
 import core.framework.search.impl.log.ESLogger;
 import core.framework.util.Maps;
 import org.apache.logging.log4j.Level;

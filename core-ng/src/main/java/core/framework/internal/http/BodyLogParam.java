@@ -1,8 +1,8 @@
 package core.framework.internal.http;
 
 import core.framework.http.ContentType;
-import core.framework.impl.log.filter.BytesLogParam;
-import core.framework.impl.log.filter.JSONLogParam;
+import core.framework.internal.log.filter.BytesLogParam;
+import core.framework.internal.log.filter.JSONLogParam;
 
 import static core.framework.http.ContentType.APPLICATION_FORM_URLENCODED;
 import static core.framework.http.ContentType.APPLICATION_JSON;

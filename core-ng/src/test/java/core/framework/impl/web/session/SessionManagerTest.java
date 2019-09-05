@@ -1,6 +1,6 @@
 package core.framework.impl.web.session;
 
-import core.framework.impl.log.ActionLog;
+import core.framework.internal.log.ActionLog;
 import core.framework.web.CookieSpec;
 import core.framework.web.Request;
 import core.framework.web.Response;

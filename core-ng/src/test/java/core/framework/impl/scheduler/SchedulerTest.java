@@ -1,8 +1,8 @@
 package core.framework.impl.scheduler;
 
 
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.LogManager;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import core.framework.scheduler.Job;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

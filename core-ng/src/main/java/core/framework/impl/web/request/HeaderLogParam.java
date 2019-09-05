@@ -1,6 +1,6 @@
 package core.framework.impl.web.request;
 
-import core.framework.impl.log.filter.LogParam;
+import core.framework.internal.log.filter.LogParam;
 import io.undertow.util.HeaderValues;
 import io.undertow.util.HttpString;
 

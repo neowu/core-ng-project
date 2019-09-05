@@ -1,6 +1,6 @@
 package core.framework.internal.kafka;
 
-import core.framework.impl.log.LogManager;
+import core.framework.internal.log.LogManager;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.util.ASCII;

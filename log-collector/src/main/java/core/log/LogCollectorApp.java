@@ -1,8 +1,8 @@
 package core.log;
 
 import core.framework.http.HTTPMethod;
-import core.framework.internal.log.message.EventMessage;
-import core.framework.internal.log.message.LogTopics;
+import core.framework.log.message.EventMessage;
+import core.framework.log.message.LogTopics;
 import core.framework.module.App;
 import core.framework.module.SystemModule;
 import core.framework.util.Sets;

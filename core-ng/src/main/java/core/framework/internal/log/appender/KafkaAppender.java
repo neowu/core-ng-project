@@ -2,9 +2,9 @@ package core.framework.internal.log.appender;
 
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.kafka.ProducerMetrics;
-import core.framework.internal.log.message.ActionLogMessage;
-import core.framework.internal.log.message.LogTopics;
-import core.framework.internal.log.message.StatMessage;
+import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.LogTopics;
+import core.framework.log.message.StatMessage;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import core.framework.util.Threads;

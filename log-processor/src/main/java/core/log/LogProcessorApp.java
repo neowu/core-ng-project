@@ -1,9 +1,9 @@
 package core.log;
 
-import core.framework.internal.log.message.ActionLogMessage;
-import core.framework.internal.log.message.EventMessage;
-import core.framework.internal.log.message.LogTopics;
-import core.framework.internal.log.message.StatMessage;
+import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.EventMessage;
+import core.framework.log.message.LogTopics;
+import core.framework.log.message.StatMessage;
 import core.framework.module.App;
 import core.framework.search.module.SearchConfig;
 import core.log.domain.ActionDocument;

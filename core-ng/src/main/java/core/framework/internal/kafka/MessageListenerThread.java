@@ -1,9 +1,9 @@
 package core.framework.internal.kafka;
 
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.LogManager;
-import core.framework.impl.log.filter.BytesLogParam;
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
+import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.kafka.Message;
 import core.framework.log.Markers;
 import core.framework.util.StopWatch;

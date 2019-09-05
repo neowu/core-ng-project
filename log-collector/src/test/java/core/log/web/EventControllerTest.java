@@ -1,6 +1,6 @@
 package core.log.web;
 
-import core.framework.internal.log.message.EventMessage;
+import core.framework.log.message.EventMessage;
 import core.framework.web.Request;
 import core.framework.web.exception.ForbiddenException;
 import org.junit.jupiter.api.BeforeEach;

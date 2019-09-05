@@ -1,7 +1,7 @@
 package core.framework.internal.kafka;
 
-import core.framework.impl.log.ActionLog;
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.log.ActionLog;
 import core.framework.kafka.Message;
 import core.framework.util.Strings;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

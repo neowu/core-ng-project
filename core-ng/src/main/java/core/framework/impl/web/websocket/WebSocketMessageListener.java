@@ -1,7 +1,7 @@
 package core.framework.impl.web.websocket;
 
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.LogManager;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import io.undertow.websockets.core.AbstractReceiveListener;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.CloseMessage;

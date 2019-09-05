@@ -1,7 +1,7 @@
 package core.framework.internal.async;
 
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.LogManager;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,9 @@
 package core.log.kafka;
 
 import core.framework.inject.Inject;
-import core.framework.internal.log.message.StatMessage;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.Message;
+import core.framework.log.message.StatMessage;
 import core.log.service.StatService;
 
 import java.util.ArrayList;

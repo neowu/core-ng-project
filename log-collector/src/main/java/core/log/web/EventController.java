@@ -2,11 +2,11 @@ package core.log.web;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.HTTPHeaders;
-import core.framework.impl.log.LogManager;
 import core.framework.inject.Inject;
-import core.framework.internal.log.message.EventMessage;
+import core.framework.internal.log.LogManager;
 import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
+import core.framework.log.message.EventMessage;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import core.framework.web.exception.ForbiddenException;

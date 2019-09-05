@@ -2,8 +2,8 @@ package core.log.service;
 
 import core.framework.inject.Inject;
 import core.framework.internal.log.appender.LogAppender;
-import core.framework.internal.log.message.ActionLogMessage;
-import core.framework.internal.log.message.StatMessage;
+import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.StatMessage;
 
 /**
  * @author neo

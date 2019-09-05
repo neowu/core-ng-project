@@ -1,12 +1,12 @@
 package core.framework.impl.web.response;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.filter.FieldLogParam;
 import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.session.SessionManager;
 import core.framework.impl.web.site.TemplateManager;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.filter.FieldLogParam;
 import core.framework.util.Encodings;
 import core.framework.web.CookieSpec;
 import io.undertow.server.HttpServerExchange;

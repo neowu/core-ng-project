@@ -1,1 +1,1 @@
-core.framework.impl.log.DefaultLoggerServiceProvider
+core.framework.internal.log.DefaultLoggerServiceProvider

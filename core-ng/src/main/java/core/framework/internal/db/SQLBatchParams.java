@@ -1,6 +1,6 @@
 package core.framework.internal.db;
 
-import core.framework.impl.log.filter.LogParam;
+import core.framework.internal.log.filter.LogParam;
 
 import java.util.List;
 import java.util.Set;

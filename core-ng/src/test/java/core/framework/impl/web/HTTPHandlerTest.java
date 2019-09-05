@@ -1,6 +1,6 @@
 package core.framework.impl.web;
 
-import core.framework.impl.log.ActionLog;
+import core.framework.internal.log.ActionLog;
 import io.undertow.util.HeaderMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 package core.framework.impl.web;
 
-import core.framework.impl.log.LogManager;
 import core.framework.impl.web.site.SiteManager;
+import core.framework.internal.log.LogManager;
 import core.framework.util.StopWatch;
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;

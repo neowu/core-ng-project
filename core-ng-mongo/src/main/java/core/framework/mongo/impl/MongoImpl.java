@@ -9,7 +9,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.connection.ClusterSettings;
 import com.mongodb.connection.ConnectionPoolSettings;
 import com.mongodb.connection.SocketSettings;
-import core.framework.impl.log.LogManager;
+import core.framework.internal.log.LogManager;
 import core.framework.mongo.Collection;
 import core.framework.mongo.Mongo;
 import core.framework.mongo.MongoCollection;

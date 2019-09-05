@@ -1,6 +1,6 @@
 package core.framework.impl.web.response;
 
-import core.framework.impl.log.filter.JSONLogParam;
+import core.framework.internal.log.filter.JSONLogParam;
 import io.undertow.io.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

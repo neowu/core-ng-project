@@ -1,8 +1,8 @@
 package core.framework.impl.web.session;
 
 import core.framework.crypto.Hash;
-import core.framework.impl.log.ActionLog;
 import core.framework.impl.web.request.RequestImpl;
+import core.framework.internal.log.ActionLog;
 import core.framework.web.CookieSpec;
 import core.framework.web.Request;
 import core.framework.web.Response;

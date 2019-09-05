@@ -1,6 +1,6 @@
 package core.framework.internal.redis;
 
-import core.framework.impl.log.filter.LogParam;
+import core.framework.internal.log.filter.LogParam;
 
 import java.util.Map;
 import java.util.Set;

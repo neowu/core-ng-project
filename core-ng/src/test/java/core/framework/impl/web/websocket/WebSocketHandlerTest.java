@@ -1,7 +1,7 @@
 package core.framework.impl.web.websocket;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.log.LogManager;
+import core.framework.internal.log.LogManager;
 import core.framework.web.exception.BadRequestException;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;

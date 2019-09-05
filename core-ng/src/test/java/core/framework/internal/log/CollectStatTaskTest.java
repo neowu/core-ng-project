@@ -1,8 +1,8 @@
 package core.framework.internal.log;
 
 import core.framework.internal.log.appender.LogAppender;
-import core.framework.internal.log.message.StatMessage;
 import core.framework.internal.stat.Stat;
+import core.framework.log.message.StatMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -16,10 +16,11 @@
 * run diagnostic when heap usage is high, send trace, log().alert() ?
 
 * refine web body bean, revisit cache/validation impl 
-* /_sys/, kafka controller, should be call message handler directly?
+* /_sys/, kafka controller, should be calling message handler directly?
 * revisit trace log truncation, better/more elegant handling?
 * support LocalTime in db?
 * db/redis diagnostic controller/stats?
+* ws: on connect not allow set session? different sessionImpl?
 
 ### jdk 11 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

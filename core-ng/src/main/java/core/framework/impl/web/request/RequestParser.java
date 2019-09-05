@@ -2,9 +2,9 @@ package core.framework.impl.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.filter.FieldLogParam;
 import core.framework.internal.http.BodyLogParam;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.filter.FieldLogParam;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;

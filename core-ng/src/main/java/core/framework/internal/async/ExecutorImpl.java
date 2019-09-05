@@ -2,8 +2,8 @@ package core.framework.internal.async;
 
 import core.framework.async.Executor;
 import core.framework.async.Task;
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.LogManager;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import core.framework.log.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

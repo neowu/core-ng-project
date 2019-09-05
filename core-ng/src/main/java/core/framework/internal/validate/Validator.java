@@ -1,6 +1,6 @@
 package core.framework.internal.validate;
 
-import core.framework.impl.log.filter.JSONLogParam;
+import core.framework.internal.log.filter.JSONLogParam;
 import core.framework.json.JSON;
 import core.framework.util.Strings;
 import org.slf4j.Logger;

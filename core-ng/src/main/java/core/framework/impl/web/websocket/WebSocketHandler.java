@@ -1,10 +1,10 @@
 package core.framework.impl.web.websocket;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.log.ActionLog;
-import core.framework.impl.log.LogManager;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.session.SessionManager;
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import core.framework.util.Sets;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.NotFoundException;

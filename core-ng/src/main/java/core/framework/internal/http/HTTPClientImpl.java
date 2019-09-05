@@ -6,7 +6,7 @@ import core.framework.http.HTTPHeaders;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.impl.log.filter.MapLogParam;
+import core.framework.internal.log.filter.MapLogParam;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.StopWatch;

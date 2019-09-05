@@ -1,8 +1,8 @@
 package core.framework.internal.log.appender;
 
-import core.framework.internal.log.message.ActionLogMessage;
-import core.framework.internal.log.message.PerformanceStat;
-import core.framework.internal.log.message.StatMessage;
+import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.PerformanceStat;
+import core.framework.log.message.StatMessage;
 
 import java.io.PrintStream;
 import java.time.format.DateTimeFormatter;

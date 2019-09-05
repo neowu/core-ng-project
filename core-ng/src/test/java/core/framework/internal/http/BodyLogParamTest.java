@@ -1,8 +1,8 @@
 package core.framework.internal.http;
 
 import core.framework.http.ContentType;
-import core.framework.impl.log.filter.BytesLogParam;
-import core.framework.impl.log.filter.JSONLogParam;
+import core.framework.internal.log.filter.BytesLogParam;
+import core.framework.internal.log.filter.JSONLogParam;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 

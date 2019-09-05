@@ -1,7 +1,7 @@
 package core.framework.search.impl.log;
 
-import core.framework.impl.log.LogLevel;
-import core.framework.impl.log.LoggerImpl;
+import core.framework.internal.log.LogLevel;
+import core.framework.internal.log.LoggerImpl;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.message.Message;
