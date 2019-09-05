@@ -1,4 +1,6 @@
 ## Change log
+### 7.0.3 (9/4/2019 - )
+
 ### 7.0.2 (9/3/2019 - 9/4/2019)
 * httpClient: added callTimeout as last timeout defense, as in prod env we encountered http client handing with timeout set
   java.lang.Thread.State: RUNNABLE

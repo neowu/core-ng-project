@@ -56,6 +56,11 @@ class RetryInterceptorTest {
         timeout.initCause(new SocketException("Socket closed"));
         assertThat(interceptor.shouldRetry(1, "POST", timeout)).isFalse();
         assertThat(interceptor.shouldRetry(2, "PUT", timeout)).isTrue();
+
+        // okio AsyncTimout cancels call when if call timout
+        IOException cancelled = new IOException("Canceled");
+        assertThat(interceptor.shouldRetry(1, "POST", cancelled)).isFalse();
+        assertThat(interceptor.shouldRetry(2, "PUT", cancelled)).isTrue();
     }
 
     @Test
