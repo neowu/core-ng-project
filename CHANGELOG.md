@@ -1,6 +1,8 @@
 ## Change log
 ### 7.0.3 (9/4/2019 - )
-
+* log-processor: log-processor will import kibana objects during start, set env KIBANA_URL and KIBANA_BANNER in kube env to enable
+    only support kibana 7.3.1+
+        
 ### 7.0.2 (9/3/2019 - 9/4/2019)
 * httpClient: added callTimeout as last timeout defense, as in prod env we encountered http client handing with timeout set
   java.lang.Thread.State: RUNNABLE

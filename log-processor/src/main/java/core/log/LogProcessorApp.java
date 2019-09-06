@@ -1,5 +1,7 @@
 package core.log;
 
+import core.framework.http.HTTPClient;
+import core.framework.http.HTTPClientBuilder;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
@@ -18,6 +20,7 @@ import core.log.service.ActionService;
 import core.log.service.ElasticSearchAppender;
 import core.log.service.EventService;
 import core.log.service.IndexService;
+import core.log.service.KibanaService;
 import core.log.service.StatService;
 
 import java.time.Duration;
@@ -30,6 +33,7 @@ public class LogProcessorApp extends App {
     @Override
     protected void initialize() {
         loadProperties("sys.properties");
+        loadProperties("kibana.properties");
 
         SearchConfig search = config(SearchConfig.class);
         search.host(requiredProperty("sys.elasticsearch.host"));
@@ -54,6 +58,12 @@ public class LogProcessorApp extends App {
         });
 
         onStartup(indexService::createIndexTemplatesUntilSuccess);
+
+        property("kibana.url").ifPresent(url -> {
+            String banner = property("kibana.banner").orElse("");
+            HTTPClient client = new HTTPClientBuilder().maxRetries(5).build();  // create ad hoc http client will be recycled once done
+            onStartup(() -> new Thread(new KibanaService(url, banner, client)::importObjects, "kibana").start());
+        });
 
         kafka().uri(requiredProperty("sys.kafka.uri"));
         kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
