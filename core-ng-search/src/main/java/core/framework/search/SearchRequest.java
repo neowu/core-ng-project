@@ -19,5 +19,5 @@ public class SearchRequest {
     public SearchType type;
     public Integer skip;
     public Integer limit;
-    public Boolean trackTotalHits;
+    public boolean trackTotalHits;
 }

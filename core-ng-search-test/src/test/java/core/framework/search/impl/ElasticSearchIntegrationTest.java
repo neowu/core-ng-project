@@ -229,7 +229,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
         var request = new SearchRequest();
         request.query = matchQuery("string_field", "value1");
-        request.trackTotalHits = Boolean.TRUE;
+        request.trackTotalHits = true;
         SearchResponse<TestDocument> response = documentType.search(request);
 
         assertThat(response.totalHits).isEqualTo(10001);
