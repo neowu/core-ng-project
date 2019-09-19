@@ -11,6 +11,7 @@ import core.framework.search.SearchRequest;
 import core.framework.search.SearchResponse;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
+import core.framework.util.Maps;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -214,6 +215,24 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
         var sum = new BigDecimal(((Sum) response.aggregations.get("totalValue")).getValue()).setScale(4, RoundingMode.HALF_UP);
         assertThat(sum).isEqualTo("19.1400");
+    }
+
+    @Test
+    void trackTotalHits() {
+        Map<String, TestDocument> map = Maps.newHashMap();
+        for (int i = 1; i <= 10001; i++) {
+            String id = String.valueOf(i);
+            map.put(id, document(id, "value1", 0, 0, null, null));
+        }
+        documentType.bulkIndex(map);
+        elasticSearch.refreshIndex("document");
+
+        var request = new SearchRequest();
+        request.query = matchQuery("string_field", "value1");
+        request.trackTotalHits = true;
+        SearchResponse<TestDocument> response = documentType.search(request);
+
+        assertThat(response.totalHits).isEqualTo(10001);
     }
 
     private TestDocument document(String id, String stringField, int intField, double doubleField, ZonedDateTime dateTimeField, LocalTime timeField) {
