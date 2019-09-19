@@ -93,7 +93,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             request.sorts.forEach(source::sort);
             if (request.skip != null) source.from(request.skip);
             if (request.limit != null) source.size(request.limit);
-            if (request.trackTotalHits) source.trackTotalHits(true);
+            if (request.trackTotalHitsUpTo != null) source.trackTotalHitsUpTo(request.trackTotalHitsUpTo);
 
             org.elasticsearch.action.search.SearchResponse response = search(searchRequest);
             esTook = response.getTook().nanos();

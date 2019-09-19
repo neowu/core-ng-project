@@ -35,6 +35,7 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.IntStream.range;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
@@ -50,7 +51,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @AfterEach
     void cleanup() {
-        documentType.bulkDelete(range(0, 30).mapToObj(String::valueOf).collect(Collectors.toList()));
+        documentType.bulkDelete(range(0, 100).mapToObj(String::valueOf).collect(Collectors.toList()));
         elasticSearch.refreshIndex("document");
     }
 
@@ -219,20 +220,26 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
 
     @Test
     void trackTotalHits() {
-        Map<String, TestDocument> map = Maps.newHashMap();
-        for (int i = 1; i <= 10001; i++) {
+        Map<String, TestDocument> documents = Maps.newHashMap();
+        for (int i = 0; i < 50; i++) {
             String id = String.valueOf(i);
-            map.put(id, document(id, "value1", 0, 0, null, null));
+            documents.put(id, document(id, "value1", 0, 0, null, null));
         }
-        documentType.bulkIndex(map);
+        documentType.bulkIndex(documents);
         elasticSearch.refreshIndex("document");
 
         var request = new SearchRequest();
-        request.query = matchQuery("string_field", "value1");
-        request.trackTotalHits = true;
+        request.query = matchAllQuery();
+        request.limit = 5;
+        request.trackTotalHitsUpTo = 10;
         SearchResponse<TestDocument> response = documentType.search(request);
 
-        assertThat(response.totalHits).isEqualTo(10001);
+        assertThat(response.hits).hasSize(5);
+        assertThat(response.totalHits).isEqualTo(10);
+
+        request.trackTotalHitsUpTo = 20;
+        response = documentType.search(request);
+        assertThat(response.totalHits).isEqualTo(20);
     }
 
     private TestDocument document(String id, String stringField, int intField, double doubleField, ZonedDateTime dateTimeField, LocalTime timeField) {

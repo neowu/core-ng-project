@@ -19,5 +19,9 @@ public class SearchRequest {
     public SearchType type;
     public Integer skip;
     public Integer limit;
-    public boolean trackTotalHits;
+    public Integer trackTotalHitsUpTo;
+
+    public void trackTotalHits() {
+        trackTotalHitsUpTo = Integer.MAX_VALUE;
+    }
 }
