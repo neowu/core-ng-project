@@ -240,6 +240,10 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         request.trackTotalHitsUpTo = 20;
         response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(20);
+
+        request.trackTotalHits();
+        response = documentType.search(request);
+        assertThat(response.totalHits).isEqualTo(50);
     }
 
     private TestDocument document(String id, String stringField, int intField, double doubleField, ZonedDateTime dateTimeField, LocalTime timeField) {
