@@ -12,7 +12,6 @@ import core.framework.search.SearchResponse;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.metrics.Sum;
@@ -83,7 +82,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         List<TestDocument> results = Lists.newArrayList();
 
         ForEach<TestDocument> forEach = new ForEach<>();
-        forEach.query = QueryBuilders.matchAllQuery();
+        forEach.query = matchAllQuery();
         forEach.limit = 7;
         forEach.consumer = results::add;
 
