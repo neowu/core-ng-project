@@ -53,8 +53,9 @@ class EventControllerTest {
         event.date = ZonedDateTime.now().minusHours(1);
         event.result = CollectEventRequest.Result.WARN;
         event.errorCode = "NOT_FOUND";
+        event.errorMessage = "not found";
         event.context.put("path", "/path");
-        event.info.put("message", "not found");
+        event.info.put("stackTrace", "trace");
         event.elapsedTime = 100L;
 
         var controller = new EventController(Set.of());

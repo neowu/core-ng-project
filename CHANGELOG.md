@@ -1,4 +1,7 @@
 ## Change log
+### 7.0.4 (10/1/2019 - )
+* log-collector: add errorMessage field in event, to keep consistent with action log
+
 ### 7.0.3 (9/4/2019 - 9/19/2019)
 * log-processor: log-processor will import kibana objects during start, set env KIBANA_URL and KIBANA_BANNER in kube env to enable
     only support kibana 7.3.1+

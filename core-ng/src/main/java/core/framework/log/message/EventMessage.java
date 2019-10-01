@@ -23,6 +23,8 @@ public class EventMessage {
     public String action;
     @Property(name = "error_code")
     public String errorCode;
+    @Property(name = "error_message")
+    public String errorMessage;
     @Property(name = "context")
     public Map<String, String> context;
     @Property(name = "info")

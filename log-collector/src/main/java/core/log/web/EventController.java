@@ -79,6 +79,7 @@ public class EventController {
         message.result = JSON.toEnumValue(event.result);
         message.action = event.action;
         message.errorCode = event.errorCode;
+        message.errorMessage = event.errorMessage;
         message.context = event.context;
         message.info = event.info;
         message.elapsed = event.elapsedTime;

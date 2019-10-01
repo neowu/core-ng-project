@@ -42,6 +42,10 @@
       "error_code": {
         "type": "keyword"
       },
+      "error_message": {
+        "type": "text",
+        "index": "false"
+      },
       "elapsed": {
         "type": "long"
       }

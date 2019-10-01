@@ -42,6 +42,8 @@ public class CollectEventRequest {
         @NotBlank
         @Property(name = "errorCode")
         public String errorCode;
+        @Property(name = "errorMessage")
+        public String errorMessage;
         @NotNull
         @Property(name = "context")
         public Map<String, String> context = new HashMap<>();
