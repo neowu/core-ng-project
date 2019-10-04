@@ -132,7 +132,7 @@ public final class RequestImpl implements Request {
                 }
                 throw new BadRequestException(format("body is missing or unsupported content type, method={}, contentType={}", method, contentType), "INVALID_HTTP_REQUEST");
             } else {
-                throw new Error(format("not supported method, method={}", method));
+                throw new Error("not supported method, method=" + method);
             }
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), e.errorCode(), e);

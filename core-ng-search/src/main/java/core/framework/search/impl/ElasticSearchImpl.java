@@ -14,6 +14,7 @@ import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CloseIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.PutIndexTemplateRequest;
@@ -107,7 +108,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void closeIndex(String index) {
         var watch = new StopWatch();
         try {
-            client().indices().close(Requests.closeIndexRequest(index), RequestOptions.DEFAULT);
+            client().indices().close(new CloseIndexRequest(index), RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
