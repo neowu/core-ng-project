@@ -127,7 +127,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         Aggregations aggregationResponse = response.getAggregations();
         Map<String, Aggregation> aggregations = aggregationResponse == null ? Map.of() : aggregationResponse.asMap();
         TotalHits totalHits = response.getHits().getTotalHits();
-        return new SearchResponse<>(items, totalHits == null ? -1 : totalHits.value, aggregations);
+        long total = totalHits == null ? -1 : totalHits.value;
+        return new SearchResponse<>(items, total, aggregations);
     }
 
     @Override
