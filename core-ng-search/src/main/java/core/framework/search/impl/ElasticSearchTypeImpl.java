@@ -20,6 +20,7 @@ import core.framework.search.SearchResponse;
 import core.framework.search.UpdateRequest;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
+import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -125,7 +126,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         }
         Aggregations aggregationResponse = response.getAggregations();
         Map<String, Aggregation> aggregations = aggregationResponse == null ? Map.of() : aggregationResponse.asMap();
-        return new SearchResponse<>(items, response.getHits().getTotalHits().value, aggregations);
+        TotalHits totalHits = response.getHits().getTotalHits();
+        return new SearchResponse<>(items, totalHits == null ? -1 : totalHits.value, aggregations);
     }
 
     @Override
