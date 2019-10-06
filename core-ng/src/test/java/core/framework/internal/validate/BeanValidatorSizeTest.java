@@ -42,6 +42,7 @@ class BeanValidatorSizeTest {
         bean.stringList = List.of("1", "2", "3");
         bean.stringMap = Map.of("key", "value");
         bean.children = List.of(new Child());
+        bean.stringListMap = Map.of("k1", List.of("v1"), "k2", List.of("v2"));
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
@@ -60,6 +61,9 @@ class BeanValidatorSizeTest {
 
         @Size(min = 1, max = 3, message = "children must have 1 to 3 items")
         public List<Child> children;
+
+        @Size(min = 2, max = 3, message = "stringListMap must have 2 to 3 items")
+        public Map<String, List<String>> stringListMap;
     }
 
     static class Child {

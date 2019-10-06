@@ -51,8 +51,12 @@ public final class ConsoleAppender implements LogAppender {
         }
         builder.append(LOG_SPLITTER).append("cpuTime=").append(log.cpuTime);
 
-        for (Map.Entry<String, String> entry : log.context.entrySet()) {
-            builder.append(LOG_SPLITTER).append(entry.getKey()).append('=').append(filterLineSeparator(entry.getValue()));
+        for (Map.Entry<String, List<String>> entry : log.context.entrySet()) {
+            String key = entry.getKey();
+            List<String> values = entry.getValue();
+            for (String value : values) {
+                builder.append(LOG_SPLITTER).append(key).append('=').append(filterLineSeparator(value));
+            }
         }
         if (log.clients != null) {
             builder.append(LOG_SPLITTER).append("client=");

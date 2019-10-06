@@ -36,7 +36,7 @@ class ConsoleAppenderTest {
         action.result = "OK";
         action.action = "action";
         action.correlationIds = List.of("refId1", "refId2");
-        action.context = Map.of("context", "value");
+        action.context = Map.of("context", List.of("value"));
         action.performanceStats = Map.of("db", perf(100, 1, 0), "redis", perf(120, 0, 1));
         action.clients = List.of("service");
         action.refIds = List.of("refId3");
@@ -44,15 +44,15 @@ class ConsoleAppenderTest {
 
         String message = appender.message(action);
         assertThat(message)
-                .contains("| OK |")
-                .contains("| correlationId=refId1,refId2 |")
-                .contains("| action=action |")
-                .contains("| context=value |")
-                .contains("| client=service |")
-                .contains("| refId=refId3 |")
-                .contains("| stat=1.0 |")
-                .contains("| dbCount=1 | dbReads=1 | dbWrites=0 | dbElapsed=100")
-                .contains("| redisCount=1 | redisReads=0 | redisWrites=1 | redisElapsed=120");
+            .contains("| OK |")
+            .contains("| correlationId=refId1,refId2 |")
+            .contains("| action=action |")
+            .contains("| context=value |")
+            .contains("| client=service |")
+            .contains("| refId=refId3 |")
+            .contains("| stat=1.0 |")
+            .contains("| dbCount=1 | dbReads=1 | dbWrites=0 | dbElapsed=100")
+            .contains("| redisCount=1 | redisReads=0 | redisWrites=1 | redisElapsed=120");
     }
 
     @Test
@@ -63,8 +63,8 @@ class ConsoleAppenderTest {
 
         String message = appender.message(stat);
         assertThat(message)
-                .contains("| thread_count=10.000000000")
-                .contains("| cpu_usage=0.010000000");
+            .contains("| thread_count=10.000000000")
+            .contains("| cpu_usage=0.010000000");
     }
 
     private PerformanceStat perf(long elapsed, int read, int write) {

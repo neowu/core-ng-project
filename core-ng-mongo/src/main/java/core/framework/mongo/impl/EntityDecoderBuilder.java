@@ -38,10 +38,10 @@ final class EntityDecoderBuilder<T> {
         builder.addField("private final {} logger = {}.getLogger({});", type(Logger.class), type(LoggerFactory.class), variable(EntityDecoder.class));
         String methodName = decodeEntityMethod(entityClass);
         var builder = new CodeBuilder()
-                .append("public Object decode(org.bson.BsonReader reader) {\n")
-                .indent(1).append("{} wrapper = new {}(reader);\n", type(BsonReaderWrapper.class), type(BsonReaderWrapper.class))
-                .indent(1).append("return {}(reader, wrapper, {});\n", methodName, variable(""))
-                .append("}");
+            .append("public Object decode(org.bson.BsonReader reader) {\n")
+            .indent(1).append("{} wrapper = new {}(reader);\n", type(BsonReaderWrapper.class), type(BsonReaderWrapper.class))
+            .indent(1).append("return {}(reader, wrapper, {});\n", methodName, variable(""))
+            .append("}");
         this.builder.addMethod(builder.build());
         return this.builder.build();
     }
@@ -90,12 +90,13 @@ final class EntityDecoderBuilder<T> {
     }
 
     private String decodeMapMethod(Type mapType) {
-        Class<?> keyClass = GenericTypes.mapKeyClass(mapType);
-        Class<?> valueClass = GenericTypes.mapValueClass(mapType);
         String methodName = decodeMethods.get(mapType);
         if (methodName != null) return methodName;
 
-        methodName = "decodeMap" + keyClass.getSimpleName() + valueClass.getSimpleName() + (index++);
+        Class<?> keyClass = GenericTypes.mapKeyClass(mapType);
+        Type valueType = GenericTypes.mapValueType(mapType);
+
+        methodName = "decodeMap" + keyClass.getSimpleName() + GenericTypes.rawClass(valueType).getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder();
         builder.append("private java.util.Map {}(org.bson.BsonReader reader, {} wrapper, String parentField) {\n", methodName, type(BsonReaderWrapper.class))
                .indent(1).append("java.util.Map map = wrapper.startReadMap(parentField);\n")
@@ -105,7 +106,7 @@ final class EntityDecoderBuilder<T> {
                .indent(2).append("String fieldName = reader.readName();\n")
                .indent(2).append("String fieldPath = parentField + \".\" + fieldName;\n");
 
-        String variable = decodeValue(builder, valueClass, 2);
+        String variable = decodeValue(builder, valueType, 2);
 
         if (String.class.equals(keyClass)) {
             builder.indent(2).append("map.put(fieldName, {});\n", variable);
@@ -127,9 +128,10 @@ final class EntityDecoderBuilder<T> {
     }
 
     private String decodeListMethod(Type listType) {
-        Class<?> valueClass = GenericTypes.listValueClass(listType);
         String methodName = decodeMethods.get(listType);
         if (methodName != null) return methodName;
+
+        Class<?> valueClass = GenericTypes.listValueClass(listType);
 
         methodName = "decodeList" + valueClass.getSimpleName() + (index++);
         CodeBuilder builder = new CodeBuilder();

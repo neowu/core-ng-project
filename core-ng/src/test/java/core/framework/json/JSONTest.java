@@ -24,11 +24,13 @@ class JSONTest {
         bean.mapField.put("key2", "value2");
         bean.enumMapField.put(TestBean.TestEnum.A, "A1");
         bean.enumMapField.put(TestBean.TestEnum.B, "B1");
+        bean.mapListField.put("key1", List.of("v1"));
 
         String json = JSON.toJSON(bean);
         assertThat(json)
             .contains("\"map\":{\"key1\":\"value1\",\"key2\":\"value2\"}")
-            .contains("\"enumMap\":{\"A1\":\"A1\",\"B1\":\"B1\"}");
+            .contains("\"enumMap\":{\"A1\":\"A1\",\"B1\":\"B1\"}")
+            .contains("\"listMap\":{\"key1\":[\"v1\"]}");
 
         var parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);

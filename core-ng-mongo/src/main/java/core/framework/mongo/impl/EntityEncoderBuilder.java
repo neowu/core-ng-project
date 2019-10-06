@@ -93,11 +93,12 @@ final class EntityEncoderBuilder<T> {
     }
 
     private String encodeMapMethod(Type mapFieldType) {
-        Class<?> keyClass = GenericTypes.mapKeyClass(mapFieldType);
-        Class<?> valueClass = GenericTypes.mapValueClass(mapFieldType);
-
         String methodName = encodeMethods.get(mapFieldType);
         if (methodName != null) return methodName;
+
+        Class<?> keyClass = GenericTypes.mapKeyClass(mapFieldType);
+        Type valueType = GenericTypes.mapValueType(mapFieldType);
+        Class<?> valueClass = GenericTypes.rawClass(valueType);
 
         methodName = "encodeMap" + keyClass.getSimpleName() + valueClass.getSimpleName() + (index++);
         var builder = new CodeBuilder();
@@ -118,7 +119,7 @@ final class EntityEncoderBuilder<T> {
         builder.indent(2).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
                .indent(2).append("writer.writeName(key);\n");
 
-        encodeField(builder, "value", valueClass, 2);
+        encodeField(builder, "value", valueType, 2);
 
         builder.indent(1).append("}\n")
                .indent(1).append("writer.writeEndDocument();\n")
@@ -142,11 +143,11 @@ final class EntityEncoderBuilder<T> {
         } else if (fieldClass.isEnum()) {
             String enumCodecVariable = registerEnumCodec(fieldClass);
             builder.indent(indent).append("{}.encode(writer, {}, null);\n", enumCodecVariable, fieldVariable);
-        } else if (GenericTypes.isGenericList(fieldType)) {
+        } else if (GenericTypes.isList(fieldType)) {
             String methodName = encodeListMethod(fieldType);
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, wrapper, {});\n", methodName, fieldVariable);
-        } else if (GenericTypes.isGenericMap(fieldType)) {
+        } else if (GenericTypes.isMap(fieldType)) {
             String methodName = encodeMapMethod(fieldType);
             builder.indent(indent).append("if ({} == null) writer.writeNull();\n", fieldVariable);
             builder.indent(indent).append("else {}(writer, wrapper, {});\n", methodName, fieldVariable);

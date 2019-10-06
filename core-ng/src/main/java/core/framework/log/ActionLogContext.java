@@ -3,7 +3,7 @@ package core.framework.log;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * @author neo
@@ -15,16 +15,18 @@ public final class ActionLogContext {
         return actionLog.id;
     }
 
-    public static Optional<String> get(String key) {
+    public static List<String> get(String key) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-        if (actionLog == null) return Optional.empty();
-        return actionLog.context(key);
+        if (actionLog == null) return List.of();
+        List<String> values = actionLog.context.get(key);
+        if (values == null) return List.of();
+        return values;
     }
 
-    public static void put(String key, Object value) {
+    public static void put(String key, Object... values) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {    // here to check null is for unit testing the logManager.begin may not be called
-            actionLog.context(key, value);
+            actionLog.context(key, values);
         }
     }
 

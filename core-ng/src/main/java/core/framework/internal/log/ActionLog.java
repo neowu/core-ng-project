@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static core.framework.internal.log.LogLevel.DEBUG;
 import static core.framework.internal.log.LogLevel.WARN;
@@ -30,8 +29,8 @@ public final class ActionLog {
     private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
 
     public final String id;
+    public final Map<String, List<String>> context;
     final Instant date;
-    final Map<String, String> context;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
     final long startTime;
@@ -116,19 +115,16 @@ public final class ActionLog {
         return null;
     }
 
-    public Optional<String> context(String key) {
-        return Optional.ofNullable(context.get(key));
-    }
-
-    public void context(String key, Object value) {
-        String contextValue = String.valueOf(value);
-        if (contextValue.length() > MAX_CONTEXT_VALUE_LENGTH) { // prevent application code from putting large blob as context, e.g. xml or json response
-            throw new Error(format("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_ERROR_MESSAGE_LENGTH)));
+    public void context(String key, Object... values) {
+        List<String> contextValues = context.computeIfAbsent(key, k -> new ArrayList<>(2));
+        for (Object value : values) {
+            String contextValue = String.valueOf(value);
+            if (contextValue.length() > MAX_CONTEXT_VALUE_LENGTH) { // prevent application code from putting large blob as context, e.g. xml or json response
+                throw new Error(format("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_ERROR_MESSAGE_LENGTH)));
+            }
+            contextValues.add(contextValue);
+            add(event("[context] {}={}", key, contextValue));
         }
-        String previous = context.put(key, contextValue);
-        // put context can be called by application code, check duplication to avoid producing huge trace log by accident
-        if (previous != null) throw new Error(format("found duplicate context key, key={}, value={}, previous={}", key, contextValue, previous));
-        add(event("[context] {}={}", key, contextValue));
     }
 
     public void stat(String key, double value) {

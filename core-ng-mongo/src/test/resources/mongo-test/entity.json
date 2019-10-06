@@ -34,5 +34,9 @@
   "null_child": null,
   "enum_map_field": {
     "I1": "V1"
+  },
+  "map_list_field": {
+    "K1": ["V1"],
+    "K2": ["V2", "V3"]
   }
 }

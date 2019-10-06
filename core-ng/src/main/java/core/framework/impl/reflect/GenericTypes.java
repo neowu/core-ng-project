@@ -60,14 +60,14 @@ public final class GenericTypes {
         if (!(type instanceof ParameterizedType)) return false;
 
         Type[] arguments = ((ParameterizedType) type).getActualTypeArguments();
-        return arguments[0] instanceof Class && arguments[1] instanceof Class;
+        return arguments[0] instanceof Class && (arguments[1] instanceof Class || isGenericList(arguments[1]));
     }
 
     public static Class<?> mapKeyClass(Type type) {
         return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
     }
 
-    public static Class<?> mapValueClass(Type type) {
-        return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[1];
+    public static Type mapValueType(Type type) {
+        return ((ParameterizedType) type).getActualTypeArguments()[1];
     }
 }

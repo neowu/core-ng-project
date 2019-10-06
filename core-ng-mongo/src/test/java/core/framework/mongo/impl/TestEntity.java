@@ -63,4 +63,7 @@ public class TestEntity {
 
     @Field(name = "enum_map_field")
     public Map<TestEnum, String> enumMapField;
+
+    @Field(name = "map_list_field")
+    public Map<String, List<String>> mapListField;
 }

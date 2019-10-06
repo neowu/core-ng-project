@@ -37,7 +37,7 @@ public class ActionLogMessage {
     @Property(name = "cpu_time")
     public Long cpuTime;
     @Property(name = "context")
-    public Map<String, String> context;
+    public Map<String, List<String>> context;
     @Property(name = "stats")
     public Map<String, Double> stats;
     @Property(name = "perf_stats")

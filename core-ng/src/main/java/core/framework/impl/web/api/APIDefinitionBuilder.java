@@ -128,7 +128,7 @@ public class APIDefinitionBuilder {
         }
         if (GenericTypes.isMap(type)) {
             Class<?> keyClass = GenericTypes.mapKeyClass(type);
-            String valueType = parseType(GenericTypes.mapValueClass(type));
+            String valueType = parseType(GenericTypes.mapValueType(type));
             if (String.class.equals(keyClass)) {
                 return "{[key:string]: " + valueType + ";}";
             } else if (keyClass.isEnum()) {

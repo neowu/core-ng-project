@@ -80,6 +80,19 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         writer.writeEndDocument();
     }
 
+    private void encodeMapStringList9(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, java.util.Map map) {
+        writer.writeStartDocument();
+        for (java.util.Iterator iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
+            java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
+            String key = (String) entry.getKey();
+            java.util.List value = (java.util.List) entry.getValue();
+            writer.writeName(key);
+            if (value == null) writer.writeNull();
+            else encodeListString1(writer, wrapper, value);
+        }
+        writer.writeEndDocument();
+    }
+
     private void encodeTestEntity0(org.bson.BsonWriter writer, core.framework.mongo.impl.BsonWriterWrapper wrapper, core.framework.mongo.impl.TestEntity entity) {
         writer.writeStartDocument();
         writer.writeName("_id");
@@ -119,6 +132,9 @@ public class EntityEncoder$TestEntity implements core.framework.mongo.impl.Entit
         writer.writeName("enum_map_field");
         if (entity.enumMapField == null) writer.writeNull();
         else encodeMapTestEnumString8(writer, wrapper, entity.enumMapField);
+        writer.writeName("map_list_field");
+        if (entity.mapListField == null) writer.writeNull();
+        else encodeMapStringList9(writer, wrapper, entity.mapListField);
         writer.writeEndDocument();
     }
 

@@ -1,5 +1,8 @@
 ## Change log
-### 7.0.4 (10/1/2019 - )
+### 7.1.0 (10/1/2019 - ) !!! Action Log format changed, must update both core-ng and log-processor to same version !!!
+### it's not designed to be backward compatible since impact is small, only lost some incompatible action logs during upgrading
+* log: support put multiple values in same action log context, to make bulk handler / api easier to track, 
+    ActionLogContext.get(key) returns List<String> now
 * log-collector: add errorMessage field in event, to keep consistent with action log
 * httpClient: update okHTTP to 4.2.0
 * search: update es to 7.4.0

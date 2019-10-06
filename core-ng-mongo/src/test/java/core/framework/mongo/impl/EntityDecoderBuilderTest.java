@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
@@ -46,5 +48,6 @@ class EntityDecoderBuilderTest {
 
         assertThat(entity.mapField).contains(entry("K1", "V1"), entry("K2", "V2"));
         assertThat(entity.enumMapField).containsEntry(TestEnum.ITEM1, "V1");
+        assertThat(entity.mapListField).containsExactly(entry("K1", List.of("V1")), entry("K2", List.of("V2", "V3")));
     }
 }

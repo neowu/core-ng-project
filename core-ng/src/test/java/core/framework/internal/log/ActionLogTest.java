@@ -4,6 +4,8 @@ import core.framework.log.message.PerformanceStat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -21,16 +23,15 @@ class ActionLogTest {
     @Test
     void contextValueIsTooLong() {
         assertThatThrownBy(() -> log.context("key", "x".repeat(1001)))
-                .isInstanceOf(Error.class)
-                .hasMessageStartingWith("context value is too long");
+            .isInstanceOf(Error.class)
+            .hasMessageStartingWith("context value is too long");
     }
 
     @Test
-    void duplicateContextKey() {
+    void multipleContextValues() {
         log.context("key", "value1");
-        assertThatThrownBy(() -> log.context("key", "value2"))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("found duplicate context key");
+        log.context("key", "value2");
+        assertThat(log.context).containsEntry("key", List.of("value1", "value2"));
     }
 
     @Test

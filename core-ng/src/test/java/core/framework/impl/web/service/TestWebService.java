@@ -71,6 +71,9 @@ public interface TestWebService {
 
         @Property(name = "items")
         public List<TestItem> items;
+
+        @Property(name = "map_list_field")
+        public Map<String, List<String>> mapListField;
     }
 
     class TestItem {

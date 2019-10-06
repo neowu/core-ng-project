@@ -36,7 +36,7 @@ class ActionServiceTest extends IntegrationTest {
     @Test
     void index() {
         ActionLogMessage message1 = message("1", "OK");
-        message1.context = Map.of("key", "value");
+        message1.context = Map.of("key", List.of("value"));
         message1.stats = Map.of("count", 1d);
         message1.correlationIds = List.of("id1", "id2");
         message1.clients = List.of("client");
@@ -60,6 +60,7 @@ class ActionServiceTest extends IntegrationTest {
         assertThat(action.refIds).isEqualTo(message1.refIds);
         assertThat(action.clients).isEqualTo(message1.clients);
         assertThat(action.performanceStats.get("redis")).isEqualToComparingFieldByField(message1.performanceStats.get("redis"));
+        assertThat(action.context).containsEntry("key", List.of("value"));
 
         TraceDocument trace = traceDocument(now, message2.id);
         assertThat(trace.content).isEqualTo(message2.traceLog);

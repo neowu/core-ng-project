@@ -58,16 +58,7 @@ public class ClassValidator {
             } else if (GenericTypes.isMap(fieldType)) {
                 if (!allowChild) throw new Error("map field is not allowed, field=" + Fields.path(field));
 
-                if (!GenericTypes.isGenericMap(fieldType))
-                    throw new Error("map must be Map<K,V>, K must be String or Enum and V must be class, field=" + Fields.path(field));
-
-                Class<?> keyClass = GenericTypes.mapKeyClass(fieldType);
-                if (!String.class.equals(keyClass) && !keyClass.isEnum())
-                    throw new Error("map key must be String or Enum, field=" + Fields.path(field));
-                if (visitor != null && keyClass.isEnum())
-                    visitor.visitEnum(keyClass);
-
-                visitValue(GenericTypes.mapValueClass(fieldType), field, fieldPath);
+                visitMap(fieldType, field, fieldPath);
             } else {
                 visitValue(GenericTypes.rawClass(fieldType), field, fieldPath);
             }
@@ -99,9 +90,33 @@ public class ClassValidator {
         visitObject(valueClass, owner, path);
     }
 
+    private void visitMap(Type fieldType, Field owner, String path) {
+        if (!GenericTypes.isGenericMap(fieldType))
+            throw new Error("map must be Map<K,V>, K must be String or Enum and V must be class or List<Value>, field=" + Fields.path(owner));
+
+        Class<?> keyClass = GenericTypes.mapKeyClass(fieldType);
+        if (!String.class.equals(keyClass) && !keyClass.isEnum())
+            throw new Error("map key must be String or Enum, field=" + Fields.path(owner));
+        if (visitor != null && keyClass.isEnum())
+            visitor.visitEnum(keyClass);
+
+        Type mapValueType = GenericTypes.mapValueType(fieldType);
+        if (GenericTypes.isList(mapValueType)) {
+            if (!GenericTypes.isGenericList(mapValueType))
+                throw new Error("map must be Map<K,List<V>> and V must be value class, field=" + Fields.path(owner));
+
+            Class<?> listValueClass = GenericTypes.listValueClass(mapValueType);
+            if (!allowedValueClasses.contains(listValueClass)) {
+                throw new Error(format("map list value class is not supported, class={}, field={}", listValueClass.getCanonicalName(), Fields.path(owner)));
+            }
+        } else {
+            visitValue(GenericTypes.rawClass(mapValueType), owner, path);
+        }
+    }
+
     private void visitList(Type listType, Field owner, String path) {
         if (!GenericTypes.isGenericList(listType))
-            throw new Error("list must be List<T> and T must be class, type=" + listType.getTypeName());
+            throw new Error("list must be List<T> and T must be class, field=" + Fields.path(owner));
 
         Class<?> valueClass = GenericTypes.listValueClass(listType);
         visitValue(valueClass, owner, path);

@@ -97,7 +97,10 @@ public class BeanValidatorBuilder {
     private void buildMapValidation(CodeBuilder builder, Field field, String pathLiteral, String parentPath) {
         buildSizeValidation(builder, field, pathLiteral);
 
-        Class<?> valueClass = GenericTypes.mapValueClass(field.getGenericType());
+        Type valueType = GenericTypes.mapValueType(field.getGenericType());
+        if (GenericTypes.isList(valueType)) return; // ensured by class validator, if it's list it must be List<Value>
+
+        Class<?> valueClass = GenericTypes.rawClass(valueType);
         if (!isValueClass(valueClass)) {
             String method = validateMethod(valueClass, path(field, parentPath));
             builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.entrySet().iterator(); iterator.hasNext(); ) {\n", field.getName())
@@ -188,15 +191,17 @@ public class BeanValidatorBuilder {
 
     private Class<?> targetValidationClass(Field field) {
         Type fieldType = field.getGenericType();
-        Class<?> targetClass;
         if (GenericTypes.isList(fieldType)) {
-            targetClass = GenericTypes.listValueClass(fieldType);
+            return GenericTypes.listValueClass(fieldType);
         } else if (GenericTypes.isMap(fieldType)) {
-            targetClass = GenericTypes.mapValueClass(fieldType);
+            Type mapValueType = GenericTypes.mapValueType(fieldType);
+            if (GenericTypes.isList(mapValueType)) {
+                return GenericTypes.listValueClass(mapValueType);
+            }
+            return GenericTypes.rawClass(mapValueType);
         } else {
-            targetClass = GenericTypes.rawClass(fieldType);
+            return GenericTypes.rawClass(fieldType);
         }
-        return targetClass;
     }
 
     private void validateAnnotations(Field field, Object beanWithDefaultValues) throws IllegalAccessException {

@@ -53,6 +53,7 @@ class EntityEncoderBuilderTest {
         entity.listField = List.of("V1", "V2");
         entity.mapField = Map.of("K1", "V1", "K2", "V2");
         entity.enumMapField = Map.of(TestEnum.ITEM1, "V1");
+        entity.mapListField = Map.of("K1", List.of("V1"), "K2", List.of("V2", "V3"));
 
         var bson = new BsonDocument();
         try (var writer = new BsonDocumentWriter(bson)) {

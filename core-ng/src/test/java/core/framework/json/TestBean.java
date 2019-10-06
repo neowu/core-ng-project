@@ -27,6 +27,10 @@ public class TestBean {
     public Map<TestEnum, String> enumMapField = new EnumMap<>(TestEnum.class);
 
     @NotNull
+    @Property(name = "listMap")
+    public Map<String, List<String>> mapListField = Maps.newHashMap();
+
+    @NotNull
     @Property(name = "list")
     public List<String> listField = Lists.newArrayList();
 
