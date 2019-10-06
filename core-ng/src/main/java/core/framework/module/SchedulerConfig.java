@@ -4,13 +4,13 @@ import core.framework.http.HTTPMethod;
 import core.framework.impl.module.Config;
 import core.framework.impl.module.ModuleContext;
 import core.framework.impl.module.ShutdownHook;
-import core.framework.impl.scheduler.DailyTrigger;
-import core.framework.impl.scheduler.HourlyTrigger;
-import core.framework.impl.scheduler.MonthlyTrigger;
-import core.framework.impl.scheduler.Scheduler;
-import core.framework.impl.scheduler.WeeklyTrigger;
 import core.framework.impl.web.management.ListJobResponse;
 import core.framework.impl.web.management.SchedulerController;
+import core.framework.internal.scheduler.DailyTrigger;
+import core.framework.internal.scheduler.HourlyTrigger;
+import core.framework.internal.scheduler.MonthlyTrigger;
+import core.framework.internal.scheduler.Scheduler;
+import core.framework.internal.scheduler.WeeklyTrigger;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
 

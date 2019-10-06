@@ -1,7 +1,7 @@
 package core.framework.internal.db;
 
 import core.framework.db.DBEnumValue;
-import core.framework.impl.reflect.Enums;
+import core.framework.internal.reflect.Enums;
 import core.framework.util.Maps;
 
 import java.util.EnumMap;

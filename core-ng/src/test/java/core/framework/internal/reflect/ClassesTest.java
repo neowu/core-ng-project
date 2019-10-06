@@ -1,8 +1,6 @@
-package core.framework.impl.reflect;
+package core.framework.internal.reflect;
 
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo

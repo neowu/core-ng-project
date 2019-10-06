@@ -1,8 +1,8 @@
 package core.framework.mongo.impl;
 
-import core.framework.impl.reflect.Classes;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
+import core.framework.internal.reflect.Classes;
 import core.framework.mongo.Id;
 import org.bson.types.ObjectId;
 

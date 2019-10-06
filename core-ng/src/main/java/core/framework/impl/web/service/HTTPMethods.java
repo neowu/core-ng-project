@@ -6,7 +6,7 @@ import core.framework.api.web.service.PATCH;
 import core.framework.api.web.service.POST;
 import core.framework.api.web.service.PUT;
 import core.framework.http.HTTPMethod;
-import core.framework.impl.reflect.Methods;
+import core.framework.internal.reflect.Methods;
 
 import java.lang.reflect.Method;
 

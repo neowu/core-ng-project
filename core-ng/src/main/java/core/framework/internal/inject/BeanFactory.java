@@ -1,10 +1,10 @@
 package core.framework.internal.inject;
 
-import core.framework.impl.reflect.Fields;
-import core.framework.impl.reflect.Methods;
-import core.framework.impl.reflect.Params;
 import core.framework.inject.Inject;
 import core.framework.inject.Named;
+import core.framework.internal.reflect.Fields;
+import core.framework.internal.reflect.Methods;
+import core.framework.internal.reflect.Params;
 import core.framework.util.Maps;
 import core.framework.util.Types;
 

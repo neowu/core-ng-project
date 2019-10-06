@@ -1,4 +1,4 @@
-package core.framework.impl.scheduler;
+package core.framework.internal.scheduler;
 
 import org.junit.jupiter.api.Test;
 
@@ -6,7 +6,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import static java.time.LocalDateTime.parse;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**

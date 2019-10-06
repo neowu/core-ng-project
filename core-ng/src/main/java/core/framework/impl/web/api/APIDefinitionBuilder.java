@@ -5,10 +5,10 @@ import core.framework.api.validate.NotNull;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.QueryParam;
-import core.framework.impl.reflect.Classes;
-import core.framework.impl.reflect.GenericTypes;
-import core.framework.impl.reflect.Params;
 import core.framework.impl.web.service.HTTPMethods;
+import core.framework.internal.reflect.Classes;
+import core.framework.internal.reflect.GenericTypes;
+import core.framework.internal.reflect.Params;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 

@@ -1,6 +1,6 @@
 package core.framework.mongo.impl;
 
-import core.framework.impl.reflect.Enums;
+import core.framework.internal.reflect.Enums;
 import core.framework.mongo.MongoEnumValue;
 import core.framework.util.Maps;
 import org.bson.BsonReader;

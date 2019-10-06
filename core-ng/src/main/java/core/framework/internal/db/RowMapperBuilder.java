@@ -1,9 +1,9 @@
 package core.framework.internal.db;
 
 import core.framework.db.Column;
-import core.framework.impl.reflect.Classes;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
+import core.framework.internal.reflect.Classes;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;

@@ -7,11 +7,11 @@ import core.framework.api.validate.NotBlank;
 import core.framework.api.validate.NotNull;
 import core.framework.api.validate.Pattern;
 import core.framework.api.validate.Size;
-import core.framework.impl.reflect.Classes;
-import core.framework.impl.reflect.Fields;
-import core.framework.impl.reflect.GenericTypes;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
+import core.framework.internal.reflect.Classes;
+import core.framework.internal.reflect.Fields;
+import core.framework.internal.reflect.GenericTypes;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

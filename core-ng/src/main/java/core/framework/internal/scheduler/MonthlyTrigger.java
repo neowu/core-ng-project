@@ -1,4 +1,4 @@
-package core.framework.impl.scheduler;
+package core.framework.internal.scheduler;
 
 import core.framework.scheduler.Trigger;
 

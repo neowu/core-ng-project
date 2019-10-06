@@ -1,4 +1,4 @@
-package core.framework.impl.reflect;
+package core.framework.internal.reflect;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +15,6 @@ class MethodsTest {
     @Test
     void path() throws NoSuchMethodException {
         String path = Methods.path(MethodsTest.class.getDeclaredMethod("testMethod", String.class, Integer.class));
-        assertThat(path).isEqualTo("core.framework.impl.reflect.MethodsTest.testMethod(java.lang.String, java.lang.Integer)");
+        assertThat(path).isEqualTo("core.framework.internal.reflect.MethodsTest.testMethod(java.lang.String, java.lang.Integer)");
     }
 }

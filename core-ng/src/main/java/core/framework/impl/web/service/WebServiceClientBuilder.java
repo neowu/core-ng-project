@@ -2,10 +2,10 @@ package core.framework.impl.web.service;
 
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.impl.reflect.Methods;
-import core.framework.impl.reflect.Params;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
+import core.framework.internal.reflect.Methods;
+import core.framework.internal.reflect.Params;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

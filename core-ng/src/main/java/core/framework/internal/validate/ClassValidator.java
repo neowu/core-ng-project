@@ -1,7 +1,7 @@
 package core.framework.internal.validate;
 
-import core.framework.impl.reflect.Fields;
-import core.framework.impl.reflect.GenericTypes;
+import core.framework.internal.reflect.Fields;
+import core.framework.internal.reflect.GenericTypes;
 import core.framework.util.Sets;
 
 import java.lang.reflect.Constructor;

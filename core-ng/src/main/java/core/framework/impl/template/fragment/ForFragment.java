@@ -1,10 +1,10 @@
 package core.framework.impl.template.fragment;
 
-import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.impl.template.expression.ExpressionBuilder;
 import core.framework.impl.template.expression.ExpressionHolder;
+import core.framework.internal.reflect.GenericTypes;
 
 import java.util.List;
 import java.util.regex.Matcher;

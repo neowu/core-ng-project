@@ -1,9 +1,9 @@
 package core.framework.impl.web.bean;
 
 import core.framework.api.web.service.QueryParam;
-import core.framework.impl.reflect.Classes;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
+import core.framework.internal.reflect.Classes;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;

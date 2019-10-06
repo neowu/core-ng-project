@@ -1,4 +1,4 @@
-package core.framework.impl.reflect;
+package core.framework.internal.reflect;
 
 
 import java.lang.reflect.Field;

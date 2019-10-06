@@ -1,6 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.reflect.GenericTypes;
+import core.framework.internal.reflect.GenericTypes;
 import core.framework.util.Strings;
 
 import java.lang.reflect.Type;

@@ -1,10 +1,10 @@
 package core.framework.impl.template.expression;
 
-import core.framework.impl.reflect.GenericTypes;
 import core.framework.impl.template.TemplateContext;
 import core.framework.impl.template.TemplateMetaContext;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
+import core.framework.internal.reflect.GenericTypes;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;

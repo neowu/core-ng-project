@@ -1,4 +1,4 @@
-package core.framework.impl.scheduler;
+package core.framework.internal.scheduler;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 import static java.time.LocalDateTime.parse;
 import static java.time.LocalTime.of;
 import static java.time.ZonedDateTime.of;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class WeeklyTriggerTest {
     private static final ZoneId US = ZoneId.of("America/Los_Angeles");

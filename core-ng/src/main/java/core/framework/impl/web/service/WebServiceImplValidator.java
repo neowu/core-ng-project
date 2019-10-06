@@ -1,8 +1,8 @@
 package core.framework.impl.web.service;
 
 import core.framework.api.web.service.PathParam;
-import core.framework.impl.reflect.Methods;
-import core.framework.impl.reflect.Params;
+import core.framework.internal.reflect.Methods;
+import core.framework.internal.reflect.Params;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

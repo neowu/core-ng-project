@@ -1,6 +1,6 @@
 package core.framework.impl.template;
 
-import core.framework.impl.reflect.Methods;
+import core.framework.internal.reflect.Methods;
 import core.framework.internal.validate.ClassValidator;
 import core.framework.internal.validate.ClassVisitor;
 

@@ -1,8 +1,8 @@
 package core.framework.impl.web.management;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.impl.scheduler.Scheduler;
 import core.framework.impl.web.http.IPv4AccessControl;
+import core.framework.internal.scheduler.Scheduler;
 import core.framework.log.Markers;
 import core.framework.web.Request;
 import core.framework.web.Response;

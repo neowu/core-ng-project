@@ -1,8 +1,8 @@
 package core.framework.internal.json;
 
 import core.framework.api.json.Property;
-import core.framework.impl.reflect.Classes;
-import core.framework.impl.reflect.Fields;
+import core.framework.internal.reflect.Classes;
+import core.framework.internal.reflect.Fields;
 import core.framework.internal.validate.ClassValidator;
 import core.framework.internal.validate.ClassVisitor;
 import core.framework.util.Maps;

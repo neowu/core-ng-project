@@ -1,6 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.reflect.Classes;
+import core.framework.internal.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

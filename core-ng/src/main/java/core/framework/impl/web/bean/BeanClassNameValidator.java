@@ -1,6 +1,6 @@
 package core.framework.impl.web.bean;
 
-import core.framework.impl.reflect.Classes;
+import core.framework.internal.reflect.Classes;
 import core.framework.util.Maps;
 
 import java.util.Map;
