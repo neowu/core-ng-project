@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 
 import static java.time.LocalDateTime.parse;
 import static java.time.ZonedDateTime.of;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MonthlyTriggerTest {
     private static final ZoneId US = ZoneId.of("America/New_York");
@@ -27,7 +28,7 @@ class MonthlyTriggerTest {
     void description() {
         MonthlyTrigger trigger = new MonthlyTrigger(5, LocalTime.of(1, 0));
 
-        assertEquals("monthly@5/01:00", trigger.toString());
+        assertThat(trigger.toString()).isEqualTo("monthly@5/01:00");
     }
 
     private ZonedDateTime date(String date) {

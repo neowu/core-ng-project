@@ -34,9 +34,13 @@ class EventControllerTest {
     }
 
     @Test
-    void allowedOrigin() {
+    void checkOrigin() {
         var controller = new EventController(Set.of("https://local", "https://localhost"));
         controller.checkOrigin("https://localhost");
+
+        assertThatThrownBy(() -> controller.checkOrigin("https://example.com"))
+            .isInstanceOf(ForbiddenException.class)
+            .hasMessageContaining("access denied");
     }
 
     @Test
@@ -44,7 +48,7 @@ class EventControllerTest {
         when(request.header("Origin")).thenReturn(Optional.empty());
         var controller = new EventController(Set.of("*"));
         assertThatThrownBy(() -> controller.options(request))
-                .isInstanceOf(ForbiddenException.class);
+            .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
