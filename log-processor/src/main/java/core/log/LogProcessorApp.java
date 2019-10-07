@@ -19,6 +19,7 @@ import core.log.kafka.StatMessageHandler;
 import core.log.service.ActionService;
 import core.log.service.ElasticSearchAppender;
 import core.log.service.EventService;
+import core.log.service.IndexOption;
 import core.log.service.IndexService;
 import core.log.service.KibanaService;
 import core.log.service.StatService;
@@ -34,15 +35,14 @@ public class LogProcessorApp extends App {
     protected void initialize() {
         loadProperties("sys.properties");
         loadProperties("kibana.properties");
+        loadProperties("index.properties");
 
-        SearchConfig search = config(SearchConfig.class);
-        search.host(requiredProperty("sys.elasticsearch.host"));
-        search.timeout(Duration.ofSeconds(20)); // use longer timeout/slowES threshold as log indexing can be slower with large batches
-        search.slowOperationThreshold(Duration.ofSeconds(10));
-        search.type(ActionDocument.class);
-        search.type(TraceDocument.class);
-        search.type(StatDocument.class);
-        search.type(EventDocument.class);
+        configureSearch();
+
+        IndexOption option = new IndexOption();
+        option.numberOfShards = Integer.parseInt(property("index.shards").orElse("1"));   // with small cluster one shard has best performance, for larger cluster use kube env to customize
+        option.refreshInterval = property("index.refresh.interval").orElse("10s");  // use longer refresh to tune load on log es
+        bind(option);
 
         IndexService indexService = bind(IndexService.class);
         bind(ActionService.class);
@@ -65,6 +65,12 @@ public class LogProcessorApp extends App {
             onStartup(() -> new Thread(new KibanaService(url, banner, client)::importObjects, "kibana").start());
         });
 
+        configureKafka();
+
+        schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
+    }
+
+    private void configureKafka() {
         kafka().uri(requiredProperty("sys.kafka.uri"));
         kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
         kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get at least 1M message
@@ -72,7 +78,16 @@ public class LogProcessorApp extends App {
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_EVENT, EventMessage.class, bind(EventMessageHandler.class));
+    }
 
-        schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
+    private void configureSearch() {
+        SearchConfig search = config(SearchConfig.class);
+        search.host(requiredProperty("sys.elasticsearch.host"));
+        search.timeout(Duration.ofSeconds(20)); // use longer timeout/slowES threshold as log indexing can be slower with large batches
+        search.slowOperationThreshold(Duration.ofSeconds(10));
+        search.type(ActionDocument.class);
+        search.type(TraceDocument.class);
+        search.type(StatDocument.class);
+        search.type(EventDocument.class);
     }
 }

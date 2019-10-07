@@ -23,6 +23,8 @@ public class IndexService {
     private final Pattern indexPattern = Pattern.compile("[\\w\\.\\-]+-(\\d{4}\\.\\d{2}\\.\\d{2})");
     @Inject
     ElasticSearch search;
+    @Inject
+    IndexOption option;
 
     public void createIndexTemplatesUntilSuccess() {
         while (true) {
@@ -37,10 +39,10 @@ public class IndexService {
     }
 
     public void createIndexTemplates() {
-        search.createIndexTemplate("action", ClasspathResources.text("index/action-index-template.json"));
-        search.createIndexTemplate("trace", ClasspathResources.text("index/trace-index-template.json"));
-        search.createIndexTemplate("stat", ClasspathResources.text("index/stat-index-template.json"));
-        search.createIndexTemplate("event", ClasspathResources.text("index/event-index-template.json"));
+        search.createIndexTemplate("action", template("index/action-index-template.json"));
+        search.createIndexTemplate("trace", template("index/trace-index-template.json"));
+        search.createIndexTemplate("stat", template("index/stat-index-template.json"));
+        search.createIndexTemplate("event", template("index/event-index-template.json"));
     }
 
     String indexName(String name, LocalDate now) {
@@ -52,5 +54,11 @@ public class IndexService {
         if (!matcher.matches()) return Optional.empty();
         String timestamp = matcher.group(1);
         return Optional.of(LocalDate.parse(timestamp, indexDateFormatter));
+    }
+
+    String template(String path) {
+        String template = ClasspathResources.text(path);
+        return template.replace("${NUMBER_OF_SHARDS}", String.valueOf(option.numberOfShards))
+                       .replace("${REFRESH_INTERVAL}", option.refreshInterval);
     }
 }

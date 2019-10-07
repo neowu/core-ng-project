@@ -17,6 +17,11 @@ class IndexServiceTest {
     @BeforeEach
     void createIndexService() {
         indexService = new IndexService();
+
+        var option = new IndexOption();
+        option.refreshInterval = "3s";
+        option.numberOfShards = 3;
+        indexService.option = option;
     }
 
     @Test
@@ -31,5 +36,12 @@ class IndexServiceTest {
         assertThat(indexService.createdDate("stat-2015.11.15")).get().isEqualTo(LocalDate.of(2015, Month.NOVEMBER, 15));
         assertThat(indexService.createdDate("metricbeat-6.3.2-2018.08.19")).get().isEqualTo(LocalDate.of(2018, Month.AUGUST, 19));
         assertThat(indexService.createdDate(".kibana")).isNotPresent();
+    }
+
+    @Test
+    void template() {
+        assertThat(indexService.template("index/action-index-template.json"))
+            .contains("\"number_of_shards\": \"3\"")
+            .contains("\"refresh_interval\": \"3s\"");
     }
 }
