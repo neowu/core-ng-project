@@ -13,6 +13,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CloseIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
@@ -39,10 +40,13 @@ public class ElasticSearchImpl implements ElasticSearch {
     private RestHighLevelClient client;
 
     public void initialize() {
-        client = new RestHighLevelClient(RestClient.builder(host)
-                                                   .setRequestConfigCallback(builder -> builder.setSocketTimeout((int) timeout.toMillis())
-                                                                                               .setConnectionRequestTimeout((int) timeout.toMillis()))  // timeout of requesting connection from connection pool
-                                                   .setHttpClientConfigCallback(builder -> builder.setMaxConnTotal(100).setMaxConnPerRoute(100)));
+        RestClientBuilder builder = RestClient.builder(host);
+        builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
+                                                         .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
+        builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
+                                                            .setMaxConnPerRoute(100)
+                                                            .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
+        client = new RestHighLevelClient(builder);
     }
 
     public <T> ElasticSearchType<T> type(Class<T> documentClass) {
