@@ -1,5 +1,5 @@
 ## Change log
-### 7.1.1 (10/7/2019 - )
+### 7.1.1 (10/7/2019 - 10/8/2019)
 * log-processor: set log-es default to 1 shard and 10s refresh interval
 * search: add keep alive setting in es high level java client
 * http: support X_FORWARDED_HOST header for external LB (Azure App Gateway)
