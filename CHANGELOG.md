@@ -1,4 +1,7 @@
 ## Change log
+### 7.1.2 (10/8/2019 - )
+* httpClient: update okHTTP to 4.2.2
+
 ### 7.1.1 (10/7/2019 - 10/8/2019)
 * log-processor: set log-es default to 1 shard and 10s refresh interval
 * search: add keep alive setting in es high level java client
