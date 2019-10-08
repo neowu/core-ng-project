@@ -44,6 +44,7 @@ public final class RequestParser {
         HeaderMap headers = exchange.getRequestHeaders();
 
         request.scheme = scheme(exchange.getRequestScheme(), headers.getFirst(Headers.X_FORWARDED_PROTO));
+        request.hostName = hostName(exchange.getHostName(), headers.getFirst(Headers.X_FORWARDED_HOST));
         int requestPort = requestPort(headers.getFirst(Headers.HOST), request.scheme, exchange);
         request.port = port(requestPort, headers.getFirst(Headers.X_FORWARDED_PORT));
 
@@ -71,6 +72,11 @@ public final class RequestParser {
             request.contentType = contentType == null ? null : ContentType.parse(contentType);
             parseBody(request, exchange);
         }
+    }
+
+    String hostName(String hostName, String xForwardedHost) {
+        if (Strings.isBlank(xForwardedHost)) return hostName;
+        return xForwardedHost;
     }
 
     void parseCookies(RequestImpl request, HttpServerExchange exchange) {

@@ -2,6 +2,7 @@
 ### 7.1.1 (10/7/2019 - )
 * log-processor: set log-es default to 1 shard and 10s refresh interval
 * search: add keep alive setting in es high level java client
+* http: support X_FORWARDED_HOST header for external LB (Azure App Gateway)
 
 ### 7.1.0 (10/1/2019 - 10/7/2019) !!! Action Log format changed, must update both core-ng and log-processor to same version !!!
 ### action-log will be send to new topic (action-log-v2), to avoid error during transition, only impact could be some old action-log is not indexed which is minor

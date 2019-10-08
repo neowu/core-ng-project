@@ -64,6 +64,12 @@ class RequestParserTest {
     }
 
     @Test
+    void hostName() {
+        assertThat(parser.hostName("proxy", "original")).isEqualTo("original");
+        assertThat(parser.hostName("original", null)).isEqualTo("original");
+    }
+
+    @Test
     void parseQueryParams() {
         var request = new RequestImpl(null, null);
         // undertow url decoding is disabled in core.framework.impl.web.HTTPServer.start, so the parser must decode all query param
