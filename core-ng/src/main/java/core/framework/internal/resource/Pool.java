@@ -1,5 +1,6 @@
 package core.framework.internal.resource;
 
+import core.framework.log.Markers;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ public class Pool<T extends AutoCloseable> {
     private int minSize = 1;
     private int maxSize = 50;
     private long checkoutTimeoutInMs = Duration.ofSeconds(30).toMillis();
+    private ResourceValidator<T> validator;
+    private long aliveWindowInMs;    // not to validate if last return time within the window
 
     public Pool(Supplier<T> factory, String name) {
         this.factory = factory;
@@ -47,20 +50,49 @@ public class Pool<T extends AutoCloseable> {
         checkoutTimeoutInMs = timeout.toMillis();
     }
 
-    public PoolItem<T> borrowItem() {
-        PoolItem<T> item = idleItems.poll();
-        if (item != null) return item;
+    public void validator(ResourceValidator<T> validator, Duration aliveWindow) {
+        this.validator = validator;
+        aliveWindowInMs = aliveWindow.toMillis();
+    }
 
-        if (size.get() < maxSize) {
-            return createNewItem();
-        } else {
-            return waitNextAvailableItem();
+    public PoolItem<T> borrowItem() {
+        while (true) {
+            PoolItem<T> item = idleItems.poll();
+            if (item != null) {
+                if (check(item)) return item;
+                else continue;
+            }
+
+            if (size.get() < maxSize) {
+                return createNewItem();         // do not need to check newly created resource
+            } else {
+                return waitNextAvailableItem(); // do not need to check valid since it's just returned resource
+            }
         }
+    }
+
+    private boolean check(PoolItem<T> item) {
+        if (validator == null || System.currentTimeMillis() - item.returnTime < aliveWindowInMs) return true;
+        boolean valid;
+        try {
+            valid = validator.validate(item.resource);
+        } catch (Throwable e) {     // catch all exceptions to make sure item will be closed to avoid resource leak
+            logger.warn(e.getMessage(), e);
+            valid = false;
+        }
+        if (!valid) {
+            logger.warn(Markers.errorCode("POOL_INVALID_RESOURCE"), "resource is not valid, will try to obtain different one immediately");
+            closeItem(item);
+        }
+        return valid;
     }
 
     public void returnItem(PoolItem<T> item) {
         if (item.broken) {
-            closeResource(item.resource);
+            // not to replenish new item if current is broken to keep it simple,
+            // if pool is full and someone is waiting for resource, there will be other to release resource soon,
+            // as the broken resource is rare case
+            closeItem(item);
         } else {
             item.returnTime = System.currentTimeMillis();
             idleItems.push(item);
@@ -117,7 +149,7 @@ public class Pool<T extends AutoCloseable> {
             if (now - item.returnTime >= maxIdleTimeInMs) {
                 boolean removed = idleItems.remove(item);
                 if (!removed) return;
-                closeResource(item.resource);
+                closeItem(item);
             } else {
                 return;
             }
@@ -130,10 +162,14 @@ public class Pool<T extends AutoCloseable> {
         }
     }
 
-    private void closeResource(T resource) {
+    private void closeItem(PoolItem<T> item) {
         size.decrementAndGet();
+        closeResource(item);
+    }
+
+    private void closeResource(PoolItem<T> item) {
         try {
-            resource.close();
+            item.resource.close();
         } catch (Exception e) {
             logger.warn("failed to close resource, pool={}", name, e);
         }
@@ -144,7 +180,7 @@ public class Pool<T extends AutoCloseable> {
         while (true) {
             PoolItem<T> item = idleItems.poll();
             if (item == null) return;
-            closeResource(item.resource);
+            closeResource(item);
         }
     }
 }

@@ -11,6 +11,7 @@ import okio.BufferedSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketException;
@@ -41,6 +42,8 @@ class RetryInterceptorTest {
         assertThat(interceptor.shouldRetry(1, "GET", new HttpTimeoutException("read timeout"))).isTrue();
         assertThat(interceptor.shouldRetry(2, "GET", new ConnectException("connection failed"))).isTrue();
         assertThat(interceptor.shouldRetry(3, "GET", new ConnectException("connection failed"))).isFalse();
+
+        assertThat(interceptor.shouldRetry(1, "GET", new SSLException("Connection reset"))).isTrue();
 
         assertThat(interceptor.shouldRetry(1, "POST", new HttpConnectTimeoutException("connection timeout"))).isTrue();
         assertThat(interceptor.shouldRetry(1, "POST", new ConnectException("connection refused"))).isTrue();

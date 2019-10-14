@@ -35,6 +35,43 @@ class PoolTest {
     }
 
     @Test
+    void borrowWithInvalidResource() {
+        pool.validator(resource -> false, Duration.ofSeconds(0));
+
+        var invalidResource = new TestPoolResource();
+        pool.returnItem(new PoolItem<>(invalidResource));
+
+        PoolItem<TestPoolResource> item = pool.borrowItem();
+        assertThat(item.resource).isNotNull().isNotSameAs(invalidResource);
+        assertThat(invalidResource.closed).isTrue();
+    }
+
+    @Test
+    void borrowWithValidatorFailure() {
+        pool.validator(resource -> {
+            throw new Error("failed validate resource");
+        }, Duration.ofSeconds(0));
+
+        var invalidResource = new TestPoolResource();
+        pool.returnItem(new PoolItem<>(invalidResource));
+
+        PoolItem<TestPoolResource> item = pool.borrowItem();
+        assertThat(item.resource).isNotNull().isNotSameAs(invalidResource);
+        assertThat(invalidResource.closed).isTrue();
+    }
+
+    @Test
+    void borrowWithinAliveWindow() {
+        pool.validator(resource -> false, Duration.ofMinutes(30));  // should not call validator to test
+
+        var resource = new TestPoolResource();
+        pool.returnItem(new PoolItem<>(resource));
+
+        PoolItem<TestPoolResource> item = pool.borrowItem();
+        assertThat(item.resource).isNotNull().isSameAs(resource);
+    }
+
+    @Test
     void returnBrokenResource() {
         PoolItem<TestPoolResource> item = pool.borrowItem();
         assertThat(item.resource).isNotNull();
