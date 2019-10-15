@@ -36,7 +36,7 @@ class PoolTest {
 
     @Test
     void borrowWithInvalidResource() {
-        pool.validator(resource -> false, Duration.ofSeconds(0));
+        pool.validator(resource -> false, Duration.ZERO);
 
         var invalidResource = new TestPoolResource();
         pool.returnItem(new PoolItem<>(invalidResource));
@@ -50,7 +50,7 @@ class PoolTest {
     void borrowWithValidatorFailure() {
         pool.validator(resource -> {
             throw new Error("failed validate resource");
-        }, Duration.ofSeconds(0));
+        }, Duration.ZERO);
 
         var invalidResource = new TestPoolResource();
         pool.returnItem(new PoolItem<>(invalidResource));
