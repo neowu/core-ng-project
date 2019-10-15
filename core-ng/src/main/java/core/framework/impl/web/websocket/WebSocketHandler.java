@@ -58,7 +58,7 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
     public void handle(HttpServerExchange exchange, RequestImpl request, ActionLog actionLog) {
         String path = exchange.getRequestPath();
         String action = "ws:" + path;
-        actionLog.action(action);
+        actionLog.action(action + ":open");
 
         ChannelListener listener = listeners.get(path);
         if (listener == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");

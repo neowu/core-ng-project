@@ -1,6 +1,5 @@
 package core.framework.internal.resource;
 
-import core.framework.log.Markers;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+
+import static core.framework.log.Markers.errorCode;
 
 /**
  * this is for internal use only,
@@ -81,7 +82,7 @@ public class Pool<T extends AutoCloseable> {
             valid = false;
         }
         if (!valid) {
-            logger.warn(Markers.errorCode("POOL_INVALID_RESOURCE"), "resource is not valid, will try to obtain different one immediately");
+            logger.warn(errorCode("INVALID_POOL_RESOURCE"), "resource is not valid, will try to obtain different one immediately");
             closeItem(item);
         }
         return valid;
@@ -127,7 +128,7 @@ public class Pool<T extends AutoCloseable> {
 
     public void refresh() {
         logger.info("refresh resource pool, pool={}", name);
-        recycleIdleItems();
+        evictIdleItems();
         replenish();
     }
 
@@ -139,7 +140,7 @@ public class Pool<T extends AutoCloseable> {
         return size.get();
     }
 
-    private void recycleIdleItems() {
+    private void evictIdleItems() {
         Iterator<PoolItem<T>> iterator = idleItems.descendingIterator();
         long maxIdleTimeInMs = maxIdleTime.toMillis();
         long now = System.currentTimeMillis();

@@ -29,18 +29,12 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===");
         try {
             actionLog.action(wrapper.action);
-            actionLog.context("channel", wrapper.id);
-            logger.debug("refId={}", wrapper.refId);
-            List<String> refIds = List.of(wrapper.refId);
-            actionLog.refIds = refIds;
-            actionLog.correlationIds = refIds;
-            logger.debug("[channel] url={}", channel.getUrl());
-            logger.debug("[channel] remoteAddress={}", channel.getSourceAddress().getAddress().getHostAddress());
-            actionLog.context("clientIP", wrapper.clientIP);
+            linkContext(channel, wrapper, actionLog);
+
             String data = message.getData();
             logger.debug("[channel] message={}", data);
             actionLog.track("ws", 0, 1, 0);
-            actionLog.context("listener", wrapper.listener.getClass().getCanonicalName());
+
             wrapper.listener.onMessage(wrapper, data);
         } catch (Throwable e) {
             logManager.logError(e);
@@ -48,5 +42,39 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
         } finally {
             logManager.end("=== ws message handling end ===");
         }
+    }
+
+    @Override
+    protected void onCloseMessage(CloseMessage message, WebSocketChannel channel) {
+        var wrapper = (ChannelImpl) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
+        ActionLog actionLog = logManager.begin("=== ws close message handling begin ===");
+        try {
+            actionLog.action(wrapper.action + ":close");
+            linkContext(channel, wrapper, actionLog);
+
+            int code = message.getCode();
+            String reason = message.getReason();
+            actionLog.context("code", code);
+            logger.debug("[channel] reason={}", reason);
+            actionLog.track("ws", 0, 1, 0);
+
+            wrapper.listener.onClose(wrapper, code, reason);
+        } catch (Throwable e) {
+            logManager.logError(e);
+        } finally {
+            logManager.end("=== ws close message handling end ===");
+        }
+    }
+
+    private void linkContext(WebSocketChannel channel, ChannelImpl wrapper, ActionLog actionLog) {
+        actionLog.context("channel", wrapper.id);
+        logger.debug("refId={}", wrapper.refId);
+        List<String> refIds = List.of(wrapper.refId);
+        actionLog.refIds = refIds;
+        actionLog.correlationIds = refIds;
+        logger.debug("[channel] url={}", channel.getUrl());
+        logger.debug("[channel] remoteAddress={}", channel.getSourceAddress().getAddress().getHostAddress());
+        actionLog.context("clientIP", wrapper.clientIP);
+        actionLog.context("listener", wrapper.listener.getClass().getCanonicalName());
     }
 }
