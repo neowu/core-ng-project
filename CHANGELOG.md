@@ -1,8 +1,9 @@
 ## Change log
-### 7.1.2 (10/8/2019 - )
+### 7.1.2 (10/8/2019 - 10/15/2019)
 * httpClient: update okHTTP to 4.2.2
 * db: to check connection validity before using, e.g. when gcloud SQL does maintenance, connections will be closed on server side  
 * websocket: support onClose message handling, and track open/close in action log
+* websocket: support send bean, register by http().bean()
 
 ### 7.1.1 (10/7/2019 - 10/8/2019)
 * log-processor: set log-es default to 1 shard and 10s refresh interval

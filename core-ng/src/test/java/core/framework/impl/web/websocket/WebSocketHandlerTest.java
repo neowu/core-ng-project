@@ -19,7 +19,7 @@ class WebSocketHandlerTest {
 
     @BeforeEach
     void createWebSocketHandler() {
-        handler = new WebSocketHandler(new LogManager(), null);
+        handler = new WebSocketHandler(new LogManager(), null, null);
     }
 
     @Test
@@ -36,14 +36,14 @@ class WebSocketHandlerTest {
     @Test
     void checkWebSocket() {
         var headers = new HeaderMap()
-                .put(Headers.SEC_WEB_SOCKET_KEY, "xxx")
-                .put(Headers.SEC_WEB_SOCKET_VERSION, "13");
+            .put(Headers.SEC_WEB_SOCKET_KEY, "xxx")
+            .put(Headers.SEC_WEB_SOCKET_VERSION, "13");
 
         assertThat(handler.checkWebSocket(HTTPMethod.GET, headers)).isTrue();
         assertThat(handler.checkWebSocket(HTTPMethod.PUT, headers)).isFalse();
 
         assertThatThrownBy(() -> handler.checkWebSocket(HTTPMethod.GET, headers.put(Headers.SEC_WEB_SOCKET_VERSION, "07")))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("only support web socket version 13");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("only support web socket version 13");
     }
 }

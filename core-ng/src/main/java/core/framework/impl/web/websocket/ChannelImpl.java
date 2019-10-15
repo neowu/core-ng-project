@@ -1,5 +1,6 @@
 package core.framework.impl.web.websocket;
 
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
@@ -16,6 +17,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * @author neo
  */
@@ -24,6 +27,7 @@ public class ChannelImpl implements Channel, Channel.Context {
     final String id = UUID.randomUUID().toString();
     final Set<String> rooms = Sets.newConcurrentHashSet();
     final ChannelListener listener;
+    private final ResponseBeanMapper mapper;
     private final WebSocketChannel channel;
     private final Map<String, Object> context = new ConcurrentHashMap<>();
     private final WebSocketContextImpl webSocketContext;
@@ -31,10 +35,11 @@ public class ChannelImpl implements Channel, Channel.Context {
     String clientIP;
     String refId;
 
-    ChannelImpl(WebSocketChannel channel, WebSocketContextImpl context, ChannelListener listener) {
+    ChannelImpl(WebSocketChannel channel, WebSocketContextImpl webSocketContext, ChannelListener listener, ResponseBeanMapper mapper) {
         this.channel = channel;
-        webSocketContext = context;
+        this.webSocketContext = webSocketContext;
         this.listener = listener;
+        this.mapper = mapper;
     }
 
     @Override
@@ -47,6 +52,11 @@ public class ChannelImpl implements Channel, Channel.Context {
             ActionLogContext.track("ws", elapsed, 0, 1);
             LOGGER.debug("send ws message, id={}, message={}, elapsed={}", id, message, elapsed);
         }
+    }
+
+    @Override
+    public void send(Object bean) {
+        send(new String(mapper.toJSON(bean), UTF_8));
     }
 
     @Override

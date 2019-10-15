@@ -76,5 +76,6 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
         logger.debug("[channel] remoteAddress={}", channel.getSourceAddress().getAddress().getHostAddress());
         actionLog.context("clientIP", wrapper.clientIP);
         actionLog.context("listener", wrapper.listener.getClass().getCanonicalName());
+        actionLog.context("room", wrapper.rooms.toArray());
     }
 }

@@ -18,7 +18,7 @@ class WebSocketContextImplTest {
 
     @Test
     void join() {
-        var channel = new ChannelImpl(null, context, null);
+        var channel = new ChannelImpl(null, context, null, null);
         channel.join("room1");
         assertThat(context.room("room1")).containsOnly(channel);
 
@@ -28,7 +28,7 @@ class WebSocketContextImplTest {
 
     @Test
     void remove() {
-        var channel = new ChannelImpl(null, context, null);
+        var channel = new ChannelImpl(null, context, null, null);
         channel.join("room1");
         channel.join("room2");
 

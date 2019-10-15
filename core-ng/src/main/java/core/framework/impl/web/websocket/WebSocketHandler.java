@@ -1,6 +1,7 @@
 package core.framework.impl.web.websocket;
 
 import core.framework.http.HTTPMethod;
+import core.framework.impl.web.bean.ResponseBeanMapper;
 import core.framework.impl.web.request.RequestImpl;
 import core.framework.impl.web.session.SessionManager;
 import core.framework.internal.log.ActionLog;
@@ -39,10 +40,12 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
     private final Handshake handshake = new Hybi13Handshake();
     private final WebSocketMessageListener messageListener;
     private final SessionManager sessionManager;
+    private final ResponseBeanMapper mapper;
 
-    public WebSocketHandler(LogManager logManager, SessionManager sessionManager) {
+    public WebSocketHandler(LogManager logManager, SessionManager sessionManager, ResponseBeanMapper mapper) {
         messageListener = new WebSocketMessageListener(logManager);
         this.sessionManager = sessionManager;
+        this.mapper = mapper;
     }
 
     public boolean checkWebSocket(HTTPMethod method, HeaderMap headers) {
@@ -69,7 +72,7 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
         exchange.upgradeChannel((connection, httpServerExchange) -> {
             WebSocketChannel channel = handshake.createChannel(webSocketExchange, connection, webSocketExchange.getBufferPool());
             channels.add(channel);
-            var wrapper = new ChannelImpl(channel, context, listener);
+            var wrapper = new ChannelImpl(channel, context, listener, mapper);
             wrapper.action = action;
             wrapper.clientIP = request.clientIP();
             wrapper.refId = actionLog.id;   // with ws, correlationId and refId must be same as parent http action id
@@ -78,6 +81,8 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
             channel.addCloseTask(this);
 
             listener.onConnect(request, wrapper);
+            actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
+
             channel.getReceiveSetter().set(messageListener);
             channel.resumeReceives();
         });
@@ -91,7 +96,7 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
     }
 
     @Override
-    public void handleEvent(WebSocketChannel channel) { // only handle channel close event
+    public void handleEvent(WebSocketChannel channel) { // only handle channel close event, refer to "channel.addCloseTask(this);" above
         var wrapper = (ChannelImpl) channel.getAttribute(CHANNEL_KEY);
         context.remove(wrapper);
     }
