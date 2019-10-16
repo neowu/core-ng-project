@@ -1,5 +1,5 @@
 ## Change log
-### 7.1.3 (10/16/2019 - )
+### 7.1.3 (10/16/2019)
 * http: remove forcing TLSv1.2 as latest JDK already fixed TLSv1.3 issue 
 * http: update XNIO to 3.7.6, monitor work queue size and busy thread size, for visibility under heavy load
 
