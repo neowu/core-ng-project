@@ -1,7 +1,7 @@
 package core.framework.search.module;
 
-import core.framework.impl.module.Config;
-import core.framework.impl.module.ModuleContext;
+import core.framework.internal.module.Config;
+import core.framework.internal.module.ModuleContext;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchTypeImpl;
 import core.framework.test.module.TestModuleContext;

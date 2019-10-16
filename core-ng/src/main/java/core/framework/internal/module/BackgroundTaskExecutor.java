@@ -1,4 +1,4 @@
-package core.framework.impl.module;
+package core.framework.internal.module;
 
 import core.framework.internal.async.ThreadPools;
 import core.framework.util.Lists;

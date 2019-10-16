@@ -2,15 +2,15 @@ package core.framework.module;
 
 import core.framework.cache.Cache;
 import core.framework.http.HTTPMethod;
-import core.framework.impl.module.Config;
-import core.framework.impl.module.ModuleContext;
-import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.web.management.CacheController;
 import core.framework.impl.web.management.ListCacheResponse;
 import core.framework.internal.cache.CacheManager;
 import core.framework.internal.cache.CacheStore;
 import core.framework.internal.cache.LocalCacheStore;
 import core.framework.internal.cache.RedisCacheStore;
+import core.framework.internal.module.Config;
+import core.framework.internal.module.ModuleContext;
+import core.framework.internal.module.ShutdownHook;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.util.Types;

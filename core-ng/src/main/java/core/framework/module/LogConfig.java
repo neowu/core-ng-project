@@ -1,16 +1,14 @@
 package core.framework.module;
 
-import core.framework.impl.module.Config;
-import core.framework.impl.module.ModuleContext;
-import core.framework.impl.module.ShutdownHook;
 import core.framework.internal.log.CollectStatTask;
 import core.framework.internal.log.appender.ConsoleAppender;
 import core.framework.internal.log.appender.KafkaAppender;
 import core.framework.internal.log.appender.LogAppender;
+import core.framework.internal.module.Config;
+import core.framework.internal.module.ModuleContext;
+import core.framework.internal.module.ShutdownHook;
 
 import java.time.Duration;
-
-import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -36,7 +34,7 @@ public class LogConfig extends Config {
     }
 
     public void appender(LogAppender appender) {
-        if (context.logManager.appender != null) throw new Error(format("log appender is already set, appender={}", context.logManager.appender.getClass().getSimpleName()));
+        if (context.logManager.appender != null) throw new Error("log appender is already set, appender=" + context.logManager.appender.getClass().getSimpleName());
         context.logManager.appender = appender;
         context.backgroundTask().scheduleWithFixedDelay(new CollectStatTask(appender, context.stat), Duration.ofSeconds(10));
     }

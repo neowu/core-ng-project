@@ -1,6 +1,6 @@
 package core.framework.module;
 
-import core.framework.impl.module.ModuleContext;
+import core.framework.internal.module.ModuleContext;
 
 /**
  * @author neo

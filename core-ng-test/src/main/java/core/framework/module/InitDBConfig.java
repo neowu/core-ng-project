@@ -1,8 +1,8 @@
 package core.framework.module;
 
 import core.framework.db.Repository;
-import core.framework.impl.module.Config;
-import core.framework.impl.module.ModuleContext;
+import core.framework.internal.module.Config;
+import core.framework.internal.module.ModuleContext;
 import core.framework.test.db.EntitySchemaGenerator;
 import core.framework.test.module.TestModuleContext;
 import core.framework.util.Types;

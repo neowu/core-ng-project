@@ -1,4 +1,4 @@
-package core.framework.impl.module;
+package core.framework.internal.module;
 
 import core.framework.api.web.service.QueryParam;
 import core.framework.async.Task;

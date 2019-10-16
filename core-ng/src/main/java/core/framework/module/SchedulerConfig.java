@@ -1,11 +1,11 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.module.Config;
-import core.framework.impl.module.ModuleContext;
-import core.framework.impl.module.ShutdownHook;
 import core.framework.impl.web.management.ListJobResponse;
 import core.framework.impl.web.management.SchedulerController;
+import core.framework.internal.module.Config;
+import core.framework.internal.module.ModuleContext;
+import core.framework.internal.module.ShutdownHook;
 import core.framework.internal.scheduler.DailyTrigger;
 import core.framework.internal.scheduler.HourlyTrigger;
 import core.framework.internal.scheduler.MonthlyTrigger;

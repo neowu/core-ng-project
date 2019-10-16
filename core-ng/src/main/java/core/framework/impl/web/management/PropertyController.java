@@ -1,7 +1,7 @@
 package core.framework.impl.web.management;
 
-import core.framework.impl.module.PropertyManager;
 import core.framework.impl.web.http.IPv4AccessControl;
+import core.framework.internal.module.PropertyManager;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;

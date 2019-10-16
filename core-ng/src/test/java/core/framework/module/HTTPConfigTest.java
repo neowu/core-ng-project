@@ -2,8 +2,8 @@ package core.framework.module;
 
 import core.framework.api.json.Property;
 import core.framework.api.web.service.QueryParam;
-import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.HTTPIOHandler;
+import core.framework.internal.module.ModuleContext;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;

@@ -1,8 +1,8 @@
 package core.framework.module;
 
-import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.http.IPv4AccessControl;
 import core.framework.impl.web.http.IPv4Ranges;
+import core.framework.internal.module.ModuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

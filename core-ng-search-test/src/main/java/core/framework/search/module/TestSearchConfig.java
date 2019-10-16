@@ -1,7 +1,7 @@
 package core.framework.search.module;
 
-import core.framework.impl.module.ModuleContext;
-import core.framework.impl.module.ShutdownHook;
+import core.framework.internal.module.ModuleContext;
+import core.framework.internal.module.ShutdownHook;
 import core.framework.search.impl.ESLoggerConfigFactory;
 import core.framework.search.impl.LocalElasticSearch;
 import org.apache.http.HttpHost;

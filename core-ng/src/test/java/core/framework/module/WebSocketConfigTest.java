@@ -1,7 +1,7 @@
 package core.framework.module;
 
-import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.HTTPIOHandler;
+import core.framework.internal.module.ModuleContext;
 import core.framework.web.websocket.Channel;
 import core.framework.web.websocket.ChannelListener;
 import core.framework.web.websocket.WebSocketContext;

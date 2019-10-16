@@ -1,4 +1,4 @@
-package core.framework.impl.module;
+package core.framework.internal.module;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

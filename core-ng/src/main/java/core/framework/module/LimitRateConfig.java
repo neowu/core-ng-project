@@ -1,8 +1,8 @@
 package core.framework.module;
 
-import core.framework.impl.module.Config;
-import core.framework.impl.module.ModuleContext;
 import core.framework.impl.web.http.LimitRateInterceptor;
+import core.framework.internal.module.Config;
+import core.framework.internal.module.ModuleContext;
 
 import java.util.concurrent.TimeUnit;
 

@@ -1,10 +1,10 @@
 package core.framework.module;
 
 import core.framework.async.Executor;
-import core.framework.impl.module.Config;
-import core.framework.impl.module.ModuleContext;
-import core.framework.impl.module.ShutdownHook;
 import core.framework.internal.async.ExecutorImpl;
+import core.framework.internal.module.Config;
+import core.framework.internal.module.ModuleContext;
+import core.framework.internal.module.ShutdownHook;
 
 /**
  * @author neo

@@ -1,4 +1,4 @@
-package core.framework.impl.module;
+package core.framework.internal.module;
 
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;

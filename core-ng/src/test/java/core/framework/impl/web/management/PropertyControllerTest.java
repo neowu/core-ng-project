@@ -1,7 +1,7 @@
 package core.framework.impl.web.management;
 
 import core.framework.http.ContentType;
-import core.framework.impl.module.PropertyManager;
+import core.framework.internal.module.PropertyManager;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.BeforeEach;
