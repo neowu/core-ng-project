@@ -22,13 +22,10 @@
 * db/redis diagnostic controller/stats?
 * ws: on connect not allow set session? different sessionImpl?
 
-### jdk 11 issues
+### jdk 12 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
 * class in interface module generates Validator make interface depends on core-ng module (java module)
-* JDK TLSv1.3 issues: cause jdk httpclient run into infinite loop on concurrent condition  
-  https://bugs.openjdk.java.net/browse/JDK-8213202  (fixed in openjdk 12)
-  or set system env jdk.tls.acknowledgeCloseNotify=true  
 * JDK HTTPClient issue: https://bugs.openjdk.java.net/browse/JDK-8211437
 
 ### kube deployment + http client keep alive issue, reference

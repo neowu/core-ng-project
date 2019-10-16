@@ -4,6 +4,7 @@ import core.framework.api.web.service.QueryParam;
 import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
 import core.framework.impl.web.HTTPServer;
+import core.framework.impl.web.HTTPServerMetrics;
 import core.framework.impl.web.bean.BeanClassNameValidator;
 import core.framework.impl.web.bean.BeanMappers;
 import core.framework.impl.web.bean.RequestBeanMapper;
@@ -52,6 +53,8 @@ public class ModuleContext {
 
     public ModuleContext() {
         httpServer = new HTTPServer(logManager);
+        stat.metrics.add(new HTTPServerMetrics(httpServer));
+
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
         startupHook.add(httpServer::start);

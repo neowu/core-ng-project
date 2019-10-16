@@ -1,4 +1,8 @@
 ## Change log
+### 7.1.3 (10/16/2019 - )
+* http: remove forcing TLSv1.2 as latest JDK already fixed TLSv1.3 issue 
+* http: update XNIO to 3.7.6, monitor work queue size and busy thread size, for visibility under heavy load
+
 ### 7.1.2 (10/8/2019 - 10/15/2019)
 * httpClient: update okHTTP to 4.2.2
 * db: to check connection validity before using, e.g. when gcloud SQL does maintenance, connections will be closed on server side  
