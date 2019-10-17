@@ -1,6 +1,7 @@
 package core.framework.test.module;
 
 import core.framework.internal.inject.Key;
+import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import core.framework.util.Sets;
 import org.slf4j.Logger;
@@ -19,6 +20,10 @@ public class TestModuleContext extends ModuleContext {
     private final Logger logger = LoggerFactory.getLogger(TestModuleContext.class);
     private final Set<Key> overrideBindings = Sets.newHashSet();
     private final Set<Key> skippedBindings = Sets.newHashSet();     // track overridden beans to detect duplicate binding
+
+    public TestModuleContext() {
+        super(new LogManager());
+    }
 
     @SuppressWarnings("unchecked")
     public <T> T getConfig(Class<T> configClass, String name) {

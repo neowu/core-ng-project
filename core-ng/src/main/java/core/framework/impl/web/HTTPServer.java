@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.xnio.Options;
 import org.xnio.management.XnioWorkerMXBean;
 
+import static core.framework.log.Markers.errorCode;
+
 /**
  * @author neo
  */
@@ -68,7 +70,7 @@ public class HTTPServer {
         }
     }
 
-    public XnioWorkerMXBean mxBean() {
+    XnioWorkerMXBean mxBean() {
         return server.getWorker().getMXBean();
     }
 
@@ -95,7 +97,7 @@ public class HTTPServer {
         if (server != null) {
             boolean success = shutdownHandler.awaitTermination(timeoutInMs);
             if (!success) {
-                logger.warn("failed to wait active http requests to complete");
+                logger.warn(errorCode("FAILED_TO_STOP"), "failed to wait active http requests to complete");
                 server.getWorker().shutdownNow();
             } else {
                 logger.info("active http requests completed");

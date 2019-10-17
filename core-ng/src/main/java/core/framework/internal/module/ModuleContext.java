@@ -39,11 +39,11 @@ import java.util.Set;
  * @author neo
  */
 public class ModuleContext {
+    public final LogManager logManager;
     public final BeanFactory beanFactory = new BeanFactory();
     public final List<Task> startupHook = Lists.newArrayList();
-    public final ShutdownHook shutdownHook = new ShutdownHook();
+    public final ShutdownHook shutdownHook;
     public final PropertyManager propertyManager = new PropertyManager();
-    public final LogManager logManager = new LogManager();
     public final HTTPServer httpServer;
     public final Stat stat = new Stat();
     protected final Map<String, Config> configs = Maps.newHashMap();
@@ -51,7 +51,10 @@ public class ModuleContext {
     PropertyValidator propertyValidator = new PropertyValidator();
     private BackgroundTaskExecutor backgroundTask;
 
-    public ModuleContext() {
+    public ModuleContext(LogManager logManager) {
+        this.logManager = logManager;
+        shutdownHook = new ShutdownHook(logManager);
+
         httpServer = new HTTPServer(logManager);
         stat.metrics.add(new HTTPServerMetrics(httpServer));
 

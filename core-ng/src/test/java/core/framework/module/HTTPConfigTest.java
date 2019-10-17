@@ -3,6 +3,7 @@ package core.framework.module;
 import core.framework.api.json.Property;
 import core.framework.api.web.service.QueryParam;
 import core.framework.impl.web.HTTPIOHandler;
+import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import core.framework.web.Controller;
 import core.framework.web.Request;
@@ -28,7 +29,7 @@ class HTTPConfigTest {
     @BeforeAll
     void createRouteConfig() {
         config = new HTTPConfig();
-        config.initialize(new ModuleContext(), null);
+        config.initialize(new ModuleContext(new LogManager()), null);
     }
 
     @Test

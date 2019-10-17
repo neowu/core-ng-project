@@ -98,6 +98,9 @@ public final class KafkaAppender implements LogAppender {
         logger.info("stop log forwarder");
         stop.set(true);
         logForwarderThread.interrupt();
+        for (ProducerRecord<byte[], byte[]> record : records) {
+            producer.send(record);
+        }
         producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));
     }
 }

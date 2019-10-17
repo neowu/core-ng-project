@@ -1,9 +1,12 @@
 package core.framework.internal.module;
 
+import core.framework.internal.log.ActionLog;
+import core.framework.internal.log.LogManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -17,7 +20,7 @@ class ShutdownHookTest {
 
     @BeforeEach
     void createShutdownHook() {
-        shutdownHook = new ShutdownHook();
+        shutdownHook = new ShutdownHook(new LogManager());
     }
 
     @AfterEach
@@ -35,5 +38,16 @@ class ShutdownHookTest {
 
         shutdownHook.run();
         verify(shutdown2).execute(anyLong());
+    }
+
+    @Test
+    void logContext() {
+        var actionLog = new ActionLog(null);
+        shutdownHook.logContext(actionLog);
+
+        assertThat(actionLog.action).isEqualTo("app:stop");
+        assertThat(actionLog.context).containsKey("host");
+        assertThat(actionLog.context).containsKey("startTime");
+        assertThat(actionLog.stats).containsKey("uptime");
     }
 }

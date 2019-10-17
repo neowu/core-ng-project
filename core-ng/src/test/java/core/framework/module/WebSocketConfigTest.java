@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.impl.web.HTTPIOHandler;
+import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import core.framework.web.websocket.Channel;
 import core.framework.web.websocket.ChannelListener;
@@ -22,7 +23,7 @@ class WebSocketConfigTest {
 
     @BeforeAll
     void createWebSocketConfig() {
-        context = new ModuleContext();
+        context = new ModuleContext(new LogManager());
         config = new WebSocketConfig(context);
     }
 

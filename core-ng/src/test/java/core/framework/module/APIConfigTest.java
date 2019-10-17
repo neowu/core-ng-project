@@ -3,6 +3,7 @@ package core.framework.module;
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
+import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ class APIConfigTest {
 
     @BeforeEach
     void createAPIConfig() {
-        context = new ModuleContext();
+        context = new ModuleContext(new LogManager());
         config = new APIConfig();
         config.initialize(context, null);
     }

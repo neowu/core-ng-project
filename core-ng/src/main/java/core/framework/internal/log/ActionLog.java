@@ -5,6 +5,7 @@ import core.framework.util.Strings;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.text.DecimalFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public final class ActionLog {
     public List<String> correlationIds;    // with bulk message handler, there will be multiple correlationIds handled by one batch
     public List<String> clients;
     public List<String> refIds;
-    Map<String, Double> stats;
+    public Map<String, Double> stats;
 
     String errorMessage;
     long elapsed;
@@ -130,7 +131,8 @@ public final class ActionLog {
     public void stat(String key, double value) {
         if (stats == null) stats = new HashMap<>();
         stats.compute(key, (k, oldValue) -> (oldValue == null) ? value : oldValue + value);
-        add(event("[stat] {}={}", key, value));
+        var format = new DecimalFormat();
+        add(event("[stat] {}={}", key, format.format(value)));
     }
 
     public void track(String action, long elapsed, Integer readEntries, Integer writeEntries) {

@@ -5,6 +5,7 @@ import core.framework.log.message.PerformanceStat;
 import core.framework.log.message.StatMessage;
 
 import java.io.PrintStream;
+import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +34,12 @@ public final class ConsoleAppender implements LogAppender {
     }
 
     String message(ActionLogMessage log) {
+        var format = new DecimalFormat();   // according to benchmark, create DecimalFormat every time is faster than String.format("%.9", value)
+
         var builder = new StringBuilder(512);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(log.date))
                .append(LOG_SPLITTER).append(log.result)
-               .append(LOG_SPLITTER).append("elapsed=").append(log.elapsed)
+               .append(LOG_SPLITTER).append("elapsed=").append(format.format(log.elapsed.longValue()))
                .append(LOG_SPLITTER).append("id=").append(log.id)
                .append(LOG_SPLITTER).append("action=").append(log.action);
 
@@ -49,7 +52,7 @@ public final class ConsoleAppender implements LogAppender {
             builder.append(LOG_SPLITTER).append("errorCode=").append(errorCode)
                    .append(LOG_SPLITTER).append("errorMessage=").append(filterLineSeparator(log.errorMessage));
         }
-        builder.append(LOG_SPLITTER).append("cpuTime=").append(log.cpuTime);
+        builder.append(LOG_SPLITTER).append("cpuTime=").append(format.format(log.cpuTime.longValue()));
 
         for (Map.Entry<String, List<String>> entry : log.context.entrySet()) {
             String key = entry.getKey();
@@ -68,7 +71,7 @@ public final class ConsoleAppender implements LogAppender {
         }
         if (log.stats != null) {
             for (Map.Entry<String, Double> entry : log.stats.entrySet()) {
-                builder.append(LOG_SPLITTER).append(entry.getKey()).append('=').append(entry.getValue());
+                builder.append(LOG_SPLITTER).append(entry.getKey()).append('=').append(format.format(entry.getValue()));
             }
         }
         for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
@@ -77,7 +80,7 @@ public final class ConsoleAppender implements LogAppender {
             builder.append(LOG_SPLITTER).append(key).append("Count=").append(tracking.count);
             if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("Reads=").append(tracking.readEntries);
             if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("Writes=").append(tracking.writeEntries);
-            builder.append(LOG_SPLITTER).append(key).append("Elapsed=").append(tracking.totalElapsed);
+            builder.append(LOG_SPLITTER).append(key).append("Elapsed=").append(format.format(tracking.totalElapsed));
         }
         return builder.toString();
     }
@@ -85,10 +88,11 @@ public final class ConsoleAppender implements LogAppender {
     String message(StatMessage message) {
         var builder = new StringBuilder(512);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(message.date));
+        var format = new DecimalFormat();
         for (Map.Entry<String, Double> entry : message.stats.entrySet()) {
-            String key = entry.getKey();
-            String value = String.format("%.9f", entry.getValue());
-            builder.append(LOG_SPLITTER).append(key).append('=').append(value);
+            builder.append(LOG_SPLITTER)
+                   .append(entry.getKey()).append('=')
+                   .append(format.format(entry.getValue()));
         }
         return builder.toString();
     }

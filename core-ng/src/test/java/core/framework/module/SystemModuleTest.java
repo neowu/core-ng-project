@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ class SystemModuleTest {
     @BeforeEach
     void createSystemModule() {
         systemModule = new SystemModule(null);
-        systemModule.context = new ModuleContext();
+        systemModule.context = new ModuleContext(new LogManager());
 
         System.clearProperty("sys.http.port");
     }

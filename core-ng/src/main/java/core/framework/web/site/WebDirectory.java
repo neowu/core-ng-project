@@ -36,7 +36,7 @@ public final class WebDirectory {
         } else {
             Path path = findLocalRootDirectory();
             if (path != null) {
-                logger.warn("found local web directory, this should only happen in local dev env or test, path={}", path);
+                logger.info("found local web directory, this should only happen in local dev env or test, path={}", path);
                 localEnv = true;
                 try {
                     return path.toRealPath();
