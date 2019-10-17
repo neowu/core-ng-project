@@ -11,8 +11,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -29,11 +27,12 @@ public final class ShutdownHook implements Runnable {
     public static final int STAGE_7 = 7;    // release all resources without dependencies, e.g. db / redis / mongo / search
     public static final int STAGE_8 = 8;    // shutdown kafka log appender, give more time try to forward all logs
     public static final int STAGE_9 = 9;    // finally stop the http server, to make sure it responses to incoming requests during shutdown
-    public static final long SHUTDOWN_TIMEOUT_IN_MS = Duration.ofSeconds(25).toMillis(); // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
+
+    private static final long SHUTDOWN_TIMEOUT_IN_MS = Duration.ofSeconds(25).toMillis(); // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
     final Thread thread = new Thread(this, "shutdown");
     private final LogManager logManager;
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
-    private final Map<Integer, List<Shutdown>> stages = new TreeMap<>();
+    private final ShutdownStage[] stages = new ShutdownStage[STAGE_9 + 1];
 
     ShutdownHook(LogManager logManager) {
         this.logManager = logManager;
@@ -41,7 +40,8 @@ public final class ShutdownHook implements Runnable {
     }
 
     public void add(int stage, Shutdown shutdown) {
-        stages.computeIfAbsent(stage, key -> new ArrayList<>()).add(shutdown);
+        if (stages[stage] == null) stages[stage] = new ShutdownStage();
+        stages[stage].shutdowns.add(shutdown);
     }
 
     @Override
@@ -65,18 +65,16 @@ public final class ShutdownHook implements Runnable {
         actionLog.stat("uptime", ManagementFactory.getRuntimeMXBean().getUptime());
     }
 
-    private void shutdown(long endTime, int min, int max) {
-        for (Map.Entry<Integer, List<Shutdown>> entry : stages.entrySet()) {
-            Integer stage = entry.getKey();
-            if (stage >= min && stage <= max) {
-                List<Shutdown> shutdowns = entry.getValue();
-                logger.info("shutdown stage: {}", stage);
-                for (Shutdown shutdown : shutdowns) {
-                    try {
-                        shutdown.execute(endTime - System.currentTimeMillis());
-                    } catch (Throwable e) {
-                        logger.warn(errorCode("FAILED_TO_STOP"), "failed to shutdown, method={}", shutdown, e);
-                    }
+    private void shutdown(long endTime, int fromStage, int toStage) {
+        for (int i = fromStage; i <= toStage; i++) {
+            ShutdownStage stage = stages[i];
+            if (stage == null) continue;
+            logger.info("shutdown stage: {}", i);
+            for (Shutdown shutdown : stage.shutdowns) {
+                try {
+                    shutdown.execute(endTime - System.currentTimeMillis());
+                } catch (Throwable e) {
+                    logger.warn(errorCode("FAILED_TO_STOP"), "failed to shutdown, method={}", shutdown, e);
                 }
             }
         }
@@ -84,5 +82,9 @@ public final class ShutdownHook implements Runnable {
 
     public interface Shutdown {
         void execute(long timeoutInMs) throws Exception;
+    }
+
+    static class ShutdownStage {
+        final List<Shutdown> shutdowns = new ArrayList<>();
     }
 }

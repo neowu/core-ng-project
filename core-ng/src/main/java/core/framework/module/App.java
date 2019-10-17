@@ -30,7 +30,7 @@ public abstract class App extends Module {
             logger.error(Markers.errorCode("FAILED_TO_START"), "app failed to start, error={}", e.getMessage(), e);
             failed = true;
         } finally {
-            logManager.end("=== app startup end ===");
+            logManager.end("=== startup end ===");
         }
         if (failed) {
             System.exit(1);
