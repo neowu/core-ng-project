@@ -79,7 +79,7 @@ public class WebServiceClient {
     }
 
     public void intercept(WebServiceClientInterceptor interceptor) {
-        if (this.interceptor != null) throw new Error(format("found duplicate interceptor, previous={}", this.interceptor.getClass().getCanonicalName()));
+        if (this.interceptor != null) throw new Error("found duplicate interceptor, previous=" + this.interceptor.getClass().getCanonicalName());
         this.interceptor = interceptor;
     }
 

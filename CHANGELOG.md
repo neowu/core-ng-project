@@ -1,6 +1,7 @@
 ## Change log
 ### 7.1.4 (10/17/2019 - )
 * action: added app:start/app:stop action to track app container life cycle (e.g. killed/recreated by kube accidentally)
+* api: exposed api().createClient() to allow create multiple instance of api client with different service url 
 
 ### 7.1.3 (10/16/2019)
 * http: remove forcing TLSv1.2 as latest JDK already fixed TLSv1.3 issue 

@@ -7,6 +7,7 @@ import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.reflect.Methods;
 import core.framework.internal.reflect.Params;
 import core.framework.util.Maps;
+import core.framework.web.service.WebServiceClientInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +46,23 @@ public class WebServiceClientBuilder<T> {
             builder.addMethod(buildImplMethod(method));
         }
 
+        // all client will impl proxy interface to additional configuration
+        builder.addInterface(WebServiceClientProxy.class);
+        builder.addMethod(buildInterceptMethod());
+
         return builder.build(client);
     }
 
+    private String buildInterceptMethod() {
+        var builder = new CodeBuilder();
+        builder.append("public void intercept({} interceptor) {\n", type(WebServiceClientInterceptor.class))
+               .indent(1).append("this.client.intercept(interceptor);\n")
+               .append("}");
+        return builder.build();
+    }
+
     private String buildImplMethod(Method method) {
-        CodeBuilder builder = new CodeBuilder();
+        var builder = new CodeBuilder();
 
         Type returnType = method.getGenericReturnType();
         Class<?> returnClass = method.getReturnType();
@@ -104,7 +117,7 @@ public class WebServiceClientBuilder<T> {
                 int variableEnd = path.indexOf('/', variableStart);
                 if (variableEnd < 0) variableEnd = path.length();
                 builder.indent(1).append("builder.append({}).append({}.toString(param{}));\n", variable(path.substring(currentIndex, variableStart)),
-                        type(PathParamHelper.class), pathParamIndexes.get(path.substring(variableStart + 1, variableEnd)));
+                    type(PathParamHelper.class), pathParamIndexes.get(path.substring(variableStart + 1, variableEnd)));
                 currentIndex = variableEnd;
             }
             if (currentIndex < path.length()) {

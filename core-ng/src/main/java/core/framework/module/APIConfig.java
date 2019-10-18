@@ -10,6 +10,7 @@ import core.framework.impl.web.controller.ControllerHolder;
 import core.framework.impl.web.service.HTTPMethods;
 import core.framework.impl.web.service.WebServiceClient;
 import core.framework.impl.web.service.WebServiceClientBuilder;
+import core.framework.impl.web.service.WebServiceClientProxy;
 import core.framework.impl.web.service.WebServiceControllerBuilder;
 import core.framework.impl.web.service.WebServiceImplValidator;
 import core.framework.impl.web.service.WebServiceInterfaceValidator;
@@ -43,12 +44,12 @@ public class APIConfig extends Config {
         this.context = context;
         // default value is for internal api call only, targeting for kube env (with short connect timeout and more retries)
         httpClientBuilder = new HTTPClientBuilder()
-                .userAgent(WebServiceClient.USER_AGENT)
-                .trustAll()
-                .connectTimeout(Duration.ofSeconds(2))
-                .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
-                .slowOperationThreshold(Duration.ofSeconds(10))
-                .maxRetries(5);
+            .userAgent(WebServiceClient.USER_AGENT)
+            .trustAll()
+            .connectTimeout(Duration.ofSeconds(2))
+            .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
+            .slowOperationThreshold(Duration.ofSeconds(10))
+            .maxRetries(5);
     }
 
     @Override
@@ -59,9 +60,9 @@ public class APIConfig extends Config {
     public <T> void service(Class<T> serviceInterface, T service) {
         logger.info("create web service, interface={}", serviceInterface.getCanonicalName());
         new WebServiceInterfaceValidator(serviceInterface,
-                context.httpServer.handler.requestBeanMapper,
-                context.httpServer.handler.responseBeanMapper,
-                context.beanClassNameValidator).validate();
+            context.httpServer.handler.requestBeanMapper,
+            context.httpServer.handler.responseBeanMapper,
+            context.beanClassNameValidator).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
 
         for (Method method : serviceInterface.getMethods()) {
@@ -84,6 +85,12 @@ public class APIConfig extends Config {
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
+        T client = createClient(serviceInterface, serviceURL);
+        context.beanFactory.bind(serviceInterface, null, client);
+        return new APIClientConfig((WebServiceClientProxy) client);
+    }
+
+    public <T> T createClient(Class<T> serviceInterface, String serviceURL) {
         logger.info("create web service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
         ResponseBeanMapper responseBeanMapper = context.httpServer.handler.responseBeanMapper;
@@ -91,9 +98,7 @@ public class APIConfig extends Config {
 
         HTTPClient httpClient = getOrCreateHTTPClient();
         var webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, responseBeanMapper);
-        T client = createWebServiceClient(serviceInterface, webServiceClient);
-        context.beanFactory.bind(serviceInterface, null, client);
-        return new APIClientConfig(webServiceClient);
+        return createWebServiceClient(serviceInterface, webServiceClient);
     }
 
     <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {

@@ -72,4 +72,8 @@ public class TestWebService$Client implements core.framework.impl.web.service.Te
         return (core.framework.impl.web.service.TestWebService.TestResponse) client.execute(core.framework.http.HTTPMethod.GET, path, requestBeanClass, requestBean, core.framework.impl.web.service.TestWebService.TestResponse.class);
     }
 
+    public void intercept(core.framework.web.service.WebServiceClientInterceptor interceptor) {
+        this.client.intercept(interceptor);
+    }
+
 }

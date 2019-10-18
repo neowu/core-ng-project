@@ -64,6 +64,14 @@ public class DynamicInstanceBuilder<T> {
         }
     }
 
+    public void addInterface(Class<?> interfaceClass) {
+        try {
+            classBuilder.addInterface(classPool.get(interfaceClass.getName()));
+        } catch (NotFoundException e) {
+            throw new Error(e);
+        }
+    }
+
     public void addMethod(String method) {
         sourceCode.methods.add(method);
         try {
