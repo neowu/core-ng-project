@@ -22,7 +22,7 @@ public class EventController {
     @Inject
     MessagePublisher<EventMessage> eventMessagePublisher;
     @Inject
-    CollectEventRequestValidator validator;
+    SendEventRequestValidator validator;
 
     public EventController(Set<String> allowedOrigins) {
         this.allowedOrigins = allowedOrigins;
@@ -38,7 +38,7 @@ public class EventController {
                        .header("Access-Control-Allow-Headers", "Accept, Content-Type");
     }
 
-    public Response put(Request request) {
+    public Response send(Request request) {
         String origin = request.header("Origin").orElse(null);
         if (origin != null)
             checkOrigin(origin);    // allow directly call, e.g. mobile app
@@ -48,10 +48,10 @@ public class EventController {
         Instant now = Instant.now();
         String clientIP = request.clientIP();
 
-        CollectEventRequest eventRequest = request.bean(CollectEventRequest.class);
+        SendEventRequest eventRequest = request.bean(SendEventRequest.class);
         validator.validate(eventRequest);
 
-        for (CollectEventRequest.Event event : eventRequest.events) {
+        for (SendEventRequest.Event event : eventRequest.events) {
             EventMessage message = message(event, app, now);
 
             if (userAgent != null) message.context.put("userAgent", userAgent);
@@ -70,12 +70,12 @@ public class EventController {
         throw new ForbiddenException("access denied");
     }
 
-    EventMessage message(CollectEventRequest.Event event, String app, Instant now) {
+    EventMessage message(SendEventRequest.Event event, String app, Instant now) {
         var message = new EventMessage();
         message.id = LogManager.ID_GENERATOR.next(now);
-        message.timestamp = now;
+        message.date = event.date.toInstant();
         message.app = app;
-        message.eventTime = event.date.toInstant();
+        message.receivedTime = now;
         message.result = JSON.toEnumValue(event.result);
         message.action = event.action;
         message.errorCode = event.errorCode;

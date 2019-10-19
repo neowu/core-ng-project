@@ -53,9 +53,9 @@ class EventControllerTest {
 
     @Test
     void message() {
-        var event = new CollectEventRequest.Event();
+        var event = new SendEventRequest.Event();
         event.date = ZonedDateTime.now().minusHours(1);
-        event.result = CollectEventRequest.Result.WARN;
+        event.result = SendEventRequest.Result.WARN;
         event.errorCode = "NOT_FOUND";
         event.errorMessage = "not found";
         event.context.put("path", "/path");
@@ -67,10 +67,11 @@ class EventControllerTest {
         EventMessage message = controller.message(event, "test", now);
 
         assertThat(message.id).isNotNull();
-        assertThat(message.timestamp).isEqualTo(now);
-        assertThat(message.eventTime).isEqualTo(event.date.toInstant());
+        assertThat(message.date).isEqualTo(event.date.toInstant());
+        assertThat(message.receivedTime).isEqualTo(now);
         assertThat(message.result).isEqualTo("WARN");
         assertThat(message.errorCode).isEqualTo(event.errorCode);
+        assertThat(message.errorMessage).isEqualTo(event.errorMessage);
         assertThat(message.action).isNull();
         assertThat(message.context).isEqualTo(event.context);
         assertThat(message.info).isEqualTo(event.info);

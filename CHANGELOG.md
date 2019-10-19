@@ -4,6 +4,7 @@
 * api: exposed api().createClient() to allow create multiple instance of api client with different service url 
 * httpClient: tweak retry condition for connect timeout
 * log-collector: allow post for navigator.sendBeacon()
+* log-collector: index event time as @timestamp, use received_time for received time on server side
 
 ### 7.1.3 (10/16/2019)
 * http: remove forcing TLSv1.2 as latest JDK already fixed TLSv1.3 issue 

@@ -66,11 +66,11 @@ class EventServiceTest extends IntegrationTest {
         var message = new EventMessage();
         message.id = id;
         message.app = "test";
-        message.timestamp = Instant.now();
+        message.date = Instant.now();
         message.result = "OK";
         message.action = "test";
         message.context = Map.of("clientIP", "127.0.0.1");
-        message.eventTime = Instant.now();
+        message.receivedTime = Instant.now();
         return message;
     }
 }

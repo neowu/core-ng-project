@@ -7,9 +7,9 @@ import core.framework.module.App;
 import core.framework.module.SystemModule;
 import core.framework.util.Sets;
 import core.framework.util.Strings;
-import core.log.web.CollectEventRequest;
-import core.log.web.CollectEventRequestValidator;
 import core.log.web.EventController;
+import core.log.web.SendEventRequest;
+import core.log.web.SendEventRequestValidator;
 
 import java.util.Set;
 
@@ -28,14 +28,14 @@ public class LogCollectorApp extends App {
 
         kafka().publish(LogTopics.TOPIC_EVENT, EventMessage.class);
 
-        bind(CollectEventRequestValidator.class);
+        bind(SendEventRequestValidator.class);
 
         Set<String> allowedOrigins = allowedOrigins(requiredProperty("app.allowedOrigins"));
         EventController controller = bind(new EventController(allowedOrigins));
         http().route(HTTPMethod.OPTIONS, "/event/:app", controller::options);
-        http().route(HTTPMethod.POST, "/event/:app", controller::put);  // allow post for navigator.sendBeacon(), refer to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-        http().route(HTTPMethod.PUT, "/event/:app", controller::put);
-        http().bean(CollectEventRequest.class);
+        http().route(HTTPMethod.POST, "/event/:app", controller::send);  // allow post for navigator.sendBeacon(), refer to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
+        http().route(HTTPMethod.PUT, "/event/:app", controller::send);
+        http().bean(SendEventRequest.class);
     }
 
     Set<String> allowedOrigins(String value) {

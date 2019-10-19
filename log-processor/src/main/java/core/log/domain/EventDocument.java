@@ -15,8 +15,8 @@ public class EventDocument {
     public Instant timestamp;
     @Property(name = "app")
     public String app;
-    @Property(name = "event_time")
-    public Instant eventTime;
+    @Property(name = "received_time")
+    public Instant receivedTime;
     @Property(name = "result")
     public String result;
     @Property(name = "action")

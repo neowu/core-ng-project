@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class CollectEventRequest {
+public class SendEventRequest {
     @NotNull
     @Size(min = 1)
     @Property(name = "events")
