@@ -3,6 +3,7 @@
 * action: added app:start/app:stop action to track app container life cycle (e.g. killed/recreated by kube accidentally)
 * api: exposed api().createClient() to allow create multiple instance of api client with different service url 
 * httpClient: tweak retry condition for connect timeout
+* log-collector: allow post for navigator.sendBeacon()
 
 ### 7.1.3 (10/16/2019)
 * http: remove forcing TLSv1.2 as latest JDK already fixed TLSv1.3 issue 
