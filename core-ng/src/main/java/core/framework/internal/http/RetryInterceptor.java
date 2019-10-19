@@ -65,11 +65,14 @@ public class RetryInterceptor implements Interceptor {
 
     boolean shouldRetry(int attempts, String method, IOException e) {
         if (attempts >= maxRetries) return false;
-        // not retry on POST with read time out
-        // okHTTP uses both socket timeout and AsyncTimeout, asyncTime close socket when timeout is detected by background thread,
-        // refer to Okio.kt line: 166
-        // and throw IOException("Canceled") if hits callTimeout, refer to RetryAndFollowUpInterceptor.kt line: 65
-        return !("POST".equals(method) && (e instanceof SocketTimeoutException || "Canceled".equals(e.getMessage())));
+
+        // only not retry on POST with read time out
+        // okHTTP uses both socket timeout and AsyncTimeout, it closes socket when timeout is detected by background thread, refer to Okio.kt line: 166
+        if (!"POST".equals(method)) return true;
+        // refer to refer to Okio.kt line: 158
+        if (e instanceof SocketTimeoutException && "timeout".equals(e.getMessage())) return false;
+        // it throws IOException("Canceled") hits callTimeout, refer to RetryAndFollowUpInterceptor.kt line: 65
+        return !"Canceled".equals(e.getMessage());
     }
 
     Duration waitTime(int attempts) {
