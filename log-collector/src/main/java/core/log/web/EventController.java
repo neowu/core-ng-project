@@ -34,7 +34,7 @@ public class EventController {
 
         return Response.empty().status(HTTPStatus.OK)
                        .header("Access-Control-Allow-Origin", origin)
-                       .header("Access-Control-Allow-Methods", "PUT, OPTIONS")
+                       .header("Access-Control-Allow-Methods", "POST, PUT, OPTIONS")
                        .header("Access-Control-Allow-Headers", "Accept, Content-Type");
     }
 

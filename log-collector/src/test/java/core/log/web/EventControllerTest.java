@@ -52,6 +52,14 @@ class EventControllerTest {
     }
 
     @Test
+    void allowPOSTWithCORS() {
+        when(request.header("Origin")).thenReturn(Optional.of("localhost"));
+        var controller = new EventController(Set.of("*"));
+        assertThat(controller.options(request).header("Access-Control-Allow-Methods"))
+            .hasValueSatisfying(methods -> assertThat(methods).contains("POST"));
+    }
+
+    @Test
     void message() {
         var event = new SendEventRequest.Event();
         event.date = ZonedDateTime.now().minusHours(1);
