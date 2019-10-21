@@ -38,7 +38,7 @@ public class EventController {
                        .header("Access-Control-Allow-Headers", "Accept, Content-Type");
     }
 
-    public Response send(Request request) {
+    public Response post(Request request) {
         String origin = request.header("Origin").orElse(null);
         if (origin != null)
             checkOrigin(origin);    // allow directly call, e.g. mobile app
@@ -82,6 +82,7 @@ public class EventController {
         message.errorMessage = event.errorMessage;
         message.context = event.context;
         message.info = event.info;
+        message.stats = event.stats;
         message.elapsed = event.elapsedTime;
         return message;
     }

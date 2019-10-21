@@ -27,6 +27,8 @@ public class EventDocument {
     public String errorMessage;
     @Property(name = "context")
     public Map<String, String> context;
+    @Property(name = "stats")
+    public Map<String, Double> stats;
     @Property(name = "info")
     public Map<String, String> info;
     @Property(name = "elapsed")

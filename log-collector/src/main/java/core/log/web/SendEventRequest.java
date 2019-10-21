@@ -48,6 +48,9 @@ public class SendEventRequest {
         @Property(name = "context")
         public Map<String, String> context = new HashMap<>();
         @NotNull
+        @Property(name = "stats")
+        public Map<String, Double> stats = new HashMap<>();
+        @NotNull
         @Property(name = "info")
         public Map<String, String> info = new HashMap<>();
         @NotNull

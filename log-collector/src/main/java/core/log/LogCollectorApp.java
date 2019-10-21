@@ -33,8 +33,7 @@ public class LogCollectorApp extends App {
         Set<String> allowedOrigins = allowedOrigins(requiredProperty("app.allowedOrigins"));
         EventController controller = bind(new EventController(allowedOrigins));
         http().route(HTTPMethod.OPTIONS, "/event/:app", controller::options);
-        http().route(HTTPMethod.POST, "/event/:app", controller::send);  // allow post for navigator.sendBeacon(), refer to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-        http().route(HTTPMethod.PUT, "/event/:app", controller::send);
+        http().route(HTTPMethod.POST, "/event/:app", controller::post);  // event will be sent via ajax or navigator.sendBeacon(), refer to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
         http().bean(SendEventRequest.class);
     }
 

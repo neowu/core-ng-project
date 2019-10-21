@@ -64,6 +64,7 @@ public class EventService {
         document.errorCode = message.errorCode;
         document.errorMessage = message.errorMessage;
         document.context = message.context;
+        document.stats = message.stats;
         document.info = message.info;
         document.elapsed = message.elapsed;
         return document;
