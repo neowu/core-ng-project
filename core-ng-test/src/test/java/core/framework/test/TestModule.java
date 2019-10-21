@@ -5,6 +5,7 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.kafka.Message;
 import core.framework.scheduler.Job;
+import core.framework.test.api.TestWebService;
 import core.framework.test.db.TestDBEntity;
 import core.framework.test.inject.TestBean;
 import core.framework.test.kafka.TestMessage;
@@ -41,12 +42,17 @@ public class TestModule extends AbstractTestModule {
 
         configureHTTP();
         configureSite();
+        configureAPI();
 
         bind(new TestBean(requiredProperty("test.inject-test.property")));
 
         configureJob();
-
         configureExecutor();
+    }
+
+    private void configureAPI() {
+        api().client(TestWebService.class, "https://localhost:8443").intercept(request -> {
+        });
     }
 
     private void configureRedis() {

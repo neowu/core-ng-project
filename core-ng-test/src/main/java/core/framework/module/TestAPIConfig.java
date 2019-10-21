@@ -1,7 +1,10 @@
 package core.framework.module;
 
 import core.framework.impl.web.service.WebServiceClient;
+import core.framework.impl.web.service.WebServiceClientProxy;
 import org.mockito.Mockito;
+
+import static org.mockito.Mockito.withSettings;
 
 /**
  * @author neo
@@ -9,6 +12,6 @@ import org.mockito.Mockito;
 public class TestAPIConfig extends APIConfig {
     @Override
     <T> T createWebServiceClient(Class<T> serviceInterface, WebServiceClient webServiceClient) {
-        return Mockito.mock(serviceInterface);
+        return Mockito.mock(serviceInterface, withSettings().extraInterfaces(WebServiceClientProxy.class));
     }
 }
