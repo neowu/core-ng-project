@@ -1,8 +1,9 @@
-package core.framework.test.api;
+package core.framework.test.web;
 
 import core.framework.impl.web.service.WebServiceClientProxy;
 import core.framework.inject.Inject;
 import core.framework.test.IntegrationTest;
+import core.framework.web.WebContext;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,6 +15,8 @@ import static org.mockito.Mockito.verify;
 class APIIntegrationTest extends IntegrationTest {
     @Inject
     TestWebService service;
+    @Inject
+    WebContext webContext;
 
     @Test
     void put() {
@@ -21,5 +24,10 @@ class APIIntegrationTest extends IntegrationTest {
         service.put(1);
 
         verify(service).put(1);
+    }
+
+    @Test
+    void webContext() {  // check web context is registered
+        assertThat(webContext).isNotNull();
     }
 }

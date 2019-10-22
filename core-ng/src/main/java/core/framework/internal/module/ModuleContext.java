@@ -24,6 +24,7 @@ import core.framework.util.ASCII;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.web.Controller;
+import core.framework.web.SessionContext;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
 
@@ -59,7 +60,9 @@ public class ModuleContext {
         stat.metrics.add(new HTTPServerMetrics(httpServer));
 
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
+        beanFactory.bind(SessionContext.class, null, httpServer.siteManager.sessionManager);
         beanFactory.bind(WebDirectory.class, null, httpServer.siteManager.webDirectory);
+
         startupHook.add(httpServer::start);
         shutdownHook.add(ShutdownHook.STAGE_0, timeout -> httpServer.shutdown());
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);

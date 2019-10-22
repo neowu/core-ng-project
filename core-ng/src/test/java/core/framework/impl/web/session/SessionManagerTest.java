@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -127,5 +128,12 @@ class SessionManagerTest {
 
         assertThat(actionLog.context.get("sessionHash")).isNotEmpty();
         verify(response).header(eq("SessionId"), anyString());
+    }
+
+    @Test
+    void invalidate() {
+        assertThatThrownBy(() -> sessionManager.invalidate(null, null))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("must not be null");
     }
 }

@@ -4,6 +4,7 @@ import core.framework.crypto.Hash;
 import core.framework.redis.Redis;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,17 @@ public class RedisSessionStore implements SessionStore {
     public void invalidate(String sessionId) {
         String key = sessionKey(sessionId);
         redis.del(key);
+    }
+
+    // use naive solution, generally invalidate by key/value is used to kick out login user, it happens rarely and will be handled by message handler which is in background
+    @Override
+    public void invalidate(String key, String value) {
+        redis.forEach("session:*", sessionKey -> {
+            String valueInSession = redis.hash().get(sessionKey, key);
+            if (Strings.equals(value, valueInSession)) {
+                redis.del(sessionKey);
+            }
+        });
     }
 
     String sessionKey(String sessionId) {

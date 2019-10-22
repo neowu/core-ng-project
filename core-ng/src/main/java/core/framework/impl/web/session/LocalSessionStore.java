@@ -2,6 +2,7 @@ package core.framework.impl.web.session;
 
 
 import core.framework.util.Maps;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,15 @@ public class LocalSessionStore implements SessionStore {
     @Override
     public void invalidate(String sessionId) {
         values.remove(sessionId);
+    }
+
+    @Override
+    public void invalidate(String key, String value) {
+        values.forEach((id, session) -> {
+            if (Strings.equals(value, session.values.get(key))) {
+                values.remove(id);
+            }
+        });
     }
 
     private Instant expirationTime(Duration sessionTimeout) {

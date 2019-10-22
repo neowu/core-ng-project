@@ -13,4 +13,6 @@ interface SessionStore {
     void save(String sessionId, Map<String, String> values, Set<String> changedFields, Duration sessionTimeout);
 
     void invalidate(String sessionId);
+
+    void invalidate(String key, String value);
 }

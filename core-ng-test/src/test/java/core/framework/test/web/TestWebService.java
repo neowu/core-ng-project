@@ -1,4 +1,4 @@
-package core.framework.test.api;
+package core.framework.test.web;
 
 import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;

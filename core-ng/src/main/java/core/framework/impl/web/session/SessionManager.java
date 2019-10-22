@@ -7,6 +7,7 @@ import core.framework.web.CookieSpec;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import core.framework.web.Session;
+import core.framework.web.SessionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ import java.util.UUID;
 /**
  * @author neo
  */
-public final class SessionManager {
+public final class SessionManager implements SessionContext {
     private final Logger logger = LoggerFactory.getLogger(SessionManager.class);
     private CookieSpec cookieSpec;
     private String header;
@@ -99,5 +100,12 @@ public final class SessionManager {
     public void header(String name) {
         if (name == null) throw new Error("name must not be null");
         header = name;
+    }
+
+    @Override
+    public void invalidate(String key, String value) {
+        if (store == null) throw new Error("session store is not initialized");
+        if (key == null || value == null) throw new Error("key/value must not be null");   // to prevent from invalidating all sessions miss this key
+        store.invalidate(key, value);
     }
 }

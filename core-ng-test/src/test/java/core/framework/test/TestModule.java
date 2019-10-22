@@ -5,12 +5,12 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.kafka.Message;
 import core.framework.scheduler.Job;
-import core.framework.test.api.TestWebService;
 import core.framework.test.db.TestDBEntity;
 import core.framework.test.inject.TestBean;
 import core.framework.test.kafka.TestMessage;
 import core.framework.test.module.AbstractTestModule;
 import core.framework.test.scheduler.TestJob;
+import core.framework.test.web.TestWebService;
 import org.mockito.Mockito;
 
 import java.time.DayOfWeek;
