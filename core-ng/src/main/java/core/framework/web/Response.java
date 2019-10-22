@@ -3,12 +3,12 @@ package core.framework.web;
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPHeaders;
-import core.framework.impl.web.response.BeanBody;
-import core.framework.impl.web.response.ByteArrayBody;
-import core.framework.impl.web.response.FileBody;
-import core.framework.impl.web.response.ResponseImpl;
-import core.framework.impl.web.response.TemplateBody;
-import core.framework.impl.web.response.TextBody;
+import core.framework.internal.web.response.BeanBody;
+import core.framework.internal.web.response.ByteArrayBody;
+import core.framework.internal.web.response.FileBody;
+import core.framework.internal.web.response.ResponseImpl;
+import core.framework.internal.web.response.TemplateBody;
+import core.framework.internal.web.response.TextBody;
 
 import java.nio.file.Path;
 import java.util.Optional;

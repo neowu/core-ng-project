@@ -1,11 +1,11 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.web.HTTPIOHandler;
-import core.framework.impl.web.site.AJAXErrorResponse;
 import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
+import core.framework.internal.web.HTTPIOHandler;
+import core.framework.internal.web.site.AJAXErrorResponse;
 import core.framework.web.Controller;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;

@@ -1,12 +1,12 @@
 package core.framework.module;
 
-import core.framework.impl.web.session.LocalSessionStore;
-import core.framework.impl.web.session.RedisSessionStore;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.resource.PoolMetrics;
+import core.framework.internal.web.session.LocalSessionStore;
+import core.framework.internal.web.session.RedisSessionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

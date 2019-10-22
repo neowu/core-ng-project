@@ -1,16 +1,16 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.web.api.APIDefinitionResponse;
-import core.framework.impl.web.http.IPv4AccessControl;
-import core.framework.impl.web.http.IPv4Ranges;
-import core.framework.impl.web.management.APIController;
-import core.framework.impl.web.site.StaticContentController;
-import core.framework.impl.web.site.StaticDirectoryController;
-import core.framework.impl.web.site.StaticFileController;
-import core.framework.impl.web.site.WebSecurityInterceptor;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
+import core.framework.internal.web.api.APIDefinitionResponse;
+import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.IPv4Ranges;
+import core.framework.internal.web.management.APIController;
+import core.framework.internal.web.site.StaticContentController;
+import core.framework.internal.web.site.StaticDirectoryController;
+import core.framework.internal.web.site.StaticFileController;
+import core.framework.internal.web.site.WebSecurityInterceptor;
 import core.framework.web.site.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

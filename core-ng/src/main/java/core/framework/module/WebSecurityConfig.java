@@ -1,6 +1,6 @@
 package core.framework.module;
 
-import core.framework.impl.web.site.WebSecurityInterceptor;
+import core.framework.internal.web.site.WebSecurityInterceptor;
 
 /**
  * @author neo

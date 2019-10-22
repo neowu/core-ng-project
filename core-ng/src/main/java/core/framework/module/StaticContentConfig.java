@@ -1,6 +1,6 @@
 package core.framework.module;
 
-import core.framework.impl.web.site.StaticContentController;
+import core.framework.internal.web.site.StaticContentController;
 
 import java.time.Duration;
 

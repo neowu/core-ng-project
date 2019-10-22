@@ -1,7 +1,7 @@
 package core.framework.test.web;
 
-import core.framework.impl.web.service.WebServiceClientProxy;
 import core.framework.inject.Inject;
+import core.framework.internal.web.service.WebServiceClientProxy;
 import core.framework.test.IntegrationTest;
 import core.framework.web.WebContext;
 import org.junit.jupiter.api.Test;

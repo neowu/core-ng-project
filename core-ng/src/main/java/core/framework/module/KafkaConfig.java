@@ -1,7 +1,6 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.web.management.KafkaController;
 import core.framework.internal.kafka.MessageListener;
 import core.framework.internal.kafka.MessageProducer;
 import core.framework.internal.kafka.MessageProducerImpl;
@@ -9,6 +8,7 @@ import core.framework.internal.kafka.MessagePublisherImpl;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
+import core.framework.internal.web.management.KafkaController;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.kafka.MessagePublisher;

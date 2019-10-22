@@ -1,7 +1,7 @@
 package core.framework.test.web;
 
-import core.framework.impl.web.session.RedisSessionStore;
 import core.framework.inject.Inject;
+import core.framework.internal.web.session.RedisSessionStore;
 import core.framework.test.IntegrationTest;
 import core.framework.test.redis.MockRedis;
 import core.framework.web.SessionContext;

@@ -1,8 +1,6 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
-import core.framework.impl.web.management.ListJobResponse;
-import core.framework.impl.web.management.SchedulerController;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
@@ -11,6 +9,8 @@ import core.framework.internal.scheduler.HourlyTrigger;
 import core.framework.internal.scheduler.MonthlyTrigger;
 import core.framework.internal.scheduler.Scheduler;
 import core.framework.internal.scheduler.WeeklyTrigger;
+import core.framework.internal.web.management.ListJobResponse;
+import core.framework.internal.web.management.SchedulerController;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
 

@@ -1,7 +1,7 @@
 package core.framework.module;
 
-import core.framework.impl.web.service.WebServiceClient;
-import core.framework.impl.web.service.WebServiceClientProxy;
+import core.framework.internal.web.service.WebServiceClient;
+import core.framework.internal.web.service.WebServiceClientProxy;
 import org.mockito.Mockito;
 
 import static org.mockito.Mockito.withSettings;

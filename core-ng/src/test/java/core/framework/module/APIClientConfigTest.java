@@ -1,6 +1,6 @@
 package core.framework.module;
 
-import core.framework.impl.web.service.WebServiceClientProxy;
+import core.framework.internal.web.service.WebServiceClientProxy;
 import core.framework.web.service.WebServiceClientInterceptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
