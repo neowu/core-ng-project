@@ -16,7 +16,8 @@ public class BeanClassNameValidator {
     public void validate(Class<?> beanClass) {
         beanClasses.compute(Classes.className(beanClass), (key, previous) -> {
             if (previous != null && !previous.equals(beanClass))
-                throw new Error(format("found bean class with duplicate name which can be confusing, please use different class name, previousClass={}, class={}", previous.getCanonicalName(), beanClass.getCanonicalName()));
+                throw new Error(format("found bean class with duplicate name which can be confusing, please use different class name, previousClass={}, class={}",
+                    previous.getCanonicalName(), beanClass.getCanonicalName()));
             return beanClass;
         });
     }

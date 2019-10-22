@@ -1,10 +1,10 @@
 package core.framework.impl.web.site;
 
-import core.framework.impl.template.CDNManager;
-import core.framework.impl.template.HTMLTemplate;
-import core.framework.impl.template.HTMLTemplateBuilder;
-import core.framework.impl.template.TemplateContext;
-import core.framework.impl.template.source.FileTemplateSource;
+import core.framework.internal.template.CDNManager;
+import core.framework.internal.template.HTMLTemplate;
+import core.framework.internal.template.HTMLTemplateBuilder;
+import core.framework.internal.template.TemplateContext;
+import core.framework.internal.template.source.FileTemplateSource;
 import core.framework.util.Files;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;

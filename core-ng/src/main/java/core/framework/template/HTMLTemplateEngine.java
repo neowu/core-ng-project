@@ -1,12 +1,12 @@
 package core.framework.template;
 
-import core.framework.impl.template.CDNManager;
-import core.framework.impl.template.HTMLTemplate;
-import core.framework.impl.template.HTMLTemplateBuilder;
-import core.framework.impl.template.TemplateContext;
-import core.framework.impl.template.source.ClasspathTemplateSource;
-import core.framework.impl.template.source.StringTemplateSource;
-import core.framework.impl.template.source.TemplateSource;
+import core.framework.internal.template.CDNManager;
+import core.framework.internal.template.HTMLTemplate;
+import core.framework.internal.template.HTMLTemplateBuilder;
+import core.framework.internal.template.TemplateContext;
+import core.framework.internal.template.source.ClasspathTemplateSource;
+import core.framework.internal.template.source.StringTemplateSource;
+import core.framework.internal.template.source.TemplateSource;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;

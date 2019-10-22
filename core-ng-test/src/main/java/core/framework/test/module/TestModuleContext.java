@@ -73,6 +73,6 @@ public class TestModuleContext extends ModuleContext {
         Set<Key> notAppliedBindings = new HashSet<>(overrideBindings);
         notAppliedBindings.removeAll(skippedBindings);
         if (!notAppliedBindings.isEmpty())
-            throw new Error(format("found unnecessary override bindings, please check test module, bindings={}", notAppliedBindings));
+            throw new Error("found unnecessary override bindings, please check test module, bindings=" + notAppliedBindings);
     }
 }
