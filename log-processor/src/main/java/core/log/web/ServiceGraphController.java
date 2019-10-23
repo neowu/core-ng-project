@@ -24,7 +24,7 @@ public class ServiceGraphController implements Controller {
         accessControl.validate(request.clientIP());
 
         ServiceGraphRequest graphRequest = request.bean(ServiceGraphRequest.class);
-        HTTPClient client = new HTTPClientBuilder().build();  // create ad hoc http client will be recycled once done
+        HTTPClient client = new HTTPClientBuilder().trustAll().build();  // create ad hoc http client will be recycled once done
         var builder = new CodeBuilder();
         builder.append("digraph {\n");
         for (String serviceURL : graphRequest.serviceURLs) {
