@@ -1,4 +1,4 @@
-package core.framework.internal.web.bean;
+package core.framework.internal.bean;
 
 import core.framework.api.json.Property;
 import core.framework.api.validate.NotNull;

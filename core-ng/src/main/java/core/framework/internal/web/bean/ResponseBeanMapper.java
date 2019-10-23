@@ -1,5 +1,6 @@
 package core.framework.internal.web.bean;
 
+import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.util.Strings;
 
@@ -22,11 +23,15 @@ public class ResponseBeanMapper {
             Optional<?> optional = (Optional) bean;
             if (optional.isEmpty()) return Strings.bytes("null");
             Object value = optional.get();
-            return beanMappers.toJSON((Class<Object>) value.getClass(), value);
+            BeanMapper<Object> mapper = beanMappers.mapper((Class<Object>) value.getClass());
+            mapper.validator.validate(value, false);
+            return mapper.mapper.toJSON(value);
         } else if (bean.getClass().getPackageName().startsWith("java")) {   // provide better error message for developer, rather than return class is not registered message
             throw new Error("response body class must be bean class, class=" + bean.getClass().getCanonicalName());
         } else {
-            return beanMappers.toJSON((Class<Object>) bean.getClass(), bean);
+            BeanMapper<Object> mapper = beanMappers.mapper((Class<Object>) bean.getClass());
+            mapper.validator.validate(bean, false);
+            return mapper.mapper.toJSON(bean);
         }
     }
 

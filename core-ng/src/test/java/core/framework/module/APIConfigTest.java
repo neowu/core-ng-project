@@ -5,7 +5,6 @@ import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
-import core.framework.internal.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +30,7 @@ class APIConfigTest {
     void service() {
         config.service(TestWebService.class, new TestWebServiceImpl());
 
-        assertThat(config.serviceInterfaces).containsEntry(Classes.className(TestWebService.class), TestWebService.class);
+        assertThat(context.serviceRegistry.serviceInterfaces).contains(TestWebService.class);
     }
 
     @Test
@@ -41,6 +40,8 @@ class APIConfigTest {
 
         TestWebService client = (TestWebService) context.beanFactory.bean(TestWebService.class, null);
         assertThat(client).isNotNull();
+
+        assertThat(context.serviceRegistry.clientInterfaces).contains(TestWebService.class);
     }
 
     public interface TestWebService {

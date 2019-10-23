@@ -1,5 +1,6 @@
 package core.framework.internal.web.bean;
 
+import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 
@@ -40,13 +41,14 @@ public class RequestBeanMapper {
         if (!queryParamMappers.containsKey(beanClass)) {
             new QueryParamClassValidator(beanClass, beanClassNameValidator).validate();
             QueryParamMapper<T> mapper = new QueryParamMapperBuilder<>(beanClass).build();
-            var validator = Validator.of(beanClass);
-            queryParamMappers.put(beanClass, new QueryParamMapperHolder<>(mapper, validator));
+            queryParamMappers.put(beanClass, new QueryParamMapperHolder<>(mapper, Validator.of(beanClass)));
         }
     }
 
     public <T> byte[] toJSON(Class<T> beanClass, T bean) {
-        return beanMappers.toJSON(beanClass, bean);
+        BeanMapper<T> mapper = beanMappers.mapper(beanClass);
+        mapper.validator.validate(bean, false);
+        return mapper.mapper.toJSON(bean);
     }
 
     public <T> T fromJSON(Class<T> beanClass, byte[] body) {

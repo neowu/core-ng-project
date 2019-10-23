@@ -1,4 +1,4 @@
-package core.framework.internal.web.bean;
+package core.framework.internal.bean;
 
 import core.framework.internal.reflect.Classes;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +22,6 @@ class BeanClassNameValidatorTest {
         validator.beanClasses.put(Classes.className(TestBean.class), Void.class);
 
         assertThatThrownBy(() -> validator.validate(TestBean.class))
-                .isInstanceOf(Error.class).hasMessageContaining("found bean class with duplicate name");
+            .isInstanceOf(Error.class).hasMessageContaining("found bean class with duplicate name");
     }
 }

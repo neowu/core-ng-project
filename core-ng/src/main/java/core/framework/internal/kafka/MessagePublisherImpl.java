@@ -4,6 +4,7 @@ import core.framework.internal.json.JSONMapper;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.filter.BytesLogParam;
+import core.framework.internal.validate.Validator;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.ActionLogContext;
 import core.framework.util.StopWatch;
@@ -20,15 +21,15 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
     private final Logger logger = LoggerFactory.getLogger(MessagePublisherImpl.class);
 
     private final MessageProducer producer;
-    private final MessageValidator<T> validator;
     private final String topic;
     private final JSONMapper<T> mapper;
+    private final Validator validator;
 
     public MessagePublisherImpl(MessageProducer producer, String topic, Class<T> messageClass) {
         this.producer = producer;
         this.topic = topic;
-        this.validator = new MessageValidator<>(messageClass);
         mapper = new JSONMapper<>(messageClass);
+        validator = Validator.of(messageClass);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
         if (key == null) throw new Error("key must not be null");   // if key is null, kafka will pick random partition which breaks determinacy
 
         var watch = new StopWatch();
-        validator.validate(value);
+        validator.validate(value, false);
         byte[] message = mapper.toJSON(value);
         try {
             var record = new ProducerRecord<>(topic, Strings.bytes(key), message);

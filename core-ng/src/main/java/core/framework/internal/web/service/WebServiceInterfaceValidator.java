@@ -8,11 +8,11 @@ import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.http.HTTPMethod;
+import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.internal.reflect.Methods;
 import core.framework.internal.reflect.Params;
-import core.framework.internal.web.bean.BeanClassNameValidator;
 import core.framework.internal.web.bean.RequestBeanMapper;
 import core.framework.internal.web.bean.ResponseBeanMapper;
 import core.framework.internal.web.route.PathPatternValidator;
@@ -48,6 +48,8 @@ public class WebServiceInterfaceValidator {
     public void validate() {
         if (!serviceInterface.isInterface())
             throw new Error("service interface must be interface, serviceInterface=" + serviceInterface.getCanonicalName());
+
+        beanClassNameValidator.validate(serviceInterface);
 
         Map<String, Method> methodNames = Maps.newHashMap();
         for (Method method : serviceInterface.getDeclaredMethods()) {

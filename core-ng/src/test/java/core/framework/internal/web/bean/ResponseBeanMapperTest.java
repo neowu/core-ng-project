@@ -1,5 +1,7 @@
 package core.framework.internal.web.bean;
 
+import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.TestBean;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.validate.ValidationException;
 import core.framework.util.Lists;

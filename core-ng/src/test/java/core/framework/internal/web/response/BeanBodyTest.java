@@ -1,10 +1,10 @@
 package core.framework.internal.web.response;
 
+import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.TestBean;
 import core.framework.internal.validate.ValidationException;
-import core.framework.internal.web.bean.BeanClassNameValidator;
 import core.framework.internal.web.bean.BeanMappers;
 import core.framework.internal.web.bean.ResponseBeanMapper;
-import core.framework.internal.web.bean.TestBean;
 import io.undertow.io.Sender;
 import org.junit.jupiter.api.Test;
 

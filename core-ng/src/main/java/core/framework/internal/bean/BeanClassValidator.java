@@ -1,4 +1,4 @@
-package core.framework.internal.web.bean;
+package core.framework.internal.bean;
 
 import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.validate.ClassVisitor;
@@ -8,16 +8,16 @@ import java.lang.reflect.Field;
 /**
  * @author neo
  */
-final class BeanClassValidator implements ClassVisitor {
+public final class BeanClassValidator implements ClassVisitor { // bean is used by both web service request/response bean and kafka message class
     private final BeanClassNameValidator beanClassNameValidator;
     private final JSONClassValidator validator;
 
-    BeanClassValidator(Class<?> beanClass, BeanClassNameValidator beanClassNameValidator) {
+    public BeanClassValidator(Class<?> beanClass, BeanClassNameValidator beanClassNameValidator) {
         validator = new JSONClassValidator(beanClass);
         this.beanClassNameValidator = beanClassNameValidator;
     }
 
-    void validate() {
+    public void validate() {
         validator.validate();
     }
 

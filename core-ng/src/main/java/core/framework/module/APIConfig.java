@@ -6,7 +6,6 @@ import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
-import core.framework.internal.reflect.Classes;
 import core.framework.internal.web.bean.RequestBeanMapper;
 import core.framework.internal.web.bean.ResponseBeanMapper;
 import core.framework.internal.web.controller.ControllerHolder;
@@ -24,16 +23,11 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-
-import static core.framework.util.Strings.format;
 
 /**
  * @author neo
  */
 public class APIConfig extends Config {
-    final Map<String, Class<?>> serviceInterfaces = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
     private ModuleContext context;
     private HTTPClientBuilder httpClientBuilder;
@@ -62,8 +56,9 @@ public class APIConfig extends Config {
         new WebServiceInterfaceValidator(serviceInterface,
             context.httpServer.handler.requestBeanMapper,
             context.httpServer.handler.responseBeanMapper,
-            context.beanClassNameValidator).validate();
+            context.serviceRegistry.beanClassNameValidator).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
+        context.serviceRegistry.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate
 
         for (Method method : serviceInterface.getMethods()) {
             HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
@@ -79,9 +74,6 @@ public class APIConfig extends Config {
                 throw new Error("failed to find impl method", e);
             }
         }
-
-        Class<?> previous = serviceInterfaces.putIfAbsent(Classes.className(serviceInterface), serviceInterface);
-        if (previous != null) throw new Error(format("found service interface with duplicate name which can be confusing, please use different class name, previousClass={}, class={}", previous.getCanonicalName(), serviceInterface.getCanonicalName()));
     }
 
     public <T> APIClientConfig client(Class<T> serviceInterface, String serviceURL) {
@@ -94,7 +86,8 @@ public class APIConfig extends Config {
         logger.info("create web service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
         RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
         ResponseBeanMapper responseBeanMapper = context.httpServer.handler.responseBeanMapper;
-        new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper, context.beanClassNameValidator).validate();
+        new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper, context.serviceRegistry.beanClassNameValidator).validate();
+        context.serviceRegistry.clientInterfaces.add(serviceInterface);
 
         HTTPClient httpClient = getOrCreateHTTPClient();
         var webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, responseBeanMapper);

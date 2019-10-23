@@ -2,10 +2,10 @@ package core.framework.internal.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
-import core.framework.internal.web.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.TestBean;
 import core.framework.internal.web.bean.BeanMappers;
 import core.framework.internal.web.bean.RequestBeanMapper;
-import core.framework.internal.web.bean.TestBean;
 import core.framework.internal.web.bean.TestQueryParamBean;
 import core.framework.util.Strings;
 import core.framework.web.CookieSpec;

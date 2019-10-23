@@ -1,4 +1,4 @@
-package core.framework.internal.web.bean;
+package core.framework.internal.bean;
 
 import core.framework.internal.reflect.Classes;
 import core.framework.util.Maps;

@@ -1,5 +1,7 @@
 package core.framework.internal.web.bean;
 
+import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassValidator;
 import core.framework.util.Maps;
 
 import java.util.Map;
@@ -15,12 +17,6 @@ public class BeanMappers {
             new BeanClassValidator(beanClass, beanClassNameValidator).validate();
             mappers.put(beanClass, new BeanMapper<>(beanClass));
         }
-    }
-
-    <T> byte[] toJSON(Class<T> beanClass, T bean) {
-        BeanMapper<T> mapper = mapper(beanClass);
-        mapper.validator.validate(bean, false);
-        return mapper.mapper.toJSON(bean);
     }
 
     <T> BeanMapper<T> mapper(Class<T> beanClass) {

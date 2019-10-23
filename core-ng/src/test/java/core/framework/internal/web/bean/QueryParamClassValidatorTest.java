@@ -1,5 +1,6 @@
 package core.framework.internal.web.bean;
 
+import core.framework.internal.bean.BeanClassNameValidator;
 import org.junit.jupiter.api.Test;
 
 /**

@@ -148,7 +148,7 @@ class MessageListenerThread extends Thread {
                 byte[] value = record.value();
                 logger.debug("[message] value={}", new BytesLogParam(value));
                 T message = process.mapper.fromJSON(value);
-                process.validator.validate(message);
+                process.validator.validate(message, false);
                 process.handler.handle(key, message);
             } catch (Throwable e) {
                 logManager.logError(e);
@@ -168,8 +168,8 @@ class MessageListenerThread extends Thread {
             actionLog.context("handler", process.bulkHandler.getClass().getCanonicalName());
 
             List<Message<T>> messages = messages(records, actionLog, process.mapper);
-            for (Message<T> message : messages) {
-                process.validator.validate(message.value);
+            for (Message<T> message : messages) {   // validate after fromJSON, so it can track refId/correlationId
+                process.validator.validate(message.value, false);
             }
 
             process.bulkHandler.handle(messages);

@@ -3,7 +3,7 @@ package core.framework.internal.web.service;
 import core.framework.api.web.service.GET;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.internal.web.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.web.bean.BeanMappers;
 import core.framework.internal.web.bean.RequestBeanMapper;
 import core.framework.internal.web.bean.ResponseBeanMapper;

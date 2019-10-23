@@ -5,7 +5,7 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.internal.web.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.web.bean.BeanMappers;
 import core.framework.internal.web.bean.RequestBeanMapper;
 import core.framework.internal.web.bean.ResponseBeanMapper;

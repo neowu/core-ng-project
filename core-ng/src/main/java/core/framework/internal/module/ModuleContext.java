@@ -8,7 +8,6 @@ import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.Stat;
 import core.framework.internal.web.HTTPServer;
 import core.framework.internal.web.HTTPServerMetrics;
-import core.framework.internal.web.bean.BeanClassNameValidator;
 import core.framework.internal.web.bean.BeanMappers;
 import core.framework.internal.web.bean.RequestBeanMapper;
 import core.framework.internal.web.controller.ControllerClassValidator;
@@ -16,6 +15,8 @@ import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.controller.ControllerInspector;
 import core.framework.internal.web.management.DiagnosticController;
 import core.framework.internal.web.management.PropertyController;
+import core.framework.internal.web.management.ServiceController;
+import core.framework.internal.web.management.ServiceResponse;
 import core.framework.internal.web.route.PathPatternValidator;
 import core.framework.internal.web.service.ErrorResponse;
 import core.framework.internal.web.site.AJAXErrorResponse;
@@ -47,8 +48,8 @@ public class ModuleContext {
     public final PropertyManager propertyManager = new PropertyManager();
     public final HTTPServer httpServer;
     public final Stat stat = new Stat();
+    public final ServiceRegistry serviceRegistry = new ServiceRegistry();
     protected final Map<String, Config> configs = Maps.newHashMap();
-    public BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
     PropertyValidator propertyValidator = new PropertyValidator();
     private BackgroundTaskExecutor backgroundTask;
 
@@ -76,6 +77,8 @@ public class ModuleContext {
         route(HTTPMethod.GET, "/_sys/thread", (LambdaController) diagnosticController::thread, true);
         route(HTTPMethod.GET, "/_sys/heap", (LambdaController) diagnosticController::heap, true);
         route(HTTPMethod.GET, "/_sys/property", new PropertyController(propertyManager), true);
+        route(HTTPMethod.GET, "/_sys/service", new ServiceController(serviceRegistry), true);
+        bean(ServiceResponse.class);
     }
 
     public BackgroundTaskExecutor backgroundTask() {
@@ -103,12 +106,12 @@ public class ModuleContext {
             if (requestBeanMapper.queryParamMappers.containsKey(beanClass)) {
                 throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             }
-            requestBeanMapper.registerQueryParamBean(beanClass, beanClassNameValidator);
+            requestBeanMapper.registerQueryParamBean(beanClass, serviceRegistry.beanClassNameValidator);
         } else {
             BeanMappers beanMappers = httpServer.handler.beanMappers;
             if (beanMappers.mappers.containsKey(beanClass))
                 throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
-            beanMappers.register(beanClass, beanClassNameValidator);
+            beanMappers.register(beanClass, serviceRegistry.beanClassNameValidator);
         }
     }
 
@@ -143,7 +146,7 @@ public class ModuleContext {
         Set<String> keys = propertyManager.properties.keys();
         propertyValidator.validate(keys);
         propertyValidator = null;   // free object not used anymore
-        beanClassNameValidator = null;
+        serviceRegistry.beanClassNameValidator = null;
 
         configs.values().forEach(Config::validate);
     }

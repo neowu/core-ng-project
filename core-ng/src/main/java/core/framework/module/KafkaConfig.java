@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
+import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.kafka.MessageListener;
 import core.framework.internal.kafka.MessageProducer;
 import core.framework.internal.kafka.MessageProducerImpl;
@@ -58,6 +59,8 @@ public class KafkaConfig extends Config {
     public <T> MessagePublisher<T> publish(String topic, Class<T> messageClass) {
         logger.info("publish, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
         if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
+        new BeanClassValidator(messageClass, context.serviceRegistry.beanClassNameValidator).validate();
+        context.serviceRegistry.producerMessageClasses.add(messageClass);
         MessagePublisher<T> publisher = createMessagePublisher(topic, messageClass);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
         handlerAdded = true;
@@ -98,6 +101,8 @@ public class KafkaConfig extends Config {
     private <T> void subscribe(String topic, Class<T> messageClass, MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler) {
         if (handler == null && bulkHandler == null) throw new Error("handler must not be null");
         logger.info("subscribe, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
+        new BeanClassValidator(messageClass, context.serviceRegistry.beanClassNameValidator).validate();
+        context.serviceRegistry.consumerMessageClasses.add(messageClass);
         listener().subscribe(topic, messageClass, handler, bulkHandler);
         handlerAdded = true;
     }
