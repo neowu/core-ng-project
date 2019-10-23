@@ -85,7 +85,6 @@ public class SiteConfig extends Config {
 
     public void publishAPI(List<String> cidrs) {
         HTTPConfig httpConfig = context.config(HTTPConfig.class, null);
-        APIConfig apiConfig = context.config(APIConfig.class, null);
 
         logger.info("publish typescript api definition, cidrs={}", cidrs);
         var accessControl = new IPv4AccessControl();

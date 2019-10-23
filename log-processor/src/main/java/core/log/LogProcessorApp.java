@@ -2,6 +2,7 @@ package core.log;
 
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
+import core.framework.http.HTTPMethod;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
@@ -23,6 +24,8 @@ import core.log.service.IndexOption;
 import core.log.service.IndexService;
 import core.log.service.KibanaService;
 import core.log.service.StatService;
+import core.log.web.ServiceGraphController;
+import core.log.web.ServiceGraphRequest;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -39,16 +42,34 @@ public class LogProcessorApp extends App {
 
         configureSearch();
 
-        IndexOption option = new IndexOption();
-        option.numberOfShards = Integer.parseInt(property("index.shards").orElse("1"));   // with small cluster one shard has best performance, for larger cluster use kube env to customize
-        option.refreshInterval = property("index.refresh.interval").orElse("10s");  // use longer refresh to tune load on log es
-        bind(option);
-
+        configureIndexOption();
         IndexService indexService = bind(IndexService.class);
         bind(ActionService.class);
         bind(StatService.class);
         bind(EventService.class);
 
+        configureLogAppender();
+        onStartup(indexService::createIndexTemplatesUntilSuccess);
+
+        configureKibanaService();
+
+        configureKafka();
+
+        schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
+
+        http().route(HTTPMethod.PUT, "/service/graph", new ServiceGraphController());
+        http().bean(ServiceGraphRequest.class);
+    }
+
+    private void configureKibanaService() {
+        property("kibana.url").ifPresent(url -> {
+            String banner = property("kibana.banner").orElse("");
+            HTTPClient client = new HTTPClientBuilder().maxRetries(5).build();  // create ad hoc http client will be recycled once done
+            onStartup(() -> new Thread(new KibanaService(url, banner, client)::importObjects, "kibana").start());
+        });
+    }
+
+    private void configureLogAppender() {
         property("sys.log.appender").ifPresent(appender -> {
             if ("console".equals(appender)) {
                 log().appendToConsole();
@@ -56,18 +77,13 @@ public class LogProcessorApp extends App {
                 log().appender(bind(ElasticSearchAppender.class));  // ElasticSearchAppender doesn't need to be stop, es will be stopped at stage 7
             }
         });
+    }
 
-        onStartup(indexService::createIndexTemplatesUntilSuccess);
-
-        property("kibana.url").ifPresent(url -> {
-            String banner = property("kibana.banner").orElse("");
-            HTTPClient client = new HTTPClientBuilder().maxRetries(5).build();  // create ad hoc http client will be recycled once done
-            onStartup(() -> new Thread(new KibanaService(url, banner, client)::importObjects, "kibana").start());
-        });
-
-        configureKafka();
-
-        schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
+    private void configureIndexOption() {
+        var option = new IndexOption();
+        option.numberOfShards = Integer.parseInt(property("index.shards").orElse("1"));   // with small cluster one shard has best performance, for larger cluster use kube env to customize
+        option.refreshInterval = property("index.refresh.interval").orElse("10s");  // use longer refresh to tune load on log es
+        bind(option);
     }
 
     private void configureKafka() {
