@@ -20,8 +20,8 @@ import static core.framework.util.Strings.format;
  */
 public class TestModuleContext extends ModuleContext {
     private final Logger logger = LoggerFactory.getLogger(TestModuleContext.class);
-    private final Map<Key, Object> overrideBindings = Maps.newHashMap();
-    private final Set<Key> appliedOverrideBindings = Sets.newHashSet();     // track overridden beans to detect duplicate binding
+    private Map<Key, Object> overrideBindings = Maps.newHashMap();
+    private Set<Key> appliedOverrideBindings = Sets.newHashSet();     // track overridden beans to detect duplicate binding
 
     public TestModuleContext() {
         super(new LogManager());
@@ -75,5 +75,7 @@ public class TestModuleContext extends ModuleContext {
         notAppliedBindings.removeAll(appliedOverrideBindings);
         if (!notAppliedBindings.isEmpty())
             throw new Error("found unnecessary override bindings, please check test module, bindings=" + notAppliedBindings);
+        overrideBindings = null;    // free not used object
+        appliedOverrideBindings = null;
     }
 }

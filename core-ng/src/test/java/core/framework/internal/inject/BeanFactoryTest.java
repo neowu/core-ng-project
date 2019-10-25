@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -27,18 +26,21 @@ class BeanFactoryTest {
 
     @Test
     void create() {
-        beanFactory.bind(Dependency1.class, null, new Dependency1());
-        beanFactory.bind(Types.generic(Dependency2.class, String.class), "dep2", new Dependency2<String>());
+        Dependency1 dependency1 = new Dependency1();
+        Dependency2<String> dependency2 = new Dependency2<>();
+        beanFactory.bind(Dependency1.class, null, dependency1);
+        beanFactory.bind(Types.generic(Dependency2.class, String.class), "dep2", dependency2);
 
         Bean bean = beanFactory.create(Bean.class);
-        assertNotNull(bean.dependency1);
-        assertNotNull(bean.dependency2);
+        assertThat(bean.dependency1).isSameAs(dependency1);
+        assertThat(bean.dependency2).isSameAs(dependency2);
     }
 
     @Test
     void bindWithMismatchedType() {
-        Error error = assertThrows(Error.class, () -> beanFactory.bind(List.class, null, "instance"));
-        assertThat(error.getMessage()).contains("instance type does not match");
+        assertThatThrownBy(() -> beanFactory.bind(List.class, null, "instance"))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("instance type does not match");
     }
 
     @Test
