@@ -2,7 +2,6 @@ package core.log;
 
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
-import core.framework.http.HTTPMethod;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
@@ -24,8 +23,6 @@ import core.log.service.IndexOption;
 import core.log.service.IndexService;
 import core.log.service.KibanaService;
 import core.log.service.StatService;
-import core.log.web.ServiceGraphController;
-import core.log.web.ServiceGraphRequest;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -56,9 +53,6 @@ public class LogProcessorApp extends App {
         configureKafka();
 
         schedule().dailyAt("cleanup-old-index-job", bind(CleanupOldIndexJob.class), LocalTime.of(1, 0));
-
-        http().route(HTTPMethod.PUT, "/service/graph", new ServiceGraphController());
-        http().bean(ServiceGraphRequest.class);
     }
 
     private void configureKibanaService() {

@@ -1,8 +1,9 @@
 ## Change log
+### 7.1.6 (10/24/2019 - )
+
 ### 7.1.5 (10/21/2019 - 10/23/2019)
 * log-collector: supports stats to collect performance data
 * session: added SessionContext.invalidate(key, value) to support kick out specific login user
-* api: support to generate service diagram via graphviz (first draft) 
 
 ### 7.1.4.1 (10/17/2019 - 10/21/2019)
 * action: added app:start/app:stop action to track app container life cycle (e.g. killed/recreated by kube accidentally)
