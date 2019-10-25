@@ -22,15 +22,15 @@ public final class ContentType {
     public static final ContentType APPLICATION_JSON = create("application/json", UTF_8);
     public static final ContentType APPLICATION_JAVASCRIPT = create("application/javascript", UTF_8);
     // form body content type doesn't use charset normally, refer to https://www.w3.org/TR/html5/sec-forms.html#urlencoded-form-data
-    public static final ContentType APPLICATION_FORM_URLENCODED = ContentType.create("application/x-www-form-urlencoded", null);
+    public static final ContentType APPLICATION_FORM_URLENCODED = create("application/x-www-form-urlencoded", null);
     public static final ContentType APPLICATION_OCTET_STREAM = create("application/octet-stream", null);
     public static final ContentType IMAGE_PNG = create("image/png", null);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentType.class);
     // cache most common ones to save paring time
     private static final Map<String, ContentType> CACHE = Map.of(
-            APPLICATION_JSON.contentType, APPLICATION_JSON,
-            TEXT_HTML.contentType, TEXT_HTML
+        APPLICATION_JSON.contentType, APPLICATION_JSON,
+        TEXT_HTML.contentType, TEXT_HTML
     );
 
     // only cover common case, assume pattern is "media-type; charset=" or "multipart/form-data; boundary="
