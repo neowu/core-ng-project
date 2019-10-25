@@ -49,13 +49,13 @@ public class TestModuleContext extends ModuleContext {
     @Override
     public <T> T bind(Type type, String name, T instance) {
         var key = new Key(type, name);
-        T targetInstance = instance;
-        if (overrideBindings.containsKey(key)) {
+        T overrideBinding = (T) overrideBindings.get(key);
+        if (overrideBinding != null) {
             appliedOverrideBindings.add(key);
             logger.info("override binding, type={}, name={}", type.getTypeName(), name);
-            targetInstance = (T) overrideBindings.get(key);
+            return super.bind(type, name, overrideBinding);
         }
-        return super.bind(type, name, targetInstance);
+        return super.bind(type, name, instance);
     }
 
     @Override
