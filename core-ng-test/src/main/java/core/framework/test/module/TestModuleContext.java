@@ -3,12 +3,14 @@ package core.framework.test.module;
 import core.framework.internal.inject.Key;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
+import core.framework.util.Maps;
 import core.framework.util.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static core.framework.util.Strings.format;
@@ -18,8 +20,8 @@ import static core.framework.util.Strings.format;
  */
 public class TestModuleContext extends ModuleContext {
     private final Logger logger = LoggerFactory.getLogger(TestModuleContext.class);
-    private final Set<Key> overrideBindings = Sets.newHashSet();
-    private final Set<Key> skippedBindings = Sets.newHashSet();     // track overridden beans to detect duplicate binding
+    private final Map<Key, Object> overrideBindings = Maps.newHashMap();
+    private final Set<Key> appliedOverrideBindings = Sets.newHashSet();     // track overridden beans to detect duplicate binding
 
     public TestModuleContext() {
         super(new LogManager());
@@ -47,14 +49,13 @@ public class TestModuleContext extends ModuleContext {
     @Override
     public <T> T bind(Type type, String name, T instance) {
         var key = new Key(type, name);
-        if (overrideBindings.contains(key)) {
-            if (skippedBindings.contains(key)) throw new Error(format("found duplicate bean, type={}, name={}", type.getTypeName(), name));
-            skippedBindings.add(key);
-            logger.info("skip bean binding, bean is overridden in test context, type={}, name={}", type.getTypeName(), name);
-            return (T) beanFactory.bean(type, name);
-        } else {
-            return super.bind(type, name, instance);
+        T targetInstance = instance;
+        if (overrideBindings.containsKey(key)) {
+            appliedOverrideBindings.add(key);
+            logger.info("override binding, type={}, name={}", type.getTypeName(), name);
+            targetInstance = (T) overrideBindings.get(key);
         }
+        return super.bind(type, name, targetInstance);
     }
 
     @Override
@@ -64,14 +65,14 @@ public class TestModuleContext extends ModuleContext {
     }
 
     <T> T overrideBinding(Type type, String name, T instance) {
-        bind(type, name, instance);
-        overrideBindings.add(new Key(type, name));
+        Object previous = overrideBindings.put(new Key(type, name), instance);
+        if (previous != null) throw new Error(format("found duplicate override binding, type={}, name={}, previous={}", type.getTypeName(), name, previous));
         return instance;
     }
 
     private void validateOverrideBindings() {
-        Set<Key> notAppliedBindings = new HashSet<>(overrideBindings);
-        notAppliedBindings.removeAll(skippedBindings);
+        Set<Key> notAppliedBindings = new HashSet<>(overrideBindings.keySet());
+        notAppliedBindings.removeAll(appliedOverrideBindings);
         if (!notAppliedBindings.isEmpty())
             throw new Error("found unnecessary override bindings, please check test module, bindings=" + notAppliedBindings);
     }

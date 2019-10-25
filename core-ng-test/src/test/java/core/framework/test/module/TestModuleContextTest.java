@@ -16,10 +16,12 @@ import core.framework.module.TestKafkaConfig;
 import core.framework.module.TestLogConfig;
 import core.framework.module.TestRedisConfig;
 import core.framework.module.TestSessionConfig;
+import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -42,5 +44,28 @@ class TestModuleContextTest {
         assertThat(context.configClass(LogConfig.class)).isEqualTo(TestLogConfig.class);
         assertThat(context.configClass(RedisConfig.class)).isEqualTo(TestRedisConfig.class);
         assertThat(context.configClass(SessionConfig.class)).isEqualTo(TestSessionConfig.class);
+    }
+
+    @Test
+    void overrideBindingWithDuplicateKey() {
+        context.overrideBinding(String.class, null, "value1");
+        assertThatThrownBy(() -> context.overrideBinding(String.class, null, "value2"))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("found duplicate override binding");
+    }
+
+    @Test
+    void overrideBinding() {
+        context.overrideBinding(String.class, null, "value1");
+        String bean = context.bind(String.class, null, "value2");
+        assertThat(bean).isEqualTo("value1");
+    }
+
+    @Test
+    void validateOverrideBindings() {
+        context.overrideBinding(Types.list(String.class), null, "value1");
+        assertThatThrownBy(() -> context.validate())
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("found unnecessary override bindings");
     }
 }

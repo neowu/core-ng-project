@@ -31,6 +31,6 @@ public final class Key {
 
     @Override
     public String toString() {
-        return "Key{type=" + type + ", name=" + name + '}';
+        return "Key{type=" + type.getTypeName() + ", name=" + name + '}';
     }
 }
