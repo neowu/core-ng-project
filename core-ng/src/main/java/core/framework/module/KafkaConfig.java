@@ -60,7 +60,6 @@ public class KafkaConfig extends Config {
         logger.info("publish, topic={}, messageClass={}, name={}", topic, messageClass.getTypeName(), name);
         if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
         new BeanClassValidator(messageClass, context.serviceRegistry.beanClassNameValidator).validate();
-        context.serviceRegistry.producerMessageClasses.add(messageClass);
         MessagePublisher<T> publisher = createMessagePublisher(topic, messageClass);
         context.beanFactory.bind(Types.generic(MessagePublisher.class, messageClass), name, publisher);
         handlerAdded = true;
@@ -102,7 +101,6 @@ public class KafkaConfig extends Config {
         if (handler == null && bulkHandler == null) throw new Error("handler must not be null");
         logger.info("subscribe, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
         new BeanClassValidator(messageClass, context.serviceRegistry.beanClassNameValidator).validate();
-        context.serviceRegistry.consumerMessageClasses.add(messageClass);
         listener().subscribe(topic, messageClass, handler, bulkHandler);
         handlerAdded = true;
     }

@@ -15,8 +15,6 @@ import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.controller.ControllerInspector;
 import core.framework.internal.web.management.DiagnosticController;
 import core.framework.internal.web.management.PropertyController;
-import core.framework.internal.web.management.ServiceController;
-import core.framework.internal.web.management.ServiceResponse;
 import core.framework.internal.web.route.PathPatternValidator;
 import core.framework.internal.web.service.ErrorResponse;
 import core.framework.internal.web.site.AJAXErrorResponse;
@@ -77,8 +75,6 @@ public class ModuleContext {
         route(HTTPMethod.GET, "/_sys/thread", (LambdaController) diagnosticController::thread, true);
         route(HTTPMethod.GET, "/_sys/heap", (LambdaController) diagnosticController::heap, true);
         route(HTTPMethod.GET, "/_sys/property", new PropertyController(propertyManager), true);
-        route(HTTPMethod.GET, "/_sys/service", new ServiceController(serviceRegistry), true);
-        bean(ServiceResponse.class);
     }
 
     public BackgroundTaskExecutor backgroundTask() {

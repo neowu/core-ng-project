@@ -40,8 +40,6 @@ class APIConfigTest {
 
         TestWebService client = (TestWebService) context.beanFactory.bean(TestWebService.class, null);
         assertThat(client).isNotNull();
-
-        assertThat(context.serviceRegistry.clientInterfaces).contains(TestWebService.class);
     }
 
     public interface TestWebService {

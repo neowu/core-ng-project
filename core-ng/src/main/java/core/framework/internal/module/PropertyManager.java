@@ -36,7 +36,8 @@ public class PropertyManager {
     }
 
     public String maskValue(String key, String value) { // generally only password or secretKey will be put into property file
-        if (key.contains("password") || key.contains("secret")) return "******";
+        String lowerCaseKey = ASCII.toLowerCase(key);
+        if (lowerCaseKey.contains("password") || lowerCaseKey.contains("secret")) return "******";
         return value;
     }
 

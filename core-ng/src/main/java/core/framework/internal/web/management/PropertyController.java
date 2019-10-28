@@ -6,7 +6,9 @@ import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
 
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -31,14 +33,26 @@ public class PropertyController implements Controller {
         builder.append("# properties\n");
         for (String key : new TreeSet<>(propertyManager.properties.keys())) {   // sort by key
             String value = propertyManager.property(key).orElse("");
-            builder.append(key).append('=').append(propertyManager.maskValue(key, value)).append('\n');
+            builder.append(key).append('=').append(mask(key, value)).append('\n');
         }
         builder.append("\n# system properties\n");
         Properties properties = System.getProperties();
         for (var key : new TreeSet<>(properties.stringPropertyNames())) { // sort by key
             String value = properties.getProperty(key);
-            builder.append(key).append('=').append(value).append('\n');
+            String maskedValue = mask(key, value);
+            builder.append(key).append('=').append(maskedValue).append('\n');
+        }
+        builder.append("\n# env variables\n");
+        Map<String, String> env = new TreeMap<>(System.getenv());   // sort by key
+        for (Map.Entry<String, String> entry : env.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            builder.append(key).append('=').append(mask(key, value)).append('\n');
         }
         return builder.toString();
+    }
+
+    private String mask(String key, String value) {
+        return propertyManager.maskValue(key, value);
     }
 }

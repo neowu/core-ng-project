@@ -87,7 +87,6 @@ public class APIConfig extends Config {
         RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
         ResponseBeanMapper responseBeanMapper = context.httpServer.handler.responseBeanMapper;
         new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper, context.serviceRegistry.beanClassNameValidator).validate();
-        context.serviceRegistry.clientInterfaces.add(serviceInterface);
 
         HTTPClient httpClient = getOrCreateHTTPClient();
         var webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, responseBeanMapper);

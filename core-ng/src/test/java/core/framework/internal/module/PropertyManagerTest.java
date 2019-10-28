@@ -48,6 +48,8 @@ class PropertyManagerTest {
         assertThat(propertyManager.maskValue("sys.jdbc.password", "password")).doesNotContain("password");
         assertThat(propertyManager.maskValue("app.key.secret", "secret")).doesNotContain("secret");
         assertThat(propertyManager.maskValue("sys.jdbc.user", "user")).isEqualTo("user");
+
+        assertThat(propertyManager.maskValue("SYS_JDBC_PASSWORD", "password")).doesNotContain("password");
     }
 
     @Test
