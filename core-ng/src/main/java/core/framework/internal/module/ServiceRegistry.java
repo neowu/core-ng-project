@@ -10,5 +10,6 @@ import java.util.Set;
  */
 public class ServiceRegistry {
     public final Set<Class<?>> serviceInterfaces = new LinkedHashSet<>();
+    public final Set<Class<?>> beanClasses = new LinkedHashSet<>();  // custom bean classes not referred by service interfaces, e.g. via controller, to publish via /_sys/api
     public BeanClassNameValidator beanClassNameValidator = new BeanClassNameValidator();
 }

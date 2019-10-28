@@ -12,23 +12,19 @@ import core.framework.web.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static core.framework.util.Strings.format;
 
 /**
  * @author neo
  */
 public final class HTTPConfig extends Config {
-    final Set<Class<?>> beanClasses = new HashSet<>();  // custom bean classes to publish via /_sys/api
     private final Logger logger = LoggerFactory.getLogger(HTTPConfig.class);
     private ModuleContext context;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
-        beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
+        context.serviceRegistry.beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
     }
 
     public void route(HTTPMethod method, String path, Controller controller) {
@@ -41,14 +37,14 @@ public final class HTTPConfig extends Config {
     }
 
     public void bean(Class<?> beanClass) {
-        logger.info("register bean, class=" + beanClass.getCanonicalName());
+        logger.info("register bean, class={}", beanClass.getCanonicalName());
         if (beanClass.isEnum()) {   // enum is usually declared to expose constants via /_sys/api, e.g. errorCodes, or pathParams used by controller directly
             context.serviceRegistry.beanClassNameValidator.validate(beanClass);
             JSONClassValidator.validateEnum(beanClass);
         } else {
             context.bean(beanClass);
         }
-        boolean added = this.beanClasses.add(beanClass);
+        boolean added = context.serviceRegistry.beanClasses.add(beanClass);
         if (!added) throw new Error("bean class is already registered, class=" + beanClass.getCanonicalName());
     }
 

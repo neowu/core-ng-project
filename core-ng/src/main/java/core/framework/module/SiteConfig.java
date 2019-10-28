@@ -84,12 +84,10 @@ public class SiteConfig extends Config {
     }
 
     public void publishAPI(List<String> cidrs) {
-        HTTPConfig httpConfig = context.config(HTTPConfig.class, null);
-
         logger.info("publish typescript api definition, cidrs={}", cidrs);
         var accessControl = new IPv4AccessControl();
         accessControl.allow = new IPv4Ranges(cidrs);
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry.serviceInterfaces, httpConfig.beanClasses, accessControl), true);
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry.serviceInterfaces, context.serviceRegistry.beanClasses, accessControl), true);
         context.bean(APIDefinitionResponse.class);
     }
 }

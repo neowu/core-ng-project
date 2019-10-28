@@ -58,7 +58,7 @@ public class APIConfig extends Config {
             context.httpServer.handler.responseBeanMapper,
             context.serviceRegistry.beanClassNameValidator).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
-        context.serviceRegistry.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate
+        context.serviceRegistry.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate, duplication will failed to register route
 
         for (Method method : serviceInterface.getMethods()) {
             HTTPMethod httpMethod = HTTPMethods.httpMethod(method);
