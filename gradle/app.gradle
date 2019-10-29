@@ -37,3 +37,9 @@ tasks.named("run").configure {
         }
     }
 }
+
+tasks.named('mkdir') {
+    doLast {
+        mkdir("${projectDir}/conf/dev/resources")
+    }
+}

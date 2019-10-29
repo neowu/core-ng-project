@@ -25,12 +25,20 @@ subprojects {
         configProperties['configDir'] = configFile.parentFile
     }
 
+    tasks.withType(Checkstyle).configureEach {
+        group = 'verification'
+    }
+
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
         toolVersion = '6.17.0'
         consoleOutput = true
         incrementalAnalysis = true
+    }
+
+    tasks.withType(Pmd).configureEach {
+        group = 'verification'
     }
 
     spotbugs {
@@ -44,6 +52,7 @@ subprojects {
     }
 
     tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach {
+        group = 'verification'
         reports {
             xml.enabled = false
             html.enabled = true

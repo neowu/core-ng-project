@@ -4,7 +4,9 @@
 <module name="Checker">
     <module name="TreeWalker">
         <!--Annotations:-->
-        <module name="AnnotationLocation"/>                 <!--Check location of annotation on language elements.-->
+        <module name="AnnotationLocation">                  <!--Check location of annotation on language elements.-->
+            <property name="allowSamelineParameterizedAnnotation" value="true"/>
+        </module>
         <module name="AnnotationUseStyle"/>                 <!--This check controls the style with the usage of annotations.-->
         <module name="SuppressWarnings">                    <!--Verifies unchecked can only used on variable, parameter and method-->
             <property name="format" value="^unchecked$"/>

@@ -6,6 +6,7 @@ sourceSets {    // add compileOnly to test scope to make simplify test dependenc
 }
 
 tasks.register("sourcesJar", Jar) {
+    group = 'distribution'
     from sourceSets.main.allSource
     archiveClassifier = 'sources'
 }

@@ -38,6 +38,15 @@ subprojects {
         }
     }
 
+    tasks.register('mkdir') {
+        group = 'build setup'
+        description = 'Create project directories.'
+        doLast {
+            sourceSets*.java.srcDirs*.each { it.mkdirs() }
+            sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+        }
+    }
+
     afterEvaluate {
         // update group on afterEvaluate since the project.gradle usually included in the first line of project build.gradle, which project.group is not assigned yet
         if (parent.depth > 0) {
