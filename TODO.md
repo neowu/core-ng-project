@@ -21,7 +21,6 @@
 * support LocalTime in db?
 * db/redis diagnostic controller/stats?
 * ws: on connect not allow set session? different sessionImpl?
-* generate graph via dot (GraphViz)
 
 ### jdk 12 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

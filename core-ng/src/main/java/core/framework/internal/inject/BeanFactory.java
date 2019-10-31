@@ -100,7 +100,7 @@ public class BeanFactory {
 
     private Object lookupValue(Field field) {
         Named name = field.getDeclaredAnnotation(Named.class);
-        Type fieldType = stripOutOwnerType(field.getGenericType());
+        Type fieldType = stripOwnerType(field.getGenericType());
         return bean(fieldType, name == null ? null : name.value());
     }
 
@@ -109,7 +109,7 @@ public class BeanFactory {
         Annotation[][] paramAnnotations = method.getParameterAnnotations();
         Object[] params = new Object[paramTypes.length];
         for (int i = 0; i < paramTypes.length; i++) {
-            Type paramType = stripOutOwnerType(paramTypes[i]);
+            Type paramType = stripOwnerType(paramTypes[i]);
             Named named = Params.annotation(paramAnnotations[i], Named.class);
             String name = named == null ? null : named.value();
             params[i] = bean(paramType, name);
@@ -117,7 +117,7 @@ public class BeanFactory {
         return params;
     }
 
-    private Type stripOutOwnerType(Type paramType) {    // type from field/method params could has owner type, which is not used in bind/key
+    private Type stripOwnerType(Type paramType) {    // type from field/method params could has owner type, which is not used in bind/key
         if (paramType instanceof ParameterizedType)
             return Types.generic((Class<?>) ((ParameterizedType) paramType).getRawType(), ((ParameterizedType) paramType).getActualTypeArguments());
         return paramType;
@@ -126,6 +126,6 @@ public class BeanFactory {
     private boolean isTypeOf(Object instance, Type type) {
         if (type instanceof Class) return ((Class) type).isInstance(instance);
         if (type instanceof ParameterizedType) return isTypeOf(instance, ((ParameterizedType) type).getRawType());
-        throw new Error(format("not supported type, type={}", type));
+        throw new Error("not supported type, type=" + type.getTypeName());
     }
 }
