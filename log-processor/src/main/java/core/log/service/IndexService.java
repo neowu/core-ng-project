@@ -39,10 +39,10 @@ public class IndexService {
     }
 
     public void createIndexTemplates() {
-        search.createIndexTemplate("action", template("index/action-index-template.json"));
-        search.createIndexTemplate("trace", template("index/trace-index-template.json"));
-        search.createIndexTemplate("stat", template("index/stat-index-template.json"));
-        search.createIndexTemplate("event", template("index/event-index-template.json"));
+        search.putIndexTemplate("action", template("index/action-index-template.json"));
+        search.putIndexTemplate("trace", template("index/trace-index-template.json"));
+        search.putIndexTemplate("stat", template("index/stat-index-template.json"));
+        search.putIndexTemplate("event", template("index/event-index-template.json"));
     }
 
     String indexName(String name, LocalDate now) {

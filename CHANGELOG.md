@@ -2,6 +2,7 @@
 ### 7.1.6 (10/24/2019 - )
 * kafka: update to 2.3.1
 * es: update to 7.4.1
+* search: update ElasticSearch.createIndex to ElasticSearch.putIndex, to support create index or update mappings, for es migration 
 
 ### 7.1.5 (10/21/2019 - 10/23/2019)
 * log-collector: supports stats to collect performance data

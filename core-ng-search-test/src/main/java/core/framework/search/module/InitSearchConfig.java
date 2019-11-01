@@ -21,12 +21,12 @@ public final class InitSearchConfig extends Config {
         config = this.context.getConfig(SearchConfig.class, null);
     }
 
-    public void createIndex(String index, String sourcePath) {
-        config.search.createIndex(index, ClasspathResources.text(sourcePath));
+    public void putIndex(String index, String sourcePath) {
+        config.search.putIndex(index, ClasspathResources.text(sourcePath));
     }
 
-    public void createIndexTemplate(String name, String sourcePath) {
-        config.search.createIndexTemplate(name, ClasspathResources.text(sourcePath));
+    public void putIndexTemplate(String name, String sourcePath) {
+        config.search.putIndexTemplate(name, ClasspathResources.text(sourcePath));
     }
 
     @SuppressWarnings("unchecked")

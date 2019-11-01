@@ -19,6 +19,7 @@ import org.elasticsearch.client.indices.CloseIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.PutIndexTemplateRequest;
+import org.elasticsearch.client.indices.PutMappingRequest;
 import org.elasticsearch.common.bytes.BytesArray;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
@@ -66,33 +67,37 @@ public class ElasticSearchImpl implements ElasticSearch {
         client.close();
     }
 
+    // this is generally used in es migration, to create index or update mapping if index exists, be aware of mapping fields can't be deleted in es, but can be removed from mapping json
     @Override
-    public void createIndex(String index, String source) {
+    public void putIndex(String index, String source) {
         var watch = new StopWatch();
         try {
             IndicesClient client = client().indices();
+            CreateIndexRequest request = new CreateIndexRequest(index).source(new BytesArray(source), XContentType.JSON);
             boolean exists = client.exists(new GetIndexRequest(index), RequestOptions.DEFAULT);
             if (!exists) {
-                client.create(new CreateIndexRequest(index).source(new BytesArray(source), XContentType.JSON), RequestOptions.DEFAULT);
+                client.create(request, RequestOptions.DEFAULT);
             } else {
-                logger.info("index already exists, skip, index={}", index);
+                // only try to update mappings, as for settings it generally requires to close index first then open after update
+                logger.info("index already exists, update mapping, index={}", index);
+                client.putMapping(new PutMappingRequest(index).source(request.mappings(), XContentType.JSON), RequestOptions.DEFAULT);
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            logger.info("create index, index={}, elapsed={}", index, watch.elapsed());
+            logger.info("put index, index={}, source={}, elapsed={}", index, source, watch.elapsed());
         }
     }
 
     @Override
-    public void createIndexTemplate(String name, String source) {
+    public void putIndexTemplate(String name, String source) {
         var watch = new StopWatch();
         try {
             client().indices().putTemplate(new PutIndexTemplateRequest(name).source(new BytesArray(source), XContentType.JSON), RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            logger.info("create index template, name={}, elapsed={}", name, watch.elapsed());
+            logger.info("put index template, name={}, elapsed={}", name, watch.elapsed());
         }
     }
 
@@ -142,7 +147,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
-            logger.info("indices, elapsed={}", watch.elapsed());
+            logger.info("get cluster state, elapsed={}", watch.elapsed());
         }
     }
 

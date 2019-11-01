@@ -4,6 +4,7 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
+import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ class KibanaServiceTest {
             assertThat(request.headers).containsEntry("kbn-xsrf", "true");
             assertThat(new String(request.body, StandardCharsets.UTF_8)).doesNotContain("${NOTIFICATION_BANNER}");
             return true;
-        }))).thenReturn(new HTTPResponse(200, Map.of(), null));
+        }))).thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes("acknowledged")));
 
         service.importObjects();
     }
@@ -50,7 +51,7 @@ class KibanaServiceTest {
     @Test
     void failedToImportObjects() {
         when(httpClient.execute(any(HTTPRequest.class)))
-            .thenReturn(new HTTPResponse(400, Map.of(), null));
+            .thenReturn(new HTTPResponse(400, Map.of(), new byte[0]));
 
         service.importObjects();
     }

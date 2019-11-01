@@ -55,10 +55,11 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     }
 
     @Test
-    void createIndex() {
+    void putIndex() {
         assertThat(elasticSearch.state().metadata.indices).containsKey("document");
 
-        elasticSearch.createIndex("document", ClasspathResources.text("search-test/document-index.json"));
+        elasticSearch.putIndex("document", ClasspathResources.text("search-test/document-index.json"));
+        elasticSearch.putIndex("document", ClasspathResources.text("search-test/document-index.json"));
     }
 
     @Test

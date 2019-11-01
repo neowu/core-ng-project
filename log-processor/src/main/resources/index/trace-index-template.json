@@ -6,6 +6,7 @@
     "refresh_interval": "${REFRESH_INTERVAL}"
   },
   "mappings": {
+    "dynamic": false,
     "properties": {
       "@timestamp": {
         "type": "date",
