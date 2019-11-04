@@ -92,21 +92,24 @@ project(':core-ng-search-test') {
     }
 }
 
-def mavenURL = hasProperty('mavenURL') ? mavenURL : null    // usage: "gradlew -PmavenURL=/path clean publish"
-
 configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
     apply plugin: 'maven-publish'
-    if (mavenURL != null) {
-        assert project.file(mavenURL).exists()
-        publishing {
-            publications {
-                maven(MavenPublication) {
-                    from components.java
-                    artifact sourcesJar
-                }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                from components.java
+                artifact sourcesJar
             }
-            repositories {
-                maven { url mavenURL }
+        }
+        repositories {
+            maven {
+                name = 'GitHubPackages'
+                url = uri('https://maven.pkg.github.com/neowu/core-ng-project')
+                credentials {
+                    username = 'neowu'
+                    password = System.getenv('GITHUB_API_TOKEN')
+                }
             }
         }
     }
