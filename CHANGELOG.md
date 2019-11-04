@@ -3,21 +3,6 @@
 * kafka: update to 2.3.1
 * es: update to 7.4.1
 * search: update ElasticSearch.createIndex to ElasticSearch.putIndex, to support create index or update mappings, for es migration 
-* publish: start publish to github package registry, use following to get package (during beta, access token is required, anonymous access will be supported)
-```
-repositories {
-    maven {
-        url 'https://maven.pkg.github.com/neowu/core-ng-project'
-        credentials {
-            username = 'neowu'
-            password = 'd429c0faff25c241a1cc99d0b976c994ec4d5997'
-        }
-        content {
-            includeGroupByRegex 'core\\.framework.*'
-        }
-    }
-}
-```
 
 ### 7.1.5 (10/21/2019 - 10/23/2019)
 * log-collector: supports stats to collect performance data
