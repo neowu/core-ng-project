@@ -1,4 +1,7 @@
 ## Change log
+### 7.1.7 (11/4/2019 - )
+* es: update to 7.4.2
+
 ### 7.1.6 (10/24/2019 - 11/3/2019)
 * kafka: update to 2.3.1
 * es: update to 7.4.1
