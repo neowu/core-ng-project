@@ -1,10 +1,12 @@
 package core.framework.http;
 
+import core.framework.log.Markers;
 import core.framework.util.ASCII;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Map;
 import java.util.Optional;
@@ -63,8 +65,8 @@ public final class ContentType {
     private static Charset parseCharset(String charset) {
         try {
             return Charset.forName(charset);
-        } catch (UnsupportedCharsetException e) {
-            LOGGER.warn("ignore unsupported charset, charset={}", charset);
+        } catch (UnsupportedCharsetException | IllegalCharsetNameException e) {
+            LOGGER.warn(Markers.errorCode("INVALID_CONTENT_TYPE"), "ignore unsupported charset, charset={}", charset, e);
             return null;
         }
     }

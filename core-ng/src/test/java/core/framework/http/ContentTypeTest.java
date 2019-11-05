@@ -45,5 +45,10 @@ class ContentTypeTest {
 
         assertThat(type.mediaType).isEqualTo("image/jpeg");
         assertThat(type.charset()).isNotPresent();
+
+        type = ContentType.parse("text/xml; charset=\"invalid\"");  // charset should not have double quote
+
+        assertThat(type.mediaType).isEqualTo("text/xml");
+        assertThat(type.charset()).isNotPresent();
     }
 }
