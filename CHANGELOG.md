@@ -1,5 +1,5 @@
 ## Change log
-### 7.1.7 (11/4/2019 - )
+### 7.1.7 (11/4/2019 - 11/6/2019)
 * es: update to 7.4.2
 * log-collector: allow client to use navigator.sendBeacon() with content-type=text/plain to bypass CORS check (due to navigator.sendBeacon doesn't preflight)
 
