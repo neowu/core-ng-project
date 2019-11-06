@@ -1,6 +1,7 @@
 ## Change log
 ### 7.1.7 (11/4/2019 - )
 * es: update to 7.4.2
+* log-collector: allow client to use navigator.sendBeacon() with content-type=text/plain to bypass CORS check (due to navigator.sendBeacon doesn't preflight)
 
 ### 7.1.6 (10/24/2019 - 11/3/2019)
 * kafka: update to 2.3.1

@@ -1,6 +1,7 @@
 package core.log;
 
 import core.framework.http.HTTPMethod;
+import core.framework.json.Bean;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.module.App;
@@ -34,7 +35,7 @@ public class LogCollectorApp extends App {
         EventController controller = bind(new EventController(allowedOrigins));
         http().route(HTTPMethod.OPTIONS, "/event/:app", controller::options);
         http().route(HTTPMethod.POST, "/event/:app", controller::post);  // event will be sent via ajax or navigator.sendBeacon(), refer to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-        http().bean(SendEventRequest.class);
+        Bean.register(SendEventRequest.class);
     }
 
     Set<String> allowedOrigins(String value) {

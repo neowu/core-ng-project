@@ -4,13 +4,16 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.http.HTTPHeaders;
 import core.framework.inject.Inject;
 import core.framework.internal.log.LogManager;
+import core.framework.json.Bean;
 import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.EventMessage;
 import core.framework.web.Request;
 import core.framework.web.Response;
+import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.ForbiddenException;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Set;
 
@@ -48,8 +51,7 @@ public class EventController {
         Instant now = Instant.now();
         String clientIP = request.clientIP();
 
-        SendEventRequest eventRequest = request.bean(SendEventRequest.class);
-        validator.validate(eventRequest);
+        SendEventRequest eventRequest = sendEventRequest(request);
 
         for (SendEventRequest.Event event : eventRequest.events) {
             EventMessage message = message(event, app, now);
@@ -63,6 +65,22 @@ public class EventController {
         Response response = Response.empty();
         if (origin != null) response.header("Access-Control-Allow-Origin", origin);
         return response;
+    }
+
+    // ignore content-type and assume it's json, due to client side may uses "navigator.sendBeacon(url, json);" to send event
+    // and navigator.sendBeacon() doesn't preflight for CORS, which triggers following exception
+    //
+    // VM35:1 Uncaught DOMException: Failed to execute 'sendBeacon' on 'Navigator': sendBeacon() with a Blob whose
+    // type is not any of the CORS-safelisted values for the Content-Type request header is disabled temporarily.
+    // See http://crbug.com/490015 for details.
+    //
+    // only work around is to allow client side sends simple request to bypass CORS check, which requires content-type=text/plain
+    // refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    SendEventRequest sendEventRequest(Request request) {
+        byte[] body = request.body().orElseThrow(() -> new BadRequestException("body must not be null", "INVALID_HTTP_REQUEST"));
+        SendEventRequest eventRequest = Bean.fromJSON(SendEventRequest.class, new String(body, StandardCharsets.UTF_8));
+        validator.validate(eventRequest);
+        return eventRequest;
     }
 
     void checkOrigin(String origin) {
