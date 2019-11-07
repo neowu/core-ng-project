@@ -6,7 +6,6 @@
     "refresh_interval": "${REFRESH_INTERVAL}"
   },
   "mappings": {
-    "dynamic": false,
     "dynamic_templates": [
       {
         "context": {

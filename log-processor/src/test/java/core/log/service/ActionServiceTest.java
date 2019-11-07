@@ -3,12 +3,15 @@ package core.log.service;
 import core.framework.inject.Inject;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.PerformanceStat;
+import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.GetRequest;
+import core.framework.search.SearchRequest;
 import core.framework.util.Lists;
 import core.log.IntegrationTest;
 import core.log.domain.ActionDocument;
 import core.log.domain.TraceDocument;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -32,6 +35,8 @@ class ActionServiceTest extends IntegrationTest {
     ElasticSearchType<ActionDocument> actionType;
     @Inject
     ElasticSearchType<TraceDocument> traceType;
+    @Inject
+    ElasticSearch elasticSearch;
 
     @Test
     void index() {
@@ -64,6 +69,11 @@ class ActionServiceTest extends IntegrationTest {
 
         TraceDocument trace = traceDocument(now, message2.id);
         assertThat(trace.content).isEqualTo(message2.traceLog);
+
+        elasticSearch.refreshIndex(indexService.indexName("action", now));
+
+        List<ActionDocument> actions = searchActionDocument(now, "context.key", "value");
+        assertThat(actions).hasSize(1);
     }
 
     @Test
@@ -98,6 +108,13 @@ class ActionServiceTest extends IntegrationTest {
         request.index = indexService.indexName("action", now);
         request.id = id;
         return actionType.get(request).orElseThrow(() -> new Error("not found"));
+    }
+
+    private List<ActionDocument> searchActionDocument(LocalDate now, String key, String value) {
+        var request = new SearchRequest();
+        request.query = QueryBuilders.matchQuery(key, value);
+        request.index = indexService.indexName("action", now);
+        return actionType.search(request).hits;
     }
 
     private TraceDocument traceDocument(LocalDate now, String id) {
