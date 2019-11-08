@@ -1,6 +1,7 @@
 package core.framework.internal.web.request;
 
 import core.framework.http.ContentType;
+import core.framework.log.ErrorCode;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.MethodNotAllowedException;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xnio.OptionMap;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -101,6 +103,17 @@ class RequestParserTest {
         parser.parseBody(request, exchange);
 
         assertThat(request.body()).hasValue(body);
+    }
+
+    @Test
+    void failedToReadBody() {
+        var request = new RequestImpl(null, null);
+        var exchange = new HttpServerExchange(null, -1);
+        exchange.putAttachment(RequestBodyReader.REQUEST_BODY, new RequestBodyReader.RequestBody(null, new IOException()));
+
+        assertThatThrownBy(() -> parser.parseBody(request, exchange))
+            .isInstanceOf(BadRequestException.class)
+            .satisfies(e -> assertThat(((ErrorCode) e).errorCode()).isEqualTo("FAILED_TO_READ_HTTP_REQUEST"));
     }
 
     @Test

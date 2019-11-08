@@ -1,4 +1,8 @@
 ## Change log
+### 7.1.8 (11/8/2019 - )
+* http: convert "UT000128: Remote peer closed connection before all data could be read" exception to warn with errorCode=FAILED_TO_READ_HTTP_REQUEST
+    this could be happen in event collector, when browser send EXIT event, the browser may be terminated before last sendBeacon finish, which causes UT000128  
+
 ### 7.1.7 (11/4/2019 - 11/6/2019)
 * es: update to 7.4.2
 * log-collector: allow client to use navigator.sendBeacon() with content-type=text/plain to bypass CORS check (due to navigator.sendBeacon doesn't preflight)

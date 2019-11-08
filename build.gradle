@@ -2,7 +2,7 @@ apply from: file("${rootDir}/gradle/project.gradle")
 
 subprojects {
     group = 'core.framework'
-    version = '7.1.7'
+    version = '7.1.8'
 }
 
 def elasticVersion = '7.4.2'

@@ -1,6 +1,7 @@
 package core.framework.internal.web.request;
 
 import core.framework.internal.web.HTTPHandler;
+import core.framework.web.exception.BadRequestException;
 import io.undertow.connector.PooledByteBuffer;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.AttachmentKey;
@@ -97,8 +98,8 @@ public final class RequestBodyReader implements ChannelListener<StreamSourceChan
             this.exception = exception;
         }
 
-        public byte[] body() throws Throwable {
-            if (exception != null) throw exception;
+        public byte[] body() {
+            if (exception != null) throw new BadRequestException(exception.getMessage(), "FAILED_TO_READ_HTTP_REQUEST", exception);
             return this.body;
         }
     }
