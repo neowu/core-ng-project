@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -28,15 +29,26 @@ public final class ShutdownHook implements Runnable {
     public static final int STAGE_8 = 8;    // shutdown kafka log appender, give more time try to forward all logs
     public static final int STAGE_9 = 9;    // finally stop the http server, to make sure it responses to incoming requests during shutdown
 
-    private static final long SHUTDOWN_TIMEOUT_IN_MS = Duration.ofSeconds(25).toMillis(); // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
     final Thread thread = new Thread(this, "shutdown");
+    private final long shutdownTimeoutInMs;
     private final LogManager logManager;
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
     private final ShutdownStage[] stages = new ShutdownStage[STAGE_9 + 1];
 
     ShutdownHook(LogManager logManager) {
+        shutdownTimeoutInMs = shutdownTimeoutInMs(System.getenv());
         this.logManager = logManager;
         Runtime.getRuntime().addShutdownHook(thread);
+    }
+
+    long shutdownTimeoutInMs(Map<String, String> env) {
+        String shutdownTimeout = env.get("SHUTDOWN_TIMEOUT_IN_SEC");
+        if (shutdownTimeout != null) {
+            Duration timeout = Duration.ofSeconds(Long.parseLong(shutdownTimeout));
+            if (timeout.isZero() || timeout.isNegative()) throw new Error("shutdown timeout must be greater than 0, timeout=" + shutdownTimeout);
+            return timeout.toMillis();
+        }
+        return Duration.ofSeconds(25).toMillis(); // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
     }
 
     public void add(int stage, Shutdown shutdown) {
@@ -49,7 +61,7 @@ public final class ShutdownHook implements Runnable {
         ActionLog actionLog = logManager.begin("=== shutdown begin ===");
         logContext(actionLog);
 
-        long endTime = System.currentTimeMillis() + SHUTDOWN_TIMEOUT_IN_MS;
+        long endTime = System.currentTimeMillis() + shutdownTimeoutInMs;
 
         shutdown(endTime, STAGE_0, STAGE_5);
         logManager.end("=== shutdown end ==="); // end action log before closing es/log appender

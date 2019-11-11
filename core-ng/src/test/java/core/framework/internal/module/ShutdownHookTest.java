@@ -6,7 +6,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -49,5 +52,17 @@ class ShutdownHookTest {
         assertThat(actionLog.context).containsKey("host");
         assertThat(actionLog.context).containsKey("startTime");
         assertThat(actionLog.stats).containsKey("uptime");
+    }
+
+    @Test
+    void shutdownTimeoutInMs() {
+        assertThat(shutdownHook.shutdownTimeoutInMs(Map.of())).isEqualTo(25000);    // default is 25s
+
+        assertThat(shutdownHook.shutdownTimeoutInMs(Map.of("SHUTDOWN_TIMEOUT_IN_SEC", "60")))
+            .isEqualTo(60000);
+
+        assertThatThrownBy(() -> shutdownHook.shutdownTimeoutInMs(Map.of("SHUTDOWN_TIMEOUT_IN_SEC", "-1")))
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("greater than 0");
     }
 }

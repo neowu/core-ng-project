@@ -82,7 +82,7 @@ public class Pool<T extends AutoCloseable> {
             valid = false;
         }
         if (!valid) {
-            logger.warn(errorCode("INVALID_POOL_RESOURCE"), "resource is not valid, will try to obtain different one immediately");
+            logger.warn(errorCode("INVALID_POOL_RESOURCE"), "resource is not valid, try to obtain different one immediately");
             closeItem(item);
         }
         return valid;
