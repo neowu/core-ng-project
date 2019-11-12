@@ -73,7 +73,9 @@ project(':core-ng-search') {
     dependencies {
         api project(":core-ng")
         api "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
-        api "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"                     // update jackson lib transitive dependencies from elasticsearch
+        constraints {
+            api "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"                     // update jackson lib transitive dependencies from elasticsearch
+        }
         testImplementation project(":core-ng-test")
     }
 }
@@ -102,7 +104,6 @@ configure(subprojects.findAll { it.name.startsWith('core-ng') }) {
             publications {
                 maven(MavenPublication) {
                     from components.java
-                    artifact sourcesJar
                 }
             }
             repositories {

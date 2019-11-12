@@ -1,16 +1,9 @@
 apply plugin: 'java-library'
 
-sourceSets {    // add compileOnly to test scope to make simplify test dependency config
-    test.compileClasspath += configurations.compileOnly
-    test.runtimeClasspath += configurations.compileOnly
+sourceSets {    // add compile only scope to test scope to simplify test dependency config
+    test.runtimeClasspath += configurations.compileClasspath
 }
 
-tasks.register("sourcesJar", Jar) {
-    group = 'distribution'
-    from sourceSets.main.allSource
-    archiveClassifier = 'sources'
-}
-
-artifacts {
-    archives tasks.named('sourcesJar')
+java {
+    withSourcesJar()
 }

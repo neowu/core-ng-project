@@ -6,7 +6,6 @@ subprojects {
     if (!childProjects.isEmpty()) return    // ignore parent project
 
     apply plugin: 'java'
-    apply plugin: 'maven'
 
     sourceCompatibility = JavaVersion.VERSION_12
     targetCompatibility = JavaVersion.VERSION_12
@@ -73,5 +72,5 @@ allprojects {
 }
 
 tasks.named('wrapper') {
-    gradleVersion = '5.6.2'
+    gradleVersion = '6.0'
 }
