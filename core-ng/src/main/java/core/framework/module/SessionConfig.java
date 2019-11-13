@@ -40,14 +40,14 @@ public class SessionConfig extends Config {
     }
 
     public void local() {
-        logger.info("create local session provider");
+        logger.info("create local session store");
         LocalSessionStore sessionStore = new LocalSessionStore();
         context.backgroundTask().scheduleWithFixedDelay(sessionStore::cleanup, Duration.ofMinutes(30));
         context.httpServer.siteManager.sessionManager.store(sessionStore);
     }
 
     public void redis(String host) {
-        logger.info("create redis session provider, host={}", host);
+        logger.info("create redis session store, host={}", host);
 
         var redis = new RedisImpl("redis-session");
         redis.host = host;

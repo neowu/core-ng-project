@@ -19,7 +19,7 @@ import java.util.UUID;
 /**
  * @author neo
  */
-public final class SessionManager implements SessionContext {
+public class SessionManager implements SessionContext {
     private final Logger logger = LoggerFactory.getLogger(SessionManager.class);
     private CookieSpec cookieSpec;
     private String header;
@@ -104,7 +104,7 @@ public final class SessionManager implements SessionContext {
 
     @Override
     public void invalidate(String key, String value) {
-        if (store == null) throw new Error("session store is not initialized");
+        if (store == null) throw new Error("site().session() must be configured");
         if (key == null || value == null) throw new Error("key/value must not be null");   // to prevent from invalidating all sessions miss this key
         store.invalidate(key, value);
     }

@@ -2,6 +2,9 @@ package core.framework.internal.web.websocket;
 
 import core.framework.http.HTTPMethod;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.web.session.SessionImpl;
+import core.framework.internal.web.session.SessionManager;
+import core.framework.web.Session;
 import core.framework.web.exception.BadRequestException;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
@@ -10,16 +13,22 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
 class WebSocketHandlerTest {
     private WebSocketHandler handler;
+    private SessionManager sessionManager;
 
     @BeforeEach
     void createWebSocketHandler() {
-        handler = new WebSocketHandler(new LogManager(), null, null);
+        sessionManager = mock(SessionManager.class);
+
+        handler = new WebSocketHandler(new LogManager(), sessionManager, null);
     }
 
     @Test
@@ -45,5 +54,16 @@ class WebSocketHandlerTest {
         assertThatThrownBy(() -> handler.checkWebSocket(HTTPMethod.GET, headers.put(Headers.SEC_WEB_SOCKET_VERSION, "07")))
             .isInstanceOf(BadRequestException.class)
             .hasMessageContaining("only support web socket version 13");
+    }
+
+    @Test
+    void loadSession() {
+        when(sessionManager.load(any(), any())).thenReturn(new SessionImpl());
+        Session session = handler.loadSession(null, null);
+        assertThat(session).isInstanceOf(ReadOnlySession.class);
+
+        when(sessionManager.load(any(), any())).thenReturn(null);
+        session = handler.loadSession(null, null);
+        assertThat(session).isNull();
     }
 }

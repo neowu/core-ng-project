@@ -19,7 +19,6 @@
 * revisit trace log truncation, better/more elegant handling?
 * support LocalTime in db?
 * db/redis diagnostic controller/stats?
-* ws: on connect not allow set session? different sessionImpl?
 
 ### jdk 12 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

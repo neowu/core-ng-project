@@ -7,6 +7,7 @@ import core.framework.internal.web.bean.ResponseBeanMapper;
 import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.util.Sets;
+import core.framework.web.Session;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.NotFoundException;
 import core.framework.web.websocket.ChannelListener;
@@ -66,7 +67,7 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
         ChannelListener listener = listeners.get(path);
         if (listener == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
 
-        request.session = sessionManager.load(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
+        request.session = loadSession(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 
         var webSocketExchange = new AsyncWebSocketHttpServerExchange(exchange, channels);
         exchange.upgradeChannel((connection, httpServerExchange) -> {
@@ -87,6 +88,12 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
             channel.resumeReceives();
         });
         handshake.handshake(webSocketExchange);
+    }
+
+    Session loadSession(RequestImpl request, ActionLog actionLog) {
+        Session session = sessionManager.load(request, actionLog);
+        if (session == null) return null;
+        return new ReadOnlySession(session);
     }
 
     public void shutdown() {
