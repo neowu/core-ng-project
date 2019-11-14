@@ -22,6 +22,7 @@ import io.undertow.websockets.core.protocol.version13.Hybi13Handshake;
 import io.undertow.websockets.spi.AsyncWebSocketHttpServerExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnio.IoUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,21 +33,29 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChannel> {
+public class WebSocketHandler {
     static final String CHANNEL_KEY = "CHANNEL";
     public final WebSocketContextImpl context = new WebSocketContextImpl();
+
     private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
-    private final Map<String, ChannelListener> listeners = new HashMap<>();
-    private final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
     private final Handshake handshake = new Hybi13Handshake();
+    private final ChannelCloseListener channelCloseListener = new ChannelCloseListener(context);
+
+    private final Map<String, ChannelListener> listeners = new HashMap<>();
+    // passes to AsyncWebSocketHttpServerExchange as peerConnections, channel will remove self on close
+    // refer to io.undertow.websockets.core.WebSocketChannel.WebSocketChannel
+    private final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
+
     private final WebSocketMessageListener messageListener;
     private final SessionManager sessionManager;
     private final ResponseBeanMapper mapper;
+    private final LogManager logManager;
 
     public WebSocketHandler(LogManager logManager, SessionManager sessionManager, ResponseBeanMapper mapper) {
-        messageListener = new WebSocketMessageListener(logManager);
+        this.logManager = logManager;
         this.sessionManager = sessionManager;
         this.mapper = mapper;
+        messageListener = new WebSocketMessageListener(logManager);
     }
 
     public boolean checkWebSocket(HTTPMethod method, HeaderMap headers) {
@@ -72,20 +81,26 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
         var webSocketExchange = new AsyncWebSocketHttpServerExchange(exchange, channels);
         exchange.upgradeChannel((connection, httpServerExchange) -> {
             WebSocketChannel channel = handshake.createChannel(webSocketExchange, connection, webSocketExchange.getBufferPool());
-            channels.add(channel);
-            var wrapper = new ChannelImpl(channel, context, listener, mapper);
-            wrapper.action = action;
-            wrapper.clientIP = request.clientIP();
-            wrapper.refId = actionLog.id;   // with ws, correlationId and refId must be same as parent http action id
-            actionLog.context("channel", wrapper.id);
-            channel.setAttribute(CHANNEL_KEY, wrapper);
-            channel.addCloseTask(this);
+            try {
+                var wrapper = new ChannelImpl(channel, context, listener, mapper);
+                wrapper.action = action;
+                wrapper.clientIP = request.clientIP();
+                wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
+                actionLog.context("channel", wrapper.id);
+                channel.setAttribute(CHANNEL_KEY, wrapper);
+                channel.addCloseTask(channelCloseListener);
 
-            listener.onConnect(request, wrapper);
-            actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
+                listener.onConnect(request, wrapper);
+                actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
+                channel.getReceiveSetter().set(messageListener);
+                channel.resumeReceives();
 
-            channel.getReceiveSetter().set(messageListener);
-            channel.resumeReceives();
+                channels.add(channel);
+            } catch (Throwable e) {
+                // upgrade is handled by io.undertow.server.protocol.http.HttpReadListener.exchangeComplete, and it catches all exceptions during onConnect
+                logManager.logError(e);
+                IoUtils.safeClose(connection);
+            }
         });
         handshake.handshake(webSocketExchange);
     }
@@ -102,18 +117,12 @@ public class WebSocketHandler implements org.xnio.ChannelListener<WebSocketChann
         }
     }
 
-    @Override
-    public void handleEvent(WebSocketChannel channel) { // only handle channel close event, refer to "channel.addCloseTask(this);" above
-        var wrapper = (ChannelImpl) channel.getAttribute(CHANNEL_KEY);
-        context.remove(wrapper);
-    }
-
     public void add(String path, ChannelListener listener) {
-        if (path.contains("/:")) throw new Error(format("web socket path must be static, path={}", path));
+        if (path.contains("/:")) throw new Error("web socket path must be static, path=" + path);
 
         Class<? extends ChannelListener> listenerClass = listener.getClass();
         if (listenerClass.isSynthetic())
-            throw new Error(format("listener class must not be anonymous class or lambda, please create static class, listenerClass={}", listenerClass.getCanonicalName()));
+            throw new Error("listener class must not be anonymous class or lambda, please create static class, listenerClass=" + listenerClass.getCanonicalName());
 
         logger.info("ws, path={}, listener={}", path, listenerClass.getCanonicalName());
         ChannelListener previous = listeners.putIfAbsent(path, listener);
