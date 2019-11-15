@@ -3,6 +3,7 @@
 * http: convert "UT000128: Remote peer closed connection before all data could be read" exception to warn with errorCode=FAILED_TO_READ_HTTP_REQUEST
     this could be happen in event collector, the browser/app may be terminated before finish sending events, which causes UT000128  
 * shutdown: allow use env SHUTDOWN_TIMEOUT_IN_SEC to define shutdown timeout corresponding to kube terminationGracePeriodSeconds, (default is still 25s) 
+* http: request.requestURL() will be x-forwarded-host aware (for proxy with different domain in front of site, e.g. Azure AppGateway with different domain)
 
 ### 7.1.7 (11/4/2019 - 11/6/2019)
 * es: update to 7.4.2

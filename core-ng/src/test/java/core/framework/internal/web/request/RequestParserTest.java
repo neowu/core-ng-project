@@ -119,15 +119,15 @@ class RequestParserTest {
     @Test
     void requestURL() {
         var exchange = new HttpServerExchange(null, -1);
-        exchange.getRequestHeaders().put(Headers.HOST, "localhost");
         exchange.setRequestURI("/path");
         exchange.setQueryString("key=value");
         var request = new RequestImpl(exchange, null);
         request.scheme = "https";
+        request.hostName = "localhost";
         request.port = 443;
-        String requestURL = parser.requestURL(request, exchange);
 
-        assertThat(requestURL).isEqualTo("https://localhost/path?key=value");
+        assertThat(parser.requestURL(request, exchange))
+            .isEqualTo("https://localhost/path?key=value");
     }
 
     @Test
