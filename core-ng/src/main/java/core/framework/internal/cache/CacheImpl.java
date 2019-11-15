@@ -4,6 +4,7 @@ import core.framework.cache.Cache;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.validate.ValidationException;
 import core.framework.internal.validate.Validator;
+import core.framework.log.Markers;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,7 +141,7 @@ public class CacheImpl<T> implements Cache<T> {
             validator.validate(bean, false);
             return true;
         } catch (ValidationException e) {
-            logger.warn("failed to validate value from cache, will reload", e);
+            logger.warn(Markers.errorCode("INVALID_CACHE_DATA"), "failed to validate value from cache, will reload", e);
             return false;
         }
     }

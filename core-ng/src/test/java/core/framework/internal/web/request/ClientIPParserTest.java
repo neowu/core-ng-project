@@ -39,6 +39,12 @@ class ClientIPParserTest {
         parser.maxForwardedIPs = 1;
         assertThat(parser.parse("10.0.0.1", "192.168.0.1,108.0.0.1,10.0.0.1")).isEqualTo("10.0.0.1");
         assertThat(parser.parse("10.0.0.1", "192.168.0.1, 192.168.0.1, 108.0.0.1, 10.0.0.1")).isEqualTo("10.0.0.1");
+
+        parser.maxForwardedIPs = 2;
+        assertThat(parser.parse("10.0.0.1", "192.168.0.1, 192.168.0.2, 192.168.0.3")).isEqualTo("192.168.0.2");
+
+        parser.maxForwardedIPs = 3;
+        assertThat(parser.parse("10.0.0.1", "192.168.0.1, 192.168.0.2, 192.168.0.3, 192.168.0.4")).isEqualTo("192.168.0.2");
     }
 
     @Test
