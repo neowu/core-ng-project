@@ -147,7 +147,7 @@ public final class Scheduler {
                 actionLog.context("trigger", task.trigger());
                 Job job = task.job();
                 actionLog.context("job", name);
-                actionLog.context("jobClass", job.getClass().getCanonicalName());
+                actionLog.context("job_class", job.getClass().getCanonicalName());
                 job.execute();
                 return null;
             } catch (Throwable e) {

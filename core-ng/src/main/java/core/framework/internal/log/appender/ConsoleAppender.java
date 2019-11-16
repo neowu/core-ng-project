@@ -44,15 +44,15 @@ public final class ConsoleAppender implements LogAppender {
                .append(LOG_SPLITTER).append("action=").append(log.action);
 
         if (log.correlationIds != null) {
-            builder.append(LOG_SPLITTER).append("correlationId=");
+            builder.append(LOG_SPLITTER).append("correlation_id=");
             appendList(builder, log.correlationIds);
         }
         String errorCode = log.errorCode;
         if (errorCode != null) {
-            builder.append(LOG_SPLITTER).append("errorCode=").append(errorCode)
-                   .append(LOG_SPLITTER).append("errorMessage=").append(filterLineSeparator(log.errorMessage));
+            builder.append(LOG_SPLITTER).append("error_code=").append(errorCode)
+                   .append(LOG_SPLITTER).append("error_message=").append(filterLineSeparator(log.errorMessage));
         }
-        builder.append(LOG_SPLITTER).append("cpuTime=").append(format.format(log.cpuTime.longValue()));
+        builder.append(LOG_SPLITTER).append("cpu_time=").append(format.format(log.cpuTime.longValue()));
 
         for (Map.Entry<String, List<String>> entry : log.context.entrySet()) {
             String key = entry.getKey();
@@ -66,7 +66,7 @@ public final class ConsoleAppender implements LogAppender {
             appendList(builder, log.clients);
         }
         if (log.refIds != null) {
-            builder.append(LOG_SPLITTER).append("refId=");
+            builder.append(LOG_SPLITTER).append("ref_id=");
             appendList(builder, log.refIds);
         }
         if (log.stats != null) {
@@ -77,10 +77,10 @@ public final class ConsoleAppender implements LogAppender {
         for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
             String key = entry.getKey();
             PerformanceStat tracking = entry.getValue();
-            builder.append(LOG_SPLITTER).append(key).append("Count=").append(tracking.count);
-            if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("Reads=").append(tracking.readEntries);
-            if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("Writes=").append(tracking.writeEntries);
-            builder.append(LOG_SPLITTER).append(key).append("Elapsed=").append(format.format(tracking.totalElapsed));
+            builder.append(LOG_SPLITTER).append(key).append("_count=").append(tracking.count);
+            if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("_reads=").append(tracking.readEntries);
+            if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("_writes=").append(tracking.writeEntries);
+            builder.append(LOG_SPLITTER).append(key).append("_elapsed=").append(format.format(tracking.totalElapsed));
         }
         return builder.toString();
     }

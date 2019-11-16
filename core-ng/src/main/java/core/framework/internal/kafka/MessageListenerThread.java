@@ -145,6 +145,10 @@ class MessageListenerThread extends Thread {
                 String key = new String(record.key(), UTF_8);   // key will be not null in our system
                 actionLog.context("key", key);
 
+                long timestamp = record.timestamp();
+                logger.debug("[message] timestamp={}", timestamp);
+                actionLog.stat("consumer_lag_in_ms", actionLog.date.toEpochMilli() - timestamp);
+
                 byte[] value = record.value();
                 logger.debug("[message] value={}", new BytesLogParam(value));
                 T message = process.mapper.fromJSON(value);
@@ -189,6 +193,7 @@ class MessageListenerThread extends Thread {
         Set<String> correlationIds = new HashSet<>();
         Set<String> clients = new HashSet<>();
         Set<String> refIds = new HashSet<>();
+        long minTimestamp = Long.MAX_VALUE;
 
         for (ConsumerRecord<byte[], byte[]> record : records) {
             Headers headers = record.headers();
@@ -202,7 +207,11 @@ class MessageListenerThread extends Thread {
 
             String key = new String(record.key(), UTF_8);    // key will not be null in our system
             byte[] value = record.value();
-            logger.debug("[message] key={}, value={}, refId={}, client={}, correlationId={}", key, new BytesLogParam(value), refId, client, correlationId);
+            long timestamp = record.timestamp();
+            logger.debug("[message] key={}, value={}, timestamp={}, refId={}, client={}, correlationId={}",
+                key, new BytesLogParam(value), timestamp, refId, client, correlationId);
+
+            if (minTimestamp > timestamp) minTimestamp = timestamp;
 
             T message = mapper.fromJSON(value);
             messages.add(new Message<>(key, message));
@@ -211,6 +220,8 @@ class MessageListenerThread extends Thread {
         if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
         if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
         if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
+        actionLog.stat("consumer_lag_in_ms", actionLog.date.toEpochMilli() - minTimestamp);
+
         return messages;
     }
 

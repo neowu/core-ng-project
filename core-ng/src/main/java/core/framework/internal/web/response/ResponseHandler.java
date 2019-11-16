@@ -44,7 +44,7 @@ public class ResponseHandler {
 
         response.body.send(exchange.getResponseSender(), context);
 
-        actionLog.context("responseCode", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
+        actionLog.context("response_code", status.code);  // set response code context at last, to avoid error handler to log duplicate action_log_context key on exception
     }
 
     private void putHeaders(ResponseImpl response, HttpServerExchange exchange) {

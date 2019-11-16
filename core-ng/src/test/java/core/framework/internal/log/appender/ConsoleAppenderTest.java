@@ -48,15 +48,15 @@ class ConsoleAppenderTest {
         assertThat(message)
             .contains("| OK |")
             .contains("| elapsed=100 |")
-            .contains("| cpuTime=100 |")
-            .contains("| correlationId=refId1,refId2 |")
+            .contains("| cpu_time=100 |")
+            .contains("| correlation_id=refId1,refId2 |")
             .contains("| action=action |")
             .contains("| context=value |")
             .contains("| client=service |")
-            .contains("| refId=refId3 |")
+            .contains("| ref_id=refId3 |")
             .contains("| stat=1 |")
-            .contains("| dbCount=1 | dbReads=1 | dbWrites=0 | dbElapsed=100")
-            .contains("| redisCount=1 | redisReads=0 | redisWrites=1 | redisElapsed=120");
+            .contains("| db_count=1 | db_reads=1 | db_writes=0 | db_elapsed=100")
+            .contains("| redis_count=1 | redis_reads=0 | redis_writes=1 | redis_elapsed=120");
     }
 
     @Test

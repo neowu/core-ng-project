@@ -46,7 +46,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
         validator.validate(value, false);
         byte[] message = mapper.toJSON(value);
         try {
-            var record = new ProducerRecord<>(topic, Strings.bytes(key), message);
+            var record = new ProducerRecord<>(topic, null, System.currentTimeMillis(), Strings.bytes(key), message, null);
             linkContext(record.headers());
             producer.send(record);
         } finally {

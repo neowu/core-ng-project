@@ -24,7 +24,7 @@ class AppTest {
 
         assertThat(actionLog.action).isEqualTo("app:start");
         assertThat(actionLog.context).containsKey("host");
-        assertThat(actionLog.stats).containsKey("availableProcessors");
+        assertThat(actionLog.stats).containsKey("cpu");
     }
 
     public static class TestApp extends App {

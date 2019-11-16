@@ -112,7 +112,7 @@ public class HTTPErrorHandler {
     private void renderDefaultErrorPage(Throwable e, HttpServerExchange exchange, ActionLog actionLog) {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, ContentType.TEXT_HTML.toString());
         exchange.setStatusCode(HTTPStatus.INTERNAL_SERVER_ERROR.code);
-        actionLog.context("responseCode", exchange.getStatusCode());
+        actionLog.context("response_code", exchange.getStatusCode());
         exchange.getResponseSender().send(errorHTML(e, actionLog.id));
     }
 }

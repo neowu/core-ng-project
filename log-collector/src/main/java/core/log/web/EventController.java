@@ -56,8 +56,8 @@ public class EventController {
         for (SendEventRequest.Event event : eventRequest.events) {
             EventMessage message = message(event, app, now);
 
-            if (userAgent != null) message.context.put("userAgent", userAgent);
-            message.context.put("clientIP", clientIP);
+            if (userAgent != null) message.context.put("user_agent", userAgent);
+            message.context.put("client_ip", clientIP);
 
             eventMessagePublisher.publish(message.id, message);
         }

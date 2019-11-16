@@ -52,7 +52,7 @@ public final class RequestParser {
         actionLog.context("method", method);
 
         request.requestURL = requestURL(request, exchange);
-        actionLog.context("requestURL", request.requestURL);
+        actionLog.context("request_url", request.requestURL);
 
         logHeaders(headers);
 
@@ -61,7 +61,7 @@ public final class RequestParser {
         parseCookies(request, exchange);
 
         String userAgent = headers.getFirst(Headers.USER_AGENT);
-        if (userAgent != null) actionLog.context("userAgent", userAgent);
+        if (userAgent != null) actionLog.context("user_agent", userAgent);
 
         request.method = httpMethod(method);    // parse method after logging header/etc, to gather more info in case we see unsupported method passed from internet
 
@@ -98,7 +98,7 @@ public final class RequestParser {
         String remoteAddress = exchange.getSourceAddress().getAddress().getHostAddress();
         logger.debug("[request] remoteAddress={}", remoteAddress);
         request.clientIP = clientIPParser.parse(remoteAddress, xForwardedFor);
-        actionLog.context("clientIP", request.clientIP);
+        actionLog.context("client_ip", request.clientIP);
     }
 
     String scheme(String requestScheme, String xForwardedProto) {       // xForwardedProto is single value, refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto

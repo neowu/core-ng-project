@@ -31,7 +31,7 @@ public final class ActionLog {
 
     public final String id;
     public final Map<String, List<String>> context;
-    final Instant date;
+    public final Instant date;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
     final long startTime;

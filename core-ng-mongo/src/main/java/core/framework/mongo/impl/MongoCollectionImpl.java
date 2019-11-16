@@ -69,7 +69,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             return collection(count.readPreference).countDocuments(filter, new CountOptions().maxTime(mongo.timeoutInMs, TimeUnit.MILLISECONDS));
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, 1, 0);
+            ActionLogContext.track("mongo", elapsed, 1, 0);
             logger.debug("count, collection={}, filter={}, readPref={}, elapsed={}",
                     collectionName,
                     new BsonLogParam(filter, mongo.registry),
@@ -87,7 +87,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             collection().insertOne(entity);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, 0, 1);
+            ActionLogContext.track("mongo", elapsed, 0, 1);
             logger.debug("insert, collection={}, elapsed={}", collectionName, elapsed);
             checkSlowOperation(elapsed);
         }
@@ -105,7 +105,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsed = watch.elapsed();
             int size = entities.size();
-            ActionLogContext.track("mongoDB", elapsed, 0, size);
+            ActionLogContext.track("mongo", elapsed, 0, size);
             logger.debug("bulkInsert, collection={}, size={}, elapsed={}", collectionName, size, elapsed);
             checkSlowOperation(elapsed);
         }
@@ -123,7 +123,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             return Optional.ofNullable(result);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, returnedDocs, 0);
+            ActionLogContext.track("mongo", elapsed, returnedDocs, 0);
             logger.debug("get, collection={}, id={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     get.id,
@@ -152,7 +152,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             return Optional.of(results.get(0));
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, returnedDocs, 0);
+            ActionLogContext.track("mongo", elapsed, returnedDocs, 0);
             logger.debug("findOne, collection={}, filter={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     new BsonLogParam(filter, mongo.registry),
@@ -175,7 +175,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsed = watch.elapsed();
             int size = results.size();
-            ActionLogContext.track("mongoDB", elapsed, size, 0);
+            ActionLogContext.track("mongo", elapsed, size, 0);
             logger.debug("find, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     new BsonLogParam(query.filter, mongo.registry),
@@ -208,7 +208,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             }
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", mongoTook, returnedDocs, 0);
+            ActionLogContext.track("mongo", mongoTook, returnedDocs, 0);
             logger.debug("forEach, collection={}, filter={}, projection={}, sort={}, skip={}, limit={}, readPref={}, returnedDocs={}, mongoTook={}, elapsed={}",
                     collectionName,
                     new BsonLogParam(query.filter, mongo.registry),
@@ -249,7 +249,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsed = watch.elapsed();
             int size = results.size();
-            ActionLogContext.track("mongoDB", elapsed, size, 0);
+            ActionLogContext.track("mongo", elapsed, size, 0);
             logger.debug("aggregate, collection={}, pipeline={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     aggregate.pipeline.stream().map(stage -> new BsonLogParam(stage, mongo.registry)).collect(Collectors.toList()),
@@ -278,7 +278,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         } finally {
             long elapsed = watch.elapsed();
             int size = results.size();
-            ActionLogContext.track("mongoDB", elapsed, size, 0);
+            ActionLogContext.track("mongo", elapsed, size, 0);
             logger.debug("mapReduce, collection={}, map={}, reduce={}, filter={}, readPref={}, returnedDocs={}, elapsed={}",
                     collectionName,
                     mapReduce.mapFunction,
@@ -309,7 +309,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             collection().replaceOne(Filters.eq("_id", id), entity, new ReplaceOptions().upsert(true));
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, 0, 1);
+            ActionLogContext.track("mongo", elapsed, 0, 1);
             logger.debug("replace, collection={}, id={}, elapsed={}", collectionName, id, elapsed);
             checkSlowOperation(elapsed);
         }
@@ -332,7 +332,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             collection().bulkWrite(models, new BulkWriteOptions().ordered(false));
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, 0, size);
+            ActionLogContext.track("mongo", elapsed, 0, size);
             logger.debug("bulkReplace, collection={}, size={}, elapsed={}", collectionName, size, elapsed);
             checkSlowOperation(elapsed);
         }
@@ -348,7 +348,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             return updatedRows;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, 0, (int) updatedRows);
+            ActionLogContext.track("mongo", elapsed, 0, (int) updatedRows);
             logger.debug("update, collection={}, filter={}, update={}, updatedRows={}, elapsed={}",
                     collectionName,
                     new BsonLogParam(filter, mongo.registry),
@@ -369,7 +369,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             return deletedRows == 1;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, 0, (int) deletedRows);
+            ActionLogContext.track("mongo", elapsed, 0, (int) deletedRows);
             logger.debug("delete, collection={}, id={}, elapsed={}", collectionName, id, elapsed);
             checkSlowOperation(elapsed);
         }
@@ -385,7 +385,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             return deletedRows;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, 0, (int) deletedRows);
+            ActionLogContext.track("mongo", elapsed, 0, (int) deletedRows);
             logger.debug("delete, collection={}, filter={}, deletedRows={}, elapsed={}", collectionName, new BsonLogParam(filter, mongo.registry), deletedRows, elapsed);
             checkSlowOperation(elapsed);
         }
@@ -406,7 +406,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             return deletedRows;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("mongoDB", elapsed, 0, deletedRows);
+            ActionLogContext.track("mongo", elapsed, 0, deletedRows);
             logger.debug("bulkDelete, collection={}, ids={}, size={}, deletedRows={}, elapsed={}", collectionName, ids, size, deletedRows, elapsed);
             checkSlowOperation(elapsed);
         }

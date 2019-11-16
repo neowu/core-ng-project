@@ -35,7 +35,7 @@ public class SessionManager implements SessionContext {
             logger.debug("load session");
             Map<String, String> values = store.getAndRefresh(sessionId, timeout);
             if (values != null) {
-                actionLog.context("sessionHash", Hash.md5Hex(sessionId));
+                actionLog.context("session_hash", Hash.md5Hex(sessionId));
                 session.id = sessionId;
                 session.values.putAll(values);
             }
@@ -62,7 +62,7 @@ public class SessionManager implements SessionContext {
             logger.debug("save session");
             if (session.id == null) {
                 session.id = UUID.randomUUID().toString();
-                actionLog.context("sessionHash", Hash.md5Hex(session.id));
+                actionLog.context("session_hash", Hash.md5Hex(session.id));
                 putSessionId(response, session.id);
             }
             store.save(session.id, session.values, session.changedFields, timeout);

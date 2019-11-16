@@ -1,9 +1,13 @@
 ## Change log
-### 7.1.8 (11/8/2019 - )
+### 7.1.8 (11/8/2019 - 11/16/2019)
 * http: convert "UT000128: Remote peer closed connection before all data could be read" exception to warn with errorCode=FAILED_TO_READ_HTTP_REQUEST
     this could be happen in event collector, the browser/app may be terminated before finish sending events, which causes UT000128  
 * shutdown: allow use env SHUTDOWN_TIMEOUT_IN_SEC to define shutdown timeout corresponding to kube terminationGracePeriodSeconds, (default is still 25s) 
 * http: request.requestURL() will be x-forwarded-host aware (for proxy with different domain in front of site, e.g. Azure AppGateway with different domain)
+* log: updated actionLog context/stats/perf_stats names to snake cases for consistency
+   also refer to https://www.elastic.co/guide/en/beats/devguide/current/event-conventions.html
+   update log-processor will update kibana config automatically
+* kafka: added actionLog stat.consumer_lag_in_ms to record lag between producer and consumer
 
 ### 7.1.7 (11/4/2019 - 11/6/2019)
 * es: update to 7.4.2

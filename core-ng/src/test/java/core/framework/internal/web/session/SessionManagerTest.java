@@ -52,7 +52,7 @@ class SessionManagerTest {
         Session session = sessionManager.load(request, actionLog);
         assertThat(session).isNotNull();
         assertThat(session.get("key")).isNotNull().hasValue("value");
-        assertThat(actionLog.context.get("sessionHash")).isNotEmpty();
+        assertThat(actionLog.context.get("session_hash")).isNotEmpty();
     }
 
     @Test
@@ -126,7 +126,7 @@ class SessionManagerTest {
         session.set("key", "value");
         sessionManager.save(session, response, actionLog);
 
-        assertThat(actionLog.context.get("sessionHash")).isNotEmpty();
+        assertThat(actionLog.context.get("session_hash")).isNotEmpty();
         verify(response).header(eq("SessionId"), anyString());
     }
 

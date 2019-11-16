@@ -73,8 +73,8 @@ public final class ShutdownHook implements Runnable {
     void logContext(ActionLog actionLog) {
         actionLog.action("app:stop");
         actionLog.context("host", Network.LOCAL_HOST_NAME);
-        actionLog.context("startTime", Instant.ofEpochMilli(ManagementFactory.getRuntimeMXBean().getStartTime()));
-        actionLog.stat("uptime", ManagementFactory.getRuntimeMXBean().getUptime());
+        actionLog.context("start_time", Instant.ofEpochMilli(ManagementFactory.getRuntimeMXBean().getStartTime()));
+        actionLog.stat("uptime_in_ms", ManagementFactory.getRuntimeMXBean().getUptime());
     }
 
     private void shutdown(long endTime, int fromStage, int toStage) {

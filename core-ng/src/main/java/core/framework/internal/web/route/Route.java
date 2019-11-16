@@ -38,7 +38,7 @@ public final class Route {
         if (handler == null) {
             throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
         }
-        actionLog.context("pathPattern", handler.pathPattern);
+        actionLog.context("path_pattern", handler.pathPattern);
         return handler.get(method);
     }
 }

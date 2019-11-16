@@ -50,8 +50,8 @@ class ShutdownHookTest {
 
         assertThat(actionLog.action).isEqualTo("app:stop");
         assertThat(actionLog.context).containsKey("host");
-        assertThat(actionLog.context).containsKey("startTime");
-        assertThat(actionLog.stats).containsKey("uptime");
+        assertThat(actionLog.context).containsKey("start_time");
+        assertThat(actionLog.stats).containsKey("uptime_in_ms");
     }
 
     @Test

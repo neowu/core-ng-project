@@ -40,8 +40,8 @@ public abstract class App extends Module {
     void logContext(ActionLog actionLog) {
         actionLog.action("app:start");
         Runtime runtime = Runtime.getRuntime();
-        actionLog.stat("availableProcessors", runtime.availableProcessors());
-        actionLog.stat("maxMemory", runtime.maxMemory());
+        actionLog.stat("cpu", runtime.availableProcessors());
+        actionLog.stat("max_memory", runtime.maxMemory());
         actionLog.context("host", Network.LOCAL_HOST_NAME);
     }
 
