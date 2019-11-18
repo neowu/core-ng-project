@@ -1,4 +1,8 @@
 ## Change log
+### 7.2.0 (11/17/2019 - )  !!! only support java 13, update docker/build server first before migration !!!
+* project: updated source/target to java 13
+* kafka: warn when consumer lag is too long, default is 60s
+
 ### 7.1.8 (11/8/2019 - 11/16/2019)
 * http: convert "UT000128: Remote peer closed connection before all data could be read" exception to warn with errorCode=FAILED_TO_READ_HTTP_REQUEST
     this could be happen in event collector, the browser/app may be terminated before finish sending events, which causes UT000128  

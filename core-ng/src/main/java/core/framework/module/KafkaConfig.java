@@ -132,6 +132,10 @@ public class KafkaConfig extends Config {
         listener().maxProcessTime = maxProcessTime;
     }
 
+    public void longConsumerLagThreshold(Duration threshold) {
+        listener().longConsumerLagThreshold = threshold;
+    }
+
     public void maxPoll(int maxRecords, int maxBytes) {
         if (maxRecords <= 0) throw new Error(format("max poll records must be greater than 0, value={}", maxRecords));
         if (maxBytes <= 0) throw new Error(format("max poll bytes must be greater than 0, value={}", maxBytes));

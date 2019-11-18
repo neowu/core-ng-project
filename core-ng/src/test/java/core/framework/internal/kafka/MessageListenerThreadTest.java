@@ -54,4 +54,14 @@ class MessageListenerThreadTest {
         assertThat(actionLog.refIds).containsExactly("refId");
         assertThat(actionLog.correlationIds).containsExactly("correlationId");
     }
+
+    @Test
+    void checkConsumerLag() {
+        thread.checkConsumerLag(99003, 60000);
+    }
+
+    @Test
+    void checkSlowProcess() {
+        thread.checkSlowProcess(Duration.ofSeconds(30).toNanos(), Duration.ofSeconds(25).toNanos());
+    }
 }

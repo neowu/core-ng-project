@@ -5,7 +5,6 @@ import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.kafka.Message;
-import core.framework.log.Markers;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -25,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static core.framework.log.Markers.errorCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -38,6 +38,7 @@ class MessageListenerThread extends Thread {
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
     private final AtomicBoolean processing = new AtomicBoolean(false);
     private final double batchLongProcessThresholdInNano;
+    private final long longConsumerLagThresholdInMs;
     private final Object lock = new Object();
 
     MessageListenerThread(String name, Consumer<byte[], byte[]> consumer, MessageListener listener) {
@@ -46,6 +47,7 @@ class MessageListenerThread extends Thread {
         processes = listener.processes;
         logManager = listener.logManager;
         batchLongProcessThresholdInNano = listener.maxProcessTime.toNanos() * 0.7; // 70% time of max
+        longConsumerLagThresholdInMs = listener.longConsumerLagThreshold.toMillis();
     }
 
     @Override
@@ -147,7 +149,9 @@ class MessageListenerThread extends Thread {
 
                 long timestamp = record.timestamp();
                 logger.debug("[message] timestamp={}", timestamp);
-                actionLog.stat("consumer_lag_in_ms", actionLog.date.toEpochMilli() - timestamp);
+                long lag = actionLog.date.toEpochMilli() - timestamp;
+                actionLog.stat("consumer_lag_in_ms", lag);
+                checkConsumerLag(lag, longConsumerLagThresholdInMs);
 
                 byte[] value = record.value();
                 logger.debug("[message] value={}", new BytesLogParam(value));
@@ -220,8 +224,9 @@ class MessageListenerThread extends Thread {
         if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
         if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
         if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
-        actionLog.stat("consumer_lag_in_ms", actionLog.date.toEpochMilli() - minTimestamp);
-
+        long lag = actionLog.date.toEpochMilli() - minTimestamp;
+        actionLog.stat("consumer_lag_in_ms", lag);
+        checkConsumerLag(lag, longConsumerLagThresholdInMs);
         return messages;
     }
 
@@ -231,9 +236,15 @@ class MessageListenerThread extends Thread {
         return new String(header.value(), UTF_8);
     }
 
-    private void checkSlowProcess(long elapsed, double longProcessThreshold) {
+    void checkSlowProcess(long elapsed, double longProcessThreshold) {
         if (elapsed > longProcessThreshold) {
-            logger.warn(Markers.errorCode("LONG_PROCESS"), "took too long to process message, elapsed={}", elapsed);
+            logger.warn(errorCode("LONG_PROCESS"), "took too long to process message, elapsed={}", elapsed);
+        }
+    }
+
+    void checkConsumerLag(long lagInMs, long longConsumerLagThresholdInMs) {
+        if (lagInMs > longConsumerLagThresholdInMs) {
+            logger.warn(errorCode("LONG_CONSUMER_LAG"), "consumer delay is too long, lag={}", Duration.ofMillis(lagInMs));
         }
     }
 
