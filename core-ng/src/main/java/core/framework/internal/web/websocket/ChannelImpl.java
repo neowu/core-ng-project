@@ -1,11 +1,9 @@
 package core.framework.internal.web.websocket;
 
-import core.framework.internal.web.bean.ResponseBeanMapper;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import core.framework.web.websocket.Channel;
-import core.framework.web.websocket.ChannelListener;
 import io.undertow.websockets.core.CloseMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
@@ -17,8 +15,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 /**
  * @author neo
  */
@@ -26,8 +22,7 @@ public class ChannelImpl implements Channel, Channel.Context {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
     final String id = UUID.randomUUID().toString();
     final Set<String> rooms = Sets.newConcurrentHashSet();
-    final ChannelListener listener;
-    private final ResponseBeanMapper mapper;
+    final ChannelHandler handler;
     private final WebSocketChannel channel;
     private final Map<String, Object> context = new ConcurrentHashMap<>();
     private final WebSocketContextImpl webSocketContext;
@@ -35,28 +30,24 @@ public class ChannelImpl implements Channel, Channel.Context {
     String clientIP;
     String refId;
 
-    ChannelImpl(WebSocketChannel channel, WebSocketContextImpl webSocketContext, ChannelListener listener, ResponseBeanMapper mapper) {
+    ChannelImpl(WebSocketChannel channel, WebSocketContextImpl webSocketContext, ChannelHandler handler) {
         this.channel = channel;
         this.webSocketContext = webSocketContext;
-        this.listener = listener;
-        this.mapper = mapper;
+        this.handler = handler;
     }
 
     @Override
-    public void send(String message) {
+    public <T> void send(T message) {
         var watch = new StopWatch();
+        String text = null;
         try {
-            WebSockets.sendText(message, channel, ChannelCallback.INSTANCE);
+            text = handler.toServerMessage(message);
+            WebSockets.sendText(text, channel, ChannelCallback.INSTANCE);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("ws", elapsed, 0, 1);
-            LOGGER.debug("send ws message, id={}, message={}, elapsed={}", id, message, elapsed);
+            LOGGER.debug("send ws message, id={}, text={}, elapsed={}", id, text, elapsed);     // not mask, assume ws message not containing sensitive info, the text can be json or plain text
         }
-    }
-
-    @Override
-    public void send(Object bean) {
-        send(new String(mapper.toJSON(bean), UTF_8));
     }
 
     @Override

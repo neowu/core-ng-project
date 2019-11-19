@@ -35,8 +35,8 @@ class ResponseBeanMapperTest {
     void validateList() {
         List<TestBean> list = Lists.newArrayList();
         assertThatThrownBy(() -> responseBeanMapper.toJSON(list))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("response body class must be bean class");
+            .isInstanceOf(Error.class)
+            .hasMessageContaining("bean class must not be java built-in class");
     }
 
     @Test

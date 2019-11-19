@@ -16,6 +16,7 @@ import java.util.List;
  * @author neo
  */
 final class WebSocketMessageListener extends AbstractReceiveListener {
+    private static final long MAX_TEXT_MESSAGE_SIZE = 10L * 1024 * 1024;     // 10M as max text message size to match max POST entity
     private final Logger logger = LoggerFactory.getLogger(WebSocketMessageListener.class);
     private final LogManager logManager;
 
@@ -24,18 +25,19 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     }
 
     @Override
-    protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage message) {
+    protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage) {
         var wrapper = (ChannelImpl) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===");
         try {
             actionLog.action(wrapper.action);
             linkContext(channel, wrapper, actionLog);
 
-            String data = message.getData();
-            logger.debug("[channel] message={}", data);
+            String data = textMessage.getData();
+            logger.debug("[channel] message={}", data);     // not mask, assume ws message not containing sensitive info, the data can be json or plain text
             actionLog.track("ws", 0, 1, 0);
 
-            wrapper.listener.onMessage(wrapper, data);
+            Object message = wrapper.handler.fromClientMessage(data);
+            wrapper.handler.listener.onMessage(wrapper, message);
         } catch (Throwable e) {
             logManager.logError(e);
             WebSockets.sendClose(CloseMessage.UNEXPECTED_ERROR, e.getMessage(), channel, ChannelCallback.INSTANCE);
@@ -58,7 +60,7 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
             logger.debug("[channel] reason={}", reason);
             actionLog.track("ws", 0, 1, 0);
 
-            wrapper.listener.onClose(wrapper, code, reason);
+            wrapper.handler.listener.onClose(wrapper, code, reason);
         } catch (Throwable e) {
             logManager.logError(e);
         } finally {
@@ -75,7 +77,12 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
         logger.debug("[channel] url={}", channel.getUrl());
         logger.debug("[channel] remoteAddress={}", channel.getSourceAddress().getAddress().getHostAddress());
         actionLog.context("client_ip", wrapper.clientIP);
-        actionLog.context("listener", wrapper.listener.getClass().getCanonicalName());
+        actionLog.context("listener", wrapper.handler.listener.getClass().getCanonicalName());
         actionLog.context("room", wrapper.rooms.toArray());
+    }
+
+    @Override
+    protected long getMaxTextBufferSize() {
+        return MAX_TEXT_MESSAGE_SIZE;
     }
 }

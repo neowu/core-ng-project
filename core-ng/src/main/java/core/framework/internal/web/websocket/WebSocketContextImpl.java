@@ -15,6 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketContextImpl implements WebSocketContext {
     private final Logger logger = LoggerFactory.getLogger(WebSocketContextImpl.class);
     private final Map<String, Map<String, Channel>> rooms = new ConcurrentHashMap<>();
+    private final Map<String, Channel> channels = new ConcurrentHashMap<>();
+
+    @Override
+    public List<Channel> all() {
+        return List.copyOf(channels.values());
+    }
 
     @Override
     public List<Channel> room(String name) {
@@ -36,7 +42,12 @@ public class WebSocketContextImpl implements WebSocketContext {
         if (channels != null) channels.remove(channel.id);
     }
 
+    void add(ChannelImpl channel) {
+        channels.put(channel.id, channel);
+    }
+
     void remove(ChannelImpl channel) {
+        channels.remove(channel.id);
         for (String room : channel.rooms) {
             rooms.get(room).remove(channel.id);
         }

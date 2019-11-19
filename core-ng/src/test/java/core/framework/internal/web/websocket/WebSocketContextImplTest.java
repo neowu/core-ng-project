@@ -18,7 +18,7 @@ class WebSocketContextImplTest {
 
     @Test
     void join() {
-        var channel = new ChannelImpl(null, context, null, null);
+        var channel = new ChannelImpl(null, context, null);
         channel.join("room1");
         assertThat(context.room("room1")).containsOnly(channel);
 
@@ -28,12 +28,23 @@ class WebSocketContextImplTest {
 
     @Test
     void remove() {
-        var channel = new ChannelImpl(null, context, null, null);
+        var channel = new ChannelImpl(null, context, null);
         channel.join("room1");
         channel.join("room2");
 
         context.remove(channel);
         assertThat(context.room("room1")).isEmpty();
         assertThat(context.room("room2")).isEmpty();
+    }
+
+    @Test
+    void all() {
+        var channel = new ChannelImpl(null, context, null);
+        context.add(channel);
+
+        assertThat(context.all()).containsOnly(channel);
+
+        context.remove(channel);
+        assertThat(context.all()).isEmpty();
     }
 }

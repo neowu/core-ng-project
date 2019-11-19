@@ -4,9 +4,7 @@ package core.framework.web.websocket;
  * @author neo
  */
 public interface Channel {
-    void send(String message);
-
-    void send(Object bean);
+    <T> void send(T message);
 
     Context context();
 

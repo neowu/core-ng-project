@@ -42,7 +42,7 @@ class WebSocketConfigTest {
         assertThat(webSocketContext).isNotNull();
     }
 
-    static class TestChannelListener implements ChannelListener {
+    static class TestChannelListener implements ChannelListener<String> {
         @Override
         public void onMessage(Channel channel, String message) {
 

@@ -3,14 +3,12 @@ package core.framework.internal.web.websocket;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.internal.web.bean.ResponseBeanMapper;
 import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.util.Sets;
 import core.framework.web.Session;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.NotFoundException;
-import core.framework.web.websocket.ChannelListener;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
@@ -20,8 +18,6 @@ import io.undertow.websockets.core.WebSockets;
 import io.undertow.websockets.core.protocol.Handshake;
 import io.undertow.websockets.core.protocol.version13.Hybi13Handshake;
 import io.undertow.websockets.spi.AsyncWebSocketHttpServerExchange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xnio.IoUtils;
 
 import java.util.HashMap;
@@ -37,24 +33,21 @@ public class WebSocketHandler {
     static final String CHANNEL_KEY = "CHANNEL";
     public final WebSocketContextImpl context = new WebSocketContextImpl();
 
-    private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
     private final Handshake handshake = new Hybi13Handshake();
-    private final ChannelCloseListener channelCloseListener = new ChannelCloseListener(context);
+    private final Map<String, ChannelHandler> handlers = new HashMap<>();
 
-    private final Map<String, ChannelListener> listeners = new HashMap<>();
     // passes to AsyncWebSocketHttpServerExchange as peerConnections, channel will remove self on close
     // refer to io.undertow.websockets.core.WebSocketChannel.WebSocketChannel
     private final Set<WebSocketChannel> channels = Sets.newConcurrentHashSet();
+    private final ChannelCloseListener channelCloseListener = new ChannelCloseListener(context);
 
     private final WebSocketMessageListener messageListener;
     private final SessionManager sessionManager;
-    private final ResponseBeanMapper mapper;
     private final LogManager logManager;
 
-    public WebSocketHandler(LogManager logManager, SessionManager sessionManager, ResponseBeanMapper mapper) {
+    public WebSocketHandler(LogManager logManager, SessionManager sessionManager) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
-        this.mapper = mapper;
         messageListener = new WebSocketMessageListener(logManager);
     }
 
@@ -73,8 +66,8 @@ public class WebSocketHandler {
         String action = "ws:" + path;
         actionLog.action(action + ":open");
 
-        ChannelListener listener = listeners.get(path);
-        if (listener == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
+        ChannelHandler handler = handlers.get(path);
+        if (handler == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
 
         request.session = loadSession(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 
@@ -82,15 +75,16 @@ public class WebSocketHandler {
         exchange.upgradeChannel((connection, httpServerExchange) -> {
             WebSocketChannel channel = handshake.createChannel(webSocketExchange, connection, webSocketExchange.getBufferPool());
             try {
-                var wrapper = new ChannelImpl(channel, context, listener, mapper);
+                var wrapper = new ChannelImpl(channel, context, handler);
                 wrapper.action = action;
                 wrapper.clientIP = request.clientIP();
                 wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
                 actionLog.context("channel", wrapper.id);
                 channel.setAttribute(CHANNEL_KEY, wrapper);
                 channel.addCloseTask(channelCloseListener);
+                context.add(wrapper);
 
-                listener.onConnect(request, wrapper);
+                handler.listener.onConnect(request, wrapper);
                 actionLog.context("room", wrapper.rooms.toArray()); // may join room onConnect
                 channel.getReceiveSetter().set(messageListener);
                 channel.resumeReceives();
@@ -117,15 +111,14 @@ public class WebSocketHandler {
         }
     }
 
-    public void add(String path, ChannelListener listener) {
-        if (path.contains("/:")) throw new Error("web socket path must be static, path=" + path);
+    public void add(String path, ChannelHandler handler) {
+        if (path.contains("/:")) throw new Error("listener path must be static, path=" + path);
 
-        Class<? extends ChannelListener> listenerClass = listener.getClass();
+        Class<?> listenerClass = handler.listener.getClass();
         if (listenerClass.isSynthetic())
             throw new Error("listener class must not be anonymous class or lambda, please create static class, listenerClass=" + listenerClass.getCanonicalName());
 
-        logger.info("ws, path={}, listener={}", path, listenerClass.getCanonicalName());
-        ChannelListener previous = listeners.putIfAbsent(path, listener);
-        if (previous != null) throw new Error(format("found duplicate web socket listener, path={}, previousClass={}", path, previous.getClass().getCanonicalName()));
+        ChannelHandler previous = handlers.putIfAbsent(path, handler);
+        if (previous != null) throw new Error(format("found duplicate channel listener, path={}, previousListener={}", path, previous.listener.getClass().getCanonicalName()));
     }
 }

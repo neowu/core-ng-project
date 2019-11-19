@@ -47,15 +47,12 @@ public class RequestBeanMapper {
 
     public <T> byte[] toJSON(Class<T> beanClass, T bean) {
         BeanMapper<T> mapper = beanMappers.mapper(beanClass);
-        mapper.validator.validate(bean, false);
-        return mapper.mapper.toJSON(bean);
+        return mapper.toJSON(bean);
     }
 
     public <T> T fromJSON(Class<T> beanClass, byte[] body) {
         BeanMapper<T> mapper = beanMappers.mapper(beanClass);
-        T bean = mapper.mapper.fromJSON(body);
-        mapper.validator.validate(bean, false);
-        return bean;
+        return mapper.fromJSON(body);
     }
 
     public void registerRequestBean(Class<?> beanClass, BeanClassNameValidator beanClassNameValidator) {

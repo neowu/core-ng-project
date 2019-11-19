@@ -26,8 +26,6 @@ public class ResponseBeanMapper {
             BeanMapper<Object> mapper = beanMappers.mapper((Class<Object>) value.getClass());
             mapper.validator.validate(value, false);
             return mapper.mapper.toJSON(value);
-        } else if (bean.getClass().getPackageName().startsWith("java")) {   // provide better error message for developer, rather than return class is not registered message
-            throw new Error("response body class must be bean class, class=" + bean.getClass().getCanonicalName());
         } else {
             BeanMapper<Object> mapper = beanMappers.mapper((Class<Object>) bean.getClass());
             mapper.validator.validate(bean, false);
