@@ -17,16 +17,28 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.20'
-            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.35.0'
+            checkstyle 'com.puppycrawl.tools:checkstyle:8.26'
+            checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.36.0'
         }
 
         configFile = rootProject.file('gradle/check/checkstyle.xml')
         configProperties['configDir'] = configFile.parentFile
     }
 
-    tasks.withType(Checkstyle).configureEach {
+    tasks.named('checkstyleMain').configure {
         group = 'verification'
+        source = fileTree('.').matching {
+            include 'conf/**'
+            include 'src/main/**'
+        }
+    }
+
+    tasks.named('checkstyleTest').configure {
+        group = 'verification'
+        source = fileTree('.').matching {
+            include 'src/test/java/**'
+            include 'src/test/resources/**/*.properties'    // test resource may contains java file not for compiling, so to skip
+        }
     }
 
     pmd {
