@@ -1,6 +1,7 @@
 package core.framework.internal.web.service;
 
 import core.framework.http.HTTPMethod;
+import core.framework.http.HTTPRequest;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Types;
@@ -40,7 +41,10 @@ class WebServiceClientBuilderTest {
     @Test
     void intercept() {
         assertThat(client).isInstanceOf(WebServiceClientProxy.class);
-        WebServiceClientInterceptor interceptor = request -> {
+        var interceptor = new WebServiceClientInterceptor() {
+            @Override
+            public void onRequest(HTTPRequest request) {
+            }
         };
         ((WebServiceClientProxy) client).intercept(interceptor);
         verify(webServiceClient).intercept(interceptor);

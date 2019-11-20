@@ -69,12 +69,17 @@ public class WebServiceClient {
         }
 
         if (interceptor != null) {
-            logger.debug("intercept request, interceptor={}", interceptor.getClass().getCanonicalName());
-            interceptor.intercept(request);
+            logger.debug("interceptor={}", interceptor.getClass().getCanonicalName());
+            interceptor.onRequest(request);
         }
 
         HTTPResponse response = httpClient.execute(request);
         validateResponse(response);
+
+        if (interceptor != null) {
+            interceptor.onResponse(response);
+        }
+
         return responseBeanMapper.fromJSON(responseType, response.body);
     }
 

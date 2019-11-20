@@ -3,6 +3,7 @@ package core.framework.test;
 import core.framework.db.IsolationLevel;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
+import core.framework.http.HTTPRequest;
 import core.framework.kafka.Message;
 import core.framework.scheduler.Job;
 import core.framework.test.db.TestDBEntity;
@@ -11,6 +12,7 @@ import core.framework.test.kafka.TestMessage;
 import core.framework.test.module.AbstractTestModule;
 import core.framework.test.scheduler.TestJob;
 import core.framework.test.web.TestWebService;
+import core.framework.web.service.WebServiceClientInterceptor;
 import org.mockito.Mockito;
 
 import java.time.DayOfWeek;
@@ -51,7 +53,10 @@ public class TestModule extends AbstractTestModule {
     }
 
     private void configureAPI() {
-        api().client(TestWebService.class, "https://localhost:8443").intercept(request -> {
+        api().client(TestWebService.class, "https://localhost:8443").intercept(new WebServiceClientInterceptor() {
+            @Override
+            public void onRequest(HTTPRequest request) {
+            }
         });
     }
 

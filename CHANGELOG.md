@@ -5,6 +5,7 @@
 * ws: support wsContext.all() to return all channels
       set default text message max size to 10M
       support register listener with clientMessageClass and serverMessageClass (type safety, one ws path only allow one client message class and one server message class)  
+* api: updated WebServiceClientInterceptor to support both onRequest/onResponse 
 
 ### 7.1.8 (11/8/2019 - 11/16/2019)
 * http: convert "UT000128: Remote peer closed connection before all data could be read" exception to warn with errorCode=FAILED_TO_READ_HTTP_REQUEST

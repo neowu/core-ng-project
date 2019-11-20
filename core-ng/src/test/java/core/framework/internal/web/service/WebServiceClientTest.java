@@ -2,6 +2,7 @@ package core.framework.internal.web.service;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
+import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
@@ -13,6 +14,7 @@ import core.framework.json.JSON;
 import core.framework.log.Severity;
 import core.framework.util.Strings;
 import core.framework.web.service.RemoteServiceException;
+import core.framework.web.service.WebServiceClientInterceptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,15 +24,23 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
 class WebServiceClientTest {
     private WebServiceClient webServiceClient;
+    private HTTPClient httpClient;
 
     @BeforeEach
     void createWebServiceClient() {
+        httpClient = mock(HTTPClient.class);
+
         var registry = new BeanMappers();
         var beanClassNameValidator = new BeanClassNameValidator();
         var requestBeanMapper = new RequestBeanMapper(registry);
@@ -39,12 +49,12 @@ class WebServiceClientTest {
         requestBeanMapper.registerRequestBean(TestWebService.TestRequest.class, beanClassNameValidator);
         responseBeanMapper.register(ErrorResponse.class, beanClassNameValidator);
 
-        webServiceClient = new WebServiceClient("http://localhost", null, requestBeanMapper, responseBeanMapper);
+        webServiceClient = new WebServiceClient("http://localhost", httpClient, requestBeanMapper, responseBeanMapper);
     }
 
     @Test
     void putRequestBeanWithGet() {
-        var request = new HTTPRequest(HTTPMethod.POST, "/");
+        var request = new HTTPRequest(HTTPMethod.GET, "/");
 
         var requestBean = new TestWebService.TestSearchRequest();
         requestBean.intField = 23;
@@ -78,27 +88,27 @@ class WebServiceClientTest {
         response.message = "not found";
 
         assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(404, Map.of(), Strings.bytes(JSON.toJSON(response)))))
-                .isInstanceOf(RemoteServiceException.class)
-                .satisfies(throwable -> {
-                    RemoteServiceException exception = (RemoteServiceException) throwable;
-                    assertThat(exception.severity()).isEqualTo(Severity.WARN);
-                    assertThat(exception.errorCode()).isEqualTo(response.errorCode);
-                    assertThat(exception.getMessage()).isEqualTo(response.message);
-                    assertThat(exception.status).isEqualTo(HTTPStatus.NOT_FOUND);
-                });
+            .isInstanceOf(RemoteServiceException.class)
+            .satisfies(throwable -> {
+                RemoteServiceException exception = (RemoteServiceException) throwable;
+                assertThat(exception.severity()).isEqualTo(Severity.WARN);
+                assertThat(exception.errorCode()).isEqualTo(response.errorCode);
+                assertThat(exception.getMessage()).isEqualTo(response.message);
+                assertThat(exception.status).isEqualTo(HTTPStatus.NOT_FOUND);
+            });
     }
 
     @Test
     void validateResponseWithEmptyBody() {
         assertThatThrownBy(() -> webServiceClient.validateResponse(new HTTPResponse(503, Map.of(), new byte[0])))
-                .isInstanceOf(RemoteServiceException.class)
-                .satisfies(throwable -> {
-                    RemoteServiceException exception = (RemoteServiceException) throwable;
-                    assertThat(exception.severity()).isEqualTo(Severity.ERROR);
-                    assertThat(exception.errorCode()).isEqualTo("REMOTE_SERVICE_ERROR");
-                    assertThat(exception.getMessage()).isEqualTo("failed to call remote service, statusCode=503");
-                    assertThat(exception.status).isEqualTo(HTTPStatus.SERVICE_UNAVAILABLE);
-                });
+            .isInstanceOf(RemoteServiceException.class)
+            .satisfies(throwable -> {
+                RemoteServiceException exception = (RemoteServiceException) throwable;
+                assertThat(exception.severity()).isEqualTo(Severity.ERROR);
+                assertThat(exception.errorCode()).isEqualTo("REMOTE_SERVICE_ERROR");
+                assertThat(exception.getMessage()).isEqualTo("failed to call remote service, statusCode=503");
+                assertThat(exception.status).isEqualTo(HTTPStatus.SERVICE_UNAVAILABLE);
+            });
     }
 
     @Test
@@ -109,6 +119,21 @@ class WebServiceClientTest {
     @Test
     void parseUnsupportedHTTPStatus() {
         assertThatThrownBy(() -> WebServiceClient.parseHTTPStatus(525))
-                .isInstanceOf(Error.class);
+            .isInstanceOf(Error.class);
+    }
+
+    @Test
+    void intercept() {
+        WebServiceClientInterceptor interceptor = mock(WebServiceClientInterceptor.class);
+        webServiceClient.intercept(interceptor);
+
+        HTTPResponse response = new HTTPResponse(200, Map.of(), new byte[0]);
+        when(httpClient.execute(any())).thenReturn(response);
+
+        webServiceClient.execute(HTTPMethod.GET, "/api", null, null, void.class);
+
+        verify(interceptor).onRequest(argThat(request -> HTTPMethod.GET.equals(request.method)
+            && request.requestURI().equals("http://localhost/api")));
+        verify(interceptor).onResponse(response);
     }
 }
