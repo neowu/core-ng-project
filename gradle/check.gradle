@@ -23,21 +23,22 @@ subprojects {
 
         configFile = rootProject.file('gradle/check/checkstyle.xml')
         configProperties['configDir'] = configFile.parentFile
-    }
 
-    tasks.named('checkstyleMain').configure {
-        group = 'verification'
-        source = fileTree('.').matching {
-            include 'conf/**'
-            include 'src/main/**'
+        tasks.named('checkstyleMain').configure {
+            group = 'verification'
+            source = fileTree(projectDir) {
+                include 'conf/**/*.properties'
+                include 'src/main/java/**/*.java'
+                include 'src/main/**/*.properties'
+            }
         }
-    }
 
-    tasks.named('checkstyleTest').configure {
-        group = 'verification'
-        source = fileTree('.').matching {
-            include 'src/test/java/**'
-            include 'src/test/resources/**/*.properties'    // test resource may contains java file not for compiling, so to skip
+        tasks.named('checkstyleTest').configure {
+            group = 'verification'
+            source = sourceSets.test.allSource.matching {
+                include 'java/**/*.java'
+                include '**/*.properties'
+            }
         }
     }
 
@@ -47,43 +48,43 @@ subprojects {
         toolVersion = '6.19.0'
         consoleOutput = true
         incrementalAnalysis = true
-    }
 
-    tasks.withType(Pmd).configureEach {
-        group = 'verification'
+        tasks.withType(Pmd).configureEach {
+            group = 'verification'
+        }
     }
 
     spotbugs {
+        dependencies {
+            spotbugsPlugins 'com.mebigfatguy.sb-contrib:sb-contrib:7.4.6'
+        }
+
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
         toolVersion = '4.0.0-beta4'
-    }
 
-    dependencies {
-        spotbugsPlugins 'com.mebigfatguy.sb-contrib:sb-contrib:7.4.6'
-    }
-
-    tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach {
-        group = 'verification'
-        reports {
-            xml.enabled = false
-            html.enabled = true
+        tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach {
+            group = 'verification'
+            reports {
+                xml.enabled = false
+                html.enabled = true
+            }
         }
     }
 
     jacoco {
         toolVersion = '0.8.5'
-    }
 
-    tasks.named('jacocoTestReport').configure {
-        // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport
-        executionData.setFrom(fileTree(rootDir).include('build/**/jacoco/test.exec'))
+        tasks.named('jacocoTestReport').configure {
+            // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport
+            executionData.setFrom(fileTree(rootDir).include('build/**/jacoco/test.exec'))
 
-        reports {
-            xml.enabled = true
-            xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")
-            html.enabled = true
-            csv.enabled = false
+            reports {
+                xml.enabled = true
+                xml.destination rootProject.file("${buildDir}/reports/jacoco/report.xml")
+                html.enabled = true
+                csv.enabled = false
+            }
         }
     }
 }
