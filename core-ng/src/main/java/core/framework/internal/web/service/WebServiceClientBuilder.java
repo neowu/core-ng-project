@@ -8,6 +8,7 @@ import core.framework.internal.reflect.Methods;
 import core.framework.internal.reflect.Params;
 import core.framework.util.Maps;
 import core.framework.web.service.WebServiceClientInterceptor;
+import core.framework.web.service.WebServiceClientProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

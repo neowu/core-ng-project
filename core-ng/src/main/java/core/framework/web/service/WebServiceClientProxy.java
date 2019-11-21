@@ -1,6 +1,4 @@
-package core.framework.internal.web.service;
-
-import core.framework.web.service.WebServiceClientInterceptor;
+package core.framework.web.service;
 
 /**
  * @author neo

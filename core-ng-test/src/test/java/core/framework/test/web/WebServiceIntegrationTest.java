@@ -1,9 +1,9 @@
 package core.framework.test.web;
 
 import core.framework.inject.Inject;
-import core.framework.internal.web.service.WebServiceClientProxy;
 import core.framework.test.IntegrationTest;
 import core.framework.web.WebContext;
+import core.framework.web.service.WebServiceClientProxy;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

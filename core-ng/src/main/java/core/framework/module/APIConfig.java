@@ -12,12 +12,12 @@ import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.service.HTTPMethods;
 import core.framework.internal.web.service.WebServiceClient;
 import core.framework.internal.web.service.WebServiceClientBuilder;
-import core.framework.internal.web.service.WebServiceClientProxy;
 import core.framework.internal.web.service.WebServiceControllerBuilder;
 import core.framework.internal.web.service.WebServiceImplValidator;
 import core.framework.internal.web.service.WebServiceInterfaceValidator;
 import core.framework.util.ASCII;
 import core.framework.web.Controller;
+import core.framework.web.service.WebServiceClientProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

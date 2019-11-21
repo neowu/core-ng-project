@@ -1,7 +1,7 @@
 package core.framework.module;
 
-import core.framework.internal.web.service.WebServiceClientProxy;
 import core.framework.web.service.WebServiceClientInterceptor;
+import core.framework.web.service.WebServiceClientProxy;
 
 /**
  * @author neo

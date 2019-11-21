@@ -4,6 +4,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Types;
+import core.framework.web.service.WebServiceClientProxy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
