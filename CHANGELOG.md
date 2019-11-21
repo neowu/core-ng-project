@@ -1,5 +1,5 @@
 ## Change log
-### 7.2.0 (11/17/2019 - )  !!! only support java 13, update docker/build server first before migration !!!
+### 7.2.0 (11/17/2019 - 11/20/2019)  !!! only support java 13, update docker/build server first before migration !!!
 * project: updated source/target to java 13
 * kafka: warn when consumer lag is too long, default is 60s
 * ws: support wsContext.all() to return all channels
