@@ -58,7 +58,7 @@ class WebServiceClientTest {
 
         var requestBean = new TestWebService.TestSearchRequest();
         requestBean.intField = 23;
-        webServiceClient.putRequestBean(request, HTTPMethod.GET, TestWebService.TestSearchRequest.class, requestBean);
+        webServiceClient.putRequestBean(request, TestWebService.TestSearchRequest.class, requestBean);
 
         assertThat(request.params).contains(entry("int_field", "23"));
     }
@@ -69,7 +69,7 @@ class WebServiceClientTest {
 
         var requestBean = new TestWebService.TestRequest();
         requestBean.stringField = "123value";
-        webServiceClient.putRequestBean(request, HTTPMethod.POST, TestWebService.TestRequest.class, requestBean);
+        webServiceClient.putRequestBean(request, TestWebService.TestRequest.class, requestBean);
 
         assertThat(new String(request.body, UTF_8)).isEqualTo(JSON.toJSON(requestBean));
         assertThat(request.contentType).isEqualTo(ContentType.APPLICATION_JSON);
@@ -132,8 +132,8 @@ class WebServiceClientTest {
 
         webServiceClient.execute(HTTPMethod.GET, "/api", null, null, void.class);
 
-        verify(interceptor).onRequest(argThat(request -> HTTPMethod.GET.equals(request.method)
-            && request.requestURI().equals("http://localhost/api")));
+        verify(interceptor).onRequest(argThat(request -> request.method == HTTPMethod.GET
+            && "http://localhost/api".equals(request.requestURI())));
         verify(interceptor).onResponse(response);
     }
 }

@@ -65,7 +65,7 @@ public class WebServiceClient {
         linkContext(request);
 
         if (requestBeanClass != null) {
-            putRequestBean(request, method, requestBeanClass, requestBean);
+            putRequestBean(request, requestBeanClass, requestBean);
         }
 
         if (interceptor != null) {
@@ -88,7 +88,8 @@ public class WebServiceClient {
         this.interceptor = interceptor;
     }
 
-    <T> void putRequestBean(HTTPRequest request, HTTPMethod method, Class<T> requestBeanClass, T requestBean) {
+    <T> void putRequestBean(HTTPRequest request, Class<T> requestBeanClass, T requestBean) {
+        HTTPMethod method = request.method;
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
             Map<String, String> queryParams = requestBeanMapper.toParams(requestBeanClass, requestBean);
             request.params.putAll(queryParams);
@@ -119,15 +120,16 @@ public class WebServiceClient {
         // handle empty body gracefully, e.g. 503 during deployment
         if (response.body.length == 0) throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
 
-        ErrorResponse error = errorResponse(response, statusCode);
+        ErrorResponse error = errorResponse(response);
         logger.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
         throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, parseHTTPStatus(statusCode));
     }
 
-    private ErrorResponse errorResponse(HTTPResponse response, int statusCode) {
+    private ErrorResponse errorResponse(HTTPResponse response) {
         try {
             return (ErrorResponse) responseBeanMapper.fromJSON(ErrorResponse.class, response.body);
         } catch (Throwable e) {
+            int statusCode = response.statusCode;
             throw new RemoteServiceException(format("internal communication failed, statusCode={}, responseText={}", statusCode, response.text()), Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode), e);
         }
     }

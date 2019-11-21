@@ -1,11 +1,9 @@
 package core.framework.internal.web.service;
 
 import core.framework.http.HTTPMethod;
-import core.framework.http.HTTPRequest;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.util.ClasspathResources;
 import core.framework.util.Types;
-import core.framework.web.service.WebServiceClientInterceptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -41,11 +39,7 @@ class WebServiceClientBuilderTest {
     @Test
     void intercept() {
         assertThat(client).isInstanceOf(WebServiceClientProxy.class);
-        var interceptor = new WebServiceClientInterceptor() {
-            @Override
-            public void onRequest(HTTPRequest request) {
-            }
-        };
+        var interceptor = new TestWebServiceClientInterceptor();
         ((WebServiceClientProxy) client).intercept(interceptor);
         verify(webServiceClient).intercept(interceptor);
     }
@@ -106,4 +100,5 @@ class WebServiceClientBuilderTest {
             .contains("builder.append(\"/\").append(core.framework.internal.web.service.PathParamHelper.toString(param1));")
             .contains("builder.append(\"/\");");
     }
+
 }

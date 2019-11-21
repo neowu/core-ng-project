@@ -1,8 +1,7 @@
 package core.framework.module;
 
-import core.framework.http.HTTPRequest;
+import core.framework.internal.web.service.TestWebServiceClientInterceptor;
 import core.framework.internal.web.service.WebServiceClientProxy;
-import core.framework.web.service.WebServiceClientInterceptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,11 +23,7 @@ class APIClientConfigTest {
 
     @Test
     void intercept() {
-        WebServiceClientInterceptor interceptor = new WebServiceClientInterceptor() {
-            @Override
-            public void onRequest(HTTPRequest request) {
-            }
-        };
+        var interceptor = new TestWebServiceClientInterceptor();
         config.intercept(interceptor);
         verify(proxy).intercept(interceptor);
     }
