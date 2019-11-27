@@ -4,6 +4,7 @@ package core.framework.internal.scheduler;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.scheduler.Job;
+import core.framework.scheduler.JobContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -48,7 +49,7 @@ class SchedulerTest {
     @Test
     void next() {
         assertThatThrownBy(() -> scheduler.next(previous -> null, ZonedDateTime.now()))
-                .hasMessageContaining("must be after previous");
+            .hasMessageContaining("must be after previous");
 
         assertThat(scheduler.next(previous -> previous.plusHours(1), ZonedDateTime.now())).isNotNull();
     }
@@ -58,7 +59,7 @@ class SchedulerTest {
         ZonedDateTime now = ZonedDateTime.now();
         scheduler.clock = Clock.fixed(now.toInstant(), ZoneId.systemDefault());
 
-        TriggerTask task = new TriggerTask("trigger-job", null, previous -> previous.plusHours(1), ZoneId.systemDefault());
+        var task = new TriggerTask("trigger-job", null, previous -> previous.plusHours(1), ZoneId.systemDefault());
         scheduler.schedule(task, now);
 
         ArgumentCaptor<Runnable> scheduledTask = ArgumentCaptor.forClass(Runnable.class);
@@ -83,7 +84,7 @@ class SchedulerTest {
 
     @Test
     void executeTaskWithTriggerError() {
-        TriggerTask task = new TriggerTask("trigger-job", null, previous -> previous, ZoneId.systemDefault());
+        var task = new TriggerTask("trigger-job", null, previous -> previous, ZoneId.systemDefault());
         scheduler.executeTask(task, ZonedDateTime.now());
 
         verify(jobExecutor, never()).submit((Callable<?>) any(Callable.class));
@@ -94,21 +95,24 @@ class SchedulerTest {
         scheduler.addFixedRateTask("hourly-job", new TestJob(), Duration.ofHours(1));
         scheduler.triggerNow("hourly-job");
 
+        @SuppressWarnings("unchecked")
         ArgumentCaptor<Callable<?>> task = ArgumentCaptor.forClass(Callable.class);
         verify(jobExecutor).submit(task.capture());
 
-        ActionLog actionLog = new ActionLog(null);
+        var actionLog = new ActionLog(null);
         when(logManager.begin(anyString())).thenReturn(actionLog);
 
         task.getValue().call();
 
         assertThat(actionLog.trace).isTrue();
+        assertThat(actionLog.context).containsKeys("trigger", "job", "job_class", "scheduled_time");
     }
 
     public static class TestJob implements Job {
         @Override
-        public void execute() {
-
+        public void execute(JobContext context) {
+            assertThat(context.name).isNotNull();
+            assertThat(context.scheduledTime).isNotNull();
         }
     }
 }

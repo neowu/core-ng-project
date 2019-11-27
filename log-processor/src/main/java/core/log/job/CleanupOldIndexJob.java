@@ -2,6 +2,7 @@ package core.log.job;
 
 import core.framework.inject.Inject;
 import core.framework.scheduler.Job;
+import core.framework.scheduler.JobContext;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.log.service.IndexService;
@@ -22,9 +23,8 @@ public class CleanupOldIndexJob implements Job {
     IndexService indexService;
 
     @Override
-    public void execute() {
-        LocalDate now = LocalDate.now();
-        cleanup(now);
+    public void execute(JobContext context) {
+        cleanup(context.scheduledTime.toLocalDate());
     }
 
     void cleanup(LocalDate now) {

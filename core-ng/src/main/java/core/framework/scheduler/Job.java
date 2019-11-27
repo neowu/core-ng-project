@@ -5,5 +5,5 @@ package core.framework.scheduler;
  */
 @FunctionalInterface
 public interface Job {
-    void execute() throws Exception;
+    void execute(JobContext context) throws Exception;
 }

@@ -1,5 +1,7 @@
 ## Change log
 ### 7.2.1 (11/20/2019 - )
+* scheduler, change Job interface to execute(JobContext context), to provide scheduledTime to job, 
+    !!! since it's easy migration, framework doesn't make it backward compatible (e.g. support old/new methods in job interface), pls just change all job classes)  
 
 ### 7.2.0 (11/17/2019 - 11/20/2019)  !!! only support java 13, update docker/build server first before migration !!!
 * project: updated source/target to java 13

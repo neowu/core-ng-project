@@ -4,6 +4,7 @@ import core.framework.internal.async.ThreadPools;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.scheduler.Job;
+import core.framework.scheduler.JobContext;
 import core.framework.scheduler.Trigger;
 import core.framework.util.Maps;
 import core.framework.util.Randoms;
@@ -34,7 +35,7 @@ public final class Scheduler {
 
     public Scheduler(LogManager logManager) {
         this(logManager, ThreadPools.singleThreadScheduler("scheduler-"),
-                ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 4, "scheduler-job-"));
+            ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 4, "scheduler-job-"));
     }
 
     Scheduler(LogManager logManager, ScheduledExecutorService scheduler, ExecutorService jobExecutor) {
@@ -115,8 +116,8 @@ public final class Scheduler {
     void schedule(FixedRateTask task) {
         Duration delay = Duration.ofMillis((long) Randoms.nextDouble(1000, 3000)); // delay 1s to 3s
         scheduler.scheduleAtFixedRate(() -> {
-            logger.info("execute scheduled job, job={}", task.name());
-            submitJob(task, false);
+            logger.info("execute scheduled job, job={}, rate={}", task.name(), task.rate);
+            submitJob(task, ZonedDateTime.now(), false);
         }, delay.toNanos(), task.rate.toNanos(), TimeUnit.NANOSECONDS);
     }
 
@@ -125,7 +126,7 @@ public final class Scheduler {
             ZonedDateTime next = next(task.trigger, time);
             schedule(task, next);
             logger.info("execute scheduled job, job={}, time={}, next={}", task.name(), time, next);
-            submitJob(task, false);
+            submitJob(task, time, false);
         } catch (Throwable e) {
             logger.error("failed to execute scheduled job, job is terminated, job={}, error={}", task.name(), e.getMessage(), e);
         }
@@ -134,10 +135,10 @@ public final class Scheduler {
     public void triggerNow(String name) {
         Task task = tasks.get(name);
         if (task == null) throw new NotFoundException("job not found, name=" + name);
-        submitJob(task, true);
+        submitJob(task, ZonedDateTime.now(), true);
     }
 
-    private void submitJob(Task task, boolean trace) {
+    private void submitJob(Task task, ZonedDateTime scheduledTime, boolean trace) {
         jobExecutor.submit(() -> {
             try {
                 ActionLog actionLog = logManager.begin("=== job execution begin ===");
@@ -148,7 +149,8 @@ public final class Scheduler {
                 Job job = task.job();
                 actionLog.context("job", name);
                 actionLog.context("job_class", job.getClass().getCanonicalName());
-                job.execute();
+                actionLog.context("scheduled_time", scheduledTime.toInstant());
+                job.execute(new JobContext(name, scheduledTime));
                 return null;
             } catch (Throwable e) {
                 logManager.logError(e);
