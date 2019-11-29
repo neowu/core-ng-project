@@ -114,19 +114,22 @@ public final class Scheduler {
     }
 
     void schedule(FixedRateTask task) {
-        Duration delay = Duration.ofMillis((long) Randoms.nextDouble(1000, 3000)); // delay 1s to 3s
+        Duration delay = Duration.ofMillis((long) Randoms.nextDouble(1000, 3000)); // delay 1s to 3s to shuffle fix rated jobs
+        task.scheduledTime = ZonedDateTime.now().plus(delay);
         scheduler.scheduleAtFixedRate(() -> {
-            logger.info("execute scheduled job, job={}, rate={}", task.name(), task.rate);
-            submitJob(task, ZonedDateTime.now(), false);
+            ZonedDateTime scheduledTime = task.scheduledTime;
+            ZonedDateTime next = task.scheduleNext();
+            logger.info("execute scheduled job, job={}, rate={}, scheduled={}, next={}", task.name(), task.rate, scheduledTime, next);
+            submitJob(task, scheduledTime, false);
         }, delay.toNanos(), task.rate.toNanos(), TimeUnit.NANOSECONDS);
     }
 
-    void executeTask(TriggerTask task, ZonedDateTime time) {
+    void executeTask(TriggerTask task, ZonedDateTime scheduledTime) {
         try {
-            ZonedDateTime next = next(task.trigger, time);
+            ZonedDateTime next = next(task.trigger, scheduledTime);
             schedule(task, next);
-            logger.info("execute scheduled job, job={}, time={}, next={}", task.name(), time, next);
-            submitJob(task, time, false);
+            logger.info("execute scheduled job, job={}, trigger={}, scheduled={}, next={}", task.name(), task.trigger(), scheduledTime, next);
+            submitJob(task, scheduledTime, false);
         } catch (Throwable e) {
             logger.error("failed to execute scheduled job, job is terminated, job={}, error={}", task.name(), e.getMessage(), e);
         }

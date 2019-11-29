@@ -4,6 +4,7 @@ package core.framework.internal.scheduler;
 import core.framework.scheduler.Job;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 
 /**
  * @author neo
@@ -12,6 +13,7 @@ public final class FixedRateTask implements Task {
     final Duration rate;
     private final String name;
     private final Job job;
+    ZonedDateTime scheduledTime;
 
     FixedRateTask(String name, Job job, Duration rate) {
         this.name = name;
@@ -32,5 +34,10 @@ public final class FixedRateTask implements Task {
     @Override
     public String trigger() {
         return "fixedRate@" + rate;
+    }
+
+    ZonedDateTime scheduleNext() {  // only for tracking scheduled time of JobContext, the actual scheduling is managed java scheduler
+        scheduledTime = scheduledTime.plus(rate);
+        return scheduledTime;
     }
 }
