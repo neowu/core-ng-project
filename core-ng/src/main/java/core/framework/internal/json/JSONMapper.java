@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
@@ -23,6 +25,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
+import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.PUBLIC_ONLY;
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
@@ -37,14 +41,18 @@ public class JSONMapper<T> {
     public static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
 
     private static ObjectMapper createObjectMapper() {
-        var mapper = new ObjectMapper();
-        mapper.registerModule(timeModule());
-        mapper.registerModule(new AfterburnerModule().setUseValueClassLoader(false));   // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
-        mapper.setDateFormat(new StdDateFormat());
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setAnnotationIntrospector(new JSONAnnotationIntrospector());
-        return mapper;
+        return JsonMapper.builder()
+                         .addModule(timeModule())
+                         // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
+                         .addModule(new AfterburnerModule().setUseValueClassLoader(false))
+                         .defaultDateFormat(new StdDateFormat())
+                         // only auto detect field, and default visibility is public_only, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
+                         .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
+                         .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                         .annotationIntrospector(new JSONAnnotationIntrospector())
+                         .deactivateDefaultTyping()
+                         .build();
     }
 
     private static JavaTimeModule timeModule() {

@@ -7,7 +7,7 @@ subprojects {
 
 def elasticVersion = '7.4.2'
 def kafkaVersion = '2.3.1'
-def jacksonVersion = '2.9.9'
+def jacksonVersion = '2.10.1'
 def junitVersion = '5.5.2'
 def mockitoVersion = '3.0.0'
 def assertjVersion = '3.13.2'
@@ -26,7 +26,7 @@ project(':core-ng') {
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.2.2'
         implementation 'io.undertow:undertow-core:2.0.28.Final'
-        implementation 'org.jboss.xnio:xnio-nio:3.7.6.Final'
+        implementation 'org.jboss.xnio:xnio-nio:3.7.7.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.7.3'      // used by kafka message compression
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
@@ -75,6 +75,10 @@ project(':core-ng-search') {
         api "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
         constraints {
             api "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"                     // update jackson lib transitive dependencies from elasticsearch
+            implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-smile:${jacksonVersion}"
+            implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+            implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:${jacksonVersion}"
+            implementation "org.yaml:snakeyaml:1.25"
         }
         testImplementation project(":core-ng-test")
     }

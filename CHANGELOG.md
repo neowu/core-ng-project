@@ -4,6 +4,7 @@
     !!! since it's easy migration, framework doesn't make it backward compatible (e.g. support old/new methods in job interface), pls just change all job classes)  
 * log-collector: update default to https:8443, gcloud lb accepts self-sign cert, so to use h2 by default, 
     for other cloud/env, use kube env SYS_HTTP_PORT: 8080 to define http listener if needed  
+* json: update jackson to 2.10.1, refer to https://medium.com/@cowtowncoder/jackson-2-10-features-cd880674d8a2
 
 ### 7.2.0 (11/17/2019 - 11/20/2019)  !!! only support java 13, update docker/build server first before migration !!!
 * project: updated source/target to java 13

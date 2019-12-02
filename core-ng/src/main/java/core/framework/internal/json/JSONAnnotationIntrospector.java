@@ -1,12 +1,9 @@
 package core.framework.internal.json;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.introspect.Annotated;
-import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
-import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import core.framework.api.json.Property;
 
 import java.lang.reflect.Field;
@@ -22,15 +19,6 @@ public class JSONAnnotationIntrospector extends AnnotationIntrospector {
     @Override
     public Version version() {
         return Version.unknownVersion();
-    }
-
-    @Override
-    public VisibilityChecker<?> findAutoDetectVisibility(AnnotatedClass annotatedClass, VisibilityChecker<?> checker) {
-        return checker.withFieldVisibility(Visibility.PUBLIC_ONLY)
-                      .withSetterVisibility(Visibility.NONE)
-                      .withGetterVisibility(Visibility.NONE)
-                      .withIsGetterVisibility(Visibility.NONE)
-                      .withCreatorVisibility(Visibility.NONE);
     }
 
     @Override
