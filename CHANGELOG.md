@@ -1,5 +1,5 @@
 ## Change log
-### 7.2.1 (11/20/2019 - )
+### 7.2.1 (11/20/2019 - 12/02/2019)
 * scheduler: change Job interface to execute(JobContext context), to provide scheduledTime to job, 
     !!! since it's easy migration, framework doesn't make it backward compatible (e.g. support old/new methods in job interface), pls just change all job classes)  
 * log-collector: update default to https:8443, gcloud lb accepts self-sign cert, so to use h2 by default, 
