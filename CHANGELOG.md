@@ -1,6 +1,7 @@
 ## Change log
-### 7.2.2 (12/02/2019 - )
+### 7.2.2 (12/02/2019 - 12/09/2019)
 * es: update to 7.5.0
+* httpClient: fixed CookieManager not deleting removed cookie from response
 
 ### 7.2.1 (11/20/2019 - 12/02/2019)
 * scheduler: change Job interface to execute(JobContext context), to provide scheduledTime to job, 

@@ -59,12 +59,12 @@ public class ResponseHandler {
 
     private void putCookies(ResponseImpl response, HttpServerExchange exchange) {
         if (response.cookies != null) {
-            Map<String, Cookie> cookies = exchange.getResponseCookies();
+            Map<String, Cookie> cookies = exchange.getResponseCookies();    // undertow uses cookie.name to setResponseCookie, which is wrong, support response writes cookies with same name but different domain and path
             for (var entry : response.cookies.entrySet()) {
                 CookieSpec spec = entry.getKey();
                 String value = entry.getValue();
                 CookieImpl cookie = cookie(spec, value);
-                cookies.put(spec.name, cookie);
+                cookies.put(cookieKey(spec), cookie);
                 logger.debug("[response:cookie] name={}, value={}, domain={}, path={}, secure={}, httpOnly={}, maxAge={}",
                         spec.name, new FieldLogParam(spec.name, cookie.getValue()), cookie.getDomain(), cookie.getPath(), cookie.isSecure(), cookie.isHttpOnly(), cookie.getMaxAge());
             }
@@ -87,5 +87,9 @@ public class ResponseHandler {
         // refer to https://www.owasp.org/index.php/SameSite, lax is good enough for common scenario, as long as webapp doesn't make sensitive side effect thru TOP LEVEL navigation
         if (spec.sameSite) cookie.setSameSiteMode("lax");
         return cookie;
+    }
+
+    String cookieKey(CookieSpec spec) {
+        return spec.name + ":" + spec.domain + ":" + spec.path;
     }
 }

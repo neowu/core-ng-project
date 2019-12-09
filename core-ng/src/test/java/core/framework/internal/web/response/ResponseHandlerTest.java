@@ -25,4 +25,11 @@ class ResponseHandlerTest {
         assertThat(cookie.getValue()).isEqualTo("1%3D2");
         assertThat(cookie.getSameSiteMode()).isEqualTo("Lax");
     }
+
+    @Test
+    void cookieKey() {
+        assertThat(responseHandler.cookieKey(new CookieSpec("test")))
+                .isNotEqualTo(responseHandler.cookieKey(new CookieSpec("test").domain("example.com")))
+                .isNotEqualTo(responseHandler.cookieKey(new CookieSpec("test").path("/")));
+    }
 }
