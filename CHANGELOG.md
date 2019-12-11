@@ -1,4 +1,6 @@
 ## Change log
+### 7.2.3 (12/11/2019 - )
+
 ### 7.2.2 (12/02/2019 - 12/09/2019)
 * es: update to 7.5.0
 * httpClient: fixed CookieManager not deleting removed cookie from response
