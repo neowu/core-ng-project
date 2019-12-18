@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author neo
@@ -13,6 +14,7 @@ import java.util.Map;
 public class LocalCacheStore implements CacheStore {
     final Map<String, CacheItem> caches = Maps.newConcurrentHashMap();
     private final Logger logger = LoggerFactory.getLogger(LocalCacheStore.class);
+    public long maxSize = (long) (Runtime.getRuntime().maxMemory() * 0.1);  // use 10% of heap by default
 
     @Override
     public byte[] get(String key) {
@@ -22,6 +24,7 @@ public class LocalCacheStore implements CacheStore {
             caches.remove(key);
             return null;
         }
+        item.hits++;
         return item.value;
     }
 
@@ -53,17 +56,57 @@ public class LocalCacheStore implements CacheStore {
         }
     }
 
-    public void cleanup() {
+    public void cleanup() {    // cleanup is only called by background thread with fixed delay, not need to synchronize
         logger.info("clean up local cache store");
         long now = System.currentTimeMillis();
-        caches.forEach((key, value) -> {
-            if (value.expired(now)) caches.remove(key);
-        });
+        long currentSize = 0;
+        for (Map.Entry<String, CacheItem> entry : caches.entrySet()) {
+            String key = entry.getKey();
+            CacheItem value = entry.getValue();
+            if (value.expired(now)) {
+                caches.remove(key);
+            } else {
+                currentSize += value.value.length;
+            }
+        }
+        if (currentSize > maxSize) {
+            logger.info("evict least frequently used cache items");
+            long evictSize = currentSize - maxSize;
+            evictLeastFrequentlyUsedItems(evictSize);
+        }
+    }
+
+    // use LFU to trade off between simplicity and access efficiency,
+    // assume local cache is only used for rarely changed items, and tolerate stale data, or use message to notify updates
+    // cleanup is running in background thread, it maintains approximate maxSize loosely
+    private void evictLeastFrequentlyUsedItems(long evictSize) {
+        Map<Integer, Long> sizes = new TreeMap<>();
+        for (CacheItem item : caches.values()) {
+            int hits = item.hits;
+            Long size = sizes.getOrDefault(hits, 0L);
+            sizes.put(hits, size + item.value.length);
+        }
+        int minHits = 0;
+        for (Map.Entry<Integer, Long> entry : sizes.entrySet()) {
+            evictSize -= entry.getValue();
+            if (evictSize <= 0) {
+                minHits = entry.getKey();
+                break;
+            }
+        }
+        for (Map.Entry<String, CacheItem> entry : caches.entrySet()) {
+            String key = entry.getKey();
+            CacheItem value = entry.getValue();
+            if (value.hits <= minHits) {
+                caches.remove(key);
+            }
+        }
     }
 
     static class CacheItem {
         final byte[] value;
         final long expirationTime;
+        int hits;
 
         CacheItem(byte[] value, long expirationTime) {
             this.value = value;

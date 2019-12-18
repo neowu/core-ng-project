@@ -13,7 +13,7 @@ class CacheManagerTest {
 
     @BeforeEach
     void createCacheManager() {
-        cacheManager = new CacheManager(null);
+        cacheManager = new CacheManager();
     }
 
     @Test

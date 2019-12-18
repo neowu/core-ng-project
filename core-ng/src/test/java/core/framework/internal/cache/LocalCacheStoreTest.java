@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -25,8 +23,7 @@ class LocalCacheStoreTest {
     @Test
     void getAll() {
         Map<String, byte[]> values = cacheStore.getAll("key1", "key2");
-        assertNull(values.get("key1"));
-        assertNull(values.get("key2"));
+        assertThat(values).isEmpty();
     }
 
     @Test
@@ -35,7 +32,13 @@ class LocalCacheStoreTest {
         cacheStore.put("key1", value, Duration.ofMinutes(1));
 
         byte[] retrievedValue = cacheStore.get("key1");
-        assertArrayEquals(value, retrievedValue);
+        assertThat(retrievedValue).isEqualTo(value);
+
+        LocalCacheStore.CacheItem item = cacheStore.caches.get("key1");
+        assertThat(item.hits).isEqualTo(1);
+
+        cacheStore.get("key1");
+        assertThat(item.hits).isEqualTo(2);
     }
 
     @Test
@@ -44,7 +47,7 @@ class LocalCacheStoreTest {
         cacheStore.put("key1", value, Duration.ZERO);
 
         byte[] retrievedValue = cacheStore.get("key1");
-        assertNull(retrievedValue);
+        assertThat(retrievedValue).isNull();
     }
 
     @Test
@@ -53,7 +56,21 @@ class LocalCacheStoreTest {
         cacheStore.put("key2", Strings.bytes("value"), Duration.ofMinutes(1));
         cacheStore.cleanup();
 
-        assertEquals(1, cacheStore.caches.size());
+        assertThat(cacheStore.caches).hasSize(1);
+    }
+
+    @Test
+    void cleanupWithEviction() {
+        cacheStore.maxSize = 6;
+        cacheStore.put("k1", Strings.bytes("12345"), Duration.ofHours(1));
+        cacheStore.put("k2", Strings.bytes("12345"), Duration.ofHours(1));
+        cacheStore.put("k3", Strings.bytes("12345"), Duration.ofHours(1));
+        cacheStore.get("k1");
+        cacheStore.get("k2");
+        cacheStore.get("k2");
+
+        cacheStore.cleanup();
+        assertThat(cacheStore.caches).containsOnlyKeys("k2");
     }
 
     @Test
@@ -62,7 +79,7 @@ class LocalCacheStoreTest {
                 "key2", Strings.bytes("2"));
         cacheStore.putAll(values, Duration.ofMinutes(1));
 
-        assertEquals(2, cacheStore.caches.size());
+        assertThat(cacheStore.caches).hasSize(2);
     }
 
     @Test
@@ -71,6 +88,6 @@ class LocalCacheStoreTest {
         cacheStore.put("key2", Strings.bytes("value"), Duration.ofMinutes(1));
         cacheStore.delete("key1", "key2");
 
-        assertEquals(0, cacheStore.caches.size());
+        assertThat(cacheStore.caches).isEmpty();
     }
 }

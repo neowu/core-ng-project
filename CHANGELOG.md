@@ -1,6 +1,10 @@
 ## Change log
-### 7.2.3 (12/11/2019 - )
+### 7.3.0 (12/11/2019 - )
 * kafka: update to 2.4.0
+* cache: support use both local and remote cache, local cache is for rarely changed but frequently accessed data
+    !!! cache().add() renamed to cache().remote()
+    !!! by default local cache uses 10% max heap
+    !!! carefully use local cache on prod as it may not refreshed in time, use message to notify if worth 
 
 ### 7.2.2 (12/02/2019 - 12/09/2019)
 * es: update to 7.5.0

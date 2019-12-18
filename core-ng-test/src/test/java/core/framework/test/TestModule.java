@@ -63,7 +63,9 @@ public class TestModule extends AbstractTestModule {
 
     private void configureCache() {
         cache().redis("localhost");
-        cache().add(TestDBEntity.class, Duration.ofHours(6));
+        cache().maxLocalSize((long) (Runtime.getRuntime().maxMemory() * 0.1));
+        cache().remote(TestDBEntity.class, Duration.ofHours(6));
+        cache().local(TestMessage.class, Duration.ofHours(6));
     }
 
     private void configureExecutor() {
