@@ -29,7 +29,7 @@ import java.time.Duration;
  */
 public class APIConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(APIConfig.class);
-    private ModuleContext context;
+    ModuleContext context;
     private HTTPClientBuilder httpClientBuilder;
     private HTTPClient httpClient;
 
@@ -38,12 +38,12 @@ public class APIConfig extends Config {
         this.context = context;
         // default value is for internal api call only, targeting for kube env (with short connect timeout and more retries)
         httpClientBuilder = new HTTPClientBuilder()
-            .userAgent(WebServiceClient.USER_AGENT)
-            .trustAll()
-            .connectTimeout(Duration.ofSeconds(2))
-            .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
-            .slowOperationThreshold(Duration.ofSeconds(10))
-            .maxRetries(5);
+                .userAgent(WebServiceClient.USER_AGENT)
+                .trustAll()
+                .connectTimeout(Duration.ofSeconds(2))
+                .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
+                .slowOperationThreshold(Duration.ofSeconds(10))
+                .maxRetries(5);
     }
 
     @Override
@@ -54,9 +54,9 @@ public class APIConfig extends Config {
     public <T> void service(Class<T> serviceInterface, T service) {
         logger.info("create web service, interface={}", serviceInterface.getCanonicalName());
         new WebServiceInterfaceValidator(serviceInterface,
-            context.httpServer.handler.requestBeanMapper,
-            context.httpServer.handler.responseBeanMapper,
-            context.serviceRegistry.beanClassNameValidator).validate();
+                context.httpServer.handler.requestBeanMapper,
+                context.httpServer.handler.responseBeanMapper,
+                context.serviceRegistry.beanClassNameValidator).validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
         context.serviceRegistry.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate, duplication will failed to register route
 

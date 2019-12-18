@@ -61,10 +61,9 @@ public class LocalCacheStore implements CacheStore {
         long now = System.currentTimeMillis();
         long currentSize = 0;
         for (Map.Entry<String, CacheItem> entry : caches.entrySet()) {
-            String key = entry.getKey();
             CacheItem value = entry.getValue();
             if (value.expired(now)) {
-                caches.remove(key);
+                caches.remove(entry.getKey());
             } else {
                 currentSize += value.value.length;
             }
@@ -87,18 +86,18 @@ public class LocalCacheStore implements CacheStore {
             sizes.put(hits, size + item.value.length);
         }
         int minHits = 0;
+        long targetEvictSize = evictSize;
         for (Map.Entry<Integer, Long> entry : sizes.entrySet()) {
-            evictSize -= entry.getValue();
-            if (evictSize <= 0) {
+            targetEvictSize -= entry.getValue();
+            if (targetEvictSize <= 0) {
                 minHits = entry.getKey();
                 break;
             }
         }
         for (Map.Entry<String, CacheItem> entry : caches.entrySet()) {
-            String key = entry.getKey();
             CacheItem value = entry.getValue();
             if (value.hits <= minHits) {
-                caches.remove(key);
+                caches.remove(entry.getKey());
             }
         }
     }

@@ -1,5 +1,7 @@
 package core.framework.module;
 
+import core.framework.internal.log.LogManager;
+import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,11 +16,16 @@ class DBConfigTest {
     @BeforeEach
     void createDBConfig() {
         config = new DBConfig();
+        config.initialize(new ModuleContext(new LogManager()), null);
     }
 
     @Test
     void validate() {
         assertThatThrownBy(() -> config.validate())
                 .hasMessageContaining("db url must be configured");
+
+        config.url("jdbc:hsqldb:mem:.");
+        assertThatThrownBy(() -> config.validate())
+                .hasMessageContaining("db is configured but no repository/view added");
     }
 }

@@ -1,5 +1,7 @@
 package core.framework.module;
 
+import core.framework.internal.log.LogManager;
+import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +16,7 @@ class CacheConfigTest {
     @BeforeEach
     void createCacheConfig() {
         config = new CacheConfig();
+        config.initialize(new ModuleContext(new LogManager()), null);
     }
 
     @Test

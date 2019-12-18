@@ -32,7 +32,6 @@ public class CacheConfig extends Config {
         this.context = context;
 
         cacheManager = new CacheManager();
-
         var controller = new CacheController(cacheManager);
         context.route(HTTPMethod.GET, "/_sys/cache", (LambdaController) controller::list, true);
         context.bean(ListCacheResponse.class);
@@ -54,15 +53,15 @@ public class CacheConfig extends Config {
         configureRedis(host);
     }
 
+    public void maxLocalSize(long size) {
+        localCacheStore().maxSize = size;
+    }
+
     public void local() {
         if (cacheManager.remoteCacheStore != null)
             throw new Error("cache store is already configured, please configure only once");
 
         cacheManager.remoteCacheStore = localCacheStore();
-    }
-
-    public void maxLocalSize(long size) {
-        localCacheStore().maxSize = size;
     }
 
     public <T> void local(Class<T> cacheClass, Duration duration) {

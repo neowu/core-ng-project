@@ -17,20 +17,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class APIConfigTest {
     private APIConfig config;
-    private ModuleContext context;
 
     @BeforeEach
     void createAPIConfig() {
-        context = new ModuleContext(new LogManager());
         config = new APIConfig();
-        config.initialize(context, null);
+        config.initialize(new ModuleContext(new LogManager()), null);
     }
 
     @Test
     void service() {
         config.service(TestWebService.class, new TestWebServiceImpl());
 
-        assertThat(context.serviceRegistry.serviceInterfaces).contains(TestWebService.class);
+        assertThat(config.context.serviceRegistry.serviceInterfaces).contains(TestWebService.class);
     }
 
     @Test
@@ -38,7 +36,7 @@ class APIConfigTest {
         config.httpClient().timeout(Duration.ofSeconds(5));
         config.client(TestWebService.class, "http://localhost");
 
-        TestWebService client = (TestWebService) context.beanFactory.bean(TestWebService.class, null);
+        TestWebService client = (TestWebService) config.context.beanFactory.bean(TestWebService.class, null);
         assertThat(client).isNotNull();
     }
 

@@ -6,8 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author neo
@@ -27,8 +25,8 @@ class SystemModuleTest {
     void configureHTTP() {
         systemModule.configureHTTP();
 
-        assertNull(systemModule.context.httpServer.httpPort);
-        assertNull(systemModule.context.httpServer.httpsPort);
+        assertThat(systemModule.context.httpServer.httpPort).isNull();
+        assertThat(systemModule.context.httpServer.httpsPort).isNull();
     }
 
     @Test
@@ -37,7 +35,7 @@ class SystemModuleTest {
         systemModule.context.propertyManager.properties.set("sys.http.port", "8082");
 
         systemModule.configureHTTP();
-        assertEquals((Integer) 8081, systemModule.context.httpServer.httpPort);
+        assertThat(systemModule.context.httpServer.httpPort).isEqualTo(8081);
     }
 
     @Test

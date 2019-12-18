@@ -32,12 +32,12 @@ class AccessConfigTest {
     void config() {
         config.allow(List.of());
         assertThatThrownBy(() -> config.allow(List.of()))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("cidrs is already configured");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("cidrs is already configured");
 
         config.deny(List.of());
         assertThatThrownBy(() -> config.deny(List.of()))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("cidrs is already configured");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("cidrs is already configured");
     }
 }

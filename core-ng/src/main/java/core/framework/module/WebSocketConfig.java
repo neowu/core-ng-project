@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
  * @author neo
  */
 public final class WebSocketConfig {
+    final ModuleContext context;
     private final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
-    private final ModuleContext context;
 
     WebSocketConfig(ModuleContext context) {
         this.context = context;
@@ -29,7 +29,7 @@ public final class WebSocketConfig {
 
     public <T, V> void listen(String path, Class<T> clientMessageClass, Class<V> serverMessageClass, ChannelListener<T> listener) {
         logger.info("ws, path={}, clientMessageClass={}, serverMessageClass={}, listener={}",
-            path, clientMessageClass.getCanonicalName(), serverMessageClass.getCanonicalName(), listener.getClass().getCanonicalName());
+                path, clientMessageClass.getCanonicalName(), serverMessageClass.getCanonicalName(), listener.getClass().getCanonicalName());
 
         if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
 

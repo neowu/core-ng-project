@@ -19,12 +19,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class WebSocketConfigTest {
     private WebSocketConfig config;
-    private ModuleContext context;
 
     @BeforeAll
     void createWebSocketConfig() {
-        context = new ModuleContext(new LogManager());
-        config = new WebSocketConfig(context);
+        config = new WebSocketConfig(new ModuleContext(new LogManager()));
     }
 
     @Test
@@ -38,7 +36,7 @@ class WebSocketConfigTest {
     void add() {
         config.listen("/ws2", new TestChannelListener());
 
-        WebSocketContext webSocketContext = (WebSocketContext) context.beanFactory.bean(WebSocketContext.class, null);
+        WebSocketContext webSocketContext = (WebSocketContext) config.context.beanFactory.bean(WebSocketContext.class, null);
         assertThat(webSocketContext).isNotNull();
     }
 
