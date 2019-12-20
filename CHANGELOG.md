@@ -1,4 +1,7 @@
 ## Change log
+### 7.3.1 (12/20/2019 - )
+
+
 ### 7.3.0 (12/11/2019 - 12/18/2019)
 * kafka: update to 2.4.0
 * cache: support use both local and remote cache, local cache is for rarely changed but frequently accessed data
