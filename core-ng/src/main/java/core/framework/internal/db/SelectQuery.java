@@ -17,6 +17,7 @@ final class SelectQuery<T> {
     final String getSQL;
     private final String table;
     private final String columns;
+    int primaryKeyColumns;
 
     SelectQuery(Class<T> entityClass) {
         table = entityClass.getDeclaredAnnotation(Table.class).name();
@@ -27,13 +28,12 @@ final class SelectQuery<T> {
 
     private String getSQL(List<Field> fields) {
         var builder = new StringBuilder("SELECT ").append(columns).append(" FROM ").append(table).append(" WHERE ");
-        int index = 0;
         for (Field field : fields) {
             if (field.isAnnotationPresent(PrimaryKey.class)) {
                 Column column = field.getDeclaredAnnotation(Column.class);
-                if (index > 0) builder.append(" AND ");
+                if (primaryKeyColumns > 0) builder.append(" AND ");
                 builder.append(column.name()).append(" = ?");
-                index++;
+                primaryKeyColumns++;
             }
         }
         return builder.toString();

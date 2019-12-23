@@ -9,8 +9,8 @@ import org.junit.jupiter.api.TestInstance;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -40,8 +40,19 @@ class RepositoryImplCompositeKeyEntityTest {
     }
 
     @Test
+    void get() {
+        assertThatThrownBy(() -> repository.get())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("the length of primary keys does not match columns");
+
+        assertThatThrownBy(() -> repository.get("id1"))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("the length of primary keys does not match columns");
+    }
+
+    @Test
     void insert() {
-        CompositeKeyEntity entity = new CompositeKeyEntity();
+        var entity = new CompositeKeyEntity();
         entity.id1 = "id1";
         entity.id2 = "id2";
         entity.booleanField = Boolean.TRUE;
@@ -51,15 +62,12 @@ class RepositoryImplCompositeKeyEntityTest {
 
         CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).orElseThrow();
 
-        assertEquals(entity.id1, selectedEntity.id1);
-        assertEquals(entity.id2, selectedEntity.id2);
-        assertEquals(entity.booleanField, selectedEntity.booleanField);
-        assertEquals(entity.longField, selectedEntity.longField);
+        assertThat(selectedEntity).usingRecursiveComparison().isEqualTo(entity);
     }
 
     @Test
     void partialUpdate() {
-        CompositeKeyEntity entity = new CompositeKeyEntity();
+        var entity = new CompositeKeyEntity();
         entity.id1 = "id1";
         entity.id2 = "id2";
         entity.booleanField = Boolean.TRUE;
@@ -70,12 +78,12 @@ class RepositoryImplCompositeKeyEntityTest {
         repository.partialUpdate(entity);
 
         CompositeKeyEntity selectedEntity = repository.get(entity.id1, entity.id2).orElseThrow();
-        assertEquals(entity.longField, selectedEntity.longField);
+        assertThat(selectedEntity).usingRecursiveComparison().isEqualTo(entity);
     }
 
     @Test
     void batchDelete() {
-        CompositeKeyEntity entity1 = new CompositeKeyEntity();
+        var entity1 = new CompositeKeyEntity();
         entity1.id1 = "1-1";
         entity1.id2 = "1-2";
         entity1.booleanField = Boolean.TRUE;
@@ -87,7 +95,7 @@ class RepositoryImplCompositeKeyEntityTest {
 
         repository.batchDelete(List.of(new Object[]{entity1.id1, entity1.id2}, new Object[]{entity2.id1, entity2.id2}));
 
-        assertFalse(repository.get(entity1.id1, entity1.id2).isPresent());
-        assertFalse(repository.get(entity2.id1, entity2.id2).isPresent());
+        assertThat(repository.get(entity1.id1, entity1.id2)).isNotPresent();
+        assertThat(repository.get(entity2.id1, entity2.id2)).isNotPresent();
     }
 }

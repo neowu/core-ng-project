@@ -6,6 +6,7 @@ import core.framework.internal.validate.Validator;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.util.StopWatch;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
     @Override
     public Optional<T> get(Object... primaryKeys) {
         String sql = selectQuery.getSQL;
+        if (primaryKeys.length != selectQuery.primaryKeyColumns)
+            throw new Error(Strings.format("the length of primary keys does not match columns, primaryKeys={}, columns={}", selectQuery.primaryKeyColumns, primaryKeys.length));
         return database.selectOne(sql, entityClass, primaryKeys);
     }
 
