@@ -14,5 +14,6 @@ services:
         - 5601:5601
         environment:
         - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        - TELEMETRY_ENABLED=false
         depends_on:
         - elasticsearch
