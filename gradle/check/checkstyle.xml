@@ -59,6 +59,7 @@
         <module name="NestedTryDepth">                  <!--Restricts nested try-catch-finally blocks to a specified depth (default = 1).-->
             <property name="max" value="0"/>
         </module>
+        <module name="NoArrayTrailingComma"/>           <!--Checks that array initialization do not contain a trailing comma.-->
         <module name="NoClone"/>
         <module name="NoFinalizer"/>
         <module name="OneStatementPerLine">                 <!--Checks there is only one statement per line.-->
