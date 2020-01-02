@@ -64,4 +64,13 @@ class MessageListenerThreadTest {
     void checkSlowProcess() {
         thread.checkSlowProcess(Duration.ofSeconds(30).toNanos(), Duration.ofSeconds(25).toNanos());
     }
+
+    @Test
+    void key() {
+        assertThat(thread.key(new ConsumerRecord<>("topic", 0, 0, null, null)))
+                .isNull();
+
+        assertThat(thread.key(new ConsumerRecord<>("topic", 0, 0, Strings.bytes("key"), null)))
+                .isEqualTo("key");
+    }
 }

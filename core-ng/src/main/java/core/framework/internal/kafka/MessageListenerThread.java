@@ -144,7 +144,7 @@ class MessageListenerThread extends Thread {
                 if (refId != null) actionLog.refIds = List.of(refId);
                 logger.debug("[header] refId={}, client={}, correlationId={}", refId, client, correlationId);
 
-                String key = new String(record.key(), UTF_8);   // key will be not null in our system
+                String key = key(record);
                 actionLog.context("key", key);
 
                 long timestamp = record.timestamp();
@@ -209,11 +209,11 @@ class MessageListenerThread extends Thread {
             String refId = header(headers, MessageHeaders.HEADER_REF_ID);
             if (refId != null) refIds.add(refId);
 
-            String key = new String(record.key(), UTF_8);    // key will not be null in our system
+            String key = key(record);
             byte[] value = record.value();
             long timestamp = record.timestamp();
             logger.debug("[message] key={}, value={}, timestamp={}, refId={}, client={}, correlationId={}",
-                key, new BytesLogParam(value), timestamp, refId, client, correlationId);
+                    key, new BytesLogParam(value), timestamp, refId, client, correlationId);
 
             if (minTimestamp > timestamp) minTimestamp = timestamp;
 
@@ -228,6 +228,11 @@ class MessageListenerThread extends Thread {
         actionLog.stat("consumer_lag_in_ms", lag);
         checkConsumerLag(lag, longConsumerLagThresholdInMs);
         return messages;
+    }
+
+    String key(ConsumerRecord<byte[], byte[]> record) {
+        byte[] key = record.key();
+        return key == null ? null : new String(key, UTF_8);
     }
 
     String header(Headers headers, String key) {

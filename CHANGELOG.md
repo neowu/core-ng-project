@@ -1,6 +1,7 @@
 ## Change log
 ### 7.3.1 (12/20/2019 - )
 * es: update to 7.5.1
+* kafka: use null as key if not specified, since from kafka 2.4.0 it supports sticky partitioning, refer to refer to org.apache.kafka.clients.producer.internals.DefaultPartitioner
 
 ### 7.3.0 (12/11/2019 - 12/18/2019)
 * kafka: update to 2.4.0
