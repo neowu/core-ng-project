@@ -3,7 +3,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath 'com.github.spotbugs:spotbugs-gradle-plugin:2.0.1'
+        classpath 'com.github.spotbugs:spotbugs-gradle-plugin:3.0.0'
     }
 }
 
@@ -63,12 +63,24 @@ subprojects {
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
         toolVersion = '4.0.0-beta4'
 
-        tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach {
+        def spotbugsReport = tasks.register('spotbugsReport') {
             group = 'verification'
+            doLast {
+                def report = file("${buildDir}/reports/spotbugs/main.text")
+                if (report.exists()) logger.error(report.text)
+                report = file("${buildDir}/reports/spotbugs/test.text")
+                if (report.exists()) logger.error(report.text)
+            }
+        }
+
+        tasks.withType(com.github.spotbugs.SpotBugsTask).configureEach { task ->
+            group = 'verification'
+            extraArgs = ['-longBugCodes']
             reports {
                 xml.enabled = false
-                html.enabled = true
+                text.enabled = true
             }
+            task.finalizedBy(spotbugsReport)
         }
     }
 
