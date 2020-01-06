@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -100,7 +100,7 @@ class SessionManagerTest {
         session.invalidate();
         sessionManager.save(session, response, new ActionLog(null));
 
-        verifyZeroInteractions(response);
+        verifyNoInteractions(response);
     }
 
     @Test
@@ -133,7 +133,7 @@ class SessionManagerTest {
     @Test
     void invalidate() {
         assertThatThrownBy(() -> sessionManager.invalidate(null, null))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("must not be null");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("must not be null");
     }
 }
