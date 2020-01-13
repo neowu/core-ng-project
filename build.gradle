@@ -24,7 +24,7 @@ project(':core-ng') {
         implementation 'org.javassist:javassist:3.26.0-GA'
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-        implementation 'com.squareup.okhttp3:okhttp:4.3.0'
+        implementation 'com.squareup.okhttp3:okhttp:4.3.1'
         implementation 'io.undertow:undertow-core:2.0.29.Final'
         implementation 'org.jboss.xnio:xnio-nio:3.7.7.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
