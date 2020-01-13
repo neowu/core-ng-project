@@ -4,6 +4,8 @@ import core.framework.web.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -37,6 +39,13 @@ class SendEventRequestValidatorTest {
         SendEventRequest request = request(SendEventRequest.Result.OK, "action", null);
         request.events.get(0).context.put("context", "x".repeat(1001));
         assertThatThrownBy(() -> validator.validate(request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("too long");
+    }
+
+    @Test
+    void validateInfo() {
+        assertThatThrownBy(() -> validator.validateInfo(Map.of("key", "value"), 7))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("too long");
     }

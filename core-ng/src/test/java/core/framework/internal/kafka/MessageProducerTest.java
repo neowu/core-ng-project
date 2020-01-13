@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 /**
  * @author neo
  */
-class MessageProducerImplTest {
-    private MessageProducerImpl producer;
+class MessageProducerTest {
+    private MessageProducer producer;
 
     @BeforeEach
     void createMessageProducerImpl() {
-        producer = new MessageProducerImpl("localhost:9092", null);
+        producer = new MessageProducer("localhost:9092", null);
     }
 
     @Test

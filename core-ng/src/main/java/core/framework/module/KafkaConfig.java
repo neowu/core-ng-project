@@ -4,7 +4,6 @@ import core.framework.http.HTTPMethod;
 import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.kafka.MessageListener;
 import core.framework.internal.kafka.MessageProducer;
-import core.framework.internal.kafka.MessageProducerImpl;
 import core.framework.internal.kafka.MessagePublisherImpl;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
@@ -66,15 +65,24 @@ public class KafkaConfig extends Config {
         return publisher;
     }
 
+    // to increase max message size, it must change both producer and broker
+    public void maxMessageSize(int maxSize) {
+        producer().maxMessageSize = maxSize;
+    }
+
     <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
+        return new MessagePublisherImpl<>(producer(), topic, messageClass);
+    }
+
+    private MessageProducer producer() {
         if (producer == null) {
-            this.producer = createMessageProducer();
+            producer = createMessageProducer();
         }
-        return new MessagePublisherImpl<>(producer, topic, messageClass);
+        return producer;
     }
 
     private MessageProducer createMessageProducer() {
-        var producer = new MessageProducerImpl(uri, name);
+        var producer = new MessageProducer(uri, name);
         context.stat.metrics.add(producer.producerMetrics);
         context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
         var controller = new KafkaController(producer);
