@@ -1,5 +1,6 @@
 package core.log.web;
 
+import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
 
 import java.util.Map;
@@ -11,7 +12,7 @@ import static core.framework.util.Strings.format;
  */
 public class SendEventRequestValidator {
     private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
-    private static final int MAX_INFO_LENGTH = 800000;  // kafka message limit is 950k, leave 150k for rest of message
+    private static final int MAX_INFO_LENGTH = 900000;  // by default kafka message limit is 1M, leave 100k for rest of message (with compression the room is actually large)
 
     void validate(SendEventRequest request) {
         for (SendEventRequest.Event event : request.events) {
@@ -26,12 +27,18 @@ public class SendEventRequestValidator {
                 && event.errorCode == null)
             throw new BadRequestException("errorCode must not be null if result is WARN/ERROR");
 
-        event.context.forEach((key, value) -> {
-            if (value.length() > MAX_CONTEXT_VALUE_LENGTH)
-                throw new BadRequestException(format("context value is too long, key={}, value={}...(truncated)", key, value.substring(0, 200)), "EVENT_TOO_LARGE");
-        });
+        validateContext(event.context, MAX_CONTEXT_VALUE_LENGTH);
 
         validateInfo(event.info, MAX_INFO_LENGTH);
+    }
+
+    void validateContext(Map<String, String> context, int maxContextValueLength) {
+        for (Map.Entry<String, String> entry : context.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if (value.length() > maxContextValueLength)
+                throw new BadRequestException(format("context value is too long, key={}, value={}...(truncated)", key, Strings.truncate(value, 200)), "EVENT_TOO_LARGE");
+        }
     }
 
     void validateInfo(Map<String, String> info, int maxInfoLength) {

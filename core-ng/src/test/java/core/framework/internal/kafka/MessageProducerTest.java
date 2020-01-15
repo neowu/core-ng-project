@@ -11,7 +11,7 @@ class MessageProducerTest {
 
     @BeforeEach
     void createMessageProducerImpl() {
-        producer = new MessageProducer("localhost:9092", null);
+        producer = new MessageProducer("localhost:9092", null, 1000000);
     }
 
     @Test

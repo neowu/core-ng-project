@@ -98,7 +98,7 @@ public class APIConfig extends Config {
     }
 
     public HTTPClientBuilder httpClient() {
-        if (httpClient != null) throw new Error("http client must be configured before adding client");
+        if (httpClient != null) throw new Error("api().httpClient() must be configured before adding client");
         return httpClientBuilder;
     }
 

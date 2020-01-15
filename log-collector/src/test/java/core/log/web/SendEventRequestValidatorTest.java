@@ -35,10 +35,8 @@ class SendEventRequestValidatorTest {
     }
 
     @Test
-    void validateWithTooLongContextValue() {
-        SendEventRequest request = request(SendEventRequest.Result.OK, "action", null);
-        request.events.get(0).context.put("context", "x".repeat(1001));
-        assertThatThrownBy(() -> validator.validate(request))
+    void validateContext() {
+        assertThatThrownBy(() -> validator.validateContext(Map.of("context", "12345"), 3))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("too long");
     }

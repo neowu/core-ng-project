@@ -22,23 +22,18 @@ public class MessageProducer {
     private final String uri;
     private final String name;
     private final Producer<byte[], byte[]> producer;
-    // refer to org.apache.kafka.clients.producer.KafkaProducer.ensureValidRecordSize,
-    // by default kafka producer max.request.size=1048576, max.message.bytes on broker=1000012
-    // and kafka uses estimated upper bound to check size (without considering compression)
-    // in rare cases, producer may send record larger than max.message.bytes and less than max.request.size, and won't trigger any error, and broker silently drops record
-    // so here we use conservative limit to check message size (though in real world with compression, the message can exceeds 1M)
-    public int maxMessageSize = 950000; // 950k by default, leave rest to batch/record overhead
 
-    public MessageProducer(String uri, String name) {
+    public MessageProducer(String uri, String name, int maxRequestSize) {
         var watch = new StopWatch();
         try {
             this.uri = uri;
             this.name = name;
             this.producerMetrics = new ProducerMetrics(name);
-            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,  // immutable map requires value must not be null
+            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,               // immutable map requires value must not be null
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                     ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) Duration.ofSeconds(60).toMillis(),     // DELIVERY_TIMEOUT_MS_CONFIG is INT type
-                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());  // metadata update timeout
+                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis(),                  // metadata update timeout
+                    ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
             var serializer = new ByteArraySerializer();
             this.producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());

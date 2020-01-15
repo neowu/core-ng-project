@@ -45,7 +45,6 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
         byte[] keyBytes = key == null ? null : Strings.bytes(key);
         validator.validate(value, false);
         byte[] message = mapper.toJSON(value);
-        validateMessageSize(keyBytes, message);
         try {
             var record = new ProducerRecord<>(topic, null, System.currentTimeMillis(), keyBytes, message, null);
             linkContext(record.headers());
@@ -54,15 +53,6 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
             long elapsed = watch.elapsed();
             ActionLogContext.track("kafka", elapsed, 0, 1);   // kafka producer send message in background, the main purpose of track is to count how many message sent in action
             logger.debug("publish, topic={}, key={}, message={}, elapsed={}", topic, key, new BytesLogParam(message), elapsed);
-        }
-    }
-
-    // since we use conservative limit, so here uses simplified way to calculate size, without considering compression, headers and record overhead
-    void validateMessageSize(byte[] keyBytes, byte[] message) {
-        int keySize = keyBytes == null ? 0 : keyBytes.length;
-        int messageSize = keySize + message.length;
-        if (messageSize > producer.maxMessageSize) {
-            throw new Error("message is too large, size=" + messageSize);
         }
     }
 

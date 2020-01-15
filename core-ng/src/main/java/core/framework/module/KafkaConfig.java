@@ -13,6 +13,7 @@ import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.kafka.MessagePublisher;
 import core.framework.util.Types;
+import org.apache.kafka.common.record.Records;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +27,17 @@ import static core.framework.util.Strings.format;
 public class KafkaConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(KafkaConfig.class);
     String name;
+    MessageProducer producer;
     private ModuleContext context;
     private String uri;
-    private MessageProducer producer;
     private MessageListener listener;
     private boolean handlerAdded;
+    // refer to org.apache.kafka.clients.producer.KafkaProducer.ensureValidRecordSize,
+    // by default kafka producer max.request.size is 1 * 1024 * 1024=1048576,
+    // but the default max.message.bytes on broker=1000012 (core/src/main/scala/kafka/server/KafkaConfig.scala, val MessageMaxBytes = 1000000 + Records.LOG_OVERHEAD)
+    // if producer may send record larger than max.message.bytes and less than max.request.size, and it won't trigger any error, and broker silently drops record
+    // so here it changes the default to match broker default (which is flaw of kafka default config)
+    private int maxRequestSize = 1000000 + Records.LOG_OVERHEAD;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -65,24 +72,22 @@ public class KafkaConfig extends Config {
         return publisher;
     }
 
-    // to increase max message size, it must change both producer and broker
-    public void maxMessageSize(int maxSize) {
-        producer().maxMessageSize = maxSize;
+    // to increase max message size, it must change on both producer and broker sides
+    public void maxRequestSize(int size) {
+        if (size <= 0) throw new Error("max request size must be greater than 0, value=" + size);
+        if (producer != null) throw new Error("kafka().maxRequestSize() must be configured before adding publisher");
+        maxRequestSize = size;
     }
 
     <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
-        return new MessagePublisherImpl<>(producer(), topic, messageClass);
-    }
-
-    private MessageProducer producer() {
         if (producer == null) {
             producer = createMessageProducer();
         }
-        return producer;
+        return new MessagePublisherImpl<>(producer, topic, messageClass);
     }
 
     private MessageProducer createMessageProducer() {
-        var producer = new MessageProducer(uri, name);
+        var producer = new MessageProducer(uri, name, maxRequestSize);
         context.stat.metrics.add(producer.producerMetrics);
         context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
         var controller = new KafkaController(producer);
@@ -145,16 +150,16 @@ public class KafkaConfig extends Config {
     }
 
     public void maxPoll(int maxRecords, int maxBytes) {
-        if (maxRecords <= 0) throw new Error(format("max poll records must be greater than 0, value={}", maxRecords));
-        if (maxBytes <= 0) throw new Error(format("max poll bytes must be greater than 0, value={}", maxBytes));
+        if (maxRecords <= 0) throw new Error("max poll records must be greater than 0, value=" + maxRecords);
+        if (maxBytes <= 0) throw new Error("max poll bytes must be greater than 0, value=" + maxBytes);
         MessageListener listener = listener();
         listener.maxPollRecords = maxRecords;
         listener.maxPollBytes = maxBytes;
     }
 
     public void minPoll(int minBytes, Duration maxWaitTime) {
-        if (minBytes <= 0) throw new Error(format("min poll bytes must be greater than 0, value={}", minBytes));
-        if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw new Error(format("max wait time must be greater than 0, value={}", maxWaitTime));
+        if (minBytes <= 0) throw new Error("min poll bytes must be greater than 0, value=" + minBytes);
+        if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw new Error("max wait time must be greater than 0, value=" + maxWaitTime);
         MessageListener listener = listener();
         listener.minPollBytes = minBytes;
         listener.minPollMaxWaitTime = maxWaitTime;

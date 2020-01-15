@@ -12,7 +12,6 @@ import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 
@@ -27,7 +26,6 @@ class MessagePublisherImplTest {
     @BeforeEach
     void createMessagePublisher() {
         producer = Mockito.mock(MessageProducer.class);
-        producer.maxMessageSize = 1000;
         publisher = new MessagePublisherImpl<>(producer, "topic", TestMessage.class);
         logManager = new LogManager();
     }
@@ -52,13 +50,5 @@ class MessagePublisherImplTest {
         verify(producer).send(argThat(record -> Arrays.equals(Strings.bytes("key"), record.key()) && "topic".equals(record.topic())));
 
         logManager.end("end");
-    }
-
-    @Test
-    void validateMessageSize() {
-        producer.maxMessageSize = 9;
-        assertThatThrownBy(() -> publisher.validateMessageSize(Strings.bytes("12345"), Strings.bytes("12345")))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("message is too large");
     }
 }
