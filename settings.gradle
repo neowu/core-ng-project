@@ -1,9 +1,10 @@
 include 'core-ng-api',
-    'core-ng',
-    'core-ng-test',
-    'core-ng-search',
-    'core-ng-search-test',
-    'core-ng-mongo',
-    'core-ng-mongo-test',
-    'log-processor',
-    'log-collector'
+        'core-ng',
+        'core-ng-test',
+        'core-ng-search',
+        'core-ng-search-test',
+        'core-ng-mongo',
+        'core-ng-mongo-test'
+
+include 'ext:log-processor',
+        'ext:log-collector'
