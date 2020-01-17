@@ -1,4 +1,7 @@
 ## Change log
+### 7.3.2 (1/17/2020 - )
+* db: change query.count() to return long instead of int
+
 ### 7.3.1 (12/20/2019 - 1/15/2020)
 * es: update to 7.5.1
 * kafka: use null as key if not specified, since from kafka 2.4.0 it supports sticky partitioning, refer to refer to org.apache.kafka.clients.producer.internals.DefaultPartitioner

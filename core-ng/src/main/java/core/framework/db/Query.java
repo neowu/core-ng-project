@@ -23,7 +23,8 @@ public interface Query<T> {
 
     <P> Optional<P> project(String projection, Class<P> viewClass);
 
-    default int count() {
-        return project("count(1)", Integer.class).orElseThrow();
+    // refer to https://dev.mysql.com/doc/refman/8.0/en/group-by-functions.html#function_count, count function return BIGINT
+    default long count() {
+        return project("count(1)", Long.class).orElseThrow();
     }
 }

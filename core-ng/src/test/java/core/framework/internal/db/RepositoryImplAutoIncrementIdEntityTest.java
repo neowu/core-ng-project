@@ -112,7 +112,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
         assertThat(entities).hasSize(1);
         assertThat(entities.get(0)).isEqualToIgnoringGivenFields(entity1, "id");
 
-        int count = repository.count("enum_field = ?", TestEnum.V1);
+        long count = repository.count("enum_field = ?", TestEnum.V1);
         assertThat(count).isEqualTo(1);
     }
 }
