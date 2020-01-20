@@ -1,4 +1,4 @@
-package core.framework.internal.web.http;
+package core.framework.internal.util;
 
 import org.junit.jupiter.api.Test;
 

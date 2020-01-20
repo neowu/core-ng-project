@@ -1,5 +1,6 @@
 package core.framework.internal.web.http;
 
+import core.framework.internal.util.LRUMap;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

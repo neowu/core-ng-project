@@ -1,6 +1,7 @@
 ## Change log
 ### 7.3.2 (1/17/2020 - )
 * db: change query.count() to return long instead of int
+* monitor: added monitor to alert for action/event (will add more features like redis/es check, sanity/deep health check)
 
 ### 7.3.1 (12/20/2019 - 1/15/2020)
 * es: update to 7.5.1

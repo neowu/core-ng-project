@@ -3,7 +3,7 @@
 /build/
 *.iml
 /classes/
-*/src/dev/java/
+**/src/dev/java/
 .DS_Store
 node_modules/
 wiki/

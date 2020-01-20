@@ -7,4 +7,5 @@ include 'core-ng-api',
         'core-ng-mongo-test'
 
 include 'ext:log-processor',
-        'ext:log-collector'
+        'ext:log-collector',
+        'ext:monitor'
