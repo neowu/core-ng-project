@@ -5,7 +5,6 @@ import app.monitor.action.ActionAlert;
 import app.monitor.action.ActionAlertService;
 import core.framework.inject.Inject;
 import core.framework.kafka.MessageHandler;
-import core.framework.log.Severity;
 import core.framework.log.message.ActionLogMessage;
 
 /**
@@ -27,7 +26,7 @@ public class ActionLogMessageHandler implements MessageHandler<ActionLogMessage>
         var alert = new ActionAlert();
         alert.id = message.id;
         alert.app = message.app;
-        alert.severity = "WARN".equals(message.result) ? Severity.WARN : Severity.ERROR;
+        alert.severity(message.result);
         alert.errorCode = message.errorCode;
         alert.errorMessage = message.errorMessage;
         alert.kibanaIndex = "trace";

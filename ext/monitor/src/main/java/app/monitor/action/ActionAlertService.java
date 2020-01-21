@@ -8,9 +8,7 @@ import core.framework.log.Severity;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.temporal.IsoFields;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +23,10 @@ public class ActionAlertService {
     private final IgnoredWarnings ignoredWarnings;
     private final Set<String> criticalErrors;
     private final int timespanInMinutes;
-
+    private final String[][] colors = {
+            {"#ff5c33", "#ff9933"}, // 2 colors for warn, change color for weekly review of every week
+            {"#a30101", "#e62a00"}  // 2 colors for error
+    };
     private final String site;
     private final Map<String, String> channels;
     @Inject
@@ -37,30 +38,26 @@ public class ActionAlertService {
         ignoredWarnings = new IgnoredWarnings(config);
         criticalErrors = Set.copyOf(config.criticalErrors);
         channels = Map.of("trace/WARN", config.channel.actionWarn,
-            "trace/ERROR", config.channel.actionError,
-            "event/WARN", config.channel.eventWarn,
-            "event/ERROR", config.channel.eventError);
+                "trace/ERROR", config.channel.actionError,
+                "event/WARN", config.channel.eventWarn,
+                "event/ERROR", config.channel.eventError);
         timespanInMinutes = config.timespanInHours * 60;
     }
 
     public void process(ActionAlert alert) {
-        Result result = check(alert);
+        LocalDateTime now = LocalDateTime.now();
+        Result result = check(alert, now);
         if (result.notify) {
-            notify(alert, result.alertCountSinceLastSent);
+            notify(alert, result.alertCountSinceLastSent, now);
         }
     }
 
-    Result check(ActionAlert alert) {
+    Result check(ActionAlert alert, LocalDateTime now) {
         if (alert.severity == Severity.WARN && ignoredWarnings.ignore(alert))
             return new Result(false, -1);
         if (alert.severity == Severity.ERROR && criticalErrors.contains(alert.errorCode))
             return new Result(true, -1);
 
-        LocalDateTime now = LocalDateTime.now();
-        return check(alert, now);
-    }
-
-    Result check(ActionAlert alert, LocalDateTime now) {
         String key = alertKey(alert);
         synchronized (stats) {
             AlertStat stat = stats.get(key);
@@ -77,9 +74,9 @@ public class ActionAlertService {
         }
     }
 
-    private void notify(ActionAlert alert, int alertCountSinceLastSent) {
+    private void notify(ActionAlert alert, int alertCountSinceLastSent, LocalDateTime now) {
         String message = message(alert, alertCountSinceLastSent);
-        String color = color(alert.severity, LocalDateTime.now());
+        String color = color(alert.severity, now);
         slackClient.send(alertChannel(alert), message, color);
     }
 
@@ -92,19 +89,15 @@ public class ActionAlertService {
         String app = site == null ? alert.app : site + " / " + alert.app;
         String docURL = docURL(alert.kibanaIndex, alert.id);
         return format("{}{}: *{}*\nid: <{}|{}>\nerrorCode: *{}*\nmessage: {}\n",
-            count, alert.severity, app,
-            docURL, alert.id,
-            alert.errorCode, alert.errorMessage);
+                count, alert.severity, app,
+                docURL, alert.id,
+                alert.errorCode, alert.errorMessage);
     }
 
     String color(Severity severity, LocalDateTime now) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()));
-
-        if (severity == Severity.WARN)
-            return calendar.get(Calendar.WEEK_OF_YEAR) % 2 == 0 ? "#ff5c33" : "#ff9933";
-        else
-            return calendar.get(Calendar.WEEK_OF_YEAR) % 2 == 0 ? "#a30101" : "#e62a00";
+        int week = now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        int colorIndex = severity == Severity.WARN ? 0 : 1;
+        return colors[colorIndex][(week - 1) % 2];
     }
 
     String alertChannel(ActionAlert alert) {

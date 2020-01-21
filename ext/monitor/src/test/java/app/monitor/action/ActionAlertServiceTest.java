@@ -60,7 +60,7 @@ class ActionAlertServiceTest {
 
     @Test
     void check() {
-        assertThat(service.check(alert(Severity.ERROR, "CRITICAL_ERROR")).notify).isTrue();
+        assertThat(service.check(alert(Severity.ERROR, "CRITICAL_ERROR"), LocalDateTime.now()).notify).isTrue();
 
         ActionAlert alert = alert(Severity.ERROR, "ERROR");
         LocalDateTime date = LocalDateTime.now();
@@ -76,7 +76,7 @@ class ActionAlertServiceTest {
 
     @Test
     void color() {
-        LocalDateTime date = LocalDateTime.of(2020, 1, 21, 0, 0, 0);
+        LocalDateTime date = LocalDateTime.of(2020, 1, 1, 0, 0, 0);
 
         assertThat(service.color(Severity.WARN, date)).isEqualTo("#ff5c33");
         assertThat(service.color(Severity.WARN, date.plusWeeks(1))).isEqualTo("#ff9933");

@@ -12,4 +12,8 @@ public class ActionAlert {
     public String errorCode;
     public String errorMessage;
     public String kibanaIndex;
+
+    public void severity(String result) {
+        severity = "WARN".equals(result) ? Severity.WARN : Severity.ERROR;
+    }
 }

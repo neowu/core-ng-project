@@ -6,7 +6,6 @@ import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.log.message.StatMessage;
 import core.framework.util.StopWatch;
-import core.framework.util.Strings;
 import core.framework.util.Threads;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -50,7 +49,7 @@ public final class KafkaAppender implements LogAppender {
         statMapper = new JSONMapper<>(StatMessage.class);
         try {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,
-                    ProducerConfig.ACKS_CONFIG, "0",                                    // no acknowledge to maximize performance
+                    ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
                     ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis(),  // metadata update timeout
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                     ProducerConfig.LINGER_MS_CONFIG, 50,
@@ -82,12 +81,12 @@ public final class KafkaAppender implements LogAppender {
 
     @Override
     public void append(ActionLogMessage message) {
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, Strings.bytes(message.id), actionLogMapper.toJSON(message)));
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, actionLogMapper.toJSON(message)));     // not specify message key for sticky partition
     }
 
     @Override
     public void append(StatMessage message) {
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, Strings.bytes(message.id), statMapper.toJSON(message)));
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, statMapper.toJSON(message)));    // not specify message key for sticky partition
     }
 
     public void start() {

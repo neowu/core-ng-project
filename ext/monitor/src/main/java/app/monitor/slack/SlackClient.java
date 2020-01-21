@@ -40,7 +40,7 @@ public class SlackClient {
         }
     }
 
-    private SlackMessageAPIRequest request(String channel, String message, String color) {
+    SlackMessageAPIRequest request(String channel, String message, String color) {
         var request = new SlackMessageAPIRequest();
         request.channel = channel;
         var attachment = new SlackMessageAPIRequest.Attachment();
