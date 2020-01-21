@@ -8,6 +8,9 @@ import core.framework.log.Severity;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,9 +37,9 @@ public class ActionAlertService {
         ignoredWarnings = new IgnoredWarnings(config);
         criticalErrors = Set.copyOf(config.criticalErrors);
         channels = Map.of("trace/WARN", config.channel.actionWarn,
-                "trace/ERROR", config.channel.actionError,
-                "event/WARN", config.channel.eventWarn,
-                "event/ERROR", config.channel.eventError);
+            "trace/ERROR", config.channel.actionError,
+            "event/WARN", config.channel.eventWarn,
+            "event/ERROR", config.channel.eventError);
         timespanInMinutes = config.timespanInHours * 60;
     }
 
@@ -76,7 +79,7 @@ public class ActionAlertService {
 
     private void notify(ActionAlert alert, int alertCountSinceLastSent) {
         String message = message(alert, alertCountSinceLastSent);
-        String color = alert.severity == Severity.WARN ? "#ff9933" : "cc0066";
+        String color = color(alert.severity, LocalDateTime.now());
         slackClient.send(alertChannel(alert), message, color);
     }
 
@@ -89,9 +92,19 @@ public class ActionAlertService {
         String app = site == null ? alert.app : site + " / " + alert.app;
         String docURL = docURL(alert.kibanaIndex, alert.id);
         return format("{}{}: *{}*\nid: <{}|{}>\nerrorCode: *{}*\nmessage: {}\n",
-                count, alert.severity, app,
-                docURL, alert.id,
-                alert.errorCode, alert.errorMessage);
+            count, alert.severity, app,
+            docURL, alert.id,
+            alert.errorCode, alert.errorMessage);
+    }
+
+    String color(Severity severity, LocalDateTime now) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()));
+
+        if (severity == Severity.WARN)
+            return calendar.get(Calendar.WEEK_OF_YEAR) % 2 == 0 ? "#ff5c33" : "#ff9933";
+        else
+            return calendar.get(Calendar.WEEK_OF_YEAR) % 2 == 0 ? "#a30101" : "#e62a00";
     }
 
     String alertChannel(ActionAlert alert) {

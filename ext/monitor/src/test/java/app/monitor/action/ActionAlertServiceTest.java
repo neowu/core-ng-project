@@ -49,7 +49,7 @@ class ActionAlertServiceTest {
         ActionAlert alert = alert(Severity.WARN, "NOT_FOUND");
         assertThat(service.alertKey(alert)).isEqualTo("website/WARN/NOT_FOUND");
     }
-    
+
     private ActionAlert alert(Severity severity, String errorCode) {
         var alert = new ActionAlert();
         alert.app = "website";
@@ -72,5 +72,16 @@ class ActionAlertServiceTest {
 
         result = service.check(alert, date.plusHours(4));
         assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == 1);
+    }
+
+    @Test
+    void color() {
+        LocalDateTime date = LocalDateTime.of(2020, 1, 21, 0, 0, 0);
+
+        assertThat(service.color(Severity.WARN, date)).isEqualTo("#ff5c33");
+        assertThat(service.color(Severity.WARN, date.plusWeeks(1))).isEqualTo("#ff9933");
+
+        assertThat(service.color(Severity.ERROR, date)).isEqualTo("#a30101");
+        assertThat(service.color(Severity.ERROR, date.plusWeeks(1))).isEqualTo("#e62a00");
     }
 }
