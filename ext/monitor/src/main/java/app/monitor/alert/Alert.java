@@ -1,11 +1,11 @@
-package app.monitor.action;
+package app.monitor.alert;
 
 import core.framework.log.Severity;
 
 /**
  * @author neo
  */
-public class ActionAlert {
+public class Alert {
     public String id;
     public String app;
     public Severity severity;

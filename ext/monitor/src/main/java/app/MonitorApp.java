@@ -1,7 +1,7 @@
 package app;
 
-import app.monitor.ActionAlertConfig;
-import app.monitor.action.ActionAlertService;
+import app.monitor.AlertConfig;
+import app.monitor.alert.AlertService;
 import app.monitor.kafka.ActionLogMessageHandler;
 import app.monitor.kafka.EventMessageHandler;
 import app.monitor.slack.SlackClient;
@@ -33,9 +33,9 @@ public class MonitorApp extends App {
     }
 
     private void configureActionAlert() {
-        Bean.register(ActionAlertConfig.class);
-        ActionAlertConfig config = Bean.fromJSON(ActionAlertConfig.class, requiredProperty("app.actionAlertConfig"));
-        bind(new ActionAlertService(config));
+        Bean.register(AlertConfig.class);
+        AlertConfig config = Bean.fromJSON(AlertConfig.class, requiredProperty("app.alert.config"));
+        bind(new AlertService(config));
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_EVENT, EventMessage.class, bind(EventMessageHandler.class));
     }
@@ -45,6 +45,6 @@ public class MonitorApp extends App {
 
         Bean.register(SlackMessageAPIRequest.class);
         Bean.register(SlackMessageAPIResponse.class);
-        bind(new SlackClient(requiredProperty("app.slackToken")));
+        bind(new SlackClient(requiredProperty("app.slack.token")));
     }
 }

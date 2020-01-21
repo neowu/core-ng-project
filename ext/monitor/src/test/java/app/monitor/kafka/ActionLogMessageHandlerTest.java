@@ -1,7 +1,7 @@
 package app.monitor.kafka;
 
 import app.MonitorApp;
-import app.monitor.action.ActionAlertService;
+import app.monitor.alert.AlertService;
 import core.framework.log.Severity;
 import core.framework.log.message.ActionLogMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,13 +17,13 @@ import static org.mockito.Mockito.verifyNoInteractions;
  */
 class ActionLogMessageHandlerTest {
     private ActionLogMessageHandler handler;
-    private ActionAlertService actionAlertService;
+    private AlertService alertService;
 
     @BeforeEach
     void createActionLogMessageHandler() {
         handler = new ActionLogMessageHandler();
-        actionAlertService = mock(ActionAlertService.class);
-        handler.actionAlertService = actionAlertService;
+        alertService = mock(AlertService.class);
+        handler.alertService = alertService;
     }
 
     @Test
@@ -31,7 +31,7 @@ class ActionLogMessageHandlerTest {
         var message = new ActionLogMessage();
         message.app = MonitorApp.MONITOR_APP;
         handler.handle(null, message);
-        verifyNoInteractions(actionAlertService);
+        verifyNoInteractions(alertService);
     }
 
     @Test
@@ -40,7 +40,7 @@ class ActionLogMessageHandlerTest {
         message.result = "OK";
         message.errorCode = null;
         handler.handle(null, message);
-        verifyNoInteractions(actionAlertService);
+        verifyNoInteractions(alertService);
     }
 
     @Test
@@ -50,6 +50,6 @@ class ActionLogMessageHandlerTest {
         message.errorCode = "NOT_FOUND";
         handler.handle(null, message);
 
-        verify(actionAlertService).process(argThat(alert -> alert.severity == Severity.WARN));
+        verify(alertService).process(argThat(alert -> alert.severity == Severity.WARN));
     }
 }

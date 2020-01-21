@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author neo
  */
-public class ActionAlertConfig {
+public class AlertConfig {
     @NotNull
     @Property(name = "ignoreWarnings")
     public List<IgnoreWarnings> ignoreWarnings = List.of();

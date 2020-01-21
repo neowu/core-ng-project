@@ -1,6 +1,6 @@
-package app.monitor.action;
+package app.monitor.alert;
 
-import app.monitor.ActionAlertConfig;
+import app.monitor.AlertConfig;
 import app.monitor.slack.SlackClient;
 import core.framework.inject.Inject;
 import core.framework.internal.util.LRUMap;
@@ -17,7 +17,7 @@ import static core.framework.util.Strings.format;
 /**
  * @author ericchung, neo
  */
-public class ActionAlertService {
+public class AlertService {
     private final LRUMap<String, AlertStat> stats = new LRUMap<>(1000);
     private final String kibanaURL;
     private final IgnoredWarnings ignoredWarnings;
@@ -32,7 +32,7 @@ public class ActionAlertService {
     @Inject
     SlackClient slackClient;
 
-    public ActionAlertService(ActionAlertConfig config) {
+    public AlertService(AlertConfig config) {
         site = config.site;
         kibanaURL = config.kibanaURL;
         ignoredWarnings = new IgnoredWarnings(config);
@@ -44,7 +44,7 @@ public class ActionAlertService {
         timespanInMinutes = config.timespanInHours * 60;
     }
 
-    public void process(ActionAlert alert) {
+    public void process(Alert alert) {
         LocalDateTime now = LocalDateTime.now();
         Result result = check(alert, now);
         if (result.notify) {
@@ -52,7 +52,7 @@ public class ActionAlertService {
         }
     }
 
-    Result check(ActionAlert alert, LocalDateTime now) {
+    Result check(Alert alert, LocalDateTime now) {
         if (alert.severity == Severity.WARN && ignoredWarnings.ignore(alert))
             return new Result(false, -1);
         if (alert.severity == Severity.ERROR && criticalErrors.contains(alert.errorCode))
@@ -74,7 +74,7 @@ public class ActionAlertService {
         }
     }
 
-    private void notify(ActionAlert alert, int alertCountSinceLastSent, LocalDateTime now) {
+    private void notify(Alert alert, int alertCountSinceLastSent, LocalDateTime now) {
         String message = message(alert, alertCountSinceLastSent);
         String color = color(alert.severity, now);
         slackClient.send(alertChannel(alert), message, color);
@@ -84,7 +84,7 @@ public class ActionAlertService {
         return format("{}/app/kibana#/doc/{}-pattern/{}-*?id={}&_g=()", kibanaURL, kibanaIndex, kibanaIndex, id);
     }
 
-    String message(ActionAlert alert, int alertCountSinceLastSent) {
+    String message(Alert alert, int alertCountSinceLastSent) {
         String count = alertCountSinceLastSent > 0 ? "*[" + alertCountSinceLastSent + "]*" : "";
         String app = site == null ? alert.app : site + " / " + alert.app;
         String docURL = docURL(alert.kibanaIndex, alert.id);
@@ -100,13 +100,13 @@ public class ActionAlertService {
         return colors[colorIndex][(week - 1) % 2];
     }
 
-    String alertChannel(ActionAlert alert) {
+    String alertChannel(Alert alert) {
         String channel = channels.get(alert.kibanaIndex + "/" + alert.severity);
         if (channel == null) throw new Error(format("channel is not defined, kibanaIndex={}, severity={}", alert.kibanaIndex, alert.severity));
         return channel;
     }
 
-    String alertKey(ActionAlert alert) {
+    String alertKey(Alert alert) {
         return alert.app + "/" + alert.severity + "/" + alert.errorCode;    // WARN and ERROR may have same error code
     }
 

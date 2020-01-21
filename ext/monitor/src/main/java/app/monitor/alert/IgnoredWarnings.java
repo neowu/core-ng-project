@@ -1,6 +1,6 @@
-package app.monitor.action;
+package app.monitor.alert;
 
-import app.monitor.ActionAlertConfig;
+import app.monitor.AlertConfig;
 
 import java.util.List;
 import java.util.Set;
@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 public class IgnoredWarnings {
     public final List<Warnings> warnings;
 
-    public IgnoredWarnings(ActionAlertConfig config) {
+    public IgnoredWarnings(AlertConfig config) {
         warnings = config.ignoreWarnings.stream()
                                         .map(warning -> new Warnings(Set.copyOf(warning.apps), Set.copyOf(warning.errorCodes)))
                                         .collect(Collectors.toList());
     }
 
-    boolean ignore(ActionAlert alert) {
+    boolean ignore(Alert alert) {
         for (Warnings warning : warnings) {
             if (warning.apps.contains(alert.app)) {
                 return warning.errorCodes.contains(alert.errorCode);

@@ -1,7 +1,7 @@
 package app.monitor.kafka;
 
-import app.monitor.action.ActionAlert;
-import app.monitor.action.ActionAlertService;
+import app.monitor.alert.Alert;
+import app.monitor.alert.AlertService;
 import core.framework.inject.Inject;
 import core.framework.kafka.MessageHandler;
 import core.framework.log.message.EventMessage;
@@ -11,17 +11,17 @@ import core.framework.log.message.EventMessage;
  */
 public class EventMessageHandler implements MessageHandler<EventMessage> {
     @Inject
-    ActionAlertService actionAlertService;
+    AlertService alertService;
 
     @Override
     public void handle(String key, EventMessage message) {
         if (message.errorCode == null) return;
 
-        actionAlertService.process(alert(message));
+        alertService.process(alert(message));
     }
 
-    private ActionAlert alert(EventMessage message) {
-        var alert = new ActionAlert();
+    private Alert alert(EventMessage message) {
+        var alert = new Alert();
         alert.id = message.id;
         alert.app = message.app;
         alert.severity(message.result);

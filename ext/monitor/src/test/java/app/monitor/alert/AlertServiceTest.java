@@ -1,6 +1,7 @@
-package app.monitor.action;
+package app.monitor.alert;
 
-import app.monitor.ActionAlertConfig;
+import app.monitor.AlertConfig;
+import app.monitor.slack.SlackClient;
 import core.framework.log.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,26 +10,37 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author ericchung
  */
-class ActionAlertServiceTest {
-    private ActionAlertService service;
+class AlertServiceTest {
+    private AlertService service;
+    private SlackClient slackClient;
 
     @BeforeEach
     void createActionAlertService() {
-        var config = new ActionAlertConfig();
+        slackClient = mock(SlackClient.class);
+
+        var warnings = new AlertConfig.IgnoreWarnings();
+        warnings.apps = List.of("website");
+        warnings.errorCodes = List.of("PATH_NOT_FOUND");
+
+        var config = new AlertConfig();
+        config.ignoreWarnings = List.of(warnings);
         config.criticalErrors = List.of("CRITICAL_ERROR");
         config.site = "site";
         config.timespanInHours = 4;
         config.kibanaURL = "http://kibana:5601";
-        config.channel = new ActionAlertConfig.Channel();
+        config.channel = new AlertConfig.Channel();
         config.channel.actionError = "actionErrorChannel";
         config.channel.actionWarn = "actionWarnChannel";
         config.channel.eventError = "eventErrorChannel";
         config.channel.eventWarn = "eventWarnChannel";
-        service = new ActionAlertService(config);
+        service = new AlertService(config);
+        service.slackClient = slackClient;
     }
 
     @Test
@@ -38,7 +50,7 @@ class ActionAlertServiceTest {
 
     @Test
     void alertChannel() {
-        var alert = new ActionAlert();
+        var alert = new Alert();
         alert.severity = Severity.ERROR;
         alert.kibanaIndex = "trace";
         assertThat(service.alertChannel(alert)).isEqualTo("actionErrorChannel");
@@ -46,12 +58,12 @@ class ActionAlertServiceTest {
 
     @Test
     void alertKey() {
-        ActionAlert alert = alert(Severity.WARN, "NOT_FOUND");
+        Alert alert = alert(Severity.WARN, "NOT_FOUND");
         assertThat(service.alertKey(alert)).isEqualTo("website/WARN/NOT_FOUND");
     }
 
-    private ActionAlert alert(Severity severity, String errorCode) {
-        var alert = new ActionAlert();
+    private Alert alert(Severity severity, String errorCode) {
+        var alert = new Alert();
         alert.app = "website";
         alert.severity = severity;
         alert.errorCode = errorCode;
@@ -59,12 +71,18 @@ class ActionAlertServiceTest {
     }
 
     @Test
+    void process() {
+        service.process(alert(Severity.WARN, "PATH_NOT_FOUND"));
+        verifyNoInteractions(slackClient);
+    }
+
+    @Test
     void check() {
         assertThat(service.check(alert(Severity.ERROR, "CRITICAL_ERROR"), LocalDateTime.now()).notify).isTrue();
 
-        ActionAlert alert = alert(Severity.ERROR, "ERROR");
+        Alert alert = alert(Severity.ERROR, "ERROR");
         LocalDateTime date = LocalDateTime.now();
-        ActionAlertService.Result result = service.check(alert, date);
+        AlertService.Result result = service.check(alert, date);
         assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == -1);
 
         result = service.check(alert, date.plusMinutes(30));

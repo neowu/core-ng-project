@@ -1,4 +1,4 @@
-package app.monitor.action;
+package app.monitor.alert;
 
 import core.framework.log.Severity;
 import org.junit.jupiter.api.Test;
@@ -8,10 +8,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class ActionAlertTest {
+class AlertTest {
     @Test
     void severity() {
-        ActionAlert alert = new ActionAlert();
+        Alert alert = new Alert();
         alert.severity("WARN");
         assertThat(alert.severity).isEqualTo(Severity.WARN);
 

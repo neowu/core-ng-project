@@ -1,6 +1,6 @@
 package app.monitor.kafka;
 
-import app.monitor.action.ActionAlertService;
+import app.monitor.alert.AlertService;
 import core.framework.log.Severity;
 import core.framework.log.message.EventMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,13 +16,13 @@ import static org.mockito.Mockito.verifyNoInteractions;
  */
 class EventMessageHandlerTest {
     private EventMessageHandler handler;
-    private ActionAlertService actionAlertService;
+    private AlertService alertService;
 
     @BeforeEach
     void createEventMessageHandler() {
         handler = new EventMessageHandler();
-        actionAlertService = mock(ActionAlertService.class);
-        handler.actionAlertService = actionAlertService;
+        alertService = mock(AlertService.class);
+        handler.alertService = alertService;
     }
 
     @Test
@@ -31,7 +31,7 @@ class EventMessageHandlerTest {
         message.result = "OK";
         message.errorCode = null;
         handler.handle(null, message);
-        verifyNoInteractions(actionAlertService);
+        verifyNoInteractions(alertService);
     }
 
     @Test
@@ -41,6 +41,6 @@ class EventMessageHandlerTest {
         message.errorCode = "RUNTIME_ERROR";
         handler.handle(null, message);
 
-        verify(actionAlertService).process(argThat(alert -> alert.severity == Severity.ERROR));
+        verify(alertService).process(argThat(alert -> alert.severity == Severity.ERROR));
     }
 }

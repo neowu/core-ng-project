@@ -1,6 +1,6 @@
-package app.monitor.action;
+package app.monitor.alert;
 
-import app.monitor.ActionAlertConfig;
+import app.monitor.AlertConfig;
 import core.framework.log.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,7 @@ class IgnoredWarningsTest {
 
     @BeforeEach
     void createIgnoredWarnings() {
-        var config = new ActionAlertConfig();
+        var config = new AlertConfig();
         config.ignoreWarnings = List.of(
                 ignoreWarnings(List.of("website", "backoffice"), List.of("PATH_NOT_FOUND")),
                 ignoreWarnings(List.of("frontend-website"), List.of("API_ERROR_401", "FORBIDDEN"))
@@ -33,16 +33,16 @@ class IgnoredWarningsTest {
         assertThat(ignoredWarnings.ignore(alert("website", "METHOD_NOT_ALLOWED"))).isFalse();
     }
 
-    private ActionAlert alert(String app, String errorCode) {
-        ActionAlert alert = new ActionAlert();
+    private Alert alert(String app, String errorCode) {
+        Alert alert = new Alert();
         alert.severity = Severity.WARN;
         alert.app = app;
         alert.errorCode = errorCode;
         return alert;
     }
 
-    private ActionAlertConfig.IgnoreWarnings ignoreWarnings(List<String> apps, List<String> errorCodes) {
-        var warnings = new ActionAlertConfig.IgnoreWarnings();
+    private AlertConfig.IgnoreWarnings ignoreWarnings(List<String> apps, List<String> errorCodes) {
+        var warnings = new AlertConfig.IgnoreWarnings();
         warnings.apps = apps;
         warnings.errorCodes = errorCodes;
         return warnings;
