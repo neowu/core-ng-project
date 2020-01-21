@@ -2,7 +2,6 @@ package app.monitor.action;
 
 import app.monitor.ActionAlertConfig;
 import core.framework.log.Severity;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,8 +49,7 @@ class ActionAlertServiceTest {
         ActionAlert alert = alert(Severity.WARN, "NOT_FOUND");
         assertThat(service.alertKey(alert)).isEqualTo("website/WARN/NOT_FOUND");
     }
-
-    @NotNull
+    
     private ActionAlert alert(Severity severity, String errorCode) {
         var alert = new ActionAlert();
         alert.app = "website";

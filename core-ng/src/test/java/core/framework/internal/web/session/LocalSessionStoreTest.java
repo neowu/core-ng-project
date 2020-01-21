@@ -1,6 +1,5 @@
 package core.framework.internal.web.session;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -79,7 +78,6 @@ class LocalSessionStoreTest {
         assertThat(localSessionStore.values).isEmpty();
     }
 
-    @NotNull
     private LocalSessionStore.SessionValue sessionValue(Instant exp, Map<String, String> values) {
         return new LocalSessionStore.SessionValue(exp, values);
     }

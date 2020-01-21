@@ -2,7 +2,6 @@ package app.monitor.action;
 
 import app.monitor.ActionAlertConfig;
 import core.framework.log.Severity;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,6 @@ class IgnoredWarningsTest {
         assertThat(ignoredWarnings.ignore(alert("website", "METHOD_NOT_ALLOWED"))).isFalse();
     }
 
-    @NotNull
     private ActionAlert alert(String app, String errorCode) {
         ActionAlert alert = new ActionAlert();
         alert.severity = Severity.WARN;
