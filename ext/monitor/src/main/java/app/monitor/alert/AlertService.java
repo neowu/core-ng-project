@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
 import java.util.Map;
-import java.util.Set;
 
 import static core.framework.util.Strings.format;
 
@@ -20,8 +19,8 @@ import static core.framework.util.Strings.format;
 public class AlertService {
     private final LRUMap<String, AlertStat> stats = new LRUMap<>(1000);
     private final String kibanaURL;
-    private final IgnoredWarnings ignoredWarnings;
-    private final Set<String> criticalErrors;
+    private final ErrorCodeMatchers ignoredWarnings;
+    private final ErrorCodeMatchers criticalErrors;
     private final int timespanInMinutes;
     private final String[][] colors = {
             {"#ff5c33", "#ff9933"}, // 2 colors for warn, change color for weekly review of every week
@@ -35,8 +34,8 @@ public class AlertService {
     public AlertService(AlertConfig config) {
         site = config.site;
         kibanaURL = config.kibanaURL;
-        ignoredWarnings = new IgnoredWarnings(config);
-        criticalErrors = Set.copyOf(config.criticalErrors);
+        ignoredWarnings = new ErrorCodeMatchers(config.ignoreWarnings);
+        criticalErrors = new ErrorCodeMatchers(config.criticalErrors);
         channels = Map.of("trace/WARN", config.channel.actionWarn,
                 "trace/ERROR", config.channel.actionError,
                 "event/WARN", config.channel.eventWarn,
@@ -53,9 +52,9 @@ public class AlertService {
     }
 
     Result check(Alert alert, LocalDateTime now) {
-        if (alert.severity == Severity.WARN && ignoredWarnings.ignore(alert))
+        if (alert.severity == Severity.WARN && ignoredWarnings.matches(alert.app, alert.errorCode))
             return new Result(false, -1);
-        if (alert.severity == Severity.ERROR && criticalErrors.contains(alert.errorCode))
+        if (alert.severity == Severity.ERROR && criticalErrors.matches(alert.app, alert.errorCode))
             return new Result(true, -1);
 
         String key = alertKey(alert);

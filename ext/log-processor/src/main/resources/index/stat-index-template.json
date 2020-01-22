@@ -25,8 +25,18 @@
       "app": {
         "type": "keyword"
       },
-      "server_ip": {
-        "type": "ip"
+      "host": {
+        "type": "keyword"
+      },
+      "result": {
+        "type": "keyword"
+      },
+      "error_code": {
+        "type": "keyword"
+      },
+      "error_message": {
+        "type": "text",
+        "index": "false"
       }
     }
   }

@@ -17,8 +17,8 @@ public class ActionDocument {
     public Instant timestamp;
     @Property(name = "app")
     public String app;
-    @Property(name = "server_ip")
-    public String serverIP;
+    @Property(name = "host")
+    public String host;
     @Property(name = "result")
     public String result;
     @Property(name = "ref_id")

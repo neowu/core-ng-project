@@ -3,6 +3,7 @@ package app.monitor.alert;
 import app.monitor.AlertConfig;
 import app.monitor.slack.SlackClient;
 import core.framework.log.Severity;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,13 +25,9 @@ class AlertServiceTest {
     void createActionAlertService() {
         slackClient = mock(SlackClient.class);
 
-        var warnings = new AlertConfig.IgnoreWarnings();
-        warnings.apps = List.of("website");
-        warnings.errorCodes = List.of("PATH_NOT_FOUND");
-
         var config = new AlertConfig();
-        config.ignoreWarnings = List.of(warnings);
-        config.criticalErrors = List.of("CRITICAL_ERROR");
+        config.ignoreWarnings = List.of(matcher(List.of("website"), List.of("PATH_NOT_FOUND")));
+        config.criticalErrors = List.of(matcher(List.of(), List.of("CRITICAL_ERROR")));
         config.site = "site";
         config.timespanInHours = 4;
         config.kibanaURL = "http://kibana:5601";
@@ -41,6 +38,14 @@ class AlertServiceTest {
         config.channel.eventWarn = "eventWarnChannel";
         service = new AlertService(config);
         service.slackClient = slackClient;
+    }
+
+    @NotNull
+    private AlertConfig.Matcher matcher(List<String> apps, List<String> errorCodes) {
+        var matcher = new AlertConfig.Matcher();
+        matcher.apps = apps;
+        matcher.errorCodes = errorCodes;
+        return matcher;
     }
 
     @Test

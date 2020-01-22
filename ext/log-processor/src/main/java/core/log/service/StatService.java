@@ -62,7 +62,10 @@ public class StatService {
         var stat = new StatDocument();
         stat.timestamp = message.date;
         stat.app = message.app;
-        stat.serverIP = message.serverIP;
+        stat.host = message.host;
+        stat.result = message.result;
+        stat.errorCode = message.errorCode;
+        stat.errorMessage = message.errorMessage;
         stat.stats = message.stats;
         return stat;
     }

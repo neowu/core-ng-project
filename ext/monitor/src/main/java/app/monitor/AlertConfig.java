@@ -12,11 +12,11 @@ import java.util.List;
 public class AlertConfig {
     @NotNull
     @Property(name = "ignoreWarnings")
-    public List<IgnoreWarnings> ignoreWarnings = List.of();
+    public List<Matcher> ignoreWarnings = List.of();
 
     @NotNull
     @Property(name = "criticalErrors")
-    public List<String> criticalErrors = List.of();
+    public List<Matcher> criticalErrors = List.of();
 
     @Min(0)
     @NotNull
@@ -34,7 +34,7 @@ public class AlertConfig {
     @Property(name = "kibanaURL")
     public String kibanaURL;
 
-    public static class IgnoreWarnings {
+    public static class Matcher {
         @NotNull
         @Property(name = "apps")
         public List<String> apps = List.of();

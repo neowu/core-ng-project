@@ -65,8 +65,8 @@
       "app": {
         "type": "keyword"
       },
-      "server_ip": {
-        "type": "ip"
+      "host": {
+        "type": "keyword"
       },
       "result": {
         "type": "keyword"

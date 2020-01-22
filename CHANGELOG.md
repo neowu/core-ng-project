@@ -1,7 +1,9 @@
 ## Change log
-### 7.3.2 (1/17/2020 - )
+### 7.3.2 (1/17/2020 - 1/22/2020)
 * db: change query.count() to return long instead of int
 * monitor: added monitor to alert for action/event (will add more features like redis/es check, sanity/deep health check)
+* log: replace "server_ip" with "host" field in action/stat log, (only on log-processor as first step), more friendly in kube env 
+        added "result" / "error_code" / "error_message" to stat log, for future monitoring support 
 
 ### 7.3.1 (12/20/2019 - 1/15/2020)
 * es: update to 7.5.1

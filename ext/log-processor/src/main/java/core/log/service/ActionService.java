@@ -94,7 +94,7 @@ public class ActionService {
         var document = new ActionDocument();
         document.timestamp = message.date;
         document.app = message.app;
-        document.serverIP = message.serverIP;
+        document.host = message.host;
         document.result = message.result;
         document.action = message.action;
         document.refIds = message.refIds;
