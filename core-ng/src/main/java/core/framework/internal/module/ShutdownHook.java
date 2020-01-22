@@ -2,7 +2,6 @@ package core.framework.internal.module;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.util.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +71,6 @@ public final class ShutdownHook implements Runnable {
 
     void logContext(ActionLog actionLog) {
         actionLog.action("app:stop");
-        actionLog.context("host", Network.LOCAL_HOST_NAME);
         actionLog.context("start_time", Instant.ofEpochMilli(ManagementFactory.getRuntimeMXBean().getStartTime()));
         actionLog.stat("uptime_in_ms", ManagementFactory.getRuntimeMXBean().getUptime());
     }

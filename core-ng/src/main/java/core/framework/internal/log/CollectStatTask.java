@@ -38,9 +38,10 @@ public final class CollectStatTask implements Runnable {
         var message = new StatMessage();
         var now = Instant.now();
         message.date = now;
+        message.result = "OK";
         message.id = LogManager.ID_GENERATOR.next(now);
         message.app = LogManager.APP_NAME;
-        message.serverIP = Network.LOCAL_HOST_ADDRESS;
+        message.host = Network.LOCAL_HOST_NAME;
         message.stats = stats;
         return message;
     }

@@ -18,9 +18,6 @@ public class ActionLogMessage {
     public String app;
     @Property(name = "host")
     public String host;
-    @Deprecated
-    @Property(name = "server_ip")
-    public String serverIP;
     @Property(name = "result")
     public String result;
     @Property(name = "action")

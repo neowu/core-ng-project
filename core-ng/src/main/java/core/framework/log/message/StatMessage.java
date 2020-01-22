@@ -17,9 +17,6 @@ public class StatMessage {
     public String app;
     @Property(name = "host")
     public String host;
-    @Deprecated
-    @Property(name = "server_ip")
-    public String serverIP;
     @Property(name = "result")
     public String result;
     @Property(name = "error_code")

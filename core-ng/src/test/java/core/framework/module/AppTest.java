@@ -23,8 +23,7 @@ class AppTest {
         app.logContext(actionLog);
 
         assertThat(actionLog.action).isEqualTo("app:start");
-        assertThat(actionLog.context).containsKey("host");
-        assertThat(actionLog.stats).containsKey("cpu");
+        assertThat(actionLog.stats).containsKeys("cpu", "max_memory");
     }
 
     public static class TestApp extends App {

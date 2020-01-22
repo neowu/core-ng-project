@@ -15,7 +15,7 @@ public class ActionLogMessageFactory {
     public ActionLogMessage create(ActionLog log) {
         var message = new ActionLogMessage();
         message.app = LogManager.APP_NAME;
-        message.serverIP = Network.LOCAL_HOST_ADDRESS;
+        message.host = Network.LOCAL_HOST_NAME;
         message.id = log.id;
         message.date = log.date;
         message.result = log.result();

@@ -5,7 +5,6 @@ import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import core.framework.log.Markers;
-import core.framework.util.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +41,6 @@ public abstract class App extends Module {
         Runtime runtime = Runtime.getRuntime();
         actionLog.stat("cpu", runtime.availableProcessors());
         actionLog.stat("max_memory", runtime.maxMemory());
-        actionLog.context("host", Network.LOCAL_HOST_NAME);
     }
 
     public final void configure() {
