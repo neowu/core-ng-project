@@ -3,7 +3,6 @@ package app.monitor.alert;
 import app.monitor.AlertConfig;
 import app.monitor.slack.SlackClient;
 import core.framework.log.Severity;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +39,6 @@ class AlertServiceTest {
         service.slackClient = slackClient;
     }
 
-    @NotNull
     private AlertConfig.Matcher matcher(List<String> apps, List<String> errorCodes) {
         var matcher = new AlertConfig.Matcher();
         matcher.apps = apps;
