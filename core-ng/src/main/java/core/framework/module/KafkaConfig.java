@@ -162,6 +162,6 @@ public class KafkaConfig extends Config {
         if (maxWaitTime == null || maxWaitTime.toMillis() <= 0) throw new Error("max wait time must be greater than 0, value=" + maxWaitTime);
         MessageListener listener = listener();
         listener.minPollBytes = minBytes;
-        listener.minPollMaxWaitTime = maxWaitTime;
+        listener.maxWaitTime = maxWaitTime;
     }
 }

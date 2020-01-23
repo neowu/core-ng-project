@@ -41,7 +41,7 @@ public class MessageListener {
     public int maxPollRecords = 500;            // default kafka setting, refer to org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG
     public int maxPollBytes = 3 * 1024 * 1024;  // get 3M bytes message at max
     public int minPollBytes = 1;                // default kafka setting
-    public Duration minPollMaxWaitTime = Duration.ofMillis(500);
+    public Duration maxWaitTime = Duration.ofMillis(500);
     public String groupId = LogManager.APP_NAME;
 
     private MessageListenerThread[] threads;
@@ -121,7 +121,7 @@ public class MessageListener {
         config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
         config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
         config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
-        config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) minPollMaxWaitTime.toMillis());
+        config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) maxWaitTime.toMillis());
         var deserializer = new ByteArrayDeserializer();
         Consumer<byte[], byte[]> consumer = new KafkaConsumer<>(config, deserializer, deserializer);
         consumerMetrics.add(consumer.metrics());

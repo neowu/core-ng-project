@@ -16,6 +16,8 @@ import core.framework.log.message.LogTopics;
 import core.framework.module.App;
 import core.framework.module.SystemModule;
 
+import java.time.Duration;
+
 /**
  * @author ericchung
  */
@@ -29,13 +31,10 @@ public class MonitorApp extends App {
 
         configureSlackClient(); // currently only support slack notification
 
-        configureActionAlert();
-    }
-
-    private void configureActionAlert() {
         Bean.register(AlertConfig.class);
         AlertConfig config = Bean.fromJSON(AlertConfig.class, requiredProperty("app.alert.config"));
         bind(new AlertService(config));
+        kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get 1M message
         kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
         kafka().subscribe(LogTopics.TOPIC_EVENT, EventMessage.class, bind(EventMessageHandler.class));
     }
