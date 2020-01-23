@@ -10,6 +10,7 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
+import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -25,6 +26,9 @@ public class StatCollector {
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats = Lists.newArrayList();
 
+    public double highCPUUsageThreshold = 0.8;
+    public double highHeapUsageThreshold = 0.8;
+
     public StatCollector() {
         List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean bean : beans) {
@@ -35,12 +39,9 @@ public class StatCollector {
     public Stats collect() {
         Stats stats = new Stats();
 
-        stats.put("sys_load_avg", os.getSystemLoadAverage());
-        stats.put("cpu_usage", cpuStat.usage());
+        collectCPUUsage(stats);
         stats.put("thread_count", thread.getThreadCount());
-        MemoryUsage usage = memory.getHeapMemoryUsage();
-        stats.put("jvm_heap_used", (double) usage.getUsed());
-        stats.put("jvm_heap_max", (double) usage.getMax());
+        collectHeapUsage(stats);
 
         for (GCStat gcStat : gcStats) {
             long count = gcStat.count();
@@ -51,6 +52,38 @@ public class StatCollector {
 
         collectMetrics(stats);
         return stats;
+    }
+
+    private void collectHeapUsage(Stats stats) {
+        MemoryUsage usage = memory.getHeapMemoryUsage();
+        double usedHeap = usage.getUsed();
+        double maxHeap = usage.getMax();
+        stats.put("jvm_heap_used", usedHeap);
+        stats.put("jvm_heap_max", maxHeap);
+        checkHighHeapUsage(usedHeap, maxHeap, stats);
+    }
+
+    private void collectCPUUsage(Stats stats) {
+        stats.put("sys_load_avg", os.getSystemLoadAverage());
+
+        double cpuUsage = cpuStat.usage();
+        stats.put("cpu_usage", cpuUsage);
+        checkHighCPUUsage(cpuUsage, stats);
+    }
+
+    void checkHighCPUUsage(double usage, Stats stats) {
+        if (usage >= highCPUUsageThreshold) {
+            NumberFormat format = NumberFormat.getPercentInstance();
+            stats.warn("HIGH_CPU_USAGE", "cpu usage is too high, usage=" + format.format(usage));
+        }
+    }
+
+    void checkHighHeapUsage(double usedHeap, double maxHeap, Stats stats) {
+        double usage = usedHeap / maxHeap;
+        if (usage >= highHeapUsageThreshold) {
+            NumberFormat format = NumberFormat.getPercentInstance();
+            stats.warn("HIGH_HEAP_USAGE", "cpu usage is too high, usage=" + format.format(usage));
+        }
     }
 
     private void collectMetrics(Stats stats) {

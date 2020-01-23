@@ -57,6 +57,11 @@ class AlertServiceTest {
         alert.severity = Severity.ERROR;
         alert.kibanaIndex = "trace";
         assertThat(service.alertChannel(alert)).isEqualTo("actionErrorChannel");
+
+        alert = new Alert();
+        alert.severity = Severity.WARN;
+        alert.kibanaIndex = "stat";
+        assertThat(service.alertChannel(alert)).isEqualTo("actionWarnChannel");
     }
 
     @Test

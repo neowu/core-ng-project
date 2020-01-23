@@ -38,6 +38,8 @@ public class AlertService {
         criticalErrors = new ErrorCodeMatchers(config.criticalErrors);
         channels = Map.of("trace/WARN", config.channel.actionWarn,
                 "trace/ERROR", config.channel.actionError,
+                "stat/WARN", config.channel.actionWarn,
+                "stat/ERROR", config.channel.actionError,
                 "event/WARN", config.channel.eventWarn,
                 "event/ERROR", config.channel.eventError);
         timespanInMinutes = config.timespanInHours * 60;

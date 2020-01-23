@@ -136,5 +136,13 @@ public abstract class Module {
         return context.config(configClass, name);
     }
 
+    public void highCPUUsageThreshold(double threshold) {
+        context.collector.highCPUUsageThreshold = threshold;
+    }
+
+    public void highHeapUsageThreshold(double threshold) {
+        context.collector.highHeapUsageThreshold = threshold;
+    }
+
     protected abstract void initialize();
 }

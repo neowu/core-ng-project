@@ -1,6 +1,7 @@
 ## Change log
 ### 7.3.3 (1/22/2020 - )
 * log: replaced "server_ip" with "host" field in action/stat log
+* stat: warn on high cpu usage and heap usage
 
 ### 7.3.2 (1/17/2020 - 1/22/2020)
 * db: change query.count() to return long instead of int

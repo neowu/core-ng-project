@@ -49,6 +49,9 @@ public class TestModule extends AbstractTestModule {
 
         configureJob();
         configureExecutor();
+
+        highCPUUsageThreshold(0.8);
+        highHeapUsageThreshold(0.8);
     }
 
     private void configureAPI() {
