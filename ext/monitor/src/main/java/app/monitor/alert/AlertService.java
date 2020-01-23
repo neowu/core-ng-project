@@ -84,7 +84,7 @@ public class AlertService {
     }
 
     String message(Alert alert, int alertCountSinceLastSent) {
-        String count = alertCountSinceLastSent > 0 ? "*[" + alertCountSinceLastSent + "]*" : "";
+        String count = alertCountSinceLastSent > 0 ? "*[" + alertCountSinceLastSent + "]* " : "";
         String app = site == null ? alert.app : site + " / " + alert.app;
         String docURL = docURL(alert.kibanaIndex, alert.id);
         return format("{}{}: *{}*\nid: <{}|{}>\nerrorCode: *{}*\nmessage: {}\n",
