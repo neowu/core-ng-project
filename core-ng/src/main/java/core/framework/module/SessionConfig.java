@@ -52,7 +52,7 @@ public class SessionConfig extends Config {
         var redis = new RedisImpl("redis-session");
         redis.host = host;
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
-        context.stat.metrics.add(new PoolMetrics(redis.pool));
+        context.collector.metrics.add(new PoolMetrics(redis.pool));
 
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
         context.httpServer.siteManager.sessionManager.store(new RedisSessionStore(redis));

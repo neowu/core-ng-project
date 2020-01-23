@@ -88,7 +88,7 @@ public class KafkaConfig extends Config {
 
     private MessageProducer createMessageProducer() {
         var producer = new MessageProducer(uri, name, maxRequestSize);
-        context.stat.metrics.add(producer.producerMetrics);
+        context.collector.metrics.add(producer.producerMetrics);
         context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
         var controller = new KafkaController(producer);
         context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), (LambdaController) controller::publish, true);
@@ -125,7 +125,7 @@ public class KafkaConfig extends Config {
             context.startupHook.add(listener::start);
             context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> listener.shutdown());
             context.shutdownHook.add(ShutdownHook.STAGE_1, listener::awaitTermination);
-            context.stat.metrics.add(listener.consumerMetrics);
+            context.collector.metrics.add(listener.consumerMetrics);
         }
         return listener;
     }

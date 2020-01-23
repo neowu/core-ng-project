@@ -1,12 +1,10 @@
 package core.framework.internal.resource;
 
-import core.framework.util.Maps;
+import core.framework.internal.stat.Stats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -23,7 +21,7 @@ class PoolMetricsTest {
 
     @Test
     void statName() {
-        assertEquals("pool_test_size", metrics.statName("size"));
+        assertThat(metrics.statName("size")).isEqualTo("pool_test_size");
     }
 
     @Test
@@ -31,10 +29,11 @@ class PoolMetricsTest {
         pool.borrowItem();
         pool.returnItem(pool.borrowItem());
 
-        Map<String, Double> stats = Maps.newHashMap();
+        var stats = new Stats();
         metrics.collect(stats);
 
-        assertEquals(1, stats.get("pool_test_active_count").intValue());
-        assertEquals(2, stats.get("pool_test_total_count").intValue());
+        assertThat(stats.stats)
+                .containsEntry("pool_test_active_count", 1.0d)
+                .containsEntry("pool_test_total_count", 2.0d);
     }
 }

@@ -1,6 +1,7 @@
 package core.framework.internal.kafka;
 
 import core.framework.internal.stat.Metrics;
+import core.framework.internal.stat.Stats;
 import core.framework.util.Lists;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
@@ -23,7 +24,7 @@ public class ConsumerMetrics implements Metrics {
     }
 
     @Override
-    public void collect(Map<String, Double> stats) {
+    public void collect(Stats stats) {
         stats.put(statName("records_max_lag"), sum(recordsLagMax));
         stats.put(statName("records_consumed_rate"), sum(recordsConsumedRate));
         stats.put(statName("bytes_consumed_rate"), sum(bytesConsumedRate));

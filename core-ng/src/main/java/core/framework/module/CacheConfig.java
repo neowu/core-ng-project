@@ -90,7 +90,7 @@ public class CacheConfig extends Config {
         redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
-        context.stat.metrics.add(new PoolMetrics(redis.pool));
+        context.collector.metrics.add(new PoolMetrics(redis.pool));
         cacheManager.remoteCacheStore = new RedisCacheStore(redis);
     }
 

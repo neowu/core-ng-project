@@ -1,11 +1,9 @@
 package core.framework.internal.kafka;
 
+import core.framework.internal.stat.Stats;
 import org.apache.kafka.common.Metric;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -30,19 +28,19 @@ class ProducerMetricsTest {
     void collect() {
         when(requestSizeAvg.metricValue()).thenReturn(10.0);
 
-        Map<String, Double> stats = new HashMap<>();
+        var stats = new Stats();
         metrics.collect(stats);
 
-        assertThat(stats).containsEntry("kafka_producer_request_size_avg", 10.0);
+        assertThat(stats.stats).containsEntry("kafka_producer_request_size_avg", 10.0);
     }
 
     @Test
     void collectWithoutRequestSizeAvg() {
         when(requestSizeAvg.metricValue()).thenReturn(Double.NaN);
 
-        Map<String, Double> stats = new HashMap<>();
+        var stats = new Stats();
         metrics.collect(stats);
 
-        assertThat(stats).doesNotContainKeys("kafka_producer_request_size_avg");
+        assertThat(stats.stats).doesNotContainKeys("kafka_producer_request_size_avg");
     }
 }

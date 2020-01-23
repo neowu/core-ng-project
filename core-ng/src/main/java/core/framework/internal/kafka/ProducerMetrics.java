@@ -1,6 +1,7 @@
 package core.framework.internal.kafka;
 
 import core.framework.internal.stat.Metrics;
+import core.framework.internal.stat.Stats;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
@@ -11,8 +12,8 @@ import java.util.Map;
  */
 public class ProducerMetrics implements Metrics {
     private final String name;
-    private Metric requestRate; // The number of requests sent per second, one request contains multiple batches
     Metric requestSizeAvg; // The average size of requests sent
+    private Metric requestRate; // The number of requests sent per second, one request contains multiple batches
     private Metric outgoingByteRate; // The number of outgoing bytes sent to all servers per second
 
     public ProducerMetrics(String name) {
@@ -20,7 +21,7 @@ public class ProducerMetrics implements Metrics {
     }
 
     @Override
-    public void collect(Map<String, Double> stats) {
+    public void collect(Stats stats) {
         if (requestRate != null) stats.put(statName("request_rate"), (Double) requestRate.metricValue());
         if (requestSizeAvg != null) {
             Double value = (Double) requestSizeAvg.metricValue();

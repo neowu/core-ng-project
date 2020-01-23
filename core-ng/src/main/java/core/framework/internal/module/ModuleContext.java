@@ -5,7 +5,7 @@ import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.inject.BeanFactory;
 import core.framework.internal.log.LogManager;
-import core.framework.internal.stat.Stat;
+import core.framework.internal.stat.StatCollector;
 import core.framework.internal.web.HTTPServer;
 import core.framework.internal.web.HTTPServerMetrics;
 import core.framework.internal.web.bean.BeanMappers;
@@ -45,7 +45,7 @@ public class ModuleContext {
     public final ShutdownHook shutdownHook;
     public final PropertyManager propertyManager = new PropertyManager();
     public final HTTPServer httpServer;
-    public final Stat stat = new Stat();
+    public final StatCollector collector = new StatCollector();
     public final ServiceRegistry serviceRegistry = new ServiceRegistry();
     protected final Map<String, Config> configs = Maps.newHashMap();
     PropertyValidator propertyValidator = new PropertyValidator();
@@ -56,7 +56,7 @@ public class ModuleContext {
         shutdownHook = new ShutdownHook(logManager);
 
         httpServer = new HTTPServer(logManager);
-        stat.metrics.add(new HTTPServerMetrics(httpServer));
+        collector.metrics.add(new HTTPServerMetrics(httpServer));
 
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(SessionContext.class, null, httpServer.siteManager.sessionManager);

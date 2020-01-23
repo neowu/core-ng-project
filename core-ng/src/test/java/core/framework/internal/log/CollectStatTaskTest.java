@@ -1,12 +1,11 @@
 package core.framework.internal.log;
 
 import core.framework.internal.log.appender.LogAppender;
-import core.framework.internal.stat.Stat;
+import core.framework.internal.stat.StatCollector;
+import core.framework.internal.stat.Stats;
 import core.framework.log.message.StatMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -24,12 +23,14 @@ class CollectStatTaskTest {
     @BeforeEach
     void createCollectStatTask() {
         appender = mock(LogAppender.class);
-        task = new CollectStatTask(appender, new Stat());
+        task = new CollectStatTask(appender, new StatCollector());
     }
 
     @Test
     void message() {
-        StatMessage message = task.message(Map.of("sys_load_avg", 1d));
+        Stats stats = new Stats();
+        stats.put("sys_load_avg", 1d);
+        StatMessage message = task.message(stats);
         assertThat(message.id).isNotNull();
         assertThat(message.stats).containsOnly(entry("sys_load_avg", 1d));
     }

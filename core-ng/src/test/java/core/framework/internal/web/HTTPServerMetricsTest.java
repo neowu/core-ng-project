@@ -1,11 +1,9 @@
 package core.framework.internal.web;
 
-import core.framework.util.Maps;
+import core.framework.internal.stat.Stats;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xnio.management.XnioWorkerMXBean;
-
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -31,11 +29,11 @@ class HTTPServerMetricsTest {
         when(mxBean.getWorkerQueueSize()).thenReturn(10);
         when(server.mxBean()).thenReturn(mxBean);
 
-        Map<String, Double> stats = Maps.newHashMap();
+        var stats = new Stats();
         metrics.collect(stats);
 
-        assertThat(stats)
-            .containsEntry("http_queue_size", 10.0)
-            .containsEntry("http_busy_thread_count", 2.0);
+        assertThat(stats.stats)
+                .containsEntry("http_queue_size", 10.0)
+                .containsEntry("http_busy_thread_count", 2.0);
     }
 }
