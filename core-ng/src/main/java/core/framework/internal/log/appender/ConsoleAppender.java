@@ -87,7 +87,15 @@ public final class ConsoleAppender implements LogAppender {
 
     String message(StatMessage message) {
         var builder = new StringBuilder(512);
-        builder.append(DateTimeFormatter.ISO_INSTANT.format(message.date));
+        builder.append(DateTimeFormatter.ISO_INSTANT.format(message.date))
+               .append(LOG_SPLITTER).append(message.result);
+
+        String errorCode = message.errorCode;
+        if (errorCode != null) {
+            builder.append(LOG_SPLITTER).append("error_code=").append(errorCode)
+                   .append(LOG_SPLITTER).append("error_message=").append(message.errorMessage);
+        }
+
         var format = new DecimalFormat();
         for (Map.Entry<String, Double> entry : message.stats.entrySet()) {
             builder.append(LOG_SPLITTER)
