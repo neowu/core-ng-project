@@ -1,4 +1,7 @@
 ## Change log
+### 7.3.4 (1/29/2020 - )
+* es: update to 7.5.2
+
 ### 7.3.3 (1/22/2020 - 1/23/2020)
 * log: replaced "server_ip" with "host" field in action/stat log
 * stat: warn on high cpu usage and heap usage

@@ -34,6 +34,7 @@
         <!--Coding:-->
         <module name="AvoidConstantAsFirstOperandInConditionCheck"/>    <!--provided by sevntu-checkstyle-->
         <module name="AvoidHidingCauseException"/>                      <!--provided by sevntu-checkstyle-->
+        <module name="AvoidNoArgumentSuperConstructorCall"/>            <!--Checks if call to superclass constructor without arguments is present.-->
         <module name="CustomDeclarationOrder">                          <!--provided by sevntu-checkstyle-->
             <property name="customDeclarationOrder"
                       value="Field(static .*) ### Method(static .*) ### DeclareAnonClassField(.*)
@@ -61,6 +62,7 @@
         </module>
         <module name="NoArrayTrailingComma"/>           <!--Checks that array initialization do not contain a trailing comma.-->
         <module name="NoClone"/>
+        <module name="NoEnumTrailingComma"/>            <!--Checks that enum definition does not contain a trailing comma.-->
         <module name="NoFinalizer"/>
         <module name="OneStatementPerLine">                 <!--Checks there is only one statement per line.-->
             <property name="treatTryResourcesAsStatement" value="true"/>
