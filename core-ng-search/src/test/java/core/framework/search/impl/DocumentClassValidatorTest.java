@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 /**
  * @author neo
  */
@@ -16,6 +18,13 @@ class DocumentClassValidatorTest {
     @Test
     void validate() {
         new DocumentClassValidator(TestDocument.class).validate();
+    }
+
+    @Test
+    void validateWithoutIndexAnnotation() {
+        assertThatThrownBy(() -> new DocumentClassValidator(TestDocumentWithoutIndexAnnotation.class).validate())
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("class must have @Index");
     }
 
     @Index(name = "test")
@@ -32,5 +41,8 @@ class DocumentClassValidatorTest {
 
         @Property(name = "map_field")
         public Map<String, String> mapField;
+    }
+
+    public static class TestDocumentWithoutIndexAnnotation {
     }
 }

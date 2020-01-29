@@ -24,12 +24,12 @@ import static core.framework.util.Strings.format;
 /**
  * @author neo
  */
-public final class JSONClassValidator implements ClassVisitor {
+public class JSONClassValidator implements ClassVisitor {
     public static ClassValidator classValidator(Class<?> instanceClass) {
         var validator = new ClassValidator(instanceClass);
         validator.allowedValueClasses = Set.of(String.class, Boolean.class,
-            Integer.class, Long.class, Double.class, BigDecimal.class,
-            LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class);
+                Integer.class, Long.class, Double.class, BigDecimal.class,
+                LocalDate.class, LocalDateTime.class, ZonedDateTime.class, Instant.class, LocalTime.class);
         validator.allowChild = true;
         return validator;
     }
