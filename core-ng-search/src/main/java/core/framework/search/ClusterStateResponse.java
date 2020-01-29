@@ -18,7 +18,7 @@ public class ClusterStateResponse {
         @Property(name = "open")
         OPEN,
         @Property(name = "close")
-        CLOSE,
+        CLOSE
     }
 
     public static class Metadata {
