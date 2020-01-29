@@ -13,6 +13,7 @@ import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
 import core.framework.util.Maps;
 import core.framework.util.StopWatch;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,12 +21,14 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.function.Consumer;
 
 import static core.framework.internal.redis.Protocol.Command.DEL;
 import static core.framework.internal.redis.Protocol.Command.EXPIRE;
 import static core.framework.internal.redis.Protocol.Command.GET;
 import static core.framework.internal.redis.Protocol.Command.INCRBY;
+import static core.framework.internal.redis.Protocol.Command.INFO;
 import static core.framework.internal.redis.Protocol.Command.MGET;
 import static core.framework.internal.redis.Protocol.Command.MSET;
 import static core.framework.internal.redis.Protocol.Command.SCAN;
@@ -317,6 +320,11 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
+    public RedisList list() {
+        return redisList;
+    }
+
+    @Override
     public void forEach(String pattern, Consumer<String> consumer) {
         var watch = new StopWatch();
         long start = System.nanoTime();
@@ -358,8 +366,38 @@ public final class RedisImpl implements Redis {
     }
 
     @Override
-    public RedisList list() {
-        return redisList;
+    public Map<String, String> info() {
+        var watch = new StopWatch();
+        String value = null;
+        PoolItem<RedisConnection> item = pool.borrowItem();
+        try {
+            RedisConnection connection = item.resource;
+            connection.writeCommand(INFO);
+            value = decode(connection.readBulkString());
+            return parseInfo(value);
+        } catch (IOException e) {
+            item.broken = true;
+            throw new UncheckedIOException(e);
+        } finally {
+            pool.returnItem(item);
+            long elapsed = watch.elapsed();
+            ActionLogContext.track("redis", elapsed, 1, 0);
+            logger.debug("info, returnedValue={}, elapsed={}", value, elapsed);
+            checkSlowOperation(elapsed);
+        }
+    }
+
+    Map<String, String> parseInfo(String info) {
+        Map<String, String> values = Maps.newHashMapWithExpectedSize(128);  // redis 5.x return roughly 122 keys for info
+        StringTokenizer tokenizer = new StringTokenizer(info, "\r\n");
+        while (tokenizer.hasMoreTokens()) {
+            String line = tokenizer.nextToken();
+            if (!Strings.startsWith(line, '#')) {
+                int index = line.indexOf(':');
+                values.put(line.substring(0, index), line.substring(index + 1));
+            }
+        }
+        return values;
     }
 
     void checkSlowOperation(long elapsed) {

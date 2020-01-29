@@ -34,7 +34,9 @@ public interface Redis {
 
     RedisHash hash();
 
+    RedisList list();
+
     void forEach(String pattern, Consumer<String> consumer);
 
-    RedisList list();
+    Map<String, String> info();
 }

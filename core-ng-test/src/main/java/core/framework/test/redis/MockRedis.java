@@ -106,6 +106,11 @@ public final class MockRedis implements Redis {
     }
 
     @Override
+    public Map<String, String> info() {
+        return Map.of();
+    }
+
+    @Override
     public RedisList list() {
         return list;
     }

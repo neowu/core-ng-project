@@ -103,4 +103,9 @@ class MockRedisTest {
         assertThat(redis.get("key7")).isEqualTo("value7");
         assertThat(redis.get("key8")).isEqualTo("value8");
     }
+
+    @Test
+    void info() {
+        assertThat(redis.info()).isNotNull();
+    }
 }

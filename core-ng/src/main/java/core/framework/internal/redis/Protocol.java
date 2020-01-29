@@ -90,6 +90,7 @@ final class Protocol {
         static final byte[] RPUSH = Strings.bytes("RPUSH");
         static final byte[] LPOP = Strings.bytes("LPOP");
         static final byte[] LRANGE = Strings.bytes("LRANGE");
+        static final byte[] INFO = Strings.bytes("INFO");
     }
 
     static class Keyword {

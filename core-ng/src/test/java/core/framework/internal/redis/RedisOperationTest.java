@@ -11,7 +11,6 @@ import java.util.Map;
 import static core.framework.internal.redis.RedisEncodings.encode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author neo
@@ -22,7 +21,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         response("$6\r\nfoobar\r\n");
         String value = redis.get("key");
 
-        assertEquals("foobar", value);
+        assertThat(value).isEqualTo("foobar");
         assertRequestEquals("*2\r\n$3\r\nGET\r\n$3\r\nkey\r\n");
     }
 
@@ -122,7 +121,16 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         List<String> keys = Lists.newArrayList();
         redis.forEach("k*", keys::add);
 
-        assertEquals(List.of("k1", "k2"), keys);
+        assertThat(keys).containsExactly("k1", "k2");
         assertRequestEquals("*6\r\n$4\r\nSCAN\r\n$1\r\n0\r\n$5\r\nmatch\r\n$2\r\nk*\r\n$5\r\ncount\r\n$3\r\n500\r\n");
+    }
+
+    @Test
+    void info() {
+        response("$31\r\n# Server\r\nredis_version:5.0.7\r\n\r\n");
+        Map<String, String> info = redis.info();
+
+        assertThat(info).containsEntry("redis_version", "5.0.7");
+        assertRequestEquals("*1\r\n$4\r\nINFO\r\n");
     }
 }
