@@ -1,7 +1,8 @@
 ## Change log
 ### 7.3.4 (1/29/2020 - )
 * es: update to 7.5.2
-* redis: added info, for later monitoring support
+* redis: added info
+* monitor: added redis monitoring, refer to https://github.com/neowu/core-ng-project/wiki/Ext for example config
 
 ### 7.3.3 (1/22/2020 - 1/23/2020)
 * log: replaced "server_ip" with "host" field in action/stat log

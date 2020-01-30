@@ -1,0 +1,8 @@
+{
+  "redis": {
+    "session": {
+      "hosts": ["session-0.session"],
+      "highMemUsageThreshold": 0.8
+    }
+  }
+}

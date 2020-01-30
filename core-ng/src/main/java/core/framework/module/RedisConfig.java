@@ -60,4 +60,8 @@ public class RedisConfig extends Config {
     public void timeout(Duration timeout) {
         ((RedisImpl) redis).timeout(timeout);
     }
+
+    public Redis client() {
+        return redis;
+    }
 }

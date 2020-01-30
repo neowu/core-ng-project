@@ -82,7 +82,7 @@ public class StatCollector {
         double usage = usedHeap / maxHeap;
         if (usage >= highHeapUsageThreshold) {
             NumberFormat format = NumberFormat.getPercentInstance();
-            stats.warn("HIGH_HEAP_USAGE", "cpu usage is too high, usage=" + format.format(usage));
+            stats.warn("HIGH_HEAP_USAGE", "heap usage is too high, usage=" + format.format(usage));
         }
     }
 
