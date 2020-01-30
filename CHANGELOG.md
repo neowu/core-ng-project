@@ -1,5 +1,5 @@
 ## Change log
-### 7.3.4 (1/29/2020 - )
+### 7.3.4 (1/29/2020 - 1/30/2020)
 * es: update to 7.5.2
 * redis: added info
 * monitor: added redis monitoring, refer to https://github.com/neowu/core-ng-project/wiki/Ext for example config
