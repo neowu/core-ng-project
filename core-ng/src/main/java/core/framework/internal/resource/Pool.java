@@ -82,7 +82,7 @@ public class Pool<T extends AutoCloseable> {
             valid = false;
         }
         if (!valid) {
-            logger.warn(errorCode("INVALID_POOL_RESOURCE"), "resource is not valid, try to obtain different one immediately");
+            logger.warn(errorCode("BROKEN_POOL_CONNECTION"), "connection is broken, try to reconnect immediately, pool=" + name);
             closeItem(item);
         }
         return valid;

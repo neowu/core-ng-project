@@ -19,7 +19,9 @@ public class TestModule extends AbstractTestModule {
         search.slowOperationThreshold(Duration.ofSeconds(5));
         search.type(TestDocument.class);
 
-        config(InitSearchConfig.class).putIndex("document", "search-test/document-index.json");
-        config(InitSearchConfig.class).putIndexTemplate("document", "search-test/document-index-template.json");
+        InitSearchConfig initSearch = config(InitSearchConfig.class);
+        initSearch.putIndex("document", "search-test/document-index.json");
+        initSearch.putIndexTemplate("document", "search-test/document-index-template.json");
+        initSearch.flush("document");
     }
 }
