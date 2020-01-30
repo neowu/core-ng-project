@@ -51,8 +51,8 @@ public class MonitorApp extends App {
 
         Bean.register(MonitorConfig.class);
         MonitorConfig config = Bean.fromJSON(MonitorConfig.class, monitorConfigJSON.get());
-        MessagePublisher<StatMessage> publisher = kafka().publish(LogTopics.TOPIC_STAT, StatMessage.class);
         if (!config.redis.isEmpty()) {
+            MessagePublisher<StatMessage> publisher = kafka().publish(LogTopics.TOPIC_STAT, StatMessage.class);
             configureRedisJob(publisher, config.redis);
         }
     }
