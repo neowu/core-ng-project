@@ -34,11 +34,17 @@ public class RedisCollector implements Collector {
         stats.put("redis_mem_used", usedMem);
         checkHighMemUsage(stats, usedMem, maxMem);
 
-        String keySpace = info.get("db0");  // e.g. keys=5,expires=0,avg_ttl=0
-        int index = keySpace.indexOf(',');
-        stats.put("redis_keys", Integer.parseInt(keySpace.substring(5, index)));
+        int keys = keys(info);
+        stats.put("redis_keys", keys);
 
         return stats;
+    }
+
+    int keys(Map<String, String> info) {
+        String keySpace = info.get("db0");      // e.g. keys=5,expires=0,avg_ttl=0
+        if (keySpace == null) return 0;         // db0 returns null if there is not any key
+        int index = keySpace.indexOf(',');
+        return Integer.parseInt(keySpace.substring(5, index));
     }
 
     private void checkHighMemUsage(Stats stats, double usedMem, double maxMem) {

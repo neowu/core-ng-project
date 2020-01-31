@@ -32,4 +32,9 @@ class RedisCollectorTest {
                 .containsEntry("redis_keys", 5d)
                 .containsEntry("redis_mem_used", 800000d);
     }
+
+    @Test
+    void keys() {
+        assertThat(collector.keys(Map.of())).isEqualTo(0);
+    }
 }
