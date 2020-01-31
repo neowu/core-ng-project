@@ -631,6 +631,32 @@
     "type": "visualization"
   },
   {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
+      "title": "stat-redis_keys",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"title\":\"stat-redis_keys\",\"type\":\"metrics\",\"params\":{\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"type\":\"timeseries\",\"series\":[{\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"color\":\"rgba(0,156,224,1)\",\"split_mode\":\"everything\",\"metrics\":[{\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"avg\",\"field\":\"stats.redis_keys\"}],\"separate_axis\":0,\"axis_position\":\"right\",\"formatter\":\"number\",\"chart_type\":\"line\",\"line_width\":\"1\",\"point_size\":\"1\",\"fill\":\"0.5\",\"stacked\":\"none\",\"label\":\"redis keys\",\"type\":\"timeseries\",\"steps\":0}],\"time_field\":\"@timestamp\",\"index_pattern\":\"stat-*\",\"interval\":\"\",\"axis_position\":\"left\",\"axis_formatter\":\"number\",\"axis_scale\":\"normal\",\"show_legend\":1,\"show_grid\":1,\"default_index_pattern\":\"action-*\",\"default_timefield\":\"@timestamp\",\"isModelInvalid\":false},\"aggs\":[]}"
+    },
+    "id": "stat-redis_keys",
+    "references": [],
+    "type": "visualization"
+  },
+  {
+    "attributes": {
+      "description": "",
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"},
+      "title": "stat-redis_mem",
+      "uiStateJSON": "{}",
+      "version": 1,
+      "visState": "{\"title\":\"stat-redis_mem\",\"type\":\"metrics\",\"params\":{\"axis_formatter\":\"number\",\"axis_position\":\"left\",\"axis_scale\":\"normal\",\"default_index_pattern\":\"action-*\",\"default_timefield\":\"@timestamp\",\"id\":\"61ca57f0-469d-11e7-af02-69e470af7417\",\"index_pattern\":\"stat-*\",\"interval\":\"\",\"isModelInvalid\":false,\"series\":[{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(174,161,255,1)\",\"fill\":\"0.5\",\"formatter\":\"bytes\",\"id\":\"61ca57f1-469d-11e7-af02-69e470af7417\",\"label\":\"redis max mem\",\"line_width\":\"1\",\"metrics\":[{\"field\":\"stats.redis_mem_max\",\"id\":\"61ca57f2-469d-11e7-af02-69e470af7417\",\"type\":\"max\"}],\"point_size\":\"1\",\"separate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\",\"steps\":0,\"type\":\"timeseries\"},{\"axis_position\":\"right\",\"chart_type\":\"line\",\"color\":\"rgba(123,100,255,1)\",\"fill\":\"0.5\",\"formatter\":\"bytes\",\"id\":\"c90a2c90-4449-11ea-b9a6-e7ecf69ef6da\",\"label\":\"redis used mem\",\"line_width\":\"1\",\"metrics\":[{\"field\":\"stats.redis_mem_used\",\"id\":\"c90a2c91-4449-11ea-b9a6-e7ecf69ef6da\",\"type\":\"max\"}],\"point_size\":\"1\",\"separate_axis\":0,\"split_mode\":\"everything\",\"stacked\":\"none\",\"steps\":0,\"type\":\"timeseries\"}],\"show_grid\":1,\"show_legend\":1,\"time_field\":\"@timestamp\",\"type\":\"timeseries\"},\"aggs\":[]}"
+    },
+    "id": "stat-redis_mem",
+    "references": [],
+    "type": "visualization"
+  },
+  {
     "id": "action-dashboard",
     "type": "dashboard",
     "attributes": {
@@ -750,7 +776,7 @@
       "hits": 0,
       "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"match_all\":{}},\"language\":\"lucene\"}}"},
       "optionsJSON": "{\"darkTheme\":true,\"hidePanelTitles\":false,\"useMargins\":true}",
-      "panelsJSON": "[{\"panelIndex\":\"1\",\"gridData\":{\"x\":0,\"y\":0,\"w\":48,\"h\":13,\"i\":\"1\"},\"embeddableConfig\":{\"vis\":{\"legendOpen\":false}},\"version\":\"7.3.0\",\"panelRefName\":\"panel_0\"},{\"panelIndex\":\"2\",\"gridData\":{\"x\":0,\"y\":28,\"w\":48,\"h\":14,\"i\":\"2\"},\"embeddableConfig\":{\"vis\":{\"legendOpen\":false}},\"version\":\"7.3.0\",\"panelRefName\":\"panel_1\"},{\"panelIndex\":\"3\",\"gridData\":{\"x\":0,\"y\":13,\"w\":48,\"h\":15,\"i\":\"3\"},\"embeddableConfig\":{\"vis\":{\"legendOpen\":false}},\"version\":\"7.3.0\",\"panelRefName\":\"panel_2\"},{\"panelIndex\":\"4\",\"gridData\":{\"x\":0,\"y\":42,\"w\":48,\"h\":16,\"i\":\"4\"},\"version\":\"7.3.0\",\"embeddableConfig\":{\"vis\":{\"legendOpen\":false}},\"panelRefName\":\"panel_3\"},{\"panelIndex\":\"5\",\"gridData\":{\"x\":0,\"y\":58,\"w\":48,\"h\":14,\"i\":\"5\"},\"version\":\"7.3.0\",\"embeddableConfig\":{\"vis\":{\"legendOpen\":false}},\"panelRefName\":\"panel_4\"}]",
+      "panelsJSON": "[\n  {\"version\": \"7.5.1\", \"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_0\"},\n  {\"version\": \"7.5.1\", \"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_1\"},\n  {\"version\": \"7.5.1\", \"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_2\"},\n  {\"version\": \"7.5.1\", \"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_3\"},\n  {\"version\": \"7.5.1\", \"gridData\": {\"x\": 0, \"y\": 60, \"w\": 48, \"h\": 15, \"i\": \"5\"}, \"panelIndex\": \"5\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_4\"},\n  {\"version\": \"7.5.1\", \"gridData\": {\"x\": 0, \"y\": 75, \"w\": 48, \"h\": 15, \"i\": \"6\"}, \"panelIndex\": \"6\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_5\"},\n  {\"version\": \"7.5.1\", \"gridData\": {\"x\": 0, \"y\": 90, \"w\": 48, \"h\": 15, \"i\": \"7\"}, \"panelIndex\": \"7\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_6\"}\n]",
       "timeRestore": false,
       "title": "redis",
       "version": 1
@@ -760,7 +786,9 @@
       {"id": "perf-redis-io", "name": "panel_1", "type": "visualization"},
       {"id": "perf-redis-count", "name": "panel_2", "type": "visualization"},
       {"id": "stat-pool_redis_count", "name": "panel_3", "type": "visualization"},
-      {"id": "stat-pool_redis-cache_count", "name": "panel_4", "type": "visualization"}
+      {"id": "stat-pool_redis-cache_count", "name": "panel_4", "type": "visualization"},
+      {"id": "stat-redis_mem", "name": "panel_5", "type": "visualization"},
+      {"id": "stat-redis_keys", "name": "panel_6", "type": "visualization"}
     ]
   },
   {
