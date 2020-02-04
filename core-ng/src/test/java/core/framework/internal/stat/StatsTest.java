@@ -20,14 +20,28 @@ class StatsTest {
     void result() {
         assertThat(stats.result()).isEqualTo("OK");
 
-        stats.warn("HIGH_CPU_USAGE", "cpu usage is too high, usage=80%");
+        stats.errorCode = "HIGH_CPU_USAGE";
         assertThat(stats.result()).isEqualTo("WARN");
     }
 
     @Test
-    void warn() {
-        stats.warn("WARN1", "message1");
-        stats.warn("WARN2", "message2");
-        assertThat(stats.errorCode).isEqualTo("WARN1");
+    void checkHighUsage() {
+        stats.checkHighUsage(7, 10, 0.8, "disk");
+        assertThat(stats.errorCode).isNull();
+
+        stats.checkHighUsage(8, 10, 0.8, "disk");
+        assertThat(stats.errorCode).isEqualTo("HIGH_DISK_USAGE");
+        assertThat(stats.errorMessage).isEqualTo("disk usage is too high, usage=80%");
+    }
+
+    @Test
+    void checkHighUsageWithPercent() {
+        stats.checkHighUsage(0.7, 0.8, "cpu");
+        assertThat(stats.errorCode).isNull();
+
+        stats.checkHighUsage(0.8, 0.8, "cpu");
+        assertThat(stats.errorCode).isEqualTo("HIGH_CPU_USAGE");
+        assertThat(stats.errorMessage).isEqualTo("cpu usage is too high, usage=80%");
+
     }
 }

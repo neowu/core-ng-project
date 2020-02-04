@@ -3,6 +3,7 @@ package app;
 import app.monitor.AlertConfig;
 import app.monitor.MonitorConfig;
 import app.monitor.alert.AlertService;
+import app.monitor.job.ElasticSearchCollector;
 import app.monitor.job.MonitorJob;
 import app.monitor.job.RedisCollector;
 import app.monitor.kafka.ActionLogMessageHandler;
@@ -51,9 +52,28 @@ public class MonitorApp extends App {
 
         Bean.register(MonitorConfig.class);
         MonitorConfig config = Bean.fromJSON(MonitorConfig.class, monitorConfigJSON.get());
+        MessagePublisher<StatMessage> publisher = kafka().publish(LogTopics.TOPIC_STAT, StatMessage.class);
         if (!config.redis.isEmpty()) {
-            MessagePublisher<StatMessage> publisher = kafka().publish(LogTopics.TOPIC_STAT, StatMessage.class);
             configureRedisJob(publisher, config.redis);
+        }
+        if (!config.es.isEmpty()) {
+            configureESJob(publisher, config.es);
+        }
+    }
+
+    private void configureESJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.ElasticSearchConfig> config) {
+        HTTPClient httpClient = new HTTPClientBuilder().build();
+        for (Map.Entry<String, MonitorConfig.ElasticSearchConfig> entry : config.entrySet()) {
+            String app = entry.getKey();
+            MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();
+            for (String host : esConfig.hosts) {
+                var collector = new ElasticSearchCollector(httpClient, host);
+                collector.highCPUUsageThreshold = esConfig.highCPUUsageThreshold;
+                collector.highMemUsageThreshold = esConfig.highMemUsageThreshold;
+                collector.highHeapUsageThreshold = esConfig.highHeapUsageThreshold;
+                collector.highDiskUsageThreshold = esConfig.highDiskUsageThreshold;
+                schedule().fixedRate("es-" + host, new MonitorJob(collector, app, host, publisher), Duration.ofSeconds(10));
+            }
         }
     }
 

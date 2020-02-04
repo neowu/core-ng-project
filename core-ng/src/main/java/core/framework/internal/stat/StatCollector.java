@@ -10,7 +10,6 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
-import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -60,7 +59,7 @@ public class StatCollector {
         double maxHeap = usage.getMax();
         stats.put("jvm_heap_used", usedHeap);
         stats.put("jvm_heap_max", maxHeap);
-        checkHighHeapUsage(usedHeap, maxHeap, stats);
+        stats.checkHighUsage(usedHeap, maxHeap, highHeapUsageThreshold, "heap");
     }
 
     private void collectCPUUsage(Stats stats) {
@@ -68,22 +67,7 @@ public class StatCollector {
 
         double cpuUsage = cpuStat.usage();
         stats.put("cpu_usage", cpuUsage);
-        checkHighCPUUsage(cpuUsage, stats);
-    }
-
-    void checkHighCPUUsage(double usage, Stats stats) {
-        if (usage >= highCPUUsageThreshold) {
-            NumberFormat format = NumberFormat.getPercentInstance();
-            stats.warn("HIGH_CPU_USAGE", "cpu usage is too high, usage=" + format.format(usage));
-        }
-    }
-
-    void checkHighHeapUsage(double usedHeap, double maxHeap, Stats stats) {
-        double usage = usedHeap / maxHeap;
-        if (usage >= highHeapUsageThreshold) {
-            NumberFormat format = NumberFormat.getPercentInstance();
-            stats.warn("HIGH_HEAP_USAGE", "heap usage is too high, usage=" + format.format(usage));
-        }
+        stats.checkHighUsage(cpuUsage, highCPUUsageThreshold, "cpu");
     }
 
     private void collectMetrics(Stats stats) {

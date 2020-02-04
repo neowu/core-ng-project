@@ -3,7 +3,6 @@ package app.monitor.job;
 import core.framework.internal.stat.Stats;
 import core.framework.redis.Redis;
 
-import java.text.NumberFormat;
 import java.util.Map;
 
 /**
@@ -32,7 +31,7 @@ public class RedisCollector implements Collector {
         stats.put("redis_mem_max", maxMem);
         double usedMem = get(info, "used_memory");
         stats.put("redis_mem_used", usedMem);
-        checkHighMemUsage(stats, usedMem, maxMem);
+        stats.checkHighUsage(usedMem, maxMem, highMemUsageThreshold, "mem");
 
         int keys = keys(info);
         stats.put("redis_keys", keys);
@@ -45,14 +44,6 @@ public class RedisCollector implements Collector {
         if (keySpace == null) return 0;         // db0 returns null if there is not any key
         int index = keySpace.indexOf(',');
         return Integer.parseInt(keySpace.substring(5, index));
-    }
-
-    private void checkHighMemUsage(Stats stats, double usedMem, double maxMem) {
-        double usage = usedMem / maxMem;
-        if (usage >= highMemUsageThreshold) {
-            NumberFormat format = NumberFormat.getPercentInstance();
-            stats.warn("HIGH_MEM_USAGE", "memory usage is too high, usage=" + format.format(usage));
-        }
     }
 
     private double get(Map<String, String> info, String key) {

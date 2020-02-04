@@ -17,6 +17,10 @@ public class MonitorConfig {
     @Property(name = "redis")
     public Map<String, RedisConfig> redis = Map.of();
 
+    @NotNull
+    @Property(name = "es")
+    public Map<String, ElasticSearchConfig> es = Map.of();
+
     public static class RedisConfig {
         @NotNull
         @Size(min = 1)
@@ -27,6 +31,37 @@ public class MonitorConfig {
         @Min(0)
         @Max(1)
         @Property(name = "highMemUsageThreshold")
-        public Double highMemUsageThreshold = 0.8;
+        public Double highMemUsageThreshold = 0.7;
+    }
+
+    public static class ElasticSearchConfig {
+        @NotNull
+        @Size(min = 1)
+        @Property(name = "hosts")
+        public List<String> hosts = List.of();
+
+        @NotNull
+        @Min(0)
+        @Max(1)
+        @Property(name = "highCPUUsageThreshold")
+        public Double highCPUUsageThreshold = 0.7;
+
+        @NotNull
+        @Min(0)
+        @Max(1)
+        @Property(name = "highDiskUsageThreshold")
+        public Double highDiskUsageThreshold = 0.7;
+
+        @NotNull
+        @Min(0)
+        @Max(1)
+        @Property(name = "highHeapUsageThreshold")
+        public Double highHeapUsageThreshold = 0.7;
+
+        @NotNull
+        @Min(0)
+        @Max(1)
+        @Property(name = "highMemUsageThreshold")
+        public Double highMemUsageThreshold = 0.7;
     }
 }
