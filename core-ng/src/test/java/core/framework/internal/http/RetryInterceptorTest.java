@@ -18,6 +18,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpTimeoutException;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -32,7 +33,7 @@ class RetryInterceptorTest {
 
     @BeforeEach
     void createRetryInterceptor() {
-        interceptor = new RetryInterceptor(3, time -> {
+        interceptor = new RetryInterceptor(3, Duration.ofMillis(500), time -> {
             // skip sleep
         });
     }
@@ -167,6 +168,12 @@ class RetryInterceptorTest {
         assertThat(interceptor.shouldRetry(1, HTTPStatus.OK.code)).isFalse();
         assertThat(interceptor.shouldRetry(1, HTTPStatus.SERVICE_UNAVAILABLE.code)).isTrue();
         assertThat(interceptor.shouldRetry(3, HTTPStatus.SERVICE_UNAVAILABLE.code)).isFalse();
+    }
+
+    @Test
+    void shouldRetryWithTooManyRequest() {
+        assertThat(interceptor.shouldRetry(1, HTTPStatus.TOO_MANY_REQUESTS.code)).isTrue();
+        assertThat(interceptor.shouldRetry(3, HTTPStatus.TOO_MANY_REQUESTS.code)).isFalse();
     }
 
     @Test

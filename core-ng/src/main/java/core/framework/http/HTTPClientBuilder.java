@@ -41,6 +41,7 @@ public final class HTTPClientBuilder {
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
     private Integer maxRetries;
+    private Duration retryWaitTime = Duration.ofMillis(500);
 
     public HTTPClient build() {
         var watch = new StopWatch();
@@ -61,7 +62,7 @@ public final class HTTPClientBuilder {
             }
             if (maxRetries != null) {
                 builder.addNetworkInterceptor(new ServiceUnavailableInterceptor());
-                builder.addInterceptor(new RetryInterceptor(maxRetries, Threads::sleepRoughly));
+                builder.addInterceptor(new RetryInterceptor(maxRetries, retryWaitTime, Threads::sleepRoughly));
             }
             if (enableCookie) builder.cookieJar(new CookieManager());
 
@@ -95,6 +96,11 @@ public final class HTTPClientBuilder {
 
     public HTTPClientBuilder maxRetries(int maxRetries) {
         this.maxRetries = maxRetries;
+        return this;
+    }
+
+    public HTTPClientBuilder retryWaitTime(Duration waitTime) {
+        retryWaitTime = waitTime;
         return this;
     }
 

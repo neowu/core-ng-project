@@ -21,11 +21,13 @@ import static okhttp3.internal.Util.closeQuietly;
 public class RetryInterceptor implements Interceptor {
     private final Logger logger = LoggerFactory.getLogger(RetryInterceptor.class);
     private final int maxRetries;
+    private final int waitTimeInMs;
     private final ThreadSleep sleep;
 
-    public RetryInterceptor(int maxRetries, ThreadSleep sleep) {
+    public RetryInterceptor(int maxRetries, Duration retryWaitTime, ThreadSleep sleep) {
         this.maxRetries = maxRetries;
         this.sleep = sleep;
+        waitTimeInMs = (int) retryWaitTime.toMillis();
     }
 
     @Override
@@ -36,8 +38,9 @@ public class RetryInterceptor implements Interceptor {
             attempts++;
             try {
                 Response response = chain.proceed(request);
-                if (shouldRetry(attempts, response.code())) {
-                    logger.warn(Markers.errorCode("HTTP_REQUEST_FAILED"), "service unavailable, retry soon, uri={}", request.url());
+                int statusCode = response.code();
+                if (shouldRetry(attempts, statusCode)) {
+                    logger.warn(Markers.errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, request.url());
                     closeRequestBody(response);
                     sleep.sleep(waitTime(attempts));
                     continue;
@@ -60,7 +63,9 @@ public class RetryInterceptor implements Interceptor {
     }
 
     boolean shouldRetry(int attempts, int statusCode) {
-        return attempts < maxRetries && statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code;
+        return attempts < maxRetries &&
+                (statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code
+                        || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code);
     }
 
     boolean shouldRetry(int attempts, String method, IOException e) {
@@ -76,7 +81,7 @@ public class RetryInterceptor implements Interceptor {
     }
 
     Duration waitTime(int attempts) {
-        return Duration.ofMillis(500 << attempts - 1);
+        return Duration.ofMillis(waitTimeInMs << attempts - 1);
     }
 
     public interface ThreadSleep {
