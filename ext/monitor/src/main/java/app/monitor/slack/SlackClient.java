@@ -6,7 +6,6 @@ import core.framework.http.HTTPHeaders;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.inject.Inject;
 import core.framework.json.Bean;
 
 import java.util.List;
@@ -17,11 +16,10 @@ import java.util.List;
 public class SlackClient {
     private static final String SLACK_API_URL = "https://slack.com/api/chat.postMessage";
     private final String token;
+    private final HTTPClient httpClient;
 
-    @Inject
-    HTTPClient httpClient;
-
-    public SlackClient(String token) {
+    public SlackClient(HTTPClient httpClient, String token) {
+        this.httpClient = httpClient;
         this.token = token;
     }
 

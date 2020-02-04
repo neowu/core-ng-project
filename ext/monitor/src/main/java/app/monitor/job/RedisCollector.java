@@ -26,7 +26,7 @@ public class RedisCollector implements Collector {
     }
 
     Stats collect(Map<String, String> info) {
-        Stats stats = new Stats();
+        var stats = new Stats();
         double maxMem = get(info, "maxmemory");
         if (maxMem == 0) maxMem = get(info, "total_system_memory");
         stats.put("redis_mem_max", maxMem);

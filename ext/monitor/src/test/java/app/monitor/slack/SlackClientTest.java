@@ -15,7 +15,7 @@ class SlackClientTest {
 
     @BeforeEach
     void createSlackClient() {
-        client = new SlackClient(null);
+        client = new SlackClient(null, null);
     }
 
     @Test

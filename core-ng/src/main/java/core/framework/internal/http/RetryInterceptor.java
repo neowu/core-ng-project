@@ -63,9 +63,8 @@ public class RetryInterceptor implements Interceptor {
     }
 
     boolean shouldRetry(int attempts, int statusCode) {
-        return attempts < maxRetries &&
-                (statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code
-                        || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code);
+        return attempts < maxRetries
+                && (statusCode == HTTPStatus.SERVICE_UNAVAILABLE.code || statusCode == HTTPStatus.TOO_MANY_REQUESTS.code);
     }
 
     boolean shouldRetry(int attempts, String method, IOException e) {

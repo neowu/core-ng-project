@@ -82,13 +82,13 @@ public class MonitorApp extends App {
     }
 
     private void configureSlackClient() {
-        bind(HTTPClient.class, new HTTPClientBuilder()
+        HTTPClient httpClient = new HTTPClientBuilder()
                 .maxRetries(3)
                 .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
-                .build());
+                .build();
 
         Bean.register(SlackMessageAPIRequest.class);
         Bean.register(SlackMessageAPIResponse.class);
-        bind(new SlackClient(requiredProperty("app.slack.token")));
+        bind(new SlackClient(httpClient, requiredProperty("app.slack.token")));
     }
 }
