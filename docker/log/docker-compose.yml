@@ -1,52 +1,52 @@
 version: "3"
 services:
-    elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.5.2
-        ports:
-        - 9200:9200
-        environment:
-        - cluster.name=log
-        - discovery.type=single-node
-        - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    kibana:
-      image: docker.elastic.co/kibana/kibana-oss:7.5.2
-        ports:
-        - 5601:5601
-        environment:
-        - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-        - TELEMETRY_ENABLED=false
-        depends_on:
-        - elasticsearch
-    zookeeper:
-        image: zookeeper
-        ports:
-        - 2181
-        environment:
-        - JMXDISABLE=true
-    kafka:
-        image: neowu/kafka:2.4.0
-        ports:
-        - 9092:9092
-        environment:
-        - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092
-        depends_on:
-        - zookeeper
-    log-processor:
-      image: neowu/log-processor:7.3.4
-        environment:
-        - JAVA_OPTS=-Xms256m -Xmx2048m -Xss256k
-        - SYS_KAFKA_URI=kafka:9092
-        - SYS_ELASTICSEARCH_HOST=elasticsearch
-        - KIBANA_URL=http://kibana:5601
-        - KIBANA_BANNER=# local
-        depends_on:
-        - kafka
-        - elasticsearch
-    log-collector:
-      image: neowu/log-collector:7.3.4
-        environment:
-        - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
-        - SYS_KAFKA_URI=kafka:9092
-        - SYS_LOG_APPENDER=kafka:9092
-        depends_on:
-        - kafka
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.5.2
+    ports:
+    - 9200:9200
+    environment:
+    - cluster.name=log
+    - discovery.type=single-node
+    - ES_JAVA_OPTS=-Xms512m -Xmx512m
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:7.5.2
+    ports:
+    - 5601:5601
+    environment:
+    - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    - TELEMETRY_ENABLED=false
+    depends_on:
+    - elasticsearch
+  zookeeper:
+    image: zookeeper
+    ports:
+    - 2181
+    environment:
+    - JMXDISABLE=true
+  kafka:
+    image: neowu/kafka:2.4.0
+    ports:
+    - 9092:9092
+    environment:
+    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092
+    depends_on:
+    - zookeeper
+  log-processor:
+    image: neowu/log-processor:7.3.5
+    environment:
+    - JAVA_OPTS=-Xms256m -Xmx1024m -Xss256k
+    - SYS_KAFKA_URI=kafka:9092
+    - SYS_ELASTICSEARCH_HOST=elasticsearch
+    - KIBANA_URL=http://kibana:5601
+    - KIBANA_BANNER=# local
+    depends_on:
+    - kafka
+    - elasticsearch
+  log-collector:
+    image: neowu/log-collector:7.3.4
+    environment:
+    - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
+    - SYS_KAFKA_URI=kafka:9092
+    - SYS_LOG_APPENDER=kafka:9092
+    depends_on:
+    - kafka

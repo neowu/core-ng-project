@@ -26,7 +26,6 @@ import core.framework.redis.Redis;
 
 import java.time.Duration;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author ericchung
@@ -39,19 +38,14 @@ public class MonitorApp extends App {
         load(new SystemModule("sys.properties"));
         loadProperties("app.properties");
 
-        configureSlackClient(); // currently only support slack notification
-
-        configureAlert();
-
-        configureMonitor();
+        property("app.slack.token").ifPresent(this::configureSlackClient);
+        property("app.alert.config").ifPresent(this::configureAlert);
+        property("app.monitor.config").ifPresent(this::configureMonitor);
     }
 
-    private void configureMonitor() {
-        Optional<String> monitorConfigJSON = property("app.monitor.config");
-        if (monitorConfigJSON.isEmpty()) return;
-
+    private void configureMonitor(String monitorConfig) {
         Bean.register(MonitorConfig.class);
-        MonitorConfig config = Bean.fromJSON(MonitorConfig.class, monitorConfigJSON.get());
+        MonitorConfig config = Bean.fromJSON(MonitorConfig.class, monitorConfig);
         MessagePublisher<StatMessage> publisher = kafka().publish(LogTopics.TOPIC_STAT, StatMessage.class);
         if (!config.redis.isEmpty()) {
             configureRedisJob(publisher, config.redis);
@@ -77,6 +71,17 @@ public class MonitorApp extends App {
         }
     }
 
+    private void configureAlert(String alertConfig) {
+        Bean.register(AlertConfig.class);
+        AlertConfig config = Bean.fromJSON(AlertConfig.class, alertConfig);
+        bind(new AlertService(config));
+        kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
+        kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get 1M message
+        kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
+        kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));
+        kafka().subscribe(LogTopics.TOPIC_EVENT, EventMessage.class, bind(EventMessageHandler.class));
+    }
+
     private void configureRedisJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.RedisConfig> config) {
         for (Map.Entry<String, MonitorConfig.RedisConfig> entry : config.entrySet()) {
             String app = entry.getKey();
@@ -90,18 +95,7 @@ public class MonitorApp extends App {
         }
     }
 
-    private void configureAlert() {
-        Bean.register(AlertConfig.class);
-        AlertConfig config = Bean.fromJSON(AlertConfig.class, requiredProperty("app.alert.config"));
-        bind(new AlertService(config));
-        kafka().poolSize(Runtime.getRuntime().availableProcessors() == 1 ? 1 : 2);
-        kafka().minPoll(1024 * 1024, Duration.ofMillis(500));           // try to get 1M message
-        kafka().subscribe(LogTopics.TOPIC_ACTION_LOG, ActionLogMessage.class, bind(ActionLogMessageHandler.class));
-        kafka().subscribe(LogTopics.TOPIC_STAT, StatMessage.class, bind(StatMessageHandler.class));
-        kafka().subscribe(LogTopics.TOPIC_EVENT, EventMessage.class, bind(EventMessageHandler.class));
-    }
-
-    private void configureSlackClient() {
+    private void configureSlackClient(String slackToken) {
         HTTPClient httpClient = new HTTPClientBuilder()
                 .maxRetries(3)
                 .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
@@ -109,6 +103,6 @@ public class MonitorApp extends App {
 
         Bean.register(SlackMessageAPIRequest.class);
         Bean.register(SlackMessageAPIResponse.class);
-        bind(new SlackClient(httpClient, requiredProperty("app.slack.token")));
+        bind(new SlackClient(httpClient, slackToken));
     }
 }

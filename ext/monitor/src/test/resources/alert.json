@@ -1,0 +1,8 @@
+{
+  "ignoreWarnings": [
+    {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"]}
+  ],
+  "criticalErrors": [],
+  "kibanaURL": "http://kibana:5601",
+  "channel": {"eventError": "mockChannel", "eventWarn": "mockChannel", "actionError": "mockChannel", "actionWarn": "mockChannel"}
+}

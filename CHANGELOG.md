@@ -2,6 +2,7 @@
 ### 7.3.5 (1/30/2020 - )
 * httpClient: support retry on 429 too many requests
 * monitor: added es monitoring, refer to https://github.com/neowu/core-ng-project/wiki/Ext for example config
+* log-processor: added realted es visualization and dashboard 
 
 ### 7.3.4 (1/29/2020 - 1/30/2020)
 * es: update to 7.5.2
