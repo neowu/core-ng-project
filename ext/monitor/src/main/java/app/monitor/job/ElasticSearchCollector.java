@@ -57,7 +57,7 @@ public class ElasticSearchCollector implements Collector {
         stats.put("es_heap_used", heapUsed);
         double heapMax = get(values, "heap.max");
         stats.put("es_heap_max", heapMax);
-        stats.checkHighUsage(heapUsed, heapMax, highHeapUsageThreshold, "heap");
+        stats.checkHighUsage(heapUsed / heapMax, highHeapUsageThreshold, "heap");
     }
 
     private void collectDisk(Stats stats, Map<String, String> values) {
@@ -65,7 +65,7 @@ public class ElasticSearchCollector implements Collector {
         stats.put("es_disk_used", diskUsed);
         double diskMax = get(values, "disk.total");
         stats.put("es_disk_max", diskMax);
-        stats.checkHighUsage(diskUsed, diskMax, highDiskUsageThreshold, "disk");
+        stats.checkHighUsage(diskUsed / diskMax, highDiskUsageThreshold, "disk");
     }
 
     private void collectMem(Stats stats, Map<String, String> values) {
@@ -73,7 +73,7 @@ public class ElasticSearchCollector implements Collector {
         stats.put("es_mem_used", memUsed);
         double memMax = get(values, "ram.max");
         stats.put("es_mem_max", memMax);
-        stats.checkHighUsage(memUsed, memMax, highMemUsageThreshold, "mem");
+        stats.checkHighUsage(memUsed / memMax, highMemUsageThreshold, "mem");
     }
 
     private double get(Map<String, String> values, String field) {

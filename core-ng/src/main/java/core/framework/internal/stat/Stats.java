@@ -23,20 +23,11 @@ public class Stats {
         stats.put(key, value);
     }
 
-    public void checkHighUsage(double used, double max, double threshold, String name) {
-        double usage = used / max;
+    public void checkHighUsage(double usage, double threshold, String name) {
         if (usage >= threshold) {
             NumberFormat format = NumberFormat.getPercentInstance();
             errorCode = "HIGH_" + ASCII.toUpperCase(name) + "_USAGE";
             errorMessage = name + " usage is too high, usage=" + format.format(usage);
-        }
-    }
-
-    public void checkHighUsage(double usagePercent, double threshold, String name) {
-        if (usagePercent >= threshold) {
-            NumberFormat format = NumberFormat.getPercentInstance();
-            errorCode = "HIGH_" + ASCII.toUpperCase(name) + "_USAGE";
-            errorMessage = name + " usage is too high, usage=" + format.format(usagePercent);
         }
     }
 }

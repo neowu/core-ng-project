@@ -31,7 +31,7 @@ public class RedisCollector implements Collector {
         stats.put("redis_mem_max", maxMem);
         double usedMem = get(info, "used_memory");
         stats.put("redis_mem_used", usedMem);
-        stats.checkHighUsage(usedMem, maxMem, highMemUsageThreshold, "mem");
+        stats.checkHighUsage(usedMem / maxMem, highMemUsageThreshold, "mem");
 
         int keys = keys(info);
         stats.put("redis_keys", keys);

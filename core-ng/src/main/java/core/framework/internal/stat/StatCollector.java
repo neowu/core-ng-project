@@ -59,7 +59,7 @@ public class StatCollector {
         double maxHeap = usage.getMax();
         stats.put("jvm_heap_used", usedHeap);
         stats.put("jvm_heap_max", maxHeap);
-        stats.checkHighUsage(usedHeap, maxHeap, highHeapUsageThreshold, "heap");
+        stats.checkHighUsage(usedHeap / maxHeap, highHeapUsageThreshold, "heap");
     }
 
     private void collectCPUUsage(Stats stats) {

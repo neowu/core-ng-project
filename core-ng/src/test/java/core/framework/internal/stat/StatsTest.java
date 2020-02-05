@@ -26,22 +26,11 @@ class StatsTest {
 
     @Test
     void checkHighUsage() {
-        stats.checkHighUsage(7, 10, 0.8, "disk");
+        stats.checkHighUsage(0.7, 0.8, "disk");
         assertThat(stats.errorCode).isNull();
 
-        stats.checkHighUsage(8, 10, 0.8, "disk");
+        stats.checkHighUsage(0.8, 0.8, "disk");
         assertThat(stats.errorCode).isEqualTo("HIGH_DISK_USAGE");
         assertThat(stats.errorMessage).isEqualTo("disk usage is too high, usage=80%");
-    }
-
-    @Test
-    void checkHighUsageWithPercent() {
-        stats.checkHighUsage(0.7, 0.8, "cpu");
-        assertThat(stats.errorCode).isNull();
-
-        stats.checkHighUsage(0.8, 0.8, "cpu");
-        assertThat(stats.errorCode).isEqualTo("HIGH_CPU_USAGE");
-        assertThat(stats.errorMessage).isEqualTo("cpu usage is too high, usage=80%");
-
     }
 }
