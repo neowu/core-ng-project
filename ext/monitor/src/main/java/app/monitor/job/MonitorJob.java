@@ -39,6 +39,8 @@ public class MonitorJob implements Job {
             Stats stats = collector.collect();
             message.result = stats.result();
             message.stats = stats.stats;
+            message.errorCode = stats.errorCode;
+            message.errorMessage = stats.errorMessage;
         } catch (Throwable e) {
             logger.warn(e.getMessage(), e);
             message.result = "ERROR";

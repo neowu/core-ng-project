@@ -8,8 +8,6 @@
   "es": {
     "log": {
       "hosts": ["log-es-0.log-es"],
-      "highCPUUsageThreshold": 0.7,
-      "highMemUsageThreshold": 0.7,
       "highHeapUsageThreshold": 0.7,
       "highDiskUsageThreshold": 0.7
     }

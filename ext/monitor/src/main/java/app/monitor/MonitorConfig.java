@@ -43,12 +43,6 @@ public class MonitorConfig {
         @NotNull
         @Min(0)
         @Max(1)
-        @Property(name = "highCPUUsageThreshold")
-        public Double highCPUUsageThreshold = 0.7;
-
-        @NotNull
-        @Min(0)
-        @Max(1)
         @Property(name = "highDiskUsageThreshold")
         public Double highDiskUsageThreshold = 0.7;
 
@@ -57,11 +51,5 @@ public class MonitorConfig {
         @Max(1)
         @Property(name = "highHeapUsageThreshold")
         public Double highHeapUsageThreshold = 0.7;
-
-        @NotNull
-        @Min(0)
-        @Max(1)
-        @Property(name = "highMemUsageThreshold")
-        public Double highMemUsageThreshold = 0.7;
     }
 }

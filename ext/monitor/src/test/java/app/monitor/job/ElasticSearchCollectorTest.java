@@ -30,14 +30,13 @@ class ElasticSearchCollectorTest {
     @Test
     void collect() {
         when(httpClient.execute(any()))
-                .thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes("[{\"cpu\":\"1\",\"disk.used\":\"6079250432\",\"disk.total\":\"62725623808\",\"heap.current\":\"139664376\",\"heap.max\":\"519438336\",\"ram.current\":\"1444081664\",\"ram.max\":\"2086522880\"}]")))
+                .thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes("[{\"disk.used\":\"6079250432\",\"disk.total\":\"62725623808\",\"heap.current\":\"139664376\",\"heap.max\":\"519438336\"}]")))
                 .thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes("[{\"count\":\"1\"}]")));
 
         Stats stats = collector.collect();
 
         assertThat(stats.stats)
-                .containsEntry("es_cpu_usage", 0.01)
                 .containsEntry("es_docs", 1d)
-                .containsKeys("es_mem_used", "es_mem_max");
+                .containsKeys("es_disk_used", "es_disk_max", "es_heap_used", "es_heap_max");
     }
 }

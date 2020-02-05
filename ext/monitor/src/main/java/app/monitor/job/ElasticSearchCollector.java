@@ -20,8 +20,6 @@ public class ElasticSearchCollector implements Collector {
     private final HTTPClient httpClient;
     private final String host;
 
-    public double highCPUUsageThreshold;
-    public double highMemUsageThreshold;
     public double highHeapUsageThreshold;
     public double highDiskUsageThreshold;
 
@@ -34,9 +32,7 @@ public class ElasticSearchCollector implements Collector {
     public Stats collect() {
         var stats = new Stats();
         // refer to org.elasticsearch.rest.action.cat.RestNodesAction for all available fields
-        Map<String, String> values = cat("nodes", "cpu", "disk.used", "disk.total", "heap.current", "heap.max", "ram.current", "ram.max");
-        collectCPU(stats, values);
-        collectMem(stats, values);
+        Map<String, String> values = cat("nodes", "disk.used", "disk.total", "heap.current", "heap.max");
         collectHeap(stats, values);
         collectDisk(stats, values);
 
@@ -44,12 +40,6 @@ public class ElasticSearchCollector implements Collector {
         stats.put("es_docs", get(values, "count"));
 
         return stats;
-    }
-
-    private void collectCPU(Stats stats, Map<String, String> values) {
-        double cpuUsage = get(values, "cpu") / 100d;
-        stats.put("es_cpu_usage", cpuUsage);
-        stats.checkHighUsage(cpuUsage, highCPUUsageThreshold, "cpu");
     }
 
     private void collectHeap(Stats stats, Map<String, String> values) {
@@ -66,14 +56,6 @@ public class ElasticSearchCollector implements Collector {
         double diskMax = get(values, "disk.total");
         stats.put("es_disk_max", diskMax);
         stats.checkHighUsage(diskUsed / diskMax, highDiskUsageThreshold, "disk");
-    }
-
-    private void collectMem(Stats stats, Map<String, String> values) {
-        double memUsed = get(values, "ram.current");
-        stats.put("es_mem_used", memUsed);
-        double memMax = get(values, "ram.max");
-        stats.put("es_mem_max", memMax);
-        stats.checkHighUsage(memUsed / memMax, highMemUsageThreshold, "mem");
     }
 
     private double get(Map<String, String> values, String field) {

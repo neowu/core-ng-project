@@ -16,7 +16,8 @@ class RedisCollectorTest {
 
     @BeforeEach
     void createRedisCollector() {
-        collector = new RedisCollector(null, 0.8);
+        collector = new RedisCollector(null);
+        collector.highMemUsageThreshold = 0.8;
     }
 
     @Test

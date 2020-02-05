@@ -10,11 +10,10 @@ import java.util.Map;
  */
 public class RedisCollector implements Collector {
     private final Redis redis;
-    private final double highMemUsageThreshold;
+    public double highMemUsageThreshold;
 
-    public RedisCollector(Redis redis, double highMemUsageThreshold) {
+    public RedisCollector(Redis redis) {
         this.redis = redis;
-        this.highMemUsageThreshold = highMemUsageThreshold;
     }
 
     @Override
