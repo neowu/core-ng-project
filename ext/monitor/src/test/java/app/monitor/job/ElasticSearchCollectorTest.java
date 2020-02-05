@@ -31,7 +31,7 @@ class ElasticSearchCollectorTest {
     void collect() {
         when(httpClient.execute(any()))
                 .thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes("[{\"cpu\":\"1\",\"disk.used\":\"6079250432\",\"disk.total\":\"62725623808\",\"heap.current\":\"139664376\",\"heap.max\":\"519438336\",\"ram.current\":\"1444081664\",\"ram.max\":\"2086522880\"}]")))
-                .thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes("[{\"docs.count\":\"1\"}]")));
+                .thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes("[{\"count\":\"1\"}]")));
 
         Stats stats = collector.collect();
 

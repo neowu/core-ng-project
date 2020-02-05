@@ -40,8 +40,8 @@ public class ElasticSearchCollector implements Collector {
         collectHeap(stats, values);
         collectDisk(stats, values);
 
-        values = cat("indices", "docs.count");
-        stats.put("es_docs", get(values, "docs.count"));
+        values = cat("count", "count");
+        stats.put("es_docs", get(values, "count"));
 
         return stats;
     }

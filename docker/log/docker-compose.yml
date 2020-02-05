@@ -34,7 +34,7 @@ services:
   log-processor:
     image: neowu/log-processor:7.3.5
     environment:
-    - JAVA_OPTS=-Xms256m -Xmx1024m -Xss256k
+    - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
     - SYS_ELASTICSEARCH_HOST=elasticsearch
     - KIBANA_URL=http://kibana:5601
