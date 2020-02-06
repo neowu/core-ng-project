@@ -18,7 +18,7 @@
 * revisit trace log truncation, better/more elegant handling?
 * support LocalTime in db?
 * db/redis diagnostic controller/stats?
-* stats, alert/warn on high heap usage? 
+* monitoring, es only need to put one host to get all nodes info of cluster, update monitor config
 
 ### jdk 12 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
