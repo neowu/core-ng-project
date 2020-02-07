@@ -28,6 +28,7 @@ public class StatMessageHandler implements MessageHandler<StatMessage> {
         alert.errorCode = message.errorCode;
         alert.errorMessage = message.errorMessage;
         alert.kibanaIndex = "stat";
+        alert.host = message.host;
         return alert;
     }
 }

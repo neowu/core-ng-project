@@ -12,6 +12,7 @@ public class Alert {
     public String errorCode;
     public String errorMessage;
     public String kibanaIndex;
+    public String host;
 
     public void severity(String result) {
         severity = "WARN".equals(result) ? Severity.WARN : Severity.ERROR;

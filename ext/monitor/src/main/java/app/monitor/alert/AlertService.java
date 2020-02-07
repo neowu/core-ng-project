@@ -86,13 +86,22 @@ public class AlertService {
     }
 
     String message(Alert alert, int alertCountSinceLastSent) {
-        String count = alertCountSinceLastSent > 0 ? "*[" + alertCountSinceLastSent + "]* " : "";
-        String app = site == null ? alert.app : site + " / " + alert.app;
         String docURL = docURL(alert.kibanaIndex, alert.id);
-        return format("{}{}: *{}*\nid: <{}|{}>\nerrorCode: *{}*\nmessage: {}\n",
-                count, alert.severity, app,
-                docURL, alert.id,
-                alert.errorCode, alert.errorMessage);
+
+        var builder = new StringBuilder(256);
+        if (alertCountSinceLastSent > 0) builder.append("*[").append(alertCountSinceLastSent).append("]* ");
+
+        builder.append(alert.severity).append(": *");
+        if (site != null) builder.append(site).append(" / ");
+        builder.append(alert.app).append("*\n");
+
+        if (alert.host != null) builder.append("host: ").append(alert.host).append('\n');
+
+        builder.append("id: <").append(docURL).append('|').append(alert.id)
+               .append(">\nerrorCode: *").append(alert.errorCode)
+               .append("*\nmessage: ").append(alert.errorMessage).append('\n');
+
+        return builder.toString();
     }
 
     String color(Severity severity, LocalDateTime now) {

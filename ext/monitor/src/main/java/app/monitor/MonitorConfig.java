@@ -50,6 +50,6 @@ public class MonitorConfig {
         @Min(0)
         @Max(1)
         @Property(name = "highHeapUsageThreshold")
-        public Double highHeapUsageThreshold = 0.7;
+        public Double highHeapUsageThreshold = 0.8;     // with ES default setting, it generally does full GC at 75%
     }
 }

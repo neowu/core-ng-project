@@ -70,14 +70,6 @@ class AlertServiceTest {
         assertThat(service.alertKey(alert)).isEqualTo("website/WARN/NOT_FOUND");
     }
 
-    private Alert alert(Severity severity, String errorCode) {
-        var alert = new Alert();
-        alert.app = "website";
-        alert.severity = severity;
-        alert.errorCode = errorCode;
-        return alert;
-    }
-
     @Test
     void process() {
         service.process(alert(Severity.WARN, "PATH_NOT_FOUND"));
@@ -109,5 +101,33 @@ class AlertServiceTest {
 
         assertThat(service.color(Severity.ERROR, date)).isEqualTo("#a30101");
         assertThat(service.color(Severity.ERROR, date.plusWeeks(1))).isEqualTo("#e62a00");
+    }
+
+    @Test
+    void message() {
+        Alert alert = alert(Severity.WARN, "ERROR_CODE");
+        alert.id = "id";
+        alert.errorMessage = "message";
+        alert.kibanaIndex = "action";
+
+        assertThat(service.message(alert, 10)).isEqualTo("*[10]* WARN: *site / website*\n"
+                + "id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
+                + "errorCode: *ERROR_CODE*\n"
+                + "message: message\n");
+
+        alert.host = "host";
+        assertThat(service.message(alert, 0)).isEqualTo("WARN: *site / website*\n"
+                + "host: host\n"
+                + "id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
+                + "errorCode: *ERROR_CODE*\n"
+                + "message: message\n");
+    }
+
+    private Alert alert(Severity severity, String errorCode) {
+        var alert = new Alert();
+        alert.app = "website";
+        alert.severity = severity;
+        alert.errorCode = errorCode;
+        return alert;
     }
 }

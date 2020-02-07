@@ -1,4 +1,7 @@
 ## Change log
+### 7.3.6 (2/7/2020 - )
+* monitor: add host in alert message for stats
+
 ### 7.3.5 (1/30/2020 - 2/6/2020)
 * httpClient: support retry on 429 too many requests
 * monitor: added es monitoring, refer to https://github.com/neowu/core-ng-project/wiki/Ext for example config
