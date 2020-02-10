@@ -6,6 +6,7 @@ import core.framework.db.Table;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.reflect.Classes;
+import core.framework.util.Lists;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ class InsertQueryBuilder<T> {
 
     private String generatedColumn;
     private List<Field> paramFields;
+    private List<Field> primaryKeyFields = Lists.newArrayList();
     private String sql;
 
     InsertQueryBuilder(Class<T> entityClass) {
@@ -53,6 +55,8 @@ class InsertQueryBuilder<T> {
             if (primaryKey != null && primaryKey.autoIncrement()) {
                 generatedColumn = column.name();
                 continue;
+            } else if (primaryKey != null) {
+                primaryKeyFields.add(field);    // only need pk fields for assigned id
             }
             if (!paramFields.isEmpty()) builder.append(", ");
             builder.append(column.name());
@@ -73,9 +77,15 @@ class InsertQueryBuilder<T> {
 
         String entityClassLiteral = type(entityClass);
         builder.append("public Object apply(Object value) {\n")
-               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral)
-               .indent(1).append("Object[] params = new Object[{}];\n", paramFields.size());
+               .indent(1).append("{} entity = ({}) value;\n", entityClassLiteral, entityClassLiteral);
 
+        if (generatedColumn == null) {
+            for (Field primaryKeyField : primaryKeyFields) {
+                builder.indent(1).append("if (entity.{} == null) throw new Error(\"primary key must not be null, field={}\");\n", primaryKeyField.getName(), primaryKeyField.getName());
+            }
+        }
+
+        builder.indent(1).append("Object[] params = new Object[{}];\n", paramFields.size());
         int index = 0;
         for (Field paramField : paramFields) {
             builder.indent(1).append("params[{}] = entity.{};\n", index, paramField.getName());

@@ -1,6 +1,7 @@
 package core.framework.internal.db;
 
 import core.framework.api.json.Property;
+import core.framework.api.validate.NotNull;
 import core.framework.db.Column;
 import core.framework.db.DBEnumValue;
 import core.framework.db.PrimaryKey;
@@ -72,8 +73,12 @@ final class DatabaseClassValidator implements ClassVisitor {
     @Override
     public void visitField(Field field, String parentPath) {
         Column column = field.getDeclaredAnnotation(Column.class);
-        if (column == null)
-            throw new Error("db entity field must have @Column, field=" + Fields.path(field));
+        if (column == null) throw new Error("db entity field must have @Column, field=" + Fields.path(field));
+
+        Property property = field.getDeclaredAnnotation(Property.class);
+        if (property != null)
+            throw new Error("db entity field must not have json annotation, please separate view and entity, field=" + Fields.path(field));
+
 
         boolean added = columns.add(column.name());
         if (!added) {
@@ -124,5 +129,9 @@ final class DatabaseClassValidator implements ClassVisitor {
         if (foundAutoIncrementalPrimaryKey && !(Integer.class.equals(fieldClass) || Long.class.equals(fieldClass))) {
             throw new Error("auto increment or sequence primary key must be Integer or Long, field=" + Fields.path(field));
         }
+
+        NotNull notNull = field.getDeclaredAnnotation(NotNull.class);
+        if (notNull != null)
+            throw new Error("db @PrimaryKey field must not have @NotNull, field=" + Fields.path(field));
     }
 }

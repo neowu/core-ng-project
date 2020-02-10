@@ -65,6 +65,15 @@ class RepositoryImplAssignedIdEntityTest {
     }
 
     @Test
+    void validateId() {
+        AssignedIdEntity entity = entity(null, "string", 1);
+
+        assertThatThrownBy(() -> repository.insert(entity))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("primary key must not be null");
+    }
+
+    @Test
     void update() {
         AssignedIdEntity entity = entity(UUID.randomUUID().toString(), "string", 11);
         repository.insert(entity);
@@ -76,8 +85,8 @@ class RepositoryImplAssignedIdEntityTest {
         repository.update(updatedEntity);
 
         assertThat(repository.get(entity.id))
-            .get().isEqualToComparingFieldByField(updatedEntity)
-            .satisfies(selectedEntity -> assertThat(selectedEntity.stringField).isNull());
+                .get().isEqualToComparingFieldByField(updatedEntity)
+                .satisfies(selectedEntity -> assertThat(selectedEntity.stringField).isNull());
     }
 
     @Test
@@ -92,8 +101,8 @@ class RepositoryImplAssignedIdEntityTest {
         repository.partialUpdate(updatedEntity);
 
         assertThat(repository.get(entity.id))
-            .get().isEqualToComparingOnlyGivenFields(updatedEntity, "stringField", "dateField")
-            .satisfies(selectedEntity -> assertThat(selectedEntity.intField).isEqualTo(11));
+                .get().isEqualToComparingOnlyGivenFields(updatedEntity, "stringField", "dateField")
+                .satisfies(selectedEntity -> assertThat(selectedEntity.intField).isEqualTo(11));
     }
 
     @Test
@@ -151,8 +160,8 @@ class RepositoryImplAssignedIdEntityTest {
         assertThat(sum).hasValue(50);
 
         assertThatThrownBy(query::fetch)
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("fetch must not be used with groupBy");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("fetch must not be used with groupBy");
     }
 
     @Test
