@@ -21,10 +21,10 @@ import static core.framework.internal.asm.Literal.type;
 class InsertQueryBuilder<T> {
     final DynamicInstanceBuilder<Function<T, Object[]>> builder;
     private final Class<T> entityClass;
+    private final List<Field> primaryKeyFields = Lists.newArrayList();
 
     private String generatedColumn;
     private List<Field> paramFields;
-    private List<Field> primaryKeyFields = Lists.newArrayList();
     private String sql;
 
     InsertQueryBuilder(Class<T> entityClass) {
@@ -52,10 +52,11 @@ class InsertQueryBuilder<T> {
         for (Field field : fields) {
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
             Column column = field.getDeclaredAnnotation(Column.class);
-            if (primaryKey != null && primaryKey.autoIncrement()) {
-                generatedColumn = column.name();
-                continue;
-            } else if (primaryKey != null) {
+            if (primaryKey != null) {
+                if (primaryKey.autoIncrement()) {
+                    generatedColumn = column.name();
+                    continue;
+                }
                 primaryKeyFields.add(field);    // only need pk fields for assigned id
             }
             if (!paramFields.isEmpty()) builder.append(", ");
