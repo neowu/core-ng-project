@@ -2,6 +2,7 @@
 ### 7.3.6 (2/7/2020 - )
 * monitor: add host in alert message for stats
 * db: not allow put @NotNull on @PrimaryKey, and validate assigned id must not be null on inserting
+* es: update to 7.6.0
 
 ### 7.3.5 (1/30/2020 - 2/6/2020)
 * httpClient: support retry on 429 too many requests

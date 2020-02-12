@@ -57,7 +57,7 @@ class InsertQueryBuilder<T> {
                     generatedColumn = column.name();
                     continue;
                 }
-                primaryKeyFields.add(field);    // only need pk fields for assigned id
+                primaryKeyFields.add(field);    // pk fields is only needed for assigned id
             }
             if (!paramFields.isEmpty()) builder.append(", ");
             builder.append(column.name());

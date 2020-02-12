@@ -21,10 +21,6 @@ import java.nio.file.Path;
  * @author neo
  */
 public class LocalElasticSearch {
-    static {
-        System.setProperty("es.scripting.exception_for_missing_value", "true"); // refer to org.elasticsearch.script.ScriptModule
-    }
-
     private final Logger logger = LoggerFactory.getLogger(LocalElasticSearch.class);
     private Path dataPath;
     private LocalNode node;
