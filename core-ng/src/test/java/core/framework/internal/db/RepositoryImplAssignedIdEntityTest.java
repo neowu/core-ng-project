@@ -124,8 +124,8 @@ class RepositoryImplAssignedIdEntityTest {
         }
         repository.batchInsert(entities);
 
-        assertThat(repository.get("1")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
-        assertThat(repository.get("2")).get().usingRecursiveComparison().isEqualTo(entities.get(1));
+        assertThat(repository.get("1")).get().isEqualToComparingFieldByField(entities.get(0));
+        assertThat(repository.get("2")).get().isEqualToComparingFieldByField(entities.get(1));
     }
 
     @Test

@@ -18,7 +18,7 @@ class MongoMigrationTest {
 
     @Test
     void migrate() {
-        assertThatThrownBy(() -> migration.migrate(search -> {
+        assertThatThrownBy(() -> migration.migrate(mongo -> {
             throw new RuntimeException("migration error");
         })).isInstanceOf(RuntimeException.class)
            .hasMessageContaining("migration");

@@ -80,7 +80,7 @@ class ResponseBeanMapperTest {
 
         @SuppressWarnings("unchecked")
         var parsedBean = (Optional<TestBean>) responseBeanMapper.fromJSON(Types.optional(TestBean.class), mapper.toJSON(bean));
-        assertThat(parsedBean).get().isEqualToComparingFieldByField(bean);
+        assertThat(parsedBean).get().usingRecursiveComparison().isEqualTo(bean);
     }
 
     @Test
@@ -103,7 +103,7 @@ class ResponseBeanMapperTest {
         bean.intField = 3;
 
         TestBean parsedBean = (TestBean) responseBeanMapper.fromJSON(TestBean.class, mapper.toJSON(bean));
-        assertThat(parsedBean).isEqualToComparingFieldByField(bean);
+        assertThat(parsedBean).usingRecursiveComparison().isEqualTo(bean);
     }
 
     @Test

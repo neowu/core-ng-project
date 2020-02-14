@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Comparator;
+import java.time.chrono.ChronoZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -99,7 +99,7 @@ class BeanTest {
 
         TestBean parsedBean = Bean.fromJSON(TestBean.class, json);
         assertThat(parsedBean).usingRecursiveComparison()
-                              .withComparatorForType(Comparator.comparing(ZonedDateTime::toInstant), ZonedDateTime.class)
+                              .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
                               .isEqualTo(bean);
     }
 

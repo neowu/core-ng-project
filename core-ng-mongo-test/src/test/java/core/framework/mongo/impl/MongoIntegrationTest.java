@@ -1,7 +1,6 @@
 package core.framework.mongo.impl;
 
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import core.framework.inject.Inject;
 import core.framework.mongo.IntegrationTest;
@@ -34,7 +33,6 @@ class MongoIntegrationTest extends IntegrationTest {
     @AfterEach
     void cleanup() {
         mongo.dropCollection("entity");
-        mongo.createIndex("entity", Indexes.ascending("string_field"));
     }
 
     @Test

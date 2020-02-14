@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.chrono.ChronoZonedDateTime;
 import java.util.List;
 import java.util.OptionalLong;
 
@@ -55,10 +56,10 @@ class RepositoryImplAutoIncrementIdEntityTest {
         assertThat(id).isPresent();
 
         assertThat(repository.get(id.orElseThrow()))
-                .get().isEqualToIgnoringGivenFields(entity, "id", "zonedDateTimeField")
+                .get().usingComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+                .isEqualToIgnoringGivenFields(entity, "id")
                 .satisfies(selectedEntity -> {
                     assertThat(selectedEntity.id).isEqualTo(id.orElseThrow());
-                    assertThat(selectedEntity.zonedDateTimeField).isEqualTo(entity.zonedDateTimeField);
                 });
     }
 
