@@ -249,7 +249,7 @@ class MessageListenerThread extends Thread {
 
     void checkConsumerLag(long lagInMs, long longConsumerLagThresholdInMs) {
         if (lagInMs > longConsumerLagThresholdInMs) {
-            logger.warn(errorCode("LONG_CONSUMER_LAG"), "consumer delay is too long, lag={}", Duration.ofMillis(lagInMs));
+            logger.warn(errorCode("LONG_CONSUMER_LAG"), "consumer delay is too long, lag={} ms", lagInMs);
         }
     }
 
