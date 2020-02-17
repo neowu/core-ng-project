@@ -80,6 +80,8 @@ public class HTTPErrorHandler {
                 response.errorCode = errorCode.errorCode();
                 response.severity = errorCode.severity().name();
             } else {
+                // internally LogManager logs exception class name as error code if not impl ErrorCode,
+                // here it uses INTERNAL_ERROR as it's border of internal, we don't want to expose internal details (exception class) to external which is part of api contract
                 response.errorCode = "INTERNAL_ERROR";
                 response.severity = Severity.ERROR.name();
             }
