@@ -111,15 +111,15 @@ class AlertServiceTest {
         alert.kibanaIndex = "action";
 
         assertThat(service.message(alert, 10)).isEqualTo("*[10]* WARN: *site / website*\n"
-                + "id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
-                + "errorCode: *ERROR_CODE*\n"
+                + "_id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
+                + "error_code: *ERROR_CODE*\n"
                 + "message: message\n");
 
         alert.host = "host";
         assertThat(service.message(alert, 0)).isEqualTo("WARN: *site / website*\n"
                 + "host: host\n"
-                + "id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
-                + "errorCode: *ERROR_CODE*\n"
+                + "_id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
+                + "error_code: *ERROR_CODE*\n"
                 + "message: message\n");
     }
 

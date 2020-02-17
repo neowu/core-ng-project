@@ -97,8 +97,8 @@ public class AlertService {
 
         if (alert.host != null) builder.append("host: ").append(alert.host).append('\n');
 
-        builder.append("id: <").append(docURL).append('|').append(alert.id)
-               .append(">\nerrorCode: *").append(alert.errorCode)
+        builder.append("_id: <").append(docURL).append('|').append(alert.id)
+               .append(">\nerror_code: *").append(alert.errorCode)
                .append("*\nmessage: ").append(alert.errorMessage).append('\n');
 
         return builder.toString();
