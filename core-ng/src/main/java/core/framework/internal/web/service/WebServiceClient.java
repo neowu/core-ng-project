@@ -119,10 +119,14 @@ public class WebServiceClient {
 
         // handle empty body gracefully, e.g. 503 during deployment
         if (response.body.length == 0) throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
-
         ErrorResponse error = errorResponse(response);
-        logger.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
-        throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, parseHTTPStatus(statusCode));
+        if (error.id != null && error.errorCode != null) {  // use manual validation rather than annotation to keep the flow straightforward and less try/catch
+            logger.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
+            throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, parseHTTPStatus(statusCode));
+        } else {
+            // handle api return non-2xx status code explicitly with valid json response, e.g. 410 GONE
+            throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
+        }
     }
 
     private ErrorResponse errorResponse(HTTPResponse response) {
