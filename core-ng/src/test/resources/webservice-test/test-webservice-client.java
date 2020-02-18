@@ -29,6 +29,17 @@ public class TestWebService$Client implements core.framework.internal.web.servic
         client.execute(core.framework.http.HTTPMethod.DELETE, path, requestBeanClass, requestBean, void.class);
     }
 
+    public java.util.Optional deprecated(java.lang.Integer param0) {
+        logger.debug("call web service, method=core.framework.internal.web.service.TestWebService.deprecated(java.lang.Integer)");
+        if (param0 == null) throw new Error("path param must not be null, name=id");
+        StringBuilder builder = new StringBuilder();
+        builder.append("/deprecated/test/").append(core.framework.internal.web.service.PathParamHelper.toString(param0));
+        String path = builder.toString();
+        Class requestBeanClass = null;
+        Object requestBean = null;
+        return (java.util.Optional) client.execute(core.framework.http.HTTPMethod.GET, path, requestBeanClass, requestBean, core.framework.util.Types.optional(core.framework.internal.web.service.TestWebService.TestResponse.class));
+    }
+
     public java.util.Optional get(java.lang.Integer param0) {
         logger.debug("call web service, method=core.framework.internal.web.service.TestWebService.get(java.lang.Integer)");
         if (param0 == null) throw new Error("path param must not be null, name=id");

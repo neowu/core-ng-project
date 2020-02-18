@@ -99,6 +99,15 @@ class WebServiceControllerBuilderTest {
         assertThat(bean).isNotNull();
     }
 
+    @Test
+    void deprecated() throws NoSuchMethodException {
+        var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("deprecated", Integer.class));
+        builder.build();
+
+        String sourceCode = builder.builder.sourceCode();
+        assertThat(sourceCode).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-controller-deprecated.java"));
+    }
+
     public static class TestWebServiceImpl implements TestWebService {
         @Override
         public TestResponse search(TestSearchRequest request) {
@@ -136,6 +145,12 @@ class WebServiceControllerBuilderTest {
             assertThat(id).isEqualTo(1);
             assertThat(enumValue).isEqualTo(TestEnum.A);
             return new TestResponse();
+        }
+
+        @Override
+        @SuppressWarnings("deprecation")    // suppress @Deprecated usage as it's test case
+        public Optional<TestResponse> deprecated(Integer id) {
+            return Optional.empty();
         }
     }
 }

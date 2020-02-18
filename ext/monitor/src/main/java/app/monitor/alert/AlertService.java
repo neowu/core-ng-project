@@ -96,10 +96,10 @@ public class AlertService {
         builder.append(alert.app).append("*\n");
 
         if (alert.host != null) builder.append("host: ").append(alert.host).append('\n');
+        builder.append("_id: <").append(docURL).append('|').append(alert.id).append(">\n");
+        if (alert.action != null) builder.append("action: ").append(alert.action).append('\n');
 
-        builder.append("_id: <").append(docURL).append('|').append(alert.id)
-               .append(">\nerror_code: *").append(alert.errorCode)
-               .append("*\nmessage: ").append(alert.errorMessage).append('\n');
+        builder.append("error_code: *").append(alert.errorCode).append("*\nmessage: ").append(alert.errorMessage).append('\n');
 
         return builder.toString();
     }

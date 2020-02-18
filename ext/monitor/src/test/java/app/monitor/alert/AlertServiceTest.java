@@ -121,6 +121,15 @@ class AlertServiceTest {
                 + "_id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
                 + "error_code: *ERROR_CODE*\n"
                 + "message: message\n");
+
+        alert.action = "action";
+        alert.host = null;
+
+        assertThat(service.message(alert, 0)).isEqualTo("WARN: *site / website*\n"
+                + "_id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
+                + "action: action\n"
+                + "error_code: *ERROR_CODE*\n"
+                + "message: message\n");
     }
 
     private Alert alert(Severity severity, String errorCode) {

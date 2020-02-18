@@ -55,6 +55,11 @@ public interface TestWebService {
     @Path("/test/:id/:enum")
     TestResponse getEnum(@PathParam("id") Long id, @PathParam("enum") TestEnum enumValue);
 
+    @GET
+    @Deprecated
+    @Path("/deprecated/test/:id")
+    Optional<TestResponse> deprecated(@PathParam("id") Integer id);
+
     enum TestEnum {
         @Property(name = "A1")
         A,

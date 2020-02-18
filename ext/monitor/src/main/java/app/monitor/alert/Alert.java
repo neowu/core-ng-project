@@ -8,6 +8,7 @@ import core.framework.log.Severity;
 public class Alert {
     public String id;
     public String app;
+    public String action;
     public Severity severity;
     public String errorCode;
     public String errorMessage;

@@ -43,6 +43,8 @@ public class APIDefinitionBuilder {
         Method[] methods = serviceInterface.getMethods();
         Arrays.sort(methods, Comparator.comparing((Method method) -> method.getDeclaredAnnotation(Path.class).value()).thenComparing(method -> HTTPMethods.httpMethod(method).ordinal()));
         for (Method method : methods) {
+            if (method.isAnnotationPresent(Deprecated.class)) continue;
+
             var operation = new ServiceDefinition.Operation();
             operation.name = method.getName();
             operation.method = HTTPMethods.httpMethod(method);

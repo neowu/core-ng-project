@@ -26,6 +26,7 @@ public class ActionLogMessageHandler implements MessageHandler<ActionLogMessage>
         var alert = new Alert();
         alert.id = message.id;
         alert.app = message.app;
+        alert.action = message.action;
         alert.severity(message.result);
         alert.errorCode = message.errorCode;
         alert.errorMessage = message.errorMessage;
