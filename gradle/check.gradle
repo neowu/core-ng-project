@@ -35,9 +35,9 @@ subprojects {
 
         tasks.named('checkstyleTest').configure {
             group = 'verification'
-            source = sourceSets.test.allSource.matching {
-                include 'java/**/*.java'
-                include '**/*.properties'
+            source = fileTree(projectDir) {
+                include 'src/test/java/**/*.java'       // not include java files in resources
+                include 'src/test/**/*.properties'
             }
         }
     }

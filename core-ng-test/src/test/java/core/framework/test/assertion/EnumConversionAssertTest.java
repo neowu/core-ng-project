@@ -32,17 +32,17 @@ class EnumConversionAssertTest {
 
     public enum Enum1 {
         A,
-        B,
+        B
     }
 
     public enum Enum2 {
         A,
-        B,
+        B
     }
 
     public enum Enum3 {
         A,
         B,
-        C,
+        C
     }
 }

@@ -1,4 +1,7 @@
 ## Change log
+### 7.3.7 (2/18/2020 - )
+* 
+
 ### 7.3.6 (2/7/2020 - 2/17/2020)
 * monitor: add host in alert message for stats, change message format to make it easier to copy/paste to kibana search box
 * db: not allow put @NotNull on @PrimaryKey, and validate assigned id must not be null on inserting
