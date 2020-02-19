@@ -1,7 +1,8 @@
 ## Change log
-### 7.3.7 (2/18/2020 - )
+### 7.3.7 (2/18/2020 - 2/19/2020)
 * api: when mark @Deprecated in API method, it won't show in /_sys/api and log warn if called
 * monitor: add action in alert message
+* httpClient: update okHTTP to 4.4.0
 
 ### 7.3.6 (2/7/2020 - 2/17/2020)
 * monitor: add host in alert message for stats, change message format to make it easier to copy/paste to kibana search box
