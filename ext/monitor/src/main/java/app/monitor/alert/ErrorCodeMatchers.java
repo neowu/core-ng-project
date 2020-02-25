@@ -20,9 +20,8 @@ public class ErrorCodeMatchers {
 
     boolean matches(String app, String errorCode) {
         for (Matcher matcher : matchers) {
-            if (matcher.apps.isEmpty() || matcher.apps.contains(app)) {
-                return matcher.errorCodes.contains(errorCode);
-            }
+            if ((matcher.apps.isEmpty() || matcher.apps.contains(app)) && matcher.errorCodes.contains(errorCode))
+                return true;
         }
         return false;
     }

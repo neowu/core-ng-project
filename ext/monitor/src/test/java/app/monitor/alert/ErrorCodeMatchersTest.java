@@ -19,7 +19,8 @@ class ErrorCodeMatchersTest {
         matchers = new ErrorCodeMatchers(List.of(
                 matcher(List.of("website", "backoffice"), List.of("PATH_NOT_FOUND")),
                 matcher(List.of("frontend-website"), List.of("API_ERROR_401", "FORBIDDEN")),
-                matcher(List.of(), List.of("VALIDATION_ERROR")) // match all apps if apps is empty
+                matcher(List.of(), List.of("VALIDATION_ERROR")), // match all apps if apps is empty
+                matcher(List.of(), List.of("UNAUTHORIZED"))
         ));
     }
 
@@ -30,6 +31,7 @@ class ErrorCodeMatchersTest {
         assertThat(matchers.matches("customer-service", "FORBIDDEN")).isFalse();
         assertThat(matchers.matches("website", "METHOD_NOT_ALLOWED")).isFalse();
         assertThat(matchers.matches("customer-service", "VALIDATION_ERROR")).isTrue();
+        assertThat(matchers.matches("customer-service", "UNAUTHORIZED")).isTrue();
     }
 
     private AlertConfig.Matcher matcher(List<String> apps, List<String> errorCodes) {
