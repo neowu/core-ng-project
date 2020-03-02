@@ -20,8 +20,9 @@ public class ErrorCodeMatchers {
 
     boolean matches(String app, String errorCode) {
         for (Matcher matcher : matchers) {
-            if ((matcher.apps.isEmpty() || matcher.apps.contains(app)) && matcher.errorCodes.contains(errorCode))
+            if (matcher.matches(app, errorCode)) {
                 return true;
+            }
         }
         return false;
     }
@@ -33,6 +34,11 @@ public class ErrorCodeMatchers {
         Matcher(Set<String> apps, Set<String> errorCodes) {
             this.apps = apps;
             this.errorCodes = errorCodes;
+        }
+
+        boolean matches(String app, String errorCode) {
+            return (apps.isEmpty() || apps.contains(app))
+                    && errorCodes.contains(errorCode);
         }
     }
 }

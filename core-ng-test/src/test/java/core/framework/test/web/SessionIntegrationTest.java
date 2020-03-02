@@ -29,15 +29,15 @@ class SessionIntegrationTest extends IntegrationTest {
 
     @Test
     void invalidate() {
-        store.save("session1", Map.of("key", "v1"), Set.of("key"), Duration.ofMinutes(30));
-        store.save("session2", Map.of("key", "v1"), Set.of("key"), Duration.ofMinutes(30));
-        store.save("session3", Map.of("key", "v2"), Set.of("key"), Duration.ofMinutes(30));
+        store.save("session1", "localhost", Map.of("key", "v1"), Set.of("key"), Duration.ofMinutes(30));
+        store.save("session2", "localhost", Map.of("key", "v1"), Set.of("key"), Duration.ofMinutes(30));
+        store.save("session3", "localhost", Map.of("key", "v2"), Set.of("key"), Duration.ofMinutes(30));
 
-        store.invalidate("key", "v1");
+        store.invalidateByKey("key", "v1");
 
-        assertThat(store.getAndRefresh("session1", Duration.ofMinutes(30))).isNull();
-        assertThat(store.getAndRefresh("session2", Duration.ofMinutes(30))).isNull();
-        assertThat(store.getAndRefresh("session3", Duration.ofMinutes(30))).containsEntry("key", "v2");
+        assertThat(store.getAndRefresh("session1", "localhost", Duration.ofMinutes(30))).isNull();
+        assertThat(store.getAndRefresh("session2", "localhost", Duration.ofMinutes(30))).isNull();
+        assertThat(store.getAndRefresh("session3", "localhost", Duration.ofMinutes(30))).containsEntry("key", "v2");
     }
 
     @Test

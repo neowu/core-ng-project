@@ -43,7 +43,7 @@ class SessionManagerTest {
         ActionLog actionLog = new ActionLog(null);
 
         String sessionId = UUID.randomUUID().toString();
-        store.save(sessionId, Map.of("key", "value"), Set.of(), Duration.ofMinutes(30));
+        store.save(sessionId, "localhost", Map.of("key", "value"), Set.of(), Duration.ofMinutes(30));
 
         Request request = mock(Request.class);
         when(request.scheme()).thenReturn("https");
@@ -60,7 +60,7 @@ class SessionManagerTest {
         sessionManager.cookie("SessionId", null);
 
         String sessionId = UUID.randomUUID().toString();
-        store.save(sessionId, Map.of("key", "value"), Set.of(), Duration.ofMinutes(30));
+        store.save(sessionId, "localhost", Map.of("key", "value"), Set.of(), Duration.ofMinutes(30));
 
         Request request = mock(Request.class);
         when(request.scheme()).thenReturn("https");
@@ -96,7 +96,7 @@ class SessionManagerTest {
     @Test
     void saveWithInvalidatedSessionWithoutId() {
         Response response = mock(Response.class);
-        var session = new SessionImpl();
+        var session = new SessionImpl("localhost");
         session.invalidate();
         sessionManager.save(session, response, new ActionLog(null));
 
@@ -108,7 +108,7 @@ class SessionManagerTest {
         sessionManager.header("SessionId");
         Response response = mock(Response.class);
 
-        var session = new SessionImpl();
+        var session = new SessionImpl("localhost");
         session.id = UUID.randomUUID().toString();
         session.invalidate();
         sessionManager.save(session, response, new ActionLog(null));
@@ -122,7 +122,7 @@ class SessionManagerTest {
         ActionLog actionLog = new ActionLog(null);
         Response response = mock(Response.class);
 
-        var session = new SessionImpl();
+        var session = new SessionImpl("localhost");
         session.set("key", "value");
         sessionManager.save(session, response, actionLog);
 
@@ -135,5 +135,26 @@ class SessionManagerTest {
         assertThatThrownBy(() -> sessionManager.invalidate(null, null))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("must not be null");
+    }
+
+    @Test
+    void domainWithHeader() {
+        sessionManager.header("SessionId");
+        sessionManager.cookie("SessionId", "example.com");
+        Request request = mock(Request.class);
+        when(request.hostName()).thenReturn("api.example.com");
+        assertThat(sessionManager.domain(request)).isEqualTo("api.example.com");
+    }
+
+    @Test
+    void domainWithCookie() {
+        Request request = mock(Request.class);
+        when(request.hostName()).thenReturn("www.example.com");
+
+        sessionManager.cookie("SessionId", "example.com");
+        assertThat(sessionManager.domain(request)).isEqualTo("example.com");
+
+        sessionManager.cookie("SessionId", null);
+        assertThat(sessionManager.domain(request)).isEqualTo("www.example.com");
     }
 }

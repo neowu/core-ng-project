@@ -20,7 +20,7 @@ public class LocalSessionStore implements SessionStore {
     private final Logger logger = LoggerFactory.getLogger(LocalSessionStore.class);
 
     @Override
-    public Map<String, String> getAndRefresh(String sessionId, Duration sessionTimeout) {
+    public Map<String, String> getAndRefresh(String sessionId, String domain, Duration sessionTimeout) {
         SessionValue sessionValue = values.get(sessionId);
         if (sessionValue == null) return null;
 
@@ -35,7 +35,7 @@ public class LocalSessionStore implements SessionStore {
     }
 
     @Override
-    public void save(String sessionId, Map<String, String> values, Set<String> changedFields, Duration sessionTimeout) {
+    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration sessionTimeout) {
         Map<String, String> updatedValues = Maps.newHashMapWithExpectedSize(values.size());
         values.forEach((field, value) -> {
             if (value != null) updatedValues.put(field, value);
@@ -44,12 +44,12 @@ public class LocalSessionStore implements SessionStore {
     }
 
     @Override
-    public void invalidate(String sessionId) {
+    public void invalidate(String sessionId, String domain) {
         values.remove(sessionId);
     }
 
     @Override
-    public void invalidate(String key, String value) {
+    public void invalidateByKey(String key, String value) {
         values.forEach((id, session) -> {
             if (Strings.equals(value, session.values.get(key))) {
                 values.remove(id);

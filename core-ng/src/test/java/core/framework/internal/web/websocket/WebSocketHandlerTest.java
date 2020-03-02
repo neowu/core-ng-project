@@ -66,7 +66,7 @@ class WebSocketHandlerTest {
 
     @Test
     void loadSession() {
-        when(sessionManager.load(any(), any())).thenReturn(new SessionImpl());
+        when(sessionManager.load(any(), any())).thenReturn(new SessionImpl("localhost"));
         Session session = handler.loadSession(null, null);
         assertThat(session).isInstanceOf(ReadOnlySession.class);
 

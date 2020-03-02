@@ -26,8 +26,8 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public Map<String, String> getAndRefresh(String sessionId, Duration sessionTimeout) {
-        String key = sessionKey(sessionId);
+    public Map<String, String> getAndRefresh(String sessionId, String domain, Duration sessionTimeout) {
+        String key = sessionKey(sessionId, domain);
         try {
             Map<String, String> sessionValues = redis.hash().getAll(key);
             if (sessionValues.isEmpty()) return null;
@@ -40,8 +40,8 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void save(String sessionId, Map<String, String> values, Set<String> changedFields, Duration sessionTimeout) {
-        String key = sessionKey(sessionId);
+    public void save(String sessionId, String domain, Map<String, String> values, Set<String> changedFields, Duration sessionTimeout) {
+        String key = sessionKey(sessionId, domain);
 
         List<String> deletedFields = Lists.newArrayList();
         Map<String, String> updatedValues = Maps.newHashMap();
@@ -56,14 +56,14 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void invalidate(String sessionId) {
-        String key = sessionKey(sessionId);
+    public void invalidate(String sessionId, String domain) {
+        String key = sessionKey(sessionId, domain);
         redis.del(key);
     }
 
     // use naive solution, generally invalidate by key/value is used to kick out login user, it happens rarely and will be handled by message handler which is in background
     @Override
-    public void invalidate(String key, String value) {
+    public void invalidateByKey(String key, String value) {
         redis.forEach("session:*", sessionKey -> {
             String valueInSession = redis.hash().get(sessionKey, key);
             if (Strings.equals(value, valueInSession)) {
@@ -72,7 +72,8 @@ public class RedisSessionStore implements SessionStore {
         });
     }
 
-    String sessionKey(String sessionId) {
-        return "session:" + Hash.sha256Hex(sessionId);
+    // make sure sessionId can only be used for specific domain, as different webapp may share one session redis, this way to prevent session hijacking by manually reuse sessionId from one site to another
+    String sessionKey(String sessionId, String domain) {
+        return "session:" + Hash.sha256Hex(domain + ":" + sessionId);
     }
 }

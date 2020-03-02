@@ -30,11 +30,12 @@ public class SessionManager implements SessionContext {
         if (store == null) return null;  // session store is not initialized
         if (!"https".equals(request.scheme())) return null;  // only load session under https
 
-        var session = new SessionImpl();
+        var session = new SessionImpl(domain(request));
         sessionId(request).ifPresent(sessionId -> {
             logger.debug("load session");
-            Map<String, String> values = store.getAndRefresh(sessionId, timeout);
+            Map<String, String> values = store.getAndRefresh(sessionId, session.domain, timeout);
             if (values != null) {
+                // the redis session store use sha256 to hash, here use md5 to make sure not logging actual redis key, and keep reference shorter
                 actionLog.context("session_hash", Hash.md5Hex(sessionId));
                 session.id = sessionId;
                 session.values.putAll(values);
@@ -55,7 +56,7 @@ public class SessionManager implements SessionContext {
         if (session.invalidated) {
             if (session.id != null) {
                 logger.debug("invalidate session");
-                store.invalidate(session.id);
+                store.invalidate(session.id, session.domain);
                 putSessionId(response, null);
             }
         } else if (session.changed()) {
@@ -65,13 +66,23 @@ public class SessionManager implements SessionContext {
                 actionLog.context("session_hash", Hash.md5Hex(session.id));
                 putSessionId(response, session.id);
             }
-            store.save(session.id, session.values, session.changedFields, timeout);
+            store.save(session.id, session.domain, session.values, session.changedFields, timeout);
         }
     }
 
     private Optional<String> sessionId(Request request) {
         if (header != null) return request.header(header);
         return request.cookie(cookieSpec);
+    }
+
+    String domain(Request request) {
+        // if header is specified, always use current host, otherwise use cookieSpec.domain if specified
+        // for header/api scenario, there is no way to share sessionId across multiple apps, so always use request.host
+        // for cookie/web scenario, only case to share session cookie is to have multiple sub-domain webapps, thus use cookieSpec.domain (usually parent domain)
+        // share sessionId requires multiple webapps decode session key/values consistently, which adds extra complexity for dev/deployment
+        if (header == null && cookieSpec.domain != null)
+            return cookieSpec.domain;
+        return request.hostName();
     }
 
     void putSessionId(Response response, String sessionId) {
@@ -106,6 +117,6 @@ public class SessionManager implements SessionContext {
     public void invalidate(String key, String value) {
         if (store == null) throw new Error("site().session() must be configured");
         if (key == null || value == null) throw new Error("key/value must not be null");   // to prevent from invalidating all sessions miss this key
-        store.invalidate(key, value);
+        store.invalidateByKey(key, value);
     }
 }

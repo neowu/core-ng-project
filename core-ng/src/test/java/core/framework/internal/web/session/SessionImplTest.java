@@ -13,7 +13,7 @@ class SessionImplTest {
 
     @BeforeEach
     void createSessionImpl() {
-        session = new SessionImpl();
+        session = new SessionImpl("localhost");
     }
 
     @Test

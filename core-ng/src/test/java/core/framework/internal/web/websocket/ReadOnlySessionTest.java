@@ -15,7 +15,7 @@ class ReadOnlySessionTest {
 
     @BeforeEach
     void createReadOnlySession() {
-        session = new ReadOnlySession(new SessionImpl());
+        session = new ReadOnlySession(new SessionImpl("localhost"));
     }
 
     @Test

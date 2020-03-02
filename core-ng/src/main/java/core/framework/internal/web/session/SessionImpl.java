@@ -16,8 +16,13 @@ public class SessionImpl implements Session {
     final Map<String, String> values = new HashMap<>();
     final Set<String> changedFields = new HashSet<>();
     String id;
+    public final String domain;
     boolean invalidated;
     boolean saved;
+
+    public SessionImpl(String domain) {
+        this.domain = domain;
+    }
 
     @Override
     public Optional<String> get(String key) {

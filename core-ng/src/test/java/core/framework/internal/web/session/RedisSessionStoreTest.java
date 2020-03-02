@@ -20,8 +20,9 @@ class RedisSessionStoreTest {
 
     @Test
     void sessionKey() {
-        assertThat(store.sessionKey("someSessionId"))
+        assertThat(store.sessionKey("someSessionId", "domain"))
                 .doesNotContain("someSessionId")
+                .doesNotContain("domain")
                 .startsWith("session:");
     }
 }

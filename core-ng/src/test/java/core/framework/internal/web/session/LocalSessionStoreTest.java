@@ -24,7 +24,7 @@ class LocalSessionStoreTest {
     @Test
     void getAndRefresh() {
         localSessionStore.values.put("sessionId", sessionValue(Instant.now().plus(Duration.ofHours(1)), Map.of()));
-        Map<String, String> values = localSessionStore.getAndRefresh("sessionId", Duration.ofSeconds(30));
+        Map<String, String> values = localSessionStore.getAndRefresh("sessionId", null, Duration.ofSeconds(30));
 
         assertThat(values).isNotNull();
     }
@@ -32,21 +32,21 @@ class LocalSessionStoreTest {
     @Test
     void getAndRefreshWithExpiredSession() {
         localSessionStore.values.put("sessionId", sessionValue(Instant.now().minus(Duration.ofSeconds(30)), Map.of()));
-        Map<String, String> values = localSessionStore.getAndRefresh("sessionId", Duration.ofSeconds(30));
+        Map<String, String> values = localSessionStore.getAndRefresh("sessionId", null, Duration.ofSeconds(30));
 
         assertThat(values).isNull();
     }
 
     @Test
     void getAndRefreshWithNotExistedSessionId() {
-        Map<String, String> values = localSessionStore.getAndRefresh("sessionId", Duration.ofSeconds(30));
+        Map<String, String> values = localSessionStore.getAndRefresh("sessionId", null, Duration.ofSeconds(30));
 
         assertThat(values).isNull();
     }
 
     @Test
     void save() {
-        localSessionStore.save("sessionId", Map.of("key", "value"), Set.of(), Duration.ofSeconds(30));
+        localSessionStore.save("sessionId", null, Map.of("key", "value"), Set.of(), Duration.ofSeconds(30));
 
         assertThat(localSessionStore.values).hasSize(1);
     }
@@ -54,7 +54,7 @@ class LocalSessionStoreTest {
     @Test
     void invalidate() {
         localSessionStore.values.put("sessionId", sessionValue(Instant.now().minus(Duration.ofSeconds(30)), Map.of()));
-        localSessionStore.invalidate("sessionId");
+        localSessionStore.invalidate("sessionId", null);
 
         assertThat(localSessionStore.values).isEmpty();
     }
@@ -65,7 +65,7 @@ class LocalSessionStoreTest {
         localSessionStore.values.put("session2", sessionValue(Instant.now().minus(Duration.ofSeconds(30)), Map.of("key", "v1")));
         localSessionStore.values.put("session3", sessionValue(Instant.now().minus(Duration.ofSeconds(30)), Map.of("key", "v2")));
 
-        localSessionStore.invalidate("key", "v1");
+        localSessionStore.invalidateByKey("key", "v1");
 
         assertThat(localSessionStore.values).containsOnlyKeys("session3");
     }
