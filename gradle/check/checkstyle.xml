@@ -33,6 +33,7 @@
 
         <!--Coding:-->
         <module name="AvoidConstantAsFirstOperandInConditionCheck"/>    <!--provided by sevntu-checkstyle-->
+        <module name="AvoidDoubleBraceInitialization"/>                 <!--Detects double brace initialization-->
         <module name="AvoidHidingCauseException"/>                      <!--provided by sevntu-checkstyle-->
         <module name="AvoidNoArgumentSuperConstructorCall"/>            <!--Checks if call to superclass constructor without arguments is present.-->
         <module name="CustomDeclarationOrder">                          <!--provided by sevntu-checkstyle-->

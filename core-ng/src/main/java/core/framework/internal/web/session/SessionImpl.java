@@ -15,8 +15,8 @@ import java.util.Set;
 public class SessionImpl implements Session {
     final Map<String, String> values = new HashMap<>();
     final Set<String> changedFields = new HashSet<>();
+    final String domain;
     String id;
-    public final String domain;
     boolean invalidated;
     boolean saved;
 
@@ -37,12 +37,12 @@ public class SessionImpl implements Session {
         }
     }
 
-    boolean changed() {
-        return !changedFields.isEmpty();
-    }
-
     @Override
     public void invalidate() {
         invalidated = true;
+    }
+
+    boolean changed() {
+        return !changedFields.isEmpty();
     }
 }
