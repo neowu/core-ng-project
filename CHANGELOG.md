@@ -1,6 +1,7 @@
 ## Change log
-### 7.3.8 (2/19/2020 - )
+### 7.3.8 (2/19/2020 - 3/3/2020)
 * session: add domain (request.domain or cookieSpec.domain if specified) to session redis key, to prevent hijack sessionId from different domain if shared session redis
+* bean: report error if @Inject is used on static fields/methods which is unintended usage 
 
 ### 7.3.7 (2/18/2020 - 2/19/2020)
 * api: when mark @Deprecated in API method, it won't show in /_sys/api and log warn if called

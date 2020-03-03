@@ -64,20 +64,24 @@ public class BeanFactory {
             while (!visitorType.equals(Object.class)) {
                 for (Field field : visitorType.getDeclaredFields()) {
                     if (field.isAnnotationPresent(Inject.class)) {
+                        if (Modifier.isStatic(field.getModifiers()))
+                            throw new Error("static field must not have @Inject, field=" + Fields.path(field));
                         if (field.trySetAccessible()) {
                             field.set(instance, lookupValue(field));
                         } else {
-                            throw new Error(format("failed to inject field, field={}", Fields.path(field)));
+                            throw new Error("failed to inject field, field=" + Fields.path(field));
                         }
                     }
                 }
                 for (Method method : visitorType.getDeclaredMethods()) {
                     if (method.isAnnotationPresent(Inject.class)) {
+                        if (Modifier.isStatic(method.getModifiers()))
+                            throw new Error("static method must not have @Inject, method=" + Methods.path(method));
                         if (method.trySetAccessible()) {
                             Object[] params = lookupParams(method);
                             method.invoke(instance, params);
                         } else {
-                            throw new Error(format("failed to inject method, method={}", Methods.path(method)));
+                            throw new Error("failed to inject method, method=" + Methods.path(method));
                         }
                     }
                 }
