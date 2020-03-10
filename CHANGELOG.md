@@ -1,5 +1,7 @@
 ## Change log
 ### 7.3.9 (3/8/2020 - )
+* es: update to 7.6.1
+* httpClient: update okHTTP to 4.4.1
 
 ### 7.3.8 (2/19/2020 - 3/3/2020)
 * session: add domain (request.domain or cookieSpec.domain if specified) to session redis key, to prevent hijack sessionId from different domain if shared session redis
