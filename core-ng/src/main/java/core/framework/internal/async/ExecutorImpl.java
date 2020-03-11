@@ -68,10 +68,7 @@ public final class ExecutorImpl implements Executor {
             }
         }
         // construct execution outside scheduler thread, to obtain parent action log
-        Callable<Void> execution = execution(action, () -> {
-            task.execute();
-            return null;
-        });
+        Callable<Void> execution = execution(action, task);
         Runnable delayedTask = () -> {
             try {
                 submitTask(action, execution);
@@ -95,34 +92,8 @@ public final class ExecutorImpl implements Executor {
         }
     }
 
-    String taskAction(String action, String parentAction) {
-        String postfix = ":" + action;
-        if (parentAction.endsWith(postfix)) return parentAction;
-        return parentAction + postfix;
-    }
-
     private <T> Callable<T> execution(String action, Callable<T> task) {
         ActionLog parentActionLog = LogManager.CURRENT_ACTION_LOG.get();
-        String taskAction = taskAction(action, parentActionLog.action);
-        String correlationId = parentActionLog.correlationId();
-        String refId = parentActionLog.id;
-        boolean trace = parentActionLog.trace;
-        return () -> {
-            try {
-                ActionLog actionLog = logManager.begin("=== task execution begin ===");
-                actionLog.action(taskAction);
-                logger.debug("correlationId={}", correlationId);
-                actionLog.correlationIds = List.of(correlationId);
-                logger.debug("refId={}", refId);
-                actionLog.refIds = List.of(refId);
-                actionLog.trace = trace;
-                return task.call();
-            } catch (Throwable e) {
-                logManager.logError(e);
-                throw e;
-            } finally {
-                logManager.end("=== task execution end ===");
-            }
-        };
+        return new ExecutorTask<>(action, task, logManager, parentActionLog);
     }
 }

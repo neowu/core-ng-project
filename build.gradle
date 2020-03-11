@@ -7,9 +7,9 @@ subprojects {
 
 def elasticVersion = '7.6.1'
 def kafkaVersion = '2.4.0'
-def jacksonVersion = '2.10.2'
+def jacksonVersion = '2.10.3'
 def junitVersion = '5.6.0'
-def mockitoVersion = '3.2.4'
+def mockitoVersion = '3.3.0'
 def assertjVersion = '3.15.0'
 
 project('core-ng-api') {
@@ -25,7 +25,7 @@ project('core-ng') {
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.4.1'
-        implementation 'io.undertow:undertow-core:2.0.29.Final'
+        implementation 'io.undertow:undertow-core:2.0.30.Final'
         implementation 'org.jboss.xnio:xnio-nio:3.7.7.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.7.3'      // used by kafka message compression

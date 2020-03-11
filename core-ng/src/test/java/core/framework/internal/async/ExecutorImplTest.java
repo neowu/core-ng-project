@@ -45,7 +45,7 @@ class ExecutorImplTest {
         Future<Boolean> future = executor.submit("action", () -> {
             ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
             assertThat(actionLog.action).isEqualTo("parentAction:action");
-            assertThat(actionLog.trace).isEqualTo(true);
+            assertThat(actionLog.trace).isTrue();
             assertThat(actionLog.correlationIds).containsExactly("correlationId");
             return Boolean.TRUE;
         });
@@ -57,16 +57,11 @@ class ExecutorImplTest {
         Future<Void> future = executor.submit("task", () -> {
             ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
             assertThat(actionLog.action).isEqualTo("parentAction:task");
+            assertThat(actionLog.context).containsEntry("root_action", List.of("parentAction"));
             assertThat(actionLog.trace).isEqualTo(true);
             assertThat(actionLog.correlationIds).containsExactly("correlationId");
         });
         assertThat(future.get()).isNull();
-    }
-
-    @Test
-    void taskAction() {
-        assertThat(executor.taskAction("task", "parentAction")).isEqualTo("parentAction:task");
-        assertThat(executor.taskAction("task", "parentAction:task")).isEqualTo("parentAction:task");
     }
 
     @Test
