@@ -16,15 +16,15 @@ public class ExecutorTask<T> implements Callable<T> {
     final String action;
     private final LogManager logManager;
     private final Callable<T> task;
-    String rootAction;
-    String refId;
-    String correlationId;
-    boolean trace;
+    private String rootAction;
+    private String refId;
+    private String correlationId;
+    private boolean trace;
 
     ExecutorTask(String action, Callable<T> task, LogManager logManager, ActionLog parentActionLog) {
         this.logManager = logManager;
         this.task = task;
-        if (parentActionLog != null) {
+        if (parentActionLog != null) {  // only keep info needed by call(), so parentActionLog can be GCed sooner
             List<String> parentActionContext = parentActionLog.context.get("root_action");
             rootAction = parentActionContext != null ? parentActionContext.get(0) : parentActionLog.action;
             correlationId = parentActionLog.correlationId();
