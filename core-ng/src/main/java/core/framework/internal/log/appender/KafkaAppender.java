@@ -12,6 +12,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.record.CompressionType;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.slf4j.Logger;
@@ -36,12 +37,7 @@ public final class KafkaAppender implements LogAppender {
     private final Thread logForwarderThread;
     private final JSONMapper<ActionLogMessage> actionLogMapper;
     private final JSONMapper<StatMessage> statMapper;
-    private final Callback callback = (metadata, exception) -> {
-        if (exception != null) {
-            logger.warn("failed to send log message", exception);
-            records.clear();
-        }
-    };
+    private final Callback callback = new ProducerCallback();
 
     public KafkaAppender(String uri) {
         var watch = new StopWatch();
@@ -101,5 +97,17 @@ public final class KafkaAppender implements LogAppender {
             producer.send(record);
         }
         producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));
+    }
+
+    // pmd has flaws to check slf4j log format with lambda, even with https://github.com/pmd/pmd/pull/2263, it fails to analyze logger in lambda+if condition block
+    // so here use inner class as workaround
+    private class ProducerCallback implements Callback {
+        @Override
+        public void onCompletion(RecordMetadata metadata, Exception exception) {
+            if (exception != null) {
+                logger.warn("failed to send log message", exception);
+                records.clear();
+            }
+        }
     }
 }

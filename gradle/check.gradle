@@ -45,7 +45,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
-        toolVersion = '6.20.0'
+        toolVersion = '6.22.0'
         consoleOutput = true
         incrementalAnalysis = true
 

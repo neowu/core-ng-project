@@ -1,4 +1,6 @@
 ## Change log
+### 7.3.10 (3/12/2020 - )
+
 ### 7.3.9 (3/8/2020 - 3/11/2020)
 * es: update to 7.6.1
 * httpClient: update okHTTP to 4.4.1
