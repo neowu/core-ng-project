@@ -22,12 +22,11 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public final class ActionLog {
+    static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
+
     private static final String LOGGER = LoggerImpl.abbreviateLoggerName(ActionLog.class.getCanonicalName());
     private static final ThreadMXBean THREAD = ManagementFactory.getThreadMXBean();
-
     private static final int SOFT_EVENTS_LIMIT = 3000;    // normally 3000 lines trace is about 350k
-    private static final int MAX_ERROR_MESSAGE_LENGTH = 200;
-    private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
 
     public final String id;
     public final Map<String, List<String>> context;
@@ -71,7 +70,7 @@ public final class ActionLog {
         if (event.level.value > result.value) {
             result = event.level;
             errorCode = event.errorCode();      // only update errorCode/message if level raised, so errorCode will be first WARN or ERROR
-            errorMessage = Strings.truncate(event.message(), MAX_ERROR_MESSAGE_LENGTH);     // limit error message length in action log
+            errorMessage = Strings.truncate(event.message(), MAX_CONTEXT_VALUE_LENGTH);     // limit error message length in action log
         }
         if (event.level.value >= WARN.value || events.size() < SOFT_EVENTS_LIMIT) {       // after reach max holding lines, only add warning/error events
             add(event);
@@ -121,7 +120,7 @@ public final class ActionLog {
         for (Object value : values) {
             String contextValue = String.valueOf(value);
             if (contextValue.length() > MAX_CONTEXT_VALUE_LENGTH) { // prevent application code from putting large blob as context, e.g. xml or json response
-                throw new Error(format("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_ERROR_MESSAGE_LENGTH)));
+                throw new Error(format("context value is too long, key={}, value={}...(truncated)", key, contextValue.substring(0, MAX_CONTEXT_VALUE_LENGTH)));
             }
             contextValues.add(contextValue);
             add(event("[context] {}={}", key, contextValue));

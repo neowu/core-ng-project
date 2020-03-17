@@ -1,5 +1,6 @@
 ## Change log
 ### 7.3.10 (3/12/2020 - )
+* log: increase max length of error message to 1000, to show more info if needed in notification 
 
 ### 7.3.9 (3/8/2020 - 3/11/2020)
 * es: update to 7.6.1

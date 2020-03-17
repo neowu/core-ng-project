@@ -22,9 +22,9 @@ class ActionLogTest {
 
     @Test
     void contextValueIsTooLong() {
-        assertThatThrownBy(() -> log.context("key", "x".repeat(1001)))
-            .isInstanceOf(Error.class)
-            .hasMessageStartingWith("context value is too long");
+        assertThatThrownBy(() -> log.context("key", "x".repeat(ActionLog.MAX_CONTEXT_VALUE_LENGTH + 1)))
+                .isInstanceOf(Error.class)
+                .hasMessageStartingWith("context value is too long");
     }
 
     @Test
@@ -66,9 +66,9 @@ class ActionLogTest {
 
     @Test
     void truncateErrorMessage() {
-        log.process(new LogEvent("logger", null, LogLevel.WARN, "x".repeat(300), null, null));
+        log.process(new LogEvent("logger", null, LogLevel.WARN, "x".repeat(ActionLog.MAX_CONTEXT_VALUE_LENGTH + 1), null, null));
 
-        assertThat(log.errorMessage.length()).isEqualTo(200);
+        assertThat(log.errorMessage.length()).isEqualTo(ActionLog.MAX_CONTEXT_VALUE_LENGTH);
     }
 
     @Test
