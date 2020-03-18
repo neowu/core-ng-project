@@ -15,20 +15,30 @@ import core.framework.web.exception.ForbiddenException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author neo
  */
 public class EventController {
-    private final Set<String> allowedOrigins;
+    private final List<String> allowedOrigins;
+
     @Inject
     MessagePublisher<EventMessage> eventMessagePublisher;
     @Inject
     SendEventRequestValidator validator;
+    private boolean allowAllOrigins;
 
-    public EventController(Set<String> allowedOrigins) {
-        this.allowedOrigins = allowedOrigins;
+    public EventController(List<String> allowedOrigins) {
+        this.allowedOrigins = new ArrayList<>(allowedOrigins.size());
+        for (String origin : allowedOrigins) {
+            if ("*".equals(origin)) {
+                allowAllOrigins = true;
+            } else {
+                this.allowedOrigins.add(origin);
+            }
+        }
     }
 
     public Response options(Request request) {
@@ -84,7 +94,10 @@ public class EventController {
     }
 
     void checkOrigin(String origin) {
-        if (allowedOrigins.contains("*") || allowedOrigins.contains(origin)) return;
+        if (allowAllOrigins) return;
+        for (String allowedOrigin : allowedOrigins) {
+            if (origin.endsWith(allowedOrigin)) return;
+        }
         throw new ForbiddenException("access denied");
     }
 

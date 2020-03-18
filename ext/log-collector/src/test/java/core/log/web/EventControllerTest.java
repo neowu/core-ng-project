@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static core.log.web.SendEventRequest.Event;
 import static core.log.web.SendEventRequest.Result;
@@ -38,34 +38,35 @@ class EventControllerTest extends IntegrationTest {
 
     @Test
     void checkOriginWithWildcard() {
-        var controller = new EventController(Set.of("*"));
+        var controller = new EventController(List.of("*"));
         controller.checkOrigin("https://localhost");
     }
 
     @Test
     void checkOrigin() {
-        var controller = new EventController(Set.of("https://local", "https://localhost"));
+        var controller = new EventController(List.of("localhost", "example.com"));
         controller.checkOrigin("https://localhost");
+        controller.checkOrigin("https://api.example.com");
 
-        assertThatThrownBy(() -> controller.checkOrigin("https://example.com"))
-            .isInstanceOf(ForbiddenException.class)
-            .hasMessageContaining("access denied");
+        assertThatThrownBy(() -> controller.checkOrigin("https://example1.com"))
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("access denied");
     }
 
     @Test
     void options() {
         when(request.header("Origin")).thenReturn(Optional.empty());
-        var controller = new EventController(Set.of("*"));
+        var controller = new EventController(List.of("*"));
         assertThatThrownBy(() -> controller.options(request))
-            .isInstanceOf(ForbiddenException.class);
+                .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
     void allowPOSTWithCORS() {
         when(request.header("Origin")).thenReturn(Optional.of("localhost"));
-        var controller = new EventController(Set.of("*"));
+        var controller = new EventController(List.of("*"));
         assertThat(controller.options(request).header("Access-Control-Allow-Methods"))
-            .hasValueSatisfying(methods -> assertThat(methods).contains("POST"));
+                .hasValueSatisfying(methods -> assertThat(methods).contains("POST"));
     }
 
     @Test
@@ -79,7 +80,7 @@ class EventControllerTest extends IntegrationTest {
         event.info.put("stackTrace", "trace");
         event.elapsedTime = 100L;
 
-        var controller = new EventController(Set.of());
+        var controller = new EventController(List.of());
         Instant now = event.date.plusHours(1).toInstant();
         EventMessage message = controller.message(event, "test", now);
 
@@ -108,7 +109,7 @@ class EventControllerTest extends IntegrationTest {
 
         when(request.body()).thenReturn(Optional.of(Strings.bytes(Bean.toJSON(sendEventRequest))));
 
-        var controller = new EventController(Set.of());
+        var controller = new EventController(List.of());
         controller.validator = validator;
         SendEventRequest parsedSendEventRequest = controller.sendEventRequest(request);
 

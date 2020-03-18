@@ -3,7 +3,7 @@ package core.log;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,8 +20,7 @@ class LogCollectorAppTest {
 
     @Test
     void allowedOrigins() {
-        Set<String> origins = app.allowedOrigins("origin1, \norigin2  ,\n\rorigin3");
-        assertThat(origins).containsExactlyInAnyOrder("origin1", "origin2", "origin3");
+        List<String> origins = app.allowedOrigins("origin1, \norigin2  ,\n\rorigin3");
+        assertThat(origins).containsExactly("origin1", "origin2", "origin3");
     }
-
 }

@@ -6,13 +6,14 @@ import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.module.App;
 import core.framework.module.SystemModule;
-import core.framework.util.Sets;
 import core.framework.util.Strings;
 import core.log.web.EventController;
 import core.log.web.SendEventRequest;
 import core.log.web.SendEventRequestValidator;
 
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -31,19 +32,15 @@ public class LogCollectorApp extends App {
 
         bind(SendEventRequestValidator.class);
 
-        Set<String> allowedOrigins = allowedOrigins(requiredProperty("app.allowedOrigins"));
+        List<String> allowedOrigins = allowedOrigins(requiredProperty("app.allowedOrigins"));
         EventController controller = bind(new EventController(allowedOrigins));
         http().route(HTTPMethod.OPTIONS, "/event/:app", controller::options);
         http().route(HTTPMethod.POST, "/event/:app", controller::post);  // event will be sent via ajax or navigator.sendBeacon(), refer to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
         Bean.register(SendEventRequest.class);
     }
 
-    Set<String> allowedOrigins(String value) {
+    List<String> allowedOrigins(String value) {
         String[] origins = Strings.split(value, ',');
-        Set<String> result = Sets.newHashSetWithExpectedSize(origins.length);
-        for (String origin : origins) {
-            result.add(origin.strip());
-        }
-        return result;
+        return Arrays.stream(origins).map(String::strip).collect(Collectors.toList());
     }
 }
