@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.crypto.Password;
 import core.framework.db.Database;
 import core.framework.db.IsolationLevel;
 import core.framework.db.Repository;
@@ -63,11 +62,6 @@ public class DBConfig extends Config {
 
     public void password(String password) {
         database.password = password;
-    }
-
-    public void encryptedPassword(String encryptedPassword, String privateKey) {
-        String password = Password.decrypt(encryptedPassword, privateKey);
-        password(password);
     }
 
     public void poolSize(int minSize, int maxSize) {
