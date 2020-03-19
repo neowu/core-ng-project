@@ -1,8 +1,9 @@
 ## Change log
-### 7.3.10 (3/12/2020 - )
+### 7.3.10 (3/12/2020 - 3/19/2020)
 * log: increase max length of error message to 1000, to show more info if needed in notification 
 * log-collector: app.allowedOrigins checks root domain (endsWith) to simplify config, e.g. app.allowedOrigins=example.com allows https://api.example.com 
 * db: removed db().encryptedPassword() config, as it recommend to use cloud provider such as KMS to encrypt/decrypt
+* kafka: update to 2.4.1
 
 ### 7.3.9 (3/8/2020 - 3/11/2020)
 * es: update to 7.6.1

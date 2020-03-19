@@ -61,7 +61,7 @@ subprojects {
 
         reportLevel = 'low'
         includeFilter = rootProject.file('gradle/check/spotbugs.xml')
-        toolVersion = '4.0.0'
+        toolVersion = '4.0.1'
 
         def spotbugsReport = tasks.register('spotbugsReport') {
             group = 'verification'
