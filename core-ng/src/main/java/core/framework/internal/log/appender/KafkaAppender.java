@@ -14,6 +14,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.record.CompressionType;
+import org.apache.kafka.common.record.Records;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,12 +46,13 @@ public final class KafkaAppender implements LogAppender {
         statMapper = new JSONMapper<>(StatMessage.class);
         try {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,
-                    ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
-                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis(),  // metadata update timeout
+                    ProducerConfig.ACKS_CONFIG, "0",                                                        // no acknowledge to maximize performance
+                    ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                                       // if not specify, kafka uses producer-${seq} name, also impact jmx naming
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
-                    ProducerConfig.LINGER_MS_CONFIG, 50,
                     ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) Duration.ofSeconds(60).toMillis(),     // DELIVERY_TIMEOUT_MS_CONFIG is INT type
-                    ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder");      // if not specify, kafka uses producer-${seq} name, also impact jmx naming
+                    ProducerConfig.LINGER_MS_CONFIG, 50,
+                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis(),          // metadata update timeout
+                    ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 1000000 + Records.LOG_OVERHEAD);        // refer to core.framework.module.KafkaConfig.maxRequestSize
             var serializer = new ByteArraySerializer();
             producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());

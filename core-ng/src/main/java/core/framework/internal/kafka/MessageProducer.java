@@ -32,6 +32,7 @@ public class MessageProducer {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,               // immutable map requires value must not be null
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                     ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) Duration.ofSeconds(60).toMillis(),     // DELIVERY_TIMEOUT_MS_CONFIG is INT type
+                    ProducerConfig.LINGER_MS_CONFIG, 5,                                                     // use small linger time within acceptable range to improve batching
                     ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis(),                  // metadata update timeout
                     ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
             var serializer = new ByteArraySerializer();
