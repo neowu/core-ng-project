@@ -37,7 +37,9 @@ public final class WebSecurityInterceptor implements Interceptor {  // refer to 
                 if (contentSecurityPolicy != null) {
                     response.header("Content-Security-Policy", contentSecurityPolicy);
                 }
-                response.header("X-XSS-Protection", "1; mode=block");       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+                // refer to https://infosec.mozilla.org/guidelines/web_security
+                response.header("X-XSS-Protection", "1; mode=block");
+                response.header("X-Frame-Options", "DENY");
             }
             response.header("X-Content-Type-Options", "nosniff");
         });

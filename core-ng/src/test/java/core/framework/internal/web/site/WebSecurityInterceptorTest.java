@@ -41,6 +41,7 @@ class WebSecurityInterceptorTest {
         verify(response).header("Content-Security-Policy", interceptor.contentSecurityPolicy);
         verify(response).header(eq("X-XSS-Protection"), anyString());
         verify(response).header(eq("X-Content-Type-Options"), anyString());
+        verify(response).header(eq("X-Frame-Options"), anyString());
     }
 
     @Test
