@@ -40,6 +40,7 @@ public final class WebSecurityInterceptor implements Interceptor {  // refer to 
                 // refer to https://infosec.mozilla.org/guidelines/web_security
                 response.header("X-XSS-Protection", "1; mode=block");
                 response.header("X-Frame-Options", "DENY");
+                response.header("Referrer-Policy", "origin-when-cross-origin");
             }
             response.header("X-Content-Type-Options", "nosniff");
         });
