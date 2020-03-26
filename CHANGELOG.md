@@ -1,4 +1,6 @@
 ## Change log
+### 7.3.12 (3/25/2020 - 
+
 ### 7.3.11 (3/23/2020 - 3/25/2020)
 * kafka: set linger.ms to 5ms by default to improve batching under load
 * security: add X-Frame-Options in WebSecurityInterceptor

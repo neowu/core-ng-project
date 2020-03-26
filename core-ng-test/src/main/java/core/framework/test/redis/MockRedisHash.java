@@ -53,7 +53,7 @@ public final class MockRedisHash implements RedisHash {
             hashValue.map().put(field, String.valueOf(increment));
             return increment;
         }
-        long result = Integer.parseInt(value) + increment;
+        long result = Long.parseLong(value) + increment;
         hashValue.map().put(field, String.valueOf(result));
         return result;
     }
