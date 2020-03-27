@@ -1,6 +1,7 @@
 ## Change log
 ### 7.3.12 (3/25/2020 - 
 * db: added query.in(field, params) shortcut to build dynamic "where in clause"
+* log-collector: added param app.cookies to collect specific cookies from request. (this is due to safari expires localStorage and cookies write by js, only way to long term track is thru first party cookie)
 
 ### 7.3.11 (3/23/2020 - 3/25/2020)
 * kafka: set linger.ms to 5ms by default to improve batching under load
