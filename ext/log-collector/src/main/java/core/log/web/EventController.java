@@ -52,7 +52,8 @@ public class EventController {
         return Response.empty().status(HTTPStatus.OK)
                        .header("Access-Control-Allow-Origin", origin)
                        .header("Access-Control-Allow-Methods", "POST, PUT, OPTIONS")
-                       .header("Access-Control-Allow-Headers", "Accept, Content-Type");
+                       .header("Access-Control-Allow-Headers", "Accept, Content-Type")
+                       .header("Access-Control-Allow-Credentials", "true");         // allow send cross-domain cookies, refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
     }
 
     public Response post(Request request) {
@@ -75,7 +76,11 @@ public class EventController {
         }
 
         Response response = Response.empty();
-        if (origin != null) response.header("Access-Control-Allow-Origin", origin);
+        if (origin != null) {
+            // only need to response CORS headers for browser/ajax
+            response.header("Access-Control-Allow-Origin", origin);
+            response.header("Access-Control-Allow-Credentials", "true");
+        }
         return response;
     }
 
