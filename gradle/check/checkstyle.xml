@@ -74,6 +74,7 @@
         <module name="SimplifyBooleanReturn"/>              <!--Checks for overly complicated boolean return statements.-->
         <module name="StringLiteralEquality"/>
         <module name="UnnecessaryParentheses"/>             <!--Checks if unnecessary parentheses are used in a statement or expression.-->
+        <module name="UnnecessarySemicolonAfterOuterTypeDeclaration"/>
         <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>
         <module name="UnnecessarySemicolonInEnumeration"/>
         <module name="UnnecessarySemicolonInTryWithResources"/>
