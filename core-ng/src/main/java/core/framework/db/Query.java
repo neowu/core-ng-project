@@ -29,7 +29,7 @@ public interface Query<T> {
     }
 
     // syntax sugar, to help to build "where in clause" with dynamic params
-    default void in(String field, List<Object> params) {
+    default <V> void in(String field, List<V> params) {
         if (field == null) throw new Error("field must not be null");
         if (params == null || params.isEmpty()) throw new Error("params must not be empty");
         // efficient version of: where(Strings.format("{} IN ({})", field, params.stream().map(param -> "?").collect(Collectors.joining(", "))), params.toArray());
