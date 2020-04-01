@@ -1,4 +1,14 @@
 ## Change log
+### 7.4.0 (4/1/2020 - ) !!! will be java 14 only
+* http: updated built-in https self sign cert
+    if you encounter chrome error for accessing localhost, open chrome://flags/#allow-insecure-localhost to enable this flag
+* crypto: removed AES/RSA/Signature support
+    cryptography is hard to get right and algorithm/best practice changes over time, for cloud env, always to use KMS (gcloud/aws/azure)
+    the default impl provided by framework is not considered as best practice, so we removed it from framework
+    there is no way to encapsulate simple/non-intrusive API to cover all cases, 
+    e.g. with CHACHA20-POLY1305 or AES-GCM, it requires to manage and share nonce/IV, like either put IV as part of cipher text, or share in different channel, and IV should be different every time
+    with RSA or X25519 it still need to encrypt a symmetric key to final content           
+
 ### 7.3.12.1 (3/25/2020 - 4/1/2020)
 * db: added query.in(field, params) shortcut to build dynamic "where in clause"
 * log-collector: added param app.cookies to collect specific cookies from request. (this is due to safari expires localStorage and cookies write by js, only way to long term track is thru first party cookie)
