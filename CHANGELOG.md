@@ -7,7 +7,8 @@
     the default impl provided by framework is not considered as best practice, so we removed it from framework
     there is no way to encapsulate simple/non-intrusive API to cover all cases, 
     e.g. with CHACHA20-POLY1305 or AES-GCM, it requires to manage and share nonce/IV, like either put IV as part of cipher text, or share in different channel, and IV should be different every time
-    with RSA or X25519 it still need to encrypt a symmetric key to final content           
+    with RSA or X25519 it still need to encrypt a symmetric key to encrypt final content           
+* es: update to 7.6.2
 
 ### 7.3.12.1 (3/25/2020 - 4/1/2020)
 * db: added query.in(field, params) shortcut to build dynamic "where in clause"
