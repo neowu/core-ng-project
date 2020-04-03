@@ -1,7 +1,7 @@
 package core.framework.internal.log.appender;
 
 import core.framework.log.message.ActionLogMessage;
-import core.framework.log.message.PerformanceStat;
+import core.framework.log.message.PerformanceStatMessage;
 import core.framework.log.message.StatMessage;
 
 import java.io.PrintStream;
@@ -74,13 +74,13 @@ public final class ConsoleAppender implements LogAppender {
                 builder.append(LOG_SPLITTER).append(entry.getKey()).append('=').append(format.format(entry.getValue()));
             }
         }
-        for (Map.Entry<String, PerformanceStat> entry : log.performanceStats.entrySet()) {
+        for (Map.Entry<String, PerformanceStatMessage> entry : log.performanceStats.entrySet()) {
             String key = entry.getKey();
-            PerformanceStat tracking = entry.getValue();
-            builder.append(LOG_SPLITTER).append(key).append("_count=").append(tracking.count);
-            if (tracking.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("_reads=").append(tracking.readEntries);
-            if (tracking.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("_writes=").append(tracking.writeEntries);
-            builder.append(LOG_SPLITTER).append(key).append("_elapsed=").append(format.format(tracking.totalElapsed));
+            PerformanceStatMessage stat = entry.getValue();
+            builder.append(LOG_SPLITTER).append(key).append("_count=").append(stat.count);
+            if (stat.readEntries != null) builder.append(LOG_SPLITTER).append(key).append("_reads=").append(stat.readEntries);
+            if (stat.writeEntries != null) builder.append(LOG_SPLITTER).append(key).append("_writes=").append(stat.writeEntries);
+            builder.append(LOG_SPLITTER).append(key).append("_elapsed=").append(format.format(stat.totalElapsed));
         }
         return builder.toString();
     }

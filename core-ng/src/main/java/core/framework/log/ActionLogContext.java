@@ -39,11 +39,11 @@ public final class ActionLogContext {
     }
 
     public static int track(String operation, long elapsed) {
-        return track(operation, elapsed, null, null);
+        return track(operation, elapsed, 0, 0);
     }
 
     // return the total count of operations within current action
-    public static int track(String operation, long elapsed, Integer readEntries, Integer writeEntries) {
+    public static int track(String operation, long elapsed, int readEntries, int writeEntries) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog == null) return 1;    // be called without action context
         return actionLog.track(operation, elapsed, readEntries, writeEntries);

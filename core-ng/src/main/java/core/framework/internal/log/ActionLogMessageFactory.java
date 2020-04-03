@@ -1,7 +1,11 @@
 package core.framework.internal.log;
 
 import core.framework.log.message.ActionLogMessage;
+import core.framework.log.message.PerformanceStatMessage;
+import core.framework.util.Maps;
 import core.framework.util.Network;
+
+import java.util.Map;
 
 import static core.framework.internal.log.LogLevel.WARN;
 
@@ -29,11 +33,27 @@ public class ActionLogMessageFactory {
         message.errorMessage = log.errorMessage;
         message.context = log.context;
         message.stats = log.stats;
-        message.performanceStats = log.performanceStats;
+        message.performanceStats = performanceStats(log.performanceStats);
         if (log.flushTraceLog()) {
             message.traceLog = trace(log, SOFT_TRACE_LIMIT, HARD_TRACE_LIMIT);
         }
         return message;
+    }
+
+    private Map<String, PerformanceStatMessage> performanceStats(Map<String, PerformanceStat> stats) {
+        Map<String, PerformanceStatMessage> messages = Maps.newHashMapWithExpectedSize(stats.size());
+        for (Map.Entry<String, PerformanceStat> entry : stats.entrySet()) {
+            PerformanceStat value = entry.getValue();
+            var message = new PerformanceStatMessage();
+            message.count = value.count;
+            message.totalElapsed = value.totalElapsed;
+            if (value.readEntries != 0 || value.writeEntries != 0) {
+                message.readEntries = value.readEntries;
+                message.writeEntries = value.writeEntries;
+            }
+            messages.put(entry.getKey(), message);
+        }
+        return messages;
     }
 
     String trace(ActionLog log, int softLimit, int hardLimit) {

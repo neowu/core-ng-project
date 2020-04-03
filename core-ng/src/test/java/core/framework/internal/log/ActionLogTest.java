@@ -1,6 +1,5 @@
 package core.framework.internal.log;
 
-import core.framework.log.message.PerformanceStat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -96,11 +95,11 @@ class ActionLogTest {
         assertThat(stat.readEntries).isEqualTo(2);
         assertThat(stat.writeEntries).isEqualTo(1);
 
-        assertThat(log.track("http", 3000, null, null)).isEqualTo(1);
+        assertThat(log.track("http", 3000, 0, 0)).isEqualTo(1);
         stat = log.performanceStats.get("http");
         assertThat(stat.count).isEqualTo(1);
         assertThat(stat.totalElapsed).isEqualTo(3000);
-        assertThat(stat.readEntries).isNull();
-        assertThat(stat.writeEntries).isNull();
+        assertThat(stat.readEntries).isZero();
+        assertThat(stat.writeEntries).isZero();
     }
 }

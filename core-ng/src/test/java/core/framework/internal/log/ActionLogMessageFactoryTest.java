@@ -2,7 +2,7 @@ package core.framework.internal.log;
 
 import core.framework.log.Markers;
 import core.framework.log.message.ActionLogMessage;
-import core.framework.log.message.PerformanceStat;
+import core.framework.log.message.PerformanceStatMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +25,7 @@ class ActionLogMessageFactoryTest {
         log.action("action");
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
         log.track("db", 1000, 1, 2);
+        log.track("http", 2000, 0, 0);
 
         ActionLogMessage message = factory.create(log);
 
@@ -34,11 +35,17 @@ class ActionLogMessageFactoryTest {
         assertThat(message.errorCode).isEqualTo("ERROR_CODE");
         assertThat(message.traceLog).isNotEmpty();
 
-        PerformanceStat statMessage = message.performanceStats.get("db");
-        assertThat(statMessage.totalElapsed).isEqualTo(1000);
-        assertThat(statMessage.count).isEqualTo(1);
-        assertThat(statMessage.readEntries).isEqualTo(1);
-        assertThat(statMessage.writeEntries).isEqualTo(2);
+        PerformanceStatMessage stats = message.performanceStats.get("db");
+        assertThat(stats.totalElapsed).isEqualTo(1000);
+        assertThat(stats.count).isEqualTo(1);
+        assertThat(stats.readEntries).isEqualTo(1);
+        assertThat(stats.writeEntries).isEqualTo(2);
+
+        stats = message.performanceStats.get("http");
+        assertThat(stats.totalElapsed).isEqualTo(2000);
+        assertThat(stats.count).isEqualTo(1);
+        assertThat(stats.readEntries).isNull();
+        assertThat(stats.writeEntries).isNull();
     }
 
     @Test

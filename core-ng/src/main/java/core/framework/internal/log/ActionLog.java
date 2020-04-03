@@ -1,6 +1,5 @@
 package core.framework.internal.log;
 
-import core.framework.log.message.PerformanceStat;
 import core.framework.util.Strings;
 
 import java.lang.management.ManagementFactory;
@@ -134,18 +133,12 @@ public final class ActionLog {
         add(event("[stat] {}={}", key, format.format(value)));
     }
 
-    public int track(String operation, long elapsed, Integer readEntries, Integer writeEntries) {
+    public int track(String operation, long elapsed, int readEntries, int writeEntries) {
         PerformanceStat stat = performanceStats.computeIfAbsent(operation, key -> new PerformanceStat());
         stat.count += 1;
         stat.totalElapsed += elapsed;
-        if (readEntries != null) {
-            if (stat.readEntries == null) stat.readEntries = readEntries;
-            else stat.readEntries += readEntries;
-        }
-        if (writeEntries != null) {
-            if (stat.writeEntries == null) stat.writeEntries = writeEntries;
-            else stat.writeEntries += writeEntries;
-        }
+        stat.readEntries += readEntries;
+        stat.writeEntries += writeEntries;
         // not to add event to keep trace log concise
         return stat.count;
     }

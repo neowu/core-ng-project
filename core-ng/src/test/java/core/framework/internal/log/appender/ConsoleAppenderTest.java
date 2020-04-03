@@ -1,7 +1,7 @@
 package core.framework.internal.log.appender;
 
 import core.framework.log.message.ActionLogMessage;
-import core.framework.log.message.PerformanceStat;
+import core.framework.log.message.PerformanceStatMessage;
 import core.framework.log.message.StatMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,12 +67,12 @@ class ConsoleAppenderTest {
 
         String message = appender.message(stat);
         assertThat(message)
-            .contains("| thread_count=10")
-            .contains("| cpu_usage=0.01");
+                .contains("| thread_count=10")
+                .contains("| cpu_usage=0.01");
     }
 
-    private PerformanceStat perf(long elapsed, int read, int write) {
-        PerformanceStat stat = new PerformanceStat();
+    private PerformanceStatMessage perf(long elapsed, int read, int write) {
+        PerformanceStatMessage stat = new PerformanceStatMessage();
         stat.count = 1;
         stat.totalElapsed = elapsed;
         stat.readEntries = read;
