@@ -134,8 +134,8 @@ public final class ActionLog {
         add(event("[stat] {}={}", key, format.format(value)));
     }
 
-    public void track(String action, long elapsed, Integer readEntries, Integer writeEntries) {
-        PerformanceStat stat = performanceStats.computeIfAbsent(action, key -> createPerformanceStat());
+    public int track(String operation, long elapsed, Integer readEntries, Integer writeEntries) {
+        PerformanceStat stat = performanceStats.computeIfAbsent(operation, key -> new PerformanceStat());
         stat.count += 1;
         stat.totalElapsed += elapsed;
         if (readEntries != null) {
@@ -147,13 +147,7 @@ public final class ActionLog {
             else stat.writeEntries += writeEntries;
         }
         // not to add event to keep trace log concise
-    }
-
-    private PerformanceStat createPerformanceStat() {
-        var stat = new PerformanceStat();
-        stat.count = 0;
-        stat.totalElapsed = 0L;
-        return stat;
+        return stat.count;
     }
 
     public String correlationId() {

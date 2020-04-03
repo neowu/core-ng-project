@@ -80,6 +80,10 @@ public class DBConfig extends Config {
         database.tooManyRowsReturnedThreshold = threshold;
     }
 
+    public void maxOperations(int threshold) {
+        database.maxOperations = threshold;
+    }
+
     public void longTransactionThreshold(Duration threshold) {
         database.operation.transactionManager.longTransactionThresholdInNanos = threshold.toNanos();
     }

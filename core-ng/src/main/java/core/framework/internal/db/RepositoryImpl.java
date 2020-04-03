@@ -4,7 +4,6 @@ import core.framework.db.Query;
 import core.framework.db.Repository;
 import core.framework.internal.validate.Validator;
 import core.framework.log.ActionLogContext;
-import core.framework.log.Markers;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
@@ -15,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
+
+import static core.framework.log.Markers.errorCode;
 
 /**
  * @author neo
@@ -62,9 +63,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
             return database.operation.insert(sql, params, insertQuery.generatedColumn);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("db", elapsed, 0, 1);
+            int operations = ActionLogContext.track("db", elapsed, 0, 1);
             logger.debug("insert, sql={}, params={}, elapsed={}", sql, new SQLParams(database.operation.enumMapper, params), elapsed);
-            checkSlowOperation(elapsed);
+            database.checkOperation(elapsed, operations);
         }
     }
 
@@ -81,12 +82,12 @@ public final class RepositoryImpl<T> implements Repository<T> {
         try {
             updatedRows = database.operation.update(query.sql, query.params);
             if (updatedRows != 1)
-                logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
+                logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "updated rows is not 1, rows={}", updatedRows);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("db", elapsed, 0, updatedRows);
+            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
             logger.debug("update, sql={}, params={}, elapsed={}", query.sql, new SQLParams(database.operation.enumMapper, query.params), elapsed);
-            checkSlowOperation(elapsed);
+            database.checkOperation(elapsed, operations);
         }
     }
 
@@ -102,12 +103,12 @@ public final class RepositoryImpl<T> implements Repository<T> {
         try {
             deletedRows = database.operation.update(deleteSQL, primaryKeys);
             if (deletedRows != 1)
-                logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", deletedRows);
+                logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows is not 1, rows={}", deletedRows);
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("db", elapsed, 0, deletedRows);
+            int operations = ActionLogContext.track("db", elapsed, 0, deletedRows);
             logger.debug("delete, sql={}, params={}, elapsed={}", deleteSQL, new SQLParams(database.operation.enumMapper, primaryKeys), elapsed);
-            checkSlowOperation(elapsed);
+            database.checkOperation(elapsed, operations);
         }
     }
 
@@ -125,9 +126,9 @@ public final class RepositoryImpl<T> implements Repository<T> {
         } finally {
             long elapsed = watch.elapsed();
             int size = entities.size();
-            ActionLogContext.track("db", elapsed, 0, size);
+            int operations = ActionLogContext.track("db", elapsed, 0, size);
             logger.debug("batchInsert, sql={}, params={}, size={}, elapsed={}", sql, new SQLBatchParams(database.operation.enumMapper, params), size, elapsed);
-            checkSlowOperation(elapsed);
+            database.checkOperation(elapsed, operations);
         }
     }
 
@@ -147,18 +148,12 @@ public final class RepositoryImpl<T> implements Repository<T> {
             int[] results = database.operation.batchUpdate(deleteSQL, params);
             deletedRows = Arrays.stream(results).sum();
             if (deletedRows != primaryKeys.size())
-                logger.warn(Markers.errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows does not match size of primary keys, rows={}", Arrays.toString(results));
+                logger.warn(errorCode("UNEXPECTED_UPDATE_RESULT"), "deleted rows does not match size of primary keys, rows={}", Arrays.toString(results));
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("db", elapsed, 0, deletedRows);
+            int operations = ActionLogContext.track("db", elapsed, 0, deletedRows);
             logger.debug("batchDelete, sql={}, params={}, size={}, elapsed={}", deleteSQL, new SQLBatchParams(database.operation.enumMapper, params), primaryKeys.size(), elapsed);
-            checkSlowOperation(elapsed);
-        }
-    }
-
-    private void checkSlowOperation(long elapsed) {
-        if (elapsed > database.slowOperationThresholdInNanos) {
-            logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsed={}", elapsed);
+            database.checkOperation(elapsed, operations);
         }
     }
 }

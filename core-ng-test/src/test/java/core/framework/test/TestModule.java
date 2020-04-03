@@ -116,6 +116,7 @@ public class TestModule extends AbstractTestModule {
         db().slowOperationThreshold(Duration.ofSeconds(5));
         db().longTransactionThreshold(Duration.ofSeconds(5));
         db().tooManyRowsReturnedThreshold(1000);
+        db().maxOperations(5000);
         db().repository(TestDBEntity.class);
         initDB().createSchema();
     }

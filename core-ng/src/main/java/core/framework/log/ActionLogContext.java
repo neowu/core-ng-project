@@ -38,14 +38,14 @@ public final class ActionLogContext {
         }
     }
 
-    public static void track(String action, long elapsed) {
-        track(action, elapsed, null, null);
+    public static int track(String operation, long elapsed) {
+        return track(operation, elapsed, null, null);
     }
 
-    public static void track(String action, long elapsed, Integer readEntries, Integer writeEntries) {
+    // return the total count of operations within current action
+    public static int track(String operation, long elapsed, Integer readEntries, Integer writeEntries) {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-        if (actionLog != null) {
-            actionLog.track(action, elapsed, readEntries, writeEntries);
-        }
+        if (actionLog == null) return 1;    // be called without action context
+        return actionLog.track(operation, elapsed, readEntries, writeEntries);
     }
 }

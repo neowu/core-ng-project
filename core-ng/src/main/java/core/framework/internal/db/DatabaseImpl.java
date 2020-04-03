@@ -7,7 +7,6 @@ import core.framework.db.Transaction;
 import core.framework.db.UncheckedSQLException;
 import core.framework.internal.resource.Pool;
 import core.framework.log.ActionLogContext;
-import core.framework.log.Markers;
 import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import static core.framework.util.Strings.format;
+import static core.framework.log.Markers.errorCode;
 
 /**
  * @author neo
@@ -40,6 +39,7 @@ public final class DatabaseImpl implements Database {
     private final Map<Class<?>, RowMapper<?>> rowMappers = new HashMap<>(32);
     public String user;
     public String password;
+    public int maxOperations = 5000;  // max db calls per action, if exceeds, it indicates either wrong impl (e.g. infinite loop with db calls) or bad practice (not CD friend), better split into multiple actions
     public int tooManyRowsReturnedThreshold = 1000;
     public long slowOperationThresholdInNanos = Duration.ofSeconds(5).toNanos();
     public IsolationLevel isolationLevel;
@@ -126,7 +126,7 @@ public final class DatabaseImpl implements Database {
         } else if (url.startsWith("jdbc:hsqldb:")) {
             return createDriver("org.hsqldb.jdbc.JDBCDriver");
         } else {
-            throw new Error(format("not supported database, url={}", url));
+            throw new Error("not supported database, url=" + url);
         }
     }
 
@@ -175,9 +175,9 @@ public final class DatabaseImpl implements Database {
             return results;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("db", elapsed, returnedRows, 0);
+            int operations = ActionLogContext.track("db", elapsed, returnedRows, 0);
             logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
-            checkSlowOperation(elapsed);
+            checkOperation(elapsed, operations);
         }
     }
 
@@ -191,9 +191,9 @@ public final class DatabaseImpl implements Database {
             return result;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("db", elapsed, returnedRows, 0);
+            int operations = ActionLogContext.track("db", elapsed, returnedRows, 0);
             logger.debug("selectOne, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
-            checkSlowOperation(elapsed);
+            checkOperation(elapsed, operations);
         }
     }
 
@@ -206,9 +206,9 @@ public final class DatabaseImpl implements Database {
             return updatedRows;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("db", elapsed, 0, updatedRows);
+            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
             logger.debug("execute, sql={}, params={}, updatedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), updatedRows, elapsed);
-            checkSlowOperation(elapsed);
+            checkOperation(elapsed, operations);
         }
     }
 
@@ -222,9 +222,9 @@ public final class DatabaseImpl implements Database {
             return results;
         } finally {
             long elapsed = watch.elapsed();
-            ActionLogContext.track("db", elapsed, 0, updatedRows);
+            int operations = ActionLogContext.track("db", elapsed, 0, updatedRows);
             logger.debug("batchExecute, sql={}, params={}, size={}, updatedRows={}, elapsed={}", sql, new SQLBatchParams(operation.enumMapper, params), params.size(), updatedRows, elapsed);
-            checkSlowOperation(elapsed);
+            checkOperation(elapsed, operations);
         }
     }
 
@@ -232,13 +232,13 @@ public final class DatabaseImpl implements Database {
         @SuppressWarnings("unchecked")
         RowMapper<T> mapper = (RowMapper<T>) rowMappers.get(viewClass);
         if (mapper == null)
-            throw new Error(format("view class is not registered, please register in module by db().view(), viewClass={}", viewClass.getCanonicalName()));
+            throw new Error("view class is not registered, please register in module by db().view(), viewClass=" + viewClass.getCanonicalName());
         return mapper;
     }
 
     private <T> void registerViewClass(Class<T> viewClass) {
         if (rowMappers.containsKey(viewClass)) {
-            throw new Error(format("found duplicate view class, viewClass={}", viewClass.getCanonicalName()));
+            throw new Error("found duplicate view class, viewClass=" + viewClass.getCanonicalName());
         }
         RowMapper<T> mapper = new RowMapperBuilder<>(viewClass, operation.enumMapper).build();
         rowMappers.put(viewClass, mapper);
@@ -246,13 +246,16 @@ public final class DatabaseImpl implements Database {
 
     private void checkTooManyRowsReturned(int size) {
         if (size > tooManyRowsReturnedThreshold) {
-            logger.warn(Markers.errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
+            logger.warn(errorCode("TOO_MANY_ROWS_RETURNED"), "too many rows returned, returnedRows={}", size);
         }
     }
 
-    private void checkSlowOperation(long elapsed) {
+    void checkOperation(long elapsed, int operations) {
+        if (operations > maxOperations) {
+            throw new Error("too many db operations, operations=" + operations);
+        }
         if (elapsed > slowOperationThresholdInNanos) {
-            logger.warn(Markers.errorCode("SLOW_DB"), "slow db operation, elapsed={}", elapsed);
+            logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", elapsed);
         }
     }
 }

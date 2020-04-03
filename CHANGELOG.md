@@ -9,6 +9,7 @@
     e.g. with CHACHA20-POLY1305 or AES-GCM, it requires to manage and share nonce/IV, like either put IV as part of cipher text, or share in different channel, and IV should be different every time
     with RSA or X25519 it still need to encrypt a symmetric key to encrypt final content           
 * es: update to 7.6.2
+* db: added max operations per action check (default is 5000), to protect bad impl (e.g. infinite loop with db calls) or bad practice (make action too long for zero-down time release) 
 
 ### 7.3.12.1 (3/25/2020 - 4/1/2020)
 * db: added query.in(field, params) shortcut to build dynamic "where in clause"

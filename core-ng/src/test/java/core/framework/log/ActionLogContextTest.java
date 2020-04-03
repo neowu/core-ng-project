@@ -17,17 +17,24 @@ class ActionLogContextTest {
         assertThat(ActionLogContext.get("key")).isEmpty();
 
         ActionLogContext.stat("stat", 1);
+
+        assertThat(ActionLogContext.track("db", 100)).isEqualTo(1);
     }
 
     @Test
-    void get() {
+    void withCurrentActionLog() {
         var logManager = new LogManager();
         logManager.begin("start");
+
+        assertThat(ActionLogContext.id()).isNotNull();
 
         ActionLogContext.get("key");
         assertThat(ActionLogContext.get("key")).isEmpty();
         ActionLogContext.put("key", "value");
         assertThat(ActionLogContext.get("key")).contains("value");
+
+        assertThat(ActionLogContext.track("db", 100)).isEqualTo(1);
+        assertThat(ActionLogContext.track("db", 100)).isEqualTo(2);
 
         logManager.end("end");
     }
