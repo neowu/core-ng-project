@@ -50,13 +50,13 @@ public abstract class Module {
         return context.bind(type, name, instance);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T bean(Class<T> instanceClass) {
-        return (T) bean(instanceClass, null);
+        return bean(instanceClass, null);
     }
 
-    public Object bean(Type type, String name) {
-        return context.beanFactory.bean(type, name);
+    @SuppressWarnings("unchecked")
+    public <T> T bean(Type type, String name) {
+        return (T) context.beanFactory.bean(type, name);
     }
 
     public void loadProperties(String classpath) {

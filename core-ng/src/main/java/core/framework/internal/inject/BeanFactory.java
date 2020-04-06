@@ -47,7 +47,7 @@ public class BeanFactory {
 
     public <T> T create(Class<T> instanceClass) {
         if (instanceClass.isInterface() || Modifier.isAbstract(instanceClass.getModifiers()))
-            throw new Error(format("instance class must be concrete, class={}", instanceClass.getCanonicalName()));
+            throw new Error("instance class must be concrete, class=" + instanceClass.getCanonicalName());
 
         try {
             T instance = construct(instanceClass);
