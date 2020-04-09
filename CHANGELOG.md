@@ -1,13 +1,14 @@
 ## Change log
-### 7.4.0 (4/1/2020 - ) !!! will be java 14 only
+### 7.4.0 (4/1/2020 - ) !!! only support java 14
+* java: update to java 14, please make sure to upgrade build/jenkins and all docker runtime to 14 before upgrading framework
 * http: updated built-in https self sign cert
     if you encounter chrome error for accessing localhost, open chrome://flags/#allow-insecure-localhost to enable this flag
 * crypto: removed AES/RSA/Signature support
     cryptography is hard to get right and algorithm/best practice changes over time, for cloud env, always to use KMS (gcloud/aws/azure)
-    the default impl provided by framework is not considered as best practice, so we removed it from framework
+    the default impl is not considered as best practice, so we removed it from the framework
     there is no way to encapsulate simple/non-intrusive API to cover all cases, 
-    e.g. with CHACHA20-POLY1305 or AES-GCM, it requires to manage and share nonce/IV, like either put IV as part of cipher text, or share in different channel, and IV should be different every time
-    with RSA or X25519 it still need to encrypt a symmetric key to encrypt final content           
+    e.g. with CHACHA20-POLY1305 or AES-GCM, it requires managing and sharing nonce/IV, like either put IV as part of cipher text, or share in different channel, and IV should be different every time
+    with RSA or X25519 it still needs to encrypt a symmetric key to encrypt final content           
 * es: update to 7.6.2
 * db: added max operations per action check (default is 5000), to protect bad impl (e.g. infinite loop with db calls) or bad practice (make action too long for zero-down time release) 
 
