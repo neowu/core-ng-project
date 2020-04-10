@@ -24,12 +24,16 @@ public final class UncheckedSQLException extends RuntimeException {
     // hsqldb: org.hsqldb.jdbc.JDBCUtil,
     // mysql: com.mysql.cj.jdbc.exceptions.SQLError
     private ErrorType errorType(SQLException e) {
-        return e instanceof SQLIntegrityConstraintViolationException ? ErrorType.INTEGRITY_CONSTRAINT_VIOLATION : null;
+        if (e instanceof SQLIntegrityConstraintViolationException) return ErrorType.INTEGRITY_CONSTRAINT_VIOLATION;
+        String state = e.getSQLState();
+        if (state != null && state.startsWith("08")) return ErrorType.CONNECTION_ERROR;
+        return null;
     }
 
     // currently only valid use case to catch UncheckedSQLException is for duplicate key / constraint violation , e.g. register with duplicate name,
     // it should not catch UncheckedSQLException for rest use cases
     public enum ErrorType {
+        CONNECTION_ERROR,   // error type used to retry db operation potentially for top critical system, in cloud env / webapp, there are only limited use cases where retry db query makes sense
         INTEGRITY_CONSTRAINT_VIOLATION
     }
 }
