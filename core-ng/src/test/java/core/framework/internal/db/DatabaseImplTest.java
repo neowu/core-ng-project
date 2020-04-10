@@ -132,6 +132,18 @@ class DatabaseImplTest {
     }
 
     @Test
+    void duplicateKey() {
+        insertRow(1, "string", TestEnum.V1);
+        assertThatThrownBy(() -> insertRow(1, "string", TestEnum.V1))
+                .isInstanceOf(UncheckedSQLException.class)
+                .satisfies(e -> {
+                    UncheckedSQLException exception = (UncheckedSQLException) e;
+                    assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
+                    assertThat(exception.sqlSate).startsWith("23");
+                });
+    }
+
+    @Test
     void rollbackTransaction() {
         try (Transaction transaction = database.beginTransaction()) {
             insertRow(1, "string", TestEnum.V1);
