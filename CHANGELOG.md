@@ -12,6 +12,7 @@
 * es: update to 7.6.2
 * db: added max operations per action check (default is 5000), to protect bad impl (e.g. infinite loop with db calls) or bad practice (make action too long for zero-down time release) 
 * db: added errorType (INTEGRITY_CONSTRAINT_VIOLATION) in UncheckedSQLException, to support catch duplicate key exception in business logic 
+* httpClient: update okHTTP to 4.5.0 
 
 ### 7.3.12.1 (3/25/2020 - 4/1/2020)
 * db: added query.in(field, params) shortcut to build dynamic "where in clause"
