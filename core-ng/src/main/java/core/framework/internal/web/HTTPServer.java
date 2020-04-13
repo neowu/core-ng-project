@@ -38,7 +38,7 @@ public class HTTPServer {
     }
 
     public void start() {
-        if (httpPort == null && httpsPort == null) httpPort = 8080;    // by default start http
+        if (httpPort == null && httpsPort == null) httpsPort = 8443;    // by default start https only
 
         var watch = new StopWatch();
         try {

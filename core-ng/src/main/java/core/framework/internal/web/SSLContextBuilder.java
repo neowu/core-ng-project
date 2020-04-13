@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public class SSLContextBuilder {
     // generate cert/key by "openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -nodes -days 3650"
-    private static final String CERT = "-----BEGIN CERTIFICATE-----\n"
+    private final String cert = "-----BEGIN CERTIFICATE-----\n"
             + "MIIEoDCCAogCCQC5Kos+icdPjzANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAd1\n"
             + "bmtub3duMB4XDTIwMDQwMTE5NTA0NloXDTMwMDMzMDE5NTA0NlowEjEQMA4GA1UE\n"
             + "AwwHdW5rbm93bjCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAOs1QKoL\n"
@@ -52,7 +52,7 @@ public class SSLContextBuilder {
             + "Rc951Uzxq+tSNopgkDbeMLc78oCneiIkG5kRtGSg0cq9F6PvAsSq/wHH2Pt/CeLG\n"
             + "T6iN3OqSp9rSOWhhEjIdDLmv47tBBg006TxZdgFHItcYxBj2\n"
             + "-----END CERTIFICATE-----\n";
-    private static final String KEY = "-----BEGIN PRIVATE KEY-----\n"
+    private final String key = "-----BEGIN PRIVATE KEY-----\n"
             + "MIIJQgIBADANBgkqhkiG9w0BAQEFAASCCSwwggkoAgEAAoICAQDrNUCqC65s90HD\n"
             + "i5YWZd1qb9pQ2sU7d2bmWpS/SEsfTtDE8+Y711t7iVm5+HHkE8RkJCfWi0JCMke9\n"
             + "2SuD9EbxmWPcy8z7DPOBUuFl0tFBA2MN/U0zAGMv1z7Pw5k4T2QEdX7bRix7bk8o\n"
@@ -107,8 +107,8 @@ public class SSLContextBuilder {
 
     public SSLContext build() {
         try {
-            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(fromPEM(KEY)));
-            Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(fromPEM(CERT)));
+            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(fromPEM(key)));
+            Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(fromPEM(cert)));
 
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, null);
