@@ -4,7 +4,6 @@ import core.framework.async.Executor;
 import core.framework.async.Task;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.log.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +15,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static core.framework.log.Markers.errorCode;
 
 /**
  * @author neo
@@ -60,7 +61,7 @@ public final class ExecutorImpl implements Executor {
     public void submit(String action, Task task, Duration delay) {
         synchronized (this) {
             if (executor.isShutdown()) {
-                logger.warn(Markers.errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action);    // with current executor impl, rejection only happens when shutdown
+                logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action);    // with current executor impl, rejection only happens when shutdown
                 return;
             }
             if (scheduler == null) {
@@ -68,7 +69,10 @@ public final class ExecutorImpl implements Executor {
             }
         }
         // construct execution outside scheduler thread, to obtain parent action log
-        Callable<Void> execution = execution(action, task);
+        Callable<Void> execution = execution(action, () -> {
+            task.execute();
+            return null;
+        });
         Runnable delayedTask = () -> {
             try {
                 submitTask(action, execution);
@@ -79,7 +83,7 @@ public final class ExecutorImpl implements Executor {
         try {
             scheduler.schedule(delayedTask, delay.toMillis(), TimeUnit.MILLISECONDS);
         } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
-            logger.warn(Markers.errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action, e);
+            logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action, e);
         }
     }
 
@@ -87,7 +91,7 @@ public final class ExecutorImpl implements Executor {
         try {
             return executor.submit(execution);
         } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
-            logger.warn(Markers.errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action, e);
+            logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action, e);
             return new CancelledFuture<>();
         }
     }

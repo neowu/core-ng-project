@@ -1,5 +1,5 @@
 ## Change log
-### 7.4.0 (4/1/2020 - ) !!! only support java 14
+### 7.4.0 (4/1/2020 - 4/14/2020) !!! only support java 14
 * java: update to java 14, please make sure to upgrade build/jenkins and all docker runtime to 14 before upgrading framework
 * http: updated built-in https self sign cert
     if you encounter chrome error for accessing localhost, open chrome://flags/#allow-insecure-localhost to enable this flag
