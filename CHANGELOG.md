@@ -15,7 +15,8 @@
 * httpClient: update okHTTP to 4.5.0 
 * http: !!! start http server on https:8443 by default if not specifying sys.http.port and sys.https.port
     currently all services use https/h2, make sure you set sys.http.port to start http listener if needed, e.g. with Azure AG -> http/8080 website since AG doesn't support self-signed cert 
-
+    make sure to update health-check of the latest monitor/log-processor to HTTPS:8443
+    
 ### 7.3.12.1 (3/25/2020 - 4/1/2020)
 * db: added query.in(field, params) shortcut to build dynamic "where in clause"
 * log-collector: added param app.cookies to collect specific cookies from request. (this is due to safari expires localStorage and cookies write by js, only way to long term track is thru first party cookie)
