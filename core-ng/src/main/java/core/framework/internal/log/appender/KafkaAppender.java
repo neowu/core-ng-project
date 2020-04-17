@@ -14,7 +14,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.record.CompressionType;
-import org.apache.kafka.common.record.Records;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,8 +50,7 @@ public final class KafkaAppender implements LogAppender {
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                     ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) Duration.ofSeconds(60).toMillis(),     // DELIVERY_TIMEOUT_MS_CONFIG is INT type
                     ProducerConfig.LINGER_MS_CONFIG, 50,
-                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis(),          // metadata update timeout
-                    ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 1000000 + Records.LOG_OVERHEAD);        // refer to core.framework.module.KafkaConfig.maxRequestSize
+                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());                 // metadata update timeout
             var serializer = new ByteArraySerializer();
             producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());

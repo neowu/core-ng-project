@@ -10,7 +10,7 @@ services:
     - ZOO_DATA_LOG_DIR=/datalog
     - ZOO_ADMINSERVER_ENABLED=false
   kafka:
-    image: neowu/kafka:2.4.1
+    image: neowu/kafka:2.5.0
     ports:
     - 9092:9092
     environment:

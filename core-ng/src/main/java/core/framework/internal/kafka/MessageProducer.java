@@ -23,7 +23,7 @@ public class MessageProducer {
     private final String name;
     private final Producer<byte[], byte[]> producer;
 
-    public MessageProducer(String uri, String name, int maxRequestSize) {
+    public MessageProducer(String uri, String name) {
         var watch = new StopWatch();
         try {
             this.uri = uri;
@@ -33,8 +33,8 @@ public class MessageProducer {
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                     ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) Duration.ofSeconds(60).toMillis(),     // DELIVERY_TIMEOUT_MS_CONFIG is INT type
                     ProducerConfig.LINGER_MS_CONFIG, 5,                                                     // use small linger time within acceptable range to improve batching
-                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis(),                  // metadata update timeout
-                    ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
+                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());                 // metadata update timeout
+
             var serializer = new ByteArraySerializer();
             this.producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());

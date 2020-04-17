@@ -84,7 +84,8 @@ public class ResponseHandler {
         cookie.setPath(spec.path);
         cookie.setSecure(spec.secure);
         cookie.setHttpOnly(spec.httpOnly);
-        // refer to https://www.owasp.org/index.php/SameSite, lax is good enough for common scenario, as long as webapp doesn't make sensitive side effect thru TOP LEVEL navigation
+        // refer to https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#samesite-cookie-attribute,
+        // lax is good enough for common scenario, as long as webapp doesn't make sensitive side effect thru TOP LEVEL navigation
         if (spec.sameSite) cookie.setSameSiteMode("lax");
         return cookie;
     }

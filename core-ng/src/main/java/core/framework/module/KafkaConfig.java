@@ -13,7 +13,6 @@ import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
 import core.framework.kafka.MessagePublisher;
 import core.framework.util.Types;
-import org.apache.kafka.common.record.Records;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,12 +31,6 @@ public class KafkaConfig extends Config {
     private String uri;
     private MessageListener listener;
     private boolean handlerAdded;
-    // refer to org.apache.kafka.clients.producer.KafkaProducer.ensureValidRecordSize,
-    // by default kafka producer max.request.size is 1 * 1024 * 1024=1048576,
-    // but the default max.message.bytes on broker=1000012 (core/src/main/scala/kafka/server/KafkaConfig.scala, val MessageMaxBytes = 1000000 + Records.LOG_OVERHEAD)
-    // if producer may send record larger than max.message.bytes and less than max.request.size, and it won't trigger any error, and broker silently drops record
-    // so here it changes the default to match broker default (which is flaw of kafka default config)
-    private int maxRequestSize = 1000000 + Records.LOG_OVERHEAD;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -72,13 +65,6 @@ public class KafkaConfig extends Config {
         return publisher;
     }
 
-    // to increase max message size, it must change on both producer and broker sides
-    public void maxRequestSize(int size) {
-        if (size <= 0) throw new Error("max request size must be greater than 0, value=" + size);
-        if (producer != null) throw new Error("kafka().maxRequestSize() must be configured before adding publisher");
-        maxRequestSize = size;
-    }
-
     <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
         if (producer == null) {
             producer = createMessageProducer();
@@ -87,7 +73,7 @@ public class KafkaConfig extends Config {
     }
 
     private MessageProducer createMessageProducer() {
-        var producer = new MessageProducer(uri, name, maxRequestSize);
+        var producer = new MessageProducer(uri, name);
         context.collector.metrics.add(producer.producerMetrics);
         context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
         var controller = new KafkaController(producer);
