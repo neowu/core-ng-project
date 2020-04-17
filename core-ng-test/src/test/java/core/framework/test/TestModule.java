@@ -2,7 +2,6 @@ package core.framework.test;
 
 import core.framework.db.IsolationLevel;
 import core.framework.http.HTTPClient;
-import core.framework.http.HTTPClientBuilder;
 import core.framework.kafka.Message;
 import core.framework.scheduler.Job;
 import core.framework.test.db.TestDBEntity;
@@ -31,7 +30,7 @@ public class TestModule extends AbstractTestModule {
         load(new OverrideBeanTest());
 
         overrideBinding(HTTPClient.class, Mockito.mock(HTTPClient.class));  // in test context, override binding is defined before actual binding
-        bind(HTTPClient.class, new HTTPClientBuilder().maxRetries(3).retryWaitTime(Duration.ofSeconds(1)).enableCookie().build());
+        bind(HTTPClient.class, HTTPClient.builder().maxRetries(3).retryWaitTime(Duration.ofSeconds(1)).enableCookie().build());
 
         configureDB();
         configureKafka();

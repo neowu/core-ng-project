@@ -1,7 +1,6 @@
 package core.log;
 
 import core.framework.http.HTTPClient;
-import core.framework.http.HTTPClientBuilder;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
@@ -58,7 +57,7 @@ public class LogProcessorApp extends App {
     private void configureKibanaService() {
         property("kibana.url").ifPresent(url -> {
             String banner = property("kibana.banner").orElse("");
-            HTTPClient client = new HTTPClientBuilder().maxRetries(5).build();  // create ad hoc http client will be recycled once done
+            HTTPClient client = HTTPClient.builder().maxRetries(5).build();  // create ad hoc http client, will be recycled once done
             onStartup(() -> new Thread(new KibanaService(url, banner, client)::importObjects, "kibana").start());
         });
     }

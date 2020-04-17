@@ -31,6 +31,7 @@ services:
     ports:
     - 9092:9092
     environment:
+    - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
     - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://kafka:9092
     depends_on:
     - zookeeper

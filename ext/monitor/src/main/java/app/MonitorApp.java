@@ -13,7 +13,6 @@ import app.monitor.slack.SlackClient;
 import app.monitor.slack.SlackMessageAPIRequest;
 import app.monitor.slack.SlackMessageAPIResponse;
 import core.framework.http.HTTPClient;
-import core.framework.http.HTTPClientBuilder;
 import core.framework.json.Bean;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.ActionLogMessage;
@@ -67,7 +66,7 @@ public class MonitorApp extends App {
     }
 
     private void configureESJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.ElasticSearchConfig> config) {
-        HTTPClient httpClient = new HTTPClientBuilder().build();
+        HTTPClient httpClient = HTTPClient.builder().build();
         for (Map.Entry<String, MonitorConfig.ElasticSearchConfig> entry : config.entrySet()) {
             String app = entry.getKey();
             MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();
@@ -96,10 +95,10 @@ public class MonitorApp extends App {
     }
 
     private void configureSlackClient(String slackToken) {
-        HTTPClient httpClient = new HTTPClientBuilder()
-                .maxRetries(3)
-                .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
-                .build();
+        HTTPClient httpClient = HTTPClient.builder()
+                                          .maxRetries(3)
+                                          .retryWaitTime(Duration.ofSeconds(2))   // slack has rate limit with 1 message per second, here to slow down further when hit limit, refer to https://api.slack.com/docs/rate-limits
+                                          .build();
 
         Bean.register(SlackMessageAPIRequest.class);
         Bean.register(SlackMessageAPIResponse.class);

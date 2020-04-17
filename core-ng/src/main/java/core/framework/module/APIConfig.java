@@ -37,13 +37,13 @@ public class APIConfig extends Config {
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
         // default value is for internal api call only, targeting for kube env (with short connect timeout and more retries)
-        httpClientBuilder = new HTTPClientBuilder()
-                .userAgent(WebServiceClient.USER_AGENT)
-                .trustAll()
-                .connectTimeout(Duration.ofSeconds(2))
-                .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
-                .slowOperationThreshold(Duration.ofSeconds(10))
-                .maxRetries(5);
+        httpClientBuilder = HTTPClient.builder()
+                                      .userAgent(WebServiceClient.USER_AGENT)
+                                      .trustAll()
+                                      .connectTimeout(Duration.ofSeconds(2))
+                                      .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
+                                      .slowOperationThreshold(Duration.ofSeconds(10))
+                                      .maxRetries(5);
     }
 
     @Override
