@@ -21,10 +21,11 @@ public abstract class App extends Module {
         try {
             logContext(actionLog);
             configure();
-            logger.info("execute startup methods");
+            logger.info("execute startup tasks");
             for (Task task : context.startupHook) {
                 task.execute();
             }
+            logger.info("startup completed, elapsed={}", actionLog.elapsed());
         } catch (Throwable e) {
             logger.error(Markers.errorCode("FAILED_TO_START"), "app failed to start, error={}", e.getMessage(), e);
             failed = true;

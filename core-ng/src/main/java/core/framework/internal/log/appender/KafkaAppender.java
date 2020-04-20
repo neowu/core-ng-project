@@ -85,6 +85,8 @@ public final class KafkaAppender implements LogAppender {
         records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, statMapper.toJSON(message)));    // not specify message key for sticky partition
     }
 
+    // during startup, if it encounters configuration runtime error, logForwarderThread won't start as all startup tasks will be skipped,
+    // but the failed_to_start action/trace will still be forwarded in stop() in shutdown hook
     public void start() {
         logForwarderThread.start();
     }

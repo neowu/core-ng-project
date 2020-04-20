@@ -63,7 +63,7 @@ public final class ShutdownHook implements Runnable {
         long endTime = System.currentTimeMillis() + shutdownTimeoutInMs;
 
         shutdown(endTime, STAGE_0, STAGE_5);
-        logManager.end("=== shutdown end ==="); // end action log before closing es/log appender
+        logManager.end("=== shutdown end ==="); // end action log before closing es/log appender, log-processor use es appender, so end action before close es
 
         shutdown(endTime, STAGE_7, STAGE_9);
         logger.info("shutdown completed, elapsed={}", actionLog.elapsed());
