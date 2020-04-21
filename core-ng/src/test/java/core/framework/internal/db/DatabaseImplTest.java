@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -166,6 +167,23 @@ class DatabaseImplTest {
 
         int count = database.selectOne("SELECT count(1) FROM database_test where id = ?", Integer.class, 1).orElse(0);
         assertThat(count).isZero();
+    }
+
+    @Test
+    void driverProperties() {
+        Properties properties = database.driverProperties("jdbc:mysql://localhost/demo", null, null);
+        assertThat(properties)
+                .doesNotContainKeys("user", "password")
+                .containsEntry("useSSL", "false")
+                .containsEntry("characterEncoding", "utf-8");
+
+        properties = database.driverProperties("jdbc:mysql://localhost/demo?useSSL=true&characterEncoding=latin1", "user", "password");
+        assertThat(properties).doesNotContainKeys("useSSL", "characterEncoding");
+
+        properties = database.driverProperties("jdbc:mysql://localhost/demo?useSSL=true", null, null);
+        assertThat(properties)
+                .doesNotContainKeys("useSSL")
+                .containsEntry("characterEncoding", "utf-8");
     }
 
     private void insertRow(int id, String stringField, TestEnum enumField) {

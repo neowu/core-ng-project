@@ -76,7 +76,7 @@ public final class DatabaseImpl implements Database {
         if (url == null) throw new Error("url must not be null");
         Properties driverProperties = this.driverProperties;
         if (driverProperties == null) {
-            driverProperties = driverProperties();
+            driverProperties = driverProperties(url, user, password);
             this.driverProperties = driverProperties;
         }
         try {
@@ -88,16 +88,25 @@ public final class DatabaseImpl implements Database {
         }
     }
 
-    private Properties driverProperties() {
+    Properties driverProperties(String url, String user, String password) {
         var properties = new Properties();
         if (user != null) properties.setProperty("user", user);
         if (password != null) properties.setProperty("password", password);
         if (url.startsWith("jdbc:mysql:")) {
             String timeoutValue = String.valueOf(timeout.toMillis());
+            // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
             properties.setProperty("connectTimeout", timeoutValue);
             properties.setProperty("socketTimeout", timeoutValue);
-            properties.setProperty("rewriteBatchedStatements", "true");     // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-configuration-properties.html
-            properties.setProperty("useSSL", "false");                      // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
+            properties.setProperty("rewriteBatchedStatements", "true");
+
+            int index = url.indexOf('?');
+            // mysql with ssl has overhead, usually we ensure security on arch level, e.g. gcloud sql proxy or firewall rule
+            if (index == -1 || url.indexOf("useSSL=", index + 1) == -1) properties.setProperty("useSSL", "false");
+            // refer to https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-charsets.html
+            // without characterEncoding, mysql driver auto detects charset based on server side var character_set_server
+            // and only character_set_server=utf8mb4 will map characterEncoding to utf-8
+            // here use utf-8 as default value, and support to override by jdbc url param
+            if (index == -1 || url.indexOf("characterEncoding=", index + 1) == -1) properties.setProperty("characterEncoding", "utf-8");
         }
         return properties;
     }

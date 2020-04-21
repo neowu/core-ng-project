@@ -2,6 +2,7 @@
 ### 7.4.1 (4/16/2020 - )
 * kafka: update to 2.5.0
 * kafka: removed maxRequestSize config, as 1M is good enough for our projects, and https://issues.apache.org/jira/browse/KAFKA-4203 is fixed on 2.5.0
+* db: add characterEncoding=utf-8 to driver properties by default, can be override by jdbc url
 
 ### 7.4.0 (4/1/2020 - 4/14/2020) !!! only support java 14
 * java: update to java 14, please make sure to upgrade build/jenkins and all docker runtime to 14 before upgrading framework
