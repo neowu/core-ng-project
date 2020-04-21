@@ -1,7 +1,6 @@
 package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
-import core.framework.log.Markers;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -13,6 +12,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 
+import static core.framework.log.Markers.errorCode;
 import static okhttp3.internal.Util.closeQuietly;
 
 /**
@@ -40,7 +40,7 @@ public class RetryInterceptor implements Interceptor {
                 Response response = chain.proceed(request);
                 int statusCode = response.code();
                 if (shouldRetry(attempts, statusCode)) {
-                    logger.warn(Markers.errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, request.url());
+                    logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, request.url());
                     closeRequestBody(response);
                     sleep.sleep(waitTime(attempts));
                     continue;
@@ -48,7 +48,7 @@ public class RetryInterceptor implements Interceptor {
                 return response;
             } catch (IOException e) {
                 if (shouldRetry(attempts, request.method(), e)) {
-                    logger.warn(Markers.errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}", request.url(), e);
+                    logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}", request.url(), e);
                     sleep.sleep(waitTime(attempts));
                 } else {
                     throw e;
@@ -71,11 +71,12 @@ public class RetryInterceptor implements Interceptor {
         if (attempts >= maxRetries) return false;
 
         // only not retry on POST with read time out
-        // okHTTP uses both socket timeout and AsyncTimeout, it closes socket when timeout is detected by background thread, refer to Okio.kt line: 166
+        // okHTTP uses both socket timeout and AsyncTimeout, it closes socket/connection when timeout is detected by background thread, so no need to close exchange
+        // refer to SocketAsyncTimeout.timeout()
         if (!"POST".equals(method)) return true;
-        // refer to refer to Okio.kt line: 158
+        // refer to AsyncTimeout.newTimeoutException() -> SocketAsyncTimeout.newTimeoutException()
         if (e instanceof SocketTimeoutException && "timeout".equals(e.getMessage())) return false;
-        // it throws IOException("Canceled") hits callTimeout, refer to RetryAndFollowUpInterceptor.kt line: 65
+        // it throws IOException("Canceled") hits callTimeout, refer to RetryAndFollowUpInterceptor.intercept()
         return !"Canceled".equals(e.getMessage());
     }
 
