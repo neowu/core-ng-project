@@ -12,6 +12,7 @@ import core.framework.web.CookieSpec;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.Cookie;
 import io.undertow.server.handlers.CookieImpl;
+import io.undertow.server.handlers.CookieSameSiteMode;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.HttpString;
 import org.slf4j.Logger;
@@ -86,7 +87,7 @@ public class ResponseHandler {
         cookie.setHttpOnly(spec.httpOnly);
         // refer to https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#samesite-cookie-attribute,
         // lax is good enough for common scenario, as long as webapp doesn't make sensitive side effect thru TOP LEVEL navigation
-        if (spec.sameSite) cookie.setSameSiteMode("lax");
+        if (spec.sameSite) cookie.setSameSiteMode(CookieSameSiteMode.LAX.toString());
         return cookie;
     }
 

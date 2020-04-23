@@ -8,7 +8,7 @@ subprojects {
 def elasticVersion = '7.6.2'
 def kafkaVersion = '2.5.0'
 def jacksonVersion = '2.10.3'
-def junitVersion = '5.6.1'
+def junitVersion = '5.6.2'
 def mockitoVersion = '3.3.3'
 def assertjVersion = '3.15.0'
 
@@ -25,8 +25,7 @@ project('core-ng') {
         implementation "com.fasterxml.jackson.module:jackson-module-afterburner:${jacksonVersion}"
         implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
         implementation 'com.squareup.okhttp3:okhttp:4.5.0'
-        implementation 'io.undertow:undertow-core:2.0.30.Final'
-        implementation 'org.jboss.xnio:xnio-nio:3.7.7.Final'
+        implementation 'io.undertow:undertow-core:2.1.0.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.7.3'      // used by kafka message compression
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
@@ -54,7 +53,7 @@ project('core-ng-mongo') {
     apply from: file("${rootDir}/gradle/lib.gradle")
     dependencies {
         api project(":core-ng")
-        api 'org.mongodb:mongo-java-driver:3.12.2'
+        api 'org.mongodb:mongo-java-driver:3.12.3'
         testImplementation project(":core-ng-test")
     }
 }
