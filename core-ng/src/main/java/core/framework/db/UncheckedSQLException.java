@@ -24,7 +24,8 @@ public final class UncheckedSQLException extends RuntimeException {
     // hsqldb: org.hsqldb.jdbc.JDBCUtil,
     // mysql: com.mysql.cj.jdbc.exceptions.SQLError
     private ErrorType errorType(SQLException e) {
-        if (e instanceof SQLIntegrityConstraintViolationException) return ErrorType.INTEGRITY_CONSTRAINT_VIOLATION;
+        if (e instanceof SQLIntegrityConstraintViolationException || e.getCause() instanceof SQLIntegrityConstraintViolationException)
+            return ErrorType.INTEGRITY_CONSTRAINT_VIOLATION;
         String state = e.getSQLState();
         if (state != null && state.startsWith("08")) return ErrorType.CONNECTION_ERROR;
         return null;
