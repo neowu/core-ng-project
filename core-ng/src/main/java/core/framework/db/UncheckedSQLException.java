@@ -1,7 +1,6 @@
 package core.framework.db;
 
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 
 /**
  * @author neo
@@ -24,10 +23,11 @@ public final class UncheckedSQLException extends RuntimeException {
     // hsqldb: org.hsqldb.jdbc.JDBCUtil,
     // mysql: com.mysql.cj.jdbc.exceptions.SQLError
     private ErrorType errorType(SQLException e) {
-        if (e instanceof SQLIntegrityConstraintViolationException || e.getCause() instanceof SQLIntegrityConstraintViolationException)
-            return ErrorType.INTEGRITY_CONSTRAINT_VIOLATION;
         String state = e.getSQLState();
-        if (state != null && state.startsWith("08")) return ErrorType.CONNECTION_ERROR;
+        if (state == null) return null;
+        // in batchExecute, driver throws BatchUpdateException and may not have SQLIntegrityConstraintViolationException as cause, so here use sql state as contract
+        if (state.startsWith("23")) return ErrorType.INTEGRITY_CONSTRAINT_VIOLATION;
+        if (state.startsWith("08")) return ErrorType.CONNECTION_ERROR;
         return null;
     }
 

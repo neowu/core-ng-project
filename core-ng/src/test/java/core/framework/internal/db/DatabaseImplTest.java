@@ -134,13 +134,25 @@ class DatabaseImplTest {
 
     @Test
     void duplicateKey() {
-        insertRow(1, "string", TestEnum.V1);
-        assertThatThrownBy(() -> insertRow(1, "string", TestEnum.V1))
+        String sql = "INSERT INTO database_test (id) VALUES (?)";
+
+        database.execute(sql, 1);
+        assertThatThrownBy(() -> database.execute(sql, 1))
                 .isInstanceOf(UncheckedSQLException.class)
                 .satisfies(e -> {
                     UncheckedSQLException exception = (UncheckedSQLException) e;
-                    assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
                     assertThat(exception.sqlSate).startsWith("23");
+                    assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
+                });
+
+        // the underlying db is hsql, hsql throws BatchUpdateException directly without SQLIntegrityConstraintViolationException as cause
+        Object[] params = {1};
+        assertThatThrownBy(() -> database.batchExecute(sql, List.of(params, params)))
+                .isInstanceOf(UncheckedSQLException.class)
+                .satisfies(e -> {
+                    UncheckedSQLException exception = (UncheckedSQLException) e;
+                    assertThat(exception.sqlSate).startsWith("23");
+                    assertThat(exception.errorType).isEqualTo(UncheckedSQLException.ErrorType.INTEGRITY_CONSTRAINT_VIOLATION);
                 });
     }
 
