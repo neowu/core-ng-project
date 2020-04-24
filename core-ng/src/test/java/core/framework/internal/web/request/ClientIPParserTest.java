@@ -58,13 +58,20 @@ class ClientIPParserTest {
     }
 
     @Test
-    void isValidIP() {
-        assertThat(parser.isValidIP("10.0.0.1")).isTrue();
-        assertThat(parser.isValidIP("127.0.0.1")).isTrue();
-        assertThat(parser.isValidIP("::0")).isTrue();
+    void extractIP() {
+        assertThat(parser.extractIP("2001:db8:cafe::17")).isEqualTo("2001:db8:cafe::17");
+        assertThat(parser.extractIP("192.0.2.43:47011")).isEqualTo("192.0.2.43");
+        assertThat(parser.extractIP("192.0.2.43")).isEqualTo("192.0.2.43");
 
-        assertThat(parser.isValidIP("g.0.0.1")).isFalse();
-        assertThat(parser.isValidIP("0.0.1")).isFalse();
-        assertThat(parser.isValidIP("::text")).isFalse();
+        assertInvalidNode("192.0.2.43:");
+        assertInvalidNode("192.0:2.43");
+        assertInvalidNode("192.0.:2.43");
+        assertInvalidNode("192.0.2:43");
+    }
+
+    private void assertInvalidNode(String node) {
+        assertThatThrownBy(() -> parser.extractIP(node))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("invalid client ip address");
     }
 }

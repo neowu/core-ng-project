@@ -1,4 +1,7 @@
 ## Change log
+### 7.4.1.1 (4/24/2020)
+* http: improve x-forwarded-for parser to support rfc7239, as Azure AG will use ipv4:port format in x-forwarded-for header
+
 ### 7.4.1 (4/16/2020 - 4/23/2020)
 * kafka: update to 2.5.0
 * kafka: removed maxRequestSize config, as 1M is good enough for our projects, and https://issues.apache.org/jira/browse/KAFKA-4203 is fixed on 2.5.0

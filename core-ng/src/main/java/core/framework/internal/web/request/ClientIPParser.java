@@ -36,27 +36,43 @@ public class ClientIPParser {
             index--;
         }
 
-        String clientIP = xForwardedFor.substring(start, end).trim();
-        if (!isValidIP(clientIP)) throw new BadRequestException("invalid client ip address");
-        return clientIP;
+        // according to https://tools.ietf.org/html/rfc7239
+        // x-forwarded-for = node, node, ...
+        // node     = nodename [ ":" node-port ]
+        // nodename = IPv4address / "[" IPv6address "]" / "unknown" / obfnode
+        // currently only Azure Application Gateway may use ipv4:port, and it doesn't support ipv6 yet
+        // so here only to support ipv4, ipv4:port, ipv6 format
+        String node = xForwardedFor.substring(start, end).trim();
+        return extractIP(node);
     }
 
-    // only check loose format, ipv4 must have 3 dots, and each char must be hex, to cover both ipv6 and ipv4
-    // currently since kube doesn't supports creating both ipv6/ipv4 forwarding rule yet, so we mainly use ipv4 only
-    // will revise once we start to use ipv6
-    boolean isValidIP(String clientIP) {
+    // check loosely to avoid unnecessary overhead, especially x-forwarded-for is extracted from right to left, where values are from trusted LB
+    // ipv4 must have 3 dots and 1 optional colon, with hex chars
+    // ipv6 must have only colons with hex chars
+    String extractIP(String node) {
+        int length = node.length();
         int dots = 0;
-        for (int i = 0; i < clientIP.length(); i++) {
-            char ch = clientIP.charAt(i);
+        int lastDotIndex = -1;
+        int colons = 0;
+        int lastColonIndex = -1;
+        for (int i = 0; i < length; i++) {
+            char ch = node.charAt(i);
             if (ch == '.') {
                 dots++;
+                lastDotIndex = i;
             } else if (ch == ':') {
-                if (dots > 0) return false; // colons must not appear after dots.
+                colons++;
+                lastColonIndex = i;
             } else if (Character.digit(ch, 16) == -1) {
-                return false; // everything else must be a decimal or hex digit.
+                throw new BadRequestException("invalid client ip address");
             }
         }
-
-        return dots == 0 || dots == 3;
+        if (dots == 0) return node; // should be ipv6 format
+        if (dots == 3 && (colons == 0
+                || colons == 1 && lastColonIndex > lastDotIndex && lastColonIndex < length - 1)) {
+            if (lastColonIndex > 0) return node.substring(0, lastColonIndex);   // should be ipv4:port
+            return node;    // should be ipv4
+        }
+        throw new BadRequestException("invalid client ip address");
     }
 }
