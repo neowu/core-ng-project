@@ -1,8 +1,11 @@
 ## Change log
+### 7.4.2 (4/27/2020 - )
+
+
 ### 7.4.1.1 (4/24/2020)
 * http: improve x-forwarded-for parser to support rfc7239, as Azure AG will use ipv4:port format in x-forwarded-for header
-* kafka: rollback kafka to 2.4.1 due to java-kafka 2.5.0 may trigger cpu 100% during startup, (still can work with kafka server 2.5.0)
-    !!! most likely to be related to behavior change of org.apache.kafka.clients.consumer.KafkaConsumer.pull -> updateAssignmentMetadataIfNeeded, but not confirmed yet, can be reproduced in server env 
+* kafka: rollback kafka client to 2.4.1, java-kafka 2.5.0 client driver causes cpu 100% during startup/rebalance if kafka server is not available or slow
+    !!! due to behavior change of org.apache.kafka.clients.consumer.KafkaConsumer.pull -> updateAssignmentMetadataIfNeeded 
 
 ### 7.4.1 (4/16/2020 - 4/23/2020)
 * kafka: update to 2.5.0

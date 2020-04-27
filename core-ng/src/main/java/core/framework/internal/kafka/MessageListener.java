@@ -117,7 +117,6 @@ public class MessageListener {
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, ASCII.toLowerCase(OffsetResetStrategy.LATEST.name()));      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
         config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
-        config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, (int) maxProcessTime.plusSeconds(5).toMillis());
         config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
         config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
         config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);

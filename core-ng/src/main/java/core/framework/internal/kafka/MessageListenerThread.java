@@ -85,7 +85,7 @@ class MessageListenerThread extends Thread {
     private void process() {
         while (!shutdown.get()) {
             try {
-                ConsumerRecords<byte[], byte[]> records = consumer.poll(Duration.ofSeconds(10));
+                ConsumerRecords<byte[], byte[]> records = consumer.poll(Duration.ofSeconds(30));    // consumer should call poll at least once every MAX_POLL_INTERVAL_MS
                 if (records.isEmpty()) continue;
                 processRecords(records);
             } catch (Throwable e) {
