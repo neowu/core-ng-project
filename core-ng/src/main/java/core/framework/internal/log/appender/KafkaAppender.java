@@ -50,6 +50,8 @@ public final class KafkaAppender implements LogAppender {
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                     ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) Duration.ofSeconds(60).toMillis(),     // DELIVERY_TIMEOUT_MS_CONFIG is INT type
                     ProducerConfig.LINGER_MS_CONFIG, 50,
+                    ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, Duration.ofMillis(500).toMillis(),          // longer backoff to reduce cpu usage when kafka is not available
+                    ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, Duration.ofSeconds(5).toMillis(),
                     ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());                 // metadata update timeout, shorter than default, to get exception sooner if kafka is not available
             var serializer = new ByteArraySerializer();
             producer = new KafkaProducer<>(config, serializer, serializer);
@@ -95,7 +97,7 @@ public final class KafkaAppender implements LogAppender {
         logger.info("stop log forwarder");
         stop.set(true);
         logForwarderThread.interrupt();
-        for (ProducerRecord<byte[], byte[]> record : records) {
+        for (ProducerRecord<byte[], byte[]> record : records) {     // if log-kafka is not available, here will block MAX_BLOCK_MS, to simplify it's ok not handling timeout since kafka appender is at end of shutdown, no more critical resources left to handle
             producer.send(record);
         }
         producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));
