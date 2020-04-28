@@ -214,7 +214,7 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         assertThat(response.hits).hasSize(1);
         assertThat(response.aggregations).containsKeys("totalValue");
 
-        var sum = new BigDecimal(((Sum) response.aggregations.get("totalValue")).getValue()).setScale(4, RoundingMode.HALF_UP);
+        var sum = BigDecimal.valueOf(((Sum) response.aggregations.get("totalValue")).getValue()).setScale(4, RoundingMode.HALF_UP);
         assertThat(sum).isEqualTo("19.1400");
     }
 
