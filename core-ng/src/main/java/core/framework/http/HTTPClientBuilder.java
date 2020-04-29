@@ -3,6 +3,7 @@ package core.framework.http;
 import core.framework.internal.http.CookieManager;
 import core.framework.internal.http.DefaultTrustManager;
 import core.framework.internal.http.HTTPClientImpl;
+import core.framework.internal.http.PEM;
 import core.framework.internal.http.RetryInterceptor;
 import core.framework.internal.http.ServiceUnavailableInterceptor;
 import core.framework.util.StopWatch;
@@ -14,8 +15,17 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +50,7 @@ public final class HTTPClientBuilder {
     private boolean enableCookie = false;
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
+    private KeyStore trustStore;
     private Integer maxRetries;
     private Duration retryWaitTime = Duration.ofMillis(500);
 
@@ -47,19 +58,14 @@ public final class HTTPClientBuilder {
         var watch = new StopWatch();
         try {
             OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .connectTimeout(connectTimeout)
-                .readTimeout(timeout)
-                .writeTimeout(timeout)
-                .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
-                .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
+                    .connectTimeout(connectTimeout)
+                    .readTimeout(timeout)
+                    .writeTimeout(timeout)
+                    .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
+                    .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
 
-            if (trustAll) {
-                SSLContext sslContext = SSLContext.getInstance("TLS");
-                var trustManager = new DefaultTrustManager();
-                sslContext.init(null, new TrustManager[]{trustManager}, null);
-                builder.hostnameVerifier((hostname, sslSession) -> true)
-                       .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
-            }
+            configureHTTPS(builder);
+
             if (maxRetries != null) {
                 builder.addNetworkInterceptor(new ServiceUnavailableInterceptor());
                 builder.addInterceptor(new RetryInterceptor(maxRetries, retryWaitTime, Threads::sleepRoughly));
@@ -67,10 +73,28 @@ public final class HTTPClientBuilder {
             if (enableCookie) builder.cookieJar(new CookieManager());
 
             return new HTTPClientImpl(builder.build(), userAgent, slowOperationThreshold);
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            throw new Error(e);
         } finally {
             logger.info("create http client, elapsed={}", watch.elapsed());
+        }
+    }
+
+    private void configureHTTPS(OkHttpClient.Builder builder) {
+        if (!trustAll && trustStore == null) return;
+        try {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            X509TrustManager trustManager;
+            if (trustAll) {
+                trustManager = new DefaultTrustManager();
+            } else {
+                var trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                trustManagerFactory.init(trustStore);
+                trustManager = (X509TrustManager) trustManagerFactory.getTrustManagers()[0];
+            }
+            sslContext.init(null, new TrustManager[]{trustManager}, null);
+            builder.hostnameVerifier((hostname, sslSession) -> true)
+                   .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
+            throw new Error(e);
         }
     }
 
@@ -114,13 +138,28 @@ public final class HTTPClientBuilder {
         return this;
     }
 
+    public HTTPClientBuilder trust(String cert) {
+        try {
+            if (trustStore == null) {
+                trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                trustStore.load(null, null);  // must be init first
+            }
+            CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            Certificate certificate = factory.generateCertificate(new ByteArrayInputStream(PEM.decode(cert)));
+            trustStore.setCertificateEntry(String.valueOf(trustStore.size() + 1), certificate);
+        } catch (CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
+            throw new Error(e);
+        }
+        return this;
+    }
+
     Duration callTimeout() {
         int attempts = maxRetries == null ? 1 : maxRetries;
         long timeout = connectTimeout.toMillis() + this.timeout.toMillis() * attempts;
         for (int i = 1; i < attempts; i++) {
             timeout += 600 << i - 1;    // rough sleep can be +20% of 500ms
         }
-        timeout += 2000;  // add 2 seconds as buffer
+        timeout += 2000;  // add 2 seconds as extra buffer
         return Duration.ofMillis(timeout);
     }
 }

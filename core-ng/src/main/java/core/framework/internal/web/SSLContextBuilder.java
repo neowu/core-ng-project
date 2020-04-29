@@ -1,6 +1,6 @@
 package core.framework.internal.web;
 
-import core.framework.util.Encodings;
+import core.framework.internal.http.PEM;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -18,7 +18,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.stream.Collectors;
 
 /**
  * @author neo
@@ -107,8 +106,8 @@ public class SSLContextBuilder {
 
     public SSLContext build() {
         try {
-            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(fromPEM(key)));
-            Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(fromPEM(cert)));
+            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(PEM.decode(key)));
+            Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(PEM.decode(cert)));
 
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(null, null);
@@ -123,11 +122,5 @@ public class SSLContextBuilder {
         } catch (KeyStoreException | IOException | CertificateException | UnrecoverableKeyException | NoSuchAlgorithmException | KeyManagementException | InvalidKeySpecException e) {
             throw new Error(e);
         }
-    }
-
-    private byte[] fromPEM(String pem) {
-        String content = pem.lines().filter(line -> !line.startsWith("-----"))
-                            .collect(Collectors.joining());
-        return Encodings.decodeBase64(content);
     }
 }
