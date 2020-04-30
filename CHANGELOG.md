@@ -2,6 +2,8 @@
 ### 7.4.2 (4/27/2020 - )
 * mongo: update driver to 4.0.2
 * httpClient: support to trust specific https cert
+* http: removed undertow HTTP metrics 
+    undertow is using jboss threading and EnhancedQueueExecutor, there is overhead to collect stats with jmx, and they are not critical stats 
 
 ### 7.4.1.1 (4/24/2020)
 * http: improve x-forwarded-for parser to support rfc7239, as Azure AG will use ipv4:port format in x-forwarded-for header

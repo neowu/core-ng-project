@@ -12,7 +12,6 @@ import io.undertow.server.handlers.encoding.GzipEncodingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnio.Options;
-import org.xnio.management.XnioWorkerMXBean;
 
 import static core.framework.log.Markers.errorCode;
 
@@ -21,7 +20,8 @@ import static core.framework.log.Markers.errorCode;
  */
 public class HTTPServer {
     static {
-        System.setProperty("org.jboss.logging.provider", "slf4j");  // make undertow to use slf4j
+        System.setProperty("org.jboss.logging.provider", "slf4j");      // make undertow to use slf4j, refer to org.jboss.logging.LoggerProviders
+        System.setProperty("jboss.threads.eqe.disable-mbean", "true");  // refer to org.jboss.threads.EnhancedQueueExecutor.DISABLE_MBEAN
     }
 
     public final SiteManager siteManager = new SiteManager();
@@ -59,8 +59,8 @@ public class HTTPServer {
                    // set tcp idle timeout to 620s, by default AWS ALB uses 60s, GCloud LB uses 600s, since it is always deployed with LB, longer timeout doesn't hurt
                    // refer to https://cloud.google.com/load-balancing/docs/https/#timeouts_and_retries
                    // refer to https://docs.aws.amazon.com/elasticloadbalancing/latest/application/application-load-balancers.html#connection-idle-timeout
-                   .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620 * 1000)     // 620s
-                   .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10 * 1000)        // 10s
+                   .setServerOption(UndertowOptions.NO_REQUEST_TIMEOUT, 620 * 1000)         // 620s
+                   .setServerOption(UndertowOptions.SHUTDOWN_TIMEOUT, 10 * 1000)            // 10s
                    .setServerOption(UndertowOptions.MAX_ENTITY_SIZE, 10L * 1024 * 1024);    // max post body is 10M
 
             server = builder.build();
@@ -70,16 +70,12 @@ public class HTTPServer {
         }
     }
 
-    XnioWorkerMXBean mxBean() {
-        return server.getWorker().getMXBean();
-    }
-
     private HttpHandler handler() {
         HttpHandler handler = new HTTPIOHandler(this.handler, shutdownHandler);
         if (gzip) {
             // only support gzip, deflate is less popular
             handler = new EncodingHandler(handler, new ContentEncodingRepository()
-                .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, new GZipPredicate()));
+                    .addEncodingHandler("gzip", new GzipEncodingProvider(), 100, new GZipPredicate()));
         }
         return handler;
     }

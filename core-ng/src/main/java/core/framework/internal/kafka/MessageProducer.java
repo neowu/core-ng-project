@@ -29,13 +29,13 @@ public class MessageProducer {
             this.uri = uri;
             this.name = name;
             this.producerMetrics = new ProducerMetrics(name);
-            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,               // immutable map requires value must not be null
+            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,    // immutable map requires value must not be null
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
-                    ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, (int) Duration.ofSeconds(60).toMillis(),     // DELIVERY_TIMEOUT_MS_CONFIG is INT type
-                    ProducerConfig.LINGER_MS_CONFIG, 5,                                                     // use small linger time within acceptable range to improve batching
-                    ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, Duration.ofMillis(500).toMillis(),          // longer backoff to reduce cpu usage when kafka is not available
-                    ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, Duration.ofSeconds(5).toMillis(),
-                    ProducerConfig.MAX_BLOCK_MS_CONFIG, Duration.ofSeconds(30).toMillis());                 // metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+                    ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60 * 1000,                        // 60s, DELIVERY_TIMEOUT_MS_CONFIG is INT type
+                    ProducerConfig.LINGER_MS_CONFIG, 5L,                                         // use small linger time within acceptable range to improve batching
+                    ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                            // longer backoff to reduce cpu usage when kafka is not available
+                    ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000,                   // 5s
+                    ProducerConfig.MAX_BLOCK_MS_CONFIG, 30L * 1000);                             // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
 
             var serializer = new ByteArraySerializer();
             this.producer = new KafkaProducer<>(config, serializer, serializer);

@@ -13,7 +13,7 @@ import java.util.Map;
 public class ProducerMetrics implements Metrics {
     private final String name;
     Metric requestSizeAvg; // The average size of requests sent
-    private Metric requestRate; // The number of requests sent per second, one request contains multiple batches
+    private Metric requestRate; // The number of batch requests sent per second, one batch request contains multiple messages
     private Metric outgoingByteRate; // The number of outgoing bytes sent to all servers per second
 
     public ProducerMetrics(String name) {

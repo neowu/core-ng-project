@@ -3,13 +3,11 @@ package core.framework.internal.kafka;
 import core.framework.internal.log.LogManager;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
-import core.framework.util.ASCII;
 import core.framework.util.Network;
 import core.framework.util.StopWatch;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,10 +113,10 @@ public class MessageListener {
         config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         config.put(ConsumerConfig.CLIENT_ID_CONFIG, Network.LOCAL_HOST_NAME + "-" + CONSUMER_CLIENT_ID_SEQUENCE.getAndIncrement());      // will show in monitor metrics
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, ASCII.toLowerCase(OffsetResetStrategy.LATEST.name()));      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
+        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");                      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
         config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
-        config.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, Duration.ofMillis(500).toMillis());                      // longer backoff to reduce cpu usage when kafka is not available
-        config.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, Duration.ofSeconds(5).toMillis());
+        config.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L);                       // longer backoff to reduce cpu usage when kafka is not available
+        config.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000);
         config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
         config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
         config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);

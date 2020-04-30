@@ -7,7 +7,6 @@ import core.framework.internal.inject.BeanFactory;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.StatCollector;
 import core.framework.internal.web.HTTPServer;
-import core.framework.internal.web.HTTPServerMetrics;
 import core.framework.internal.web.bean.BeanMappers;
 import core.framework.internal.web.bean.RequestBeanMapper;
 import core.framework.internal.web.controller.ControllerClassValidator;
@@ -56,7 +55,6 @@ public class ModuleContext {
         shutdownHook = new ShutdownHook(logManager);
 
         httpServer = new HTTPServer(logManager);
-        collector.metrics.add(new HTTPServerMetrics(httpServer));
 
         beanFactory.bind(WebContext.class, null, httpServer.handler.webContext);
         beanFactory.bind(SessionContext.class, null, httpServer.siteManager.sessionManager);
