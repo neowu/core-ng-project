@@ -46,8 +46,8 @@ class EntityDecoderBuilderTest {
         assertThat(entity.listField).containsExactly("V1", "V2");
         assertThat(entity.nullChild).isNull();
 
-        assertThat(entity.mapField).contains(entry("K1", "V1"), entry("K2", "V2"));
+        assertThat(entity.mapField).containsOnly(entry("K1", "V1"), entry("K2", "V2"));
         assertThat(entity.enumMapField).containsEntry(TestEnum.ITEM1, "V1");
-        assertThat(entity.mapListField).containsExactly(entry("K1", List.of("V1")), entry("K2", List.of("V2", "V3")));
+        assertThat(entity.mapListField).containsOnly(entry("K1", List.of("V1")), entry("K2", List.of("V2", "V3")));
     }
 }

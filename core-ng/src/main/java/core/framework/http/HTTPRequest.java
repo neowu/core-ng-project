@@ -33,6 +33,10 @@ public final class HTTPRequest {
         headers.put(HTTPHeaders.AUTHORIZATION, "Basic " + Encodings.base64(user + ':' + password));
     }
 
+    public void bearerAuth(String token) {
+        headers.put(HTTPHeaders.AUTHORIZATION, "Bearer " + token);
+    }
+
     public void body(byte[] body, ContentType contentType) {
         this.body = body;
         this.contentType = contentType;

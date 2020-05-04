@@ -8,7 +8,6 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 
 /**
  * @author neo
@@ -44,7 +43,15 @@ class HTTPRequestTest {
         var request = new HTTPRequest(HTTPMethod.GET, "http://localhost/uri");
         request.basicAuth("Aladdin", "OpenSesame");
 
-        assertThat(request.headers).contains(entry(HTTPHeaders.AUTHORIZATION, "Basic QWxhZGRpbjpPcGVuU2VzYW1l"));
+        assertThat(request.headers).containsEntry(HTTPHeaders.AUTHORIZATION, "Basic QWxhZGRpbjpPcGVuU2VzYW1l");
+    }
+
+    @Test
+    void bearerAuth() {
+        var request = new HTTPRequest(HTTPMethod.GET, "http://localhost/uri");
+        request.bearerAuth("token");
+
+        assertThat(request.headers).containsEntry(HTTPHeaders.AUTHORIZATION, "Bearer token");
     }
 
     @Test
