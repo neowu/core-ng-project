@@ -26,16 +26,16 @@ class ProtocolTest {
     }
 
     @Test
-    void writeBulkString() throws IOException {
+    void writeBlobString() throws IOException {
         var stream = new ByteArrayOutputStream();
         var outputStream = new RedisOutputStream(stream, 8192);
-        Protocol.writeBulkString(outputStream, encode("value"));
+        Protocol.writeBlobString(outputStream, encode("value"));
         outputStream.flush();
         assertThat(decode(stream.toByteArray())).isEqualTo("$5\r\nvalue\r\n");
     }
 
     @Test
-    void readError() {
+    void readSimpleError() {
         var stream = new ByteArrayInputStream(Strings.bytes("-error-message\r\n"));
         assertThatThrownBy(() -> Protocol.read(new RedisInputStream(stream)))
                 .isInstanceOf(RedisException.class)
@@ -57,7 +57,7 @@ class ProtocolTest {
     }
 
     @Test
-    void readLong() throws IOException {
+    void readNumber() throws IOException {
         var stream = new ByteArrayInputStream(Strings.bytes(":10\r\n"));
         long response = (Long) Protocol.read(new RedisInputStream(stream));
         assertThat(response).isEqualTo(10);

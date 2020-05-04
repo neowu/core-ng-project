@@ -28,42 +28,36 @@ class RedisConnection implements AutoCloseable {
         inputStream = new RedisInputStream(socket.getInputStream());
     }
 
-    void writeCommand(byte[] command) throws IOException {
-        writeArray(1);
-        writeBulkString(command);
-        flush();
-    }
-
     void writeKeyCommand(byte[] command, String key) throws IOException {
         writeArray(2);
-        writeBulkString(command);
-        writeBulkString(encode(key));
+        writeBlobString(command);
+        writeBlobString(encode(key));
         flush();
     }
 
     void writeKeysCommand(byte[] command, String... keys) throws IOException {
         writeArray(1 + keys.length);
-        writeBulkString(command);
+        writeBlobString(command);
         for (String key : keys) {
-            writeBulkString(encode(key));
+            writeBlobString(encode(key));
         }
         flush();
     }
 
     void writeKeyArgumentCommand(byte[] command, String key, byte[] argument) throws IOException {
         writeArray(3);
-        writeBulkString(command);
-        writeBulkString(encode(key));
-        writeBulkString(argument);
+        writeBlobString(command);
+        writeBlobString(encode(key));
+        writeBlobString(argument);
         flush();
     }
 
     void writeKeyArgumentsCommand(byte[] command, String key, String... arguments) throws IOException {
         writeArray(2 + arguments.length);
-        writeBulkString(command);
-        writeBulkString(encode(key));
+        writeBlobString(command);
+        writeBlobString(encode(key));
         for (String value : arguments) {
-            writeBulkString(encode(value));
+            writeBlobString(encode(value));
         }
         flush();
     }
@@ -72,8 +66,8 @@ class RedisConnection implements AutoCloseable {
         Protocol.writeArray(outputStream, length);
     }
 
-    void writeBulkString(byte[] value) throws IOException {
-        Protocol.writeBulkString(outputStream, value);
+    void writeBlobString(byte[] value) throws IOException {
+        Protocol.writeBlobString(outputStream, value);
     }
 
     void flush() throws IOException {
@@ -89,12 +83,12 @@ class RedisConnection implements AutoCloseable {
         return (String) Protocol.read(inputStream);
     }
 
-    byte[] readBulkString() throws IOException {
+    byte[] readBlobString() throws IOException {
         return (byte[]) Protocol.read(inputStream);
     }
 
-    Long readLong() throws IOException {
-        return (Long) Protocol.read(inputStream);
+    long readLong() throws IOException {
+        return (long) Protocol.read(inputStream);
     }
 
     Object[] readArray() throws IOException {

@@ -90,7 +90,7 @@ public final class RedisSetImpl implements RedisSet {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(SISMEMBER, key, encode(value));
-            Long response = connection.readLong();
+            long response = connection.readLong();
             isMember = response == 1;
             return isMember;
         } catch (IOException e) {

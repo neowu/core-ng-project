@@ -69,7 +69,7 @@ class RedisInputStream {
         return negative ? -value : value;
     }
 
-    byte[] readBulkString(int length) throws IOException {
+    byte[] readBytes(int length) throws IOException {
         byte[] response = new byte[length];
         int offset = 0;
         while (offset < length) {

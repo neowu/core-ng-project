@@ -99,7 +99,7 @@ public final class RedisImpl implements Redis {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyCommand(GET, key);
-            value = connection.readBulkString();
+            value = connection.readBlobString();
             return value;
         } catch (IOException e) {
             item.broken = true;
@@ -131,13 +131,13 @@ public final class RedisImpl implements Redis {
             RedisConnection connection = item.resource;
             int length = 3 + (onlyIfAbsent ? 1 : 0) + (expiration != null ? 2 : 0);
             connection.writeArray(length);
-            connection.writeBulkString(SET);
-            connection.writeBulkString(encode(key));
-            connection.writeBulkString(value);
-            if (onlyIfAbsent) connection.writeBulkString(NX);
+            connection.writeBlobString(SET);
+            connection.writeBlobString(encode(key));
+            connection.writeBlobString(value);
+            if (onlyIfAbsent) connection.writeBlobString(NX);
             if (expiration != null) {
-                connection.writeBulkString(EX);
-                connection.writeBulkString(encode(expiration.getSeconds()));
+                connection.writeBlobString(EX);
+                connection.writeBlobString(encode(expiration.getSeconds()));
             }
             connection.flush();
             String result = connection.readSimpleString();
@@ -264,10 +264,10 @@ public final class RedisImpl implements Redis {
         try {
             RedisConnection connection = item.resource;
             connection.writeArray(1 + values.size() * 2);
-            connection.writeBulkString(MSET);
+            connection.writeBlobString(MSET);
             for (Map.Entry<String, String> entry : values.entrySet()) {
-                connection.writeBulkString(encode(entry.getKey()));
-                connection.writeBulkString(encode(entry.getValue()));
+                connection.writeBlobString(encode(entry.getKey()));
+                connection.writeBlobString(encode(entry.getValue()));
             }
             connection.flush();
             connection.readSimpleString();
@@ -294,11 +294,11 @@ public final class RedisImpl implements Redis {
             RedisConnection connection = item.resource;
             for (Map.Entry<String, byte[]> entry : values.entrySet()) { // redis doesn't support mset with expiration, here to use pipeline
                 connection.writeArray(5);
-                connection.writeBulkString(SET);
-                connection.writeBulkString(encode(entry.getKey()));
-                connection.writeBulkString(entry.getValue());
-                connection.writeBulkString(EX);
-                connection.writeBulkString(expirationValue);
+                connection.writeBlobString(SET);
+                connection.writeBlobString(encode(entry.getKey()));
+                connection.writeBlobString(entry.getValue());
+                connection.writeBlobString(EX);
+                connection.writeBlobString(expirationValue);
             }
             connection.flush();
             connection.readAll(size);
@@ -337,12 +337,12 @@ public final class RedisImpl implements Redis {
             String cursor = "0";
             do {
                 connection.writeArray(6);
-                connection.writeBulkString(SCAN);
-                connection.writeBulkString(encode(cursor));
-                connection.writeBulkString(MATCH);
-                connection.writeBulkString(encode(pattern));
-                connection.writeBulkString(COUNT);
-                connection.writeBulkString(batchSize);
+                connection.writeBlobString(SCAN);
+                connection.writeBlobString(encode(cursor));
+                connection.writeBlobString(MATCH);
+                connection.writeBlobString(encode(pattern));
+                connection.writeBlobString(COUNT);
+                connection.writeBlobString(batchSize);
                 connection.flush();
                 Object[] response = connection.readArray();
                 cursor = decode((byte[]) response[0]);
@@ -372,8 +372,10 @@ public final class RedisImpl implements Redis {
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.writeCommand(INFO);
-            value = decode(connection.readBulkString());
+            connection.writeArray(1);
+            connection.writeBlobString(INFO);
+            connection.flush();
+            value = decode(connection.readBlobString());
             return parseInfo(value);
         } catch (IOException e) {
             item.broken = true;

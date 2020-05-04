@@ -5,13 +5,13 @@ import core.framework.util.Strings;
 import java.io.IOException;
 
 /**
- * refer to https://redis.io/topics/protocol, this only supports request-response/pipeline model
+ * refer to https://github.com/antirez/RESP3/blob/master/spec.md
  */
 final class Protocol {
+    private static final byte BLOB_STRING_BYTE = '$';
     private static final byte SIMPLE_STRING_BYTE = '+';
-    private static final byte ERROR_BYTE = '-';
-    private static final byte INTEGER_BYTE = ':';
-    private static final byte BULK_STRING_BYTE = '$';
+    private static final byte SIMPLE_ERROR_BYTE = '-';
+    private static final byte NUMBER_BYTE = ':';
     private static final byte ARRAY_BYTE = '*';
 
     static void writeArray(RedisOutputStream stream, int length) throws IOException {
@@ -19,8 +19,8 @@ final class Protocol {
         stream.writeBytesCRLF(RedisEncodings.encode(length));
     }
 
-    static void writeBulkString(RedisOutputStream stream, byte[] value) throws IOException {
-        stream.write(BULK_STRING_BYTE);
+    static void writeBlobString(RedisOutputStream stream, byte[] value) throws IOException {
+        stream.write(BLOB_STRING_BYTE);
         stream.writeBytesCRLF(RedisEncodings.encode(value.length));
         stream.writeBytesCRLF(value);
     }
@@ -34,13 +34,13 @@ final class Protocol {
         switch (firstByte) {
             case SIMPLE_STRING_BYTE:
                 return stream.readSimpleString();
-            case BULK_STRING_BYTE:
-                return parseBulkString(stream);
+            case BLOB_STRING_BYTE:
+                return parseBlobString(stream);
             case ARRAY_BYTE:
                 return parseArray(stream);
-            case INTEGER_BYTE:
+            case NUMBER_BYTE:
                 return stream.readLong();
-            case ERROR_BYTE:
+            case SIMPLE_ERROR_BYTE:
                 String message = stream.readSimpleString();
                 throw new RedisException(message);
             default:
@@ -48,11 +48,11 @@ final class Protocol {
         }
     }
 
-    private static byte[] parseBulkString(RedisInputStream stream) throws IOException {
+    private static byte[] parseBlobString(RedisInputStream stream) throws IOException {
         int length = (int) stream.readLong();
         if (length == -1) return null;
 
-        return stream.readBulkString(length);
+        return stream.readBytes(length);
     }
 
     private static Object[] parseArray(RedisInputStream stream) throws IOException {

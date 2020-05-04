@@ -38,7 +38,7 @@ public final class RedisListImpl implements RedisList {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyCommand(LPOP, key);
-            value = decode(connection.readBulkString());
+            value = decode(connection.readBlobString());
             return value;
         } catch (IOException e) {
             item.broken = true;
@@ -81,10 +81,10 @@ public final class RedisListImpl implements RedisList {
         try {
             RedisConnection connection = item.resource;
             connection.writeArray(4);
-            connection.writeBulkString(LRANGE);
-            connection.writeBulkString(encode(key));
-            connection.writeBulkString(encode(start));
-            connection.writeBulkString(encode(end));
+            connection.writeBlobString(LRANGE);
+            connection.writeBlobString(encode(key));
+            connection.writeBlobString(encode(start));
+            connection.writeBlobString(encode(end));
             connection.flush();
             Object[] response = connection.readArray();
             values = new ArrayList<>(response.length);

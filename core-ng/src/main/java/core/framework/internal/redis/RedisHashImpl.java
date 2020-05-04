@@ -42,7 +42,7 @@ public final class RedisHashImpl implements RedisHash {
         try {
             RedisConnection connection = item.resource;
             connection.writeKeyArgumentCommand(HGET, key, encode(field));
-            value = decode(connection.readBulkString());
+            value = decode(connection.readBlobString());
             return value;
         } catch (IOException e) {
             item.broken = true;
@@ -90,10 +90,10 @@ public final class RedisHashImpl implements RedisHash {
         try {
             RedisConnection connection = item.resource;
             connection.writeArray(4);
-            connection.writeBulkString(HSET);
-            connection.writeBulkString(encode(key));
-            connection.writeBulkString(encode(field));
-            connection.writeBulkString(encode(value));
+            connection.writeBlobString(HSET);
+            connection.writeBlobString(encode(key));
+            connection.writeBlobString(encode(field));
+            connection.writeBlobString(encode(value));
             connection.flush();
             connection.readLong();
         } catch (IOException e) {
@@ -116,11 +116,11 @@ public final class RedisHashImpl implements RedisHash {
         try {
             RedisConnection connection = item.resource;
             connection.writeArray(2 + values.size() * 2);
-            connection.writeBulkString(HMSET);
-            connection.writeBulkString(encode(key));
+            connection.writeBlobString(HMSET);
+            connection.writeBlobString(encode(key));
             for (Map.Entry<String, String> entry : values.entrySet()) {
-                connection.writeBulkString(encode(entry.getKey()));
-                connection.writeBulkString(encode(entry.getValue()));
+                connection.writeBlobString(encode(entry.getKey()));
+                connection.writeBlobString(encode(entry.getValue()));
             }
             connection.flush();
             connection.readSimpleString();
