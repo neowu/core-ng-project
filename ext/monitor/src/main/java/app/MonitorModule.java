@@ -47,7 +47,7 @@ public class MonitorModule extends Module {
         KubeClient kubeClient = bind(new KubeClient());
         kubeClient.initialize();
         var job = new KubeMonitorJob(publisher, kubeClient, config.namespaces);
-        schedule().fixedRate("kube", job, Duration.ofSeconds(10));
+        schedule().fixedRate("kube", job, Duration.ofSeconds(30));  // not check pod too often
     }
 
     private void configureESJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.ElasticSearchConfig> config) {
