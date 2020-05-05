@@ -21,6 +21,9 @@ public class MonitorConfig {
     @Property(name = "es")
     public Map<String, ElasticSearchConfig> es = Map.of();
 
+    @Property(name = "kube")
+    public KubeConfig kube;
+
     public static class RedisConfig {
         @NotNull
         @Size(min = 1)
@@ -51,5 +54,12 @@ public class MonitorConfig {
         @Max(1)
         @Property(name = "highHeapUsageThreshold")
         public Double highHeapUsageThreshold = 0.8;     // with ES default setting, it generally does full GC at 75%
+    }
+
+    public static class KubeConfig {
+        @NotNull
+        @Size(min = 1)
+        @Property(name = "namespaces")
+        public List<String> namespaces = List.of();
     }
 }

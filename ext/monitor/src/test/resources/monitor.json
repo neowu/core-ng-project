@@ -11,5 +11,8 @@
       "highHeapUsageThreshold": 0.7,
       "highDiskUsageThreshold": 0.7
     }
+  },
+  "kube": {
+    "namespaces": ["ops", "app"]
   }
 }

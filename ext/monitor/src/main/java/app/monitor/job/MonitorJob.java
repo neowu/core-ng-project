@@ -1,5 +1,6 @@
 package app.monitor.job;
 
+import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.Stats;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
@@ -9,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.UUID;
 
 /**
  * @author neo
@@ -31,8 +31,9 @@ public class MonitorJob implements Job {
     @Override
     public void execute(JobContext context) {
         var message = new StatMessage();
-        message.id = UUID.randomUUID().toString();
-        message.date = Instant.now();
+        Instant now = Instant.now();
+        message.id = LogManager.ID_GENERATOR.next(now);
+        message.date = now;
         message.app = app;
         message.host = host;
         try {
