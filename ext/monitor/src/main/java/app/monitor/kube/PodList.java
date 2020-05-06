@@ -41,9 +41,18 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
 
         @Property(name = "startTime")
         public ZonedDateTime startTime;
+
+        @Property(name = "reason")
+        public String reason;
+
+        @Property(name = "message")
+        public String message;
     }
 
     public static class ContainerStatus {
+        @Property(name = "image")
+        public String image;
+
         @Property(name = "ready")
         public Boolean ready;   // whether pass readiness probe
 
@@ -52,15 +61,39 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
 
         @Property(name = "state")
         public ContainerState state;
+
+        @Property(name = "lastState")
+        public ContainerState lastState;
     }
 
     public static class ContainerState {
-        // there are running / terminated / waiting states, right now only waiting is used
+        @Property(name = "running")
+        public ContainerStateRunning running;
+
         @Property(name = "waiting")
         public ContainerStateWaiting waiting;
+
+        @Property(name = "terminated")
+        public ContainerStateTerminated terminated;
+    }
+
+    public static class ContainerStateRunning {
+        @Property(name = "startedAt")
+        public ZonedDateTime startedAt;
     }
 
     public static class ContainerStateWaiting {
+        @Property(name = "reason")
+        public String reason;
+
+        @Property(name = "message")
+        public String message;
+    }
+
+    public static class ContainerStateTerminated {
+        @Property(name = "exitCode")
+        public Integer exitCode;
+
         @Property(name = "reason")
         public String reason;
 

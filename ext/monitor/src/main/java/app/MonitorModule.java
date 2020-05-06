@@ -6,7 +6,6 @@ import app.monitor.job.KubeMonitorJob;
 import app.monitor.job.MonitorJob;
 import app.monitor.job.RedisCollector;
 import app.monitor.kube.KubeClient;
-import app.monitor.kube.PodList;
 import core.framework.http.HTTPClient;
 import core.framework.json.Bean;
 import core.framework.kafka.MessagePublisher;
@@ -43,7 +42,6 @@ public class MonitorModule extends Module {
     }
 
     private void configureKubeJob(MessagePublisher<StatMessage> publisher, MonitorConfig.KubeConfig config) {
-        Bean.register(PodList.class);
         KubeClient kubeClient = bind(new KubeClient());
         kubeClient.initialize();
         var job = new KubeMonitorJob(publisher, kubeClient, config.namespaces);

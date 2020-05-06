@@ -3,6 +3,7 @@ package app.monitor.job;
 import app.monitor.kube.KubeClient;
 import app.monitor.kube.PodList;
 import core.framework.internal.log.LogManager;
+import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
@@ -39,6 +40,7 @@ public class KubeMonitorJob implements Job {
                 for (PodList.Pod pod : pods.items) {
                     String errorMessage = check(pod);
                     if (errorMessage != null) {
+                        logger.warn("detected failed pod, pod={}", JSON.toJSON(pod));
                         publishPodFailure(pod, errorMessage);
                     }
                 }
@@ -69,7 +71,9 @@ public class KubeMonitorJob implements Job {
                 if (status.restartCount >= 5) {
                     return "pod restarted too many times, restart=" + status.restartCount;
                 }
-                if (!Boolean.TRUE.equals(status.ready)) allReady = false;
+                if (status.state.terminated == null
+                        && !Boolean.TRUE.equals(status.ready))
+                    allReady = false;
             }
             if (allReady) return null;  // all running, all ready
         }

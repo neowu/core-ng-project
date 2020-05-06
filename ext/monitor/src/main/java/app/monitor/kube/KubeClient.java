@@ -6,7 +6,7 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.json.Bean;
+import core.framework.json.JSON;
 import core.framework.util.Files;
 
 import java.nio.file.Path;
@@ -33,6 +33,7 @@ public class KubeClient {
         if (response.statusCode != HTTPStatus.OK.code) {
             throw new Error("failed to call kube api, statusCode=" + response.statusCode + ", message=" + response.text());
         }
-        return Bean.fromJSON(PodList.class, response.text());
+        // not using validation to reduce overhead
+        return JSON.fromJSON(PodList.class, response.text());
     }
 }
