@@ -6,6 +6,7 @@
     undertow is using jboss threading and EnhancedQueueExecutor, there is overhead to collect stats with jmx, and they are not critical stats 
 * redis: start preparing for Redis6/RESP3 (later version may requires redis 6)
 * httpClient: update okHTTP to 4.6.0 
+* httpClient: mask form body param
 * monitor: monitor failed pod in kube namespaces
 
 ### 7.4.1.1 (4/24/2020)

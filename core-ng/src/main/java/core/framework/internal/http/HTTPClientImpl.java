@@ -76,7 +76,7 @@ public final class HTTPClientImpl implements HTTPClient {
         byte[] body = responseBody.bytes();
 
         var response = new HTTPResponse(statusCode, headers, body);
-        logger.debug("[response] body={}", BodyLogParam.param(body, response.contentType));
+        logger.debug("[response] body={}", BodyLogParam.of(body, response.contentType));
         return response;
     }
 
@@ -101,7 +101,7 @@ public final class HTTPClientImpl implements HTTPClient {
         logger.debug("[request] headers={}", new MapLogParam(request.headers));
 
         if (request.body != null) {
-            logger.debug("[request] body={}", BodyLogParam.param(request.body, request.contentType));
+            logger.debug("[request] body={}", BodyLogParam.of(request.body, request.contentType));
             builder.method(request.method.name(), RequestBody.create(request.body, MediaType.get(request.contentType.toString())));
         } else {
             RequestBody body = request.method == HTTPMethod.GET || request.method == HTTPMethod.HEAD ? null : RequestBody.create(new byte[0], null);

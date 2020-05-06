@@ -14,17 +14,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class BodyLogParamTest {
     @Test
     void bodyParam() {
-        assertThat(BodyLogParam.param(Strings.bytes("{}"), ContentType.APPLICATION_JSON))
+        assertThat(BodyLogParam.of(Strings.bytes("{}"), ContentType.APPLICATION_JSON))
                 .isInstanceOf(JSONLogParam.class);
 
-        assertThat(BodyLogParam.param(Strings.bytes("<xml/>"), ContentType.TEXT_XML))
-                .isInstanceOf(BytesLogParam.class);
-        assertThat(BodyLogParam.param(Strings.bytes("key=value"), ContentType.APPLICATION_FORM_URLENCODED))
+        assertThat(BodyLogParam.of(Strings.bytes("<xml/>"), ContentType.TEXT_XML))
                 .isInstanceOf(BytesLogParam.class);
 
-        assertThat(BodyLogParam.param(Strings.bytes("value"), null))
+        assertThat(BodyLogParam.of(Strings.bytes("key=value"), ContentType.APPLICATION_FORM_URLENCODED))
+                .isInstanceOf(FormLogParam.class);
+
+        assertThat(BodyLogParam.of(Strings.bytes("value"), null))
                 .isEqualTo("byte[5]");
-        assertThat(BodyLogParam.param(new byte[10], ContentType.IMAGE_PNG))
+        assertThat(BodyLogParam.of(new byte[10], ContentType.IMAGE_PNG))
                 .isEqualTo("byte[10]");
     }
 }

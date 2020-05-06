@@ -52,7 +52,7 @@ public class KubeMonitorJob implements Job {
 
     String check(PodList.Pod pod) {
         String phase = pod.status.phase;
-        if (phase == null || "Succeeded".equals(phase)) return null; // terminated
+        if ("Succeeded".equals(phase)) return null; // terminated
         if ("Failed".equals(phase) || "Unknown".equals(phase)) return "unexpected pod phase, phase=" + phase;
         if ("Pending".equals(phase)) {
             for (PodList.ContainerStatus status : pod.status.containerStatuses) {
@@ -76,8 +76,11 @@ public class KubeMonitorJob implements Job {
             }
             if (allReady) return null;  // all running, all ready
         }
-        if (Duration.between(pod.status.startTime, ZonedDateTime.now()).toSeconds() > 300) {
-            return "pod took too long to be ready";
+        if (pod.status.startTime != null) { // startTime may not be populated yet if pod is just created
+            Duration elapsed = Duration.between(pod.status.startTime, ZonedDateTime.now());
+            if (elapsed.toSeconds() > 300) {
+                return "pod is still not ready, elapsed=" + elapsed;
+            }
         }
         return null;
     }
