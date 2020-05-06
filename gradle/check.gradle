@@ -47,7 +47,6 @@ subprojects {
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
         toolVersion = '6.23.0'
         consoleOutput = true
-        incrementalAnalysis = true
 
         tasks.withType(Pmd).configureEach {
             group = 'verification'
