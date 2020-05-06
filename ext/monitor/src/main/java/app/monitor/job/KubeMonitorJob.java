@@ -52,7 +52,7 @@ public class KubeMonitorJob implements Job {
 
     String check(PodList.Pod pod) {
         String phase = pod.status.phase;
-        if ("Succeeded".equals(phase)) return null; // terminated in success
+        if (phase == null || "Succeeded".equals(phase)) return null; // terminated
         if ("Failed".equals(phase) || "Unknown".equals(phase)) return "unexpected pod phase, phase=" + phase;
         if ("Pending".equals(phase)) {
             for (PodList.ContainerStatus status : pod.status.containerStatuses) {
