@@ -18,7 +18,7 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
         public ObjectMeta metadata;
 
         @Property(name = "status")
-        public PodStatus status;
+        public PodStatus status = new PodStatus();
     }
 
     public static class ObjectMeta {
@@ -29,7 +29,7 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
         public String name;
 
         @Property(name = "labels")
-        public Map<String, String> labels;
+        public Map<String, String> labels = Map.of();
     }
 
     public static class PodStatus {
@@ -37,7 +37,7 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
         public String phase;
 
         @Property(name = "containerStatuses")
-        public List<ContainerStatus> containerStatuses;
+        public List<ContainerStatus> containerStatuses = List.of();
 
         @Property(name = "startTime")
         public ZonedDateTime startTime;
@@ -57,10 +57,10 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
         public Boolean ready;   // whether pass readiness probe
 
         @Property(name = "restartCount")
-        public Integer restartCount;
+        public Integer restartCount = 0;
 
         @Property(name = "state")
-        public ContainerState state;
+        public ContainerState state = new ContainerState();
 
         @Property(name = "lastState")
         public ContainerState lastState;

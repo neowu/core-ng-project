@@ -53,12 +53,8 @@ class KubeMonitorJobTest {
 
     private PodList.Pod pod(String phase) {
         var pod = new PodList.Pod();
-        pod.status = new PodList.PodStatus();
         pod.status.phase = phase;
-        var status = new PodList.ContainerStatus();
-        status.restartCount = 0;
-        status.state = new PodList.ContainerState();
-        pod.status.containerStatuses = List.of(status);
+        pod.status.containerStatuses = List.of(new PodList.ContainerStatus());
         return pod;
     }
 }

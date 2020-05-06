@@ -15,7 +15,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author neo
@@ -89,17 +88,11 @@ public class KubeMonitorJob implements Job {
         message.id = LogManager.ID_GENERATOR.next(now);
         message.date = Instant.now();
         message.result = "ERROR";
-        message.app = app(pod);
+        message.app = pod.metadata.labels.getOrDefault("app", pod.metadata.name);
         message.host = pod.metadata.name;
         message.errorCode = "POD_FAILURE";
         message.errorMessage = errorMessage;
         publisher.publish(message);
-    }
-
-    private String app(PodList.Pod pod) {
-        Map<String, String> labels = pod.metadata.labels;
-        if (labels == null) return pod.metadata.name;
-        return labels.getOrDefault("app", pod.metadata.name);
     }
 
     private void publishError(Throwable e) {
