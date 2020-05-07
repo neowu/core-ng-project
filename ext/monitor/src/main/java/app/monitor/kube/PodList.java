@@ -28,6 +28,9 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
         @Property(name = "name")
         public String name;
 
+        @Property(name = "creationTimestamp")
+        public ZonedDateTime creationTimestamp;
+
         @Property(name = "labels")
         public Map<String, String> labels = Map.of();
     }
@@ -52,6 +55,9 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
     public static class ContainerStatus {
         @Property(name = "image")
         public String image;
+
+        @Property(name = "name")
+        public String name;
 
         @Property(name = "ready")
         public Boolean ready;   // whether pass readiness probe

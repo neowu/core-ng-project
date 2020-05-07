@@ -2,8 +2,8 @@ package app.monitor.job;
 
 import app.monitor.kube.KubeClient;
 import app.monitor.kube.PodList;
+import app.monitor.kube.PodListResponse;
 import core.framework.internal.log.LogManager;
-import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,18 +36,27 @@ public class KubeMonitorJob implements Job {
     public void execute(JobContext context) {
         try {
             for (String namespace : namespaces) {
-                PodList pods = kubeClient.listPods(namespace);
-                for (PodList.Pod pod : pods.items) {
-                    String errorMessage = check(pod);
-                    if (errorMessage != null) {
-                        logger.warn("detected failed pod, pod={}", JSON.toJSON(pod));
-                        publishPodFailure(pod, errorMessage);
-                    }
-                }
+                check(namespace);
             }
         } catch (Throwable e) {
             logger.warn(e.getMessage(), e);
             publishError(e);
+        }
+    }
+
+    private void check(String namespace) {
+        PodListResponse response = kubeClient.listPods(namespace);
+        List<String> failedPods = new ArrayList<>();
+        List<PodList.Pod> pods = response.pods();
+        for (PodList.Pod pod : pods) {
+            String errorMessage = check(pod);
+            if (errorMessage != null) {
+                failedPods.add(pod.metadata.name);
+                publishPodFailure(pod, errorMessage);
+            }
+        }
+        if (!failedPods.isEmpty()) {
+            logger.warn("detected failed pods, ns={}, pods={}, response={}", namespace, failedPods, response.body);
         }
     }
 
