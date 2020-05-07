@@ -46,7 +46,6 @@ class KubeMonitorJobTest {
         var startTime = ZonedDateTime.now();
 
         var pod = pod("Pending");
-        pod.status.containerStatuses = null;
         pod.metadata.creationTimestamp = startTime;
 
         assertThat(job.check(pod, startTime.plusMinutes(1))).isNull();

@@ -55,7 +55,7 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
         public List<ContainerStatus> initContainerStatuses;
 
         @Property(name = "containerStatuses")
-        public List<ContainerStatus> containerStatuses; // can be null when pod is pending
+        public List<ContainerStatus> containerStatuses = List.of(); // kube api may return null for newly created pending pod
 
         @Property(name = "startTime")
         public ZonedDateTime startTime;

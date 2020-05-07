@@ -63,7 +63,8 @@ public class KubeMonitorJob implements Job {
         String phase = pod.status.phase;
         if ("Succeeded".equals(phase)) return null; // terminated
         if ("Failed".equals(phase) || "Unknown".equals(phase)) return "unexpected pod phase, phase=" + phase;
-        if ("Pending".equals(phase) && pod.status.containerStatuses != null) {  // newly created pod may not have container status yet
+        if ("Pending".equals(phase)) {
+            // newly created pod may not have container status yet, containerStatuses is initialized as empty
             for (PodList.ContainerStatus status : pod.status.containerStatuses) {
                 if (status.state.waiting != null && "ImagePullBackOff".equals(status.state.waiting.reason)) {
                     return status.state.waiting.message;
