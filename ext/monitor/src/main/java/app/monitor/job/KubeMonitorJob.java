@@ -2,8 +2,8 @@ package app.monitor.job;
 
 import app.monitor.kube.KubeClient;
 import app.monitor.kube.PodList;
-import app.monitor.kube.PodListResponse;
 import core.framework.internal.log.LogManager;
+import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,8 +34,16 @@ public class KubeMonitorJob implements Job {
     @Override
     public void execute(JobContext context) {
         try {
+            var now = ZonedDateTime.now();
             for (String namespace : namespaces) {
-                check(namespace);
+                PodList pods = kubeClient.listPods(namespace);
+                for (PodList.Pod pod : pods.items) {
+                    String errorMessage = check(pod, now);
+                    if (errorMessage != null) {
+                        logger.warn("detected failed pod, ns={}, name={}, pod={}", namespace, pod.metadata.name, JSON.toJSON(pod));
+                        publishPodFailure(pod, errorMessage);
+                    }
+                }
             }
         } catch (Throwable e) {
             logger.warn(e.getMessage(), e);
@@ -44,27 +51,19 @@ public class KubeMonitorJob implements Job {
         }
     }
 
-    private void check(String namespace) {
-        PodListResponse response = kubeClient.listPods(namespace);
-        List<String> failedPods = new ArrayList<>();
-        List<PodList.Pod> pods = response.pods();
-        for (PodList.Pod pod : pods) {
-            String errorMessage = check(pod);
-            if (errorMessage != null) {
-                failedPods.add(pod.metadata.name);
-                publishPodFailure(pod, errorMessage);
+    String check(PodList.Pod pod, ZonedDateTime now) {
+        if (pod.metadata.deletionTimestamp != null) {
+            Duration elapsed = Duration.between(pod.metadata.deletionTimestamp, now);
+            if (elapsed.toSeconds() >= 300) {
+                return "pod is still in deletion, elapsed=" + elapsed;
             }
+            return null;
         }
-        if (!failedPods.isEmpty()) {
-            logger.warn("detected failed pods, ns={}, pods={}, response={}", namespace, failedPods, response.body);
-        }
-    }
 
-    String check(PodList.Pod pod) {
         String phase = pod.status.phase;
         if ("Succeeded".equals(phase)) return null; // terminated
         if ("Failed".equals(phase) || "Unknown".equals(phase)) return "unexpected pod phase, phase=" + phase;
-        if ("Pending".equals(phase)) {
+        if ("Pending".equals(phase) && pod.status.containerStatuses != null) {  // newly created pod may not have container status yet
             for (PodList.ContainerStatus status : pod.status.containerStatuses) {
                 if (status.state.waiting != null && "ImagePullBackOff".equals(status.state.waiting.reason)) {
                     return status.state.waiting.message;
@@ -72,7 +71,7 @@ public class KubeMonitorJob implements Job {
             }
         }
         if ("Running".equals(phase)) {
-            boolean allReady = true;
+            boolean ready = true;
             for (PodList.ContainerStatus status : pod.status.containerStatuses) {
                 if (status.state.waiting != null && "CrashLoopBackOff".equals(status.state.waiting.reason)) {
                     return status.state.waiting.message;
@@ -80,17 +79,16 @@ public class KubeMonitorJob implements Job {
                 if (status.restartCount >= 5) {
                     return "pod restarted too many times, restart=" + status.restartCount;
                 }
-                if (status.state.terminated == null
-                        && !Boolean.TRUE.equals(status.ready))
-                    allReady = false;
+                if (!Boolean.TRUE.equals(status.ready)) {
+                    ready = false;
+                }
             }
-            if (allReady) return null;  // all running, all ready
+            if (ready) return null;  // all running, all ready
         }
-        if (pod.status.startTime != null) { // startTime may not be populated yet if pod is just created
-            Duration elapsed = Duration.between(pod.status.startTime, ZonedDateTime.now());
-            if (elapsed.toSeconds() > 300) {
-                return "pod is still not ready, elapsed=" + elapsed;
-            }
+        ZonedDateTime startTime = pod.status.startTime != null ? pod.status.startTime : pod.metadata.creationTimestamp;  // startTime may not be populated yet if pod is just created
+        Duration elapsed = Duration.between(startTime, now);
+        if (elapsed.toSeconds() >= 300) {
+            return "pod is still not ready, elapsed=" + elapsed;
         }
         return null;
     }

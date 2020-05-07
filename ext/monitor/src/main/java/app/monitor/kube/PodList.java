@@ -15,7 +15,7 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
 
     public static class Pod {
         @Property(name = "metadata")
-        public ObjectMeta metadata;
+        public ObjectMeta metadata = new ObjectMeta();
 
         @Property(name = "status")
         public PodStatus status = new PodStatus();
@@ -28,8 +28,17 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
         @Property(name = "name")
         public String name;
 
+        @Property(name = "generateName")
+        public String generateName;
+
         @Property(name = "creationTimestamp")
         public ZonedDateTime creationTimestamp;
+
+        @Property(name = "deletionTimestamp")
+        public ZonedDateTime deletionTimestamp;
+
+        @Property(name = "deletionGracePeriodSeconds")
+        public Integer deletionGracePeriodSeconds;
 
         @Property(name = "labels")
         public Map<String, String> labels = Map.of();
@@ -39,11 +48,23 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
         @Property(name = "phase")
         public String phase;
 
+        @Property(name = "conditions")
+        public List<PodCondition> conditions;
+
+        @Property(name = "initContainerStatuses")
+        public List<ContainerStatus> initContainerStatuses;
+
         @Property(name = "containerStatuses")
-        public List<ContainerStatus> containerStatuses = List.of();
+        public List<ContainerStatus> containerStatuses; // can be null when pod is pending
 
         @Property(name = "startTime")
         public ZonedDateTime startTime;
+
+        @Property(name = "hostIP")
+        public String hostIP;
+
+        @Property(name = "podIP")
+        public String podIP;
 
         @Property(name = "reason")
         public String reason;
@@ -99,6 +120,26 @@ public class PodList {  // refer to https://kubernetes.io/docs/reference/generat
     public static class ContainerStateTerminated {
         @Property(name = "exitCode")
         public Integer exitCode;
+
+        @Property(name = "reason")
+        public String reason;
+
+        @Property(name = "message")
+        public String message;
+    }
+
+    public static class PodCondition {
+        @Property(name = "type")
+        public String type;
+
+        @Property(name = "status")
+        public String status;
+
+        @Property(name = "lastProbeTime")
+        public ZonedDateTime lastProbeTime;
+
+        @Property(name = "lastTransitionTime")
+        public ZonedDateTime lastTransitionTime;
 
         @Property(name = "reason")
         public String reason;
