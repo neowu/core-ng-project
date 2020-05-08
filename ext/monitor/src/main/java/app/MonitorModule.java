@@ -1,10 +1,9 @@
 package app;
 
 import app.monitor.MonitorConfig;
-import app.monitor.job.ElasticSearchCollector;
+import app.monitor.job.ElasticSearchMonitorJob;
 import app.monitor.job.KubeMonitorJob;
-import app.monitor.job.MonitorJob;
-import app.monitor.job.RedisCollector;
+import app.monitor.job.RedisMonitorJob;
 import app.monitor.kube.KubeClient;
 import core.framework.http.HTTPClient;
 import core.framework.json.Bean;
@@ -44,7 +43,7 @@ public class MonitorModule extends Module {
     private void configureKubeJob(MessagePublisher<StatMessage> publisher, MonitorConfig.KubeConfig config) {
         KubeClient kubeClient = bind(new KubeClient());
         kubeClient.initialize();
-        var job = new KubeMonitorJob(publisher, kubeClient, config.namespaces);
+        var job = new KubeMonitorJob(config.namespaces, kubeClient, publisher);
         schedule().fixedRate("kube", job, Duration.ofSeconds(30));  // not check pod too often
     }
 
@@ -53,12 +52,11 @@ public class MonitorModule extends Module {
         for (Map.Entry<String, MonitorConfig.ElasticSearchConfig> entry : config.entrySet()) {
             String app = entry.getKey();
             MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();
-            for (String host : esConfig.hosts) {
-                var collector = new ElasticSearchCollector(httpClient, host);
-                collector.highHeapUsageThreshold = esConfig.highHeapUsageThreshold;
-                collector.highDiskUsageThreshold = esConfig.highDiskUsageThreshold;
-                schedule().fixedRate("es-" + host, new MonitorJob(collector, app, host, publisher), Duration.ofSeconds(10));
-            }
+
+            var job = new ElasticSearchMonitorJob(httpClient, app, esConfig.host, publisher);
+            job.highHeapUsageThreshold = esConfig.highHeapUsageThreshold;
+            job.highDiskUsageThreshold = esConfig.highDiskUsageThreshold;
+            schedule().fixedRate("es-" + app, job, Duration.ofSeconds(10));
         }
     }
 
@@ -70,9 +68,9 @@ public class MonitorModule extends Module {
                 redis(host).host(host);
                 redis(host).poolSize(1, 1);
                 Redis redis = redis(host).client();
-                var collector = new RedisCollector(redis);
-                collector.highMemUsageThreshold = redisConfig.highMemUsageThreshold;
-                schedule().fixedRate("redis-" + host, new MonitorJob(collector, app, host, publisher), Duration.ofSeconds(10));
+                RedisMonitorJob job = new RedisMonitorJob(redis, app, host, publisher);
+                job.highMemUsageThreshold = redisConfig.highMemUsageThreshold;
+                schedule().fixedRate("redis-" + host, job, Duration.ofSeconds(10));
             }
         }
     }

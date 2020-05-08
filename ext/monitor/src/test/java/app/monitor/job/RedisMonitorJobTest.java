@@ -11,18 +11,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class RedisCollectorTest {
-    private RedisCollector collector;
+class RedisMonitorJobTest {
+    private RedisMonitorJob job;
 
     @BeforeEach
-    void createRedisCollector() {
-        collector = new RedisCollector(null);
-        collector.highMemUsageThreshold = 0.8;
+    void createRedisMonitorJob() {
+        job = new RedisMonitorJob(null, "app", "host", null);
+        job.highMemUsageThreshold = 0.8;
     }
 
     @Test
-    void collect() {
-        Stats stats = collector.collect(Map.of("maxmemory", "0",
+    void stats() {
+        Stats stats = job.stats(Map.of("maxmemory", "0",
                 "total_system_memory", "1000000",
                 "used_memory", "800000",
                 "db0", "keys=5,expires=0,avg_ttl=0"));
@@ -36,6 +36,6 @@ class RedisCollectorTest {
 
     @Test
     void keys() {
-        assertThat(collector.keys(Map.of())).isEqualTo(0);
+        assertThat(job.keys(Map.of())).isEqualTo(0);
     }
 }

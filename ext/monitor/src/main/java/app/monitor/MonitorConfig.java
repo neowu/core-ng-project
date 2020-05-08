@@ -39,9 +39,8 @@ public class MonitorConfig {
 
     public static class ElasticSearchConfig {
         @NotNull
-        @Size(min = 1)
-        @Property(name = "hosts")
-        public List<String> hosts = List.of();
+        @Property(name = "host")
+        public String host;                             // only need to put one host per cluster
 
         @NotNull
         @Min(0)

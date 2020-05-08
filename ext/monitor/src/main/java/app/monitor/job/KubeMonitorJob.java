@@ -25,7 +25,7 @@ public class KubeMonitorJob implements Job {
     public final List<String> namespaces;
     private final Logger logger = LoggerFactory.getLogger(KubeMonitorJob.class);
 
-    public KubeMonitorJob(MessagePublisher<StatMessage> publisher, KubeClient kubeClient, List<String> namespaces) {
+    public KubeMonitorJob(List<String> namespaces, KubeClient kubeClient, MessagePublisher<StatMessage> publisher) {
         this.publisher = publisher;
         this.kubeClient = kubeClient;
         this.namespaces = namespaces;

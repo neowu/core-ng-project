@@ -1,23 +1,36 @@
 package app.monitor.job;
 
+import app.monitor.kube.KubeClient;
 import app.monitor.kube.PodList;
+import core.framework.kafka.MessagePublisher;
+import core.framework.log.message.StatMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
 class KubeMonitorJobTest {
+    @Mock
+    KubeClient kubeClient;
+    @Mock
+    MessagePublisher<StatMessage> publisher;
     private KubeMonitorJob job;
 
     @BeforeEach
     void createKubeMonitorJob() {
-        job = new KubeMonitorJob(null, null, null);
+        MockitoAnnotations.initMocks(this);
+        job = new KubeMonitorJob(List.of("ns"), kubeClient, publisher);
     }
 
     @Test
@@ -76,6 +89,15 @@ class KubeMonitorJobTest {
         status.state.waiting.message = "Back-off pulling image \"gcr.io/project/ops/debug:latest\"";
 
         assertThat(job.check(pod, ZonedDateTime.now())).isEqualTo(status.state.waiting.message);
+    }
+
+    @Test
+    void publishError() {
+        when(kubeClient.listPods("ns")).thenThrow(new Error("mock"));
+        job.execute(null);
+        verify(publisher).publish(argThat(message -> "kubernetes".equals(message.app)
+                && "ERROR".equals(message.result)
+                && "FAILED_TO_COLLECT".equals(message.errorCode)));
     }
 
     private PodList.Pod pod(String phase) {

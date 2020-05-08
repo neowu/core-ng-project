@@ -7,7 +7,7 @@
   },
   "es": {
     "log": {
-      "hosts": ["log-es-0.log-es"],
+      "host": "log-es-0.log-es",
       "highHeapUsageThreshold": 0.7,
       "highDiskUsageThreshold": 0.7
     }

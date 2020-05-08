@@ -8,6 +8,8 @@
 * httpClient: update okHTTP to 4.6.0 
 * httpClient: mask form body param
 * monitor: monitor failed pod in kube namespaces
+* monitor: support monitor es cluster
+    !!! MonitorConfig.es.hosts (list) changes to es.host, only need to connect to one of cluster node to get all nodes info 
 
 ### 7.4.1.1 (4/24/2020)
 * http: improve x-forwarded-for parser to support rfc7239, as Azure AG will use ipv4:port format in x-forwarded-for header
