@@ -7,6 +7,7 @@ import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.log.ESLoggerContextFactory;
+import core.framework.util.Strings;
 import core.framework.util.Types;
 import org.apache.http.HttpHost;
 
@@ -16,6 +17,16 @@ import java.time.Duration;
  * @author neo
  */
 public class SearchConfig extends Config {
+    public static HttpHost[] parseHosts(String host) {
+        String[] values = Strings.split(host, ',');
+        HttpHost[] hosts = new HttpHost[values.length];
+        for (int i = 0; i < values.length; i++) {
+            String value = values[i].strip();
+            hosts[i] = new HttpHost(value, 9200);
+        }
+        return hosts;
+    }
+
     ElasticSearchImpl search;
     private ModuleContext context;
     private String name;
@@ -36,13 +47,14 @@ public class SearchConfig extends Config {
 
     @Override
     protected void validate() {
-        if (search.host == null) throw new Error("search host must be configured, name=" + name);
+        if (search.hosts == null) throw new Error("search host must be configured, name=" + name);
         if (!typeAdded)
             throw new Error("elasticsearch is configured but no type added, please remove unnecessary config, name=" + name);
     }
 
+    // comma separated hosts
     public void host(String host) {
-        search.host = new HttpHost(host, 9200);
+        search.hosts = parseHosts(host);
     }
 
     void configureLogger() {

@@ -33,7 +33,7 @@ public class TestSearchConfig extends SearchConfig {
 
     @Override
     public void host(String host) {
-        search.host = this.host;
+        search.hosts = new HttpHost[]{this.host};
     }
 
     // es refers to log4j core directly in org.elasticsearch.common.logging.Loggers, this is to bridge es log to coreng logger

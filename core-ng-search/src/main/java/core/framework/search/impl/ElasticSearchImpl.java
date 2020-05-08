@@ -37,11 +37,11 @@ public class ElasticSearchImpl implements ElasticSearch {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchImpl.class);
     public Duration timeout = Duration.ofSeconds(10);
     public Duration slowOperationThreshold = Duration.ofSeconds(5);
-    public HttpHost host;
+    public HttpHost[] hosts;
     private RestHighLevelClient client;
 
     public void initialize() {
-        RestClientBuilder builder = RestClient.builder(host);
+        RestClientBuilder builder = RestClient.builder(hosts);
         builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
                                                          .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
         builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
@@ -63,7 +63,7 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void close() throws IOException {
         if (client == null) return;
 
-        logger.info("close elasticsearch client, host={}", host);
+        logger.info("close elasticsearch client, host={}", hosts[0]);
         client.close();
     }
 
