@@ -1,5 +1,5 @@
 ## Change log
-### 7.4.2 (4/27/2020 - )
+### 7.4.2 (4/27/2020 - 5/8/2020)
 * mongo: update driver to 4.0.2
 * httpClient: support to trust specific https cert
 * http: removed undertow HTTP metrics 
