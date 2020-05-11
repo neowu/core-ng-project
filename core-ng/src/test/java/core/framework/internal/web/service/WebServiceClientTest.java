@@ -160,7 +160,7 @@ class WebServiceClientTest {
         webServiceClient.execute(HTTPMethod.GET, "/api", null, null, void.class);
 
         verify(interceptor).onRequest(argThat(request -> request.method == HTTPMethod.GET
-                && "http://localhost/api".equals(request.requestURI())));
+                && "http://localhost/api".equals(request.uri)));
         verify(interceptor).onResponse(response);
     }
 }

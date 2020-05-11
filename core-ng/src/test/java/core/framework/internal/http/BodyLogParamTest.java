@@ -20,9 +20,6 @@ class BodyLogParamTest {
         assertThat(BodyLogParam.of(Strings.bytes("<xml/>"), ContentType.TEXT_XML))
                 .isInstanceOf(BytesLogParam.class);
 
-        assertThat(BodyLogParam.of(Strings.bytes("key=value"), ContentType.APPLICATION_FORM_URLENCODED))
-                .isInstanceOf(FormLogParam.class);
-
         assertThat(BodyLogParam.of(Strings.bytes("value"), null))
                 .isEqualTo("byte[5]");
         assertThat(BodyLogParam.of(new byte[10], ContentType.IMAGE_PNG))

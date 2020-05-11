@@ -84,9 +84,10 @@ public final class HTTPClientImpl implements HTTPClient {
         Request.Builder builder = new Request.Builder();
 
         try {
-            String url = request.requestURI();
-            builder.url(url);
-            logger.debug("[request] method={}, url={}", request.method, url);
+            logger.debug("[request] method={}, uri={}", request.method, request.uri);
+            // not log final uri with query params which may contain sensitive data, to simplify so no need to do additional masking
+            // the downside is the query param logged below may not appear in final requestURI if value is null or empty
+            builder.url(request.requestURI());
         } catch (IllegalArgumentException e) {
             throw new HTTPClientException("uri is invalid, uri=" + request.uri, "INVALID_URL", e);
         }
@@ -101,7 +102,11 @@ public final class HTTPClientImpl implements HTTPClient {
         logger.debug("[request] headers={}", new MapLogParam(request.headers));
 
         if (request.body != null) {
-            logger.debug("[request] body={}", BodyLogParam.of(request.body, request.contentType));
+            if (request.form != null) {
+                logger.debug("[request] form={}", new MapLogParam(request.form));
+            } else {
+                logger.debug("[request] body={}", BodyLogParam.of(request.body, request.contentType));
+            }
             builder.method(request.method.name(), RequestBody.create(request.body, MediaType.get(request.contentType.toString())));
         } else {
             RequestBody body = request.method == HTTPMethod.GET || request.method == HTTPMethod.HEAD ? null : RequestBody.create(new byte[0], null);

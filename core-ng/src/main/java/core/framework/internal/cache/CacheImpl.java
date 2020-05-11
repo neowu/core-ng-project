@@ -2,7 +2,6 @@ package core.framework.internal.cache;
 
 import core.framework.cache.Cache;
 import core.framework.internal.json.JSONMapper;
-import core.framework.internal.validate.ValidationException;
 import core.framework.internal.validate.Validator;
 import core.framework.log.Markers;
 import core.framework.util.Maps;
@@ -137,12 +136,11 @@ public class CacheImpl<T> implements Cache<T> {
     }
 
     private boolean validate(T bean) {
-        try {
-            validator.validate(bean, false);
-            return true;
-        } catch (ValidationException e) {
-            logger.warn(Markers.errorCode("INVALID_CACHE_DATA"), "failed to validate value from cache, will reload", e);
+        Map<String, String> errors = validator.isValid(bean, false);
+        if (errors != null) {
+            logger.warn(Markers.errorCode("INVALID_CACHE_DATA"), "failed to validate value from cache, will reload, errors={}", errors);
             return false;
         }
+        return true;
     }
 }

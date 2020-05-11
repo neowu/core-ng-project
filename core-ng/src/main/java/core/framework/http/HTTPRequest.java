@@ -17,6 +17,7 @@ public final class HTTPRequest {
     public final Map<String, String> params = Maps.newLinkedHashMap();
     public final Map<String, String> headers = Maps.newLinkedHashMap();    // make headers/params order deterministic
     public String uri;
+    public Map<String, String> form;    // read only, should not modify
     public byte[] body;
     public ContentType contentType;
 
@@ -49,6 +50,8 @@ public final class HTTPRequest {
     }
 
     public void form(Map<String, String> form) {
+        if (method != HTTPMethod.POST) throw new Error("form must be used with POST, method=" + method);
+        this.form = form;
         var builder = new StringBuilder(256);
         HTTPRequestHelper.urlEncoding(builder, form);
         body(Strings.bytes(builder.toString()), ContentType.APPLICATION_FORM_URLENCODED);

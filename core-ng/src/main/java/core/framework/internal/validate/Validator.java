@@ -30,8 +30,14 @@ public final class Validator {
     }
 
     public void validate(Object bean, boolean partial) {
+        Map<String, String> errors = isValid(bean, partial);
+        if (errors != null) throw new ValidationException(errors);
+    }
+
+    // used only internally, for places don't want to catch exception
+    public Map<String, String> isValid(Object bean, boolean partial) {
         if (bean == null) {
-            throw new ValidationException(Map.of("bean", "bean must not be null"));
+            return Map.of("bean", "bean must not be null");
         }
 
         if (validator != null) { // validator can be null if no validation annotation presents
@@ -43,8 +49,9 @@ public final class Validator {
                 LOGGER.debug("validate, beanClass={}, bean={}, partial={}", bean.getClass().getCanonicalName(),
                         new JSONLogParam(Strings.bytes(JSON.toJSON(bean)), UTF_8),
                         partial);
-                throw new ValidationException(errors.errors);
+                return errors.errors;
             }
         }
+        return null;
     }
 }

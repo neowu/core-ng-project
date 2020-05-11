@@ -8,6 +8,7 @@ import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -65,6 +66,10 @@ class HTTPRequestTest {
         assertThat(request.contentType).isEqualTo(ContentType.APPLICATION_FORM_URLENCODED);
         assertThat(request.headers).containsEntry(HTTPHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
         assertThat(new String(request.body, UTF_8)).isEqualTo("key1=v1+v2&key2=v1%2Bv2");
+
+        assertThatThrownBy(() -> new HTTPRequest(HTTPMethod.PUT, "http://localhost/uri").form(Map.of()))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("form must be used with POST");
     }
 
     @Test
