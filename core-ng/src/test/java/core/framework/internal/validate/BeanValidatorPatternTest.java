@@ -6,9 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -23,33 +20,33 @@ class BeanValidatorPatternTest {
 
     @Test
     void valid() {
-        Bean bean = new Bean();
+        var bean = new Bean();
         bean.field1 = "abc-def";
 
-        ValidationErrors errors = new ValidationErrors();
+        var errors = new ValidationErrors();
         validator.validate(bean, errors, false);
-        assertFalse(errors.hasError());
+        assertThat(errors.hasError()).isFalse();
     }
 
     @Test
     void invalid() {
-        Bean bean = new Bean();
+        var bean = new Bean();
         bean.field1 = "ABC-DEF";
         bean.field2 = "a001";
         bean.field3 = "A001";
 
-        ValidationErrors errors = new ValidationErrors();
+        var errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
-        assertTrue(errors.hasError());
-        assertEquals(2, errors.errors.size());
-        assertThat(errors.errors.get("field1")).contains("field1");
+        assertThat(errors.hasError()).isTrue();
+        assertThat(errors.errors).hasSize(2);
+        assertThat(errors.errors.get("field1")).isEqualTo("field must match /[a-z-]+/, value=ABC-DEF");
         assertThat(errors.errors.get("field3")).contains("field3");
     }
 
     static class Bean {
         @NotNull
-        @Pattern(value = "[a-z-]+", message = "field1 must match pattern")
+        @Pattern(value = "[a-z-]+")
         public String field1;
 
         @Pattern("[a-z0-9]{0,20}")

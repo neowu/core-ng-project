@@ -26,7 +26,7 @@ class BeanValidatorNotNullTest {
     @Test
     void sourceCode() {
         assertThat(builder.builder.sourceCode())
-                .isEqualTo(ClasspathResources.text("validator-test/validator-not-null.java"));
+                .isEqualToIgnoringWhitespace(ClasspathResources.text("validator-test/validator-not-null.java"));
     }
 
     @Test

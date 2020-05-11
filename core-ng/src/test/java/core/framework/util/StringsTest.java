@@ -54,6 +54,7 @@ class StringsTest {
 
     @Test
     void format() {
+        // ignore surplus arguments
         assertThat(Strings.format("{}, {}, {}", 1, 2, 3, 4)).isEqualTo("1, 2, 3");
 
         assertThat(Strings.format("{}")).isEqualTo("{}");

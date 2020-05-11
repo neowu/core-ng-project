@@ -18,5 +18,5 @@ public @interface Size {
 
     int max() default -1;
 
-    String message() default "size must be between min and max";
+    String message() default "size must be between {min} and {max}, size={value}";
 }

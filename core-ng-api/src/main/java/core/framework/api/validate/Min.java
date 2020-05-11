@@ -16,5 +16,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Min {
     double value();
 
-    String message() default "field must not be less than min";
+    String message() default "field must not be less than {min}, value={value}";
 }

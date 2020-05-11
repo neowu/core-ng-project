@@ -64,7 +64,7 @@ public class BeanValidatorBuilder {
             builder.indent(1).append("if (bean.{} == null) {\n", field.getName());
             NotNull notNull = field.getDeclaredAnnotation(NotNull.class);
             if (notNull != null)
-                builder.indent(2).append("if (!partial) errors.add({}, {});\n", pathLiteral, variable(notNull.message()));
+                builder.indent(2).append("if (!partial) errors.add({}, {}, null);\n", pathLiteral, variable(notNull.message()));
             builder.indent(1).append("} else {\n");
 
             if (String.class.equals(fieldClass)) {
@@ -89,9 +89,15 @@ public class BeanValidatorBuilder {
 
     private void buildNumberValidation(CodeBuilder builder, Field field, String pathLiteral) {
         Min min = field.getDeclaredAnnotation(Min.class);
-        if (min != null) builder.indent(2).append("if (bean.{}.doubleValue() < {}) errors.add({}, {});\n", field.getName(), min.value(), pathLiteral, variable(min.message()));
+        if (min != null)
+            builder.indent(2).append("if (bean.{}.doubleValue() < {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}), \"min\", \"{}\"));\n",
+                    field.getName(), min.value(), pathLiteral, variable(min.message()),
+                    field.getName(), min.value());
         Max max = field.getDeclaredAnnotation(Max.class);
-        if (max != null) builder.indent(2).append("if (bean.{}.doubleValue() > {}) errors.add({}, {});\n", field.getName(), max.value(), pathLiteral, variable(max.message()));
+        if (max != null)
+            builder.indent(2).append("if (bean.{}.doubleValue() > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}), \"max\", \"{}\"));\n",
+                    field.getName(), max.value(), pathLiteral, variable(max.message()),
+                    field.getName(), max.value());
     }
 
     private void buildMapValidation(CodeBuilder builder, Field field, String pathLiteral, String parentPath) {
@@ -126,27 +132,42 @@ public class BeanValidatorBuilder {
 
     private void buildStringValidation(CodeBuilder builder, Field field, String pathLiteral) {
         NotBlank notBlank = field.getDeclaredAnnotation(NotBlank.class);
-        if (notBlank != null) builder.indent(2).append("if (bean.{}.isBlank()) errors.add({}, {});\n", field.getName(), pathLiteral, variable(notBlank.message()));
+        if (notBlank != null) builder.indent(2).append("if (bean.{}.isBlank()) errors.add({}, {}, null);\n", field.getName(), pathLiteral, variable(notBlank.message()));
 
         Length length = field.getDeclaredAnnotation(Length.class);
         if (length != null) {
-            if (length.min() > -1) builder.indent(2).append("if (bean.{}.length() < {}) errors.add({}, {});\n", field.getName(), length.min(), pathLiteral, variable(length.message()));
-            if (length.max() > -1) builder.indent(2).append("if (bean.{}.length() > {}) errors.add({}, {});\n", field.getName(), length.max(), pathLiteral, variable(length.message()));
+            if (length.min() > -1)
+                builder.indent(2).append("if (bean.{}.length() < {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.length()), \"min\", \"{}\", \"max\", \"{}\"));\n",
+                        field.getName(), String.valueOf(length.min()), pathLiteral, variable(length.message()),
+                        field.getName(), length.min(), length.max() == -1 ? "inf" : length.max());
+            if (length.max() > -1)
+                builder.indent(2).append("if (bean.{}.length() > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.length()), \"min\", \"{}\", \"max\", \"{}\"));\n",
+                        field.getName(), length.max(), pathLiteral, variable(length.message()),
+                        field.getName(), length.min() == -1 ? "0" : length.min(), length.max());
         }
 
         Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
         if (pattern != null) {
             String patternFieldName = field.getName() + "Pattern" + (index++);
-            this.builder.addField("private final java.util.regex.Pattern {} = java.util.regex.Pattern.compile({});", patternFieldName, variable(pattern.value()));
-            builder.indent(2).append("if (!this.{}.matcher(bean.{}).matches()) errors.add({}, {});\n", patternFieldName, field.getName(), pathLiteral, variable(pattern.message()));
+            String patternVariable = variable(pattern.value());
+            this.builder.addField("private final java.util.regex.Pattern {} = java.util.regex.Pattern.compile({});", patternFieldName, patternVariable);
+            builder.indent(2).append("if (!this.{}.matcher(bean.{}).matches()) errors.add({}, {}, java.util.Map.of(\"value\", bean.{}, \"pattern\", {}));\n",
+                    patternFieldName, field.getName(), pathLiteral, variable(pattern.message()),
+                    field.getName(), patternVariable);
         }
     }
 
     private void buildSizeValidation(CodeBuilder builder, Field field, String pathLiteral) {
         Size size = field.getDeclaredAnnotation(Size.class);
         if (size != null) {
-            if (size.min() > -1) builder.indent(2).append("if (bean.{}.size() < {}) errors.add({}, {});\n", field.getName(), size.min(), pathLiteral, variable(size.message()));
-            if (size.max() > -1) builder.indent(2).append("if (bean.{}.size() > {}) errors.add({}, {});\n", field.getName(), size.max(), pathLiteral, variable(size.message()));
+            if (size.min() > -1)
+                builder.indent(2).append("if (bean.{}.size() < {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.size()), \"min\", \"{}\", \"max\", \"{}\"));\n",
+                        field.getName(), size.min(), pathLiteral, variable(size.message()),
+                        field.getName(), size.min(), size.max() == -1 ? "inf" : size.max());
+            if (size.max() > -1)
+                builder.indent(2).append("if (bean.{}.size() > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.size()), \"min\", \"{}\", \"max\", \"{}\"));\n",
+                        field.getName(), size.max(), pathLiteral, variable(size.message()),
+                        field.getName(), size.min() == -1 ? "0" : size.min(), size.max());
         }
     }
 
@@ -172,12 +193,12 @@ public class BeanValidatorBuilder {
 
     private boolean hasValidationAnnotation(Field field) {
         boolean hasAnnotation = field.isAnnotationPresent(NotNull.class)
-            || field.isAnnotationPresent(NotBlank.class)
-            || field.isAnnotationPresent(Length.class)
-            || field.isAnnotationPresent(Max.class)
-            || field.isAnnotationPresent(Min.class)
-            || field.isAnnotationPresent(Pattern.class)
-            || field.isAnnotationPresent(Size.class);
+                || field.isAnnotationPresent(NotBlank.class)
+                || field.isAnnotationPresent(Length.class)
+                || field.isAnnotationPresent(Max.class)
+                || field.isAnnotationPresent(Min.class)
+                || field.isAnnotationPresent(Pattern.class)
+                || field.isAnnotationPresent(Size.class);
         if (hasAnnotation) return true;
 
         Class<?> targetClass = targetValidationClass(field);
@@ -244,14 +265,14 @@ public class BeanValidatorBuilder {
 
     private boolean isValueClass(Class<?> fieldClass) {
         return String.class.equals(fieldClass)
-            || Number.class.isAssignableFrom(fieldClass)
-            || Boolean.class.equals(fieldClass)
-            || LocalDateTime.class.equals(fieldClass)
-            || LocalDate.class.equals(fieldClass)
-            || LocalTime.class.equals(fieldClass)
-            || Instant.class.equals(fieldClass)
-            || ZonedDateTime.class.equals(fieldClass)
-            || fieldClass.isEnum()
-            || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
+                || Number.class.isAssignableFrom(fieldClass)
+                || Boolean.class.equals(fieldClass)
+                || LocalDateTime.class.equals(fieldClass)
+                || LocalDate.class.equals(fieldClass)
+                || LocalTime.class.equals(fieldClass)
+                || Instant.class.equals(fieldClass)
+                || ZonedDateTime.class.equals(fieldClass)
+                || fieldClass.isEnum()
+                || "org.bson.types.ObjectId".equals(fieldClass.getCanonicalName()); // not depends on mongo jar if application doesn't include mongo driver
     }
 }

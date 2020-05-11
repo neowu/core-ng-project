@@ -1,6 +1,7 @@
 ## Change log
 ### 7.4.3 (5/8/2020 - )
 * httpClient: simplify form post masking handling and log uri instead of complete requestURI
+* validator: make default message more user friendly
 
 ### 7.4.2 (4/27/2020 - 5/8/2020)
 * mongo: update driver to 4.0.2

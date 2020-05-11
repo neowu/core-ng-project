@@ -7,8 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -31,15 +29,15 @@ class BeanValidatorNotBlankTest {
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
-        assertTrue(errors.hasError());
-        assertEquals(1, errors.errors.size());
+        assertThat(errors.hasError()).isTrue();
+        assertThat(errors.errors).hasSize(1);
         assertThat(errors.errors.get("stringField1")).contains("stringField1");
     }
 
     @Test
     void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("validator-test/validator-not-blank.java"), sourceCode);
+        assertThat(sourceCode).isEqualToIgnoringWhitespace(ClasspathResources.text("validator-test/validator-not-blank.java"));
     }
 
     @Test
@@ -50,8 +48,8 @@ class BeanValidatorNotBlankTest {
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, true);
 
-        assertTrue(errors.hasError());
-        assertEquals(1, errors.errors.size());
+        assertThat(errors.hasError()).isTrue();
+        assertThat(errors.errors).hasSize(1);
         assertThat(errors.errors.get("stringField2")).contains("stringField2");
     }
 

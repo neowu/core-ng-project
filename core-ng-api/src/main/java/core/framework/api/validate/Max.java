@@ -16,5 +16,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Max {
     double value();
 
-    String message() default "field must not be greater than max";
+    String message() default "field must not be greater than {max}, value={value}";
 }

@@ -8,9 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author neo
@@ -29,40 +26,40 @@ class BeanValidatorLengthTest {
     @Test
     void sourceCode() {
         String sourceCode = builder.builder.sourceCode();
-        assertEquals(ClasspathResources.text("validator-test/validator-length.java"), sourceCode);
+        assertThat(sourceCode).isEqualToIgnoringWhitespace(ClasspathResources.text("validator-test/validator-length.java"));
     }
 
     @Test
     void validate() {
-        Bean bean = new Bean();
+        var bean = new Bean();
         bean.field1 = "123456";
         bean.field2 = "1";
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
-        assertTrue(errors.hasError());
-        assertEquals(2, errors.errors.size());
-        assertThat(errors.errors.get("field1")).contains("field1");
+        assertThat(errors.hasError()).isTrue();
+        assertThat(errors.errors).hasSize(2);
+        assertThat(errors.errors.get("field1")).isEqualTo("field1 must not be longer than 5");
         assertThat(errors.errors.get("field2")).contains("field2");
     }
 
     @Test
     void partialValidate() {
-        Bean bean = new Bean();
+        var bean = new Bean();
         bean.field1 = "123456";
 
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, true);
 
-        assertTrue(errors.hasError());
-        assertEquals(1, errors.errors.size());
+        assertThat(errors.hasError()).isTrue();
+        assertThat(errors.errors).hasSize(1);
         assertThat(errors.errors.get("field1")).contains("field1");
     }
 
     @Test
     void validateWithoutError() {
-        Bean bean = new Bean();
+        var bean = new Bean();
         bean.field1 = "12345";
         bean.field2 = "12345";
         bean.field3 = "123";
@@ -70,17 +67,17 @@ class BeanValidatorLengthTest {
         ValidationErrors errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
-        assertFalse(errors.hasError());
+        assertThat(errors.hasError()).isFalse();
     }
 
     static class Bean {
         @NotNull
-        @Length(max = 5, message = "field1 must not be longer than 5")
+        @Length(max = 5, message = "field1 must not be longer than {max}")
         public String field1;
         @NotNull
-        @Length(min = 5, message = "field2 must be longer than 5")
+        @Length(min = 5, message = "field2 must be longer than {min}")
         public String field2;
-        @Length(min = 3, max = 5, message = "field3 length must between 3 and 5")
+        @Length(min = 3, max = 5)
         public String field3;
     }
 }

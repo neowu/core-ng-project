@@ -14,5 +14,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface Pattern {
     String value();
 
-    String message() default "field must match pattern";
+    String message() default "field must match /{pattern}/, value={value}";
 }

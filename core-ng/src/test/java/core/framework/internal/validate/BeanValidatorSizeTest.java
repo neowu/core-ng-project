@@ -23,28 +23,28 @@ class BeanValidatorSizeTest {
 
     @Test
     void validate() {
-        Bean bean = new Bean();
+        var bean = new Bean();
         bean.stringList = List.of("1", "2", "3", "4");
         bean.stringMap = Map.of();
 
-        ValidationErrors errors = new ValidationErrors();
+        var errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
         assertThat(errors.hasError()).isTrue();
         assertThat(errors.errors).hasSize(2);
-        assertThat(errors.errors.get("stringList")).contains("stringList");
-        assertThat(errors.errors.get("stringMap")).contains("stringMap");
+        assertThat(errors.errors.get("stringList")).isEqualTo("stringList must not have more than 3 items, value=4");
+        assertThat(errors.errors.get("stringMap")).isEqualTo("size must be between 1 and inf, size=0");
     }
 
     @Test
     void validateWithoutError() {
-        Bean bean = new Bean();
+        var bean = new Bean();
         bean.stringList = List.of("1", "2", "3");
         bean.stringMap = Map.of("key", "value");
         bean.children = List.of(new Child());
         bean.stringListMap = Map.of("k1", List.of("v1"), "k2", List.of("v2"));
 
-        ValidationErrors errors = new ValidationErrors();
+        var errors = new ValidationErrors();
         validator.validate(bean, errors, false);
 
         assertThat(errors.hasError()).isFalse();
@@ -52,11 +52,11 @@ class BeanValidatorSizeTest {
 
     static class Bean {
         @NotNull
-        @Size(max = 3, message = "stringList must not have more than 3 items")
+        @Size(max = 3, message = "stringList must not have more than {max} items, value={value}")
         public List<String> stringList;
 
         @NotNull
-        @Size(min = 1, message = "stringMap must have at least 1 item")
+        @Size(min = 1)
         public Map<String, String> stringMap;
 
         @Size(min = 1, max = 3, message = "children must have 1 to 3 items")
