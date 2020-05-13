@@ -11,7 +11,6 @@
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 * rethink module structure to fit java module export requirement
 
-* refine web body bean, revisit cache/validation impl 
 * /_sys/, kafka controller, should be calling message handler directly?
 * revisit trace log truncation, better/more elegant handling?
 * monitoring, es only need to put one host to get all nodes info of cluster, update monitor config

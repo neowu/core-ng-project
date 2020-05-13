@@ -1,5 +1,5 @@
 ## Change log
-### 7.4.3 (5/8/2020 - )
+### 7.4.3 (5/8/2020 - 5/13/2020)
 * httpClient: simplify form post masking handling and log uri instead of complete requestURI
 * validator: make default message more user friendly
 
