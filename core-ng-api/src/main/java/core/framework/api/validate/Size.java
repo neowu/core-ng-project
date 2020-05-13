@@ -7,7 +7,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Size is used on List and Map.
+ * Size is used on String, List and Map.
  *
  * @author neo
  */

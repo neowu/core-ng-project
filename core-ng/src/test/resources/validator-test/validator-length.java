@@ -1,5 +1,5 @@
-public class BeanValidatorLengthTest$Bean$Validator implements core.framework.internal.validate.BeanValidator {
-    private void validateBean0(core.framework.internal.validate.BeanValidatorLengthTest.Bean bean, core.framework.internal.validate.ValidationErrors errors, boolean partial) {
+public class BeanValidatorStringLengthTest$Bean$Validator implements core.framework.internal.validate.BeanValidator {
+    private void validateBean0(core.framework.internal.validate.BeanValidatorStringLengthTest.Bean bean, core.framework.internal.validate.ValidationErrors errors, boolean partial) {
         if (bean.field1 == null) {
             if (!partial) errors.add("field1", "field must not be null", null);
         } else {
@@ -12,13 +12,13 @@ public class BeanValidatorLengthTest$Bean$Validator implements core.framework.in
         }
         if (bean.field3 == null) {
         } else {
-            if (bean.field3.length() < 3) errors.add("field3", "length must be between {min} and {max}, length={value}", java.util.Map.of("value", String.valueOf(bean.field3.length()), "min", "3", "max", "5"));
-            if (bean.field3.length() > 5) errors.add("field3", "length must be between {min} and {max}, length={value}", java.util.Map.of("value", String.valueOf(bean.field3.length()), "min", "3", "max", "5"));
+            if (bean.field3.length() < 3) errors.add("field3", "size must be between {min} and {max}, size={value}", java.util.Map.of("value", String.valueOf(bean.field3.length()), "min", "3", "max", "5"));
+            if (bean.field3.length() > 5) errors.add("field3", "size must be between {min} and {max}, size={value}", java.util.Map.of("value", String.valueOf(bean.field3.length()), "min", "3", "max", "5"));
         }
     }
 
     public void validate(Object instance, core.framework.internal.validate.ValidationErrors errors, boolean partial) {
-        validateBean0((core.framework.internal.validate.BeanValidatorLengthTest.Bean) instance, errors, partial);
+        validateBean0((core.framework.internal.validate.BeanValidatorStringLengthTest.Bean) instance, errors, partial);
     }
 
 }

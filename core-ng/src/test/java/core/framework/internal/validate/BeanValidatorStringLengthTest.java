@@ -1,7 +1,7 @@
 package core.framework.internal.validate;
 
-import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
+import core.framework.api.validate.Size;
 import core.framework.util.ClasspathResources;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author neo
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class BeanValidatorLengthTest {
+class BeanValidatorStringLengthTest {
     private BeanValidatorBuilder builder;
     private BeanValidator validator;
 
@@ -72,12 +72,12 @@ class BeanValidatorLengthTest {
 
     static class Bean {
         @NotNull
-        @Length(max = 5, message = "field1 must not be longer than {max}")
+        @Size(max = 5, message = "field1 must not be longer than {max}")
         public String field1;
         @NotNull
-        @Length(min = 5, message = "field2 must be longer than {min}")
+        @Size(min = 5, message = "field2 must be longer than {min}")
         public String field2;
-        @Length(min = 3, max = 5)
+        @Size(min = 3, max = 5)
         public String field3;
     }
 }

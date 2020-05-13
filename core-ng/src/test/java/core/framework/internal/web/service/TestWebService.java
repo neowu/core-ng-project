@@ -2,7 +2,6 @@ package core.framework.internal.web.service;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.api.json.Property;
-import core.framework.api.validate.Length;
 import core.framework.api.validate.Max;
 import core.framework.api.validate.Min;
 import core.framework.api.validate.NotNull;
@@ -70,7 +69,7 @@ public interface TestWebService {
     class TestRequest {
         @NotNull
         @Pattern("\\d+.*")
-        @Length(max = 10)
+        @Size(max = 10)
         @Property(name = "string_field")
         public String stringField;
 

@@ -46,7 +46,7 @@ class BeanValidatorPatternTest {
 
     static class Bean {
         @NotNull
-        @Pattern(value = "[a-z-]+")
+        @Pattern("[a-z-]+")
         public String field1;
 
         @Pattern("[a-z0-9]{0,20}")

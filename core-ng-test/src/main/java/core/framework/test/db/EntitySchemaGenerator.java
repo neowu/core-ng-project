@@ -1,7 +1,7 @@
 package core.framework.test.db;
 
-import core.framework.api.validate.Length;
 import core.framework.api.validate.NotNull;
+import core.framework.api.validate.Size;
 import core.framework.db.Column;
 import core.framework.db.Database;
 import core.framework.db.PrimaryKey;
@@ -19,8 +19,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
-
-import static core.framework.util.Strings.format;
 
 /**
  * @author neo
@@ -63,7 +61,7 @@ public final class EntitySchemaGenerator {
             PrimaryKey primaryKey = field.getDeclaredAnnotation(PrimaryKey.class);
 
             builder.append(column.name()).append(' ');
-            builder.append(columnType(field.getType(), field.getDeclaredAnnotation(Length.class)));
+            builder.append(columnType(field.getType(), field.getDeclaredAnnotation(Size.class)));
 
             if (primaryKey != null) {
                 if (primaryKey.autoIncrement()) builder.append(" AUTO_INCREMENT");
@@ -85,16 +83,16 @@ public final class EntitySchemaGenerator {
     }
 
     // http://dev.mysql.com/doc/connector-j/en/connector-j-reference-type-conversions.html
-    private String columnType(Class<?> fieldClass, Length lengthAnnotation) {
+    private String columnType(Class<?> fieldClass, Size size) {
         if (Integer.class.equals(fieldClass)) return "INT";
         if (Long.class.equals(fieldClass)) return "BIGINT";
         if (String.class.equals(fieldClass)) {
             int length = 500;
-            if (lengthAnnotation != null && lengthAnnotation.max() > 0) length = lengthAnnotation.max();
+            if (size != null && size.max() > 0) length = size.max();
             return "VARCHAR(" + length + ")";
         }
         if (fieldClass.isEnum()) {
-            return "VARCHAR(100)";
+            return "VARCHAR(100)";  // generally length of enum values is smaller than 100
         }
         if (Boolean.class.equals(fieldClass)) {
             return "BIT(1)";
@@ -111,6 +109,6 @@ public final class EntitySchemaGenerator {
         if (LocalDate.class.equals(fieldClass)) {
             return "DATE";
         }
-        throw new Error(format("unsupported field class, class={}", fieldClass.getCanonicalName()));
+        throw new Error("unsupported field class, class=" + fieldClass.getCanonicalName());
     }
 }

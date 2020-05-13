@@ -1,8 +1,8 @@
 package core.framework.test.assertion;
 
-import core.framework.api.validate.Length;
 import core.framework.api.validate.NotBlank;
 import core.framework.api.validate.NotNull;
+import core.framework.api.validate.Size;
 import org.junit.jupiter.api.Test;
 
 import static core.framework.test.Assertions.assertBean;
@@ -39,7 +39,7 @@ class ValidatorAssertTest {
 
     public static class Bean {
         @NotNull
-        @Length(max = 5, message = "field1 must not be longer than 5")
+        @Size(max = 5, message = "field1 must not be longer than 5")
         public String field1;
 
         @NotBlank

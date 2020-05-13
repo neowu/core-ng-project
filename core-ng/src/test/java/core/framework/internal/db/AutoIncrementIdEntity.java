@@ -1,6 +1,6 @@
 package core.framework.internal.db;
 
-import core.framework.api.validate.Length;
+import core.framework.api.validate.Size;
 import core.framework.db.Column;
 import core.framework.db.PrimaryKey;
 import core.framework.db.Table;
@@ -17,7 +17,7 @@ public class AutoIncrementIdEntity {
     @Column(name = "id")
     public Integer id;
 
-    @Length(max = 20)
+    @Size(max = 20)
     @Column(name = "string_field")
     public String stringField;
 

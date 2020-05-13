@@ -1,6 +1,5 @@
 package core.framework.internal.validate;
 
-import core.framework.api.validate.Length;
 import core.framework.api.validate.Max;
 import core.framework.api.validate.Min;
 import core.framework.api.validate.NotBlank;
@@ -101,7 +100,7 @@ public class BeanValidatorBuilder {
     }
 
     private void buildMapValidation(CodeBuilder builder, Field field, String pathLiteral, String parentPath) {
-        buildSizeValidation(builder, field, pathLiteral);
+        buildSizeValidation(builder, field, pathLiteral, "size");
 
         Type valueType = GenericTypes.mapValueType(field.getGenericType());
         if (GenericTypes.isList(valueType)) return; // ensured by class validator, if it's list it must be List<Value>
@@ -118,7 +117,7 @@ public class BeanValidatorBuilder {
     }
 
     private void buildListValidation(CodeBuilder builder, Field field, String pathLiteral, String parentPath) {
-        buildSizeValidation(builder, field, pathLiteral);
+        buildSizeValidation(builder, field, pathLiteral, "size");
 
         Class<?> valueClass = GenericTypes.listValueClass(field.getGenericType());
         if (!isValueClass(valueClass)) {
@@ -134,17 +133,7 @@ public class BeanValidatorBuilder {
         NotBlank notBlank = field.getDeclaredAnnotation(NotBlank.class);
         if (notBlank != null) builder.indent(2).append("if (bean.{}.isBlank()) errors.add({}, {}, null);\n", field.getName(), pathLiteral, variable(notBlank.message()));
 
-        Length length = field.getDeclaredAnnotation(Length.class);
-        if (length != null) {
-            if (length.min() > -1)
-                builder.indent(2).append("if (bean.{}.length() < {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.length()), \"min\", \"{}\", \"max\", \"{}\"));\n",
-                        field.getName(), String.valueOf(length.min()), pathLiteral, variable(length.message()),
-                        field.getName(), length.min(), length.max() == -1 ? "inf" : length.max());
-            if (length.max() > -1)
-                builder.indent(2).append("if (bean.{}.length() > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.length()), \"min\", \"{}\", \"max\", \"{}\"));\n",
-                        field.getName(), length.max(), pathLiteral, variable(length.message()),
-                        field.getName(), length.min() == -1 ? "0" : length.min(), length.max());
-        }
+        buildSizeValidation(builder, field, pathLiteral, "length");
 
         Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
         if (pattern != null) {
@@ -157,17 +146,19 @@ public class BeanValidatorBuilder {
         }
     }
 
-    private void buildSizeValidation(CodeBuilder builder, Field field, String pathLiteral) {
+    private void buildSizeValidation(CodeBuilder builder, Field field, String pathLiteral, String sizeMethod) {
         Size size = field.getDeclaredAnnotation(Size.class);
         if (size != null) {
-            if (size.min() > -1)
-                builder.indent(2).append("if (bean.{}.size() < {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.size()), \"min\", \"{}\", \"max\", \"{}\"));\n",
-                        field.getName(), size.min(), pathLiteral, variable(size.message()),
-                        field.getName(), size.min(), size.max() == -1 ? "inf" : size.max());
-            if (size.max() > -1)
-                builder.indent(2).append("if (bean.{}.size() > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.size()), \"min\", \"{}\", \"max\", \"{}\"));\n",
-                        field.getName(), size.max(), pathLiteral, variable(size.message()),
-                        field.getName(), size.min() == -1 ? "0" : size.min(), size.max());
+            int min = size.min();
+            int max = size.max();
+            if (min > -1)
+                builder.indent(2).append("if (bean.{}.{}() < {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.{}()), \"min\", \"{}\", \"max\", \"{}\"));\n",
+                        field.getName(), sizeMethod, min, pathLiteral, variable(size.message()),
+                        field.getName(), sizeMethod, min, max == -1 ? "inf" : max);
+            if (max > -1)
+                builder.indent(2).append("if (bean.{}.{}() > {}) errors.add({}, {}, java.util.Map.of(\"value\", String.valueOf(bean.{}.{}()), \"min\", \"{}\", \"max\", \"{}\"));\n",
+                        field.getName(), sizeMethod, max, pathLiteral, variable(size.message()),
+                        field.getName(), sizeMethod, min == -1 ? "0" : min, max);
         }
     }
 
@@ -194,7 +185,6 @@ public class BeanValidatorBuilder {
     private boolean hasValidationAnnotation(Field field) {
         boolean hasAnnotation = field.isAnnotationPresent(NotNull.class)
                 || field.isAnnotationPresent(NotBlank.class)
-                || field.isAnnotationPresent(Length.class)
                 || field.isAnnotationPresent(Max.class)
                 || field.isAnnotationPresent(Min.class)
                 || field.isAnnotationPresent(Pattern.class)
@@ -232,16 +222,12 @@ public class BeanValidatorBuilder {
             throw new Error(format("field with default value must have @NotNull, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
 
         Size size = field.getDeclaredAnnotation(Size.class);
-        if (size != null && !GenericTypes.isList(fieldType) && !GenericTypes.isMap(fieldType))
-            throw new Error(format("@Size must on List<?> or Map<String, ?>, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
+        if (size != null && !String.class.equals(fieldType) && !GenericTypes.isList(fieldType) && !GenericTypes.isMap(fieldType))
+            throw new Error(format("@Size must on String, List<?> or Map<String, ?>, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
 
         NotBlank notBlank = field.getDeclaredAnnotation(NotBlank.class);
         if (notBlank != null && !String.class.equals(fieldType))
             throw new Error(format("@NotBlank must on String, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
-
-        Length length = field.getDeclaredAnnotation(Length.class);
-        if (length != null && !String.class.equals(fieldType))
-            throw new Error(format("@Length must on String, field={}, fieldType={}", Fields.path(field), fieldType.getTypeName()));
 
         Pattern pattern = field.getDeclaredAnnotation(Pattern.class);
         if (pattern != null) {

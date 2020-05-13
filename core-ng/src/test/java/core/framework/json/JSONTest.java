@@ -148,8 +148,9 @@ class JSONTest {
     @Test
     void nullObject() {
         String json = JSON.toJSON(null);
-        TestBean bean = JSON.fromJSON(TestBean.class, json);
+        assertThat(json).isEqualTo("null");
 
+        TestBean bean = JSON.fromJSON(TestBean.class, json);
         assertThat(bean).isNull();
     }
 

@@ -44,7 +44,7 @@ public class CacheImpl<T> implements Cache<T> {
         byte[] cacheValue = cacheStore.get(cacheKey);
         if (cacheValue != null) {
             T result = mapper.fromJSON(cacheValue);
-            if (validate(result)) return result;
+            if (isValid(result)) return result;
         }
         logger.debug("load value, key={}", key);
         T value = load(loader, key);
@@ -68,22 +68,21 @@ public class CacheImpl<T> implements Cache<T> {
         Map<String, byte[]> cacheValues = cacheStore.getAll(cacheKeys);
         index = 0;
         for (String key : keys) {
+            T result = null;
             String cacheKey = cacheKeys[index];
             byte[] cacheValue = cacheValues.get(cacheKey);
-            boolean load = true;
             if (cacheValue != null) {
-                T result = mapper.fromJSON(cacheValue);
-                if (validate(result)) {
-                    values.put(key, result);
-                    load = false;
+                T value = mapper.fromJSON(cacheValue);
+                if (isValid(value)) {
+                    result = value;
                 }
             }
-            if (load) {
+            if (result == null) {
                 logger.debug("load value, key={}", key);
-                T value = load(loader, key);
-                newValues.put(cacheKey, mapper.toJSON(value));
-                values.put(key, value);
+                result = load(loader, key);
+                newValues.put(cacheKey, mapper.toJSON(result));
             }
+            values.put(key, result);
             index++;
         }
         if (!newValues.isEmpty()) cacheStore.putAll(newValues, duration);
@@ -135,8 +134,8 @@ public class CacheImpl<T> implements Cache<T> {
         return value;
     }
 
-    private boolean validate(T bean) {
-        Map<String, String> errors = validator.isValid(bean, false);
+    private boolean isValid(T bean) {
+        Map<String, String> errors = validator.errors(bean, false);
         if (errors != null) {
             logger.warn(Markers.errorCode("INVALID_CACHE_DATA"), "failed to validate value from cache, will reload, errors={}", errors);
             return false;

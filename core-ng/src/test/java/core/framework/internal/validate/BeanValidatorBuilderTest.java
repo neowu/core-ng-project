@@ -1,7 +1,7 @@
 package core.framework.internal.validate;
 
-import core.framework.api.validate.Length;
 import core.framework.api.validate.Min;
+import core.framework.api.validate.Size;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,10 +24,10 @@ class BeanValidatorBuilderTest {
     }
 
     @Test
-    void validateLengthAnnotation() {
-        assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithInvalidLengthAnnotation.class).build())
+    void validateSizeAnnotation() {
+        assertThatThrownBy(() -> new BeanValidatorBuilder(BeanWithInvalidSizeAnnotation.class).build())
                 .isInstanceOf(Error.class)
-                .hasMessageContaining("@Length must on String");
+                .hasMessageContaining("@Size must on String");
     }
 
     @Test
@@ -46,8 +46,8 @@ class BeanValidatorBuilderTest {
         public String stringField;
     }
 
-    public static class BeanWithInvalidLengthAnnotation {
-        @Length(min = 1)
+    public static class BeanWithInvalidSizeAnnotation {
+        @Size(min = 1)
         public Integer intField;
     }
 

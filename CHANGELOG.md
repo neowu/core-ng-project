@@ -1,4 +1,8 @@
 ## Change log
+### 7.4.4 (5/13/2020 - )
+* validation: removed @Length, replaced with @Size (now @Size works with string/list/map), to simplify and follow style of javax.validation.constraints
+    !!! replace all @Length with @Size
+
 ### 7.4.3 (5/8/2020 - 5/13/2020)
 * httpClient: simplify form post masking handling and log uri instead of complete requestURI
 * validator: make default message more user friendly
