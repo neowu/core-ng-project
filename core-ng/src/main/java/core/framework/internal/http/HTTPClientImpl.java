@@ -8,8 +8,8 @@ import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.internal.log.filter.MapLogParam;
 import core.framework.log.ActionLogContext;
-import core.framework.log.Markers;
 import core.framework.util.StopWatch;
+import core.framework.util.Strings;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static core.framework.log.Markers.errorCode;
 import static java.lang.String.CASE_INSENSITIVE_ORDER;
 
 /**
@@ -49,13 +50,13 @@ public final class HTTPClientImpl implements HTTPClient {
         try (Response httpResponse = client.newCall(httpRequest).execute()) {
             return response(httpResponse);
         } catch (IOException e) {
-            throw new HTTPClientException("http request failed, uri=" + request.uri, "HTTP_REQUEST_FAILED", e);
+            throw new HTTPClientException(Strings.format("http request failed, uri={}, error={}", request.uri, e.getMessage()), "HTTP_REQUEST_FAILED", e);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("http", elapsed);
             logger.debug("execute, elapsed={}", elapsed);
             if (elapsed > slowOperationThresholdInNanos) {
-                logger.warn(Markers.errorCode("SLOW_HTTP"), "slow http operation, elapsed={}", elapsed);
+                logger.warn(errorCode("SLOW_HTTP"), "slow http operation, method={}, uri={}, elapsed={}", request.method, request.uri, elapsed);
             }
         }
     }

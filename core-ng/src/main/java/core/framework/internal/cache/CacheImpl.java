@@ -3,7 +3,6 @@ package core.framework.internal.cache;
 import core.framework.cache.Cache;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.validate.Validator;
-import core.framework.log.Markers;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static core.framework.log.Markers.errorCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -137,7 +137,7 @@ public class CacheImpl<T> implements Cache<T> {
     private boolean isValid(T bean) {
         Map<String, String> errors = validator.errors(bean, false);
         if (errors != null) {
-            logger.warn(Markers.errorCode("INVALID_CACHE_DATA"), "failed to validate value from cache, will reload, errors={}", errors);
+            logger.warn(errorCode("INVALID_CACHE_DATA"), "failed to validate value from cache, will reload, errors={}", errors);
             return false;
         }
         return true;

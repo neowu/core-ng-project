@@ -43,7 +43,7 @@ class KibanaServiceTest {
 
     @Test
     void failedToConnectToKibana() {
-        when(httpClient.execute(any(HTTPRequest.class))).thenThrow(new HTTPClientException("failed to connect", "HTTP_REQUEST_FAILED"));
+        when(httpClient.execute(any(HTTPRequest.class))).thenThrow(new HTTPClientException("failed to connect", "HTTP_REQUEST_FAILED", null));
 
         service.importObjects();
     }

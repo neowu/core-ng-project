@@ -4,13 +4,13 @@ import core.framework.internal.template.TemplateContext;
 import core.framework.internal.template.TemplateMetaContext;
 import core.framework.internal.template.expression.ExpressionBuilder;
 import core.framework.internal.template.expression.ExpressionHolder;
-import core.framework.log.Markers;
 import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.BitSet;
 
+import static core.framework.log.Markers.errorCode;
 import static core.framework.util.Strings.format;
 
 /**
@@ -108,7 +108,7 @@ public class URLFragment implements Fragment {  // this is for dynamic href/src 
 
     String url(String url, TemplateContext context) {
         if (!isValidURL(url)) {
-            logger.warn(Markers.errorCode("ILLEGAL_URL"), "illegal url detected, url={}, location={}", url, location);
+            logger.warn(errorCode("INVALID_URL"), "invalid url detected, url={}, location={}", url, location);
             return "\"\"";
         }
         return cdn ? context.cdnManager.url(url) : url;

@@ -48,7 +48,7 @@ public class RetryInterceptor implements Interceptor {
                 return response;
             } catch (IOException e) {
                 if (shouldRetry(attempts, request.method(), e)) {
-                    logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}", request.url(), e);
+                    logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}, error={}", request.url(), e.getMessage(), e);
                     sleep.sleep(waitTime(attempts));
                 } else {
                     throw e;

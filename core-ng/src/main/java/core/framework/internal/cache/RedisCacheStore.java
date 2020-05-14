@@ -9,6 +9,8 @@ import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.Map;
 
+import static core.framework.log.Markers.errorCode;
+
 /**
  * @author neo
  */
@@ -26,7 +28,7 @@ public class RedisCacheStore implements CacheStore {
         try {
             return redis.getBytes(key);
         } catch (UncheckedIOException | RedisException e) {
-            logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
+            logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
             return null;
         }
     }
@@ -36,7 +38,7 @@ public class RedisCacheStore implements CacheStore {
         try {
             return redis.multiGetBytes(keys);
         } catch (UncheckedIOException | RedisException e) {
-            logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
+            logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
             return Map.of();
         }
     }
@@ -46,7 +48,7 @@ public class RedisCacheStore implements CacheStore {
         try {
             redis.set(key, value, expiration, false);
         } catch (UncheckedIOException | RedisException e) {
-            logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
+            logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
         }
     }
 
@@ -55,7 +57,7 @@ public class RedisCacheStore implements CacheStore {
         try {
             redis.multiSet(values, expiration);
         } catch (UncheckedIOException | RedisException e) {
-            logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
+            logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
         }
     }
 
@@ -64,7 +66,7 @@ public class RedisCacheStore implements CacheStore {
         try {
             redis.del(keys);
         } catch (UncheckedIOException | RedisException e) {
-            logger.warn("failed to connect to redis, error={}", e.getMessage(), e);
+            logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
         }
     }
 }

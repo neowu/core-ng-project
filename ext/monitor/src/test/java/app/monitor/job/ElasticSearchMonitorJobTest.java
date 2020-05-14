@@ -61,7 +61,7 @@ class ElasticSearchMonitorJobTest {
 
     @Test
     void publishError() {
-        when(httpClient.execute(any())).thenThrow(new HTTPClientException("mock", "MOCK_ERROR_CODE"));
+        when(httpClient.execute(any())).thenThrow(new HTTPClientException("mock", "MOCK_ERROR_CODE", null));
         job.execute(null);
         verify(publisher).publish(argThat(message -> "es".equals(message.app)
                 && "ERROR".equals(message.result)
