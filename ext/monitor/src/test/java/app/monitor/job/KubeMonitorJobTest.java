@@ -51,7 +51,9 @@ class KubeMonitorJobTest {
         status.state.waiting.reason = "CrashLoopBackOff";
         status.state.waiting.message = "Back-off 5m0s restarting failed container";
 
-        assertThat(job.check(pod, ZonedDateTime.now())).isEqualTo(status.state.waiting.message);
+        assertThat(job.check(pod, ZonedDateTime.now()))
+                .contains(status.state.waiting.reason)
+                .contains(status.state.waiting.message);
     }
 
     @Test
@@ -88,7 +90,9 @@ class KubeMonitorJobTest {
         status.state.waiting.reason = "ImagePullBackOff";
         status.state.waiting.message = "Back-off pulling image \"gcr.io/project/ops/debug:latest\"";
 
-        assertThat(job.check(pod, ZonedDateTime.now())).isEqualTo(status.state.waiting.message);
+        assertThat(job.check(pod, ZonedDateTime.now()))
+                .contains(status.state.waiting.reason)
+                .contains(status.state.waiting.message);
     }
 
     @Test

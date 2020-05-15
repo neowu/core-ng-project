@@ -67,7 +67,7 @@ public class KubeMonitorJob implements Job {
             // newly created pod may not have container status yet, containerStatuses is initialized as empty
             for (PodList.ContainerStatus status : pod.status.containerStatuses) {
                 if (status.state.waiting != null && "ImagePullBackOff".equals(status.state.waiting.reason)) {
-                    return status.state.waiting.message;
+                    return "ImagePullBackOff: " + status.state.waiting.message;
                 }
             }
         }
@@ -75,7 +75,7 @@ public class KubeMonitorJob implements Job {
             boolean ready = true;
             for (PodList.ContainerStatus status : pod.status.containerStatuses) {
                 if (status.state.waiting != null && "CrashLoopBackOff".equals(status.state.waiting.reason)) {
-                    return status.state.waiting.message;
+                    return "CrashLoopBackOff: " + status.state.waiting.message;
                 }
                 if (status.restartCount >= 5) {
                     return "pod restarted too many times, restart=" + status.restartCount;
