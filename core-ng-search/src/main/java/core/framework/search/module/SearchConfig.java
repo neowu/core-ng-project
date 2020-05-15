@@ -10,6 +10,7 @@ import core.framework.search.impl.log.ESLoggerContextFactory;
 import core.framework.util.Strings;
 import core.framework.util.Types;
 import org.apache.http.HttpHost;
+import org.apache.logging.log4j.LogManager;
 
 import java.time.Duration;
 
@@ -58,7 +59,7 @@ public class SearchConfig extends Config {
     }
 
     void configureLogger() {
-        System.setProperty("log4j2.loggerContextFactory", ESLoggerContextFactory.class.getName());
+        System.setProperty(LogManager.FACTORY_PROPERTY_NAME, ESLoggerContextFactory.class.getName());
     }
 
     public void slowOperationThreshold(Duration threshold) {

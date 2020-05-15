@@ -5,6 +5,7 @@ import core.framework.internal.module.ShutdownHook;
 import core.framework.search.impl.ESLoggerConfigFactory;
 import core.framework.search.impl.LocalElasticSearch;
 import org.apache.http.HttpHost;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
 
 /**
  * @author neo
@@ -42,8 +43,9 @@ public class TestSearchConfig extends SearchConfig {
     // ES keeps removing log4j-core dependency, now seems only above one left
     @Override
     void configureLogger() {
-        if (System.getProperty("log4j.configurationFactory") != null) return;
-        System.setProperty("log4j.configurationFactory", ESLoggerConfigFactory.class.getName());
+        if (System.getProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY) != null) return;
+        System.setProperty(ConfigurationFactory.CONFIGURATION_FACTORY_PROPERTY, ESLoggerConfigFactory.class.getName());
+        // refer to org.apache.logging.log4j.core.jmx.Server.PROPERTY_DISABLE_JMX, disable to reduce overhead
         System.setProperty("log4j2.disable.jmx", "true");
         ESLoggerConfigFactory.configureLogger();
     }
