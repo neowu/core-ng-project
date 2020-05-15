@@ -39,7 +39,7 @@ public class ESLoggerConfigFactory extends ConfigurationFactory {  // due to ela
         appender.start();
         config.addAppender(appender);
 
-        var loggerConfig = new LoggerConfig("", Level.ALL, false);
+        var loggerConfig = new LoggerConfig("", Level.INFO, false); // only enable info and higher level
         loggerConfig.addAppender(appender, null, null);
         config.addLogger("", loggerConfig);
         context.updateLoggers();
