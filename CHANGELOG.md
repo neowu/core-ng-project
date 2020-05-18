@@ -4,6 +4,7 @@
     !!! replace all @Length with @Size
 * es: update to 7.7.0
 * kafka: added uri parser, to support kafka uri without port (now it doesn't require port in url in all db/kafka/redis/mongo/es)
+* httpClient: update okHTTP to 4.7.0 
 
 ### 7.4.3 (5/8/2020 - 5/13/2020)
 * httpClient: simplify form post masking handling and log uri instead of complete requestURI

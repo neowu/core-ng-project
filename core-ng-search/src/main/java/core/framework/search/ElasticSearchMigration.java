@@ -1,8 +1,8 @@
 package core.framework.search;
 
+import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.log.ESLoggerContextFactory;
-import core.framework.search.module.SearchConfig;
 import core.framework.util.Properties;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +26,7 @@ public class ElasticSearchMigration {
         var properties = new Properties();
         properties.load(propertyFileClasspath);
         String host = properties.get("sys.elasticsearch.host").orElseThrow();
-        hosts = SearchConfig.parseHosts(host);
+        hosts = ElasticSearchHost.parse(host);
     }
 
     public void migrate(Consumer<ElasticSearch> consumer) {
