@@ -13,7 +13,7 @@ class MessageListenerTest {
 
     @BeforeEach
     void createMessageListener() {
-        listener = new MessageListener("localhost:9092", null, null);
+        listener = new MessageListener("localhost", null, null);
     }
 
     @Test

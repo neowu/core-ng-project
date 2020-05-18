@@ -109,7 +109,7 @@ public class MessageListener {
 
     Consumer<byte[], byte[]> consumer() {
         Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri);   // immutable map requires value must not be null
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaURI.parse(uri));
         config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         config.put(ConsumerConfig.CLIENT_ID_CONFIG, Network.LOCAL_HOST_NAME + "-" + CONSUMER_CLIENT_ID_SEQUENCE.getAndIncrement());      // will show in monitor metrics
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);

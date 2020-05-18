@@ -1,6 +1,7 @@
 package core.framework.internal.log.appender;
 
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.kafka.KafkaURI;
 import core.framework.internal.kafka.ProducerMetrics;
 import core.framework.log.message.ActionLogMessage;
 import core.framework.log.message.LogTopics;
@@ -44,7 +45,7 @@ public final class KafkaAppender implements LogAppender {
         actionLogMapper = new JSONMapper<>(ActionLogMessage.class);
         statMapper = new JSONMapper<>(StatMessage.class);
         try {
-            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,
+            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaURI.parse(uri),
                     ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
                     ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                       // if not specify, kafka uses producer-${seq} name, also impact jmx naming
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,

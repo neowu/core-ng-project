@@ -5,11 +5,10 @@ import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
+import core.framework.search.impl.ElasticSearchHost;
 import core.framework.search.impl.ElasticSearchImpl;
 import core.framework.search.impl.log.ESLoggerContextFactory;
-import core.framework.util.Strings;
 import core.framework.util.Types;
-import org.apache.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.Duration;
@@ -18,16 +17,6 @@ import java.time.Duration;
  * @author neo
  */
 public class SearchConfig extends Config {
-    public static HttpHost[] parseHosts(String host) {
-        String[] values = Strings.split(host, ',');
-        HttpHost[] hosts = new HttpHost[values.length];
-        for (int i = 0; i < values.length; i++) {
-            String value = values[i].strip();
-            hosts[i] = new HttpHost(value, 9200);
-        }
-        return hosts;
-    }
-
     ElasticSearchImpl search;
     private ModuleContext context;
     private String name;
@@ -55,7 +44,7 @@ public class SearchConfig extends Config {
 
     // comma separated hosts
     public void host(String host) {
-        search.hosts = parseHosts(host);
+        search.hosts = ElasticSearchHost.parse(host);
     }
 
     void configureLogger() {

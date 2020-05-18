@@ -29,7 +29,7 @@ public class MessageProducer {
             this.uri = uri;
             this.name = name;
             this.producerMetrics = new ProducerMetrics(name);
-            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri,    // immutable map requires value must not be null
+            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaURI.parse(uri),
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
                     ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60 * 1000,                        // 60s, DELIVERY_TIMEOUT_MS_CONFIG is INT type
                     ProducerConfig.LINGER_MS_CONFIG, 5L,                                         // use small linger time within acceptable range to improve batching

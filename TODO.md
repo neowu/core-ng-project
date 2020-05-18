@@ -15,6 +15,8 @@
 * revisit trace log truncation, better/more elegant handling?
 * monitoring, es only need to put one host to get all nodes info of cluster, update monitor config
 
+kafka client with default port ()
+
 ### jdk 12 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled

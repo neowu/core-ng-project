@@ -36,7 +36,7 @@ public class TestModule extends AbstractTestModule {
         configureKafka();
         configureRedis();
 
-        log().appendToKafka("localhost:9092");
+        log().appendToKafka("localhost");
 
         configureCache();
 

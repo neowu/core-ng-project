@@ -11,7 +11,7 @@ class KafkaAppenderTest {
 
     @BeforeEach
     void createKafkaAppender() {
-        appender = new KafkaAppender("localhost:9092");
+        appender = new KafkaAppender("localhost");
     }
 
     @Test
