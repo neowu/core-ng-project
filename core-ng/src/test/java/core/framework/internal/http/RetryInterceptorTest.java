@@ -200,4 +200,10 @@ class RetryInterceptorTest {
 
         verify(source).close();
     }
+
+    @Test
+    void uri() {
+        Request request = new Request.Builder().url("http://localhost/path?query=value").build();
+        assertThat(interceptor.uri(request)).isEqualTo("http://localhost/path");
+    }
 }

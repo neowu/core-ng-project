@@ -1,4 +1,6 @@
 ## Change log
+### 7.4.5 (5/19/2020 - )
+
 ### 7.4.4 (5/13/2020 - 5/18/2020)
 * validation: removed @Length, replaced with @Size (now @Size works with string/list/map), to simplify and follow style of javax.validation.constraints
     !!! replace all @Length with @Size

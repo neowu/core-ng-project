@@ -40,7 +40,7 @@ public class RetryInterceptor implements Interceptor {
                 Response response = chain.proceed(request);
                 int statusCode = response.code();
                 if (shouldRetry(attempts, statusCode)) {
-                    logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, request.url());
+                    logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, uri(request));
                     closeRequestBody(response);
                     sleep.sleep(waitTime(attempts));
                     continue;
@@ -48,13 +48,18 @@ public class RetryInterceptor implements Interceptor {
                 return response;
             } catch (IOException e) {
                 if (shouldRetry(attempts, request.method(), e)) {
-                    logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}, error={}", request.url(), e.getMessage(), e);
+                    logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}, error={}", uri(request), e.getMessage(), e);
                     sleep.sleep(waitTime(attempts));
                 } else {
                     throw e;
                 }
             }
         }
+    }
+
+    // remove query params, to keep it simple by skipping masking
+    String uri(Request request) {
+        return request.url().newBuilder().query(null).build().toString();
     }
 
     private void closeRequestBody(Response response) {
