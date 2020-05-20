@@ -12,7 +12,10 @@ import java.net.InetSocketAddress;
  * @author neo
  */
 public class TestMongoConfig extends MongoConfig {
-    private static MongoServer server;
+    // only start one mongo server for testing to reduce resource overhead,
+    // only breaking case is that multiple mongo() using same collection name, then if one unit test operates both MongoCollection may result in conflict or merged results
+    // this can be avoided by designing test differently
+    private static InetSocketAddress localMongoAddress;
     String name;
 
     @Override
@@ -26,9 +29,9 @@ public class TestMongoConfig extends MongoConfig {
     private void startInMemoryMongoServer(ModuleContext context) {
         synchronized (TestMongoConfig.class) {
             // in test env, config is initialized in order and within same thread, so no threading issue
-            if (server == null) {
-                server = new MongoServer(new MemoryBackend());
-                server.bind(new InetSocketAddress("localhost", 27017));
+            if (localMongoAddress == null) {
+                var server = new MongoServer(new MemoryBackend());
+                localMongoAddress = server.bind();
                 context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> server.shutdown());
             }
         }
@@ -37,6 +40,6 @@ public class TestMongoConfig extends MongoConfig {
     @Override
     ConnectionString connectionString(ConnectionString uri) {
         String database = name == null ? "test" : name;
-        return new ConnectionString("mongodb://localhost:27017/" + database);
+        return new ConnectionString("mongodb://localhost:" + localMongoAddress.getPort() + "/" + database);
     }
 }

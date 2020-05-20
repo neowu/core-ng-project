@@ -61,7 +61,7 @@ public class SearchConfig extends Config {
 
     public <T> void type(Class<T> documentClass) {
         ElasticSearchType<T> searchType = search.type(documentClass);
-        context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), null, searchType);
+        context.beanFactory.bind(Types.generic(ElasticSearchType.class, documentClass), name, searchType);
         typeAdded = true;
     }
 }

@@ -1,6 +1,7 @@
 ## Change log
 ### 7.4.5 (5/19/2020 - )
-* httpClient: update okHTTP to 4.7.2 
+* httpClient: update okHTTP to 4.7.2
+* mongo: for unit test, start test mongo server on random port, to avoid multiple tests running on same server 
 
 ### 7.4.4 (5/13/2020 - 5/18/2020)
 * validation: removed @Length, replaced with @Size (now @Size works with string/list/map), to simplify and follow style of javax.validation.constraints
