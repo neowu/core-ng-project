@@ -1,6 +1,7 @@
 package core.framework.internal.web.session;
 
 import core.framework.crypto.Hash;
+import core.framework.internal.redis.RedisException;
 import core.framework.redis.Redis;
 import core.framework.util.Lists;
 import core.framework.util.Maps;
@@ -12,6 +13,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static core.framework.log.Markers.errorCode;
 
 /**
  * @author neo
@@ -33,8 +36,9 @@ public class RedisSessionStore implements SessionStore {
             if (sessionValues.isEmpty()) return null;
             redis.expire(key, sessionTimeout);
             return sessionValues;
-        } catch (Exception e) {    // gracefully handle invalid data in redis, either legacy old format value, or invalid value inserted manually
-            logger.warn("failed to get redis session values", e);
+        } catch (RedisException e) {
+            // gracefully handle invalid data in redis, either legacy old format value, or invalid value/key type inserted manually,
+            logger.warn(errorCode("INVALID_SESSION_VALUE"), "failed to get redis session values", e);
             return null;
         }
     }
