@@ -11,22 +11,34 @@ import java.security.NoSuchAlgorithmException;
 public final class Hash {
     private static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-    public static String md5Hex(String text) {
-        return hash(text, "MD5");
+    public static String md5Hex(byte[] value) {
+        return hash(value, "MD5");
     }
 
-    public static String sha1Hex(String text) {
-        return hash(text, "SHA1");
+    public static String md5Hex(String value) {
+        return md5Hex(Strings.bytes(value));
     }
 
-    public static String sha256Hex(String text) {
-        return hash(text, "SHA-256");
+    public static String sha1Hex(byte[] value) {
+        return hash(value, "SHA1");
     }
 
-    private static String hash(String text, String algorithm) {
+    public static String sha1Hex(String value) {
+        return sha1Hex(Strings.bytes(value));
+    }
+
+    public static String sha256Hex(byte[] value) {
+        return hash(value, "SHA-256");
+    }
+
+    public static String sha256Hex(String value) {
+        return sha256Hex(Strings.bytes(value));
+    }
+
+    private static String hash(byte[] value, String algorithm) {
         try {
             MessageDigest md = MessageDigest.getInstance(algorithm);
-            byte[] digest = md.digest(Strings.bytes(text));
+            byte[] digest = md.digest(value);
             return hex(digest);
         } catch (NoSuchAlgorithmException e) {
             throw new Error(e);

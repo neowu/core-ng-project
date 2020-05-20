@@ -2,6 +2,7 @@ package core.framework.crypto;
 
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class HashTest {
     @Test
     void md5Hex() {  // use linux md5sum or Mac md5 to verify
-        assertEquals("d41d8cd98f00b204e9800998ecf8427e", Hash.md5Hex(""));
+        assertThat(Hash.md5Hex("")).isEqualTo("d41d8cd98f00b204e9800998ecf8427e");
         assertEquals("26b17225b626fb9238849fd60eabdf60", Hash.md5Hex("+"));
         assertEquals("202cb962ac59075b964b07152d234b70", Hash.md5Hex("123"));
     }
