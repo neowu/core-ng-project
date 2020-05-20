@@ -18,9 +18,9 @@ class TestMongoConfigTest {
 
     @Test
     void connectionString() {
-        assertThat(config.connectionString(null).getDatabase()).isEqualTo("test");
+        assertThat(config.connectionString(27017).getDatabase()).isEqualTo("test");
 
         config.name = "other";
-        assertThat(config.connectionString(null).getDatabase()).isEqualTo("other");
+        assertThat(config.connectionString(27017).getDatabase()).isEqualTo("other");
     }
 }

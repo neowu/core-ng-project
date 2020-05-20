@@ -23,10 +23,10 @@ public class TestMongoConfig extends MongoConfig {
         super.initialize(context, name);
         this.name = name;
 
-        startInMemoryMongoServer(context);
+        startLocalMongoServer(context);
     }
 
-    private void startInMemoryMongoServer(ModuleContext context) {
+    private void startLocalMongoServer(ModuleContext context) {
         synchronized (TestMongoConfig.class) {
             // in test env, config is initialized in order and within same thread, so no threading issue
             if (localMongoAddress == null) {
@@ -39,7 +39,11 @@ public class TestMongoConfig extends MongoConfig {
 
     @Override
     ConnectionString connectionString(ConnectionString uri) {
+        return connectionString(localMongoAddress.getPort());
+    }
+
+    ConnectionString connectionString(int port) {
         String database = name == null ? "test" : name;
-        return new ConnectionString("mongodb://localhost:" + localMongoAddress.getPort() + "/" + database);
+        return new ConnectionString("mongodb://localhost:" + port + "/" + database);
     }
 }
