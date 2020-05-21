@@ -76,7 +76,6 @@ subprojects {
             group = 'verification'
             extraArgs = ['-longBugCodes']
             reports {
-                xml.enabled = false
                 text.enabled = true
             }
             task.finalizedBy(spotbugsReport)
