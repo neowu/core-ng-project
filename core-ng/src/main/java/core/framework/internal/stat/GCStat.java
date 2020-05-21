@@ -3,7 +3,6 @@ package core.framework.internal.stat;
 import core.framework.util.ASCII;
 
 import java.lang.management.GarbageCollectorMXBean;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author neo
@@ -30,7 +29,7 @@ class GCStat {
         long previous = previousElapsed;
         long current = bean.getCollectionTime();
         previousElapsed = current;
-        return TimeUnit.NANOSECONDS.convert(current - previous, TimeUnit.MILLISECONDS);
+        return (current - previous) * 1000_000; // convert to nano
     }
 
     final String garbageCollectorName(String name) {

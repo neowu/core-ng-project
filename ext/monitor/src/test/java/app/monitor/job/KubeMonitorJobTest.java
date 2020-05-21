@@ -67,7 +67,7 @@ class KubeMonitorJobTest {
         assertThat(job.check(pod, startTime.plusMinutes(5))).isEqualTo("pod is still not ready, elapsed=PT5M");
 
         pod = pod("Running");
-        pod.status.containerStatuses.get(0).ready = false;
+        pod.status.containerStatuses.get(0).ready = Boolean.FALSE;
         pod.status.startTime = startTime;
 
         assertThat(job.check(pod, startTime.plusMinutes(1))).isNull();

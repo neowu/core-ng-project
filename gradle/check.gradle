@@ -65,9 +65,9 @@ subprojects {
         def spotbugsReport = tasks.register('spotbugsReport') {
             group = 'verification'
             doLast {
-                def report = file("${buildDir}/reports/spotbugs/main.text")
+                def report = file("${buildDir}/reports/spotbugs/main.txt")
                 if (report.exists()) logger.error(report.text)
-                report = file("${buildDir}/reports/spotbugs/test.text")
+                report = file("${buildDir}/reports/spotbugs/test.txt")
                 if (report.exists()) logger.error(report.text)
             }
         }
