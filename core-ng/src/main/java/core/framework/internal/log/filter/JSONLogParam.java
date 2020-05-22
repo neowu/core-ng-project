@@ -67,10 +67,13 @@ public class JSONLogParam implements LogParam {
                 maskStart = index + 1;
             } else if (!escaped && maskStart >= 0 && ch == '\"') {
                 return new int[]{maskStart, index};
+            } else if (maskStart < 0 && (ch == ',' || ch == '{' || ch == '}')) {
+                return null;    // not found start double quote, and reached next field
             } else {
                 escaped = false;
             }
         }
+        if (maskStart >= 0) return new int[]{maskStart, length};  // json can be truncated, mask rest if found start quote
         return null;
     }
 

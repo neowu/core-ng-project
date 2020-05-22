@@ -25,14 +25,22 @@ class JSONLogParamTest {
         var value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"field2\": \"value2\"\n}";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
                 .isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"field2\": \"value2\"\n}");
+
+        value = "{\"field1\": \"value1\", \"password\": null, \"field2\": null, \"field3\": null}";
+        assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
+                .isEqualTo(value);
+
+        value = "{\"field1\": \"value1\", \"password\": {\"field2\": null}}";
+        assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
+                .isEqualTo(value);
     }
 
     @Test
     void filterWithMultipleMaskedFields() {
         var param = new JSONLogParam(null, null);
-        var value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\": \"pass123\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"pass\\\"123\",\n    \"passwordConfirm\": \"pass123\"}}";
+        var value = "{\"field1\": \"value1\", \"password\": \"pass123\", \"passwordConfirm\": \"pass123\", \"field2\": \"value2\", \"nested\": {\"password\": \"pass\\\"123\", \"passwordConfirm\": \"pass123\"}}";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
-                .isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"passwordConfirm\": \"******\",\n  \"field2\": \"value2\",\n  \"nested\": {\n    \"password\": \"******\",\n    \"passwordConfirm\": \"******\"}}");
+                .isEqualTo("{\"field1\": \"value1\", \"password\": \"******\", \"passwordConfirm\": \"******\", \"field2\": \"value2\", \"nested\": {\"password\": \"******\", \"passwordConfirm\": \"******\"}}");
     }
 
     @Test
@@ -43,6 +51,10 @@ class JSONLogParamTest {
 
         value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"passwordConfirm\"";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm"))).doesNotContain("pass123");
+
+        value = "{\"field1\": \"value1\", \"password\": \"pass123";
+        assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
+                .isEqualTo("{\"field1\": \"value1\", \"password\": \"******");
     }
 
     @Test
