@@ -1,5 +1,5 @@
 ## Change log
-### 7.4.5 (5/19/2020 - )
+### 7.4.5 (5/19/2020 - 05/22/2020)
 * httpClient: update okHTTP to 4.7.2
 * mongo: for unit test, start test mongo server on random port, to avoid multiple tests running on same server 
 
