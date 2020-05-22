@@ -13,6 +13,8 @@
 
 * /_sys/, kafka controller, should be calling message handler directly?
 * revisit trace log truncation, better/more elegant handling?
+* write unit test support to check break compatibility of API/DB?
+* publish all sql to kafka, then have query-analyzer to call explain and send alert? same as ES?
 
 ### jdk 14 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
