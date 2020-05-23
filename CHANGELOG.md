@@ -2,6 +2,7 @@
 ### 7.4.6 (5/22/2020 - )
 * config: moved site().publishAPI() to api().publishAPI(), sys property key ("sys.publishAPI.allowCIDR") remains same
 * site: if called site(), then User-Agent and Referrer will be logged in action log context
+* kafka: log key in action context for bulk message handler 
 
 ### 7.4.5 (5/19/2020 - 5/22/2020)
 * httpClient: update okHTTP to 4.7.2

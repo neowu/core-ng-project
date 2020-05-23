@@ -115,7 +115,7 @@ public final class ActionLog {
     }
 
     public void context(String key, Object... values) {
-        List<String> contextValues = context.computeIfAbsent(key, k -> new ArrayList<>(2));
+        List<String> contextValues = context.computeIfAbsent(key, k -> new ArrayList<>(Math.max(2, values.length)));    // at least use 2 as init capacity, 0 capacity will result in size 10 array after adding
         for (Object value : values) {
             String contextValue = String.valueOf(value);
             if (contextValue.length() > MAX_CONTEXT_VALUE_LENGTH) { // prevent application code from putting large blob as context, e.g. xml or json response

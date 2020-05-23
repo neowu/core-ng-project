@@ -197,8 +197,10 @@ class MessageListenerThread extends Thread {
         Set<String> correlationIds = new HashSet<>();
         Set<String> clients = new HashSet<>();
         Set<String> refIds = new HashSet<>();
+        Object[] keys = new Object[size];
         long minTimestamp = Long.MAX_VALUE;
 
+        int index = 0;
         for (ConsumerRecord<byte[], byte[]> record : records) {
             Headers headers = record.headers();
             if ("true".equals(header(headers, MessageHeaders.HEADER_TRACE))) actionLog.trace = true;    // trigger trace if any message is trace
@@ -210,6 +212,9 @@ class MessageListenerThread extends Thread {
             if (refId != null) refIds.add(refId);
 
             String key = key(record);
+            keys[index] = key;
+            index++;
+
             byte[] value = record.value();
             long timestamp = record.timestamp();
             logger.debug("[message] key={}, value={}, timestamp={}, refId={}, client={}, correlationId={}",
@@ -220,6 +225,7 @@ class MessageListenerThread extends Thread {
             T message = mapper.fromJSON(value);
             messages.add(new Message<>(key, message));
         }
+        actionLog.context("key", keys);
 
         if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
         if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
