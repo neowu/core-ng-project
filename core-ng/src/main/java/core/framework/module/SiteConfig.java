@@ -3,10 +3,6 @@ package core.framework.module;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
-import core.framework.internal.web.api.APIDefinitionResponse;
-import core.framework.internal.web.http.IPv4AccessControl;
-import core.framework.internal.web.http.IPv4Ranges;
-import core.framework.internal.web.management.APIController;
 import core.framework.internal.web.site.StaticContentController;
 import core.framework.internal.web.site.StaticDirectoryController;
 import core.framework.internal.web.site.StaticFileController;
@@ -34,6 +30,7 @@ public class SiteConfig extends Config {
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
+        context.httpServer.handler.requestParser.logSiteHeaders = true;
     }
 
     public SessionConfig session() {
@@ -81,13 +78,5 @@ public class SiteConfig extends Config {
             context.httpServer.handler.interceptors.add(webSecurityInterceptor);
         }
         return new WebSecurityConfig(webSecurityInterceptor);
-    }
-
-    public void publishAPI(List<String> cidrs) {
-        logger.info("publish typescript api definition, cidrs={}", cidrs);
-        var accessControl = new IPv4AccessControl();
-        accessControl.allow = new IPv4Ranges(cidrs);
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry.serviceInterfaces, context.serviceRegistry.beanClasses, accessControl), true);
-        context.bean(APIDefinitionResponse.class);
     }
 }

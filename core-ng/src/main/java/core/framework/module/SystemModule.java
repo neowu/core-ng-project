@@ -21,6 +21,7 @@ public final class SystemModule extends Module {
         configureDB();
         property("sys.redis.host").ifPresent(host -> redis().host(host));
         configureSite();
+        property("sys.publishAPI.allowCIDR").ifPresent(cidrs -> api().publishAPI(new IPv4RangePropertyValueParser(cidrs).parse()));
     }
 
     private void configureCache() {
@@ -42,7 +43,6 @@ public final class SystemModule extends Module {
             }
         });
         property("sys.cdn.host").ifPresent(host -> site().cdn().host(host));
-        property("sys.publishAPI.allowCIDR").ifPresent(cidrs -> site().publishAPI(new IPv4RangePropertyValueParser(cidrs).parse()));
         property("sys.security.csp").ifPresent(policy -> site().security().contentSecurityPolicy(policy));
     }
 

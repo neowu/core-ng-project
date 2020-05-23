@@ -6,9 +6,13 @@ import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
+import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.internal.web.bean.RequestBeanMapper;
 import core.framework.internal.web.bean.ResponseBeanMapper;
 import core.framework.internal.web.controller.ControllerHolder;
+import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.IPv4Ranges;
+import core.framework.internal.web.management.APIController;
 import core.framework.internal.web.service.HTTPMethods;
 import core.framework.internal.web.service.WebServiceClient;
 import core.framework.internal.web.service.WebServiceClientBuilder;
@@ -23,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
+import java.util.List;
 
 /**
  * @author neo
@@ -100,6 +105,14 @@ public class APIConfig extends Config {
     public HTTPClientBuilder httpClient() {
         if (httpClient != null) throw new Error("api().httpClient() must be configured before adding client");
         return httpClientBuilder;
+    }
+
+    public void publishAPI(List<String> cidrs) {
+        logger.info("publish typescript api definition, cidrs={}", cidrs);
+        var accessControl = new IPv4AccessControl();
+        accessControl.allow = new IPv4Ranges(cidrs);
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry.serviceInterfaces, context.serviceRegistry.beanClasses, accessControl), true);
+        context.bean(APIDefinitionResponse.class);
     }
 
     private HTTPClient getOrCreateHTTPClient() {
