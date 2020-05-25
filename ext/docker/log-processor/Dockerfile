@@ -1,7 +1,7 @@
-FROM        adoptopenjdk/openjdk14:alpine as build
+FROM        gradle:jdk14 as build
 WORKDIR     /depot
 ADD         ./ /depot
-RUN         ./gradlew -Penv=prod :ext:log-processor:installDist
+RUN         gradle -Penv=prod :ext:log-processor:installDist
 
 FROM        adoptopenjdk/openjdk14:alpine-jre
 LABEL       app=log-processor
