@@ -1,6 +1,7 @@
 apply plugin: 'java-library'
 
 sourceSets {    // add compile only scope to test scope to simplify test dependency config
+    test.compileClasspath += configurations.compileClasspath
     test.runtimeClasspath += configurations.compileClasspath
 }
 

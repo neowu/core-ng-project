@@ -49,6 +49,8 @@ public final class ActionLog {
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
+    public boolean enableSlowSQLWarning = true;
+
     public ActionLog(String message) {
         startTime = System.nanoTime();
         startCPUTime = THREAD.getCurrentThreadCpuTime();

@@ -11,6 +11,7 @@ def jacksonVersion = '2.10.4'
 def junitVersion = '5.6.2'
 def mockitoVersion = '3.3.3'
 def assertjVersion = '3.16.1'
+def mysqlVersion = '8.0.20'
 
 project('core-ng-api') {
     apply from: file("${rootDir}/gradle/lib.gradle")
@@ -28,6 +29,7 @@ project('core-ng') {
         implementation 'io.undertow:undertow-core:2.1.1.Final'
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"
         implementation 'org.xerial.snappy:snappy-java:1.1.7.3'      // used by kafka message compression
+        compileOnly "mysql:mysql-connector-java:${mysqlVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
