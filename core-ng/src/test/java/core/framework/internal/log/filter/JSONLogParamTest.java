@@ -22,9 +22,10 @@ class JSONLogParamTest {
     @Test
     void filterWithOneMaskedField() {
         var param = new JSONLogParam(null, null);
-        var value = "{\"field1\": \"value1\",\n  \"password\": \"pass123\",\n  \"field2\": \"value2\"\n}";
+        // language=json
+        var value = "{\"field1\": \"value1\",\n  \"password\" : \"pass123\",\n  \"field2\": \"value2\"\n}";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
-                .isEqualTo("{\"field1\": \"value1\",\n  \"password\": \"******\",\n  \"field2\": \"value2\"\n}");
+                .isEqualTo("{\"field1\": \"value1\",\n  \"password\" : \"******\",\n  \"field2\": \"value2\"\n}");
 
         value = "{\"field1\": \"value1\", \"password\": null, \"field2\": null, \"field3\": null}";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
@@ -32,6 +33,10 @@ class JSONLogParamTest {
 
         value = "{\"field1\": \"value1\", \"password\": {\"field2\": null}}";
         assertThat(param.filter(value, Set.of("password", "passwordConfirm")).toString())
+                .isEqualTo(value);
+
+        value = "{\"field1\": [\"secret1\", \"secret2\", \"secret3\"], \"field2\": \"value\"}";
+        assertThat(param.filter(value, Set.of("secret1", "secret2", "secret3")).toString())
                 .isEqualTo(value);
     }
 

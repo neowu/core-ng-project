@@ -21,7 +21,7 @@ import static core.framework.log.Markers.errorCode;
  */
 public class MySQLQueryInterceptor implements QueryInterceptor {
     // mysql will create new interceptor instance for every connection, so to minimize initialization cost
-    private final static Logger LOGGER = LoggerFactory.getLogger(MySQLQueryInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MySQLQueryInterceptor.class);
 
     @Override
     public QueryInterceptor init(MysqlConnection connection, Properties properties, Log log) {

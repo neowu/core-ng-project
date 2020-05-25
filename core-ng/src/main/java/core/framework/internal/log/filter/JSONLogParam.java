@@ -55,7 +55,8 @@ public class JSONLogParam implements LogParam {
         return builder;
     }
 
-    private int[] maskRange(StringBuilder builder, int start) {  // find first json "string" range from start
+    // find first json "string" range from start, only mask string field value, ignore if target field value is list or object
+    private int[] maskRange(StringBuilder builder, int start) {
         boolean escaped = false;
         int maskStart = -1;
         int length = builder.length();
@@ -67,7 +68,7 @@ public class JSONLogParam implements LogParam {
                 maskStart = index + 1;
             } else if (!escaped && maskStart >= 0 && ch == '\"') {
                 return new int[]{maskStart, index};
-            } else if (maskStart < 0 && (ch == ',' || ch == '{' || ch == '}')) {
+            } else if (maskStart < 0 && (ch == ',' || ch == '{' || ch == '}' || ch == '[' || ch == ']')) {
                 return null;    // not found start double quote, and reached next field
             } else {
                 escaped = false;
