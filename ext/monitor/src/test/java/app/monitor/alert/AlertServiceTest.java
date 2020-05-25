@@ -26,7 +26,7 @@ class AlertServiceTest {
 
         var config = new AlertConfig();
         config.ignoreWarnings = List.of(matcher(List.of("website"), List.of("PATH_NOT_FOUND")));
-        config.criticalErrors = List.of(matcher(List.of(), List.of("CRITICAL_ERROR")));
+        config.criticalErrors = List.of(matcher(List.of(), List.of("CRITICAL_ERROR", "SLOW_SQL")));
         config.site = "site";
         config.timespanInHours = 4;
         config.kibanaURL = "http://kibana:5601";
@@ -79,6 +79,7 @@ class AlertServiceTest {
     @Test
     void check() {
         assertThat(service.check(alert(Severity.ERROR, "CRITICAL_ERROR"), LocalDateTime.now()).notify).isTrue();
+        assertThat(service.check(alert(Severity.WARN, "SLOW_SQL"), LocalDateTime.now()).notify).isTrue();
 
         Alert alert = alert(Severity.ERROR, "ERROR");
         LocalDateTime date = LocalDateTime.now();

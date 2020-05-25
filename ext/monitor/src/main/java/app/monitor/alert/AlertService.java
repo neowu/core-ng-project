@@ -56,7 +56,8 @@ public class AlertService {
     Result check(Alert alert, LocalDateTime now) {
         if (alert.severity == Severity.WARN && ignoredWarnings.matches(alert.app, alert.errorCode))
             return new Result(false, -1);
-        if (alert.severity == Severity.ERROR && criticalErrors.matches(alert.app, alert.errorCode))
+        // use critical errors for both warning adn errors, as for certain warnings we still want to see every one, e.g. SLOW_SQL
+        if (criticalErrors.matches(alert.app, alert.errorCode))
             return new Result(true, -1);
 
         String key = alertKey(alert);

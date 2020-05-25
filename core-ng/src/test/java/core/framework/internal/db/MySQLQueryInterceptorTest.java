@@ -44,7 +44,7 @@ class MySQLQueryInterceptorTest {
     @Test
     void postProcess() {
         ServerSession session = mock(ServerSession.class);
-        when(session.noGoodIndexUsed()).thenReturn(true);
+        when(session.noGoodIndexUsed()).thenReturn(Boolean.TRUE);
         interceptor.postProcess(() -> "sql", null, null, session);
 
         Database.enableSlowSQLWarning(false);
