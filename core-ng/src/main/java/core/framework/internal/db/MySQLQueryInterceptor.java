@@ -20,7 +20,8 @@ import static core.framework.log.Markers.errorCode;
  * @author neo
  */
 public class MySQLQueryInterceptor implements QueryInterceptor {
-    private final Logger logger = LoggerFactory.getLogger(MySQLQueryInterceptor.class);
+    // mysql will create new interceptor instance for every connection, so to minimize initialization cost
+    private final static Logger LOGGER = LoggerFactory.getLogger(MySQLQueryInterceptor.class);
 
     @Override
     public QueryInterceptor init(MysqlConnection connection, Properties properties, Log log) {
@@ -50,9 +51,9 @@ public class MySQLQueryInterceptor implements QueryInterceptor {
             String message = noIndexUsed ? "no index used" : "bad index used";
             String sqlValue = sql.get();
             if (warning) {
-                logger.warn(errorCode("SLOW_SQL"), "{}, sql={}", message, sqlValue);
+                LOGGER.warn(errorCode("SLOW_SQL"), "{}, sql={}", message, sqlValue);
             } else {
-                logger.debug("{}, sql={}", message, sqlValue);
+                LOGGER.debug("{}, sql={}", message, sqlValue);
             }
         }
         return null;
