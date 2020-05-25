@@ -41,6 +41,10 @@ public class MonitorModule extends Module {
     }
 
     private void configureKubeJob(MessagePublisher<StatMessage> publisher, MonitorConfig.KubeConfig config) {
+        // due to kube 1.6 starts support TLSv1.3, and it doesn't compatible with java SSL, workaround is to downgrade to TLSv1.2
+        // it seems only java 11 and 15 will have fix
+        // refer to https://bugs.openjdk.java.net/browse/JDK-8236039, https://github.com/golang/go/issues/35722
+        System.setProperty("jdk.tls.client.protocols", "TLSv1.2");
         KubeClient kubeClient = bind(new KubeClient());
         kubeClient.initialize();
         var job = new KubeMonitorJob(config.namespaces, kubeClient, publisher);

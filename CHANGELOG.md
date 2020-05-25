@@ -3,6 +3,8 @@
 * config: moved site().publishAPI() to api().publishAPI(), sys property key ("sys.publishAPI.allowCIDR") remains same
 * site: if called site(), then User-Agent and Referrer will be logged in action log context
 * kafka: log key in action context for bulk message handler 
+* monitor: fixed kube 1.16 TLSv1.3 issues (workaround to downgrade to TLSv1.2, seems only java 11/15 will have the fix) 
+           refer to https://bugs.openjdk.java.net/browse/JDK-8236039, https://github.com/golang/go/issues/35722
 
 ### 7.4.5 (5/19/2020 - 5/22/2020)
 * httpClient: update okHTTP to 4.7.2
