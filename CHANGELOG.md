@@ -1,5 +1,5 @@
 ## Change log
-### 7.4.6 (5/22/2020 - )
+### 7.4.6 (5/22/2020 - 5/25/2020)
 * config: moved site().publishAPI() to api().publishAPI(), sys property key ("sys.publishAPI.allowCIDR") remains same
 * site: if called site(), then User-Agent and Referrer will be logged in action log context
 * kafka: log key in action context for bulk message handler             
@@ -7,6 +7,7 @@
     Database.enableSlowSQLWarning(false)
     database.select(...)
     Database.enableSlowSQLWarning(true)
+!!! requires mysql jdbc driver 8.0+, recommend to use same or higher version referred by the framework.    
 * monitor: fixed kube 1.16 TLSv1.3 issues (workaround to downgrade to TLSv1.2, and wait newer version of JDK) 
            refer to https://bugs.openjdk.java.net/browse/JDK-8236039, https://github.com/golang/go/issues/35722
 * monitor: make criticalErrors apply to warnings, e.g. alert every SLOW_SQL warning
