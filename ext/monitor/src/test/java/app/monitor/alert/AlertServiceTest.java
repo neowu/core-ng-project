@@ -67,7 +67,8 @@ class AlertServiceTest {
     @Test
     void alertKey() {
         Alert alert = alert(Severity.WARN, "NOT_FOUND");
-        assertThat(service.alertKey(alert)).isEqualTo("website/WARN/NOT_FOUND");
+        alert.action = "action";
+        assertThat(service.alertKey(alert)).isEqualTo("website/action/WARN/NOT_FOUND");
     }
 
     @Test
