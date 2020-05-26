@@ -5,6 +5,7 @@ import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.filter.BytesLogParam;
 import core.framework.kafka.Message;
+import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -197,7 +198,7 @@ class MessageListenerThread extends Thread {
         Set<String> correlationIds = new HashSet<>();
         Set<String> clients = new HashSet<>();
         Set<String> refIds = new HashSet<>();
-        Set<String> keys = new HashSet<>();
+        Set<String> keys = Sets.newHashSetWithExpectedSize(size);
         long minTimestamp = Long.MAX_VALUE;
 
         for (ConsumerRecord<byte[], byte[]> record : records) {
