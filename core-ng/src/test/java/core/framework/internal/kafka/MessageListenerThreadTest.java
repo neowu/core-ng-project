@@ -50,6 +50,7 @@ class MessageListenerThreadTest {
 
         assertThat(messages).hasSize(1);
         assertThat(messages.get(0).key).isEqualTo("key");
+        assertThat(actionLog.context.get("key")).containsExactly("key");
         assertThat(actionLog.clients).containsExactly("client");
         assertThat(actionLog.refIds).containsExactly("refId");
         assertThat(actionLog.correlationIds).containsExactly("correlationId");
