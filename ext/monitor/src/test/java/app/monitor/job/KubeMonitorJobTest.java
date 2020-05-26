@@ -77,9 +77,14 @@ class KubeMonitorJobTest {
     @Test
     void checkWithTooManyRestarts() {
         var pod = pod("Running");
-        pod.status.containerStatuses.get(0).restartCount = 5;
+        PodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        status.ready = Boolean.FALSE;
+        status.restartCount = 5;
 
         assertThat(job.check(pod, ZonedDateTime.now())).isEqualTo("pod restarted too many times, restart=5");
+
+        status.ready = Boolean.TRUE;
+        assertThat(job.check(pod, ZonedDateTime.now())).isNull();
     }
 
     @Test

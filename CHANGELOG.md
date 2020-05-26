@@ -1,4 +1,7 @@
 ## Change log
+### 7.4.8 (05/26/2020 - )
+* monitor: fix kube monitor false alert with too many restarts (use neowu/monitor:7.4.8-b0 before releasing 7.4.8)
+
 ### 7.4.7 (05/25/2020 - 05/25/2020)
 * db: rename suppress flag method to Database.suppressSlowSQLWarning
 * monitor: use app/action/errorCode as group, show one group every 4 hours

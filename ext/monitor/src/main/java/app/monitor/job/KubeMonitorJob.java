@@ -77,10 +77,11 @@ public class KubeMonitorJob implements Job {
                 if (status.state.waiting != null && "CrashLoopBackOff".equals(status.state.waiting.reason)) {
                     return "CrashLoopBackOff: " + status.state.waiting.message;
                 }
-                if (status.restartCount >= 5) {
+                boolean containerReady = Boolean.TRUE.equals(status.ready);
+                if (!containerReady && status.restartCount >= 5) {
                     return "pod restarted too many times, restart=" + status.restartCount;
                 }
-                if (!Boolean.TRUE.equals(status.ready)) {
+                if (!containerReady) {
                     ready = false;
                 }
             }
