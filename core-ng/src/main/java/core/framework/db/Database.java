@@ -15,18 +15,18 @@ public interface Database {
      * disable warning then enable after<p>
      * e.g.
      * <blockquote><pre>
-     * Database.enableSlowSQLWarning(false)
-     * database.select(...)
-     * Database.enableSlowSQLWarning(true)
+     * Database.suppressSlowSQLWarning(false);
+     * database.select(...);
+     * Database.suppressSlowSQLWarning(true);
      * </pre></blockquote>
      *
-     * @param enable whether enable slow sql warning
+     * @param suppress whether suppress slow sql warning
      */
-    static void enableSlowSQLWarning(boolean enable) {
+    static void suppressSlowSQLWarning(boolean suppress) {
         // pass flag thru thread local to MySQLQueryInterceptor, and put in action log to reset for every action
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
-            actionLog.enableSlowSQLWarning = enable;
+            actionLog.suppressSlowSQLWarning = suppress;
         }
     }
 

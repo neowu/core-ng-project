@@ -49,7 +49,7 @@ public final class ActionLog {
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
-    public boolean enableSlowSQLWarning = true;
+    public boolean suppressSlowSQLWarning;
 
     public ActionLog(String message) {
         startTime = System.nanoTime();
@@ -110,7 +110,7 @@ public final class ActionLog {
         return trace || result.value >= WARN.value;
     }
 
-    String errorCode() {
+    public String errorCode() {
         if (errorCode != null) return errorCode;
         if (result.value >= WARN.value) return "UNASSIGNED";
         return null;

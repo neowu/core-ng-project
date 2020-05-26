@@ -47,23 +47,23 @@ public class MySQLQueryInterceptor implements QueryInterceptor {
         boolean noIndexUsed = serverSession.noIndexUsed();
         boolean badIndexUsed = serverSession.noGoodIndexUsed();
         if (noIndexUsed || badIndexUsed) {
-            boolean warning = isSlowSQLWarningEnabled();
+            boolean suppress = suppressSlowSQLWarning();
             String message = noIndexUsed ? "no index used" : "bad index used";
             String sqlValue = sql.get();
-            if (warning) {
-                LOGGER.warn(errorCode("SLOW_SQL"), "{}, sql={}", message, sqlValue);
-            } else {
+            if (suppress) {
                 LOGGER.debug("{}, sql={}", message, sqlValue);
+            } else {
+                LOGGER.warn(errorCode("SLOW_SQL"), "{}, sql={}", message, sqlValue);
             }
         }
         return null;
     }
 
-    private boolean isSlowSQLWarningEnabled() {
+    private boolean suppressSlowSQLWarning() {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog != null) {
-            return actionLog.enableSlowSQLWarning;
+            return actionLog.suppressSlowSQLWarning;
         }
-        return true;
+        return false;
     }
 }

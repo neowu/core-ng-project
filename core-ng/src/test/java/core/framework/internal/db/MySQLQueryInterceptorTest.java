@@ -3,6 +3,7 @@ package core.framework.internal.db;
 import com.mysql.cj.protocol.Resultset;
 import com.mysql.cj.protocol.ServerSession;
 import core.framework.db.Database;
+import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,13 +19,14 @@ import static org.mockito.Mockito.when;
 class MySQLQueryInterceptorTest {
     private MySQLQueryInterceptor interceptor;
     private LogManager logManager;
+    private ActionLog actionLog;
 
     @BeforeEach
     void createMySQLQueryInterceptor() {
         logManager = new LogManager();
         interceptor = new MySQLQueryInterceptor();
 
-        logManager.begin("begin");
+        actionLog = logManager.begin("begin");
     }
 
     @AfterEach
@@ -45,10 +47,13 @@ class MySQLQueryInterceptorTest {
     void postProcess() {
         ServerSession session = mock(ServerSession.class);
         when(session.noGoodIndexUsed()).thenReturn(Boolean.TRUE);
-        interceptor.postProcess(() -> "sql", null, null, session);
 
-        Database.enableSlowSQLWarning(false);
+        Database.suppressSlowSQLWarning(true);
         interceptor.postProcess(() -> "sql", null, null, session);
-        Database.enableSlowSQLWarning(true);
+        Database.suppressSlowSQLWarning(false);
+        assertThat(actionLog.errorCode()).isNull();
+
+        interceptor.postProcess(() -> "sql", null, null, session);
+        assertThat(actionLog.errorCode()).isEqualTo("SLOW_SQL");
     }
 }
