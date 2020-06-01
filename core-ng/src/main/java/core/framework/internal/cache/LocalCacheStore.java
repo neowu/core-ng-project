@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -60,12 +61,12 @@ public class LocalCacheStore implements CacheStore {
         logger.info("clean up local cache store");
         long now = System.currentTimeMillis();
         long currentSize = 0;
-        for (Map.Entry<String, CacheItem> entry : caches.entrySet()) {
-            CacheItem value = entry.getValue();
-            if (value.expired(now)) {
-                caches.remove(entry.getKey());
+        for (Iterator<CacheItem> iterator = caches.values().iterator(); iterator.hasNext(); ) {
+            CacheItem item = iterator.next();
+            if (item.expired(now)) {
+                iterator.remove();
             } else {
-                currentSize += value.value.length;
+                currentSize += item.value.length;
             }
         }
         if (currentSize > maxSize) {
@@ -94,10 +95,10 @@ public class LocalCacheStore implements CacheStore {
                 break;
             }
         }
-        for (Map.Entry<String, CacheItem> entry : caches.entrySet()) {
-            CacheItem value = entry.getValue();
-            if (value.hits <= minHits) {
-                caches.remove(entry.getKey());
+        for (Iterator<CacheItem> iterator = caches.values().iterator(); iterator.hasNext(); ) {
+            CacheItem item = iterator.next();
+            if (item.hits <= minHits) {
+                iterator.remove();
             }
         }
     }

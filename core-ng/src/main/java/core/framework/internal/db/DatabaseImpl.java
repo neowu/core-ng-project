@@ -143,7 +143,7 @@ public final class DatabaseImpl implements Database {
 
     private Driver createDriver(String driverClass) {
         try {
-            return (Driver) Class.forName(driverClass).getDeclaredConstructor().newInstance();
+            return Class.forName(driverClass).asSubclass(Driver.class).getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new Error(e);
         }

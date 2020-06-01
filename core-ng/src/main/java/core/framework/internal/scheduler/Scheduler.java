@@ -31,11 +31,11 @@ public final class Scheduler {
     private final ScheduledExecutorService scheduler;
     private final ExecutorService jobExecutor;
     private final LogManager logManager;
-    public Clock clock = Clock.systemDefaultZone();
+    public Clock clock = Clock.systemUTC();
 
     public Scheduler(LogManager logManager) {
         this(logManager, ThreadPools.singleThreadScheduler("scheduler-"),
-            ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 4, "scheduler-job-"));
+                ThreadPools.cachedThreadPool(Runtime.getRuntime().availableProcessors() * 4, "scheduler-job-"));
     }
 
     Scheduler(LogManager logManager, ScheduledExecutorService scheduler, ExecutorService jobExecutor) {
@@ -115,7 +115,7 @@ public final class Scheduler {
 
     void schedule(FixedRateTask task) {
         Duration delay = Duration.ofMillis((long) Randoms.nextDouble(1000, 3000)); // delay 1s to 3s to shuffle fix rated jobs
-        task.scheduledTime = ZonedDateTime.now().plus(delay);
+        task.scheduledTime = ZonedDateTime.now(clock).plus(delay);
         scheduler.scheduleAtFixedRate(() -> {
             ZonedDateTime scheduledTime = task.scheduledTime;
             ZonedDateTime next = task.scheduleNext();
@@ -138,7 +138,7 @@ public final class Scheduler {
     public void triggerNow(String name) {
         Task task = tasks.get(name);
         if (task == null) throw new NotFoundException("job not found, name=" + name);
-        submitJob(task, ZonedDateTime.now(), true);
+        submitJob(task, ZonedDateTime.now(clock), true);
     }
 
     private void submitJob(Task task, ZonedDateTime scheduledTime, boolean trace) {

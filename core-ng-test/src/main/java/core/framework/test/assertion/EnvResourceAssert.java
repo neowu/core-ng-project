@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,9 +26,12 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
         try {
             assertThat(actual).isDirectory();
 
-            List<Path> resourceDirs = Files.list(actual).filter(Files::isDirectory).map(path -> path.resolve("resources"))
-                                           .filter(Files::exists)
-                                           .collect(Collectors.toList());
+            List<Path> resourceDirs;
+            try (Stream<Path> stream = Files.list(actual)) {
+                resourceDirs = stream.filter(Files::isDirectory)
+                                     .map(path -> path.resolve("resources")).filter(Files::exists)
+                                     .collect(Collectors.toList());
+            }
 
             for (Path resourceDir : resourceDirs) {
                 assertThat(resourceDir).isDirectory();
@@ -46,18 +50,20 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
 
     private void assertOverridesDefault(Path resourceDir) throws IOException {
         Path defaultResourceDir = Paths.get("src/main/resources");
-        Files.walk(resourceDir).forEach(path -> {
-            Path defaultFile = defaultResourceDir.resolve(resourceDir.relativize(path));
-            assertThat(defaultFile).as("%s must override src/main/resources", defaultFile).exists();
-        });
+        try (Stream<Path> stream = Files.walk(resourceDir)) {
+            stream.forEach(path -> {
+                Path defaultFile = defaultResourceDir.resolve(resourceDir.relativize(path));
+                assertThat(defaultFile).as("%s must override src/main/resources", path).exists();
+            });
+        }
     }
 
     private void assertPropertyOverridesDefault(Path resourceDir) throws IOException {
         Path defaultResourceDir = Paths.get("src/main/resources");
-        List<Path> propertyFiles = Files.walk(resourceDir).filter(path -> Files.isDirectory(path) || path.toString().endsWith(".properties"))
-                                        .collect(Collectors.toList())
-                                        .stream().filter(Files::isRegularFile)
-                                        .collect(Collectors.toList());
+        List<Path> propertyFiles;
+        try (Stream<Path> stream = Files.walk(resourceDir).filter(path -> path.toString().endsWith(".properties"))) {
+            propertyFiles = stream.collect(Collectors.toList());
+        }
         for (Path propertyFile : propertyFiles) {
             Path defaultPropertyFile = defaultResourceDir.resolve(resourceDir.relativize(propertyFile));
             if (!Files.exists(defaultPropertyFile)) continue;   // for src/test/resources, ignore non override property file, conf/resources is checked by assertOverridesDefault
