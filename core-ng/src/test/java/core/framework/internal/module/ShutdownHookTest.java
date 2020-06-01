@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,13 +56,25 @@ class ShutdownHookTest {
 
     @Test
     void shutdownTimeoutInMs() {
-        assertThat(shutdownHook.shutdownTimeoutInMs(Map.of())).isEqualTo(25000);    // default is 25s
+        assertThat(shutdownHook.shutdownTimeoutInMs(Map.of())).isEqualTo(Duration.ofSeconds(25).toMillis());    // default is 25s
 
         assertThat(shutdownHook.shutdownTimeoutInMs(Map.of("SHUTDOWN_TIMEOUT_IN_SEC", "60")))
-            .isEqualTo(60000);
+                .isEqualTo(Duration.ofSeconds(60).toMillis());
 
         assertThatThrownBy(() -> shutdownHook.shutdownTimeoutInMs(Map.of("SHUTDOWN_TIMEOUT_IN_SEC", "-1")))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("greater than 0");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("greater than 0");
+    }
+
+    @Test
+    void shutdownDelayInMs() {
+        assertThat(shutdownHook.shutdownDelayInMs(Map.of())).isEqualTo(-1);    // default to no delay
+
+        assertThat(shutdownHook.shutdownDelayInMs(Map.of("SHUTDOWN_DELAY_IN_SEC", "10")))
+                .isEqualTo(Duration.ofSeconds(10).toMillis());
+
+        assertThatThrownBy(() -> shutdownHook.shutdownDelayInMs(Map.of("SHUTDOWN_DELAY_IN_SEC", "-1")))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("greater than 0");
     }
 }

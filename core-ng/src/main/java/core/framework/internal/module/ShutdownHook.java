@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,25 +28,43 @@ public final class ShutdownHook implements Runnable {
     public static final int STAGE_9 = 9;    // finally stop the http server, to make sure it responses to incoming requests during shutdown
 
     final Thread thread = new Thread(this, "shutdown");
+    private final long shutdownDelayInMs;
     private final long shutdownTimeoutInMs;
     private final LogManager logManager;
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
     private final ShutdownStage[] stages = new ShutdownStage[STAGE_9 + 1];
 
     ShutdownHook(LogManager logManager) {
-        shutdownTimeoutInMs = shutdownTimeoutInMs(System.getenv());
+        Map<String, String> env = System.getenv();
+        shutdownDelayInMs = shutdownDelayInMs(env);
+        shutdownTimeoutInMs = shutdownTimeoutInMs(env);
         this.logManager = logManager;
         Runtime.getRuntime().addShutdownHook(thread);
+    }
+
+    // in kube env, once Pod is set to the “Terminating” State,
+    // api-server remove pod from endpoint, and notify kubelet pod deletion simultaneously
+    // kube-proxy watches endpoint changes, and modify iptables accordingly
+    // put delay to make sure kube-proxy update iptables before pod stops serving new requests, to reduce connection errors / 503
+    // (client still needs retry)
+    long shutdownDelayInMs(Map<String, String> env) {
+        String shutdownDelay = env.get("SHUTDOWN_DELAY_IN_SEC");
+        if (shutdownDelay != null) {
+            long delay = Long.parseLong(shutdownDelay) * 1000;
+            if (delay <= 0) throw new Error("shutdown delay must be greater than 0, delay=" + shutdownDelay);
+            return delay;
+        }
+        return -1;
     }
 
     long shutdownTimeoutInMs(Map<String, String> env) {
         String shutdownTimeout = env.get("SHUTDOWN_TIMEOUT_IN_SEC");
         if (shutdownTimeout != null) {
-            Duration timeout = Duration.ofSeconds(Long.parseLong(shutdownTimeout));
-            if (timeout.isZero() || timeout.isNegative()) throw new Error("shutdown timeout must be greater than 0, timeout=" + shutdownTimeout);
-            return timeout.toMillis();
+            long timeout = Long.parseLong(shutdownTimeout) * 1000;
+            if (timeout <= 0) throw new Error("shutdown timeout must be greater than 0, timeout=" + shutdownTimeout);
+            return timeout;
         }
-        return Duration.ofSeconds(25).toMillis(); // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
+        return 25000;   // default kube terminationGracePeriodSeconds is 30s, here give 25s try to stop important processes
     }
 
     public void add(int stage, Shutdown shutdown) {
@@ -57,6 +74,15 @@ public final class ShutdownHook implements Runnable {
 
     @Override
     public void run() {
+        if (shutdownDelayInMs > 0) {
+            try {
+                logger.info("delay {} ms prior to shutdown", shutdownDelayInMs);
+                Thread.sleep(shutdownDelayInMs);
+            } catch (InterruptedException e) {
+                logger.warn("sleep is interrupted", e);
+            }
+        }
+
         ActionLog actionLog = logManager.begin("=== shutdown begin ===");
         logContext(actionLog);
 
