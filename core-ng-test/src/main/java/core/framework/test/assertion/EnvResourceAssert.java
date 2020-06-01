@@ -26,12 +26,7 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
         try {
             assertThat(actual).isDirectory();
 
-            List<Path> resourceDirs;
-            try (Stream<Path> stream = Files.list(actual)) {
-                resourceDirs = stream.filter(Files::isDirectory)
-                                     .map(path -> path.resolve("resources")).filter(Files::exists)
-                                     .collect(Collectors.toList());
-            }
+            List<Path> resourceDirs = resourceDirs();
 
             for (Path resourceDir : resourceDirs) {
                 assertThat(resourceDir).isDirectory();
@@ -45,6 +40,14 @@ public class EnvResourceAssert extends AbstractAssert<EnvResourceAssert, Path> {
             }
         } catch (IOException e) {
             throw new AssertionError(e);
+        }
+    }
+
+    private List<Path> resourceDirs() throws IOException {
+        try (Stream<Path> stream = Files.list(actual)) {
+            return stream.filter(Files::isDirectory)
+                         .map(path -> path.resolve("resources")).filter(Files::exists)
+                         .collect(Collectors.toList());
         }
     }
 
