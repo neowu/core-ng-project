@@ -14,7 +14,7 @@ class KeyMatcher {
     boolean matches(String key) {
         int keyLength = key.length();
         int patternLength = pattern.length();
-        boolean state[][] = new boolean[keyLength + 1][patternLength + 1];
+        boolean[][] state = new boolean[keyLength + 1][patternLength + 1];
         state[0][0] = true;     // empty key matches empty pattern
         for (int i = 0; i < patternLength; i++) {
             if (pattern.charAt(i) == '*') state[0][i + 1] = state[0][i];    // whether first empty matches pattern

@@ -67,13 +67,13 @@ class ShutdownHookTest {
     }
 
     @Test
-    void shutdownDelayInMs() {
-        assertThat(shutdownHook.shutdownDelayInMs(Map.of())).isEqualTo(-1);    // default to no delay
+    void shutdownDelayInSec() {
+        assertThat(shutdownHook.shutdownDelayInSec(Map.of())).isEqualTo(-1);    // default to no delay
 
-        assertThat(shutdownHook.shutdownDelayInMs(Map.of("SHUTDOWN_DELAY_IN_SEC", "10")))
-                .isEqualTo(Duration.ofSeconds(10).toMillis());
+        assertThat(shutdownHook.shutdownDelayInSec(Map.of("SHUTDOWN_DELAY_IN_SEC", "10")))
+                .isEqualTo(10);
 
-        assertThatThrownBy(() -> shutdownHook.shutdownDelayInMs(Map.of("SHUTDOWN_DELAY_IN_SEC", "-1")))
+        assertThatThrownBy(() -> shutdownHook.shutdownDelayInSec(Map.of("SHUTDOWN_DELAY_IN_SEC", "-1")))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("greater than 0");
     }

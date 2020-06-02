@@ -28,7 +28,7 @@ public final class ShutdownHook implements Runnable {
     public static final int STAGE_9 = 9;    // finally stop the http server, to make sure it responses to incoming requests during shutdown
 
     final Thread thread = new Thread(this, "shutdown");
-    private final long shutdownDelayInMs;
+    private final long shutdownDelayInSec;
     private final long shutdownTimeoutInMs;
     private final LogManager logManager;
     private final Logger logger = LoggerFactory.getLogger(ShutdownHook.class);
@@ -36,7 +36,7 @@ public final class ShutdownHook implements Runnable {
 
     ShutdownHook(LogManager logManager) {
         Map<String, String> env = System.getenv();
-        shutdownDelayInMs = shutdownDelayInMs(env);
+        shutdownDelayInSec = shutdownDelayInSec(env);
         shutdownTimeoutInMs = shutdownTimeoutInMs(env);
         this.logManager = logManager;
         Runtime.getRuntime().addShutdownHook(thread);
@@ -47,10 +47,10 @@ public final class ShutdownHook implements Runnable {
     // kube-proxy watches endpoint changes, and modify iptables accordingly
     // put delay to make sure kube-proxy update iptables before pod stops serving new requests, to reduce connection errors / 503
     // (client still needs retry)
-    long shutdownDelayInMs(Map<String, String> env) {
+    long shutdownDelayInSec(Map<String, String> env) {
         String shutdownDelay = env.get("SHUTDOWN_DELAY_IN_SEC");
         if (shutdownDelay != null) {
-            long delay = Long.parseLong(shutdownDelay) * 1000;
+            long delay = Long.parseLong(shutdownDelay);
             if (delay <= 0) throw new Error("shutdown delay must be greater than 0, delay=" + shutdownDelay);
             return delay;
         }
@@ -74,10 +74,10 @@ public final class ShutdownHook implements Runnable {
 
     @Override
     public void run() {
-        if (shutdownDelayInMs > 0) {
+        if (shutdownDelayInSec > 0) {
             try {
-                logger.info("delay {} ms prior to shutdown", shutdownDelayInMs);
-                Thread.sleep(shutdownDelayInMs);
+                logger.info("delay {} seconds prior to shutdown", shutdownDelayInSec);
+                Thread.sleep(shutdownDelayInSec * 1000);
             } catch (InterruptedException e) {
                 logger.warn("sleep is interrupted", e);
             }

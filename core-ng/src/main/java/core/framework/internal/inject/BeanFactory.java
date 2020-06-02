@@ -128,7 +128,7 @@ public class BeanFactory {
     }
 
     private boolean isTypeOf(Object instance, Type type) {
-        if (type instanceof Class) return ((Class) type).isInstance(instance);
+        if (type instanceof Class) return ((Class<?>) type).isInstance(instance);
         if (type instanceof ParameterizedType) return isTypeOf(instance, ((ParameterizedType) type).getRawType());
         throw new Error("not supported type, type=" + type.getTypeName());
     }
