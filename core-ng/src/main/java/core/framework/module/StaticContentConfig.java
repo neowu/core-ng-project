@@ -4,8 +4,6 @@ import core.framework.internal.web.site.StaticContentController;
 
 import java.time.Duration;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -17,7 +15,7 @@ public final class StaticContentConfig {
     }
 
     public void cache(Duration maxAge) {
-        if (maxAge == null || maxAge.getSeconds() <= 0) throw new Error(format("maxAge must be greater than 0, maxAge={}", maxAge));
+        if (maxAge == null || maxAge.getSeconds() <= 0) throw new Error("maxAge must be greater than 0, maxAge=" + maxAge);
         controller.cache(maxAge);
     }
 }

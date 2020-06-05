@@ -56,6 +56,7 @@ public class SiteConfig extends Config {
         context.httpServer.siteManager.templateManager.add(path, modelClass);
     }
 
+    // this is only for POC or local testing, in cloud env, all static content should be served from LB + AWS S3/Google Storage/Azure Storage Account
     public StaticContentConfig staticContent(String path) {
         logger.info("add static content path, path={}", path);
         Path contentPath = context.httpServer.siteManager.webDirectory.path(path);

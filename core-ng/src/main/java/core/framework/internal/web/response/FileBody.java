@@ -1,5 +1,7 @@
 package core.framework.internal.web.response;
 
+import core.framework.log.ErrorCode;
+import core.framework.log.Severity;
 import io.undertow.io.IoCallback;
 import io.undertow.io.Sender;
 import io.undertow.server.HttpServerExchange;
@@ -9,6 +11,7 @@ import org.xnio.IoUtils;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -35,7 +38,7 @@ public final class FileBody implements Body {
         }
     }
 
-    private static class FileBodyCallback implements IoCallback {
+    static class FileBodyCallback implements IoCallback {
         private final FileChannel channel;
 
         FileBodyCallback(FileChannel channel) {
@@ -52,7 +55,33 @@ public final class FileBody implements Body {
         public void onException(HttpServerExchange exchange, Sender sender, IOException exception) {
             IoUtils.safeClose(channel);
             END_EXCHANGE.onException(exchange, sender, exception);
-            throw new UncheckedIOException(exception);
+            throw convertException(exception);
+        }
+
+        UncheckedIOException convertException(IOException exception) {
+            // convert client abort exception to warning, e.g. user closed browser before content is transferred completely
+            if (exception instanceof ClosedChannelException) {
+                return new ClientAbortException(exception);
+            }
+            return new UncheckedIOException(exception);
+        }
+    }
+
+    static class ClientAbortException extends UncheckedIOException implements ErrorCode {
+        private static final long serialVersionUID = 3981103270777664274L;
+
+        ClientAbortException(IOException cause) {
+            super(cause);
+        }
+
+        @Override
+        public String errorCode() {
+            return "CHANNEL_CLOSED";
+        }
+
+        @Override
+        public Severity severity() {
+            return Severity.WARN;
         }
     }
 }

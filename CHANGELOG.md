@@ -1,4 +1,7 @@
 ## Change log
+### 7.4.9 (06/04/2020 - )
+* http: for static content controllers, convert client abort exception to warning (still better use CDN/Storage solution to serve static resources)
+
 ### 7.4.8 (05/26/2020 - 06/02/2020)
 * monitor: fix kube monitor false alert with too many restarts (use neowu/monitor:7.4.8-b0 before releasing 7.4.8)
 * shutdown: support env SHUTDOWN_DELAY_IN_SEC / SHUTDOWN_TIMEOUT_IN_SEC to fine control graceful shutdown in kube env (check source to see details)
