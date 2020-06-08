@@ -62,20 +62,7 @@ public class EventController {
         if (origin != null)
             checkOrigin(origin);    // allow directly call, e.g. mobile app
 
-        Instant now = Instant.now();
-        String app = request.pathParam("app");
-
-        SendEventRequest eventRequest = sendEventRequest(request);
-        if (eventRequest != null) {
-            String userAgent = request.header(HTTPHeaders.USER_AGENT).orElse(null);
-            String clientIP = request.clientIP();
-            List<Cookie> cookies = cookies(request);
-            for (SendEventRequest.Event event : eventRequest.events) {
-                EventMessage message = message(event, app, now);
-                addContext(message.context, userAgent, cookies, clientIP);
-                eventMessagePublisher.publish(message.id, message);
-            }
-        }
+        processEvents(request, Instant.now());
 
         Response response = Response.empty();
         if (origin != null) {
@@ -84,6 +71,21 @@ public class EventController {
             response.header("Access-Control-Allow-Credentials", "true");
         }
         return response;
+    }
+
+    private void processEvents(Request request, Instant now) {
+        SendEventRequest eventRequest = sendEventRequest(request);
+        if (eventRequest == null) return;
+
+        String app = request.pathParam("app");
+        String userAgent = request.header(HTTPHeaders.USER_AGENT).orElse(null);
+        String clientIP = request.clientIP();
+        List<Cookie> cookies = cookies(request);
+        for (SendEventRequest.Event event : eventRequest.events) {
+            EventMessage message = message(event, app, now);
+            addContext(message.context, userAgent, cookies, clientIP);
+            eventMessagePublisher.publish(message.id, message);
+        }
     }
 
     void addContext(Map<String, String> context, String userAgent, List<Cookie> cookies, String clientIP) {
