@@ -2,30 +2,46 @@ package core.framework.internal.web.http;
 
 import core.framework.internal.util.LRUMap;
 import core.framework.util.Maps;
+import core.framework.web.exception.TooManyRequestsException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
-class RateLimiter {
-    private final Logger logger = LoggerFactory.getLogger(RateLimiter.class);
-    private final Map<String, RateConfig> config = Maps.newHashMap();
-    private final LRUMap<String, Rate> rates;
+public class RateControl {
+    private final Logger logger = LoggerFactory.getLogger(RateControl.class);
+    private final int maxEntries;
 
-    RateLimiter(int maxEntries) {
-        rates = new LRUMap<>(maxEntries);
+    public Map<String, RateConfig> config;
+    private LRUMap<String, Rate> rates;
+
+    public RateControl(int maxEntries) {
+        this.maxEntries = maxEntries;
     }
 
+    // config is always called during initialization, so no concurrency issue
     public void config(String group, int maxPermits, int fillRate, TimeUnit unit) {
+        synchronized (this) {
+            if (config == null) {
+                config = Maps.newHashMap();
+                rates = new LRUMap<>(maxEntries);
+            }
+        }
         double fillRatePerNano = ratePerNano(fillRate, unit);
         RateConfig previous = config.put(group, new RateConfig(maxPermits, fillRatePerNano));
-        if (previous != null) throw new Error(format("found duplicate group, group={}", group));
+        if (previous != null) throw new Error("found duplicate group, group=" + group);
+    }
+
+    public void validateRate(String group, String clientIP) {
+        logger.debug("acquire, group={}, clientIP={}", group, clientIP);
+        boolean acquired = acquire(group, clientIP);
+        if (!acquired) {
+            throw new TooManyRequestsException("rate exceeded");
+        }
     }
 
     double ratePerNano(int rate, TimeUnit unit) {
@@ -42,7 +58,7 @@ class RateLimiter {
 
         String key = group + "/" + clientIP;
         Rate rate;
-        synchronized (rates) {
+        synchronized (this) {
             rate = rates.computeIfAbsent(key, k -> new Rate(config.maxPermits));
         }
         long currentTime = System.nanoTime();

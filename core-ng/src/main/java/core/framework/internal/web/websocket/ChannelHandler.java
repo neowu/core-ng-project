@@ -3,6 +3,8 @@ package core.framework.internal.web.websocket;
 import core.framework.internal.web.bean.BeanMapper;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
+import core.framework.web.rate.LimitRate;
+import core.framework.web.websocket.Channel;
 import core.framework.web.websocket.ChannelListener;
 
 import java.io.UncheckedIOException;
@@ -14,7 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class ChannelHandler {
     final ChannelListener<Object> listener;
-
+    final LimitRate limitRate;  // only supported annotation currently
     private final BeanMapper<Object> clientMessageMapper;
     private final Class<?> serverMessageClass;
     private final BeanMapper<Object> serverMessageMapper;
@@ -25,6 +27,11 @@ public class ChannelHandler {
         this.serverMessageClass = serverMessageClass;
         this.serverMessageMapper = (BeanMapper<Object>) serverMessageMapper;
         this.listener = (ChannelListener<Object>) listener;
+        try {
+            limitRate = listener.getClass().getDeclaredMethod("onMessage", Channel.class, Object.class).getDeclaredAnnotation(LimitRate.class);
+        } catch (NoSuchMethodException e) {
+            throw new Error(e);
+        }
     }
 
     String toServerMessage(Object message) {

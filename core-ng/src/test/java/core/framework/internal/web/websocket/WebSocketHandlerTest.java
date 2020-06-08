@@ -30,7 +30,7 @@ class WebSocketHandlerTest {
     void createWebSocketHandler() {
         sessionManager = mock(SessionManager.class);
 
-        handler = new WebSocketHandler(new LogManager(), sessionManager);
+        handler = new WebSocketHandler(new LogManager(), sessionManager, null);
     }
 
     @Test

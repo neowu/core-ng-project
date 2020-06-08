@@ -13,7 +13,7 @@ class WebSocketMessageListenerTest {
 
     @BeforeEach
     void createWebSocketMessageListener() {
-        listener = new WebSocketMessageListener(null);
+        listener = new WebSocketMessageListener(null, null);
     }
 
     @Test

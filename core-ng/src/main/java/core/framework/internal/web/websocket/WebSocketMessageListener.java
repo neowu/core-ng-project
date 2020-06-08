@@ -2,6 +2,7 @@ package core.framework.internal.web.websocket;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.web.http.RateControl;
 import io.undertow.websockets.core.AbstractReceiveListener;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.CloseMessage;
@@ -19,9 +20,11 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     private static final long MAX_TEXT_MESSAGE_SIZE = 10L * 1024 * 1024;     // 10M as max text message size to match max POST entity
     private final Logger logger = LoggerFactory.getLogger(WebSocketMessageListener.class);
     private final LogManager logManager;
+    private final RateControl rateControl;
 
-    WebSocketMessageListener(LogManager logManager) {
+    WebSocketMessageListener(LogManager logManager, RateControl rateControl) {
         this.logManager = logManager;
+        this.rateControl = rateControl;
     }
 
     @Override
@@ -36,6 +39,8 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
             logger.debug("[channel] message={}", data);     // not mask, assume ws message not containing sensitive info, the data can be json or plain text
             actionLog.track("ws", 0, 1, 0);
 
+            validateRate(wrapper);
+
             Object message = wrapper.handler.fromClientMessage(data);
             wrapper.handler.listener.onMessage(wrapper, message);
         } catch (Throwable e) {
@@ -43,6 +48,12 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
             WebSockets.sendClose(CloseMessage.UNEXPECTED_ERROR, e.getMessage(), channel, ChannelCallback.INSTANCE);
         } finally {
             logManager.end("=== ws message handling end ===");
+        }
+    }
+
+    private void validateRate(ChannelImpl wrapper) {
+        if (rateControl.config != null && wrapper.handler.limitRate != null) {
+            rateControl.validateRate(wrapper.handler.limitRate.value(), wrapper.clientIP);
         }
     }
 

@@ -35,7 +35,7 @@ public final class WebSocketConfig {
 
         BeanMappers beanMappers = context.httpServer.handler.beanMappers;
         if (context.httpServer.handler.webSocketHandler == null) {
-            context.httpServer.handler.webSocketHandler = new WebSocketHandler(context.logManager, context.httpServer.siteManager.sessionManager);
+            context.httpServer.handler.webSocketHandler = new WebSocketHandler(context.logManager, context.httpServer.siteManager.sessionManager, context.httpServer.handler.rateControl);
             context.beanFactory.bind(WebSocketContext.class, null, context.httpServer.handler.webSocketHandler.context);
         }
         BeanClassNameValidator beanClassNameValidator = context.serviceRegistry.beanClassNameValidator;

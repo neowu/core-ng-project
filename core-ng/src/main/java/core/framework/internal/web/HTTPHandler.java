@@ -10,6 +10,7 @@ import core.framework.internal.web.controller.Interceptors;
 import core.framework.internal.web.controller.InvocationImpl;
 import core.framework.internal.web.controller.WebContextImpl;
 import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.internal.web.http.RateControl;
 import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.request.RequestParser;
 import core.framework.internal.web.response.ResponseHandler;
@@ -46,6 +47,7 @@ public class HTTPHandler implements HttpHandler {
     public final BeanMappers beanMappers = new BeanMappers();
     public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanMappers);
     public final ResponseBeanMapper responseBeanMapper = new ResponseBeanMapper(beanMappers);
+    public final RateControl rateControl = new RateControl(1000);   // save at max 1000 group/ip combination
 
     private final Logger logger = LoggerFactory.getLogger(HTTPHandler.class);
     private final LogManager logManager;

@@ -4,6 +4,8 @@ import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.web.bean.BeanMapper;
 import core.framework.internal.web.bean.BeanMappers;
 import core.framework.web.exception.BadRequestException;
+import core.framework.web.websocket.Channel;
+import core.framework.web.websocket.ChannelListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,21 +22,21 @@ class ChannelHandlerTest {
     @BeforeEach
     void createChannelHandler() {
         BeanMapper<TestBean> mapper = new BeanMappers().register(TestBean.class, new BeanClassNameValidator());
-        beanHandler = new ChannelHandler(mapper, TestBean.class, mapper, null);
-        stringHandler = new ChannelHandler(null, String.class, null, null);
+        beanHandler = new ChannelHandler(mapper, TestBean.class, mapper, new TestBeanListener());
+        stringHandler = new ChannelHandler(null, String.class, null, new TestStringListener());
     }
 
     @Test
     void toServerMessage() {
         assertThat(stringHandler.toServerMessage("message")).isEqualTo("message");
         assertThatThrownBy(() -> stringHandler.toServerMessage(new TestBean()))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("message class does not match");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("message class does not match");
 
         assertThat(beanHandler.toServerMessage(new TestBean())).isEqualTo("{}");
         assertThatThrownBy(() -> beanHandler.toServerMessage("message"))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("message class does not match");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("message class does not match");
     }
 
     @Test
@@ -42,9 +44,21 @@ class ChannelHandlerTest {
         assertThat(stringHandler.fromClientMessage("message")).isEqualTo("message");
 
         assertThatThrownBy(() -> beanHandler.fromClientMessage("message"))
-            .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     public static class TestBean {
+    }
+
+    static class TestBeanListener implements ChannelListener<TestBean> {
+        @Override
+        public void onMessage(Channel channel, TestBean message) {
+        }
+    }
+
+    static class TestStringListener implements ChannelListener<String> {
+        @Override
+        public void onMessage(Channel channel, String message) {
+        }
     }
 }

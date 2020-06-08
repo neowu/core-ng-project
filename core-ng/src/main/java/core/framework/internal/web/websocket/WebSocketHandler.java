@@ -3,6 +3,7 @@ package core.framework.internal.web.websocket;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.internal.web.http.RateControl;
 import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.util.Sets;
@@ -45,10 +46,10 @@ public class WebSocketHandler {
     private final SessionManager sessionManager;
     private final LogManager logManager;
 
-    public WebSocketHandler(LogManager logManager, SessionManager sessionManager) {
+    public WebSocketHandler(LogManager logManager, SessionManager sessionManager, RateControl rateControl) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
-        messageListener = new WebSocketMessageListener(logManager);
+        messageListener = new WebSocketMessageListener(logManager, rateControl);
     }
 
     public boolean checkWebSocket(HTTPMethod method, HeaderMap headers) {
