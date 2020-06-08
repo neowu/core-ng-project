@@ -1,6 +1,7 @@
 package core.log.web;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.http.ContentType;
 import core.framework.http.HTTPHeaders;
 import core.framework.inject.Inject;
 import core.framework.internal.log.LogManager;
@@ -61,18 +62,19 @@ public class EventController {
         if (origin != null)
             checkOrigin(origin);    // allow directly call, e.g. mobile app
 
-        String app = request.pathParam("app");
-        String userAgent = request.header(HTTPHeaders.USER_AGENT).orElse(null);
         Instant now = Instant.now();
-        String clientIP = request.clientIP();
-        List<Cookie> cookies = cookies(request);
+        String app = request.pathParam("app");
 
         SendEventRequest eventRequest = sendEventRequest(request);
-
-        for (SendEventRequest.Event event : eventRequest.events) {
-            EventMessage message = message(event, app, now);
-            addContext(message.context, userAgent, cookies, clientIP);
-            eventMessagePublisher.publish(message.id, message);
+        if (eventRequest != null) {
+            String userAgent = request.header(HTTPHeaders.USER_AGENT).orElse(null);
+            String clientIP = request.clientIP();
+            List<Cookie> cookies = cookies(request);
+            for (SendEventRequest.Event event : eventRequest.events) {
+                EventMessage message = message(event, app, now);
+                addContext(message.context, userAgent, cookies, clientIP);
+                eventMessagePublisher.publish(message.id, message);
+            }
         }
 
         Response response = Response.empty();
@@ -116,7 +118,13 @@ public class EventController {
     // only work around is to allow client side sends simple request to bypass CORS check, which requires content-type=text/plain
     // refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
     SendEventRequest sendEventRequest(Request request) {
-        byte[] body = request.body().orElseThrow(() -> new BadRequestException("body must not be null", "INVALID_HTTP_REQUEST"));
+        byte[] body = request.body().orElse(null);
+        if (body == null) {
+            String contentType = request.header(HTTPHeaders.CONTENT_TYPE).orElse(null);
+            // different browser/privacy setting/plugin impact sendBeacon behaviour, here to ignore empty body if not ajax with application/json
+            if (contentType == null || contentType.startsWith(ContentType.TEXT_PLAIN.mediaType)) return null;
+            throw new BadRequestException("body must not be null", "INVALID_HTTP_REQUEST");
+        }
         SendEventRequest eventRequest = Bean.fromJSON(SendEventRequest.class, new String(body, StandardCharsets.UTF_8));
         validator.validate(eventRequest);
         return eventRequest;

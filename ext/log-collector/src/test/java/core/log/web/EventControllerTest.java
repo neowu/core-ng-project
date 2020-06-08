@@ -1,11 +1,14 @@
 package core.log.web;
 
+import core.framework.http.ContentType;
+import core.framework.http.HTTPHeaders;
 import core.framework.inject.Inject;
 import core.framework.json.Bean;
 import core.framework.log.message.EventMessage;
 import core.framework.util.Strings;
 import core.framework.web.CookieSpec;
 import core.framework.web.Request;
+import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.ForbiddenException;
 import core.log.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,6 +120,20 @@ class EventControllerTest extends IntegrationTest {
         SendEventRequest parsedSendEventRequest = controller.sendEventRequest(request);
 
         assertThat(parsedSendEventRequest).usingRecursiveComparison().isEqualTo(sendEventRequest);
+    }
+
+    @Test
+    void sendEventRequestWithEmptyBody() {
+        var controller = new EventController(List.of(), null);
+
+        when(request.body()).thenReturn(Optional.empty());
+        when(request.header(HTTPHeaders.CONTENT_TYPE)).thenReturn(Optional.of(ContentType.APPLICATION_JSON.toString()));
+        assertThatThrownBy(() -> controller.sendEventRequest(request))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("body must not be null");
+
+        when(request.header(HTTPHeaders.CONTENT_TYPE)).thenReturn(Optional.of(ContentType.TEXT_PLAIN.toString()));
+        assertThat(controller.sendEventRequest(request)).isNull();
     }
 
     @Test
