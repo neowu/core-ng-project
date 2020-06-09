@@ -1,5 +1,7 @@
 package core.framework.internal.web.websocket;
 
+import core.framework.api.json.Property;
+import core.framework.api.validate.NotNull;
 import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.web.bean.BeanMapper;
 import core.framework.internal.web.bean.BeanMappers;
@@ -28,12 +30,14 @@ class ChannelHandlerTest {
 
     @Test
     void toServerMessage() {
+        var bean = new TestBean();
+        bean.value = "value";
         assertThat(stringHandler.toServerMessage("message")).isEqualTo("message");
-        assertThatThrownBy(() -> stringHandler.toServerMessage(new TestBean()))
+        assertThatThrownBy(() -> stringHandler.toServerMessage(bean))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("message class does not match");
 
-        assertThat(beanHandler.toServerMessage(new TestBean())).isEqualTo("{}");
+        assertThat(beanHandler.toServerMessage(bean)).isEqualTo("{\"value\":\"value\"}");
         assertThatThrownBy(() -> beanHandler.toServerMessage("message"))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("message class does not match");
@@ -44,10 +48,18 @@ class ChannelHandlerTest {
         assertThat(stringHandler.fromClientMessage("message")).isEqualTo("message");
 
         assertThatThrownBy(() -> beanHandler.fromClientMessage("message"))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(BadRequestException.class)
+                .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_WS_MESSAGE"));
+
+        assertThatThrownBy(() -> beanHandler.fromClientMessage("{}"))
+                .isInstanceOf(BadRequestException.class)
+                .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("VALIDATION_ERROR"));
     }
 
     public static class TestBean {
+        @NotNull
+        @Property(name = "value")
+        public String value;
     }
 
     static class TestBeanListener implements ChannelListener<TestBean> {

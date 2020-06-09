@@ -1,5 +1,6 @@
 package core.framework.internal.web.websocket;
 
+import core.framework.internal.validate.ValidationException;
 import core.framework.internal.web.bean.BeanMapper;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
@@ -47,6 +48,8 @@ public class ChannelHandler {
         try {
             if (clientMessageMapper == null) return message;
             return clientMessageMapper.fromJSON(Strings.bytes(message));
+        } catch (ValidationException e) {
+            throw new BadRequestException(e.getMessage(), e.errorCode(), e);
         } catch (UncheckedIOException e) {  // for invalid json string
             throw new BadRequestException(e.getMessage(), "INVALID_WS_MESSAGE", e);
         }

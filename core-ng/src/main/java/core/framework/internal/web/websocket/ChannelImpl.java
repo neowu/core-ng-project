@@ -4,7 +4,6 @@ import core.framework.log.ActionLogContext;
 import core.framework.util.Sets;
 import core.framework.util.StopWatch;
 import core.framework.web.websocket.Channel;
-import io.undertow.websockets.core.CloseMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class ChannelImpl implements Channel, Channel.Context {
     public void close() {
         var watch = new StopWatch();
         try {
-            WebSockets.sendClose(CloseMessage.NORMAL_CLOSURE, null, channel, ChannelCallback.INSTANCE);
+            WebSockets.sendClose(WebSocketCloseCodes.NORMAL_CLOSURE, null, channel, ChannelCallback.INSTANCE);
         } finally {
             long elapsed = watch.elapsed();
             ActionLogContext.track("ws", elapsed, 0, 1);

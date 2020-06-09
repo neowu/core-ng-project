@@ -3,6 +3,8 @@
 * http: for static content controllers, convert client abort exception to warning (still better use CDN/Storage solution to serve static resources)
 * log-collector: ignore sendBeacon request with empty body, (browser/privacy/plugin may impact sendBeacon's behavior)
 * ws: support limitRate for websocket message listener
+* ws: return appropriated close code according to exception type
+* es: update to 7.7.1
 
 ### 7.4.8 (05/26/2020 - 06/02/2020)
 * monitor: fix kube monitor false alert with too many restarts (use neowu/monitor:7.4.8-b0 before releasing 7.4.8)

@@ -23,9 +23,9 @@ import static core.framework.util.Strings.format;
  */
 public class TemplateManager {
     public final CDNManager cdnManager = new CDNManager();
+    private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
     private final Map<String, Map<String, HTMLTemplate>> templates = Maps.newConcurrentHashMap();    // path->language->template
     private final MessageImpl message;
-    private final Logger logger = LoggerFactory.getLogger(TemplateManager.class);
     private final Map<String, Instant> templateLastModifiedTimes = Maps.newConcurrentHashMap();
     private final WebDirectory webDirectory;
 

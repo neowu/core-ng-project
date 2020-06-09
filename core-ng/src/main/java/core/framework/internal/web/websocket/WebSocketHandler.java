@@ -13,7 +13,6 @@ import core.framework.web.exception.NotFoundException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
-import io.undertow.websockets.core.CloseMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.core.WebSockets;
 import io.undertow.websockets.core.protocol.Handshake;
@@ -108,7 +107,7 @@ public class WebSocketHandler {
 
     public void shutdown() {
         for (var channel : channels) {
-            WebSockets.sendClose(CloseMessage.GOING_AWAY, "server is shutting down", channel, ChannelCallback.INSTANCE);
+            WebSockets.sendClose(WebSocketCloseCodes.SERVICE_RESTART, "server is shutting down", channel, ChannelCallback.INSTANCE);
         }
     }
 
