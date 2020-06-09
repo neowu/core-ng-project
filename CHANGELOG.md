@@ -1,5 +1,5 @@
 ## Change log
-### 7.4.9 (06/04/2020 - )
+### 7.4.9 (06/04/2020 - 06/09/2020)
 * http: for static content controllers, convert client abort exception to warning (still better use CDN/Storage solution to serve static resources)
 * log-collector: ignore sendBeacon request with empty body, (browser/privacy/plugin may impact sendBeacon's behavior)
 * ws: support limitRate for websocket message listener
