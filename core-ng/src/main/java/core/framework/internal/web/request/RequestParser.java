@@ -118,7 +118,7 @@ public final class RequestParser {
             String userAgent = headers.getFirst(Headers.USER_AGENT);
             if (userAgent != null) actionLog.context("user_agent", userAgent);
             String referer = headers.getFirst(Headers.REFERER);
-            if (referer != null) actionLog.context("referer", referer);
+            if (referer != null) actionLog.context("referer", Strings.truncate(referer, 1000));     // referer passed from browser can be long
         }
     }
 
