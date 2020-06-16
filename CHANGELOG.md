@@ -1,5 +1,6 @@
 ## Change log
 ### 7.4.10 (06/10/2020 - )
+* monitor: tweak kube monitor pod not ready error message
 
 ### 7.4.9 (06/04/2020 - 06/09/2020)
 * http: for static content controllers, convert client abort exception to warning (still better use CDN/Storage solution to serve static resources)

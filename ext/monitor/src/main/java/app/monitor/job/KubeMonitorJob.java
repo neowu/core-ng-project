@@ -90,7 +90,8 @@ public class KubeMonitorJob implements Job {
         ZonedDateTime startTime = pod.status.startTime != null ? pod.status.startTime : pod.metadata.creationTimestamp;  // startTime may not be populated yet if pod is just created
         Duration elapsed = Duration.between(startTime, now);
         if (elapsed.toSeconds() >= 300) {
-            return "pod is still not ready, elapsed=" + elapsed;
+            // can be: 1) took long to be ready after start, or 2) readiness check failed in the middle run
+            return "pod is not in ready state, uptime=" + elapsed;
         }
         return null;
     }
