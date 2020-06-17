@@ -40,7 +40,7 @@ public class StatCollector {
 
         collectCPUUsage(stats);
         stats.put("thread_count", thread.getThreadCount());
-        collectHeapUsage(stats);
+        collectMemoryUsage(stats);
 
         for (GCStat gcStat : gcStats) {
             long count = gcStat.count();
@@ -53,13 +53,16 @@ public class StatCollector {
         return stats;
     }
 
-    private void collectHeapUsage(Stats stats) {
-        MemoryUsage usage = memory.getHeapMemoryUsage();
-        double usedHeap = usage.getUsed();
-        double maxHeap = usage.getMax();
+    private void collectMemoryUsage(Stats stats) {
+        MemoryUsage heapUsage = memory.getHeapMemoryUsage();
+        double usedHeap = heapUsage.getUsed();
+        double maxHeap = heapUsage.getMax();
         stats.put("jvm_heap_used", usedHeap);
         stats.put("jvm_heap_max", maxHeap);
         stats.checkHighUsage(usedHeap / maxHeap, highHeapUsageThreshold, "heap");
+
+        MemoryUsage nonHeapUsage = memory.getNonHeapMemoryUsage();
+        stats.put("jvm_non_heap_used", nonHeapUsage.getUsed());
     }
 
     private void collectCPUUsage(Stats stats) {

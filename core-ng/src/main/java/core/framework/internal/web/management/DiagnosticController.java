@@ -33,6 +33,7 @@ public class DiagnosticController {
         return Response.text(invoke("gcClassHistogram"));
     }
 
+    // use "jcmd pid help" to list all operations
     private String invoke(String operation) {
         try {
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();

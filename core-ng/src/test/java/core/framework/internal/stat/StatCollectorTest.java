@@ -20,6 +20,6 @@ class StatCollectorTest {
     void collect() {
         Stats stats = collector.collect();
 
-        assertThat(stats.stats).containsKeys("cpu_usage", "thread_count", "jvm_heap_used", "jvm_heap_max");
+        assertThat(stats.stats).containsKeys("cpu_usage", "thread_count", "jvm_heap_used", "jvm_heap_max", "jvm_non_heap_used");
     }
 }
