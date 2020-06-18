@@ -1,17 +1,16 @@
 ### ideas
 * redis: support cluster, https://github.com/RedisLabs/redis-cluster-proxy / https://github.com/twitter/twemproxy
-* inject: remove method inject support? 
 * template, use ByteBuffer[] for performance?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * mongo: update entity decoder to use switch(fieldName) to replace if statement? (optimization)
 * cache: hit rate report? cluster support? envoy?
-* framework error (queue listener, background task error, customer scheduler trigger) forward to kafka?
+* framework error (queue listener, background task error, custom scheduler trigger) forward to kafka?
 
 * change gradle to kotlin?
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
 * rethink module structure to fit java module export requirement
 
-* /_sys/, kafka controller, should be calling message handler directly?
+* /_sys/, kafka controller, should call message handler directly?
 * revisit trace log truncation, better/more elegant handling?
 * write unit test support to check break compatibility of API/DB?
 

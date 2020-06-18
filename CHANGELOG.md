@@ -1,8 +1,11 @@
 ## Change log
-### 7.4.10 (06/10/2020 - )
+### 7.4.10 (06/10/2020 - 06/18/2020)
 * monitor: tweak kube monitor pod not ready error message
 * stats: track jvm_non_heap_used by default
 * cache: gracefully handle incompatible json structure from redis, to avoid clearing cache keys manually
+* inject: remove method injection support
+    !!! from the actual usage, only method injection use case is to do init with dependencies we don't want to put in fields, 
+        but generally we prefer calling init method explicitly in modules to make review easier.  
 
 ### 7.4.9 (06/04/2020 - 06/09/2020)
 * http: for static content controllers, convert client abort exception to warning (still better use CDN/Storage solution to serve static resources)

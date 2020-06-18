@@ -48,10 +48,6 @@ class BeanFactoryTest {
         assertThatThrownBy(() -> beanFactory.create(BeanWithInjectStaticField.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("static field must not have @Inject");
-
-        assertThatThrownBy(() -> beanFactory.create(BeanWithInjectStaticMethod.class))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("static method must not have @Inject");
     }
 
     @Test
@@ -70,25 +66,13 @@ class BeanFactoryTest {
     public static class Bean {
         @Inject
         Dependency1 dependency1;
-        Dependency2<String> dependency2;
-
         @Inject
-        public void setDependency2(@Named("dep2") Dependency2<String> dependency2) {
-            this.dependency2 = dependency2;
-        }
+        @Named("dep2")
+        Dependency2<String> dependency2;
     }
 
     public static class BeanWithInjectStaticField {
         @Inject
         static Dependency1 dependency1;
-    }
-
-    public static class BeanWithInjectStaticMethod {
-        static Dependency1 dependency1;
-
-        @Inject
-        public static void setDependency1(Dependency1 dependency1) {
-            BeanWithInjectStaticMethod.dependency1 = dependency1;
-        }
     }
 }

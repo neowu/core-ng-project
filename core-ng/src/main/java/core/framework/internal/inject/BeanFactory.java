@@ -3,17 +3,11 @@ package core.framework.internal.inject;
 import core.framework.inject.Inject;
 import core.framework.inject.Named;
 import core.framework.internal.reflect.Fields;
-import core.framework.internal.reflect.Methods;
-import core.framework.internal.reflect.Params;
 import core.framework.util.Maps;
 import core.framework.util.Types;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -73,24 +67,10 @@ public class BeanFactory {
                         }
                     }
                 }
-                for (Method method : visitorType.getDeclaredMethods()) {
-                    if (method.isAnnotationPresent(Inject.class)) {
-                        if (Modifier.isStatic(method.getModifiers()))
-                            throw new Error("static method must not have @Inject, method=" + Methods.path(method));
-                        if (method.trySetAccessible()) {
-                            Object[] params = lookupParams(method);
-                            method.invoke(instance, params);
-                        } else {
-                            throw new Error("failed to inject method, method=" + Methods.path(method));
-                        }
-                    }
-                }
                 visitorType = visitorType.getSuperclass();
             }
         } catch (IllegalAccessException e) {
             throw new Error(e);
-        } catch (InvocationTargetException e) {
-            throw new Error(format("failed to inject bean, beanClass={}, error={}", instance.getClass().getCanonicalName(), e.getTargetException().getMessage()), e);
         }
     }
 
@@ -106,19 +86,6 @@ public class BeanFactory {
         Named name = field.getDeclaredAnnotation(Named.class);
         Type fieldType = stripOwnerType(field.getGenericType());
         return bean(fieldType, name == null ? null : name.value());
-    }
-
-    private Object[] lookupParams(Executable method) {
-        Type[] paramTypes = method.getGenericParameterTypes();
-        Annotation[][] paramAnnotations = method.getParameterAnnotations();
-        Object[] params = new Object[paramTypes.length];
-        for (int i = 0; i < paramTypes.length; i++) {
-            Type paramType = stripOwnerType(paramTypes[i]);
-            Named named = Params.annotation(paramAnnotations[i], Named.class);
-            String name = named == null ? null : named.value();
-            params[i] = bean(paramType, name);
-        }
-        return params;
     }
 
     private Type stripOwnerType(Type paramType) {    // type from field/method params could has owner type, which is not used in bind/key
