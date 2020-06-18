@@ -60,32 +60,32 @@ public class JSONMapper<T> {
 
         // redefine date time formatter to output nano seconds in at least 3 digits, which inline with ISO standard and ES standard
         DateTimeFormatter localTimeFormatter = new DateTimeFormatterBuilder()
-            .parseStrict()
-            .appendValue(HOUR_OF_DAY, 2)
-            .appendLiteral(':')
-            .appendValue(MINUTE_OF_HOUR, 2)
-            .appendLiteral(':')
-            .appendValue(SECOND_OF_MINUTE, 2)
-            .appendFraction(NANO_OF_SECOND, 3, 9, true) // always output 3 digits of nano seconds (iso date format doesn't specify how many digits it should present, here always keep 3)
-            .toFormatter();
+                .parseStrict()
+                .appendValue(HOUR_OF_DAY, 2)
+                .appendLiteral(':')
+                .appendValue(MINUTE_OF_HOUR, 2)
+                .appendLiteral(':')
+                .appendValue(SECOND_OF_MINUTE, 2)
+                .appendFraction(NANO_OF_SECOND, 3, 9, true) // always output 3 digits of nano seconds (iso date format doesn't specify how many digits it should present, here always keep 3)
+                .toFormatter();
 
         module.addSerializer(ZonedDateTime.class, new ZonedDateTimeSerializer(ISO_INSTANT));
         module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(new DateTimeFormatterBuilder()
-            .parseStrict()
-            .append(ISO_LOCAL_DATE)
-            .appendLiteral('T')
-            .append(localTimeFormatter)
-            .toFormatter()));
+                .parseStrict()
+                .append(ISO_LOCAL_DATE)
+                .appendLiteral('T')
+                .append(localTimeFormatter)
+                .toFormatter()));
         module.addSerializer(LocalTime.class, new LocalTimeSerializer(new DateTimeFormatterBuilder()
-            .parseStrict()
-            .append(localTimeFormatter)
-            .toFormatter()));
+                .parseStrict()
+                .append(localTimeFormatter)
+                .toFormatter()));
         return module;
     }
 
     // used internally, performance is top priority in design, reader is about 3~6% faster than mapper since type is pre determined
     // refer to https://github.com/FasterXML/jackson-docs/wiki/Presentation:-Jackson-Performance
-    private final ObjectReader reader;
+    public final ObjectReader reader;
     private final ObjectWriter writer;
 
     public JSONMapper(Type instanceType) {

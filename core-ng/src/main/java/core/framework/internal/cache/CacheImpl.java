@@ -7,6 +7,7 @@ import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
@@ -43,8 +44,8 @@ public class CacheImpl<T> implements Cache<T> {
         String cacheKey = cacheKey(key);
         byte[] cacheValue = cacheStore.get(cacheKey);
         if (cacheValue != null) {
-            T result = mapper.fromJSON(cacheValue);
-            if (isValid(result)) return result;
+            T result = fromJSON(cacheValue);
+            if (result != null && isValid(result)) return result;
         }
         logger.debug("load value, key={}", key);
         T value = load(loader, key);
@@ -72,8 +73,8 @@ public class CacheImpl<T> implements Cache<T> {
             String cacheKey = cacheKeys[index];
             byte[] cacheValue = cacheValues.get(cacheKey);
             if (cacheValue != null) {
-                T value = mapper.fromJSON(cacheValue);
-                if (isValid(value)) {
+                T value = fromJSON(cacheValue);
+                if (value != null && isValid(value)) {
                     result = value;
                 }
             }
@@ -132,6 +133,15 @@ public class CacheImpl<T> implements Cache<T> {
         T value = loader.apply(key);
         if (value == null) throw new Error("value must not be null, key=" + key);
         return value;
+    }
+
+    private T fromJSON(byte[] cacheValue) {
+        try {
+            return mapper.reader.readValue(cacheValue);
+        } catch (IOException e) {
+            logger.warn(errorCode("INVALID_CACHE_DATA"), "failed to deserialize value from cache, will reload, error={}", e.getMessage(), e);
+            return null;
+        }
     }
 
     private boolean isValid(T bean) {

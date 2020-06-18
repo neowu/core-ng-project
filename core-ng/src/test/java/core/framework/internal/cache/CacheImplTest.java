@@ -49,6 +49,14 @@ class CacheImplTest {
     }
 
     @Test
+    void hitWithInvalidJSON() {
+        when(cacheStore.get("name:key")).thenReturn(Strings.bytes("{\"listField\": 1}")); // incompatible json structure
+
+        TestCache value = cache.get("key", key -> cacheItem("new"));
+        assertThat(value.stringField).isEqualTo("new");
+    }
+
+    @Test
     void miss() {
         when(cacheStore.get("name:key")).thenReturn(null);
 
@@ -92,6 +100,20 @@ class CacheImplTest {
     @Test
     void getAllWithStaleData() {
         var values = Map.of("name:key1", Strings.bytes("{}"),
+                "name:key2", Strings.bytes(JSON.toJSON(cacheItem("key2"))));
+        when(cacheStore.getAll("name:key1", "name:key2")).thenReturn(values);
+
+        Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2"), this::cacheItem);
+        assertThat(results).containsKeys("key1", "key2");
+        assertThat(results.get("key1").stringField).isEqualTo("key1");
+        assertThat(results.get("key2").stringField).isEqualTo("key2");
+
+        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && Arrays.equals(argument.get("name:key1"), Strings.bytes(JSON.toJSON(cacheItem("key1"))))), eq(Duration.ofHours(1)));
+    }
+
+    @Test
+    void getAllWithInvalidJSON() {
+        var values = Map.of("name:key1", Strings.bytes("{\"listField\": 1}"),
                 "name:key2", Strings.bytes(JSON.toJSON(cacheItem("key2"))));
         when(cacheStore.getAll("name:key1", "name:key2")).thenReturn(values);
 
