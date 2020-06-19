@@ -17,8 +17,7 @@ public final class ClasspathResources {
     }
 
     public static byte[] bytes(String path) {
-        InputStream stream = stream(path);
-        try (stream) {
+        try (InputStream stream = stream(path)) {
             return stream.readAllBytes();
         } catch (IOException e) {
             throw new UncheckedIOException(e);

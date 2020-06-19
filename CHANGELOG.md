@@ -1,4 +1,6 @@
 ## Change log
+### 7.4.11 (06/19/2020 - )
+
 ### 7.4.10 (06/10/2020 - 06/18/2020)
 * monitor: tweak kube monitor pod not ready error message
 * stats: track jvm_non_heap_used by default
@@ -15,7 +17,7 @@
 * es: update to 7.7.1
 
 ### 7.4.8 (05/26/2020 - 06/02/2020)
-* monitor: fix kube monitor false alert with too many restarts (use neowu/monitor:7.4.8-b0 before releasing 7.4.8)
+* monitor: fix kube monitor false alert with too many restarts
 * shutdown: support env SHUTDOWN_DELAY_IN_SEC / SHUTDOWN_TIMEOUT_IN_SEC to fine control graceful shutdown in kube env (check source to see details)
 
 ### 7.4.7 (05/25/2020 - 05/25/2020)

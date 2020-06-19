@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Optional;
@@ -20,8 +19,8 @@ public final class Properties {
     final Map<String, String> properties = Maps.newHashMap();
 
     public void load(String classpath) {
-        InputStream stream = ClasspathResources.stream(classpath);
-        try (Reader reader = new BufferedReader(new InputStreamReader(stream, UTF_8))) {
+        try (InputStream stream = ClasspathResources.stream(classpath);
+             var reader = new BufferedReader(new InputStreamReader(stream, UTF_8))) {
             var properties = new java.util.Properties();
             properties.load(reader);
             properties.forEach((key, value) -> set((String) key, (String) value));
