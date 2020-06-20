@@ -41,10 +41,4 @@ class DiagnosticControllerTest {
         Response response = controller.thread(request);
         assertThat(response.contentType()).get().isEqualTo(ContentType.TEXT_PLAIN);
     }
-
-    @Test
-    void nativeMemory() {
-        Response response = controller.nativeMemory(request);
-        assertThat(response.contentType()).get().isEqualTo(ContentType.TEXT_PLAIN);
-    }
 }

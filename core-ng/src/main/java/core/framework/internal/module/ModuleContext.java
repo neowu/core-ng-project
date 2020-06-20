@@ -72,7 +72,6 @@ public class ModuleContext {
         route(HTTPMethod.GET, "/_sys/vm", (LambdaController) diagnosticController::vm, true);
         route(HTTPMethod.GET, "/_sys/thread", (LambdaController) diagnosticController::thread, true);
         route(HTTPMethod.GET, "/_sys/heap", (LambdaController) diagnosticController::heap, true);
-        route(HTTPMethod.GET, "/_sys/native-memory", (LambdaController) diagnosticController::nativeMemory, true);
         route(HTTPMethod.GET, "/_sys/property", new PropertyController(propertyManager), true);
     }
 
