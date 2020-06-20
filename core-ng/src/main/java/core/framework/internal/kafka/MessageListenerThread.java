@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static core.framework.log.Markers.errorCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -36,11 +35,12 @@ class MessageListenerThread extends Thread {
     private final Consumer<byte[], byte[]> consumer;
     private final LogManager logManager;
     private final Map<String, MessageProcess<?>> processes;
-    private final AtomicBoolean shutdown = new AtomicBoolean(false);
-    private final AtomicBoolean processing = new AtomicBoolean(false);
     private final double batchLongProcessThresholdInNano;
     private final long longConsumerLagThresholdInMs;
+
     private final Object lock = new Object();
+    private volatile boolean shutdown;
+    private volatile boolean processing;
 
     MessageListenerThread(String name, Consumer<byte[], byte[]> consumer, MessageListener listener) {
         super(name);
@@ -54,10 +54,10 @@ class MessageListenerThread extends Thread {
     @Override
     public void run() {
         try {
-            processing.set(true);
+            processing = true;
             process();
         } finally {
-            processing.set(false);
+            processing = false;
             synchronized (lock) {
                 lock.notifyAll();
             }
@@ -65,14 +65,14 @@ class MessageListenerThread extends Thread {
     }
 
     void shutdown() {
-        shutdown.set(true);
+        shutdown = true;
         consumer.wakeup();
     }
 
     void awaitTermination(long timeoutInMs) throws InterruptedException {
         long end = System.currentTimeMillis() + timeoutInMs;
         synchronized (lock) {
-            while (processing.get()) {
+            while (processing) {
                 long left = end - System.currentTimeMillis();
                 if (left <= 0) {
                     logger.warn("failed to terminate kafka message listener thread, name={}", getName());
@@ -84,13 +84,13 @@ class MessageListenerThread extends Thread {
     }
 
     private void process() {
-        while (!shutdown.get()) {
+        while (!shutdown) {
             try {
                 ConsumerRecords<byte[], byte[]> records = consumer.poll(Duration.ofSeconds(30));    // consumer should call poll at least once every MAX_POLL_INTERVAL_MS
                 if (records.isEmpty()) continue;
                 processRecords(records);
             } catch (Throwable e) {
-                if (shutdown.get()) break;
+                if (shutdown) break;
                 logger.error("failed to pull message, retry in 10 seconds", e);
                 Threads.sleepRoughly(Duration.ofSeconds(10));
             }

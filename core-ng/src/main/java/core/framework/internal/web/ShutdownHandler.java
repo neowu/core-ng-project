@@ -6,7 +6,6 @@ import io.undertow.util.StatusCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -16,14 +15,14 @@ public class ShutdownHandler implements ExchangeCompletionListener {
     final AtomicLong activeRequests = new AtomicLong(0);
 
     private final Logger logger = LoggerFactory.getLogger(ShutdownHandler.class);
-    private final AtomicBoolean shutdown = new AtomicBoolean(false);
     private final Object lock = new Object();
+    private volatile boolean shutdown;
 
     boolean handle(Exchange exchange) {
         activeRequests.getAndIncrement();
         exchange.addExchangeCompleteListener(this);
 
-        if (shutdown.get()) {
+        if (shutdown) {
             logger.warn("reject request due to server is shutting down, requestURL={}", exchange.getRequestURL());
             // ask client not set keep alive for current connection, with persistent=false, undertow will send header "connection: close",
             // this does no effect with http/2.0, only for http/1.1
@@ -37,7 +36,7 @@ public class ShutdownHandler implements ExchangeCompletionListener {
     }
 
     void shutdown() {
-        shutdown.set(true);
+        shutdown = true;
     }
 
     boolean awaitTermination(long timeoutInMs) throws InterruptedException {
@@ -58,7 +57,7 @@ public class ShutdownHandler implements ExchangeCompletionListener {
     public void exchangeEvent(HttpServerExchange exchange, NextListener next) {
         try {
             long count = activeRequests.decrementAndGet();
-            if (count <= 0 && shutdown.get()) {
+            if (count <= 0 && shutdown) {
                 synchronized (lock) {
                     lock.notifyAll();
                 }
