@@ -1,5 +1,8 @@
 ## Change log
 ### 7.4.11 (06/19/2020 - )
+* diagnostic: support /_sys/native-memory to view/track jvm native memory usage
+        use -XX:NativeMemoryTracking=summary or -XX:NativeMemoryTracking=detail to enable NMT
+        Enabling NMT will result in a 5-10 percent JVM performance drop 
 
 ### 7.4.10 (06/10/2020 - 06/18/2020)
 * monitor: tweak kube monitor pod not ready error message
