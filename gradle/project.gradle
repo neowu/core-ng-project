@@ -29,13 +29,6 @@ subprojects {
         testLogging.exceptionFormat 'full'
     }
 
-    tasks.named('jar') {
-        // put parent name in final jar name, to resolve collision of child projects with same name under different parents
-        if (parent.depth > 0) {
-            archiveBaseName = "${parent.name}-${archiveBaseName.get()}"
-        }
-    }
-
     tasks.register('mkdir') {
         group = 'build setup'
         description = 'Create project directories.'
@@ -52,12 +45,15 @@ subprojects {
         }
 
         tasks.withType(Jar).configureEach {
+            // put group name in final jar name, to resolve collision of child projects with same name under different parents
+            archiveBaseName = "${project.group}.${archiveBaseName.get()}"
+
             manifest {
                 attributes 'Implementation-Title': project.name,
-                    'Implementation-Version': project.version,
-                    'Created-By': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
-                    'Built-With': "gradle ${project.gradle.gradleVersion}",
-                    'Build-Time': Instant.now().toString()
+                        'Implementation-Version': project.version,
+                        'Created-By': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
+                        'Built-With': "gradle ${project.gradle.gradleVersion}",
+                        'Build-Time': Instant.now().toString()
             }
         }
     }

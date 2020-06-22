@@ -1,5 +1,6 @@
 ## Change log
 ### 7.4.11 (06/19/2020 - )
+* es: update to 7.8.0
 
 ### 7.4.10 (06/10/2020 - 06/18/2020)
 * monitor: tweak kube monitor pod not ready error message
