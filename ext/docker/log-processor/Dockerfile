@@ -1,11 +1,12 @@
 FROM        gradle:jdk14 as build
 WORKDIR     /depot
 ADD         ./ /depot
-RUN         gradle -Penv=prod :ext:log-processor:installDist
+RUN         gradle -Penv=prod :ext:log-processor:docker
 
 FROM        adoptopenjdk/openjdk14:alpine-jre
 LABEL       app=log-processor
 RUN         addgroup --system app && adduser --system --no-create-home --ingroup app app
 USER        app
-COPY        --from=build /depot/build/ext/log-processor/install/log-processor /opt/log-processor
-ENTRYPOINT  ["/opt/log-processor/bin/log-processor"]
+COPY        --from=build /depot/build/ext/log-processor/distributions/docker/dependency    /opt/app
+COPY        --from=build /depot/build/ext/log-processor/distributions/docker/app           /opt/app
+ENTRYPOINT  ["/opt/app/bin/log-processor"]
