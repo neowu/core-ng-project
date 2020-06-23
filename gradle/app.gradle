@@ -44,3 +44,26 @@ tasks.named('mkdir') {
         mkdir("${projectDir}/conf/dev/resources")
     }
 }
+
+afterEvaluate {
+    // split dependencies lib and app classes/bin/web to support layered docker image
+    // to cache/reuse dependencies layer
+    task docker(type: Sync) {
+        from(installDist.destinationDir) {
+            exclude "lib/${project.group}.*.jar"
+            exclude 'bin'
+            exclude 'web'
+            into('dependency')
+        }
+        from(installDist.destinationDir) {
+            include "lib/${project.group}.*.jar"
+            include 'bin/**'
+            include 'web/**'
+            into('app')
+        }
+        into("${buildDir}/distributions/docker")
+    }
+
+    docker.group = 'distribution'
+    docker.dependsOn installDist
+}

@@ -8,7 +8,7 @@ import java.io.StringWriter;
  */
 public final class Exceptions {
     public static String stackTrace(Throwable e) {
-        StringWriter writer = new StringWriter();
+        var writer = new StringWriter();
         e.printStackTrace(new PrintWriter(writer));
         return writer.toString();
     }
