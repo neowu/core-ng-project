@@ -48,22 +48,16 @@ tasks.named('mkdir') {
 afterEvaluate {
     // split dependencies lib and app classes/bin/web to support layered docker image
     // to cache/reuse dependencies layer
-    task docker(type: Sync) {
-        from(installDist.destinationDir) {
-            exclude "lib/${project.group}.*.jar"
-            exclude 'bin'
-            exclude 'web'
-            into('dependency')
+    tasks.register('docker') {
+        group = 'distribution'
+        dependsOn installDist
+        doLast {
+            ant.tar(destfile: "${buildDir}/distributions/docker/dependency.tar",
+                    basedir: installDist.destinationDir,
+                    excludes: "lib/${project.group}.*.jar bin/** web/**")
+            ant.tar(destfile: "${buildDir}/distributions/docker/app.tar",
+                    basedir: installDist.destinationDir,
+                    includes: "lib/${project.group}.*.jar bin/** web/**")
         }
-        from(installDist.destinationDir) {
-            include "lib/${project.group}.*.jar"
-            include 'bin/**'
-            include 'web/**'
-            into('app')
-        }
-        into("${buildDir}/distributions/docker")
     }
-
-    docker.group = 'distribution'
-    docker.dependsOn installDist
 }
