@@ -39,13 +39,13 @@ subprojects {
     }
 
     afterEvaluate {
-        // update group on afterEvaluate since the project.gradle usually included in the first line of project build.gradle, which project.group is not assigned yet
+        // project.group/version is available on afterEvaluate as project.gradle is usually included at top
         if (parent.depth > 0) {
-            group = "${group}.${parent.name}"    // append parent into group, let child projects with same name under different parent have different artifactId
+            group = "${group}.${parent.name}"    // resolve dependency collision of child projects with same name under different parents, result in unique artifactId
         }
 
         tasks.withType(Jar).configureEach {
-            // put group name in final jar name, to resolve collision of child projects with same name under different parents
+            // resolve jar name collision of child projects with same name under different parents
             archiveBaseName = "${project.group}.${archiveBaseName.get()}"
 
             manifest {

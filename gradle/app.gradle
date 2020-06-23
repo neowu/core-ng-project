@@ -52,12 +52,22 @@ afterEvaluate {
         group = 'distribution'
         dependsOn installDist
         doLast {
-            ant.tar(destfile: "${buildDir}/distributions/docker/dependency.tar",
-                    basedir: installDist.destinationDir,
-                    excludes: "lib/${project.group}.*.jar bin/** web/**")
-            ant.tar(destfile: "${buildDir}/distributions/docker/app.tar",
-                    basedir: installDist.destinationDir,
-                    includes: "lib/${project.group}.*.jar bin/** web/**")
+            def appJarPrefix = parent.depth > 0 ? parent.group : project.group;
+            project.sync {
+                from(installDist.destinationDir) {
+                    exclude "lib/${appJarPrefix}.*.jar"
+                    exclude 'bin'
+                    exclude 'web'
+                    into('dependency')
+                }
+                from(installDist.destinationDir) {
+                    include "lib/${appJarPrefix}.*.jar"
+                    include 'bin/**'
+                    include 'web/**'
+                    into('app')
+                }
+                into("${buildDir}/distributions/docker")
+            }
         }
     }
 }
