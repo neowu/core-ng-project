@@ -87,275 +87,275 @@
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "action-relation",
-      "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": 2,\n        \"direction\": \"asc\"\n      }\n    }\n  }\n}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"action-relation\",\"type\":\"table\",\"params\":{\"perPage\":50,\"showMetricsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":2,\"direction\":\"asc\"},\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"client\",\"size\":30,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"none\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"app\",\"size\":30,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"action\",\"size\":30,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"exclude\":\"unassigned\"}}]}"
     },
     "id": "action-relation",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "business-customer_registered",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"business-customer_registered\",\"type\":\"metric\",\"params\":{\"addLegend\":false,\"addTooltip\":true,\"metric\":{\"colorSchema\":\"Green to Red\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"invertColors\":false,\"labels\":{\"show\":true},\"metricColorMode\":\"None\",\"percentageMode\":false,\"style\":{\"bgColor\":false,\"bgFill\":\"#000\",\"fontSize\":60,\"labelColor\":false,\"subText\":\"\"},\"useRanges\":false},\"type\":\"metric\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.customer_registered\",\"customLabel\":\"Customer Registered\"}}]}"
     },
     "id": "business-customer_registered",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "business-order_amount",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"business-order_amount\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":60}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.order_amount\",\"customLabel\":\"Total Order Amount\"}}]}"
     },
     "id": "business-order_amount",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "business-order_placed",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"business-order_placed\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":60}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.order_placed\",\"customLabel\":\"Order Placed\"}}]}"
     },
     "id": "business-order_placed",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-pool_db_count",
-      "uiStateJSON": "{\n  \"vis\": {\n    \"colors\": {\n      \"total count\": \"#E0F9D7\",\n      \"active count\": \"#3F6833\"\n    }\n  }\n}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-pool_db_count\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"date per 30 seconds\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"active count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"total count\"},\"valueAxis\":\"ValueAxis-1\"}],\"type\":\"line\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.pool_db_active_count\",\"customLabel\":\"active count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.pool_db_total_count\",\"customLabel\":\"total count\"}}]}"
     },
     "id": "stat-pool_db_count",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-db",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-db\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"radiusRatio\":9,\"scale\":\"square root\",\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"date per 30 seconds\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"nanoseconds\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"total elapsed\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}],\"legendPosition\":\"right\",\"type\":\"line\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"percentiles\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.db.total_elapsed\",\"percents\":[1,50,99],\"customLabel\":\"total elapsed\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "perf-db",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-db-io",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":false}}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-db-io\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"radiusRatio\":9,\"scale\":\"square root\",\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"date per 30 seconds\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"read rows\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"write rows\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\",\"type\":\"line\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.db.read_entries\",\"customLabel\":\"read rows\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.db.write_entries\",\"customLabel\":\"write rows\"}}],\"listeners\":{}}"
     },
     "id": "perf-db-io",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-db-count",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":false}}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-db-count\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"radiusRatio\":9,\"scale\":\"square root\",\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"date per 30 seconds\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"stacked\",\"data\":{\"label\":\"operation count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}],\"legendPosition\":\"right\",\"type\":\"line\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.db.count\",\"customLabel\":\"operation count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "perf-db-count",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-sys_load",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-sys_load\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.sys_load_avg\"}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.sys_load_avg\"}}],\"listeners\":{}}"
     },
     "id": "stat-sys_load",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-jvm_heap",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-jvm_heap\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{},\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"bytes\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"used heap\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"max heap\"},\"valueAxis\":\"ValueAxis-1\"},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"4\",\"label\":\"max used heap\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.jvm_heap_used\",\"customLabel\":\"used heap\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.jvm_heap_max\",\"customLabel\":\"max heap\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.jvm_heap_used\",\"customLabel\":\"max used heap\"}}]}"
     },
     "id": "stat-jvm_heap",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-jvm_non_heap",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\n  \"title\": \"stat-jvm_non_heap\",\n  \"type\": \"line\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"showCircles\": true,\n    \"smoothLines\": false,\n    \"interpolate\": \"linear\",\n    \"scale\": \"linear\",\n    \"drawLinesBetweenPoints\": true,\n    \"radiusRatio\": 9,\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {},\n    \"type\": \"line\",\n    \"grid\": {\"categoryLines\": false, \"style\": {\"color\": \"#eee\"}},\n    \"categoryAxes\": [{\"id\": \"CategoryAxis-1\", \"type\": \"category\", \"position\": \"bottom\", \"show\": true, \"style\": {}, \"scale\": {\"type\": \"linear\"}, \"labels\": {\"show\": true, \"truncate\": 100}, \"title\": {}}],\n    \"valueAxes\": [\n      {\n        \"id\": \"ValueAxis-1\",\n        \"name\": \"LeftAxis-1\",\n        \"type\": \"value\",\n        \"position\": \"left\",\n        \"show\": true,\n        \"style\": {},\n        \"scale\": {\"type\": \"linear\", \"mode\": \"normal\", \"setYExtents\": false, \"defaultYExtents\": false},\n        \"labels\": {\"show\": true, \"rotate\": 0, \"filter\": false, \"truncate\": 100},\n        \"title\": {\"text\": \"bytes\"}\n      }\n    ],\n    \"seriesParams\": [\n      {\"show\": true, \"type\": \"line\", \"mode\": \"normal\", \"data\": {\"label\": \"used non heap\", \"id\": \"1\"}, \"valueAxis\": \"ValueAxis-1\", \"drawLinesBetweenPoints\": true, \"showCircles\": true, \"interpolate\": \"linear\", \"radiusRatio\": 9},\n      {\"show\": true, \"mode\": \"normal\", \"type\": \"line\", \"drawLinesBetweenPoints\": true, \"showCircles\": true, \"interpolate\": \"linear\", \"data\": {\"id\": \"4\", \"label\": \"max used non heap\"}, \"valueAxis\": \"ValueAxis-1\"}\n    ],\n    \"legendPosition\": \"right\"\n  },\n  \"aggs\": [\n    {\"id\": \"1\", \"enabled\": true, \"type\": \"avg\", \"schema\": \"metric\", \"params\": {\"field\": \"stats.jvm_non_heap_used\", \"customLabel\": \"used non heap\"}},\n    {\"id\": \"2\", \"enabled\": true, \"type\": \"date_histogram\", \"schema\": \"segment\", \"params\": {\"field\": \"@timestamp\", \"interval\": \"auto\", \"min_doc_count\": 1, \"extended_bounds\": {}}},\n    {\"id\": \"4\", \"enabled\": true, \"type\": \"max\", \"schema\": \"metric\", \"params\": {\"field\": \"stats.jvm_non_heap_used\", \"customLabel\": \"max used non heap\"}}\n  ]\n}"
     },
     "id": "stat-jvm_non_heap",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-thread",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\n  \"title\": \"stat-thread\",\n  \"type\": \"line\",\n  \"params\": {\n    \"shareYAxis\": true,\n    \"addTooltip\": true,\n    \"addLegend\": true,\n    \"showCircles\": true,\n    \"smoothLines\": false,\n    \"interpolate\": \"linear\",\n    \"scale\": \"linear\",\n    \"drawLinesBetweenPoints\": true,\n    \"radiusRatio\": 9,\n    \"times\": [],\n    \"addTimeMarker\": false,\n    \"defaultYExtents\": false,\n    \"setYExtents\": false,\n    \"yAxis\": {},\n    \"type\": \"line\",\n    \"grid\": {\"categoryLines\": false, \"style\": {\"color\": \"#eee\"}},\n    \"categoryAxes\": [{\"id\": \"CategoryAxis-1\", \"type\": \"category\", \"position\": \"bottom\", \"show\": true, \"style\": {}, \"scale\": {\"type\": \"linear\"}, \"labels\": {\"show\": true, \"truncate\": 100}, \"title\": {}}],\n    \"valueAxes\": [\n      {\n        \"id\": \"ValueAxis-1\",\n        \"name\": \"LeftAxis-1\",\n        \"type\": \"value\",\n        \"position\": \"left\",\n        \"show\": true,\n        \"style\": {},\n        \"scale\": {\"type\": \"linear\", \"mode\": \"normal\", \"setYExtents\": false, \"defaultYExtents\": false},\n        \"labels\": {\"show\": true, \"rotate\": 0, \"filter\": false, \"truncate\": 100},\n        \"title\": {\"text\": \"count\"}\n      }\n    ],\n    \"seriesParams\": [\n      {\"show\": \"true\", \"type\": \"line\", \"mode\": \"normal\", \"data\": {\"label\": \"Average stats.thread_count\", \"id\": \"1\"}, \"valueAxis\": \"ValueAxis-1\", \"drawLinesBetweenPoints\": true, \"showCircles\": true, \"interpolate\": \"linear\", \"radiusRatio\": 9},\n      {\"show\": true, \"mode\": \"normal\", \"type\": \"line\", \"drawLinesBetweenPoints\": true, \"showCircles\": true, \"interpolate\": \"linear\", \"data\": {\"id\": \"3\", \"label\": \"Max stats.thread_count\"}, \"valueAxis\": \"ValueAxis-1\"}\n    ],\n    \"legendPosition\": \"right\"\n  },\n  \"aggs\": [\n    {\"id\": \"1\", \"enabled\": true, \"type\": \"avg\", \"schema\": \"metric\", \"params\": {\"field\": \"stats.thread_count\", \"customLabel\": \"avg thread count\"}},\n    {\"id\": \"2\", \"enabled\": true, \"type\": \"date_histogram\", \"schema\": \"segment\", \"params\": {\"field\": \"@timestamp\", \"timeRange\": {\"from\": \"now-15m\", \"to\": \"now\", \"mode\": \"quick\"}, \"useNormalizedEsInterval\": true, \"interval\": \"auto\", \"drop_partials\": false, \"min_doc_count\": 1, \"extended_bounds\": {}}},\n    {\"id\": \"3\", \"enabled\": true, \"type\": \"max\", \"schema\": \"metric\", \"params\": {\"field\": \"stats.thread_count\", \"customLabel\": \"max thread count\"}}\n  ]\n}\n"
     },
     "id": "stat-thread",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-redis",
       "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
       "version": 1,
       "visState": "{\"title\":\"perf-redis\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"radiusRatio\":9,\"scale\":\"square root\",\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"nanoseconds\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"total elapsed\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}],\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"percentiles\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.redis.total_elapsed\",\"percents\":[1,50,99],\"customLabel\":\"total elapsed\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "perf-redis",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "action-count",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"action-count\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{},\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}],\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-15m\",\"to\":\"now\",\"mode\":\"quick\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "action-count",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "action-elapsed",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"action-elapsed\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"square root\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{},\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"nanoseconds\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Max elapsed\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"Average elapsed\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"elapsed\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-15m\",\"to\":\"now\",\"mode\":\"quick\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"elapsed\"}}]}"
     },
     "id": "action-elapsed",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "action-consumer_lag",
-      "uiStateJSON": "{\"vis\":{\"colors\":{\"avg consumer lag\":\"#82B5D8\",\"max consumer lag\":\"#EA6460\"}}}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"action-consumer_lag\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"filter\":true,\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"dimensions\":{\"x\":{\"accessor\":0,\"format\":{\"id\":\"date\",\"params\":{\"pattern\":\"HH:mm:ss\"}},\"params\":{\"date\":true,\"interval\":\"PT30S\",\"format\":\"HH:mm:ss\"},\"aggType\":\"date_histogram\"},\"y\":[{\"accessor\":1,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"max\"},{\"accessor\":2,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"avg\"}]},\"grid\":{\"categoryLines\":false},\"labels\":{},\"legendPosition\":\"right\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"max consumer lag\"},\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"mode\":\"normal\",\"show\":\"true\",\"showCircles\":true,\"type\":\"line\",\"valueAxis\":\"ValueAxis-1\"},{\"data\":{\"id\":\"2\",\"label\":\"avg consumer lag\"},\"drawLinesBetweenPoints\":true,\"mode\":\"normal\",\"show\":true,\"showCircles\":true,\"type\":\"line\",\"valueAxis\":\"ValueAxis-1\"}],\"thresholdLine\":{\"color\":\"#34130C\",\"show\":false,\"style\":\"full\",\"value\":10,\"width\":1},\"times\":[],\"type\":\"line\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"milliseconds\"},\"type\":\"value\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.consumer_lag_in_ms\",\"customLabel\":\"max consumer lag\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.consumer_lag_in_ms\",\"customLabel\":\"avg consumer lag\"}},{\"id\":\"3\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-15m\",\"to\":\"now\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "action-consumer_lag",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-es",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-es\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"square root\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{},\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"nanoseconds\"}}],\"seriesParams\":[{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"4\",\"label\":\"total elapsed\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"s\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"4\",\"enabled\":true,\"type\":\"percentiles\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.elasticsearch.total_elapsed\",\"percents\":[1,50,99],\"customLabel\":\"total elapsed\"}}]}"
     },
     "id": "perf-es",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-mongo",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-mongo\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"square root\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{},\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"nanoseconds\"}}],\"seriesParams\":[{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"4\",\"label\":\"total elapsed\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"s\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"4\",\"enabled\":true,\"type\":\"percentiles\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.mongo.total_elapsed\",\"percents\":[1,50,99],\"customLabel\":\"total elapsed\"}}]}"
     },
     "id": "perf-mongo",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "action-cpu_time",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"action-cpu_time\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"square root\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{},\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"nanoseconds\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Max cpu_time\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"Average cpu_time\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"cpu_time\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"timeRange\":{\"from\":\"now-15m\",\"to\":\"now\",\"mode\":\"quick\"},\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"cpu_time\"}}]}"
     },
     "id": "action-cpu_time",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-jvm_gc",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-jvm_gc\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{},\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"nanoseconds\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"Max stats.jvm_gc_g1_young_generation_total_elapsed\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"Max stats.jvm_gc_g1_old_generation_total_elapsed\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.jvm_gc_g1_young_generation_total_elapsed\",\"customLabel\":\"\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.jvm_gc_g1_old_generation_total_elapsed\"}}]}"
     },
     "id": "stat-jvm_gc",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-jvm_gc_count",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-jvm_gc_count\",\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"4\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.jvm_gc_g1_young_generation_count\"}},{\"id\":\"5\",\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.jvm_gc_g1_old_generation_count\"}}],\"listeners\":{}}"
     },
     "id": "stat-jvm_gc_count",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
@@ -372,236 +372,236 @@
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-es-count",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":false}}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-es-count\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"radiusRatio\":9,\"scale\":\"square root\",\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"date per 30 seconds\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"stacked\",\"data\":{\"label\":\"operation count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}],\"legendPosition\":\"right\",\"type\":\"line\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.elasticsearch.count\",\"customLabel\":\"operation count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "perf-es-count",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-es-io",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":false}}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-es-io\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"radiusRatio\":9,\"scale\":\"square root\",\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"date per 30 seconds\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"read docs\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"write docs\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\",\"type\":\"line\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.elasticsearch.read_entries\",\"customLabel\":\"read docs\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.elasticsearch.write_entries\",\"customLabel\":\"write docs\"}}]}"
     },
     "id": "perf-es-io",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-redis-io",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-redis-io\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"radiusRatio\":9,\"scale\":\"square root\",\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"date per 30 seconds\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"read keys\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"write keys\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\",\"type\":\"line\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.redis.read_entries\",\"customLabel\":\"read keys\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.redis.write_entries\",\"customLabel\":\"write keys\"}}]}"
     },
     "id": "perf-redis-io",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-redis-count",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-redis-count\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"radiusRatio\":9,\"scale\":\"square root\",\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"operation count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}],\"legendPosition\":\"right\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.redis.count\",\"customLabel\":\"operation count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "perf-redis-count",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-pool_redis_count",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-pool_redis_count\",\"type\":\"line\",\"params\":{\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"total count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"data\":{\"id\":\"3\",\"label\":\"active count\"},\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.pool_redis_total_count\",\"customLabel\":\"total count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.pool_redis_active_count\",\"customLabel\":\"active count\"}}]}"
     },
     "id": "stat-pool_redis_count",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-pool_redis-cache_count",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-pool_redis-cache_count\",\"type\":\"line\",\"params\":{\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"total count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"data\":{\"id\":\"3\",\"label\":\"active count\"},\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.pool_redis-cache_total_count\",\"customLabel\":\"total count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.pool_redis-cache_active_count\",\"customLabel\":\"active count\"}}]}"
     },
     "id": "stat-pool_redis-cache_count",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-kafka_bytes_consumed_rate",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"bytes consumed rate\",\"field\":\"stats.kafka_consumer_bytes_consumed_rate\"},\"schema\":\"metric\",\"type\":\"sum\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1},\"schema\":\"segment\",\"type\":\"date_histogram\"}],\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"interpolate\":\"linear\",\"legendPosition\":\"right\",\"radiusRatio\":9,\"scale\":\"linear\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"bytes consumed rate\"},\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"mode\":\"normal\",\"radiusRatio\":9,\"show\":\"true\",\"showCircles\":true,\"type\":\"line\",\"valueAxis\":\"ValueAxis-1\"}],\"setYExtents\":false,\"showCircles\":true,\"times\":[],\"type\":\"line\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"defaultYExtents\":false,\"mode\":\"normal\",\"setYExtents\":false,\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"bytes consumed rate\"},\"type\":\"value\"}]},\"title\":\"stat-kafka_bytes_consumed_rate\",\"type\":\"line\"}"
     },
     "id": "stat-kafka_bytes_consumed_rate",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-kafka_fetch_rate",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-kafka_fetch_rate\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"records per second\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"avg fetch rate\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"min fetch rate\"},\"valueAxis\":\"ValueAxis-1\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_consumer_fetch_rate\",\"customLabel\":\"avg fetch rate\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"min\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_consumer_fetch_rate\",\"customLabel\":\"min fetch rate\"}}]}"
     },
     "id": "stat-kafka_fetch_rate",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-kafka_max_lag",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-kafka_max_lag\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"legendPosition\":\"right\",\"radiusRatio\":9,\"scale\":\"linear\",\"setYExtents\":false,\"showCircles\":true,\"times\":[],\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"max lag\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_consumer_records_max_lag\",\"customLabel\":\"max lag\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "stat-kafka_max_lag",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-kafka_producer_outgoing_byte_rate",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-kafka_producer_outgoing_byte_rate\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"},\"valueAxis\":null},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"bytes per second\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"outgoing byte rate\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_producer_outgoing_byte_rate\",\"customLabel\":\"outgoing byte rate\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "stat-kafka_producer_outgoing_byte_rate",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-kafka_producer_request_rate",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-kafka_producer_request_rate\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"requests per second\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"request rate\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_producer_request_rate\",\"customLabel\":\"request rate\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "stat-kafka_producer_request_rate",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-kafka_records_consumed_rate",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-kafka_records_consumed_rate\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"records per second\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"avg records consumed rate\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_consumer_records_consumed_rate\",\"customLabel\":\"avg records consumed rate\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "stat-kafka_records_consumed_rate",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-log-forwarder_outgoing_byte_rate",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-log-forwarder_outgoing_byte_rate\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"bytes per second\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"outgoing byte rate\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_producer_log-forwarder_outgoing_byte_rate\",\"customLabel\":\"outgoing byte rate\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "stat-log-forwarder_outgoing_byte_rate",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-log-forwarder_request_rate",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-log-forwarder_request_rate\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"requests per second\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"avg request rate\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_producer_log-forwarder_request_rate\",\"customLabel\":\"avg request rate\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "stat-log-forwarder_request_rate",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"*\",\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "perf-kafka-io",
-      "uiStateJSON": "{\"vis\":{\"legendOpen\":true}}",
+      "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"perf-kafka-io\",\"type\":\"line\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"radiusRatio\":9,\"scale\":\"square root\",\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"yAxis\":{},\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"date per 30 seconds\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"square root\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"read messages\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9},{\"show\":true,\"mode\":\"normal\",\"type\":\"line\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"data\":{\"id\":\"3\",\"label\":\"write messages\"},\"valueAxis\":\"ValueAxis-1\"}],\"legendPosition\":\"right\",\"type\":\"line\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.kafka.read_entries\",\"customLabel\":\"read messages\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"perf_stats.kafka.write_entries\",\"customLabel\":\"write messages\"}}]}"
     },
     "id": "perf-kafka-io",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-log-forwarder_request_size_avg",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-log-forwarder_request_size_avg\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"bytes\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"avg request size\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_producer_log-forwarder_request_size_avg\",\"customLabel\":\"avg request size\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "stat-log-forwarder_request_size_avg",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-kafka_producer_request_size_avg",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"title\":\"stat-kafka_producer_request_size_avg\",\"type\":\"line\",\"params\":{\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"showCircles\":true,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"type\":\"line\",\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\",\"setYExtents\":false,\"defaultYExtents\":false},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"bytes\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"line\",\"mode\":\"normal\",\"data\":{\"label\":\"request size avg\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"radiusRatio\":9}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"stats.kafka_producer_request_size_avg\",\"customLabel\":\"request size avg\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"extended_bounds\":{}}}]}"
     },
     "id": "stat-kafka_producer_request_size_avg",
-    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "stat-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\"}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "errors",
       "uiStateJSON": "{\n  \"vis\": {\n    \"params\": {\n      \"sort\": {\n        \"columnIndex\": null,\n        \"direction\": null\n      }\n    }\n  }\n}",
       "version": 1,
       "visState": "{\"title\":\"errors\",\"type\":\"table\",\"params\":{\"perPage\":5,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"showTotal\":true,\"totalFunc\":\"sum\"},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{\"customLabel\":\"count\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"split\",\"params\":{\"field\":\"app\",\"size\":50,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"row\":true}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"result\",\"size\":50,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}},{\"id\":\"4\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"error_code\",\"size\":50,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}},{\"id\":\"5\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"bucket\",\"params\":{\"field\":\"action\",\"size\":50,\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
     },
     "id": "action-errors",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
@@ -613,22 +613,21 @@
       "visState": "{\"title\":\"trace-result_count\",\"type\":\"histogram\",\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"filter\":true,\"truncate\":100},\"title\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"histogram\",\"mode\":\"stacked\",\"data\":{\"label\":\"count\",\"id\":\"1\"},\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"showCircles\":true}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false,\"labels\":{\"show\":false},\"dimensions\":{\"x\":null,\"y\":[{\"accessor\":0,\"format\":{\"id\":\"number\"},\"params\":{},\"aggType\":\"count\"}]}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"useNormalizedEsInterval\":true,\"interval\":\"auto\",\"drop_partials\":false,\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"result\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":5,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"}}]}"
     },
     "id": "trace-result_count",
-    "migrationVersion": {"visualization": "7.3.0"},
-    "references": [{"id": "trace-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "trace-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"language\":\"lucene\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "request-count-per-app",
       "uiStateJSON": "{}",
       "version": 1,
       "visState": "{\"type\":\"line\",\"params\":{\"shareYAxis\":true,\"addTooltip\":true,\"addLegend\":true,\"showCircles\":true,\"smoothLines\":false,\"interpolate\":\"linear\",\"scale\":\"linear\",\"drawLinesBetweenPoints\":true,\"radiusRatio\":9,\"times\":[],\"addTimeMarker\":false,\"defaultYExtents\":false,\"setYExtents\":false,\"yAxis\":{}},\"aggs\":[{\"id\":\"1\",\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"m\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"app\",\"size\":10,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{},\"title\":\"request-count-per-app\"}"
     },
     "id": "request-statistic-per-app",
-    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}],
-    "type": "visualization"
+    "type": "visualization",
+    "references": [{"id": "action-pattern", "name": "kibanaSavedObjectMeta.searchSourceJSON.index", "type": "index-pattern"}]
   },
   {
     "attributes": {
@@ -640,7 +639,6 @@
       "visState": "{\n  \"title\": \"stat-redis_keys\",\n  \"type\": \"metrics\",\n  \"params\": {\n    \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\",\n    \"type\": \"timeseries\",\n    \"series\": [\n      {\n        \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\",\n        \"color\": \"rgba(0,156,224,1)\",\n        \"split_mode\": \"everything\",\n        \"metrics\": [{\"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"type\": \"max\", \"field\": \"stats.redis_keys\"}],\n        \"separate_axis\": 0,\n        \"axis_position\": \"right\",\n        \"formatter\": \"number\",\n        \"chart_type\": \"line\",\n        \"line_width\": \"1\",\n        \"point_size\": \"1\",\n        \"fill\": \"0.5\",\n        \"stacked\": \"none\",\n        \"label\": \"keys\",\n        \"type\": \"timeseries\",\n        \"steps\": 0\n      }\n    ],\n    \"time_field\": \"@timestamp\",\n    \"index_pattern\": \"stat-*\",\n    \"interval\": \"\",\n    \"axis_position\": \"left\",\n    \"axis_formatter\": \"number\",\n    \"axis_scale\": \"normal\",\n    \"show_legend\": 1,\n    \"show_grid\": 1,\n    \"default_index_pattern\": \"action-*\",\n    \"default_timefield\": \"@timestamp\",\n    \"isModelInvalid\": false\n  },\n  \"aggs\": []\n}"
     },
     "id": "stat-redis_keys",
-    "references": [],
     "type": "visualization"
   },
   {
@@ -653,7 +651,6 @@
       "visState": "{\n  \"title\": \"stat-redis_mem\", \"type\": \"metrics\", \"params\": {\n  \"axis_formatter\": \"number\",\n  \"axis_position\": \"left\",\n  \"axis_scale\": \"normal\",\n  \"default_index_pattern\": \"action-*\",\n  \"default_timefield\": \"@timestamp\",\n  \"id\": \"61ca57f0-469d-11e7-af02-69e470af7417\",\n  \"index_pattern\": \"stat-*\",\n  \"interval\": \"\",\n  \"isModelInvalid\": false,\n  \"series\": [\n    {\n      \"axis_position\": \"right\",\n      \"chart_type\": \"line\",\n      \"color\": \"rgba(174,161,255,1)\",\n      \"fill\": \"0.5\",\n      \"formatter\": \"bytes\",\n      \"id\": \"61ca57f1-469d-11e7-af02-69e470af7417\",\n      \"label\": \"max memory\",\n      \"line_width\": \"1\",\n      \"metrics\": [{\"field\": \"stats.redis_mem_max\", \"id\": \"61ca57f2-469d-11e7-af02-69e470af7417\", \"type\": \"max\"}],\n      \"point_size\": \"1\",\n      \"separate_axis\": 0,\n      \"split_mode\": \"everything\",\n      \"stacked\": \"none\",\n      \"steps\": 0,\n      \"type\": \"timeseries\"\n    },\n    {\n      \"axis_position\": \"right\",\n      \"chart_type\": \"line\",\n      \"color\": \"rgba(123,100,255,1)\",\n      \"fill\": \"0.5\",\n      \"formatter\": \"bytes\",\n      \"id\": \"c90a2c90-4449-11ea-b9a6-e7ecf69ef6da\",\n      \"label\": \"used memory\",\n      \"line_width\": \"1\",\n      \"metrics\": [{\"field\": \"stats.redis_mem_used\", \"id\": \"c90a2c91-4449-11ea-b9a6-e7ecf69ef6da\", \"type\": \"max\"}],\n      \"point_size\": \"1\",\n      \"separate_axis\": 0,\n      \"split_mode\": \"everything\",\n      \"stacked\": \"none\",\n      \"steps\": 0,\n      \"type\": \"timeseries\"\n    }\n  ],\n  \"show_grid\": 1,\n  \"show_legend\": 1,\n  \"time_field\": \"@timestamp\",\n  \"type\": \"timeseries\"\n}, \"aggs\": []\n}"
     },
     "id": "stat-redis_mem",
-    "references": [],
     "type": "visualization"
   },
   {
@@ -666,7 +663,6 @@
       "visState": "{\n  \"title\": \"stat-es_disk\", \"type\": \"metrics\", \"params\": {\n  \"axis_formatter\": \"number\",\n  \"axis_position\": \"left\",\n  \"axis_scale\": \"normal\",\n  \"default_index_pattern\": \"stat-*\",\n  \"default_timefield\": \"@timestamp\",\n  \"id\": \"stat-es_disk\",\n  \"index_pattern\": \"stat-*\",\n  \"interval\": \"\",\n  \"isModelInvalid\": false,\n  \"series\": [\n    {\n      \"axis_position\": \"right\",\n      \"chart_type\": \"line\",\n      \"color\": \"rgba(174,161,255,1)\",\n      \"fill\": \"0.5\",\n      \"formatter\": \"bytes\",\n      \"id\": \"es_disk_max\",\n      \"label\": \"max disk\",\n      \"line_width\": \"1\",\n      \"metrics\": [{\"field\": \"stats.es_disk_max\", \"id\": \"es_disk_max\", \"type\": \"max\"}],\n      \"point_size\": \"1\",\n      \"separate_axis\": 0,\n      \"split_mode\": \"everything\",\n      \"stacked\": \"none\",\n      \"steps\": 0,\n      \"type\": \"timeseries\"\n    },\n    {\n      \"axis_position\": \"right\",\n      \"chart_type\": \"line\",\n      \"color\": \"rgba(123,100,255,1)\",\n      \"fill\": \"0.5\",\n      \"formatter\": \"bytes\",\n      \"id\": \"es_disk_used\",\n      \"label\": \"used disk\",\n      \"line_width\": \"1\",\n      \"metrics\": [{\"field\": \"stats.es_disk_used\", \"id\": \"es_disk_used\", \"type\": \"max\"}],\n      \"point_size\": \"1\",\n      \"separate_axis\": 0,\n      \"split_mode\": \"everything\",\n      \"stacked\": \"none\",\n      \"steps\": 0,\n      \"type\": \"timeseries\"\n    }\n  ],\n  \"show_grid\": 1,\n  \"show_legend\": 1,\n  \"time_field\": \"@timestamp\",\n  \"type\": \"timeseries\"\n}, \"aggs\": []\n}"
     },
     "id": "stat-es_disk",
-    "references": [],
     "type": "visualization"
   },
   {
@@ -679,7 +675,6 @@
       "visState": "{\n  \"title\": \"stat-es_heap\", \"type\": \"metrics\", \"params\": {\n  \"axis_formatter\": \"number\",\n  \"axis_position\": \"left\",\n  \"axis_scale\": \"normal\",\n  \"default_index_pattern\": \"stat-*\",\n  \"default_timefield\": \"@timestamp\",\n  \"id\": \"stat-es_heap\",\n  \"index_pattern\": \"stat-*\",\n  \"interval\": \"\",\n  \"isModelInvalid\": false,\n  \"series\": [\n    {\n      \"axis_position\": \"right\",\n      \"chart_type\": \"line\",\n      \"color\": \"rgba(174,161,255,1)\",\n      \"fill\": \"0.5\",\n      \"formatter\": \"bytes\",\n      \"id\": \"es_heap_max\",\n      \"label\": \"max heap\",\n      \"line_width\": \"1\",\n      \"metrics\": [{\"field\": \"stats.es_heap_max\", \"id\": \"es_heap_max\", \"type\": \"max\"}],\n      \"point_size\": \"1\",\n      \"separate_axis\": 0,\n      \"split_mode\": \"everything\",\n      \"stacked\": \"none\",\n      \"steps\": 0,\n      \"type\": \"timeseries\"\n    },\n    {\n      \"axis_position\": \"right\",\n      \"chart_type\": \"line\",\n      \"color\": \"rgba(123,100,255,1)\",\n      \"fill\": \"0.5\",\n      \"formatter\": \"bytes\",\n      \"id\": \"es_heap_used\",\n      \"label\": \"used heap\",\n      \"line_width\": \"1\",\n      \"metrics\": [{\"field\": \"stats.es_heap_used\", \"id\": \"es_heap_used\", \"type\": \"max\"}],\n      \"point_size\": \"1\",\n      \"separate_axis\": 0,\n      \"split_mode\": \"everything\",\n      \"stacked\": \"none\",\n      \"steps\": 0,\n      \"type\": \"timeseries\"\n    }\n  ],\n  \"show_grid\": 1,\n  \"show_legend\": 1,\n  \"time_field\": \"@timestamp\",\n  \"type\": \"timeseries\"\n}, \"aggs\": []\n}"
     },
     "id": "stat-es_heap",
-    "references": [],
     "type": "visualization"
   },
   {
@@ -692,7 +687,6 @@
       "visState": "{\n  \"title\": \"stat-es_docs\", \"type\": \"metrics\", \"params\": {\n  \"axis_formatter\": \"number\",\n  \"axis_position\": \"left\",\n  \"axis_scale\": \"normal\",\n  \"default_index_pattern\": \"stat-*\",\n  \"default_timefield\": \"@timestamp\",\n  \"id\": \"stat-es_docs\",\n  \"index_pattern\": \"stat-*\",\n  \"interval\": \"\",\n  \"isModelInvalid\": false,\n  \"series\": [\n    {\n      \"axis_position\": \"right\",\n      \"chart_type\": \"line\",\n      \"color\": \"rgba(174,161,255,1)\",\n      \"fill\": \"0.5\",\n      \"formatter\": \"number\",\n      \"id\": \"es_docs\",\n      \"label\": \"doc count\",\n      \"line_width\": \"1\",\n      \"metrics\": [{\"field\": \"stats.es_docs\", \"id\": \"es_docs\", \"type\": \"max\"}],\n      \"point_size\": \"1\",\n      \"separate_axis\": 0,\n      \"split_mode\": \"everything\",\n      \"stacked\": \"none\",\n      \"steps\": 0,\n      \"type\": \"timeseries\"\n    }\n  ],\n  \"show_grid\": 1,\n  \"show_legend\": 1,\n  \"time_field\": \"@timestamp\",\n  \"type\": \"timeseries\"\n}, \"aggs\": []\n}"
     },
     "id": "stat-es_docs",
-    "references": [],
     "type": "visualization"
   },
   {
@@ -701,8 +695,8 @@
     "attributes": {
       "description": "Overall action statistics",
       "hits": 0,
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"},
-      "optionsJSON": "{\"darkTheme\":true,\"useMargins\":true,\"hidePanelTitles\":false}",
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
+      "optionsJSON": "{}",
       "panelsJSON": "[\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_0\"},\n  {\"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"},\n  {\"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_3\"},\n  {\"gridData\": {\"x\": 0, \"y\": 60, \"w\": 48, \"h\": 60, \"i\": \"5\"}, \"panelIndex\": \"5\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_4\"}\n]",
       "timeRestore": false,
       "title": "action",
@@ -722,7 +716,7 @@
     "attributes": {
       "description": "Application performance",
       "hits": 0,
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"match_all\":{}},\"language\":\"lucene\"}}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
       "optionsJSON": "{}",
       "panelsJSON": "[\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_1\"},\n  {\"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_2\"},\n  {\"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_3\"},\n  {\"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_4\"},\n  {\"gridData\": {\"x\": 0, \"y\": 60, \"w\": 48, \"h\": 15, \"i\": \"5\"}, \"panelIndex\": \"5\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_5\"},\n  {\"gridData\": {\"x\": 0, \"y\": 75, \"w\": 48, \"h\": 15, \"i\": \"6\"}, \"panelIndex\": \"6\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_6\"},\n  {\"gridData\": {\"x\": 0, \"y\": 90, \"w\": 48, \"h\": 15, \"i\": \"7\"}, \"panelIndex\": \"7\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_7\"},\n  {\"gridData\": {\"x\": 0, \"y\": 105, \"w\": 48, \"h\": 15, \"i\": \"8\"}, \"panelIndex\": \"8\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_8\"},\n  {\"gridData\": {\"x\": 0, \"y\": 120, \"w\": 48, \"h\": 15, \"i\": \"9\"}, \"panelIndex\": \"9\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_9\"},\n  {\"gridData\": {\"x\": 0, \"y\": 135, \"w\": 48, \"h\": 15, \"i\": \"10\"}, \"panelIndex\": \"10\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_10\"},\n  {\"gridData\": {\"x\": 0, \"y\": 150, \"w\": 48, \"h\": 15, \"i\": \"11\"}, \"panelIndex\": \"11\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_11\"},\n  {\"gridData\": {\"x\": 0, \"y\": 165, \"w\": 48, \"h\": 15, \"i\": \"12\"}, \"panelIndex\": \"12\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_12\"},\n  {\"gridData\": {\"x\": 0, \"y\": 180, \"w\": 48, \"h\": 15, \"i\": \"13\"}, \"panelIndex\": \"13\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_13\"},\n  {\"gridData\": {\"x\": 0, \"y\": 195, \"w\": 48, \"h\": 15, \"i\": \"14\"}, \"panelIndex\": \"14\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_14\"},\n  {\"gridData\": {\"x\": 0, \"y\": 205, \"w\": 48, \"h\": 15, \"i\": \"15\"}, \"panelIndex\": \"15\", \"embeddableConfig\": {\"vis\": {\"legendOpen\": false}}, \"panelRefName\": \"panel_15\"}\n]\n",
       "timeRestore": false,
@@ -753,10 +747,9 @@
     "attributes": {
       "description": "Application errors",
       "hits": 0,
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"query\":{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true,\"default_field\":\"*\",\"time_zone\":\"America/New_York\"}},\"language\":\"lucene\"}}"},
-      "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
+      "optionsJSON": "",
       "panelsJSON": "[\n  {\"panelIndex\": \"1\", \"embeddableConfig\": {}, \"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 60, \"i\": \"1\"}, \"panelRefName\": \"panel_0\"},\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"}\n]",
-      "refreshInterval": {"pause": true, "value": 0},
       "timeFrom": "now-24h",
       "timeRestore": true,
       "timeTo": "now",
@@ -774,8 +767,8 @@
     "attributes": {
       "description": "Business metrics",
       "hits": 0,
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"lucene\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"default_field\":\"*\",\"query\":\"*\"}}},\"highlightAll\":true,\"version\":true}"},
-      "optionsJSON": "{\"darkTheme\":false,\"useMargins\":false}",
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
+      "optionsJSON": "{}",
       "panelsJSON": "[\n  {\"panelIndex\": \"4\", \"gridData\": {\"x\": 0, \"y\": 0, \"w\": 24, \"h\": 15, \"i\": \"4\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_0\"},\n  {\"panelIndex\": \"5\", \"gridData\": {\"x\": 24, \"y\": 0, \"w\": 24, \"h\": 15, \"i\": \"5\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"panelIndex\": \"6\", \"gridData\": {\"x\": 0, \"y\": 15, \"w\": 24, \"h\": 15, \"i\": \"6\"}, \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"}\n]",
       "timeRestore": false,
       "title": "business",
@@ -793,8 +786,8 @@
     "attributes": {
       "description": "DB performance",
       "hits": 0,
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"match_all\":{}},\"language\":\"lucene\"}}"},
-      "optionsJSON": "{\"darkTheme\":true,\"useMargins\":true}",
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
+      "optionsJSON": "{}",
       "panelsJSON": "[\n  {\"embeddableConfig\": {}, \"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"panelRefName\": \"panel_0\"},\n  {\"embeddableConfig\": {}, \"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"panelRefName\": \"panel_1\"},\n  {\"embeddableConfig\": {}, \"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"panelRefName\": \"panel_2\"},\n  {\"embeddableConfig\": {}, \"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"panelRefName\": \"panel_3\"}\n]",
       "timeRestore": false,
       "title": "db",
@@ -813,8 +806,8 @@
     "attributes": {
       "description": "Redis performance",
       "hits": 0,
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"match_all\":{}},\"language\":\"lucene\"}}"},
-      "optionsJSON": "{\"darkTheme\":true,\"hidePanelTitles\":false,\"useMargins\":true}",
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
+      "optionsJSON": "{}",
       "panelsJSON": "[\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_0\"},\n  {\"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"},\n  {\"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_3\"},\n  {\"gridData\": {\"x\": 0, \"y\": 60, \"w\": 48, \"h\": 15, \"i\": \"5\"}, \"panelIndex\": \"5\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_4\"},\n  {\"gridData\": {\"x\": 0, \"y\": 75, \"w\": 48, \"h\": 15, \"i\": \"6\"}, \"panelIndex\": \"6\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_5\"},\n  {\"gridData\": {\"x\": 0, \"y\": 90, \"w\": 48, \"h\": 15, \"i\": \"7\"}, \"panelIndex\": \"7\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_6\"}\n]",
       "timeRestore": false,
       "title": "redis",
@@ -836,7 +829,7 @@
     "attributes": {
       "description": "Kafka performance",
       "hits": 0,
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":{\"match_all\":{}},\"language\":\"lucene\"}}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
       "optionsJSON": "{}",
       "panelsJSON": "[\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"},\n  {\"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_3\"},\n  {\"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_4\"},\n  {\"gridData\": {\"x\": 0, \"y\": 60, \"w\": 48, \"h\": 15, \"i\": \"5\"}, \"panelIndex\": \"5\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_5\"},\n  {\"gridData\": {\"x\": 0, \"y\": 75, \"w\": 48, \"h\": 15, \"i\": \"6\"}, \"panelIndex\": \"6\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_6\"},\n  {\"gridData\": {\"x\": 0, \"y\": 90, \"w\": 48, \"h\": 15, \"i\": \"7\"}, \"panelIndex\": \"7\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_7\"},\n  {\"gridData\": {\"x\": 0, \"y\": 105, \"w\": 48, \"h\": 15, \"i\": \"8\"}, \"panelIndex\": \"8\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_8\"},\n  {\"gridData\": {\"x\": 0, \"y\": 120, \"w\": 48, \"h\": 15, \"i\": \"9\"}, \"panelIndex\": \"9\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_9\"},\n  {\"gridData\": {\"x\": 0, \"y\": 135, \"w\": 48, \"h\": 15, \"i\": \"10\"}, \"panelIndex\": \"10\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_10\"},\n  {\"gridData\": {\"x\": 0, \"y\": 150, \"w\": 48, \"h\": 15, \"i\": \"11\"}, \"panelIndex\": \"11\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_11\"},\n  {\"gridData\": {\"x\": 0, \"y\": 165, \"w\": 48, \"h\": 15, \"i\": \"12\"}, \"panelIndex\": \"12\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_12\"}\n]\n",
       "timeRestore": false,
@@ -864,8 +857,8 @@
     "attributes": {
       "description": "Elasticsearch performance",
       "hits": 0,
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[]}"},
-      "optionsJSON": "{\"darkTheme\":true,\"hidePanelTitles\":false,\"useMargins\":true}",
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
+      "optionsJSON": "{}",
       "panelsJSON": "[\n  {\"gridData\": {\"x\": 0, \"y\": 0, \"w\": 48, \"h\": 15, \"i\": \"1\"}, \"panelIndex\": \"1\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_0\"},\n  {\"gridData\": {\"x\": 0, \"y\": 15, \"w\": 48, \"h\": 15, \"i\": \"2\"}, \"panelIndex\": \"2\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_1\"},\n  {\"gridData\": {\"x\": 0, \"y\": 30, \"w\": 48, \"h\": 15, \"i\": \"3\"}, \"panelIndex\": \"3\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_2\"},\n  {\"gridData\": {\"x\": 0, \"y\": 45, \"w\": 48, \"h\": 15, \"i\": \"4\"}, \"panelIndex\": \"4\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_3\"},\n  {\"gridData\": {\"x\": 0, \"y\": 60, \"w\": 48, \"h\": 15, \"i\": \"5\"}, \"panelIndex\": \"5\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_4\"},\n  {\"gridData\": {\"x\": 0, \"y\": 75, \"w\": 48, \"h\": 15, \"i\": \"6\"}, \"panelIndex\": \"6\", \"embeddableConfig\": {}, \"panelRefName\": \"panel_5\"}\n]",
       "timeRestore": false,
       "title": "elasticsearch",
