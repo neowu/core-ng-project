@@ -13,6 +13,7 @@
 * /_sys/, kafka controller, should call message handler directly?
 * revisit trace log truncation, better/more elegant handling?
 * write unit test support to check break compatibility of API/DB?
+* ws: whether optimize channelContext.all().send()? only toJson once?
 
 ### jdk 14 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
