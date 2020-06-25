@@ -7,6 +7,6 @@ FROM        adoptopenjdk/openjdk14:alpine-jre
 LABEL       app=monitor
 RUN         addgroup --system app && adduser --system --no-create-home --ingroup app app
 USER        app
-COPY        --from=build /depot/build/ext/monitor/distributions/docker/dependency    /opt/app
-COPY        --from=build /depot/build/ext/monitor/distributions/docker/app           /opt/app
+COPY        --from=build /depot/build/ext/monitor/docker/package/dependency    /opt/app
+COPY        --from=build /depot/build/ext/monitor/docker/package/app           /opt/app
 ENTRYPOINT  ["/opt/app/bin/monitor"]

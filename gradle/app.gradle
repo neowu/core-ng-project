@@ -52,21 +52,29 @@ afterEvaluate {
         group = 'distribution'
         dependsOn installDist
         doLast {
-            def appJarPrefix = parent.depth > 0 ? parent.group : project.group;
+            def rootGroup = parent.depth > 0 ? parent.group : project.group;
             project.sync {
                 from(installDist.destinationDir) {
-                    exclude "lib/${appJarPrefix}.*.jar"
+                    exclude "lib/${rootGroup}.*.jar"
                     exclude 'bin'
                     exclude 'web'
                     into('dependency')
                 }
                 from(installDist.destinationDir) {
-                    include "lib/${appJarPrefix}.*.jar"
+                    include "lib/${rootGroup}.*.jar"
                     include 'bin/**'
                     include 'web/**'
                     into('app')
                 }
-                into("${buildDir}/distributions/docker")
+                into("${buildDir}/docker/package")
+            }
+            if (project.file('docker/Dockerfile').exists()) {
+                // due to https://github.com/gradle/gradle/issues/4553, project.sync can't use preserve
+                delete project.file("${buildDir}/docker").listFiles().findAll { it.getName() != 'package' }
+                project.copy {
+                    from(project.file('docker'))
+                    into("${buildDir}/docker")
+                }
             }
         }
     }

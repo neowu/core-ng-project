@@ -7,6 +7,6 @@ FROM        adoptopenjdk/openjdk14:alpine-jre
 LABEL       app=log-processor
 RUN         addgroup --system app && adduser --system --no-create-home --ingroup app app
 USER        app
-COPY        --from=build /depot/build/ext/log-processor/distributions/docker/dependency    /opt/app
-COPY        --from=build /depot/build/ext/log-processor/distributions/docker/app           /opt/app
+COPY        --from=build /depot/build/ext/log-processor/docker/package/dependency    /opt/app
+COPY        --from=build /depot/build/ext/log-processor/docker/package/app           /opt/app
 ENTRYPOINT  ["/opt/app/bin/log-processor"]
