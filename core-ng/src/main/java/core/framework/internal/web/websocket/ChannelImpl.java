@@ -37,18 +37,16 @@ public class ChannelImpl implements Channel, Channel.Context {
 
     @Override
     public <T> void send(T message) {
-        // refer to io.undertow.websockets.core.WebSocketChannel.send,
+        var watch = new StopWatch();
+        String text = handler.toServerMessage(message);
+
+        // refer to io.undertow.websockets.core.WebSocketChannel.send(WebSocketFrameType),
         // in concurrent env, one thread can still get hold of channel from context right before channel close listener removes it from context
-        // this condition is to reduce chance of WebSocketMessages.MESSAGES.channelClosed() warning
-        //
-        // but in theory, there is still small possibility to trigger channelClosed() exception,
-        // even put this check right before WebSockets.sendText(), so only check at beginning of method to keep overall structure simple
+        // this is to reduce chance of triggering WebSocketMessages.MESSAGES.channelClosed() exception
+        // but in theory, there is still small possibility to cause channelClosed()
         if (channel.isCloseFrameSent() || channel.isCloseFrameReceived()) return;
 
-        var watch = new StopWatch();
-        String text = null;
         try {
-            text = handler.toServerMessage(message);
             WebSockets.sendText(text, channel, ChannelCallback.INSTANCE);
         } finally {
             long elapsed = watch.elapsed();
