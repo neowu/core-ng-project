@@ -19,33 +19,77 @@ import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author neo
  */
 public final class KafkaAppender implements LogAppender {
     public final ProducerMetrics producerMetrics = new ProducerMetrics("log-forwarder");
+
     private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
     private final BlockingQueue<ProducerRecord<byte[], byte[]>> records = new LinkedBlockingQueue<>();
-    private final Producer<byte[], byte[]> producer;
-
-    private final AtomicBoolean stop = new AtomicBoolean(false);
     private final Thread logForwarderThread;
     private final JSONMapper<ActionLogMessage> actionLogMapper;
     private final JSONMapper<StatMessage> statMapper;
     private final Callback callback = new ProducerCallback();
 
+    private Producer<byte[], byte[]> producer;
+    private volatile boolean stop;
+
     public KafkaAppender(String uri) {
-        var watch = new StopWatch();
         actionLogMapper = new JSONMapper<>(ActionLogMessage.class);
         statMapper = new JSONMapper<>(StatMessage.class);
+
+        logForwarderThread = new Thread(() -> {
+            logger.info("log forwarder thread started, uri={}", uri);
+            List<String> uris = KafkaURI.parse(uri);
+            waitUntilKafkaHostIsResolvable(uris);
+            producer = createProducer(uris);
+
+            while (!stop) {
+                try {
+                    ProducerRecord<byte[], byte[]> record = records.take();
+                    producer.send(record, callback);
+                } catch (Throwable e) {
+                    if (!stop) {
+                        logger.warn("failed to send log message, retry in 30 seconds", e);
+                        records.clear();
+                        Threads.sleepRoughly(Duration.ofSeconds(30));
+                    }
+                }
+            }
+        }, "log-forwarder");
+    }
+
+    private void waitUntilKafkaHostIsResolvable(List<String> uris) {
+        while (!stop) {
+            for (String uri : uris) {
+                if (resolveURI(uri)) return;
+            }
+            logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", uris);
+            records.clear();
+            Threads.sleepRoughly(Duration.ofSeconds(10));
+        }
+    }
+
+    boolean resolveURI(String uri) {
+        int index = uri.indexOf(':');
+        if (index == -1) throw new Error("invalid kafka uri, uri=" + uri);
+        String host = uri.substring(0, index);
+        InetSocketAddress address = new InetSocketAddress(host, 9092);
+        return !address.isUnresolved();
+    }
+
+    private KafkaProducer<byte[], byte[]> createProducer(List<String> uris) {
+        var watch = new StopWatch();
         try {
-            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaURI.parse(uri),
+            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uris,
                     ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
                     ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                       // if not specify, kafka uses producer-${seq} name, also impact jmx naming
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
@@ -55,27 +99,12 @@ public final class KafkaAppender implements LogAppender {
                     ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000,               // 5s
                     ProducerConfig.MAX_BLOCK_MS_CONFIG, 30L * 1000);                         // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
             var serializer = new ByteArraySerializer();
-            producer = new KafkaProducer<>(config, serializer, serializer);
+            var producer = new KafkaProducer<>(config, serializer, serializer);
             producerMetrics.set(producer.metrics());
+            return producer;
         } finally {
-            logger.info("create log forwarder, uri={}, elapsed={}", uri, watch.elapsed());
+            logger.info("create kafka log producer, uri={}, elapsed={}", uris, watch.elapsed());
         }
-
-        logForwarderThread = new Thread(() -> {
-            logger.info("log forwarder thread started, uri={}", uri);
-            while (!stop.get()) {
-                try {
-                    ProducerRecord<byte[], byte[]> record = records.take();
-                    producer.send(record, callback);
-                } catch (Throwable e) {
-                    if (!stop.get()) {
-                        logger.warn("failed to send log message, retry in 30 seconds", e);
-                        records.clear();
-                        Threads.sleepRoughly(Duration.ofSeconds(30));
-                    }
-                }
-            }
-        }, "log-forwarder");
     }
 
     @Override
@@ -96,12 +125,14 @@ public final class KafkaAppender implements LogAppender {
 
     public void stop(long timeoutInMs) {
         logger.info("stop log forwarder");
-        stop.set(true);
+        stop = true;
         logForwarderThread.interrupt();
-        for (ProducerRecord<byte[], byte[]> record : records) {     // if log-kafka is not available, here will block MAX_BLOCK_MS, to simplify it's ok not handling timeout since kafka appender is at end of shutdown, no more critical resources left to handle
-            producer.send(record);
+        if (producer != null) {     // producer can be null if uri is not resolved
+            for (ProducerRecord<byte[], byte[]> record : records) {     // if log-kafka is not available, here will block MAX_BLOCK_MS, to simplify it's ok not handling timeout since kafka appender is at end of shutdown, no more critical resources left to handle
+                producer.send(record);
+            }
+            producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));
         }
-        producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));
     }
 
     // pmd has flaws to check slf4j log format with lambda, even with https://github.com/pmd/pmd/pull/2263, it fails to analyze logger in lambda+if condition block
