@@ -52,8 +52,7 @@ subprojects {
                 attributes 'Implementation-Title': project.name,
                         'Implementation-Version': project.version,
                         'Created-By': "${System.getProperty('java.version')} (${System.getProperty('java.vendor')})",
-                        'Built-With': "gradle ${project.gradle.gradleVersion}",
-                        'Build-Time': Instant.now().toString()
+                        'Built-With': "gradle ${project.gradle.gradleVersion}"
             }
         }
     }
