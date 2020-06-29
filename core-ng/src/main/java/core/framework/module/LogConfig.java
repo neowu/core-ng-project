@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.internal.kafka.KafkaURI;
 import core.framework.internal.log.CollectStatTask;
 import core.framework.internal.log.appender.ConsoleAppender;
 import core.framework.internal.log.appender.KafkaAppender;
@@ -25,8 +26,8 @@ public class LogConfig extends Config {
         appender(new ConsoleAppender());
     }
 
-    public void appendToKafka(String kafkaURI) {
-        var appender = new KafkaAppender(kafkaURI);
+    public void appendToKafka(String uri) {
+        var appender = new KafkaAppender(new KafkaURI(uri));
         appender(appender);
         context.startupHook.add(appender::start);
         context.shutdownHook.add(ShutdownHook.STAGE_8, appender::stop);

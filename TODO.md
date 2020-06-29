@@ -13,6 +13,7 @@
 * revisit trace log truncation, better/more elegant handling?
 * write unit test support to check break compatibility of API/DB?
 * cache: redis 6, resp3, client tracking 
+* redis: support zset
 
 ### jdk 14 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

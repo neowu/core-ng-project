@@ -1,9 +1,9 @@
 ## Change log
-### 7.4.11 (06/19/2020 - )
+### 7.4.11 (06/19/2020 - 06/29/2020)
 * es: update to 7.8.0
 * ws: reduce warnings on sending message to closed channel (occurs on sending message before channel close listener finish)
-* log: log kafka appender will wait until log-kafka is resolvable, to make log-kafka not to block app startup
-    in kube env, this improves recovery time if both log-kafka and app recreated at same time  
+* kafka: kafka producer/consumer will be created after startup and wait until kafka uri is resolvable
+    in kube env, this improves recovery time if both kafka and app recreated at same time, and this make kafka has same behavior of other db (mysql/redis/etc)  
 
 ### 7.4.10 (06/10/2020 - 06/18/2020)
 * monitor: tweak kube monitor pod not ready error message

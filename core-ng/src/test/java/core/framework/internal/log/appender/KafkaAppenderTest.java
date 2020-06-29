@@ -1,11 +1,8 @@
 package core.framework.internal.log.appender;
 
+import core.framework.internal.kafka.KafkaURI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -15,16 +12,11 @@ class KafkaAppenderTest {
 
     @BeforeEach
     void createKafkaAppender() {
-        appender = new KafkaAppender("localhost");
+        appender = new KafkaAppender(new KafkaURI("localhost"));
     }
 
     @Test
     void stop() {
         appender.stop(-1);
-    }
-
-    @Test
-    void resolveURI() {
-        assertThat(appender.resolveURI(List.of("localhost:9092"))).isTrue();
     }
 }

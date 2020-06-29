@@ -19,9 +19,7 @@ import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -37,22 +35,21 @@ public final class KafkaAppender implements LogAppender {
     private final Thread logForwarderThread;
     private final JSONMapper<ActionLogMessage> actionLogMapper;
     private final JSONMapper<StatMessage> statMapper;
-    private final Callback callback = new ProducerCallback();
+    private final Callback callback = new KafkaCallback();
 
     private Producer<byte[], byte[]> producer;
     private volatile boolean stop;
 
-    public KafkaAppender(String uri) {
+    public KafkaAppender(KafkaURI uri) {
         actionLogMapper = new JSONMapper<>(ActionLogMessage.class);
         statMapper = new JSONMapper<>(StatMessage.class);
 
         logForwarderThread = new Thread(() -> {
-            logger.info("log forwarder thread started, uri={}", uri);
-            List<String> uris = KafkaURI.parse(uri);
+            logger.info("log forwarder thread started, uri={}", uri.uri);
 
             while (!stop) {
-                if (resolveURI(uris)) {
-                    producer = createProducer(uris);
+                if (uri.resolveURI()) {
+                    producer = createProducer(uri);
                     break;
                 }
                 logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", uri);
@@ -60,36 +57,29 @@ public final class KafkaAppender implements LogAppender {
                 Threads.sleepRoughly(Duration.ofSeconds(10));
             }
 
-            while (!stop) {
-                try {
-                    ProducerRecord<byte[], byte[]> record = records.take();
-                    producer.send(record, callback);
-                } catch (Throwable e) {
-                    if (!stop) {
-                        logger.warn("failed to send log message, retry in 30 seconds", e);
-                        records.clear();
-                        Threads.sleepRoughly(Duration.ofSeconds(30));
-                    }
-                }
-            }
+            process();
         }, "log-forwarder");
     }
 
-    boolean resolveURI(List<String> uris) {
-        for (String uri : uris) {
-            int index = uri.indexOf(':');
-            if (index == -1) throw new Error("invalid kafka uri, uri=" + uri);
-            String host = uri.substring(0, index);
-            InetSocketAddress address = new InetSocketAddress(host, 9092);
-            if (!address.isUnresolved()) return true;    // break if any uri is resolvable
+    private void process() {
+        while (!stop) {
+            try {
+                ProducerRecord<byte[], byte[]> record = records.take();
+                producer.send(record, callback);
+            } catch (Throwable e) {
+                if (!stop) {
+                    logger.warn("failed to send log message, retry in 30 seconds", e);
+                    records.clear();
+                    Threads.sleepRoughly(Duration.ofSeconds(30));
+                }
+            }
         }
-        return false;
     }
 
-    private KafkaProducer<byte[], byte[]> createProducer(List<String> uris) {
+    private KafkaProducer<byte[], byte[]> createProducer(KafkaURI uri) {
         var watch = new StopWatch();
         try {
-            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uris,
+            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
                     ProducerConfig.ACKS_CONFIG, "0",                                        // no acknowledge to maximize performance
                     ProducerConfig.CLIENT_ID_CONFIG, "log-forwarder",                       // if not specify, kafka uses producer-${seq} name, also impact jmx naming
                     ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
@@ -103,7 +93,7 @@ public final class KafkaAppender implements LogAppender {
             producerMetrics.set(producer.metrics());
             return producer;
         } finally {
-            logger.info("create kafka log producer, uri={}, elapsed={}", uris, watch.elapsed());
+            logger.info("create kafka log producer, uri={}, elapsed={}", uri.uri, watch.elapsed());
         }
     }
 
@@ -137,7 +127,7 @@ public final class KafkaAppender implements LogAppender {
 
     // pmd has flaws to check slf4j log format with lambda, even with https://github.com/pmd/pmd/pull/2263, it fails to analyze logger in lambda+if condition block
     // so here use inner class as workaround
-    private class ProducerCallback implements Callback {
+    private class KafkaCallback implements Callback {
         @Override
         public void onCompletion(RecordMetadata metadata, Exception exception) {
             if (exception != null) {

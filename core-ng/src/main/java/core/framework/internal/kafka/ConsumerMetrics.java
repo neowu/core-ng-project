@@ -2,22 +2,22 @@ package core.framework.internal.kafka;
 
 import core.framework.internal.stat.Metrics;
 import core.framework.internal.stat.Stats;
-import core.framework.util.Lists;
 import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author neo
  */
 public class ConsumerMetrics implements Metrics {
     private final String name;
-    private final List<Metric> recordsLagMax = Lists.newArrayList();        // use non-thread-safe list as it's ok to fail once, and the list is initialized on startup
-    private final List<Metric> recordsConsumedRate = Lists.newArrayList();
-    private final List<Metric> bytesConsumedRate = Lists.newArrayList();
-    private final List<Metric> fetchRate = Lists.newArrayList();
+    private final List<Metric> recordsLagMax = new CopyOnWriteArrayList<>();    // all metrics are added in message thread, so to use concurrent list
+    private final List<Metric> recordsConsumedRate = new CopyOnWriteArrayList<>();
+    private final List<Metric> bytesConsumedRate = new CopyOnWriteArrayList<>();
+    private final List<Metric> fetchRate = new CopyOnWriteArrayList<>();
 
     ConsumerMetrics(String name) {
         this.name = name;

@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static core.framework.log.Markers.errorCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -32,19 +33,22 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 class MessageListenerThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(MessageListenerThread.class);
-    private final Consumer<byte[], byte[]> consumer;
     private final LogManager logManager;
     private final Map<String, MessageProcess<?>> processes;
     private final double batchLongProcessThresholdInNano;
     private final long longConsumerLagThresholdInMs;
+    private final KafkaURI uri;
 
     private final Object lock = new Object();
+    private Consumer<byte[], byte[]> consumer;
+    private Supplier<Consumer<byte[], byte[]>> consumerSupplier;
     private volatile boolean shutdown;
     private volatile boolean processing;
 
-    MessageListenerThread(String name, Consumer<byte[], byte[]> consumer, MessageListener listener) {
+    MessageListenerThread(String name, KafkaURI uri, Supplier<Consumer<byte[], byte[]>> consumerSupplier, MessageListener listener) {
         super(name);
-        this.consumer = consumer;
+        this.uri = uri;
+        this.consumerSupplier = consumerSupplier;
         processes = listener.processes;
         logManager = listener.logManager;
         batchLongProcessThresholdInNano = listener.maxProcessTime.toNanos() * 0.7; // 70% time of max
@@ -55,30 +59,22 @@ class MessageListenerThread extends Thread {
     public void run() {
         try {
             processing = true;
+
+            while (!shutdown) {
+                if (uri.resolveURI()) {
+                    consumer = consumerSupplier.get();
+                    consumerSupplier = null;
+                    break;
+                }
+                logger.warn("failed to resolve kafka uri, retry in 10 seconds, uri={}", uri.uri);
+                Threads.sleepRoughly(Duration.ofSeconds(10));
+            }
+
             process();
         } finally {
             processing = false;
             synchronized (lock) {
                 lock.notifyAll();
-            }
-        }
-    }
-
-    void shutdown() {
-        shutdown = true;
-        consumer.wakeup();
-    }
-
-    void awaitTermination(long timeoutInMs) throws InterruptedException {
-        long end = System.currentTimeMillis() + timeoutInMs;
-        synchronized (lock) {
-            while (processing) {
-                long left = end - System.currentTimeMillis();
-                if (left <= 0) {
-                    logger.warn("failed to terminate kafka message listener thread, name={}", getName());
-                    break;
-                }
-                lock.wait(left);
             }
         }
     }
@@ -95,8 +91,31 @@ class MessageListenerThread extends Thread {
                 Threads.sleepRoughly(Duration.ofSeconds(10));
             }
         }
-        logger.info("close kafka consumer, name={}", getName());
-        consumer.close();
+        if (consumer != null) {
+            logger.info("close kafka consumer, name={}", getName());
+            consumer.close();
+        }
+    }
+
+    void shutdown() {
+        shutdown = true;
+        if (consumer != null) {
+            consumer.wakeup();
+        }
+    }
+
+    void awaitTermination(long timeoutInMs) throws InterruptedException {
+        long end = System.currentTimeMillis() + timeoutInMs;
+        synchronized (lock) {
+            while (processing) {
+                long left = end - System.currentTimeMillis();
+                if (left <= 0) {
+                    logger.warn("failed to terminate kafka message listener thread, name={}", getName());
+                    break;
+                }
+                lock.wait(left);
+            }
+        }
     }
 
     private void processRecords(ConsumerRecords<byte[], byte[]> kafkaRecords) {

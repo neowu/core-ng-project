@@ -3,6 +3,7 @@ package core.framework.internal.kafka;
 import core.framework.internal.log.LogManager;
 import core.framework.kafka.BulkMessageHandler;
 import core.framework.kafka.MessageHandler;
+import core.framework.util.Maps;
 import core.framework.util.Network;
 import core.framework.util.StopWatch;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -18,6 +19,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 /**
  * @author neo
@@ -29,7 +31,7 @@ public class MessageListener {
     final LogManager logManager;
 
     private final Logger logger = LoggerFactory.getLogger(MessageListener.class);
-    private final String uri;
+    private final KafkaURI uri;
     private final String name;
     private final Set<String> topics = new HashSet<>();
 
@@ -44,7 +46,7 @@ public class MessageListener {
 
     private MessageListenerThread[] threads;
 
-    public MessageListener(String uri, String name, LogManager logManager) {
+    public MessageListener(KafkaURI uri, String name, LogManager logManager) {
         this.uri = uri;
         this.name = name;
         this.logManager = logManager;
@@ -58,26 +60,16 @@ public class MessageListener {
     }
 
     public void start() {
-        this.threads = createListenerThreads(); // if it fails to create thread (such kafka host is invalid, failed to create consumer), this.threads will be null to skip shutdown/awaitTermination
+        Supplier<Consumer<byte[], byte[]>> supplier = consumerSupplier();
+        threads = new MessageListenerThread[poolSize];
+        for (int i = 0; i < poolSize; i++) {
+            String name = listenerThreadName(this.name, i);
+            threads[i] = new MessageListenerThread(name, uri, supplier, this);
+        }
         for (var thread : threads) {
             thread.start();
         }
-        logger.info("kafka listener started, uri={}, topics={}, name={}, groupId={}", uri, topics, name, groupId);
-    }
-
-    private MessageListenerThread[] createListenerThreads() {
-        var threads = new MessageListenerThread[poolSize];
-        var watch = new StopWatch();
-        for (int i = 0; i < poolSize; i++) {
-            watch.reset();
-            String name = listenerThreadName(this.name, i);
-            Consumer<byte[], byte[]> consumer = consumer();
-            consumer.subscribe(topics);
-            var thread = new MessageListenerThread(name, consumer, this);
-            threads[i] = thread;
-            logger.info("create kafka listener thread, topics={}, name={}, elapsed={}", topics, name, watch.elapsed());
-        }
-        return threads;
+        logger.info("kafka listener started, uri={}, topics={}, name={}, groupId={}", uri.uri, topics, name, groupId);
     }
 
     String listenerThreadName(String name, int index) {
@@ -85,8 +77,8 @@ public class MessageListener {
     }
 
     public void shutdown() {
-        if (threads != null) {
-            logger.info("shutting down kafka listener, uri={}, name={}", uri, name);
+        if (threads != null) {  // in case of shutdown before startup finish
+            logger.info("shutting down kafka listener, uri={}, name={}", uri.uri, name);
             for (MessageListenerThread thread : threads) {
                 thread.shutdown();
             }
@@ -103,28 +95,36 @@ public class MessageListener {
                     logger.warn(e.getMessage(), e);
                 }
             }
-            logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri, topics, name);
+            logger.info("kafka listener stopped, uri={}, topics={}, name={}", uri.uri, topics, name);
         }
     }
 
-    Consumer<byte[], byte[]> consumer() {
-        Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaURI.parse(uri));
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        config.put(ConsumerConfig.CLIENT_ID_CONFIG, Network.LOCAL_HOST_NAME + "-" + CONSUMER_CLIENT_ID_SEQUENCE.getAndIncrement());      // will show in monitor metrics
-        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");                      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
-        config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
-        config.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L);                       // longer backoff to reduce cpu usage when kafka is not available
-        config.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000);
-        config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
-        config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
-        config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
-        config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) maxWaitTime.toMillis());
-        var deserializer = new ByteArrayDeserializer();
-        Consumer<byte[], byte[]> consumer = new KafkaConsumer<>(config, deserializer, deserializer);
-        consumerMetrics.add(consumer.metrics());
-        return consumer;
-    }
+    Supplier<Consumer<byte[], byte[]>> consumerSupplier() {
+        return () -> {
+            var watch = new StopWatch();
+            try {
+                Map<String, Object> config = Maps.newHashMapWithExpectedSize(12);
+                config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs);
+                config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+                config.put(ConsumerConfig.CLIENT_ID_CONFIG, Network.LOCAL_HOST_NAME + "-" + CONSUMER_CLIENT_ID_SEQUENCE.getAndIncrement());      // will show in monitor metrics
+                config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
+                config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");                      // refer to org.apache.kafka.clients.consumer.ConsumerConfig, must be in("latest", "earliest", "none")
+                config.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) maxProcessTime.toMillis());
+                config.put(ConsumerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L);                       // longer backoff to reduce cpu usage when kafka is not available
+                config.put(ConsumerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000);
+                config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
+                config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxPollBytes);
+                config.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, minPollBytes);
+                config.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, (int) maxWaitTime.toMillis());
+                var deserializer = new ByteArrayDeserializer();
+                Consumer<byte[], byte[]> consumer = new KafkaConsumer<>(config, deserializer, deserializer);
+                consumerMetrics.add(consumer.metrics());
 
+                consumer.subscribe(topics);
+                return consumer;
+            } finally {
+                logger.info("create kafka consumer, topics={}, name={}, elapsed={}", topics, name, watch.elapsed());
+            }
+        };
+    }
 }

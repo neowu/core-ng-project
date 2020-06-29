@@ -2,6 +2,7 @@ package core.framework.module;
 
 import core.framework.http.HTTPMethod;
 import core.framework.internal.bean.BeanClassValidator;
+import core.framework.internal.kafka.KafkaURI;
 import core.framework.internal.kafka.MessageListener;
 import core.framework.internal.kafka.MessageProducer;
 import core.framework.internal.kafka.MessagePublisherImpl;
@@ -28,7 +29,7 @@ public class KafkaConfig extends Config {
     String name;
     MessageProducer producer;
     private ModuleContext context;
-    private String uri;
+    private KafkaURI uri;
     private MessageListener listener;
     private boolean handlerAdded;
 
@@ -46,8 +47,8 @@ public class KafkaConfig extends Config {
 
     public void uri(String uri) {
         if (this.uri != null)
-            throw new Error(format("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri));
-        this.uri = uri;
+            throw new Error(format("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri.uri));
+        this.uri = new KafkaURI(uri);
     }
 
     // for use case as replying message back to publisher, so the topic can be dynamic (different services (consumer group) expect to receive reply in their own topic)
@@ -74,6 +75,7 @@ public class KafkaConfig extends Config {
 
     private MessageProducer createMessageProducer() {
         var producer = new MessageProducer(uri, name);
+        producer.tryCreateProducer();  // try to init kafka during startup
         context.collector.metrics.add(producer.producerMetrics);
         context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
         var controller = new KafkaController(producer);

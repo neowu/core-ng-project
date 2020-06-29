@@ -1,7 +1,10 @@
 package core.framework.internal.kafka;
 
+import org.apache.kafka.clients.consumer.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +16,7 @@ class MessageListenerTest {
 
     @BeforeEach
     void createMessageListener() {
-        listener = new MessageListener("localhost", null, null);
+        listener = new MessageListener(new KafkaURI("localhost"), null, null);
     }
 
     @Test
@@ -23,7 +26,8 @@ class MessageListenerTest {
     }
 
     @Test
-    void consumer() {
-        assertThat(listener.consumer()).isNotNull();
+    void consumerSupplier() {
+        Supplier<Consumer<byte[], byte[]>> supplier = listener.consumerSupplier();
+        assertThat(supplier.get()).isNotNull();
     }
 }
