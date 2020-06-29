@@ -49,8 +49,16 @@ public final class KafkaAppender implements LogAppender {
         logForwarderThread = new Thread(() -> {
             logger.info("log forwarder thread started, uri={}", uri);
             List<String> uris = KafkaURI.parse(uri);
-            waitUntilKafkaHostIsResolvable(uris);
-            producer = createProducer(uris);
+
+            while (!stop) {
+                if (resolveURI(uris)) {
+                    producer = createProducer(uris);
+                    break;
+                }
+                logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", uri);
+                records.clear();    // throw away records, to prevent high heap usage
+                Threads.sleepRoughly(Duration.ofSeconds(10));
+            }
 
             while (!stop) {
                 try {
@@ -67,23 +75,15 @@ public final class KafkaAppender implements LogAppender {
         }, "log-forwarder");
     }
 
-    private void waitUntilKafkaHostIsResolvable(List<String> uris) {
-        while (!stop) {
-            for (String uri : uris) {
-                if (resolveURI(uri)) return;
-            }
-            logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", uris);
-            records.clear();
-            Threads.sleepRoughly(Duration.ofSeconds(10));
+    boolean resolveURI(List<String> uris) {
+        for (String uri : uris) {
+            int index = uri.indexOf(':');
+            if (index == -1) throw new Error("invalid kafka uri, uri=" + uri);
+            String host = uri.substring(0, index);
+            InetSocketAddress address = new InetSocketAddress(host, 9092);
+            if (!address.isUnresolved()) return true;    // break if any uri is resolvable
         }
-    }
-
-    boolean resolveURI(String uri) {
-        int index = uri.indexOf(':');
-        if (index == -1) throw new Error("invalid kafka uri, uri=" + uri);
-        String host = uri.substring(0, index);
-        InetSocketAddress address = new InetSocketAddress(host, 9092);
-        return !address.isUnresolved();
+        return false;
     }
 
     private KafkaProducer<byte[], byte[]> createProducer(List<String> uris) {

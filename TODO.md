@@ -3,7 +3,6 @@
 * template, use ByteBuffer[] for performance?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * mongo: update entity decoder to use switch(fieldName) to replace if statement? (optimization)
-* cache: hit rate report? cluster support? envoy?
 * framework error (queue listener, background task error, custom scheduler trigger) forward to kafka?
 
 * change gradle to kotlin?
@@ -13,6 +12,7 @@
 * /_sys/, kafka controller, should call message handler directly?
 * revisit trace log truncation, better/more elegant handling?
 * write unit test support to check break compatibility of API/DB?
+* cache: redis 6, resp3, client tracking 
 
 ### jdk 14 issues
 * spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  

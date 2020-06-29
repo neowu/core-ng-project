@@ -3,6 +3,8 @@ package core.framework.internal.log.appender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -23,6 +25,6 @@ class KafkaAppenderTest {
 
     @Test
     void resolveURI() {
-        assertThat(appender.resolveURI("localhost:9092")).isTrue();
+        assertThat(appender.resolveURI(List.of("localhost:9092"))).isTrue();
     }
 }

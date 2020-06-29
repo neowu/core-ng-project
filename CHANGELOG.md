@@ -2,8 +2,8 @@
 ### 7.4.11 (06/19/2020 - )
 * es: update to 7.8.0
 * ws: reduce warnings on sending message to closed channel (occurs on sending message before channel close listener finish)
-* log: log kafka appender will wait until log-kafka is resolvable, to make log-kafka is not hard dependency of starting app
-    in kube env, this improves recovery time if both log-kafka and app recreated  
+* log: log kafka appender will wait until log-kafka is resolvable, to make log-kafka not to block app startup
+    in kube env, this improves recovery time if both log-kafka and app recreated at same time  
 
 ### 7.4.10 (06/10/2020 - 06/18/2020)
 * monitor: tweak kube monitor pod not ready error message
