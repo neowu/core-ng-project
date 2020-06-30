@@ -47,7 +47,7 @@ public class KafkaConfig extends Config {
 
     public void uri(String uri) {
         if (this.uri != null)
-            throw new Error(format("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri.uri));
+            throw new Error(format("kafka uri is already configured, name={}, uri={}, previous={}", name, uri, this.uri));
         this.uri = new KafkaURI(uri);
     }
 

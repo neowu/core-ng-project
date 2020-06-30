@@ -22,7 +22,7 @@ class MessageListenerThreadTest {
 
     @BeforeEach
     void createKafkaMessageListenerThread() {
-        thread = new MessageListenerThread("listener-thread-1", new KafkaURI("localhost"), null, new MessageListener(null, null, null));
+        thread = new MessageListenerThread("listener-thread-1", new MessageListener(null, null, null));
     }
 
     @Test

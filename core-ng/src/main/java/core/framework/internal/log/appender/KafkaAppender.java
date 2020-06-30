@@ -45,15 +45,15 @@ public final class KafkaAppender implements LogAppender {
         statMapper = new JSONMapper<>(StatMessage.class);
 
         logForwarderThread = new Thread(() -> {
-            logger.info("log forwarder thread started, uri={}", uri.uri);
+            logger.info("log forwarder thread started, uri={}", uri);
 
             while (!stop) {
                 if (uri.resolveURI()) {
                     producer = createProducer(uri);
                     break;
                 }
-                logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", uri.uri);
-                records.clear();    // throw away records, to prevent high heap usage
+                logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", uri);
+                records.clear();    // throw away records, to prevent from high heap usage
                 Threads.sleepRoughly(Duration.ofSeconds(10));
             }
 
@@ -93,7 +93,7 @@ public final class KafkaAppender implements LogAppender {
             producerMetrics.set(producer.metrics());
             return producer;
         } finally {
-            logger.info("create kafka log producer, uri={}, elapsed={}", uri.uri, watch.elapsed());
+            logger.info("create kafka log producer, uri={}, elapsed={}", uri, watch.elapsed());
         }
     }
 

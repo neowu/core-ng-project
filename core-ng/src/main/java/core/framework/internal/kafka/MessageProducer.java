@@ -39,7 +39,7 @@ public class MessageProducer {
         if (producer == null) {
             synchronized (this) {   // make sure only one producer will be created
                 if (this.producer == null) tryCreateProducer();
-                if (this.producer == null) throw new KafkaException("kafka uri is not resolvable, uri=" + uri.uri);
+                if (this.producer == null) throw new KafkaException("kafka uri is not resolvable, uri=" + uri);
                 producer = this.producer;
             }
         }
@@ -62,14 +62,14 @@ public class MessageProducer {
                 producer = new KafkaProducer<>(config, serializer, serializer);
                 producerMetrics.set(producer.metrics());
             } finally {
-                logger.info("create kafka producer, uri={}, name={}, elapsed={}", uri.uri, name, watch.elapsed());
+                logger.info("create kafka producer, uri={}, name={}, elapsed={}", uri, name, watch.elapsed());
             }
         }
     }
 
     public void close(long timeoutInMs) {
         if (producer != null) {
-            logger.info("close kafka producer, uri={}, name={}", uri.uri, name);
+            logger.info("close kafka producer, uri={}, name={}", uri, name);
             producer.flush();
             producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));    // close timeout must greater than 0, here use 1s to try best if no time left
         }

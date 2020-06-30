@@ -1,10 +1,7 @@
 package core.framework.internal.kafka;
 
-import org.apache.kafka.clients.consumer.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,8 +23,7 @@ class MessageListenerTest {
     }
 
     @Test
-    void consumerSupplier() {
-        Supplier<Consumer<byte[], byte[]>> supplier = listener.consumerSupplier();
-        assertThat(supplier.get()).isNotNull();
+    void createConsumer() {
+        assertThat(listener.createConsumer()).isNotNull();
     }
 }

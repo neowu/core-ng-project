@@ -24,4 +24,9 @@ class KafkaURITest {
     void resolveURI() {
         assertThat(new KafkaURI("localhost").resolveURI()).isTrue();
     }
+
+    @Test
+    void convertToString() {
+        assertThat(String.valueOf(new KafkaURI("kafka"))).isEqualTo("kafka");
+    }
 }

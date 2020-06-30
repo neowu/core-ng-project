@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static core.framework.log.Markers.errorCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -33,23 +32,19 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 class MessageListenerThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(MessageListenerThread.class);
+    private final MessageListener listener;
     private final LogManager logManager;
-    private final Map<String, MessageProcess<?>> processes;
     private final double batchLongProcessThresholdInNano;
     private final long longConsumerLagThresholdInMs;
-    private final KafkaURI uri;
 
     private final Object lock = new Object();
     private Consumer<byte[], byte[]> consumer;
-    private Supplier<Consumer<byte[], byte[]>> consumerSupplier;
-    private volatile boolean shutdown;
+
     private volatile boolean processing;
 
-    MessageListenerThread(String name, KafkaURI uri, Supplier<Consumer<byte[], byte[]>> consumerSupplier, MessageListener listener) {
+    MessageListenerThread(String name, MessageListener listener) {
         super(name);
-        this.uri = uri;
-        this.consumerSupplier = consumerSupplier;
-        processes = listener.processes;
+        this.listener = listener;
         logManager = listener.logManager;
         batchLongProcessThresholdInNano = listener.maxProcessTime.toNanos() * 0.7; // 70% time of max
         longConsumerLagThresholdInMs = listener.longConsumerLagThreshold.toMillis();
@@ -59,17 +54,7 @@ class MessageListenerThread extends Thread {
     public void run() {
         try {
             processing = true;
-
-            while (!shutdown) {
-                if (uri.resolveURI()) {
-                    consumer = consumerSupplier.get();
-                    consumerSupplier = null;
-                    break;
-                }
-                logger.warn("failed to resolve kafka uri, retry in 10 seconds, uri={}", uri.uri);
-                Threads.sleepRoughly(Duration.ofSeconds(10));
-            }
-
+            consumer = listener.createConsumer();
             process();
         } finally {
             processing = false;
@@ -80,31 +65,30 @@ class MessageListenerThread extends Thread {
     }
 
     private void process() {
-        while (!shutdown) {
+        while (!listener.shutdown) {
             try {
                 ConsumerRecords<byte[], byte[]> records = consumer.poll(Duration.ofSeconds(30));    // consumer should call poll at least once every MAX_POLL_INTERVAL_MS
                 if (records.isEmpty()) continue;
                 processRecords(records);
             } catch (Throwable e) {
-                if (!shutdown) {
+                if (!listener.shutdown) {
                     logger.error("failed to pull message, retry in 10 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(10));
                 }
             }
         }
-        if (consumer != null) {
+        if (consumer != null) { // consumer can be null if host is not resolvable
             logger.info("close kafka consumer, name={}", getName());
             consumer.close();
         }
     }
 
     void shutdown() {
-        shutdown = true;
         if (consumer == null) {
-            interrupt();    // interrupt resolveURI/sleep if needed
+            interrupt();    // interrupt listener.createConsumer() if needed
         } else {
             // if consumer != null, interrupt() will interrupt consumer coordinator,
-            // the only downside of not calling interrupt() is if thread is in Line 91/sleep, shutdown will have to wait until sleep ends
+            // the only downside of not calling interrupt() is if thread is at process->exception->sleepRoughly, shutdown will have to wait until sleep ends
             consumer.wakeup();
         }
     }
@@ -137,7 +121,7 @@ class MessageListenerThread extends Thread {
             for (Map.Entry<String, List<ConsumerRecord<byte[], byte[]>>> entry : messages.entrySet()) {
                 String topic = entry.getKey();
                 List<ConsumerRecord<byte[], byte[]>> records = entry.getValue();
-                MessageProcess<?> process = processes.get(topic);
+                MessageProcess<?> process = listener.processes.get(topic);
                 if (process.bulkHandler != null) {
                     handleBulk(topic, process, records, longProcessThreshold(batchLongProcessThresholdInNano, records.size(), count));
                 } else {

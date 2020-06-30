@@ -10,8 +10,8 @@ import java.util.List;
  * @author neo
  */
 public class KafkaURI {
-    public final String uri;
     public final List<String> bootstrapURIs;
+    private final String uri;
     private boolean resolved;
 
     public KafkaURI(String uri) {
@@ -36,20 +36,24 @@ public class KafkaURI {
     }
 
     public boolean resolveURI() {
-        synchronized (this) {
-            if (resolved) return true;
+        if (resolved) return true;
 
-            for (String uri : bootstrapURIs) {
-                int index = uri.indexOf(':');
-                if (index == -1) throw new Error("invalid kafka uri, uri=" + uri);
-                String host = uri.substring(0, index);
-                InetSocketAddress address = new InetSocketAddress(host, 9092);
-                if (!address.isUnresolved()) {
-                    resolved = true;
-                    return true;    // break if any uri is resolvable
-                }
+        for (String uri : bootstrapURIs) {
+            int index = uri.indexOf(':');
+            if (index == -1) throw new Error("invalid kafka uri, uri=" + uri);
+            String host = uri.substring(0, index);
+            var address = new InetSocketAddress(host, 9092);
+            if (!address.isUnresolved()) {
+                resolved = true;
+                return true;    // break if any uri is resolvable
             }
-            return false;
         }
+
+        return false;
+    }
+
+    @Override
+    public String toString() {  // make it easier to log kafkaURI
+        return uri;
     }
 }
