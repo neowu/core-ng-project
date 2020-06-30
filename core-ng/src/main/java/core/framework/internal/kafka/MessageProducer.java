@@ -69,7 +69,7 @@ public class MessageProducer {
 
     public void close(long timeoutInMs) {
         if (producer != null) {
-            logger.info("close kafka producer, uri={}, name={}", uri, name);
+            logger.info("close kafka producer, uri={}, name={}", uri.uri, name);
             producer.flush();
             producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));    // close timeout must greater than 0, here use 1s to try best if no time left
         }

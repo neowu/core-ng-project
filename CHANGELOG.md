@@ -1,4 +1,6 @@
 ## Change log
+### 7.4.12 (06/29/2020 - )
+
 ### 7.4.11 (06/19/2020 - 06/29/2020)
 * es: update to 7.8.0
 * ws: reduce warnings on sending message to closed channel (occurs on sending message before channel close listener finish)

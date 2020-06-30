@@ -52,7 +52,7 @@ public final class KafkaAppender implements LogAppender {
                     producer = createProducer(uri);
                     break;
                 }
-                logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", uri);
+                logger.warn("failed to resolve log kafka uri, retry in 10 seconds, uri={}", uri.uri);
                 records.clear();    // throw away records, to prevent high heap usage
                 Threads.sleepRoughly(Duration.ofSeconds(10));
             }
@@ -67,7 +67,7 @@ public final class KafkaAppender implements LogAppender {
                 ProducerRecord<byte[], byte[]> record = records.take();
                 producer.send(record, callback);
             } catch (Throwable e) {
-                if (!stop) {
+                if (!stop) {    // if during stop and records.take() is interrupted, not clear records and sleep
                     logger.warn("failed to send log message, retry in 30 seconds", e);
                     records.clear();
                     Threads.sleepRoughly(Duration.ofSeconds(30));

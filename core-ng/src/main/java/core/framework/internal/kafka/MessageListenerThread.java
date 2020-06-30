@@ -86,9 +86,10 @@ class MessageListenerThread extends Thread {
                 if (records.isEmpty()) continue;
                 processRecords(records);
             } catch (Throwable e) {
-                if (shutdown) break;
-                logger.error("failed to pull message, retry in 10 seconds", e);
-                Threads.sleepRoughly(Duration.ofSeconds(10));
+                if (!shutdown) {
+                    logger.error("failed to pull message, retry in 10 seconds", e);
+                    Threads.sleepRoughly(Duration.ofSeconds(10));
+                }
             }
         }
         if (consumer != null) {
@@ -99,7 +100,11 @@ class MessageListenerThread extends Thread {
 
     void shutdown() {
         shutdown = true;
-        if (consumer != null) {
+        if (consumer == null) {
+            interrupt();    // interrupt resolveURI/sleep if needed
+        } else {
+            // if consumer != null, interrupt() will interrupt consumer coordinator,
+            // the only downside of not calling interrupt() is if thread is in Line 91/sleep, shutdown will have to wait until sleep ends
             consumer.wakeup();
         }
     }
