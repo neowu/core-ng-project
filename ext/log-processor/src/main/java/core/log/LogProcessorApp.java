@@ -67,7 +67,7 @@ public class LogProcessorApp extends App {
             if ("console".equals(appender)) {
                 log().appendToConsole();
             } else if ("elasticsearch".equals(appender)) {
-                log().appender(bind(ElasticSearchAppender.class));  // ElasticSearchAppender doesn't need to be stop, es will be stopped at stage 7
+                log().appender(bind(ElasticSearchAppender.class));  // ElasticSearchAppender doesn't need to stop, es will be stopped at stage 7
             }
         });
     }

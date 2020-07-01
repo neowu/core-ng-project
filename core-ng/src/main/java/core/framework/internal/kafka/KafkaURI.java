@@ -12,7 +12,7 @@ import java.util.List;
 public class KafkaURI {
     public final List<String> bootstrapURIs;
     private final String uri;
-    private boolean resolved;
+    private volatile boolean resolved;
 
     public KafkaURI(String uri) {
         this.uri = uri;
