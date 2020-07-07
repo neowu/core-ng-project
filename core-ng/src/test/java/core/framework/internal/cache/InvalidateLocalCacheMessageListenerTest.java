@@ -28,7 +28,7 @@ class InvalidateLocalCacheMessageListenerTest {
     void onSubscribe() {
         listener.onSubscribe();
 
-        verify(cacheStore).flushAll();
+        verify(cacheStore).clear();
     }
 
     @Test

@@ -28,6 +28,12 @@ class RedisConnection implements AutoCloseable {
         inputStream = new RedisInputStream(socket.getInputStream());
     }
 
+    void writeCommand(byte[] command) throws IOException {
+        writeArray(1);
+        writeBlobString(command);
+        flush();
+    }
+
     void writeKeyCommand(byte[] command, String key) throws IOException {
         writeArray(2);
         writeBlobString(command);

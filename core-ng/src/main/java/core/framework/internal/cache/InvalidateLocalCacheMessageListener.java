@@ -21,8 +21,8 @@ public class InvalidateLocalCacheMessageListener implements RedisChannelListener
 
     @Override
     public void onSubscribe() {
-        logger.info("flush all local cache");
-        localCache.flushAll();
+        logger.info("clear local cache");
+        localCache.clear();
     }
 
     @Override

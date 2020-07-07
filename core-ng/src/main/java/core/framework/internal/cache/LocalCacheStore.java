@@ -114,7 +114,7 @@ public class LocalCacheStore implements CacheStore {
         }
     }
 
-    public void flushAll() {
+    public void clear() {
         caches.clear();
     }
 

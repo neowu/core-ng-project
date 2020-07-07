@@ -35,9 +35,7 @@ public class RedisAdminImpl implements RedisAdmin {
         PoolItem<RedisConnection> item = redis.pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.writeArray(1);
-            connection.writeBlobString(INFO);
-            connection.flush();
+            connection.writeCommand(INFO);
             value = decode(connection.readBlobString());
             return parseInfo(value);
         } catch (IOException e) {

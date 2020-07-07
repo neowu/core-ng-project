@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.time.Duration;
 
 import static core.framework.internal.redis.RedisEncodings.decode;
@@ -32,22 +31,22 @@ public class RedisSubscribeThread extends Thread {
     @Override
     public void run() {
         while (!stop) {
-            try {
-                process();
-            } catch (IOException | UncheckedIOException e) {
+            try (RedisConnection connection = redis.createConnection(0)) {
+                this.connection = connection;
+                process(connection);
+            } catch (Throwable e) {
+                this.connection = null;
                 if (!stop) {
                     logger.warn("redis subscribe connection failed, retry in 10 seconds", e);
                     Threads.sleepRoughly(Duration.ofSeconds(10));
-                    closeConnection();
                 }
             }
         }
-        closeConnection();
         logger.info("redis subscribe thread stopped, channel={}", channel);
     }
 
-    void process() throws IOException {
-        subscribe();
+    void process(RedisConnection connection) throws IOException {
+        subscribe(connection);
         listener.onSubscribe();
 
         while (true) {
@@ -70,36 +69,21 @@ public class RedisSubscribeThread extends Thread {
         }
     }
 
-    private void subscribe() throws IOException {
-        connection = redis.createConnection(0);
+    private void subscribe(RedisConnection connection) throws IOException {
         connection.writeKeyCommand(Protocol.Command.SUBSCRIBE, channel);
-        connection.flush();
         String kind = decode((byte[]) connection.readArray()[0]);
         if (!"subscribe".equals(kind)) throw new Error("unexpected response, kind=" + kind);
         logger.info("subscribed to redis channel, channel={}", channel);
     }
 
-    private void closeConnection() {
-        try {
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (IOException e) {
-            logger.warn("failed to close redis connection", e);
-        }
-    }
-
-    public void close() {
+    public void close() throws IOException {
         logger.info("stopping redis subscribe thread, channel={}", channel);
         stop = true;
+        RedisConnection connection = this.connection;
         if (connection != null) {
-            try {
-                connection.writeKeysCommand(Protocol.Command.QUIT);
-            } catch (IOException e) {
-                logger.warn("failed to send quit command", e);
-                closeConnection();
-            }
+            connection.writeCommand(Protocol.Command.QUIT); // to simplify by not catching exception, if connection is broken, run loop will cleanup
         }
+        interrupt();    // interrupt sleep during failure if needed
     }
 }
 
