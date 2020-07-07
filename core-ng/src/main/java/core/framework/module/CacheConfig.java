@@ -35,6 +35,7 @@ public class CacheConfig extends Config {
     private CacheStore redisCacheStore;
     private RedisImpl redis;
     private CacheStore redisLocalCacheStore;
+    private long maxLocalSize;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -53,6 +54,10 @@ public class CacheConfig extends Config {
         if (cacheManager.caches().isEmpty()) {
             throw new Error("cache is configured but no cache added, please remove unnecessary config");
         }
+        // maxLocalSize() can be configured before localCacheStore is created, so set max size at end
+        if (maxLocalSize > 0 && localCacheStore != null) {
+            localCacheStore.maxSize = maxLocalSize;
+        }
     }
 
     public void redis(String host) {
@@ -62,7 +67,7 @@ public class CacheConfig extends Config {
     }
 
     public void maxLocalSize(long size) {
-        localCacheStore().maxSize = size;
+        maxLocalSize = size;
     }
 
     public void local() {

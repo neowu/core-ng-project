@@ -134,7 +134,7 @@ class RedisLocalCacheStoreTest {
 
     @Test
     void deleteWithRemoteExpired() {
-        when(redisCacheStore.delete("key1")).thenReturn(false);
+        when(redisCacheStore.delete("key1")).thenReturn(Boolean.FALSE);
 
         cacheStore.delete("key1");
 
@@ -144,7 +144,7 @@ class RedisLocalCacheStoreTest {
 
     @Test
     void delete() {
-        when(redisCacheStore.delete("key1")).thenReturn(true);
+        when(redisCacheStore.delete("key1")).thenReturn(Boolean.TRUE);
 
         cacheStore.delete("key1");
 
