@@ -90,7 +90,7 @@ public class RedisSubscribeThread extends Thread {
     }
 
     public void close() {
-        logger.info("stopping redis subscribe thread");
+        logger.info("stopping redis subscribe thread, channel={}", channel);
         stop = true;
         if (connection != null) {
             try {

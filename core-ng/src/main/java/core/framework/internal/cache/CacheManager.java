@@ -16,27 +16,14 @@ import java.util.Optional;
 public class CacheManager {
     private final Map<String, CacheImpl<?>> caches = Maps.newHashMap();
 
-    public LocalCacheStore localCacheStore;
-    public RedisCacheStore redisCacheStore;
-    public CacheStore redisLocalCacheStore;
-
-    public <T> Cache<T> add(Class<T> cacheClass, Duration duration, boolean localCache) {
+    public <T> Cache<T> add(Class<T> cacheClass, Duration duration, CacheStore cacheStore) {
         new CacheClassValidator(cacheClass).validate();
 
         String name = cacheName(cacheClass);
-        CacheImpl<T> cache = new CacheImpl<>(name, cacheClass, duration, cacheStore(localCache));
+        CacheImpl<T> cache = new CacheImpl<>(name, cacheClass, duration, cacheStore);
         CacheImpl<?> previous = caches.putIfAbsent(name, cache);
         if (previous != null) throw new Error("found duplicate cache name, name=" + name);
         return cache;
-    }
-
-    CacheStore cacheStore(boolean localCache) {
-        if (localCache) {
-            if (redisLocalCacheStore != null) return redisLocalCacheStore;
-        } else {
-            if (redisCacheStore != null) return redisCacheStore;
-        }
-        return localCacheStore;
     }
 
     public Optional<CacheImpl<?>> get(String name) {

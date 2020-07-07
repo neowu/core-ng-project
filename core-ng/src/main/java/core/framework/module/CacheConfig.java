@@ -3,6 +3,7 @@ package core.framework.module;
 import core.framework.cache.Cache;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.cache.CacheManager;
+import core.framework.internal.cache.CacheStore;
 import core.framework.internal.cache.InvalidateLocalCacheMessage;
 import core.framework.internal.cache.InvalidateLocalCacheMessageListener;
 import core.framework.internal.cache.LocalCacheStore;
@@ -30,7 +31,10 @@ public class CacheConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
     private ModuleContext context;
     private CacheManager cacheManager;
+    private LocalCacheStore localCacheStore;
+    private CacheStore redisCacheStore;
     private RedisImpl redis;
+    private CacheStore redisLocalCacheStore;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -52,8 +56,7 @@ public class CacheConfig extends Config {
     }
 
     public void redis(String host) {
-        if (cacheManager.localCacheStore != null || cacheManager.redisCacheStore != null)
-            throw new Error("cache is already configured, please configure cache store only once");
+        if (localCacheStore != null || redisCacheStore != null) throw new Error("cache is already configured, please configure cache store only once");
 
         configureRedis(host);
     }
@@ -63,33 +66,24 @@ public class CacheConfig extends Config {
     }
 
     public void local() {
-        if (cacheManager.localCacheStore != null || cacheManager.redisCacheStore != null)
-            throw new Error("cache store is already configured, please configure only once");
+        if (localCacheStore != null || redisCacheStore != null) throw new Error("cache store is already configured, please configure only once");
 
         localCacheStore();
     }
 
     public <T> void local(Class<T> cacheClass, Duration duration) {
-        if (cacheManager.redisCacheStore != null) {
-            LocalCacheStore localCache = localCacheStore();
-            var mapper = new JSONMapper<InvalidateLocalCacheMessage>(InvalidateLocalCacheMessage.class);
-            var redisLocalCacheStore = new RedisLocalCacheStore(localCache, cacheManager.redisCacheStore, redis, mapper);
-            var thread = new RedisSubscribeThread("cache-invalidator", redis, new InvalidateLocalCacheMessageListener(localCache, mapper), RedisLocalCacheStore.CHANNEL_INVALIDATE_CACHE);
-            context.startupHook.add(thread::start);
-            context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> thread.close());
-            cacheManager.redisLocalCacheStore = redisLocalCacheStore;
-        }
+        if (localCacheStore == null && redisCacheStore == null) throw new Error("cache store is not configured, please configure first");
 
         logger.info("add local cache, class={}", cacheClass.getCanonicalName());
-        Cache<T> cache = cacheManager.add(cacheClass, duration, true);
+        Cache<T> cache = cacheManager.add(cacheClass, duration, cacheStore(true));
         context.beanFactory.bind(Types.generic(Cache.class, cacheClass), null, cache);
     }
 
     public <T> void remote(Class<T> cacheClass, Duration duration) {
-        if (cacheManager.localCacheStore == null && cacheManager.redisCacheStore == null) throw new Error("cache store is not configured, please configure first");
+        if (localCacheStore == null && redisCacheStore == null) throw new Error("cache store is not configured, please configure first");
 
         logger.info("add remote cache, class={}", cacheClass.getCanonicalName());
-        Cache<T> cache = cacheManager.add(cacheClass, duration, false);
+        Cache<T> cache = cacheManager.add(cacheClass, duration, cacheStore(false));
         context.beanFactory.bind(Types.generic(Cache.class, cacheClass), null, cache);
     }
 
@@ -102,16 +96,37 @@ public class CacheConfig extends Config {
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.collector.metrics.add(new PoolMetrics(redis.pool));
-        cacheManager.redisCacheStore = new RedisCacheStore(redis);
+        redisCacheStore = new RedisCacheStore(redis);
     }
 
     private LocalCacheStore localCacheStore() {
-        if (cacheManager.localCacheStore == null) {
+        if (localCacheStore == null) {
             logger.info("create local cache store");
-            var cacheStore = new LocalCacheStore();
-            context.backgroundTask().scheduleWithFixedDelay(cacheStore::cleanup, Duration.ofMinutes(5));
-            cacheManager.localCacheStore = cacheStore;
+            localCacheStore = new LocalCacheStore();
+            context.backgroundTask().scheduleWithFixedDelay(localCacheStore::cleanup, Duration.ofMinutes(5));
         }
-        return cacheManager.localCacheStore;
+        return localCacheStore;
+    }
+
+    private CacheStore redisLocalCacheStore() {
+        if (redisLocalCacheStore == null) {
+            logger.info("create redis local cache store");
+            LocalCacheStore localCache = localCacheStore();
+            var mapper = new JSONMapper<InvalidateLocalCacheMessage>(InvalidateLocalCacheMessage.class);
+            var thread = new RedisSubscribeThread("cache-invalidator", redis, new InvalidateLocalCacheMessageListener(localCache, mapper), RedisLocalCacheStore.CHANNEL_INVALIDATE_CACHE);
+            context.startupHook.add(thread::start);
+            context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> thread.close());
+            redisLocalCacheStore = new RedisLocalCacheStore(localCache, redisCacheStore, redis, mapper);
+        }
+        return redisLocalCacheStore;
+    }
+
+    CacheStore cacheStore(boolean local) {
+        if (local) {
+            if (redisCacheStore != null) return redisLocalCacheStore();
+        } else {
+            if (redisCacheStore != null) return redisCacheStore;
+        }
+        return localCacheStore;
     }
 }

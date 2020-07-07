@@ -5,8 +5,10 @@ import core.framework.internal.redis.RedisImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Map;
 
+import static core.framework.internal.cache.RedisLocalCacheStore.CHANNEL_INVALIDATE_CACHE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -21,14 +23,14 @@ import static org.mockito.Mockito.when;
 class RedisLocalCacheStoreTest {
     private RedisLocalCacheStore cacheStore;
     private RedisImpl redis;
-    private LocalCacheStore localCacheStore;
-    private RedisCacheStore redisCacheStore;
+    private CacheStore localCacheStore;
+    private CacheStore redisCacheStore;
 
     @BeforeEach
     void createRedisLocalCacheStore() {
-        localCacheStore = mock(LocalCacheStore.class);
+        localCacheStore = mock(CacheStore.class);
         redis = mock(RedisImpl.class);
-        redisCacheStore = mock(RedisCacheStore.class);
+        redisCacheStore = mock(CacheStore.class);
 
         cacheStore = new RedisLocalCacheStore(localCacheStore, redisCacheStore, redis, new JSONMapper<>(InvalidateLocalCacheMessage.class));
     }
@@ -108,5 +110,45 @@ class RedisLocalCacheStoreTest {
 
         assertThat(cacheStore.getAll("key1")).containsKeys("key1");
         verify(localCacheStore, never()).put(eq("key2"), any(), any());
+    }
+
+    @Test
+    void put() {
+        cacheStore.put("key", new byte[0], Duration.ofHours(1));
+
+        verify(localCacheStore).put("key", new byte[0], Duration.ofHours(1));
+        verify(redisCacheStore).put("key", new byte[0], Duration.ofHours(1));
+        verify(redis).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
+    }
+
+    @Test
+    void putAll() {
+        Map<String, byte[]> values = Map.of("key", new byte[0]);
+        Duration expiration = Duration.ofHours(1);
+        cacheStore.putAll(values, expiration);
+
+        verify(localCacheStore).putAll(values, expiration);
+        verify(redisCacheStore).putAll(values, expiration);
+        verify(redis).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
+    }
+
+    @Test
+    void deleteWithRemoteExpired() {
+        when(redisCacheStore.delete("key1")).thenReturn(false);
+
+        cacheStore.delete("key1");
+
+        verify(localCacheStore).delete("key1");
+        verify(redis, never()).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
+    }
+
+    @Test
+    void delete() {
+        when(redisCacheStore.delete("key1")).thenReturn(true);
+
+        cacheStore.delete("key1");
+
+        verify(localCacheStore).delete("key1");
+        verify(redis).publish(eq(CHANNEL_INVALIDATE_CACHE), any());
     }
 }

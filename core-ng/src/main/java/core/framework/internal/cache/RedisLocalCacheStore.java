@@ -16,12 +16,12 @@ import java.util.Map;
  */
 public class RedisLocalCacheStore implements CacheStore {
     public static final String CHANNEL_INVALIDATE_CACHE = "cache:invalidate";
-    private final LocalCacheStore localCache;
-    private final RedisCacheStore redisCache;
+    private final CacheStore localCache;
+    private final CacheStore redisCache;
     private final RedisImpl redis;
     private final JSONMapper<InvalidateLocalCacheMessage> mapper;
 
-    public RedisLocalCacheStore(LocalCacheStore localCache, RedisCacheStore redisCache, RedisImpl redis, JSONMapper<InvalidateLocalCacheMessage> mapper) {
+    public RedisLocalCacheStore(CacheStore localCache, CacheStore redisCache, RedisImpl redis, JSONMapper<InvalidateLocalCacheMessage> mapper) {
         this.localCache = localCache;
         this.redisCache = redisCache;
         this.redis = redis;
