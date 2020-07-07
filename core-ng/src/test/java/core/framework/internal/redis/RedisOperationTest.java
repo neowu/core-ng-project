@@ -1,6 +1,7 @@
 package core.framework.internal.redis;
 
 import core.framework.util.Lists;
+import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -126,11 +127,19 @@ class RedisOperationTest extends AbstractRedisOperationTest {
     }
 
     @Test
-    void info() {
-        response("$31\r\n# Server\r\nredis_version:5.0.7\r\n\r\n");
-        Map<String, String> info = redis.info();
+    void expirationTime() {
+        response(":1000\r\n:-1\r\n:-2\r\n");
+        long[] expirationTimes = redis.expirationTime("k1", "k2", "k3");
 
-        assertThat(info).containsEntry("redis_version", "5.0.7");
-        assertRequestEquals("*1\r\n$4\r\nINFO\r\n");
+        assertThat(expirationTimes).containsExactly(1000, -1, -2);
+        assertRequestEquals("*2\r\n$4\r\nPTTL\r\n$2\r\nk1\r\n" + "*2\r\n$4\r\nPTTL\r\n$2\r\nk2\r\n" + "*2\r\n$4\r\nPTTL\r\n$2\r\nk3\r\n");
+    }
+
+    @Test
+    void publish() {
+        response(":1\r\n");
+        redis.publish("channel", Strings.bytes("message"));
+
+        assertRequestEquals("*3\r\n$7\r\nPUBLISH\r\n$7\r\nchannel\r\n$7\r\nmessage\r\n");
     }
 }

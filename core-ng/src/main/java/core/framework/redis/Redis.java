@@ -38,5 +38,5 @@ public interface Redis {
 
     void forEach(String pattern, Consumer<String> consumer);
 
-    Map<String, String> info();
+    RedisAdmin admin();
 }

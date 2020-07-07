@@ -40,7 +40,7 @@ public class RedisMonitorJob implements Job {
         message.app = app;
         message.host = host;
         try {
-            Map<String, String> info = redis.info();
+            Map<String, String> info = redis.admin().info();
             Stats stats = stats(info);
             message.result = stats.result();
             message.stats = stats.stats;

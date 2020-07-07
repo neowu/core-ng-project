@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 /**
  * @author neo
  */
-public final class Network {    // in cloud env, the application vm or container stick with same host ip / name during creation
+public final class Network {    // in cloud env, the application vm or container stick with same host ip / name during entire lifecycle
     public static final String LOCAL_HOST_ADDRESS;
     public static final String LOCAL_HOST_NAME;
 

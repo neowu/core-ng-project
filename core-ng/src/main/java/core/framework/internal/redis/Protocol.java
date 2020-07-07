@@ -5,7 +5,7 @@ import core.framework.util.Strings;
 import java.io.IOException;
 
 /**
- * refer to https://github.com/antirez/RESP3/blob/master/spec.md
+ * refer to https://github.com/antirez/RESP3/blob/master/spec.md, currently only support RESP2
  */
 final class Protocol {
     private static final byte BLOB_STRING_BYTE = '$';
@@ -70,27 +70,36 @@ final class Protocol {
         static final byte[] GET = Strings.bytes("GET");
         static final byte[] SET = Strings.bytes("SET");
         static final byte[] EXPIRE = Strings.bytes("EXPIRE");
+        static final byte[] PTTL = Strings.bytes("PTTL");
         static final byte[] DEL = Strings.bytes("DEL");
         static final byte[] INCRBY = Strings.bytes("INCRBY");
         static final byte[] MGET = Strings.bytes("MGET");
         static final byte[] MSET = Strings.bytes("MSET");
         static final byte[] SCAN = Strings.bytes("SCAN");
+
         static final byte[] HGET = Strings.bytes("HGET");
         static final byte[] HGETALL = Strings.bytes("HGETALL");
         static final byte[] HSET = Strings.bytes("HSET");
         static final byte[] HMSET = Strings.bytes("HMSET");
         static final byte[] HDEL = Strings.bytes("HDEL");
         static final byte[] HINCRBY = Strings.bytes("HINCRBY");
+
         static final byte[] SADD = Strings.bytes("SADD");
         static final byte[] SMEMBERS = Strings.bytes("SMEMBERS");
         static final byte[] SISMEMBER = Strings.bytes("SISMEMBER");
         static final byte[] SREM = Strings.bytes("SREM");
         static final byte[] SPOP = Strings.bytes("SPOP");
         static final byte[] SCARD = Strings.bytes("SCARD");
+
+        static final byte[] LRANGE = Strings.bytes("LRANGE");
         static final byte[] RPUSH = Strings.bytes("RPUSH");
         static final byte[] LPOP = Strings.bytes("LPOP");
-        static final byte[] LRANGE = Strings.bytes("LRANGE");
+
+        static final byte[] SUBSCRIBE = Strings.bytes("SUBSCRIBE");
+        static final byte[] PUBLISH = Strings.bytes("PUBLISH");
+
         static final byte[] INFO = Strings.bytes("INFO");
+        static final byte[] QUIT = Strings.bytes("QUIT");
     }
 
     static class Keyword {

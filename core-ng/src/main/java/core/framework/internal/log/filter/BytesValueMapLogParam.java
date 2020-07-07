@@ -1,6 +1,4 @@
-package core.framework.internal.redis;
-
-import core.framework.internal.log.filter.LogParam;
+package core.framework.internal.log.filter;
 
 import java.util.Map;
 import java.util.Set;
@@ -10,10 +8,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * @author neo
  */
-class BytesValueMapLogParam implements LogParam {
+public class BytesValueMapLogParam implements LogParam {
     private final Map<String, byte[]> values;
 
-    BytesValueMapLogParam(Map<String, byte[]> values) {
+    public BytesValueMapLogParam(Map<String, byte[]> values) {
         this.values = values;
     }
 

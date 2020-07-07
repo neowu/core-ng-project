@@ -1,5 +1,8 @@
 package core.framework.internal.cache;
 
+import core.framework.internal.log.filter.ArrayLogParam;
+import core.framework.internal.log.filter.BytesLogParam;
+import core.framework.internal.log.filter.BytesValueMapLogParam;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +22,7 @@ public class LocalCacheStore implements CacheStore {
 
     @Override
     public byte[] get(String key) {
+        logger.debug("get, key={}", key);
         CacheItem item = caches.get(key);
         if (item == null) return null;
         if (item.expired(System.currentTimeMillis())) {
@@ -31,6 +35,7 @@ public class LocalCacheStore implements CacheStore {
 
     @Override
     public Map<String, byte[]> getAll(String... keys) {
+        logger.debug("getAll, keys={}", new ArrayLogParam(keys));
         Map<String, byte[]> results = Maps.newHashMapWithExpectedSize(keys.length);
         for (String key : keys) {
             byte[] value = get(key);
@@ -41,20 +46,26 @@ public class LocalCacheStore implements CacheStore {
 
     @Override
     public void put(String key, byte[] value, Duration expiration) {
+        logger.debug("put, key={}, value={}, expiration={}", key, new BytesLogParam(value), expiration);
         long now = System.currentTimeMillis();
         caches.put(key, new CacheItem(value, now + expiration.toMillis()));
     }
 
     @Override
     public void putAll(Map<String, byte[]> values, Duration expiration) {
+        logger.debug("putAll, values={}, expiration={}", new BytesValueMapLogParam(values), expiration);
         values.forEach((key, value) -> put(key, value, expiration));
     }
 
     @Override
-    public void delete(String... keys) {
+    public boolean delete(String... keys) {
+        logger.debug("delete, keys={}", new ArrayLogParam(keys));
+        boolean result = false;
         for (String key : keys) {
-            caches.remove(key);
+            CacheItem previous = caches.remove(key);
+            if (!result && previous != null) result = true;
         }
+        return result;
     }
 
     public void cleanup() {    // cleanup is only called by background thread with fixed delay, not need to synchronize
@@ -101,6 +112,10 @@ public class LocalCacheStore implements CacheStore {
                 iterator.remove();
             }
         }
+    }
+
+    public void flushAll() {
+        caches.clear();
     }
 
     static class CacheItem {

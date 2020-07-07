@@ -1,4 +1,4 @@
-package core.framework.internal.redis;
+package core.framework.internal.log.filter;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,7 @@
 package core.framework.test.redis;
 
 import core.framework.redis.Redis;
+import core.framework.redis.RedisAdmin;
 import core.framework.redis.RedisHash;
 import core.framework.redis.RedisList;
 import core.framework.redis.RedisSet;
@@ -20,6 +21,7 @@ public final class MockRedis implements Redis {
     private final MockRedisHash hash = new MockRedisHash(store);
     private final MockRedisSet set = new MockRedisSet(store);
     private final MockRedisList list = new MockRedisList(store);
+    private final MockRedisAdmin admin = new MockRedisAdmin();
 
     @Override
     public String get(String key) {
@@ -106,8 +108,8 @@ public final class MockRedis implements Redis {
     }
 
     @Override
-    public Map<String, String> info() {
-        return Map.of();
+    public RedisAdmin admin() {
+        return admin;
     }
 
     @Override

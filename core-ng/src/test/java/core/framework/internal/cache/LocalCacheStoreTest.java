@@ -90,4 +90,11 @@ class LocalCacheStoreTest {
 
         assertThat(cacheStore.caches).isEmpty();
     }
+
+    @Test
+    void flushAll() {
+        cacheStore.flushAll();
+
+        assertThat(cacheStore.caches).isEmpty();
+    }
 }
