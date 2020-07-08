@@ -1,8 +1,8 @@
 ## Change log
 ### 7.4.12 (06/29/2020 - )
-* cache: support 2 level cache, with redis, local cache will use redis channel to sync invalidated keys
-    !!! cache().local() will be using local+redis if redis is used, otherwise will be local only cache.
-    !!! cache().local() should be used in performance sensitive area with high hit rate, to reduce number of redis commands overhead (but increased JVM GC burden)
+* cache: support 2 level cache
+    !!! with redis configured, cache().local() will be using local + redis 2 levels cache, and using redis channel to notify invalidated keys
+    !!! cache().local() should be used in performance sensitive area with high hit rate, to reduce number of redis commands overhead (but to increase JVM GC burden)
     !!! cache().remote() keeps old behavior.
 
 ### 7.4.11 (06/19/2020 - 06/29/2020)
