@@ -57,6 +57,10 @@ public final class HTTPClientBuilder {
     private Duration retryWaitTime = Duration.ofMillis(500);
     private String[] tlsVersions;
 
+    // force to use HTTPClient.builder()
+    HTTPClientBuilder() {
+    }
+
     public HTTPClient build() {
         var watch = new StopWatch();
         try {

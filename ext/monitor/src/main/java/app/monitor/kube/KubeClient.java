@@ -21,7 +21,7 @@ public class KubeClient {
     // only support Pod ServiceAccount auth within cluster
     public void initialize() {
         // kube 1.6 starts support TLSv1.3, and break java TLSv1.3 impl,
-        // workaround is to downgrade to TLSv1.2, and waiting for new version of JDK to fix
+        // workaround is to downgrade to TLSv1.2, jdk 14.0.2 will fix
         // refer to https://bugs.openjdk.java.net/browse/JDK-8236039, https://github.com/golang/go/issues/35722
         httpClient = HTTPClient.builder()
                                .trust(Files.text(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")))
