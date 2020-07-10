@@ -2,6 +2,7 @@ package core.framework.internal.cache;
 
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.redis.RedisImpl;
+import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 import core.framework.util.Network;
 
@@ -29,40 +30,42 @@ public class RedisLocalCacheStore implements CacheStore {
     }
 
     @Override
-    public byte[] get(String key) {
-        byte[] value = localCache.get(key);
+    public <T> T get(String key, JSONMapper<T> mapper, Validator validator) {
+        T value = localCache.get(key, mapper, validator);
         if (value != null) return value;
-        value = redisCache.get(key);
+        value = redisCache.get(key, mapper, validator);
         if (value == null) return null;
         long expirationTime = redis.expirationTime(key)[0];
         if (expirationTime <= 0) return null;
-        localCache.put(key, value, Duration.ofMillis(expirationTime));
+        localCache.put(key, value, Duration.ofMillis(expirationTime), mapper);
         return value;
     }
 
     @Override
-    public Map<String, byte[]> getAll(String... keys) {
-        Map<String, byte[]> results = Maps.newHashMapWithExpectedSize(keys.length);
+    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator validator) {
+        Map<String, T> results = Maps.newHashMapWithExpectedSize(keys.length);
         List<String> localNotFoundKeys = new ArrayList<>();
         for (String key : keys) {
-            byte[] value = localCache.get(key);
+            T value = localCache.get(key, mapper, validator);
             if (value != null) {
                 results.put(key, value);
             } else {
                 localNotFoundKeys.add(key);
             }
         }
-        if (!localNotFoundKeys.isEmpty()) {
-            Map<String, byte[]> redisValues = redisCache.getAll(localNotFoundKeys.toArray(String[]::new));
+        if (localNotFoundKeys.isEmpty()) return results;
+
+        Map<String, T> redisValues = redisCache.getAll(localNotFoundKeys.toArray(String[]::new), mapper, validator);
+        if (!redisValues.isEmpty()) {
             String[] redisKeys = redisValues.keySet().toArray(String[]::new);
             long[] expirationTimes = redis.expirationTime(redisKeys);
             for (int i = 0; i < expirationTimes.length; i++) {
                 long expirationTime = expirationTimes[i];
                 if (expirationTime > 0) {
                     String redisKey = redisKeys[i];
-                    byte[] value = redisValues.get(redisKey);
+                    T value = redisValues.get(redisKey);
                     results.put(redisKey, value);
-                    localCache.put(redisKey, value, Duration.ofMillis(expirationTime));
+                    localCache.put(redisKey, value, Duration.ofMillis(expirationTime), mapper);
                 }
             }
         }
@@ -70,17 +73,25 @@ public class RedisLocalCacheStore implements CacheStore {
     }
 
     @Override
-    public void put(String key, byte[] value, Duration expiration) {
-        localCache.put(key, value, expiration);
-        redisCache.put(key, value, expiration);
+    public <T> void put(String key, T value, Duration expiration, JSONMapper<T> mapper) {
+        localCache.put(key, value, expiration, mapper);
+        redisCache.put(key, value, expiration, mapper);
         publishInvalidateLocalCacheMessage(List.of(key));
     }
 
     @Override
-    public void putAll(Map<String, byte[]> values, Duration expiration) {
-        localCache.putAll(values, expiration);
-        redisCache.putAll(values, expiration);
-        publishInvalidateLocalCacheMessage(new ArrayList<>(values.keySet()));
+    public <T> void putAll(List<Entry<T>> values, Duration expiration, JSONMapper<T> mapper) {
+        localCache.putAll(values, expiration, mapper);
+        redisCache.putAll(values, expiration, mapper);
+        publishInvalidateLocalCacheMessage(keys(values));
+    }
+
+    private <T> List<String> keys(List<Entry<T>> values) {
+        List<String> keys = new ArrayList<>(values.size());
+        for (Entry<T> value : values) {
+            keys.add(value.key);
+        }
+        return keys;
     }
 
     @Override

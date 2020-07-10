@@ -1,4 +1,7 @@
 ## Change log
+### 7.4.13 (07/09/2020 - )
+* cache: optimize local cache performance
+
 ### 7.4.12 (06/29/2020 - 07/09/2020)
 * cache: support 2 level cache
     !!! with redis configured, cache().local() will be using local + redis 2 levels cache, and using redis channel to notify invalidated keys

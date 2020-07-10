@@ -1,7 +1,5 @@
 package core.framework.internal.cache;
 
-import core.framework.json.JSON;
-import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +8,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -34,44 +35,30 @@ class CacheImplTest {
 
     @Test
     void hit() {
-        when(cacheStore.get("name:key")).thenReturn(Strings.bytes("{\"stringField\":\"value\"}"));
+        var value = cacheItem("value");
+        when(cacheStore.get("name:key", cache.mapper, cache.validator)).thenReturn(value);
 
-        TestCache value = cache.get("key", key -> null);
-        assertThat(value.stringField).isEqualTo("value");
-    }
-
-    @Test
-    void hitWithStaleData() {
-        when(cacheStore.get("name:key")).thenReturn(Strings.bytes("{}"));
-
-        TestCache value = cache.get("key", key -> cacheItem("new"));
-        assertThat(value.stringField).isEqualTo("new");
-    }
-
-    @Test
-    void hitWithInvalidJSON() {
-        when(cacheStore.get("name:key")).thenReturn(Strings.bytes("{\"listField\": 1}")); // incompatible json structure
-
-        TestCache value = cache.get("key", key -> cacheItem("new"));
-        assertThat(value.stringField).isEqualTo("new");
+        TestCache result = cache.get("key", key -> null);
+        assertThat(result).isSameAs(value);
     }
 
     @Test
     void miss() {
-        when(cacheStore.get("name:key")).thenReturn(null);
+        when(cacheStore.get("name:key", cache.mapper, cache.validator)).thenReturn(null);
 
         TestCache value = cache.get("key", key -> cacheItem("value"));
         assertThat(value.stringField).isEqualTo("value");
 
-        verify(cacheStore).put("name:key", Strings.bytes(JSON.toJSON(value)), Duration.ofHours(1));
+        verify(cacheStore).put("name:key", value, Duration.ofHours(1), cache.mapper);
     }
 
     @Test
     void get() {
-        when(cacheStore.get("name:key")).thenReturn(Strings.bytes("{}"));
+        TestCache item = cacheItem("value");
+        when(cacheStore.get("name:key", cache.mapper, cache.validator)).thenReturn(item);
 
         Optional<String> value = cache.get("key");
-        assertThat(value).get().isEqualTo("{}");
+        assertThat(value).get().isEqualTo(new String(cache.mapper.toJSON(item), UTF_8));
     }
 
     @Test
@@ -83,9 +70,9 @@ class CacheImplTest {
 
     @Test
     void getAll() {
-        var values = Map.of("name:key1", Strings.bytes(JSON.toJSON(cacheItem("v1"))),
-                "name:key3", Strings.bytes(JSON.toJSON(cacheItem("v3"))));
-        when(cacheStore.getAll("name:key1", "name:key2", "name:key3")).thenReturn(values);
+        var values = Map.of("name:key1", cacheItem("v1"),
+                "name:key3", cacheItem("v3"));
+        when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key3"}, cache.mapper, cache.validator)).thenReturn(values);
 
         TestCache item2 = cacheItem("v2");
         Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> item2);
@@ -94,35 +81,7 @@ class CacheImplTest {
         assertThat(results.get("key2").stringField).isEqualTo("v2");
         assertThat(results.get("key3").stringField).isEqualTo("v3");
 
-        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && Arrays.equals(argument.get("name:key2"), Strings.bytes(JSON.toJSON(item2)))), eq(Duration.ofHours(1)));
-    }
-
-    @Test
-    void getAllWithStaleData() {
-        var values = Map.of("name:key1", Strings.bytes("{}"),
-                "name:key2", Strings.bytes(JSON.toJSON(cacheItem("key2"))));
-        when(cacheStore.getAll("name:key1", "name:key2")).thenReturn(values);
-
-        Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2"), this::cacheItem);
-        assertThat(results).containsKeys("key1", "key2");
-        assertThat(results.get("key1").stringField).isEqualTo("key1");
-        assertThat(results.get("key2").stringField).isEqualTo("key2");
-
-        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && Arrays.equals(argument.get("name:key1"), Strings.bytes(JSON.toJSON(cacheItem("key1"))))), eq(Duration.ofHours(1)));
-    }
-
-    @Test
-    void getAllWithInvalidJSON() {
-        var values = Map.of("name:key1", Strings.bytes("{\"listField\": 1}"),
-                "name:key2", Strings.bytes(JSON.toJSON(cacheItem("key2"))));
-        when(cacheStore.getAll("name:key1", "name:key2")).thenReturn(values);
-
-        Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2"), this::cacheItem);
-        assertThat(results).containsKeys("key1", "key2");
-        assertThat(results.get("key1").stringField).isEqualTo("key1");
-        assertThat(results.get("key2").stringField).isEqualTo("key2");
-
-        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && Arrays.equals(argument.get("name:key1"), Strings.bytes(JSON.toJSON(cacheItem("key1"))))), eq(Duration.ofHours(1)));
+        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && "v2".equals(argument.get(0).value.stringField)), eq(Duration.ofHours(1)), eq(cache.mapper));
     }
 
     @Test
@@ -130,18 +89,20 @@ class CacheImplTest {
         TestCache item = cacheItem("v1");
         cache.put("key", item);
 
-        verify(cacheStore).put("name:key", Strings.bytes(JSON.toJSON(item)), Duration.ofHours(1));
+        verify(cacheStore).put("name:key", item, Duration.ofHours(1), cache.mapper);
     }
 
     @Test
     void putAll() {
-        TestCache item1 = cacheItem("v1");
-        TestCache item2 = cacheItem("v2");
-        cache.putAll(Map.of("key1", item1, "key2", item2));
+        cache.putAll(Map.of("key1", cacheItem("v1"),
+                "key2", cacheItem("v2")));
 
-        verify(cacheStore).putAll(argThat(argument -> argument.size() == 2
-                && Arrays.equals(argument.get("name:key1"), Strings.bytes(JSON.toJSON(item1)))
-                && Arrays.equals(argument.get("name:key2"), Strings.bytes(JSON.toJSON(item2)))), eq(Duration.ofHours(1)));
+        verify(cacheStore).putAll(argThat(argument -> {
+            Set<String> keys = argument.stream().map(entry -> entry.key).collect(Collectors.toSet());
+            return argument.size() == 2
+                    && keys.contains("name:key1")
+                    && keys.contains("name:key2");
+        }), eq(Duration.ofHours(1)), eq(cache.mapper));
     }
 
     @Test

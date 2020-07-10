@@ -1,14 +1,14 @@
 package core.framework.internal.cache;
 
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.log.filter.ArrayLogParam;
-import core.framework.internal.log.filter.BytesLogParam;
-import core.framework.internal.log.filter.BytesValueMapLogParam;
+import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -16,16 +16,21 @@ import java.util.TreeMap;
  * @author neo
  */
 public class LocalCacheStore implements CacheStore {
-    final Map<String, CacheItem> caches = Maps.newConcurrentHashMap();
+    final Map<String, CacheItem<?>> caches = Maps.newConcurrentHashMap();
     private final Logger logger = LoggerFactory.getLogger(LocalCacheStore.class);
-    public long maxSize = (long) (Runtime.getRuntime().maxMemory() * 0.1);  // use 10% of heap by default
+    public int maxSize = 10000;  // 10000 simple objects roughly takes 1M-10M heap + hashmap overhead
 
     @Override
-    public byte[] get(String key) {
+    public <T> T get(String key, JSONMapper<T> mapper, Validator validator) {
         logger.debug("get, key={}", key);
-        CacheItem item = caches.get(key);
+        return get(key, System.currentTimeMillis());
+    }
+
+    private <T> T get(String key, long now) {
+        @SuppressWarnings("unchecked")
+        CacheItem<T> item = (CacheItem<T>) caches.get(key);
         if (item == null) return null;
-        if (item.expired(System.currentTimeMillis())) {
+        if (item.expired(now)) {
             caches.remove(key);
             return null;
         }
@@ -34,55 +39,62 @@ public class LocalCacheStore implements CacheStore {
     }
 
     @Override
-    public Map<String, byte[]> getAll(String... keys) {
+    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator validator) {
         logger.debug("getAll, keys={}", new ArrayLogParam(keys));
-        Map<String, byte[]> results = Maps.newHashMapWithExpectedSize(keys.length);
+        long now = System.currentTimeMillis();
+        Map<String, T> results = Maps.newHashMapWithExpectedSize(keys.length);
         for (String key : keys) {
-            byte[] value = get(key);
+            T value = get(key, now);
             if (value != null) results.put(key, value);
         }
         return results;
     }
 
     @Override
-    public void put(String key, byte[] value, Duration expiration) {
-        logger.debug("put, key={}, value={}, expiration={}", key, new BytesLogParam(value), expiration);
-        long now = System.currentTimeMillis();
-        caches.put(key, new CacheItem(value, now + expiration.toMillis()));
+    public <T> void put(String key, T value, Duration expiration, JSONMapper<T> mapper) {
+        logger.debug("put, key={}, expiration={}", key, expiration);
+        long expirationTime = System.currentTimeMillis() + expiration.toMillis();
+        caches.put(key, new CacheItem<>(value, expirationTime));
     }
 
     @Override
-    public void putAll(Map<String, byte[]> values, Duration expiration) {
-        logger.debug("putAll, values={}, expiration={}", new BytesValueMapLogParam(values), expiration);
-        values.forEach((key, value) -> put(key, value, expiration));
+    public <T> void putAll(List<Entry<T>> values, Duration expiration, JSONMapper<T> mapper) {
+        logger.debug("putAll, keys={}, expiration={}", new ArrayLogParam(keys(values)), expiration);
+        long expirationTime = System.currentTimeMillis() + expiration.toMillis();
+        for (Entry<T> value : values) {
+            caches.put(value.key, new CacheItem<>(value.value, expirationTime));
+        }
+    }
+
+    private <T> String[] keys(List<Entry<T>> values) {
+        String[] keys = new String[values.size()];
+        int index = 0;
+        for (Entry<T> value : values) {
+            keys[index] = value.key;
+            index++;
+        }
+        return keys;
     }
 
     @Override
     public boolean delete(String... keys) {
         logger.debug("delete, keys={}", new ArrayLogParam(keys));
-        boolean result = false;
+        boolean deleted = false;
         for (String key : keys) {
-            CacheItem previous = caches.remove(key);
-            if (!result && previous != null) result = true;
+            CacheItem<?> previous = caches.remove(key);
+            if (!deleted && previous != null) deleted = true;
         }
-        return result;
+        return deleted;
     }
 
     public void cleanup() {    // cleanup is only called by background thread with fixed delay, not need to synchronize
         logger.info("clean up local cache store");
         long now = System.currentTimeMillis();
-        long currentSize = 0;
-        for (Iterator<CacheItem> iterator = caches.values().iterator(); iterator.hasNext(); ) {
-            CacheItem item = iterator.next();
-            if (item.expired(now)) {
-                iterator.remove();
-            } else {
-                currentSize += item.value.length;
-            }
-        }
-        if (currentSize > maxSize) {
-            logger.info("evict least frequently used cache items");
-            long evictSize = currentSize - maxSize;
+        caches.values().removeIf(item -> item.expired(now));
+        int size = caches.size();
+        if (size > maxSize) {
+            logger.info("evict least frequently used cache items, currentSize={}, maxSize={}", size, maxSize);
+            int evictSize = size - maxSize;
             evictLeastFrequentlyUsedItems(evictSize);
         }
     }
@@ -90,40 +102,36 @@ public class LocalCacheStore implements CacheStore {
     // use LFU to trade off between simplicity and access efficiency,
     // assume local cache is only used for rarely changed items, and tolerate stale data, or use message to notify updates
     // cleanup is running in background thread, it maintains approximate maxSize loosely
-    private void evictLeastFrequentlyUsedItems(long evictSize) {
-        Map<Integer, Long> sizes = new TreeMap<>();
-        for (CacheItem item : caches.values()) {
+    private void evictLeastFrequentlyUsedItems(int evictSize) {
+        Map<Integer, Integer> sizes = new TreeMap<>();
+        for (CacheItem<?> item : caches.values()) {
             int hits = item.hits;
-            Long size = sizes.getOrDefault(hits, 0L);
-            sizes.put(hits, size + item.value.length);
+            int size = sizes.getOrDefault(hits, 0);
+            sizes.put(hits, size + 1);
         }
         int minHits = 0;
-        long targetEvictSize = evictSize;
-        for (Map.Entry<Integer, Long> entry : sizes.entrySet()) {
-            targetEvictSize -= entry.getValue();
-            if (targetEvictSize <= 0) {
+        int currentEvictSize = 0;
+        for (Map.Entry<Integer, Integer> entry : sizes.entrySet()) {
+            currentEvictSize += entry.getValue();
+            if (currentEvictSize >= evictSize) {
                 minHits = entry.getKey();
                 break;
             }
         }
-        for (Iterator<CacheItem> iterator = caches.values().iterator(); iterator.hasNext(); ) {
-            CacheItem item = iterator.next();
-            if (item.hits <= minHits) {
-                iterator.remove();
-            }
-        }
+        int targetHits = minHits;
+        caches.values().removeIf(item -> item.hits <= targetHits);
     }
 
     public void clear() {
         caches.clear();
     }
 
-    static class CacheItem {
-        final byte[] value;
+    static class CacheItem<T> {
+        final T value;
         final long expirationTime;
         int hits;
 
-        CacheItem(byte[] value, long expirationTime) {
+        CacheItem(T value, long expirationTime) {
             this.value = value;
             this.expirationTime = expirationTime;
         }

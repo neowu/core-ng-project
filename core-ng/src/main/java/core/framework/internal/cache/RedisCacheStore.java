@@ -1,12 +1,17 @@
 package core.framework.internal.cache;
 
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.redis.RedisException;
 import core.framework.internal.redis.RedisImpl;
+import core.framework.internal.validate.Validator;
+import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 import static core.framework.log.Markers.errorCode;
@@ -24,9 +29,11 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public byte[] get(String key) {
+    public <T> T get(String key, JSONMapper<T> mapper, Validator validator) {
         try {
-            return redis.getBytes(key);
+            byte[] value = redis.getBytes(key);
+            if (value == null) return null;
+            return deserialize(value, mapper, validator);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
             return null;
@@ -34,28 +41,58 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public Map<String, byte[]> getAll(String... keys) {
+    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator validator) {
         try {
-            return redis.multiGetBytes(keys);
+            Map<String, byte[]> redisValues = redis.multiGetBytes(keys);
+            Map<String, T> values = Maps.newHashMapWithExpectedSize(redisValues.size());
+            for (Map.Entry<String, byte[]> entry : redisValues.entrySet()) {
+                T value = deserialize(entry.getValue(), mapper, validator);
+                if (value != null) {
+                    values.put(entry.getKey(), value);
+                }
+            }
+            return values;
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
             return Map.of();
         }
     }
 
-    @Override
-    public void put(String key, byte[] value, Duration expiration) {
+    private <T> T deserialize(byte[] value, JSONMapper<T> mapper, Validator validator) {
         try {
-            redis.set(key, value, expiration, false);
+            T result = mapper.reader.readValue(value);
+            if (result == null) return null;
+
+            Map<String, String> errors = validator.errors(result, false);
+            if (errors != null) {
+                logger.warn(errorCode("INVALID_CACHE_DATA"), "failed to validate value from cache, will reload, errors={}", errors);
+                return null;
+            }
+
+            return result;
+        } catch (IOException e) {
+            logger.warn(errorCode("INVALID_CACHE_DATA"), "failed to deserialize value from cache, will reload, error={}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @Override
+    public <T> void put(String key, T value, Duration expiration, JSONMapper<T> mapper) {
+        try {
+            redis.set(key, mapper.toJSON(value), expiration, false);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
         }
     }
 
     @Override
-    public void putAll(Map<String, byte[]> values, Duration expiration) {
+    public <T> void putAll(List<Entry<T>> values, Duration expiration, JSONMapper<T> mapper) {
+        Map<String, byte[]> cacheValues = Maps.newHashMapWithExpectedSize(values.size());
+        for (Entry<T> value : values) {
+            cacheValues.put(value.key, mapper.toJSON(value.value));
+        }
         try {
-            redis.multiSet(values, expiration);
+            redis.multiSet(cacheValues, expiration);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
         }

@@ -35,7 +35,7 @@ public class CacheConfig extends Config {
     private CacheStore redisCacheStore;
     private RedisImpl redis;
     private CacheStore redisLocalCacheStore;
-    private long maxLocalSize;
+    private int maxLocalSize;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
@@ -66,7 +66,8 @@ public class CacheConfig extends Config {
         configureRedis(host);
     }
 
-    public void maxLocalSize(long size) {
+    // number of objects to cache
+    public void maxLocalSize(int size) {
         maxLocalSize = size;
     }
 

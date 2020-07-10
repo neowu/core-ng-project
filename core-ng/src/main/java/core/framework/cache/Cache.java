@@ -9,6 +9,7 @@ import java.util.function.Function;
  */
 public interface Cache<T> {
     // loader must not return null, use wrapper class if it is necessary to cache null value
+    // for performance reason, it does not copy the object returned by local cache, so it must not modify local cache object unless to put it back
     T get(String key, Function<String, T> loader);
 
     Map<String, T> getAll(Collection<String> keys, Function<String, T> loader);
