@@ -37,11 +37,14 @@ public class SendEventRequest {
         @Property(name = "result")
         public Result result;
         @NotBlank
+        @Size(max = 200)
         @Property(name = "action")
         public String action;
         @NotBlank
+        @Size(max = 200)
         @Property(name = "errorCode")
         public String errorCode;
+        @Size(max = 1000)
         @Property(name = "errorMessage")
         public String errorMessage;
         @NotNull
