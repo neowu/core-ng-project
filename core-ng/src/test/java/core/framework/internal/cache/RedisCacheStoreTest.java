@@ -95,10 +95,11 @@ class RedisCacheStoreTest {
 
     @Test
     void putWithFailure() {
+        var value = new TestCache();
         Duration expiration = Duration.ofHours(1);
-        doThrow(new RedisException("unexpected")).when(redis).set("key", Strings.bytes("{}"), expiration, false);
+        doThrow(new RedisException("unexpected")).when(redis).set("key", mapper.toJSON(value), expiration, false);
 
-        cacheStore.put("key", new TestCache(), expiration, mapper);
+        cacheStore.put("key", value, expiration, mapper);
     }
 
     @Test

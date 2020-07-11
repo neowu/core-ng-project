@@ -1,12 +1,14 @@
 package core.framework.internal.cache;
 
 import core.framework.internal.json.JSONMapper;
+import core.framework.util.Network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -39,5 +41,15 @@ class InvalidateLocalCacheMessageListenerTest {
         listener.onMessage(mapper.toJSON(message));
 
         verify(cacheStore).delete("key1", "key2");
+    }
+
+    @Test
+    void onMessageWithSameClientIP() {
+        var message = new InvalidateLocalCacheMessage();
+        message.clientIP = Network.LOCAL_HOST_ADDRESS;
+        message.keys = List.of("key1");
+        listener.onMessage(mapper.toJSON(message));
+
+        verify(cacheStore, never()).delete("key1");
     }
 }

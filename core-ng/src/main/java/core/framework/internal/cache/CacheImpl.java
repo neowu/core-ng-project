@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 /**
  * @author neo
  */
@@ -54,21 +52,20 @@ public class CacheImpl<T> implements Cache<T> {
         return value;
     }
 
-    public Optional<String> get(String key) {
+    public Optional<T> get(String key) {
         T result = cacheStore.get(cacheKey(key), mapper, validator);
         if (result == null) return Optional.empty();
-        return Optional.of(new String(mapper.toJSON(result), UTF_8));
+        return Optional.of(result);
     }
 
     @Override
     public Map<String, T> getAll(Collection<String> keys, Function<String, T> loader) {
         int size = keys.size();
-        int index;
+        int index = 0;
         String[] cacheKeys = cacheKeys(keys);
         Map<String, T> values = Maps.newHashMapWithExpectedSize(size);
         List<CacheStore.Entry<T>> newValues = new ArrayList<>(size);
         Map<String, T> cacheValues = cacheStore.getAll(cacheKeys, mapper, validator);
-        index = 0;
         for (String key : keys) {
             String cacheKey = cacheKeys[index];
             T result = cacheValues.get(cacheKey);

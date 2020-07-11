@@ -4,6 +4,7 @@ import core.framework.http.ContentType;
 import core.framework.internal.cache.CacheImpl;
 import core.framework.internal.cache.CacheManager;
 import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.json.JSON;
 import core.framework.util.Strings;
 import core.framework.web.Request;
 import core.framework.web.Response;
@@ -27,8 +28,8 @@ public class CacheController {
         String name = request.pathParam("name");
         String key = request.pathParam("key");
         CacheImpl<?> cache = cache(name);
-        String value = cache.get(key).orElseThrow(() -> new NotFoundException("cache key not found, name=" + name + ", key=" + key));
-        return Response.text(value).contentType(ContentType.APPLICATION_JSON);
+        Object value = cache.get(key).orElseThrow(() -> new NotFoundException("cache key not found, name=" + name + ", key=" + key));
+        return Response.text(JSON.toJSON(value)).contentType(ContentType.APPLICATION_JSON);
     }
 
     public Response delete(Request request) {

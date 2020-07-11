@@ -22,8 +22,13 @@ class LocalCacheStoreTest {
 
     @Test
     void getAll() {
-        Map<String, ?> values = cacheStore.getAll(new String[]{"key1", "key2"}, null, null);
+        Map<String, TestCache> values = cacheStore.getAll(new String[]{"key1", "key2"}, null, null);
         assertThat(values).isEmpty();
+
+        var value = new TestCache();
+        cacheStore.put("key1", value, Duration.ofMinutes(1), null);
+        values = cacheStore.getAll(new String[]{"key1", "key2"}, null, null);
+        assertThat(values).hasSize(1).containsEntry("key1", value);
     }
 
     @Test
@@ -86,9 +91,11 @@ class LocalCacheStoreTest {
     void delete() {
         cacheStore.put("key1", new TestCache(), Duration.ofMinutes(1), null);
         cacheStore.put("key2", new TestCache(), Duration.ofMinutes(1), null);
-        cacheStore.delete("key1", "key2");
 
+        assertThat(cacheStore.delete("key1", "key2")).isTrue();
         assertThat(cacheStore.caches).isEmpty();
+
+        assertThat(cacheStore.delete("key1", "key2")).isFalse();
     }
 
     @Test

@@ -11,12 +11,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +35,7 @@ class CacheImplTest {
     }
 
     @Test
-    void hit() {
+    void getWhenHit() {
         var value = cacheItem("value");
         when(cacheStore.get("name:key", cache.mapper, cache.validator)).thenReturn(value);
 
@@ -43,7 +44,7 @@ class CacheImplTest {
     }
 
     @Test
-    void miss() {
+    void getWhenMiss() {
         when(cacheStore.get("name:key", cache.mapper, cache.validator)).thenReturn(null);
 
         TestCache value = cache.get("key", key -> cacheItem("value"));
@@ -57,8 +58,10 @@ class CacheImplTest {
         TestCache item = cacheItem("value");
         when(cacheStore.get("name:key", cache.mapper, cache.validator)).thenReturn(item);
 
-        Optional<String> value = cache.get("key");
-        assertThat(value).get().isEqualTo(new String(cache.mapper.toJSON(item), UTF_8));
+        Optional<TestCache> value = cache.get("key");
+        assertThat(value).get().isSameAs(item);
+
+        assertThat(cache.get("notExistedKey")).isEmpty();
     }
 
     @Test
@@ -69,7 +72,7 @@ class CacheImplTest {
     }
 
     @Test
-    void getAll() {
+    void getAllWhenMiss() {
         var values = Map.of("name:key1", cacheItem("v1"),
                 "name:key3", cacheItem("v3"));
         when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key3"}, cache.mapper, cache.validator)).thenReturn(values);
@@ -82,6 +85,18 @@ class CacheImplTest {
         assertThat(results.get("key3").stringField).isEqualTo("v3");
 
         verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && "v2".equals(argument.get(0).value.stringField)), eq(Duration.ofHours(1)), eq(cache.mapper));
+    }
+
+    @Test
+    void getAllWhenHit() {
+        var values = Map.of("name:key1", cacheItem("v1"),
+                "name:key2", cacheItem("v2"));
+        when(cacheStore.getAll(new String[]{"name:key1", "name:key2"}, cache.mapper, cache.validator)).thenReturn(values);
+
+        Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2"), key -> null);
+        assertThat(results).containsKeys("key1", "key2");
+
+        verify(cacheStore, never()).putAll(any(), any(), any());
     }
 
     @Test
