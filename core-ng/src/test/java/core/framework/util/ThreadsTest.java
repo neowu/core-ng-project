@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -13,12 +13,17 @@ class ThreadsTest {
     @Test
     void sleepTime() {
         long sleepTime = Threads.sleepTime(Duration.ofMillis(10));
-        assertTrue(sleepTime >= 8 && sleepTime <= 12);
+        assertThat(sleepTime).isGreaterThanOrEqualTo(8).isLessThanOrEqualTo(12);
 
         sleepTime = Threads.sleepTime(Duration.ofMillis(100));
-        assertTrue(sleepTime >= 80 && sleepTime <= 120);
+        assertThat(sleepTime).isGreaterThanOrEqualTo(80).isLessThanOrEqualTo(120);
 
         sleepTime = Threads.sleepTime(Duration.ofSeconds(10));
-        assertTrue(sleepTime >= 8000 && sleepTime <= 12000);
+        assertThat(sleepTime).isGreaterThanOrEqualTo(8000).isLessThanOrEqualTo(12000);
+    }
+
+    @Test
+    void sleepRoughly() {
+        Threads.sleepRoughly(Duration.ZERO);
     }
 }

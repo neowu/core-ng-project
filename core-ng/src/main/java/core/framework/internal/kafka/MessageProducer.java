@@ -48,22 +48,27 @@ public class MessageProducer {
 
     public void tryCreateProducer() {
         if (uri.resolveURI()) {
-            var watch = new StopWatch();
-            try {
-                Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
-                        ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
-                        ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60 * 1000,                        // 60s, DELIVERY_TIMEOUT_MS_CONFIG is INT type
-                        ProducerConfig.LINGER_MS_CONFIG, 5L,                                         // use small linger time within acceptable range to improve batching
-                        ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                            // longer backoff to reduce cpu usage when kafka is not available
-                        ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000,                   // 5s
-                        ProducerConfig.MAX_BLOCK_MS_CONFIG, 30L * 1000);                             // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+            producer = createProducer(uri);
+        }
+    }
 
-                var serializer = new ByteArraySerializer();
-                producer = new KafkaProducer<>(config, serializer, serializer);
-                producerMetrics.set(producer.metrics());
-            } finally {
-                logger.info("create kafka producer, uri={}, name={}, elapsed={}", uri, name, watch.elapsed());
-            }
+    Producer<byte[], byte[]> createProducer(KafkaURI uri) {
+        var watch = new StopWatch();
+        try {
+            Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
+                    ProducerConfig.COMPRESSION_TYPE_CONFIG, CompressionType.SNAPPY.name,
+                    ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 60 * 1000,                        // 60s, DELIVERY_TIMEOUT_MS_CONFIG is INT type
+                    ProducerConfig.LINGER_MS_CONFIG, 5L,                                         // use small linger time within acceptable range to improve batching
+                    ProducerConfig.RECONNECT_BACKOFF_MS_CONFIG, 500L,                            // longer backoff to reduce cpu usage when kafka is not available
+                    ProducerConfig.RECONNECT_BACKOFF_MAX_MS_CONFIG, 5L * 1000,                   // 5s
+                    ProducerConfig.MAX_BLOCK_MS_CONFIG, 30L * 1000);                             // 30s, metadata update timeout, shorter than default, to get exception sooner if kafka is not available
+
+            var serializer = new ByteArraySerializer();
+            var producer = new KafkaProducer<>(config, serializer, serializer);
+            producerMetrics.set(producer.metrics());
+            return producer;
+        } finally {
+            logger.info("create kafka producer, uri={}, name={}, elapsed={}", uri, name, watch.elapsed());
         }
     }
 
@@ -75,11 +80,11 @@ public class MessageProducer {
         }
     }
 
-    private static final class KafkaCallback implements Callback {
+    static final class KafkaCallback implements Callback {
         private static final Logger LOGGER = LoggerFactory.getLogger(KafkaCallback.class);
         private final ProducerRecord<byte[], byte[]> record;
 
-        private KafkaCallback(ProducerRecord<byte[], byte[]> record) {
+        KafkaCallback(ProducerRecord<byte[], byte[]> record) {
             this.record = record;
         }
 

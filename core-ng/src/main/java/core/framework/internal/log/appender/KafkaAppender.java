@@ -30,8 +30,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public final class KafkaAppender implements LogAppender {
     public final ProducerMetrics producerMetrics = new ProducerMetrics("log-forwarder");
 
+    final BlockingQueue<ProducerRecord<byte[], byte[]>> records = new LinkedBlockingQueue<>();
     private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
-    private final BlockingQueue<ProducerRecord<byte[], byte[]>> records = new LinkedBlockingQueue<>();
     private final Thread logForwarderThread;
     private final JSONMapper<ActionLogMessage> actionLogMapper;
     private final JSONMapper<StatMessage> statMapper;
@@ -76,7 +76,7 @@ public final class KafkaAppender implements LogAppender {
         }
     }
 
-    private KafkaProducer<byte[], byte[]> createProducer(KafkaURI uri) {
+    KafkaProducer<byte[], byte[]> createProducer(KafkaURI uri) {
         var watch = new StopWatch();
         try {
             Map<String, Object> config = Map.of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, uri.bootstrapURIs,
@@ -127,7 +127,7 @@ public final class KafkaAppender implements LogAppender {
 
     // pmd has flaws to check slf4j log format with lambda, even with https://github.com/pmd/pmd/pull/2263, it fails to analyze logger in lambda+if condition block
     // so here use inner class as workaround
-    private class KafkaCallback implements Callback {
+    class KafkaCallback implements Callback {
         @Override
         public void onCompletion(RecordMetadata metadata, Exception exception) {
             if (exception != null) {
