@@ -3,6 +3,7 @@ package core.framework.internal.cache;
 import core.framework.cache.Cache;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.validate.Validator;
+import core.framework.log.ActionLogContext;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +45,15 @@ public class CacheImpl<T> implements Cache<T> {
     public T get(String key, Function<String, T> loader) {
         String cacheKey = cacheKey(key);
         T cacheValue = cacheStore.get(cacheKey, mapper, validator);
-        if (cacheValue != null) return cacheValue;
+        if (cacheValue != null) {
+            ActionLogContext.stat("cache_hit", 1);
+            return cacheValue;
+        }
 
         logger.debug("load value, key={}", key);
         T value = load(loader, key);
         cacheStore.put(cacheKey, value, duration, mapper);
+        ActionLogContext.stat("cache_miss", 1);
         return value;
     }
 
@@ -66,6 +71,7 @@ public class CacheImpl<T> implements Cache<T> {
         Map<String, T> values = Maps.newHashMapWithExpectedSize(size);
         List<CacheStore.Entry<T>> newValues = new ArrayList<>(size);
         Map<String, T> cacheValues = cacheStore.getAll(cacheKeys, mapper, validator);
+        ActionLogContext.stat("cache_hit", cacheValues.size());
         for (String key : keys) {
             String cacheKey = cacheKeys[index];
             T result = cacheValues.get(cacheKey);
@@ -77,7 +83,10 @@ public class CacheImpl<T> implements Cache<T> {
             values.put(key, result);
             index++;
         }
-        if (!newValues.isEmpty()) cacheStore.putAll(newValues, duration, mapper);
+        if (!newValues.isEmpty()) {
+            cacheStore.putAll(newValues, duration, mapper);
+            ActionLogContext.stat("cache_miss", newValues.size());
+        }
         return values;
     }
 

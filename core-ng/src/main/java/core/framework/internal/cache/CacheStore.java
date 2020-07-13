@@ -22,10 +22,10 @@ public interface CacheStore {   // all keys here are direct cacheKey, not the ke
     boolean delete(String... keys);
 
     class Entry<T> {
-        public final String key;
-        public final T value;
+        final String key;
+        final T value;
 
-        public Entry(String key, T value) {
+        Entry(String key, T value) {
             this.key = key;
             this.value = value;
         }

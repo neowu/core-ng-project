@@ -1,6 +1,7 @@
 ## Change log
-### 7.4.13 (07/09/2020 - )
+### 7.4.13 (07/09/2020 - 07/13/2020)
 * cache: optimize local cache performance
+* cache: added cache tracking, includes stats.cache_size, stats.cache_hit and stats.cache_miss 
 * log-collector: add validation for request, max error message size to 1000, max action size to 200, max error code size to 200
 
 ### 7.4.12 (06/29/2020 - 07/09/2020)

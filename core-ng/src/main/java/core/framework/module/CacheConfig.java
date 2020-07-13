@@ -6,6 +6,7 @@ import core.framework.internal.cache.CacheManager;
 import core.framework.internal.cache.CacheStore;
 import core.framework.internal.cache.InvalidateLocalCacheMessage;
 import core.framework.internal.cache.InvalidateLocalCacheMessageListener;
+import core.framework.internal.cache.LocalCacheMetrics;
 import core.framework.internal.cache.LocalCacheStore;
 import core.framework.internal.cache.RedisCacheStore;
 import core.framework.internal.cache.RedisLocalCacheStore;
@@ -110,6 +111,7 @@ public class CacheConfig extends Config {
             logger.info("create local cache store");
             localCacheStore = new LocalCacheStore();
             context.backgroundTask().scheduleWithFixedDelay(localCacheStore::cleanup, Duration.ofMinutes(5));
+            context.collector.metrics.add(new LocalCacheMetrics(localCacheStore));
         }
         return localCacheStore;
     }
