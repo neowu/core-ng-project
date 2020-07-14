@@ -692,7 +692,7 @@
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-cache_hit_rate",
       "uiStateJSON": "{}",
       "version": 1,
@@ -705,7 +705,7 @@
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},
       "title": "stat-cache_size",
       "uiStateJSON": "{}",
       "version": 1,
