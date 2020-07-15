@@ -25,19 +25,19 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static core.framework.internal.redis.Protocol.Command.DEL;
-import static core.framework.internal.redis.Protocol.Command.EXPIRE;
 import static core.framework.internal.redis.Protocol.Command.GET;
 import static core.framework.internal.redis.Protocol.Command.INCRBY;
 import static core.framework.internal.redis.Protocol.Command.MGET;
 import static core.framework.internal.redis.Protocol.Command.MSET;
+import static core.framework.internal.redis.Protocol.Command.PEXPIRE;
 import static core.framework.internal.redis.Protocol.Command.PTTL;
 import static core.framework.internal.redis.Protocol.Command.PUBLISH;
 import static core.framework.internal.redis.Protocol.Command.SCAN;
 import static core.framework.internal.redis.Protocol.Command.SET;
 import static core.framework.internal.redis.Protocol.Keyword.COUNT;
-import static core.framework.internal.redis.Protocol.Keyword.EX;
 import static core.framework.internal.redis.Protocol.Keyword.MATCH;
 import static core.framework.internal.redis.Protocol.Keyword.NX;
+import static core.framework.internal.redis.Protocol.Keyword.PX;
 import static core.framework.internal.redis.RedisEncodings.decode;
 import static core.framework.internal.redis.RedisEncodings.encode;
 
@@ -127,6 +127,7 @@ public class RedisImpl implements Redis {
 
     public boolean set(String key, byte[] value, Duration expiration, boolean onlyIfAbsent) {
         var watch = new StopWatch();
+        byte[] expirationTime = expiration == null ? null : expirationTime(expiration);
         boolean updated = false;
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
@@ -138,8 +139,8 @@ public class RedisImpl implements Redis {
             connection.writeBlobString(value);
             if (onlyIfAbsent) connection.writeBlobString(NX);
             if (expiration != null) {
-                connection.writeBlobString(EX);
-                connection.writeBlobString(encode(expiration.getSeconds()));
+                connection.writeBlobString(PX);
+                connection.writeBlobString(expirationTime);
             }
             connection.flush();
             String result = connection.readSimpleString();
@@ -163,7 +164,7 @@ public class RedisImpl implements Redis {
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
             RedisConnection connection = item.resource;
-            connection.writeKeyArgumentCommand(EXPIRE, key, encode(expiration.getSeconds()));
+            connection.writeKeyArgumentCommand(PEXPIRE, key, encode(expiration.toMillis()));    // PEXPIRE accepts zero and negative ttl
             connection.readLong();
         } catch (IOException e) {
             item.broken = true;
@@ -172,7 +173,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, 1);
-            logger.debug("expire, key={}, expiration={}, elapsed={}", key, expiration, elapsed);
+            logger.debug("pexpire, key={}, expiration={}, elapsed={}", key, expiration, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -289,7 +290,7 @@ public class RedisImpl implements Redis {
     public void multiSet(Map<String, byte[]> values, Duration expiration) {
         var watch = new StopWatch();
         if (values.isEmpty()) throw new Error("values must not be empty");
-        byte[] expirationValue = encode(expiration.getSeconds());
+        byte[] expirationValue = expirationTime(expiration);
         int size = values.size();
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
@@ -299,7 +300,7 @@ public class RedisImpl implements Redis {
                 connection.writeBlobString(SET);
                 connection.writeBlobString(encode(entry.getKey()));
                 connection.writeBlobString(entry.getValue());
-                connection.writeBlobString(EX);
+                connection.writeBlobString(PX);
                 connection.writeBlobString(expirationValue);
             }
             connection.flush();
@@ -311,7 +312,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("mset, values={}, size={}, expiration={}, elapsed={}", new BytesValueMapLogParam(values), size, expiration, elapsed);
+            logger.debug("set, values={}, size={}, expiration={}, elapsed={}", new BytesValueMapLogParam(values), size, expiration, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -363,7 +364,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", redisTook, returnedKeys, 0);
-            logger.debug("forEach, pattern={}, returnedKeys={}, redisTook={}, elapsed={}", pattern, returnedKeys, redisTook, elapsed);
+            logger.debug("scan, pattern={}, returnedKeys={}, redisTook={}, elapsed={}", pattern, returnedKeys, redisTook, elapsed);
         }
     }
 
@@ -428,5 +429,11 @@ public class RedisImpl implements Redis {
         if (elapsed > slowOperationThresholdInNanos) {
             logger.warn(Markers.errorCode("SLOW_REDIS"), "slow redis operation, elapsed={}", elapsed);
         }
+    }
+
+    private byte[] expirationTime(Duration expiration) {
+        long expirationTime = expiration.toMillis();
+        if (expirationTime <= 0) throw new Error("expiration time must be longer than 1ms");
+        return encode(expirationTime);
     }
 }

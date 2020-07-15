@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author neo
@@ -37,5 +38,12 @@ class RedisImplTest {
         redis.slowOperationThreshold(threshold);
 
         assertThat(redis.slowOperationThresholdInNanos).isEqualTo(threshold.toNanos());
+    }
+
+    @Test
+    void set() {
+        assertThatThrownBy(() -> redis.set("key", "value", Duration.ZERO, true))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("expiration time must be longer than 1ms");
     }
 }

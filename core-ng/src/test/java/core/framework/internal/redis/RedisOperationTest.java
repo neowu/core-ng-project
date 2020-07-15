@@ -39,7 +39,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         response("+OK\r\n");
         redis.set("key", "value", Duration.ofMinutes(1));
 
-        assertRequestEquals("*5\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nex\r\n$2\r\n60\r\n");
+        assertRequestEquals("*5\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nPX\r\n$5\r\n60000\r\n");
     }
 
     @Test
@@ -48,7 +48,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         boolean result = redis.set("key", "value", Duration.ofMinutes(1), true);
 
         assertThat(result).isTrue();
-        assertRequestEquals("*6\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nnx\r\n$2\r\nex\r\n$2\r\n60\r\n");
+        assertRequestEquals("*6\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nNX\r\n$2\r\nPX\r\n$5\r\n60000\r\n");
     }
 
     @Test
@@ -57,7 +57,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         boolean result = redis.set("key", "value", null, true);
 
         assertThat(result).isFalse();
-        assertRequestEquals("*4\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nnx\r\n");
+        assertRequestEquals("*4\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n$2\r\nNX\r\n");
     }
 
     @Test
@@ -65,7 +65,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         response(":1\r\n");
         redis.expire("key", Duration.ofMinutes(1));
 
-        assertRequestEquals("*3\r\n$6\r\nEXPIRE\r\n$3\r\nkey\r\n$2\r\n60\r\n");
+        assertRequestEquals("*3\r\n$7\r\nPEXPIRE\r\n$3\r\nkey\r\n$5\r\n60000\r\n");
     }
 
     @Test
@@ -104,8 +104,8 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         values.put("k2", encode("v2"));
         redis.multiSet(values, Duration.ofMinutes(1));
 
-        assertRequestEquals("*5\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n$2\r\nex\r\n$2\r\n60\r\n"
-                + "*5\r\n$3\r\nSET\r\n$2\r\nk2\r\n$2\r\nv2\r\n$2\r\nex\r\n$2\r\n60\r\n");
+        assertRequestEquals("*5\r\n$3\r\nSET\r\n$2\r\nk1\r\n$2\r\nv1\r\n$2\r\nPX\r\n$5\r\n60000\r\n"
+                + "*5\r\n$3\r\nSET\r\n$2\r\nk2\r\n$2\r\nv2\r\n$2\r\nPX\r\n$5\r\n60000\r\n");
     }
 
     @Test
@@ -123,7 +123,7 @@ class RedisOperationTest extends AbstractRedisOperationTest {
         redis.forEach("k*", keys::add);
 
         assertThat(keys).containsExactly("k1", "k2");
-        assertRequestEquals("*6\r\n$4\r\nSCAN\r\n$1\r\n0\r\n$5\r\nmatch\r\n$2\r\nk*\r\n$5\r\ncount\r\n$3\r\n500\r\n");
+        assertRequestEquals("*6\r\n$4\r\nSCAN\r\n$1\r\n0\r\n$5\r\nMATCH\r\n$2\r\nk*\r\n$5\r\nCOUNT\r\n$3\r\n500\r\n");
     }
 
     @Test

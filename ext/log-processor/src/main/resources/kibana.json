@@ -39,7 +39,7 @@
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
       "title": "action-by-response_code",
       "uiStateJSON": "{}",
       "version": 1,
@@ -51,7 +51,7 @@
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
       "title": "action-by-app",
       "uiStateJSON": "{}",
       "version": 1,
@@ -63,7 +63,7 @@
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
       "title": "action-by-action",
       "uiStateJSON": "{}",
       "version": 1,
@@ -75,7 +75,7 @@
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"lucene\"},\"filter\":[]}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
       "title": "action-by-elapsed",
       "uiStateJSON": "{}",
       "version": 1,
@@ -360,7 +360,7 @@
   {
     "attributes": {
       "description": "",
-      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"language\":\"lucene\",\"query\":\"\"},\"filter\":[]}"},
+      "kibanaSavedObjectMeta": {"searchSourceJSON": "{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[]}"},
       "title": "stat-cpu_usage",
       "uiStateJSON": "{}",
       "version": 1,

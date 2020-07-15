@@ -69,7 +69,7 @@ final class Protocol {
     static class Command {
         static final byte[] GET = Strings.bytes("GET");
         static final byte[] SET = Strings.bytes("SET");
-        static final byte[] EXPIRE = Strings.bytes("EXPIRE");
+        static final byte[] PEXPIRE = Strings.bytes("PEXPIRE");
         static final byte[] PTTL = Strings.bytes("PTTL");
         static final byte[] DEL = Strings.bytes("DEL");
         static final byte[] INCRBY = Strings.bytes("INCRBY");
@@ -103,9 +103,9 @@ final class Protocol {
     }
 
     static class Keyword {
-        static final byte[] MATCH = Strings.bytes("match");
-        static final byte[] COUNT = Strings.bytes("count");
-        static final byte[] NX = Strings.bytes("nx");
-        static final byte[] EX = Strings.bytes("ex");
+        static final byte[] MATCH = Strings.bytes("MATCH");
+        static final byte[] COUNT = Strings.bytes("COUNT");
+        static final byte[] NX = Strings.bytes("NX");
+        static final byte[] PX = Strings.bytes("PX");
     }
 }
