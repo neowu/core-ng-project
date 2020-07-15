@@ -127,7 +127,7 @@ public class RedisImpl implements Redis {
 
     public boolean set(String key, byte[] value, Duration expiration, boolean onlyIfAbsent) {
         var watch = new StopWatch();
-        byte[] expirationTime = expiration == null ? null : expirationTime(expiration);
+        byte[] expirationValue = expiration == null ? null : expirationValue(expiration);
         boolean updated = false;
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
@@ -140,7 +140,7 @@ public class RedisImpl implements Redis {
             if (onlyIfAbsent) connection.writeBlobString(NX);
             if (expiration != null) {
                 connection.writeBlobString(PX);
-                connection.writeBlobString(expirationTime);
+                connection.writeBlobString(expirationValue);
             }
             connection.flush();
             String result = connection.readSimpleString();
@@ -290,7 +290,7 @@ public class RedisImpl implements Redis {
     public void multiSet(Map<String, byte[]> values, Duration expiration) {
         var watch = new StopWatch();
         if (values.isEmpty()) throw new Error("values must not be empty");
-        byte[] expirationValue = expirationTime(expiration);
+        byte[] expirationValue = expirationValue(expiration);
         int size = values.size();
         PoolItem<RedisConnection> item = pool.borrowItem();
         try {
@@ -431,7 +431,7 @@ public class RedisImpl implements Redis {
         }
     }
 
-    private byte[] expirationTime(Duration expiration) {
+    private byte[] expirationValue(Duration expiration) {
         long expirationTime = expiration.toMillis();
         if (expirationTime <= 0) throw new Error("expiration time must be longer than 1ms");
         return encode(expirationTime);
