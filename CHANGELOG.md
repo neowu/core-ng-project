@@ -12,7 +12,7 @@
     !!! with redis configured, cache().local() will be using local + redis 2 levels cache, and using redis channel to notify invalidated keys
     !!! cache().local() should be used in performance sensitive area with high hit rate, to reduce number of redis commands overhead (but to increase JVM GC burden)
     !!! cache().remote() keeps old behavior.
-* httpClient: disallowed new HTTPClientBuilder(), prefer HTTPClient.builder()
+* httpClient: disallowed new HTTPClientBuilder(), use HTTPClient.builder()
 
 ### 7.4.11 (06/19/2020 - 06/29/2020)
 * es: update to 7.8.0

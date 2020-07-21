@@ -38,7 +38,7 @@ public class ServiceUnavailableInterceptor implements Interceptor {
         }
 
         void noNewExchanges() {
-            ((RealConnection) connection).noNewExchanges();
+            ((RealConnection) connection).setNoNewExchanges(true);
         }
     }
 }
