@@ -29,7 +29,7 @@ public class ExecutorConfig extends Config {
 
     Executor createExecutor(String name, int poolSize) {
         var executor = new ExecutorImpl(poolSize, name, context.logManager);
-        context.shutdownHook.add(ShutdownHook.STAGE_2, timeoutInMs -> executor.shutdown());
+        context.shutdownHook.add(ShutdownHook.STAGE_2, timeout -> executor.shutdown());
         context.shutdownHook.add(ShutdownHook.STAGE_3, executor::awaitTermination);
         return executor;
     }

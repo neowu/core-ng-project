@@ -121,7 +121,7 @@ public final class KafkaAppender implements LogAppender {
             for (ProducerRecord<byte[], byte[]> record : records) {     // if log-kafka is not available, here will block MAX_BLOCK_MS, to simplify it's ok not handling timeout since kafka appender is at end of shutdown, no more critical resources left to handle
                 producer.send(record);
             }
-            producer.close(Duration.ofMillis(timeoutInMs <= 0 ? 1000 : timeoutInMs));
+            producer.close(Duration.ofMillis(timeoutInMs));
         }
     }
 

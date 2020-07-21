@@ -101,14 +101,16 @@ public final class ShutdownHook implements Runnable {
         actionLog.stat("uptime_in_ms", ManagementFactory.getRuntimeMXBean().getUptime());
     }
 
-    private void shutdown(long endTime, int fromStage, int toStage) {
+    void shutdown(long endTime, int fromStage, int toStage) {
         for (int i = fromStage; i <= toStage; i++) {
             ShutdownStage stage = stages[i];
             if (stage == null) continue;
             logger.info("shutdown stage: {}", i);
             for (Shutdown shutdown : stage.shutdowns) {
                 try {
-                    shutdown.execute(endTime - System.currentTimeMillis());
+                    long timeoutInMs = endTime - System.currentTimeMillis();
+                    if (timeoutInMs < 1000) timeoutInMs = 1000; // give 1s if less 1s is left, usually we put larger terminationGracePeriodSeconds than SHUTDOWN_TIMEOUT_IN_SEC, so there are some room to gracefully shutdown rest resources
+                    shutdown.execute(timeoutInMs);
                 } catch (Throwable e) {
                     logger.warn(errorCode("FAILED_TO_STOP"), "failed to shutdown, method={}", shutdown, e);
                 }

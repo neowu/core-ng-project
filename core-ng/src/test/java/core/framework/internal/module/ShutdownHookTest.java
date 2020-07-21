@@ -77,4 +77,13 @@ class ShutdownHookTest {
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("greater than 0");
     }
+
+    @Test
+    void shutdown() throws Exception {
+        var shutdown = mock(ShutdownHook.Shutdown.class);
+        shutdownHook.add(ShutdownHook.STAGE_7, shutdown);
+        shutdownHook.shutdown(System.currentTimeMillis(), ShutdownHook.STAGE_7, ShutdownHook.STAGE_9);
+
+        verify(shutdown).execute(1000); // give resource as least 1s to shutdown
+    }
 }
