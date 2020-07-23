@@ -38,6 +38,7 @@ class StatServiceTest extends IntegrationTest {
 
         StatDocument stat = statDocument(now, message.id);
         assertThat(stat.stats).isEqualTo(message.stats);
+        assertThat(stat.info).isEqualTo(message.info);
     }
 
     @Test
@@ -51,7 +52,7 @@ class StatServiceTest extends IntegrationTest {
         statService.index(messages, now);
 
         StatDocument stat = statDocument(now, messages.get(0).id);
-        assertThat(stat.stats).isEqualTo(messages.get(0).stats);
+        assertThat(stat.stats).isEqualToComparingFieldByField(messages.get(0).stats);
     }
 
     private StatDocument statDocument(LocalDate now, String id) {

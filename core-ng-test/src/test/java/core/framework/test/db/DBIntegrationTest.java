@@ -8,8 +8,9 @@ import core.framework.test.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +34,11 @@ class DBIntegrationTest extends IntegrationTest {
 
     @Test
     void insert() {
-        TestDBEntity entity = new TestDBEntity();
+        var entity = new TestDBEntity();
         entity.id = UUID.randomUUID().toString();
-        entity.dateTimeField = LocalDateTime.now();
-        entity.dateField = LocalDate.now();
-        entity.zonedDateTimeField = ZonedDateTime.now();
+        entity.dateTimeField = LocalDateTime.of(2020, Month.JULY, 23, 14, 0, 0);
+        entity.dateField = entity.dateTimeField.toLocalDate();
+        entity.zonedDateTimeField = ZonedDateTime.of(entity.dateTimeField, ZoneId.systemDefault());
         repository.insert(entity);
 
         Optional<TestDBEntity> selectedEntity = repository.get(entity.id);
