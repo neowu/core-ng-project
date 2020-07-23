@@ -7,6 +7,7 @@ import core.framework.log.message.StatMessage;
 import core.framework.redis.Redis;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
+import core.framework.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +52,7 @@ public class RedisMonitorJob implements Job {
             message.result = "ERROR";
             message.errorCode = "FAILED_TO_COLLECT";
             message.errorMessage = e.getMessage();
+            message.info = Map.of("stack_trace", Exceptions.stackTrace(e));
         }
         publisher.publish(message);
     }

@@ -15,6 +15,15 @@
             "scaling_factor": 1000
           }
         }
+      },
+      {
+        "info": {
+          "path_match": "info.*",
+          "mapping": {
+            "type": "text",
+            "index": "false"
+          }
+        }
       }
     ],
     "properties": {

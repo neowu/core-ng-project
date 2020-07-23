@@ -49,7 +49,7 @@ class RepositoryImplAutoIncrementIdEntityTest {
         var entity = new AutoIncrementIdEntity();
         entity.stringField = "string";
         entity.doubleField = 3.25;
-        entity.dateTimeField = LocalDateTime.now();
+        entity.dateTimeField = LocalDateTime.of(2020, 7, 23, 12, 0, 0);
         entity.zonedDateTimeField = ZonedDateTime.of(LocalDateTime.of(2017, Month.APRIL, 3, 12, 0), ZoneId.of("UTC"));
 
         OptionalLong id = repository.insert(entity);

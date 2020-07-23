@@ -8,6 +8,7 @@ import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
+import core.framework.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author neo
@@ -40,7 +42,6 @@ public class KubeMonitorJob implements Job {
                 for (PodList.Pod pod : pods.items) {
                     String errorMessage = check(pod, now);
                     if (errorMessage != null) {
-                        logger.warn("detected failed pod, ns={}, name={}, pod={}", namespace, pod.metadata.name, JSON.toJSON(pod));
                         publishPodFailure(pod, errorMessage);
                     }
                 }
@@ -106,6 +107,7 @@ public class KubeMonitorJob implements Job {
         message.host = pod.metadata.name;
         message.errorCode = "POD_FAILURE";
         message.errorMessage = errorMessage;
+        message.info = Map.of("pod", JSON.toJSON(pod));
         publisher.publish(message);
     }
 
@@ -118,6 +120,7 @@ public class KubeMonitorJob implements Job {
         message.app = "kubernetes";
         message.errorCode = "FAILED_TO_COLLECT";
         message.errorMessage = e.getMessage();
+        message.info = Map.of("stack_trace", Exceptions.stackTrace(e));
         publisher.publish(message);
     }
 }

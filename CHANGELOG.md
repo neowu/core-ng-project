@@ -1,7 +1,8 @@
 ## Change log
-### 7.4.14 (07/13/2020 - )
+### 7.4.14 (07/13/2020 - 07/23/2020)
 * redis: change expiration precision from second to milliseconds
 * shutdown: give resources at least 1s to terminate gracefully
+* log: add info context to stat document, for collecting additional info, mainly for monitor
 
 ### 7.4.13 (07/09/2020 - 07/13/2020)
 * cache: optimize local cache performance

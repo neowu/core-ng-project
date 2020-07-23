@@ -67,6 +67,7 @@ public class StatService {
         stat.errorCode = message.errorCode;
         stat.errorMessage = message.errorMessage;
         stat.stats = message.stats;
+        stat.info = message.info;
         return stat;
     }
 }

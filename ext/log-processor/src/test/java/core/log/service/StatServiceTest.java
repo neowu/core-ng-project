@@ -31,6 +31,7 @@ class StatServiceTest extends IntegrationTest {
     @Test
     void index() {
         StatMessage message = message("1");
+        message.info = Map.of("key", "value");
 
         var now = LocalDate.of(2017, Month.OCTOBER, 10);
         statService.index(List.of(message), now);

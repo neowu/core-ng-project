@@ -12,6 +12,7 @@ import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
+import core.framework.util.Exceptions;
 import core.framework.util.Strings;
 import core.framework.util.Types;
 import org.slf4j.Logger;
@@ -105,6 +106,7 @@ public class ElasticSearchMonitorJob implements Job {
         message.host = host;
         message.errorCode = "FAILED_TO_COLLECT";
         message.errorMessage = e.getMessage();
+        message.info = Map.of("stack_trace", Exceptions.stackTrace(e));
         publisher.publish(message);
     }
 

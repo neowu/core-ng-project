@@ -25,4 +25,6 @@ public class StatMessage {
     public String errorMessage;
     @Property(name = "stats")
     public Map<String, Double> stats;
+    @Property(name = "info")
+    public Map<String, String> info;
 }
