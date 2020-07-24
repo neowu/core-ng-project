@@ -1,5 +1,6 @@
 package core.framework.util;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -40,5 +41,9 @@ public final class Maps {
             capacity = (int) ((float) size / 0.75f + 1);
         }
         return capacity;
+    }
+
+    public static <T extends Enum<T>, V> Map<T, V> newEnumMap(Class<T> enumClass) {
+        return new EnumMap<>(enumClass);
     }
 }

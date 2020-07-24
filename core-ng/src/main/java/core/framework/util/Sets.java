@@ -1,5 +1,6 @@
 package core.framework.util;
 
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,5 +27,10 @@ public final class Sets {
             capacity = (int) ((float) size / 0.75f + 1);
         }
         return new HashSet<>(capacity);
+    }
+
+    // EnumSet provides EnumSet.of(values...) methods, use it directly when apply
+    public static <T extends Enum<T>> Set<T> newEnumSet(Class<T> enumClass) {
+        return EnumSet.noneOf(enumClass);
     }
 }

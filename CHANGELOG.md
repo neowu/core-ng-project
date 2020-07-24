@@ -1,4 +1,7 @@
 ## Change log
+### 7.4.15 (07/23/2020 - )
+* utils: add Sets.newEnumSet and Maps.newEnumMap shortcuts
+
 ### 7.4.14 (07/13/2020 - 07/23/2020)
 * redis: change expiration precision from second to milliseconds
 * shutdown: give resources at least 1s to terminate gracefully

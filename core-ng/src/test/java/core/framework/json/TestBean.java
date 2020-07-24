@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,7 @@ public class TestBean {
 
     @NotNull
     @Property(name = "enumMap")
-    public Map<TestEnum, String> enumMapField = new EnumMap<>(TestEnum.class);
+    public Map<TestEnum, String> enumMapField = Maps.newEnumMap(TestEnum.class);
 
     @NotNull
     @Property(name = "listMap")

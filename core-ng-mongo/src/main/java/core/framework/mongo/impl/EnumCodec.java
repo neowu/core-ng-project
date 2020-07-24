@@ -12,7 +12,6 @@ import org.bson.codecs.EncoderContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 import static core.framework.util.Strings.format;
@@ -24,13 +23,13 @@ public class EnumCodec<T extends Enum<T>> implements Codec<T> {
     private final Logger logger = LoggerFactory.getLogger(EnumCodec.class);
 
     private final Class<T> enumClass;
-    private final EnumMap<T, String> encodingMappings;
+    private final Map<T, String> encodingMappings;
     private final Map<String, T> decodingMappings;
 
     public EnumCodec(Class<T> enumClass) {
         T[] constants = enumClass.getEnumConstants();
         this.enumClass = enumClass;
-        encodingMappings = new EnumMap<>(enumClass);
+        encodingMappings = Maps.newEnumMap(enumClass);
         decodingMappings = Maps.newHashMapWithExpectedSize(constants.length);
         for (T constant : constants) {
             String value = Enums.constantAnnotation(constant, MongoEnumValue.class).value();
