@@ -9,7 +9,6 @@ import core.framework.internal.http.ServiceUnavailableInterceptor;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import okhttp3.ConnectionPool;
-import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.time.Duration;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -55,7 +53,6 @@ public final class HTTPClientBuilder {
     private KeyStore trustStore;
     private Integer maxRetries;
     private Duration retryWaitTime = Duration.ofMillis(500);
-    private String[] tlsVersions;
 
     // force to use HTTPClient.builder()
     HTTPClientBuilder() {
@@ -72,12 +69,6 @@ public final class HTTPClientBuilder {
                     .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
 
             configureHTTPS(builder);
-
-            if (tlsVersions != null) {  // TLSv1.3 is troublesome, jdk impl is still not complete and may cause problem with different TLSv1.3 server, this is to provide way to disable client TLSv1.3
-                builder.connectionSpecs(List.of(new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                        .tlsVersions(tlsVersions)
-                        .build(), ConnectionSpec.CLEARTEXT));
-            }
 
             if (maxRetries != null) {
                 builder.addNetworkInterceptor(new ServiceUnavailableInterceptor());
@@ -105,7 +96,7 @@ public final class HTTPClientBuilder {
             }
             sslContext.init(null, new TrustManager[]{trustManager}, null);
             builder.hostnameVerifier((hostname, sslSession) -> true)
-                   .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
+                    .sslSocketFactory(sslContext.getSocketFactory(), trustManager);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             throw new Error(e);
         }
@@ -163,11 +154,6 @@ public final class HTTPClientBuilder {
         } catch (CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException e) {
             throw new Error(e);
         }
-        return this;
-    }
-
-    public HTTPClientBuilder tlsVersions(String... versions) {
-        tlsVersions = versions;
         return this;
     }
 
