@@ -8,7 +8,7 @@ import static core.framework.log.Markers.errorCode;
 /**
  * @author neo
  */
-public class WebServiceController {
+public final class WebServiceController {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebServiceController.class);
 
     // used by generated class, must be public

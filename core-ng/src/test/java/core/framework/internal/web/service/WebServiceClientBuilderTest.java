@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +29,8 @@ class WebServiceClientBuilderTest {
     @BeforeEach
     void createTestWebServiceClient() {
         webServiceClient = mock(WebServiceClient.class);
+        doCallRealMethod().when(webServiceClient).logCallWebService(anyString());
+
         builder = new WebServiceClientBuilder<>(TestWebService.class, webServiceClient);
         client = builder.build();
     }
@@ -50,7 +54,7 @@ class WebServiceClientBuilderTest {
         var expectedResponse = new TestWebService.TestResponse();
 
         when(webServiceClient.execute(HTTPMethod.GET, "/test/1", null, null, Types.optional(TestWebService.TestResponse.class)))
-            .thenReturn(Optional.of(expectedResponse));
+                .thenReturn(Optional.of(expectedResponse));
 
         TestWebService.TestResponse response = client.get(1).orElseThrow();
         assertThat(response).isSameAs(expectedResponse);
@@ -85,21 +89,21 @@ class WebServiceClientBuilderTest {
         builder = new CodeBuilder();
         this.builder.buildPath(builder, "/:id/status", Map.of("id", 0));
         assertThat(builder.build())
-            .contains("builder.append(\"/\").append(core.framework.internal.web.service.PathParamHelper.toString(param0));")
-            .contains("builder.append(\"/status\");");
+                .contains("builder.append(\"/\").append(core.framework.internal.web.service.PathParamHelper.toString(param0));")
+                .contains("builder.append(\"/status\");");
 
         builder = new CodeBuilder();
         this.builder.buildPath(builder, "/test/:key1/:key2", Map.of("key1", 0, "key2", 1));
         assertThat(builder.build())
-            .contains("builder.append(\"/test/\").append(core.framework.internal.web.service.PathParamHelper.toString(param0));")
-            .contains("builder.append(\"/\").append(core.framework.internal.web.service.PathParamHelper.toString(param1));");
+                .contains("builder.append(\"/test/\").append(core.framework.internal.web.service.PathParamHelper.toString(param0));")
+                .contains("builder.append(\"/\").append(core.framework.internal.web.service.PathParamHelper.toString(param1));");
 
         builder = new CodeBuilder();
         this.builder.buildPath(builder, "/test/:key1/:key2/", Map.of("key1", 0, "key2", 1));
         assertThat(builder.build())
-            .contains("builder.append(\"/test/\").append(core.framework.internal.web.service.PathParamHelper.toString(param0));")
-            .contains("builder.append(\"/\").append(core.framework.internal.web.service.PathParamHelper.toString(param1));")
-            .contains("builder.append(\"/\");");
+                .contains("builder.append(\"/test/\").append(core.framework.internal.web.service.PathParamHelper.toString(param0));")
+                .contains("builder.append(\"/\").append(core.framework.internal.web.service.PathParamHelper.toString(param1));")
+                .contains("builder.append(\"/\");");
     }
 
 }

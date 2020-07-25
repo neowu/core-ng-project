@@ -150,6 +150,17 @@ class WebServiceClientTest {
     }
 
     @Test
+    void execute() {
+        HTTPResponse response = new HTTPResponse(200, Map.of(), new byte[0]);
+        when(httpClient.execute(any())).thenReturn(response);
+
+        var request = new TestWebService.TestRequest();
+        request.stringField = "12345";
+        Object result = webServiceClient.execute(HTTPMethod.PUT, "/api", TestWebService.TestRequest.class, request, void.class);
+        assertThat(result).isNull();
+    }
+
+    @Test
     void intercept() {
         WebServiceClientInterceptor interceptor = mock(WebServiceClientInterceptor.class);
         webServiceClient.intercept(interceptor);
