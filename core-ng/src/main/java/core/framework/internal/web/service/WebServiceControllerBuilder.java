@@ -4,13 +4,11 @@ import core.framework.api.web.service.PathParam;
 import core.framework.api.web.service.ResponseStatus;
 import core.framework.internal.asm.CodeBuilder;
 import core.framework.internal.asm.DynamicInstanceBuilder;
+import core.framework.internal.reflect.Methods;
 import core.framework.internal.reflect.Params;
-import core.framework.log.Markers;
 import core.framework.web.Controller;
 import core.framework.web.Request;
 import core.framework.web.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -41,9 +39,6 @@ public class WebServiceControllerBuilder<T> {
         builder.constructor(new Class<?>[]{serviceInterface}, "this.delegate = $1;");
 
         boolean deprecated = method.isAnnotationPresent(Deprecated.class);
-        if (deprecated) {
-            builder.addField("private final {} logger = {}.getLogger({});", type(Logger.class), type(LoggerFactory.class), variable(serviceInterface));
-        }
         builder.addMethod(buildMethod(deprecated));
 
         return builder.build(service);
@@ -53,7 +48,7 @@ public class WebServiceControllerBuilder<T> {
         var builder = new CodeBuilder();
         builder.append("public {} execute({} request) throws Exception {\n", type(Response.class), type(Request.class));
 
-        if (deprecated) builder.indent(1).append("logger.warn({}.errorCode({}), {});\n", type(Markers.class), variable("DEPRECATION"), variable("web service has been deprecated, please notify consumer to update"));
+        if (deprecated) builder.indent(1).append("{}.logDeprecation({});\n", type(WebServiceController.class), variable(Methods.path(method)));
 
         Annotation[][] annotations = method.getParameterAnnotations();
         List<String> params = new ArrayList<>(annotations.length);

@@ -1,14 +1,12 @@
 public class TestWebService$Client implements core.framework.internal.web.service.TestWebService {
     private final core.framework.internal.web.service.WebServiceClient client;
 
-    private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(core.framework.internal.web.service.WebServiceClient.class);
-
     public TestWebService$Client(core.framework.internal.web.service.WebServiceClient $1) {
         this.client = $1;
     }
 
     public void create(java.lang.Integer param0, core.framework.internal.web.service.TestWebService.TestRequest param1) {
-        logger.debug("call web service, method=core.framework.internal.web.service.TestWebService.create(java.lang.Integer, core.framework.internal.web.service.TestWebService$TestRequest)");
+        client.logCallWebService("core.framework.internal.web.service.TestWebService.create(Integer, core.framework.internal.web.service.TestWebService$TestRequest)");
         if (param0 == null) throw new Error("path param must not be null, name=id");
         StringBuilder builder = new StringBuilder();
         builder.append("/test/").append(core.framework.internal.web.service.PathParamHelper.toString(param0));
@@ -19,7 +17,7 @@ public class TestWebService$Client implements core.framework.internal.web.servic
     }
 
     public void delete(java.lang.String param0) {
-        logger.debug("call web service, method=core.framework.internal.web.service.TestWebService.delete(java.lang.String)");
+        client.logCallWebService("core.framework.internal.web.service.TestWebService.delete(String)");
         if (param0 == null) throw new Error("path param must not be null, name=id");
         StringBuilder builder = new StringBuilder();
         builder.append("/test/").append(core.framework.internal.web.service.PathParamHelper.toString(param0));
@@ -30,7 +28,7 @@ public class TestWebService$Client implements core.framework.internal.web.servic
     }
 
     public java.util.Optional deprecated(java.lang.Integer param0) {
-        logger.debug("call web service, method=core.framework.internal.web.service.TestWebService.deprecated(java.lang.Integer)");
+        client.logCallWebService("core.framework.internal.web.service.TestWebService.deprecated(Integer)");
         if (param0 == null) throw new Error("path param must not be null, name=id");
         StringBuilder builder = new StringBuilder();
         builder.append("/deprecated/test/").append(core.framework.internal.web.service.PathParamHelper.toString(param0));
@@ -41,7 +39,7 @@ public class TestWebService$Client implements core.framework.internal.web.servic
     }
 
     public java.util.Optional get(java.lang.Integer param0) {
-        logger.debug("call web service, method=core.framework.internal.web.service.TestWebService.get(java.lang.Integer)");
+        client.logCallWebService("core.framework.internal.web.service.TestWebService.get(Integer)");
         if (param0 == null) throw new Error("path param must not be null, name=id");
         StringBuilder builder = new StringBuilder();
         builder.append("/test/").append(core.framework.internal.web.service.PathParamHelper.toString(param0));
@@ -52,7 +50,7 @@ public class TestWebService$Client implements core.framework.internal.web.servic
     }
 
     public core.framework.internal.web.service.TestWebService.TestResponse getEnum(java.lang.Long param0, core.framework.internal.web.service.TestWebService.TestEnum param1) {
-        logger.debug("call web service, method=core.framework.internal.web.service.TestWebService.getEnum(java.lang.Long, core.framework.internal.web.service.TestWebService$TestEnum)");
+        client.logCallWebService("core.framework.internal.web.service.TestWebService.getEnum(Long, core.framework.internal.web.service.TestWebService$TestEnum)");
         if (param0 == null) throw new Error("path param must not be null, name=id");
         if (param1 == null) throw new Error("path param must not be null, name=enum");
         StringBuilder builder = new StringBuilder();
@@ -65,7 +63,7 @@ public class TestWebService$Client implements core.framework.internal.web.servic
     }
 
     public void patch(java.lang.Integer param0, core.framework.internal.web.service.TestWebService.TestRequest param1) {
-        logger.debug("call web service, method=core.framework.internal.web.service.TestWebService.patch(java.lang.Integer, core.framework.internal.web.service.TestWebService$TestRequest)");
+        client.logCallWebService("core.framework.internal.web.service.TestWebService.patch(Integer, core.framework.internal.web.service.TestWebService$TestRequest)");
         if (param0 == null) throw new Error("path param must not be null, name=id");
         StringBuilder builder = new StringBuilder();
         builder.append("/test/").append(core.framework.internal.web.service.PathParamHelper.toString(param0));
@@ -76,7 +74,7 @@ public class TestWebService$Client implements core.framework.internal.web.servic
     }
 
     public core.framework.internal.web.service.TestWebService.TestResponse search(core.framework.internal.web.service.TestWebService.TestSearchRequest param0) {
-        logger.debug("call web service, method=core.framework.internal.web.service.TestWebService.search(core.framework.internal.web.service.TestWebService$TestSearchRequest)");
+        client.logCallWebService("core.framework.internal.web.service.TestWebService.search(core.framework.internal.web.service.TestWebService$TestSearchRequest)");
         String path = "/test";
         Class requestBeanClass = core.framework.internal.web.service.TestWebService.TestSearchRequest.class;
         Object requestBean = param0;
@@ -84,7 +82,7 @@ public class TestWebService$Client implements core.framework.internal.web.servic
     }
 
     public void intercept(core.framework.web.service.WebServiceClientInterceptor interceptor) {
-        this.client.intercept(interceptor);
+        client.intercept(interceptor);
     }
 
 }

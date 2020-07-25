@@ -22,9 +22,9 @@ final class LogEvent {
     private final Throwable exception;
 
     LogEvent(String logger, Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
-        this.level = level;
-        this.marker = marker;
         this.logger = logger;
+        this.marker = marker;
+        this.level = level;
         this.message = message;
         this.arguments = arguments;
         this.exception = exception;

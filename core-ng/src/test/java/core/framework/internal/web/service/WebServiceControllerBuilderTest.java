@@ -100,12 +100,21 @@ class WebServiceControllerBuilderTest {
     }
 
     @Test
-    void deprecated() throws NoSuchMethodException {
+    void deprecated() throws Exception {
+        when(request.pathParam("id")).thenReturn("1");
+
         var builder = new WebServiceControllerBuilder<>(TestWebService.class, serviceImpl, TestWebService.class.getDeclaredMethod("deprecated", Integer.class));
-        builder.build();
+        Controller controller = builder.build();
 
         String sourceCode = builder.builder.sourceCode();
         assertThat(sourceCode).isEqualTo(ClasspathResources.text("webservice-test/test-webservice-controller-deprecated.java"));
+
+        Response response = controller.execute(request);
+        assertThat(response.status()).isEqualTo(HTTPStatus.OK);
+
+        @SuppressWarnings("unchecked")
+        var bean = (Optional<TestWebService.TestResponse>) ((BeanBody) ((ResponseImpl) response).body).bean;
+        assertThat(bean).isEmpty();
     }
 
     public static class TestWebServiceImpl implements TestWebService {

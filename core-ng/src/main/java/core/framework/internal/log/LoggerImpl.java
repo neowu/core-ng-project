@@ -9,6 +9,9 @@ import java.io.PrintStream;
  * @author neo
  */
 public final class LoggerImpl extends AbstractLogger {
+    private static final PrintStream STDOUT = System.out;
+    private static final PrintStream STDERR = System.err;
+
     static String abbreviateLoggerName(String name) {
         String[] tokens = Strings.split(name, '.');
         var builder = new StringBuilder();
@@ -28,8 +31,6 @@ public final class LoggerImpl extends AbstractLogger {
     private final String logger;
     private final LogLevel infoLevel;
     private final LogLevel traceLevel;
-    private final PrintStream stdout = System.out;
-    private final PrintStream stderr = System.err;
 
     LoggerImpl(String name, LogLevel infoLevel, LogLevel traceLevel) {
         super(name);
@@ -55,8 +56,8 @@ public final class LoggerImpl extends AbstractLogger {
     private void write(LogEvent event) {
         String message = event.info();
         if (event.level.value >= LogLevel.WARN.value)
-            stderr.print(message);
+            STDERR.print(message);
         else
-            stdout.print(message);
+            STDOUT.print(message);
     }
 }

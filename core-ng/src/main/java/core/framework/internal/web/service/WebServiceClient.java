@@ -28,6 +28,7 @@ import static core.framework.util.Strings.format;
  */
 public class WebServiceClient {
     public static final String USER_AGENT = "APIClient";
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebServiceClient.class);
     private static final Map<Integer, HTTPStatus> HTTP_STATUSES;
 
     static {
@@ -44,7 +45,6 @@ public class WebServiceClient {
         return status;
     }
 
-    private final Logger logger = LoggerFactory.getLogger(WebServiceClient.class);
     private final String serviceURL;
     private final HTTPClient httpClient;
     private final RequestBeanMapper requestBeanMapper;
@@ -69,7 +69,7 @@ public class WebServiceClient {
         }
 
         if (interceptor != null) {
-            logger.debug("interceptor={}", interceptor.getClass().getCanonicalName());
+            LOGGER.debug("interceptor={}", interceptor.getClass().getCanonicalName());
             interceptor.onRequest(request);
         }
 
@@ -83,9 +83,15 @@ public class WebServiceClient {
         return responseBeanMapper.fromJSON(responseType, response.body);
     }
 
+    // used by generated code, must be public
     public void intercept(WebServiceClientInterceptor interceptor) {
         if (this.interceptor != null) throw new Error("found duplicate interceptor, previous=" + this.interceptor.getClass().getCanonicalName());
         this.interceptor = interceptor;
+    }
+
+    // used by generated code, must be public
+    public void logCallWebService(String method) {
+        LOGGER.debug("call web service, method={}", method);
     }
 
     <T> void putRequestBean(HTTPRequest request, Class<T> requestBeanClass, T requestBean) {
@@ -121,7 +127,7 @@ public class WebServiceClient {
         if (response.body.length == 0) throw new RemoteServiceException("failed to call remote service, statusCode=" + statusCode, Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode));
         ErrorResponse error = errorResponse(response);
         if (error.id != null && error.errorCode != null) {  // use manual validation rather than annotation to keep the flow straightforward and less try/catch
-            logger.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
+            LOGGER.debug("failed to call remote service, statusCode={}, id={}, severity={}, errorCode={}, remoteStackTrace={}", statusCode, error.id, error.severity, error.errorCode, error.stackTrace);
             throw new RemoteServiceException(error.message, parseSeverity(error.severity), error.errorCode, parseHTTPStatus(statusCode));
         } else {
             // handle api return non-2xx status code explicitly with valid json response, e.g. 410 GONE

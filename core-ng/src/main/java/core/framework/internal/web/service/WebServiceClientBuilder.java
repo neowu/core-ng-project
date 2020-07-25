@@ -9,8 +9,6 @@ import core.framework.internal.reflect.Params;
 import core.framework.util.Maps;
 import core.framework.web.service.WebServiceClientInterceptor;
 import core.framework.web.service.WebServiceClientProxy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -38,7 +36,6 @@ public class WebServiceClientBuilder<T> {
 
     public T build() {
         builder.addField("private final {} client;", type(WebServiceClient.class));
-        builder.addField("private final {} logger = {}.getLogger({});", type(Logger.class), type(LoggerFactory.class), variable(WebServiceClient.class));
         builder.constructor(new Class<?>[]{WebServiceClient.class}, "this.client = $1;");
 
         Method[] methods = serviceInterface.getMethods();
@@ -57,8 +54,8 @@ public class WebServiceClientBuilder<T> {
     private String buildInterceptMethod() {
         var builder = new CodeBuilder();
         builder.append("public void intercept({} interceptor) {\n", type(WebServiceClientInterceptor.class))
-               .indent(1).append("this.client.intercept(interceptor);\n")
-               .append("}");
+                .indent(1).append("client.intercept(interceptor);\n")
+                .append("}");
         return builder.build();
     }
 
@@ -88,7 +85,7 @@ public class WebServiceClientBuilder<T> {
             }
         }
         builder.append(") {\n");
-        builder.indent(1).append("logger.debug(\"call web service, method={}\");\n", Methods.path(method));
+        builder.indent(1).append("client.logCallWebService({});\n", variable(Methods.path(method)));
 
         buildPath(builder, method.getDeclaredAnnotation(Path.class).value(), pathParamIndexes);
         builder.indent(1).append("Class requestBeanClass = {};\n", requestBeanClass == null ? "null" : variable(requestBeanClass));
@@ -118,7 +115,7 @@ public class WebServiceClientBuilder<T> {
                 int variableEnd = path.indexOf('/', variableStart);
                 if (variableEnd < 0) variableEnd = path.length();
                 builder.indent(1).append("builder.append({}).append({}.toString(param{}));\n", variable(path.substring(currentIndex, variableStart)),
-                    type(PathParamHelper.class), pathParamIndexes.get(path.substring(variableStart + 1, variableEnd)));
+                        type(PathParamHelper.class), pathParamIndexes.get(path.substring(variableStart + 1, variableEnd)));
                 currentIndex = variableEnd;
             }
             if (currentIndex < path.length()) {
