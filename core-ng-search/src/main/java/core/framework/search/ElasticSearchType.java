@@ -1,5 +1,6 @@
 package core.framework.search;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,7 +23,7 @@ public interface ElasticSearchType<T> {
     Optional<T> get(GetRequest request);
 
     default Optional<T> get(String id) {
-        GetRequest request = new GetRequest();
+        var request = new GetRequest();
         request.id = id;
         return get(request);
     }
@@ -30,7 +31,7 @@ public interface ElasticSearchType<T> {
     void index(IndexRequest<T> request);
 
     default void index(String id, T source) {
-        IndexRequest<T> request = new IndexRequest<>();
+        var request = new IndexRequest<T>();
         request.id = id;
         request.source = source;
         index(request);
@@ -39,15 +40,15 @@ public interface ElasticSearchType<T> {
     void bulkIndex(BulkIndexRequest<T> request);
 
     default void bulkIndex(Map<String, T> sources) {
-        BulkIndexRequest<T> request = new BulkIndexRequest<>();
+        var request = new BulkIndexRequest<T>();
         request.sources = sources;
         bulkIndex(request);
     }
 
     void update(UpdateRequest<T> request);
 
-    default void update(String id, String script, Map<String, Object> params) {
-        UpdateRequest<T> request = new UpdateRequest<>();
+    default void update(String id, String script, @Nullable Map<String, Object> params) {
+        var request = new UpdateRequest<T>();
         request.id = id;
         request.script = script;
         request.params = params;
@@ -57,7 +58,7 @@ public interface ElasticSearchType<T> {
     boolean delete(DeleteRequest request);
 
     default boolean delete(String id) {
-        DeleteRequest request = new DeleteRequest();
+        var request = new DeleteRequest();
         request.id = id;
         return delete(request);
     }
@@ -65,7 +66,7 @@ public interface ElasticSearchType<T> {
     void bulkDelete(BulkDeleteRequest request);
 
     default void bulkDelete(List<String> ids) {
-        BulkDeleteRequest request = new BulkDeleteRequest();
+        var request = new BulkDeleteRequest();
         request.ids = ids;
         bulkDelete(request);
     }

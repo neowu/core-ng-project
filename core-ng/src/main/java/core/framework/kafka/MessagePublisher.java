@@ -1,5 +1,7 @@
 package core.framework.kafka;
 
+import javax.annotation.Nullable;
+
 /**
  * @author neo
  */
@@ -9,7 +11,7 @@ public interface MessagePublisher<T> {
         publish(null, value);
     }
 
-    void publish(String key, T value);
+    void publish(@Nullable String key, T value);
 
-    void publish(String topic, String key, T value);
+    void publish(String topic, @Nullable String key, T value);
 }

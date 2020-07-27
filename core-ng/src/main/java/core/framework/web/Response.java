@@ -10,6 +10,7 @@ import core.framework.internal.web.response.ResponseImpl;
 import core.framework.internal.web.response.TemplateBody;
 import core.framework.internal.web.response.TextBody;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public interface Response {
         return html(templatePath, model, null);
     }
 
-    static Response html(String templatePath, Object model, String language) {
+    static Response html(String templatePath, Object model, @Nullable String language) {
         return new ResponseImpl(new TemplateBody(templatePath, model, language))
                 .contentType(ContentType.TEXT_HTML);
     }
@@ -74,11 +75,11 @@ public interface Response {
 
     Optional<String> header(String name);
 
-    Response header(String name, String value);
+    Response header(String name, @Nullable String value);
 
     Optional<ContentType> contentType();
 
     Response contentType(ContentType contentType);
 
-    Response cookie(CookieSpec spec, String value);
+    Response cookie(CookieSpec spec, @Nullable String value);
 }

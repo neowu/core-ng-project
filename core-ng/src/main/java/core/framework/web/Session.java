@@ -1,5 +1,6 @@
 package core.framework.web;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Optional;
 public interface Session {
     Optional<String> get(String key);
 
-    void set(String key, String value); // set value to null to remove key
+    void set(String key, @Nullable String value); // set value to null to remove key
 
     void invalidate();
 }

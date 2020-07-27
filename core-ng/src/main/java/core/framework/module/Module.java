@@ -7,6 +7,7 @@ import core.framework.internal.module.ShutdownHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
@@ -45,7 +46,7 @@ public abstract class Module {
         return bind(instanceClass, null, instance);
     }
 
-    public <T> T bind(Type type, String name, T instance) {
+    public <T> T bind(Type type, @Nullable String name, T instance) {
         context.beanFactory.inject(instance);
         return context.bind(type, name, instance);
     }
@@ -55,7 +56,7 @@ public abstract class Module {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T bean(Type type, String name) {
+    public <T> T bean(Type type, @Nullable String name) {
         return (T) context.beanFactory.bean(type, name);
     }
 

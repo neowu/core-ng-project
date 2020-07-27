@@ -26,6 +26,7 @@ import core.framework.web.SessionContext;
 import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -116,7 +117,7 @@ public class ModuleContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Config> T config(Class<T> configClass, String name) {
+    public <T extends Config> T config(Class<T> configClass, @Nullable String name) {
         String key = configClass.getCanonicalName() + ":" + name;   // not using computeIfAbsent, to avoid concurrent modification in nested call, e.g. httpConfig->publishAPIConfig->apiConfig
         T config = (T) configs.get(key);
         if (config == null) {
@@ -131,7 +132,7 @@ public class ModuleContext {
         return config;
     }
 
-    public <T> T bind(Type type, String name, T instance) {
+    public <T> T bind(Type type, @Nullable String name, T instance) {
         beanFactory.bind(type, name, instance);
         return instance;
     }

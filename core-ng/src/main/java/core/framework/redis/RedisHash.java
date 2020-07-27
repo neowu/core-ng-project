@@ -1,11 +1,13 @@
 package core.framework.redis;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
  * @author neo
  */
 public interface RedisHash {
+    @Nullable
     String get(String key, String field);
 
     Map<String, String> getAll(String key);

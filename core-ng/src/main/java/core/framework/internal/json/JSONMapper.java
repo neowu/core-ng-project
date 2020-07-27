@@ -1,7 +1,6 @@
 package core.framework.internal.json;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -18,7 +17,6 @@ import core.framework.util.Strings;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -42,17 +40,17 @@ public class JSONMapper<T> {
 
     private static ObjectMapper createObjectMapper() {
         return JsonMapper.builder()
-                         .addModule(timeModule())
-                         // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
-                         .addModule(new AfterburnerModule().setUseValueClassLoader(false))
-                         .defaultDateFormat(new StdDateFormat())
-                         // only auto detect field, and default visibility is public_only, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
-                         .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
-                         .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-                         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                         .annotationIntrospector(new JSONAnnotationIntrospector())
-                         .deactivateDefaultTyping()
-                         .build();
+                .addModule(timeModule())
+                // disable value class loader to avoid jdk illegal reflection warning, requires JSON class/fields must be public
+                .addModule(new AfterburnerModule().setUseValueClassLoader(false))
+                .defaultDateFormat(new StdDateFormat())
+                // only auto detect field, and default visibility is public_only, refer to com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std
+                .visibility(new VisibilityChecker.Std(NONE, NONE, NONE, NONE, PUBLIC_ONLY))
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .annotationIntrospector(new JSONAnnotationIntrospector())
+                .deactivateDefaultTyping()
+                .build();
     }
 
     private static JavaTimeModule timeModule() {
@@ -88,10 +86,9 @@ public class JSONMapper<T> {
     public final ObjectReader reader;
     private final ObjectWriter writer;
 
-    public JSONMapper(Type instanceType) {
-        JavaType type = OBJECT_MAPPER.getTypeFactory().constructType(instanceType);
-        reader = OBJECT_MAPPER.readerFor(type);
-        writer = OBJECT_MAPPER.writerFor(type);
+    public JSONMapper(Class<?> instanceClass) {
+        reader = OBJECT_MAPPER.readerFor(instanceClass);
+        writer = OBJECT_MAPPER.writerFor(instanceClass);
     }
 
     public T fromJSON(byte[] json) {

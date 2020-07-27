@@ -51,6 +51,9 @@ public class TestModule extends AbstractTestModule {
 
         highCPUUsageThreshold(0.8);
         highHeapUsageThreshold(0.8);
+
+        onShutdown(() -> {
+        });
     }
 
     private void configureAPI() {

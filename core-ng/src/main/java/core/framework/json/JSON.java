@@ -2,6 +2,7 @@ package core.framework.json;
 
 import com.fasterxml.jackson.databind.JavaType;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
@@ -12,6 +13,7 @@ import static core.framework.internal.json.JSONMapper.OBJECT_MAPPER;
  * @author neo
  */
 public final class JSON {
+    @Nullable
     public static Object fromJSON(Type instanceType, String json) {
         try {
             JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructType(instanceType);
@@ -21,6 +23,7 @@ public final class JSON {
         }
     }
 
+    @Nullable
     public static <T> T fromJSON(Class<T> instanceClass, String json) {
         try {
             return OBJECT_MAPPER.readValue(json, instanceClass);
@@ -29,7 +32,7 @@ public final class JSON {
         }
     }
 
-    public static String toJSON(Object instance) {
+    public static String toJSON(@Nullable Object instance) {
         try {
             return OBJECT_MAPPER.writeValueAsString(instance);
         } catch (IOException e) {

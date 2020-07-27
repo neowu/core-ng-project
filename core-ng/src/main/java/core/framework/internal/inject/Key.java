@@ -1,5 +1,6 @@
 package core.framework.internal.inject;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
@@ -8,9 +9,10 @@ import java.util.Objects;
  */
 public final class Key {
     public final Type type;
+    @Nullable
     public final String name;
 
-    public Key(Type type, String name) {
+    public Key(Type type, @Nullable String name) {
         this.type = type;
         this.name = name;
     }

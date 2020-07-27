@@ -6,6 +6,7 @@ import core.framework.internal.reflect.Fields;
 import core.framework.util.Maps;
 import core.framework.util.Types;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -22,7 +23,7 @@ import static core.framework.util.Strings.format;
 public class BeanFactory {
     private final Map<Key, Object> beans = Maps.newHashMap();
 
-    public void bind(Type type, String name, Object instance) {
+    public void bind(Type type, @Nullable String name, Object instance) {
         if (instance == null) throw new Error("instance must not be null");
 
         if (!isTypeOf(instance, type))

@@ -2,6 +2,7 @@ package core.framework.util;
 
 import org.slf4j.helpers.MessageFormatter;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -18,29 +19,31 @@ public final class Strings {
         return MessageFormatter.arrayFormat(pattern, params).getMessage();
     }
 
-    public static int compare(String text1, String text2) {
+    public static int compare(@Nullable String text1, @Nullable String text2) {
         if (text1 == null && text2 == null) return 0;
         if (text1 != null && text2 == null) return 1;
         if (text1 == null) return -1;
         return text1.compareTo(text2);
     }
 
-    public static boolean isBlank(String text) {
+    public static boolean isBlank(@Nullable String text) {
         return text == null || text.isBlank();
     }
 
-    public static boolean equals(String text1, String text2) {
+    public static boolean equals(@Nullable String text1, @Nullable String text2) {
         if (text1 == null) return text2 == null;
         return text1.equals(text2);
     }
 
-    public static String truncate(String text, int maxLength) {
+    @Nullable
+    public static String truncate(@Nullable String text, int maxLength) {
         if (text == null) return null;
         if (text.length() <= maxLength) return text;
         return text.substring(0, maxLength);
     }
 
-    public static String strip(String text) {
+    @Nullable
+    public static String strip(@Nullable String text) {
         if (text == null) return null;
         return text.strip();
     }

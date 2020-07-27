@@ -3,12 +3,14 @@ package core.framework.log;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
  * @author neo
  */
 public final class ActionLogContext {
+    @Nullable
     public static String id() {
         ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
         if (actionLog == null) return null;

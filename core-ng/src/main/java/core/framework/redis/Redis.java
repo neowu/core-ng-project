@@ -1,5 +1,6 @@
 package core.framework.redis;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -8,6 +9,7 @@ import java.util.function.Consumer;
  * @author neo
  */
 public interface Redis {
+    @Nullable
     String get(String key);
 
     default void set(String key, String value) {
@@ -18,7 +20,7 @@ public interface Redis {
         set(key, value, expiration, false);
     }
 
-    boolean set(String key, String value, Duration expiration, boolean onlyIfAbsent);
+    boolean set(String key, String value, @Nullable Duration expiration, boolean onlyIfAbsent);
 
     RedisSet set();
 
