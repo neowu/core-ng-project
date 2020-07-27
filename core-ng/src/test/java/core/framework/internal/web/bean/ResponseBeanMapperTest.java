@@ -10,6 +10,7 @@ import core.framework.util.Types;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -67,14 +68,14 @@ class ResponseBeanMapperTest {
     }
 
     @Test
-    void fromJSONWithEmptyOptional() {
+    void fromJSONWithEmptyOptional() throws IOException {
         @SuppressWarnings("unchecked")
         var parsedBean = (Optional<TestBean>) responseBeanMapper.fromJSON(Types.optional(TestBean.class), Strings.bytes("null"));
         assertThat(parsedBean).isNotPresent();
     }
 
     @Test
-    void fromJSONWithOptional() {
+    void fromJSONWithOptional() throws IOException {
         var bean = new TestBean();
         bean.intField = 3;
 
@@ -93,12 +94,12 @@ class ResponseBeanMapperTest {
     }
 
     @Test
-    void fromJSONWithVoid() {
+    void fromJSONWithVoid() throws IOException {
         assertThat(responseBeanMapper.fromJSON(void.class, null)).isNull();
     }
 
     @Test
-    void fromJSON() {
+    void fromJSON() throws IOException {
         var bean = new TestBean();
         bean.intField = 3;
 

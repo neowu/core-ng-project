@@ -5,6 +5,7 @@ import core.framework.util.Network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.mockito.Mockito.mock;
@@ -34,7 +35,7 @@ class InvalidateLocalCacheMessageListenerTest {
     }
 
     @Test
-    void onMessage() {
+    void onMessage() throws IOException {
         var message = new InvalidateLocalCacheMessage();
         message.clientIP = "remoteIP";
         message.keys = List.of("key1", "key2");
@@ -44,7 +45,7 @@ class InvalidateLocalCacheMessageListenerTest {
     }
 
     @Test
-    void onMessageWithSameClientIP() {
+    void onMessageWithSameClientIP() throws IOException {
         var message = new InvalidateLocalCacheMessage();
         message.clientIP = Network.LOCAL_HOST_ADDRESS;
         message.keys = List.of("key1");

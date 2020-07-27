@@ -8,7 +8,7 @@ import core.framework.web.rate.LimitRate;
 import core.framework.web.websocket.Channel;
 import core.framework.web.websocket.ChannelListener;
 
-import java.io.UncheckedIOException;
+import java.io.IOException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -50,7 +50,7 @@ public class ChannelHandler {
             return clientMessageMapper.fromJSON(Strings.bytes(message));
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), e.errorCode(), e);
-        } catch (UncheckedIOException e) {  // for invalid json string
+        } catch (IOException e) {  // for invalid json string
             throw new BadRequestException(e.getMessage(), "INVALID_WS_MESSAGE", e);
         }
     }

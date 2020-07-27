@@ -4,6 +4,7 @@ import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.util.Strings;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class ResponseBeanMapper {
         }
     }
 
-    public Object fromJSON(Type responseType, byte[] body) {
+    public Object fromJSON(Type responseType, byte[] body) throws IOException {
         if (void.class == responseType) return null;
 
         Class<?> beanClass = beanClass(responseType);

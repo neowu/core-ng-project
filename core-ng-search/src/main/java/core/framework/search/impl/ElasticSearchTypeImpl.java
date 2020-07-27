@@ -118,7 +118,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         return response;
     }
 
-    private SearchResponse<T> searchResponse(org.elasticsearch.action.search.SearchResponse response) {
+    private SearchResponse<T> searchResponse(org.elasticsearch.action.search.SearchResponse response) throws IOException {
         SearchHit[] hits = response.getHits().getHits();
         List<T> items = new ArrayList<>(hits.length);
         for (SearchHit hit : hits) {

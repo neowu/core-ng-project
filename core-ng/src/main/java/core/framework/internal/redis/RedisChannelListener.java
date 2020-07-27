@@ -4,7 +4,7 @@ package core.framework.internal.redis;
  * @author neo
  */
 public interface RedisChannelListener {
-    void onSubscribe();
+    void onSubscribe() throws Exception;
 
-    void onMessage(byte[] message);
+    void onMessage(byte[] message) throws Exception;
 }

@@ -18,6 +18,8 @@ import core.framework.web.service.WebServiceClientInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -80,7 +82,11 @@ public class WebServiceClient {
             interceptor.onResponse(response);
         }
 
-        return responseBeanMapper.fromJSON(responseType, response.body);
+        try {
+            return responseBeanMapper.fromJSON(responseType, response.body);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     // used by generated code, must be public

@@ -6,6 +6,8 @@ import core.framework.util.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 /**
  * @author neo
  */
@@ -26,7 +28,7 @@ public class InvalidateLocalCacheMessageListener implements RedisChannelListener
     }
 
     @Override
-    public void onMessage(byte[] message) {
+    public void onMessage(byte[] message) throws IOException {
         InvalidateLocalCacheMessage invalidateMessage = mapper.fromJSON(message);
         if (!Network.LOCAL_HOST_ADDRESS.equals(invalidateMessage.clientIP)) {
             logger.info("invalidate local cache, keys={}", invalidateMessage.keys);

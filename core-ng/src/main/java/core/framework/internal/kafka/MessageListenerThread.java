@@ -16,6 +16,7 @@ import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -199,7 +200,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONMapper<T> mapper) {
+    <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONMapper<T> mapper) throws IOException {
         int size = records.size();
         actionLog.track("kafka", 0, size, 0);
         List<Message<T>> messages = new ArrayList<>(size);

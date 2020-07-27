@@ -45,7 +45,7 @@ public class RedisSubscribeThread extends Thread {
         logger.info("redis subscribe thread stopped, channel={}", channel);
     }
 
-    void process(RedisConnection connection) throws IOException {
+    void process(RedisConnection connection) throws Exception {
         subscribe(connection);
         listener.onSubscribe();
 

@@ -9,6 +9,7 @@ import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
@@ -40,7 +41,7 @@ class MessageListenerThreadTest {
     }
 
     @Test
-    void messages() {
+    void messages() throws IOException {
         ConsumerRecord<byte[], byte[]> record = new ConsumerRecord<>("topic", 0, 1, Strings.bytes("key"), Strings.bytes("{}"));
         record.headers().add(MessageHeaders.HEADER_CLIENT, Strings.bytes("client"));
         record.headers().add(MessageHeaders.HEADER_REF_ID, Strings.bytes("refId"));

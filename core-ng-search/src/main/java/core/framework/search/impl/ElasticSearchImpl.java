@@ -1,6 +1,6 @@
 package core.framework.search.impl;
 
-import core.framework.internal.json.JSONMapper;
+import core.framework.json.JSON;
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
 import core.framework.search.ElasticSearchType;
@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.time.Duration;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * @author neo
  */
@@ -43,10 +45,10 @@ public class ElasticSearchImpl implements ElasticSearch {
     public void initialize() {
         RestClientBuilder builder = RestClient.builder(hosts);
         builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
-                                                         .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
+                .setConnectionRequestTimeout((int) timeout.toMillis())); // timeout of requesting connection from connection pool
         builder.setHttpClientConfigCallback(config -> config.setMaxConnTotal(100)
-                                                            .setMaxConnPerRoute(100)
-                                                            .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
+                .setMaxConnPerRoute(100)
+                .setKeepAliveStrategy((response, context) -> Duration.ofSeconds(30).toMillis()));
         client = new RestHighLevelClient(builder);
     }
 
@@ -143,7 +145,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         try {
             Response response = client().getLowLevelClient().performRequest(new Request("GET", "/_cluster/state/metadata"));
             byte[] bytes = responseBody(response.getEntity());
-            return new JSONMapper<ClusterStateResponse>(ClusterStateResponse.class).fromJSON(bytes);
+            return JSON.fromJSON(ClusterStateResponse.class, new String(bytes, UTF_8));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {

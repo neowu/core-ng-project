@@ -12,7 +12,7 @@ import core.framework.web.Session;
 import core.framework.web.exception.BadRequestException;
 import io.undertow.server.HttpServerExchange;
 
-import java.io.UncheckedIOException;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -137,7 +137,7 @@ public final class RequestImpl implements Request {
             }
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), e.errorCode(), e);
-        } catch (UncheckedIOException e) {  // for invalid json string
+        } catch (IOException e) {  // for invalid json string
             throw new BadRequestException(e.getMessage(), "INVALID_HTTP_REQUEST", e);
         }
     }

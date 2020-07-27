@@ -91,12 +91,8 @@ public class JSONMapper<T> {
         writer = OBJECT_MAPPER.writerFor(instanceClass);
     }
 
-    public T fromJSON(byte[] json) {
-        try {
-            return reader.readValue(json);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+    public T fromJSON(byte[] json) throws IOException {
+        return reader.readValue(json);
     }
 
     // with jdk 11, write to String then covert to byte[] is faster than write to byte[]

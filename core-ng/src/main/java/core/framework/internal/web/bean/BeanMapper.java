@@ -3,6 +3,8 @@ package core.framework.internal.web.bean;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.validate.Validator;
 
+import java.io.IOException;
+
 /**
  * @author neo
  */
@@ -20,7 +22,7 @@ public class BeanMapper<T> {
         return mapper.toJSON(bean);
     }
 
-    public T fromJSON(byte[] body) {
+    public T fromJSON(byte[] body) throws IOException {
         T bean = mapper.fromJSON(body);
         validator.validate(bean, false);
         return bean;

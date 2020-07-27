@@ -4,6 +4,7 @@ import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -50,7 +51,7 @@ public class RequestBeanMapper {
         return mapper.toJSON(bean);
     }
 
-    public <T> T fromJSON(Class<T> beanClass, byte[] body) {
+    public <T> T fromJSON(Class<T> beanClass, byte[] body) throws IOException {
         BeanMapper<T> mapper = beanMappers.mapper(beanClass);
         return mapper.fromJSON(body);
     }
