@@ -32,7 +32,7 @@ public class CacheImpl<T> implements Cache<T> {
     private final Logger logger = LoggerFactory.getLogger(CacheImpl.class);
     private final CacheStore cacheStore;
 
-    CacheImpl(String name, Class<T> cacheClass, Duration duration, CacheStore cacheStore) {
+    public CacheImpl(String name, Class<T> cacheClass, Duration duration, CacheStore cacheStore) {
         this.name = name;
         this.cacheClass = cacheClass;
         this.duration = duration;

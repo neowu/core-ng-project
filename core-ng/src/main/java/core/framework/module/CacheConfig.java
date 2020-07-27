@@ -2,7 +2,8 @@ package core.framework.module;
 
 import core.framework.cache.Cache;
 import core.framework.http.HTTPMethod;
-import core.framework.internal.cache.CacheManager;
+import core.framework.internal.cache.CacheClassValidator;
+import core.framework.internal.cache.CacheImpl;
 import core.framework.internal.cache.CacheStore;
 import core.framework.internal.cache.InvalidateLocalCacheMessageListener;
 import core.framework.internal.cache.LocalCacheMetrics;
@@ -17,19 +18,23 @@ import core.framework.internal.redis.RedisSubscribeThread;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.internal.web.management.CacheController;
 import core.framework.internal.web.management.ListCacheResponse;
+import core.framework.util.ASCII;
 import core.framework.util.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author neo
  */
 public class CacheConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(CacheConfig.class);
+    Map<String, CacheImpl<?>> caches;
+
     private ModuleContext context;
-    private CacheManager cacheManager;
     private LocalCacheStore localCacheStore;
     private CacheStore redisCacheStore;
     private RedisImpl redis;
@@ -40,8 +45,8 @@ public class CacheConfig extends Config {
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
 
-        cacheManager = new CacheManager();
-        var controller = new CacheController(cacheManager);
+        caches = new HashMap<>();
+        var controller = new CacheController(caches);
         context.route(HTTPMethod.GET, "/_sys/cache", (LambdaController) controller::list, true);
         context.bean(ListCacheResponse.class);
         context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", (LambdaController) controller::get, true);
@@ -50,7 +55,7 @@ public class CacheConfig extends Config {
 
     @Override
     protected void validate() {
-        if (cacheManager.caches().isEmpty()) {
+        if (caches.isEmpty()) {
             throw new Error("cache is configured but no cache added, please remove unnecessary config");
         }
         // maxLocalSize() can be configured before localCacheStore is created, so set max size at end
@@ -80,7 +85,7 @@ public class CacheConfig extends Config {
         if (localCacheStore == null && redisCacheStore == null) throw new Error("cache store is not configured, please configure first");
 
         logger.info("add local cache, class={}", cacheClass.getCanonicalName());
-        Cache<T> cache = cacheManager.add(cacheClass, duration, cacheStore(true));
+        Cache<T> cache = add(cacheClass, duration, cacheStore(true));
         context.beanFactory.bind(Types.generic(Cache.class, cacheClass), null, cache);
     }
 
@@ -88,8 +93,22 @@ public class CacheConfig extends Config {
         if (localCacheStore == null && redisCacheStore == null) throw new Error("cache store is not configured, please configure first");
 
         logger.info("add remote cache, class={}", cacheClass.getCanonicalName());
-        Cache<T> cache = cacheManager.add(cacheClass, duration, cacheStore(false));
+        Cache<T> cache = add(cacheClass, duration, cacheStore(false));
         context.beanFactory.bind(Types.generic(Cache.class, cacheClass), null, cache);
+    }
+
+    <T> Cache<T> add(Class<T> cacheClass, Duration duration, CacheStore cacheStore) {
+        new CacheClassValidator(cacheClass).validate();
+
+        String name = cacheName(cacheClass);
+        CacheImpl<T> cache = new CacheImpl<>(name, cacheClass, duration, cacheStore);
+        CacheImpl<?> previous = caches.putIfAbsent(name, cache);
+        if (previous != null) throw new Error("found duplicate cache name, name=" + name);
+        return cache;
+    }
+
+    String cacheName(Class<?> cacheClass) {
+        return ASCII.toLowerCase(cacheClass.getSimpleName());
     }
 
     void configureRedis(String host) {

@@ -21,7 +21,7 @@ public class ResponseBeanMapper {
     @SuppressWarnings("unchecked")
     public byte[] toJSON(Object bean) {
         if (bean instanceof Optional) {  // only support Optional<T> as response bean type
-            Optional<?> optional = (Optional) bean;
+            Optional<?> optional = (Optional<?>) bean;
             if (optional.isEmpty()) return Strings.bytes("null");
             Object value = optional.get();
             BeanMapper<Object> mapper = beanMappers.mapper((Class<Object>) value.getClass());
@@ -34,12 +34,13 @@ public class ResponseBeanMapper {
         }
     }
 
-    public <T> Object fromJSON(Type responseType, byte[] body) throws IOException {
+    public Object fromJSON(Type responseType, byte[] body) throws IOException {
         if (void.class == responseType) return null;
 
-        Class<T> beanClass = beanClass(responseType);
-        BeanMapper<T> mapper = beanMappers.mapper(beanClass);
-        T bean = mapper.mapper.fromJSON(body);
+        @SuppressWarnings("unchecked")
+        Class<Object> beanClass = (Class<Object>) beanClass(responseType);
+        BeanMapper<Object> mapper = beanMappers.mapper(beanClass);
+        Object bean = mapper.mapper.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {
             if (bean == null) return Optional.empty();
             mapper.validator.validate(bean, false);
@@ -54,8 +55,7 @@ public class ResponseBeanMapper {
         beanMappers.register(beanClass(responseType), beanClassNameValidator);
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> Class<T> beanClass(Type responseType) {
-        return (Class<T>) (GenericTypes.isOptional(responseType) ? GenericTypes.optionalValueClass(responseType) : GenericTypes.rawClass(responseType));
+    private Class<?> beanClass(Type responseType) {
+        return GenericTypes.isOptional(responseType) ? GenericTypes.optionalValueClass(responseType) : GenericTypes.rawClass(responseType);
     }
 }
