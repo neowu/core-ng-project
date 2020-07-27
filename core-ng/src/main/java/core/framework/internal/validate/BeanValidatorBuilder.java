@@ -12,6 +12,7 @@ import core.framework.internal.reflect.Classes;
 import core.framework.internal.reflect.Fields;
 import core.framework.internal.reflect.GenericTypes;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.time.Instant;
@@ -19,7 +20,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
 import static core.framework.internal.asm.Literal.type;
@@ -38,16 +38,18 @@ public class BeanValidatorBuilder {
         this.beanClass = beanClass;
     }
 
-    public Optional<BeanValidator> build() {
+    @Nullable
+    public BeanValidator build() {
         validate(beanClass);
-        if (Classes.instanceFields(beanClass).stream().noneMatch(this::hasValidationAnnotation)) return Optional.empty();
+        if (Classes.instanceFields(beanClass).stream().noneMatch(this::hasValidationAnnotation)) return null;
+
         builder = new DynamicInstanceBuilder<>(BeanValidator.class, beanClass.getName() + "$Validator");
         String method = validateMethod(beanClass, null);
-        var builder = new CodeBuilder().append("public void validate(Object instance, {} errors, boolean partial) {\n", type(ValidationErrors.class));
-        builder.indent(1).append("{}(({}) instance, errors, partial);\n", method, type(beanClass));
-        builder.append('}');
-        this.builder.addMethod(builder.build());
-        return Optional.of(this.builder.build());
+        var code = new CodeBuilder().append("public void validate(Object instance, {} errors, boolean partial) {\n", type(ValidationErrors.class));
+        code.indent(1).append("{}(({}) instance, errors, partial);\n", method, type(beanClass));
+        code.append('}');
+        builder.addMethod(code.build());
+        return builder.build();
     }
 
     private String validateMethod(Class<?> beanClass, String parentPath) {
@@ -109,10 +111,10 @@ public class BeanValidatorBuilder {
         if (!isValueClass(valueClass)) {
             String method = validateMethod(valueClass, path(field, parentPath));
             builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.entrySet().iterator(); iterator.hasNext(); ) {\n", field.getName())
-                   .indent(3).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
-                   .indent(3).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
-                   .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
-                   .indent(2).append("}\n");
+                    .indent(3).append("java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();\n")
+                    .indent(3).append("{} value = ({}) entry.getValue();\n", type(valueClass), type(valueClass))
+                    .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
+                    .indent(2).append("}\n");
         }
     }
 
@@ -123,9 +125,9 @@ public class BeanValidatorBuilder {
         if (!isValueClass(valueClass)) {
             String method = validateMethod(valueClass, path(field, parentPath));
             builder.indent(2).append("for (java.util.Iterator iterator = bean.{}.iterator(); iterator.hasNext(); ) {\n", field.getName())
-                   .indent(3).append("{} value = ({}) iterator.next();\n", type(valueClass), type(valueClass))
-                   .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
-                   .indent(2).append("}\n");
+                    .indent(3).append("{} value = ({}) iterator.next();\n", type(valueClass), type(valueClass))
+                    .indent(3).append("if (value != null) {}(value, errors, partial);\n", method)
+                    .indent(2).append("}\n");
         }
     }
 

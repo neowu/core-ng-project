@@ -34,12 +34,12 @@ public class ResponseBeanMapper {
         }
     }
 
-    public Object fromJSON(Type responseType, byte[] body) throws IOException {
+    public <T> Object fromJSON(Type responseType, byte[] body) throws IOException {
         if (void.class == responseType) return null;
 
-        Class<?> beanClass = beanClass(responseType);
-        BeanMapper<?> mapper = beanMappers.mapper(beanClass);
-        Object bean = mapper.mapper.fromJSON(body);
+        Class<T> beanClass = beanClass(responseType);
+        BeanMapper<T> mapper = beanMappers.mapper(beanClass);
+        T bean = mapper.mapper.fromJSON(body);
         if (GenericTypes.isOptional(responseType)) {
             if (bean == null) return Optional.empty();
             mapper.validator.validate(bean, false);
@@ -54,7 +54,8 @@ public class ResponseBeanMapper {
         beanMappers.register(beanClass(responseType), beanClassNameValidator);
     }
 
-    private Class<?> beanClass(Type responseType) {
-        return GenericTypes.isOptional(responseType) ? GenericTypes.optionalValueClass(responseType) : GenericTypes.rawClass(responseType);
+    @SuppressWarnings("unchecked")
+    private <T> Class<T> beanClass(Type responseType) {
+        return (Class<T>) (GenericTypes.isOptional(responseType) ? GenericTypes.optionalValueClass(responseType) : GenericTypes.rawClass(responseType));
     }
 }

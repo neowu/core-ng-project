@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class BeanValidatorBuilderTest {
     @Test
     void withoutValidationAnnotation() {
-        assertThat(new BeanValidatorBuilder(Bean.class).build()).isNotPresent();
+        assertThat(new BeanValidatorBuilder(Bean.class).build()).isNull();
     }
 
     @Test

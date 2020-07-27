@@ -1,6 +1,5 @@
 package core.framework.internal.cache;
 
-import core.framework.internal.json.JSONMapper;
 import core.framework.internal.redis.RedisImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +32,7 @@ class RedisLocalCacheStoreTest {
         redis = mock(RedisImpl.class);
         redisCacheStore = mock(CacheStore.class);
 
-        cacheStore = new RedisLocalCacheStore(localCacheStore, redisCacheStore, redis, new JSONMapper<>(InvalidateLocalCacheMessage.class));
+        cacheStore = new RedisLocalCacheStore(localCacheStore, redisCacheStore, redis);
     }
 
     @Test

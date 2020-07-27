@@ -18,7 +18,7 @@ class BeanValidatorSizeTest {
 
     @BeforeEach
     void createObjectValidator() {
-        validator = new BeanValidatorBuilder(Bean.class).build().orElseThrow();
+        validator = new BeanValidatorBuilder(Bean.class).build();
     }
 
     @Test

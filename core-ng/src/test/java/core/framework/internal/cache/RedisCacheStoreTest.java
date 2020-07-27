@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
  */
 class RedisCacheStoreTest {
     private final JSONMapper<TestCache> mapper = new JSONMapper<>(TestCache.class);
-    private final Validator validator = Validator.of(TestCache.class);
+    private final Validator<TestCache> validator = new Validator<>(TestCache.class);
     private RedisCacheStore cacheStore;
     private RedisImpl redis;
 

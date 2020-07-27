@@ -1,6 +1,6 @@
 package core.framework.internal.kafka;
 
-import core.framework.internal.json.JSONMapper;
+import core.framework.internal.json.JSONWriter;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.filter.BytesLogParam;
@@ -22,14 +22,14 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
 
     private final MessageProducer producer;
     private final String topic;
-    private final JSONMapper<T> mapper;
-    private final Validator validator;
+    private final JSONWriter<T> writer;
+    private final Validator<T> validator;
 
     public MessagePublisherImpl(MessageProducer producer, String topic, Class<T> messageClass) {
         this.producer = producer;
         this.topic = topic;
-        mapper = new JSONMapper<>(messageClass);
-        validator = Validator.of(messageClass);
+        writer = new JSONWriter<>(messageClass);
+        validator = new Validator<>(messageClass);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
         var watch = new StopWatch();
         byte[] keyBytes = key == null ? null : Strings.bytes(key);
         validator.validate(value, false);
-        byte[] message = mapper.toJSON(value);
+        byte[] message = writer.toJSON(value);
         try {
             var record = new ProducerRecord<>(topic, null, System.currentTimeMillis(), keyBytes, message, null);
             linkContext(record.headers());

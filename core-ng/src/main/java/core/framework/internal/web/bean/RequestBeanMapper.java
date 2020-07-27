@@ -62,9 +62,9 @@ public class RequestBeanMapper {
 
     static class QueryParamMapperHolder<T> {
         final QueryParamMapper<T> mapper;
-        final Validator validator;
+        final Validator<T> validator;
 
-        QueryParamMapperHolder(QueryParamMapper<T> mapper, Validator validator) {
+        QueryParamMapperHolder(QueryParamMapper<T> mapper, Validator<T> validator) {
             this.mapper = mapper;
             this.validator = validator;
         }

@@ -6,8 +6,6 @@ import core.framework.internal.validate.ValidationErrors;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.MapAssert;
 
-import java.util.Optional;
-
 /**
  * @author neo
  */
@@ -42,10 +40,10 @@ public class ValidatorAssert extends AbstractAssert<ValidatorAssert, Object> {
     private BeanValidator validator(Object bean) {
         Class<?> beanClass = bean.getClass();
         var builder = new BeanValidatorBuilder(beanClass);
-        Optional<BeanValidator> validator = builder.build();
-        if (!validator.isPresent()) {
+        BeanValidator validator = builder.build();
+        if (validator == null) {
             failWithMessage("%nExpecting:%n  %s%nhas validation annotations, but was not found", beanClass.getName());
         }
-        return validator.orElseThrow();
+        return validator;
     }
 }

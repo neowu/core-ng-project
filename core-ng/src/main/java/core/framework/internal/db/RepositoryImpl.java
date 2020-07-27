@@ -23,7 +23,7 @@ import static core.framework.log.Markers.errorCode;
 public final class RepositoryImpl<T> implements Repository<T> {
     private final Logger logger = LoggerFactory.getLogger(RepositoryImpl.class);
     private final DatabaseImpl database;
-    private final Validator validator;
+    private final Validator<T> validator;
     private final SelectQuery<T> selectQuery;
     private final InsertQuery<T> insertQuery;
     private final UpdateQuery<T> updateQuery;

@@ -67,7 +67,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     private final ElasticSearchImpl elasticSearch;
     private final String index;
-    private final Validator validator;
+    private final Validator<T> validator;
     private final long slowOperationThresholdInNanos;
     private final JSONMapper<T> mapper;
 

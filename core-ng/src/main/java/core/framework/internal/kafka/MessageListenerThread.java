@@ -1,6 +1,6 @@
 package core.framework.internal.kafka;
 
-import core.framework.internal.json.JSONMapper;
+import core.framework.internal.json.JSONReader;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.log.filter.BytesLogParam;
@@ -165,7 +165,7 @@ class MessageListenerThread extends Thread {
 
                 byte[] value = record.value();
                 logger.debug("[message] value={}", new BytesLogParam(value));
-                T message = process.mapper.fromJSON(value);
+                T message = process.reader.fromJSON(value);
                 process.validator.validate(message, false);
                 process.handler.handle(key, message);
             } catch (Throwable e) {
@@ -185,7 +185,7 @@ class MessageListenerThread extends Thread {
             actionLog.context("topic", topic);
             actionLog.context("handler", process.bulkHandler.getClass().getCanonicalName());
 
-            List<Message<T>> messages = messages(records, actionLog, process.mapper);
+            List<Message<T>> messages = messages(records, actionLog, process.reader);
             for (Message<T> message : messages) {   // validate after fromJSON, so it can track refId/correlationId
                 process.validator.validate(message.value, false);
             }
@@ -200,7 +200,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONMapper<T> mapper) throws IOException {
+    <T> List<Message<T>> messages(List<ConsumerRecord<byte[], byte[]>> records, ActionLog actionLog, JSONReader<T> reader) throws IOException {
         int size = records.size();
         actionLog.track("kafka", 0, size, 0);
         List<Message<T>> messages = new ArrayList<>(size);
@@ -230,7 +230,7 @@ class MessageListenerThread extends Thread {
 
             if (minTimestamp > timestamp) minTimestamp = timestamp;
 
-            T message = mapper.fromJSON(value);
+            T message = reader.fromJSON(value);
             messages.add(new Message<>(key, message));
         }
         actionLog.context("key", keys.toArray());

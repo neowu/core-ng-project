@@ -4,13 +4,11 @@ import core.framework.cache.Cache;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.cache.CacheManager;
 import core.framework.internal.cache.CacheStore;
-import core.framework.internal.cache.InvalidateLocalCacheMessage;
 import core.framework.internal.cache.InvalidateLocalCacheMessageListener;
 import core.framework.internal.cache.LocalCacheMetrics;
 import core.framework.internal.cache.LocalCacheStore;
 import core.framework.internal.cache.RedisCacheStore;
 import core.framework.internal.cache.RedisLocalCacheStore;
-import core.framework.internal.json.JSONMapper;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
@@ -120,11 +118,10 @@ public class CacheConfig extends Config {
         if (redisLocalCacheStore == null) {
             logger.info("create redis local cache store");
             LocalCacheStore localCache = localCacheStore();
-            var mapper = new JSONMapper<InvalidateLocalCacheMessage>(InvalidateLocalCacheMessage.class);
-            var thread = new RedisSubscribeThread("cache-invalidator", redis, new InvalidateLocalCacheMessageListener(localCache, mapper), RedisLocalCacheStore.CHANNEL_INVALIDATE_CACHE);
+            var thread = new RedisSubscribeThread("cache-invalidator", redis, new InvalidateLocalCacheMessageListener(localCache), RedisLocalCacheStore.CHANNEL_INVALIDATE_CACHE);
             context.startupHook.add(thread::start);
             context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> thread.close());
-            redisLocalCacheStore = new RedisLocalCacheStore(localCache, redisCacheStore, redis, mapper);
+            redisLocalCacheStore = new RedisLocalCacheStore(localCache, redisCacheStore, redis);
         }
         return redisLocalCacheStore;
     }

@@ -27,7 +27,7 @@ public class CacheImpl<T> implements Cache<T> {
     final JSONMapper<T> mapper;
     // only validate when retrieve cache from store, in case data in cache store is stale, e.g. the class structure is changed but still got old data from cache
     // it's opposite as DB, which only validate on save
-    final Validator validator;
+    final Validator<T> validator;
 
     private final Logger logger = LoggerFactory.getLogger(CacheImpl.class);
     private final CacheStore cacheStore;

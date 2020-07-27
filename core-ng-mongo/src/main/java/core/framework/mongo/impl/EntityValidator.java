@@ -6,7 +6,7 @@ import core.framework.internal.validate.Validator;
  * @author neo
  */
 final class EntityValidator<T> {
-    private final Validator validator;
+    private final Validator<T> validator;
 
     EntityValidator(Class<T> entityClass) {
         validator = Validator.of(entityClass);

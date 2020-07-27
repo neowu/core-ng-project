@@ -1,6 +1,7 @@
 package core.framework.internal.cache;
 
 import core.framework.internal.json.JSONMapper;
+import core.framework.internal.json.JSONWriter;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
@@ -20,17 +21,16 @@ public class RedisLocalCacheStore implements CacheStore {
     private final CacheStore localCache;
     private final CacheStore redisCache;
     private final RedisImpl redis;
-    private final JSONMapper<InvalidateLocalCacheMessage> mapper;
+    private final JSONWriter<InvalidateLocalCacheMessage> writer = new JSONWriter<>(InvalidateLocalCacheMessage.class);
 
-    public RedisLocalCacheStore(CacheStore localCache, CacheStore redisCache, RedisImpl redis, JSONMapper<InvalidateLocalCacheMessage> mapper) {
+    public RedisLocalCacheStore(CacheStore localCache, CacheStore redisCache, RedisImpl redis) {
         this.localCache = localCache;
         this.redisCache = redisCache;
         this.redis = redis;
-        this.mapper = mapper;
     }
 
     @Override
-    public <T> T get(String key, JSONMapper<T> mapper, Validator validator) {
+    public <T> T get(String key, JSONMapper<T> mapper, Validator<T> validator) {
         T value = localCache.get(key, mapper, validator);
         if (value != null) return value;
         value = redisCache.get(key, mapper, validator);
@@ -42,7 +42,7 @@ public class RedisLocalCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator validator) {
+    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator<T> validator) {
         Map<String, T> results = Maps.newHashMapWithExpectedSize(keys.length);
         List<String> localNotFoundKeys = new ArrayList<>();
         for (String key : keys) {
@@ -108,6 +108,6 @@ public class RedisLocalCacheStore implements CacheStore {
         var message = new InvalidateLocalCacheMessage();
         message.keys = keys;
         message.clientIP = Network.LOCAL_HOST_ADDRESS;
-        redis.publish(CHANNEL_INVALIDATE_CACHE, mapper.toJSON(message));
+        redis.publish(CHANNEL_INVALIDATE_CACHE, writer.toJSON(message));
     }
 }

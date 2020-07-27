@@ -1,7 +1,8 @@
 package core.framework.internal.cache;
 
-import core.framework.internal.json.JSONMapper;
+import core.framework.json.JSON;
 import core.framework.util.Network;
+import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,13 +19,11 @@ import static org.mockito.Mockito.verify;
 class InvalidateLocalCacheMessageListenerTest {
     private InvalidateLocalCacheMessageListener listener;
     private LocalCacheStore cacheStore;
-    private JSONMapper<InvalidateLocalCacheMessage> mapper;
 
     @BeforeEach
     void createInvalidateLocalCacheMessageListener() {
         cacheStore = mock(LocalCacheStore.class);
-        mapper = new JSONMapper<>(InvalidateLocalCacheMessage.class);
-        listener = new InvalidateLocalCacheMessageListener(cacheStore, mapper);
+        listener = new InvalidateLocalCacheMessageListener(cacheStore);
     }
 
     @Test
@@ -39,7 +38,7 @@ class InvalidateLocalCacheMessageListenerTest {
         var message = new InvalidateLocalCacheMessage();
         message.clientIP = "remoteIP";
         message.keys = List.of("key1", "key2");
-        listener.onMessage(mapper.toJSON(message));
+        listener.onMessage(Strings.bytes(JSON.toJSON(message)));
 
         verify(cacheStore).delete("key1", "key2");
     }
@@ -49,7 +48,7 @@ class InvalidateLocalCacheMessageListenerTest {
         var message = new InvalidateLocalCacheMessage();
         message.clientIP = Network.LOCAL_HOST_ADDRESS;
         message.keys = List.of("key1");
-        listener.onMessage(mapper.toJSON(message));
+        listener.onMessage(Strings.bytes(JSON.toJSON(message)));
 
         verify(cacheStore, never()).delete("key1");
     }

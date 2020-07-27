@@ -21,7 +21,7 @@ public class LocalCacheStore implements CacheStore {
     public int maxSize = 10000;  // 10000 simple objects roughly takes 1M-10M heap + hashmap overhead
 
     @Override
-    public <T> T get(String key, JSONMapper<T> mapper, Validator validator) {
+    public <T> T get(String key, JSONMapper<T> mapper, Validator<T> validator) {
         logger.debug("get, key={}", key);
         return get(key, System.currentTimeMillis());
     }
@@ -39,7 +39,7 @@ public class LocalCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator validator) {
+    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator<T> validator) {
         logger.debug("getAll, keys={}", new ArrayLogParam(keys));
         long now = System.currentTimeMillis();
         Map<String, T> results = Maps.newHashMapWithExpectedSize(keys.length);

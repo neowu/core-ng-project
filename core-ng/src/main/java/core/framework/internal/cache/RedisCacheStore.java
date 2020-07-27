@@ -29,7 +29,7 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> T get(String key, JSONMapper<T> mapper, Validator validator) {
+    public <T> T get(String key, JSONMapper<T> mapper, Validator<T> validator) {
         try {
             byte[] value = redis.getBytes(key);
             if (value == null) return null;
@@ -41,7 +41,7 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator validator) {
+    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator<T> validator) {
         try {
             Map<String, byte[]> redisValues = redis.multiGetBytes(keys);
             Map<String, T> values = Maps.newHashMapWithExpectedSize(redisValues.size());
@@ -58,7 +58,7 @@ public class RedisCacheStore implements CacheStore {
         }
     }
 
-    private <T> T deserialize(byte[] value, JSONMapper<T> mapper, Validator validator) {
+    private <T> T deserialize(byte[] value, JSONMapper<T> mapper, Validator<T> validator) {
         try {
             T result = mapper.reader.readValue(value);
             if (result == null) return null;

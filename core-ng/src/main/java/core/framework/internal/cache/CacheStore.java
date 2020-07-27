@@ -11,9 +11,9 @@ import java.util.Map;
  * @author neo
  */
 public interface CacheStore {   // all keys here are direct cacheKey, not the key passed to Cache<T>
-    <T> T get(String key, JSONMapper<T> mapper, Validator validator);
+    <T> T get(String key, JSONMapper<T> mapper, Validator<T> validator);
 
-    <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator validator);
+    <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator<T> validator);
 
     <T> void put(String key, T value, Duration expiration, JSONMapper<T> mapper);
 

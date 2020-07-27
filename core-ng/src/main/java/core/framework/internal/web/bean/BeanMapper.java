@@ -10,7 +10,7 @@ import java.io.IOException;
  */
 public class BeanMapper<T> {
     final JSONMapper<T> mapper;
-    final Validator validator;
+    final Validator<T> validator;
 
     BeanMapper(Class<T> beanClass) {
         mapper = new JSONMapper<>(beanClass);

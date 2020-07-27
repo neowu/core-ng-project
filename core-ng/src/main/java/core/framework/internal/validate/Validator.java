@@ -6,6 +6,7 @@ import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,28 +15,31 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * @author neo
  */
-public final class Validator {
-    private static final Map<Class<?>, Validator> VALIDATORS = new HashMap<>();    // validators are always created during startup in single thread, it's ok not be thread safe
+public final class Validator<T> {
+    // TODO: remove soon
+    private static final Map<Class<?>, Validator<?>> VALIDATORS = new HashMap<>();    // validators are always created during startup in single thread, it's ok not be thread safe
     private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
 
-    public static Validator of(Class<?> beanClass) {
-        return VALIDATORS.computeIfAbsent(beanClass, Validator::new);
+    @SuppressWarnings("unchecked")
+    public static <T> Validator<T> of(Class<T> beanClass) {
+        return (Validator<T>) VALIDATORS.computeIfAbsent(beanClass, Validator::new);
     }
 
+    @Nullable
     private final BeanValidator validator;
 
-    private Validator(Class<?> beanClass) {
+    public Validator(Class<T> beanClass) {
         var builder = new BeanValidatorBuilder(beanClass);
-        this.validator = builder.build().orElse(null);
+        this.validator = builder.build();
     }
 
-    public void validate(Object bean, boolean partial) {
+    public void validate(T bean, boolean partial) {
         Map<String, String> errors = errors(bean, partial);
         if (errors != null) throw new ValidationException(errors);
     }
 
     // used only internally, for places don't want to catch exception
-    public Map<String, String> errors(Object bean, boolean partial) {
+    public Map<String, String> errors(T bean, boolean partial) {
         if (bean == null) {
             return Map.of("bean", "bean must not be null");
         }
