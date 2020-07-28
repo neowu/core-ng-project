@@ -1,7 +1,8 @@
 package core.framework.json;
 
 import core.framework.internal.json.JSONClassValidator;
-import core.framework.internal.json.JSONMapper;
+import core.framework.internal.json.JSONReader;
+import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
 
 import java.io.IOException;
@@ -13,21 +14,21 @@ import java.util.Map;
  * @author neo
  */
 public final class Bean {
-    private static final Map<Class<?>, Validator<?>> VALIDATORS = new HashMap<>(); // always requires register beanClass during startup, so not be thread safe
+    private static final Map<Class<?>, Context<?>> CONTEXT = new HashMap<>(); // always requires register beanClass during startup, so not be thread safe
 
     public static void register(Class<?> beanClass) {
-        VALIDATORS.compute(beanClass, (key, value) -> {
+        CONTEXT.compute(beanClass, (key, value) -> {
             if (value != null) throw new Error("bean class is already registered, beanClass=" + key.getCanonicalName());
             new JSONClassValidator(key).validate();
-            return Validator.of(key);
+            return new Context<>(beanClass);
         });
     }
 
     public static <T> T fromJSON(Class<T> beanClass, String json) {
-        Validator<T> validator = validator(beanClass);
+        Context<T> context = context(beanClass);
         try {
-            T instance = JSONMapper.OBJECT_MAPPER.readValue(json, beanClass);
-            validator.validate(instance, false);
+            T instance = context.reader.fromJSON(json);
+            context.validator.validate(instance, false);
             return instance;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -36,19 +37,28 @@ public final class Bean {
 
     public static <T> String toJSON(T bean) {
         @SuppressWarnings("unchecked")
-        Validator<T> validator = validator((Class<T>) bean.getClass());
-        validator.validate(bean, false);
-        try {
-            return JSONMapper.OBJECT_MAPPER.writeValueAsString(bean);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        Context<T> context = context((Class<T>) bean.getClass());
+
+        context.validator.validate(bean, false);
+        return context.writer.toJSONString(bean);
     }
 
-    private static <T> Validator<T> validator(Class<T> beanClass) {
+    private static <T> Context<T> context(Class<T> beanClass) {
         @SuppressWarnings("unchecked")
-        Validator<T> validator = (Validator<T>) VALIDATORS.get(beanClass);
-        if (validator == null) throw new Error("bean class is not registered, beanClass=" + beanClass.getCanonicalName());
-        return validator;
+        Context<T> context = (Context<T>) CONTEXT.get(beanClass);
+        if (context == null) throw new Error("bean class is not registered, beanClass=" + beanClass.getCanonicalName());
+        return context;
+    }
+
+    private static class Context<T> {
+        final JSONReader<T> reader;
+        final JSONWriter<T> writer;
+        final Validator<T> validator;
+
+        Context(Class<T> beanClass) {
+            reader = JSONReader.of(beanClass);
+            writer = JSONWriter.of(beanClass);
+            validator = Validator.of(beanClass);
+        }
     }
 }

@@ -17,12 +17,16 @@ public final class JSONWriter<T> {
 
     @SuppressWarnings("unchecked")
     public static <T> JSONWriter<T> of(Class<T> beanClass) {
-        if (cache == null) cache = new HashMap<>();
-        return (JSONWriter<T>) cache.computeIfAbsent(beanClass, JSONWriter::new);
+        synchronized (JSONWriter.class) {
+            if (cache == null) cache = new HashMap<>();
+            return (JSONWriter<T>) cache.computeIfAbsent(beanClass, JSONWriter::new);
+        }
     }
 
     public static void clearCache() {
-        cache = null;
+        synchronized (JSONWriter.class) {
+            cache = null;
+        }
     }
 
     private final ObjectWriter writer;
@@ -36,6 +40,14 @@ public final class JSONWriter<T> {
     public byte[] toJSON(T instance) {
         try {
             return Strings.bytes(writer.writeValueAsString(instance));
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public String toJSONString(T instance) {
+        try {
+            return writer.writeValueAsString(instance);
         } catch (JsonProcessingException e) {
             throw new UncheckedIOException(e);
         }

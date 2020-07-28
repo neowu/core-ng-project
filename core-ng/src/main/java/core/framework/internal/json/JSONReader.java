@@ -15,12 +15,16 @@ public final class JSONReader<T> {
 
     @SuppressWarnings("unchecked")
     public static <T> JSONReader<T> of(Class<T> beanClass) {
-        if (cache == null) cache = new HashMap<>();
-        return (JSONReader<T>) cache.computeIfAbsent(beanClass, JSONReader::new);
+        synchronized (JSONReader.class) {
+            if (cache == null) cache = new HashMap<>();
+            return (JSONReader<T>) cache.computeIfAbsent(beanClass, JSONReader::new);
+        }
     }
 
     public static void clearCache() {
-        cache = null;
+        synchronized (JSONReader.class) {
+            cache = null;
+        }
     }
 
     // used internally, performance is top priority in design, reader is about 3~6% faster than mapper since type is pre determined
@@ -32,6 +36,10 @@ public final class JSONReader<T> {
     }
 
     public T fromJSON(byte[] json) throws IOException {
+        return reader.readValue(json);
+    }
+
+    public T fromJSON(String json) throws IOException {
         return reader.readValue(json);
     }
 }

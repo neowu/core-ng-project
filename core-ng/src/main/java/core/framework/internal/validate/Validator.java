@@ -22,12 +22,16 @@ public final class Validator<T> {
 
     @SuppressWarnings("unchecked")
     public static <T> Validator<T> of(Class<T> beanClass) {
-        if (cache == null) cache = new HashMap<>();
-        return (Validator<T>) cache.computeIfAbsent(beanClass, Validator::new);
+        synchronized (Validator.class) {
+            if (cache == null) cache = new HashMap<>();
+            return (Validator<T>) cache.computeIfAbsent(beanClass, Validator::new);
+        }
     }
 
     public static void clearCache() {
-        cache = null;
+        synchronized (Validator.class) {
+            cache = null;
+        }
     }
 
     @Nullable
