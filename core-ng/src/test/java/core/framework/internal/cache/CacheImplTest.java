@@ -37,7 +37,7 @@ class CacheImplTest {
     @Test
     void getWhenHit() {
         var value = cacheItem("value");
-        when(cacheStore.get("name:key", cache.mapper, cache.validator)).thenReturn(value);
+        when(cacheStore.get("name:key", cache.context)).thenReturn(value);
 
         TestCache result = cache.get("key", key -> null);
         assertThat(result).isSameAs(value);
@@ -45,18 +45,18 @@ class CacheImplTest {
 
     @Test
     void getWhenMiss() {
-        when(cacheStore.get("name:key", cache.mapper, cache.validator)).thenReturn(null);
+        when(cacheStore.get("name:key", cache.context)).thenReturn(null);
 
         TestCache value = cache.get("key", key -> cacheItem("value"));
         assertThat(value.stringField).isEqualTo("value");
 
-        verify(cacheStore).put("name:key", value, Duration.ofHours(1), cache.mapper);
+        verify(cacheStore).put("name:key", value, Duration.ofHours(1), cache.context);
     }
 
     @Test
     void get() {
         TestCache item = cacheItem("value");
-        when(cacheStore.get("name:key", cache.mapper, cache.validator)).thenReturn(item);
+        when(cacheStore.get("name:key", cache.context)).thenReturn(item);
 
         Optional<TestCache> value = cache.get("key");
         assertThat(value).get().isSameAs(item);
@@ -75,7 +75,7 @@ class CacheImplTest {
     void getAllWhenMiss() {
         var values = Map.of("name:key1", cacheItem("v1"),
                 "name:key3", cacheItem("v3"));
-        when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key3"}, cache.mapper, cache.validator)).thenReturn(values);
+        when(cacheStore.getAll(new String[]{"name:key1", "name:key2", "name:key3"}, cache.context)).thenReturn(values);
 
         TestCache item2 = cacheItem("v2");
         Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2", "key3"), key -> item2);
@@ -84,14 +84,14 @@ class CacheImplTest {
         assertThat(results.get("key2").stringField).isEqualTo("v2");
         assertThat(results.get("key3").stringField).isEqualTo("v3");
 
-        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && "v2".equals(argument.get(0).value.stringField)), eq(Duration.ofHours(1)), eq(cache.mapper));
+        verify(cacheStore).putAll(argThat(argument -> argument.size() == 1 && "v2".equals(argument.get(0).value.stringField)), eq(Duration.ofHours(1)), eq(cache.context));
     }
 
     @Test
     void getAllWhenHit() {
         var values = Map.of("name:key1", cacheItem("v1"),
                 "name:key2", cacheItem("v2"));
-        when(cacheStore.getAll(new String[]{"name:key1", "name:key2"}, cache.mapper, cache.validator)).thenReturn(values);
+        when(cacheStore.getAll(new String[]{"name:key1", "name:key2"}, cache.context)).thenReturn(values);
 
         Map<String, TestCache> results = cache.getAll(Arrays.asList("key1", "key2"), key -> null);
         assertThat(results).containsKeys("key1", "key2");
@@ -104,7 +104,7 @@ class CacheImplTest {
         TestCache item = cacheItem("v1");
         cache.put("key", item);
 
-        verify(cacheStore).put("name:key", item, Duration.ofHours(1), cache.mapper);
+        verify(cacheStore).put("name:key", item, Duration.ofHours(1), cache.context);
     }
 
     @Test
@@ -117,7 +117,7 @@ class CacheImplTest {
             return argument.size() == 2
                     && keys.contains("name:key1")
                     && keys.contains("name:key2");
-        }), eq(Duration.ofHours(1)), eq(cache.mapper));
+        }), eq(Duration.ofHours(1)), eq(cache.context));
     }
 
     @Test

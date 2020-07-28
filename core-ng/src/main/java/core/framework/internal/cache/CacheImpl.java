@@ -1,8 +1,6 @@
 package core.framework.internal.cache;
 
 import core.framework.cache.Cache;
-import core.framework.internal.json.JSONMapper;
-import core.framework.internal.validate.Validator;
 import core.framework.log.ActionLogContext;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
@@ -24,11 +22,7 @@ public class CacheImpl<T> implements Cache<T> {
     public final Class<T> cacheClass;
     public final Duration duration;
 
-    final JSONMapper<T> mapper;
-    // only validate when retrieve cache from store, in case data in cache store is stale, e.g. the class structure is changed but still got old data from cache
-    // it's opposite as DB, which only validate on save
-    final Validator<T> validator;
-
+    final CacheContext<T> context;
     private final Logger logger = LoggerFactory.getLogger(CacheImpl.class);
     private final CacheStore cacheStore;
 
@@ -37,14 +31,14 @@ public class CacheImpl<T> implements Cache<T> {
         this.cacheClass = cacheClass;
         this.duration = duration;
         this.cacheStore = cacheStore;
-        mapper = new JSONMapper<>(cacheClass);
-        validator = Validator.of(cacheClass);
+
+        context = new CacheContext<>(cacheClass);
     }
 
     @Override
     public T get(String key, Function<String, T> loader) {
         String cacheKey = cacheKey(key);
-        T cacheValue = cacheStore.get(cacheKey, mapper, validator);
+        T cacheValue = cacheStore.get(cacheKey, context);
         if (cacheValue != null) {
             ActionLogContext.stat("cache_hit", 1);
             return cacheValue;
@@ -52,13 +46,13 @@ public class CacheImpl<T> implements Cache<T> {
 
         logger.debug("load value, key={}", key);
         T value = load(loader, key);
-        cacheStore.put(cacheKey, value, duration, mapper);
+        cacheStore.put(cacheKey, value, duration, context);
         ActionLogContext.stat("cache_miss", 1);
         return value;
     }
 
     public Optional<T> get(String key) {
-        T result = cacheStore.get(cacheKey(key), mapper, validator);
+        T result = cacheStore.get(cacheKey(key), context);
         if (result == null) return Optional.empty();
         return Optional.of(result);
     }
@@ -70,7 +64,7 @@ public class CacheImpl<T> implements Cache<T> {
         String[] cacheKeys = cacheKeys(keys);
         Map<String, T> values = Maps.newHashMapWithExpectedSize(size);
         List<CacheStore.Entry<T>> newValues = new ArrayList<>(size);
-        Map<String, T> cacheValues = cacheStore.getAll(cacheKeys, mapper, validator);
+        Map<String, T> cacheValues = cacheStore.getAll(cacheKeys, context);
         ActionLogContext.stat("cache_hit", cacheValues.size());
         for (String key : keys) {
             String cacheKey = cacheKeys[index];
@@ -84,7 +78,7 @@ public class CacheImpl<T> implements Cache<T> {
             index++;
         }
         if (!newValues.isEmpty()) {
-            cacheStore.putAll(newValues, duration, mapper);
+            cacheStore.putAll(newValues, duration, context);
             ActionLogContext.stat("cache_miss", newValues.size());
         }
         return values;
@@ -92,7 +86,7 @@ public class CacheImpl<T> implements Cache<T> {
 
     @Override
     public void put(String key, T value) {
-        cacheStore.put(cacheKey(key), value, duration, mapper);
+        cacheStore.put(cacheKey(key), value, duration, context);
     }
 
     @Override
@@ -101,7 +95,7 @@ public class CacheImpl<T> implements Cache<T> {
         for (Map.Entry<String, T> entry : values.entrySet()) {
             cacheValues.add(new CacheStore.Entry<>(cacheKey(entry.getKey()), entry.getValue()));
         }
-        cacheStore.putAll(cacheValues, duration, mapper);
+        cacheStore.putAll(cacheValues, duration, context);
     }
 
     @Override

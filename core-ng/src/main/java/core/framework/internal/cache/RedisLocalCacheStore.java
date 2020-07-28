@@ -1,9 +1,7 @@
 package core.framework.internal.cache;
 
-import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.redis.RedisImpl;
-import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 import core.framework.util.Network;
 
@@ -21,7 +19,7 @@ public class RedisLocalCacheStore implements CacheStore {
     private final CacheStore localCache;
     private final CacheStore redisCache;
     private final RedisImpl redis;
-    private final JSONWriter<InvalidateLocalCacheMessage> writer = new JSONWriter<>(InvalidateLocalCacheMessage.class);
+    private final JSONWriter<InvalidateLocalCacheMessage> writer = JSONWriter.of(InvalidateLocalCacheMessage.class);
 
     public RedisLocalCacheStore(CacheStore localCache, CacheStore redisCache, RedisImpl redis) {
         this.localCache = localCache;
@@ -30,23 +28,23 @@ public class RedisLocalCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> T get(String key, JSONMapper<T> mapper, Validator<T> validator) {
-        T value = localCache.get(key, mapper, validator);
+    public <T> T get(String key, CacheContext<T> context) {
+        T value = localCache.get(key, context);
         if (value != null) return value;
-        value = redisCache.get(key, mapper, validator);
+        value = redisCache.get(key, context);
         if (value == null) return null;
         long expirationTime = redis.expirationTime(key)[0];
         if (expirationTime <= 0) return null;
-        localCache.put(key, value, Duration.ofMillis(expirationTime), mapper);
+        localCache.put(key, value, Duration.ofMillis(expirationTime), context);
         return value;
     }
 
     @Override
-    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator<T> validator) {
+    public <T> Map<String, T> getAll(String[] keys, CacheContext<T> context) {
         Map<String, T> results = Maps.newHashMapWithExpectedSize(keys.length);
         List<String> localNotFoundKeys = new ArrayList<>();
         for (String key : keys) {
-            T value = localCache.get(key, mapper, validator);
+            T value = localCache.get(key, context);
             if (value != null) {
                 results.put(key, value);
             } else {
@@ -55,7 +53,7 @@ public class RedisLocalCacheStore implements CacheStore {
         }
         if (localNotFoundKeys.isEmpty()) return results;
 
-        Map<String, T> redisValues = redisCache.getAll(localNotFoundKeys.toArray(String[]::new), mapper, validator);
+        Map<String, T> redisValues = redisCache.getAll(localNotFoundKeys.toArray(String[]::new), context);
         if (!redisValues.isEmpty()) {
             String[] redisKeys = redisValues.keySet().toArray(String[]::new);
             long[] expirationTimes = redis.expirationTime(redisKeys);
@@ -65,7 +63,7 @@ public class RedisLocalCacheStore implements CacheStore {
                     String redisKey = redisKeys[i];
                     T value = redisValues.get(redisKey);
                     results.put(redisKey, value);
-                    localCache.put(redisKey, value, Duration.ofMillis(expirationTime), mapper);
+                    localCache.put(redisKey, value, Duration.ofMillis(expirationTime), context);
                 }
             }
         }
@@ -73,16 +71,16 @@ public class RedisLocalCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> void put(String key, T value, Duration expiration, JSONMapper<T> mapper) {
-        localCache.put(key, value, expiration, mapper);
-        redisCache.put(key, value, expiration, mapper);
+    public <T> void put(String key, T value, Duration expiration, CacheContext<T> context) {
+        localCache.put(key, value, expiration, context);
+        redisCache.put(key, value, expiration, context);
         publishInvalidateLocalCacheMessage(List.of(key));
     }
 
     @Override
-    public <T> void putAll(List<Entry<T>> values, Duration expiration, JSONMapper<T> mapper) {
-        localCache.putAll(values, expiration, mapper);
-        redisCache.putAll(values, expiration, mapper);
+    public <T> void putAll(List<Entry<T>> values, Duration expiration, CacheContext<T> context) {
+        localCache.putAll(values, expiration, context);
+        redisCache.putAll(values, expiration, context);
         publishInvalidateLocalCacheMessage(keys(values));
     }
 

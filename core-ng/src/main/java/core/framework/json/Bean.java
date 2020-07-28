@@ -1,14 +1,13 @@
 package core.framework.json;
 
 import core.framework.internal.json.JSONClassValidator;
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.validate.Validator;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static core.framework.internal.json.JSONMapper.OBJECT_MAPPER;
 
 /**
  * @author neo
@@ -20,14 +19,14 @@ public final class Bean {
         VALIDATORS.compute(beanClass, (key, value) -> {
             if (value != null) throw new Error("bean class is already registered, beanClass=" + key.getCanonicalName());
             new JSONClassValidator(key).validate();
-            return new Validator<>(key);
+            return Validator.of(key);
         });
     }
 
     public static <T> T fromJSON(Class<T> beanClass, String json) {
         Validator<T> validator = validator(beanClass);
         try {
-            T instance = OBJECT_MAPPER.readValue(json, beanClass);
+            T instance = JSONMapper.OBJECT_MAPPER.readValue(json, beanClass);
             validator.validate(instance, false);
             return instance;
         } catch (IOException e) {
@@ -40,7 +39,7 @@ public final class Bean {
         Validator<T> validator = validator((Class<T>) bean.getClass());
         validator.validate(bean, false);
         try {
-            return OBJECT_MAPPER.writeValueAsString(bean);
+            return JSONMapper.OBJECT_MAPPER.writeValueAsString(bean);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

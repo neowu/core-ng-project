@@ -22,12 +22,12 @@ class LocalCacheStoreTest {
 
     @Test
     void getAll() {
-        Map<String, TestCache> values = cacheStore.getAll(new String[]{"key1", "key2"}, null, null);
+        Map<String, TestCache> values = cacheStore.getAll(new String[]{"key1", "key2"}, null);
         assertThat(values).isEmpty();
 
         var value = new TestCache();
         cacheStore.put("key1", value, Duration.ofMinutes(1), null);
-        values = cacheStore.getAll(new String[]{"key1", "key2"}, null, null);
+        values = cacheStore.getAll(new String[]{"key1", "key2"}, null);
         assertThat(values).hasSize(1).containsEntry("key1", value);
     }
 
@@ -36,13 +36,13 @@ class LocalCacheStoreTest {
         var value = new TestCache();
         cacheStore.put("key1", value, Duration.ofMinutes(1), null);
 
-        TestCache retrievedValue = cacheStore.get("key1", null, null);
+        TestCache retrievedValue = cacheStore.get("key1", null);
         assertThat(retrievedValue).isSameAs(value);
 
         LocalCacheStore.CacheItem<?> item = cacheStore.caches.get("key1");
         assertThat(item.hits).isEqualTo(1);
 
-        cacheStore.get("key1", null, null);
+        cacheStore.get("key1", null);
         assertThat(item.hits).isEqualTo(2);
     }
 
@@ -51,7 +51,7 @@ class LocalCacheStoreTest {
         var value = new TestCache();
         cacheStore.put("key1", value, Duration.ZERO, null);
 
-        TestCache retrievedValue = cacheStore.get("key1", null, null);
+        TestCache retrievedValue = cacheStore.get("key1", null);
         assertThat(retrievedValue).isNull();
     }
 
@@ -70,9 +70,9 @@ class LocalCacheStoreTest {
         cacheStore.put("k1", new TestCache(), Duration.ofHours(1), null);
         cacheStore.put("k2", new TestCache(), Duration.ofHours(1), null);
         cacheStore.put("k3", new TestCache(), Duration.ofHours(1), null);
-        cacheStore.get("k1", null, null);
-        cacheStore.get("k2", null, null);
-        cacheStore.get("k2", null, null);
+        cacheStore.get("k1", null);
+        cacheStore.get("k2", null);
+        cacheStore.get("k2", null);
 
         cacheStore.cleanup();
         assertThat(cacheStore.caches).containsOnlyKeys("k2");

@@ -38,77 +38,77 @@ class RedisLocalCacheStoreTest {
     @Test
     void getWithLocalHit() {
         var value = new TestCache();
-        when(localCacheStore.get("key", null, null)).thenReturn(value);
+        when(localCacheStore.get("key", null)).thenReturn(value);
 
-        assertThat(cacheStore.<TestCache>get("key", null, null)).isSameAs(value);
+        assertThat(cacheStore.<TestCache>get("key", null)).isSameAs(value);
     }
 
     @Test
     void getWithRemoteHit() {
         var value = new TestCache();
-        when(localCacheStore.get("key", null, null)).thenReturn(null);
-        when(redisCacheStore.get("key", null, null)).thenReturn(value);
+        when(localCacheStore.get("key", null)).thenReturn(null);
+        when(redisCacheStore.get("key", null)).thenReturn(value);
         when(redis.expirationTime("key")).thenReturn(new long[]{1000});
 
-        assertThat(cacheStore.<TestCache>get("key", null, null)).isSameAs(value);
+        assertThat(cacheStore.<TestCache>get("key", null)).isSameAs(value);
         verify(localCacheStore).put(eq("key"), eq(value), any(), any());
     }
 
     @Test
     void getWithRemoteHitButExpired() {
-        when(localCacheStore.get("key", null, null)).thenReturn(null);
-        when(redisCacheStore.get("key", null, null)).thenReturn(new byte[0]);
+        when(localCacheStore.get("key", null)).thenReturn(null);
+        when(redisCacheStore.get("key", null)).thenReturn(new byte[0]);
         when(redis.expirationTime("key")).thenReturn(new long[]{0});
 
-        assertThat(cacheStore.<TestCache>get("key", null, null)).isNull();
+        assertThat(cacheStore.<TestCache>get("key", null)).isNull();
         verify(localCacheStore, never()).put(any(), any(), any(), any());
     }
 
     @Test
     void getWithMiss() {
-        when(localCacheStore.get("key", null, null)).thenReturn(null);
-        when(redisCacheStore.get("key", null, null)).thenReturn(null);
+        when(localCacheStore.get("key", null)).thenReturn(null);
+        when(redisCacheStore.get("key", null)).thenReturn(null);
 
-        assertThat(cacheStore.<TestCache>get("key", null, null)).isNull();
+        assertThat(cacheStore.<TestCache>get("key", null)).isNull();
     }
 
     @Test
     void getAllWithLocalHit() {
-        when(localCacheStore.get("key1", null, null)).thenReturn(new TestCache());
-        when(localCacheStore.get("key2", null, null)).thenReturn(new TestCache());
+        when(localCacheStore.get("key1", null)).thenReturn(new TestCache());
+        when(localCacheStore.get("key2", null)).thenReturn(new TestCache());
 
-        assertThat(cacheStore.getAll(new String[]{"key1", "key2"}, null, null)).containsKeys("key1", "key2");
+        assertThat(cacheStore.getAll(new String[]{"key1", "key2"}, null)).containsKeys("key1", "key2");
     }
 
     @Test
     void getAllWithRemoteHit() {
-        when(localCacheStore.get("key1", null, null)).thenReturn(new TestCache());
-        when(localCacheStore.get("key2", null, null)).thenReturn(null);
-        when(redisCacheStore.getAll(new String[]{"key2"}, null, null)).thenReturn(Map.of("key2", new TestCache()));
+        when(localCacheStore.get("key1", null)).thenReturn(new TestCache());
+        when(localCacheStore.get("key2", null)).thenReturn(null);
+        when(redisCacheStore.getAll(new String[]{"key2"}, null)).thenReturn(Map.of("key2", new TestCache()));
         when(redis.expirationTime("key2")).thenReturn(new long[]{1000});
 
-        assertThat(cacheStore.getAll(new String[]{"key1", "key2"}, null, null)).containsKeys("key1", "key2");
+        assertThat(cacheStore.getAll(new String[]{"key1", "key2"}, null)).containsKeys("key1", "key2");
         verify(localCacheStore).put(eq("key2"), any(), any(), any());
     }
 
     @Test
     void getAllWithRemoteHitButExpired() {
-        when(localCacheStore.get("key1", null, null)).thenReturn(new TestCache());
-        when(localCacheStore.get("key2", null, null)).thenReturn(null);
-        when(redisCacheStore.getAll(new String[]{"key2"}, null, null)).thenReturn(Map.of("key2", new TestCache()));
+        when(localCacheStore.get("key1", null)).thenReturn(new TestCache());
+        when(localCacheStore.get("key2", null)).thenReturn(null);
+        when(redisCacheStore.getAll(new String[]{"key2"}, null)).thenReturn(Map.of("key2", new TestCache()));
         when(redis.expirationTime("key2")).thenReturn(new long[]{0});
 
-        assertThat(cacheStore.getAll(new String[]{"key1", "key2"}, null, null)).containsKeys("key1");
+        assertThat(cacheStore.getAll(new String[]{"key1", "key2"}, null)).containsKeys("key1");
         verify(localCacheStore, never()).put(eq("key2"), any(), any(), any());
     }
 
     @Test
     void getAllWithRemoteMiss() {
-        when(localCacheStore.get("key1", null, null)).thenReturn(new TestCache());
-        when(localCacheStore.get("key2", null, null)).thenReturn(null);
-        when(redisCacheStore.getAll(new String[]{"key2"}, null, null)).thenReturn(Map.of());
+        when(localCacheStore.get("key1", null)).thenReturn(new TestCache());
+        when(localCacheStore.get("key2", null)).thenReturn(null);
+        when(redisCacheStore.getAll(new String[]{"key2"}, null)).thenReturn(Map.of());
 
-        assertThat(cacheStore.getAll(new String[]{"key1", "key2"}, null, null)).containsKeys("key1");
+        assertThat(cacheStore.getAll(new String[]{"key1", "key2"}, null)).containsKeys("key1");
         verify(localCacheStore, never()).put(eq("key2"), any(), any(), any());
     }
 

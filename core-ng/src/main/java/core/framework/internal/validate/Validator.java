@@ -16,19 +16,24 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author neo
  */
 public final class Validator<T> {
-    // TODO: remove soon
-    private static final Map<Class<?>, Validator<?>> VALIDATORS = new HashMap<>();    // validators are always created during startup in single thread, it's ok not be thread safe
     private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
+
+    private static Map<Class<?>, Validator<?>> cache;
 
     @SuppressWarnings("unchecked")
     public static <T> Validator<T> of(Class<T> beanClass) {
-        return (Validator<T>) VALIDATORS.computeIfAbsent(beanClass, Validator::new);
+        if (cache == null) cache = new HashMap<>();
+        return (Validator<T>) cache.computeIfAbsent(beanClass, Validator::new);
+    }
+
+    public static void clearCache() {
+        cache = null;
     }
 
     @Nullable
     private final BeanValidator validator;
 
-    public Validator(Class<T> beanClass) {
+    private Validator(Class<T> beanClass) {
         var builder = new BeanValidatorBuilder(beanClass);
         this.validator = builder.build();
     }

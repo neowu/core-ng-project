@@ -14,7 +14,7 @@ import java.io.IOException;
 public class InvalidateLocalCacheMessageListener implements RedisChannelListener {
     private final Logger logger = LoggerFactory.getLogger(InvalidateLocalCacheMessageListener.class);
     private final LocalCacheStore localCache;
-    private final JSONReader<InvalidateLocalCacheMessage> reader = new JSONReader<>(InvalidateLocalCacheMessage.class);
+    private final JSONReader<InvalidateLocalCacheMessage> reader = JSONReader.of(InvalidateLocalCacheMessage.class);
 
     public InvalidateLocalCacheMessageListener(LocalCacheStore localCache) {
         this.localCache = localCache;

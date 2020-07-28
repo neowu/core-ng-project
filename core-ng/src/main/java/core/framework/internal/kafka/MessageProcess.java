@@ -17,7 +17,7 @@ class MessageProcess<T> {
     MessageProcess(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler, Class<T> messageClass) {
         this.handler = handler;
         this.bulkHandler = bulkHandler;
-        reader = new JSONReader<>(messageClass);
-        validator = new Validator<>(messageClass);
+        reader = JSONReader.of(messageClass);
+        validator = Validator.of(messageClass);
     }
 }

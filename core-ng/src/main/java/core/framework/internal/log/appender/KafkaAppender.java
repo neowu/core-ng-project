@@ -1,6 +1,6 @@
 package core.framework.internal.log.appender;
 
-import core.framework.internal.json.JSONMapper;
+import core.framework.internal.json.JSONWriter;
 import core.framework.internal.kafka.KafkaURI;
 import core.framework.internal.kafka.ProducerMetrics;
 import core.framework.log.message.ActionLogMessage;
@@ -33,17 +33,14 @@ public final class KafkaAppender implements LogAppender {
     final BlockingQueue<ProducerRecord<byte[], byte[]>> records = new LinkedBlockingQueue<>();
     private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
     private final Thread logForwarderThread;
-    private final JSONMapper<ActionLogMessage> actionLogMapper;
-    private final JSONMapper<StatMessage> statMapper;
+    private final JSONWriter<ActionLogMessage> actionLogWriter = JSONWriter.of(ActionLogMessage.class);
+    private final JSONWriter<StatMessage> statWriter = JSONWriter.of(StatMessage.class);
     private final Callback callback = new KafkaCallback();
 
     private Producer<byte[], byte[]> producer;
     private volatile boolean stop;
 
     public KafkaAppender(KafkaURI uri) {
-        actionLogMapper = new JSONMapper<>(ActionLogMessage.class);
-        statMapper = new JSONMapper<>(StatMessage.class);
-
         logForwarderThread = new Thread(() -> {
             logger.info("log forwarder thread started, uri={}", uri);
 
@@ -99,12 +96,12 @@ public final class KafkaAppender implements LogAppender {
 
     @Override
     public void append(ActionLogMessage message) {
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, actionLogMapper.toJSON(message)));     // not specify message key for sticky partition
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_ACTION_LOG, actionLogWriter.toJSON(message)));     // not specify message key for sticky partition
     }
 
     @Override
     public void append(StatMessage message) {
-        records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, statMapper.toJSON(message)));    // not specify message key for sticky partition
+        records.add(new ProducerRecord<>(LogTopics.TOPIC_STAT, statWriter.toJSON(message)));    // not specify message key for sticky partition
     }
 
     // during startup, if it encounters configuration runtime error, logForwarderThread won't start as all startup tasks will be skipped,

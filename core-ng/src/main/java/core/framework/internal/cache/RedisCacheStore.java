@@ -1,6 +1,6 @@
 package core.framework.internal.cache;
 
-import core.framework.internal.json.JSONMapper;
+import core.framework.internal.json.JSONReader;
 import core.framework.internal.redis.RedisException;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.validate.Validator;
@@ -29,11 +29,11 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> T get(String key, JSONMapper<T> mapper, Validator<T> validator) {
+    public <T> T get(String key, CacheContext<T> context) {
         try {
             byte[] value = redis.getBytes(key);
             if (value == null) return null;
-            return deserialize(value, mapper, validator);
+            return deserialize(value, context.reader, context.validator);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
             return null;
@@ -41,12 +41,12 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator<T> validator) {
+    public <T> Map<String, T> getAll(String[] keys, CacheContext<T> context) {
         try {
             Map<String, byte[]> redisValues = redis.multiGetBytes(keys);
             Map<String, T> values = Maps.newHashMapWithExpectedSize(redisValues.size());
             for (Map.Entry<String, byte[]> entry : redisValues.entrySet()) {
-                T value = deserialize(entry.getValue(), mapper, validator);
+                T value = deserialize(entry.getValue(), context.reader, context.validator);
                 if (value != null) {
                     values.put(entry.getKey(), value);
                 }
@@ -58,9 +58,9 @@ public class RedisCacheStore implements CacheStore {
         }
     }
 
-    private <T> T deserialize(byte[] value, JSONMapper<T> mapper, Validator<T> validator) {
+    private <T> T deserialize(byte[] value, JSONReader<T> reader, Validator<T> validator) {
         try {
-            T result = mapper.reader.readValue(value);
+            T result = reader.fromJSON(value);
             if (result == null) return null;
 
             Map<String, String> errors = validator.errors(result, false);
@@ -77,19 +77,19 @@ public class RedisCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> void put(String key, T value, Duration expiration, JSONMapper<T> mapper) {
+    public <T> void put(String key, T value, Duration expiration, CacheContext<T> context) {
         try {
-            redis.set(key, mapper.toJSON(value), expiration, false);
+            redis.set(key, context.writer.toJSON(value), expiration, false);
         } catch (UncheckedIOException | RedisException e) {
             logger.warn(errorCode("CACHE_STORE_FAILED"), "failed to connect to redis, error={}", e.getMessage(), e);
         }
     }
 
     @Override
-    public <T> void putAll(List<Entry<T>> values, Duration expiration, JSONMapper<T> mapper) {
+    public <T> void putAll(List<Entry<T>> values, Duration expiration, CacheContext<T> context) {
         Map<String, byte[]> cacheValues = Maps.newHashMapWithExpectedSize(values.size());
         for (Entry<T> value : values) {
-            cacheValues.put(value.key, mapper.toJSON(value.value));
+            cacheValues.put(value.key, context.writer.toJSON(value.value));
         }
         try {
             redis.multiSet(cacheValues, expiration);

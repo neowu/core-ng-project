@@ -4,8 +4,11 @@ import core.framework.api.web.service.QueryParam;
 import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.inject.BeanFactory;
+import core.framework.internal.json.JSONReader;
+import core.framework.internal.json.JSONWriter;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.StatCollector;
+import core.framework.internal.validate.Validator;
 import core.framework.internal.web.HTTPServer;
 import core.framework.internal.web.bean.BeanMappers;
 import core.framework.internal.web.bean.RequestBeanMapper;
@@ -142,6 +145,11 @@ public class ModuleContext {
         propertyValidator.validate(keys);
         propertyValidator = null;   // free object not used anymore
         serviceRegistry.beanClassNameValidator = null;
+
+        // clear internal object cache after startup
+        Validator.clearCache();
+        JSONReader.clearCache();
+        JSONWriter.clearCache();
 
         configs.values().forEach(Config::validate);
     }

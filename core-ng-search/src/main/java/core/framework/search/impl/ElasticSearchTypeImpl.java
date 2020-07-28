@@ -1,6 +1,7 @@
 package core.framework.search.impl;
 
-import core.framework.internal.json.JSONMapper;
+import core.framework.internal.json.JSONReader;
+import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
@@ -67,16 +68,18 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     private final ElasticSearchImpl elasticSearch;
     private final String index;
-    private final Validator<T> validator;
     private final long slowOperationThresholdInNanos;
-    private final JSONMapper<T> mapper;
+    private final JSONReader<T> reader;
+    private final JSONWriter<T> writer;
+    private final Validator<T> validator;
 
     ElasticSearchTypeImpl(ElasticSearchImpl elasticSearch, Class<T> documentClass, Duration slowOperationThreshold) {
         this.elasticSearch = elasticSearch;
         this.slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
         this.index = documentClass.getDeclaredAnnotation(Index.class).name();
+        reader = JSONReader.of(documentClass);
+        writer = JSONWriter.of(documentClass);
         validator = Validator.of(documentClass);
-        mapper = new JSONMapper<>(documentClass);
     }
 
     @Override
@@ -122,7 +125,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         SearchHit[] hits = response.getHits().getHits();
         List<T> items = new ArrayList<>(hits.length);
         for (SearchHit hit : hits) {
-            items.add(mapper.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
+            items.add(reader.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
         }
         Aggregations aggregationResponse = response.getAggregations();
         Map<String, Aggregation> aggregations = aggregationResponse == null ? Map.of() : aggregationResponse.asMap();
@@ -152,9 +155,9 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             esTook = response.getTook().nanos();
 
             List<String> suggestions = response.getSuggest().filter(CompletionSuggestion.class).stream()
-                                               .map(CompletionSuggestion::getOptions).flatMap(Collection::stream).map(option -> option.getText().string())
-                                               .distinct()
-                                               .collect(Collectors.toList());
+                    .map(CompletionSuggestion::getOptions).flatMap(Collection::stream).map(option -> option.getText().string())
+                    .distinct()
+                    .collect(Collectors.toList());
             options = suggestions.size();
             return suggestions;
         } catch (IOException e) {
@@ -177,7 +180,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             GetResponse response = elasticSearch.client().get(getRequest, RequestOptions.DEFAULT);
             if (!response.isExists()) return Optional.empty();
             hits = 1;
-            return Optional.of(mapper.fromJSON(response.getSourceAsBytes()));
+            return Optional.of(reader.fromJSON(response.getSourceAsBytes()));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
@@ -193,7 +196,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         var watch = new StopWatch();
         String index = request.index == null ? this.index : request.index;
         validator.validate(request.source, false);
-        byte[] document = mapper.toJSON(request.source);
+        byte[] document = writer.toJSON(request.source);
         try {
             var indexRequest = new org.elasticsearch.action.index.IndexRequest(index).id(request.id).source(document, XContentType.JSON);
             elasticSearch.client().index(indexRequest, RequestOptions.DEFAULT);
@@ -217,7 +220,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
             String id = entry.getKey();
             T source = entry.getValue();
             validator.validate(source, false);
-            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index).id(id).source(mapper.toJSON(source), XContentType.JSON);
+            var indexRequest = new org.elasticsearch.action.index.IndexRequest(index).id(id).source(writer.toJSON(source), XContentType.JSON);
             bulkRequest.add(indexRequest);
         }
         long esTook = 0;
@@ -345,7 +348,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
                 totalHits += hits.length;
 
                 for (SearchHit hit : hits) {
-                    forEach.consumer.accept(mapper.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
+                    forEach.consumer.accept(reader.fromJSON(BytesReference.toBytes(hit.getSourceRef())));
                 }
 
                 start = System.nanoTime();

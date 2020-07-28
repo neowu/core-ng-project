@@ -1,8 +1,6 @@
 package core.framework.internal.cache;
 
-import core.framework.internal.json.JSONMapper;
 import core.framework.internal.log.filter.ArrayLogParam;
-import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +19,7 @@ public class LocalCacheStore implements CacheStore {
     public int maxSize = 10000;  // 10000 simple objects roughly takes 1M-10M heap + hashmap overhead
 
     @Override
-    public <T> T get(String key, JSONMapper<T> mapper, Validator<T> validator) {
+    public <T> T get(String key, CacheContext<T> context) {
         logger.debug("get, key={}", key);
         return get(key, System.currentTimeMillis());
     }
@@ -39,7 +37,7 @@ public class LocalCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> Map<String, T> getAll(String[] keys, JSONMapper<T> mapper, Validator<T> validator) {
+    public <T> Map<String, T> getAll(String[] keys, CacheContext<T> context) {
         logger.debug("getAll, keys={}", new ArrayLogParam(keys));
         long now = System.currentTimeMillis();
         Map<String, T> results = Maps.newHashMapWithExpectedSize(keys.length);
@@ -51,14 +49,14 @@ public class LocalCacheStore implements CacheStore {
     }
 
     @Override
-    public <T> void put(String key, T value, Duration expiration, JSONMapper<T> mapper) {
+    public <T> void put(String key, T value, Duration expiration, CacheContext<T> context) {
         logger.debug("put, key={}, expiration={}", key, expiration);
         long expirationTime = System.currentTimeMillis() + expiration.toMillis();
         caches.put(key, new CacheItem<>(value, expirationTime));
     }
 
     @Override
-    public <T> void putAll(List<Entry<T>> values, Duration expiration, JSONMapper<T> mapper) {
+    public <T> void putAll(List<Entry<T>> values, Duration expiration, CacheContext<T> context) {
         logger.debug("putAll, keys={}, expiration={}", new ArrayLogParam(keys(values)), expiration);
         long expirationTime = System.currentTimeMillis() + expiration.toMillis();
         for (Entry<T> value : values) {

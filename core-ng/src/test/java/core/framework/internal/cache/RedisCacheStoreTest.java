@@ -1,9 +1,7 @@
 package core.framework.internal.cache;
 
-import core.framework.internal.json.JSONMapper;
 import core.framework.internal.redis.RedisException;
 import core.framework.internal.redis.RedisImpl;
-import core.framework.internal.validate.Validator;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +22,7 @@ import static org.mockito.Mockito.when;
  * @author neo
  */
 class RedisCacheStoreTest {
-    private final JSONMapper<TestCache> mapper = new JSONMapper<>(TestCache.class);
-    private final Validator<TestCache> validator = new Validator<>(TestCache.class);
+    private final CacheContext<TestCache> context = new CacheContext<>(TestCache.class);
     private RedisCacheStore cacheStore;
     private RedisImpl redis;
 
@@ -38,32 +35,32 @@ class RedisCacheStoreTest {
     @Test
     void get() {
         when(redis.getBytes("key")).thenReturn(Strings.bytes("{\"stringField\":\"value\"}"));
-        assertThat(cacheStore.get("key", mapper, validator).stringField).isEqualTo("value");
+        assertThat(cacheStore.get("key", context).stringField).isEqualTo("value");
     }
 
     @Test
     void getWithStaleData() {
         when(redis.getBytes("key")).thenReturn(Strings.bytes("{}"));
-        assertThat(cacheStore.get("key", mapper, validator)).isNull();
+        assertThat(cacheStore.get("key", context)).isNull();
     }
 
     @Test
     void getWithInvalidJSON() {
         when(redis.getBytes("key")).thenReturn(Strings.bytes("{\"listField\": 1}"));
-        assertThat(cacheStore.get("key", mapper, validator)).isNull();
+        assertThat(cacheStore.get("key", context)).isNull();
     }
 
     @Test
     void getWithFailure() {
         when(redis.getBytes("key")).thenThrow(new RedisException("unexpected"));
-        assertThat(cacheStore.get("key", mapper, validator)).isNull();
+        assertThat(cacheStore.get("key", context)).isNull();
     }
 
     @Test
     void getAll() {
         Map<String, byte[]> values = Map.of("key", Strings.bytes("{\"stringField\":\"value\"}"));
         when(redis.multiGetBytes("key")).thenReturn(values);
-        Map<String, TestCache> results = cacheStore.getAll(new String[]{"key"}, mapper, validator);
+        Map<String, TestCache> results = cacheStore.getAll(new String[]{"key"}, context);
         assertThat(results).hasSize(1);
         assertThat(results.get("key").stringField).isEqualTo("value");
     }
@@ -74,7 +71,7 @@ class RedisCacheStoreTest {
                 "key2", Strings.bytes("{}"),
                 "key3", Strings.bytes("{\"listField\": 1}"));
         when(redis.multiGetBytes("key1", "key2", "key3")).thenReturn(values);
-        Map<String, TestCache> results = cacheStore.getAll(new String[]{"key1", "key2", "key3"}, mapper, validator);
+        Map<String, TestCache> results = cacheStore.getAll(new String[]{"key1", "key2", "key3"}, context);
         assertThat(results).hasSize(1);
         assertThat(results.get("key1").stringField).isEqualTo("value");
     }
@@ -82,31 +79,31 @@ class RedisCacheStoreTest {
     @Test
     void getAllWithFailure() {
         when(redis.multiGetBytes("key")).thenThrow(new RedisException("unexpected"));
-        assertThat(cacheStore.getAll(new String[]{"key"}, mapper, validator)).isEmpty();
+        assertThat(cacheStore.getAll(new String[]{"key"}, context)).isEmpty();
     }
 
     @Test
     void put() {
         Duration expiration = Duration.ofHours(1);
         var value = new TestCache();
-        cacheStore.put("key", value, expiration, mapper);
-        verify(redis).set("key", mapper.toJSON(value), expiration, false);
+        cacheStore.put("key", value, expiration, context);
+        verify(redis).set("key", context.writer.toJSON(value), expiration, false);
     }
 
     @Test
     void putWithFailure() {
         var value = new TestCache();
         Duration expiration = Duration.ofHours(1);
-        doThrow(new RedisException("unexpected")).when(redis).set("key", mapper.toJSON(value), expiration, false);
+        doThrow(new RedisException("unexpected")).when(redis).set("key", context.writer.toJSON(value), expiration, false);
 
-        cacheStore.put("key", value, expiration, mapper);
+        cacheStore.put("key", value, expiration, context);
     }
 
     @Test
     void putAll() {
         Duration expiration = Duration.ofHours(1);
         List<CacheStore.Entry<TestCache>> values = List.of(new CacheStore.Entry<>("key", new TestCache()));
-        cacheStore.putAll(values, expiration, mapper);
+        cacheStore.putAll(values, expiration, context);
         verify(redis).multiSet(anyMap(), eq(expiration));
     }
 
@@ -115,7 +112,7 @@ class RedisCacheStoreTest {
         Duration expiration = Duration.ofHours(1);
         doThrow(new RedisException("unexpected")).when(redis).multiSet(anyMap(), eq(expiration));
 
-        cacheStore.putAll(List.of(new CacheStore.Entry<>("key", new TestCache())), expiration, mapper);
+        cacheStore.putAll(List.of(new CacheStore.Entry<>("key", new TestCache())), expiration, context);
     }
 
     @Test

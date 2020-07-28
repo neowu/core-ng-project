@@ -28,8 +28,8 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
     public MessagePublisherImpl(MessageProducer producer, String topic, Class<T> messageClass) {
         this.producer = producer;
         this.topic = topic;
-        writer = new JSONWriter<>(messageClass);
-        validator = new Validator<>(messageClass);
+        writer = JSONWriter.of(messageClass);
+        validator = Validator.of(messageClass);
     }
 
     @Override
