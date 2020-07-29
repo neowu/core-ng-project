@@ -2,7 +2,7 @@ package core.framework.internal.web.request;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
-import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.bean.TestBean;
 import core.framework.internal.web.bean.RequestBeanReader;
 import core.framework.internal.web.bean.TestQueryParamBean;
@@ -25,10 +25,10 @@ class RequestImplTest {
 
     @BeforeEach
     void createRequest() {
-        var beanClassNameValidator = new BeanClassNameValidator();
+        var validator = new BeanClassValidator();
         var reader = new RequestBeanReader();
-        reader.registerQueryParam(TestQueryParamBean.class, beanClassNameValidator);
-        reader.registerBean(TestBean.class, beanClassNameValidator);
+        reader.registerQueryParam(TestQueryParamBean.class, validator.beanClassNameValidator);
+        reader.registerBean(TestBean.class, validator);
         request = new RequestImpl(null, reader);
     }
 

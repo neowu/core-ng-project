@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.HTTPIOHandler;
 import core.framework.internal.web.websocket.ChannelHandler;
@@ -31,8 +30,9 @@ public final class WebSocketConfig {
             context.httpServer.handler.webSocketHandler = new WebSocketHandler(context.logManager, context.httpServer.siteManager.sessionManager, context.httpServer.handler.rateControl);
             context.beanFactory.bind(WebSocketContext.class, null, context.httpServer.handler.webSocketHandler.context);
         }
-        new BeanClassValidator(clientMessageClass, context.serviceRegistry.beanClassNameValidator).validate();
-        new BeanClassValidator(serverMessageClass, context.serviceRegistry.beanClassNameValidator).validate();
+
+        context.beanClassValidator.validate(clientMessageClass);
+        context.beanClassValidator.validate(serverMessageClass);
 
         var handler = new ChannelHandler<>(clientMessageClass, serverMessageClass, listener);
         context.httpServer.handler.webSocketHandler.add(path, handler);

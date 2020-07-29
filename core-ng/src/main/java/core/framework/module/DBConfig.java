@@ -103,7 +103,7 @@ public class DBConfig extends Config {
     }
 
     public <T> void repository(Class<T> entityClass) {
-        if (url == null) throw new Error(format("db url must be configured first, name={}", name));
+        if (url == null) throw new Error("db url must be configured first, name=" + name);
         context.beanFactory.bind(Types.generic(Repository.class, entityClass), name, database.repository(entityClass));
         entityAdded = true;
         entityClasses.add(entityClass);

@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class RequestBeanReader {
+public class RequestBeanReader {    // used by controller and web service
     private final Map<Class<?>, QueryParamContext<?>> queryParamContext = Maps.newHashMap();
     private final Map<Class<?>, BeanContext<?>> beanContext = Maps.newHashMap();
 
@@ -23,9 +23,9 @@ public class RequestBeanReader {
         }
     }
 
-    public void registerBean(Class<?> beanClass, BeanClassNameValidator beanClassNameValidator) {
+    public void registerBean(Class<?> beanClass, BeanClassValidator validator) {
         if (!beanContext.containsKey(beanClass)) {
-            new BeanClassValidator(beanClass, beanClassNameValidator).validate();
+            validator.validate(beanClass);
             beanContext.put(beanClass, new BeanContext<>(beanClass));
         }
     }

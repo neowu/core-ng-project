@@ -16,6 +16,7 @@ import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
+import core.framework.internal.validate.Validator;
 import core.framework.log.ActionLogContext;
 import core.framework.log.Markers;
 import core.framework.mongo.Aggregate;
@@ -51,13 +52,13 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     private final MongoImpl mongo;
     private final Class<T> entityClass;
     private final String collectionName;
-    private final EntityValidator<T> validator;
+    private final Validator<T> validator;
     private com.mongodb.client.MongoCollection<T> collection;
 
     MongoCollectionImpl(MongoImpl mongo, Class<T> entityClass) {
         this.mongo = mongo;
         this.entityClass = entityClass;
-        validator = new EntityValidator<>(entityClass);
+        validator = Validator.of(entityClass);
         collectionName = entityClass.getDeclaredAnnotation(Collection.class).name();
     }
 
@@ -82,7 +83,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     @Override
     public void insert(T entity) {
         var watch = new StopWatch();
-        validator.validate(entity);
+        validator.validate(entity, false);
         try {
             collection().insertOne(entity);
         } finally {
@@ -99,7 +100,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         if (entities == null || entities.isEmpty()) throw new Error("entities must not be empty");
 
         for (T entity : entities)
-            validator.validate(entity);
+            validator.validate(entity, false);
         try {
             collection().insertMany(entities, new InsertManyOptions().ordered(false));
         } finally {
@@ -302,7 +303,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
     public void replace(T entity) {
         var watch = new StopWatch();
         Object id = null;
-        validator.validate(entity);
+        validator.validate(entity, false);
         try {
             id = mongo.codecs.id(entity);
             if (id == null) throw new Error(format("entity must have id, entityClass={}", entityClass.getCanonicalName()));
@@ -321,7 +322,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         if (entities == null || entities.isEmpty()) throw new Error("entities must not be empty");
         int size = entities.size();
         for (T entity : entities)
-            validator.validate(entity);
+            validator.validate(entity, false);
         try {
             List<ReplaceOneModel<T>> models = new ArrayList<>(size);
             for (T entity : entities) {

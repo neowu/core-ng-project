@@ -6,7 +6,7 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.web.bean.RequestBeanWriter;
 import core.framework.internal.web.bean.ResponseBeanReader;
 import core.framework.json.JSON;
@@ -40,14 +40,12 @@ class WebServiceClientTest {
     void createWebServiceClient() {
         httpClient = mock(HTTPClient.class);
 
-        var beanClassNameValidator = new BeanClassNameValidator();
+        var validator = new BeanClassValidator();
         var writer = new RequestBeanWriter();
-        writer.registerQueryParam(TestWebService.TestSearchRequest.class, beanClassNameValidator);
-        writer.registerBean(TestWebService.TestRequest.class, beanClassNameValidator);
-        var reader = new ResponseBeanReader();
-        reader.register(ErrorResponse.class, beanClassNameValidator);
+        writer.registerQueryParam(TestWebService.TestSearchRequest.class, validator.beanClassNameValidator);
+        writer.registerBean(TestWebService.TestRequest.class, validator);
 
-        webServiceClient = new WebServiceClient("http://localhost", httpClient, writer, reader);
+        webServiceClient = new WebServiceClient("http://localhost", httpClient, writer, new ResponseBeanReader());
     }
 
     @Test

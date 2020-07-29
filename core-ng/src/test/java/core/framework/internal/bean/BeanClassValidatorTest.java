@@ -1,6 +1,7 @@
 package core.framework.internal.bean;
 
 import core.framework.internal.reflect.Classes;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,34 +12,39 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * @author neo
  */
 class BeanClassValidatorTest {
+    private BeanClassValidator validator;
+
+    @BeforeEach
+    void createBeanClassValidator() {
+        validator = new BeanClassValidator();
+    }
+
     @Test
     void validate() {
-        new BeanClassValidator(TestBean.class, new BeanClassNameValidator()).validate();
+        validator.validate(TestBean.class);
     }
 
     @Test
     void validateWithList() {
-        assertThatThrownBy(() -> new BeanClassValidator(List.class, new BeanClassNameValidator()).validate())
+        assertThatThrownBy(() -> validator.validate(List.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("class must be bean class");
     }
 
     @Test
     void validateWithDuplicateClassName() {
-        var validator = new BeanClassNameValidator();
-        validator.beanClasses.put(Classes.className(TestBean.class), Void.class);
+        validator.beanClassNameValidator.beanClasses.put(Classes.className(TestBean.class), Void.class);
 
-        assertThatThrownBy(() -> new BeanClassValidator(TestBean.class, validator).validate())
+        assertThatThrownBy(() -> validator.validate(TestBean.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("found bean class with duplicate name which can be confusing");
     }
 
     @Test
     void validateWithDuplicateEnumName() {
-        var validator = new BeanClassNameValidator();
-        validator.beanClasses.put(Classes.className(TestBean.TestEnum.class), Void.class);
+        validator.beanClassNameValidator.beanClasses.put(Classes.className(TestBean.TestEnum.class), Void.class);
 
-        assertThatThrownBy(() -> new BeanClassValidator(TestBean.class, validator).validate())
+        assertThatThrownBy(() -> validator.validate(TestBean.class))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("found bean class with duplicate name which can be confusing");
     }

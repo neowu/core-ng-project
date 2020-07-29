@@ -1,6 +1,5 @@
 package core.framework.internal.web.bean;
 
-import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
@@ -16,7 +15,7 @@ import java.util.Optional;
 /**
  * @author neo
  */
-public class ResponseBeanWriter {
+public class ResponseBeanWriter {   // used by controller and web service
     private final Map<Class<?>, Context<?>> context = Maps.newHashMap();
 
     public ResponseBeanWriter() {
@@ -24,11 +23,11 @@ public class ResponseBeanWriter {
         context.put(AJAXErrorResponse.class, new Context<>(AJAXErrorResponse.class));
     }
 
-    public void register(Type responseType, BeanClassNameValidator beanClassNameValidator) {
+    public void register(Type responseType, BeanClassValidator validator) {
         Class<?> beanClass = ContextHelper.responseBeanClass(responseType);
 
         if (!context.containsKey(beanClass)) {
-            new BeanClassValidator(beanClass, beanClassNameValidator).validate();
+            validator.validate(beanClass);
             context.put(beanClass, new Context<>(beanClass));
         }
     }

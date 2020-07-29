@@ -1,6 +1,6 @@
 package core.framework.internal.web.bean;
 
-import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.bean.TestBean;
 import core.framework.internal.validate.ValidationException;
 import core.framework.util.Lists;
@@ -19,11 +19,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class ResponseBeanWriterTest {
     private ResponseBeanWriter writer;
+    private BeanClassValidator validator;
 
     @BeforeEach
     void createResponseBeanMapper() {
+        validator = new BeanClassValidator();
         writer = new ResponseBeanWriter();
-        writer.register(TestBean.class, new BeanClassNameValidator());
+        writer.register(TestBean.class, validator);
     }
 
     @Test
@@ -66,6 +68,6 @@ class ResponseBeanWriterTest {
 
     @Test
     void register() {
-        writer.register(TestBean.class, new BeanClassNameValidator());
+        writer.register(TestBean.class, validator);
     }
 }

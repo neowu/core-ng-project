@@ -39,7 +39,7 @@ public final class HTTPConfig extends Config {
     public void bean(Class<?> beanClass) {
         logger.info("register bean, class={}", beanClass.getCanonicalName());
         if (beanClass.isEnum()) {   // enum is usually declared to expose constants via /_sys/api, e.g. errorCodes, or pathParams used by controller directly
-            context.serviceRegistry.beanClassNameValidator.validate(beanClass);
+            context.beanClassValidator.beanClassNameValidator.validate(beanClass);
             JSONClassValidator.validateEnum(beanClass);
         } else {
             context.bean(beanClass);

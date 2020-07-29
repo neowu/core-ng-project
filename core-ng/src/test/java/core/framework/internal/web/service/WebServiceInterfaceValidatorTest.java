@@ -3,7 +3,7 @@ package core.framework.internal.web.service;
 import core.framework.api.web.service.GET;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
-import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassValidator;
 import core.framework.util.Types;
 import org.junit.jupiter.api.Test;
 
@@ -17,13 +17,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class WebServiceInterfaceValidatorTest {
     @Test
     void validate() {
-        var validator = new WebServiceInterfaceValidator(TestWebService.class, new BeanClassNameValidator());
+        var validator = new WebServiceInterfaceValidator(TestWebService.class, new BeanClassValidator());
         validator.validate();
     }
 
     @Test
     void validateRequestBeanClass() throws NoSuchMethodException {
-        var validator = new WebServiceInterfaceValidator(TestWebService.class, new BeanClassNameValidator());
+        var validator = new WebServiceInterfaceValidator(TestWebService.class, new BeanClassValidator());
         var method = TestWebService.class.getDeclaredMethod("get", Integer.class);
 
         assertThatThrownBy(() -> validator.validateRequestBeanClass(Integer.class, method))
@@ -38,7 +38,7 @@ class WebServiceInterfaceValidatorTest {
 
     @Test
     void validateResponseBeanType() throws NoSuchMethodException {
-        var validator = new WebServiceInterfaceValidator(TestWebService.class, new BeanClassNameValidator());
+        var validator = new WebServiceInterfaceValidator(TestWebService.class, new BeanClassValidator());
         var method = TestWebService.class.getDeclaredMethod("get", Integer.class);
 
         assertThatThrownBy(() -> validator.validateResponseBeanType(Integer.class, method))
@@ -50,7 +50,7 @@ class WebServiceInterfaceValidatorTest {
 
     @Test
     void duplicateMethodNames() {
-        var validator = new WebServiceInterfaceValidator(WebServiceWithDuplicateMethod.class, new BeanClassNameValidator());
+        var validator = new WebServiceInterfaceValidator(WebServiceWithDuplicateMethod.class, new BeanClassValidator());
 
         assertThatThrownBy(validator::validate)
                 .isInstanceOf(Error.class).hasMessageContaining("found duplicate method name");

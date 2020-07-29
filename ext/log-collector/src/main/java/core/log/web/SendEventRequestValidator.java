@@ -51,7 +51,7 @@ public class SendEventRequestValidator {
             infoLength += entry.getValue().length();
         }
         if (infoLength > maxInfoLength) {
-            throw new BadRequestException(format("info is too long, length={}", infoLength), "EVENT_TOO_LARGE");
+            throw new BadRequestException("info is too long, length=" + infoLength, "EVENT_TOO_LARGE");
         }
     }
 }

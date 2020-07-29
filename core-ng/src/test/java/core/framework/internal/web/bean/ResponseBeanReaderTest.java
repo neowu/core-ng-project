@@ -1,6 +1,6 @@
 package core.framework.internal.web.bean;
 
-import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.bean.TestBean;
 import core.framework.internal.validate.ValidationException;
 import core.framework.json.JSON;
@@ -20,16 +20,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 class ResponseBeanReaderTest {
     private ResponseBeanReader reader;
+    private BeanClassValidator validator;
 
     @BeforeEach
     void createResponseBeanMapper() {
+        validator = new BeanClassValidator();
         reader = new ResponseBeanReader();
-        reader.register(TestBean.class, new BeanClassNameValidator());
+        reader.register(TestBean.class, validator);
     }
 
     @Test
     void register() {
-        reader.register(TestBean.class, new BeanClassNameValidator());
+        reader.register(TestBean.class, validator);
     }
 
     @Test

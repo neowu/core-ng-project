@@ -1,6 +1,5 @@
 package core.framework.internal.web.bean;
 
-import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.reflect.GenericTypes;
@@ -16,18 +15,18 @@ import java.util.Optional;
 /**
  * @author neo
  */
-public class ResponseBeanReader {
+public class ResponseBeanReader {   // used by webservice client
     private final Map<Class<?>, Context<?>> context = Maps.newHashMap();
 
     public ResponseBeanReader() {
         context.put(ErrorResponse.class, new Context<>(ErrorResponse.class));   // webservice client doesn't need AJAXErrorResponse
     }
 
-    public void register(Type responseType, BeanClassNameValidator beanClassNameValidator) {
+    public void register(Type responseType, BeanClassValidator validator) {
         Class<?> beanClass = ContextHelper.responseBeanClass(responseType);
 
         if (!context.containsKey(beanClass)) {
-            new BeanClassValidator(beanClass, beanClassNameValidator).validate();
+            validator.validate(beanClass);
             context.put(beanClass, new Context<>(beanClass));
         }
     }

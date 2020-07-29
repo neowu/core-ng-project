@@ -3,6 +3,7 @@ package core.framework.internal.module;
 import core.framework.api.web.service.QueryParam;
 import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
+import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.inject.BeanFactory;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.json.JSONWriter;
@@ -49,8 +50,10 @@ public class ModuleContext {
     public final StatCollector collector = new StatCollector();
     public final ServiceRegistry serviceRegistry = new ServiceRegistry();
     protected final Map<String, Config> configs = Maps.newHashMap();
+    public BeanClassValidator beanClassValidator = new BeanClassValidator();
     PropertyValidator propertyValidator = new PropertyValidator();
     private BackgroundTaskExecutor backgroundTask;
+
 
     public ModuleContext(LogManager logManager) {
         this.logManager = logManager;
@@ -99,14 +102,14 @@ public class ModuleContext {
             if (reader.containsQueryParam(beanClass)) {
                 throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             }
-            reader.registerQueryParam(beanClass, serviceRegistry.beanClassNameValidator);
+            reader.registerQueryParam(beanClass, beanClassValidator.beanClassNameValidator);
         } else {
             ResponseBeanWriter writer = httpServer.handler.responseBeanWriter;
             if (reader.containsBean(beanClass) || writer.contains(beanClass)) {
                 throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             }
-            reader.registerBean(beanClass, serviceRegistry.beanClassNameValidator);
-            writer.register(beanClass, serviceRegistry.beanClassNameValidator);
+            reader.registerBean(beanClass, beanClassValidator);
+            writer.register(beanClass, beanClassValidator);
         }
     }
 
@@ -141,7 +144,7 @@ public class ModuleContext {
         Set<String> keys = propertyManager.properties.keys();
         propertyValidator.validate(keys);
         propertyValidator = null;   // free object not used anymore
-        serviceRegistry.beanClassNameValidator = null;
+        beanClassValidator = null;
 
         // clear internal object cache after startup
         Validator.clearCache();

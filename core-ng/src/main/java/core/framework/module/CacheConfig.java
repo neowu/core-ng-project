@@ -99,9 +99,8 @@ public class CacheConfig extends Config {
 
     <T> Cache<T> add(Class<T> cacheClass, Duration duration, CacheStore cacheStore) {
         new CacheClassValidator(cacheClass).validate();
-
         String name = cacheName(cacheClass);
-        CacheImpl<T> cache = new CacheImpl<>(name, cacheClass, duration, cacheStore);
+        var cache = new CacheImpl<>(name, cacheClass, duration, cacheStore);
         CacheImpl<?> previous = caches.putIfAbsent(name, cache);
         if (previous != null) throw new Error("found duplicate cache name, name=" + name);
         return cache;

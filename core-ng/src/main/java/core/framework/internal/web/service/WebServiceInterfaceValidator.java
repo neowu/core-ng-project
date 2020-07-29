@@ -8,7 +8,7 @@ import core.framework.api.web.service.PUT;
 import core.framework.api.web.service.Path;
 import core.framework.api.web.service.PathParam;
 import core.framework.http.HTTPMethod;
-import core.framework.internal.bean.BeanClassNameValidator;
+import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.internal.reflect.Methods;
@@ -36,22 +36,22 @@ import static core.framework.util.Strings.format;
  */
 public class WebServiceInterfaceValidator {
     private final Class<?> serviceInterface;
-    private final BeanClassNameValidator beanClassNameValidator;
+    private final BeanClassValidator validator;
     public RequestBeanReader requestBeanReader;
     public RequestBeanWriter requestBeanWriter;
     public ResponseBeanReader responseBeanReader;
     public ResponseBeanWriter responseBeanWriter;
 
-    public WebServiceInterfaceValidator(Class<?> serviceInterface, BeanClassNameValidator beanClassNameValidator) {
+    public WebServiceInterfaceValidator(Class<?> serviceInterface, BeanClassValidator validator) {
         this.serviceInterface = serviceInterface;
-        this.beanClassNameValidator = beanClassNameValidator;
+        this.validator = validator;
     }
 
     public void validate() {
         if (!serviceInterface.isInterface())
             throw new Error("service interface must be interface, serviceInterface=" + serviceInterface.getCanonicalName());
 
-        beanClassNameValidator.validate(serviceInterface);
+        validator.beanClassNameValidator.validate(serviceInterface);
 
         Map<String, Method> methodNames = Maps.newHashMap();
         for (Method method : serviceInterface.getDeclaredMethods()) {
@@ -107,13 +107,13 @@ public class WebServiceInterfaceValidator {
     }
 
     private void registerBean(Class<?> requestBeanClass) {
-        if (requestBeanReader != null) requestBeanReader.registerBean(requestBeanClass, beanClassNameValidator);
-        if (requestBeanWriter != null) requestBeanWriter.registerBean(requestBeanClass, beanClassNameValidator);
+        if (requestBeanReader != null) requestBeanReader.registerBean(requestBeanClass, validator);
+        if (requestBeanWriter != null) requestBeanWriter.registerBean(requestBeanClass, validator);
     }
 
     private void registerQueryParam(Class<?> requestBeanClass) {
-        if (requestBeanReader != null) requestBeanReader.registerQueryParam(requestBeanClass, beanClassNameValidator);
-        if (requestBeanWriter != null) requestBeanWriter.registerQueryParam(requestBeanClass, beanClassNameValidator);
+        if (requestBeanReader != null) requestBeanReader.registerQueryParam(requestBeanClass, validator.beanClassNameValidator);
+        if (requestBeanWriter != null) requestBeanWriter.registerQueryParam(requestBeanClass, validator.beanClassNameValidator);
     }
 
     void validateRequestBeanClass(Class<?> beanClass, Method method) {    // due to it's common to forget @PathParam in service method param, this is to make error message more friendly
@@ -164,8 +164,8 @@ public class WebServiceInterfaceValidator {
         if (isGenericButNotOptional || isValueType)
             throw new Error(format("response bean type must be bean class or Optional<T>, type={}, method={}", beanType.getTypeName(), Methods.path(method)));
 
-        if (responseBeanWriter != null) responseBeanWriter.register(beanType, beanClassNameValidator);
-        if (responseBeanReader != null) responseBeanReader.register(beanType, beanClassNameValidator);
+        if (responseBeanWriter != null) responseBeanWriter.register(beanType, validator);
+        if (responseBeanReader != null) responseBeanReader.register(beanType, validator);
     }
 
     private void validateHTTPMethod(Method method) {
