@@ -1,5 +1,5 @@
 ## Change log
-### 7.5.0 (07/23/2020 - )
+### 7.5.0 (07/23/2020 - 07/29/2020)
 * utils: add Sets.newEnumSet and Maps.newEnumMap shortcuts
 * httpClient: remove HTTPClientBuilder.tlsVersions(), jdk 14.0.2 fixed TLSv1.3 issues
     refer to https://bugs.openjdk.java.net/browse/JDK-8236039, https://github.com/golang/go/issues/35722

@@ -7,7 +7,6 @@ import core.framework.module.App;
 import core.framework.module.SystemModule;
 import core.framework.util.Strings;
 import core.log.web.EventController;
-import core.log.web.SendEventRequestValidator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,8 +26,6 @@ public class LogCollectorApp extends App {
         site().staticContent("/robots.txt");
 
         kafka().publish(LogTopics.TOPIC_EVENT, EventMessage.class);
-
-        bind(SendEventRequestValidator.class);
 
         List<String> allowedOrigins = allowedOrigins(requiredProperty("app.allowedOrigins"));
         List<String> collectCookies = collectCookies(property("app.cookies").orElse(null));

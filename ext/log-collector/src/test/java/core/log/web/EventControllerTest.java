@@ -2,7 +2,6 @@ package core.log.web;
 
 import core.framework.http.ContentType;
 import core.framework.http.HTTPHeaders;
-import core.framework.inject.Inject;
 import core.framework.json.JSON;
 import core.framework.log.message.EventMessage;
 import core.framework.util.Strings;
@@ -33,8 +32,6 @@ import static org.mockito.Mockito.when;
  * @author neo
  */
 class EventControllerTest extends IntegrationTest {
-    @Inject
-    SendEventRequestValidator validator;
     private Request request;
 
     @BeforeEach
@@ -116,7 +113,6 @@ class EventControllerTest extends IntegrationTest {
         when(request.body()).thenReturn(Optional.of(Strings.bytes(JSON.toJSON(sendEventRequest))));
 
         var controller = new EventController(List.of(), null);
-        controller.validator = validator;
         SendEventRequest parsedSendEventRequest = controller.sendEventRequest(request);
 
         assertThat(parsedSendEventRequest).usingRecursiveComparison().isEqualTo(sendEventRequest);

@@ -26,13 +26,12 @@ import java.util.Map;
  * @author neo
  */
 public class EventController {
+    private final SendEventRequestValidator validator = new SendEventRequestValidator();
+    private final JSONReader<SendEventRequest> reader = JSONReader.of(SendEventRequest.class);
     private final List<String> allowedOrigins;
     private final List<String> collectCookies;
-    private final JSONReader<SendEventRequest> reader = JSONReader.of(SendEventRequest.class);
     @Inject
     MessagePublisher<EventMessage> eventMessagePublisher;
-    @Inject
-    SendEventRequestValidator validator;
     private boolean allowAllOrigins;
 
     public EventController(List<String> allowedOrigins, List<String> collectCookies) {
