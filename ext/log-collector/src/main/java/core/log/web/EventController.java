@@ -4,8 +4,9 @@ import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPHeaders;
 import core.framework.inject.Inject;
+import core.framework.internal.json.JSONReader;
 import core.framework.internal.log.LogManager;
-import core.framework.json.Bean;
+import core.framework.internal.validate.ValidationException;
 import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.EventMessage;
@@ -15,7 +16,7 @@ import core.framework.web.Response;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.ForbiddenException;
 
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.Map;
 public class EventController {
     private final List<String> allowedOrigins;
     private final List<String> collectCookies;
-
+    private final JSONReader<SendEventRequest> reader = JSONReader.of(SendEventRequest.class);
     @Inject
     MessagePublisher<EventMessage> eventMessagePublisher;
     @Inject
@@ -51,10 +52,10 @@ public class EventController {
         checkOrigin(origin);
 
         return Response.empty().status(HTTPStatus.OK)
-                       .header("Access-Control-Allow-Origin", origin)
-                       .header("Access-Control-Allow-Methods", "POST, PUT, OPTIONS")
-                       .header("Access-Control-Allow-Headers", "Accept, Content-Type")
-                       .header("Access-Control-Allow-Credentials", "true");         // allow send cross-domain cookies, refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
+                .header("Access-Control-Allow-Origin", origin)
+                .header("Access-Control-Allow-Methods", "POST, PUT, OPTIONS")
+                .header("Access-Control-Allow-Headers", "Accept, Content-Type")
+                .header("Access-Control-Allow-Credentials", "true");         // allow send cross-domain cookies, refer to https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
     }
 
     public Response post(Request request) {
@@ -105,7 +106,7 @@ public class EventController {
         List<Cookie> cookies = new ArrayList<>(collectCookies.size());
         for (String name : collectCookies) {
             request.cookie(new CookieSpec(name))
-                   .ifPresent(value -> cookies.add(new Cookie(name, value)));
+                    .ifPresent(value -> cookies.add(new Cookie(name, value)));
         }
         return cookies;
     }
@@ -127,9 +128,15 @@ public class EventController {
             if (contentType == null || contentType.startsWith(ContentType.TEXT_PLAIN.mediaType)) return null;
             throw new BadRequestException("body must not be null", "INVALID_HTTP_REQUEST");
         }
-        SendEventRequest eventRequest = Bean.fromJSON(SendEventRequest.class, new String(body, StandardCharsets.UTF_8));
-        validator.validate(eventRequest);
-        return eventRequest;
+        try {
+            SendEventRequest eventRequest = reader.fromJSON(body);
+            validator.validate(eventRequest);
+            return eventRequest;
+        } catch (ValidationException e) {
+            throw new BadRequestException(e.getMessage(), e.errorCode(), e);
+        } catch (IOException e) {
+            throw new BadRequestException(e.getMessage(), "INVALID_HTTP_REQUEST", e);
+        }
     }
 
     void checkOrigin(String origin) {

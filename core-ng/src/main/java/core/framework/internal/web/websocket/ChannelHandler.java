@@ -1,7 +1,9 @@
 package core.framework.internal.web.websocket;
 
+import core.framework.internal.json.JSONReader;
+import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.ValidationException;
-import core.framework.internal.web.bean.BeanMapper;
+import core.framework.internal.validate.Validator;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.rate.LimitRate;
@@ -10,24 +12,29 @@ import core.framework.web.websocket.ChannelListener;
 
 import java.io.IOException;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 /**
  * @author neo
  */
-public class ChannelHandler {
-    final ChannelListener<Object> listener;
+public class ChannelHandler<T, V> {
+    final ChannelListener<T, V> listener;
     final LimitRate limitRate;  // only supported annotation currently
-    private final BeanMapper<Object> clientMessageMapper;
-    private final Class<?> serverMessageClass;
-    private final BeanMapper<Object> serverMessageMapper;
 
-    @SuppressWarnings("unchecked")
-    public ChannelHandler(BeanMapper<?> clientMessageMapper, Class<?> serverMessageClass, BeanMapper<?> serverMessageMapper, ChannelListener<?> listener) {
-        this.clientMessageMapper = (BeanMapper<Object>) clientMessageMapper;
+    private final JSONReader<T> clientMessageReader;
+    private final Validator<T> clientMessageValidator;
+
+    private final Class<V> serverMessageClass;
+    private final JSONWriter<V> serverMessageWriter;
+    private final Validator<V> serverMessageValidator;
+
+    public ChannelHandler(Class<T> clientMessageClass, Class<V> serverMessageClass, ChannelListener<T, V> listener) {
+        clientMessageReader = JSONReader.of(clientMessageClass);
+        clientMessageValidator = Validator.of(clientMessageClass);
+
         this.serverMessageClass = serverMessageClass;
-        this.serverMessageMapper = (BeanMapper<Object>) serverMessageMapper;
-        this.listener = (ChannelListener<Object>) listener;
+        serverMessageWriter = JSONWriter.of(serverMessageClass);
+        serverMessageValidator = Validator.of(serverMessageClass);
+
+        this.listener = listener;
         try {
             limitRate = listener.getClass().getDeclaredMethod("onMessage", Channel.class, Object.class).getDeclaredAnnotation(LimitRate.class);
         } catch (NoSuchMethodException e) {
@@ -35,19 +42,20 @@ public class ChannelHandler {
         }
     }
 
-    String toServerMessage(Object message) {
+    String toServerMessage(V message) {
         if (message == null) throw new Error("message must not be null");
         if (!serverMessageClass.equals(message.getClass())) {
             throw new Error(Strings.format("message class does not match, expected={}, actual={}", serverMessageClass.getCanonicalName(), message.getClass().getCanonicalName()));
         }
-        if (this.serverMessageMapper == null) return (String) message;
-        return new String(this.serverMessageMapper.toJSON(message), UTF_8);
+        serverMessageValidator.validate(message, false);
+        return serverMessageWriter.toJSONString(message);
     }
 
-    Object fromClientMessage(String message) {
+    T fromClientMessage(String message) {
         try {
-            if (clientMessageMapper == null) return message;
-            return clientMessageMapper.fromJSON(Strings.bytes(message));
+            T clientMessage = clientMessageReader.fromJSON(message);
+            clientMessageValidator.validate(clientMessage, false);
+            return clientMessage;
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), e.errorCode(), e);
         } catch (IOException e) {  // for invalid json string

@@ -1,9 +1,10 @@
 ## Change log
-### 7.4.15 (07/23/2020 - )
+### 7.5.0 (07/23/2020 - )
 * utils: add Sets.newEnumSet and Maps.newEnumMap shortcuts
 * httpClient: remove HTTPClientBuilder.tlsVersions(), jdk 14.0.2 fixed TLSv1.3 issues
     refer to https://bugs.openjdk.java.net/browse/JDK-8236039, https://github.com/golang/go/issues/35722
-* ide: added javax.annotation.Nullable to improve IDE/Intellij nullability analysis﻿, no runtime impaction
+* ide: added javax.annotation.Nullable to improve IDE/Intellij nullability analysis, no runtime impaction.
+* ws: update channel interface to be generic typing, only support bean message for client/server
 
 ### 7.4.14 (07/13/2020 - 07/23/2020)
 * redis: change expiration precision from second to milliseconds

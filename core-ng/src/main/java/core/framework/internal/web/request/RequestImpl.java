@@ -3,7 +3,7 @@ package core.framework.internal.web.request;
 import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.validate.ValidationException;
-import core.framework.internal.web.bean.RequestBeanMapper;
+import core.framework.internal.web.bean.RequestBeanReader;
 import core.framework.util.Maps;
 import core.framework.web.CookieSpec;
 import core.framework.web.MultipartFile;
@@ -29,7 +29,7 @@ public final class RequestImpl implements Request {
     final Map<String, MultipartFile> files = Maps.newHashMap();
 
     private final HttpServerExchange exchange;
-    private final RequestBeanMapper mapper;
+    private final RequestBeanReader reader;
     public Session session;
 
     HTTPMethod method;
@@ -42,9 +42,9 @@ public final class RequestImpl implements Request {
     byte[] body;
     Map<String, String> cookies;
 
-    public RequestImpl(HttpServerExchange exchange, RequestBeanMapper mapper) {
+    public RequestImpl(HttpServerExchange exchange, RequestBeanReader reader) {
         this.exchange = exchange;
-        this.mapper = mapper;
+        this.reader = reader;
     }
 
     @Override
@@ -124,12 +124,12 @@ public final class RequestImpl implements Request {
     public <T> T bean(Class<T> beanClass) {
         try {
             if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-                return mapper.fromParams(beanClass, queryParams);
+                return reader.fromParams(beanClass, queryParams);
             } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT || method == HTTPMethod.PATCH) {
                 if (!formParams.isEmpty()) {
-                    return mapper.fromParams(beanClass, formParams);
+                    return reader.fromParams(beanClass, formParams);
                 } else if (body != null && contentType != null && ContentType.APPLICATION_JSON.mediaType.equals(contentType.mediaType)) {
-                    return mapper.fromJSON(beanClass, body);
+                    return reader.fromJSON(beanClass, body);
                 }
                 throw new BadRequestException(format("body is missing or unsupported content type, method={}, contentType={}", method, contentType), "INVALID_HTTP_REQUEST");
             } else {

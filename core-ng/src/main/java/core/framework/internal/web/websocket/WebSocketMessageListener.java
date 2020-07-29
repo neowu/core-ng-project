@@ -31,7 +31,8 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
 
     @Override
     protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage) {
-        var wrapper = (ChannelImpl) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
+        @SuppressWarnings("unchecked")
+        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
         ActionLog actionLog = logManager.begin("=== ws message handling begin ===");
         try {
             actionLog.action(wrapper.action);
@@ -53,7 +54,7 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
         }
     }
 
-    private void validateRate(ChannelImpl wrapper) {
+    private void validateRate(ChannelImpl<?, ?> wrapper) {
         if (rateControl.config != null && wrapper.handler.limitRate != null) {
             rateControl.validateRate(wrapper.handler.limitRate.value(), wrapper.clientIP);
         }
@@ -61,7 +62,8 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
 
     @Override
     protected void onCloseMessage(CloseMessage message, WebSocketChannel channel) {
-        var wrapper = (ChannelImpl) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
+        @SuppressWarnings("unchecked")
+        var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
         ActionLog actionLog = logManager.begin("=== ws close message handling begin ===");
         try {
             actionLog.action(wrapper.action + ":close");
@@ -81,7 +83,7 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
         }
     }
 
-    private void linkContext(WebSocketChannel channel, ChannelImpl wrapper, ActionLog actionLog) {
+    private void linkContext(WebSocketChannel channel, ChannelImpl<?, ?> wrapper, ActionLog actionLog) {
         actionLog.context("channel", wrapper.id);
         logger.debug("refId={}", wrapper.refId);
         List<String> refIds = List.of(wrapper.refId);

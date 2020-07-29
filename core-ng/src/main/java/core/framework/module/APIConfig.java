@@ -7,8 +7,8 @@ import core.framework.http.HTTPMethod;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.api.APIDefinitionResponse;
-import core.framework.internal.web.bean.RequestBeanMapper;
-import core.framework.internal.web.bean.ResponseBeanMapper;
+import core.framework.internal.web.bean.RequestBeanWriter;
+import core.framework.internal.web.bean.ResponseBeanReader;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.http.IPv4AccessControl;
 import core.framework.internal.web.http.IPv4Ranges;
@@ -37,18 +37,22 @@ public class APIConfig extends Config {
     ModuleContext context;
     private HTTPClientBuilder httpClientBuilder;
     private HTTPClient httpClient;
+    private RequestBeanWriter writer;
+    private ResponseBeanReader reader;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
         // default value is for internal api call only, targeting for kube env (with short connect timeout and more retries)
         httpClientBuilder = HTTPClient.builder()
-                                      .userAgent(WebServiceClient.USER_AGENT)
-                                      .trustAll()
-                                      .connectTimeout(Duration.ofSeconds(2))
-                                      .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
-                                      .slowOperationThreshold(Duration.ofSeconds(10))
-                                      .maxRetries(5);
+                .userAgent(WebServiceClient.USER_AGENT)
+                .trustAll()
+                .connectTimeout(Duration.ofSeconds(2))
+                .timeout(Duration.ofSeconds(20))    // refer to: kube graceful shutdown period is 30s, db timeout is 15s
+                .slowOperationThreshold(Duration.ofSeconds(10))
+                .maxRetries(5);
+        writer = new RequestBeanWriter();
+        reader = new ResponseBeanReader();
     }
 
     @Override
@@ -58,10 +62,10 @@ public class APIConfig extends Config {
 
     public <T> void service(Class<T> serviceInterface, T service) {
         logger.info("create web service, interface={}", serviceInterface.getCanonicalName());
-        new WebServiceInterfaceValidator(serviceInterface,
-                context.httpServer.handler.requestBeanMapper,
-                context.httpServer.handler.responseBeanMapper,
-                context.serviceRegistry.beanClassNameValidator).validate();
+        var validator = new WebServiceInterfaceValidator(serviceInterface, context.serviceRegistry.beanClassNameValidator);
+        validator.requestBeanReader = context.httpServer.handler.requestBeanReader;
+        validator.responseBeanWriter = context.httpServer.handler.responseBeanWriter;
+        validator.validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
         context.serviceRegistry.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate, duplication will failed to register route
 
@@ -89,12 +93,13 @@ public class APIConfig extends Config {
 
     public <T> T createClient(Class<T> serviceInterface, String serviceURL) {
         logger.info("create web service client, interface={}, serviceURL={}", serviceInterface.getCanonicalName(), serviceURL);
-        RequestBeanMapper requestBeanMapper = context.httpServer.handler.requestBeanMapper;
-        ResponseBeanMapper responseBeanMapper = context.httpServer.handler.responseBeanMapper;
-        new WebServiceInterfaceValidator(serviceInterface, requestBeanMapper, responseBeanMapper, context.serviceRegistry.beanClassNameValidator).validate();
+        var validator = new WebServiceInterfaceValidator(serviceInterface, context.serviceRegistry.beanClassNameValidator);
+        validator.requestBeanWriter = writer;
+        validator.responseBeanReader = reader;
+        validator.validate();
 
         HTTPClient httpClient = getOrCreateHTTPClient();
-        var webServiceClient = new WebServiceClient(serviceURL, httpClient, requestBeanMapper, responseBeanMapper);
+        var webServiceClient = new WebServiceClient(serviceURL, httpClient, writer, reader);
         return createWebServiceClient(serviceInterface, webServiceClient);
     }
 

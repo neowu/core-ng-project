@@ -1,5 +1,6 @@
 package core.log.web;
 
+import core.framework.internal.validate.Validator;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
 
@@ -13,8 +14,10 @@ import static core.framework.util.Strings.format;
 public class SendEventRequestValidator {
     private static final int MAX_CONTEXT_VALUE_LENGTH = 1000;
     private static final int MAX_INFO_LENGTH = 900000;  // by default kafka message limit is 1M, leave 100k for rest of message (with compression the room is actually large)
+    private final Validator<SendEventRequest> validator = Validator.of(SendEventRequest.class);
 
     void validate(SendEventRequest request) {
+        validator.validate(request, false);
         for (SendEventRequest.Event event : request.events) {
             validate(event);
         }

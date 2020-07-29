@@ -6,8 +6,6 @@ import core.framework.internal.web.session.SessionImpl;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.web.Session;
 import core.framework.web.exception.BadRequestException;
-import core.framework.web.websocket.Channel;
-import core.framework.web.websocket.ChannelListener;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,32 +34,32 @@ class WebSocketHandlerTest {
     @Test
     void add() {
         assertThatThrownBy(() -> handler.add("/ws/:name", null))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("listener path must be static");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("listener path must be static");
 
-        assertThatThrownBy(() -> handler.add("/ws", new ChannelHandler(null, null, null, (channel, message) -> {
+        assertThatThrownBy(() -> handler.add("/ws", new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, (channel, message) -> {
         }))).isInstanceOf(Error.class)
-            .hasMessageContaining("listener class must not be anonymous class or lambda");
+                .hasMessageContaining("listener class must not be anonymous class or lambda");
 
-        ChannelHandler handler = new ChannelHandler(null, null, null, new TestChannelListener());
+        ChannelHandler<?, ?> handler = new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener());
         this.handler.add("/ws", handler);
         assertThatThrownBy(() -> this.handler.add("/ws", handler))
-            .isInstanceOf(Error.class)
-            .hasMessageContaining("found duplicate channel listener");
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("found duplicate channel listener");
     }
 
     @Test
     void checkWebSocket() {
         var headers = new HeaderMap()
-            .put(Headers.SEC_WEB_SOCKET_KEY, "xxx")
-            .put(Headers.SEC_WEB_SOCKET_VERSION, "13");
+                .put(Headers.SEC_WEB_SOCKET_KEY, "xxx")
+                .put(Headers.SEC_WEB_SOCKET_VERSION, "13");
 
         assertThat(handler.checkWebSocket(HTTPMethod.GET, headers)).isTrue();
         assertThat(handler.checkWebSocket(HTTPMethod.PUT, headers)).isFalse();
 
         assertThatThrownBy(() -> handler.checkWebSocket(HTTPMethod.GET, headers.put(Headers.SEC_WEB_SOCKET_VERSION, "07")))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("only support web socket version 13");
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("only support web socket version 13");
     }
 
     @Test
@@ -73,12 +71,5 @@ class WebSocketHandlerTest {
         when(sessionManager.load(any(), any())).thenReturn(null);
         session = handler.loadSession(null, null);
         assertThat(session).isNull();
-    }
-
-    static class TestChannelListener implements ChannelListener<String> {
-        @Override
-        public void onMessage(Channel channel, String message) {
-
-        }
     }
 }

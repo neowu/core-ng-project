@@ -17,11 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author neo
  */
-public class ChannelImpl implements Channel, Channel.Context {
+public class ChannelImpl<T, V> implements Channel<V>, Channel.Context {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelImpl.class);
     final String id = UUID.randomUUID().toString();
     final Set<String> rooms = Sets.newConcurrentHashSet();
-    final ChannelHandler handler;
+    final ChannelHandler<T, V> handler;
     private final WebSocketChannel channel;
     private final Map<String, Object> context = new ConcurrentHashMap<>();
     private final WebSocketContextImpl webSocketContext;
@@ -29,14 +29,14 @@ public class ChannelImpl implements Channel, Channel.Context {
     String clientIP;
     String refId;
 
-    ChannelImpl(WebSocketChannel channel, WebSocketContextImpl webSocketContext, ChannelHandler handler) {
+    ChannelImpl(WebSocketChannel channel, WebSocketContextImpl webSocketContext, ChannelHandler<T, V> handler) {
         this.channel = channel;
         this.webSocketContext = webSocketContext;
         this.handler = handler;
     }
 
     @Override
-    public <T> void send(T message) {
+    public void send(V message) {
         var watch = new StopWatch();
         String text = handler.toServerMessage(message);
 

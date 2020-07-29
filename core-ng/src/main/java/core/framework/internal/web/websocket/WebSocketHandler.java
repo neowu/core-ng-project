@@ -34,7 +34,7 @@ public class WebSocketHandler {
     public final WebSocketContextImpl context = new WebSocketContextImpl();
 
     private final Handshake handshake = new Hybi13Handshake();
-    private final Map<String, ChannelHandler> handlers = new HashMap<>();
+    private final Map<String, ChannelHandler<?, ?>> handlers = new HashMap<>();
 
     // passes to AsyncWebSocketHttpServerExchange as peerConnections, channel will remove self on close
     // refer to io.undertow.websockets.core.WebSocketChannel.WebSocketChannel
@@ -66,7 +66,8 @@ public class WebSocketHandler {
         String action = "ws:" + path;
         actionLog.action(action + ":open");
 
-        ChannelHandler handler = handlers.get(path);
+        @SuppressWarnings("unchecked")
+        ChannelHandler<Object, Object> handler = (ChannelHandler<Object, Object>) handlers.get(path);
         if (handler == null) throw new NotFoundException("not found, path=" + path, "PATH_NOT_FOUND");
 
         request.session = loadSession(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
@@ -75,7 +76,7 @@ public class WebSocketHandler {
         exchange.upgradeChannel((connection, httpServerExchange) -> {
             WebSocketChannel channel = handshake.createChannel(webSocketExchange, connection, webSocketExchange.getBufferPool());
             try {
-                var wrapper = new ChannelImpl(channel, context, handler);
+                var wrapper = new ChannelImpl<>(channel, context, handler);
                 wrapper.action = action;
                 wrapper.clientIP = request.clientIP();
                 wrapper.refId = actionLog.id;   // with ws, correlationId and refId are same as parent http action id
@@ -111,14 +112,14 @@ public class WebSocketHandler {
         }
     }
 
-    public void add(String path, ChannelHandler handler) {
+    public void add(String path, ChannelHandler<?, ?> handler) {
         if (path.contains("/:")) throw new Error("listener path must be static, path=" + path);
 
         Class<?> listenerClass = handler.listener.getClass();
         if (listenerClass.isSynthetic())
             throw new Error("listener class must not be anonymous class or lambda, please create static class, listenerClass=" + listenerClass.getCanonicalName());
 
-        ChannelHandler previous = handlers.putIfAbsent(path, handler);
+        ChannelHandler<?, ?> previous = handlers.putIfAbsent(path, handler);
         if (previous != null) throw new Error(format("found duplicate channel listener, path={}, previousListener={}", path, previous.listener.getClass().getCanonicalName()));
     }
 }

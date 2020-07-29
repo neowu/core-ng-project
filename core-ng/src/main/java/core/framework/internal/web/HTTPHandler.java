@@ -2,9 +2,8 @@ package core.framework.internal.web;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
-import core.framework.internal.web.bean.BeanMappers;
-import core.framework.internal.web.bean.RequestBeanMapper;
-import core.framework.internal.web.bean.ResponseBeanMapper;
+import core.framework.internal.web.bean.RequestBeanReader;
+import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.controller.Interceptors;
 import core.framework.internal.web.controller.InvocationImpl;
@@ -44,9 +43,9 @@ public class HTTPHandler implements HttpHandler {
     public final WebContextImpl webContext = new WebContextImpl();
     public final HTTPErrorHandler errorHandler;
 
-    public final BeanMappers beanMappers = new BeanMappers();
-    public final RequestBeanMapper requestBeanMapper = new RequestBeanMapper(beanMappers);
-    public final ResponseBeanMapper responseBeanMapper = new ResponseBeanMapper(beanMappers);
+    public final RequestBeanReader requestBeanReader = new RequestBeanReader();
+    public final ResponseBeanWriter responseBeanWriter = new ResponseBeanWriter();
+
     public final RateControl rateControl = new RateControl(1000);   // save at max 1000 group/ip combination
 
     private final Logger logger = LoggerFactory.getLogger(HTTPHandler.class);
@@ -60,7 +59,7 @@ public class HTTPHandler implements HttpHandler {
     HTTPHandler(LogManager logManager, SessionManager sessionManager, TemplateManager templateManager) {
         this.logManager = logManager;
         this.sessionManager = sessionManager;
-        responseHandler = new ResponseHandler(responseBeanMapper, templateManager, sessionManager);
+        responseHandler = new ResponseHandler(responseBeanWriter, templateManager, sessionManager);
         errorHandler = new HTTPErrorHandler(responseHandler);
     }
 
@@ -76,7 +75,7 @@ public class HTTPHandler implements HttpHandler {
 
     private void handle(HttpServerExchange exchange) {
         ActionLog actionLog = logManager.begin("=== http transaction begin ===");
-        var request = new RequestImpl(exchange, requestBeanMapper);
+        var request = new RequestImpl(exchange, requestBeanReader);
         try {
             webContext.initialize(request);
             requestParser.parse(request, exchange, actionLog);

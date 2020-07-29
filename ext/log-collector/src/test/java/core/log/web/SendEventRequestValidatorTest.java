@@ -4,6 +4,7 @@ import core.framework.web.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,9 +52,11 @@ class SendEventRequestValidatorTest {
     private SendEventRequest request(SendEventRequest.Result result, String action, String errorCode) {
         SendEventRequest request = new SendEventRequest();
         var event = new SendEventRequest.Event();
+        event.date = ZonedDateTime.now();
         event.result = result;
         event.action = action;
         event.errorCode = errorCode;
+        event.elapsedTime = 1000L;
         request.events.add(event);
         return request;
     }

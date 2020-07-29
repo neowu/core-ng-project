@@ -22,7 +22,7 @@ public final class BeanBody implements Body {
 
     @Override
     public void send(Sender sender, ResponseHandlerContext context) {
-        byte[] body = context.responseBeanMapper.toJSON(bean);
+        byte[] body = context.writer.toJSON(bean);
         LOGGER.debug("[response] body={}", new JSONLogParam(body, UTF_8));
         sender.send(ByteBuffer.wrap(body));
     }

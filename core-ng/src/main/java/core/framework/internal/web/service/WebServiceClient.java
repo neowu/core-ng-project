@@ -9,8 +9,8 @@ import core.framework.http.HTTPResponse;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.web.HTTPHandler;
-import core.framework.internal.web.bean.RequestBeanMapper;
-import core.framework.internal.web.bean.ResponseBeanMapper;
+import core.framework.internal.web.bean.RequestBeanWriter;
+import core.framework.internal.web.bean.ResponseBeanReader;
 import core.framework.log.Severity;
 import core.framework.util.Maps;
 import core.framework.web.service.RemoteServiceException;
@@ -49,15 +49,15 @@ public class WebServiceClient {
 
     private final String serviceURL;
     private final HTTPClient httpClient;
-    private final RequestBeanMapper requestBeanMapper;
-    private final ResponseBeanMapper responseBeanMapper;
+    private final RequestBeanWriter writer;
+    private final ResponseBeanReader reader;
     private WebServiceClientInterceptor interceptor;
 
-    public WebServiceClient(String serviceURL, HTTPClient httpClient, RequestBeanMapper requestBeanMapper, ResponseBeanMapper responseBeanMapper) {
+    public WebServiceClient(String serviceURL, HTTPClient httpClient, RequestBeanWriter writer, ResponseBeanReader reader) {
         this.serviceURL = serviceURL;
         this.httpClient = httpClient;
-        this.requestBeanMapper = requestBeanMapper;
-        this.responseBeanMapper = responseBeanMapper;
+        this.writer = writer;
+        this.reader = reader;
     }
 
     // used by generated code, must be public
@@ -83,7 +83,7 @@ public class WebServiceClient {
         }
 
         try {
-            return responseBeanMapper.fromJSON(responseType, response.body);
+            return reader.fromJSON(responseType, response.body);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -103,10 +103,10 @@ public class WebServiceClient {
     <T> void putRequestBean(HTTPRequest request, Class<T> requestBeanClass, T requestBean) {
         HTTPMethod method = request.method;
         if (method == HTTPMethod.GET || method == HTTPMethod.DELETE) {
-            Map<String, String> queryParams = requestBeanMapper.toParams(requestBeanClass, requestBean);
+            Map<String, String> queryParams = writer.toParams(requestBeanClass, requestBean);
             request.params.putAll(queryParams);
         } else if (method == HTTPMethod.POST || method == HTTPMethod.PUT || method == HTTPMethod.PATCH) {
-            byte[] json = requestBeanMapper.toJSON(requestBeanClass, requestBean);
+            byte[] json = writer.toJSON(requestBeanClass, requestBean);
             request.body(json, ContentType.APPLICATION_JSON);
         } else {
             throw new Error("not supported method, method=" + method);
@@ -143,7 +143,7 @@ public class WebServiceClient {
 
     private ErrorResponse errorResponse(HTTPResponse response) {
         try {
-            return (ErrorResponse) responseBeanMapper.fromJSON(ErrorResponse.class, response.body);
+            return (ErrorResponse) reader.fromJSON(ErrorResponse.class, response.body);
         } catch (Throwable e) {
             int statusCode = response.statusCode;
             throw new RemoteServiceException(format("internal communication failed, statusCode={}, responseText={}", statusCode, response.text()), Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode), e);

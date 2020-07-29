@@ -5,9 +5,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-interface QueryParamMapper<T> {
-    Map<String, String> toParams(T bean);
-
+public interface QueryParamReader<T> {
     // in query string or form url encoding body, key=value, the value can be empty string
     // with use cases
     //  1. api client calls web service (possibly client uses old version of QueryParamBean)

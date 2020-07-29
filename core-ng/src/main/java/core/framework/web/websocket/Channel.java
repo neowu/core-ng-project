@@ -5,8 +5,8 @@ import javax.annotation.Nullable;
 /**
  * @author neo
  */
-public interface Channel {
-    <T> void send(T message);
+public interface Channel<V> {
+    void send(V message);
 
     Context context();
 

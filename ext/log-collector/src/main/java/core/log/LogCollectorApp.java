@@ -1,14 +1,12 @@
 package core.log;
 
 import core.framework.http.HTTPMethod;
-import core.framework.json.Bean;
 import core.framework.log.message.EventMessage;
 import core.framework.log.message.LogTopics;
 import core.framework.module.App;
 import core.framework.module.SystemModule;
 import core.framework.util.Strings;
 import core.log.web.EventController;
-import core.log.web.SendEventRequest;
 import core.log.web.SendEventRequestValidator;
 
 import java.util.Arrays;
@@ -37,7 +35,6 @@ public class LogCollectorApp extends App {
         EventController controller = bind(new EventController(allowedOrigins, collectCookies));
         http().route(HTTPMethod.OPTIONS, "/event/:app", controller::options);
         http().route(HTTPMethod.POST, "/event/:app", controller::post);  // event will be sent via ajax or navigator.sendBeacon(), refer to https://developer.mozilla.org/en-US/docs/Web/API/Navigator/sendBeacon
-        Bean.register(SendEventRequest.class);
     }
 
     List<String> collectCookies(String value) {

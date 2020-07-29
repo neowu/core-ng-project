@@ -13,8 +13,10 @@ import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.internal.reflect.Methods;
 import core.framework.internal.reflect.Params;
-import core.framework.internal.web.bean.RequestBeanMapper;
-import core.framework.internal.web.bean.ResponseBeanMapper;
+import core.framework.internal.web.bean.RequestBeanReader;
+import core.framework.internal.web.bean.RequestBeanWriter;
+import core.framework.internal.web.bean.ResponseBeanReader;
+import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.internal.web.route.PathPatternValidator;
 import core.framework.util.Maps;
 import core.framework.util.Sets;
@@ -34,14 +36,14 @@ import static core.framework.util.Strings.format;
  */
 public class WebServiceInterfaceValidator {
     private final Class<?> serviceInterface;
-    private final RequestBeanMapper requestBeanMapper;
-    private final ResponseBeanMapper responseBeanMapper;
     private final BeanClassNameValidator beanClassNameValidator;
+    public RequestBeanReader requestBeanReader;
+    public RequestBeanWriter requestBeanWriter;
+    public ResponseBeanReader responseBeanReader;
+    public ResponseBeanWriter responseBeanWriter;
 
-    public WebServiceInterfaceValidator(Class<?> serviceInterface, RequestBeanMapper requestBeanMapper, ResponseBeanMapper responseBeanMapper, BeanClassNameValidator beanClassNameValidator) {
+    public WebServiceInterfaceValidator(Class<?> serviceInterface, BeanClassNameValidator beanClassNameValidator) {
         this.serviceInterface = serviceInterface;
-        this.requestBeanMapper = requestBeanMapper;
-        this.responseBeanMapper = responseBeanMapper;
         this.beanClassNameValidator = beanClassNameValidator;
     }
 
@@ -93,15 +95,25 @@ public class WebServiceInterfaceValidator {
                 validateRequestBeanClass(requestBeanClass, method);
 
                 if (httpMethod == HTTPMethod.GET || httpMethod == HTTPMethod.DELETE) {
-                    requestBeanMapper.registerQueryParamBean(requestBeanClass, beanClassNameValidator);
+                    registerQueryParam(requestBeanClass);
                 } else {
-                    requestBeanMapper.registerRequestBean(requestBeanClass, beanClassNameValidator);
+                    registerBean(requestBeanClass);
                 }
             }
         }
 
         if (pathVariables.size() != pathParams.size() || !pathVariables.containsAll(pathParams))
             throw new Error(format("service method @PathParam params must match variable in path pattern, path={}, method={}", path.value(), Methods.path(method)));
+    }
+
+    private void registerBean(Class<?> requestBeanClass) {
+        if (requestBeanReader != null) requestBeanReader.registerBean(requestBeanClass, beanClassNameValidator);
+        if (requestBeanWriter != null) requestBeanWriter.registerBean(requestBeanClass, beanClassNameValidator);
+    }
+
+    private void registerQueryParam(Class<?> requestBeanClass) {
+        if (requestBeanReader != null) requestBeanReader.registerQueryParam(requestBeanClass, beanClassNameValidator);
+        if (requestBeanWriter != null) requestBeanWriter.registerQueryParam(requestBeanClass, beanClassNameValidator);
     }
 
     void validateRequestBeanClass(Class<?> beanClass, Method method) {    // due to it's common to forget @PathParam in service method param, this is to make error message more friendly
@@ -152,7 +164,8 @@ public class WebServiceInterfaceValidator {
         if (isGenericButNotOptional || isValueType)
             throw new Error(format("response bean type must be bean class or Optional<T>, type={}, method={}", beanType.getTypeName(), Methods.path(method)));
 
-        responseBeanMapper.register(beanType, beanClassNameValidator);
+        if (responseBeanWriter != null) responseBeanWriter.register(beanType, beanClassNameValidator);
+        if (responseBeanReader != null) responseBeanReader.register(beanType, beanClassNameValidator);
     }
 
     private void validateHTTPMethod(Method method) {

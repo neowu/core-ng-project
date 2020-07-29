@@ -16,11 +16,11 @@ class ChannelCloseListener implements org.xnio.ChannelListener<WebSocketChannel>
 
     @Override
     public void handleEvent(WebSocketChannel channel) {
-        var wrapper = (ChannelImpl) channel.getAttribute(CHANNEL_KEY);
+        var wrapper = (ChannelImpl<?, ?>) channel.getAttribute(CHANNEL_KEY);
         remove(wrapper);
     }
 
-    void remove(ChannelImpl wrapper) {
+    void remove(ChannelImpl<?, ?> wrapper) {
         context.remove(wrapper);
     }
 }

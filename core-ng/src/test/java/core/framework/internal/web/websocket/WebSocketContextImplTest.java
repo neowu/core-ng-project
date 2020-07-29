@@ -1,7 +1,10 @@
 package core.framework.internal.web.websocket;
 
+import core.framework.web.websocket.Channel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,9 +21,10 @@ class WebSocketContextImplTest {
 
     @Test
     void join() {
-        var channel = new ChannelImpl(null, context, null);
+        var channel = new ChannelImpl<TestWebSocketMessage, TestWebSocketMessage>(null, context, null);
         channel.join("room1");
-        assertThat(context.room("room1")).containsOnly(channel);
+        List<Channel<TestWebSocketMessage>> room = context.room("room1");
+        assertThat(room).containsOnly(channel);
 
         channel.leave("room1");
         assertThat(context.room("room1")).isEmpty();
@@ -28,7 +32,7 @@ class WebSocketContextImplTest {
 
     @Test
     void remove() {
-        var channel = new ChannelImpl(null, context, null);
+        var channel = new ChannelImpl<TestWebSocketMessage, TestWebSocketMessage>(null, context, null);
         channel.join("room1");
         channel.join("room2");
 
@@ -39,10 +43,11 @@ class WebSocketContextImplTest {
 
     @Test
     void all() {
-        var channel = new ChannelImpl(null, context, null);
+        var channel = new ChannelImpl<TestWebSocketMessage, TestWebSocketMessage>(null, context, null);
         context.add(channel);
 
-        assertThat(context.all()).containsOnly(channel);
+        List<Channel<TestWebSocketMessage>> all = context.all();
+        assertThat(all).containsOnly(channel);
 
         context.remove(channel);
         assertThat(context.all()).isEmpty();

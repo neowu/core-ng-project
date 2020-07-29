@@ -2,8 +2,6 @@ package core.framework.internal.json;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -13,10 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
-import core.framework.util.Strings;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -35,7 +30,7 @@ import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 /**
  * @author neo
  */
-public class JSONMapper<T> {
+public class JSONMapper {
     public static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
 
     private static ObjectMapper createObjectMapper() {
@@ -79,28 +74,5 @@ public class JSONMapper<T> {
                 .append(localTimeFormatter)
                 .toFormatter()));
         return module;
-    }
-
-    // used internally, performance is top priority in design, reader is about 3~6% faster than mapper since type is pre determined
-    // refer to https://github.com/FasterXML/jackson-docs/wiki/Presentation:-Jackson-Performance
-    public final ObjectReader reader;
-    private final ObjectWriter writer;
-
-    public JSONMapper(Class<?> instanceClass) {
-        reader = OBJECT_MAPPER.readerFor(instanceClass);
-        writer = OBJECT_MAPPER.writerFor(instanceClass);
-    }
-
-    public T fromJSON(byte[] json) throws IOException {
-        return reader.readValue(json);
-    }
-
-    // with jdk 11, write to String then covert to byte[] is faster than write to byte[]
-    public byte[] toJSON(T instance) {
-        try {
-            return Strings.bytes(writer.writeValueAsString(instance));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 }

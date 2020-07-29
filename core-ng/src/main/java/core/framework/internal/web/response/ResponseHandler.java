@@ -3,7 +3,7 @@ package core.framework.internal.web.response;
 import core.framework.api.http.HTTPStatus;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.filter.FieldLogParam;
-import core.framework.internal.web.bean.ResponseBeanMapper;
+import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.internal.web.request.RequestImpl;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.internal.web.site.TemplateManager;
@@ -28,8 +28,8 @@ public class ResponseHandler {
     private final ResponseHandlerContext context;
     private final SessionManager sessionManager;
 
-    public ResponseHandler(ResponseBeanMapper mapper, TemplateManager templateManager, SessionManager sessionManager) {
-        context = new ResponseHandlerContext(mapper, templateManager);
+    public ResponseHandler(ResponseBeanWriter writer, TemplateManager templateManager, SessionManager sessionManager) {
+        context = new ResponseHandlerContext(writer, templateManager);
         this.sessionManager = sessionManager;
     }
 

@@ -20,7 +20,7 @@ class ChannelCloseListenerTest {
 
     @Test
     void remove() {
-        var channel = new ChannelImpl(null, context, null);
+        var channel = new ChannelImpl<TestWebSocketMessage, TestWebSocketMessage>(null, context, null);
         context.join(channel, "room1");
         assertThat(context.room("room1")).hasSize(1);
 

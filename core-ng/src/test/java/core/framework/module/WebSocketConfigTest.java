@@ -3,8 +3,8 @@ package core.framework.module;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.HTTPIOHandler;
-import core.framework.web.websocket.Channel;
-import core.framework.web.websocket.ChannelListener;
+import core.framework.internal.web.websocket.TestChannelListener;
+import core.framework.internal.web.websocket.TestWebSocketMessage;
 import core.framework.web.websocket.WebSocketContext;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,23 +27,16 @@ class WebSocketConfigTest {
 
     @Test
     void withReservedPath() {
-        assertThatThrownBy(() -> config.listen(HTTPIOHandler.HEALTH_CHECK_PATH, new TestChannelListener()))
+        assertThatThrownBy(() -> config.listen(HTTPIOHandler.HEALTH_CHECK_PATH, TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener()))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("/health-check is reserved path");
     }
 
     @Test
     void add() {
-        config.listen("/ws2", new TestChannelListener());
+        config.listen("/ws2", TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener());
 
         WebSocketContext webSocketContext = (WebSocketContext) config.context.beanFactory.bean(WebSocketContext.class, null);
         assertThat(webSocketContext).isNotNull();
-    }
-
-    static class TestChannelListener implements ChannelListener<String> {
-        @Override
-        public void onMessage(Channel channel, String message) {
-
-        }
     }
 }

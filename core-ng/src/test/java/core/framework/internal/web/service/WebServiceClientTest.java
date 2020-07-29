@@ -7,9 +7,8 @@ import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
 import core.framework.internal.bean.BeanClassNameValidator;
-import core.framework.internal.web.bean.BeanMappers;
-import core.framework.internal.web.bean.RequestBeanMapper;
-import core.framework.internal.web.bean.ResponseBeanMapper;
+import core.framework.internal.web.bean.RequestBeanWriter;
+import core.framework.internal.web.bean.ResponseBeanReader;
 import core.framework.json.JSON;
 import core.framework.log.Severity;
 import core.framework.util.Strings;
@@ -41,15 +40,14 @@ class WebServiceClientTest {
     void createWebServiceClient() {
         httpClient = mock(HTTPClient.class);
 
-        var registry = new BeanMappers();
         var beanClassNameValidator = new BeanClassNameValidator();
-        var requestBeanMapper = new RequestBeanMapper(registry);
-        var responseBeanMapper = new ResponseBeanMapper(registry);
-        requestBeanMapper.registerQueryParamBean(TestWebService.TestSearchRequest.class, beanClassNameValidator);
-        requestBeanMapper.registerRequestBean(TestWebService.TestRequest.class, beanClassNameValidator);
-        responseBeanMapper.register(ErrorResponse.class, beanClassNameValidator);
+        var writer = new RequestBeanWriter();
+        writer.registerQueryParam(TestWebService.TestSearchRequest.class, beanClassNameValidator);
+        writer.registerBean(TestWebService.TestRequest.class, beanClassNameValidator);
+        var reader = new ResponseBeanReader();
+        reader.register(ErrorResponse.class, beanClassNameValidator);
 
-        webServiceClient = new WebServiceClient("http://localhost", httpClient, requestBeanMapper, responseBeanMapper);
+        webServiceClient = new WebServiceClient("http://localhost", httpClient, writer, reader);
     }
 
     @Test

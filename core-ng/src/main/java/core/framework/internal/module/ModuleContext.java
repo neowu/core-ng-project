@@ -10,16 +10,14 @@ import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.StatCollector;
 import core.framework.internal.validate.Validator;
 import core.framework.internal.web.HTTPServer;
-import core.framework.internal.web.bean.BeanMappers;
-import core.framework.internal.web.bean.RequestBeanMapper;
+import core.framework.internal.web.bean.RequestBeanReader;
+import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.internal.web.controller.ControllerClassValidator;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.controller.ControllerInspector;
 import core.framework.internal.web.management.DiagnosticController;
 import core.framework.internal.web.management.PropertyController;
 import core.framework.internal.web.route.PathPatternValidator;
-import core.framework.internal.web.service.ErrorResponse;
-import core.framework.internal.web.site.AJAXErrorResponse;
 import core.framework.module.LambdaController;
 import core.framework.util.ASCII;
 import core.framework.util.Lists;
@@ -69,9 +67,6 @@ public class ModuleContext {
         shutdownHook.add(ShutdownHook.STAGE_1, httpServer::awaitRequestCompletion);
         shutdownHook.add(ShutdownHook.STAGE_9, timeout -> httpServer.awaitTermination());
 
-        bean(ErrorResponse.class);
-        bean(AJAXErrorResponse.class);
-
         var diagnosticController = new DiagnosticController();
         route(HTTPMethod.GET, "/_sys/vm", (LambdaController) diagnosticController::vm, true);
         route(HTTPMethod.GET, "/_sys/thread", (LambdaController) diagnosticController::thread, true);
@@ -99,17 +94,19 @@ public class ModuleContext {
 
     // register http body bean and query param bean
     public final void bean(Class<?> beanClass) {
+        RequestBeanReader reader = httpServer.handler.requestBeanReader;
         if (isQueryParamBean(beanClass)) {
-            RequestBeanMapper requestBeanMapper = httpServer.handler.requestBeanMapper;
-            if (requestBeanMapper.queryParamMappers.containsKey(beanClass)) {
+            if (reader.containsQueryParam(beanClass)) {
                 throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
             }
-            requestBeanMapper.registerQueryParamBean(beanClass, serviceRegistry.beanClassNameValidator);
+            reader.registerQueryParam(beanClass, serviceRegistry.beanClassNameValidator);
         } else {
-            BeanMappers beanMappers = httpServer.handler.beanMappers;
-            if (beanMappers.mappers.containsKey(beanClass))
+            ResponseBeanWriter writer = httpServer.handler.responseBeanWriter;
+            if (reader.containsBean(beanClass) || writer.contains(beanClass)) {
                 throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
-            beanMappers.register(beanClass, serviceRegistry.beanClassNameValidator);
+            }
+            reader.registerBean(beanClass, serviceRegistry.beanClassNameValidator);
+            writer.register(beanClass, serviceRegistry.beanClassNameValidator);
         }
     }
 

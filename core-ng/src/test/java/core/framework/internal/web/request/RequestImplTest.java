@@ -4,8 +4,7 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.bean.TestBean;
-import core.framework.internal.web.bean.BeanMappers;
-import core.framework.internal.web.bean.RequestBeanMapper;
+import core.framework.internal.web.bean.RequestBeanReader;
 import core.framework.internal.web.bean.TestQueryParamBean;
 import core.framework.util.Strings;
 import core.framework.web.CookieSpec;
@@ -27,10 +26,10 @@ class RequestImplTest {
     @BeforeEach
     void createRequest() {
         var beanClassNameValidator = new BeanClassNameValidator();
-        var mapper = new RequestBeanMapper(new BeanMappers());
-        mapper.registerQueryParamBean(TestQueryParamBean.class, beanClassNameValidator);
-        mapper.registerRequestBean(TestBean.class, beanClassNameValidator);
-        request = new RequestImpl(null, mapper);
+        var reader = new RequestBeanReader();
+        reader.registerQueryParam(TestQueryParamBean.class, beanClassNameValidator);
+        reader.registerBean(TestBean.class, beanClassNameValidator);
+        request = new RequestImpl(null, reader);
     }
 
     @Test
