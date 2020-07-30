@@ -24,12 +24,12 @@ public class DynamicInstanceBuilder<T> {
 
     public DynamicInstanceBuilder(Class<? super T> interfaceClass, String className) {
         if (!interfaceClass.isInterface())
-            throw new Error(format("class must be interface, class={}", interfaceClass.getCanonicalName()));
+            throw new Error("class must be interface, class=" + interfaceClass.getCanonicalName());
 
         sourceCode.interfaceClass = interfaceClass;
         sourceCode.className = className;
 
-        classPool = ClassPool.getDefault();
+        classPool = ClassPoolFactory.get();
         classBuilder = classPool.makeClass(className + "$" + (INDEX.getAndIncrement()));
 
         try {

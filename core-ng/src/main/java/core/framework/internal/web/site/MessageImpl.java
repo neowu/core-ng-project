@@ -1,6 +1,5 @@
 package core.framework.internal.web.site;
 
-import core.framework.util.Lists;
 import core.framework.util.Maps;
 import core.framework.util.Properties;
 import core.framework.util.Sets;
@@ -9,6 +8,7 @@ import core.framework.web.site.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -83,7 +83,7 @@ public class MessageImpl implements Message {
     }
 
     private List<Properties> languageProperties(Map<String, Properties> languageProperties, String language) {
-        List<Properties> messages = Lists.newArrayList();
+        List<Properties> messages = new ArrayList<>(languageProperties.size());
         String currentLanguage = language;
         while (true) {
             Properties properties = languageProperties.get(currentLanguage);

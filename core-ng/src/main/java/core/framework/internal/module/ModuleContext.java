@@ -2,6 +2,7 @@ package core.framework.internal.module;
 
 import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
+import core.framework.internal.asm.ClassPoolFactory;
 import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.inject.BeanFactory;
 import core.framework.internal.json.JSONReader;
@@ -120,6 +121,11 @@ public class ModuleContext {
         }
     }
 
+    public Optional<String> property(String key) {
+        propertyValidator.usedProperties.add(key);
+        return propertyManager.property(key);
+    }
+
     // free object not used anymore
     public void cleanup() {
         propertyValidator = null;
@@ -132,11 +138,8 @@ public class ModuleContext {
         Validator.clearCache();
         JSONReader.clearCache();
         JSONWriter.clearCache();
-    }
 
-    public Optional<String> property(String key) {
-        propertyValidator.usedProperties.add(key);
-        return propertyManager.property(key);
+        ClassPoolFactory.cleanup();
     }
 
     protected <T> Class<T> configClass(Class<T> configClass) {
