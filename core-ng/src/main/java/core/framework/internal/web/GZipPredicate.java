@@ -12,7 +12,9 @@ import java.util.Set;
  * @author neo
  */
 public class GZipPredicate implements Predicate {
-    private static final int MIN_GZIP_LENGTH = 20;  // as nginx default, refer to http://nginx.org/en/docs/http/ngx_http_gzip_module.html#gzip_min_length
+    // from test, roughly the compressed value becomes smaller after text larger than 100B,
+    // by considering gzip cpu/ram overhead, use 200B as threshold
+    private static final int MIN_GZIP_LENGTH = 200;
     private final Set<String> gzipContentTypes = Set.of(ContentType.TEXT_PLAIN.toString(),
             ContentType.TEXT_HTML.toString(),
             ContentType.TEXT_CSS.toString(),

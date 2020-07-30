@@ -23,7 +23,7 @@ class GZipPredicateTest {
     void resolve() {
         var headers = new HeaderMap();
         headers.put(Headers.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
-        headers.put(Headers.CONTENT_LENGTH, 50);
+        headers.put(Headers.CONTENT_LENGTH, 210);
         assertThat(predicate.resolve(headers)).isTrue();
     }
 
