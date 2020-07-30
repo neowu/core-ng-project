@@ -33,6 +33,8 @@ public final class WebSocketConfig {
 
         context.beanClassValidator.validate(clientMessageClass);
         context.beanClassValidator.validate(serverMessageClass);
+        context.serviceRegistry.beanClasses.add(clientMessageClass);
+        context.serviceRegistry.beanClasses.add(serverMessageClass);
 
         var handler = new ChannelHandler<>(clientMessageClass, serverMessageClass, listener);
         context.httpServer.handler.webSocketHandler.add(path, handler);

@@ -17,6 +17,7 @@ import static core.framework.http.HTTPMethod.GET;
 import static core.framework.http.HTTPMethod.PATCH;
 import static core.framework.http.HTTPMethod.POST;
 import static core.framework.http.HTTPMethod.PUT;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -48,8 +49,13 @@ class HTTPConfigTest {
     @Test
     void bean() {
         config.bean(TestBean.class);
+        assertThat(config.context.serviceRegistry.beanClasses).contains(TestBean.class);
+
         config.bean(TestQueryParamBean.class);
+        assertThat(config.context.serviceRegistry.beanClasses).contains(TestQueryParamBean.class);
+
         config.bean(TestEnum.class);
+        assertThat(config.context.serviceRegistry.beanClasses).contains(TestEnum.class);
 
         assertThatThrownBy(() -> config.bean(TestBean.class))
                 .isInstanceOf(Error.class)

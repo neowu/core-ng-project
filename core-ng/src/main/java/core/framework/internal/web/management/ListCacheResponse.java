@@ -1,7 +1,6 @@
 package core.framework.internal.web.management;
 
 import core.framework.api.json.Property;
-import core.framework.api.validate.NotNull;
 
 import java.util.List;
 
@@ -9,7 +8,6 @@ import java.util.List;
  * @author neo
  */
 public class ListCacheResponse {
-    @NotNull
     @Property(name = "caches")
     public List<Cache> caches;
 

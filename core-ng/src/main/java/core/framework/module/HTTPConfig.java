@@ -1,16 +1,20 @@
 package core.framework.module;
 
+import core.framework.api.web.service.QueryParam;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.HTTPIOHandler;
-import core.framework.internal.web.site.AJAXErrorResponse;
+import core.framework.internal.web.bean.RequestBeanReader;
+import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.web.Controller;
 import core.framework.web.ErrorHandler;
 import core.framework.web.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
 
 import static core.framework.util.Strings.format;
 
@@ -19,12 +23,11 @@ import static core.framework.util.Strings.format;
  */
 public final class HTTPConfig extends Config {
     private final Logger logger = LoggerFactory.getLogger(HTTPConfig.class);
-    private ModuleContext context;
+    ModuleContext context;
 
     @Override
     protected void initialize(ModuleContext context, String name) {
         this.context = context;
-        context.serviceRegistry.beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
     }
 
     public void route(HTTPMethod method, String path, Controller controller) {
@@ -42,10 +45,34 @@ public final class HTTPConfig extends Config {
             context.beanClassValidator.beanClassNameValidator.validate(beanClass);
             JSONClassValidator.validateEnum(beanClass);
         } else {
-            context.bean(beanClass);
+            registerBean(beanClass);
         }
         boolean added = context.serviceRegistry.beanClasses.add(beanClass);
         if (!added) throw new Error("bean class is already registered, class=" + beanClass.getCanonicalName());
+    }
+
+    // register http body bean and query param bean
+    private void registerBean(Class<?> beanClass) {
+        RequestBeanReader reader = context.httpServer.handler.requestBeanReader;
+        if (isQueryParamBean(beanClass)) {
+            if (reader.containsQueryParam(beanClass)) {
+                throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+            }
+            reader.registerQueryParam(beanClass, context.beanClassValidator.beanClassNameValidator);
+        } else {
+            ResponseBeanWriter writer = context.httpServer.handler.responseBeanWriter;
+            if (reader.containsBean(beanClass) || writer.contains(beanClass)) {
+                throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
+            }
+            reader.registerBean(beanClass, context.beanClassValidator);
+            writer.register(beanClass, context.beanClassValidator);
+        }
+    }
+
+    private boolean isQueryParamBean(Class<?> beanClass) {
+        Field[] fields = beanClass.getDeclaredFields();
+        if (fields.length == 0) return false;
+        return fields[0].isAnnotationPresent(QueryParam.class);
     }
 
     public void intercept(Interceptor interceptor) {

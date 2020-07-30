@@ -17,7 +17,6 @@ import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.redis.RedisSubscribeThread;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.internal.web.management.CacheController;
-import core.framework.internal.web.management.ListCacheResponse;
 import core.framework.util.ASCII;
 import core.framework.util.Types;
 import org.slf4j.Logger;
@@ -48,7 +47,6 @@ public class CacheConfig extends Config {
         caches = new HashMap<>();
         var controller = new CacheController(caches);
         context.route(HTTPMethod.GET, "/_sys/cache", (LambdaController) controller::list, true);
-        context.bean(ListCacheResponse.class);
         context.route(HTTPMethod.GET, "/_sys/cache/:name/:key", (LambdaController) controller::get, true);
         context.route(HTTPMethod.DELETE, "/_sys/cache/:name/:key", (LambdaController) controller::delete, true);
     }

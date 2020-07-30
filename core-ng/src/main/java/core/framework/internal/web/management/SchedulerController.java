@@ -1,13 +1,18 @@
 package core.framework.internal.web.management;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.http.ContentType;
 import core.framework.internal.scheduler.Scheduler;
 import core.framework.internal.web.http.IPv4AccessControl;
+import core.framework.json.JSON;
 import core.framework.log.Markers;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author neo
@@ -25,14 +30,16 @@ public class SchedulerController {
         accessControl.validate(request.clientIP());
 
         var response = new ListJobResponse();
+        List<ListJobResponse.JobView> jobs = new ArrayList<>();
         scheduler.tasks.forEach((name, trigger) -> {
             var job = new ListJobResponse.JobView();
             job.name = trigger.name();
             job.jobClass = trigger.job().getClass().getCanonicalName();
             job.trigger = trigger.trigger();
-            response.jobs.add(job);
+            jobs.add(job);
         });
-        return Response.bean(response);
+        response.jobs = jobs;
+        return Response.text(JSON.toJSON(response)).contentType(ContentType.APPLICATION_JSON);
     }
 
     public Response triggerJob(Request request) {

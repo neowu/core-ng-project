@@ -45,7 +45,7 @@ public class CacheController {
         accessControl.validate(request.clientIP());
         var response = new ListCacheResponse();
         response.caches = caches.values().stream().map(this::view).collect(Collectors.toList());
-        return Response.bean(response);
+        return Response.text(JSON.toJSON(response)).contentType(ContentType.APPLICATION_JSON);
     }
 
     CacheImpl<?> cache(String name) {

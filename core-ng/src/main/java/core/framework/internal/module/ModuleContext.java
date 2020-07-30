@@ -1,6 +1,5 @@
 package core.framework.internal.module;
 
-import core.framework.api.web.service.QueryParam;
 import core.framework.async.Task;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.bean.BeanClassValidator;
@@ -11,8 +10,6 @@ import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.StatCollector;
 import core.framework.internal.validate.Validator;
 import core.framework.internal.web.HTTPServer;
-import core.framework.internal.web.bean.RequestBeanReader;
-import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.internal.web.controller.ControllerClassValidator;
 import core.framework.internal.web.controller.ControllerHolder;
 import core.framework.internal.web.controller.ControllerInspector;
@@ -29,7 +26,6 @@ import core.framework.web.WebContext;
 import core.framework.web.site.WebDirectory;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -48,12 +44,11 @@ public class ModuleContext {
     public final PropertyManager propertyManager = new PropertyManager();
     public final HTTPServer httpServer;
     public final StatCollector collector = new StatCollector();
-    public final ServiceRegistry serviceRegistry = new ServiceRegistry();
     protected final Map<String, Config> configs = Maps.newHashMap();
+    public ServiceRegistry serviceRegistry = new ServiceRegistry();
     public BeanClassValidator beanClassValidator = new BeanClassValidator();
     PropertyValidator propertyValidator = new PropertyValidator();
     private BackgroundTaskExecutor backgroundTask;
-
 
     public ModuleContext(LogManager logManager) {
         this.logManager = logManager;
@@ -95,30 +90,6 @@ public class ModuleContext {
         httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
     }
 
-    // register http body bean and query param bean
-    public final void bean(Class<?> beanClass) {
-        RequestBeanReader reader = httpServer.handler.requestBeanReader;
-        if (isQueryParamBean(beanClass)) {
-            if (reader.containsQueryParam(beanClass)) {
-                throw new Error("query param bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
-            }
-            reader.registerQueryParam(beanClass, beanClassValidator.beanClassNameValidator);
-        } else {
-            ResponseBeanWriter writer = httpServer.handler.responseBeanWriter;
-            if (reader.containsBean(beanClass) || writer.contains(beanClass)) {
-                throw new Error("bean class is already registered or referred by service interface, class=" + beanClass.getCanonicalName());
-            }
-            reader.registerBean(beanClass, beanClassValidator);
-            writer.register(beanClass, beanClassValidator);
-        }
-    }
-
-    private boolean isQueryParamBean(Class<?> beanClass) {
-        Field[] fields = beanClass.getDeclaredFields();
-        if (fields.length == 0) return false;
-        return fields[0].isAnnotationPresent(QueryParam.class);
-    }
-
     @SuppressWarnings("unchecked")
     public <T extends Config> T config(Class<T> configClass, @Nullable String name) {
         String key = configClass.getCanonicalName() + ":" + name;   // not using computeIfAbsent, to avoid concurrent modification in nested call, e.g. httpConfig->publishAPIConfig->apiConfig
@@ -144,6 +115,7 @@ public class ModuleContext {
         Set<String> keys = propertyManager.properties.keys();
         propertyValidator.validate(keys);
         propertyValidator = null;   // free object not used anymore
+        serviceRegistry = null;
         beanClassValidator = null;
 
         // clear internal object cache after startup

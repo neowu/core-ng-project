@@ -6,7 +6,6 @@ import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
-import core.framework.internal.web.api.APIDefinitionResponse;
 import core.framework.internal.web.bean.RequestBeanWriter;
 import core.framework.internal.web.bean.ResponseBeanReader;
 import core.framework.internal.web.controller.ControllerHolder;
@@ -19,6 +18,7 @@ import core.framework.internal.web.service.WebServiceClientBuilder;
 import core.framework.internal.web.service.WebServiceControllerBuilder;
 import core.framework.internal.web.service.WebServiceImplValidator;
 import core.framework.internal.web.service.WebServiceInterfaceValidator;
+import core.framework.internal.web.site.AJAXErrorResponse;
 import core.framework.util.ASCII;
 import core.framework.web.Controller;
 import core.framework.web.service.WebServiceClientProxy;
@@ -58,6 +58,8 @@ public class APIConfig extends Config {
     @Override
     protected void validate() {
         httpClientBuilder = null;
+        writer = null;
+        reader = null;
     }
 
     public <T> void service(Class<T> serviceInterface, T service) {
@@ -116,8 +118,8 @@ public class APIConfig extends Config {
         logger.info("publish typescript api definition, cidrs={}", cidrs);
         var accessControl = new IPv4AccessControl();
         accessControl.allow = new IPv4Ranges(cidrs);
-        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry.serviceInterfaces, context.serviceRegistry.beanClasses, accessControl), true);
-        context.bean(APIDefinitionResponse.class);
+        context.route(HTTPMethod.GET, "/_sys/api", new APIController(context.serviceRegistry, accessControl), true);
+        context.serviceRegistry.beanClasses.add(AJAXErrorResponse.class);   // publish default ajax error response
     }
 
     private HTTPClient getOrCreateHTTPClient() {

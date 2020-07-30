@@ -9,7 +9,6 @@ import core.framework.internal.scheduler.HourlyTrigger;
 import core.framework.internal.scheduler.MonthlyTrigger;
 import core.framework.internal.scheduler.Scheduler;
 import core.framework.internal.scheduler.WeeklyTrigger;
-import core.framework.internal.web.management.ListJobResponse;
 import core.framework.internal.web.management.SchedulerController;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
@@ -36,7 +35,6 @@ public final class SchedulerConfig extends Config {
 
         var schedulerController = new SchedulerController(scheduler);
         context.route(HTTPMethod.GET, "/_sys/job", (LambdaController) schedulerController::jobs, true);
-        context.bean(ListJobResponse.class);
         context.route(HTTPMethod.POST, "/_sys/job/:job", (LambdaController) schedulerController::triggerJob, true);
     }
 

@@ -38,5 +38,7 @@ class WebSocketConfigTest {
 
         WebSocketContext webSocketContext = (WebSocketContext) config.context.beanFactory.bean(WebSocketContext.class, null);
         assertThat(webSocketContext).isNotNull();
+
+        assertThat(config.context.serviceRegistry.beanClasses).contains(TestWebSocketMessage.class);
     }
 }
