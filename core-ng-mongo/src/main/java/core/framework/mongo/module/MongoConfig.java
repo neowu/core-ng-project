@@ -28,10 +28,11 @@ public class MongoConfig extends Config {
         this.context = context;
         this.name = name;
 
-        mongo = new MongoImpl();
+        var mongo = new MongoImpl();
         this.context.startupHook.add(mongo::initialize);
         this.context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> mongo.close());
         context.beanFactory.bind(Mongo.class, name, mongo);
+        this.mongo = mongo;
     }
 
     @Override

@@ -111,21 +111,23 @@ public class CacheConfig extends Config {
     void configureRedis(String host) {
         logger.info("create redis cache store, host={}", host);
 
-        redis = new RedisImpl("redis-cache");
+        var redis = new RedisImpl("redis-cache");
         redis.host = host;
         redis.timeout(Duration.ofSeconds(1));   // for cache, use shorter timeout than default redis config
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));
         context.collector.metrics.add(new PoolMetrics(redis.pool));
         redisCacheStore = new RedisCacheStore(redis);
+        this.redis = redis;
     }
 
     private LocalCacheStore localCacheStore() {
         if (localCacheStore == null) {
             logger.info("create local cache store");
-            localCacheStore = new LocalCacheStore();
+            var localCacheStore = new LocalCacheStore();
             context.backgroundTask().scheduleWithFixedDelay(localCacheStore::cleanup, Duration.ofMinutes(5));
             context.collector.metrics.add(new LocalCacheMetrics(localCacheStore));
+            this.localCacheStore = localCacheStore;
         }
         return localCacheStore;
     }

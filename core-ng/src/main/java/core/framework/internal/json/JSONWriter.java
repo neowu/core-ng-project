@@ -13,20 +13,15 @@ import java.util.Map;
  * @author neo
  */
 public final class JSONWriter<T> {
-    private static Map<Class<?>, JSONWriter<?>> cache;
+    private static Map<Class<?>, JSONWriter<?>> cache = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T> JSONWriter<T> of(Class<T> beanClass) {
-        synchronized (JSONWriter.class) {
-            if (cache == null) cache = new HashMap<>();
-            return (JSONWriter<T>) cache.computeIfAbsent(beanClass, JSONWriter::new);
-        }
+        return (JSONWriter<T>) cache.computeIfAbsent(beanClass, JSONWriter::new);
     }
 
-    public static void clearCache() {
-        synchronized (JSONWriter.class) {
-            cache = null;
-        }
+    public static void cleanup() {
+        cache = null;
     }
 
     private final ObjectWriter writer;

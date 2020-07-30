@@ -11,20 +11,15 @@ import java.util.Map;
  * @author neo
  */
 public final class JSONReader<T> {
-    private static Map<Class<?>, JSONReader<?>> cache;
+    private static Map<Class<?>, JSONReader<?>> cache = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T> JSONReader<T> of(Class<T> beanClass) {
-        synchronized (JSONReader.class) {
-            if (cache == null) cache = new HashMap<>();
-            return (JSONReader<T>) cache.computeIfAbsent(beanClass, JSONReader::new);
-        }
+        return (JSONReader<T>) cache.computeIfAbsent(beanClass, JSONReader::new);
     }
 
-    public static void clearCache() {
-        synchronized (JSONReader.class) {
-            cache = null;
-        }
+    public static void cleanup() {
+        cache = null;
     }
 
     // used internally, performance is top priority in design, reader is about 3~6% faster than mapper since type is pre determined

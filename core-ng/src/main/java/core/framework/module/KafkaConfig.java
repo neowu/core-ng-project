@@ -67,19 +67,15 @@ public class KafkaConfig extends Config {
 
     <T> MessagePublisher<T> createMessagePublisher(String topic, Class<T> messageClass) {
         if (producer == null) {
-            producer = createMessageProducer();
+            var producer = new MessageProducer(uri, name);
+            producer.tryCreateProducer();  // try to init kafka during startup
+            context.collector.metrics.add(producer.producerMetrics);
+            context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
+            var controller = new KafkaController(producer);
+            context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), (LambdaController) controller::publish, true);
+            this.producer = producer;
         }
         return new MessagePublisherImpl<>(producer, topic, messageClass);
-    }
-
-    private MessageProducer createMessageProducer() {
-        var producer = new MessageProducer(uri, name);
-        producer.tryCreateProducer();  // try to init kafka during startup
-        context.collector.metrics.add(producer.producerMetrics);
-        context.shutdownHook.add(ShutdownHook.STAGE_4, producer::close);
-        var controller = new KafkaController(producer);
-        context.route(HTTPMethod.POST, managementPathPattern("/topic/:topic/message/:key"), (LambdaController) controller::publish, true);
-        return producer;
     }
 
     String managementPathPattern(String postfix) {

@@ -1,9 +1,13 @@
 package core.framework.module;
 
 import core.framework.async.Task;
+import core.framework.internal.asm.ClassPoolFactory;
+import core.framework.internal.json.JSONReader;
+import core.framework.internal.json.JSONWriter;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
+import core.framework.internal.validate.Validator;
 import core.framework.log.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +29,7 @@ public abstract class App extends Module {
             for (Task task : context.startupHook) {
                 task.execute();
             }
-            context.cleanup();
+            cleanup();
             logger.info("startup completed, elapsed={}", actionLog.elapsed());
         } catch (Throwable e) {
             logger.error(Markers.errorCode("FAILED_TO_START"), "app failed to start, error={}", e.getMessage(), e);
@@ -38,13 +42,6 @@ public abstract class App extends Module {
         }
     }
 
-    void logContext(ActionLog actionLog) {
-        actionLog.action("app:start");
-        Runtime runtime = Runtime.getRuntime();
-        actionLog.stat("cpu", runtime.availableProcessors());
-        actionLog.stat("max_memory", runtime.maxMemory());
-    }
-
     public final void configure() {
         logger.info("initialize framework");
         context = new ModuleContext(logManager);
@@ -53,5 +50,20 @@ public abstract class App extends Module {
         logger.info("initialize application");
         initialize();
         context.validate();
+    }
+
+    void logContext(ActionLog actionLog) {
+        actionLog.action("app:start");
+        Runtime runtime = Runtime.getRuntime();
+        actionLog.stat("cpu", runtime.availableProcessors());
+        actionLog.stat("max_memory", runtime.maxMemory());
+    }
+
+    private void cleanup() {
+        // free object not used anymore
+        Validator.cleanup();
+        JSONReader.cleanup();
+        JSONWriter.cleanup();
+        ClassPoolFactory.cleanup();
     }
 }

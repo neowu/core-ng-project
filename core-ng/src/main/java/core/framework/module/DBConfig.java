@@ -32,11 +32,12 @@ public class DBConfig extends Config {
         this.context = context;
         this.name = name;
 
-        database = new DatabaseImpl("db" + (name == null ? "" : "-" + name));
+        var database = new DatabaseImpl("db" + (name == null ? "" : "-" + name));
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> database.close());
         context.backgroundTask().scheduleWithFixedDelay(database.pool::refresh, Duration.ofMinutes(10));
         context.collector.metrics.add(new PoolMetrics(database.pool));
         context.beanFactory.bind(Database.class, name, database);
+        this.database = database;
     }
 
     @Override

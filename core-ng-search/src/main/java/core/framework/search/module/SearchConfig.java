@@ -29,10 +29,11 @@ public class SearchConfig extends Config {
 
         configureLogger();
 
-        search = new ElasticSearchImpl();
+        var search = new ElasticSearchImpl();
         context.startupHook.add(search::initialize);
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> search.close());
         context.beanFactory.bind(ElasticSearch.class, name, search);
+        this.search = search;
     }
 
     @Override

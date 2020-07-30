@@ -17,21 +17,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public final class Validator<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
-
-    private static Map<Class<?>, Validator<?>> cache;
+    private static Map<Class<?>, Validator<?>> cache = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T> Validator<T> of(Class<T> beanClass) {
-        synchronized (Validator.class) {
-            if (cache == null) cache = new HashMap<>();
-            return (Validator<T>) cache.computeIfAbsent(beanClass, Validator::new);
-        }
+        return (Validator<T>) cache.computeIfAbsent(beanClass, Validator::new);
     }
 
-    public static void clearCache() {
-        synchronized (Validator.class) {
-            cache = null;
-        }
+    public static void cleanup() {
+        cache = null;
     }
 
     @Nullable
