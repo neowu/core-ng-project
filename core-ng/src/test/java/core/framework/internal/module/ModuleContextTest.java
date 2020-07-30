@@ -1,6 +1,5 @@
 package core.framework.internal.module;
 
-import core.framework.internal.log.LogManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +13,7 @@ class ModuleContextTest {
 
     @BeforeEach
     void createModuleContext() {
-        moduleContext = new ModuleContext(new LogManager());
+        moduleContext = new ModuleContext(null);
     }
 
     @Test

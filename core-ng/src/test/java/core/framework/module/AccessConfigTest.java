@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ class AccessConfigTest {
 
     @BeforeEach
     void createAccessConfig() {
-        config = new AccessConfig(new ModuleContext(new LogManager()));
+        config = new AccessConfig(new ModuleContext(null));
     }
 
     @Test

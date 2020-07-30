@@ -1,6 +1,5 @@
 package core.framework.module;
 
-import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,7 @@ class DBConfigTest {
     @BeforeEach
     void createDBConfig() {
         config = new DBConfig();
-        config.initialize(new ModuleContext(new LogManager()), null);
+        config.initialize(new ModuleContext(null), null);
     }
 
     @Test

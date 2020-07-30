@@ -6,7 +6,6 @@ import core.framework.internal.cache.LocalCacheStore;
 import core.framework.internal.cache.RedisCacheStore;
 import core.framework.internal.cache.RedisLocalCacheStore;
 import core.framework.internal.cache.TestCache;
-import core.framework.internal.log.LogManager;
 import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ class CacheConfigTest {
     @BeforeEach
     void createCacheConfig() {
         config = new CacheConfig();
-        config.initialize(new ModuleContext(new LogManager()), null);
+        config.initialize(new ModuleContext(null), null);
     }
 
     @Test

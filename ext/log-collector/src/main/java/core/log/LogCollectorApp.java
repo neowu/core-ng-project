@@ -8,6 +8,7 @@ import core.framework.module.SystemModule;
 import core.framework.util.Strings;
 import core.log.web.EventController;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class LogCollectorApp extends App {
         http().maxForwardedIPs(3);      // loose x-forwarded-for ip config, there are cdn/proxy before system, and in event collector, preventing fake client ip is less important
 
         site().security();
-        site().staticContent("/robots.txt");
+        site().staticContent("/robots.txt").cache(Duration.ofDays(30));
 
         kafka().publish(LogTopics.TOPIC_EVENT, EventMessage.class);
 
