@@ -108,11 +108,12 @@ public class KafkaConfig extends Config {
     private MessageListener listener() {
         if (listener == null) {
             if (uri == null) throw new Error("kafka uri must be configured first, name=" + name);
-            listener = new MessageListener(uri, name, context.logManager);
+            var listener = new MessageListener(uri, name, context.logManager);
             context.startupHook.add(listener::start);
             context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> listener.shutdown());
             context.shutdownHook.add(ShutdownHook.STAGE_1, listener::awaitTermination);
             context.collector.metrics.add(listener.consumerMetrics);
+            this.listener = listener;   // make lambda not refer to this class/field
         }
         return listener;
     }

@@ -38,15 +38,15 @@ import java.util.Set;
  */
 public class ModuleContext {
     public final LogManager logManager;
-    public final BeanFactory beanFactory = new BeanFactory();
-    public final List<Task> startupHook = Lists.newArrayList();
     public final ShutdownHook shutdownHook;
     public final PropertyManager propertyManager = new PropertyManager();
     public final HTTPServer httpServer;
     public final StatCollector collector = new StatCollector();
-    protected final Map<String, Config> configs = Maps.newHashMap();
+    public List<Task> startupHook = Lists.newArrayList();
+    public BeanFactory beanFactory = new BeanFactory();
     public ServiceRegistry serviceRegistry = new ServiceRegistry();
     public BeanClassValidator beanClassValidator = new BeanClassValidator();
+    protected Map<String, Config> configs = Maps.newHashMap();
     PropertyValidator propertyValidator = new PropertyValidator();
     private BackgroundTaskExecutor backgroundTask;
 
@@ -114,16 +114,24 @@ public class ModuleContext {
     public void validate() {
         Set<String> keys = propertyManager.properties.keys();
         propertyValidator.validate(keys);
-        propertyValidator = null;   // free object not used anymore
+
+        for (Config config : configs.values()) {
+            config.validate();
+        }
+    }
+
+    // free object not used anymore
+    public void cleanup() {
+        propertyValidator = null;
         serviceRegistry = null;
         beanClassValidator = null;
+        beanFactory = null;
+        configs = null;
+        startupHook = null;
 
-        // clear internal object cache after startup
         Validator.clearCache();
         JSONReader.clearCache();
         JSONWriter.clearCache();
-
-        configs.values().forEach(Config::validate);
     }
 
     public Optional<String> property(String key) {

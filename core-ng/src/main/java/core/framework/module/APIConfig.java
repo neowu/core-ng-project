@@ -55,13 +55,6 @@ public class APIConfig extends Config {
         reader = new ResponseBeanReader();
     }
 
-    @Override
-    protected void validate() {
-        httpClientBuilder = null;
-        writer = null;
-        reader = null;
-    }
-
     public <T> void service(Class<T> serviceInterface, T service) {
         logger.info("create web service, interface={}", serviceInterface.getCanonicalName());
         var validator = new WebServiceInterfaceValidator(serviceInterface, context.beanClassValidator);

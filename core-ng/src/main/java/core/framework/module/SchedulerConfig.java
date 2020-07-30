@@ -28,7 +28,7 @@ public final class SchedulerConfig extends Config {
 
     @Override
     protected void initialize(ModuleContext context, String name) {
-        scheduler = new Scheduler(context.logManager);
+        var scheduler = new Scheduler(context.logManager);
         context.startupHook.add(scheduler::start);
         context.shutdownHook.add(ShutdownHook.STAGE_0, timeout -> scheduler.shutdown());
         context.shutdownHook.add(ShutdownHook.STAGE_1, scheduler::awaitTermination);
@@ -36,6 +36,8 @@ public final class SchedulerConfig extends Config {
         var schedulerController = new SchedulerController(scheduler);
         context.route(HTTPMethod.GET, "/_sys/job", (LambdaController) schedulerController::jobs, true);
         context.route(HTTPMethod.POST, "/_sys/job/:job", (LambdaController) schedulerController::triggerJob, true);
+
+        this.scheduler = scheduler; // make lambda not refer to this class/field
     }
 
     public void timeZone(ZoneId zoneId) {

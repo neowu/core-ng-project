@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 public abstract class Config {  // use abstract class not interface is for hiding those method from app module, interface methods must be public
     protected abstract void initialize(ModuleContext context, @Nullable String name);
 
-    // after all creation, validate and cleanup
+    // after initialization done, validate and finalize
     protected void validate() {
     }
 }

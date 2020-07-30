@@ -27,7 +27,6 @@ public final class ShutdownHook implements Runnable {
     public static final int STAGE_8 = 8;    // shutdown kafka log appender, give more time try to forward all logs
     public static final int STAGE_9 = 9;    // finally stop the http server, to make sure it responses to incoming requests during shutdown
 
-    final Thread thread = new Thread(this, "shutdown");
     private final long shutdownDelayInSec;
     private final long shutdownTimeoutInMs;
     private final LogManager logManager;
@@ -39,7 +38,6 @@ public final class ShutdownHook implements Runnable {
         shutdownDelayInSec = shutdownDelayInSec(env);
         shutdownTimeoutInMs = shutdownTimeoutInMs(env);
         this.logManager = logManager;
-        Runtime.getRuntime().addShutdownHook(thread);
     }
 
     // in kube env, once Pod is set to the “Terminating” State,

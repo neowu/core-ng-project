@@ -4,8 +4,6 @@ import core.framework.test.module.AbstractTestModule;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -41,6 +39,6 @@ public final class IntegrationExtension implements TestInstancePostProcessor {
             if (context != null) return context;
             currentClass = currentClass.getSuperclass();
         }
-        throw new Error(format("integration test must have @Context, testClass={}", testClass.getCanonicalName()));
+        throw new Error("integration test must have @Context, testClass=" + testClass.getCanonicalName());
     }
 }

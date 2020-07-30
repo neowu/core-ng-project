@@ -25,6 +25,7 @@ public abstract class App extends Module {
             for (Task task : context.startupHook) {
                 task.execute();
             }
+            context.cleanup();
             logger.info("startup completed, elapsed={}", actionLog.elapsed());
         } catch (Throwable e) {
             logger.error(Markers.errorCode("FAILED_TO_START"), "app failed to start, error={}", e.getMessage(), e);
@@ -47,6 +48,7 @@ public abstract class App extends Module {
     public final void configure() {
         logger.info("initialize framework");
         context = new ModuleContext(logManager);
+        Runtime.getRuntime().addShutdownHook(new Thread(context.shutdownHook, "shutdown"));
 
         logger.info("initialize application");
         initialize();

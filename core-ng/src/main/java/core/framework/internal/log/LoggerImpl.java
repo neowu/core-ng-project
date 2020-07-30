@@ -28,13 +28,11 @@ public final class LoggerImpl extends AbstractLogger {
         return builder.toString();
     }
 
-    private final String logger;
     private final LogLevel infoLevel;
     private final LogLevel traceLevel;
 
     LoggerImpl(String name, LogLevel infoLevel, LogLevel traceLevel) {
-        super(name);
-        this.logger = abbreviateLoggerName(name);
+        super(abbreviateLoggerName(name));
         this.infoLevel = infoLevel;
         this.traceLevel = traceLevel;
     }
@@ -42,7 +40,7 @@ public final class LoggerImpl extends AbstractLogger {
     @Override
     public void log(Marker marker, LogLevel level, String message, Object[] arguments, Throwable exception) {
         if (level.value >= traceLevel.value) {
-            var event = new LogEvent(logger, marker, level, message, arguments, exception);
+            var event = new LogEvent(name, marker, level, message, arguments, exception);
 
             ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
             if (actionLog != null) actionLog.process(event);    // logManager.begin() may not be called

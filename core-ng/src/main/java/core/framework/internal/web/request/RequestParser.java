@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 
 import static core.framework.util.Encodings.decodeURIComponent;
 import static core.framework.util.Strings.format;
@@ -38,7 +39,7 @@ public final class RequestParser {
     private static final int MAX_URL_LENGTH = 1000;
     public final ClientIPParser clientIPParser = new ClientIPParser();
     private final Logger logger = LoggerFactory.getLogger(RequestParser.class);
-    private final EnumSet<HTTPMethod> withBodyMethods = EnumSet.of(HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH);
+    private final Set<HTTPMethod> withBodyMethods = EnumSet.of(HTTPMethod.POST, HTTPMethod.PUT, HTTPMethod.PATCH);
     public boolean logSiteHeaders;
 
     public void parse(RequestImpl request, HttpServerExchange exchange, ActionLog actionLog) throws Throwable {
