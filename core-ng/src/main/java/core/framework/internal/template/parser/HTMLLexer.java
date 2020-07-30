@@ -1,7 +1,5 @@
 package core.framework.internal.template.parser;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -73,7 +71,7 @@ class HTMLLexer {
                 break;
             }
         }
-        if (length == -1) throw new Error(format("comment is not closed, location={}", currentLocation()));
+        if (length == -1) throw new Error("comment is not closed, location=" + currentLocation());
         move(length);
 
         return HTMLTokenType.END_COMMENT;
@@ -90,7 +88,7 @@ class HTMLLexer {
                 break;
             }
         }
-        if (length == -1) throw new Error(format("script/css is not closed, location={}", currentLocation()));
+        if (length == -1) throw new Error("script/css is not closed, location=" + currentLocation());
 
         if (length > 0) {
             move(length);
@@ -132,7 +130,7 @@ class HTMLLexer {
                 return i - currentIndex;
             }
         }
-        throw new Error(format("start tag is invalid, location={}", currentLocation()));
+        throw new Error("start tag is invalid, location=" + currentLocation());
     }
 
     private int findEndTagLength() {
@@ -143,7 +141,7 @@ class HTMLLexer {
                 return i - currentIndex + 1;
             }
         }
-        throw new Error(format("end tag is invalid, location={}", currentLocation()));
+        throw new Error("end tag is invalid, location=" + currentLocation());
     }
 
     private int findTextLength() {
@@ -162,16 +160,16 @@ class HTMLLexer {
                 return i - currentIndex;
             }
             if (ch == '<') {
-                throw new Error(format("attribute name is invalid, location={}", currentLocation()));
+                throw new Error("attribute name is invalid, location=" + currentLocation());
             }
         }
-        throw new Error(format("attribute name is invalid, location={}", currentLocation()));
+        throw new Error("attribute name is invalid, location=" + currentLocation());
     }
 
     private int findAttributeValueLength() {
         char currentChar = html.charAt(currentIndex);
         if (currentChar == '\'')
-            throw new Error(format("it is recommended to use double quote to delimit attribute value, location={}", currentLocation()));
+            throw new Error("it is recommended to use double quote to delimit attribute value, location=" + currentLocation());
 
         boolean hasDoubleQuote = currentChar == '"';
         int i = hasDoubleQuote ? currentIndex + 1 : currentIndex;
@@ -183,7 +181,7 @@ class HTMLLexer {
                 return i - currentIndex + 1;
             }
         }
-        throw new Error(format("attribute value is invalid, location={}", currentLocation()));
+        throw new Error("attribute value is invalid, location=" + currentLocation());
     }
 
     private boolean match(int index, String token) {
@@ -199,7 +197,7 @@ class HTMLLexer {
     }
 
     private void move(int length) {
-        if (length == 0) throw new Error(format("syntax is invalid, location={}", currentLocation()));
+        if (length == 0) throw new Error("syntax is invalid, location=" + currentLocation());
         for (int i = 0; i < length; i++) {
             char ch = html.charAt(currentIndex);
             if (ch == '\n') {

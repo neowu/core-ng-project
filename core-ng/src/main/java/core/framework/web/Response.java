@@ -14,8 +14,6 @@ import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -62,7 +60,7 @@ public interface Response {
                 && redirectStatus != HTTPStatus.MOVED_PERMANENTLY
                 && redirectStatus != HTTPStatus.PERMANENT_REDIRECT
                 && redirectStatus != HTTPStatus.TEMPORARY_REDIRECT)
-            throw new Error(format("invalid redirect status, status={}", redirectStatus));
+            throw new Error("invalid redirect status, status=" + redirectStatus);
 
         return new ResponseImpl(new ByteArrayBody(new byte[0]))
                 .header(HTTPHeaders.LOCATION, url)

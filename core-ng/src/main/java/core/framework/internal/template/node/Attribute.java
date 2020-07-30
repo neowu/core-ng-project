@@ -49,12 +49,12 @@ public class Attribute {
 
     boolean isDynamicBooleanAttribute() {
         return "c:checked".equals(name)
-            || "c:selected".equals(name)
-            || "c:disabled".equals(name)
-            || "c:readonly".equals(name)
-            || "c:multiple".equals(name)
-            || "c:ismap".equals(name)
-            || "c:defer".equals(name);
+                || "c:selected".equals(name)
+                || "c:disabled".equals(name)
+                || "c:readonly".equals(name)
+                || "c:multiple".equals(name)
+                || "c:ismap".equals(name)
+                || "c:defer".equals(name);
     }
 
     void addBooleanAttribute(ContainerFragment parent, TemplateMetaContext context) {
@@ -131,7 +131,7 @@ public class Attribute {
                 document.buildTemplate(parent, context, includedSource);
                 break;
             default:
-                throw new Error(format("not supported dynamic content attribute, name={}", name));
+                throw new Error("not supported dynamic content attribute, name=" + name);
         }
     }
 }

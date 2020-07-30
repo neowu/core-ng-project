@@ -21,9 +21,9 @@ public class PathPatternValidator {
     }
 
     public void validate() {
-        if (Strings.isBlank(pattern)) throw new Error(format("path pattern must not be blank, pattern={}", pattern));
+        if (Strings.isBlank(pattern)) throw new Error("path pattern must not be blank, pattern=" + pattern);
 
-        if (!Strings.startsWith(pattern, '/')) throw new Error(format("path pattern must start with '/', pattern={}", pattern));
+        if (!Strings.startsWith(pattern, '/')) throw new Error("path pattern must start with '/', pattern=" + pattern);
 
         Set<String> variables = Sets.newHashSet();
         String[] tokens = Strings.split(pattern, '/');

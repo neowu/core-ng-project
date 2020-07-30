@@ -5,8 +5,6 @@ import core.framework.util.Strings;
 
 import java.nio.file.Path;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -16,7 +14,7 @@ public final class FileTemplateSource implements TemplateSource {
 
     public FileTemplateSource(Path root, String path) {
         this.root = root;
-        if (!Strings.startsWith(path, '/')) throw new Error(format("path must start with '/', path={}", path));
+        if (!Strings.startsWith(path, '/')) throw new Error("path must start with '/', path=" + path);
         this.path = root.resolve(path.substring(1));
     }
 

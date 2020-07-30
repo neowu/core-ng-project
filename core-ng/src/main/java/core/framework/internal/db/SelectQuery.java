@@ -8,8 +8,6 @@ import core.framework.internal.reflect.Classes;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -67,7 +65,7 @@ final class SelectQuery<T> {
     }
 
     Object[] fetchParams(List<Object> params, Integer skip, Integer limit) {
-        if (skip != null && limit == null) throw new Error(format("limit must not be null if skip is not, skip={}", skip));
+        if (skip != null && limit == null) throw new Error("limit must not be null if skip is not, skip=" + skip);
         if (skip == null && limit == null) return params.toArray();
 
         Integer skipValue = skip == null ? Integer.valueOf(0) : skip;

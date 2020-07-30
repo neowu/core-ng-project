@@ -98,7 +98,7 @@ public class HTMLParser {
                     break;
                 case ATTRIBUTE_VALUE:
                     if (currentAttribute == null)
-                        throw new Error(format("attribute syntax is invalid, location={}", lexer.currentLocation()));
+                        throw new Error("attribute syntax is invalid, location=" + lexer.currentLocation());
                     String attributeValue = lexer.currentToken();
                     if (attributeValue.startsWith("\"")) {
                         currentAttribute.value = attributeValue.substring(1, attributeValue.length() - 1);

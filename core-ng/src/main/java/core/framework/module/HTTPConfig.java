@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -102,7 +100,7 @@ public final class HTTPConfig extends Config {
      * @param maxIPs the max number for forwarded ips
      */
     public void maxForwardedIPs(int maxIPs) {
-        if (maxIPs < 1) throw new Error(format("maxIPs must be greater than 1, maxIPs={}", maxIPs));
+        if (maxIPs < 1) throw new Error("maxIPs must be greater than 1, maxIPs=" + maxIPs);
         context.httpServer.handler.requestParser.clientIPParser.maxForwardedIPs = maxIPs;
     }
 

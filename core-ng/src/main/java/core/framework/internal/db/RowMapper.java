@@ -6,8 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -15,7 +13,7 @@ import static core.framework.util.Strings.format;
 interface RowMapper<T> {
     static void checkColumnCount(ResultSetWrapper resultSet) {
         int count = resultSet.columnCount();
-        if (count > 1) throw new Error(format("returned column count must be one, count={}", count));
+        if (count > 1) throw new Error("returned column count must be one, count=" + count);
     }
 
     T map(ResultSetWrapper resultSet) throws SQLException;

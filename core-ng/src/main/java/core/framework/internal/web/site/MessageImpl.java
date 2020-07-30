@@ -41,7 +41,7 @@ public class MessageImpl implements Message {
             String language = language(path);
             validateLanguage(path, language);
             properties.computeIfAbsent(language, key -> new Properties())
-                      .load(path);
+                    .load(path);
         }
 
         for (String language : this.languages) {
@@ -100,7 +100,7 @@ public class MessageImpl implements Message {
     String language(String path) {
         Matcher matcher = MESSAGE_PROPERTY_PATH_PATTERN.matcher(path);
         if (!matcher.matches())
-            throw new Error(format("property path must match 'path/name_language.properties' pattern, path={}", path));
+            throw new Error("property path must match 'path/name_language.properties' pattern, path=" + path);
         String languagePostfix = matcher.group(1);
         if (Strings.isBlank(languagePostfix)) return DEFAULT_LANGUAGE;
         return languagePostfix.substring(1);
@@ -108,13 +108,13 @@ public class MessageImpl implements Message {
 
     @Override
     public String get(String key, String language) {
-        return getMessage(key, language).orElseThrow(() -> new Error(format("can not find message, key={}", key)));
+        return getMessage(key, language).orElseThrow(() -> new Error("can not find message, key=" + key));
     }
 
     Optional<String> getMessage(String key, String language) {
         String targetLanguage = language == null ? DEFAULT_LANGUAGE : language;
         List<Properties> properties = messages.get(targetLanguage);
-        if (properties == null) throw new Error(format("language is not defined, please check site().message(), language={}", targetLanguage));
+        if (properties == null) throw new Error("language is not defined, please check site().message(), language=" + targetLanguage);
         for (Properties property : properties) {
             Optional<String> message = property.get(key);
             if (message.isPresent()) return message;

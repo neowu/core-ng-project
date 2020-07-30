@@ -2,8 +2,6 @@ package core.framework.internal.template.expression;
 
 import java.util.regex.Pattern;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -46,7 +44,7 @@ class ExpressionParser {
             return new ValueToken(expression, Number.class);
         } else {
             if (!FIELD_PATTERN.matcher(expression).matches())
-                throw new Error(format("invalid field name, field={}", expression));
+                throw new Error("invalid field name, field=" + expression);
             return new FieldToken(expression);
         }
     }

@@ -42,8 +42,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -224,15 +222,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         }
     }
 
-    private FindIterable<T> mongoQuery(Query query) {
-        FindIterable<T> mongoQuery = collection(query.readPreference).find(query.filter == null ? new BsonDocument() : query.filter);
-        if (query.projection != null) mongoQuery.projection(query.projection);
-        if (query.sort != null) mongoQuery.sort(query.sort);
-        if (query.skip != null) mongoQuery.skip(query.skip);
-        if (query.limit != null) mongoQuery.limit(query.limit);
-        return mongoQuery;
-    }
-
     @Override
     public <V> List<V> aggregate(Aggregate<V> aggregate) {
         var watch = new StopWatch();
@@ -291,14 +280,6 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         }
     }
 
-    private <V> void fetch(MongoIterable<V> iterable, List<V> results) {
-        try (MongoCursor<V> cursor = iterable.iterator()) {
-            while (cursor.hasNext()) {
-                results.add(cursor.next());
-            }
-        }
-    }
-
     @Override
     public void replace(T entity) {
         var watch = new StopWatch();
@@ -306,7 +287,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
         validator.validate(entity, false);
         try {
             id = mongo.codecs.id(entity);
-            if (id == null) throw new Error(format("entity must have id, entityClass={}", entityClass.getCanonicalName()));
+            if (id == null) throw new Error("entity must have id, entityClass=" + entityClass.getCanonicalName());
             collection().replaceOne(Filters.eq("_id", id), entity, new ReplaceOptions().upsert(true));
         } finally {
             long elapsed = watch.elapsed();
@@ -327,7 +308,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             List<ReplaceOneModel<T>> models = new ArrayList<>(size);
             for (T entity : entities) {
                 Object id = mongo.codecs.id(entity);
-                if (id == null) throw new Error(format("entity must have id, entityClass={}", entityClass.getCanonicalName()));
+                if (id == null) throw new Error("entity must have id, entityClass=" + entityClass.getCanonicalName());
                 models.add(new ReplaceOneModel<>(Filters.eq("_id", id), entity, new ReplaceOptions().upsert(true)));
             }
             collection().bulkWrite(models, new BulkWriteOptions().ordered(false));
@@ -410,6 +391,23 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
             ActionLogContext.track("mongo", elapsed, 0, deletedRows);
             logger.debug("bulkDelete, collection={}, ids={}, size={}, deletedRows={}, elapsed={}", collectionName, ids, size, deletedRows, elapsed);
             checkSlowOperation(elapsed);
+        }
+    }
+
+    private FindIterable<T> mongoQuery(Query query) {
+        FindIterable<T> mongoQuery = collection(query.readPreference).find(query.filter == null ? new BsonDocument() : query.filter);
+        if (query.projection != null) mongoQuery.projection(query.projection);
+        if (query.sort != null) mongoQuery.sort(query.sort);
+        if (query.skip != null) mongoQuery.skip(query.skip);
+        if (query.limit != null) mongoQuery.limit(query.limit);
+        return mongoQuery;
+    }
+
+    private <V> void fetch(MongoIterable<V> iterable, List<V> results) {
+        try (MongoCursor<V> cursor = iterable.iterator()) {
+            while (cursor.hasNext()) {
+                results.add(cursor.next());
+            }
         }
     }
 

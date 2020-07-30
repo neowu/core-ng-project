@@ -16,8 +16,6 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.List;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -60,7 +58,7 @@ public class SiteConfig extends Config {
     public StaticContentConfig staticContent(String path) {
         logger.info("add static content path, path={}", path);
         Path contentPath = context.httpServer.siteManager.webDirectory.path(path);
-        if (!Files.exists(contentPath, LinkOption.NOFOLLOW_LINKS)) throw new Error(format("path does not exist, path={}", path));
+        if (!Files.exists(contentPath, LinkOption.NOFOLLOW_LINKS)) throw new Error("path does not exist, path=" + path);
 
         StaticContentController controller;
         if (Files.isDirectory(contentPath)) {

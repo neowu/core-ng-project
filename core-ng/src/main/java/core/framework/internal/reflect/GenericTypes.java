@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static core.framework.util.Strings.format;
-
 /**
  * @author neo
  */
@@ -18,7 +16,7 @@ public final class GenericTypes {
         } else if (type instanceof ParameterizedType) {
             return (Class<?>) ((ParameterizedType) type).getRawType();
         } else {
-            throw new Error(format("unsupported type, type={}", type));
+            throw new Error("unsupported type, type=" + type);
         }
     }
 

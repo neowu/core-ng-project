@@ -28,7 +28,7 @@ public class WebServiceImplValidator<T> {
         Class<?> serviceClass = service.getClass();
 
         if (!Object.class.equals(serviceClass.getSuperclass())) {
-            throw new Error(format("service impl class must not have super class, class={}", serviceClass.getCanonicalName()));
+            throw new Error("service impl class must not have super class, class=" + serviceClass.getCanonicalName());
         }
 
         for (Method method : serviceInterface.getDeclaredMethods()) {
@@ -47,7 +47,7 @@ public class WebServiceImplValidator<T> {
         for (Annotation[] parameterAnnotations : annotations) {
             PathParam pathParam = Params.annotation(parameterAnnotations, PathParam.class);
             if (pathParam != null) {
-                throw new Error(format("service impl must not have @PathParam, method={}", Methods.path(method)));
+                throw new Error("service impl must not have @PathParam, method=" + Methods.path(method));
             }
         }
     }

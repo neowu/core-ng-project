@@ -93,7 +93,7 @@ public final class Scheduler {
     private void addTask(Task task) {
         Class<? extends Job> jobClass = task.job().getClass();
         if (jobClass.isSynthetic())
-            throw new Error(format("job class must not be anonymous class or lambda, please create static class, jobClass={}", jobClass.getCanonicalName()));
+            throw new Error("job class must not be anonymous class or lambda, please create static class, jobClass=" + jobClass.getCanonicalName());
 
         String name = task.name();
         Task previous = tasks.putIfAbsent(name, task);
