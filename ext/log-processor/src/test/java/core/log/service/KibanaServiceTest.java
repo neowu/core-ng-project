@@ -4,9 +4,12 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
+import core.framework.test.MockitoExtension;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -14,19 +17,19 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class KibanaServiceTest {
     private KibanaService service;
+    @Mock
     private HTTPClient httpClient;
 
     @BeforeEach
     void createKibanaService() {
-        httpClient = mock(HTTPClient.class);
         service = new KibanaService("http://kibana:5601", "banner", httpClient);
     }
 
@@ -51,7 +54,7 @@ class KibanaServiceTest {
     @Test
     void failedToImportObjects() {
         when(httpClient.execute(any(HTTPRequest.class)))
-            .thenReturn(new HTTPResponse(400, Map.of(), new byte[0]));
+                .thenReturn(new HTTPResponse(400, Map.of(), new byte[0]));
 
         service.importObjects();
     }

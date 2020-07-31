@@ -4,14 +4,16 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPHeaders;
 import core.framework.json.JSON;
 import core.framework.log.message.EventMessage;
+import core.framework.test.MockitoExtension;
 import core.framework.util.Strings;
 import core.framework.web.CookieSpec;
 import core.framework.web.Request;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.ForbiddenException;
 import core.log.IntegrationTest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -25,19 +27,15 @@ import static core.log.web.SendEventRequest.Event;
 import static core.log.web.SendEventRequest.Result;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class EventControllerTest extends IntegrationTest {
+    @Mock
     private Request request;
-
-    @BeforeEach
-    void prepare() {
-        request = mock(Request.class);
-    }
 
     @Test
     void checkOriginWithWildcard() {

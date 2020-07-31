@@ -2,28 +2,30 @@ package core.log.job;
 
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
+import core.framework.test.MockitoExtension;
 import core.log.service.IndexService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 
 import java.time.LocalDate;
 import java.util.Map;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class CleanupOldIndexJobTest {
     private CleanupOldIndexJob job;
+    @Mock
     private ElasticSearch elasticSearch;
 
     @BeforeEach
     void createCleanupOldIndexJob() {
-        elasticSearch = mock(ElasticSearch.class);
-
         job = new CleanupOldIndexJob();
         job.elasticSearch = elasticSearch;
         job.indexService = new IndexService();

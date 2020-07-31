@@ -3,27 +3,29 @@ package app.monitor.alert;
 import app.monitor.AlertConfig;
 import app.monitor.slack.SlackClient;
 import core.framework.log.Severity;
+import core.framework.test.MockitoExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author ericchung
  */
+@ExtendWith(MockitoExtension.class)
 class AlertServiceTest {
+    @Mock
     private AlertService service;
     private SlackClient slackClient;
 
     @BeforeEach
     void createActionAlertService() {
-        slackClient = mock(SlackClient.class);
-
         var config = new AlertConfig();
         config.ignoreWarnings = List.of(matcher(List.of("website"), List.of("PATH_NOT_FOUND")));
         config.criticalErrors = List.of(matcher(List.of(), List.of("CRITICAL_ERROR", "SLOW_SQL")));

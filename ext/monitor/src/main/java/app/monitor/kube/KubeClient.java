@@ -6,15 +6,17 @@ import core.framework.http.HTTPClient;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.json.JSON;
+import core.framework.internal.json.JSONReader;
 import core.framework.util.Files;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 /**
  * @author neo
  */
 public class KubeClient {
+    private final JSONReader<PodList> reader = new JSONReader<>(PodList.class);
     private HTTPClient httpClient;
     private String token;
 
@@ -27,7 +29,7 @@ public class KubeClient {
         token = Files.text(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/token"));
     }
 
-    public PodList listPods(String namespace) {
+    public PodList listPods(String namespace) throws IOException {
         HTTPRequest request = new HTTPRequest(HTTPMethod.GET, "https://kubernetes.default.svc/api/v1/namespaces/" + namespace + "/pods");
         request.bearerAuth(token);
         request.accept(ContentType.APPLICATION_JSON);
@@ -36,6 +38,6 @@ public class KubeClient {
             throw new Error("failed to call kube api, statusCode=" + response.statusCode + ", message=" + response.text());
         }
         // not using validation to reduce overhead
-        return JSON.fromJSON(PodList.class, response.text());
+        return reader.fromJSON(response.body);
     }
 }

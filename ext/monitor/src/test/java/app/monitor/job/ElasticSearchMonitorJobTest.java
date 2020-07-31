@@ -6,11 +6,12 @@ import core.framework.http.HTTPResponse;
 import core.framework.internal.stat.Stats;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
+import core.framework.test.MockitoExtension;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class ElasticSearchMonitorJobTest {
     @Mock
     HTTPClient httpClient;
@@ -33,7 +35,6 @@ class ElasticSearchMonitorJobTest {
 
     @BeforeEach
     void createElasticSearchMonitorJob() {
-        MockitoAnnotations.initMocks(this);
         job = new ElasticSearchMonitorJob(httpClient, "es", "localhost", publisher);
     }
 

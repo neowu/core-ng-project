@@ -4,10 +4,11 @@ import app.monitor.kube.KubeClient;
 import app.monitor.kube.PodList;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
+import core.framework.test.MockitoExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class KubeMonitorJobTest {
     @Mock
     KubeClient kubeClient;
@@ -29,7 +31,6 @@ class KubeMonitorJobTest {
 
     @BeforeEach
     void createKubeMonitorJob() {
-        MockitoAnnotations.initMocks(this);
         job = new KubeMonitorJob(List.of("ns"), kubeClient, publisher);
     }
 

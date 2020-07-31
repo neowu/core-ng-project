@@ -3,25 +3,28 @@ package app.monitor.kafka;
 import app.monitor.alert.AlertService;
 import core.framework.log.Severity;
 import core.framework.log.message.EventMessage;
+import core.framework.test.MockitoExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class EventMessageHandlerTest {
     private EventMessageHandler handler;
+    @Mock
     private AlertService alertService;
 
     @BeforeEach
     void createEventMessageHandler() {
         handler = new EventMessageHandler();
-        alertService = mock(AlertService.class);
         handler.alertService = alertService;
     }
 
