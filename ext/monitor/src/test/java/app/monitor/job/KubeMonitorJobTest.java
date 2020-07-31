@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -102,7 +103,7 @@ class KubeMonitorJobTest {
     }
 
     @Test
-    void publishError() {
+    void publishError() throws IOException {
         when(kubeClient.listPods("ns")).thenThrow(new Error("mock"));
         job.execute(null);
         verify(publisher).publish(argThat(message -> "kubernetes".equals(message.app)
