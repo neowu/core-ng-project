@@ -20,8 +20,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
  */
 @ExtendWith(MockitoExtension.class)
 class AlertServiceTest {
-    @Mock
     private AlertService service;
+    @Mock
     private SlackClient slackClient;
 
     @BeforeEach
