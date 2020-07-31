@@ -48,7 +48,7 @@ public class ResponseBeanReader {   // used by webservice client
         }
     }
 
-    private static class Context<T> {
+    static class Context<T> {
         final JSONReader<T> reader;
         final Validator<T> validator;
 
