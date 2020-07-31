@@ -4,7 +4,7 @@ import core.framework.http.HTTPMethod;
 import core.framework.util.Types;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author neo
@@ -12,15 +12,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class LiteralTest {
     @Test
     void enumVariable() {
-        assertEquals("core.framework.http.HTTPMethod.POST", Literal.variable(HTTPMethod.POST));
+        assertThat(Literal.variable(HTTPMethod.POST)).isEqualTo("core.framework.http.HTTPMethod.POST");
     }
 
     @Test
     void typeVariable() {
-        assertEquals("java.lang.String.class", Literal.variable(String.class));
+        assertThat(Literal.variable(String.class)).isEqualTo("java.lang.String.class");
 
-        assertEquals("core.framework.util.Types.list(java.lang.String.class)", Literal.variable(Types.list(String.class)));
+        assertThat(Literal.variable(Types.list(String.class))).isEqualTo("core.framework.util.Types.list(java.lang.String.class)");
 
-        assertEquals("core.framework.util.Types.optional(java.lang.String.class)", Literal.variable(Types.optional(String.class)));
+        assertThat(Literal.variable(Types.optional(String.class))).isEqualTo("core.framework.util.Types.optional(java.lang.String.class)");
+    }
+
+    @Test
+    void stringVariable() {
+        assertThat(Literal.variable("\n")).isEqualTo("\"\\n\"");
+        assertThat(Literal.variable("\r")).isEqualTo("\"\\r\"");
+        assertThat(Literal.variable("\\")).isEqualTo("\"\\\\\"");
+        assertThat(Literal.variable("\"")).isEqualTo("\"\\\"\"");
     }
 }

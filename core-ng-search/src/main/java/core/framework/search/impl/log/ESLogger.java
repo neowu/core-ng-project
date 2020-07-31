@@ -38,6 +38,11 @@ public class ESLogger extends AbstractLogger {
     }
 
     @Override
+    public boolean isEnabled(Level level, Marker marker, String data, Throwable t) {
+        return isEnabled(level);
+    }
+
+    @Override
     public boolean isEnabled(Level level, Marker marker, String data) {
         return isEnabled(level);
     }
@@ -105,13 +110,8 @@ public class ESLogger extends AbstractLogger {
     }
 
     @Override
-    public boolean isEnabled(Level level, Marker marker, String data, Throwable t) {
-        return isEnabled(level);
-    }
-
-    @Override
     public boolean isEnabled(Level level) {
-        return level.getStandardLevel().intLevel() <= Level.INFO.intLevel();
+        return level.intLevel() <= Level.INFO.intLevel();
     }
 
     @Override

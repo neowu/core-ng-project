@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-class ContextHelper {
+class ContextHelper {   // shared logic for request/response bean reader/writer
     static <T, V> T context(Map<Class<?>, ?> context, Class<V> beanClass) {
         @SuppressWarnings("unchecked")
         T result = (T) context.get(beanClass);

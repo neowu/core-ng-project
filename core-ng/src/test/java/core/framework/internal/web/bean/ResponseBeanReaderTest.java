@@ -3,6 +3,7 @@ package core.framework.internal.web.bean;
 import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.bean.TestBean;
 import core.framework.internal.validate.ValidationException;
+import core.framework.internal.web.service.ErrorResponse;
 import core.framework.json.JSON;
 import core.framework.util.Strings;
 import core.framework.util.Types;
@@ -32,6 +33,12 @@ class ResponseBeanReaderTest {
     @Test
     void register() {
         reader.register(TestBean.class, validator);
+    }
+
+    @Test
+    void builtinClasses() {
+        // webservice client may get error response
+        assertThat(reader.context).containsKey(ErrorResponse.class);
     }
 
     @Test

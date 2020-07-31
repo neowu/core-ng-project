@@ -36,7 +36,8 @@ class QueryParamReaderTest {
                 "date_field", "2017-08-28",
                 "time_field", "13:01:02",
                 "long_field", "123",
-                "double_field", "");
+                "double_field", "",
+                "enum_field", "V1");
 
         TestQueryParamBean bean = reader.fromParams(params);
 
@@ -46,6 +47,7 @@ class QueryParamReaderTest {
         assertThat(bean.timeField).isEqualTo(LocalTime.of(13, 1, 2));
         assertThat(bean.longField).isEqualTo(123);
         assertThat(bean.doubleField).isNull();
+        assertThat(bean.enumField).isEqualTo(TestQueryParamBean.TestEnum.VALUE1);
         assertThat(bean.defaultValueField).isEqualTo("value");
     }
 }

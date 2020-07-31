@@ -1,7 +1,7 @@
 package core.framework.module;
 
 import core.framework.async.Task;
-import core.framework.internal.asm.ClassPoolFactory;
+import core.framework.internal.asm.DynamicInstanceBuilder;
 import core.framework.internal.json.JSONMapper;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
@@ -62,6 +62,6 @@ public abstract class App extends Module {
         // free object not used anymore
         Validator.cleanup();
         JSONMapper.cleanup();
-        ClassPoolFactory.cleanup();
+        DynamicInstanceBuilder.cleanup();
     }
 }

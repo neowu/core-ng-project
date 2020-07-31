@@ -16,9 +16,20 @@ import static core.framework.util.Strings.format;
  * @author neo
  */
 public class DynamicInstanceBuilder<T> {
-    private static final AtomicInteger INDEX = new AtomicInteger();
+    private static AtomicInteger index = new AtomicInteger();
+    private static ClassPool pool;
+
+    static {
+        pool = new ClassPool(null);
+        pool.appendSystemPath();
+    }
+
+    public static void cleanup() {
+        pool = null;
+        index = null;
+    }
+
     private final CtClass classBuilder;
-    private final ClassPool classPool;
     private final SourceCode sourceCode = new SourceCode();
     private Class<?>[] constructorParamClasses;
 
@@ -29,12 +40,11 @@ public class DynamicInstanceBuilder<T> {
         sourceCode.interfaceClass = interfaceClass;
         sourceCode.className = className;
 
-        classPool = ClassPoolFactory.get();
-        classBuilder = classPool.makeClass(className + "$" + (INDEX.getAndIncrement()));
+        classBuilder = pool.makeClass(className + "$" + (index.getAndIncrement()));
 
         try {
-            classBuilder.addInterface(classPool.get(interfaceClass.getName()));
-            CtConstructor constructor = new CtConstructor(null, classBuilder);
+            classBuilder.addInterface(pool.get(interfaceClass.getName()));
+            var constructor = new CtConstructor(null, classBuilder);
             constructor.setBody(";");
             classBuilder.addConstructor(constructor);
         } catch (NotFoundException | CannotCompileException e) {
@@ -51,12 +61,12 @@ public class DynamicInstanceBuilder<T> {
 
         try {
             this.constructorParamClasses = constructorParamClasses;
-            CtClass[] params = new CtClass[constructorParamClasses.length];
+            var params = new CtClass[constructorParamClasses.length];
             for (int i = 0; i < constructorParamClasses.length; i++) {
                 Class<?> paramClass = constructorParamClasses[i];
-                params[i] = classPool.getCtClass(paramClass.getName());
+                params[i] = pool.getCtClass(paramClass.getName());
             }
-            CtConstructor constructor = new CtConstructor(params, classBuilder);
+            var constructor = new CtConstructor(params, classBuilder);
             constructor.setBody(body);
             classBuilder.addConstructor(constructor);
         } catch (CannotCompileException | NotFoundException e) {
@@ -66,7 +76,7 @@ public class DynamicInstanceBuilder<T> {
 
     public void addInterface(Class<?> interfaceClass) {
         try {
-            classBuilder.addInterface(classPool.get(interfaceClass.getName()));
+            classBuilder.addInterface(pool.get(interfaceClass.getName()));
         } catch (NotFoundException e) {
             throw new Error(e);
         }

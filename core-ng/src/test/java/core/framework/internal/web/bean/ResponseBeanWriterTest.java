@@ -3,6 +3,8 @@ package core.framework.internal.web.bean;
 import core.framework.internal.bean.BeanClassValidator;
 import core.framework.internal.bean.TestBean;
 import core.framework.internal.validate.ValidationException;
+import core.framework.internal.web.service.ErrorResponse;
+import core.framework.internal.web.site.AJAXErrorResponse;
 import core.framework.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,18 @@ class ResponseBeanWriterTest {
         validator = new BeanClassValidator();
         writer = new ResponseBeanWriter();
         writer.register(TestBean.class, validator);
+    }
+
+    @Test
+    void register() {
+        writer.register(TestBean.class, validator);
+    }
+
+    @Test
+    void builtinClasses() {
+        // controller may return error responses
+        assertThat(writer.contains(AJAXErrorResponse.class)).isTrue();
+        assertThat(writer.contains(ErrorResponse.class)).isTrue();
     }
 
     @Test
@@ -64,10 +78,5 @@ class ResponseBeanWriterTest {
     void toJSONWithValidationError() {
         assertThatThrownBy(() -> writer.toJSON(new TestBean()))
                 .isInstanceOf(ValidationException.class);
-    }
-
-    @Test
-    void register() {
-        writer.register(TestBean.class, validator);
     }
 }

@@ -17,7 +17,7 @@ import java.util.Optional;
  * @author neo
  */
 public class ResponseBeanReader {   // used by webservice client
-    private final Map<Class<?>, Context<?>> context = Maps.newHashMap();
+    final Map<Class<?>, Context<?>> context = Maps.newHashMap();
 
     public ResponseBeanReader() {
         context.put(ErrorResponse.class, new Context<>(ErrorResponse.class));   // webservice client doesn't need AJAXErrorResponse
