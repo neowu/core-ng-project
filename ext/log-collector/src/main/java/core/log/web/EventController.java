@@ -26,16 +26,18 @@ import java.util.Map;
  * @author neo
  */
 public class EventController {
+    private final JSONReader<SendEventRequest> reader = new JSONReader<>(SendEventRequest.class);
     private final SendEventRequestValidator validator = new SendEventRequestValidator();
-    private final JSONReader<SendEventRequest> reader = JSONReader.of(SendEventRequest.class);
     private final List<String> allowedOrigins;
     private final List<String> collectCookies;
+    private final boolean allowAllOrigins;
+
     @Inject
     MessagePublisher<EventMessage> eventMessagePublisher;
-    private boolean allowAllOrigins;
 
     public EventController(List<String> allowedOrigins, List<String> collectCookies) {
         this.allowedOrigins = new ArrayList<>(allowedOrigins.size());
+        boolean allowAllOrigins = false;
         for (String origin : allowedOrigins) {
             if ("*".equals(origin)) {
                 allowAllOrigins = true;
@@ -43,6 +45,7 @@ public class EventController {
                 this.allowedOrigins.add(origin);
             }
         }
+        this.allowAllOrigins = allowAllOrigins;
         this.collectCookies = collectCookies;
     }
 

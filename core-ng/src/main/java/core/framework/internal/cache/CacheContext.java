@@ -1,5 +1,6 @@
 package core.framework.internal.cache;
 
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
@@ -15,8 +16,8 @@ public class CacheContext<T> {
     final Validator<T> validator;
 
     CacheContext(Class<T> cacheClass) {
-        reader = JSONReader.of(cacheClass);
-        writer = JSONWriter.of(cacheClass);
+        reader = JSONMapper.reader(cacheClass);
+        writer = JSONMapper.writer(cacheClass);
         validator = Validator.of(cacheClass);
     }
 }

@@ -17,6 +17,8 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.PUBLIC_ONLY;
@@ -32,6 +34,23 @@ import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
  */
 public class JSONMapper {
     public static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
+    private static Map<Class<?>, JSONReader<?>> readers = new HashMap<>();
+    private static Map<Class<?>, JSONWriter<?>> writers = new HashMap<>();
+
+    @SuppressWarnings("unchecked")
+    public static <T> JSONReader<T> reader(Class<T> beanClass) {
+        return (JSONReader<T>) readers.computeIfAbsent(beanClass, JSONReader::new);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> JSONWriter<T> writer(Class<T> beanClass) {
+        return (JSONWriter<T>) writers.computeIfAbsent(beanClass, JSONWriter::new);
+    }
+
+    public static void cleanup() {
+        readers = null;
+        writers = null;
+    }
 
     private static ObjectMapper createObjectMapper() {
         return JsonMapper.builder()

@@ -1,5 +1,6 @@
 package core.framework.search.impl;
 
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
@@ -77,8 +78,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
         this.elasticSearch = elasticSearch;
         this.slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
         this.index = documentClass.getDeclaredAnnotation(Index.class).name();
-        reader = JSONReader.of(documentClass);
-        writer = JSONWriter.of(documentClass);
+        reader = JSONMapper.reader(documentClass);
+        writer = JSONMapper.writer(documentClass);
         validator = Validator.of(documentClass);
     }
 

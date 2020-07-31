@@ -1,6 +1,7 @@
 package core.framework.internal.web.bean;
 
 import core.framework.internal.bean.BeanClassValidator;
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.reflect.GenericTypes;
 import core.framework.internal.validate.Validator;
@@ -52,7 +53,7 @@ public class ResponseBeanReader {   // used by webservice client
         final Validator<T> validator;
 
         Context(Class<T> beanClass) {
-            reader = JSONReader.of(beanClass);
+            reader = JSONMapper.reader(beanClass);
             validator = Validator.of(beanClass);
         }
     }

@@ -5,28 +5,15 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import core.framework.util.Strings;
 
 import java.io.UncheckedIOException;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
  * @author neo
  */
 public final class JSONWriter<T> {
-    private static Map<Class<?>, JSONWriter<?>> cache = new HashMap<>();
-
-    @SuppressWarnings("unchecked")
-    public static <T> JSONWriter<T> of(Class<T> beanClass) {
-        return (JSONWriter<T>) cache.computeIfAbsent(beanClass, JSONWriter::new);
-    }
-
-    public static void cleanup() {
-        cache = null;
-    }
-
     private final ObjectWriter writer;
 
-    private JSONWriter(Class<T> instanceClass) {
+    public JSONWriter(Class<T> instanceClass) {
         this.writer = JSONMapper.OBJECT_MAPPER.writerFor(instanceClass);
     }
 

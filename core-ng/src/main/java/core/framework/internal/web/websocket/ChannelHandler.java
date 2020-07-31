@@ -1,5 +1,6 @@
 package core.framework.internal.web.websocket;
 
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.ValidationException;
@@ -27,11 +28,11 @@ public class ChannelHandler<T, V> {
     private final Validator<V> serverMessageValidator;
 
     public ChannelHandler(Class<T> clientMessageClass, Class<V> serverMessageClass, ChannelListener<T, V> listener) {
-        clientMessageReader = JSONReader.of(clientMessageClass);
+        clientMessageReader = JSONMapper.reader(clientMessageClass);
         clientMessageValidator = Validator.of(clientMessageClass);
 
         this.serverMessageClass = serverMessageClass;
-        serverMessageWriter = JSONWriter.of(serverMessageClass);
+        serverMessageWriter = JSONMapper.writer(serverMessageClass);
         serverMessageValidator = Validator.of(serverMessageClass);
 
         this.listener = listener;

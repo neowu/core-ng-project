@@ -187,5 +187,8 @@ class JSONTest {
     void invalidJSON() {
         assertThatThrownBy(() -> JSON.fromJSON(TestBean.class, "{"))
                 .isInstanceOf(UncheckedIOException.class);
+
+        assertThatThrownBy(() -> JSON.fromJSON(Types.list(TestBean.class), "{"))
+                .isInstanceOf(UncheckedIOException.class);
     }
 }

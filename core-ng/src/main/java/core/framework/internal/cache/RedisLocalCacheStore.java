@@ -19,7 +19,7 @@ public class RedisLocalCacheStore implements CacheStore {
     private final CacheStore localCache;
     private final CacheStore redisCache;
     private final RedisImpl redis;
-    private final JSONWriter<InvalidateLocalCacheMessage> writer = JSONWriter.of(InvalidateLocalCacheMessage.class);
+    private final JSONWriter<InvalidateLocalCacheMessage> writer = new JSONWriter<>(InvalidateLocalCacheMessage.class);
 
     public RedisLocalCacheStore(CacheStore localCache, CacheStore redisCache, RedisImpl redis) {
         this.localCache = localCache;
@@ -84,14 +84,6 @@ public class RedisLocalCacheStore implements CacheStore {
         publishInvalidateLocalCacheMessage(keys(values));
     }
 
-    private <T> List<String> keys(List<Entry<T>> values) {
-        List<String> keys = new ArrayList<>(values.size());
-        for (Entry<T> value : values) {
-            keys.add(value.key);
-        }
-        return keys;
-    }
-
     @Override
     public boolean delete(String... keys) {
         boolean deleted = redisCache.delete(keys);
@@ -100,6 +92,14 @@ public class RedisLocalCacheStore implements CacheStore {
             publishInvalidateLocalCacheMessage(Arrays.asList(keys));
         }
         return deleted;
+    }
+
+    private <T> List<String> keys(List<Entry<T>> values) {
+        List<String> keys = new ArrayList<>(values.size());
+        for (Entry<T> value : values) {
+            keys.add(value.key);
+        }
+        return keys;
     }
 
     private void publishInvalidateLocalCacheMessage(List<String> keys) {

@@ -33,8 +33,8 @@ public final class KafkaAppender implements LogAppender {
     final BlockingQueue<ProducerRecord<byte[], byte[]>> records = new LinkedBlockingQueue<>();
     private final Logger logger = LoggerFactory.getLogger(KafkaAppender.class);
     private final Thread logForwarderThread;
-    private final JSONWriter<ActionLogMessage> actionLogWriter = JSONWriter.of(ActionLogMessage.class);
-    private final JSONWriter<StatMessage> statWriter = JSONWriter.of(StatMessage.class);
+    private final JSONWriter<ActionLogMessage> actionLogWriter = new JSONWriter<>(ActionLogMessage.class);
+    private final JSONWriter<StatMessage> statWriter = new JSONWriter<>(StatMessage.class);
     private final Callback callback = new KafkaCallback();
 
     private Producer<byte[], byte[]> producer;

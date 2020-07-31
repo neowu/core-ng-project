@@ -1,6 +1,6 @@
 package core.framework.internal.kafka;
 
-import core.framework.internal.json.JSONReader;
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.log.ActionLog;
 import core.framework.kafka.Message;
 import core.framework.util.Strings;
@@ -47,7 +47,7 @@ class MessageListenerThreadTest {
         record.headers().add(MessageHeaders.HEADER_REF_ID, Strings.bytes("refId"));
         record.headers().add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes("correlationId"));
         var actionLog = new ActionLog(null);
-        List<Message<TestMessage>> messages = thread.messages(List.of(record), actionLog, JSONReader.of(TestMessage.class));
+        List<Message<TestMessage>> messages = thread.messages(List.of(record), actionLog, JSONMapper.reader(TestMessage.class));
 
         assertThat(messages).hasSize(1);
         assertThat(messages.get(0).key).isEqualTo("key");

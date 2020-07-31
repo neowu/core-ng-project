@@ -1,5 +1,6 @@
 package core.framework.internal.kafka;
 
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.validate.Validator;
 import core.framework.kafka.BulkMessageHandler;
@@ -17,7 +18,7 @@ class MessageProcess<T> {
     MessageProcess(MessageHandler<T> handler, BulkMessageHandler<T> bulkHandler, Class<T> messageClass) {
         this.handler = handler;
         this.bulkHandler = bulkHandler;
-        reader = JSONReader.of(messageClass);
+        reader = JSONMapper.reader(messageClass);
         validator = Validator.of(messageClass);
     }
 }

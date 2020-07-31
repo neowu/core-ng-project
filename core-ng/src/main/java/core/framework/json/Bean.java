@@ -1,6 +1,7 @@
 package core.framework.json;
 
 import core.framework.internal.json.JSONClassValidator;
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONReader;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
@@ -56,8 +57,8 @@ public final class Bean {
         final Validator<T> validator;
 
         Context(Class<T> beanClass) {
-            reader = JSONReader.of(beanClass);
-            writer = JSONWriter.of(beanClass);
+            reader = JSONMapper.reader(beanClass);
+            writer = JSONMapper.writer(beanClass);
             validator = Validator.of(beanClass);
         }
     }

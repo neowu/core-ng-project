@@ -2,6 +2,7 @@ package core.framework.internal.web.bean;
 
 import core.framework.internal.bean.BeanClassNameValidator;
 import core.framework.internal.bean.BeanClassValidator;
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
 import core.framework.util.Maps;
@@ -56,7 +57,7 @@ public class RequestBeanWriter {    // used by webservice client
         final Validator<T> validator;
 
         BeanContext(Class<T> beanClass) {
-            writer = JSONWriter.of(beanClass);
+            writer = JSONMapper.writer(beanClass);
             validator = Validator.of(beanClass);
         }
     }

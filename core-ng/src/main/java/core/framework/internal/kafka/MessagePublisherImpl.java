@@ -1,5 +1,6 @@
 package core.framework.internal.kafka;
 
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
@@ -28,7 +29,7 @@ public class MessagePublisherImpl<T> implements MessagePublisher<T> {
     public MessagePublisherImpl(MessageProducer producer, String topic, Class<T> messageClass) {
         this.producer = producer;
         this.topic = topic;
-        writer = JSONWriter.of(messageClass);
+        writer = JSONMapper.writer(messageClass);
         validator = Validator.of(messageClass);
     }
 

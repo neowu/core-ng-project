@@ -1,6 +1,7 @@
 package core.framework.internal.web.bean;
 
 import core.framework.internal.bean.BeanClassValidator;
+import core.framework.internal.json.JSONMapper;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
 import core.framework.internal.web.service.ErrorResponse;
@@ -57,7 +58,7 @@ public class ResponseBeanWriter {   // used by controller and web service
         final Validator<T> validator;
 
         Context(Class<T> beanClass) {
-            writer = JSONWriter.of(beanClass);
+            writer = JSONMapper.writer(beanClass);
             validator = Validator.of(beanClass);
         }
     }
