@@ -139,8 +139,7 @@ class JSONTest {
 
     @Test
     void listObject() {
-        @SuppressWarnings("unchecked")
-        var beans = (List<TestBean>) JSON.fromJSON(Types.list(TestBean.class), "[{\"string\":\"n1\"},{\"string\":\"n2\"}]");
+        List<TestBean> beans = JSON.fromJSON(Types.list(TestBean.class), "[{\"string\":\"n1\"},{\"string\":\"n2\"}]");
 
         assertThat(beans).hasSize(2);
         assertThat(beans.get(0).stringField).isEqualTo("n1");

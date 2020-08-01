@@ -39,11 +39,13 @@ public class JSONMapper {
 
     @SuppressWarnings("unchecked")
     public static <T> JSONReader<T> reader(Class<T> beanClass) {
+        // can only be used during config time within module, App will run cleanup after startup
         return (JSONReader<T>) readers.computeIfAbsent(beanClass, JSONReader::new);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> JSONWriter<T> writer(Class<T> beanClass) {
+        // can only be used during config time within module, App will run cleanup after startup
         return (JSONWriter<T>) writers.computeIfAbsent(beanClass, JSONWriter::new);
     }
 

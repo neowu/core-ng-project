@@ -91,9 +91,9 @@ public class ModuleContext {
         httpServer.handler.route.add(method, path, new ControllerHolder(controller, inspector.targetMethod, inspector.controllerInfo, action, skipInterceptor));
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends Config> T config(Class<T> configClass, @Nullable String name) {
         String key = configClass.getCanonicalName() + ":" + name;   // not using computeIfAbsent, to avoid concurrent modification in nested call, e.g. httpConfig->publishAPIConfig->apiConfig
+        @SuppressWarnings("unchecked")
         T config = (T) configs.get(key);
         if (config == null) {
             try {

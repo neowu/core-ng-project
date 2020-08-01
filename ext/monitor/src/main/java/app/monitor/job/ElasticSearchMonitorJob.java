@@ -18,6 +18,7 @@ import core.framework.util.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +28,11 @@ import java.util.Map;
  */
 public class ElasticSearchMonitorJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchMonitorJob.class);
+    private final Type responseType = Types.list(Types.map(String.class, String.class));
     private final HTTPClient httpClient;
+    private final MessagePublisher<StatMessage> publisher;
     private final String app;
     private final String host;
-    private final MessagePublisher<StatMessage> publisher;
     public double highHeapUsageThreshold;
     public double highDiskUsageThreshold;
 
@@ -124,8 +126,6 @@ public class ElasticSearchMonitorJob implements Job {
         HTTPResponse response = httpClient.execute(request);
         if (response.statusCode != HTTPStatus.OK.code)
             throw new Error(Strings.format("failed to call es cat api, uri={}, status={}", request.requestURI(), response.statusCode));
-        @SuppressWarnings("unchecked")
-        List<Map<String, String>> results = (List<Map<String, String>>) JSON.fromJSON(Types.list(Types.map(String.class, String.class)), response.text());
-        return results;
+        return JSON.fromJSON(responseType, response.text());
     }
 }

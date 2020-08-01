@@ -25,7 +25,7 @@ import static core.framework.internal.asm.Literal.variable;
 final class EntityDecoderBuilder<T> {
     final DynamicInstanceBuilder<EntityDecoder<T>> builder;
     private final Class<T> entityClass;
-    private final Map<Class<? extends Enum<?>>, String> enumCodecFields = Maps.newHashMap();
+    private final Map<Class<?>, String> enumCodecFields = Maps.newHashMap();
     private final Map<Type, String> decodeMethods = Maps.newHashMap();
     private int index;
 
@@ -192,9 +192,7 @@ final class EntityDecoderBuilder<T> {
     }
 
     private String registerEnumCodec(Class<?> fieldClass) {
-        @SuppressWarnings("unchecked")
-        Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) fieldClass;
-        return enumCodecFields.computeIfAbsent(enumClass, key -> {
+        return enumCodecFields.computeIfAbsent(fieldClass, key -> {
             String fieldVariable = "enumCodec" + fieldClass.getSimpleName() + (index++);
             builder.addField("private final {} {} = new {}({});", type(EnumCodec.class), fieldVariable, type(EnumCodec.class), variable(fieldClass));
             return fieldVariable;

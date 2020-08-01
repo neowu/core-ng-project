@@ -14,14 +14,14 @@ public final class Classes {
     public static List<Field> instanceFields(Class<?> instanceClass) {
         // even though according to JDK doc, the fields returned is not in particular order, but common JDK impl follows field declaration order of source code
         return Arrays.stream(instanceClass.getDeclaredFields())
-                     .filter(field -> !Modifier.isStatic(field.getModifiers()))
-                     .collect(Collectors.toList());
+                .filter(field -> !Modifier.isStatic(field.getModifiers()))
+                .collect(Collectors.toList());
     }
 
     public static List<Field> enumConstantFields(Class<?> enumClass) {
         return Arrays.stream(enumClass.getDeclaredFields())
-                     .filter(Field::isEnumConstant)
-                     .collect(Collectors.toList());
+                .filter(Field::isEnumConstant)
+                .collect(Collectors.toList());
     }
 
     // return class name without package, e.g. for nested class will be EnclosingClass$NestedClass

@@ -37,17 +37,16 @@ public class ResponseBeanWriter {   // used by controller and web service
         return context.containsKey(beanClass);
     }
 
-    @SuppressWarnings("unchecked")
     public byte[] toJSON(Object bean) {
         if (bean instanceof Optional) {  // only support Optional<T> as response bean type
             Optional<?> optional = (Optional<?>) bean;
             if (optional.isEmpty()) return Strings.bytes("null");
             Object value = optional.get();
-            Context<Object> context = ContextHelper.context(this.context, (Class<Object>) value.getClass());
+            Context<Object> context = ContextHelper.context(this.context, value.getClass());
             context.validator.validate(value, false);
             return context.writer.toJSON(value);
         } else {
-            Context<Object> context = ContextHelper.context(this.context, (Class<Object>) bean.getClass());
+            Context<Object> context = ContextHelper.context(this.context, bean.getClass());
             context.validator.validate(bean, false);
             return context.writer.toJSON(bean);
         }

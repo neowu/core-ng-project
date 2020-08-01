@@ -2,26 +2,27 @@ package core.framework.db;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
  * @author neo
  */
 class QueryTest<T> {
-    private Query<T> query;
+    @Mock
+    Query<T> query;
 
     @BeforeEach
-    @SuppressWarnings("unchecked")
     void createQuery() {
-        query = mock(Query.class);
+        MockitoAnnotations.initMocks(this);
         Mockito.doCallRealMethod().when(query).in(any(), anyList());
     }
 

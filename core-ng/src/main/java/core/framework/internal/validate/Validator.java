@@ -17,15 +17,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public final class Validator<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Validator.class);
-    private static Map<Class<?>, Validator<?>> cache = new HashMap<>();
+    private static Map<Class<?>, Validator<?>> validators = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T> Validator<T> of(Class<T> beanClass) {
-        return (Validator<T>) cache.computeIfAbsent(beanClass, Validator::new);
+        // can only be used during config time within module, App will run cleanup after startup
+        return (Validator<T>) validators.computeIfAbsent(beanClass, Validator::new);
     }
 
     public static void cleanup() {
-        cache = null;
+        validators = null;
     }
 
     @Nullable

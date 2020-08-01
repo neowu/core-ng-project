@@ -37,14 +37,13 @@ public final class Bean {
     }
 
     public static <T> String toJSON(T bean) {
-        @SuppressWarnings("unchecked")
-        Context<T> context = context((Class<T>) bean.getClass());
+        Context<T> context = context(bean.getClass());
 
         context.validator.validate(bean, false);
         return context.writer.toJSONString(bean);
     }
 
-    private static <T> Context<T> context(Class<T> beanClass) {
+    private static <T> Context<T> context(Class<?> beanClass) {
         @SuppressWarnings("unchecked")
         Context<T> context = (Context<T>) CONTEXT.get(beanClass);
         if (context == null) throw new Error("bean class is not registered, beanClass=" + beanClass.getCanonicalName());

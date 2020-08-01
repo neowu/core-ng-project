@@ -14,7 +14,7 @@ import static core.framework.internal.json.JSONMapper.OBJECT_MAPPER;
  */
 public final class JSON {
     @Nullable
-    public static Object fromJSON(Type instanceType, String json) {
+    public static <T> T fromJSON(Type instanceType, String json) {
         try {
             JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructType(instanceType);
             return OBJECT_MAPPER.readValue(json, javaType);

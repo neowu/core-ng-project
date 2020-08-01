@@ -59,7 +59,7 @@ public abstract class App extends Module {
     }
 
     private void cleanup() {
-        // free object not used anymore
+        // free static objects not used anymore
         Validator.cleanup();
         JSONMapper.cleanup();
         DynamicInstanceBuilder.cleanup();

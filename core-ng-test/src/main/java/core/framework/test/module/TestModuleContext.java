@@ -27,8 +27,8 @@ public class TestModuleContext extends ModuleContext {
         super(new LogManager());
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T getConfig(Class<T> configClass, String name) {
+        @SuppressWarnings("unchecked")
         T config = (T) configs.get(configClass.getCanonicalName() + ":" + name);
         if (config == null) throw new Error(format("can not find config, configClass={}, name={}", configClass.getCanonicalName(), name));
         return config;

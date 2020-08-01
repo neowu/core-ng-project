@@ -40,6 +40,7 @@ public class DynamicInstanceBuilder<T> {
         sourceCode.interfaceClass = interfaceClass;
         sourceCode.className = className;
 
+        // can only be used during config time within module, App will run cleanup after startup
         classBuilder = pool.makeClass(className + "$" + (index.getAndIncrement()));
 
         try {

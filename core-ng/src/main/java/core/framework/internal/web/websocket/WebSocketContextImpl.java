@@ -18,8 +18,8 @@ public class WebSocketContextImpl implements WebSocketContext {
     private final Map<String, Map<String, Channel<?>>> rooms = new ConcurrentHashMap<>();
     private final Map<String, Channel<?>> channels = new ConcurrentHashMap<>();
 
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     public <V> List<Channel<V>> all() {
         List<Channel<V>> results = new ArrayList<>(channels.size());
         for (Channel<?> channel : channels.values()) {
@@ -28,8 +28,8 @@ public class WebSocketContextImpl implements WebSocketContext {
         return results;
     }
 
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     public <V> List<Channel<V>> room(String name) {
         Map<String, Channel<?>> channels = rooms.get(name);
         if (channels == null) return List.of();
