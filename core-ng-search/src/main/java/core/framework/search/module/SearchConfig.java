@@ -40,7 +40,7 @@ public class SearchConfig extends Config {
     protected void validate() {
         if (search.hosts == null) throw new Error("search host must be configured, name=" + name);
         if (!typeAdded)
-            throw new Error("elasticsearch is configured but no type added, please remove unnecessary config, name=" + name);
+            throw new Error("search is configured but no type added, please remove unnecessary config, name=" + name);
     }
 
     // comma separated hosts

@@ -5,7 +5,6 @@ import core.framework.internal.json.JSONReader;
 import core.framework.internal.json.JSONWriter;
 import core.framework.internal.validate.Validator;
 import core.framework.log.ActionLogContext;
-import core.framework.log.Markers;
 import core.framework.search.AnalyzeRequest;
 import core.framework.search.BulkDeleteRequest;
 import core.framework.search.BulkIndexRequest;
@@ -57,6 +56,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static core.framework.log.Markers.errorCode;
 import static org.elasticsearch.client.Requests.searchRequest;
 import static org.elasticsearch.script.Script.DEFAULT_SCRIPT_LANG;
 import static org.elasticsearch.script.Script.DEFAULT_SCRIPT_TYPE;
@@ -118,7 +118,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     private org.elasticsearch.action.search.SearchResponse search(org.elasticsearch.action.search.SearchRequest searchRequest) throws IOException {
         logger.debug("search, request={}", searchRequest);
         org.elasticsearch.action.search.SearchResponse response = elasticSearch.client().search(searchRequest, RequestOptions.DEFAULT);
-        if (response.getFailedShards() > 0) logger.warn("some shard failed, response={}", response);
+        if (response.getFailedShards() > 0) logger.warn("elasticsearch shards failed, response={}", response);
         return response;
     }
 
@@ -380,7 +380,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     private void checkSlowOperation(long elapsed) {
         if (elapsed > slowOperationThresholdInNanos) {
-            logger.warn(Markers.errorCode("SLOW_ES"), "slow elasticsearch operation, elapsed={}", elapsed);
+            logger.warn(errorCode("SLOW_ES"), "slow elasticsearch operation, elapsed={}", elapsed);
         }
     }
 }

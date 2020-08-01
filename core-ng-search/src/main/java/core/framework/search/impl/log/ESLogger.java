@@ -19,7 +19,8 @@ public class ESLogger extends AbstractLogger {
 
     @Override
     public Level getLevel() {
-        return Level.INFO;      // only process info level for elasticsearch
+        // only process info level for elasticsearch log
+        return Level.INFO;
     }
 
     @Override
