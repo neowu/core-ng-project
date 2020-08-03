@@ -26,7 +26,7 @@ public final class ExecutorImpl implements Executor {
     private final ExecutorService executor;
     private final LogManager logManager;
     private final String name;
-    private volatile ScheduledExecutorService scheduler;
+    volatile ScheduledExecutorService scheduler;
 
     public ExecutorImpl(int poolSize, String name, LogManager logManager) {
         this.name = "executor" + (name == null ? "" : "-" + name);

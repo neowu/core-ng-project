@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -23,8 +24,9 @@ class ExecutorImplStandaloneTest {
     }
 
     @AfterEach
-    void cleanup() {
+    void cleanup() throws InterruptedException {
         executor.shutdown();
+        executor.awaitTermination(100);
     }
 
     @Test
@@ -39,5 +41,13 @@ class ExecutorImplStandaloneTest {
             return Boolean.TRUE;
         });
         assertThat(future.get()).isEqualTo(true);
+    }
+
+    @Test
+    void submitWithDelayedTask() {
+        executor.submit("action", () -> {
+        }, Duration.ofHours(12));
+
+        assertThat(executor.scheduler).isNotNull();
     }
 }

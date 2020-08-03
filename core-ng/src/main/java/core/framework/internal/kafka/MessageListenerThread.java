@@ -135,7 +135,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, double longProcessThresholdInNano) {
+    <T> void handle(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, double longProcessThresholdInNano) {
         for (ConsumerRecord<byte[], byte[]> record : records) {
             ActionLog actionLog = logManager.begin("=== message handling begin ===");
             try {
@@ -178,7 +178,7 @@ class MessageListenerThread extends Thread {
         }
     }
 
-    private <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, double longProcessThresholdInNano) {
+    <T> void handleBulk(String topic, MessageProcess<T> process, List<ConsumerRecord<byte[], byte[]>> records, double longProcessThresholdInNano) {
         ActionLog actionLog = logManager.begin("=== message handling begin ===");
         try {
             actionLog.action("topic:" + topic);

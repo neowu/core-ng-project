@@ -68,8 +68,9 @@ class ExecutorImplTest {
     void submitAfterShutdown() {
         executor.shutdown();
         Future<Object> future = executor.submit("task", () -> null);
-        assertThat(future).isNotDone().isCancelled();
 
+        assertThat(future).isNotDone().isCancelled();
+        assertThat(future.cancel(true)).isTrue();
         assertThatThrownBy(future::get).isInstanceOf(CancellationException.class);
         assertThatThrownBy(() -> future.get(100, TimeUnit.MILLISECONDS)).isInstanceOf(CancellationException.class);
 
