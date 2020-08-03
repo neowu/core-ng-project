@@ -99,7 +99,7 @@ class RequestParserTest {
     void parseBody() throws Throwable {
         var request = new RequestImpl(null, null);
         request.contentType = ContentType.TEXT_XML;
-        var exchange = new HttpServerExchange(null, -1);
+        var exchange = new HttpServerExchange(null);
         byte[] body = Strings.bytes("<xml/>");
         exchange.putAttachment(RequestBodyReader.REQUEST_BODY, new RequestBodyReader.RequestBody(body, null));
         parser.parseBody(request, exchange);
@@ -110,7 +110,7 @@ class RequestParserTest {
     @Test
     void failedToReadBody() {
         var request = new RequestImpl(null, null);
-        var exchange = new HttpServerExchange(null, -1);
+        var exchange = new HttpServerExchange(null);
         exchange.putAttachment(RequestBodyReader.REQUEST_BODY, new RequestBodyReader.RequestBody(null, new IOException()));
 
         assertThatThrownBy(() -> parser.parseBody(request, exchange))
@@ -120,7 +120,7 @@ class RequestParserTest {
 
     @Test
     void requestURL() {
-        var exchange = new HttpServerExchange(null, -1);
+        var exchange = new HttpServerExchange(null);
         exchange.setRequestURI("/path");
         exchange.setQueryString("key=value");
         var request = new RequestImpl(exchange, null);
@@ -134,14 +134,12 @@ class RequestParserTest {
 
     @Test
     void requestURLIsTooLong() {
-        var exchange = new HttpServerExchange(null, -1);
+        var exchange = new HttpServerExchange(null);
         exchange.getRequestHeaders().put(Headers.HOST, "localhost");
         exchange.setRequestURI("/path");
 
-        var builder = new StringBuilder(1000);
-        builder.append("1234567890".repeat(100));
-        exchange.setQueryString(builder.toString());
-        RequestImpl request = new RequestImpl(exchange, null);
+        exchange.setQueryString("1234567890".repeat(100));
+        var request = new RequestImpl(exchange, null);
         request.scheme = "http";
         request.port = 80;
         assertThatThrownBy(() -> parser.requestURL(request, exchange))
@@ -159,7 +157,7 @@ class RequestParserTest {
     void parseInvalidCookie() {
         ServerConnection connection = mock(ServerConnection.class);
         when(connection.getUndertowOptions()).thenReturn(OptionMap.EMPTY);
-        var exchange = new HttpServerExchange(connection, -1);
+        var exchange = new HttpServerExchange(connection);
         exchange.getRequestHeaders().put(Headers.COOKIE, "name=invalid-" + (char) 232);
 
         assertThatThrownBy(() -> parser.parseCookies(new RequestImpl(null, null), exchange))
