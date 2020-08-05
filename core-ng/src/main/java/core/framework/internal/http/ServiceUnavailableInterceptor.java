@@ -18,7 +18,9 @@ public class ServiceUnavailableInterceptor implements Interceptor {
         Response response = chain.proceed(chain.request());
         if (response.code() == HTTPStatus.SERVICE_UNAVAILABLE.code) {
             RealConnection connection = (RealConnection) chain.connection();
-            connection.setNoNewExchanges(true);
+            if (connection != null) {
+                connection.setNoNewExchanges(true);
+            }
         }
         return response;
     }
