@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author neo
@@ -25,8 +24,8 @@ class ChannelHandlerTest {
         message.message = "value";
         assertThat(handler.toServerMessage(message)).isEqualTo("{\"message\":\"value\"}");
 
-        assertThatThrownBy(() -> handler.toServerMessage(mock(TestWebSocketMessage.class)))
-                .isInstanceOf(Error.class)
+        assertThatThrownBy(() -> handler.toServerMessage(new TestWebSocketMessage() {   // mimic different message class
+        })).isInstanceOf(Error.class)
                 .hasMessageContaining("message class does not match");
     }
 

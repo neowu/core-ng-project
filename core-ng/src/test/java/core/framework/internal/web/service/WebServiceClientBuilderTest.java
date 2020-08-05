@@ -32,8 +32,6 @@ class WebServiceClientBuilderTest {
 
     @BeforeEach
     void createTestWebServiceClient() {
-        doCallRealMethod().when(webServiceClient).logCallWebService(anyString());
-
         builder = new WebServiceClientBuilder<>(TestWebService.class, webServiceClient);
         client = builder.build();
     }
@@ -54,8 +52,8 @@ class WebServiceClientBuilderTest {
 
     @Test
     void get() {
+        doCallRealMethod().when(webServiceClient).logCallWebService(anyString());
         var expectedResponse = new TestWebService.TestResponse();
-
         when(webServiceClient.execute(HTTPMethod.GET, "/test/1", null, null, Types.optional(TestWebService.TestResponse.class)))
                 .thenReturn(Optional.of(expectedResponse));
 
@@ -65,6 +63,7 @@ class WebServiceClientBuilderTest {
 
     @Test
     void create() {
+        doCallRealMethod().when(webServiceClient).logCallWebService(anyString());
         var request = new TestWebService.TestRequest();
         client.create(1, request);
 
@@ -73,6 +72,7 @@ class WebServiceClientBuilderTest {
 
     @Test
     void patch() {
+        doCallRealMethod().when(webServiceClient).logCallWebService(anyString());
         var request = new TestWebService.TestRequest();
         client.patch(1, request);
 

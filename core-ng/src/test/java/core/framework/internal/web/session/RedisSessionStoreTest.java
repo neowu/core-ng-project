@@ -31,8 +31,6 @@ class RedisSessionStoreTest {
 
     @BeforeEach
     void createRedisSessionStore() {
-        when(redis.hash()).thenReturn(redisHash);
-
         store = new RedisSessionStore(redis);
     }
 
@@ -47,7 +45,9 @@ class RedisSessionStoreTest {
     @Test
     void getAndRefreshWithRedisDown() {
         // redis shutdown in the middle
+        when(redis.hash()).thenReturn(redisHash);
         when(redisHash.getAll(anyString())).thenThrow(new UncheckedIOException(new IOException("unexpected end of stream")));
+
         assertThatThrownBy(() -> store.getAndRefresh("sessionId", "localhost", Duration.ofMinutes(30)))
                 .isInstanceOf(UncheckedIOException.class);
     }
@@ -55,6 +55,7 @@ class RedisSessionStoreTest {
     @Test
     void getAndRefreshWithInvalidRedisData() {
         // session value in redis is invalid
+        when(redis.hash()).thenReturn(redisHash);
         when(redisHash.getAll(anyString())).thenThrow(new RedisException("WRONGTYPE Operation against a key holding the wrong kind of value"));
         assertThat(store.getAndRefresh("sessionId", "localhost", Duration.ofMinutes(30))).isNull();
     }
