@@ -7,16 +7,21 @@ import core.framework.web.Invocation;
 import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class InvocationImplTest {
+    @Mock
+    Request request;
+
     @Test
     void process() throws Exception {
         var stack = new Stack();
@@ -25,7 +30,7 @@ class InvocationImplTest {
         interceptors.add(new TestInterceptor(stack, 0));
         interceptors.add(new TestInterceptor(stack, 1));
         interceptors.add(new TestInterceptor(stack, 2));
-        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), interceptors, mock(Request.class), new WebContextImpl());
+        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), interceptors, request, new WebContextImpl());
 
         Response response = invocation.proceed();
         assertThat(response.status()).isEqualTo(HTTPStatus.NO_CONTENT);
@@ -41,7 +46,7 @@ class InvocationImplTest {
         var controller = new TestController(stack, 0);
         var interceptors = new Interceptors();
         interceptors.add(new TestInterceptor(stack, 0));
-        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, true), interceptors, mock(Request.class), new WebContextImpl());
+        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, true), interceptors, request, new WebContextImpl());
 
         Response response = invocation.proceed();
         assertThat(response.status()).isEqualTo(HTTPStatus.NO_CONTENT);
@@ -55,12 +60,12 @@ class InvocationImplTest {
     void withNullResponse() {
         Controller controller = request -> null;
         Interceptors interceptors = new Interceptors();
-        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), interceptors, mock(Request.class), new WebContextImpl());
+        var invocation = new InvocationImpl(new ControllerHolder(controller, null, null, null, false), interceptors, request, new WebContextImpl());
 
         assertThatThrownBy(invocation::proceed).isInstanceOf(Error.class).hasMessageContaining("controller must not return null response");
 
         interceptors.add(new TestNullResponseInterceptor());
-        invocation = new InvocationImpl(new ControllerHolder(request -> Response.empty(), null, null, null, false), interceptors, mock(Request.class), new WebContextImpl());
+        invocation = new InvocationImpl(new ControllerHolder(request -> Response.empty(), null, null, null, false), interceptors, request, new WebContextImpl());
         assertThatThrownBy(invocation::proceed).isInstanceOf(Error.class).hasMessageContaining("interceptor must not return null response");
     }
 
@@ -81,7 +86,7 @@ class InvocationImplTest {
         @Override
         public Response execute(Request request) {
             executed = true;
-            assertEquals(expectedStack, stack.currentStack);
+            assertThat(stack.currentStack).isEqualTo(expectedStack);
             return Response.empty();
         }
     }

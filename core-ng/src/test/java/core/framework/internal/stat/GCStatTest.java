@@ -2,24 +2,27 @@ package core.framework.internal.stat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class GCStatTest {
+    @Mock
+    GarbageCollectorMXBean bean;
     private GCStat stat;
-    private GarbageCollectorMXBean bean;
 
     @BeforeEach
     void createGCStat() {
-        bean = mock(GarbageCollectorMXBean.class);
         when(bean.getName()).thenReturn("G1 Young Generation");
         stat = new GCStat(bean);
     }

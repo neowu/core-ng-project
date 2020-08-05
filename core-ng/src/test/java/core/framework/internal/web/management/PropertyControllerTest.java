@@ -6,9 +6,9 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
@@ -26,7 +26,7 @@ class PropertyControllerTest {
 
     @Test
     void execute() {
-        Request request = Mockito.mock(Request.class);
+        var request = mock(Request.class);
         when(request.clientIP()).thenReturn("127.0.0.1");
 
         Response response = controller.execute(request);

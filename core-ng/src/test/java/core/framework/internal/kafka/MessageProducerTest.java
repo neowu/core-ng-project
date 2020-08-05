@@ -6,24 +6,27 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class MessageProducerTest {
+    @Mock
+    KafkaURI uri;
     private MessageProducer producer;
-    private KafkaURI uri;
 
     @BeforeEach
     void createMessageProducer() {
-        uri = mock(KafkaURI.class);
         producer = new MessageProducer(uri, null);
     }
 

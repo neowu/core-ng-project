@@ -3,6 +3,9 @@ package core.framework.internal.cache;
 import core.framework.internal.redis.RedisImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.List;
@@ -12,7 +15,6 @@ import static core.framework.internal.cache.RedisLocalCacheStore.CHANNEL_INVALID
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,18 +22,18 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class RedisLocalCacheStoreTest {
+    @Mock
+    CacheStore localCacheStore;
+    @Mock
+    CacheStore redisCacheStore;
+    @Mock
+    RedisImpl redis;
     private RedisLocalCacheStore cacheStore;
-    private RedisImpl redis;
-    private CacheStore localCacheStore;
-    private CacheStore redisCacheStore;
 
     @BeforeEach
     void createRedisLocalCacheStore() {
-        localCacheStore = mock(CacheStore.class);
-        redis = mock(RedisImpl.class);
-        redisCacheStore = mock(CacheStore.class);
-
         cacheStore = new RedisLocalCacheStore(localCacheStore, redisCacheStore, redis);
     }
 

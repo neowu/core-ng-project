@@ -5,46 +5,47 @@ import okhttp3.Interceptor;
 import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.connection.RealConnection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class ServiceUnavailableInterceptorTest {
+    @Mock
+    Interceptor.Chain chain;
+    @Mock
+    RealConnection connection;
     private ServiceUnavailableInterceptor interceptor;
-    private ServiceUnavailableInterceptor.ConnectionWrapper connection;
 
     @BeforeEach
     void createServiceUnavailableInterceptor() {
-        connection = mock(ServiceUnavailableInterceptor.ConnectionWrapper.class);
-        interceptor = new ServiceUnavailableInterceptor() {
-            @Override
-            ConnectionWrapper connection(Chain chain) {
-                return connection;
-            }
-        };
+        when(chain.connection()).thenReturn(connection);
+        interceptor = new ServiceUnavailableInterceptor();
     }
 
     @Test
     void intercept() throws IOException {
         var request = new Request.Builder().url("http://localhost").build();
         var response = new Response.Builder().request(request)
-                                             .protocol(Protocol.HTTP_2)
-                                             .code(HTTPStatus.SERVICE_UNAVAILABLE.code)
-                                             .message("service unavailable").build();
-        Interceptor.Chain chain = mock(Interceptor.Chain.class);
-        when(chain.proceed(any())).thenReturn(response);
+                .protocol(Protocol.HTTP_2)
+                .code(HTTPStatus.SERVICE_UNAVAILABLE.code)
+                .message("service unavailable").build();
+        when(chain.request()).thenReturn(request);
+        when(chain.proceed(request)).thenReturn(response);
 
         interceptor.intercept(chain);
 
-        verify(connection).noNewExchanges();
+        verify(connection).setNoNewExchanges(true);
     }
 }

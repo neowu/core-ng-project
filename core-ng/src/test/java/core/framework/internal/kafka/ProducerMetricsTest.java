@@ -4,22 +4,24 @@ import core.framework.internal.stat.Stats;
 import org.apache.kafka.common.Metric;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class ProducerMetricsTest {
+    @Mock
+    Metric requestSizeAvg;
     private ProducerMetrics metrics;
-    private Metric requestSizeAvg;
 
     @BeforeEach
     void createProducerMetrics() {
-        requestSizeAvg = mock(Metric.class);
-
         metrics = new ProducerMetrics(null);
         metrics.requestSizeAvg = requestSizeAvg;
     }

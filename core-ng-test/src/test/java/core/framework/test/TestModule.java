@@ -11,13 +11,14 @@ import core.framework.test.module.AbstractTestModule;
 import core.framework.test.scheduler.TestJob;
 import core.framework.test.web.TestWebService;
 import core.framework.test.web.TestWebServiceClientInterceptor;
-import org.mockito.Mockito;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * @author neo
@@ -29,7 +30,7 @@ public class TestModule extends AbstractTestModule {
 
         load(new OverrideBeanTest());
 
-        overrideBinding(HTTPClient.class, Mockito.mock(HTTPClient.class));  // in test context, override binding is defined before actual binding
+        overrideBinding(HTTPClient.class, mock(HTTPClient.class));  // in test context, override binding is defined before actual binding
         bind(HTTPClient.class, HTTPClient.builder().maxRetries(3).retryWaitTime(Duration.ofSeconds(1)).enableCookie().build());
 
         configureDB();

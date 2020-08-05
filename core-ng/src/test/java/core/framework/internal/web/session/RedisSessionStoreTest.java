@@ -5,6 +5,9 @@ import core.framework.redis.Redis;
 import core.framework.redis.RedisHash;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -13,20 +16,21 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class RedisSessionStoreTest {
+    @Mock
+    Redis redis;
+    @Mock
+    RedisHash redisHash;
     private RedisSessionStore store;
-    private RedisHash redisHash;
 
     @BeforeEach
     void createRedisSessionStore() {
-        Redis redis = mock(Redis.class);
-        redisHash = mock(RedisHash.class);
         when(redis.hash()).thenReturn(redisHash);
 
         store = new RedisSessionStore(redis);

@@ -9,7 +9,9 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
@@ -19,14 +21,15 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class WebServiceControllerBuilderTest {
-    private Request request;
+    @Mock
+    Request request;
     private TestWebServiceImpl serviceImpl;
 
     @BeforeEach
     void prepare() {
         serviceImpl = new TestWebServiceImpl();
-        request = Mockito.mock(Request.class);
     }
 
     @Test

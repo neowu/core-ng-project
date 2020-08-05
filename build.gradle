@@ -9,7 +9,7 @@ def elasticVersion = '7.8.1'
 def kafkaVersion = '2.4.1'
 def jacksonVersion = '2.10.4'
 def junitVersion = '5.6.2'
-def mockitoVersion = '3.3.3'
+def mockitoVersion = '3.4.6'
 def assertjVersion = '3.16.1'
 def mysqlVersion = '8.0.21'
 
@@ -32,6 +32,7 @@ project('core-ng') {
         compileOnly "mysql:mysql-connector-java:${mysqlVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+        testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         testRuntimeOnly 'org.hsqldb:hsqldb:2.5.1'
@@ -44,6 +45,7 @@ project('core-ng-test') {
         api project(":core-ng")
         api "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
         api "org.mockito:mockito-core:${mockitoVersion}"
+        api "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
         implementation "org.apache.kafka:kafka-clients:${kafkaVersion}@jar"

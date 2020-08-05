@@ -16,6 +16,9 @@ import core.framework.web.service.RemoteServiceException;
 import core.framework.web.service.WebServiceClientInterceptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 
@@ -32,14 +35,14 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class WebServiceClientTest {
+    @Mock
+    HTTPClient httpClient;
     private WebServiceClient webServiceClient;
-    private HTTPClient httpClient;
 
     @BeforeEach
     void createWebServiceClient() {
-        httpClient = mock(HTTPClient.class);
-
         var validator = new BeanClassValidator();
         var writer = new RequestBeanWriter();
         writer.registerQueryParam(TestWebService.TestSearchRequest.class, validator.beanClassNameValidator);

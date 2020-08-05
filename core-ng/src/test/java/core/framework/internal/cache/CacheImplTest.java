@@ -2,6 +2,9 @@ package core.framework.internal.cache;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -16,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,13 +26,14 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class CacheImplTest {
+    @Mock
+    CacheStore cacheStore;
     private CacheImpl<TestCache> cache;
-    private CacheStore cacheStore;
 
     @BeforeEach
     void createCache() {
-        cacheStore = mock(CacheStore.class);
         cache = new CacheImpl<>("name", TestCache.class, Duration.ofHours(1), cacheStore);
     }
 

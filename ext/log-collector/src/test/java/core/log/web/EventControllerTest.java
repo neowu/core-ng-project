@@ -4,7 +4,6 @@ import core.framework.http.ContentType;
 import core.framework.http.HTTPHeaders;
 import core.framework.json.JSON;
 import core.framework.log.message.EventMessage;
-import core.framework.test.MockitoExtension;
 import core.framework.util.Strings;
 import core.framework.web.CookieSpec;
 import core.framework.web.Request;

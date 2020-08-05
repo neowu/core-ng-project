@@ -13,8 +13,9 @@ import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.record.TimestampType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.verify;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class MessageListenerThreadTest {
     @Mock
     MessageHandler<TestMessage> messageHandler;
@@ -37,7 +39,6 @@ class MessageListenerThreadTest {
 
     @BeforeEach
     void createKafkaMessageListenerThread() {
-        MockitoAnnotations.initMocks(this);
         thread = new MessageListenerThread("listener-thread-1", new MessageListener(null, null, new LogManager()));
     }
 

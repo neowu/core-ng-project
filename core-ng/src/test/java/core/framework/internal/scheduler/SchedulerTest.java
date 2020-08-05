@@ -7,9 +7,10 @@ import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class SchedulerTest {
     @Mock
     ScheduledExecutorService schedulerExecutor;
@@ -44,7 +46,6 @@ class SchedulerTest {
 
     @BeforeEach
     void createScheduler() {
-        MockitoAnnotations.initMocks(this);
         scheduler = new Scheduler(logManager, schedulerExecutor, jobExecutor);
     }
 

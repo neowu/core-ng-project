@@ -5,7 +5,9 @@ import core.framework.internal.log.LogManager;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,14 +20,15 @@ import static org.mockito.Mockito.verify;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class MessagePublisherImplTest {
+    @Mock
+    MessageProducer producer;
     private MessagePublisherImpl<TestMessage> publisher;
-    private MessageProducer producer;
     private LogManager logManager;
 
     @BeforeEach
     void createMessagePublisher() {
-        producer = Mockito.mock(MessageProducer.class);
         publisher = new MessagePublisherImpl<>(producer, "topic", TestMessage.class);
         logManager = new LogManager();
     }

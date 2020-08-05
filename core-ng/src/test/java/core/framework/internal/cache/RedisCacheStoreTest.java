@@ -5,6 +5,9 @@ import core.framework.internal.redis.RedisImpl;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.List;
@@ -14,21 +17,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class RedisCacheStoreTest {
-    private final CacheContext<TestCache> context = new CacheContext<>(TestCache.class);
+    @Mock
+    RedisImpl redis;
+    private CacheContext<TestCache> context;
     private RedisCacheStore cacheStore;
-    private RedisImpl redis;
 
     @BeforeEach
     void createRedisCacheStore() {
-        redis = mock(RedisImpl.class);
+        context = new CacheContext<>(TestCache.class);
         cacheStore = new RedisCacheStore(redis);
     }
 

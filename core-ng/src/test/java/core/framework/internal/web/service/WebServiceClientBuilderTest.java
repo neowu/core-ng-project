@@ -7,6 +7,9 @@ import core.framework.util.Types;
 import core.framework.web.service.WebServiceClientProxy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Map;
 import java.util.Optional;
@@ -14,21 +17,21 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class WebServiceClientBuilderTest {
+    @Mock
+    WebServiceClient webServiceClient;
     private TestWebService client;
     private WebServiceClientBuilder<TestWebService> builder;
-    private WebServiceClient webServiceClient;
 
     @BeforeEach
     void createTestWebServiceClient() {
-        webServiceClient = mock(WebServiceClient.class);
         doCallRealMethod().when(webServiceClient).logCallWebService(anyString());
 
         builder = new WebServiceClientBuilder<>(TestWebService.class, webServiceClient);

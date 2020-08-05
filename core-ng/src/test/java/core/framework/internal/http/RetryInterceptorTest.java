@@ -181,18 +181,18 @@ class RetryInterceptorTest {
         var request = new Request.Builder().url("http://localhost").build();
         var source = mock(BufferedSource.class);
         var serviceUnavailableResponse = new Response.Builder().request(request)
-                                                               .protocol(Protocol.HTTP_2)
-                                                               .code(HTTPStatus.SERVICE_UNAVAILABLE.code)
-                                                               .message("service unavailable")
-                                                               .body(ResponseBody.create(source, MediaType.get("application/json"), 0))
-                                                               .build();
+                .protocol(Protocol.HTTP_2)
+                .code(HTTPStatus.SERVICE_UNAVAILABLE.code)
+                .message("service unavailable")
+                .body(ResponseBody.create(source, MediaType.get("application/json"), 0))
+                .build();
         var okResponse = new Response.Builder().request(request)
-                                               .protocol(Protocol.HTTP_2)
-                                               .code(HTTPStatus.OK.code)
-                                               .message("ok")
-                                               .build();
+                .protocol(Protocol.HTTP_2)
+                .code(HTTPStatus.OK.code)
+                .message("ok")
+                .build();
 
-        Interceptor.Chain chain = mock(Interceptor.Chain.class);
+        var chain = mock(Interceptor.Chain.class);
         when(chain.request()).thenReturn(request);
         when(chain.proceed(request)).thenReturn(serviceUnavailableResponse).thenReturn(okResponse);
 

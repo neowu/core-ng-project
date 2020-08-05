@@ -155,7 +155,7 @@ class RequestParserTest {
 
     @Test
     void parseInvalidCookie() {
-        ServerConnection connection = mock(ServerConnection.class);
+        var connection = mock(ServerConnection.class);
         when(connection.getUndertowOptions()).thenReturn(OptionMap.EMPTY);
         var exchange = new HttpServerExchange(connection);
         exchange.getRequestHeaders().put(Headers.COOKIE, "name=invalid-" + (char) 232);

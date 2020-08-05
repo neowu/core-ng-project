@@ -4,20 +4,23 @@ import core.framework.internal.web.service.TestWebServiceClientInterceptor;
 import core.framework.web.service.WebServiceClientProxy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class APIClientConfigTest {
+    @Mock
+    WebServiceClientProxy proxy;
     private APIClientConfig config;
-    private WebServiceClientProxy proxy;
 
     @BeforeEach
     void createAPIClientConfig() {
-        proxy = mock(WebServiceClientProxy.class);
         config = new APIClientConfig(proxy);
     }
 

@@ -1,5 +1,6 @@
 ## Change log
 ### 7.5.2 (07/31/2020 - )
+* test: added mockito builtin MockitoExtension via mockito-junit-jupiter, removed framework one
 
 ### 7.5.1 (07/23/2020 - 07/31/2020)
 * utils: add Sets.newEnumSet and Maps.newEnumMap shortcuts

@@ -3,25 +3,27 @@ package core.framework.internal.redis;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class RedisSubscribeThreadTest {
+    @Mock
+    RedisChannelListener listener;
     private RedisSubscribeThread thread;
-    private RedisChannelListener listener;
 
     @BeforeEach
     void createRedisSubscribeThread() {
-        listener = mock(RedisChannelListener.class);
-
         thread = new RedisSubscribeThread("name", null, listener, "channel");
     }
 

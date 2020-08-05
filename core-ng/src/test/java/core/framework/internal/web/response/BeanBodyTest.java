@@ -6,17 +6,22 @@ import core.framework.internal.validate.ValidationException;
 import core.framework.internal.web.bean.ResponseBeanWriter;
 import io.undertow.io.Sender;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class BeanBodyTest {
+    @Mock
+    Sender sender;
+
     @Test
     void send() {
-        var sender = mock(Sender.class);
         var writer = new ResponseBeanWriter();
         writer.register(TestBean.class, new BeanClassValidator());
         var context = new ResponseHandlerContext(writer, null);

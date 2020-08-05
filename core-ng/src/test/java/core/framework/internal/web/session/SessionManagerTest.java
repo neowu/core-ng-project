@@ -7,6 +7,9 @@ import core.framework.web.Response;
 import core.framework.web.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.util.Map;
@@ -18,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -26,7 +28,12 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class SessionManagerTest {
+    @Mock
+    Request request;
+    @Mock
+    Response response;
     private SessionManager sessionManager;
     private LocalSessionStore store;
 
@@ -45,7 +52,6 @@ class SessionManagerTest {
         String sessionId = UUID.randomUUID().toString();
         store.save(sessionId, "localhost", Map.of("key", "value"), Set.of(), Duration.ofMinutes(30));
 
-        Request request = mock(Request.class);
         when(request.scheme()).thenReturn("https");
         when(request.header("SessionId")).thenReturn(Optional.of(sessionId));
 
@@ -62,7 +68,6 @@ class SessionManagerTest {
         String sessionId = UUID.randomUUID().toString();
         store.save(sessionId, "localhost", Map.of("key", "value"), Set.of(), Duration.ofMinutes(30));
 
-        Request request = mock(Request.class);
         when(request.scheme()).thenReturn("https");
         when(request.cookie(eq(new CookieSpec("SessionId").path("/")))).thenReturn(Optional.of(sessionId));
 
@@ -74,7 +79,6 @@ class SessionManagerTest {
     @Test
     void putSessionIdToHeader() {
         sessionManager.header("SessionId");
-        Response response = mock(Response.class);
 
         String sessionId = UUID.randomUUID().toString();
         sessionManager.putSessionId(response, sessionId);
@@ -85,7 +89,6 @@ class SessionManagerTest {
     @Test
     void putSessionIdToCookie() {
         sessionManager.cookie("SessionId", null);
-        Response response = mock(Response.class);
 
         String sessionId = UUID.randomUUID().toString();
         sessionManager.putSessionId(response, sessionId);
@@ -95,7 +98,6 @@ class SessionManagerTest {
 
     @Test
     void saveWithInvalidatedSessionWithoutId() {
-        Response response = mock(Response.class);
         var session = new SessionImpl("localhost");
         session.invalidate();
         sessionManager.save(session, response, new ActionLog(null));
@@ -106,7 +108,6 @@ class SessionManagerTest {
     @Test
     void saveWithInvalidatedSession() {
         sessionManager.header("SessionId");
-        Response response = mock(Response.class);
 
         var session = new SessionImpl("localhost");
         session.id = UUID.randomUUID().toString();
@@ -120,7 +121,6 @@ class SessionManagerTest {
     void saveNewSession() {
         sessionManager.header("SessionId");
         ActionLog actionLog = new ActionLog(null);
-        Response response = mock(Response.class);
 
         var session = new SessionImpl("localhost");
         session.set("key", "value");
@@ -141,14 +141,13 @@ class SessionManagerTest {
     void domainWithHeader() {
         sessionManager.header("SessionId");
         sessionManager.cookie("SessionId", "example.com");
-        Request request = mock(Request.class);
+
         when(request.hostName()).thenReturn("api.example.com");
         assertThat(sessionManager.domain(request)).isEqualTo("api.example.com");
     }
 
     @Test
     void domainWithCookie() {
-        Request request = mock(Request.class);
         when(request.hostName()).thenReturn("www.example.com");
 
         sessionManager.cookie("SessionId", "example.com");

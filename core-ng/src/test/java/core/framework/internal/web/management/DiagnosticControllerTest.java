@@ -5,7 +5,9 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -13,15 +15,16 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class DiagnosticControllerTest {
+    @Mock
+    Request request;
     private DiagnosticController controller;
-    private Request request;
 
     @BeforeEach
     void createDiagnosticController() {
-        controller = new DiagnosticController();
-        request = Mockito.mock(Request.class);
         when(request.clientIP()).thenReturn("127.0.0.1");
+        controller = new DiagnosticController();
     }
 
     @Test

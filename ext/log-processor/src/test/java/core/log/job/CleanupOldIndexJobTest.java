@@ -2,7 +2,6 @@ package core.log.job;
 
 import core.framework.search.ClusterStateResponse;
 import core.framework.search.ElasticSearch;
-import core.framework.test.MockitoExtension;
 import core.log.service.IndexService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

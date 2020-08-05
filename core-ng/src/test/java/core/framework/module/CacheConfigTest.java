@@ -9,17 +9,22 @@ import core.framework.internal.cache.TestCache;
 import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class CacheConfigTest {
+    @Mock
+    CacheStore store;
     private CacheConfig config;
 
     @BeforeEach
@@ -58,7 +63,6 @@ class CacheConfigTest {
 
     @Test
     void add() {
-        CacheStore store = mock(CacheStore.class);
         Cache<TestCache> cache = config.add(TestCache.class, Duration.ofHours(1), store);
         assertThat(cache).isNotNull();
         assertThat(config.caches.get("testcache")).isNotNull();

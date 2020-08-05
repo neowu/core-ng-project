@@ -22,7 +22,7 @@ class QueryTest<T> {
 
     @BeforeEach
     void createQuery() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         Mockito.doCallRealMethod().when(query).in(any(), anyList());
     }
 

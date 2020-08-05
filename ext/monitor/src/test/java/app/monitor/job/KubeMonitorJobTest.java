@@ -4,11 +4,11 @@ import app.monitor.kube.KubeClient;
 import app.monitor.kube.PodList;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
-import core.framework.test.MockitoExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;

@@ -26,9 +26,9 @@ class ConsumerMetricsTest {
 
     @Test
     void sum() {
-        Metric metric1 = mock(Metric.class);
+        var metric1 = mock(Metric.class);
         when(metric1.metricValue()).thenReturn(1d);
-        Metric metric2 = mock(Metric.class);
+        var metric2 = mock(Metric.class);
         when(metric2.metricValue()).thenReturn(Double.NEGATIVE_INFINITY);
 
         var metrics = new ConsumerMetrics(null);

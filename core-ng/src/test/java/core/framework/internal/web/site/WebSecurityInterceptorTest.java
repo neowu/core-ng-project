@@ -5,6 +5,9 @@ import core.framework.web.Request;
 import core.framework.web.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,7 +16,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,7 +23,12 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 class WebSecurityInterceptorTest {
+    @Mock
+    Request request;
+    @Mock
+    Response response;
     private WebSecurityInterceptor interceptor;
 
     @BeforeEach
@@ -33,7 +40,6 @@ class WebSecurityInterceptorTest {
     void appendSecurityHeaders() {
         interceptor.contentSecurityPolicy = "default-src 'self';";
 
-        Response response = mock(Response.class);
         when(response.contentType()).thenReturn(Optional.of(ContentType.TEXT_HTML));
 
         interceptor.appendSecurityHeaders(response);
@@ -48,7 +54,6 @@ class WebSecurityInterceptorTest {
     void skipCSP() {
         interceptor.contentSecurityPolicy = null;
 
-        Response response = mock(Response.class);
         when(response.contentType()).thenReturn(Optional.of(ContentType.TEXT_HTML));
 
         interceptor.appendSecurityHeaders(response);
@@ -57,7 +62,6 @@ class WebSecurityInterceptorTest {
 
     @Test
     void redirectURL() {
-        Request request = mock(Request.class);
         when(request.hostName()).thenReturn("host");
         when(request.path()).thenReturn("/path");
         Map<String, String> queryParams = new LinkedHashMap<>();

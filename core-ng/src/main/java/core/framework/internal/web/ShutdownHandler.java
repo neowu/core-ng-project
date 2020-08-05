@@ -18,7 +18,7 @@ public class ShutdownHandler implements ExchangeCompletionListener {
     private final Object lock = new Object();
     private volatile boolean shutdown;
 
-    boolean handle(Exchange exchange) {
+    boolean handle(HttpServerExchange exchange) {
         activeRequests.getAndIncrement();
         exchange.addExchangeCompleteListener(this);
 

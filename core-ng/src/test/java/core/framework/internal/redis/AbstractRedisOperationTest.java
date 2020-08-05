@@ -5,8 +5,9 @@ import core.framework.internal.resource.PoolItem;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author neo
  */
+@ExtendWith(MockitoExtension.class)
 abstract class AbstractRedisOperationTest {
     protected RedisImpl redis;
     @Mock
@@ -28,7 +30,6 @@ abstract class AbstractRedisOperationTest {
 
     @BeforeEach
     void createRedis() {
-        MockitoAnnotations.initMocks(this);
         request = new ByteArrayOutputStream();
         var connection = new RedisConnection();
         connection.outputStream = new RedisOutputStream(request, 512);
