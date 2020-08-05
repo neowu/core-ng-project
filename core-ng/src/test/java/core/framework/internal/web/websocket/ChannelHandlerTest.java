@@ -24,8 +24,8 @@ class ChannelHandlerTest {
         message.message = "value";
         assertThat(handler.toServerMessage(message)).isEqualTo("{\"message\":\"value\"}");
 
-        assertThatThrownBy(() -> handler.toServerMessage(new TestWebSocketMessage() {   // mimic different message class
-        })).isInstanceOf(Error.class)
+        assertThatThrownBy(() -> handler.toServerMessage(new MismatchTestMessage()))
+                .isInstanceOf(Error.class)
                 .hasMessageContaining("message class does not match");
     }
 
@@ -38,5 +38,8 @@ class ChannelHandlerTest {
         assertThatThrownBy(() -> handler.fromClientMessage("{}"))
                 .isInstanceOf(BadRequestException.class)
                 .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("VALIDATION_ERROR"));
+    }
+
+    static class MismatchTestMessage extends TestWebSocketMessage {
     }
 }
