@@ -68,7 +68,7 @@ public class MonitorModule extends Module {
                 redis(host).host(host);
                 redis(host).poolSize(1, 1);
                 Redis redis = redis(host).client();
-                RedisMonitorJob job = new RedisMonitorJob(redis, app, host, publisher);
+                var job = new RedisMonitorJob(redis, app, host, publisher);
                 job.highMemUsageThreshold = redisConfig.highMemUsageThreshold;
                 schedule().fixedRate("redis-" + host, job, Duration.ofSeconds(10));
             }

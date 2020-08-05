@@ -15,6 +15,6 @@ services:
     - 9092:9092
     environment:
     - KAFKA_HEAP_OPTS=-Xms1G -Xmx1G
-    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://localhost:9092
+    - KAFKA_ARGS=--override advertised.listeners=PLAINTEXT://localhost:9092 --override num.partitions=3
     depends_on:
     - zookeeper

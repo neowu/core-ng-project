@@ -52,7 +52,7 @@ public class RedisImpl implements Redis {
     private final RedisAdmin redisAdmin = new RedisAdminImpl(this);
     private final String name;
     public Pool<RedisConnection> pool;
-    public String host;
+    public RedisHost host;
     long slowOperationThresholdInNanos = Duration.ofMillis(500).toNanos();
     int timeoutInMs = (int) Duration.ofSeconds(5).toMillis();
 
@@ -77,7 +77,7 @@ public class RedisImpl implements Redis {
         if (host == null) throw new Error("redis.host must not be null");
         try {
             var connection = new RedisConnection();
-            connection.connect(host, timeoutInMs);
+            connection.connect(host.host, host.port, timeoutInMs);
             return connection;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -85,7 +85,7 @@ public class RedisImpl implements Redis {
     }
 
     public void close() {
-        logger.info("close redis client, name={}, host={}", name, host);
+        logger.info("close redis client, name={}, host={}, port={}", name, host.host, host.port);
         pool.close();
     }
 

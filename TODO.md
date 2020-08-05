@@ -1,5 +1,4 @@
 ### ideas
-* redis: support cluster, https://github.com/RedisLabs/redis-cluster-proxy / https://github.com/twitter/twemproxy
 * template, use ByteBuffer[] for performance?
 * mongo: collect mongo stats thru JMX ConnectionPoolStatisticsMBean?
 * mongo: update entity decoder to use switch(fieldName) to replace if statement? (optimization)

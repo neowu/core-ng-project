@@ -10,19 +10,17 @@ import static core.framework.internal.redis.RedisEncodings.encode;
  * @author neo
  */
 class RedisConnection implements AutoCloseable {
-    private static final int DEFAULT_PORT = 6379;
-
     RedisOutputStream outputStream;
     RedisInputStream inputStream;
     private Socket socket;
 
-    void connect(String host, int timeoutInMs) throws IOException {
+    void connect(String host, int port, int timeoutInMs) throws IOException {
         socket = new Socket();
         socket.setReuseAddress(true);
         socket.setKeepAlive(true);
         socket.setTcpNoDelay(true); // Socket buffer whether closed, to ensure timely delivery of data
         socket.setSoLinger(true, 0); // Control calls close () method, the underlying socket is closed immediately
-        socket.connect(new InetSocketAddress(host, DEFAULT_PORT), timeoutInMs);
+        socket.connect(new InetSocketAddress(host, port), timeoutInMs);
         socket.setSoTimeout(timeoutInMs);
         outputStream = new RedisOutputStream(socket.getOutputStream(), 8192);
         inputStream = new RedisInputStream(socket.getInputStream());
