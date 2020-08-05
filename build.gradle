@@ -31,7 +31,6 @@ project('core-ng') {
         implementation 'org.xerial.snappy:snappy-java:1.1.7.5'      // used by kafka message compression
         compileOnly "mysql:mysql-connector-java:${mysqlVersion}"
         testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-        testImplementation "org.mockito:mockito-core:${mockitoVersion}"
         testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         testImplementation "org.assertj:assertj-core:${assertjVersion}"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
@@ -44,7 +43,6 @@ project('core-ng-test') {
     dependencies {
         api project(":core-ng")
         api "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-        api "org.mockito:mockito-core:${mockitoVersion}"
         api "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
         api "org.assertj:assertj-core:${assertjVersion}"
         implementation "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
