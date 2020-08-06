@@ -17,6 +17,7 @@ class RedisImplTest {
     @BeforeEach
     void createRedis() {
         redis = new RedisImpl(null);
+        redis.host = new RedisHost("localhost");
     }
 
     @Test
