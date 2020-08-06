@@ -1,16 +1,17 @@
 version: "3"
 services:
   zookeeper:
-    image: zookeeper:3.5.7
+    image: zookeeper:3.5.8
     ports:
     - 2181
     environment:
     - JMXDISABLE=true
+    - SERVER_JVMFLAGS=-Dzookeeper.jmx.log4j.disable=true
     - ZOO_DATA_DIR=/data
     - ZOO_DATA_LOG_DIR=/datalog
     - ZOO_ADMINSERVER_ENABLED=false
   kafka:
-    image: neowu/kafka:2.5.0
+    image: neowu/kafka:2.6.0
     ports:
     - 9092:9092
     environment:

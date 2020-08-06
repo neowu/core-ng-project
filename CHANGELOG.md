@@ -7,6 +7,8 @@
     it does not support SCAN/PUBSUB command yet, so the usage is kind of limited. e.g. partition redis db, or remote only cache
     other options are like managed redis service, e.g. gcloud memorystore
     the official one moves slowly, https://github.com/RedisLabs/redis-cluster-proxy
+* kafka: update to 2.6.0
+    high cpu issue fixed, https://issues.apache.org/jira/browse/KAFKA-10134
 
 ### 7.5.1 (07/23/2020 - 07/31/2020)
 * utils: add Sets.newEnumSet and Maps.newEnumMap shortcuts
