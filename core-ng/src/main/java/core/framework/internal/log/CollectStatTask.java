@@ -5,8 +5,6 @@ import core.framework.internal.stat.StatCollector;
 import core.framework.internal.stat.Stats;
 import core.framework.log.message.StatMessage;
 import core.framework.util.Network;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 
@@ -14,7 +12,6 @@ import java.time.Instant;
  * @author neo
  */
 public final class CollectStatTask implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(CollectStatTask.class);
     private final LogAppender appender;
     private final StatCollector collector;
 
@@ -27,11 +24,7 @@ public final class CollectStatTask implements Runnable {
     public void run() {
         Stats stats = collector.collect();
         StatMessage message = message(stats);
-        try {
-            appender.append(message);
-        } catch (Throwable e) {
-            logger.warn("failed to append stat, error={}", e.getMessage(), e);
-        }
+        appender.append(message);
     }
 
     StatMessage message(Stats stats) {

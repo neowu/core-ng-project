@@ -50,11 +50,7 @@ public class LocalSessionStore implements SessionStore {
 
     @Override
     public void invalidateByKey(String key, String value) {
-        values.forEach((id, session) -> {
-            if (Strings.equals(value, session.values.get(key))) {
-                values.remove(id);
-            }
-        });
+        values.values().removeIf(session -> Strings.equals(value, session.values.get(key)));
     }
 
     private Instant expirationTime(Duration sessionTimeout) {
@@ -64,11 +60,7 @@ public class LocalSessionStore implements SessionStore {
     public void cleanup() {
         logger.info("cleanup local session store");
         Instant now = Instant.now();
-        values.forEach((id, session) -> {
-            if (now.isAfter(session.expirationTime)) {
-                values.remove(id);
-            }
-        });
+        values.values().removeIf(session -> now.isAfter(session.expirationTime));
     }
 
     static class SessionValue {

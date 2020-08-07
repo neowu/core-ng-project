@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author neo
@@ -31,7 +31,7 @@ class CollectStatTaskTest {
 
     @Test
     void message() {
-        Stats stats = new Stats();
+        var stats = new Stats();
         stats.put("sys_load_avg", 1d);
         StatMessage message = task.message(stats);
         assertThat(message.id).isNotNull();
@@ -39,8 +39,8 @@ class CollectStatTaskTest {
     }
 
     @Test
-    void appendWithError() {
-        doThrow(new Error()).when(appender).append(any(StatMessage.class));
+    void run() {
         task.run();
+        verify(appender).append(any(StatMessage.class));
     }
 }
