@@ -24,14 +24,13 @@ public class CacheImpl<T> implements Cache<T> {
 
     final CacheContext<T> context;
     private final Logger logger = LoggerFactory.getLogger(CacheImpl.class);
-    private final CacheStore cacheStore;
 
-    public CacheImpl(String name, Class<T> cacheClass, Duration duration, CacheStore cacheStore) {
+    public CacheStore cacheStore;
+
+    public CacheImpl(String name, Class<T> cacheClass, Duration duration) {
         this.name = name;
         this.cacheClass = cacheClass;
         this.duration = duration;
-        this.cacheStore = cacheStore;
-
         context = new CacheContext<>(cacheClass);
     }
 

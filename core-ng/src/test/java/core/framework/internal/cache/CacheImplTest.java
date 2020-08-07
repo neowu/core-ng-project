@@ -34,7 +34,8 @@ class CacheImplTest {
 
     @BeforeEach
     void createCache() {
-        cache = new CacheImpl<>("name", TestCache.class, Duration.ofHours(1), cacheStore);
+        cache = new CacheImpl<>("name", TestCache.class, Duration.ofHours(1));
+        cache.cacheStore = cacheStore;
     }
 
     @Test

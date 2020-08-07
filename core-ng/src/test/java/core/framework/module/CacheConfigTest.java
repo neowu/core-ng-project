@@ -1,7 +1,6 @@
 package core.framework.module;
 
-import core.framework.cache.Cache;
-import core.framework.internal.cache.CacheStore;
+import core.framework.internal.cache.CacheImpl;
 import core.framework.internal.cache.LocalCacheStore;
 import core.framework.internal.cache.RedisCacheStore;
 import core.framework.internal.cache.RedisLocalCacheStore;
@@ -10,7 +9,6 @@ import core.framework.internal.module.ModuleContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
@@ -23,8 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @ExtendWith(MockitoExtension.class)
 class CacheConfigTest {
-    @Mock
-    CacheStore store;
     private CacheConfig config;
 
     @BeforeEach
@@ -40,19 +36,38 @@ class CacheConfigTest {
     }
 
     @Test
-    void cacheStoreWithLocal() {
+    void local() {
         config.local();
 
-        assertThat(config.cacheStore(false)).isInstanceOf(LocalCacheStore.class);
-        assertThat(config.cacheStore(true)).isInstanceOf(LocalCacheStore.class);
+        assertThatThrownBy(() -> config.local())
+                .hasMessageContaining("cache store is already configured");
+
+        assertThatThrownBy(() -> config.redis("localhost"))
+                .hasMessageContaining("cache store is already configured");
     }
 
     @Test
-    void cacheStoreWithRedis() {
+    void addWithLocal() {
+        config.local();
+
+        CacheStoreConfig cacheStoreConfig = config.add(TestCache.class, Duration.ofHours(1));
+        CacheImpl<?> cache = config.caches.get("testcache");
+        assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
+
+        cacheStoreConfig.local();
+        assertThat(cache.cacheStore).isInstanceOf(LocalCacheStore.class);
+    }
+
+    @Test
+    void addWithRedis() {
         config.redis("localhost");
 
-        assertThat(config.cacheStore(false)).isInstanceOf(RedisCacheStore.class);
-        assertThat(config.cacheStore(true)).isInstanceOf(RedisLocalCacheStore.class);
+        CacheStoreConfig cacheStoreConfig = config.add(TestCache.class, Duration.ofHours(1));
+        CacheImpl<?> cache = config.caches.get("testcache");
+        assertThat(cache.cacheStore).isInstanceOf(RedisCacheStore.class);
+
+        cacheStoreConfig.local();
+        assertThat(cache.cacheStore).isInstanceOf(RedisLocalCacheStore.class);
     }
 
     @Test
@@ -62,12 +77,13 @@ class CacheConfigTest {
     }
 
     @Test
-    void add() {
-        Cache<TestCache> cache = config.add(TestCache.class, Duration.ofHours(1), store);
-        assertThat(cache).isNotNull();
+    void addWithDuplicateCache() {
+        config.local();
+
+        config.add(TestCache.class, Duration.ofHours(1));
         assertThat(config.caches.get("testcache")).isNotNull();
 
-        assertThatThrownBy(() -> config.add(TestCache.class, Duration.ofHours(1), store))
+        assertThatThrownBy(() -> config.add(TestCache.class, Duration.ofHours(1)))
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("found duplicate cache name");
     }

@@ -63,46 +63,33 @@ public class CacheConfig extends Config {
         }
     }
 
-    public void redis(String host) {
-        if (localCacheStore != null || redisCacheStore != null) throw new Error("cache is already configured, please configure cache store only once");
+    public void local() {
+        if (localCacheStore != null || redisCacheStore != null) throw new Error("cache store is already configured, please configure only once");
+        localCacheStore();
+    }
 
+    public void redis(String host) {
+        if (localCacheStore != null || redisCacheStore != null) throw new Error("cache store is already configured, please configure only once");
         configureRedis(host);
+    }
+
+    public <T> CacheStoreConfig add(Class<T> cacheClass, Duration duration) {
+        if (localCacheStore == null && redisCacheStore == null) throw new Error("cache store is not configured, please configure first");
+        logger.info("add cache, class={}, duration={}", cacheClass.getCanonicalName(), duration);
+        new CacheClassValidator(cacheClass).validate();
+        String name = cacheName(cacheClass);
+        var cache = new CacheImpl<>(name, cacheClass, duration);
+        cache.cacheStore = redisCacheStore != null ? redisCacheStore : localCacheStore;
+        CacheImpl<?> previous = caches.putIfAbsent(name, cache);
+        if (previous != null) throw new Error("found duplicate cache name, name=" + name);
+        context.beanFactory.bind(Types.generic(Cache.class, cacheClass), null, cache);
+
+        return new CacheStoreConfig(cache, this);
     }
 
     // number of objects to cache
     public void maxLocalSize(int size) {
         maxLocalSize = size;
-    }
-
-    public void local() {
-        if (localCacheStore != null || redisCacheStore != null) throw new Error("cache store is already configured, please configure only once");
-
-        localCacheStore();
-    }
-
-    public <T> void local(Class<T> cacheClass, Duration duration) {
-        if (localCacheStore == null && redisCacheStore == null) throw new Error("cache store is not configured, please configure first");
-
-        logger.info("add local cache, class={}", cacheClass.getCanonicalName());
-        Cache<T> cache = add(cacheClass, duration, cacheStore(true));
-        context.beanFactory.bind(Types.generic(Cache.class, cacheClass), null, cache);
-    }
-
-    public <T> void remote(Class<T> cacheClass, Duration duration) {
-        if (localCacheStore == null && redisCacheStore == null) throw new Error("cache store is not configured, please configure first");
-
-        logger.info("add remote cache, class={}", cacheClass.getCanonicalName());
-        Cache<T> cache = add(cacheClass, duration, cacheStore(false));
-        context.beanFactory.bind(Types.generic(Cache.class, cacheClass), null, cache);
-    }
-
-    <T> Cache<T> add(Class<T> cacheClass, Duration duration, CacheStore cacheStore) {
-        new CacheClassValidator(cacheClass).validate();
-        String name = cacheName(cacheClass);
-        var cache = new CacheImpl<>(name, cacheClass, duration, cacheStore);
-        CacheImpl<?> previous = caches.putIfAbsent(name, cache);
-        if (previous != null) throw new Error("found duplicate cache name, name=" + name);
-        return cache;
     }
 
     String cacheName(Class<?> cacheClass) {
@@ -133,7 +120,7 @@ public class CacheConfig extends Config {
         return localCacheStore;
     }
 
-    private CacheStore redisLocalCacheStore() {
+    CacheStore redisLocalCacheStore() {
         if (redisLocalCacheStore == null) {
             logger.info("create redis local cache store");
             LocalCacheStore localCache = localCacheStore();
@@ -143,14 +130,5 @@ public class CacheConfig extends Config {
             redisLocalCacheStore = new RedisLocalCacheStore(localCache, redisCacheStore, redis);
         }
         return redisLocalCacheStore;
-    }
-
-    CacheStore cacheStore(boolean local) {
-        if (local) {
-            if (redisCacheStore != null) return redisLocalCacheStore();
-        } else {
-            if (redisCacheStore != null) return redisCacheStore;
-        }
-        return localCacheStore;
     }
 }
