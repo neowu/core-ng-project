@@ -7,6 +7,8 @@ import core.framework.internal.redis.RedisHost;
 import core.framework.internal.redis.RedisImpl;
 import core.framework.internal.resource.PoolMetrics;
 import core.framework.redis.Redis;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
@@ -14,6 +16,7 @@ import java.time.Duration;
  * @author neo
  */
 public class RedisConfig extends Config {
+    private final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
     private ModuleContext context;
     private Redis redis;
     private String name;
@@ -33,6 +36,7 @@ public class RedisConfig extends Config {
     }
 
     Redis createRedis() {
+        logger.info("create redis client, name={}", name);
         var redis = new RedisImpl("redis" + (name == null ? "" : "-" + name));
         context.shutdownHook.add(ShutdownHook.STAGE_7, timeout -> redis.close());
         context.backgroundTask().scheduleWithFixedDelay(redis.pool::refresh, Duration.ofMinutes(5));

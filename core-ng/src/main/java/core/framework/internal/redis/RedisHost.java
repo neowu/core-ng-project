@@ -23,4 +23,9 @@ public class RedisHost {
             port = DEFAULT_PORT;
         }
     }
+
+    @Override
+    public String toString() {  // make it easier to log
+        return port == DEFAULT_PORT ? host : host + ':' + port;
+    }
 }

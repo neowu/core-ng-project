@@ -85,7 +85,7 @@ public class RedisImpl implements Redis {
     }
 
     public void close() {
-        logger.info("close redis client, name={}, host={}, port={}", name, host.host, host.port);
+        logger.info("close redis client, name={}, host={}", name, host);
         pool.close();
     }
 

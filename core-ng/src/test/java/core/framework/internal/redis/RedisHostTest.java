@@ -37,4 +37,11 @@ class RedisHostTest {
                 .isInstanceOf(Error.class)
                 .hasMessageContaining("invalid host");
     }
+
+    @Test
+    void convertToString() {
+        assertThat(new RedisHost("redis-1").toString()).isEqualTo("redis-1");
+        assertThat(new RedisHost("redis-2:6379").toString()).isEqualTo("redis-2");
+        assertThat(new RedisHost("redis-3:1999").toString()).isEqualTo("redis-3:1999");
+    }
 }

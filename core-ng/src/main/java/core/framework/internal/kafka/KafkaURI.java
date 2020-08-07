@@ -53,7 +53,7 @@ public class KafkaURI {
     }
 
     @Override
-    public String toString() {  // make it easier to log kafkaURI
+    public String toString() {  // make it easier to log
         return uri;
     }
 }
