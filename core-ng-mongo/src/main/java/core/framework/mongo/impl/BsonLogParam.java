@@ -25,7 +25,7 @@ class BsonLogParam implements LogParam {
         builder.append(value);
     }
 
-    private String logValue() {
+    String logValue() {
         if (bson == null) {
             return "null";
         } else {

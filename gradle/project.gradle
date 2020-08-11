@@ -44,7 +44,7 @@ subprojects {
 
         tasks.withType(Jar).configureEach {
             // resolve jar name collision of child projects with same name under different parents
-            archiveBaseName = "${project.group}.${archiveBaseName.get()}"
+            archiveBaseName.set("${project.group}.${archiveBaseName.get()}")
 
             manifest {
                 attributes 'Implementation-Title': project.name,
@@ -64,5 +64,5 @@ allprojects {
 }
 
 tasks.named('wrapper') {
-    gradleVersion = '6.5.1'
+    gradleVersion = '6.6'
 }

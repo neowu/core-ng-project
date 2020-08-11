@@ -1,6 +1,7 @@
 ## Change log
-### 7.5.2 (07/31/2020 - )
+### 7.5.2 (07/31/2020 - 08/11/2020)
 * test: added mockito builtin MockitoExtension via mockito-junit-jupiter, removed framework one
+    !!! old org.mockito.MockitoAnnotations.initMocks(this) is deprecated, use @ExtendWith(MockitoExtension.class) 
 * redis: update redis config to support different port other than 6379
     potentially to use Envoy as redis proxy, by considering the future of service mesh and isito development
     refer to https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/other_protocols/redis#arch-overview-redis

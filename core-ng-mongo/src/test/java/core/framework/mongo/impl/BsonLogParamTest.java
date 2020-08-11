@@ -22,11 +22,11 @@ class BsonLogParamTest {
     }
 
     @Test
-    void appendUnregisteredEnum() {
-        var param = new BsonLogParam(Filters.eq("field", TestUnregisteredEnum.V1), MongoClientSettings.getDefaultCodecRegistry());
-        var builder = new StringBuilder();
-        param.append(builder, Set.of(), 1000);
-        assertThat(builder.toString()).contains("V1");
+    void logValue() {
+        assertThat(new BsonLogParam(Filters.eq("field", TestUnregisteredEnum.V1), MongoClientSettings.getDefaultCodecRegistry()).logValue())
+                .contains("V1");
+        assertThat(new BsonLogParam(null, MongoClientSettings.getDefaultCodecRegistry()).logValue())
+                .isEqualTo("null");
     }
 
     public enum TestUnregisteredEnum {
