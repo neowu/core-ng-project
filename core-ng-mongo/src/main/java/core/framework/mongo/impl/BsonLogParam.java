@@ -1,6 +1,7 @@
 package core.framework.mongo.impl;
 
 import core.framework.internal.log.filter.LogParam;
+import org.bson.codecs.configuration.CodecConfigurationException;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 
@@ -20,10 +21,19 @@ class BsonLogParam implements LogParam {
 
     @Override
     public void append(StringBuilder builder, Set<String> maskedFields, int maxParamLength) {
+        String value = logValue();
+        builder.append(value);
+    }
+
+    private String logValue() {
         if (bson == null) {
-            builder.append("null");
+            return "null";
         } else {
-            builder.append(bson.toBsonDocument(null, registry).toJson());
+            try {
+                return bson.toBsonDocument(null, registry).toJson();
+            } catch (CodecConfigurationException e) {
+                return bson.toString(); // if can't find codec, fallback to toString to log, e.g. Updates/Filters may use unregistered enum codec
+            }
         }
     }
 }

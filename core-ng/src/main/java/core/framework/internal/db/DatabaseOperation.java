@@ -187,6 +187,10 @@ public class DatabaseOperation {
         } else if (param instanceof LocalDateTime) {
             statement.setTimestamp(index, Timestamp.valueOf((LocalDateTime) param));
         } else if (param instanceof ZonedDateTime) {
+            // https://dev.mysql.com/doc/refman/8.0/en/datetime.html,
+            // TIMESTAMP has a range of '1970-01-01 00:00:01' UTC to '2038-01-19 03:14:07' UTC.
+            // for timestamp column type, there is year 2038 issue
+            // for datetime column type, jdbc will save UTC values
             statement.setTimestamp(index, Timestamp.from(((ZonedDateTime) param).toInstant()));
         } else if (param instanceof Boolean) {
             statement.setBoolean(index, (Boolean) param);
