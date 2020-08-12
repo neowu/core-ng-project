@@ -108,6 +108,19 @@ class DatabaseImplTest {
     }
 
     @Test
+    void validateSQL() {
+        assertThatThrownBy(() -> database.select("SELECT * FROM database_test", String.class))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("sql must not contain asterisk(*)");
+        assertThatThrownBy(() -> database.selectOne("SELECT id FROM database_test WHERE string_field = 'value'", Integer.class))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("sql must not contain single quote(')");
+        assertThatThrownBy(() -> database.execute("UPDATE database_test SET string_value = 'value' WHERE string_field = 'value'", Integer.class))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("sql must not contain single quote(')");
+    }
+
+    @Test
     void commitTransaction() {
         try (Transaction transaction = database.beginTransaction()) {
             insertRow(1, "string", TestEnum.V1);

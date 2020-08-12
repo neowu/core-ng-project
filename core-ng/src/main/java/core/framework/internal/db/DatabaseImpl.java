@@ -177,6 +177,8 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public <T> List<T> select(String sql, Class<T> viewClass, Object... params) {
+        validateAsterisk(sql);
+        validateStringValue(sql);
         var watch = new StopWatch();
         int returnedRows = 0;
         try {
@@ -194,6 +196,8 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public <T> Optional<T> selectOne(String sql, Class<T> viewClass, Object... params) {
+        validateAsterisk(sql);
+        validateStringValue(sql);
         var watch = new StopWatch();
         int returnedRows = 0;
         try {
@@ -210,6 +214,7 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public int execute(String sql, Object... params) {
+        validateStringValue(sql);
         var watch = new StopWatch();
         int updatedRows = 0;
         try {
@@ -225,6 +230,7 @@ public final class DatabaseImpl implements Database {
 
     @Override
     public int[] batchExecute(String sql, List<Object[]> params) {
+        validateStringValue(sql);
         StopWatch watch = new StopWatch();
         int updatedRows = 0;
         try {
@@ -268,5 +274,17 @@ public final class DatabaseImpl implements Database {
         if (elapsed > slowOperationThresholdInNanos) {
             logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", elapsed);
         }
+    }
+
+    private void validateAsterisk(String sql) {
+        if (sql.indexOf('*') != -1)
+            throw new Error("sql must not contain asterisk(*), please only select columns needed, sql=" + sql);
+    }
+
+    // by this way, it also disallows functions with string values, e.g. IFNULL(column, 'value'), but it usually can be prevented by different design,
+    // and we prefer to simplify db usage if possible, and shift complexity to application layer
+    private void validateStringValue(String sql) {
+        if (sql.indexOf('\'') != -1)
+            throw new Error("sql must not contain single quote('), please use prepared statement and question mark(?), sql=" + sql);
     }
 }

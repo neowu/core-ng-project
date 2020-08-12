@@ -77,8 +77,6 @@ public class DatabaseOperation {
     }
 
     <T> Optional<T> selectOne(String sql, RowMapper<T> mapper, Object... params) {
-        validateSelectSQL(sql);
-
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
@@ -93,8 +91,6 @@ public class DatabaseOperation {
     }
 
     <T> List<T> select(String sql, RowMapper<T> mapper, Object... params) {
-        validateSelectSQL(sql);
-
         PoolItem<Connection> connection = transactionManager.getConnection();
         try (PreparedStatement statement = connection.resource.prepareStatement(sql)) {
             statement.setQueryTimeout(queryTimeoutInSeconds);
@@ -127,11 +123,6 @@ public class DatabaseOperation {
     private PreparedStatement insertStatement(Connection connection, String sql, String generatedColumn) throws SQLException {
         if (generatedColumn == null) return connection.prepareStatement(sql);
         return connection.prepareStatement(sql, new String[]{generatedColumn});
-    }
-
-    private void validateSelectSQL(String sql) {
-        if (sql.contains("*"))
-            throw new Error("sql must not contain wildcard(*), please only select columns needed, sql=" + sql);
     }
 
     private <T> Optional<T> fetchOne(PreparedStatement statement, RowMapper<T> mapper) throws SQLException {

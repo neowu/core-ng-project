@@ -98,6 +98,8 @@ public final class RepositoryImpl<T> implements Repository<T> {
 
     @Override
     public void delete(Object... primaryKeys) {
+        if (primaryKeys.length != selectQuery.primaryKeyColumns)
+            throw new Error(Strings.format("the length of primary keys does not match columns, primaryKeys={}, columns={}", selectQuery.primaryKeyColumns, primaryKeys.length));
         var watch = new StopWatch();
         int deletedRows = 0;
         try {

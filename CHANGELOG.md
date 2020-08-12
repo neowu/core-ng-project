@@ -1,4 +1,9 @@
 ## Change log
+### 7.5.3 (08/11/2020 - )
+* db: disallow single quote (') in sql, this is to enforce prepared statement, not allowing concat string values indirectly into dynamic sql
+    !!! make sure to review all exiting usages, query.where(), database.select()/execute() etc,
+    !!! this also disallows function usage, like IFNULL(column, 'default'), but in our design, we prefer to simplify in first place, by either saving exact needed data, or handle in java code  
+
 ### 7.5.2 (07/31/2020 - 08/11/2020)
 * test: added mockito builtin MockitoExtension via mockito-junit-jupiter, removed framework one
     !!! old org.mockito.MockitoAnnotations.initMocks(this) is deprecated, use @ExtendWith(MockitoExtension.class) 

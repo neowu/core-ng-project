@@ -82,6 +82,27 @@ class RepositoryImplCompositeKeyEntityTest {
     }
 
     @Test
+    void delete() {
+        var entity = new CompositeKeyEntity();
+        entity.id1 = "id1";
+        entity.id2 = "id2";
+        entity.booleanField = Boolean.TRUE;
+        entity.longField = 1L;
+
+        repository.insert(entity);
+
+        repository.delete(entity.id1, entity.id2);
+        assertThat(repository.get(entity.id1, entity.id2)).isNotPresent();
+    }
+
+    @Test
+    void deleteWithInvalidPrimaryKeys() {
+        assertThatThrownBy(() -> repository.delete("id1"))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("the length of primary keys does not match columns");
+    }
+
+    @Test
     void batchDelete() {
         var entity1 = new CompositeKeyEntity();
         entity1.id1 = "1-1";

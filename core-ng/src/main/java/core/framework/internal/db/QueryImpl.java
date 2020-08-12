@@ -1,6 +1,5 @@
 package core.framework.internal.db;
 
-import core.framework.db.Database;
 import core.framework.db.Query;
 import core.framework.util.Lists;
 import core.framework.util.Strings;
@@ -13,7 +12,7 @@ import java.util.Optional;
  * @author neo
  */
 public class QueryImpl<T> implements Query<T> {
-    private final Database database;
+    private final DatabaseImpl database;
     private final Class<T> entityClass;
     private final SelectQuery<T> selectQuery;
     private final StringBuilder whereClause = new StringBuilder();
@@ -23,7 +22,7 @@ public class QueryImpl<T> implements Query<T> {
     private Integer skip;
     private Integer limit;
 
-    QueryImpl(Database database, Class<T> entityClass, SelectQuery<T> selectQuery) {
+    QueryImpl(DatabaseImpl database, Class<T> entityClass, SelectQuery<T> selectQuery) {
         this.database = database;
         this.entityClass = entityClass;
         this.selectQuery = selectQuery;
