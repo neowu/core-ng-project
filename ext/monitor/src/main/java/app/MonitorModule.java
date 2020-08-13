@@ -1,11 +1,11 @@
 package app;
 
 import app.monitor.MonitorConfig;
+import app.monitor.job.ElasticSearchClient;
 import app.monitor.job.ElasticSearchMonitorJob;
+import app.monitor.job.KubeClient;
 import app.monitor.job.KubeMonitorJob;
 import app.monitor.job.RedisMonitorJob;
-import app.monitor.kube.KubeClient;
-import core.framework.http.HTTPClient;
 import core.framework.json.Bean;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.LogTopics;
@@ -48,12 +48,12 @@ public class MonitorModule extends Module {
     }
 
     private void configureESJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.ElasticSearchConfig> config) {
-        HTTPClient httpClient = HTTPClient.builder().build();
+        ElasticSearchClient elasticSearchClient = new ElasticSearchClient();
         for (Map.Entry<String, MonitorConfig.ElasticSearchConfig> entry : config.entrySet()) {
             String app = entry.getKey();
             MonitorConfig.ElasticSearchConfig esConfig = entry.getValue();
 
-            var job = new ElasticSearchMonitorJob(httpClient, app, esConfig.host, publisher);
+            var job = new ElasticSearchMonitorJob(elasticSearchClient, app, esConfig.host, publisher);
             job.highHeapUsageThreshold = esConfig.highHeapUsageThreshold;
             job.highDiskUsageThreshold = esConfig.highDiskUsageThreshold;
             schedule().fixedRate("es-" + app, job, Duration.ofSeconds(10));

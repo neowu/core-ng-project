@@ -1,4 +1,4 @@
-package app.monitor.kube;
+package app.monitor.job;
 
 import core.framework.api.json.Property;
 
@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author neo
  */
-public class PodList {  // refer to https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#list-pod-v1-core
+public class KubePodList {  // refer to https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#list-pod-v1-core
     @Property(name = "items")
     public List<Pod> items;
 

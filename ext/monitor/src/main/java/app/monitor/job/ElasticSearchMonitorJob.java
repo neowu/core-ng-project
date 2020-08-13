@@ -1,26 +1,17 @@
 package app.monitor.job;
 
-import core.framework.api.http.HTTPStatus;
-import core.framework.http.HTTPClient;
-import core.framework.http.HTTPMethod;
-import core.framework.http.HTTPRequest;
-import core.framework.http.HTTPResponse;
 import core.framework.internal.log.LogManager;
 import core.framework.internal.stat.Stats;
-import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.JobContext;
 import core.framework.util.Exceptions;
-import core.framework.util.Strings;
-import core.framework.util.Types;
+import core.framework.util.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Type;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,16 +19,16 @@ import java.util.Map;
  */
 public class ElasticSearchMonitorJob implements Job {
     private final Logger logger = LoggerFactory.getLogger(ElasticSearchMonitorJob.class);
-    private final Type responseType = Types.list(Types.map(String.class, String.class));
-    private final HTTPClient httpClient;
+    private final ElasticSearchClient elasticSearchClient;
     private final MessagePublisher<StatMessage> publisher;
     private final String app;
     private final String host;
+    private final Map<String, GCStat> gcStats = Maps.newHashMapWithExpectedSize(2);
     public double highHeapUsageThreshold;
     public double highDiskUsageThreshold;
 
-    public ElasticSearchMonitorJob(HTTPClient httpClient, String app, String host, MessagePublisher<StatMessage> publisher) {
-        this.httpClient = httpClient;
+    public ElasticSearchMonitorJob(ElasticSearchClient elasticSearchClient, String app, String host, MessagePublisher<StatMessage> publisher) {
+        this.elasticSearchClient = elasticSearchClient;
         this.app = app;
         this.host = host;
         this.publisher = publisher;
@@ -46,12 +37,10 @@ public class ElasticSearchMonitorJob implements Job {
     @Override
     public void execute(JobContext context) {
         try {
-            double count = collectCount();
-            // refer to org.elasticsearch.rest.action.cat.RestNodesAction for all available fields
-            List<Map<String, String>> nodeValues = cat("nodes", "name", "disk.used", "disk.total", "heap.current", "heap.max");
-            for (Map<String, String> values : nodeValues) {
-                String host = values.get("name");
-                Stats stats = collect(values, count);
+            ElasticSearchNodeStats nodeStats = elasticSearchClient.stats(host);
+            for (ElasticSearchNodeStats.Node node : nodeStats.nodes.values()) {
+                String host = node.name;
+                Stats stats = collect(node);
                 publishStats(host, stats);
             }
         } catch (Throwable e) {
@@ -60,22 +49,32 @@ public class ElasticSearchMonitorJob implements Job {
         }
     }
 
-    Stats collect(Map<String, String> values, double count) {
+    Stats collect(ElasticSearchNodeStats.Node node) {
         var stats = new Stats();
 
-        double heapUsed = get(values, "heap.current");
+        double heapUsed = node.jvm.mem.heapUsedInBytes;
         stats.put("es_heap_used", heapUsed);
-        double heapMax = get(values, "heap.max");
+        double heapMax = node.jvm.mem.heapMaxInBytes;
         stats.put("es_heap_max", heapMax);
         stats.checkHighUsage(heapUsed / heapMax, highHeapUsageThreshold, "heap");
+        stats.put("es_non_heap_used", node.jvm.mem.nonHeapUsedInBytes);
 
-        double diskUsed = get(values, "disk.used");
+        for (Map.Entry<String, ElasticSearchNodeStats.Collector> entry : node.jvm.gc.collectors.entrySet()) {
+            ElasticSearchNodeStats.Collector collector = entry.getValue();
+            GCStat gcStat = gcStats.computeIfAbsent(entry.getKey(), GCStat::new);
+            long count = gcStat.count(collector.collectionCount);
+            long elapsed = gcStat.elapsed(collector.collectionTimeInMillis);
+            stats.put("es_gc_" + gcStat.name + "_count", (double) count);
+            stats.put("es_gc_" + gcStat.name + "_elapsed", (double) elapsed);
+        }
+
+        double diskUsed = node.fs.total.totalInBytes - node.fs.total.freeInBytes;
         stats.put("es_disk_used", diskUsed);
-        double diskMax = get(values, "disk.total");
+        double diskMax = node.fs.total.totalInBytes;
         stats.put("es_disk_max", diskMax);
         stats.checkHighUsage(diskUsed / diskMax, highDiskUsageThreshold, "disk");
 
-        stats.put("es_docs", count);
+        stats.put("es_docs", node.indices.docs.count);
         return stats;
     }
 
@@ -93,11 +92,6 @@ public class ElasticSearchMonitorJob implements Job {
         publisher.publish(message);
     }
 
-    double collectCount() {
-        Map<String, String> values = cat("count", "count").get(0);
-        return get(values, "count");
-    }
-
     private void publishError(Throwable e) {
         Instant now = Instant.now();
         var message = new StatMessage();
@@ -110,22 +104,5 @@ public class ElasticSearchMonitorJob implements Job {
         message.errorMessage = e.getMessage();
         message.info = Map.of("stack_trace", Exceptions.stackTrace(e));
         publisher.publish(message);
-    }
-
-    private double get(Map<String, String> values, String field) {
-        String value = values.get(field);
-        if (value == null) throw new Error("can not find field, field=" + field);
-        return Double.parseDouble(value);
-    }
-
-    private List<Map<String, String>> cat(String command, String... fields) {
-        var request = new HTTPRequest(HTTPMethod.GET, "http://" + host + ":9200/_cat/" + command);
-        request.params.put("bytes", "b");
-        request.params.put("format", "json");
-        request.params.put("h", String.join(",", fields));
-        HTTPResponse response = httpClient.execute(request);
-        if (response.statusCode != HTTPStatus.OK.code)
-            throw new Error(Strings.format("failed to call es cat api, uri={}, status={}", request.requestURI(), response.statusCode));
-        return JSON.fromJSON(responseType, response.text());
     }
 }

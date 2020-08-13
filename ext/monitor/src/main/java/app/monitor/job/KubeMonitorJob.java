@@ -1,7 +1,5 @@
 package app.monitor.job;
 
-import app.monitor.kube.KubeClient;
-import app.monitor.kube.PodList;
 import core.framework.internal.log.LogManager;
 import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
@@ -38,8 +36,8 @@ public class KubeMonitorJob implements Job {
         try {
             var now = ZonedDateTime.now();
             for (String namespace : namespaces) {
-                PodList pods = kubeClient.listPods(namespace);
-                for (PodList.Pod pod : pods.items) {
+                KubePodList pods = kubeClient.listPods(namespace);
+                for (KubePodList.Pod pod : pods.items) {
                     String errorMessage = check(pod, now);
                     if (errorMessage != null) {
                         publishPodFailure(pod, errorMessage);
@@ -52,7 +50,7 @@ public class KubeMonitorJob implements Job {
         }
     }
 
-    String check(PodList.Pod pod, ZonedDateTime now) {
+    String check(KubePodList.Pod pod, ZonedDateTime now) {
         if (pod.metadata.deletionTimestamp != null) {
             Duration elapsed = Duration.between(pod.metadata.deletionTimestamp, now);
             if (elapsed.toSeconds() >= 300) {
@@ -66,7 +64,7 @@ public class KubeMonitorJob implements Job {
         if ("Failed".equals(phase) || "Unknown".equals(phase)) return "unexpected pod phase, phase=" + phase;
         if ("Pending".equals(phase)) {
             // newly created pod may not have container status yet, containerStatuses is initialized as empty
-            for (PodList.ContainerStatus status : pod.status.containerStatuses) {
+            for (KubePodList.ContainerStatus status : pod.status.containerStatuses) {
                 if (status.state.waiting != null && "ImagePullBackOff".equals(status.state.waiting.reason)) {
                     return "ImagePullBackOff: " + status.state.waiting.message;
                 }
@@ -74,7 +72,7 @@ public class KubeMonitorJob implements Job {
         }
         if ("Running".equals(phase)) {
             boolean ready = true;
-            for (PodList.ContainerStatus status : pod.status.containerStatuses) {
+            for (KubePodList.ContainerStatus status : pod.status.containerStatuses) {
                 if (status.state.waiting != null && "CrashLoopBackOff".equals(status.state.waiting.reason)) {
                     return "CrashLoopBackOff: " + status.state.waiting.message;
                 }
@@ -97,7 +95,7 @@ public class KubeMonitorJob implements Job {
         return null;
     }
 
-    private void publishPodFailure(PodList.Pod pod, String errorMessage) {
+    private void publishPodFailure(KubePodList.Pod pod, String errorMessage) {
         var message = new StatMessage();
         Instant now = Instant.now();
         message.id = LogManager.ID_GENERATOR.next(now);

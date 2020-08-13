@@ -1,6 +1,6 @@
 package app;
 
-import app.monitor.kube.KubeClient;
+import app.monitor.job.KubeClient;
 import core.framework.test.module.AbstractTestModule;
 import core.framework.util.ClasspathResources;
 

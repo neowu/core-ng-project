@@ -1,0 +1,77 @@
+package app.monitor.job;
+
+import core.framework.api.json.Property;
+
+import java.util.Map;
+
+/**
+ * @author neo
+ */
+public class ElasticSearchNodeStats {
+    @Property(name = "nodes")
+    public Map<String, Node> nodes;
+
+    public static class Node {
+        @Property(name = "name")
+        public String name;
+        @Property(name = "indices")
+        public Indices indices;
+        @Property(name = "jvm")
+        public JVM jvm;
+        @Property(name = "fs")
+        public FS fs;
+    }
+
+    public static class Indices {
+        @Property(name = "docs")
+        public Docs docs;
+    }
+
+    public static class Docs {
+        @Property(name = "count")
+        public Long count;
+        @Property(name = "deleted")
+        public Long deleted;
+    }
+
+    public static class JVM {
+        @Property(name = "mem")
+        public Mem mem;
+        @Property(name = "gc")
+        public GC gc;
+    }
+
+    public static class Mem {
+        @Property(name = "heap_used_in_bytes")
+        public Long heapUsedInBytes;
+        @Property(name = "heap_max_in_bytes")
+        public Long heapMaxInBytes;
+        @Property(name = "non_heap_used_in_bytes")
+        public Long nonHeapUsedInBytes;
+    }
+
+    public static class GC {
+        @Property(name = "collectors")
+        public Map<String, Collector> collectors;
+    }
+
+    public static class Collector {
+        @Property(name = "collection_count")
+        public Long collectionCount;
+
+        @Property(name = "collection_time_in_millis")
+        public Long collectionTimeInMillis;
+    }
+
+    public static class FS {
+        @Property(name = "total")
+        public Total total;
+    }
+
+    public static class Total {
+        @Property(name = "total_in_bytes")
+        public Long totalInBytes;
+        @Property(name = "free_in_bytes")
+        public Long freeInBytes;
+    }
+}

@@ -1,4 +1,4 @@
-package app.monitor.kube;
+package app.monitor.job;
 
 import core.framework.api.http.HTTPStatus;
 import core.framework.http.ContentType;
@@ -16,7 +16,7 @@ import java.nio.file.Path;
  * @author neo
  */
 public class KubeClient {
-    private final JSONReader<PodList> reader = new JSONReader<>(PodList.class);
+    private final JSONReader<KubePodList> reader = new JSONReader<>(KubePodList.class);
     private HTTPClient httpClient;
     private String token;
 
@@ -29,8 +29,8 @@ public class KubeClient {
         token = Files.text(Path.of("/var/run/secrets/kubernetes.io/serviceaccount/token"));
     }
 
-    public PodList listPods(String namespace) throws IOException {
-        HTTPRequest request = new HTTPRequest(HTTPMethod.GET, "https://kubernetes.default.svc/api/v1/namespaces/" + namespace + "/pods");
+    public KubePodList listPods(String namespace) throws IOException {
+        var request = new HTTPRequest(HTTPMethod.GET, "https://kubernetes.default.svc/api/v1/namespaces/" + namespace + "/pods");
         request.bearerAuth(token);
         request.accept(ContentType.APPLICATION_JSON);
         HTTPResponse response = httpClient.execute(request);

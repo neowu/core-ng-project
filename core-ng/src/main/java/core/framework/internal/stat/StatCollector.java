@@ -10,6 +10,7 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public class StatCollector {
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final CPUStat cpuStat = new CPUStat(thread, os.getAvailableProcessors());
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
-    private final List<GCStat> gcStats = Lists.newArrayList();
+    private final List<GCStat> gcStats = new ArrayList<>(2);
 
     public double highCPUUsageThreshold = 0.8;
     public double highHeapUsageThreshold = 0.8;
@@ -31,7 +32,8 @@ public class StatCollector {
     public StatCollector() {
         List<GarbageCollectorMXBean> beans = ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean bean : beans) {
-            gcStats.add(new GCStat(bean));
+            GCStat stat = GCStat.of(bean);
+            if (stat != null) gcStats.add(stat);
         }
     }
 
@@ -46,7 +48,7 @@ public class StatCollector {
             long count = gcStat.count();
             long elapsed = gcStat.elapsed();
             stats.put("jvm_gc_" + gcStat.name + "_count", (double) count);
-            stats.put("jvm_gc_" + gcStat.name + "_total_elapsed", (double) elapsed);
+            stats.put("jvm_gc_" + gcStat.name + "_elapsed", (double) elapsed);
         }
 
         collectMetrics(stats);

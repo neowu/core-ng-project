@@ -1,22 +1,20 @@
 package app.monitor.job;
 
-import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientException;
-import core.framework.http.HTTPResponse;
 import core.framework.internal.stat.Stats;
+import core.framework.json.JSON;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
-import core.framework.util.Strings;
+import core.framework.util.ClasspathResources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Map;
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,7 +25,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ElasticSearchMonitorJobTest {
     @Mock
-    HTTPClient httpClient;
+    ElasticSearchClient elasticSearchClient;
     @Mock
     MessagePublisher<StatMessage> publisher;
 
@@ -35,34 +33,30 @@ class ElasticSearchMonitorJobTest {
 
     @BeforeEach
     void createElasticSearchMonitorJob() {
-        job = new ElasticSearchMonitorJob(httpClient, "es", "localhost", publisher);
+        job = new ElasticSearchMonitorJob(elasticSearchClient, "es", "localhost", publisher);
     }
 
     @Test
-    void collectCount() {
-        when(httpClient.execute(any()))
-                .thenReturn(new HTTPResponse(200, Map.of(), Strings.bytes("[{\"count\":\"1\"}]")));
+    void execute() throws IOException {
+        when(elasticSearchClient.stats("localhost"))
+                .thenReturn(JSON.fromJSON(ElasticSearchNodeStats.class, ClasspathResources.text("es-job-test/stats.json")));
+        job.execute(null);
 
-        double count = job.collectCount();
-
-        assertThat(count).isEqualTo(1);
+        verify(publisher).publish(argThat(message -> "es-0".equals(message.host)));
     }
 
     @Test
     void collect() {
-        Stats stats = job.collect(Map.of("disk.used", "6079250432",
-                "disk.total", "62725623808",
-                "heap.current", "139664376",
-                "heap.max", "519438336"), 1);
-
+        ElasticSearchNodeStats nodeStats = JSON.fromJSON(ElasticSearchNodeStats.class, ClasspathResources.text("es-job-test/stats.json"));
+        Stats stats = job.collect(nodeStats.nodes.get("lwOM4R6MQTOinxEVW1antA"));
         assertThat(stats.stats)
-                .containsEntry("es_docs", 1d)
-                .containsKeys("es_disk_used", "es_disk_max", "es_heap_used", "es_heap_max");
+                .containsEntry("es_docs", 49029079d)
+                .containsKeys("es_disk_used", "es_disk_max", "es_heap_used", "es_heap_max", "es_gc_young_count", "es_gc_old_total_elapsed");
     }
 
     @Test
-    void publishError() {
-        when(httpClient.execute(any())).thenThrow(new HTTPClientException("mock", "MOCK_ERROR_CODE", null));
+    void publishError() throws IOException {
+        when(elasticSearchClient.stats("localhost")).thenThrow(new HTTPClientException("mock", "MOCK_ERROR_CODE", null));
         job.execute(null);
         verify(publisher).publish(argThat(message -> "es".equals(message.app)
                 && "ERROR".equals(message.result)

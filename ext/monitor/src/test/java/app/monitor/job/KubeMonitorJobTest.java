@@ -1,7 +1,5 @@
 package app.monitor.job;
 
-import app.monitor.kube.KubeClient;
-import app.monitor.kube.PodList;
 import core.framework.kafka.MessagePublisher;
 import core.framework.log.message.StatMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,8 +46,8 @@ class KubeMonitorJobTest {
     @Test
     void checkWithCrashLoopBackOff() {
         var pod = pod("Running");
-        PodList.ContainerStatus status = pod.status.containerStatuses.get(0);
-        status.state.waiting = new PodList.ContainerStateWaiting();
+        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        status.state.waiting = new KubePodList.ContainerStateWaiting();
         status.state.waiting.reason = "CrashLoopBackOff";
         status.state.waiting.message = "Back-off 5m0s restarting failed container";
 
@@ -79,7 +77,7 @@ class KubeMonitorJobTest {
     @Test
     void checkWithTooManyRestarts() {
         var pod = pod("Running");
-        PodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
         status.ready = Boolean.FALSE;
         status.restartCount = 5;
 
@@ -92,8 +90,8 @@ class KubeMonitorJobTest {
     @Test
     void checkWithImagePullBackOff() {
         var pod = pod("Pending");
-        PodList.ContainerStatus status = pod.status.containerStatuses.get(0);
-        status.state.waiting = new PodList.ContainerStateWaiting();
+        KubePodList.ContainerStatus status = pod.status.containerStatuses.get(0);
+        status.state.waiting = new KubePodList.ContainerStateWaiting();
         status.state.waiting.reason = "ImagePullBackOff";
         status.state.waiting.message = "Back-off pulling image \"gcr.io/project/ops/debug:latest\"";
 
@@ -111,10 +109,10 @@ class KubeMonitorJobTest {
                 && "FAILED_TO_COLLECT".equals(message.errorCode)));
     }
 
-    private PodList.Pod pod(String phase) {
-        var pod = new PodList.Pod();
+    private KubePodList.Pod pod(String phase) {
+        var pod = new KubePodList.Pod();
         pod.status.phase = phase;
-        pod.status.containerStatuses = List.of(new PodList.ContainerStatus());
+        pod.status.containerStatuses = List.of(new KubePodList.ContainerStatus());
         return pod;
     }
 }
