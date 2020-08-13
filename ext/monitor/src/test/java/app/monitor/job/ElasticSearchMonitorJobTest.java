@@ -51,7 +51,7 @@ class ElasticSearchMonitorJobTest {
         Stats stats = job.collect(nodeStats.nodes.get("lwOM4R6MQTOinxEVW1antA"));
         assertThat(stats.stats)
                 .containsEntry("es_docs", 49029079d)
-                .containsKeys("es_disk_used", "es_disk_max", "es_heap_used", "es_heap_max", "es_gc_young_count", "es_gc_old_total_elapsed");
+                .containsKeys("es_disk_used", "es_disk_max", "es_heap_used", "es_heap_max", "es_gc_young_count", "es_gc_old_elapsed");
     }
 
     @Test
