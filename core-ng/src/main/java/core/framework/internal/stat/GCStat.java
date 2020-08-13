@@ -6,7 +6,7 @@ import java.lang.management.GarbageCollectorMXBean;
 /**
  * @author neo
  */
-class GCStat {
+final class GCStat {
     @Nullable
     static GCStat of(GarbageCollectorMXBean bean) {
         String name = collector(bean.getName());

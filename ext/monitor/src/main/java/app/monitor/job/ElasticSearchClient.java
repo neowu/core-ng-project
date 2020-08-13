@@ -17,6 +17,7 @@ public class ElasticSearchClient {
     private final JSONReader<ElasticSearchNodeStats> reader = new JSONReader<>(ElasticSearchNodeStats.class);
     private final HTTPClient httpClient = HTTPClient.builder().build();
 
+    // refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-stats.html
     public ElasticSearchNodeStats stats(String host) throws IOException {
         var request = new HTTPRequest(HTTPMethod.GET, "http://" + host + ":9200/_nodes/stats");
         request.params.put("metric", "indices,jvm,fs");
