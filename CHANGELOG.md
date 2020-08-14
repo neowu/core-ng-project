@@ -3,6 +3,9 @@
 * db: disallow single quote (') in sql, this is to enforce prepared statement, not allowing concat string values indirectly into dynamic sql
     !!! make sure to review all exiting usages, query.where(), database.select()/execute() etc,
     !!! this also disallows function usage, like IFNULL(column, 'default'), but in our design, we prefer to simplify in first place, by either saving exact needed data, or handle in java code  
+* monitor: added es_gc stats for es monitor
+* stats: simplify stats key for jvm_gc and es_gc
+    !!! pls use same version of monitor/log-processor with framework 
 
 ### 7.5.2 (07/31/2020 - 08/11/2020)
 * test: added mockito builtin MockitoExtension via mockito-junit-jupiter, removed framework one
