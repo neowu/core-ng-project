@@ -62,6 +62,16 @@ class DBIntegrationTest extends IntegrationTest {
         List<TestDBEntity> entities = query.fetch();
         assertThat(entities).hasSize(5);
         assertThat(entities.get(0).intField).isEqualTo(4);
+
+        // with or condition
+        query = repository.select();
+        query.where("int_field >= ? OR int_field <= ?", 2, 4);
+        query.where("string_field = ?", "value-3");
+        assertThat(query.count()).isEqualTo(1);
+
+        entities = query.fetch();
+        assertThat(entities).hasSize(1);
+        assertThat(entities.get(0).intField).isEqualTo(3);
     }
 
     @Test

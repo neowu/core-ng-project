@@ -32,7 +32,11 @@ public class QueryImpl<T> implements Query<T> {
     public void where(String condition, Object... params) {
         if (Strings.isBlank(condition)) throw new Error("condition must not be blank");
         if (whereClause.length() > 0) whereClause.append(" AND ");
-        whereClause.append(condition);
+        if (condition.contains(" OR ") || condition.contains(" or ")) { // fastest way to only cover common cases, ignore Or or oR
+            whereClause.append('(').append(condition).append(')');
+        } else {
+            whereClause.append(condition);
+        }
         Collections.addAll(this.params, params);
     }
 
