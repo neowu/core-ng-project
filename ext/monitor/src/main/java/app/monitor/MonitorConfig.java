@@ -21,6 +21,10 @@ public class MonitorConfig {
     @Property(name = "es")
     public Map<String, ElasticSearchConfig> es = Map.of();
 
+    @NotNull
+    @Property(name = "kafka")
+    public Map<String, KafkaConfig> kafka = Map.of();
+
     @Property(name = "kube")
     public KubeConfig kube;
 
@@ -53,6 +57,19 @@ public class MonitorConfig {
         @Max(1)
         @Property(name = "highHeapUsageThreshold")
         public Double highHeapUsageThreshold = 0.8;     // with ES default setting, it generally does full GC at 75%
+    }
+
+    public static class KafkaConfig {
+        @NotNull
+        @Size(min = 1)
+        @Property(name = "hosts")
+        public List<String> hosts = List.of();
+
+        @NotNull
+        @Min(0)
+        @Max(1)
+        @Property(name = "highHeapUsageThreshold")
+        public Double highHeapUsageThreshold = 0.8;
     }
 
     public static class KubeConfig {

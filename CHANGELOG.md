@@ -4,8 +4,12 @@
     !!! make sure to review all exiting usages, query.where(), database.select()/execute() etc,
     !!! this also disallows function usage, like IFNULL(column, 'default'), but in our design, we prefer to simplify in first place, by either saving exact needed data, or handle in java code  
 * monitor: added es_gc stats for es monitor
-* stats: simplify stats key for jvm_gc and es_gc
-    !!! pls use same version of monitor/log-processor with framework 
+           added kafka monitor
+* stats: tweak stats and kibana field format 
+         simplify stats key for jvm_gc and es_gc
+         update consumer_lag_in_ms to nanoseconds
+         update kibana bytes fields with better formatting
+         !!! pls use same version of monitor/log-processor and framework. 
 
 ### 7.5.2 (07/31/2020 - 08/11/2020)
 * test: added mockito builtin MockitoExtension via mockito-junit-jupiter, removed framework one

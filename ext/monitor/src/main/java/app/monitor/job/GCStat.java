@@ -23,6 +23,6 @@ public class GCStat {
         long previous = previousElapsed;
         previousElapsed = currentCollectionTime;
         if (previous == -1) return 0;   // ignore first data point, only count changes, as monitor just started
-        return (currentCollectionTime - previous) * 1000_000; // convert to nano
+        return (currentCollectionTime - previous) * 1_000_000; // convert to nano
     }
 }

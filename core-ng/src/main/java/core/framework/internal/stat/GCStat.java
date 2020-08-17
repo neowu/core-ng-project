@@ -47,6 +47,6 @@ final class GCStat {
         long current = bean.getCollectionTime();
         previousElapsed = current;
         if (previous == -1) return 0;   // ignore first data point, only count changes, as monitor just started
-        return (current - previous) * 1000_000; // convert to nano
+        return (current - previous) * 1_000_000; // convert to nano
     }
 }

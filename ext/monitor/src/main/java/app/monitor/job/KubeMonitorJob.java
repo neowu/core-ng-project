@@ -45,7 +45,7 @@ public class KubeMonitorJob implements Job {
                 }
             }
         } catch (Throwable e) {
-            logger.warn(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             publishError(e);
         }
     }

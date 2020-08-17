@@ -3,6 +3,8 @@ package app;
 import app.monitor.MonitorConfig;
 import app.monitor.job.ElasticSearchClient;
 import app.monitor.job.ElasticSearchMonitorJob;
+import app.monitor.job.JMXClient;
+import app.monitor.job.KafkaMonitorJob;
 import app.monitor.job.KubeClient;
 import app.monitor.job.KubeMonitorJob;
 import app.monitor.job.RedisMonitorJob;
@@ -34,6 +36,9 @@ public class MonitorModule extends Module {
         }
         if (!config.es.isEmpty()) {
             configureESJob(publisher, config.es);
+        }
+        if (!config.kafka.isEmpty()) {
+            configureKafkaJob(publisher, config.kafka);
         }
         if (config.kube != null) {
             configureKubeJob(publisher, config.kube);
@@ -71,6 +76,18 @@ public class MonitorModule extends Module {
                 var job = new RedisMonitorJob(redis, app, host, publisher);
                 job.highMemUsageThreshold = redisConfig.highMemUsageThreshold;
                 schedule().fixedRate("redis-" + host, job, Duration.ofSeconds(10));
+            }
+        }
+    }
+
+    private void configureKafkaJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.KafkaConfig> config) {
+        for (Map.Entry<String, MonitorConfig.KafkaConfig> entry : config.entrySet()) {
+            String app = entry.getKey();
+            MonitorConfig.KafkaConfig kafkaConfig = entry.getValue();
+            for (String host : kafkaConfig.hosts) {
+                var job = new KafkaMonitorJob(new JMXClient(host), app, host, publisher);
+                job.highHeapUsageThreshold = kafkaConfig.highHeapUsageThreshold;
+                schedule().fixedRate("kafka-" + host, job, Duration.ofSeconds(10));
             }
         }
     }

@@ -12,6 +12,12 @@
       "highDiskUsageThreshold": 0.7
     }
   },
+  "kafka": {
+    "log": {
+      "hosts": ["log-kafka-0.log-kafka"],
+      "highHeapUsageThreshold": 0.7
+    }
+  },
   "kube": {
     "namespaces": ["ops", "app"]
   }

@@ -44,7 +44,7 @@ public class ElasticSearchMonitorJob implements Job {
                 publishStats(host, stats);
             }
         } catch (Throwable e) {
-            logger.warn(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             publishError(e);
         }
     }
