@@ -6,14 +6,13 @@ import core.framework.log.ErrorCode;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.MethodNotAllowedException;
+import io.undertow.UndertowMessages;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.server.ServerConnection;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xnio.OptionMap;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -155,13 +154,22 @@ class RequestParserTest {
 
     @Test
     void parseInvalidCookie() {
-        var connection = mock(ServerConnection.class);
-        when(connection.getUndertowOptions()).thenReturn(OptionMap.EMPTY);
-        var exchange = new HttpServerExchange(connection);
-        exchange.getRequestHeaders().put(Headers.COOKIE, "name=invalid-" + (char) 232);
+        var headers = new HeaderMap();
+        headers.put(Headers.COOKIE, "value");
+        var exchange = mock(HttpServerExchange.class);
+        when(exchange.getRequestHeaders()).thenReturn(headers);
 
-        assertThatThrownBy(() -> parser.parseCookies(new RequestImpl(null, null), exchange))
-                .isInstanceOf(BadRequestException.class);
+        when(exchange.getRequestCookies())
+                .thenThrow(UndertowMessages.MESSAGES.tooManyCookies(200))
+                .thenThrow(UndertowMessages.MESSAGES.couldNotParseCookie("value"));
+
+        assertThatThrownBy(() -> parser.parseCookies(null, exchange))
+                .isInstanceOf(BadRequestException.class)
+                .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_COOKIE"));
+
+        assertThatThrownBy(() -> parser.parseCookies(null, exchange))
+                .isInstanceOf(BadRequestException.class)
+                .satisfies(e -> assertThat(((BadRequestException) e).errorCode()).isEqualTo("INVALID_COOKIE"));
     }
 
     @Test

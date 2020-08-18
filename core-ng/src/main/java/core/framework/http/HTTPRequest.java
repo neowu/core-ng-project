@@ -18,8 +18,8 @@ public final class HTTPRequest {
     public final Map<String, String> headers = Maps.newLinkedHashMap();    // make headers/params order deterministic
     public String uri;
     public byte[] body;
+    public ContentType contentType;
     public Map<String, String> form;    // shortcut view only, doesn't impact final request
-    public ContentType contentType;     // shortcut view only, doesn't impact final request
 
     public HTTPRequest(HTTPMethod method, String uri) {
         this.method = method;

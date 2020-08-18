@@ -83,11 +83,13 @@ public final class RequestParser {
         if (cookieHeaders != null) {
             try {
                 request.cookies = decodeCookies(exchange.getRequestCookies());
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException | IllegalStateException e) {
                 logger.debug("[request:header] {}={}", Headers.COOKIE, new HeaderLogParam(Headers.COOKIE, cookieHeaders));
                 // entire cookie will be failed to parse if there is poison cookie value, undertow doesn't provide API to parse cookie individually
                 // since it's rare case, here is to use simplified solution to block entire request, rather than hide which may cause potential issues, e.g. never get SESSION_ID to login
                 // so this force client to clear all cookies and refresh
+                // refer to io.undertow.UndertowMessages.couldNotParseCookie
+                // refer to io.undertow.UndertowMessages.tooManyCookies
                 throw new BadRequestException("invalid cookie", "INVALID_COOKIE", e);
             }
         }
@@ -234,8 +236,8 @@ public final class RequestParser {
             int port = request.port;
 
             builder.append(scheme)
-                   .append("://")
-                   .append(request.hostName);
+                    .append("://")
+                    .append(request.hostName);
 
             if (!(port == 80 && "http".equals(scheme)) && !(port == 443 && "https".equals(scheme))) {
                 builder.append(':').append(port);
