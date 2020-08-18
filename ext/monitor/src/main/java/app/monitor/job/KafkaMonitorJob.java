@@ -85,6 +85,10 @@ public class KafkaMonitorJob implements Job {
         stats.put("kafka_heap_max", heapMax);
         stats.checkHighUsage(heapUsed / heapMax, highHeapUsageThreshold, "heap");
 
+        CompositeData nonHeap = (CompositeData) connection.getAttribute(MEMORY_BEAN, "NonHeapMemoryUsage");
+        double nonHeapUsed = (Long) nonHeap.get("used");
+        stats.put("kafka_non_heap_used", nonHeapUsed);
+
         collectGCStats(stats, connection, youngGCStats, YOUNG_GC_BEAN);
         collectGCStats(stats, connection, oldGCStats, OLD_GC_BEAN);
 

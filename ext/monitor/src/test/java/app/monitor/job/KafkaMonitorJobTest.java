@@ -44,6 +44,7 @@ class KafkaMonitorJobTest {
         when(heap.get("used")).thenReturn(1000L);
         when(heap.get("max")).thenReturn(2000L);
         when(connection.getAttribute(KafkaMonitorJob.MEMORY_BEAN, "HeapMemoryUsage")).thenReturn(heap);
+        when(connection.getAttribute(KafkaMonitorJob.MEMORY_BEAN, "NonHeapMemoryUsage")).thenReturn(heap);
         when(connection.getAttribute(KafkaMonitorJob.OLD_GC_BEAN, "CollectionCount")).thenReturn(0L);
         when(connection.getAttribute(KafkaMonitorJob.OLD_GC_BEAN, "CollectionTime")).thenReturn(0L);
         when(connection.getAttribute(KafkaMonitorJob.YOUNG_GC_BEAN, "CollectionCount")).thenReturn(1L);
@@ -52,7 +53,7 @@ class KafkaMonitorJobTest {
         when(connection.getAttribute(KafkaMonitorJob.BYTES_IN_RATE_BEAN, "OneMinuteRate")).thenReturn(10D);
 
         Stats stats = job.collect(connection);
-        assertThat(stats.stats).containsKeys("kafka_heap_used", "kafka_heap_max",
+        assertThat(stats.stats).containsKeys("kafka_heap_used", "kafka_heap_max", "kafka_non_heap_used",
                 "kafka_gc_young_count", "kafka_gc_young_elapsed",
                 "kafka_gc_old_count", "kafka_gc_old_elapsed",
                 "kafka_bytes_out_rate", "kafka_bytes_in_rate");
