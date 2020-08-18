@@ -1,5 +1,6 @@
 package core.framework.internal.http;
 
+import core.framework.http.ContentType;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientException;
 import core.framework.http.HTTPHeaders;
@@ -20,6 +21,7 @@ import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
@@ -32,6 +34,8 @@ import static java.lang.String.CASE_INSENSITIVE_ORDER;
  * @author neo
  */
 public final class HTTPClientImpl implements HTTPClient {
+    private static final MediaType MEDIA_TYPE_APPLICATION_JSON = MediaType.get(ContentType.APPLICATION_JSON.toString());
+
     private final Logger logger = LoggerFactory.getLogger(HTTPClientImpl.class);
     private final String userAgent;
     private final long slowOperationThresholdInNanos;
@@ -108,12 +112,20 @@ public final class HTTPClientImpl implements HTTPClient {
             } else {
                 logger.debug("[request] body={}", BodyLogParam.of(request.body, request.contentType));
             }
-            builder.method(request.method.name(), RequestBody.create(request.body, MediaType.get(request.contentType.toString())));
+            MediaType contentType = mediaType(request.contentType);
+            builder.method(request.method.name(), RequestBody.create(request.body, contentType));
         } else {
             RequestBody body = request.method == HTTPMethod.GET || request.method == HTTPMethod.HEAD ? null : RequestBody.create(new byte[0], null);
             builder.method(request.method.name(), body);
         }
 
         return builder.build();
+    }
+
+    @Nullable
+    MediaType mediaType(ContentType contentType) {
+        if (contentType == null) return null;   // generally body is always set with valid content type, but in theory contentType=null is considered legitimate, so here to support such case
+        if (contentType == ContentType.APPLICATION_JSON) return MEDIA_TYPE_APPLICATION_JSON; // avoid parsing as application/json is most used type
+        return MediaType.get(contentType.toString());   // use get() not parse() to fail if passed invalid contentType
     }
 }

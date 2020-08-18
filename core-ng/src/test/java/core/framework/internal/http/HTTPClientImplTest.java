@@ -55,17 +55,28 @@ class HTTPClientImplTest {
     @Test
     void response() throws IOException {
         Response httpResponse = new Response.Builder().request(new Request.Builder().url("http://localhost/uri").build())
-                                                      .protocol(Protocol.HTTP_1_1)
-                                                      .code(200)
-                                                      .message("OK")
-                                                      .header("content-type", "text/html")
-                                                      .body(ResponseBody.create(Strings.bytes("{}"), MediaType.get("application/json")))
-                                                      .build();
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .header("content-type", "text/html")
+                .body(ResponseBody.create(Strings.bytes("{}"), MediaType.get("application/json")))
+                .build();
 
         HTTPResponse response = httpClient.response(httpResponse);
         assertThat(response.statusCode).isEqualTo(200);
         assertThat(response.contentType.mediaType).isEqualTo(ContentType.TEXT_HTML.mediaType);
         assertThat(response.headers).containsEntry(HTTPHeaders.CONTENT_TYPE, "text/html");
         assertThat(response.text()).isEqualTo("{}");
+    }
+
+    @Test
+    void mediaType() {
+        assertThat(httpClient.mediaType(null)).isNull();
+
+        assertThat(httpClient.mediaType(ContentType.APPLICATION_JSON))
+                .isSameAs(httpClient.mediaType(ContentType.APPLICATION_JSON));
+
+        assertThat(httpClient.mediaType(ContentType.APPLICATION_FORM_URLENCODED).toString())
+                .isEqualTo(ContentType.APPLICATION_FORM_URLENCODED.mediaType);
     }
 }

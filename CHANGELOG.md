@@ -5,10 +5,10 @@
     !!! this also disallows function usage, like IFNULL(column, 'default'), but in our design, we prefer to simplify in first place, by either saving exact needed data, or handle in java code  
 * db: query.where(condition) enclose the condition with parentheses if it has OR operator
 * monitor: added es_gc stats for es monitor
-* monitor: added kafka monitor
+* monitor: added kafka monitor (heap/gc/network), and kibana visualizations
 * stats: tweak kibana field format, update kibana bytes fields with better formatting 
 * stats: simplify stats key for jvm_gc and es_gc
-         update consumer_lag_in_ms to nanoseconds         
+         update consumer_lag_in_ms to nanoseconds                  
          !!! pls use same version of monitor/log-processor and framework. 
 
 ### 7.5.2 (07/31/2020 - 08/11/2020)
