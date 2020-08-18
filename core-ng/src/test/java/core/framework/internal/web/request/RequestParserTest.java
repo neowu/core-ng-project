@@ -6,7 +6,6 @@ import core.framework.log.ErrorCode;
 import core.framework.util.Strings;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.MethodNotAllowedException;
-import io.undertow.UndertowMessages;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
 import io.undertow.util.HeaderMap;
@@ -159,9 +158,11 @@ class RequestParserTest {
         var exchange = mock(HttpServerExchange.class);
         when(exchange.getRequestHeaders()).thenReturn(headers);
 
+        // refer to io.undertow.UndertowMessages.tooManyCookies
+        // refer to io.undertow.UndertowMessages.couldNotParseCookie
         when(exchange.getRequestCookies())
-                .thenThrow(UndertowMessages.MESSAGES.tooManyCookies(200))
-                .thenThrow(UndertowMessages.MESSAGES.couldNotParseCookie("value"));
+                .thenThrow(new IllegalStateException("UT000046: The number of cookies sent exceeded the maximum of 200"))
+                .thenThrow(new IllegalArgumentException("UT000069: Could not parse set cookie header value"));
 
         assertThatThrownBy(() -> parser.parseCookies(null, exchange))
                 .isInstanceOf(BadRequestException.class)
