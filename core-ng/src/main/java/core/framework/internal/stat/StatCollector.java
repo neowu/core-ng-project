@@ -1,5 +1,6 @@
 package core.framework.internal.stat;
 
+import com.sun.management.OperatingSystemMXBean;
 import core.framework.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +9,6 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +20,8 @@ public class StatCollector {
     public final List<Metrics> metrics = Lists.newArrayList();
 
     private final Logger logger = LoggerFactory.getLogger(StatCollector.class);
-    private final OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
+    private final OperatingSystemMXBean os = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
-    private final CPUStat cpuStat = new CPUStat(thread, os.getAvailableProcessors());
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats = new ArrayList<>(2);
 
@@ -70,7 +69,7 @@ public class StatCollector {
     private void collectCPUUsage(Stats stats) {
         stats.put("sys_load_avg", os.getSystemLoadAverage());
 
-        double cpuUsage = cpuStat.usage();
+        double cpuUsage = os.getProcessCpuLoad();
         stats.put("cpu_usage", cpuUsage);
         stats.checkHighUsage(cpuUsage, highCPUUsageThreshold, "cpu");
     }
