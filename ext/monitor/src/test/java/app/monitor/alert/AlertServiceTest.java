@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -32,11 +33,24 @@ class AlertServiceTest {
         config.site = "site";
         config.timespanInHours = 4;
         config.kibanaURL = "http://kibana:5601";
-        config.channel = new AlertConfig.Channel();
-        config.channel.actionError = "actionErrorChannel";
-        config.channel.actionWarn = "actionWarnChannel";
-        config.channel.eventError = "eventErrorChannel";
-        config.channel.eventWarn = "eventWarnChannel";
+
+        var actionErrorMatcher = new AlertConfig.Matcher();
+        actionErrorMatcher.severity = Severity.ERROR;
+        actionErrorMatcher.kibanaIndex = "trace";
+
+        var productErrorMatcher = new AlertConfig.Matcher();
+        productErrorMatcher.apps = List.of("website");
+        productErrorMatcher.errorCodes = List.of("PRODUCT_ERROR");
+
+        var eventErrorMatcher = new AlertConfig.Matcher();
+        eventErrorMatcher.severity = Severity.ERROR;
+        eventErrorMatcher.kibanaIndex = "event";
+
+        config.channels = Map.ofEntries(
+            Map.entry("actionErrorChannel", actionErrorMatcher),
+            Map.entry("productChannel", productErrorMatcher),
+            Map.entry("eventErrorChannel", eventErrorMatcher)
+        );
         service = new AlertService(config);
         service.slackClient = slackClient;
     }
@@ -54,16 +68,27 @@ class AlertServiceTest {
     }
 
     @Test
-    void alertChannel() {
+    void eligibleChannels() {
         var alert = new Alert();
+        alert.app = "website";
         alert.severity = Severity.ERROR;
         alert.kibanaIndex = "trace";
-        assertThat(service.alertChannel(alert)).isEqualTo("actionErrorChannel");
+        alert.errorCode = "java.lang.NullPointerException";
+        assertThat(service.eligibleChannels(alert.app, alert.errorCode, alert.severity, alert.kibanaIndex)).contains("actionErrorChannel");
 
         alert = new Alert();
-        alert.severity = Severity.WARN;
-        alert.kibanaIndex = "stat";
-        assertThat(service.alertChannel(alert)).isEqualTo("actionWarnChannel");
+        alert.app = "website";
+        alert.severity = Severity.ERROR;
+        alert.kibanaIndex = "trace";
+        alert.errorCode = "PRODUCT_ERROR";
+        assertThat(service.eligibleChannels(alert.app, alert.errorCode, alert.severity, alert.kibanaIndex)).contains("actionErrorChannel", "productChannel");
+
+        alert = new Alert();
+        alert.app = "website";
+        alert.severity = Severity.ERROR;
+        alert.kibanaIndex = "event";
+        alert.errorCode = "EVENT_ERROR";
+        assertThat(service.eligibleChannels(alert.app, alert.errorCode, alert.severity, alert.kibanaIndex)).contains("eventErrorChannel");
     }
 
     @Test
