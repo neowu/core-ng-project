@@ -13,8 +13,8 @@ import java.util.Map;
  */
 public class AlertConfig {
     @NotNull
-    @Property(name = "ignoreWarnings")
-    public List<Matcher> ignoreWarnings = List.of();
+    @Property(name = "ignoreErrors")
+    public List<Matcher> ignoreErrors = List.of();
 
     @NotNull
     @Property(name = "criticalErrors")
@@ -43,9 +43,9 @@ public class AlertConfig {
 
         @Property(name = "severity")
         public Severity severity;
-
-        @Property(name = "kibanaIndex")
-        public String kibanaIndex;
+        @NotNull
+        @Property(name = "indices")
+        public List<String> indices = List.of();
 
         @NotNull
         @Property(name = "errorCodes")

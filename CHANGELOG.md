@@ -1,7 +1,27 @@
 ## Change log
 ### 7.5.4 (08/20/2020 - )
 * es: update to 7.9.0
-
+* monitor: support more flexible notification config, allow notifying certain slack channel based on matching criteria 
+    !!! pls update monitor config similar like
+```json
+{
+  "ignoreErrors": [
+    {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"], "severity": "WARN"}
+  ],
+  "criticalErrors": [
+    {"errorCodes": ["FAILED_TO_START", "POD_FAILURE"]}
+  ],
+  "kibanaURL": "http://kibana:5601",
+  "channels": {
+    "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
+    "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
+    "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
+    "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
+    "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
+  }
+}
+```    
+    
 ### 7.5.3 (08/11/2020 - 08/19/2020)
 * db: disallow single quote (') in sql, this is to enforce prepared statement, not allowing concat string values indirectly into dynamic sql
     !!! make sure to review all exiting usages, query.where(), database.select()/execute() etc,

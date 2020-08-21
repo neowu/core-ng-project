@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static core.framework.util.Strings.format;
@@ -21,24 +20,26 @@ import static core.framework.util.Strings.format;
 public class AlertService {
     private final LRUMap<String, AlertStat> stats = new LRUMap<>(1000);
     private final String kibanaURL;
-    private final ErrorCodeMatchers ignoredWarnings;
-    private final ErrorCodeMatchers criticalErrors;
+    private final AlertMatcher ignoredErrors;
+    private final AlertMatcher criticalErrors;
     private final int timespanInMinutes;
     private final String[][] colors = {
             {"#ff5c33", "#ff9933"}, // 2 colors for warn, change color for weekly review of every week
             {"#a30101", "#e62a00"}  // 2 colors for error
     };
     private final String site;
-    private final Map<ErrorCodeMatchers, String> channels;
+    private final List<NotificationChannel> channels;
     @Inject
     SlackClient slackClient;
 
     public AlertService(AlertConfig config) {
         site = config.site;
         kibanaURL = config.kibanaURL;
-        ignoredWarnings = new ErrorCodeMatchers(config.ignoreWarnings);
-        criticalErrors = new ErrorCodeMatchers(config.criticalErrors);
-        channels = config.channels.entrySet().stream().collect(Collectors.toMap(entry -> new ErrorCodeMatchers(List.of(entry.getValue())), Map.Entry::getKey));
+        ignoredErrors = new AlertMatcher(config.ignoreErrors);
+        criticalErrors = new AlertMatcher(config.criticalErrors);
+        channels = config.channels.entrySet().stream()
+                .map(entry -> new NotificationChannel(entry.getKey(), new AlertMatcher(List.of(entry.getValue()))))
+                .collect(Collectors.toList());
         timespanInMinutes = config.timespanInHours * 60;
     }
 
@@ -51,9 +52,9 @@ public class AlertService {
     }
 
     Result check(Alert alert, LocalDateTime now) {
-        if (alert.severity == Severity.WARN && ignoredWarnings.matches(alert.app, alert.errorCode))
+        if (ignoredErrors.matches(alert))
             return new Result(false, -1);
-        if (alert.severity == Severity.ERROR && criticalErrors.matches(alert.app, alert.errorCode))
+        if (criticalErrors.matches(alert))
             return new Result(true, -1);
 
         String key = alertKey(alert);
@@ -75,7 +76,11 @@ public class AlertService {
     private void notify(Alert alert, int alertCountSinceLastSent, LocalDateTime now) {
         String message = message(alert, alertCountSinceLastSent);
         String color = color(alert.severity, now);
-        eligibleChannels(alert.app, alert.errorCode, alert.severity, alert.kibanaIndex).forEach(channel -> slackClient.send(channel, message, color));
+        for (NotificationChannel channel : channels) {
+            if (channel.matcher.matches(alert)) {
+                slackClient.send(channel.channel, message, color);
+            }
+        }
     }
 
     String docURL(String kibanaIndex, String id) {
@@ -105,13 +110,6 @@ public class AlertService {
         int week = now.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
         int colorIndex = severity == Severity.WARN ? 0 : 1;
         return colors[colorIndex][(week - 1) % 2];
-    }
-
-    List<String> eligibleChannels(String app, String errorCode, Severity severity, String kibanaIndex) {
-        return channels.entrySet().stream().filter(entry -> {
-            ErrorCodeMatchers matcher = entry.getKey();
-            return matcher.matches(app, errorCode, severity, kibanaIndex);
-        }).map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
     String alertKey(Alert alert) {

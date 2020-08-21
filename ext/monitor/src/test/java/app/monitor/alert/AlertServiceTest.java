@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
@@ -28,37 +31,28 @@ class AlertServiceTest {
     @BeforeEach
     void createActionAlertService() {
         var config = new AlertConfig();
-        config.ignoreWarnings = List.of(matcher(List.of("website"), List.of("PATH_NOT_FOUND")));
-        config.criticalErrors = List.of(matcher(List.of(), List.of("CRITICAL_ERROR", "SLOW_SQL")));
+        config.ignoreErrors = List.of(matcher(List.of("website"), List.of("PATH_NOT_FOUND"), Severity.WARN, null));
+        config.criticalErrors = List.of(matcher(null, List.of("CRITICAL_ERROR", "SLOW_SQL"), Severity.ERROR, null));
         config.site = "site";
         config.timespanInHours = 4;
         config.kibanaURL = "http://kibana:5601";
 
-        var actionErrorMatcher = new AlertConfig.Matcher();
-        actionErrorMatcher.severity = Severity.ERROR;
-        actionErrorMatcher.kibanaIndex = "trace";
+        config.channels = Map.of("actionWarnChannel", matcher(null, null, Severity.WARN, List.of("trace", "stat")),
+                "actionErrorChannel", matcher(null, null, Severity.ERROR, List.of("trace", "stat")),
+                "eventWarnChannel", matcher(null, null, Severity.WARN, List.of("event")),
+                "eventErrorChannel", matcher(null, null, Severity.ERROR, List.of("event")),
+                "productChannel", matcher(List.of("website"), List.of("PRODUCT_ERROR"), null, null));
 
-        var productErrorMatcher = new AlertConfig.Matcher();
-        productErrorMatcher.apps = List.of("website");
-        productErrorMatcher.errorCodes = List.of("PRODUCT_ERROR");
-
-        var eventErrorMatcher = new AlertConfig.Matcher();
-        eventErrorMatcher.severity = Severity.ERROR;
-        eventErrorMatcher.kibanaIndex = "event";
-
-        config.channels = Map.ofEntries(
-            Map.entry("actionErrorChannel", actionErrorMatcher),
-            Map.entry("productChannel", productErrorMatcher),
-            Map.entry("eventErrorChannel", eventErrorMatcher)
-        );
         service = new AlertService(config);
         service.slackClient = slackClient;
     }
 
-    private AlertConfig.Matcher matcher(List<String> apps, List<String> errorCodes) {
+    private AlertConfig.Matcher matcher(List<String> apps, List<String> errorCodes, Severity severity, List<String> indices) {
         var matcher = new AlertConfig.Matcher();
-        matcher.apps = apps;
-        matcher.errorCodes = errorCodes;
+        if (apps != null) matcher.apps = apps;
+        if (errorCodes != null) matcher.errorCodes = errorCodes;
+        matcher.severity = severity;
+        if (indices != null) matcher.indices = indices;
         return matcher;
     }
 
@@ -68,48 +62,43 @@ class AlertServiceTest {
     }
 
     @Test
-    void eligibleChannels() {
-        var alert = new Alert();
-        alert.app = "website";
-        alert.severity = Severity.ERROR;
-        alert.kibanaIndex = "trace";
-        alert.errorCode = "java.lang.NullPointerException";
-        assertThat(service.eligibleChannels(alert.app, alert.errorCode, alert.severity, alert.kibanaIndex)).contains("actionErrorChannel");
-
-        alert = new Alert();
-        alert.app = "website";
-        alert.severity = Severity.ERROR;
-        alert.kibanaIndex = "trace";
-        alert.errorCode = "PRODUCT_ERROR";
-        assertThat(service.eligibleChannels(alert.app, alert.errorCode, alert.severity, alert.kibanaIndex)).contains("actionErrorChannel", "productChannel");
-
-        alert = new Alert();
-        alert.app = "website";
-        alert.severity = Severity.ERROR;
-        alert.kibanaIndex = "event";
-        alert.errorCode = "EVENT_ERROR";
-        assertThat(service.eligibleChannels(alert.app, alert.errorCode, alert.severity, alert.kibanaIndex)).contains("eventErrorChannel");
-    }
-
-    @Test
     void alertKey() {
-        Alert alert = alert(Severity.WARN, "NOT_FOUND");
+        Alert alert = alert(Severity.WARN, "NOT_FOUND", "trace");
         alert.action = "action";
         assertThat(service.alertKey(alert)).isEqualTo("website/action/WARN/NOT_FOUND");
     }
 
     @Test
-    void process() {
-        service.process(alert(Severity.WARN, "PATH_NOT_FOUND"));
+    void processWithIgnoredWarning() {
+        service.process(alert(Severity.WARN, "PATH_NOT_FOUND", "trace"));
         verifyNoInteractions(slackClient);
     }
 
     @Test
-    void check() {
-        assertThat(service.check(alert(Severity.ERROR, "CRITICAL_ERROR"), LocalDateTime.now()).notify).isTrue();
-        assertThat(service.check(alert(Severity.WARN, "SLOW_SQL"), LocalDateTime.now()).notify).isTrue();
+    void processWithError() {
+        service.process(alert(Severity.ERROR, "java.lang.NullPointerException", "trace"));
+        verify(slackClient).send(eq("actionErrorChannel"), anyString(), anyString());
+    }
 
-        Alert alert = alert(Severity.ERROR, "ERROR");
+    @Test
+    void processWithProductError() {
+        service.process(alert(Severity.ERROR, "PRODUCT_ERROR", "trace"));
+        verify(slackClient).send(eq("actionErrorChannel"), anyString(), anyString());
+        verify(slackClient).send(eq("productChannel"), anyString(), anyString());
+    }
+
+    @Test
+    void processWithEventError() {
+        service.process(alert(Severity.ERROR, "EVENT_ERROR", "event"));
+        verify(slackClient).send(eq("eventErrorChannel"), anyString(), anyString());
+    }
+
+    @Test
+    void check() {
+        assertThat(service.check(alert(Severity.ERROR, "CRITICAL_ERROR", "trace"), LocalDateTime.now()).notify).isTrue();
+        assertThat(service.check(alert(Severity.WARN, "SLOW_SQL", "trace"), LocalDateTime.now()).notify).isTrue();
+
+        Alert alert = alert(Severity.ERROR, "ERROR", "trace");
         LocalDateTime date = LocalDateTime.now();
         AlertService.Result result = service.check(alert, date);
         assertThat(result).matches(r -> r.notify && r.alertCountSinceLastSent == -1);
@@ -134,7 +123,7 @@ class AlertServiceTest {
 
     @Test
     void message() {
-        Alert alert = alert(Severity.WARN, "ERROR_CODE");
+        Alert alert = alert(Severity.WARN, "ERROR_CODE", "trace");
         alert.id = "id";
         alert.errorMessage = "message";
         alert.kibanaIndex = "action";
@@ -161,11 +150,12 @@ class AlertServiceTest {
                 + "message: message\n");
     }
 
-    private Alert alert(Severity severity, String errorCode) {
+    private Alert alert(Severity severity, String errorCode, String index) {
         var alert = new Alert();
         alert.app = "website";
         alert.severity = severity;
         alert.errorCode = errorCode;
+        alert.kibanaIndex = index;
         return alert;
     }
 }

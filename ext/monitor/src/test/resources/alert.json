@@ -1,19 +1,14 @@
 {
-  "ignoreWarnings": [
+  "ignoreErrors": [
     {"apps": ["website"], "errorCodes": ["PATH_NOT_FOUND"]}
   ],
   "criticalErrors": [],
   "kibanaURL": "http://kibana:5601",
   "channels": {
-    "mockErrorChannel": {
-      "apps": [],
-      "severity": "ERROR",
-      "kibanaIndex": "trace",
-      "errorCodes": []
-    },
-    "mockProductChannel": {
-      "apps": ["website"],
-      "errorCodes": ["PATH_NOT_FOUND"]
-    }
+    "actionWarnChannel": {"severity": "WARN", "indices": ["trace", "stat"]},
+    "actionErrorChannel": {"severity": "ERROR", "indices": ["trace", "stat"]},
+    "eventWarnChannel": {"severity": "WARN", "indices": ["event"]},
+    "eventErrorChannel": {"severity": "ERROR", "indices": ["event"]},
+    "additionalErrorCodeChannel": {"apps": ["product-service"], "errorCodes": ["PRODUCT_ERROR"]}
   }
 }
