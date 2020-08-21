@@ -9,7 +9,9 @@ import core.framework.log.Severity;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static core.framework.util.Strings.format;
 
@@ -27,7 +29,7 @@ public class AlertService {
             {"#a30101", "#e62a00"}  // 2 colors for error
     };
     private final String site;
-    private final Map<String, String> channels;
+    private final Map<ErrorCodeMatchers, String> channels;
     @Inject
     SlackClient slackClient;
 
@@ -36,12 +38,7 @@ public class AlertService {
         kibanaURL = config.kibanaURL;
         ignoredWarnings = new ErrorCodeMatchers(config.ignoreWarnings);
         criticalErrors = new ErrorCodeMatchers(config.criticalErrors);
-        channels = Map.of("trace/WARN", config.channel.actionWarn,
-                "trace/ERROR", config.channel.actionError,
-                "stat/WARN", config.channel.actionWarn,
-                "stat/ERROR", config.channel.actionError,
-                "event/WARN", config.channel.eventWarn,
-                "event/ERROR", config.channel.eventError);
+        channels = config.channels.entrySet().stream().collect(Collectors.toMap(entry -> new ErrorCodeMatchers(List.of(entry.getValue())), Map.Entry::getKey));
         timespanInMinutes = config.timespanInHours * 60;
     }
 
@@ -78,7 +75,7 @@ public class AlertService {
     private void notify(Alert alert, int alertCountSinceLastSent, LocalDateTime now) {
         String message = message(alert, alertCountSinceLastSent);
         String color = color(alert.severity, now);
-        slackClient.send(alertChannel(alert), message, color);
+        eligibleChannels(alert.app, alert.errorCode, alert.severity, alert.kibanaIndex).forEach(channel -> slackClient.send(channel, message, color));
     }
 
     String docURL(String kibanaIndex, String id) {
@@ -110,10 +107,11 @@ public class AlertService {
         return colors[colorIndex][(week - 1) % 2];
     }
 
-    String alertChannel(Alert alert) {
-        String channel = channels.get(alert.kibanaIndex + "/" + alert.severity);
-        if (channel == null) throw new Error(format("channel is not defined, kibanaIndex={}, severity={}", alert.kibanaIndex, alert.severity));
-        return channel;
+    List<String> eligibleChannels(String app, String errorCode, Severity severity, String kibanaIndex) {
+        return channels.entrySet().stream().filter(entry -> {
+            ErrorCodeMatchers matcher = entry.getKey();
+            return matcher.matches(app, errorCode, severity, kibanaIndex);
+        }).map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
     String alertKey(Alert alert) {
