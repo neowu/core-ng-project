@@ -4,5 +4,16 @@
   ],
   "criticalErrors": [],
   "kibanaURL": "http://kibana:5601",
-  "channel": {"eventError": "mockChannel", "eventWarn": "mockChannel", "actionError": "mockChannel", "actionWarn": "mockChannel"}
+  "channels": {
+    "mockErrorChannel": {
+      "apps": [],
+      "severity": "ERROR",
+      "kibanaIndex": "trace",
+      "errorCodes": []
+    },
+    "mockProductChannel": {
+      "apps": ["website"],
+      "errorCodes": ["PATH_NOT_FOUND"]
+    }
+  }
 }
