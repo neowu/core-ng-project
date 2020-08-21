@@ -56,7 +56,9 @@ class MessageListenerThread extends Thread {
         try {
             processing = true;
             consumer = listener.createConsumer();
-            process();
+            if (consumer != null) { // consumer can be null if host is not resolved before shutdown
+                process();
+            }
         } finally {
             processing = false;
             synchronized (lock) {
@@ -78,10 +80,9 @@ class MessageListenerThread extends Thread {
                 }
             }
         }
-        if (consumer != null) { // consumer can be null if host is not resolvable
-            logger.info("close kafka consumer, name={}", getName());
-            consumer.close();
-        }
+
+        logger.info("close kafka consumer, name={}", getName());
+        consumer.close();
     }
 
     void shutdown() {
