@@ -1,4 +1,9 @@
 ## Change log
+### 7.5.5 (08/24/2020 - )
+* stats: updated cpu usage calculation to support docker (overhead improved compare to previous impl which used threading time)
+    !!! due to within java, there is no way to get exact cpu shares, in kube env, better to put cpu limit as integer, like 1000m or 2000m
+    !!! to keep it simple, retrieve available cpu count by java API (Runtime.getAvailableProcessors()), and not going hard way e.g. read "/sys/fs/cgroup/cpu/cpu.shares".     
+
 ### 7.5.4 (08/20/2020 - 08/24/2020)
 * kafka: rollback kafka java client to 2.4.1
     !!! https://issues.apache.org/jira/browse/KAFKA-10134 is not fully fixed.

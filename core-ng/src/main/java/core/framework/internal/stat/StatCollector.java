@@ -24,6 +24,7 @@ public class StatCollector {
     private final ThreadMXBean thread = ManagementFactory.getThreadMXBean();
     private final MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
     private final List<GCStat> gcStats = new ArrayList<>(2);
+    private final CPUStat cpuStat = new CPUStat(os);
 
     public double highCPUUsageThreshold = 0.8;
     public double highHeapUsageThreshold = 0.8;
@@ -67,11 +68,11 @@ public class StatCollector {
     }
 
     private void collectCPUUsage(Stats stats) {
-        stats.put("sys_load_avg", os.getSystemLoadAverage());
+        stats.put("sys_load_avg", os.getSystemLoadAverage());   // until java 14, OperatingSystemMXBean returns host level load and cpu usage, not container level
 
-        double cpuUsage = os.getProcessCpuLoad();
-        stats.put("cpu_usage", cpuUsage);
-        stats.checkHighUsage(cpuUsage, highCPUUsageThreshold, "cpu");
+        double usage = cpuStat.usage();
+        stats.put("cpu_usage", usage);
+        stats.checkHighUsage(usage, highCPUUsageThreshold, "cpu");
     }
 
     private void collectMetrics(Stats stats) {
