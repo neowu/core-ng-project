@@ -1,5 +1,7 @@
 ## Change log
-### 7.5.4 (08/20/2020 - )
+### 7.5.4 (08/20/2020 - 08/24/2020)
+* kafka: rollback kafka java client to 2.4.1
+    !!! https://issues.apache.org/jira/browse/KAFKA-10134 is not fully fixed.
 * es: update to 7.9.0
 * monitor: support more flexible notification config, allow notifying certain slack channel based on matching criteria 
     !!! pls update monitor config similar like
@@ -22,7 +24,7 @@
 }
 ```    
     
-### 7.5.3 (08/11/2020 - 08/19/2020)
+### 7.5.3 (08/11/2020 - 08/19/2020)  !!! do not use this version, kafka 2.6.0 java client still may cause high cpu during re-balancing
 * db: disallow single quote (') in sql, this is to enforce prepared statement, not allowing concat string values indirectly into dynamic sql
     !!! make sure to review all exiting usages, query.where(), database.select()/execute() etc,
     !!! this also disallows function usage, like IFNULL(column, 'default'), but in our design, we prefer to simplify in first place, by either saving exact needed data, or handle in java code  
@@ -34,7 +36,7 @@
          update consumer_lag_in_ms to nanoseconds                  
          !!! pls use same version of monitor/log-processor and framework. 
 
-### 7.5.2 (07/31/2020 - 08/11/2020)
+### 7.5.2 (07/31/2020 - 08/11/2020)  !!! do not use this version, kafka 2.6.0 java client still may cause high cpu during re-balancing
 * test: added mockito builtin MockitoExtension via mockito-junit-jupiter, removed framework one
     !!! old org.mockito.MockitoAnnotations.initMocks(this) is deprecated, use @ExtendWith(MockitoExtension.class) 
 * redis: update redis config to support different port other than 6379
