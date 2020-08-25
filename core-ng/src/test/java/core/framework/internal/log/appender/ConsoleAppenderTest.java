@@ -46,17 +46,17 @@ class ConsoleAppenderTest {
 
         String message = appender.message(action);
         assertThat(message)
-            .contains("| OK |")
-            .contains("| elapsed=100 |")
-            .contains("| cpu_time=100 |")
-            .contains("| correlation_id=refId1,refId2 |")
-            .contains("| action=action |")
-            .contains("| context=value |")
-            .contains("| client=service |")
-            .contains("| ref_id=refId3 |")
-            .contains("| stat=1 |")
-            .contains("| db_count=1 | db_reads=1 | db_writes=0 | db_elapsed=100")
-            .contains("| redis_count=1 | redis_reads=0 | redis_writes=1 | redis_elapsed=120");
+                .contains("| OK |")
+                .contains("| elapsed=100 |")
+                .contains("| cpu_time=100 |")
+                .contains("| correlation_id=refId1,refId2 |")
+                .contains("| action=action |")
+                .contains("| context=value |")
+                .contains("| client=service |")
+                .contains("| ref_id=refId3 |")
+                .contains("| stat=1 |")
+                .contains("| db_count=1 | db_reads=1 | db_writes=0 | db_elapsed=100")
+                .contains("| redis_count=1 | redis_reads=0 | redis_writes=1 | redis_elapsed=120");
     }
 
     @Test
@@ -64,11 +64,13 @@ class ConsoleAppenderTest {
         var stat = new StatMessage();
         stat.date = Instant.now();
         stat.stats = Map.of("thread_count", 10.0, "cpu_usage", 0.01);
+        stat.info = Map.of("info", "text");
 
         String message = appender.message(stat);
         assertThat(message)
                 .contains("| thread_count=10")
-                .contains("| cpu_usage=0.01");
+                .contains("| cpu_usage=0.01")
+                .contains("| info=text");
     }
 
     private PerformanceStatMessage perf(long elapsed, int read, int write) {

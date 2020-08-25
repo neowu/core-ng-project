@@ -38,10 +38,10 @@ public final class ConsoleAppender implements LogAppender {
 
         var builder = new StringBuilder(512);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(log.date))
-               .append(LOG_SPLITTER).append(log.result)
-               .append(LOG_SPLITTER).append("elapsed=").append(format.format(log.elapsed.longValue()))
-               .append(LOG_SPLITTER).append("id=").append(log.id)
-               .append(LOG_SPLITTER).append("action=").append(log.action);
+                .append(LOG_SPLITTER).append(log.result)
+                .append(LOG_SPLITTER).append("elapsed=").append(format.format(log.elapsed.longValue()))
+                .append(LOG_SPLITTER).append("id=").append(log.id)
+                .append(LOG_SPLITTER).append("action=").append(log.action);
 
         if (log.correlationIds != null) {
             builder.append(LOG_SPLITTER).append("correlation_id=");
@@ -50,7 +50,7 @@ public final class ConsoleAppender implements LogAppender {
         String errorCode = log.errorCode;
         if (errorCode != null) {
             builder.append(LOG_SPLITTER).append("error_code=").append(errorCode)
-                   .append(LOG_SPLITTER).append("error_message=").append(filterLineSeparator(log.errorMessage));
+                    .append(LOG_SPLITTER).append("error_message=").append(filterLineSeparator(log.errorMessage));
         }
         builder.append(LOG_SPLITTER).append("cpu_time=").append(format.format(log.cpuTime.longValue()));
 
@@ -88,20 +88,29 @@ public final class ConsoleAppender implements LogAppender {
     String message(StatMessage message) {
         var builder = new StringBuilder(512);
         builder.append(DateTimeFormatter.ISO_INSTANT.format(message.date))
-               .append(LOG_SPLITTER).append(message.result);
+                .append(LOG_SPLITTER).append(message.result);
 
         String errorCode = message.errorCode;
         if (errorCode != null) {
             builder.append(LOG_SPLITTER).append("error_code=").append(errorCode)
-                   .append(LOG_SPLITTER).append("error_message=").append(message.errorMessage);
+                    .append(LOG_SPLITTER).append("error_message=").append(message.errorMessage);
         }
 
         var format = new DecimalFormat();
         for (Map.Entry<String, Double> entry : message.stats.entrySet()) {
             builder.append(LOG_SPLITTER)
-                   .append(entry.getKey()).append('=')
-                   .append(format.format(entry.getValue()));
+                    .append(entry.getKey()).append('=')
+                    .append(format.format(entry.getValue()));
         }
+
+        if (message.info != null) {
+            for (Map.Entry<String, String> entry : message.info.entrySet()) {
+                builder.append(LOG_SPLITTER)
+                        .append(entry.getKey()).append('=')
+                        .append(entry.getValue());
+            }
+        }
+
         return builder.toString();
     }
 

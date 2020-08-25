@@ -38,7 +38,7 @@ public class StatCollector {
     }
 
     public Stats collect() {
-        Stats stats = new Stats();
+        var stats = new Stats();
 
         collectCPUUsage(stats);
         stats.put("thread_count", thread.getThreadCount());
@@ -72,7 +72,10 @@ public class StatCollector {
 
         double usage = cpuStat.usage();
         stats.put("cpu_usage", usage);
-        stats.checkHighUsage(usage, highCPUUsageThreshold, "cpu");
+        boolean highUsage = stats.checkHighUsage(usage, highCPUUsageThreshold, "cpu");
+        if (highUsage) {
+            stats.info("thread_dump", Diagnostic.thread());
+        }
     }
 
     private void collectMetrics(Stats stats) {

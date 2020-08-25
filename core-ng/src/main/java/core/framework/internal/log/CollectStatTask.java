@@ -38,6 +38,7 @@ public final class CollectStatTask implements Runnable {
         message.errorCode = stats.errorCode;
         message.errorMessage = stats.errorMessage;
         message.stats = stats.stats;
+        message.info = stats.info;
         return message;
     }
 }
