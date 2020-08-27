@@ -38,11 +38,13 @@ class HTTPClientImplTest {
         request.params.put("query", "value");
         request.accept(ContentType.APPLICATION_JSON);
         request.body("text", ContentType.TEXT_PLAIN);
+        request.connectTimeout = Duration.ofSeconds(30);
 
         Request httpRequest = httpClient.httpRequest(request);
         assertThat(httpRequest.url().toString()).isEqualTo("http://localhost/uri?query=value");
         assertThat(httpRequest.headers().get(HTTPHeaders.ACCEPT)).isEqualTo(ContentType.APPLICATION_JSON.toString());
         assertThat(httpRequest.headers().get(HTTPHeaders.USER_AGENT)).isEqualTo("TestUserAgent");
+        assertThat(httpRequest.tag(HTTPRequest.class)).isSameAs(request);
     }
 
     @Test

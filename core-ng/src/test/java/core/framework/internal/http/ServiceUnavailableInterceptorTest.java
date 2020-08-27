@@ -34,7 +34,7 @@ class ServiceUnavailableInterceptorTest {
     }
 
     @Test
-    void intercept() throws IOException {
+    void interceptWith503() throws IOException {
         var request = new Request.Builder().url("http://localhost").build();
         var response = new Response.Builder().request(request)
                 .protocol(Protocol.HTTP_2)
@@ -47,5 +47,18 @@ class ServiceUnavailableInterceptorTest {
         interceptor.intercept(chain);
 
         verify(connection).setNoNewExchanges(true);
+    }
+
+    @Test
+    void interceptWithout503() throws IOException {
+        var request = new Request.Builder().url("http://localhost").build();
+        var response = new Response.Builder().request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(HTTPStatus.OK.code)
+                .message("ok").build();
+        when(chain.request()).thenReturn(request);
+        when(chain.proceed(request)).thenReturn(response);
+
+        interceptor.intercept(chain);
     }
 }

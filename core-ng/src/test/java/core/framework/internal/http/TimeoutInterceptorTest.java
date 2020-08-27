@@ -31,16 +31,34 @@ class TimeoutInterceptorTest {
     }
 
     @Test
-    void intercept() throws IOException {
+    void interceptWithConnectTimeout() throws IOException {
         var httpRequest = new HTTPRequest(HTTPMethod.POST, "https://localhost");
         httpRequest.connectTimeout = Duration.ofSeconds(30);
-        httpRequest.timeout = Duration.ofSeconds(30);
-        var request = new Request.Builder().url("http://localhost").tag(HTTPRequest.class, httpRequest).build();
+        var request = new Request.Builder().url(httpRequest.uri).tag(HTTPRequest.class, httpRequest).build();
         when(chain.request()).thenReturn(request);
 
         when(chain.withConnectTimeout(30000, TimeUnit.MILLISECONDS)).thenReturn(chain);
+
+        interceptor.intercept(chain);
+    }
+
+    @Test
+    void interceptWithTimeout() throws IOException {
+        var httpRequest = new HTTPRequest(HTTPMethod.POST, "https://localhost");
+        httpRequest.timeout = Duration.ofSeconds(30);
+        var request = new Request.Builder().url(httpRequest.uri).tag(HTTPRequest.class, httpRequest).build();
+        when(chain.request()).thenReturn(request);
+
         when(chain.withReadTimeout(30000, TimeUnit.MILLISECONDS)).thenReturn(chain);
         when(chain.withWriteTimeout(30000, TimeUnit.MILLISECONDS)).thenReturn(chain);
+
+        interceptor.intercept(chain);
+    }
+
+    @Test
+    void interceptWithoutTimeout() throws IOException {
+        var request = new Request.Builder().url("http://localhost").build();
+        when(chain.request()).thenReturn(request);
 
         interceptor.intercept(chain);
     }
