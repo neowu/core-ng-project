@@ -6,6 +6,7 @@ import core.framework.internal.http.HTTPClientImpl;
 import core.framework.internal.http.PEM;
 import core.framework.internal.http.RetryInterceptor;
 import core.framework.internal.http.ServiceUnavailableInterceptor;
+import core.framework.internal.http.TimeoutInterceptor;
 import core.framework.util.StopWatch;
 import core.framework.util.Threads;
 import okhttp3.ConnectionPool;
@@ -70,6 +71,7 @@ public final class HTTPClientBuilder {
 
             configureHTTPS(builder);
 
+            builder.addInterceptor(new TimeoutInterceptor());
             if (maxRetries != null) {
                 builder.addNetworkInterceptor(new ServiceUnavailableInterceptor());
                 builder.addInterceptor(new RetryInterceptor(maxRetries, retryWaitTime, Threads::sleepRoughly));
@@ -102,11 +104,13 @@ public final class HTTPClientBuilder {
         }
     }
 
+    // client level connect timeout, request level timeout can be specified in HTTPRequest
     public HTTPClientBuilder connectTimeout(Duration connectTimeout) {
         this.connectTimeout = connectTimeout;
         return this;
     }
 
+    // client level read/write timeout, request level timeout can be specified in HTTPRequest
     public HTTPClientBuilder timeout(Duration timeout) {
         this.timeout = timeout;
         return this;

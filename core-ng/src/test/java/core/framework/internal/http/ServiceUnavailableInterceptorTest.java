@@ -30,7 +30,6 @@ class ServiceUnavailableInterceptorTest {
 
     @BeforeEach
     void createServiceUnavailableInterceptor() {
-        when(chain.connection()).thenReturn(connection);
         interceptor = new ServiceUnavailableInterceptor();
     }
 
@@ -43,6 +42,7 @@ class ServiceUnavailableInterceptorTest {
                 .message("service unavailable").build();
         when(chain.request()).thenReturn(request);
         when(chain.proceed(request)).thenReturn(response);
+        when(chain.connection()).thenReturn(connection);
 
         interceptor.intercept(chain);
 

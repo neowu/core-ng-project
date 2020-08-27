@@ -5,6 +5,7 @@ import core.framework.util.Encodings;
 import core.framework.util.Maps;
 import core.framework.util.Strings;
 
+import java.time.Duration;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -20,6 +21,8 @@ public final class HTTPRequest {
     public byte[] body;
     public ContentType contentType;
     public Map<String, String> form;    // shortcut view only, doesn't impact final request
+    public Duration connectTimeout;
+    public Duration timeout;            // read and write timeout
 
     public HTTPRequest(HTTPMethod method, String uri) {
         this.method = method;

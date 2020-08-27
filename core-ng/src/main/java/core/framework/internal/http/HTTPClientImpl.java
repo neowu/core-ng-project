@@ -86,7 +86,7 @@ public final class HTTPClientImpl implements HTTPClient {
     }
 
     Request httpRequest(HTTPRequest request) {
-        Request.Builder builder = new Request.Builder();
+        var builder = new Request.Builder();
 
         try {
             logger.debug("[request] method={}, uri={}", request.method, request.uri);
@@ -117,6 +117,11 @@ public final class HTTPClientImpl implements HTTPClient {
         } else {
             RequestBody body = request.method == HTTPMethod.GET || request.method == HTTPMethod.HEAD ? null : RequestBody.create(new byte[0], null);
             builder.method(request.method.name(), body);
+        }
+
+        if (request.connectTimeout != null || request.timeout != null) {
+            logger.debug("[request] connectTimeout={}, timeout={}", request.connectTimeout, request.timeout);
+            builder.tag(HTTPRequest.class, request);
         }
 
         return builder.build();
