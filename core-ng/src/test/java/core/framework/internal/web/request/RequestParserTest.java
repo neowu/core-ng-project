@@ -1,6 +1,7 @@
 package core.framework.internal.web.request;
 
 import core.framework.http.ContentType;
+import core.framework.http.HTTPMethod;
 import core.framework.internal.log.ActionLog;
 import core.framework.log.ErrorCode;
 import core.framework.util.Strings;
@@ -8,6 +9,8 @@ import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.MethodNotAllowedException;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.CookieImpl;
+import io.undertow.server.handlers.form.FormData;
+import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,6 +63,8 @@ class RequestParserTest {
 
     @Test
     void httpMethod() {
+        assertThat(parser.httpMethod("POST")).isEqualTo(HTTPMethod.POST);
+
         assertThatThrownBy(() -> parser.httpMethod("TRACK"))
                 .isInstanceOf(MethodNotAllowedException.class)
                 .hasMessageContaining("method=TRACK");
@@ -103,6 +108,21 @@ class RequestParserTest {
         parser.parseBody(request, exchange);
 
         assertThat(request.body()).hasValue(body);
+    }
+
+    @Test
+    void parseBodyWithForm() throws Throwable {
+        var request = new RequestImpl(null, null);
+        var exchange = new HttpServerExchange(null);
+        var form = new FormData(3);
+        form.add("k1", "v1");
+        form.add("k2", "v2");
+        form.add("file", new byte[0], "file", new HeaderMap());
+        exchange.putAttachment(FormDataParser.FORM_DATA, form);
+        parser.parseBody(request, exchange);
+
+        assertThat(request.formParams).containsKeys("k1", "k2");
+        assertThat(request.files).containsKeys("file");
     }
 
     @Test

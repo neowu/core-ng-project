@@ -35,6 +35,6 @@ class ActionLogMessageHandlerTest {
         List<Message<ActionLogMessage>> messages = List.of(new Message<>("k1", new ActionLogMessage()), new Message<>("k1", new ActionLogMessage()));
         handler.handle(messages);
 
-        verify(actionService).index(argThat(((List<ActionLogMessage> values) -> values.size() == 2)));
+        verify(actionService).index(argThat((List<ActionLogMessage> values) -> values.size() == 2));
     }
 }

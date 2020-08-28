@@ -35,6 +35,6 @@ class StatMessageHandlerTest {
         List<Message<StatMessage>> messages = List.of(new Message<>("k1", new StatMessage()), new Message<>("k1", new StatMessage()));
         handler.handle(messages);
 
-        verify(statService).index(argThat(((List<StatMessage> values) -> values.size() == 2)));
+        verify(statService).index(argThat((List<StatMessage> values) -> values.size() == 2));
     }
 }

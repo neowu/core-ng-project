@@ -35,6 +35,6 @@ class EventMessageHandlerTest {
         List<Message<EventMessage>> messages = List.of(new Message<>("k1", new EventMessage()), new Message<>("k1", new EventMessage()));
         handler.handle(messages);
 
-        verify(eventService).index(argThat(((List<EventMessage> values) -> values.size() == 2)));
+        verify(eventService).index(argThat((List<EventMessage> values) -> values.size() == 2));
     }
 }
