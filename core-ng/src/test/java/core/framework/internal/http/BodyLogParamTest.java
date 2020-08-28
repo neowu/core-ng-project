@@ -2,7 +2,6 @@ package core.framework.internal.http;
 
 import core.framework.http.ContentType;
 import core.framework.internal.log.filter.BytesLogParam;
-import core.framework.internal.log.filter.JSONLogParam;
 import core.framework.util.Strings;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +14,7 @@ class BodyLogParamTest {
     @Test
     void bodyParam() {
         assertThat(BodyLogParam.of(Strings.bytes("{}"), ContentType.APPLICATION_JSON))
-                .isInstanceOf(JSONLogParam.class);
+                .isInstanceOf(BytesLogParam.class);
 
         assertThat(BodyLogParam.of(Strings.bytes("<xml/>"), ContentType.TEXT_XML))
                 .isInstanceOf(BytesLogParam.class);

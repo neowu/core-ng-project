@@ -3,15 +3,14 @@ package core.framework.internal.log.filter;
 import java.util.Map;
 import java.util.Set;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 /**
  * @author neo
  */
-public class BytesValueMapLogParam implements LogParam {
-    private final Map<String, byte[]> values;
+public class FieldMapLogParam implements LogParam {
+    private final Map<String, String> values;
 
-    public BytesValueMapLogParam(Map<String, byte[]> values) {
+    // used for field based map, and mask based on field, not value (e.g. value in json format)
+    public FieldMapLogParam(Map<String, String> values) {
         this.values = values;
     }
 
@@ -20,11 +19,13 @@ public class BytesValueMapLogParam implements LogParam {
         int maxLength = builder.length() + maxParamLength;
         builder.append('{');
         int index = 0;
-        for (Map.Entry<String, byte[]> entry : values.entrySet()) {
+        for (Map.Entry<String, String> entry : values.entrySet()) {
             if (index > 0) builder.append(", ");
-            builder.append(entry.getKey())
-                   .append('=')
-                   .append(new String(entry.getValue(), UTF_8));
+            String key = entry.getKey();
+            builder.append(key).append('=');
+
+            if (maskedFields.contains(key)) builder.append("******");
+            else builder.append(entry.getValue());
 
             if (builder.length() >= maxLength) {
                 builder.setLength(maxLength);

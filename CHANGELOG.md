@@ -5,6 +5,7 @@
     !!! to keep it simple, retrieve available cpu count by java API (Runtime.getAvailableProcessors()), and not going hard way e.g. read "/sys/fs/cgroup/cpu/cpu.shares".     
 * stats: collect thread dump via stats.info if cpu usage is high
 * httpClient: support request level connectTimeout and timeout (read/write)
+* log: unified BytesLogParam and JSONLogParam, to make cache returned log maskable
 
 ### 7.5.4 (08/20/2020 - 08/24/2020)
 * kafka: rollback kafka java client to 2.4.1

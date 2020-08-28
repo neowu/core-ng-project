@@ -11,10 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class MapLogParamTest {
+class FieldMapLogParamTest {
     @Test
     void append() {
-        var param = new MapLogParam(Map.of("SessionId", "123", "key1", "value1"));
+        var param = new FieldMapLogParam(Map.of("SessionId", "123", "key1", "value1"));
         var builder = new StringBuilder();
         param.append(builder, Set.of("SessionId"), 1000);
         assertThat(builder.toString()).contains("SessionId=******").contains("key1=value1");
@@ -26,7 +26,7 @@ class MapLogParamTest {
         values.put("k1", "v1");
         values.put("k2", "v2");
 
-        var param = new MapLogParam(values);
+        var param = new FieldMapLogParam(values);
         var builder = new StringBuilder();
         param.append(builder, Set.of(), 7);
         assertThat(builder.toString())

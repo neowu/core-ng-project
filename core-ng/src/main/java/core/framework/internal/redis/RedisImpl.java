@@ -2,8 +2,8 @@ package core.framework.internal.redis;
 
 import core.framework.internal.log.filter.ArrayLogParam;
 import core.framework.internal.log.filter.BytesLogParam;
-import core.framework.internal.log.filter.BytesValueMapLogParam;
-import core.framework.internal.log.filter.MapLogParam;
+import core.framework.internal.log.filter.BytesMapLogParam;
+import core.framework.internal.log.filter.FieldMapLogParam;
 import core.framework.internal.resource.Pool;
 import core.framework.internal.resource.PoolItem;
 import core.framework.log.ActionLogContext;
@@ -254,7 +254,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, values.size(), 0);
-            logger.debug("mget, keys={}, size={}, returnedValues={}, elapsed={}", new ArrayLogParam(keys), keys.length, new BytesValueMapLogParam(values), elapsed);
+            logger.debug("mget, keys={}, size={}, returnedValues={}, elapsed={}", new ArrayLogParam(keys), keys.length, new BytesMapLogParam(values), elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -282,7 +282,7 @@ public class RedisImpl implements Redis {
             long elapsed = watch.elapsed();
             int size = values.size();
             ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("mset, values={}, size={}, elapsed={}", new MapLogParam(values), size, elapsed);
+            logger.debug("mset, values={}, size={}, elapsed={}", new FieldMapLogParam(values), size, elapsed);
             checkSlowOperation(elapsed);
         }
     }
@@ -312,7 +312,7 @@ public class RedisImpl implements Redis {
             pool.returnItem(item);
             long elapsed = watch.elapsed();
             ActionLogContext.track("redis", elapsed, 0, size);
-            logger.debug("set, values={}, size={}, expiration={}, elapsed={}", new BytesValueMapLogParam(values), size, expiration, elapsed);
+            logger.debug("set, values={}, size={}, expiration={}, elapsed={}", new BytesMapLogParam(values), size, expiration, elapsed);
             checkSlowOperation(elapsed);
         }
     }

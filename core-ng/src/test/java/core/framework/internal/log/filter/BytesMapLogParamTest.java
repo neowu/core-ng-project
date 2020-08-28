@@ -12,10 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author neo
  */
-class BytesValueMapLogParamTest {
+class BytesMapLogParamTest {
     @Test
     void append() {
-        var param = new BytesValueMapLogParam(Map.of("k1", bytes("v1"), "k2", bytes("v2")));
+        var param = new BytesMapLogParam(Map.of("k1", bytes("v1"), "k2", bytes("v2")));
         var builder = new StringBuilder();
         param.append(builder, Set.of(), 1000);
         assertThat(builder.toString())
@@ -29,7 +29,7 @@ class BytesValueMapLogParamTest {
         values.put("k1", bytes("v1"));
         values.put("k2", bytes("v2"));
 
-        var param = new BytesValueMapLogParam(values);
+        var param = new BytesMapLogParam(values);
         var builder = new StringBuilder();
         param.append(builder, Set.of(), 5);
         assertThat(builder.toString())

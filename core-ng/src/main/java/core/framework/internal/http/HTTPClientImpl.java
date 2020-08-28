@@ -7,7 +7,7 @@ import core.framework.http.HTTPHeaders;
 import core.framework.http.HTTPMethod;
 import core.framework.http.HTTPRequest;
 import core.framework.http.HTTPResponse;
-import core.framework.internal.log.filter.MapLogParam;
+import core.framework.internal.log.filter.FieldMapLogParam;
 import core.framework.log.ActionLogContext;
 import core.framework.util.StopWatch;
 import core.framework.util.Strings;
@@ -74,7 +74,7 @@ public final class HTTPClientImpl implements HTTPClient {
         for (int i = 0; i < httpHeaders.size(); i++) {
             headers.put(httpHeaders.name(i), httpHeaders.value(i));
         }
-        logger.debug("[response] headers={}", new MapLogParam(headers));
+        logger.debug("[response] headers={}", new FieldMapLogParam(headers));
 
         ResponseBody responseBody = httpResponse.body();
         if (responseBody == null) throw new Error("unexpected response body"); // refer to okhttp3.Response.body(), call.execute always return non-null body except for cachedResponse/networkResponse
@@ -98,17 +98,17 @@ public final class HTTPClientImpl implements HTTPClient {
         }
 
         if (!request.params.isEmpty())
-            logger.debug("[request] params={}", new MapLogParam(request.params));   // due to null/empty will be serialized to empty value, so here to log actual params
+            logger.debug("[request] params={}", new FieldMapLogParam(request.params));   // due to null/empty will be serialized to empty value, so here to log actual params
 
         request.headers.put(HTTPHeaders.USER_AGENT, userAgent);
         for (Map.Entry<String, String> entry : request.headers.entrySet()) {
             builder.addHeader(entry.getKey(), entry.getValue());
         }
-        logger.debug("[request] headers={}", new MapLogParam(request.headers));
+        logger.debug("[request] headers={}", new FieldMapLogParam(request.headers));
 
         if (request.body != null) {
             if (request.form != null) {
-                logger.debug("[request] form={}", new MapLogParam(request.form));
+                logger.debug("[request] form={}", new FieldMapLogParam(request.form));
             } else {
                 logger.debug("[request] body={}", BodyLogParam.of(request.body, request.contentType));
             }
