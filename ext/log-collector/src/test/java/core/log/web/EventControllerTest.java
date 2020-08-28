@@ -7,6 +7,7 @@ import core.framework.log.message.EventMessage;
 import core.framework.util.Strings;
 import core.framework.web.CookieSpec;
 import core.framework.web.Request;
+import core.framework.web.Response;
 import core.framework.web.exception.BadRequestException;
 import core.framework.web.exception.ForbiddenException;
 import core.log.IntegrationTest;
@@ -60,6 +61,16 @@ class EventControllerTest extends IntegrationTest {
         var controller = new EventController(List.of("*"), null);
         assertThatThrownBy(() -> controller.options(request))
                 .isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    void post() {
+        when(request.header("Origin")).thenReturn(Optional.of("localhost"));
+        when(request.body()).thenReturn(Optional.empty());
+        var controller = new EventController(List.of("localhost"), null);
+        Response response = controller.post(request);
+        assertThat(response.header("Access-Control-Allow-Origin")).get().isEqualTo("localhost");
+        assertThat(response.header("Access-Control-Allow-Credentials")).get().isEqualTo("true");
     }
 
     @Test
