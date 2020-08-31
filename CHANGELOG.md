@@ -1,4 +1,6 @@
 ## Change log
+### 7.5.6 (08/30/2020 - )
+
 ### 7.5.5 (08/24/2020 - 08/30/2020)
 * stats: updated cpu usage calculation to support docker (overhead improved compare to previous impl which used threading time)
     !!! due to within java, there is no way to get exact cpu shares, in kube env, better to put cpu limit as integer, like 1000m or 2000m

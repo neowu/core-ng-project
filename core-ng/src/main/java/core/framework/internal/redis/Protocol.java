@@ -31,21 +31,17 @@ final class Protocol {
 
     private static Object parseObject(RedisInputStream stream) throws IOException {
         byte firstByte = stream.readByte();
-        switch (firstByte) {
-            case SIMPLE_STRING_BYTE:
-                return stream.readSimpleString();
-            case BLOB_STRING_BYTE:
-                return parseBlobString(stream);
-            case ARRAY_BYTE:
-                return parseArray(stream);
-            case NUMBER_BYTE:
-                return stream.readLong();
-            case SIMPLE_ERROR_BYTE:
+        return switch (firstByte) {
+            case SIMPLE_STRING_BYTE -> stream.readSimpleString();
+            case BLOB_STRING_BYTE -> parseBlobString(stream);
+            case ARRAY_BYTE -> parseArray(stream);
+            case NUMBER_BYTE -> stream.readLong();
+            case SIMPLE_ERROR_BYTE -> {
                 String message = stream.readSimpleString();
                 throw new RedisException(message);
-            default:
-                throw new IOException("unknown redis response, firstByte=" + (char) firstByte);
-        }
+            }
+            default -> throw new IOException("unknown redis response, firstByte=" + (char) firstByte);
+        };
     }
 
     private static byte[] parseBlobString(RedisInputStream stream) throws IOException {

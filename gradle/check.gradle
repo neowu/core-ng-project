@@ -17,7 +17,7 @@ subprojects {
 
     checkstyle {
         dependencies {
-            checkstyle 'com.puppycrawl.tools:checkstyle:8.35'
+            checkstyle 'com.puppycrawl.tools:checkstyle:8.36'
             checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.37.1'
         }
 
@@ -45,7 +45,7 @@ subprojects {
     pmd {
         ruleSets = []
         ruleSetFiles = rootProject.files('gradle/check/pmd.xml')
-        toolVersion = '6.25.0'
+        toolVersion = '6.27.0'
         consoleOutput = true
 
         tasks.withType(Pmd).configureEach {

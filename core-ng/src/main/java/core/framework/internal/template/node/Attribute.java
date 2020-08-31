@@ -115,23 +115,18 @@ public class Attribute {
 
     void addDynamicContent(ContainerFragment parent, TemplateMetaContext context, TemplateSource source) {
         switch (name) {
-            case "c:text":
-                parent.add(new TextContentFragment(value, context, location));
-                break;
-            case "c:html":
-                parent.add(new HTMLContentFragment(value, context, location));
-                break;
-            case "m:text":
+            case "c:text" -> parent.add(new TextContentFragment(value, context, location));
+            case "c:html" -> parent.add(new HTMLContentFragment(value, context, location));
+            case "m:text" -> {
                 String message = context.message.get(value).orElseThrow(() -> new Error(format("can not find message, key={}, location={}", value, location)));
                 parent.addStaticContent(message);
-                break;
-            case "c:include":
+            }
+            case "c:include" -> {
                 TemplateSource includedSource = source.resolve(value);
                 Document document = new HTMLParser(includedSource).parse();
                 document.buildTemplate(parent, context, includedSource);
-                break;
-            default:
-                throw new Error("not supported dynamic content attribute, name=" + name);
+            }
+            default -> throw new Error("not supported dynamic content attribute, name=" + name);
         }
     }
 }

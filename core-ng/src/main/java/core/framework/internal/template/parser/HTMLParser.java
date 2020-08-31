@@ -77,13 +77,15 @@ public class HTMLParser {
         while (true) {
             HTMLTokenType type = lexer.nextElementToken();
             switch (type) {
-                case EOF:
+                case EOF -> {
                     if (currentAttribute != null) validateAttribute(currentAttribute);
                     return;
-                case START_TAG_END_CLOSE:
+                }
+                case START_TAG_END_CLOSE -> {
                     validateSelfCloseTag(tagName);
                     return;
-                case START_TAG_END:
+                }
+                case START_TAG_END -> {
                     if (currentAttribute != null) validateAttribute(currentAttribute);
                     if (!voidElements.contains(tagName)) stack.push(currentElement);
                     if ("script".equals(currentElement.name) || "style".equals(currentElement.name)) {
@@ -91,12 +93,13 @@ public class HTMLParser {
                         if (contentType == HTMLTokenType.TEXT) stack.peek().add(new Text(lexer.currentToken()));
                     }
                     return;
-                case ATTRIBUTE_NAME:
+                }
+                case ATTRIBUTE_NAME -> {
                     if (currentAttribute != null) validateAttribute(currentAttribute);
                     currentAttribute = new Attribute(lexer.currentToken(), tagName, lexer.currentLocation());
                     currentElement.attributes.add(currentAttribute);
-                    break;
-                case ATTRIBUTE_VALUE:
+                }
+                case ATTRIBUTE_VALUE -> {
                     if (currentAttribute == null)
                         throw new Error("attribute syntax is invalid, location=" + lexer.currentLocation());
                     String attributeValue = lexer.currentToken();
@@ -106,9 +109,8 @@ public class HTMLParser {
                     } else if (!"".equals(attributeValue)) {    // not assign null attribute value, e.g. <p class=/>
                         currentAttribute.value = attributeValue;
                     }
-                    break;
-                default:
-                    throw new Error(format("unexpected type, type={}, location={}", type, lexer.currentLocation()));
+                }
+                default -> throw new Error(format("unexpected type, type={}, location={}", type, lexer.currentLocation()));
             }
         }
     }

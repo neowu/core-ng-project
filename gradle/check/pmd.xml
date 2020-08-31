@@ -8,6 +8,7 @@
     <rule ref="category/java/bestpractices.xml/AccessorClassGeneration"/>
     <rule ref="category/java/bestpractices.xml/AccessorMethodGeneration"/>
     <rule ref="category/java/bestpractices.xml/AvoidPrintStackTrace"/>
+    <rule ref="category/java/bestpractices.xml/AvoidReassigningCatchVariables"/>
     <rule ref="category/java/bestpractices.xml/AvoidReassigningParameters"/>
     <rule ref="category/java/bestpractices.xml/AvoidReassigningLoopVariables"/>
     <rule ref="category/java/bestpractices.xml/ConstantsInInterface"/>
@@ -20,9 +21,8 @@
     <rule ref="category/java/bestpractices.xml/OneDeclarationPerLine"/>
     <rule ref="category/java/bestpractices.xml/LiteralsFirstInComparisons"/>
     <rule ref="category/java/bestpractices.xml/PreserveStackTrace"/>
-    <rule ref="category/java/bestpractices.xml/SwitchStmtsShouldHaveDefault"/>
     <rule ref="category/java/bestpractices.xml/SystemPrintln"/>
-    <!--    <rule ref="category/java/bestpractices.xml/UnusedAssignment"/> disable as 6.26 has bug -->
+    <rule ref="category/java/bestpractices.xml/UnusedAssignment"/>
     <rule ref="category/java/bestpractices.xml/UnusedFormalParameter"/>
     <rule ref="category/java/bestpractices.xml/UnusedImports"/>
     <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>

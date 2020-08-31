@@ -18,27 +18,13 @@ public class TextContentFragment implements Fragment {
         for (; index < length; index++) {
             char ch = text.charAt(index);
             switch (ch) {
-                case '<':
-                    builder.append("&lt;");
-                    break;
-                case '>':
-                    builder.append("&gt;");
-                    break;
-                case '"':
-                    builder.append("&quot;");
-                    break;
-                case '&':
-                    builder.append("&amp;");
-                    break;
-                case '\'':
-                    builder.append("&#39;");
-                    break;
-                case '/':
-                    builder.append("&#47;");
-                    break;
-                default:
-                    builder.append(ch);
-                    break;
+                case '<' -> builder.append("&lt;");
+                case '>' -> builder.append("&gt;");
+                case '"' -> builder.append("&quot;");
+                case '&' -> builder.append("&amp;");
+                case '\'' -> builder.append("&#39;");
+                case '/' -> builder.append("&#47;");
+                default -> builder.append(ch);
             }
         }
         return builder.toString();
