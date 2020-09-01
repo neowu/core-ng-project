@@ -27,22 +27,21 @@ class ExecutorImplTest {
     void createExecutorImpl() {
         logManager = new LogManager();
         executor = new ExecutorImpl(1, "test", logManager);
-
-        ActionLog actionLog = logManager.begin("begin");
-        actionLog.action("parentAction");
-        actionLog.trace = true;
-        actionLog.correlationIds = List.of("correlationId");
     }
 
     @AfterEach
     void cleanup() throws InterruptedException {
-        logManager.end("end");
         executor.shutdown();
         executor.awaitTermination(1000);
     }
 
     @Test
     void submit() throws ExecutionException, InterruptedException {
+        ActionLog parentAction = logManager.begin("begin");
+        parentAction.action("parentAction");
+        parentAction.trace = true;
+        parentAction.correlationIds = List.of("correlationId");
+
         Future<Boolean> future = executor.submit("action", () -> {
             ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
             assertThat(actionLog.action).isEqualTo("parentAction:action");
@@ -51,16 +50,17 @@ class ExecutorImplTest {
             return Boolean.TRUE;
         });
         assertThat(future.get()).isEqualTo(true);
+
+        logManager.end("end");
     }
 
     @Test
     void submitTask() throws ExecutionException, InterruptedException {
-        Future<Void> future = executor.submit("task", () -> {
+        Future<Void> future = executor.submit("action", () -> {
             ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-            assertThat(actionLog.action).isEqualTo("parentAction:task");
-            assertThat(actionLog.context).containsEntry("root_action", List.of("parentAction"));
-            assertThat(actionLog.trace).isEqualTo(true);
-            assertThat(actionLog.correlationIds).containsExactly("correlationId");
+            assertThat(actionLog.action).isEqualTo("task:action");
+            assertThat(actionLog.context).doesNotContainKey("root_action");
+            assertThat(actionLog.trace).isFalse();
         });
         assertThat(future.get()).isNull();
     }
@@ -74,15 +74,15 @@ class ExecutorImplTest {
     }
 
     @Test
-    void scheduleDelayedTask() {
+    void scheduleDelayedTask() throws InterruptedException {
         executor.scheduler = ThreadPools.singleThreadScheduler("test-");
-        boolean scheduled = executor.scheduleDelayedTask("task", () -> {
+        boolean scheduled = executor.scheduleDelayedTask("action", () -> {
             ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
-            assertThat(actionLog.action).isEqualTo("parentAction:task");
-            assertThat(actionLog.context).containsEntry("root_action", List.of("parentAction"));
-            assertThat(actionLog.trace).isEqualTo(true);
-            assertThat(actionLog.correlationIds).containsExactly("correlationId");
+            assertThat(actionLog.action).isEqualTo("task:action");
+            assertThat(actionLog.context).doesNotContainKey("root_action");
         }, Duration.ZERO);
+        executor.scheduler.shutdown();
+        executor.scheduler.awaitTermination(10, TimeUnit.SECONDS);
         assertThat(scheduled).isTrue();
     }
 

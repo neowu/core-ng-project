@@ -196,9 +196,27 @@ class RetryInterceptorTest {
         when(chain.request()).thenReturn(request);
         when(chain.proceed(request)).thenReturn(serviceUnavailableResponse).thenReturn(okResponse);
 
-        interceptor.intercept(chain);
+        Response response = interceptor.intercept(chain);
+        assertThat(response).isSameAs(okResponse);
 
         verify(source).close();
+    }
+
+    @Test
+    void retryWithConnectionFailure() throws IOException {
+        var request = new Request.Builder().url("http://localhost").build();
+        var okResponse = new Response.Builder().request(request)
+                .protocol(Protocol.HTTP_2)
+                .code(HTTPStatus.OK.code)
+                .message("ok")
+                .build();
+
+        var chain = mock(Interceptor.Chain.class);
+        when(chain.request()).thenReturn(request);
+        when(chain.proceed(request)).thenThrow(new ConnectException("connection refused")).thenReturn(okResponse);
+
+        Response response = interceptor.intercept(chain);
+        assertThat(response).isSameAs(okResponse);
     }
 
     @Test

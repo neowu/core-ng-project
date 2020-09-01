@@ -81,4 +81,13 @@ class HTTPClientImplTest {
         assertThat(httpClient.mediaType(ContentType.APPLICATION_FORM_URLENCODED).toString())
                 .isEqualTo(ContentType.APPLICATION_FORM_URLENCODED.mediaType);
     }
+
+    @Test
+    void slowOperationThresholdInNanos() {
+        var request = new HTTPRequest(HTTPMethod.POST, "http://localhost/uri");
+        assertThat(httpClient.slowOperationThresholdInNanos(request)).isEqualTo(Duration.ofSeconds(10).toNanos());
+
+        request.slowOperationThreshold = Duration.ofSeconds(1);
+        assertThat(httpClient.slowOperationThresholdInNanos(request)).isEqualTo(Duration.ofSeconds(1).toNanos());
+    }
 }

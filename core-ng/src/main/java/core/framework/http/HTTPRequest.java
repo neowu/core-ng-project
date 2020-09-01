@@ -21,8 +21,10 @@ public final class HTTPRequest {
     public byte[] body;
     public ContentType contentType;
     public Map<String, String> form;    // shortcut view only, doesn't impact final request
+
     public Duration connectTimeout;
     public Duration timeout;            // read and write timeout
+    public Duration slowOperationThreshold;
 
     public HTTPRequest(HTTPMethod method, String uri) {
         this.method = method;
