@@ -35,9 +35,10 @@ class ExecutorImplTest {
     }
 
     @AfterEach
-    void cleanup() {
+    void cleanup() throws InterruptedException {
         logManager.end("end");
         executor.shutdown();
+        executor.awaitTermination(1000);
     }
 
     @Test
@@ -65,6 +66,27 @@ class ExecutorImplTest {
     }
 
     @Test
+    void submitWithDelayedTask() {
+        executor.submit("action", () -> {
+        }, Duration.ofHours(12));
+
+        assertThat(executor.scheduler).isNotNull();
+    }
+
+    @Test
+    void scheduleDelayedTask() {
+        executor.scheduler = ThreadPools.singleThreadScheduler("test-");
+        boolean scheduled = executor.scheduleDelayedTask("task", () -> {
+            ActionLog actionLog = LogManager.CURRENT_ACTION_LOG.get();
+            assertThat(actionLog.action).isEqualTo("parentAction:task");
+            assertThat(actionLog.context).containsEntry("root_action", List.of("parentAction"));
+            assertThat(actionLog.trace).isEqualTo(true);
+            assertThat(actionLog.correlationIds).containsExactly("correlationId");
+        }, Duration.ZERO);
+        assertThat(scheduled).isTrue();
+    }
+
+    @Test
     void submitAfterShutdown() {
         executor.shutdown();
         Future<Object> future = executor.submit("task", () -> null);
@@ -76,5 +98,14 @@ class ExecutorImplTest {
 
         executor.submit("task", () -> {
         }, Duration.ZERO);
+    }
+
+    @Test
+    void scheduleDelayedTaskAfterShutdown() {
+        executor.scheduler = ThreadPools.singleThreadScheduler("test-");
+        executor.scheduler.shutdown();
+        boolean scheduled = executor.scheduleDelayedTask("task", () -> {
+        }, Duration.ofHours(1));
+        assertThat(scheduled).isFalse();
     }
 }

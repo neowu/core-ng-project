@@ -29,13 +29,13 @@ public final class ExecutorImpl implements Executor {
     volatile ScheduledExecutorService scheduler;
 
     public ExecutorImpl(int poolSize, String name, LogManager logManager) {
-        this.name = "executor" + (name == null ? "" : "-" + name);
-        this.executor = ThreadPools.cachedThreadPool(poolSize, this.name + "-");
+        this.name = name;
         this.logManager = logManager;
+        this.executor = ThreadPools.cachedThreadPool(poolSize, "executor" + (name == null ? "" : "-" + name) + "-");
     }
 
     public void shutdown() {
-        logger.info("shutting down {}", name);
+        logger.info("shutting down executor, name={}", name);
         synchronized (this) {
             if (scheduler != null) {
                 List<Runnable> delayedTasks = scheduler.shutdownNow(); // drop all delayed tasks
@@ -47,8 +47,8 @@ public final class ExecutorImpl implements Executor {
 
     public void awaitTermination(long timeoutInMs) throws InterruptedException {
         boolean success = executor.awaitTermination(timeoutInMs, TimeUnit.MILLISECONDS);
-        if (!success) logger.warn("failed to terminate {}", name);
-        else logger.info("{} stopped", name);
+        if (!success) logger.warn("failed to terminate executor, name={}", name);
+        else logger.info("executor stopped, name={}", name);
     }
 
     @Override
@@ -65,9 +65,13 @@ public final class ExecutorImpl implements Executor {
                 return;
             }
             if (scheduler == null) {
-                scheduler = ThreadPools.singleThreadScheduler(name + "-scheduler-");
+                scheduler = ThreadPools.singleThreadScheduler("executor-scheduler" + (name == null ? "" : "-" + name) + "-");
             }
         }
+        scheduleDelayedTask(action, task, delay);
+    }
+
+    boolean scheduleDelayedTask(String action, Task task, Duration delay) {
         // construct execution outside scheduler thread, to obtain parent action log
         Callable<Void> execution = execution(action, () -> {
             task.execute();
@@ -82,9 +86,11 @@ public final class ExecutorImpl implements Executor {
         };
         try {
             scheduler.schedule(delayedTask, delay.toMillis(), TimeUnit.MILLISECONDS);
+            return true;
         } catch (RejectedExecutionException e) {    // with current executor impl, rejection only happens when shutdown
             logger.warn(errorCode("TASK_REJECTED"), "reject task due to server is shutting down, action={}", action, e);
         }
+        return false;
     }
 
     private <T> Future<T> submitTask(String action, Callable<T> execution) {

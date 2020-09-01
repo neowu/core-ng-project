@@ -5,11 +5,14 @@ import core.framework.internal.async.ExecutorImpl;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author neo
  */
 public class ExecutorConfig extends Config {
+    private final Logger logger = LoggerFactory.getLogger(ExecutorConfig.class);
     private ModuleContext context;
 
     @Override
@@ -22,6 +25,7 @@ public class ExecutorConfig extends Config {
     }
 
     public Executor add(String name, int poolSize) {
+        logger.info("create executor, name={}, poolSize={}", name, poolSize);
         Executor executor = createExecutor(name, poolSize);
         context.beanFactory.bind(Executor.class, name, executor);
         return executor;
