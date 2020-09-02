@@ -3,12 +3,11 @@ install: true
 jdk:
 - openjdk14
 before_cache:
-- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
-    directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+  directories:
+  - $HOME/.gradle/caches/modules-2/
+  - $HOME/.gradle/wrapper/dists/
 script:
 - ./gradlew check
 - ./gradlew jacocoTestReport
