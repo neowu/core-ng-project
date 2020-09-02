@@ -42,7 +42,8 @@ class DBIntegrationTest extends IntegrationTest {
         repository.insert(entity);
 
         Optional<TestDBEntity> selectedEntity = repository.get(entity.id);
-        assertThat(selectedEntity).get().isEqualToComparingFieldByField(entity);
+        assertThat(selectedEntity).get()
+                .usingRecursiveComparison().isEqualTo(entity);
     }
 
     @Test
@@ -95,7 +96,8 @@ class DBIntegrationTest extends IntegrationTest {
         query.where("int_field = ?", 2);
         Optional<TestDBEntity> result = query.fetchOne();
 
-        assertThat(result).isPresent().get().isEqualToComparingFieldByField(entity);
+        assertThat(result).get()
+                .usingRecursiveComparison().isEqualTo(entity);
     }
 
     private void createTestEntities() {

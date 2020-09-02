@@ -64,7 +64,7 @@ class ActionServiceTest extends IntegrationTest {
         assertThat(action.correlationIds).isEqualTo(message1.correlationIds);
         assertThat(action.refIds).isEqualTo(message1.refIds);
         assertThat(action.clients).isEqualTo(message1.clients);
-        assertThat(action.performanceStats.get("redis")).isEqualToComparingFieldByField(message1.performanceStats.get("redis"));
+        assertThat(action.performanceStats.get("redis")).usingRecursiveComparison().isEqualTo(message1.performanceStats.get("redis"));
         assertThat(action.context).containsEntry("key", List.of("value"));
 
         TraceDocument trace = traceDocument(now, message2.id);

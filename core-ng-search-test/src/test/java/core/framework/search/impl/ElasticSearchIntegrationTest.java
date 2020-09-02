@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.time.chrono.ChronoZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,19 +66,21 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @Test
     void index() {
         TestDocument document = document("2", "value2", 2, 0,
-            ZonedDateTime.now(),
-            LocalTime.of(12, 1, 2, 200000000));
+                ZonedDateTime.now(),
+                LocalTime.of(12, 1, 2, 200000000));
         documentType.index(document.id, document);
 
         Optional<TestDocument> returnedDocument = documentType.get(document.id);
-        assertThat(returnedDocument).get().isEqualToIgnoringGivenFields(document, "zonedDateTimeField");
-        assertThat(returnedDocument.orElseThrow().zonedDateTimeField).isEqualTo(document.zonedDateTimeField);
+        assertThat(returnedDocument).get()
+                .usingRecursiveComparison()
+                .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+                .isEqualTo(document);
     }
 
     @Test
     void forEach() {
         documentType.bulkIndex(range(0, 30).mapToObj(i -> document(String.valueOf(i), String.valueOf(i), i, 0, null, null))
-                                           .collect(toMap(document -> document.id, identity())));
+                .collect(toMap(document -> document.id, identity())));
         elasticSearch.refreshIndex("document");
 
         List<TestDocument> results = Lists.newArrayList();
@@ -95,9 +98,9 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
     @Test
     void complete() {
         documentType.bulkIndex(Map.of("1", document("1", "HashSet", 1, 0, null, null),
-            "2", document("2", "HashMap", 2, 0, null, null),
-            "3", document("3", "TreeSet", 3, 0, null, null),
-            "4", document("4", "TreeMap", 4, 0, null, null)));
+                "2", document("2", "HashMap", 2, 0, null, null),
+                "3", document("3", "TreeSet", 3, 0, null, null),
+                "4", document("4", "TreeMap", 4, 0, null, null)));
         elasticSearch.refreshIndex("document");
 
         List<String> options = documentType.complete("hash", "completion1", "completion2");
@@ -113,13 +116,16 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         // test synonyms
         SearchRequest request = new SearchRequest();
         request.query = boolQuery()
-            .must(matchQuery("string_field", "first"))
-            .filter(termQuery("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1)));
+                .must(matchQuery("string_field", "first"))
+                .filter(termQuery("enum_field", JSON.toEnumValue(TestDocument.TestEnum.VALUE1)));
         request.sorts.add(SortBuilders.scriptSort(new Script("doc['int_field'].value * 3"), ScriptSortBuilder.ScriptSortType.NUMBER));
         SearchResponse<TestDocument> response = documentType.search(request);
 
         assertThat(response.totalHits).isEqualTo(1);
-        assertThat(response.hits.get(0)).isEqualToIgnoringGivenFields(document, "zonedDateTimeField");
+        assertThat(response.hits).hasSize(1)
+                .first().usingRecursiveComparison()
+                .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+                .isEqualTo(document);
 
         // test stemmer
         request = new SearchRequest();
@@ -127,7 +133,10 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         response = documentType.search(request);
 
         assertThat(response.totalHits).isEqualTo(1);
-        assertThat(response.hits.get(0)).isEqualToIgnoringGivenFields(document, "zonedDateTimeField");
+        assertThat(response.hits).hasSize(1)
+                .first().usingRecursiveComparison()
+                .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+                .isEqualTo(document);
     }
 
     @Test
@@ -145,13 +154,13 @@ class ElasticSearchIntegrationTest extends IntegrationTest {
         SearchResponse<TestDocument> response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(3);
         assertThat(response.hits.stream().map(document1 -> document1.stringField).collect(Collectors.toList()))
-            .containsOnly("value1", "value2", "value3");
+                .containsOnly("value1", "value2", "value3");
 
         request.query = rangeQuery("local_time_field").gt(LocalTime.of(13, 0));
         response = documentType.search(request);
         assertThat(response.totalHits).isEqualTo(2);
         assertThat(response.hits.stream().map(document -> document.stringField).collect(Collectors.toList()))
-            .containsOnly("value3", "value4");
+                .containsOnly("value3", "value4");
     }
 
     @Test
