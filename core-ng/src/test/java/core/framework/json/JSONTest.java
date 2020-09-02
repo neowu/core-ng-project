@@ -86,8 +86,8 @@ class JSONTest {
 
         TestBean parsedBean = JSON.fromJSON(TestBean.class, json);
         assertThat(parsedBean).usingRecursiveComparison()
-                              .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
-                              .isEqualTo(bean);
+                .withComparatorForType(ChronoZonedDateTime.timeLineOrder(), ZonedDateTime.class)
+                .isEqualTo(bean);
     }
 
     @Test
@@ -162,6 +162,10 @@ class JSONTest {
 
         assertThat(JSON.toEnumValue(TestBean.TestEnum.B)).isEqualTo("B1");
         assertThat(JSON.toEnumValue(TestBean.TestEnum.C)).isEqualTo("C");
+
+        // ordinal should be treated as invalid value
+        assertThatThrownBy(() -> JSON.fromEnumValue(TestBean.TestEnum.class, "0"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
