@@ -44,7 +44,9 @@ class HTTPErrorHandlerTest {
         expected.severity = "WARN";
 
         var response = handler.errorResponse(new NotFoundException("test message", "TEST_ERROR_CODE"), WebServiceClient.USER_AGENT, "actionId");
-        assertThat(response).isInstanceOf(ErrorResponse.class).isEqualToIgnoringGivenFields(expected, "stackTrace");
+        assertThat(response).isInstanceOf(ErrorResponse.class)
+                .usingRecursiveComparison().ignoringFields("stackTrace")
+                .isEqualTo(expected);
     }
 
     @Test
@@ -56,7 +58,9 @@ class HTTPErrorHandlerTest {
         expected.severity = "ERROR";
 
         var response = handler.errorResponse(new Error("test message"), WebServiceClient.USER_AGENT, "actionId");
-        assertThat(response).isInstanceOf(ErrorResponse.class).isEqualToIgnoringGivenFields(expected, "stackTrace");
+        assertThat(response).isInstanceOf(ErrorResponse.class)
+                .usingRecursiveComparison().ignoringFields("stackTrace")
+                .isEqualTo(expected);
     }
 
     @Test
@@ -67,7 +71,9 @@ class HTTPErrorHandlerTest {
         expected.errorCode = "INTERNAL_ERROR";
 
         var response = handler.errorResponse(new Error("test message"), "Mozilla/5.0", "actionId");
-        assertThat(response).isInstanceOf(AJAXErrorResponse.class).isEqualToIgnoringGivenFields(expected, "stackTrace");
+        assertThat(response).isInstanceOf(AJAXErrorResponse.class)
+                .usingRecursiveComparison().ignoringFields("stackTrace")
+                .isEqualTo(expected);
     }
 
     @Test

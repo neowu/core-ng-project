@@ -61,7 +61,7 @@ class RepositoryImplAssignedIdEntityTest {
         OptionalLong id = repository.insert(entity);
         assertFalse(id.isPresent());
 
-        assertThat(repository.get(entity.id)).get().isEqualToComparingFieldByField(entity);
+        assertThat(repository.get(entity.id)).get().usingRecursiveComparison().isEqualTo(entity);
     }
 
     @Test
@@ -84,9 +84,9 @@ class RepositoryImplAssignedIdEntityTest {
         updatedEntity.intField = 12;
         repository.update(updatedEntity);
 
-        assertThat(repository.get(entity.id))
-                .get().isEqualToComparingFieldByField(updatedEntity)
-                .satisfies(selectedEntity -> assertThat(selectedEntity.stringField).isNull());
+        AssignedIdEntity result = repository.get(entity.id).orElseThrow();
+        assertThat(result).usingRecursiveComparison().isEqualTo(updatedEntity);
+        assertThat(result.stringField).isNull();
     }
 
     @Test
@@ -100,9 +100,10 @@ class RepositoryImplAssignedIdEntityTest {
         updatedEntity.dateField = LocalDate.of(2016, Month.JULY, 5);
         repository.partialUpdate(updatedEntity);
 
-        assertThat(repository.get(entity.id))
-                .get().isEqualToComparingOnlyGivenFields(updatedEntity, "stringField", "dateField")
-                .satisfies(selectedEntity -> assertThat(selectedEntity.intField).isEqualTo(11));
+        AssignedIdEntity result = repository.get(entity.id).orElseThrow();
+        assertThat(result.stringField).isEqualTo(updatedEntity.stringField);
+        assertThat(result.dateField).isEqualTo(updatedEntity.dateField);
+        assertThat(result.intField).isEqualTo(11);
     }
 
     @Test
@@ -124,8 +125,8 @@ class RepositoryImplAssignedIdEntityTest {
         }
         repository.batchInsert(entities);
 
-        assertThat(repository.get("1")).get().isEqualToComparingFieldByField(entities.get(0));
-        assertThat(repository.get("2")).get().isEqualToComparingFieldByField(entities.get(1));
+        assertThat(repository.get("1")).get().usingRecursiveComparison().isEqualTo(entities.get(0));
+        assertThat(repository.get("2")).get().usingRecursiveComparison().isEqualTo(entities.get(1));
     }
 
     @Test
