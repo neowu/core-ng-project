@@ -1,5 +1,8 @@
 ## Change log
 ### 7.5.6 (08/30/2020 - )
+* json: disable to deserialize ordinal number to enum (the default setting of jackson is not strict)
+* api: use generic error message when webservice client or controller failed to deserialize json
+    !!! not to leak too much internal info to public, e.g. jackson return all possible enums in error message. 
 
 ### 7.5.5 (08/24/2020 - 08/30/2020)
 * stats: updated cpu usage calculation to support docker (overhead improved compare to previous impl which used threading time)
@@ -9,7 +12,7 @@
 * httpClient: support request level connectTimeout and timeout (read/write)
 * log: unified BytesLogParam and JSONLogParam, to make cache returned log maskable
 
-### 7.5.4 (08/20/2020 - 08/24/2020)
+### 7.5.4 (07/31/2020 - 08/24/2020)
 * kafka: rollback kafka java client to 2.4.1
     !!! https://issues.apache.org/jira/browse/KAFKA-10134 is not fully fixed.
 * es: update to 7.9.0
@@ -33,8 +36,6 @@
   }
 }
 ```    
-    
-### 7.5.3 (08/11/2020 - 08/19/2020)  !!! do not use this version, kafka 2.6.0 java client still may cause high cpu during re-balancing
 * db: disallow single quote (') in sql, this is to enforce prepared statement, not allowing concat string values indirectly into dynamic sql
     !!! make sure to review all exiting usages, query.where(), database.select()/execute() etc,
     !!! this also disallows function usage, like IFNULL(column, 'default'), but in our design, we prefer to simplify in first place, by either saving exact needed data, or handle in java code  
@@ -45,8 +46,6 @@
 * stats: simplify stats key for jvm_gc and es_gc
          update consumer_lag_in_ms to nanoseconds                  
          !!! pls use same version of monitor/log-processor and framework. 
-
-### 7.5.2 (07/31/2020 - 08/11/2020)  !!! do not use this version, kafka 2.6.0 java client still may cause high cpu during re-balancing
 * test: added mockito builtin MockitoExtension via mockito-junit-jupiter, removed framework one
     !!! old org.mockito.MockitoAnnotations.initMocks(this) is deprecated, use @ExtendWith(MockitoExtension.class) 
 * redis: update redis config to support different port other than 6379
@@ -55,8 +54,6 @@
     it does not support SCAN/PUBSUB command yet, so the usage is kind of limited. e.g. partition redis db, or remote only cache
     other options are like managed redis service, e.g. gcloud memorystore
     the official one moves slowly, https://github.com/RedisLabs/redis-cluster-proxy
-* kafka: update to 2.6.0
-    high cpu issue fixed, https://issues.apache.org/jira/browse/KAFKA-10134
 * cache: cache config api changed 
     !!! replace cache().local() cache().remote() back to cache().add()
     !!! for multiple level caching, use cache().add().local()

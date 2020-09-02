@@ -85,7 +85,9 @@ public class WebServiceClient {
         try {
             return reader.fromJSON(responseType, response.body);
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            // for security concern, to hide original error message, jackson may return detailed info, e.g. possible allowed values for enum
+            // detailed info can still be found in trace log or exception stack trace
+            throw new UncheckedIOException("failed to deserialize remote service response, responseType=" + responseType.getTypeName(), e);
         }
     }
 
@@ -146,7 +148,7 @@ public class WebServiceClient {
             return (ErrorResponse) reader.fromJSON(ErrorResponse.class, response.body);
         } catch (Throwable e) {
             int statusCode = response.statusCode;
-            throw new RemoteServiceException(format("internal communication failed, statusCode={}, responseText={}", statusCode, response.text()), Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode), e);
+            throw new RemoteServiceException(format("failed to deserialize remote service error response, statusCode={}", statusCode), Severity.ERROR, "REMOTE_SERVICE_ERROR", parseHTTPStatus(statusCode), e);
         }
     }
 

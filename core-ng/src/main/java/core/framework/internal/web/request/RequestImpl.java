@@ -138,7 +138,9 @@ public final class RequestImpl implements Request {
         } catch (ValidationException e) {
             throw new BadRequestException(e.getMessage(), e.errorCode(), e);
         } catch (IOException e) {  // for invalid json string
-            throw new BadRequestException(e.getMessage(), "INVALID_HTTP_REQUEST", e);
+            // for security concern, to hide original error message, jackson may return detailed info, e.g. possible allowed values for enum
+            // detailed info can still be found in trace log or exception stack trace
+            throw new BadRequestException("failed to deserialize request, beanClass=" + beanClass.getCanonicalName(), "INVALID_HTTP_REQUEST", e);
         }
     }
 }

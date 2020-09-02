@@ -132,7 +132,7 @@ class WebServiceClientTest {
                     RemoteServiceException exception = (RemoteServiceException) throwable;
                     assertThat(exception.severity()).isEqualTo(Severity.ERROR);
                     assertThat(exception.errorCode()).isEqualTo("REMOTE_SERVICE_ERROR");
-                    assertThat(exception.getMessage()).startsWith("internal communication failed, statusCode=503");
+                    assertThat(exception.getMessage()).startsWith("failed to deserialize remote service error response, statusCode=503");
                     assertThat(exception.status).isEqualTo(HTTPStatus.SERVICE_UNAVAILABLE);
                 });
     }
