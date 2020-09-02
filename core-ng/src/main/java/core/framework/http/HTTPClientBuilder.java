@@ -27,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -151,6 +152,17 @@ public final class HTTPClientBuilder {
             if (trustStore == null) {
                 trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
                 trustStore.load(null, null);  // must be init first
+
+                // add all system issuers to trust store to accept all authorized http certs
+                TrustManagerFactory factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                factory.init((KeyStore) null);
+                for (TrustManager trustManager : factory.getTrustManagers()) {
+                    if (trustManager instanceof X509TrustManager) {
+                        for (X509Certificate issuer : ((X509TrustManager) trustManager).getAcceptedIssuers()) {
+                            trustStore.setCertificateEntry(issuer.getSubjectDN().getName(), issuer);
+                        }
+                    }
+                }
             }
             CertificateFactory factory = CertificateFactory.getInstance("X.509");
             Certificate certificate = factory.generateCertificate(new ByteArrayInputStream(PEM.decode(cert)));
