@@ -98,6 +98,10 @@ class DBIntegrationTest extends IntegrationTest {
 
         assertThat(result).get()
                 .usingRecursiveComparison().isEqualTo(entity);
+
+        TestDBView view = query.project("id, int_field", TestDBView.class).orElseThrow();
+        assertThat(view.id).isEqualTo(entity.id);
+        assertThat(view.intField).isEqualTo(entity.intField);
     }
 
     private void createTestEntities() {

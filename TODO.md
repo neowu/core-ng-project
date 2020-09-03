@@ -10,7 +10,8 @@
 
 * /_sys/, kafka controller, should call message handler directly?
 * revisit trace log truncation, better/more elegant handling?
-* write unit test support to check break compatibility of API/DB?
+* monitor to collect api/db definition overtime and compare to check backaward compability?
+* way to expose service structure/dependency diagram? 
 * redis: support zset / resp3 ? 
 
 ### jdk 14 issues

@@ -21,6 +21,7 @@ import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -217,6 +218,18 @@ class RetryInterceptorTest {
 
         Response response = interceptor.intercept(chain);
         assertThat(response).isSameAs(okResponse);
+    }
+
+    @Test
+    void failedToRetry() throws IOException {
+        var request = new Request.Builder().url("http://localhost").build();
+        var chain = mock(Interceptor.Chain.class);
+        when(chain.request()).thenReturn(request);
+        when(chain.proceed(request)).thenThrow(new ConnectException("connection refused"));
+
+        assertThatThrownBy(() -> interceptor.intercept(chain))
+                .isInstanceOf(ConnectException.class)
+                .hasMessageContaining("connection refused");
     }
 
     @Test

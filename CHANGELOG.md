@@ -1,5 +1,5 @@
 ## Change log
-### 7.5.6.1 (08/30/2020 - 09/03/2020)
+### 7.5.7 (08/30/2020 - 09/03/2020)
 * json: disable to deserialize ordinal number to enum (the default setting of jackson is not strict)
 * api: use generic error message when webservice client or controller failed to deserialize json
     !!! not to leak too much internal info to public, e.g. jackson return all possible enums in error message. 

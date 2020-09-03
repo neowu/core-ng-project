@@ -19,6 +19,7 @@ class FilesTest {
         java.nio.file.Files.write(file, Strings.bytes("test"));
         assertThat(Files.size(file)).isEqualTo(4);
         assertThat(Files.lastModified(file)).isNotNull();
+        assertThat(Files.text(file)).isEqualTo("test");
 
         Files.delete(file);
     }
@@ -27,6 +28,8 @@ class FilesTest {
     void tempDir() {
         Path tempDir = Files.tempDir();
         assertThat(tempDir).exists().isDirectory();
+        Files.createDir(tempDir.resolve("temp"));
+        Files.createDir(tempDir.resolve("temp"));   // createDir skips if dir already exists
 
         Files.deleteDir(tempDir);
     }
