@@ -1,12 +1,10 @@
 ## Change log
-### 7.5.7 (09/03/2020 - )
-* stats: collect cpu usage after the startup, to ignore high cpu usage during startup
-
-### 7.5.6 (08/30/2020 - 09/02/2020)
+### 7.5.6.1 (08/30/2020 - 09/03/2020)
 * json: disable to deserialize ordinal number to enum (the default setting of jackson is not strict)
 * api: use generic error message when webservice client or controller failed to deserialize json
     !!! not to leak too much internal info to public, e.g. jackson return all possible enums in error message. 
 * httpClient: HTTPClient.builder().trust(CERT) to add system trusted issuers as well
+* stats: collect cpu usage after the startup, to ignore high cpu usage during startup
 
 ### 7.5.5 (08/24/2020 - 08/30/2020)
 * stats: updated cpu usage calculation to support docker (overhead improved compare to previous impl which used threading time)
