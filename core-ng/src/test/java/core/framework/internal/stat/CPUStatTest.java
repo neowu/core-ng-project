@@ -22,7 +22,10 @@ class CPUStatTest {
     @Test
     void usage() {
         double usage = stat.usage();
-        assertThat(usage).isGreaterThanOrEqualTo(0);
+        assertThat(usage).isEqualTo(0); // first data point should be 0
+
+        usage = stat.usage();
+        assertThat(usage).isGreaterThan(0);
     }
 
     @Test

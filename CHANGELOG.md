@@ -1,4 +1,7 @@
 ## Change log
+### 7.5.7 (09/03/2020 - )
+* stats: collect cpu usage after the startup, to ignore high cpu usage during startup
+
 ### 7.5.6 (08/30/2020 - 09/02/2020)
 * json: disable to deserialize ordinal number to enum (the default setting of jackson is not strict)
 * api: use generic error message when webservice client or controller failed to deserialize json
