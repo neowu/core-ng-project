@@ -1,6 +1,9 @@
 ## Change log
 ### 7.5.8 (09/03/2020 - )
 * api: WebServiceClientInterceptor will process onResponse before validateResponse, let interceptor see error http response as well
+* es: update to 7.9.1
+* inject: check if any bean has @Inject field but not autowired 
+    e.g. someone may pass a manually created object into api().service(), but later someone else may add @Inject field in serviceImpl and failed to realize bind() was not used 
 
 ### 7.5.7 (08/30/2020 - 09/03/2020)
 * json: disable to deserialize ordinal number to enum (the default setting of jackson is not strict)

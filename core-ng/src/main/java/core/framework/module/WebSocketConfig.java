@@ -1,5 +1,6 @@
 package core.framework.module;
 
+import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.HTTPIOHandler;
 import core.framework.internal.web.websocket.ChannelHandler;
@@ -31,6 +32,7 @@ public final class WebSocketConfig {
             context.beanFactory.bind(WebSocketContext.class, null, context.httpServer.handler.webSocketHandler.context);
         }
 
+        new InjectValidator(listener).validate();
         context.beanClassValidator.validate(clientMessageClass);
         context.beanClassValidator.validate(serverMessageClass);
         context.serviceRegistry.beanClasses.add(clientMessageClass);

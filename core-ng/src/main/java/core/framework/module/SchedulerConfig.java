@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
+import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.module.ShutdownHook;
@@ -47,6 +48,7 @@ public final class SchedulerConfig extends Config {
     }
 
     public void fixedRate(String name, Job job, Duration rate) {
+        new InjectValidator(job).validate();
         scheduler.addFixedRateTask(name, job, rate);
         triggerAdded = true;
     }
@@ -68,6 +70,7 @@ public final class SchedulerConfig extends Config {
     }
 
     public void trigger(String name, Job job, Trigger trigger) {
+        new InjectValidator(job).validate();
         scheduler.addTriggerTask(name, job, trigger);
         triggerAdded = true;
     }

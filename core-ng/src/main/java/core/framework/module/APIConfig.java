@@ -4,6 +4,7 @@ import core.framework.api.web.service.Path;
 import core.framework.http.HTTPClient;
 import core.framework.http.HTTPClientBuilder;
 import core.framework.http.HTTPMethod;
+import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
 import core.framework.internal.web.bean.RequestBeanWriter;
@@ -62,6 +63,7 @@ public class APIConfig extends Config {
         validator.responseBeanWriter = context.httpServer.handler.responseBeanWriter;
         validator.validate();
         new WebServiceImplValidator<>(serviceInterface, service).validate();
+        new InjectValidator(service).validate();
         context.serviceRegistry.serviceInterfaces.add(serviceInterface);    // doesn't need to check duplicate, duplication will failed to register route
 
         for (Method method : serviceInterface.getMethods()) {

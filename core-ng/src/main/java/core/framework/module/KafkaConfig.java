@@ -1,6 +1,7 @@
 package core.framework.module;
 
 import core.framework.http.HTTPMethod;
+import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.kafka.KafkaURI;
 import core.framework.internal.kafka.MessageListener;
 import core.framework.internal.kafka.MessageProducer;
@@ -97,6 +98,7 @@ public class KafkaConfig extends Config {
         if (handler == null && bulkHandler == null) throw new Error("handler must not be null");
         logger.info("subscribe, topic={}, messageClass={}, handlerClass={}, name={}", topic, messageClass.getTypeName(), handler != null ? handler.getClass().getCanonicalName() : bulkHandler.getClass().getCanonicalName(), name);
         context.beanClassValidator.validate(messageClass);
+        new InjectValidator(handler != null ? handler : bulkHandler).validate();
         listener().subscribe(topic, messageClass, handler, bulkHandler);
         handlerAdded = true;
     }
