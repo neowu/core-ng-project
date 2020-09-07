@@ -1,5 +1,7 @@
 ## Change log
-### 7.5.8 (09/03/2020 - )
+### 7.5.9 (09/07/2020 - )
+
+### 7.5.8 (09/03/2020 - 09/07/2020)
 * api: WebServiceClientInterceptor will process onResponse before validateResponse, let interceptor see error http response as well
 * es: update to 7.9.1
 * inject: check if any bean has @Inject field but not autowired 
