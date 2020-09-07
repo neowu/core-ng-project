@@ -57,7 +57,7 @@ public class InjectValidator {
     // only try to inspect relevant / application level classes
     private boolean shouldInspect(Object value) {
         Class<?> valueClass = value.getClass();
-        if (valueClass.getPackageName().startsWith("java") || valueClass.isArray() || valueClass.isEnum()) return false;
+        if (valueClass.getPackageName().startsWith("java") || valueClass.isEnum()) return false;
         return !visitedObjects.contains(value);
     }
 

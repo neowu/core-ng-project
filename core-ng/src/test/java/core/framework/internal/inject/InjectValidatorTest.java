@@ -29,6 +29,7 @@ class InjectValidatorTest {
         var bean = new TestBeanWithCircularReference();
         assertThat(bean.selfDependency).isSameAs(bean.selfDependency.dependency);
         assertThat(bean.dependency1).isSameAs(bean.dependency1.dependency.dependency);
+        assertThat(bean.testEnum).isNotNull();
 
         var validator = new InjectValidator(bean);
         validator.validate();
