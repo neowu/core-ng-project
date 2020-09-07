@@ -113,12 +113,6 @@ public class WebSocketHandler {
     }
 
     public void add(String path, ChannelHandler<?, ?> handler) {
-        if (path.contains("/:")) throw new Error("listener path must be static, path=" + path);
-
-        Class<?> listenerClass = handler.listener.getClass();
-        if (listenerClass.isSynthetic())
-            throw new Error("listener class must not be anonymous class or lambda, please create static class, listenerClass=" + listenerClass.getCanonicalName());
-
         ChannelHandler<?, ?> previous = handlers.putIfAbsent(path, handler);
         if (previous != null) throw new Error(format("found duplicate channel listener, path={}, previousListener={}", path, previous.listener.getClass().getCanonicalName()));
     }

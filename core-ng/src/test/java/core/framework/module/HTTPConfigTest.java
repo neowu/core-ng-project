@@ -76,6 +76,13 @@ class HTTPConfigTest {
                 .hasMessageContaining("/health-check is reserved path");
     }
 
+    @Test
+    void intercept() {
+        assertThatThrownBy(() -> config.intercept(invocation -> null))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("interceptor class must not be anonymous class or lambda");
+    }
+
     public enum TestEnum {
         @Property(name = "value")
         VALUE

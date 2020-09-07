@@ -1,15 +1,13 @@
 package core.framework.internal.inject;
 
 import core.framework.inject.Inject;
-import core.framework.internal.reflect.Classes;
 import core.framework.internal.reflect.Fields;
-import core.framework.internal.reflect.GenericTypes;
 import core.framework.util.Strings;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayDeque;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -36,10 +34,10 @@ public class InjectValidator {
 
             visitedObjects.add(instance);
 
-            List<Field> fields = Classes.instanceFields(instance.getClass());
+            Field[] fields = instance.getClass().getDeclaredFields();
             for (Field field : fields) {
-                Class<?> fieldClass = GenericTypes.rawClass(field.getGenericType());
-                if (fieldClass.getPackageName().startsWith("java") || fieldClass.isEnum()) continue;
+                int modifiers = field.getModifiers();
+                if (Modifier.isStatic(modifiers) || Modifier.isFinal(modifiers)) continue;  // skip final field as final field enforces initialization
 
                 Object value = fieldValue(field, instance);
 
@@ -49,11 +47,18 @@ public class InjectValidator {
                 // 4. @Inject not present, null -> stop as it could be app managed field
                 if (field.isAnnotationPresent(Inject.class)) {
                     if (value == null) throw new Error(Strings.format("field with @Inject is not bound to any value, rootClass={}, field={}", rootClass.getCanonicalName(), Fields.path(field)));
-                } else if (value != null && !visitedObjects.contains(value)) {
+                } else if (value != null && shouldInspect(value)) {
                     queue.add(value);
                 }
             }
         }
+    }
+
+    // only try to inspect relevant / application level classes
+    private boolean shouldInspect(Object value) {
+        Class<?> valueClass = value.getClass();
+        if (valueClass.getPackageName().startsWith("java") || valueClass.isArray() || valueClass.isEnum()) return false;
+        return !visitedObjects.contains(value);
     }
 
     private Object fieldValue(Field field, Object instance) {

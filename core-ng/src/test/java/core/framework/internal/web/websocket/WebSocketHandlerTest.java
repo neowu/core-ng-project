@@ -35,14 +35,6 @@ class WebSocketHandlerTest {
 
     @Test
     void add() {
-        assertThatThrownBy(() -> handler.add("/ws/:name", null))
-                .isInstanceOf(Error.class)
-                .hasMessageContaining("listener path must be static");
-
-        assertThatThrownBy(() -> handler.add("/ws", new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, (channel, message) -> {
-        }))).isInstanceOf(Error.class)
-                .hasMessageContaining("listener class must not be anonymous class or lambda");
-
         ChannelHandler<?, ?> handler = new ChannelHandler<>(TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener());
         this.handler.add("/ws", handler);
         assertThatThrownBy(() -> this.handler.add("/ws", handler))

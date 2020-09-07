@@ -2,6 +2,7 @@ package core.framework.module;
 
 import core.framework.api.web.service.QueryParam;
 import core.framework.http.HTTPMethod;
+import core.framework.internal.inject.InjectValidator;
 import core.framework.internal.json.JSONClassValidator;
 import core.framework.internal.module.Config;
 import core.framework.internal.module.ModuleContext;
@@ -74,6 +75,9 @@ public final class HTTPConfig extends Config {
     }
 
     public void intercept(Interceptor interceptor) {
+        if (interceptor.getClass().isSynthetic())
+            throw new Error("interceptor class must not be anonymous class or lambda, please use static class, interceptorClass=" + interceptor.getClass().getCanonicalName());
+        new InjectValidator(interceptor).validate();
         context.httpServer.handler.interceptors.add(interceptor);
     }
 

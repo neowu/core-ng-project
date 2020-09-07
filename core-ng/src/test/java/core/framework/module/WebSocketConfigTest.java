@@ -32,12 +32,18 @@ class WebSocketConfigTest {
     }
 
     @Test
-    void add() {
+    void listen() {
+        assertThatThrownBy(() -> config.listen("/ws/:name", null, null, null))
+                .isInstanceOf(Error.class)
+                .hasMessageContaining("listener path must be static");
+
+        assertThatThrownBy(() -> config.listen("/ws", TestWebSocketMessage.class, TestWebSocketMessage.class, (channel, message) -> {
+        })).isInstanceOf(Error.class)
+                .hasMessageContaining("listener class must not be anonymous class or lambda");
+
         config.listen("/ws2", TestWebSocketMessage.class, TestWebSocketMessage.class, new TestChannelListener());
-
-        WebSocketContext webSocketContext = (WebSocketContext) config.context.beanFactory.bean(WebSocketContext.class, null);
+        var webSocketContext = (WebSocketContext) config.context.beanFactory.bean(WebSocketContext.class, null);
         assertThat(webSocketContext).isNotNull();
-
         assertThat(config.context.serviceRegistry.beanClasses).contains(TestWebSocketMessage.class);
     }
 }

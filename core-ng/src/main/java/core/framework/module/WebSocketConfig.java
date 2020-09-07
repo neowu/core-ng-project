@@ -22,17 +22,21 @@ public final class WebSocketConfig {
     }
 
     public <T, V> void listen(String path, Class<T> clientMessageClass, Class<V> serverMessageClass, ChannelListener<T, V> listener) {
+        if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
+        if (path.contains("/:")) throw new Error("listener path must be static, path=" + path);
+
+        if (listener.getClass().isSynthetic())
+            throw new Error("listener class must not be anonymous class or lambda, please create static class, listenerClass=" + listener.getClass().getCanonicalName());
+        new InjectValidator(listener).validate();
+
         logger.info("ws, path={}, clientMessageClass={}, serverMessageClass={}, listener={}",
                 path, clientMessageClass.getCanonicalName(), serverMessageClass.getCanonicalName(), listener.getClass().getCanonicalName());
-
-        if (HTTPIOHandler.HEALTH_CHECK_PATH.equals(path)) throw new Error("/health-check is reserved path");
 
         if (context.httpServer.handler.webSocketHandler == null) {
             context.httpServer.handler.webSocketHandler = new WebSocketHandler(context.logManager, context.httpServer.siteManager.sessionManager, context.httpServer.handler.rateControl);
             context.beanFactory.bind(WebSocketContext.class, null, context.httpServer.handler.webSocketHandler.context);
         }
 
-        new InjectValidator(listener).validate();
         context.beanClassValidator.validate(clientMessageClass);
         context.beanClassValidator.validate(serverMessageClass);
         context.serviceRegistry.beanClasses.add(clientMessageClass);

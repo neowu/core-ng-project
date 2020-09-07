@@ -35,7 +35,7 @@ class InjectValidatorTest {
     }
 
     public static class TestBeanWithNotInjectedField {
-        public final List<Object> list = new ArrayList<>();
+        public List<Object> list = new ArrayList<>();
         @Inject
         Dependency dependency1 = new Dependency();
         @Inject
@@ -46,8 +46,9 @@ class InjectValidatorTest {
     }
 
     public static class TestBeanWithCircularReference {
-        final SelfDependency selfDependency = new SelfDependency();
-        final Dependency1 dependency1 = new Dependency1();
+        SelfDependency selfDependency = new SelfDependency();
+        Dependency1 dependency1 = new Dependency1();
+        TestEnum testEnum = TestEnum.V1;
 
         TestBeanWithCircularReference() {
             var dependency2 = new Dependency2();
@@ -55,6 +56,10 @@ class InjectValidatorTest {
             dependency2.dependency = dependency1;
 
             selfDependency.dependency = selfDependency;
+        }
+
+        enum TestEnum {
+            V1, V2
         }
 
         static class Dependency1 {

@@ -13,6 +13,7 @@ import core.framework.internal.scheduler.WeeklyTrigger;
 import core.framework.internal.web.management.SchedulerController;
 import core.framework.scheduler.Job;
 import core.framework.scheduler.Trigger;
+import core.framework.util.Strings;
 
 import java.time.Clock;
 import java.time.DayOfWeek;
@@ -48,7 +49,8 @@ public final class SchedulerConfig extends Config {
     }
 
     public void fixedRate(String name, Job job, Duration rate) {
-        new InjectValidator(job).validate();
+        validateJob(name, job);
+
         scheduler.addFixedRateTask(name, job, rate);
         triggerAdded = true;
     }
@@ -70,8 +72,16 @@ public final class SchedulerConfig extends Config {
     }
 
     public void trigger(String name, Job job, Trigger trigger) {
-        new InjectValidator(job).validate();
+        validateJob(name, job);
+
         scheduler.addTriggerTask(name, job, trigger);
         triggerAdded = true;
+    }
+
+    void validateJob(String name, Job job) {
+        Class<? extends Job> jobClass = job.getClass();
+        if (jobClass.isSynthetic())
+            throw new Error(Strings.format("job class must not be anonymous class or lambda, please create static class, name={}, jobClass={}", name, jobClass.getCanonicalName()));
+        new InjectValidator(job).validate();
     }
 }

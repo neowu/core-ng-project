@@ -5,7 +5,6 @@ import core.framework.internal.log.LogManager;
 import core.framework.internal.web.bean.RequestBeanReader;
 import core.framework.internal.web.bean.ResponseBeanWriter;
 import core.framework.internal.web.controller.ControllerHolder;
-import core.framework.internal.web.controller.Interceptors;
 import core.framework.internal.web.controller.InvocationImpl;
 import core.framework.internal.web.controller.WebContextImpl;
 import core.framework.internal.web.http.IPv4AccessControl;
@@ -18,6 +17,8 @@ import core.framework.internal.web.route.Route;
 import core.framework.internal.web.session.SessionManager;
 import core.framework.internal.web.site.TemplateManager;
 import core.framework.internal.web.websocket.WebSocketHandler;
+import core.framework.util.Lists;
+import core.framework.web.Interceptor;
 import core.framework.web.Response;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -39,7 +40,7 @@ public class HTTPHandler implements HttpHandler {
 
     public final RequestParser requestParser = new RequestParser();
     public final Route route = new Route();
-    public final Interceptors interceptors = new Interceptors();
+    public final List<Interceptor> interceptors = Lists.newArrayList();
     public final WebContextImpl webContext = new WebContextImpl();
     public final HTTPErrorHandler errorHandler;
 
