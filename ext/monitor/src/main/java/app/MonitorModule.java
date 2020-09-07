@@ -49,7 +49,7 @@ public class MonitorModule extends Module {
         KubeClient kubeClient = bind(new KubeClient());
         kubeClient.initialize();
         var job = new KubeMonitorJob(config.namespaces, kubeClient, publisher);
-        schedule().fixedRate("kube", job, Duration.ofSeconds(30));  // not check pod too often
+        schedule().fixedRate("monitor:kube", job, Duration.ofSeconds(30));  // not check pod too often
     }
 
     private void configureESJob(MessagePublisher<StatMessage> publisher, Map<String, MonitorConfig.ElasticSearchConfig> config) {
@@ -61,7 +61,7 @@ public class MonitorModule extends Module {
             var job = new ElasticSearchMonitorJob(elasticSearchClient, app, esConfig.host, publisher);
             job.highHeapUsageThreshold = esConfig.highHeapUsageThreshold;
             job.highDiskUsageThreshold = esConfig.highDiskUsageThreshold;
-            schedule().fixedRate("es-" + app, job, Duration.ofSeconds(10));
+            schedule().fixedRate("monitor:es:" + app, job, Duration.ofSeconds(10));
         }
     }
 
@@ -75,7 +75,7 @@ public class MonitorModule extends Module {
                 Redis redis = redis(host).client();
                 var job = new RedisMonitorJob(redis, app, host, publisher);
                 job.highMemUsageThreshold = redisConfig.highMemUsageThreshold;
-                schedule().fixedRate("redis-" + host, job, Duration.ofSeconds(10));
+                schedule().fixedRate("monitor:redis:" + host, job, Duration.ofSeconds(10));
             }
         }
     }
@@ -87,7 +87,7 @@ public class MonitorModule extends Module {
             for (String host : kafkaConfig.hosts) {
                 var job = new KafkaMonitorJob(new JMXClient(host), app, host, publisher);
                 job.highHeapUsageThreshold = kafkaConfig.highHeapUsageThreshold;
-                schedule().fixedRate("kafka-" + host, job, Duration.ofSeconds(10));
+                schedule().fixedRate("monitor:kafka:" + host, job, Duration.ofSeconds(10));
             }
         }
     }

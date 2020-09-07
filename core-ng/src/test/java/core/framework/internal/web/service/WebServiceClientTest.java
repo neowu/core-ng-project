@@ -164,10 +164,27 @@ class WebServiceClientTest {
         WebServiceClientInterceptor interceptor = mock(WebServiceClientInterceptor.class);
         webServiceClient.intercept(interceptor);
 
-        HTTPResponse response = new HTTPResponse(200, Map.of(), new byte[0]);
+        var response = new HTTPResponse(200, Map.of(), new byte[0]);
         when(httpClient.execute(any())).thenReturn(response);
 
         webServiceClient.execute(HTTPMethod.GET, "/api", null, null, void.class);
+
+        verify(interceptor).onRequest(argThat(request -> request.method == HTTPMethod.GET
+                && "http://localhost/api".equals(request.uri)));
+        verify(interceptor).onResponse(response);
+    }
+
+    @Test
+    void interceptWithErrorResponse() {
+        WebServiceClientInterceptor interceptor = mock(WebServiceClientInterceptor.class);
+        webServiceClient.intercept(interceptor);
+
+        var response = new HTTPResponse(404, Map.of(), new byte[0]);
+        when(httpClient.execute(any())).thenReturn(response);
+
+        assertThatThrownBy(() -> webServiceClient.execute(HTTPMethod.GET, "/api", null, null, void.class))
+                .isInstanceOf(RemoteServiceException.class)
+                .satisfies(e -> assertThat(((RemoteServiceException) e).status).isEqualTo(HTTPStatus.NOT_FOUND));
 
         verify(interceptor).onRequest(argThat(request -> request.method == HTTPMethod.GET
                 && "http://localhost/api".equals(request.uri)));

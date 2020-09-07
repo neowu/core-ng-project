@@ -74,14 +74,12 @@ public class WebServiceClient {
             LOGGER.debug("interceptor={}", interceptor.getClass().getCanonicalName());
             interceptor.onRequest(request);
         }
-
         HTTPResponse response = httpClient.execute(request);
-        validateResponse(response);
-
         if (interceptor != null) {
             interceptor.onResponse(response);
         }
 
+        validateResponse(response);
         try {
             return reader.fromJSON(responseType, response.body);
         } catch (IOException e) {
