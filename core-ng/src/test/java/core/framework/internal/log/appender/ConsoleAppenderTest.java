@@ -40,21 +40,19 @@ class ConsoleAppenderTest {
         action.performanceStats = Map.of("db", perf(100, 1, 0), "redis", perf(120, 0, 1));
         action.clients = List.of("service");
         action.refIds = List.of("refId3");
-        action.stats = Map.of("stat", 1.0);
+        action.stats = Map.of("cpu_time", 100.0);
         action.elapsed = 100L;
-        action.cpuTime = 100L;
 
         String message = appender.message(action);
         assertThat(message)
                 .contains("| OK |")
                 .contains("| elapsed=100 |")
-                .contains("| cpu_time=100 |")
                 .contains("| correlation_id=refId1,refId2 |")
                 .contains("| action=action |")
                 .contains("| context=value |")
                 .contains("| client=service |")
                 .contains("| ref_id=refId3 |")
-                .contains("| stat=1 |")
+                .contains("| cpu_time=100 |")
                 .contains("| db_count=1 | db_reads=1 | db_writes=0 | db_elapsed=100")
                 .contains("| redis_count=1 | redis_reads=0 | redis_writes=1 | redis_elapsed=120");
     }

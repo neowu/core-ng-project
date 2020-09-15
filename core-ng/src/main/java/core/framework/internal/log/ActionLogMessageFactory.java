@@ -27,7 +27,6 @@ public class ActionLogMessageFactory {
         message.clients = log.clients;
         message.refIds = log.refIds;
         message.elapsed = log.elapsed;
-        message.cpuTime = log.cpuTime;
         message.action = log.action;
         message.errorCode = log.errorCode();
         message.errorMessage = log.errorMessage;

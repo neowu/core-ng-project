@@ -103,7 +103,6 @@ public class ActionService {
         document.errorCode = message.errorCode;
         document.errorMessage = message.errorMessage;
         document.elapsed = message.elapsed;
-        document.cpuTime = message.cpuTime;
         document.context = message.context;
         document.stats = message.stats;
         document.performanceStats = message.performanceStats;

@@ -92,9 +92,6 @@
       },
       "elapsed": {
         "type": "long"
-      },
-      "cpu_time": {
-        "type": "long"
       }
     }
   }

@@ -52,7 +52,6 @@ public final class ConsoleAppender implements LogAppender {
             builder.append(LOG_SPLITTER).append("error_code=").append(errorCode)
                     .append(LOG_SPLITTER).append("error_message=").append(filterLineSeparator(log.errorMessage));
         }
-        builder.append(LOG_SPLITTER).append("cpu_time=").append(format.format(log.cpuTime.longValue()));
 
         for (Map.Entry<String, List<String>> entry : log.context.entrySet()) {
             String key = entry.getKey();
@@ -69,10 +68,8 @@ public final class ConsoleAppender implements LogAppender {
             builder.append(LOG_SPLITTER).append("ref_id=");
             appendList(builder, log.refIds);
         }
-        if (log.stats != null) {
-            for (Map.Entry<String, Double> entry : log.stats.entrySet()) {
-                builder.append(LOG_SPLITTER).append(entry.getKey()).append('=').append(format.format(entry.getValue()));
-            }
+        for (Map.Entry<String, Double> entry : log.stats.entrySet()) {
+            builder.append(LOG_SPLITTER).append(entry.getKey()).append('=').append(format.format(entry.getValue()));
         }
         for (Map.Entry<String, PerformanceStatMessage> entry : log.performanceStats.entrySet()) {
             String key = entry.getKey();

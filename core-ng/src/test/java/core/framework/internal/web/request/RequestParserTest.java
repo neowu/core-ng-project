@@ -13,10 +13,12 @@ import io.undertow.server.handlers.form.FormData;
 import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.util.HeaderMap;
 import io.undertow.util.Headers;
+import io.undertow.util.Methods;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -212,5 +214,26 @@ class RequestParserTest {
         parser.logSiteHeaders = true;
         parser.logSiteHeaders(headers, actionLog);
         assertThat(actionLog.context).containsKeys("user_agent", "referer");
+    }
+
+    @Test
+    void parse() throws Throwable {
+        byte[] body = Strings.bytes("{}");
+
+        var actionLog = new ActionLog(null);
+        var exchange = new HttpServerExchange(null);
+        exchange.setRequestMethod(Methods.POST);
+        exchange.getRequestHeaders().put(Headers.HOST, "localhost");
+        exchange.setDestinationAddress(new InetSocketAddress(80));
+        exchange.setSourceAddress(new InetSocketAddress(10000));
+        exchange.getRequestHeaders().put(Headers.CONTENT_LENGTH, body.length);
+        exchange.putAttachment(RequestBodyReader.REQUEST_BODY, new RequestBodyReader.RequestBody(body, null));
+        var request = new RequestImpl(exchange, null);
+        request.contentType = ContentType.TEXT_XML;
+        parser.parse(request, exchange, actionLog);
+
+        assertThat(request.method).isEqualTo(HTTPMethod.POST);
+        assertThat(request.body()).hasValue(body);
+        assertThat(actionLog.stats).containsKeys("http_content_length");
     }
 }

@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +28,7 @@ public final class ActionLog {
 
     public final String id;
     public final Map<String, List<String>> context;
+    public final Map<String, Double> stats;
     public final Instant date;
     final Map<String, PerformanceStat> performanceStats;
     final List<LogEvent> events;
@@ -40,16 +40,14 @@ public final class ActionLog {
     public List<String> correlationIds;    // with bulk message handler, there will be multiple correlationIds handled by one batch
     public List<String> clients;
     public List<String> refIds;
-    public Map<String, Double> stats;
+
+    public boolean suppressSlowSQLWarning;
 
     String errorMessage;
     long elapsed;
-    long cpuTime;
 
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
-
-    public boolean suppressSlowSQLWarning;
 
     public ActionLog(String message) {
         startTime = System.nanoTime();
@@ -57,7 +55,8 @@ public final class ActionLog {
         date = Instant.now();
         id = LogManager.ID_GENERATOR.next(date);
         events = new ArrayList<>(32);   // according to benchmark, ArrayList is as fast as LinkedList with max 3000 items, and has smaller memory footprint
-        context = new LinkedHashMap<>();
+        context = new HashMap<>();  // default capacity is 16, no need to keep insertion order, kibana will sort all keys on display
+        stats = new HashMap<>();
         performanceStats = new HashMap<>();
 
         add(event(message));
@@ -79,7 +78,8 @@ public final class ActionLog {
     }
 
     void end(String message) {
-        cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
+        double cpuTime = THREAD.getCurrentThreadCpuTime() - startCPUTime;
+        stats.put("cpu_time", cpuTime);
         elapsed = elapsed();
         add(event("elapsed={}", elapsed));
         add(event(message));
@@ -129,7 +129,6 @@ public final class ActionLog {
     }
 
     public void stat(String key, double value) {
-        if (stats == null) stats = new HashMap<>();
         stats.compute(key, (k, oldValue) -> (oldValue == null) ? value : oldValue + value);
         var format = new DecimalFormat();
         add(event("[stat] {}={}", key, format.format(value)));

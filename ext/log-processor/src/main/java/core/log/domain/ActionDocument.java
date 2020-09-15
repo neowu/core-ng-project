@@ -35,8 +35,6 @@ public class ActionDocument {
     public String errorMessage;
     @Property(name = "elapsed")
     public Long elapsed;
-    @Property(name = "cpu_time")
-    public Long cpuTime;
     @Property(name = "context")
     public Map<String, List<String>> context;
     @Property(name = "stats")
