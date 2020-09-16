@@ -1,8 +1,10 @@
 ## Change log
-### 7.5.10 (09/07/2020 - )
+### 7.5.10 (09/07/2020 - 09/16/2020)
 * log: moved action.cpu_time to action.stats.cpu_time
     !!! please update to latest log-processor to refresh log es indices. 
 * log: added action.stats.http_content_length to track http body size
+* httpClient: update okHTTP to 4.9.0
+* executor: improved future.get(), report both action and id on exception, to help troubleshooting
 
 ### 7.5.8 (09/03/2020 - 09/07/2020)
 * api: WebServiceClientInterceptor will process onResponse before validateResponse, let interceptor see error http response as well

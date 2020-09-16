@@ -39,7 +39,7 @@ services:
     depends_on:
     - zookeeper
   log-processor:
-    image: neowu/log-processor:7.5.7
+    image: neowu/log-processor:7.5.10
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092
@@ -50,7 +50,7 @@ services:
     - kafka
     - elasticsearch
   log-collector:
-    image: neowu/log-collector:7.5.7
+    image: neowu/log-collector:7.5.10
     environment:
     - JAVA_OPTS=-Xms256m -Xmx256m -Xss256k
     - SYS_KAFKA_URI=kafka:9092

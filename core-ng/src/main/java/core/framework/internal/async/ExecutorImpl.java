@@ -53,6 +53,7 @@ public final class ExecutorImpl implements Executor {
 
     @Override
     public <T> Future<T> submit(String action, Callable<T> task) {
+        logger.debug("submit task, action={}", action);
         Callable<T> execution = execution(action, task);
         return submitTask(action, execution);
     }
@@ -68,6 +69,7 @@ public final class ExecutorImpl implements Executor {
                 scheduler = ThreadPools.singleThreadScheduler("executor-scheduler" + (name == null ? "" : "-" + name) + "-");
             }
         }
+        logger.debug("submit delayed task, action={}, delay={}", action, delay);
         scheduleDelayedTask(action, task, delay);
     }
 

@@ -2,6 +2,7 @@ package core.framework.internal.async;
 
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.LogManager;
+import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +14,7 @@ import java.util.concurrent.Callable;
  */
 public class ExecutorTask<T> implements Callable<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecutorTask.class);
-    final String action;
+    private final String action;
     private final LogManager logManager;
     private final Callable<T> task;
     private String rootAction;
@@ -22,8 +23,9 @@ public class ExecutorTask<T> implements Callable<T> {
     private boolean trace;
 
     ExecutorTask(String action, Callable<T> task, LogManager logManager, ActionLog parentActionLog) {
-        this.logManager = logManager;
+        this.action = action;
         this.task = task;
+        this.logManager = logManager;
         if (parentActionLog != null) {  // only keep info needed by call(), so parentActionLog can be GCed sooner
             List<String> parentActionContext = parentActionLog.context.get("root_action");
             rootAction = parentActionContext != null ? parentActionContext.get(0) : parentActionLog.action;
@@ -31,15 +33,16 @@ public class ExecutorTask<T> implements Callable<T> {
             refId = parentActionLog.id;
             trace = parentActionLog.trace;
         }
-        this.action = rootAction == null ? "task:" + action : rootAction + ":" + action;
     }
 
     @Override
     public T call() throws Exception {
+        String actionId = null;
         try {
             ActionLog actionLog = logManager.begin("=== task execution begin ===");
-            actionLog.action(action);
-            // here it doesn't log task class, is due to task usually is lambda or method reference, it takes big overhead to inspect, refer to ControllerInspector
+            actionId = actionLog.id;
+            actionLog.action(action());
+            // here it doesn't log task class, is due to task usually is lambda or method reference, it's expensive to inspect, refer to ControllerInspector
             if (rootAction != null) { // if rootAction != null, then all parent info are available
                 actionLog.context("root_action", rootAction);
                 LOGGER.debug("correlationId={}", correlationId);
@@ -51,9 +54,13 @@ public class ExecutorTask<T> implements Callable<T> {
             return task.call();
         } catch (Throwable e) {
             logManager.logError(e);
-            throw e;
+            throw new TaskException(Strings.format("task failed, action={}, id={}, error={}", action, actionId, e.getMessage()), e);
         } finally {
             logManager.end("=== task execution end ===");
         }
+    }
+
+    String action() {
+        return rootAction == null ? "task:" + action : rootAction + ":" + action;
     }
 }
