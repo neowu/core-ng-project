@@ -54,8 +54,8 @@ public abstract class App extends Module {
     void logContext(ActionLog actionLog) {
         actionLog.action("app:start");
         Runtime runtime = Runtime.getRuntime();
-        actionLog.stat("cpu", runtime.availableProcessors());
-        actionLog.stat("max_memory", runtime.maxMemory());
+        actionLog.stats.put("cpu", (double) runtime.availableProcessors());
+        actionLog.stats.put("max_memory", (double) runtime.maxMemory());
     }
 
     private void cleanup() {

@@ -161,7 +161,7 @@ class MessageListenerThread extends Thread {
                 long timestamp = record.timestamp();
                 logger.debug("[message] timestamp={}", timestamp);
                 long lag = actionLog.date.toEpochMilli() - timestamp;
-                actionLog.stat("consumer_lag", lag * 1_000_000);    // convert to nanoseconds
+                actionLog.stats.put("consumer_lag", lag * 1_000_000d);    // convert to nanoseconds
                 checkConsumerLag(lag, longConsumerLagThresholdInMs);
 
                 byte[] value = record.value();
@@ -240,7 +240,7 @@ class MessageListenerThread extends Thread {
         if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
         if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
         long lag = actionLog.date.toEpochMilli() - minTimestamp;
-        actionLog.stat("consumer_lag", lag * 1_000_000);    // convert to nanoseconds
+        actionLog.stats.put("consumer_lag", lag * 1_000_000d);    // convert to nanoseconds
         checkConsumerLag(lag, longConsumerLagThresholdInMs);
         return messages;
     }

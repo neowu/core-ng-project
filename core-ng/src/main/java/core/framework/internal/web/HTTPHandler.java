@@ -94,7 +94,6 @@ public class HTTPHandler implements HttpHandler {
             ControllerHolder controller = route.get(request.path(), request.method(), request.pathParams, actionLog);
             actionLog.action(controller.action);
             actionLog.context("controller", controller.controllerInfo);
-            logger.debug("controllerClass={}", controller.controller.getClass().getCanonicalName());
 
             request.session = sessionManager.load(request, actionLog);  // load session as late as possible, so for sniffer/scan request with sessionId, it won't call redis every time even for 404/405
 

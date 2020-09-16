@@ -96,7 +96,7 @@ public final class ShutdownHook implements Runnable {
     void logContext(ActionLog actionLog) {
         actionLog.action("app:stop");
         actionLog.context("start_time", Instant.ofEpochMilli(ManagementFactory.getRuntimeMXBean().getStartTime()));
-        actionLog.stat("uptime", ManagementFactory.getRuntimeMXBean().getUptime() * 1_000_000);   // convert to nanoseconds
+        actionLog.stats.put("uptime", ManagementFactory.getRuntimeMXBean().getUptime() * 1_000_000d);   // convert to nanoseconds
     }
 
     void shutdown(long endTime, int fromStage, int toStage) {
