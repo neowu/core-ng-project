@@ -1,5 +1,5 @@
 ## Change log
-### 7.5.9 (09/07/2020 - )
+### 7.5.10 (09/07/2020 - )
 * log: moved action.cpu_time to action.stats.cpu_time
     !!! please update to latest log-processor to refresh log es indices. 
 * log: added action.stats.http_content_length to track http body size
