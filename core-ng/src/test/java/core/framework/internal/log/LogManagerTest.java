@@ -28,7 +28,7 @@ class LogManagerTest {
 
     @Test
     void appName() {
-        assertThat(LogManager.appName(Map.of("APP_NAME", "test"))).isEqualTo("test");
+        assertThat(LogManager.appName(Map.of("CORE_APP_NAME", "test"))).isEqualTo("test");
         assertThat(LogManager.appName(Map.of())).isEqualTo("local");
     }
 

@@ -1,4 +1,8 @@
 ## Change log
+### 7.5.11 (09/17/2020 - )
+* log: use CORE_APP_NAME instead of APP_NAME env var to override appName 
+    APP_NAME is shadowed by gradle application plugin linux start script     
+
 ### 7.5.10 (09/07/2020 - 09/16/2020)
 * log: moved action.cpu_time to action.stats.cpu_time
     !!! please update to latest log-processor to refresh log es indices. 

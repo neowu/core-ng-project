@@ -28,9 +28,11 @@ public class LogManager {
     }
 
     static String appName(Map<String, String> env) {
-        String appName = env.get("APP_NAME");
+        // gradle application plugin linux script uses APP_NAME as variable which shadowed env variable, so here to use different name
+        // refer to https://github.com/gradle/gradle/blob/master/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/unixStartScript.txt
+        String appName = env.get("CORE_APP_NAME");
         if (appName != null) {
-            LOGGER.info("found APP_NAME env var, appName={}", appName);
+            LOGGER.info("found CORE_APP_NAME env var, appName={}", appName);
             return appName;
         }
         appName = System.getProperty("core.appName");

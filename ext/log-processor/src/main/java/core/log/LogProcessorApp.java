@@ -25,6 +25,7 @@ import core.log.service.StatService;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.Optional;
 
 /**
  * @author neo
@@ -55,8 +56,10 @@ public class LogProcessorApp extends App {
     }
 
     private void configureKibanaService() {
-        property("kibana.url").ifPresent(url -> {
-            String banner = property("kibana.banner").orElse("");
+        // explicitly use all properties in case runtime env doesn't define any, otherwise startup may fail with unused property error
+        Optional<String> kibanaURL = property("kibana.url");
+        String banner = property("kibana.banner").orElse("");
+        kibanaURL.ifPresent(url -> {
             HTTPClient client = HTTPClient.builder().maxRetries(5).build();  // create ad hoc http client, will be recycled once done
             onStartup(() -> new Thread(new KibanaService(url, banner, client)::importObjects, "kibana").start());
         });

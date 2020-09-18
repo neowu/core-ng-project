@@ -22,7 +22,7 @@ tasks.named("distZip").configure {
 }
 
 tasks.named("startScripts").configure {
-    defaultJvmOpts = ['-Dcore.webPath=APP_HOME_VAR/web', "-Dcore.appName=${project.name}"]
+    defaultJvmOpts = ['-Dcore.webPath=APP_HOME_VAR/web', "-Dcore.appName=${applicationName}"]
 
     doLast {
         windowsScript.text = windowsScript.text.replaceFirst('APP_HOME_VAR', '%APP_HOME%')
