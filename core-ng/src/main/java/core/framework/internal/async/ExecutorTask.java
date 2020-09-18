@@ -6,6 +6,8 @@ import core.framework.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -17,15 +19,17 @@ public class ExecutorTask<T> implements Callable<T> {
     private final String action;
     private final LogManager logManager;
     private final Callable<T> task;
+    private final Instant startTime;
     private String rootAction;
     private String refId;
     private String correlationId;
     private boolean trace;
 
-    ExecutorTask(String action, Callable<T> task, LogManager logManager, ActionLog parentActionLog) {
+    ExecutorTask(String action, Callable<T> task, LogManager logManager, ActionLog parentActionLog, Instant startTime) {
         this.action = action;
         this.task = task;
         this.logManager = logManager;
+        this.startTime = startTime;
         if (parentActionLog != null) {  // only keep info needed by call(), so parentActionLog can be GCed sooner
             List<String> parentActionContext = parentActionLog.context.get("root_action");
             rootAction = parentActionContext != null ? parentActionContext.get(0) : parentActionLog.action;
@@ -51,6 +55,9 @@ public class ExecutorTask<T> implements Callable<T> {
                 actionLog.refIds = List.of(refId);
                 actionLog.trace = trace;
             }
+            Duration delay = Duration.between(startTime, actionLog.date);
+            LOGGER.debug("[stat] task_delay={}", delay);
+            actionLog.stats.put("task_delay", (double) delay.toNanos());
             return task.call();
         } catch (Throwable e) {
             logManager.logError(e);

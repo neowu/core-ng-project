@@ -60,7 +60,7 @@ public final class HTTPClientImpl implements HTTPClient {
             ActionLogContext.track("http", elapsed);
             logger.debug("execute, elapsed={}", elapsed);
             if (elapsed > slowOperationThresholdInNanos(request)) {
-                logger.warn(errorCode("SLOW_HTTP"), "slow http operation, method={}, uri={}, elapsed={}", request.method, request.uri, elapsed);
+                logger.warn(errorCode("SLOW_HTTP"), "slow http operation, method={}, uri={}, elapsed={}", request.method, request.uri, Duration.ofNanos(elapsed));
             }
         }
     }

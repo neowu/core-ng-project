@@ -427,7 +427,7 @@ public class RedisImpl implements Redis {
 
     void checkSlowOperation(long elapsed) {
         if (elapsed > slowOperationThresholdInNanos) {
-            logger.warn(Markers.errorCode("SLOW_REDIS"), "slow redis operation, elapsed={}", elapsed);
+            logger.warn(Markers.errorCode("SLOW_REDIS"), "slow redis operation, elapsed={}", Duration.ofNanos(elapsed));
         }
     }
 

@@ -2,6 +2,9 @@
 ### 7.5.11 (09/17/2020 - )
 * log: use CORE_APP_NAME instead of APP_NAME env var to override appName 
     APP_NAME is shadowed by gradle application plugin linux start script     
+* kafka: renamed stats.consumer_lag to stats.consumer_delay and updated kibana dashboard
+    !!! please update to latest log-processor to refresh log es indices
+* executor: track task delay via stats.task_delay, indicator of whether thread pool is queuing    
 
 ### 7.5.10 (09/07/2020 - 09/16/2020)
 * log: moved action.cpu_time to action.stats.cpu_time

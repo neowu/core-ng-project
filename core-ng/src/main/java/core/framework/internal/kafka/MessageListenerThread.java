@@ -36,7 +36,7 @@ class MessageListenerThread extends Thread {
     private final MessageListener listener;
     private final LogManager logManager;
     private final double batchLongProcessThresholdInNano;
-    private final long longConsumerLagThresholdInMs;
+    private final long longConsumerDelayThresholdInNano;
 
     private final Object lock = new Object();
     private Consumer<byte[], byte[]> consumer;
@@ -48,7 +48,7 @@ class MessageListenerThread extends Thread {
         this.listener = listener;
         logManager = listener.logManager;
         batchLongProcessThresholdInNano = listener.maxProcessTime.toNanos() * 0.7; // 70% time of max
-        longConsumerLagThresholdInMs = listener.longConsumerLagThreshold.toMillis();
+        longConsumerDelayThresholdInNano = listener.longConsumerDelayThreshold.toNanos();
     }
 
     @Override
@@ -160,9 +160,7 @@ class MessageListenerThread extends Thread {
 
                 long timestamp = record.timestamp();
                 logger.debug("[message] timestamp={}", timestamp);
-                long lag = actionLog.date.toEpochMilli() - timestamp;
-                actionLog.stats.put("consumer_lag", lag * 1_000_000d);    // convert to nanoseconds
-                checkConsumerLag(lag, longConsumerLagThresholdInMs);
+                checkConsumerDelay(actionLog, timestamp, longConsumerDelayThresholdInNano);
 
                 byte[] value = record.value();
                 logger.debug("[message] value={}", new BytesLogParam(value));
@@ -239,9 +237,7 @@ class MessageListenerThread extends Thread {
         if (!correlationIds.isEmpty()) actionLog.correlationIds = List.copyOf(correlationIds);  // action log kafka appender doesn't send headers
         if (!clients.isEmpty()) actionLog.clients = List.copyOf(clients);
         if (!refIds.isEmpty()) actionLog.refIds = List.copyOf(refIds);
-        long lag = actionLog.date.toEpochMilli() - minTimestamp;
-        actionLog.stats.put("consumer_lag", lag * 1_000_000d);    // convert to nanoseconds
-        checkConsumerLag(lag, longConsumerLagThresholdInMs);
+        checkConsumerDelay(actionLog, minTimestamp, longConsumerDelayThresholdInNano);
         return messages;
     }
 
@@ -258,13 +254,15 @@ class MessageListenerThread extends Thread {
 
     void checkSlowProcess(long elapsed, double longProcessThreshold) {
         if (elapsed > longProcessThreshold) {
-            logger.warn(errorCode("LONG_PROCESS"), "took too long to process message, elapsed={}", elapsed);
+            logger.warn(errorCode("LONG_PROCESS"), "took too long to process message, elapsed={}", Duration.ofNanos(elapsed));
         }
     }
 
-    void checkConsumerLag(long lagInMs, long longConsumerLagThresholdInMs) {
-        if (lagInMs > longConsumerLagThresholdInMs) {
-            logger.warn(errorCode("LONG_CONSUMER_LAG"), "consumer delay is too long, lag={}", Duration.ofMillis(lagInMs));
+    void checkConsumerDelay(ActionLog actionLog, long timestamp, long longConsumerDelayThresholdInNano) {
+        long delay = (actionLog.date.toEpochMilli() - timestamp) * 1_000_000;     // convert to nanoseconds
+        actionLog.stats.put("consumer_delay", (double) delay);
+        if (delay > longConsumerDelayThresholdInNano) {
+            logger.warn(errorCode("LONG_CONSUMER_DELAY"), "consumer delay is too long, delay={}", Duration.ofNanos(delay));
         }
     }
 

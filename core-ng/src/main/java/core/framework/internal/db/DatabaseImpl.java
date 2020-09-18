@@ -272,7 +272,7 @@ public final class DatabaseImpl implements Database {
             throw new Error("too many db operations, operations=" + operations);
         }
         if (elapsed > slowOperationThresholdInNanos) {
-            logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", elapsed);
+            logger.warn(errorCode("SLOW_DB"), "slow db operation, elapsed={}", Duration.ofNanos(elapsed));
         }
     }
 

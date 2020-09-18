@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -54,7 +55,7 @@ public final class ExecutorImpl implements Executor {
     @Override
     public <T> Future<T> submit(String action, Callable<T> task) {
         logger.debug("submit task, action={}", action);
-        Callable<T> execution = execution(action, task);
+        Callable<T> execution = execution(action, task, Instant.now());
         return submitTask(action, execution);
     }
 
@@ -78,7 +79,7 @@ public final class ExecutorImpl implements Executor {
         Callable<Void> execution = execution(action, () -> {
             task.execute();
             return null;
-        });
+        }, Instant.now().plus(delay));
         Runnable delayedTask = () -> {
             try {
                 submitTask(action, execution);
@@ -104,8 +105,8 @@ public final class ExecutorImpl implements Executor {
         }
     }
 
-    private <T> Callable<T> execution(String action, Callable<T> task) {
+    private <T> Callable<T> execution(String action, Callable<T> task, Instant startTime) {
         ActionLog parentActionLog = LogManager.CURRENT_ACTION_LOG.get();
-        return new ExecutorTask<>(action, task, logManager, parentActionLog);
+        return new ExecutorTask<>(action, task, logManager, parentActionLog, startTime);
     }
 }

@@ -7,6 +7,8 @@ import core.framework.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+
 /**
  * @author neo
  */
@@ -41,7 +43,7 @@ final class TransactionImpl implements Transaction {
             long elapsed = watch.elapsed();
             logger.debug("end transaction, elapsed={}", elapsed);
             if (elapsed > longTransactionThresholdInNanos) {
-                logger.warn(Markers.errorCode("LONG_TRANSACTION"), "long db transaction, elapsed={}", elapsed);
+                logger.warn(Markers.errorCode("LONG_TRANSACTION"), "long db transaction, elapsed={}", Duration.ofNanos(elapsed));
             }
         }
     }

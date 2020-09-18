@@ -380,7 +380,7 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
 
     private void checkSlowOperation(long elapsed) {
         if (elapsed > slowOperationThresholdInNanos) {
-            logger.warn(errorCode("SLOW_ES"), "slow elasticsearch operation, elapsed={}", elapsed);
+            logger.warn(errorCode("SLOW_ES"), "slow elasticsearch operation, elapsed={}", Duration.ofNanos(elapsed));
         }
     }
 }

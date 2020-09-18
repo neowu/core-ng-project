@@ -35,6 +35,7 @@ import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -413,7 +414,7 @@ class MongoCollectionImpl<T> implements MongoCollection<T> {
 
     private void checkSlowOperation(long elapsed) {
         if (elapsed > mongo.slowOperationThresholdInNanos)
-            logger.warn(Markers.errorCode("SLOW_MONGODB"), "slow mongoDB query, elapsed={}", elapsed);
+            logger.warn(Markers.errorCode("SLOW_MONGODB"), "slow mongoDB query, elapsed={}", Duration.ofNanos(elapsed));
     }
 
     private void checkTooManyRowsReturned(int size) {

@@ -36,10 +36,12 @@ class MessageListenerThreadTest {
     @Mock
     BulkMessageHandler<TestMessage> bulkMessageHandler;
     private MessageListenerThread thread;
+    private LogManager logManager;
 
     @BeforeEach
     void createKafkaMessageListenerThread() {
-        thread = new MessageListenerThread("listener-thread-1", new MessageListener(null, null, new LogManager()));
+        logManager = new LogManager();
+        thread = new MessageListenerThread("listener-thread-1", new MessageListener(null, null, logManager));
     }
 
     @Test
@@ -74,8 +76,16 @@ class MessageListenerThreadTest {
     }
 
     @Test
-    void checkConsumerLag() {
-        thread.checkConsumerLag(99003, 60000);
+    void checkConsumerDelay() {
+        var actionLog = logManager.begin(null);
+        thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(5).toEpochMilli(), Duration.ofSeconds(3).toNanos());
+        assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(5).toNanos());
+        assertThat(actionLog.errorCode()).isEqualTo("LONG_CONSUMER_DELAY");
+
+        actionLog = logManager.begin(null);
+        thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(1).toEpochMilli(), Duration.ofSeconds(6).toNanos());
+        assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(1).toNanos());
+        assertThat(actionLog.errorCode()).isNull();
     }
 
     @Test

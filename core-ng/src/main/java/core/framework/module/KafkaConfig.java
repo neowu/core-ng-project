@@ -131,8 +131,8 @@ public class KafkaConfig extends Config {
         listener().maxProcessTime = maxProcessTime;
     }
 
-    public void longConsumerLagThreshold(Duration threshold) {
-        listener().longConsumerLagThreshold = threshold;
+    public void longConsumerDelayThreshold(Duration threshold) {
+        listener().longConsumerDelayThreshold = threshold;
     }
 
     public void maxPoll(int maxRecords, int maxBytes) {
