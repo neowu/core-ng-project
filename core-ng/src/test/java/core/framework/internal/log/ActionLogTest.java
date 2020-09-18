@@ -16,7 +16,7 @@ class ActionLogTest {
 
     @BeforeEach
     void createActionLog() {
-        log = new ActionLog("begin");
+        log = new ActionLog("begin", "actionId");
     }
 
     @Test

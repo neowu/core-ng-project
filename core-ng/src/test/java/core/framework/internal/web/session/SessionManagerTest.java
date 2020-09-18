@@ -47,7 +47,7 @@ class SessionManagerTest {
     @Test
     void header() {
         sessionManager.header("SessionId");
-        ActionLog actionLog = new ActionLog(null);
+        ActionLog actionLog = new ActionLog(null, null);
 
         String sessionId = UUID.randomUUID().toString();
         store.save(sessionId, "localhost", Map.of("key", "value"), Set.of(), Duration.ofMinutes(30));
@@ -71,7 +71,7 @@ class SessionManagerTest {
         when(request.scheme()).thenReturn("https");
         when(request.cookie(eq(new CookieSpec("SessionId").path("/")))).thenReturn(Optional.of(sessionId));
 
-        Session session = sessionManager.load(request, new ActionLog(null));
+        Session session = sessionManager.load(request, new ActionLog(null, null));
         assertThat(session).isNotNull();
         assertThat(session.get("key")).isNotNull().hasValue("value");
     }
@@ -100,7 +100,7 @@ class SessionManagerTest {
     void saveWithInvalidatedSessionWithoutId() {
         var session = new SessionImpl("localhost");
         session.invalidate();
-        sessionManager.save(session, response, new ActionLog(null));
+        sessionManager.save(session, response, new ActionLog(null, null));
 
         verifyNoInteractions(response);
     }
@@ -112,7 +112,7 @@ class SessionManagerTest {
         var session = new SessionImpl("localhost");
         session.id = UUID.randomUUID().toString();
         session.invalidate();
-        sessionManager.save(session, response, new ActionLog(null));
+        sessionManager.save(session, response, new ActionLog(null, null));
 
         verify(response).header("SessionId", "");
     }
@@ -120,7 +120,7 @@ class SessionManagerTest {
     @Test
     void saveNewSession() {
         sessionManager.header("SessionId");
-        ActionLog actionLog = new ActionLog(null);
+        ActionLog actionLog = new ActionLog(null, null);
 
         var session = new SessionImpl("localhost");
         session.set("key", "value");

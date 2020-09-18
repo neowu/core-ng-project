@@ -15,24 +15,24 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ExecutorTaskTest {
     @Test
     void action() {
-        assertThat(new ExecutorTask<Void>("action", () -> null, null, null, Instant.now()).action())
+        assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), null, null, () -> null).action())
                 .isEqualTo("task:action");
 
-        var parentActionLog = new ActionLog(null);
+        var parentActionLog = new ActionLog(null, null);
         parentActionLog.action = "parentAction";
-        assertThat(new ExecutorTask<Void>("action", () -> null, null, parentActionLog, Instant.now()).action())
+        assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), parentActionLog, null, () -> null).action())
                 .isEqualTo("parentAction:action");
 
         parentActionLog.context("root_action", "rootAction");
-        assertThat(new ExecutorTask<Void>("action", () -> null, null, parentActionLog, Instant.now()).action())
+        assertThat(new ExecutorTask<Void>("actionId", "action", Instant.now(), parentActionLog, null, () -> null).action())
                 .isEqualTo("rootAction:action");
     }
 
     @Test
     void callWithException() {
-        var task = new ExecutorTask<Void>("action", () -> {
+        var task = new ExecutorTask<Void>("actionId", "action", Instant.now(), null, new LogManager(), () -> {
             throw new Error("test");
-        }, new LogManager(), null, Instant.now());
+        });
         assertThatThrownBy(task::call)
                 .isInstanceOf(TaskException.class)
                 .hasMessageContaining("task failed")

@@ -140,7 +140,7 @@ public final class Scheduler {
     private void submitJob(Task task, ZonedDateTime scheduledTime, boolean trace) {
         jobExecutor.submit(() -> {
             try {
-                ActionLog actionLog = logManager.begin("=== job execution begin ===");
+                ActionLog actionLog = logManager.begin("=== job execution begin ===", null);
                 String name = task.name();
                 actionLog.action("job:" + name);
                 actionLog.trace = trace;

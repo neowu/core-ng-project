@@ -21,7 +21,7 @@ class ActionLogMessageFactoryTest {
 
     @Test
     void actionLog() {
-        var log = new ActionLog("begin");
+        var log = new ActionLog("begin", null);
         log.action("action");
         log.process(new LogEvent("logger", Markers.errorCode("ERROR_CODE"), LogLevel.WARN, "message", null, null));
         log.track("db", 1000, 1, 2);
@@ -51,11 +51,11 @@ class ActionLogMessageFactoryTest {
     @Test
     void trace() {
         String suffix = "...(soft trace limit reached)\n";
-        var log = new ActionLog("begin");
+        var log = new ActionLog("begin", null);
         String trace = factory.trace(log, 200, 500);
         assertThat(trace).hasSize(200 + suffix.length())
-                         .contains("ActionLog - begin")
-                         .endsWith(suffix);
+                .contains("ActionLog - begin")
+                .endsWith(suffix);
 
         log.process(new LogEvent("logger", null, LogLevel.WARN, "warning", null, null));
 
@@ -64,7 +64,7 @@ class ActionLogMessageFactoryTest {
 
         trace = factory.trace(log, 250, 500);   // the max debug length will hit warning event
         assertThat(trace).contains("warning")
-                         .endsWith(suffix);
+                .endsWith(suffix);
 
         log.process(new LogEvent("logger", null, LogLevel.WARN, "warning2", null, null));
         trace = factory.trace(log, 250, 320);   // truncate with hard limit

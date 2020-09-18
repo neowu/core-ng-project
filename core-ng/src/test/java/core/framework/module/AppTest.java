@@ -19,7 +19,7 @@ class AppTest {
 
     @Test
     void logContext() {
-        ActionLog actionLog = new ActionLog(null);
+        ActionLog actionLog = new ActionLog(null, null);
         app.logContext(actionLog);
 
         assertThat(actionLog.action).isEqualTo("app:start");

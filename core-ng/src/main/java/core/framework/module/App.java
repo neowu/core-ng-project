@@ -19,7 +19,7 @@ public abstract class App extends Module {
     private final Logger logger = LoggerFactory.getLogger(App.class);
 
     public final void start() {
-        ActionLog actionLog = logManager.begin("=== startup begin ===");
+        ActionLog actionLog = logManager.begin("=== startup begin ===", null);
         boolean failed = false;
         try {
             logContext(actionLog);

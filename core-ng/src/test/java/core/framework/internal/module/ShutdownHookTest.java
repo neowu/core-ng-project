@@ -40,7 +40,7 @@ class ShutdownHookTest {
 
     @Test
     void logContext() {
-        var actionLog = new ActionLog(null);
+        var actionLog = new ActionLog(null, null);
         shutdownHook.logContext(actionLog);
 
         assertThat(actionLog.action).isEqualTo("app:stop");

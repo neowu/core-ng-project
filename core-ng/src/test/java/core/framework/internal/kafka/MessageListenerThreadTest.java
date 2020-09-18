@@ -64,7 +64,7 @@ class MessageListenerThreadTest {
         record.headers().add(MessageHeaders.HEADER_CLIENT, Strings.bytes("client"));
         record.headers().add(MessageHeaders.HEADER_REF_ID, Strings.bytes("refId"));
         record.headers().add(MessageHeaders.HEADER_CORRELATION_ID, Strings.bytes("correlationId"));
-        var actionLog = new ActionLog(null);
+        var actionLog = new ActionLog(null, null);
         List<Message<TestMessage>> messages = thread.messages(List.of(record), actionLog, JSONMapper.reader(TestMessage.class));
 
         assertThat(messages).hasSize(1);
@@ -77,12 +77,12 @@ class MessageListenerThreadTest {
 
     @Test
     void checkConsumerDelay() {
-        var actionLog = logManager.begin(null);
+        var actionLog = logManager.begin(null, null);
         thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(5).toEpochMilli(), Duration.ofSeconds(3).toNanos());
         assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(5).toNanos());
         assertThat(actionLog.errorCode()).isEqualTo("LONG_CONSUMER_DELAY");
 
-        actionLog = logManager.begin(null);
+        actionLog = logManager.begin(null, null);
         thread.checkConsumerDelay(actionLog, actionLog.date.minusSeconds(1).toEpochMilli(), Duration.ofSeconds(6).toNanos());
         assertThat(actionLog.stats).containsEntry("consumer_delay", (double) Duration.ofSeconds(1).toNanos());
         assertThat(actionLog.errorCode()).isNull();

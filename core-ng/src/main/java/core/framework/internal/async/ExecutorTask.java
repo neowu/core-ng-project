@@ -20,16 +20,18 @@ public class ExecutorTask<T> implements Callable<T> {
     private final LogManager logManager;
     private final Callable<T> task;
     private final Instant startTime;
+    private final String actionId;
     private String rootAction;
     private String refId;
     private String correlationId;
     private boolean trace;
 
-    ExecutorTask(String action, Callable<T> task, LogManager logManager, ActionLog parentActionLog, Instant startTime) {
+    ExecutorTask(String actionId, String action, Instant startTime, ActionLog parentActionLog, LogManager logManager, Callable<T> task) {
         this.action = action;
         this.task = task;
         this.logManager = logManager;
         this.startTime = startTime;
+        this.actionId = actionId;
         if (parentActionLog != null) {  // only keep info needed by call(), so parentActionLog can be GCed sooner
             List<String> parentActionContext = parentActionLog.context.get("root_action");
             rootAction = parentActionContext != null ? parentActionContext.get(0) : parentActionLog.action;
@@ -41,10 +43,8 @@ public class ExecutorTask<T> implements Callable<T> {
 
     @Override
     public T call() throws Exception {
-        String actionId = null;
         try {
-            ActionLog actionLog = logManager.begin("=== task execution begin ===");
-            actionId = actionLog.id;
+            ActionLog actionLog = logManager.begin("=== task execution begin ===", actionId);
             actionLog.action(action());
             // here it doesn't log task class, is due to task usually is lambda or method reference, it's expensive to inspect, refer to ControllerInspector
             if (rootAction != null) { // if rootAction != null, then all parent info are available

@@ -35,7 +35,7 @@ class MessagePublisherImplTest {
 
     @Test
     void publish() {
-        ActionLog actionLog = logManager.begin("begin");
+        ActionLog actionLog = logManager.begin("begin", null);
         actionLog.correlationIds = List.of("correlationId");
 
         var message = new TestMessage();

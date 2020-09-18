@@ -37,7 +37,7 @@ class ExecutorImplTest {
 
     @Test
     void submit() throws ExecutionException, InterruptedException {
-        ActionLog parentAction = logManager.begin("begin");
+        ActionLog parentAction = logManager.begin("begin", null);
         parentAction.action("parentAction");
         parentAction.trace = true;
         parentAction.correlationIds = List.of("correlationId");

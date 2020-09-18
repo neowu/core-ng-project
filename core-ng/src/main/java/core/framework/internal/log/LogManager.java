@@ -46,8 +46,8 @@ public class LogManager {
     private final ActionLogMessageFactory actionLogMessageFactory = new ActionLogMessageFactory();
     public LogAppender appender;
 
-    public ActionLog begin(String message) {
-        var actionLog = new ActionLog(message);
+    public ActionLog begin(String message, String id) {
+        var actionLog = new ActionLog(message, id);
         CURRENT_ACTION_LOG.set(actionLog);
         return actionLog;
     }

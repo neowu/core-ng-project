@@ -81,7 +81,7 @@ public final class ShutdownHook implements Runnable {
             }
         }
 
-        ActionLog actionLog = logManager.begin("=== shutdown begin ===");
+        ActionLog actionLog = logManager.begin("=== shutdown begin ===", null);
         logContext(actionLog);
 
         long endTime = System.currentTimeMillis() + shutdownTimeoutInMs;

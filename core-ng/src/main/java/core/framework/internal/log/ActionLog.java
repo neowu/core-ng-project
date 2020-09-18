@@ -49,21 +49,24 @@ public final class ActionLog {
     private LogLevel result = LogLevel.INFO;
     private String errorCode;
 
-    public ActionLog(String message) {
+    public ActionLog(String message, String id) {
         startTime = System.nanoTime();
         startCPUTime = THREAD.getCurrentThreadCpuTime();
         date = Instant.now();
-        id = LogManager.ID_GENERATOR.next(date);
+        if (id == null) {
+            this.id = LogManager.ID_GENERATOR.next(date);
+        } else {
+            this.id = id;   // in executor, id is generated in advance to link parent and task
+        }
         events = new ArrayList<>(32);   // according to benchmark, ArrayList is as fast as LinkedList with max 3000 items, and has smaller memory footprint
         context = new HashMap<>();  // default capacity is 16, no need to keep insertion order, kibana will sort all keys on display
         stats = new HashMap<>();
         performanceStats = new HashMap<>();
 
         add(event(message));
-        add(event("id={}", id));
+        add(event("id={}", this.id));
         add(event("date={}", DateTimeFormatter.ISO_INSTANT.format(date)));
-        Thread thread = Thread.currentThread();
-        add(event("thread={}", thread.getName()));
+        add(event("thread={}", Thread.currentThread().getName()));
     }
 
     void process(LogEvent event) {

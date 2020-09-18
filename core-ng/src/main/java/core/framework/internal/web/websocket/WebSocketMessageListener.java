@@ -33,7 +33,7 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage textMessage) {
         @SuppressWarnings("unchecked")
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
-        ActionLog actionLog = logManager.begin("=== ws message handling begin ===");
+        ActionLog actionLog = logManager.begin("=== ws message handling begin ===", null);
         try {
             actionLog.action(wrapper.action);
             linkContext(channel, wrapper, actionLog);
@@ -64,7 +64,7 @@ final class WebSocketMessageListener extends AbstractReceiveListener {
     protected void onCloseMessage(CloseMessage message, WebSocketChannel channel) {
         @SuppressWarnings("unchecked")
         var wrapper = (ChannelImpl<Object, Object>) channel.getAttribute(WebSocketHandler.CHANNEL_KEY);
-        ActionLog actionLog = logManager.begin("=== ws close message handling begin ===");
+        ActionLog actionLog = logManager.begin("=== ws close message handling begin ===", null);
         try {
             actionLog.action(wrapper.action + ":close");
             linkContext(channel, wrapper, actionLog);

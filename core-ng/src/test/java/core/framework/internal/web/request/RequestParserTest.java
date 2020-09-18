@@ -206,7 +206,7 @@ class RequestParserTest {
         var headers = new HeaderMap();
         headers.put(Headers.REFERER, "http://localhost");
         headers.put(Headers.USER_AGENT, "Mozilla/5.0");
-        var actionLog = new ActionLog(null);
+        var actionLog = new ActionLog(null, null);
 
         parser.logSiteHeaders(headers, actionLog);
         assertThat(actionLog.context).doesNotContainKeys("user_agent", "referer");
@@ -220,7 +220,7 @@ class RequestParserTest {
     void parse() throws Throwable {
         byte[] body = Strings.bytes("{}");
 
-        var actionLog = new ActionLog(null);
+        var actionLog = new ActionLog(null, null);
         var exchange = new HttpServerExchange(null);
         exchange.setRequestMethod(Methods.POST);
         exchange.getRequestHeaders().put(Headers.HOST, "localhost");

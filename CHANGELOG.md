@@ -4,7 +4,8 @@
     APP_NAME is shadowed by gradle application plugin linux start script     
 * kafka: renamed stats.consumer_lag to stats.consumer_delay and updated kibana dashboard
     !!! please update to latest log-processor to refresh log es indices
-* executor: track task delay via stats.task_delay, indicator of whether thread pool is queuing    
+* executor: track task delay via stats.task_delay, indicator of whether thread pool is queuing
+* executor: log task actionId in parent trace to improve visibility    
 
 ### 7.5.10 (09/07/2020 - 09/16/2020)
 * log: moved action.cpu_time to action.stats.cpu_time

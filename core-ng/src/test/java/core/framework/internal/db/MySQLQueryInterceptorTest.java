@@ -31,7 +31,7 @@ class MySQLQueryInterceptorTest {
         logManager = new LogManager();
         interceptor = new MySQLQueryInterceptor();
 
-        actionLog = logManager.begin("begin");
+        actionLog = logManager.begin("begin", null);
     }
 
     @AfterEach

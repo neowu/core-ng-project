@@ -72,7 +72,7 @@ public class HTTPHandler implements HttpHandler {
     }
 
     private void handle(HttpServerExchange exchange) {
-        ActionLog actionLog = logManager.begin("=== http transaction begin ===");
+        ActionLog actionLog = logManager.begin("=== http transaction begin ===", null);
         var request = new RequestImpl(exchange, requestBeanReader);
         try {
             webContext.initialize(request);

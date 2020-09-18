@@ -20,7 +20,7 @@ class HTTPHandlerTest {
 
     @Test
     void linkContext() {
-        var actionLog = new ActionLog(null);
+        var actionLog = new ActionLog(null, null);
         var headers = new HeaderMap();
         headers.put(HTTPHandler.HEADER_TRACE, "true");
         headers.put(HTTPHandler.HEADER_CLIENT, "client");

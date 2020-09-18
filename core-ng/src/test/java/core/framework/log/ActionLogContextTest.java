@@ -24,7 +24,7 @@ class ActionLogContextTest {
     @Test
     void withCurrentActionLog() {
         var logManager = new LogManager();
-        logManager.begin("start");
+        logManager.begin("start", null);
 
         assertThat(ActionLogContext.id()).isNotNull();
 

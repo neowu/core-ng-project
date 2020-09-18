@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -102,8 +103,8 @@ class SchedulerTest {
         ArgumentCaptor<Callable<?>> task = ArgumentCaptor.forClass(Callable.class);
         verify(jobExecutor).submit(task.capture());
 
-        var actionLog = new ActionLog(null);
-        when(logManager.begin(anyString())).thenReturn(actionLog);
+        var actionLog = new ActionLog(null, null);
+        when(logManager.begin(anyString(), isNull())).thenReturn(actionLog);
 
         task.getValue().call();
 
