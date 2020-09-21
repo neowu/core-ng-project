@@ -48,6 +48,11 @@ class ActionLogTest {
     }
 
     @Test
+    void flushTraceLog() {
+        assertThat(log.flushTraceLog()).isFalse();
+    }
+
+    @Test
     void result() {
         assertThat(log.result()).isEqualTo("OK");
 

@@ -112,6 +112,15 @@ class SchedulerTest {
         assertThat(actionLog.context).containsKeys("trigger", "job", "job_class", "scheduled_time");
     }
 
+    @Test
+    void shutdown() throws InterruptedException {
+        when(schedulerExecutor.awaitTermination(anyLong(), eq(TimeUnit.MILLISECONDS))).thenReturn(true);
+        scheduler.shutdown();
+
+        verify(schedulerExecutor).shutdown();
+        verify(jobExecutor).shutdown();
+    }
+
     public static class TestJob implements Job {
         @Override
         public void execute(JobContext context) {
