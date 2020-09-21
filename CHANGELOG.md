@@ -1,5 +1,5 @@
 ## Change log
-### 7.5.11 (09/17/2020 - )
+### 7.5.11 (09/17/2020 - 09/21/2020)
 * log: use CORE_APP_NAME instead of APP_NAME env var to override appName 
     APP_NAME shadowed by gradle application plugin linux start script     
 * kafka: renamed stats.consumer_lag to stats.consumer_delay and updated kibana dashboard
