@@ -23,6 +23,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -169,7 +170,7 @@ class RequestParserTest {
 
     @Test
     void parseCookies() {
-        Map<String, String> cookies = parser.decodeCookies(Map.of("name", new CookieImpl("name", "value")));
+        Map<String, String> cookies = parser.decodeCookies(Set.of(new CookieImpl("name", "value")));
         assertThat(cookies).containsEntry("name", "value");
     }
 
@@ -182,7 +183,7 @@ class RequestParserTest {
 
         // refer to io.undertow.UndertowMessages.tooManyCookies
         // refer to io.undertow.UndertowMessages.couldNotParseCookie
-        when(exchange.getRequestCookies())
+        when(exchange.requestCookies())
                 .thenThrow(new IllegalStateException("UT000046: The number of cookies sent exceeded the maximum of 200"))
                 .thenThrow(new IllegalArgumentException("UT000069: Could not parse set cookie header value"));
 
@@ -197,7 +198,7 @@ class RequestParserTest {
 
     @Test
     void decodeInvalidCookieValue() {
-        Map<String, String> cookies = parser.decodeCookies(Map.of("name", new CookieImpl("name", "%%")));
+        Map<String, String> cookies = parser.decodeCookies(Set.of(new CookieImpl("name", "%%")));
         assertThat(cookies).isEmpty();
     }
 

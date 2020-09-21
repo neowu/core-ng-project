@@ -5,7 +5,6 @@ import core.framework.http.HTTPMethod;
 import core.framework.internal.http.BodyLogParam;
 import core.framework.internal.log.ActionLog;
 import core.framework.internal.log.filter.FieldLogParam;
-import core.framework.util.Maps;
 import core.framework.util.Strings;
 import core.framework.web.MultipartFile;
 import core.framework.web.exception.BadRequestException;
@@ -24,9 +23,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Deque;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static core.framework.log.Markers.errorCode;
 import static core.framework.util.Encodings.decodeURIComponent;
 import static core.framework.util.Strings.format;
 import static java.net.URLDecoder.decode;
@@ -83,7 +84,7 @@ public final class RequestParser {
         HeaderValues cookieHeaders = exchange.getRequestHeaders().get(Headers.COOKIE);
         if (cookieHeaders != null) {
             try {
-                request.cookies = decodeCookies(exchange.getRequestCookies());
+                request.cookies = decodeCookies(exchange.requestCookies());
             } catch (IllegalArgumentException | IllegalStateException e) {
                 logger.debug("[request:header] {}={}", Headers.COOKIE, new HeaderLogParam(Headers.COOKIE, cookieHeaders));
                 // entire cookie will be failed to parse if there is poison cookie value, undertow doesn't provide API to parse cookie individually
@@ -126,19 +127,19 @@ public final class RequestParser {
         }
     }
 
-    Map<String, String> decodeCookies(Map<String, Cookie> cookies) {
-        Map<String, String> cookieValues = Maps.newHashMapWithExpectedSize(cookies.size());
-        for (Map.Entry<String, Cookie> entry : cookies.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue().getValue();
+    Map<String, String> decodeCookies(Iterable<Cookie> cookies) {
+        Map<String, String> cookieValues = new HashMap<>();
+        for (Cookie cookie : cookies) {
+            String name = cookie.getName();
+            String value = cookie.getValue();
             try {
-                String cookieName = decodeURIComponent(key);
+                String cookieName = decodeURIComponent(name);
                 String cookieValue = decodeURIComponent(value);
                 logger.debug("[request:cookie] {}={}", cookieName, new FieldLogParam(cookieName, cookieValue));
                 cookieValues.put(cookieName, cookieValue);
             } catch (IllegalArgumentException e) {
                 // cookies is persistent in browser, here is to ignore, in case user may not be able to access website with legacy cookie
-                logger.warn("ignore invalid encoded cookie, name={}, value={}", key, value, e);
+                logger.warn(errorCode("INVALID_COOKIE"), "ignore invalid encoded cookie, name={}, value={}", name, value, e);
             }
         }
         return cookieValues;
