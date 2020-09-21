@@ -114,7 +114,7 @@ class SchedulerTest {
 
     @Test
     void shutdown() throws InterruptedException {
-        when(schedulerExecutor.awaitTermination(anyLong(), eq(TimeUnit.MILLISECONDS))).thenReturn(true);
+        when(schedulerExecutor.awaitTermination(anyLong(), eq(TimeUnit.MILLISECONDS))).thenReturn(Boolean.TRUE);
         scheduler.shutdown();
 
         verify(schedulerExecutor).shutdown();
