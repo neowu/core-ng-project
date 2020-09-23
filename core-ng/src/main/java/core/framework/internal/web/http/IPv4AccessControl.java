@@ -24,7 +24,7 @@ public class IPv4AccessControl {
             }
 
             if (!allow(address.getAddress())) {
-                throw new ForbiddenException("access denied");
+                throw new ForbiddenException("access denied", "IP_ACCESS_DENIED");
             }
         } catch (UnknownHostException e) {
             throw new Error(e);  // client ip format is already validated in ClientIPParser, so here it won't resolve DNS

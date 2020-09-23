@@ -1,4 +1,7 @@
 ## Change log
+### 7.5.12 (09/23/2020 - )
+* http: ForbiddenException supports errorCode, ipv4AccessControl throws forbiddenException with IP_ACCESS_DENIED error code 
+
 ### 7.5.11 (09/17/2020 - 09/21/2020)
 * log: use CORE_APP_NAME instead of APP_NAME env var to override appName 
     APP_NAME shadowed by gradle application plugin linux start script     

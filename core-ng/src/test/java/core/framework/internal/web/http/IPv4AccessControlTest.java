@@ -40,8 +40,8 @@ class IPv4AccessControlTest {
     void validateWithNotAllowedIP() {
         accessControl.allow = new IPv4Ranges(List.of("100.100.100.100/32"));
         assertThatThrownBy(() -> accessControl.validate("100.100.100.1"))
-            .isInstanceOf(ForbiddenException.class)
-            .hasMessageContaining("denied");
+                .isInstanceOf(ForbiddenException.class)
+                .hasMessageContaining("access denied");
     }
 
     @Test
