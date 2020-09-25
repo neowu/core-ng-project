@@ -153,7 +153,7 @@ public class DatabaseOperation {
     // http://dev.mysql.com/doc/refman/5.7/en/information-functions.html
     private OptionalLong fetchGeneratedKey(PreparedStatement statement) throws SQLException {
         try (ResultSet keys = statement.getGeneratedKeys()) {
-            if (keys.next()) {
+            if (keys != null && keys.next()) {
                 return OptionalLong.of(keys.getLong(1));
             }
         }

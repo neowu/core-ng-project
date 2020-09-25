@@ -222,6 +222,7 @@
             UCF_USELESS_CONTROL_FLOW_NEXT_LINE,
             DMI_ARGUMENTS_WRONG_ORDER,
             RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE,
+            RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE,
             RCN_REDUNDANT_COMPARISON_TWO_NULL_VALUES,
             RCN_REDUNDANT_COMPARISON_OF_NULL_AND_NONNULL_VALUE,
             UL_UNRELEASED_LOCK,
@@ -364,6 +365,7 @@
             TQ_EXPLICIT_UNKNOWN_SOURCE_VALUE_REACHES_NEVER_SINK,
             TQ_EXPLICIT_UNKNOWN_SOURCE_VALUE_REACHES_ALWAYS_SINK,
             OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE,
+            OBL_UNSATISFIED_OBLIGATION,
             FB_UNEXPECTED_WARNING,
             FB_MISSING_EXPECTED_WARNING,
             RV_RETURN_VALUE_OF_PUTIFABSENT_IGNORED,
@@ -592,14 +594,4 @@
             SUI_CONTAINS_BEFORE_ADD,
             SUI_CONTAINS_BEFORE_REMOVE"/>
     </Match>
-
-    <!--
-    broken rules with jdk 9
-    OBL_UNSATISFIED_OBLIGATION: Method may fail to clean up stream or resource (spotbugs bug: https://github.com/spotbugs/spotbugs/issues/432)
-
-    broken rules with jdk 11, due to jdk 11 generated either wrong or different byte code
-    spotbugs:
-    RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE
-    RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE
-    -->
 </FindBugsFilter>
