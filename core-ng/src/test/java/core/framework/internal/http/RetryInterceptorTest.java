@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
@@ -162,6 +163,12 @@ class RetryInterceptorTest {
         var cancelled = new IOException("Canceled");
         assertThat(interceptor.shouldRetry(1, "POST", cancelled)).isFalse();
         assertThat(interceptor.shouldRetry(2, "PUT", cancelled)).isTrue();
+    }
+
+    @Test
+    void shouldRetryWithUnknownHost() {
+        // if failed to query DNS
+        assertThat(interceptor.shouldRetry(1, "POST", new UnknownHostException("unknown.host: System error"))).isTrue();
     }
 
     @Test
