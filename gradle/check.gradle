@@ -83,7 +83,7 @@ subprojects {
     }
 
     jacoco {
-        toolVersion = '0.8.5'
+        toolVersion = '0.8.6'
 
         tasks.named('jacocoTestReport').configure {
             // to generate cross sub project report, run: gradlew test && gradlew jacocoTestReport
