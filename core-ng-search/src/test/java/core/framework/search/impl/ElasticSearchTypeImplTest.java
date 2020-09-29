@@ -13,13 +13,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  * @author neo
  */
 class ElasticSearchTypeImplTest {
-    private ElasticSearchTypeImpl searchType;
+    private ElasticSearchTypeImpl<TestDocument> searchType;
 
     @BeforeEach
     void createElasticSearchTypeImpl() {
         var search = new ElasticSearchImpl();
         search.maxResultWindow = 100;
-        searchType = new ElasticSearchTypeImpl(search, TestDocument.class);
+        searchType = new ElasticSearchTypeImpl<>(search, TestDocument.class);
     }
 
     @Test
