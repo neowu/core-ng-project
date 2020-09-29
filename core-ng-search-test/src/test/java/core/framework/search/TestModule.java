@@ -17,6 +17,7 @@ public class TestModule extends AbstractTestModule {
         search.host("localhost");
         search.timeout(Duration.ofSeconds(5));
         search.slowOperationThreshold(Duration.ofSeconds(5));
+        search.maxResultWindow(1000);
         search.type(TestDocument.class);
 
         InitSearchConfig initSearch = config(InitSearchConfig.class);

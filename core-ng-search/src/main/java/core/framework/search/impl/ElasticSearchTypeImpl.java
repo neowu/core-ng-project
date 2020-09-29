@@ -70,13 +70,15 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     private final ElasticSearchImpl elasticSearch;
     private final String index;
     private final long slowOperationThresholdInNanos;
+    private final int maxResultWindow;
     private final JSONReader<T> reader;
     private final JSONWriter<T> writer;
     private final Validator<T> validator;
 
-    ElasticSearchTypeImpl(ElasticSearchImpl elasticSearch, Class<T> documentClass, Duration slowOperationThreshold) {
+    ElasticSearchTypeImpl(ElasticSearchImpl elasticSearch, Class<T> documentClass) {
         this.elasticSearch = elasticSearch;
-        this.slowOperationThresholdInNanos = slowOperationThreshold.toNanos();
+        this.slowOperationThresholdInNanos = elasticSearch.slowOperationThreshold.toNanos();
+        this.maxResultWindow = elasticSearch.maxResultWindow;
         this.index = documentClass.getDeclaredAnnotation(Index.class).name();
         reader = JSONMapper.reader(documentClass);
         writer = JSONMapper.writer(documentClass);
@@ -367,8 +369,8 @@ public final class ElasticSearchTypeImpl<T> implements ElasticSearchType<T> {
     private void validate(SearchRequest request) {
         int skip = request.skip == null ? 0 : request.skip;
         int limit = request.limit == null ? 0 : request.limit;
-        if (skip + limit > 10000)
-            throw new Error(Strings.format("result window is too large, skip + limit must be less than or equal to 10000, skip={}, limit={}", request.skip, request.limit));
+        if (skip + limit > maxResultWindow)
+            throw new Error(Strings.format("result window is too large, skip + limit must be less than or equal to max result window, skip={}, limit={}, maxResultWindow={}", request.skip, request.limit, maxResultWindow));
     }
 
     private void validate(ForEach<T> forEach) {

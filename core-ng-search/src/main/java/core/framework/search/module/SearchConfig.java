@@ -56,6 +56,12 @@ public class SearchConfig extends Config {
         search.slowOperationThreshold = threshold;
     }
 
+    // refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-max-result-window
+    // this config should match index.max_result_window
+    public void maxResultWindow(int maxResultWindow) {
+        search.maxResultWindow = maxResultWindow;
+    }
+
     public void timeout(Duration timeout) {
         search.timeout = timeout;
     }

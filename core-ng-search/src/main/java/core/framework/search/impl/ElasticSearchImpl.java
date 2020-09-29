@@ -40,8 +40,10 @@ public class ElasticSearchImpl implements ElasticSearch {
     public Duration timeout = Duration.ofSeconds(10);
     public Duration slowOperationThreshold = Duration.ofSeconds(5);
     public HttpHost[] hosts;
+    public int maxResultWindow = 10000;
     private RestHighLevelClient client;
 
+    // initialize will be called in startup hook, so no need to synchronize
     public void initialize() {
         RestClientBuilder builder = RestClient.builder(hosts);
         builder.setRequestConfigCallback(config -> config.setSocketTimeout((int) timeout.toMillis())
@@ -56,7 +58,7 @@ public class ElasticSearchImpl implements ElasticSearch {
         var watch = new StopWatch();
         try {
             new DocumentClassValidator(documentClass).validate();
-            return new ElasticSearchTypeImpl<>(this, documentClass, slowOperationThreshold);
+            return new ElasticSearchTypeImpl<>(this, documentClass);
         } finally {
             logger.info("register elasticsearch type, documentClass={}, elapsed={}", documentClass.getCanonicalName(), watch.elapsed());
         }
