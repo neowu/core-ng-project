@@ -34,7 +34,7 @@ public class HTTPEventListenerFactory implements EventListener.Factory {
         @Override
         public void dnsEnd(Call call, String domain, List<InetAddress> addresses) {
             long elapsed = System.nanoTime() - dnsStart;
-            LOGGER.debug("resolve dns, domain={}, elapsed={}", domain, elapsed);
+            LOGGER.debug("resolve dns, domain={}, addresses={}, elapsed={}", domain, addresses, elapsed);
             ActionLogContext.track("http_dns", elapsed);
         }
 
