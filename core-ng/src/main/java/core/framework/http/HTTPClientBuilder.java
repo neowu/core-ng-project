@@ -48,7 +48,8 @@ public final class HTTPClientBuilder {
 
     private Duration connectTimeout = Duration.ofSeconds(25);
     private Duration timeout = Duration.ofSeconds(60);
-    private Duration slowOperationThreshold = Duration.ofSeconds(30);   // slow threshold should be greater than connect timeout, to let connect timeout happen first
+    private Duration keepAlive = Duration.ofSeconds(30);    // conservative setting, as http connection to internet/external can be cut off by NAT/firewall if idle too long
+    private Duration slowOperationThreshold = Duration.ofSeconds(30);   // slow threshold should be longer than connect timeout
     private boolean enableCookie = false;
     private String userAgent = "HTTPClient";
     private boolean trustAll = false;
@@ -68,7 +69,8 @@ public final class HTTPClientBuilder {
                     .readTimeout(timeout)
                     .writeTimeout(timeout)
                     .callTimeout(callTimeout()) // call timeout is only used as last defense, timeout for complete call includes connect/retry/etc
-                    .connectionPool(new ConnectionPool(100, 30, TimeUnit.SECONDS));
+                    .connectionPool(new ConnectionPool(100, keepAlive.toSeconds(), TimeUnit.SECONDS))
+                    .eventListenerFactory(new HTTPEventListenerFactory());
 
             configureHTTPS(builder);
 
@@ -114,6 +116,11 @@ public final class HTTPClientBuilder {
     // client level read/write timeout, request level timeout can be specified in HTTPRequest
     public HTTPClientBuilder timeout(Duration timeout) {
         this.timeout = timeout;
+        return this;
+    }
+
+    public HTTPClientBuilder keepAlive(Duration keepAlive) {
+        this.keepAlive = keepAlive;
         return this;
     }
 

@@ -1,4 +1,7 @@
 ## Change log
+### 7.5.13 (09/30/2020 - )
+* http: api client extends keep alive duration to 5 mins to improve internal api calls, track resolving dns and establishing connection performance 
+
 ### 7.5.12 (09/23/2020 - 09/29/2020)
 * http: ForbiddenException supports errorCode, ipv4AccessControl throws forbiddenException with IP_ACCESS_DENIED error code 
 * es: update to 7.9.2
