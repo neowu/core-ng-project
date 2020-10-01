@@ -7,7 +7,6 @@ import okhttp3.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -45,7 +44,7 @@ public class HTTPEventListenerFactory implements EventListener.Factory {
         }
 
         @Override
-        public void connectEnd(Call call, InetSocketAddress address, Proxy proxy, @Nullable Protocol protocol) {
+        public void connectEnd(Call call, InetSocketAddress address, Proxy proxy, Protocol protocol) {
             long elapsed = System.nanoTime() - connectStart;
             LOGGER.debug("create http connection, address={}, elapsed={}", address, elapsed);
             ActionLogContext.track("http_conn", elapsed);
