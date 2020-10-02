@@ -26,6 +26,9 @@ public class HTTPEventListenerFactory implements EventListener.Factory {
         private long dnsStart;
         private long connectStart;
 
+        // okHTTP uses URL Host/Address as key to acquire connection, refer to okhttp3.internal.connection.RealConnectionPool -> callAcquirePooledConnection
+        // if conn pool doesn't have matched connection, it creates new connection object, resolves dns(dnsStart/End), connects socket (connectStart/End)
+        // if conn pool has eligible connection, then reuses connection, dns/connect are skipped
         @Override
         public void dnsStart(Call call, String domain) {
             dnsStart = System.nanoTime();
