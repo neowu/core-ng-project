@@ -24,7 +24,9 @@ class ControllerInspectorTest {
     @Test
     void lambdaMethod() {
         var inspector = new ControllerInspector((LambdaController) request -> null);
-        assertThat(inspector.targetClass.getCanonicalName()).startsWith(ControllerInspectorTest.class.getCanonicalName());
+        assertThat(inspector.targetClass.isHidden()).isTrue();
+        // hidden class does not have canonicalName
+        assertThat(inspector.targetClass.getName()).startsWith(ControllerInspectorTest.class.getCanonicalName());
         assertThat(inspector.targetMethod).isNotNull();
         assertThat(inspector.controllerInfo).startsWith(ControllerInspectorTest.class.getCanonicalName() + ".");
     }

@@ -128,26 +128,32 @@ class AlertServiceTest {
         alert.errorMessage = "message";
         alert.kibanaIndex = "action";
 
-        assertThat(service.message(alert, 10)).isEqualTo("*[10]* WARN: *site / website*\n"
-                + "_id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
-                + "error_code: *ERROR_CODE*\n"
-                + "message: message\n");
+        assertThat(service.message(alert, 10)).isEqualTo("""
+                *[10]* WARN: *site / website*
+                _id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>
+                error_code: *ERROR_CODE*
+                message: message
+                """);
 
         alert.host = "host";
-        assertThat(service.message(alert, 0)).isEqualTo("WARN: *site / website*\n"
-                + "host: host\n"
-                + "_id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
-                + "error_code: *ERROR_CODE*\n"
-                + "message: message\n");
+        assertThat(service.message(alert, 0)).isEqualTo("""
+                WARN: *site / website*
+                host: host
+                _id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>
+                error_code: *ERROR_CODE*
+                message: message
+                """);
 
         alert.action = "action";
         alert.host = null;
 
-        assertThat(service.message(alert, 0)).isEqualTo("WARN: *site / website*\n"
-                + "_id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>\n"
-                + "action: action\n"
-                + "error_code: *ERROR_CODE*\n"
-                + "message: message\n");
+        assertThat(service.message(alert, 0)).isEqualTo("""
+                WARN: *site / website*
+                _id: <http://kibana:5601/app/kibana#/doc/action-pattern/action-*?id=id&_g=()|id>
+                action: action
+                error_code: *ERROR_CODE*
+                message: message
+                """);
     }
 
     private Alert alert(Severity severity, String errorCode, String index) {
