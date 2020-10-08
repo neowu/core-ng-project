@@ -1,9 +1,10 @@
-FROM        gradle:jdk14 as build
+# replace with gradle image once gradle:jdk15 is available
+FROM        adoptopenjdk/openjdk15:alpine as build
 WORKDIR     /depot
 ADD         ./ /depot
-RUN         gradle -Penv=prod :ext:monitor:docker
+RUN         ./gradlew -Penv=prod :ext:monitor:docker
 
-FROM        adoptopenjdk/openjdk14:alpine-jre
+FROM        adoptopenjdk/openjdk15:alpine-jre
 LABEL       app=monitor
 RUN         addgroup --system app && adduser --system --no-create-home --ingroup app app
 USER        app
