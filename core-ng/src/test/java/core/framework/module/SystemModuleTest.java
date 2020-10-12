@@ -10,46 +10,46 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author neo
  */
 class SystemModuleTest {
-    private SystemModule systemModule;
+    private SystemModule module;
 
     @BeforeEach
     void createSystemModule() {
-        systemModule = new SystemModule(null);
-        systemModule.context = new ModuleContext(null);
+        module = new SystemModule(null);
+        module.context = new ModuleContext(null);
 
         System.clearProperty("sys.http.port");
     }
 
     @Test
     void configureHTTP() {
-        systemModule.configureHTTP();
+        module.configureHTTP();
 
-        assertThat(systemModule.context.httpServer.httpPort).isNull();
-        assertThat(systemModule.context.httpServer.httpsPort).isNull();
+        assertThat(module.context.httpServer.httpPort).isNull();
+        assertThat(module.context.httpServer.httpsPort).isNull();
     }
 
     @Test
     void configureHTTPPortFromSystemProperty() {
         System.setProperty("sys.http.port", "8081");
-        systemModule.context.propertyManager.properties.set("sys.http.port", "8082");
+        module.context.propertyManager.properties.set("sys.http.port", "8082");
 
-        systemModule.configureHTTP();
-        assertThat(systemModule.context.httpServer.httpPort).isEqualTo(8081);
+        module.configureHTTP();
+        assertThat(module.context.httpServer.httpPort).isEqualTo(8081);
     }
 
     @Test
     void configureHTTPPortFromProperty() {
-        systemModule.context.propertyManager.properties.set("sys.https.port", "8082");
+        module.context.propertyManager.properties.set("sys.https.port", "8082");
 
-        systemModule.configureHTTP();
-        assertThat(systemModule.context.httpServer.httpPort).isNull();
-        assertThat(systemModule.context.httpServer.httpsPort).isEqualTo(8082);
+        module.configureHTTP();
+        assertThat(module.context.httpServer.httpPort).isNull();
+        assertThat(module.context.httpServer.httpsPort).isEqualTo(8082);
     }
 
     @Test
     void configureSite() {
-        systemModule.context.propertyManager.properties.set("sys.security.csp", "default-src 'self';");
-        systemModule.configureSite();
-        assertThat(systemModule.site().security().interceptor.contentSecurityPolicy).isEqualTo("default-src 'self';");
+        module.context.propertyManager.properties.set("sys.security.csp", "default-src 'self';");
+        module.configureSite();
+        assertThat(module.site().security().interceptor.contentSecurityPolicy).isEqualTo("default-src 'self';");
     }
 }

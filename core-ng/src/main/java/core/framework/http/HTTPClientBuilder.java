@@ -24,6 +24,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -42,6 +43,17 @@ public final class HTTPClientBuilder {
         // http client uses pooled connection, multiple requests to same host may hit different server behind LB
         // refer to sun.security.ssl.ClientHandshakeContext, allowUnsafeServerCertChange = Utilities.getBooleanProperty("jdk.tls.allowUnsafeServerCertChange", false);
         System.setProperty("jdk.tls.allowUnsafeServerCertChange", "true");
+
+        // refer to jdk InetAddressCachePolicy.class, it reads value from Security properties
+        // for application to override, one way is to put Security.setProperty() in Main before starting app
+        // override default to 300
+        if (Security.getProperty("networkaddress.cache.ttl") == null) {
+            Security.setProperty("networkaddress.cache.ttl", "300");
+        }
+        // override negative default from 10 to 0, not cache failure when http client retry dns resolving
+        if ("10".equals(Security.getProperty("networkaddress.cache.negative.ttl"))) {
+            Security.setProperty("networkaddress.cache.negative.ttl", "0");
+        }
     }
 
     private final Logger logger = LoggerFactory.getLogger(HTTPClientBuilder.class);

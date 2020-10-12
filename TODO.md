@@ -6,7 +6,6 @@
 
 * change gradle to kotlin?
 * impl own json bind by referring https://github.com/json-iterator/java and https://github.com/ngs-doo/dsl-json with annotation processor?
-* rethink module structure to fit java module export requirement
 
 * /_sys/, kafka controller, should call message handler directly?
 * revisit trace log truncation, better/more elegant handling?
@@ -14,7 +13,5 @@
 * way to expose service structure/dependency diagram? 
 * redis: support zset / resp3 ? 
 
-### jdk 14 issues
-* spotbugs: OBL bug https://github.com/spotbugs/spotbugs/issues/432  
 * elasticsearch libs has too many duplicated namespaces with module-info.java enabled
 * class in interface module generates Validator make interface depends on core-ng module (java module)
