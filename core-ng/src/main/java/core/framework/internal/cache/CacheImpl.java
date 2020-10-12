@@ -39,14 +39,14 @@ public class CacheImpl<T> implements Cache<T> {
         String cacheKey = cacheKey(key);
         T cacheValue = cacheStore.get(cacheKey, context);
         if (cacheValue != null) {
-            ActionLogContext.stat("cache_hit", 1);
+            ActionLogContext.stat("cache_hits", 1);
             return cacheValue;
         }
 
         logger.debug("load value, key={}", key);
         T value = load(loader, key);
         cacheStore.put(cacheKey, value, duration, context);
-        ActionLogContext.stat("cache_miss", 1);
+        ActionLogContext.stat("cache_misses", 1);
         return value;
     }
 
@@ -64,7 +64,7 @@ public class CacheImpl<T> implements Cache<T> {
         Map<String, T> values = Maps.newHashMapWithExpectedSize(size);
         List<CacheStore.Entry<T>> newValues = new ArrayList<>(size);
         Map<String, T> cacheValues = cacheStore.getAll(cacheKeys, context);
-        ActionLogContext.stat("cache_hit", cacheValues.size());
+        ActionLogContext.stat("cache_hits", cacheValues.size());
         for (String key : keys) {
             String cacheKey = cacheKeys[index];
             T result = cacheValues.get(cacheKey);
@@ -78,7 +78,7 @@ public class CacheImpl<T> implements Cache<T> {
         }
         if (!newValues.isEmpty()) {
             cacheStore.putAll(newValues, duration, context);
-            ActionLogContext.stat("cache_miss", newValues.size());
+            ActionLogContext.stat("cache_misses", newValues.size());
         }
         return values;
     }

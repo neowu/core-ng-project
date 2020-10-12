@@ -1,4 +1,4 @@
-package core.framework.http;
+package core.framework.internal.http;
 
 import core.framework.log.ActionLogContext;
 import okhttp3.Call;

@@ -3,6 +3,7 @@ package core.framework.http;
 import core.framework.internal.http.CookieManager;
 import core.framework.internal.http.DefaultTrustManager;
 import core.framework.internal.http.HTTPClientImpl;
+import core.framework.internal.http.HTTPEventListenerFactory;
 import core.framework.internal.http.PEM;
 import core.framework.internal.http.RetryInterceptor;
 import core.framework.internal.http.ServiceUnavailableInterceptor;

@@ -1,6 +1,7 @@
 package core.framework.internal.http;
 
 import core.framework.api.http.HTTPStatus;
+import core.framework.log.ActionLogContext;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -33,27 +34,27 @@ public class RetryInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
-        int attempts = 0;
+        int attempts = 1;
         while (true) {
-            attempts++;
             try {
                 Response response = chain.proceed(request);
                 int statusCode = response.code();
                 if (shouldRetry(attempts, statusCode)) {
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, responseStatus={}, uri={}", statusCode, uri(request));
-                    closeRequestBody(response);
-                    sleep.sleep(waitTime(attempts));
-                    continue;
+                    closeResponseBody(response);
+                } else {
+                    return response;
                 }
-                return response;
             } catch (IOException e) {
                 if (shouldRetry(attempts, request.method(), e)) {
                     logger.warn(errorCode("HTTP_REQUEST_FAILED"), "http request failed, retry soon, uri={}, error={}", uri(request), e.getMessage(), e);
-                    sleep.sleep(waitTime(attempts));
                 } else {
                     throw e;
                 }
             }
+            sleep.sleep(waitTime(attempts));
+            attempts++;
+            ActionLogContext.stat("http_retries", 1);
         }
     }
 
@@ -62,9 +63,9 @@ public class RetryInterceptor implements Interceptor {
         return request.url().newBuilder().query(null).build().toString();
     }
 
-    private void closeRequestBody(Response response) {
-        ResponseBody responseBody = response.body();
-        if (responseBody != null) closeQuietly(responseBody);
+    private void closeResponseBody(Response response) {
+        ResponseBody body = response.body();
+        if (body != null) closeQuietly(body);
     }
 
     boolean shouldRetry(int attempts, int statusCode) {

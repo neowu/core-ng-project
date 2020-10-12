@@ -1,4 +1,4 @@
-package core.framework.http;
+package core.framework.internal.http;
 
 import okhttp3.Call;
 import okhttp3.EventListener;

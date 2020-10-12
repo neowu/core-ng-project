@@ -4,6 +4,9 @@
     !!! recommended to use adoptopenjdk/openjdk15:alpine-jre for docker image
 * http: api client extends keep alive duration to 5 mins to improve internal api calls, track resolving dns and establishing connection performance 
 * http: set jdk networkaddress.cache.ttl/networkaddress.cache.negative.ttl to 300/0 by default
+* http: track action.stats.http_retries for http client retries 
+* cache: renamed stats.cache_hit/miss to cache_hits/misses, 
+    !!! log processor kibana index updated accordingly.  
 
 ### 7.5.12 (09/23/2020 - 09/29/2020)
 * http: ForbiddenException supports errorCode, ipv4AccessControl throws forbiddenException with IP_ACCESS_DENIED error code 
