@@ -1,5 +1,5 @@
 ## Change log
-### 7.6.0 (09/30/2020 - ) !!! only support java 15
+### 7.6.0 (09/30/2020 - 10/13/2020) !!! only support java 15
 * java: update to java 15, please make sure to upgrade build/jenkins and all docker runtime to 14 before upgrading framework
     !!! recommended to use adoptopenjdk/openjdk15:alpine-jre for docker image
 * http: api client extends keep alive duration to 5 mins to improve internal api calls, track resolving dns and establishing connection performance 
