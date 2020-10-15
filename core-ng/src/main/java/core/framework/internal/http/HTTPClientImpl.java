@@ -81,9 +81,15 @@ public final class HTTPClientImpl implements HTTPClient {
         }
         logger.debug("[response] headers={}", new FieldMapLogParam(headers));
 
-        ResponseBody responseBody = httpResponse.body();
-        if (responseBody == null) throw new Error("unexpected response body"); // refer to okhttp3.Response.body(), call.execute always return non-null body except for cachedResponse/networkResponse
-        byte[] body = responseBody.bytes();
+        byte[] body;
+        if (statusCode == 204) {
+            // refer to https://tools.ietf.org/html/rfc7230#section-3.3.2, with 204, server won't send body and content-length, hence no need to read it, and body will be quietly closed by response.close()
+            body = new byte[0];
+        } else {
+            ResponseBody responseBody = httpResponse.body();
+            if (responseBody == null) throw new Error("unexpected response body"); // refer to okhttp3.Response.body(), call.execute always return non-null body except for cachedResponse/networkResponse
+            body = responseBody.bytes();
+        }
 
         var response = new HTTPResponse(statusCode, headers, body);
         logger.debug("[response] body={}", BodyLogParam.of(body, response.contentType));

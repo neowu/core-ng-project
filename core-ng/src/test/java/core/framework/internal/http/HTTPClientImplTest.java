@@ -68,7 +68,7 @@ class HTTPClientImplTest {
     @Test
     void response() throws IOException {
         Response httpResponse = new Response.Builder().request(new Request.Builder().url("http://localhost/uri").build())
-                .protocol(Protocol.HTTP_1_1).code(200).message("OK")
+                .protocol(Protocol.HTTP_1_1).code(200).message("")
                 .header("content-type", "text/html")
                 .body(ResponseBody.create(Strings.bytes("<html/>"), MediaType.get("text/html")))
                 .build();
@@ -78,6 +78,17 @@ class HTTPClientImplTest {
         assertThat(response.contentType.mediaType).isEqualTo(ContentType.TEXT_HTML.mediaType);
         assertThat(response.headers).containsEntry(HTTPHeaders.CONTENT_TYPE, "text/html");
         assertThat(response.text()).isEqualTo("<html/>");
+    }
+
+    @Test
+    void responseWith204() throws IOException {
+        Response httpResponse = new Response.Builder().request(new Request.Builder().url("http://localhost/uri").build())
+                .protocol(Protocol.HTTP_2).code(204).message("")
+                .build();
+
+        HTTPResponse response = httpClient.response(httpResponse);
+        assertThat(response.statusCode).isEqualTo(204);
+        assertThat(response.text()).isEmpty();
     }
 
     @Test
