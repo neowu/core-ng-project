@@ -184,12 +184,12 @@ public final class DatabaseImpl implements Database {
         try {
             List<T> results = operation.select(sql, rowMapper(viewClass), params);
             returnedRows = results.size();
-            checkTooManyRowsReturned(returnedRows);
             return results;
         } finally {
             long elapsed = watch.elapsed();
             int operations = ActionLogContext.track("db", elapsed, returnedRows, 0);
             logger.debug("select, sql={}, params={}, returnedRows={}, elapsed={}", sql, new SQLParams(operation.enumMapper, params), returnedRows, elapsed);
+            checkTooManyRowsReturned(returnedRows); // check returnedRows after sql debug log, to make log easier to read
             checkOperation(elapsed, operations);
         }
     }
